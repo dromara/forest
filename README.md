@@ -11,10 +11,10 @@ Forest是一个通过动态代理模式实现的HTTP访问接口的框架。<br>
 
 * 主流程已完成
 * 已支持GET, HEAD, OPTIONS, TRACE, POST, DELETE请求方法
+* 已支持Spring集成（仅配置定义）
 * 现只支持文本和JSON两种返回解析方式
 * 支持Commons-Log, SLF4j, Log4J等日志框架
 * 暂不支持异步请求方式 (计划中)
-* 暂不支持Spring集成（计划中）
 
 
 如何获取：
