@@ -21,7 +21,7 @@
 
     </forest:configuration>
 
-    <forest:scan configuration="forestConfiguration"
-                 base-package="org.forest.spring.client"/>
+    <!--<forest:scan configuration="forestConfiguration"-->
+                 <!--base-package="org.forest.spring.client"/>-->
 
 </beans>

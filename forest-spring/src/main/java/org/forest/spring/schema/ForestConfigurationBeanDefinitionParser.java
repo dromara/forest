@@ -35,7 +35,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
 
         beanDefinition.setBeanClass(beanClass);
         beanDefinition.setLazyInit(false);
-        beanDefinition.setInitMethodName("configuration");
+        beanDefinition.setFactoryMethodName("configuration");
         String id = element.getAttribute("id");
         if (id == null || id.length() == 0) {
             String generatedBeanName = beanClass.getName();

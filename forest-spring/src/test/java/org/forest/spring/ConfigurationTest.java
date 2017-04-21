@@ -2,6 +2,7 @@ package org.forest.spring;
 
 import junit.framework.TestCase;
 import org.forest.config.ForestConfiguration;
+import org.forest.spring.client.BeastshopClient;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
@@ -25,6 +26,11 @@ public class ConfigurationTest extends TestCase {
         assertEquals(forestConfiguration.getVariableValue("baseUrl"), "http://www.thebeastshop.com");
         assertEquals(forestConfiguration.getVariableValue("x"), "0");
         assertEquals(forestConfiguration.getVariableValue("y"), "1");
+        assertNotNull(forestConfiguration.getExecutorFactory());
+
+        BeastshopClient beastshopClient = forestConfiguration.createInstance(BeastshopClient.class);
+        String index = beastshopClient.index();
+        assertNotNull(index);
     }
 
 }
