@@ -19,6 +19,7 @@ public class ConfigurationTest extends TestCase {
         ForestConfiguration forestConfiguration =
                 (ForestConfiguration) applicationContext.getBean("forestConfiguration");
         assertNotNull(forestConfiguration);
+        assertNotNull(forestConfiguration.getExecutorFactory());
         assertEquals(forestConfiguration.getTimeout(), new Integer(30000));
         assertEquals(forestConfiguration.getConnectTimeout(), new Integer(10000));
         assertEquals(forestConfiguration.getMaxConnections(), new Integer(500));
@@ -26,11 +27,6 @@ public class ConfigurationTest extends TestCase {
         assertEquals(forestConfiguration.getVariableValue("baseUrl"), "http://www.thebeastshop.com");
         assertEquals(forestConfiguration.getVariableValue("x"), "0");
         assertEquals(forestConfiguration.getVariableValue("y"), "1");
-        assertNotNull(forestConfiguration.getExecutorFactory());
-
-        BeastshopClient beastshopClient = forestConfiguration.createInstance(BeastshopClient.class);
-        String index = beastshopClient.index();
-        assertNotNull(index);
     }
 
 }
