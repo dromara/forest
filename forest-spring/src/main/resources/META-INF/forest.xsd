@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://forest.org/schema/forest-spring"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:beans="http://www.springframework.org/schema/beans"
+            xmlns:tool="http://www.springframework.org/schema/tool"
+            targetNamespace="http://forest.org/schema/forest-spring"
+            elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+    <xsd:annotation>
+        <xsd:documentation><![CDATA[ Namespace support for the forest framework. ]]></xsd:documentation>
+    </xsd:annotation>
+
+    <xsd:element name="configuration" type="configurationType">
+        <xsd:annotation>
+            <xsd:documentation>
+                <![CDATA[
+                    The configuration for the forest definition.
+                ]]>
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="var" type="variableType">
+        <xsd:annotation>
+            <xsd:documentation>
+                <![CDATA[
+                    The global variable definitions.
+                ]]>
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="scan" type="scanType">
+    </xsd:element>
+
+
+    <xsd:complexType name="configurationType">
+        <xsd:sequence>
+            <xsd:element ref="var" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="id" type="xsd:ID" use="optional">
+        </xsd:attribute>
+        <xsd:attribute name="timeout" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           Timeout in milliseconds.
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="maxConnections" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           Maximum number of conntections allowed.
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="maxRouteConnections" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           Maximum number of connections allowed per route.
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="connectTimeout" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           Connect timeout in milliseconds.
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="retryCount" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           Maximum number of retry times.
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+
+    <xsd:complexType name="variableType" mixed="true">
+        <xsd:attribute name="name" type="xsd:string" use="required">
+        </xsd:attribute>
+        <xsd:attribute name="value" type="xsd:string" use="required">
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="scanType">
+        <xsd:attribute name="configuration" type="xsd:string" use="required">
+        </xsd:attribute>
+        <xsd:attribute name="base-package" type="xsd:string" use="required">
+        </xsd:attribute>
+    </xsd:complexType>
+
+</xsd:schema>

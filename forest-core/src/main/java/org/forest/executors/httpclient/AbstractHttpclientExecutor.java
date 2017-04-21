@@ -1,0 +1,226 @@
+package org.forest.executors.httpclient;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.cookie.*;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.cookie.BrowserCompatSpec;
+import org.apache.http.params.CoreConnectionPNames;
+import org.apache.http.params.HttpParams;
+import org.apache.http.util.EntityUtils;
+import org.forest.converter.json.ForestJsonConverter;
+import org.forest.executors.httpclient.provider.HttpclientRequestProvider;
+import org.forest.http.ForestRequest;
+import org.forest.http.ForestResponse;
+import org.forest.utils.RequestNameValue;
+import org.forest.exceptions.ForestNetworkException;
+import org.forest.exceptions.ForestRuntimeException;
+import org.forest.executors.AbstractHttpExecutor;
+import org.forest.mapping.MappingTemplate;
+import org.forest.utils.StringUtils;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.List;
+
+/**
+ * @author gongjun
+ * @since 2016-06-14
+ */
+public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> extends AbstractHttpExecutor {
+    private static Log log = LogFactory.getLog(AbstractHttpclientExecutor.class);
+
+    protected HttpClient client = getHttpClient();
+    protected HttpResponse httpResponse = null;
+    protected String url = buildUrl();
+    protected final String typeName;
+    protected T httpRequest;
+
+    protected T buildRequest() {
+        return getRequestProvider().getRequest(url);
+    }
+
+    protected abstract HttpclientRequestProvider<T> getRequestProvider();
+
+
+    protected String buildUrl() {
+        String url = request.getUrl();
+        List<RequestNameValue> data = request.getDataNameValueList();
+        StringBuilder paramBuilder = new StringBuilder();
+        ForestJsonConverter jsonConverter = request.getConfiguration().getJsonCoverter();
+        for (int i = 0; i < data.size(); i++) {
+            RequestNameValue nameValue = data.get(i);
+            paramBuilder.append(nameValue.getName());
+            String value = MappingTemplate.getParameterValue(jsonConverter, nameValue.getValue());
+            paramBuilder.append('=');
+            if (StringUtils.isNotEmpty(value)) {
+                String encodedValue = null;
+                try {
+                    encodedValue = URLEncoder.encode(value, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                }
+                if (encodedValue != null) {
+                    paramBuilder.append(encodedValue);
+                }
+            }
+            if (i < data.size() - 1) {
+                paramBuilder.append('&');
+            }
+        }
+        String query = paramBuilder.toString();
+        if (StringUtils.isNotEmpty(query)) {
+            return url + "?" + query;
+        }
+        return url;
+    }
+
+
+    private final static CookieSpecFactory defaultCookieSF = new CookieSpecFactory() {
+public CookieSpec newInstance(HttpParams params) {
+            return new BrowserCompatSpec() {
+                @Override
+                public void validate(Cookie cookie, CookieOrigin origin)
+                        throws MalformedCookieException {
+                }
+            };
+        }
+    };
+
+    protected void prepare() {
+        httpRequest = buildRequest();
+        setupHeaders();
+        setupBody();
+    }
+
+    public AbstractHttpclientExecutor(HttpclientConnectionManager connectionManager, ForestRequest request) {
+        super(connectionManager, request);
+        typeName = request.getType().toUpperCase();
+        prepare();
+    }
+
+    public void setupHeaders() {
+        ForestJsonConverter jsonConverter = request.getConfiguration().getJsonCoverter();
+        List<RequestNameValue> headerList = request.getHeaderNameValueList();
+        if (headerList != null && !headerList.isEmpty()) {
+            for (RequestNameValue nameValue : headerList) {
+                httpRequest.setHeader(nameValue.getName(), MappingTemplate.getParameterValue(jsonConverter, nameValue.getValue()));
+            }
+        }
+    }
+
+    public void setupBody() {
+    }
+
+    protected HttpClient getHttpClient() {
+        HttpClient client = connectionManager.getHttpClient();
+        setupHttpClient(client);
+        return client;
+    }
+
+    protected void setupHttpClient(HttpClient client) {
+        client.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, request.getTimeout());
+        if (client instanceof DefaultHttpClient) {
+            ((DefaultHttpClient) client).getCookieSpecs().register("default", defaultCookieSF);
+            client.getParams().setParameter(ClientPNames.COOKIE_POLICY, "default");
+        }
+    }
+
+    protected void logContent(String content) {
+        log.info("[Forest] " + content);
+    }
+
+    public void logRequestBegine(int retryCount, HttpClient client, T httpReq) {
+        if (!request.isLogEnable()) return;
+        String requestLine = getLogContentForRequestLine(retryCount, httpReq);
+        String headers = getLogContentForHeaders(httpReq);
+        String body = getLogContentForBody(httpReq);
+        String content = "Request: \n\t" + requestLine;
+        if (StringUtils.isNotEmpty(headers)) {
+            content += "\n\tHeaders: \n" + headers;
+        }
+        if (StringUtils.isNotEmpty(body)) {
+            content += "\n\tBody: " + body;
+        }
+        logContent(content);
+    }
+
+    protected String getLogContentForRequestLine(int retryCount, T httpReq) {
+        if (retryCount == 0) {
+            return httpReq.getRequestLine().toString();
+        }
+        else {
+            return "[Retry: " + retryCount + "] " + httpReq.getRequestLine().toString();
+        }
+    }
+
+    protected String getLogContentForHeaders(T httpReq) {
+        StringBuffer buffer = new StringBuffer();
+        Header[] headers = httpReq.getAllHeaders();
+        for (int i = 0; i < headers.length; i++) {
+            Header header = headers[i];
+            buffer.append("\t\t" + header.getName() + ": " + header.getValue());
+            if (i < headers.length - 1) {
+                buffer.append("\n");
+            }
+        }
+        return buffer.toString();
+    }
+
+    protected String getLogContentForBody(T httpReq) {
+        return null;
+    }
+
+    public void logResponse(int retryCount, HttpClient client, HttpRequestBase httpReq, ForestResponse response) {
+        if (!request.isLogEnable()) return;
+        logContent("Response: Status=" + response.getStatusCode());
+    }
+
+    public void execute() {
+        execute(0);
+    }
+
+
+    public void execute(int retryCount) {
+        try {
+            logRequestBegine(retryCount, client, httpRequest);
+            HttpResponse httpResponse = client.execute(httpRequest);
+            int statusCode = httpResponse.getStatusLine().getStatusCode();
+            if (statusCode < HttpStatus.SC_OK || statusCode > HttpStatus.SC_MULTI_STATUS) {
+                throw new ForestNetworkException(httpResponse.getStatusLine().getReasonPhrase(), statusCode);
+            }
+            ForestResponse response = new ForestResponse(request, httpResponse);
+            logResponse(retryCount, client, httpRequest, response);
+            setResponse(response);
+        } catch (IOException e) {
+            if (retryCount >= request.getRetryCount()) {
+                httpRequest.abort();
+                throw new ForestRuntimeException(e);
+            }
+            log.error(e.getMessage());
+            execute(retryCount + 1);
+        }
+    }
+
+    public void close() {
+/*
+        if (httpResponse != null) {
+            try {
+                EntityUtils.consume(httpResponse.getEntity());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        client.getConnectionManager().closeExpiredConnections();
+*/
+    }
+
+
+}
