@@ -6,15 +6,15 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
- * @since 2017-04-24 14:40
+ * @since 2017-04-24 19:39
  */
-public class ScanTest extends TestCase {
+public class ClientTest extends TestCase {
 
     private ClassPathXmlApplicationContext applicationContext;
 
     public void testScan() {
         applicationContext = new ClassPathXmlApplicationContext(
-                new String[] { "classpath:scan-test.xml" });
+                new String[] { "classpath:client-test.xml" });
         BeastshopClient beastshopClient =
                 (BeastshopClient) applicationContext.getBean("beastshopClient");
         assertNotNull(beastshopClient);

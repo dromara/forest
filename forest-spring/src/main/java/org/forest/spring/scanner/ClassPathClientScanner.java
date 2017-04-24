@@ -3,6 +3,7 @@ package org.forest.spring.scanner;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.forest.spring.beans.ClientFactoryBean;
+import org.forest.spring.utils.ClientFactoryBeanUtils;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -26,8 +27,6 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
     private final String configurationId;
 
     private boolean allInterfaces = true;
-
-    private Class factoryBeanClass = ClientFactoryBean.class;
 
     public ClassPathClientScanner(String configurationId, BeanDefinitionRegistry registry) {
         super(registry, false);
@@ -64,13 +63,11 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
 
             if (logger.isDebugEnabled()) {
                 logger.debug("[Forest] Creating Forest Client Bean with name '" + holder.getBeanName()
-                        + "' and '" + definition.getBeanClassName() + "' mapperInterface");
+                        + "' and Proxy of '" + definition.getBeanClassName() + "' client interface");
             }
 
             String beanClassName = definition.getBeanClassName();
-            definition.setBeanClass(factoryBeanClass);
-            definition.getPropertyValues().add("forestConfiguration", new RuntimeBeanReference(configurationId));
-            definition.getPropertyValues().add("interfaceClass", beanClassName);
+            ClientFactoryBeanUtils.setupClientFactoryBean(definition, configurationId, beanClassName);
             logger.info("[Forest] Created Forest Client Bean with name '" + holder.getBeanName()
                     + "' and Proxy of '" + beanClassName + "' client interface");
 

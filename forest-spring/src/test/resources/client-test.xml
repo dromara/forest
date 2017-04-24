@@ -21,7 +21,6 @@
 
     </forest:configuration>
 
-    <forest:scan configuration="forestConfiguration"
-                 base-package="org.forest.spring.client"/>
+    <forest:client id="beastshopClient" configuration="forestConfiguration" class="org.forest.spring.client.BeastshopClient"/>
 
 </beans>

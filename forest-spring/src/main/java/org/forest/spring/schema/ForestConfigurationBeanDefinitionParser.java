@@ -75,7 +75,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         }
 
         parseChildren(element.getChildNodes(), beanDefinition);
-        log.info("[Forest] created forest configuration bean: " + beanDefinition);
+        log.info("[Forest] Created Forest Configuration Bean: " + beanDefinition);
         return beanDefinition;
 
     }
