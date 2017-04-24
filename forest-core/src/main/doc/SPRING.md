@@ -61,3 +61,8 @@ http://forest.org/schema/forest-spring.xsd http://www.springframework.org/schema
 
    </forest:configuration>
 ```
+ * 创建Client Bean有两种方式
+ 1. 通过forest:client标签创建单个Client Bean
+```xml
+   <forest:client id="beastshopClient" configuration="forestConfiguration" class="org.forest.spring.client.BeastshopClient"/>
+```
