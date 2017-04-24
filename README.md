@@ -34,7 +34,6 @@ Forest是一个通过动态代理模式实现的HTTP客户端框架。<br>
 设置maven仓库地址
 
 ```xml
-
     <repository>
         <id>mySingleLive-maven-repo</id>
         <url>https://raw.githubusercontent.com/mySingleLive/maven-repo/master/repository</url>
