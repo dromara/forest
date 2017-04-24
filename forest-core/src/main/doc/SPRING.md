@@ -4,7 +4,7 @@
 
  * 添加依赖
 
-Maven中除了forest-core，还要加入以下依赖
+Maven中除了forest-core和spring外，还要加入以下依赖
 
 ```xml
 
