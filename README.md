@@ -45,7 +45,7 @@ Forest是一个通过动态代理模式实现的HTTP访问接口的框架。<br>
     <dependency>
         <groupId>org.forest</groupId>
         <artifactId>forest-core</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.6</version>
     </dependency>
 
 ```
