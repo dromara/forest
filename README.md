@@ -96,7 +96,7 @@ public interface Www {
 ForestConfiguration configuration = ForestConfiguration.configuration();
 ProxyFactory<Www> factory = configuration.getProxyFactory(Www.class);
 Www www = factory.createInstance();
-Map result = www.getShortUrl("https://github.com/mySingleLive");
+Map result = www.getShortUrl("https://github.com/mySingleLive/forest");
 System.out.println(result);
 
 ```
