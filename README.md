@@ -9,7 +9,7 @@ Forest是一个通过动态代理模式实现的HTTP访问接口的框架。<br>
 项目特点：
 -------------------------------------
 * 基于注解、配置化的方式定义Http请求
-* 基于Java的Interface方式，发送一个Http就和调用原声Java方式一样简单
+* 基于Java的Interface方式，发送一个Http就和调用本地Java方法一样简单
 * 实现了业务逻辑与Http协议的解耦
 * 基于HttpClient，有稳定保障
 
