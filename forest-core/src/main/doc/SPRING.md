@@ -19,8 +19,10 @@ Maven中除了forest-core，还要加入以下依赖
 ```
 xmlns:forest="http://forest.org/schema/forest-spring" xmlns:util="http://www.springframework.org/schema/util"
    ...
+xsi:schemaLocation=" ...
 http://forest.org/schema/forest-spring
 http://forest.org/schema/forest-spring.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+..."
 ```
 
 加入完成后效果如下
