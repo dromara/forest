@@ -56,7 +56,7 @@ http://forest.org/schema/forest-spring.xsd http://www.springframework.org/schema
            maxRouteConnections="500">
 
        <!-- forest全局变量定义 开始 -->
-       <forest:var name="baseUrl" value="http://www.thebeastshop.com"/>
+       <forest:var name="baseUrl" value="http://www.xxx.com"/>
        <forest:var name="x" value="0"/>
        <forest:var name="y" value="1"/>
        <!-- forest全局变量定义 结束 -->
