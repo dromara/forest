@@ -2,6 +2,7 @@
 
 ### 在Spring中使用
 
+ * 添加依赖
 
 Maven中除了forest-core，还要加入以下依赖
 
@@ -15,7 +16,8 @@ Maven中除了forest-core，还要加入以下依赖
 
 ```
 
-打开spring的上下文配置文件，在beans开头定义的属性中加入Forest的Schema
+ * 打开spring的上下文配置文件，在beans开头定义的属性中加入Forest的Schema
+
 ```
 xmlns:forest="http://forest.org/schema/forest-spring" xmlns:util="http://www.springframework.org/schema/util"
    ...
@@ -42,7 +44,7 @@ http://forest.org/schema/forest-spring.xsd http://www.springframework.org/schema
 </beans>
 ```
 
-添加Configuration的定义
+ * 添加Configuration的定义
 
 ```xml
    <forest:configuration
@@ -63,6 +65,16 @@ http://forest.org/schema/forest-spring.xsd http://www.springframework.org/schema
 ```
  * 创建Client Bean有两种方式
  1. 通过forest:client标签创建单个Client Bean
+
 ```xml
    <forest:client id="beastshopClient" configuration="forestConfiguration" class="org.forest.spring.client.BeastshopClient"/>
 ```
+
+ 2. 通过forest:scan标签制定back-package的方式批量创建Client Bean
+
+```xml
+    <forest:scan configuration="forestConfiguration"
+                     base-package="com.xxx.client"/>
+```
+
+
