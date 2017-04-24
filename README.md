@@ -108,7 +108,7 @@ System.out.println(result);
 * [在Spring中使用](https://github.com/mySingleLive/forest/blob/master/forest-core/src/main/doc/SPRING.md)
 
 
-Licence
+项目协议
 --------------------------
 The MIT License (MIT)
 
