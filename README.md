@@ -106,3 +106,10 @@ System.out.println(result);
 * [变量/参数](https://github.com/mySingleLive/forest/blob/master/forest-core/src/main/doc/DOCUMENTATION.md)<br>
 * [回调方法](https://github.com/mySingleLive/forest/blob/master/forest-core/src/main/doc/CALLBACK.md)<br>
 * [在Spring中使用](https://github.com/mySingleLive/forest/blob/master/forest-core/src/main/doc/SPRING.md)
+
+
+Licence
+--------------------------
+The MIT License (MIT)
+
+Copyright (c) 2016 Jun Gong
