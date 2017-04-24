@@ -44,7 +44,7 @@ http://forest.org/schema/forest-spring.xsd http://www.springframework.org/schema
 </beans>
 ```
 
- * 添加Configuration的定义
+ * 添加Forest基本配置的定义
 
 ```xml
    <forest:configuration
