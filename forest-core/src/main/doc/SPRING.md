@@ -3,7 +3,7 @@
 ### 在Spring中使用
 
 
-Maven依赖
+Maven中加入以下依赖
 
 ```xml
 
@@ -11,19 +11,6 @@ Maven依赖
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient-cache</artifactId>
         <version>4.1.2</version>
-    </dependency>
-
-
-    <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-beans</artifactId>
-        <version>${spring.version}</version>
-    </dependency>
-
-    <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-context</artifactId>
-        <version>${spring.version}</version>
     </dependency>
 
     <dependency>
