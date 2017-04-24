@@ -3,21 +3,9 @@
 ### 在Spring中使用
 
 
-Maven中加入以下依赖
+Maven中除了forest-core，还要加入以下依赖
 
 ```xml
-
-    <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpclient-cache</artifactId>
-        <version>4.1.2</version>
-    </dependency>
-
-    <dependency>
-        <groupId>org.forest</groupId>
-        <artifactId>forest-core</artifactId>
-        <version>0.0.6</version>
-    </dependency>
 
     <dependency>
         <groupId>org.forest</groupId>
