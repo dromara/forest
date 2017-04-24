@@ -66,7 +66,7 @@ http://forest.org/schema/forest-spring.xsd http://www.springframework.org/schema
  1. 使用forest:configuration标签创建在Spring中的ForestConfiguration Bean
  2. 使用forest:var标签定义变量
 
-    注意：***变量的作用域为该ForestConfiguration之下，所有跟这个Bean绑定的Client都能访问到其下的变量，而别的ForestConfiguration下定义的变量不能访问。***
+    注意：***变量的作用域为该ForestConfiguration之下，所有跟这个配置对象绑定的Client都能访问到其下的变量，而别的ForestConfiguration下定义的变量不能访问。***
 
  * 创建Client Bean有两种方式
 
