@@ -73,8 +73,7 @@ http://forest.org/schema/forest-spring.xsd http://www.springframework.org/schema
  2. 通过forest:scan标签制定back-package的方式批量创建Client Bean
 
 ```xml
-    <forest:scan configuration="forestConfiguration"
-                     base-package="com.xxx.client"/>
+    <forest:scan configuration="forestConfiguration" base-package="com.xxx.client"/>
 ```
 
 
