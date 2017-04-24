@@ -73,7 +73,7 @@ http://forest.org/schema/forest-spring.xsd http://www.springframework.org/schema
  1. 通过forest:client标签创建单个Client Bean
 
 ```xml
-   <forest:client id="beastshopClient" configuration="forestConfiguration" class="com.xxx.client.SiteAClient"/>
+   <forest:client id="siteAClient" configuration="forestConfiguration" class="com.xxx.client.SiteAClient"/>
 ```
 
  2. 通过forest:scan标签制定back-package的方式批量创建Client Bean
