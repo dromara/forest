@@ -1,18 +1,27 @@
-# HTTP请求访问框架 Forest
+# HTTP客户端框架 Forest
 
 项目介绍：
 -------------------------------------
 
-Forest是一个通过动态代理模式实现的HTTP访问接口的框架。<br>
+Forest是一个通过动态代理模式实现的HTTP客户端框架。<br>
 相比直接使用Httpclient您不再用写一大堆重复的代码了，只需像调用本地方法一样调用HTTP链接。
+
+项目特点：
+-------------------------------------
+* 基于注解、配置化的方式定义Http请求
+* 将发送一个Http请求的过程转化为调用本地Java方法的形式，使整个过程变得非常简单
+* 配置简单，一般只需要@Request一个注解就能完成绝大多数请求的定义
+* 实现了业务逻辑与Http协议的解耦
+* 基于HttpClient，有稳定保障
+
 
 项目状态：
 -------------------------------------
 
 * 主流程已完成
-* 已支持GET, HEAD, OPTIONS, TRACE, POST, DELETE请求方法
-* 已支持Spring集成（仅配置定义）
-* 现只支持文本和JSON两种返回解析方式
+* 已支持的请求方法有：GET, HEAD, OPTIONS, TRACE, POST, DELETE
+* 已支持Spring集成
+* 现只支持文本和JSON两种响应解析方式
 * 支持Commons-Log, SLF4j, Log4J等日志框架
 * 暂不支持异步请求方式 (计划中)
 
@@ -25,7 +34,6 @@ Forest是一个通过动态代理模式实现的HTTP访问接口的框架。<br>
 设置maven仓库地址
 
 ```xml
-
     <repository>
         <id>mySingleLive-maven-repo</id>
         <url>https://raw.githubusercontent.com/mySingleLive/maven-repo/master/repository</url>
@@ -45,7 +53,7 @@ Forest是一个通过动态代理模式实现的HTTP访问接口的框架。<br>
     <dependency>
         <groupId>org.forest</groupId>
         <artifactId>forest-core</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.6</version>
     </dependency>
 
 ```
@@ -87,12 +95,20 @@ public interface Www {
 ForestConfiguration configuration = ForestConfiguration.configuration();
 ProxyFactory<Www> factory = configuration.getProxyFactory(Www.class);
 Www www = factory.createInstance();
-Map result = www.getShortUrl("https://github.com/mySingleLive");
+Map result = www.getShortUrl("https://github.com/mySingleLive/forest");
 System.out.println(result);
 
 ```
 
 
 详细文档:<br>
-* [变量/参数](https://github.com/mySingleLive/forest/blob/master/src/main/doc/DOCUMENTATION.md)<br>
-* [回调方法](https://github.com/mySingleLive/forest/blob/master/src/main/doc/CALLBACK.md)
+* [变量/参数](https://github.com/mySingleLive/forest/blob/master/forest-core/src/main/doc/DOCUMENTATION.md)<br>
+* [回调方法](https://github.com/mySingleLive/forest/blob/master/forest-core/src/main/doc/CALLBACK.md)<br>
+* [在Spring中使用](https://github.com/mySingleLive/forest/blob/master/forest-core/src/main/doc/SPRING.md)
+
+
+项目协议
+--------------------------
+The MIT License (MIT)
+
+Copyright (c) 2016 Jun Gong
