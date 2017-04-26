@@ -2,7 +2,9 @@ package org.forest.converter.json;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.forest.exceptions.ForestRuntimeException;
+import org.forest.utils.StringUtils;
 
 import java.lang.reflect.Type;
 
@@ -13,6 +15,35 @@ import java.lang.reflect.Type;
  * @since 2016-05-30
  */
 public class ForestFastjsonConverter implements ForestJsonConverter {
+
+    /**
+     * Fastjson序列化方式
+     */
+    private String serializerFeatureName = "DisableCircularReferenceDetect";
+
+    private SerializerFeature serializerFeature;
+
+
+    public String getSerializerFeatureName() {
+        return serializerFeatureName;
+    }
+
+    public void setSerializerFeatureName(String serializerFeatureName) {
+        this.serializerFeatureName = serializerFeatureName;
+        setSerializerFeature(SerializerFeature.valueOf(serializerFeatureName));
+    }
+
+    public SerializerFeature getSerializerFeature() {
+        return serializerFeature;
+    }
+
+    public ForestFastjsonConverter() {
+        setSerializerFeature(SerializerFeature.valueOf(serializerFeatureName));
+    }
+
+    public void setSerializerFeature(SerializerFeature serializerFeature) {
+        this.serializerFeature = serializerFeature;
+    }
 
     public <T> T convertToJavaObject(String source, Class<T> targetType) {
         try {
@@ -43,6 +74,9 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
 
 
     public String convertToJson(Object obj) {
-        return JSON.toJSONString(obj);
+        if (serializerFeature == null) {
+            return JSON.toJSONString(obj);
+        }
+        return JSON.toJSONString(obj, serializerFeature);
     }
 }
