@@ -87,7 +87,7 @@ public class HttpclientExecutorFactory implements ForestExecutorFactory {
         String key = request.getType().toUpperCase();
         HttpExecutorCreator httpExecutorCreator = executorCreatorMap.get(key);
         if (httpExecutorCreator == null) {
-            throw new ForestRuntimeException("http type\"" + key + "\" is not be supported.");
+            throw new ForestRuntimeException("Http request type\"" + key + "\" is not be supported.");
         }
         executor = httpExecutorCreator.createExecutor(connectionManager, request);
         return executor;
