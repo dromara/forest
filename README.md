@@ -70,7 +70,7 @@ Forest是一个通过动态代理模式实现的HTTP客户端框架。<br>
 ```java
 
 import org.forest.annotation.Request;
-import org.forest.annotation.var.DataParam;
+import org.forest.annotation.DataParam;
 
 public interface Www {
 
