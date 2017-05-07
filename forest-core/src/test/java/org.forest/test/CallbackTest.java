@@ -9,6 +9,7 @@ import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
 import org.forest.callback.OnSuccess;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 /**
@@ -21,11 +22,13 @@ public class CallbackTest extends TestCase {
     public void testCallback() {
         ForestConfiguration configuration = ForestConfiguration.configuration();
         CallbackClient callbackClient = configuration.createInstance(CallbackClient.class);
-        String text = callbackClient.testOnSuccess("https://github.com/mySingleLive", new OnSuccess<Map>() {
+        BigDecimal longitude = new BigDecimal("121.04925573429551");
+        BigDecimal latitude = new BigDecimal("31.315590522490712");
+        String text = callbackClient.testOnSuccess(longitude, latitude, new OnSuccess<Map>() {
             public void onSuccess(Map data, ForestRequest request, ForestResponse response) {
                 log.info(data);
                 assertNotNull(data);
-                assertEquals(data.get("status"), 0);
+                assertEquals(data.get("status"), "1");
             }
         });
         log.info(text);

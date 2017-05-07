@@ -6,6 +6,7 @@ import org.apache.commons.logging.LogFactory;
 import org.forest.client.DataClient;
 import org.forest.config.ForestConfiguration;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 /**
@@ -18,9 +19,11 @@ public class DataTest extends TestCase {
     private DataClient dataClient = configuration.createInstance(DataClient.class);
 
     public void testData() {
-        Map<String, Object> result = dataClient.testData("http://www.baidu.com");
+        BigDecimal longitude = new BigDecimal("121.04925573429551");
+        BigDecimal latitude = new BigDecimal("31.315590522490712");
+        Map<String, Object> result = dataClient.getLocation(longitude, latitude);
         log.info(result);
         assertNotNull(result);
-        assertEquals(0, result.get("status"));
+        assertEquals("1", result.get("status"));
     }
 }

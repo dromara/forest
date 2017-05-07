@@ -4,6 +4,7 @@ import org.forest.annotation.Request;
 import org.forest.annotation.DataParam;
 import org.forest.callback.OnSuccess;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 /**
@@ -13,14 +14,9 @@ import java.util.Map;
 public interface CallbackClient {
 
     @Request(
-        url = "http://dwz.cn/create.php",
-        type = "post",
-        dataType = "json",
-        headers = {
-            "charset:UTF-8",
-            "Cache-control:no-cache"
-        }
+        url = "http://ditu.amap.com/service/regeo",
+        dataType = "json"
     )
-    String testOnSuccess(@DataParam("url") String url, OnSuccess<Map> onSuccess);
+    String testOnSuccess(@DataParam("longitude") BigDecimal longitude, @DataParam("latitude") BigDecimal latitude, OnSuccess<Map> onSuccess);
 
 }
