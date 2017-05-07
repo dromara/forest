@@ -1,7 +1,7 @@
 # Forest - HTTP客户端访问框架
 
 
-[![Build Status](https://api.travis-ci.org/mySingleLive/forest.svg?branch=master)](https://api.travis-ci.org/mySingleLive/forest)
+[![Build Status](https://api.travis-ci.org/mySingleLive/forest.svg?branch=master)](https://travis-ci.org/mySingleLive/forest)
 
 
 项目介绍：
