@@ -193,12 +193,12 @@ public CookieSpec newInstance(HttpParams params) {
             logRequestBegine(retryCount, client, httpRequest);
             HttpResponse httpResponse = client.execute(httpRequest);
             int statusCode = httpResponse.getStatusLine().getStatusCode();
-            if (statusCode < HttpStatus.SC_OK || statusCode > HttpStatus.SC_MULTI_STATUS) {
-                throw new ForestNetworkException(httpResponse.getStatusLine().getReasonPhrase(), statusCode);
-            }
             ForestResponse response = new ForestResponse(request, httpResponse);
             logResponse(retryCount, client, httpRequest, response);
             setResponse(response);
+            if (statusCode < HttpStatus.SC_OK || statusCode > HttpStatus.SC_MULTI_STATUS) {
+                throw new ForestNetworkException(httpResponse.getStatusLine().getReasonPhrase(), statusCode);
+            }
         } catch (IOException e) {
             if (retryCount >= request.getRetryCount()) {
                 httpRequest.abort();
