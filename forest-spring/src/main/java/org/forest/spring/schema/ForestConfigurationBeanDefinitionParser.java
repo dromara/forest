@@ -50,7 +50,6 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
                 throw new IllegalStateException("Duplicate spring bean id " + id);
             }
             parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);
-//            beanDefinition.getPropertyValues().addPropertyValue("id", id);
         }
 
         Method[] methods = beanClass.getMethods();

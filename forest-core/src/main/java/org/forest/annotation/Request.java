@@ -38,18 +38,31 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Request {
+
+
     String url();
+
     String type() default "GET";
+
     String dataType() default "text";
+
     boolean async() default false;
+
     int timeout() default -1;
+
     int retryCount() default -1;
+
     String username() default "";
+
     String password() default "";
+
     String contentType() default "application/x-www-form-urlencoded";
+
     String contentEncoding() default "UTF-8";
+
     String[] headers() default {};
+
     String[] data() default {};
+
     boolean logEnable() default true;
-//    Class handler() default Object.class;
 }
