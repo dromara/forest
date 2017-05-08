@@ -83,7 +83,6 @@ public class ForestConfiguration implements Serializable {
 
     private Map<ForestDataType, ForestConverter> converterMap;
 
-    private Map<String, RemoteConfiguration> remoteConfigurationMap;
 
     private Map<String, Object> variables = new HashMap<String, Object>();
 
@@ -235,20 +234,6 @@ public class ForestConfiguration implements Serializable {
         this.converterMap = converterMap;
     }
 
-    public Map<String, RemoteConfiguration> getRemoteConfigurationMap() {
-        if (remoteConfigurationMap == null) {
-            remoteConfigurationMap = new HashMap<String, RemoteConfiguration>();
-        }
-        return remoteConfigurationMap;
-    }
-
-    public void setRemoteConfigurationMap(Map<String, RemoteConfiguration> remoteConfigurationMap) {
-        this.remoteConfigurationMap = remoteConfigurationMap;
-    }
-
-    public void addRemoteConfiguration(RemoteConfiguration remoteConfiguration) {
-        getRemoteConfigurationMap().put(remoteConfiguration.getName(), remoteConfiguration);
-    }
 
     public Map<String, Object> getVariables() {
         if (variables == null) {
