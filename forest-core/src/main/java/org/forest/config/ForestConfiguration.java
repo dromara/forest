@@ -94,6 +94,10 @@ public class ForestConfiguration implements Serializable {
         ForestConfiguration configuration = new ForestConfiguration();
         setupJSONConverter(configuration);
         setupExecutorFactory(configuration);
+        configuration.setTimeout(3000);
+        configuration.setConnectTimeout(2000);
+        configuration.setMaxConnections(500);
+        configuration.setMaxRouteConnections(500);
         return configuration;
     }
 
