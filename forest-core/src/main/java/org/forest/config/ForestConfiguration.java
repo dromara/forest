@@ -236,9 +236,6 @@ public class ForestConfiguration implements Serializable {
 
 
     public Map<String, Object> getVariables() {
-        if (variables == null) {
-            variables = new HashMap<String, Object>();
-        }
         return variables;
     }
 

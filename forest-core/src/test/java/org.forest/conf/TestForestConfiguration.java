@@ -2,6 +2,9 @@ package org.forest.conf;
 
 import junit.framework.Assert;
 import org.forest.config.ForestConfiguration;
+import org.forest.converter.ForestConverter;
+import org.forest.converter.json.ForestFastjsonConverter;
+import org.forest.utils.ForestDataType;
 import org.forest.utils.RequestNameValue;
 import org.junit.Test;
 
@@ -75,6 +78,16 @@ public class TestForestConfiguration {
         defaultHeaders.add(new RequestNameValue("Accept", "text/html"));
         configuration.setDefaultHeaders(defaultHeaders);
         Assert.assertEquals(defaultHeaders, configuration.getDefaultHeaders());
+    }
+
+    @Test
+    public void testConverterMap() {
+        ForestConfiguration configuration = ForestConfiguration.configuration();
+        Assert.assertNotNull(configuration.getConverterMap());
+        Map<ForestDataType, ForestConverter> converterMap = new HashMap<>();
+        converterMap.put(ForestDataType.JSON, new ForestFastjsonConverter());
+        configuration.setConverterMap(converterMap);
+        Assert.assertEquals(converterMap, configuration.getConverterMap());
     }
 
 }
