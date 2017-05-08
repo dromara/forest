@@ -26,6 +26,7 @@ package org.forest.config;
 
 
 import org.forest.converter.ForestConverter;
+import org.forest.converter.JSONConvertSelector;
 import org.forest.converter.json.ForestFastjsonConverter;
 import org.forest.converter.json.ForestGsonConverter;
 import org.forest.converter.json.ForestJacksonConverter;
@@ -83,6 +84,8 @@ public class ForestConfiguration implements Serializable {
 
     private Map<ForestDataType, ForestConverter> converterMap;
 
+    private JSONConvertSelector jsonConvertSelector;
+
 
     private Map<String, Object> variables = new HashMap<String, Object>();
 
@@ -91,6 +94,7 @@ public class ForestConfiguration implements Serializable {
 
     public static ForestConfiguration configuration() {
         ForestConfiguration configuration = new ForestConfiguration();
+        configuration.setJsonConvertSelector(new JSONConvertSelector());
         setupJSONConverter(configuration);
         setupExecutorFactory(configuration);
         configuration.setTimeout(3000);
@@ -105,30 +109,8 @@ public class ForestConfiguration implements Serializable {
     }
 
     private static void setupJSONConverter(ForestConfiguration configuration) {
-        Class toLoadClass = null;
-        try {
-            toLoadClass = Class.forName("com.alibaba.fastjson.JSON");
-        } catch (ClassNotFoundException e) {
-        }
-        if (toLoadClass != null) {
-            configuration.setJsonConverter(new ForestFastjsonConverter());
-            return;
-        }
-        try {
-            toLoadClass = Class.forName("com.fasterxml.jackson.databind.ObjectMapper");
-        } catch (ClassNotFoundException e) {
-        }
-        if (toLoadClass != null) {
-            configuration.setJsonConverter(new ForestJacksonConverter());
-            return;
-        }
-        try {
-            toLoadClass = Class.forName("com.google.gson.JsonParser");
-        } catch (ClassNotFoundException e) {
-        }
-        if (toLoadClass != null) {
-            configuration.setJsonConverter(new ForestGsonConverter());
-        }
+        JSONConvertSelector jsonConvertSelector = new JSONConvertSelector();
+        configuration.setJsonConverter(jsonConvertSelector.select());
     }
 
     public String getId() {
@@ -247,5 +229,13 @@ public class ForestConfiguration implements Serializable {
     public <T> T createInstance(Class<T> clazz) {
         ProxyFactory<T> proxyFactory = getProxyFactory(clazz);
         return proxyFactory.createInstance();
+    }
+
+    public JSONConvertSelector getJsonConvertSelector() {
+        return jsonConvertSelector;
+    }
+
+    public void setJsonConvertSelector(JSONConvertSelector jsonConvertSelector) {
+        this.jsonConvertSelector = jsonConvertSelector;
     }
 }

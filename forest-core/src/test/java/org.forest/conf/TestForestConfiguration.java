@@ -3,10 +3,18 @@ package org.forest.conf;
 import junit.framework.Assert;
 import org.forest.config.ForestConfiguration;
 import org.forest.converter.ForestConverter;
+import org.forest.converter.JSONConvertSelector;
 import org.forest.converter.json.ForestFastjsonConverter;
+import org.forest.converter.json.ForestGsonConverter;
+import org.forest.converter.json.ForestJacksonConverter;
+import org.forest.converter.json.ForestJsonConverter;
 import org.forest.utils.ForestDataType;
 import org.forest.utils.RequestNameValue;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -88,6 +96,27 @@ public class TestForestConfiguration {
         converterMap.put(ForestDataType.JSON, new ForestFastjsonConverter());
         configuration.setConverterMap(converterMap);
         Assert.assertEquals(converterMap, configuration.getConverterMap());
+    }
+
+    @Test
+    public void testJSONConverterSelect() {
+        JSONConvertSelector jsonConvertSelector = new JSONConvertSelector();
+        JSONConvertSelector spy = Mockito.spy(jsonConvertSelector);
+        Mockito.when(spy.checkFastJSONClass()).thenReturn(false);
+        Assert.assertFalse(spy.checkFastJSONClass());
+
+        ForestJsonConverter jsonConverter = spy.select();
+        Assert.assertNotNull(jsonConverter);
+        Assert.assertTrue(jsonConverter instanceof ForestJacksonConverter);
+
+        Mockito.when(spy.checkJacsonClass()).thenReturn(false);
+        jsonConverter = spy.select();
+        Assert.assertNotNull(jsonConverter);
+        Assert.assertTrue(jsonConverter instanceof ForestGsonConverter);
+
+        Mockito.when(spy.checkGsonClass()).thenReturn(false);
+        jsonConverter = spy.select();
+        Assert.assertNull(jsonConverter);
     }
 
 }
