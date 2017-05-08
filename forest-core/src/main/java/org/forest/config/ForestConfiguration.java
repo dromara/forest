@@ -91,6 +91,7 @@ public class ForestConfiguration implements Serializable {
 
     public static ForestConfiguration configuration() {
         ForestConfiguration configuration = new ForestConfiguration();
+        configuration.setId("forestConfiguration" + configuration.hashCode());
         configuration.setJsonConverterSelector(new JSONConverterSelector());
         setupJSONConverter(configuration);
         setupExecutorFactory(configuration);
