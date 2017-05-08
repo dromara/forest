@@ -2,9 +2,12 @@ package org.forest.conf;
 
 import junit.framework.Assert;
 import org.forest.config.ForestConfiguration;
+import org.forest.utils.RequestNameValue;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -51,7 +54,27 @@ public class TestForestConfiguration {
         configuration.setVariables(varMap);
         Assert.assertEquals("Linda", configuration.getVariableValue("name"));
         Assert.assertEquals("123", configuration.getVariableValue("abc"));
+        Assert.assertEquals(varMap, configuration.getVariables());
     }
 
+
+    @Test
+    public void testDefaultParameters() {
+        ForestConfiguration configuration = ForestConfiguration.configuration();
+        List<RequestNameValue> defaultParameters = new LinkedList<>();
+        defaultParameters.add(new RequestNameValue("name", "Peter"));
+        defaultParameters.add(new RequestNameValue("age", "15"));
+        configuration.setDefaultParameters(defaultParameters);
+        Assert.assertEquals(defaultParameters, configuration.getDefaultParameters());
+    }
+
+    @Test
+    public void testDefaultHeaders() {
+        ForestConfiguration configuration = ForestConfiguration.configuration();
+        List<RequestNameValue> defaultHeaders = new LinkedList<>();
+        defaultHeaders.add(new RequestNameValue("Accept", "text/html"));
+        configuration.setDefaultHeaders(defaultHeaders);
+        Assert.assertEquals(defaultHeaders, configuration.getDefaultHeaders());
+    }
 
 }
