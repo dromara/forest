@@ -11,7 +11,7 @@ import java.io.Serializable;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2017-05-08 22:21
  */
-public class JSONConvertSelector implements Serializable {
+public class JSONConverterSelector implements Serializable {
 
     /**
      * check FastJSON

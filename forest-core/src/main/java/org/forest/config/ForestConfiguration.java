@@ -26,10 +26,7 @@ package org.forest.config;
 
 
 import org.forest.converter.ForestConverter;
-import org.forest.converter.JSONConvertSelector;
-import org.forest.converter.json.ForestFastjsonConverter;
-import org.forest.converter.json.ForestGsonConverter;
-import org.forest.converter.json.ForestJacksonConverter;
+import org.forest.converter.JSONConverterSelector;
 import org.forest.converter.json.ForestJsonConverter;
 import org.forest.executors.ForestExecutorFactory;
 import org.forest.executors.httpclient.HttpclientExecutorFactory;
@@ -84,7 +81,7 @@ public class ForestConfiguration implements Serializable {
 
     private Map<ForestDataType, ForestConverter> converterMap;
 
-    private JSONConvertSelector jsonConvertSelector;
+    private JSONConverterSelector jsonConverterSelector;
 
 
     private Map<String, Object> variables = new HashMap<String, Object>();
@@ -94,7 +91,7 @@ public class ForestConfiguration implements Serializable {
 
     public static ForestConfiguration configuration() {
         ForestConfiguration configuration = new ForestConfiguration();
-        configuration.setJsonConvertSelector(new JSONConvertSelector());
+        configuration.setJsonConverterSelector(new JSONConverterSelector());
         setupJSONConverter(configuration);
         setupExecutorFactory(configuration);
         configuration.setTimeout(3000);
@@ -109,8 +106,8 @@ public class ForestConfiguration implements Serializable {
     }
 
     private static void setupJSONConverter(ForestConfiguration configuration) {
-        JSONConvertSelector jsonConvertSelector = new JSONConvertSelector();
-        configuration.setJsonConverter(jsonConvertSelector.select());
+        JSONConverterSelector jsonConverterSelector = new JSONConverterSelector();
+        configuration.setJsonConverter(jsonConverterSelector.select());
     }
 
     public String getId() {
@@ -231,11 +228,11 @@ public class ForestConfiguration implements Serializable {
         return proxyFactory.createInstance();
     }
 
-    public JSONConvertSelector getJsonConvertSelector() {
-        return jsonConvertSelector;
+    public JSONConverterSelector getJsonConverterSelector() {
+        return jsonConverterSelector;
     }
 
-    public void setJsonConvertSelector(JSONConvertSelector jsonConvertSelector) {
-        this.jsonConvertSelector = jsonConvertSelector;
+    public void setJsonConverterSelector(JSONConverterSelector jsonConverterSelector) {
+        this.jsonConverterSelector = jsonConverterSelector;
     }
 }

@@ -43,6 +43,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
 
     public void setSerializerFeature(SerializerFeature serializerFeature) {
         this.serializerFeature = serializerFeature;
+        this.serializerFeatureName = serializerFeature.name();
     }
 
     public <T> T convertToJavaObject(String source, Class<T> targetType) {
