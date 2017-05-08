@@ -1,7 +1,6 @@
 package org.forest.converter;
 
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.sun.javafx.collections.MappingChange;
 import junit.framework.Assert;
 import org.forest.converter.json.ForestFastjsonConverter;
 import org.forest.exceptions.ForestRuntimeException;
