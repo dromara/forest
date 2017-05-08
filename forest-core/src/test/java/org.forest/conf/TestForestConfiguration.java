@@ -42,6 +42,8 @@ public class TestForestConfiguration {
     public void testCustomized() {
         ForestConfiguration configuration = ForestConfiguration.configuration();
         configuration.setRetryCount(3);
+        configuration.setId("config_2");
+        Assert.assertEquals("config_2", configuration.getId());
         Assert.assertEquals(Integer.valueOf(3), configuration.getRetryCount());
         configuration.setMaxConnections(123);
         Assert.assertEquals(Integer.valueOf(123), configuration.getMaxConnections());
