@@ -17,50 +17,44 @@ public class JSONConverterSelector implements Serializable {
      * check FastJSON
      * @return
      */
-    public boolean checkFastJSONClass() {
-        Class toLoadClass = null;
-        try {
-            toLoadClass = Class.forName("com.alibaba.fastjson.JSON");
-        } catch (ClassNotFoundException e) {
-        }
-        return toLoadClass != null;
+    public boolean checkFastJSONClass() throws ClassNotFoundException {
+        Class.forName("com.alibaba.fastjson.JSON");
+        return true;
     }
 
     /**
      * check Jaskon
      * @return
      */
-    public boolean checkJacsonClass() {
-        Class toLoadClass = null;
-        try {
-            toLoadClass = Class.forName("com.fasterxml.jackson.databind.ObjectMapper");
-        } catch (ClassNotFoundException e) {
-        }
-        return toLoadClass != null;
+    public boolean checkJacsonClass() throws ClassNotFoundException {
+        Class.forName("com.fasterxml.jackson.databind.ObjectMapper");
+        return true;
     }
 
     /**
      * check Gson
      * @return
      */
-    public boolean checkGsonClass() {
-        Class toLoadClass = null;
-        try {
-            toLoadClass = Class.forName("com.google.gson.JsonParser");
-        } catch (ClassNotFoundException e) {
-        }
-        return toLoadClass != null;
+    public boolean checkGsonClass() throws ClassNotFoundException {
+        Class.forName("com.google.gson.JsonParser");
+        return true;
     }
 
     public ForestJsonConverter select() {
-        if (checkFastJSONClass()) {
+        try {
+            checkFastJSONClass();
             return new ForestFastjsonConverter();
+        } catch (ClassNotFoundException e) {
         }
-        if (checkJacsonClass()) {
+        try {
+            checkJacsonClass();
             return new ForestJacksonConverter();
+        } catch (ClassNotFoundException e1) {
         }
-        if (checkGsonClass()) {
+        try {
+            checkGsonClass();
             return new ForestGsonConverter();
+        } catch (ClassNotFoundException e) {
         }
         return null;
     }

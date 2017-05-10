@@ -101,22 +101,24 @@ public class TestForestConfiguration {
     }
 
     @Test
-    public void testJSONConverterSelect() {
+    public void testJSONConverterSelect() throws ClassNotFoundException {
         JSONConverterSelector jsonConverterSelector = new JSONConverterSelector();
         JSONConverterSelector spy = Mockito.spy(jsonConverterSelector);
-        Mockito.when(spy.checkFastJSONClass()).thenReturn(false);
-        Assert.assertFalse(spy.checkFastJSONClass());
+        Mockito.when(spy.checkFastJSONClass())
+                .thenThrow(new ClassNotFoundException("com.alibaba.fastjson.JSON"));
 
         ForestJsonConverter jsonConverter = spy.select();
         Assert.assertNotNull(jsonConverter);
         Assert.assertTrue(jsonConverter instanceof ForestJacksonConverter);
 
-        Mockito.when(spy.checkJacsonClass()).thenReturn(false);
+        Mockito.when(spy.checkJacsonClass())
+                .thenThrow(new ClassNotFoundException("com.alibaba.fastjson.JSON"));
         jsonConverter = spy.select();
         Assert.assertNotNull(jsonConverter);
         Assert.assertTrue(jsonConverter instanceof ForestGsonConverter);
 
-        Mockito.when(spy.checkGsonClass()).thenReturn(false);
+        Mockito.when(spy.checkGsonClass())
+                .thenThrow(new ClassNotFoundException("com.google.gson.JsonParser"));
         jsonConverter = spy.select();
         Assert.assertNull(jsonConverter);
     }
