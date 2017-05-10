@@ -17,27 +17,24 @@ public class JSONConverterSelector implements Serializable {
      * check FastJSON
      * @return
      */
-    public boolean checkFastJSONClass() throws ClassNotFoundException {
-        Class.forName("com.alibaba.fastjson.JSON");
-        return true;
+    public Class checkFastJSONClass() throws ClassNotFoundException {
+        return Class.forName("com.alibaba.fastjson.JSON");
     }
 
     /**
      * check Jaskon
      * @return
      */
-    public boolean checkJacsonClass() throws ClassNotFoundException {
-        Class.forName("com.fasterxml.jackson.databind.ObjectMapper");
-        return true;
+    public Class checkJacsonClass() throws ClassNotFoundException {
+        return Class.forName("com.fasterxml.jackson.databind.ObjectMapper");
     }
 
     /**
      * check Gson
      * @return
      */
-    public boolean checkGsonClass() throws ClassNotFoundException {
-        Class.forName("com.google.gson.JsonParser");
-        return true;
+    public Class checkGsonClass() throws ClassNotFoundException {
+        return Class.forName("com.google.gson.JsonParser");
     }
 
     public ForestJsonConverter select() {
