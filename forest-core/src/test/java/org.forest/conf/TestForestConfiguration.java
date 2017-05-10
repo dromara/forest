@@ -125,7 +125,7 @@ public class TestForestConfiguration {
         assertTrue(jsonConverter instanceof ForestJacksonConverter);
 
         Mockito.when(spy.checkJacsonClass())
-                .thenThrow(new ClassNotFoundException("com.alibaba.fastjson.JSON"));
+                .thenThrow(new ClassNotFoundException("com.fasterxml.jackson.databind.ObjectMapper"));
         jsonConverter = spy.select();
         assertNotNull(jsonConverter);
         assertTrue(jsonConverter instanceof ForestGsonConverter);
