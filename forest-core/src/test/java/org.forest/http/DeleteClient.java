@@ -31,6 +31,6 @@ public interface DeleteClient {
             type = "delete",
             headers = {"Accept:text/plan"}
     )
-    String annParamDelete(@DataParam("username") String usernam);
+    String annParamDelete(@DataParam("username") String username);
 
 }
