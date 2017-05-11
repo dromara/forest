@@ -48,9 +48,10 @@ public class TestGetClient {
         MockServerClient mockClient = new MockServerClient("localhost", 5000);
         mockClient.when(
                 request()
-                        .withPath("/hello/foo")
+                        .withPath("/hello/user")
                         .withMethod("GET")
                         .withHeader(new Header(HttpHeaders.ACCEPT, "text/plan"))
+                        .withQueryStringParameter("username",  "foo")
         ).respond(
                 response()
                         .withStatusCode(200)
@@ -73,5 +74,35 @@ public class TestGetClient {
         assertNotNull(map);
         assertEquals("ok", map.get("status"));
     }
+
+
+    @Test
+    public void testTextParamGet() {
+        String result = getClient.textParamGet("foo");
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(expected, result);
+    }
+
+
+    @Test
+    public void testTextParamInPathGet() {
+        String result = getClient.textParamInPathGet("foo");
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(expected, result);
+    }
+
+
+
+    @Test
+    public void testAnnParamGet() {
+        String result = getClient.varParamGet("foo");
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(expected, result);
+    }
+
+
 
 }
