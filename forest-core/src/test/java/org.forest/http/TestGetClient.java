@@ -97,12 +97,19 @@ public class TestGetClient {
 
     @Test
     public void testAnnParamGet() {
-        String result = getClient.varParamGet("foo");
+        String result = getClient.annParamGet("foo");
         log.info("response: " + result);
         assertNotNull(result);
         assertEquals(expected, result);
     }
 
+    @Test
+    public void testVarParamGet() {
+        String result = getClient.varParamGet("foo");
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(expected, result);
+    }
 
 
 }
