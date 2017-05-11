@@ -78,6 +78,9 @@ public class DefaultResponseHandlerAdaptor extends ResponseHandler {
                 throw new ForestRuntimeException(e, request, response);
             }
         }
+        else if (ForestResponse.class.isAssignableFrom(clazz)) {
+            return response;
+        }
         return null;
     }
 }
