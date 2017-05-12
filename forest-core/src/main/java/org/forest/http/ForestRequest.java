@@ -50,6 +50,8 @@ public class ForestRequest<T> {
 
     private String encode;
 
+    private String responseEncode = "UTF-8";
+
     private boolean async;
 
     private ForestDataType dataType;
@@ -104,6 +106,15 @@ public class ForestRequest<T> {
 
     public ForestRequest setEncode(String encode) {
         this.encode = encode;
+        return this;
+    }
+
+    public String getResponseEncode() {
+        return responseEncode;
+    }
+
+    public ForestRequest<T> setResponseEncode(String responseEncode) {
+        this.responseEncode = responseEncode;
         return this;
     }
 

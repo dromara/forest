@@ -44,6 +44,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
     protected final String typeName;
     protected T httpRequest;
 
+
     protected T buildRequest() {
         return getRequestProvider().getRequest(url);
     }
@@ -193,10 +194,10 @@ public CookieSpec newInstance(HttpParams params) {
             logRequestBegine(retryCount, client, httpRequest);
             HttpResponse httpResponse = client.execute(httpRequest);
             int statusCode = httpResponse.getStatusLine().getStatusCode();
-            ForestResponse response = new ForestResponse(request, httpResponse);
+            ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
             logResponse(retryCount, client, httpRequest, response);
             setResponse(response);
-            if (statusCode < HttpStatus.SC_OK || statusCode > HttpStatus.SC_MULTI_STATUS) {
+            if (response.isError()) {
                 throw new ForestNetworkException(httpResponse.getStatusLine().getReasonPhrase(), statusCode);
             }
         } catch (IOException e) {

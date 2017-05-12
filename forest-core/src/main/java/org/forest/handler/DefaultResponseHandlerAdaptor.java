@@ -19,15 +19,6 @@ import java.lang.reflect.Type;
  */
 public class DefaultResponseHandlerAdaptor extends ResponseHandler {
 
-    private String responseContent;
-
-    private String getString(HttpEntity entity) throws IOException {
-        if (responseContent == null) {
-            InputStream inputStream = entity.getContent();
-            responseContent = IOUtils.toString(inputStream, "UTF-8");
-        }
-        return responseContent;
-    }
 
     public DefaultResponseHandlerAdaptor(ForestMethod method) {
         super(method);
@@ -61,7 +52,7 @@ public class DefaultResponseHandlerAdaptor extends ResponseHandler {
                         return EntityUtils.toByteArray(entity);
                     }
                 }
-                String responseText = getString(entity);
+                String responseText = response.getContent();
                 response.setContent(responseText);
                 if (CharSequence.class.isAssignableFrom(clazz)) {
                     return responseText;

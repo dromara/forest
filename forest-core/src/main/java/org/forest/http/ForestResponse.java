@@ -25,17 +25,18 @@
 package org.forest.http;
 
 import org.apache.http.HttpResponse;
-import org.forest.http.ForestRequest;
 
 /**
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-03-25 16:33
  */
-public class ForestResponse {
+public class ForestResponse<T> {
 
     private ForestRequest request;
     private HttpResponse httpResponse;
+    private Integer statusCode;
     private String content;
+    private T result;
 
     public ForestResponse(ForestRequest request, HttpResponse httpResponse) {
         this.request = request;
@@ -58,12 +59,25 @@ public class ForestResponse {
         return content;
     }
 
+    public T getResult() {
+        return result;
+    }
+
+    public void setResult(T result) {
+        this.result = result;
+    }
+
     public int getStatusCode() {
-        return httpResponse.getStatusLine().getStatusCode();
+        return statusCode;
+    }
+
+    public ForestResponse<T> setStatusCode(Integer statusCode) {
+        this.statusCode = statusCode;
+        return this;
     }
 
     public boolean isSuccess() {
-        return getStatusCode() == 200;
+        return getStatusCode() >= HttpStatus.OK && getStatusCode() < HttpStatus.MULTIPLE_CHOICES;
     }
 
     public boolean isError() {

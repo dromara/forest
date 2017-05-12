@@ -154,18 +154,12 @@ public abstract class AbstractEntityHttpExecutor<T extends HttpEntityEnclosingRe
     }
 
 
-    private static HttpResponse sendRequest(HttpClient httpclient, HttpUriRequest httpPost) {
+    private static HttpResponse sendRequest(HttpClient httpclient, HttpUriRequest httpPost) throws IOException {
         HttpResponse httpResponse = null;
-        try {
-            httpResponse = httpclient.execute(httpPost);
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
-            if (statusCode < HttpStatus.SC_OK || statusCode > HttpStatus.SC_MULTI_STATUS) {
-                throw new ForestNetworkException(httpResponse.getStatusLine().getReasonPhrase(), statusCode);
-            }
-        } catch (ClientProtocolException e) {
-            throw new ForestRuntimeException(e);
-        } catch (IOException e) {
-            throw new ForestRuntimeException(e);
+        httpResponse = httpclient.execute(httpPost);
+        int statusCode = httpResponse.getStatusLine().getStatusCode();
+        if (statusCode < HttpStatus.SC_OK || statusCode > HttpStatus.SC_MULTI_STATUS) {
+            throw new ForestNetworkException(httpResponse.getStatusLine().getReasonPhrase(), statusCode);
         }
         return httpResponse;
     }
@@ -174,19 +168,22 @@ public abstract class AbstractEntityHttpExecutor<T extends HttpEntityEnclosingRe
         try {
             logRequestBegine(retryCount, client, httpRequest);
             httpResponse = sendRequest(client, httpRequest);
-            ForestResponse response = new ForestResponse(request, httpResponse);
+            ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
             logResponse(retryCount, client, httpRequest, response);
             setResponse(response);
-        } catch (RuntimeException e) {
+            if (response.isError()) {
+                throw new ForestNetworkException(httpResponse.getStatusLine().getReasonPhrase(), response.getStatusCode());
+            }
+        } catch (IOException e) {
             if (retryCount >= request.getRetryCount()) {
                 httpRequest.abort();
-                throw e;
+                throw new RuntimeException(e);
             }
             log.error(e.getMessage());
             execute(retryCount + 1);
-        } catch (Exception e) {
+        } catch (ForestRuntimeException e) {
             httpRequest.abort();
-            throw new ForestRuntimeException(e);
+            throw e;
         }
     }
 }
