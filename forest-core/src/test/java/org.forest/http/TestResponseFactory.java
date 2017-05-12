@@ -1,6 +1,5 @@
 package org.forest.http;
 
-import com.twitter.finagle.Http;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.forest.config.ForestConfiguration;
