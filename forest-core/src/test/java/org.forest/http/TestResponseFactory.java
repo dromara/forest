@@ -4,10 +4,8 @@ import com.twitter.finagle.Http;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.forest.config.ForestConfiguration;
-import org.forest.executors.httpclient.HttpclientExecutorFactory;
 import org.forest.executors.httpclient.HttpclientForestResponseFactory;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
