@@ -11,11 +11,11 @@
     <parent>
         <groupId>org.forest</groupId>
         <artifactId>forest</artifactId>
-        <version>0.0.6</version>
+        <version>0.0.7</version>
     </parent>
 
     <properties>
-        <forest.version>0.0.6</forest.version>
+        <forest.version>0.0.7</forest.version>
         <spring.version>3.2.16.RELEASE</spring.version>
     </properties>
 

@@ -62,7 +62,7 @@ Forest是一个通过动态代理模式实现的HTTP客户端框架。<br>
     <dependency>
         <groupId>org.forest</groupId>
         <artifactId>forest-core</artifactId>
-        <version>0.0.6</version>
+        <version>0.0.7</version>
     </dependency>
 
 ```
