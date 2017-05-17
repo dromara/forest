@@ -1,8 +1,6 @@
 package org.forest.executors.httpclient;
 
 import org.apache.http.client.methods.HttpOptions;
-import org.forest.executors.httpclient.provider.HttpclientOptionsRequestProvider;
-import org.forest.executors.httpclient.provider.HttpclientRequestProvider;
 import org.forest.http.ForestRequest;
 
 /**
@@ -13,7 +11,12 @@ public class HttpclientOptionsExecutor extends AbstractHttpclientExecutor<HttpOp
 
     @Override
     protected HttpclientRequestProvider<HttpOptions> getRequestProvider() {
-        return new HttpclientOptionsRequestProvider();
+        return new HttpclientRequestProvider<HttpOptions>() {
+            @Override
+            public HttpOptions getRequest(String url) {
+                return new HttpOptions(url);
+            }
+        };
     }
 
     public HttpclientOptionsExecutor(HttpclientConnectionManager connectionManager, ForestRequest request) {

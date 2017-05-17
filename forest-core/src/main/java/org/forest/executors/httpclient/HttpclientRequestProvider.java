@@ -1,4 +1,4 @@
-package org.forest.executors.httpclient.provider;
+package org.forest.executors.httpclient;
 
 import org.apache.http.client.methods.HttpRequestBase;
 import org.forest.http.ForestRequest;

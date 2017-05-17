@@ -1,8 +1,6 @@
 package org.forest.executors.httpclient;
 
 import org.apache.http.client.methods.HttpPost;
-import org.forest.executors.httpclient.provider.HttpclientPostRequestProvider;
-import org.forest.executors.httpclient.provider.HttpclientRequestProvider;
 import org.forest.http.ForestRequest;
 
 /**
@@ -13,7 +11,12 @@ public class HttpclientPostExecutor extends AbstractEntityHttpExecutor<HttpPost>
 
     @Override
     protected HttpclientRequestProvider<HttpPost> getRequestProvider() {
-        return new HttpclientPostRequestProvider();
+        return new HttpclientRequestProvider<HttpPost>() {
+            @Override
+            public HttpPost getRequest(String url) {
+                return new HttpPost(url);
+            }
+        };
     }
 
     public HttpclientPostExecutor(HttpclientConnectionManager connectionManager, ForestRequest requst) {

@@ -2,8 +2,6 @@ package org.forest.executors.httpclient;
 
 
 import org.apache.http.client.methods.HttpDelete;
-import org.forest.executors.httpclient.provider.HttpclientDeleteRequestProvider;
-import org.forest.executors.httpclient.provider.HttpclientRequestProvider;
 import org.forest.http.ForestRequest;
 
 /**
@@ -14,7 +12,12 @@ public class HttpclientDeleteExecutor extends AbstractHttpclientExecutor<HttpDel
 
     @Override
     protected HttpclientRequestProvider<HttpDelete> getRequestProvider() {
-        return new HttpclientDeleteRequestProvider();
+        return new HttpclientRequestProvider<HttpDelete>() {
+            @Override
+            public HttpDelete getRequest(String url) {
+                return new HttpDelete(url);
+            }
+        };
     }
 
     public HttpclientDeleteExecutor(HttpclientConnectionManager connectionManager, ForestRequest request) {

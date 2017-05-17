@@ -1,8 +1,6 @@
 package org.forest.executors.httpclient;
 
 import org.apache.http.client.methods.HttpTrace;
-import org.forest.executors.httpclient.provider.HttpclientRequestProvider;
-import org.forest.executors.httpclient.provider.HttpclientTraceRequestProvider;
 import org.forest.http.ForestRequest;
 
 /**
@@ -13,7 +11,12 @@ public class HttpclientTraceExecutor extends AbstractHttpclientExecutor<HttpTrac
 
     @Override
     protected HttpclientRequestProvider<HttpTrace> getRequestProvider() {
-        return new HttpclientTraceRequestProvider();
+        return new HttpclientRequestProvider<HttpTrace>() {
+            @Override
+            public HttpTrace getRequest(String url) {
+                return new HttpTrace(url);
+            }
+        };
     }
 
     public HttpclientTraceExecutor(HttpclientConnectionManager connectionManager, ForestRequest request) {

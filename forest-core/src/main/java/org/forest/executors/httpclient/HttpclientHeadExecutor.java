@@ -1,8 +1,6 @@
 package org.forest.executors.httpclient;
 
 import org.apache.http.client.methods.HttpHead;
-import org.forest.executors.httpclient.provider.HttpclientHeadRequestProvider;
-import org.forest.executors.httpclient.provider.HttpclientRequestProvider;
 import org.forest.http.ForestRequest;
 
 /**
@@ -13,7 +11,12 @@ public class HttpclientHeadExecutor extends AbstractHttpclientExecutor<HttpHead>
 
     @Override
     protected HttpclientRequestProvider<HttpHead> getRequestProvider() {
-        return new HttpclientHeadRequestProvider();
+        return new HttpclientRequestProvider<HttpHead>() {
+            @Override
+            public HttpHead getRequest(String url) {
+                return new HttpHead(url);
+            }
+        };
     }
 
     public HttpclientHeadExecutor(HttpclientConnectionManager connectionManager, ForestRequest request) {

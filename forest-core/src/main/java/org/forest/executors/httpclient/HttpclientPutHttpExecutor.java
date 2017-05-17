@@ -1,8 +1,6 @@
 package org.forest.executors.httpclient;
 
 import org.apache.http.client.methods.HttpPut;
-import org.forest.executors.httpclient.provider.HttpclientPutRequestProvider;
-import org.forest.executors.httpclient.provider.HttpclientRequestProvider;
 import org.forest.http.ForestRequest;
 
 /**
@@ -13,7 +11,12 @@ public class HttpclientPutHttpExecutor extends AbstractEntityHttpExecutor<HttpPu
 
     @Override
     protected HttpclientRequestProvider<HttpPut> getRequestProvider() {
-        return new HttpclientPutRequestProvider();
+        return new HttpclientRequestProvider<HttpPut>() {
+            @Override
+            public HttpPut getRequest(String url) {
+                return new HttpPut(url);
+            }
+        };
     }
 
     public HttpclientPutHttpExecutor(HttpclientConnectionManager connectionManager, ForestRequest requst) {
