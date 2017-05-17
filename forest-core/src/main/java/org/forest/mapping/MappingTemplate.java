@@ -1,6 +1,7 @@
 package org.forest.mapping;
 
 
+import org.forest.config.VariableScope;
 import org.forest.converter.json.ForestJsonConverter;
 import org.forest.reflection.ForestMethod;
 
@@ -13,7 +14,7 @@ import java.util.*;
 public class MappingTemplate {
     private  String template;
     private List<MappingExpr> exprList;
-    private ForestMethod forestMethod;
+    private VariableScope variableScope;
 
     int readIndex = -1;
 
@@ -30,9 +31,9 @@ public class MappingTemplate {
         return template.charAt(readIndex + i);
     }
 
-    public MappingTemplate(String template, ForestMethod forestMethod) {
+    public MappingTemplate(String template, VariableScope variableScope) {
         this.template = template;
-        this.forestMethod = forestMethod;
+        this.variableScope = variableScope;
         compile();
     }
 
@@ -80,7 +81,7 @@ public class MappingTemplate {
                         expr = parseExpr(buffer);
                     }
                     else {
-                        expr = new MappingDot(forestMethod, expr, buffer.toString());
+                        expr = new MappingDot(variableScope, expr, buffer.toString());
                     }
                     return expr;
                 case '.':
@@ -88,7 +89,7 @@ public class MappingTemplate {
                         expr = parseExpr(buffer);
                     }
                     else {
-                        expr = new MappingDot(forestMethod, expr, buffer.toString());
+                        expr = new MappingDot(variableScope, expr, buffer.toString());
                     }
                     buffer = new StringBuffer();
                     break;
@@ -112,12 +113,12 @@ public class MappingTemplate {
             return new MappingIndex(Integer.parseInt(str));
         }
         else {
-            return new MappingReference(forestMethod, buffer.toString());
+            return new MappingReference(variableScope, buffer.toString());
         }
     }
 
     public String render(Object[] args) {
-        ForestJsonConverter jsonConverter = forestMethod.getConfiguration().getJsonCoverter();
+        ForestJsonConverter jsonConverter = variableScope.getConfiguration().getJsonCoverter();
         int len = exprList.size();
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < len; i++) {

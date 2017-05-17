@@ -34,7 +34,7 @@ import java.lang.annotation.Target;
  * @since 2016-06-01
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(value = ElementType.PARAMETER)
+@Target(ElementType.PARAMETER)
 public @interface DataObject {
     String jsonParam() default "";
 }

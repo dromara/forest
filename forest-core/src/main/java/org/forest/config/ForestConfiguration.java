@@ -30,6 +30,7 @@ import org.forest.converter.JSONConverterSelector;
 import org.forest.converter.json.ForestJsonConverter;
 import org.forest.executors.ForestExecutorFactory;
 import org.forest.executors.httpclient.HttpclientExecutorFactory;
+import org.forest.mapping.MappingVariable;
 import org.forest.utils.ForestDataType;
 import org.forest.utils.RequestNameValue;
 import org.forest.proxy.ProxyFactory;

@@ -1,5 +1,6 @@
 package org.forest.mapping;
 
+import org.forest.config.VariableScope;
 import org.forest.reflection.ForestMethod;
 
 /**
@@ -9,8 +10,8 @@ public class MappingReference extends MappingExpr {
 
     private String name;
 
-    public MappingReference(ForestMethod method, String name) {
-        this.forestMethod = method;
+    public MappingReference(VariableScope variableScope, String name) {
+        this.variableScope = variableScope;
         this.name = name;
     }
 
@@ -19,11 +20,11 @@ public class MappingReference extends MappingExpr {
     }
 
     public Object render(Object[] args) {
-        MappingVariable variable = forestMethod.getVariable(name);
+        MappingVariable variable = variableScope.getVariable(name);
         if (variable != null) {
             return args[variable.getIndex()];
         }
-        return forestMethod.getVariableValue(name);
+        return variableScope.getVariableValue(name);
     }
 
     @Override

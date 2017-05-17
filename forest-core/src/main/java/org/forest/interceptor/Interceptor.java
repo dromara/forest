@@ -1,6 +1,5 @@
 package org.forest.interceptor;
 
-import org.forest.reflection.ForestMethod;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
 import org.forest.exceptions.ForestRuntimeException;
@@ -15,7 +14,7 @@ public interface Interceptor {
 
     void onSuccess(Object data, ForestRequest request, ForestResponse response);
 
-    void onError(ForestRuntimeException ex, ForestResponse response);
+    void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response);
 
     void afterExecute(ForestRequest request, ForestResponse response);
 

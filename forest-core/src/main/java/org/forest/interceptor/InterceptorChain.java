@@ -15,7 +15,7 @@ public class InterceptorChain implements Interceptor {
 
     private LinkedList<Interceptor> interceptors = new LinkedList<>();
 
-    public InterceptorChain addInteceptor(Interceptor interceptor) {
+    public synchronized InterceptorChain addInteceptor(Interceptor interceptor) {
         interceptors.add(interceptor);
         return this;
     }
@@ -47,11 +47,11 @@ public class InterceptorChain implements Interceptor {
     }
 
     @Override
-    public void onError(ForestRuntimeException ex, ForestResponse response) {
+    public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
         Iterator<Interceptor> iter = interceptors.iterator();
         for ( ; iter.hasNext(); ) {
             Interceptor item = iter.next();
-            item.onError(ex, response);
+            item.onError(ex, request, response);
         }
     }
 

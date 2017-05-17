@@ -1,5 +1,6 @@
 package org.forest.mapping;
 
+import org.forest.config.VariableScope;
 import org.forest.reflection.ForestMethod;
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.utils.StringUtils;
@@ -16,8 +17,8 @@ public class MappingDot extends MappingExpr {
     private MappingExpr left;
     private String right;
 
-    public MappingDot(ForestMethod method, MappingExpr left, String right) {
-        this.forestMethod = method;
+    public MappingDot(VariableScope variableScope, MappingExpr left, String right) {
+        this.variableScope = variableScope;
         this.left = left;
         this.right = right;
     }

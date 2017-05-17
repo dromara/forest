@@ -46,7 +46,7 @@ public class TestInterceptorChain {
             }
 
             @Override
-            public void onError(ForestRuntimeException ex, ForestResponse response) {
+            public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
                 inter1Error.set(true);
             }
 
@@ -71,7 +71,7 @@ public class TestInterceptorChain {
             }
 
             @Override
-            public void onError(ForestRuntimeException ex, ForestResponse response) {
+            public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
                 inter2Error.set(true);
             }
 
@@ -97,7 +97,7 @@ public class TestInterceptorChain {
         assertTrue(inter2Success.get());
         assertEquals(2, count.get());
 
-        chain.onError(null, null);
+        chain.onError(null, null, null);
         assertTrue(inter1Error.get());
         assertTrue(inter2Error.get());
 

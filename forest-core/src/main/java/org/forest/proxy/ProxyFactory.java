@@ -33,8 +33,8 @@ public class ProxyFactory<T> {
         if (instance != null) {
             return instance;
         }
-        ProxyHandler<T> proxyHandler = new ProxyHandler<T>(configuration, this, interfaceClass);
-        instance = (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class[] {interfaceClass}, proxyHandler);
+        InterfaceProxyHandler<T> interfaceProxyHandler = new InterfaceProxyHandler<T>(configuration, this, interfaceClass);
+        instance = (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class[] {interfaceClass}, interfaceProxyHandler);
         instanceCache.put(interfaceClass, instance);
         return instance;
     }

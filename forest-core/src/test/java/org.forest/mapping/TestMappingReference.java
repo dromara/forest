@@ -1,7 +1,6 @@
 package org.forest.mapping;
 
 import junit.framework.Assert;
-import org.forest.config.ForestConfiguration;
 import org.forest.reflection.ForestMethod;
 import org.junit.Test;
 import org.mockito.Mockito;

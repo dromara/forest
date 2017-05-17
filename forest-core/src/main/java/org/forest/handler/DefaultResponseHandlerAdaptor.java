@@ -1,6 +1,5 @@
 package org.forest.handler;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.util.EntityUtils;
 import org.forest.converter.ForestConverter;

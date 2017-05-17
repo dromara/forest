@@ -1,6 +1,6 @@
 package org.forest.mapping;
 
-import org.forest.reflection.ForestMethod;
+import org.forest.config.VariableScope;
 
 /**
  * @author gongjun
@@ -8,7 +8,7 @@ import org.forest.reflection.ForestMethod;
  */
 public abstract class MappingExpr {
 
-    protected ForestMethod forestMethod;
+    protected VariableScope variableScope;
 
     public Object render(Object[] args) {
         return null;

@@ -1,14 +1,12 @@
 package org.forest.http;
 
-import org.apache.http.HttpHeaders;
 import org.forest.config.ForestConfiguration;
+import org.forest.mock.GetMockServer;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockserver.client.server.MockServerClient;
 import org.mockserver.junit.MockServerRule;
-import org.mockserver.model.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,8 +14,6 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockserver.model.HttpRequest.request;
-import static org.mockserver.model.HttpResponse.response;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -28,13 +24,12 @@ public class TestGetClient {
     private final static Logger log = LoggerFactory.getLogger(TestGetClient.class);
 
     @Rule
-    public MockServerRule server = new MockServerRule(this, 5000);
+    public GetMockServer server = new GetMockServer(this);
 
     private static ForestConfiguration configuration;
 
     private static GetClient getClient;
 
-    private final static String expected = "{\"status\": \"ok\"}";
 
     @BeforeClass
     public static void prepareClient() {
@@ -45,18 +40,7 @@ public class TestGetClient {
 
     @Before
     public void prepareMockServer() {
-        MockServerClient mockClient = new MockServerClient("localhost", 5000);
-        mockClient.when(
-                request()
-                        .withPath("/hello/user")
-                        .withMethod("GET")
-                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plan"))
-                        .withQueryStringParameter("username",  "foo")
-        ).respond(
-                response()
-                        .withStatusCode(200)
-                        .withBody(expected)
-        );
+        server.initServer();
     }
 
     @Test
@@ -64,7 +48,7 @@ public class TestGetClient {
         String result = getClient.simpleGet();
         log.info("response: " + result);
         assertNotNull(result);
-        assertEquals(expected, result);
+        assertEquals(GetMockServer.EXPECTED, result);
     }
 
 
@@ -81,7 +65,7 @@ public class TestGetClient {
         String result = getClient.textParamGet("foo");
         log.info("response: " + result);
         assertNotNull(result);
-        assertEquals(expected, result);
+        assertEquals(GetMockServer.EXPECTED, result);
     }
 
 
@@ -90,7 +74,7 @@ public class TestGetClient {
         String result = getClient.textParamInPathGet("foo");
         log.info("response: " + result);
         assertNotNull(result);
-        assertEquals(expected, result);
+        assertEquals(GetMockServer.EXPECTED, result);
     }
 
 
@@ -100,7 +84,7 @@ public class TestGetClient {
         String result = getClient.annParamGet("foo");
         log.info("response: " + result);
         assertNotNull(result);
-        assertEquals(expected, result);
+        assertEquals(GetMockServer.EXPECTED, result);
     }
 
     @Test
@@ -108,7 +92,7 @@ public class TestGetClient {
         String result = getClient.varParamGet("foo");
         log.info("response: " + result);
         assertNotNull(result);
-        assertEquals(expected, result);
+        assertEquals(GetMockServer.EXPECTED, result);
     }
 
 

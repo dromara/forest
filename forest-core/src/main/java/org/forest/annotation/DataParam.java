@@ -24,7 +24,7 @@
 
 package org.forest.annotation;
 
-import org.forest.handler.DataProcessor;
+import org.forest.filter.Filter;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -41,5 +41,5 @@ public @interface DataParam {
     String value();
     String encoding() default "";
     String type() default "text";
-    Class<DataProcessor> processor() default DataProcessor.class;
+    Class<Filter>[] filter() default {};
 }

@@ -7,8 +7,10 @@ import org.forest.annotation.DataVariable;
 import org.forest.callback.OnError;
 import org.forest.callback.OnSuccess;
 import org.forest.config.ForestConfiguration;
+import org.forest.config.VariableScope;
 import org.forest.converter.ForestConverter;
 import org.forest.converter.json.ForestJsonConverter;
+import org.forest.exceptions.ForestException;
 import org.forest.exceptions.ForestNetworkException;
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.handler.DefaultResponseHandlerAdaptor;
@@ -16,9 +18,11 @@ import org.forest.handler.ResponseHandler;
 import org.forest.http.ForestResponse;
 import org.forest.mapping.*;
 import org.forest.http.ForestRequest;
+import org.forest.proxy.InterfaceProxyHandler;
 import org.forest.utils.ForestDataType;
 import org.forest.utils.RequestNameValue;
 import org.forest.utils.StringUtils;
+import org.forest.utils.URLUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
@@ -31,10 +35,11 @@ import java.util.*;
  * @author gongjun
  * @since 2016-05-03
  */
-public class ForestMethod<T> {
+public class ForestMethod<T> implements VariableScope {
 
-    private ForestConfiguration configuration;
-    private Method method;
+    private final InterfaceProxyHandler interfaceProxyHandler;
+    private final ForestConfiguration configuration;
+    private final Method method;
     private Class resultType;
     private MappingTemplate urlTemplate;
     private MappingTemplate typeTemplate;
@@ -54,7 +59,8 @@ public class ForestMethod<T> {
     private boolean async = false;
     private boolean logEnable = true;
 
-    public ForestMethod(ForestConfiguration configuration, Method method) {
+    public ForestMethod(InterfaceProxyHandler interfaceProxyHandler, ForestConfiguration configuration, Method method) {
+        this.interfaceProxyHandler = interfaceProxyHandler;
         this.configuration = configuration;
         this.method = method;
         processInterfaceMethods();
@@ -214,19 +220,23 @@ public class ForestMethod<T> {
         }
     }
 
+
+
     /**
      * 创建请求
      * @param args
      * @return
      */
     private ForestRequest makeRequest(Object[] args) {
-        String rendedUrl = urlTemplate.render(args);
-        String rendedType = typeTemplate.render(args);
-        String rendedContentType = contentTypeTemplate.render(args).trim();
+        String renderedUrl = urlTemplate.render(args);
+        String renderedType = typeTemplate.render(args);
+        String renderedContentType = contentTypeTemplate.render(args).trim();
         String newUrl = "";
         List<RequestNameValue> nameValueList = new ArrayList<RequestNameValue>();
+        String baseUrl = interfaceProxyHandler.getBaseURL();
+        renderedUrl = URLUtils.getValidURL(baseUrl, renderedUrl);
         try {
-            URL u = new URL(rendedUrl);
+            URL u = new URL(renderedUrl);
             String query = u.getQuery();
             if (StringUtils.isNotEmpty(query)) {
                 String[] params = query.split("&");
@@ -264,7 +274,7 @@ public class ForestMethod<T> {
             }
 
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            throw new ForestRuntimeException(e);
         }
 
         for (int i = 0; i < namedParameters.size(); i++) {
@@ -303,8 +313,8 @@ public class ForestMethod<T> {
         // create and initialize http instance
         ForestRequest<T> request = new ForestRequest(configuration);
         request.setUrl(newUrl);
-        request.setType(rendedType);
-        request.setContentType(rendedContentType);
+        request.setType(renderedType);
+        request.setContentType(renderedContentType);
         request.setLogEnable(logEnable);
         if (configuration.getDefaultParameters() != null) {
             request.addData(configuration.getDefaultParameters());

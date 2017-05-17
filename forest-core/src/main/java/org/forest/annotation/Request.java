@@ -26,6 +26,8 @@ package org.forest.annotation;
 
 
 
+import org.forest.interceptor.Interceptor;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -38,7 +40,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Request {
-
 
     String url();
 
@@ -61,6 +62,8 @@ public @interface Request {
     String contentEncoding() default "UTF-8";
 
     String[] headers() default {};
+
+    Class<?>[] interceptor() default {};
 
     String[] data() default {};
 
