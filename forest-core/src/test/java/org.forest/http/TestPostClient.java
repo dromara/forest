@@ -2,6 +2,7 @@ package org.forest.http;
 
 import org.apache.http.HttpHeaders;
 import org.forest.config.ForestConfiguration;
+import org.forest.mock.PostMockServer;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -26,13 +27,12 @@ public class TestPostClient {
     private final static Logger log = LoggerFactory.getLogger(TestPostClient.class);
 
     @Rule
-    public MockServerRule server = new MockServerRule(this, 5000);
+    public PostMockServer server = new PostMockServer(this);
 
     private static ForestConfiguration configuration;
 
     private static PostClient postClient;
 
-    private final static String expected = "{\"status\": \"ok\"}";
 
     @BeforeClass
     public static void prepareClient() {
@@ -43,18 +43,7 @@ public class TestPostClient {
 
     @Before
     public void prepareMockServer() {
-        MockServerClient mockClient = new MockServerClient("localhost", 5000);
-        mockClient.when(
-                request()
-                        .withPath("/hello")
-                        .withMethod("POST")
-                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plan"))
-                        .withBody("username=foo&password=123456")
-        ).respond(
-                response()
-                        .withStatusCode(200)
-                        .withBody(expected)
-        );
+        server.initServer();
     }
 
     @Test
@@ -62,7 +51,7 @@ public class TestPostClient {
         String result = postClient.simplePost();
         log.info("response: " + result);
         assertNotNull(result);
-        assertEquals(expected, result);
+        assertEquals(PostMockServer.EXPECTED, result);
     }
 
     @Test
@@ -70,7 +59,7 @@ public class TestPostClient {
         String result = postClient.textParamPost("foo", "123456");
         log.info("response: " + result);
         assertNotNull(result);
-        assertEquals(expected, result);
+        assertEquals(PostMockServer.EXPECTED, result);
     }
 
     @Test
@@ -78,7 +67,7 @@ public class TestPostClient {
         String result = postClient.textParamPost("foo", "123456");
         log.info("response: " + result);
         assertNotNull(result);
-        assertEquals(expected, result);
+        assertEquals(PostMockServer.EXPECTED, result);
     }
 
 

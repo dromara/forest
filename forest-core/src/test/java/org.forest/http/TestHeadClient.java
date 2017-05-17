@@ -2,6 +2,7 @@ package org.forest.http;
 
 import org.apache.http.HttpHeaders;
 import org.forest.config.ForestConfiguration;
+import org.forest.mock.HeadMockServer;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -25,7 +26,7 @@ public class TestHeadClient {
     private final static Logger log = LoggerFactory.getLogger(TestHeadClient.class);
 
     @Rule
-    public MockServerRule server = new MockServerRule(this, 5000);
+    public HeadMockServer server = new HeadMockServer(this);
 
     private static ForestConfiguration configuration;
 
@@ -41,17 +42,7 @@ public class TestHeadClient {
 
     @Before
     public void prepareMockServer() {
-        MockServerClient mockClient = new MockServerClient("localhost", 5000);
-        mockClient.when(
-                request()
-                        .withPath("/hello/user")
-                        .withMethod("HEAD")
-                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plan"))
-                        .withQueryStringParameter("username", "foo")
-        ).respond(
-                response()
-                        .withStatusCode(200)
-        );
+        server.initServer();
     }
 
 
