@@ -27,10 +27,14 @@ public class TestBaseURLClient {
 
     private static BaseURLClient baseURLClient;
 
+    private static BaseURLVarClient baseURLVarClient;
+
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
+        configuration.setVariableValue("baseURL", "http://localhost:5000");
         baseURLClient = configuration.createInstance(BaseURLClient.class);
+        baseURLVarClient = configuration.createInstance(BaseURLVarClient.class);
     }
 
 
@@ -42,6 +46,12 @@ public class TestBaseURLClient {
     @Test
     public void testBaseURL() {
         String result = baseURLClient.simpleGet();
+        assertEquals(GetMockServer.EXPECTED, result);
+    }
+
+    @Test
+    public void testBaseURLVar() {
+        String result = baseURLVarClient.simpleGet();
         assertEquals(GetMockServer.EXPECTED, result);
     }
 
