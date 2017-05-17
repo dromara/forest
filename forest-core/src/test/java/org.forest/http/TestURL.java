@@ -40,6 +40,7 @@ public class TestURL {
             exception = true;
         }
         assertTrue(exception);
+
     }
 
     @Test
@@ -51,13 +52,11 @@ public class TestURL {
         String newURL = URLUtils.getValidURL(baseUrl, uri);
         assertEquals(expected, newURL);
 
-
         baseUrl = "http://www.xxx.com";
         uri = "/cc/yy";
 
         newURL = URLUtils.getValidURL(baseUrl, uri);
         assertEquals(expected, newURL);
-
 
         baseUrl = "http://www.xxx.com/";
         uri = "/cc/yy";

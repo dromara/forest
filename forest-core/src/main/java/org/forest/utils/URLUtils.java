@@ -27,8 +27,9 @@ public class URLUtils {
                 if (ch != '/') {
                     break;
                 }
+                i--;
             } while (i > 0);
-            return baseUrl.substring(0, i);
+            return baseUrl.substring(0, i + 1);
         }
         return baseUrl;
     }
@@ -38,7 +39,7 @@ public class URLUtils {
         if (!URLUtils.hasProtocal(uri)) {
             if (StringUtils.isNotEmpty(baseURL)) {
                 if (baseURL.endsWith("/")) {
-                    baseURL = baseURL.substring(0, baseURL.length() - 1);
+                    baseURL = getValidBaseURL(baseURL);
                 }
                 if (!uri.startsWith("/")) {
                     uri = "/" + uri;

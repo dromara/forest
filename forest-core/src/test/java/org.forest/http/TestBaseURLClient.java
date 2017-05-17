@@ -32,7 +32,7 @@ public class TestBaseURLClient {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
-        configuration.setVariableValue("baseURL", "http://localhost:5000");
+        configuration.setVariableValue("baseURL", "http://localhost:5000/");
         baseURLClient = configuration.createInstance(BaseURLClient.class);
         baseURLVarClient = configuration.createInstance(BaseURLVarClient.class);
     }
