@@ -1,9 +1,8 @@
 package org.forest.http;
 
-import com.twitter.jvm.Opt;
-import junit.framework.Assert;
 import org.apache.http.HttpHeaders;
 import org.forest.config.ForestConfiguration;
+import org.forest.http.client.OptionsClient;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;

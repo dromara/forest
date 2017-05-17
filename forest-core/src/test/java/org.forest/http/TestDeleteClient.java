@@ -2,6 +2,7 @@ package org.forest.http;
 
 import org.apache.http.HttpHeaders;
 import org.forest.config.ForestConfiguration;
+import org.forest.http.client.DeleteClient;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;

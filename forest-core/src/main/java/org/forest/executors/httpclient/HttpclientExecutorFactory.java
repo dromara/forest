@@ -69,6 +69,14 @@ public class HttpclientExecutorFactory implements ForestExecutorFactory {
             }
         });
 
+        executorCreatorMap.put("PATCH", new HttpExecutorCreator() {
+            @Override
+            public HttpExecutor createExecutor(HttpclientConnectionManager connectionManager, ForestRequest request) {
+                return new HttpclientPatchExecutor(connectionManager, request);
+            }
+        });
+
+
     }
 
     private final ForestConfiguration configuration;

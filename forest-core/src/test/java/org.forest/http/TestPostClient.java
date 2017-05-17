@@ -1,15 +1,12 @@
 package org.forest.http;
 
-import org.apache.http.HttpHeaders;
 import org.forest.config.ForestConfiguration;
+import org.forest.http.client.PostClient;
 import org.forest.mock.PostMockServer;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockserver.client.server.MockServerClient;
-import org.mockserver.junit.MockServerRule;
-import org.mockserver.model.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

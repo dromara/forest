@@ -1,12 +1,12 @@
 package org.forest.http;
 
 import org.forest.config.ForestConfiguration;
+import org.forest.http.client.GetClient;
 import org.forest.mock.GetMockServer;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockserver.junit.MockServerRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

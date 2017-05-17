@@ -1,4 +1,4 @@
-package org.forest.http;
+package org.forest.http.client;
 
 import org.forest.annotation.DataParam;
 import org.forest.annotation.DataVariable;

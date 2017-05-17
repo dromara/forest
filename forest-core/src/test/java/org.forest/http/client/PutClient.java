@@ -1,40 +1,38 @@
-package org.forest.http;
+package org.forest.http.client;
 
 import org.forest.annotation.DataParam;
 import org.forest.annotation.Request;
 
-import java.util.Map;
-
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
- * @since 2017-05-11 16:55
+ * @since 2017-05-11 17:11
  */
-public interface PostClient {
+public interface PutClient {
 
 
     @Request(
             url = "http://localhost:5000/hello",
-            type = "post",
+            type = "put",
             data = "username=foo&password=123456",
             headers = {"Accept:text/plan"}
     )
-    String simplePost();
-
+    String simplePut();
 
     @Request(
             url = "http://localhost:5000/hello",
-            type = "post",
+            type = "put",
             data = "username=${0}&password=${1}",
             headers = {"Accept:text/plan"}
     )
-    String textParamPost(String username, String password);
-
+    String textParamPut(String username, String password);
 
     @Request(
             url = "http://localhost:5000/hello",
-            type = "post",
+            type = "put",
             headers = {"Accept:text/plan"}
     )
-    String annParamPost(@DataParam("username") String username, @DataParam("password") String password);
+    String annParamPut(@DataParam("username") String username, @DataParam("password") String password);
+
+
 
 }

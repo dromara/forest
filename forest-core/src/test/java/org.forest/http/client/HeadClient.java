@@ -1,6 +1,7 @@
-package org.forest.http;
+package org.forest.http.client;
 
 import org.forest.annotation.Request;
+import org.forest.http.ForestResponse;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]

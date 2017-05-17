@@ -1,6 +1,8 @@
 package org.forest.http;
 
 import org.forest.config.ForestConfiguration;
+import org.forest.http.client.BaseURLClient;
+import org.forest.http.client.BaseURLVarClient;
 import org.forest.mock.GetMockServer;
 import org.junit.Before;
 import org.junit.BeforeClass;
