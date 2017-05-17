@@ -27,7 +27,7 @@ Forest是一个通过动态代理模式实现的HTTP客户端框架。<br>
 -------------------------------------
 
 * 主流程已完成
-* 已支持的请求方法有：GET, HEAD, OPTIONS, TRACE, POST, DELETE
+* 已支持所有请求方法：GET, HEAD, OPTIONS, TRACE, POST, DELETE, PUT, PATCH
 * 已支持Spring集成
 * 现只支持文本和JSON两种响应解析方式
 * 支持Commons-Log, SLF4j, Log4J等日志框架
