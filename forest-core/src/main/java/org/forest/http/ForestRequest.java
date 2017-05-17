@@ -30,6 +30,8 @@ import org.forest.config.ForestConfiguration;
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.executors.ForestExecutorFactory;
 import org.forest.executors.HttpExecutor;
+import org.forest.interceptor.Interceptor;
+import org.forest.interceptor.InterceptorChain;
 import org.forest.reflection.ForestMethod;
 import org.forest.utils.ForestDataType;
 import org.forest.utils.RequestNameValue;
@@ -64,13 +66,15 @@ public class ForestRequest<T> {
 
     private Map<String, Object> data = new LinkedHashMap<String, Object>();
 
-    private Map<String, Object> headers = new LinkedHashMap<String, Object>();
+    private Map<String, Object> headers = new LinkedHashMap<>();
 
     private String requestBody;
 
     private OnSuccess onSuccess;
 
     private OnError onError;
+
+    private InterceptorChain interceptorChain = new InterceptorChain();
 
     private boolean logEnable = true;
 
@@ -258,6 +262,15 @@ public class ForestRequest<T> {
     public ForestRequest setOnError(OnError onError) {
         this.onError = onError;
         return this;
+    }
+
+    public ForestRequest<T> addInterceptor(Interceptor interceptor) {
+        interceptorChain.addInterceptor(interceptor);
+        return this;
+    }
+
+    public InterceptorChain getInterceptorChain() {
+        return interceptorChain;
     }
 
     public boolean isLogEnable() {

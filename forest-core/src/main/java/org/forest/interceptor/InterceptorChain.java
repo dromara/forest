@@ -15,12 +15,12 @@ public class InterceptorChain implements Interceptor {
 
     private LinkedList<Interceptor> interceptors = new LinkedList<>();
 
-    public synchronized InterceptorChain addInteceptor(Interceptor interceptor) {
+    public synchronized InterceptorChain addInterceptor(Interceptor interceptor) {
         interceptors.add(interceptor);
         return this;
     }
 
-    public int getInteceptorSize() {
+    public int getInterceptorSize() {
         return interceptors.size();
     }
 

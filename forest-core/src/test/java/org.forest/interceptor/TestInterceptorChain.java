@@ -84,9 +84,9 @@ public class TestInterceptorChain {
 
         InterceptorChain chain = new InterceptorChain();
         chain
-                .addInteceptor(interceptor1)
-                .addInteceptor(interceptor2);
-        assertEquals(2, chain.getInteceptorSize());
+                .addInterceptor(interceptor1)
+                .addInterceptor(interceptor2);
+        assertEquals(2, chain.getInterceptorSize());
 
         assertTrue(chain.beforeExecute(null));
         assertTrue(inter1Before.get());
