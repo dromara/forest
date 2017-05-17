@@ -285,10 +285,15 @@ public class ForestRequest<T> {
     public T execute(ForestExecutorFactory executorFactory, ForestMethod<T> method) {
         HttpExecutor executor  = executorFactory.create(this, method);
         if (executor != null) {
+            ForestResponse response = null;
             try {
-                executor.execute();
-                ForestResponse response = executor.getResponse();
-                return method.handleResponse(this, response);
+                if (interceptorChain.beforeExecute(this)) {
+                    executor.execute();
+                    response = executor.getResponse();
+                    T data = method.handleResponse(this, response);
+                    interceptorChain.onSuccess(data, this, response);
+                    return data;
+                }
             } catch (ForestRuntimeException e) {
                 if (onError == null) {
                     throw e;
@@ -298,8 +303,10 @@ public class ForestRequest<T> {
                     runtimeException = new ForestRuntimeException(e);
                 }
                 onError.onError(runtimeException, this);
+                interceptorChain.onError(e, this, response);
             } finally {
                 executor.close();
+                interceptorChain.afterExecute(this, response);
             }
         }
         return null;

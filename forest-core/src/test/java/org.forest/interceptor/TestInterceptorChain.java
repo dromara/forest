@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
 /**
@@ -23,6 +24,7 @@ public class TestInterceptorChain {
         final AtomicInteger count = new AtomicInteger(0);
         final AtomicBoolean inter1Before = new AtomicBoolean(false);
         final AtomicBoolean inter2Before = new AtomicBoolean(false);
+        final AtomicBoolean inter3Before = new AtomicBoolean(false);
         final AtomicBoolean inter1Success = new AtomicBoolean(false);
         final AtomicBoolean inter2Success = new AtomicBoolean(false);
         final AtomicBoolean inter1Error = new AtomicBoolean(false);
@@ -82,6 +84,28 @@ public class TestInterceptorChain {
             }
         };
 
+
+        Interceptor interceptor3 = new Interceptor() {
+            @Override
+            public boolean beforeExecute(ForestRequest request) {
+                inter3Before.set(true);
+                return false;
+            }
+
+            @Override
+            public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
+            }
+
+            @Override
+            public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
+            }
+
+            @Override
+            public void afterExecute(ForestRequest request, ForestResponse response) {
+            }
+        };
+
+
         InterceptorChain chain = new InterceptorChain();
         chain
                 .addInterceptor(interceptor1)
@@ -91,6 +115,9 @@ public class TestInterceptorChain {
         assertTrue(chain.beforeExecute(null));
         assertTrue(inter1Before.get());
         assertTrue(inter2Before.get());
+
+        chain.addInterceptor(interceptor3);
+        assertFalse(inter3Before.get());
 
         chain.onSuccess(null, null, null);
         assertTrue(inter1Success.get());
