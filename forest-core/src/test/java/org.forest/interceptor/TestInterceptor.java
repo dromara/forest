@@ -12,10 +12,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.*;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -70,6 +67,12 @@ public class TestInterceptor {
                     Interceptor.class.getName() + "] interface.", e.getMessage());
         }
         assertTrue(error);
+    }
+
+    @Test
+    public void testFalseInterceptor() {
+        String result = interceptorClient.beforeFalse();
+        assertNull(result);
     }
 
 

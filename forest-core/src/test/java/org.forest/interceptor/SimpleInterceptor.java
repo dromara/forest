@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public class SimpleInterceptor implements Interceptor<String> {
 
-    private final static Logger log = LoggerFactory.getLogger(TestGetClient.class);
+    private final static Logger log = LoggerFactory.getLogger(SimpleInterceptor.class);
 
     @Override
     public boolean beforeExecute(ForestRequest request) {

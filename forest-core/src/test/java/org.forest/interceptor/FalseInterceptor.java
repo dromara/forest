@@ -9,22 +9,21 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
- * @since 2017-05-18 18:17
+ * @since 2017-05-18 18:26
  */
-public class Simple2Interceptor implements Interceptor {
+public class FalseInterceptor implements Interceptor {
 
-    private final static Logger log = LoggerFactory.getLogger(Simple2Interceptor.class);
+    private final static Logger log = LoggerFactory.getLogger(FalseInterceptor.class);
 
     @Override
     public boolean beforeExecute(ForestRequest request) {
-        log.info("invoke Simple2 beforeExecute");
-        return true;
+        log.info("invoke False beforeExecute");
+        return false;
     }
 
     @Override
     public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
-        log.info("invoke Simple2 onSuccess, data: " + data);
-        response.setResult("YY: " + data);
+        log.info("invoke False onSuccess");
     }
 
     @Override
@@ -34,6 +33,6 @@ public class Simple2Interceptor implements Interceptor {
 
     @Override
     public void afterExecute(ForestRequest request, ForestResponse response) {
-        log.info("invoke Simple2 afterExecute");
+        log.info("invoke False afterExecute");
     }
 }
