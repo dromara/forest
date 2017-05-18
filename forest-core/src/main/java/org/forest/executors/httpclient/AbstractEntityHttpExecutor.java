@@ -55,7 +55,7 @@ public abstract class AbstractEntityHttpExecutor<T extends HttpEntityEnclosingRe
             mineType = "application/x-www-form-urlencoded";
         }
         if (typeGroup.length > 1) {
-            charset = HTTP.UTF_8;
+            charset = typeGroup[1];
         }
 
         List<RequestNameValue> nameValueList = request.getDataNameValueList();

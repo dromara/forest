@@ -273,6 +273,7 @@ public class ForestRequest<T> {
         return interceptorChain;
     }
 
+
     public boolean isLogEnable() {
         return logEnable;
     }
@@ -291,7 +292,6 @@ public class ForestRequest<T> {
                     executor.execute();
                     response = executor.getResponse();
                     T data = method.handleResponse(this, response);
-                    interceptorChain.onSuccess(data, this, response);
                     return data;
                 }
             } catch (ForestRuntimeException e) {

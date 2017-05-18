@@ -1,5 +1,6 @@
 package org.forest.reflection;
 
+import org.forest.Forest;
 import org.forest.annotation.Request;
 import org.forest.annotation.DataObject;
 import org.forest.annotation.DataParam;
@@ -15,6 +16,7 @@ import org.forest.exceptions.ForestRuntimeException;
 import org.forest.handler.DefaultResponseHandlerAdaptor;
 import org.forest.handler.ResponseHandler;
 import org.forest.http.ForestResponse;
+import org.forest.interceptor.Interceptor;
 import org.forest.mapping.*;
 import org.forest.http.ForestRequest;
 import org.forest.proxy.InterfaceProxyHandler;
@@ -53,6 +55,7 @@ public class ForestMethod<T> implements VariableScope {
     private Map<String, MappingVariable> variables = new HashMap<String, MappingVariable>();
     private MappingParameter onSuccessParameter = null;
     private MappingParameter onErrorParameter = null;
+    private List<Interceptor> interceptorList;
     private Class onSuccessClass = null;
     private Class onSuccessClassGenericType = null;
     private boolean async = false;
@@ -146,6 +149,20 @@ public class ForestMethod<T> implements VariableScope {
                     String header = headerArray[j];
                     MappingTemplate headerTemplate = makeTemplate(header);
                     headerTemplateArray[j] = headerTemplate;
+                }
+
+                Class[] interceptorClasses = reqAnn.interceptor();
+                if (interceptorClasses != null && interceptorClasses.length > 0) {
+                    interceptorList = new LinkedList<>();
+                    for (int cidx = 0, len = interceptorClasses.length; cidx < len; cidx++) {
+                        Class clazz = interceptorClasses[cidx];
+                        if (!Interceptor.class.isAssignableFrom(clazz) || clazz.isInterface()) {
+                            throw new ForestRuntimeException("Class [" + clazz.getName() + "] is not a implement of [" +
+                                    Interceptor.class.getName() + "] interface.");
+                        }
+                        Interceptor interceptor = Forest.getInterceptor(clazz);
+                        interceptorList.add(interceptor);
+                    }
                 }
             }
         }
@@ -395,6 +412,12 @@ public class ForestMethod<T> implements VariableScope {
             request.setDataType(forestDataType);
         }
 
+        if (interceptorList != null && interceptorList.size() > 0) {
+            for (Interceptor item : interceptorList) {
+                request.addInterceptor(item);
+            }
+        }
+
         return request;
     }
 
@@ -482,10 +505,12 @@ public class ForestMethod<T> implements VariableScope {
         ResponseHandler responseHandler = new DefaultResponseHandlerAdaptor(this);
         Type returnType = getReturnType();
         Object resultData = responseHandler.getResult(request, response, returnType);
-
+        response.setResult(resultData);
         if (response.isSuccess()) {
-            OnSuccess onSuccess = request.getOnSuccess();
             Object data = resultData;
+            request.getInterceptorChain().onSuccess(data, request, response);
+            data = resultData = response.getResult();
+            OnSuccess onSuccess = request.getOnSuccess();
             if (onSuccess != null) {
                 if (onSuccessClassGenericType != null) {
                     data = responseHandler.getResult(request, response, onSuccessClassGenericType);
@@ -500,6 +525,7 @@ public class ForestMethod<T> implements VariableScope {
             if (request.getOnError() != null) {
                 ForestNetworkException networkException = new ForestNetworkException("", response.getStatusCode());
                 ForestRuntimeException e = new ForestRuntimeException(networkException);
+                request.getInterceptorChain().onError(e, request, response);
                 request.getOnError().onError(e, request);
             }
         }
