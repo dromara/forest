@@ -71,7 +71,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.writeValueAsString(obj);
-        } catch (IOException e) {
+        } catch (Throwable e) {
             throw new ForestRuntimeException(e);
         }
     }

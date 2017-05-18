@@ -9,6 +9,7 @@ import org.forest.converter.json.ForestJacksonConverter;
 import org.forest.exceptions.ForestRuntimeException;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +36,25 @@ public class TestForestJacksonConverter {
         String text = forestJacksonConverter.convertToJson(new Integer[] {100, 10});
         Assert.assertEquals("[100,10]", text);
     }
+
+    @Test
+    public void testConvertToJsonError() {
+        ForestJacksonConverter forestJacksonConverter = new ForestJacksonConverter();
+        Map map = new HashMap();
+        map.put("ref", map);
+
+        boolean error = false;
+        try {
+            forestJacksonConverter.convertToJson(map);
+        } catch (ForestRuntimeException e) {
+            error = true;
+            assertNotNull(e.getCause());
+        }
+        assertTrue(error);
+
+
+    }
+
 
     @Test
     public void testConvertToJava() {
