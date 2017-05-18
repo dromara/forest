@@ -59,7 +59,7 @@ public class TestInterceptor {
     public void testWrongInterceptorClass() {
         boolean error = false;
         try {
-            WrongInterceptorClient wrongInterceptorClient = configuration.createInstance(WrongInterceptorClient.class);
+            configuration.createInstance(WrongInterceptorClient.class);
         } catch (ForestRuntimeException e) {
             error = true;
             log.error(e.getMessage());
