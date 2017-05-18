@@ -33,7 +33,7 @@ public class ForestNetworkException extends RuntimeException {
     private Integer statusCode;
 
     public ForestNetworkException(String message, Integer statusCode) {
-        super(statusCode + ": " + message);
+        super("HTTP " + statusCode + " Error: " + message);
         this.statusCode = statusCode;
     }
 

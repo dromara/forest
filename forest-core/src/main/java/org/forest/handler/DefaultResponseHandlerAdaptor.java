@@ -3,6 +3,7 @@ package org.forest.handler;
 import org.apache.http.HttpEntity;
 import org.apache.http.util.EntityUtils;
 import org.forest.converter.ForestConverter;
+import org.forest.exceptions.ForestHandlerException;
 import org.forest.utils.ForestDataType;
 import org.forest.reflection.ForestMethod;
 import org.forest.http.ForestRequest;
@@ -65,7 +66,7 @@ public class DefaultResponseHandlerAdaptor extends ResponseHandler {
                 return converter.convertToJavaObject(responseText, resultType);
 
             } catch (IOException e) {
-                throw new ForestRuntimeException(e, request, response);
+                throw new ForestHandlerException(e, request, response);
             }
         }
         else if (ForestResponse.class.isAssignableFrom(clazz)) {

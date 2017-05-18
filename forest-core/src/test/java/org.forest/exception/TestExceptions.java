@@ -1,0 +1,72 @@
+package org.forest.exception;
+
+import org.forest.exceptions.ForestException;
+import org.forest.exceptions.ForestHandlerException;
+import org.forest.exceptions.ForestNetworkException;
+import org.forest.exceptions.ForestRuntimeException;
+import org.forest.http.ForestRequest;
+import org.forest.http.ForestResponse;
+import org.junit.Test;
+
+import static junit.framework.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+
+/**
+ * @author gongjun[jun.gong@thebeastshop.com]
+ * @since 2017-05-18 12:33
+ */
+public class TestExceptions {
+
+    @Test
+    public void testForestException() {
+        try {
+            throw new ForestException("test exception");
+        } catch (ForestException e) {
+            assertEquals("test exception", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testForestNetworkException() {
+        try {
+            throw new ForestNetworkException("test network exception", 500);
+        } catch (ForestNetworkException e) {
+            assertEquals("HTTP 500 Error: test network exception", e.getMessage());
+            assertEquals(Integer.valueOf(500), e.getStatusCode());
+        }
+    }
+
+    @Test
+    public void testForestRuntimeException() {
+        try {
+            throw new Exception("first Exception");
+        } catch (Exception e) {
+            try {
+                throw new ForestRuntimeException("second Exception", e);
+            } catch (ForestRuntimeException fe) {
+                assertEquals("second Exception", fe.getMessage());
+                assertEquals(e, fe.getCause());
+            }
+        }
+
+        try {
+            throw new ForestRuntimeException("runtime exception");
+        } catch (ForestRuntimeException fe) {
+            assertEquals("runtime exception", fe.getMessage());
+        }
+    }
+
+    @Test
+    public void testForestHandlerException() {
+        ForestRequest request = mock(ForestRequest.class);
+        ForestResponse response = mock(ForestResponse.class);
+        try {
+            throw new ForestHandlerException("test", request, response);
+        } catch (ForestHandlerException e) {
+            assertEquals("test", e.getMessage());
+            assertEquals(request, e.getRequest());
+            assertEquals(response, e.getResponse());
+        }
+    }
+
+}

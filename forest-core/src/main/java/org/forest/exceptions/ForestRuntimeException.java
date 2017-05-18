@@ -8,20 +8,9 @@ import org.forest.http.ForestResponse;
  */
 public class ForestRuntimeException extends RuntimeException {
 
-    private Integer errorCode;
-
-    private ForestRequest request;
-
-    private ForestResponse response;
-
-    public Integer getErrorCode() {
-        return errorCode;
-    }
-
 
     public ForestRuntimeException(ForestNetworkException cause) {
         super(cause);
-        this.errorCode = cause.getStatusCode();
     }
 
     public ForestRuntimeException(String message) {
@@ -32,22 +21,10 @@ public class ForestRuntimeException extends RuntimeException {
         super(message, cause);
     }
 
-    public ForestRuntimeException(Throwable cause, ForestRequest request, ForestResponse response) {
-        super(cause);
-        this.request = request;
-        this.response = response;
-    }
 
     public ForestRuntimeException(Throwable cause) {
         super(cause);
     }
 
 
-    public ForestRequest getRequest() {
-        return request;
-    }
-
-    public ForestResponse getResponse() {
-        return response;
-    }
 }
