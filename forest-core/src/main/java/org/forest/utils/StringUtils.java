@@ -6,7 +6,9 @@ import java.lang.reflect.Method;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-05-17
  */
-public class StringUtils {
+public final class StringUtils {
+
+    private StringUtils() {}
 
     public static boolean isEmpty(String text) {
         return text == null || text.length() == 0;
