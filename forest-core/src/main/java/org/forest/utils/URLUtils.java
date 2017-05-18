@@ -6,8 +6,10 @@ import org.forest.exceptions.ForestRuntimeException;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-17 16:35
  */
-public class URLUtils {
+public final class URLUtils {
 
+    private URLUtils() {
+    }
 
     public static boolean hasProtocol(String url) {
         return url.startsWith("http://") || url.startsWith("https://");

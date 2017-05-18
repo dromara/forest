@@ -1,14 +1,12 @@
 package org.forest.converter;
 
 import org.forest.converter.xml.ForestJaxbConverter;
+import org.forest.exceptions.ForestRuntimeException;
 import org.junit.Test;
 
 import javax.xml.bind.annotation.*;
 
-import java.util.List;
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.*;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -51,6 +49,25 @@ public class TestJaxbConverter {
         assertEquals("Peter", user.getName());
         assertEquals(Integer.valueOf(32), user.getAge());
     }
+
+    @Test
+    public void convertToJavaObjectError() {
+        ForestJaxbConverter forestJaxbConverter = new ForestJaxbConverter();
+        String xmlText = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<user>\n" +
+                "<name>Peter</name>\n" +
+                "<age>32</age>\n" +
+                "</user";
+        boolean error = false;
+        try {
+            forestJaxbConverter.convertToJavaObject(xmlText, User.class);
+        } catch (ForestRuntimeException e) {
+            error = true;
+            assertNotNull(e.getCause());
+        }
+        assertTrue(error);
+    }
+
 
     @Test
     public void testConvertToXml() {
