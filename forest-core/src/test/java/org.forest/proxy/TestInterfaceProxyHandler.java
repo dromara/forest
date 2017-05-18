@@ -32,7 +32,7 @@ public class TestInterfaceProxyHandler {
 
 
     @BaseURL("localhost")
-    interface NonProtocalBaseURLClient {
+    interface NonProtocolBaseURLClient {
     }
 
 
@@ -61,12 +61,11 @@ public class TestInterfaceProxyHandler {
     }
 
     @Test
-    public void testNonProtocalBaseURL() {
-        ProxyFactory<NonProtocalBaseURLClient> getClientProxyFactory = new ProxyFactory<>(configuration, NonProtocalBaseURLClient.class);
-        InterfaceProxyHandler<NonProtocalBaseURLClient> interfaceProxyHandler =
-                new InterfaceProxyHandler(configuration, getClientProxyFactory, NonProtocalBaseURLClient.class);
+    public void testNonProtocolBaseURL() {
+        ProxyFactory<NonProtocolBaseURLClient> getClientProxyFactory = new ProxyFactory<>(configuration, NonProtocolBaseURLClient.class);
+        InterfaceProxyHandler<NonProtocolBaseURLClient> interfaceProxyHandler =
+                new InterfaceProxyHandler(configuration, getClientProxyFactory, NonProtocolBaseURLClient.class);
         assertEquals("http://localhost", interfaceProxyHandler.getBaseURL());
-
     }
 
 

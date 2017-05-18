@@ -9,12 +9,12 @@ import org.forest.exceptions.ForestRuntimeException;
 public class URLUtils {
 
 
-    public static boolean hasProtocal(String url) {
+    public static boolean hasProtocol(String url) {
         return url.startsWith("http://") || url.startsWith("https://");
     }
 
     public static void checkBaseURL(String baseUrl) {
-        if (!hasProtocal(baseUrl)) {
+        if (!hasProtocol(baseUrl)) {
             throw new ForestRuntimeException("base url has no protocol: " + baseUrl);
         }
     }
@@ -36,7 +36,7 @@ public class URLUtils {
 
 
     public static String getValidURL(String baseURL, String uri) {
-        if (!URLUtils.hasProtocal(uri)) {
+        if (!URLUtils.hasProtocol(uri)) {
             if (StringUtils.isNotEmpty(baseURL)) {
                 if (baseURL.endsWith("/")) {
                     baseURL = getValidBaseURL(baseURL);

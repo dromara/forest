@@ -56,7 +56,7 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
                 MappingTemplate template = new MappingTemplate(value.trim(), this);
                 template.compile();
                 baseURL = template.render(new Object[] {});
-                if (!URLUtils.hasProtocal(baseURL)) {
+                if (!URLUtils.hasProtocol(baseURL)) {
                     baseURL = "http://" + baseURL;
                 }
                 baseURL = URLUtils.getValidBaseURL(baseURL);
