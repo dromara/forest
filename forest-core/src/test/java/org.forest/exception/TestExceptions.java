@@ -42,6 +42,16 @@ public class TestExceptions {
             throw new Exception("first Exception");
         } catch (Exception e) {
             try {
+                throw new ForestRuntimeException( e);
+            } catch (ForestRuntimeException fe) {
+                assertEquals(e, fe.getCause());
+            }
+        }
+
+        try {
+            throw new Exception("first Exception");
+        } catch (Exception e) {
+            try {
                 throw new ForestRuntimeException("second Exception", e);
             } catch (ForestRuntimeException fe) {
                 assertEquals("second Exception", fe.getMessage());
@@ -67,6 +77,33 @@ public class TestExceptions {
             assertEquals(request, e.getRequest());
             assertEquals(response, e.getResponse());
         }
+
+        try {
+            throw new Exception("first Exception");
+        } catch (Exception e) {
+            try {
+                throw new ForestHandlerException("second Exception", e, request, response);
+            } catch (ForestHandlerException fe) {
+                assertEquals("second Exception", fe.getMessage());
+                assertEquals(e, fe.getCause());
+                assertEquals(request, fe.getRequest());
+                assertEquals(response, fe.getResponse());
+            }
+        }
+
+        try {
+            throw new Exception("first Exception");
+        } catch (Exception e) {
+            try {
+                throw new ForestHandlerException( e, request, response);
+            } catch (ForestHandlerException fe) {
+                assertEquals(e, fe.getCause());
+                assertEquals(request, fe.getRequest());
+                assertEquals(response, fe.getResponse());
+            }
+        }
+
+
     }
 
 }
