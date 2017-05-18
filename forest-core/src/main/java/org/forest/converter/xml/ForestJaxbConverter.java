@@ -47,7 +47,7 @@ public class ForestJaxbConverter implements ForestXmlConverter {
 
     @Override
     public <T> T convertToJavaObject(String source, Type targetType) {
-        return convertToJavaObject(source, targetType);
+        return convertToJavaObject(source, (Class<? extends T>) targetType);
     }
 
 

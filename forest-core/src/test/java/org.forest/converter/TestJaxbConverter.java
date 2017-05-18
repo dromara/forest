@@ -1,5 +1,6 @@
 package org.forest.converter;
 
+import com.alibaba.fastjson.TypeReference;
 import org.forest.converter.xml.ForestJaxbConverter;
 import org.forest.exceptions.ForestRuntimeException;
 import org.junit.Test;
@@ -48,6 +49,11 @@ public class TestJaxbConverter {
         assertNotNull(user);
         assertEquals("Peter", user.getName());
         assertEquals(Integer.valueOf(32), user.getAge());
+
+        user = forestJaxbConverter.convertToJavaObject(xmlText, new TypeReference<User>() {}.getType());
+        assertNotNull(user);
+        assertEquals("Peter", user.getName());
+        assertEquals(Integer.valueOf(32), user.getAge());
     }
 
     @Test
@@ -84,5 +90,44 @@ public class TestJaxbConverter {
                 "    <age>32</age>\n" +
                 "</user>\n", xml);
     }
+
+
+    public static class BadUser {
+        @XmlElement(name="name")
+        private String name;
+        @XmlElement(name="age")
+        private Integer age;
+        public String getName() {
+            return name;
+        }
+        public void setName(String name) {
+            this.name = name;
+        }
+        public Integer getAge() {
+            return age;
+        }
+        public void setAge(Integer age) {
+            this.age = age;
+        }
+    }
+
+
+
+    @Test
+    public void testConvertToXmlError() {
+        BadUser user = new BadUser();
+        user.setName("Peter");
+        user.setAge(32);
+
+        ForestJaxbConverter forestJaxbConverter = new ForestJaxbConverter();
+        boolean error = false;
+        try {
+            forestJaxbConverter.convertToXml(user);
+        } catch (ForestRuntimeException e) {
+            error = true;
+        }
+        assertTrue(error);
+    }
+
 
 }
