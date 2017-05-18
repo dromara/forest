@@ -34,7 +34,7 @@ public class TestExceptions {
             throw new Exception("first Exception");
         } catch (Exception e) {
             try {
-                throw new ForestRuntimeException( e);
+                throw new ForestRuntimeException(e);
             } catch (ForestRuntimeException fe) {
                 assertEquals(e, fe.getCause());
             }
