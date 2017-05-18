@@ -1,6 +1,5 @@
 package org.forest.exception;
 
-import org.forest.exceptions.ForestException;
 import org.forest.exceptions.ForestHandlerException;
 import org.forest.exceptions.ForestNetworkException;
 import org.forest.exceptions.ForestRuntimeException;
@@ -17,14 +16,6 @@ import static org.mockito.Mockito.mock;
  */
 public class TestExceptions {
 
-    @Test
-    public void testForestException() {
-        try {
-            throw new ForestException("test exception");
-        } catch (ForestException e) {
-            assertEquals("test exception", e.getMessage());
-        }
-    }
 
     @Test
     public void testForestNetworkException() {

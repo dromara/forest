@@ -10,7 +10,6 @@ import org.forest.config.ForestConfiguration;
 import org.forest.config.VariableScope;
 import org.forest.converter.ForestConverter;
 import org.forest.converter.json.ForestJsonConverter;
-import org.forest.exceptions.ForestException;
 import org.forest.exceptions.ForestNetworkException;
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.handler.DefaultResponseHandlerAdaptor;
