@@ -29,7 +29,7 @@ Forest是一个通过动态代理模式实现的HTTP客户端框架。<br>
 
 * 主流程已完成
 * 已支持所有请求方法：GET, HEAD, OPTIONS, TRACE, POST, DELETE, PUT, PATCH
-* 已支持JSON转换
+* 已支持的JSON转换框架: FastJSON, Jackson, Gson
 * 已支持Spring集成
 * 已支持JAXB形式的XML转换
 * 现只支持文本和JSON两种响应解析方式
