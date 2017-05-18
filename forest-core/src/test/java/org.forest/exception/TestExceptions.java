@@ -8,6 +8,7 @@ import org.forest.http.ForestResponse;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -67,6 +68,10 @@ public class TestExceptions {
             assertEquals("test", e.getMessage());
             assertEquals(request, e.getRequest());
             assertEquals(response, e.getResponse());
+            e.setRequest(null);
+            assertNull(e.getRequest());
+            e.setResponse(null);
+            assertNull(e.getResponse());
         }
 
         try {
