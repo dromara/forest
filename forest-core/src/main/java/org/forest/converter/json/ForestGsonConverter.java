@@ -1,7 +1,10 @@
 package org.forest.converter.json;
 
 import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
+import com.sun.javafx.fxml.expression.Expression;
 import org.forest.exceptions.ForestRuntimeException;
+import sun.reflect.generics.tree.TypeTree;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -35,10 +38,13 @@ public class ForestGsonConverter implements ForestJsonConverter {
     }
 
     public <T> T convertToJavaObject(String source, Type targetType) {
-        Gson gson = new Gson();
         try {
-            T t = gson.fromJson(source, targetType);
-            return t;
+            if (targetType instanceof ParameterizedType ||
+                    targetType.getClass().getName().startsWith("com.google.gson")) {
+                Gson gson = new Gson();
+                return gson.fromJson(source, targetType);
+            }
+            return convertToJavaObject(source, (Class<? extends T>) targetType);
         } catch (Exception ex) {
             return null;
         }
@@ -125,22 +131,6 @@ public class ForestGsonConverter implements ForestJsonConverter {
             }
         }
         return list;
-    }
-
-    static ParameterizedType type(final Class raw, final Type... args) {
-        return new ParameterizedType() {
-            public Type getRawType() {
-                return raw;
-            }
-
-            public Type[] getActualTypeArguments() {
-                return args;
-            }
-
-            public Type getOwnerType() {
-                return null;
-            }
-        };
     }
 
     public String convertToJson(Object obj) {
