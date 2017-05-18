@@ -43,7 +43,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
             }
             return convertToJavaObject(source, (Class<? extends T>) targetType);
         } catch (Exception ex) {
-            return null;
+            throw new ForestRuntimeException(ex);
         }
     }
 

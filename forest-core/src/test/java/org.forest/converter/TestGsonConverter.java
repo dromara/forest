@@ -3,6 +3,8 @@ package org.forest.converter;
 import com.google.gson.reflect.TypeToken;
 import junit.framework.Assert;
 import org.forest.converter.json.ForestGsonConverter;
+import org.forest.converter.json.ForestJacksonConverter;
+import org.forest.exceptions.ForestRuntimeException;
 import org.junit.Test;
 
 import java.util.List;
@@ -93,6 +95,39 @@ public class TestGsonConverter {
         assertEquals(1, map.get("a"));
         assertEquals(2, map.get("b"));
 
+    }
+
+
+    @Test
+    public void testConvertToJavaError() {
+        String jsonText = "{\"a\":1, ";
+        boolean error = false;
+        ForestGsonConverter gsonConverter = new ForestGsonConverter();
+        try {
+            gsonConverter.convertToJavaObject(jsonText, Map.class);
+        } catch (ForestRuntimeException e) {
+            error = true;
+            assertNotNull(e.getCause());
+        }
+        assertTrue(error);
+
+        error = false;
+        try {
+            gsonConverter.convertToJavaObject(jsonText, new TypeToken<Map>() {}.getType());
+        } catch (ForestRuntimeException e) {
+            error = true;
+            assertNotNull(e.getCause());
+        }
+        assertTrue(error);
+
+        jsonText = "[1, 2,";
+        try {
+            gsonConverter.convertToJavaObject(jsonText, Map.class);
+        } catch (ForestRuntimeException e) {
+            error = true;
+            assertNotNull(e.getCause());
+        }
+        assertTrue(error);
     }
 
 
