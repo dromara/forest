@@ -9,6 +9,7 @@ import org.forest.converter.json.ForestJacksonConverter;
 import org.forest.exceptions.ForestRuntimeException;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
@@ -75,12 +76,22 @@ public class TestForestJacksonConverter {
 
         jsonText = "[1, 2,";
         try {
-            forestJacksonConverter.convertToJavaObject(jsonText, Map.class);
+            forestJacksonConverter.convertToJavaObject(jsonText, List.class);
         } catch (ForestRuntimeException e) {
             error = true;
             assertNotNull(e.getCause());
         }
         assertTrue(error);
+
+        jsonText = "[1, 2,";
+        try {
+            forestJacksonConverter.convertToJavaObject(jsonText, List.class, Integer.class);
+        } catch (ForestRuntimeException e) {
+            error = true;
+            assertNotNull(e.getCause());
+        }
+        assertTrue(error);
+
     }
 
 
