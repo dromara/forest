@@ -51,8 +51,6 @@ public class TestForestJacksonConverter {
             assertNotNull(e.getCause());
         }
         assertTrue(error);
-
-
     }
 
 

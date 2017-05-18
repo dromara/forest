@@ -81,9 +81,13 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
 
 
     public String convertToJson(Object obj) {
-        if (serializerFeature == null) {
-            return JSON.toJSONString(obj);
+        try {
+            if (serializerFeature == null) {
+                return JSON.toJSONString(obj);
+            }
+            return JSON.toJSONString(obj, serializerFeature);
+        } catch (Throwable th) {
+            throw new ForestRuntimeException(th);
         }
-        return JSON.toJSONString(obj, serializerFeature);
     }
 }

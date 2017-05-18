@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import junit.framework.Assert;
 import org.forest.converter.json.ForestFastjsonConverter;
+import org.forest.converter.json.ForestJacksonConverter;
 import org.forest.exceptions.ForestRuntimeException;
 import org.junit.Test;
 
@@ -68,8 +69,24 @@ public class TestForestFastjsonConverter {
         forestFastjsonConverter.setSerializerFeature(null);
         text = forestFastjsonConverter.convertToJson(new Integer[] {100, 10});
         assertEquals("[100,10]", text);
-
     }
+
+    @Test
+    public void testConvertToJsonError() {
+        ForestFastjsonConverter forestFastjsonConverter = new ForestFastjsonConverter();
+        Map map = new HashMap();
+        map.put("ref", map);
+
+        boolean error = false;
+        try {
+            forestFastjsonConverter.convertToJson(map);
+        } catch (ForestRuntimeException e) {
+            error = true;
+            assertNotNull(e.getCause());
+        }
+        assertTrue(error);
+    }
+
 
     @Test
     public void testConvertToJava() {
@@ -90,6 +107,7 @@ public class TestForestFastjsonConverter {
         assertEquals(1, result.get("a"));
         assertEquals(2, result.get("b"));
     }
+
 
     @Test
     public void testConvertToJavaError() {
