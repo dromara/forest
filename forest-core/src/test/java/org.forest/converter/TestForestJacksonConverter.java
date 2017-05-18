@@ -6,12 +6,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import junit.framework.Assert;
 import org.forest.converter.json.ForestFastjsonConverter;
 import org.forest.converter.json.ForestJacksonConverter;
+import org.forest.exceptions.ForestRuntimeException;
 import org.junit.Test;
 
 import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * @author gongjun[dt_flys@hotmail.com]
@@ -46,8 +48,32 @@ public class TestForestJacksonConverter {
         assertNotNull(result);
         assertEquals(1, result.get("a"));
         assertEquals(2, result.get("b"));
-
     }
+
+
+    @Test
+    public void testConvertToJavaError() {
+        String jsonText = "{\"a\":1, ";
+        boolean error = false;
+        ForestJacksonConverter forestJacksonConverter = new ForestJacksonConverter();
+        try {
+            forestJacksonConverter.convertToJavaObject(jsonText, Map.class);
+        } catch (ForestRuntimeException e) {
+            error = true;
+            assertNotNull(e.getCause());
+        }
+        assertTrue(error);
+
+        error = false;
+        try {
+            forestJacksonConverter.convertToJavaObject(jsonText, mapper.constructType(Map.class));
+        } catch (ForestRuntimeException e) {
+            error = true;
+            assertNotNull(e.getCause());
+        }
+        assertTrue(error);
+    }
+
 
 
 }
