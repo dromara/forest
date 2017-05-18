@@ -72,6 +72,15 @@ public class TestForestJacksonConverter {
             assertNotNull(e.getCause());
         }
         assertTrue(error);
+
+        jsonText = "[1, 2,";
+        try {
+            forestJacksonConverter.convertToJavaObject(jsonText, Map.class);
+        } catch (ForestRuntimeException e) {
+            error = true;
+            assertNotNull(e.getCause());
+        }
+        assertTrue(error);
     }
 
 
