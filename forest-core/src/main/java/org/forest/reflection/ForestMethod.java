@@ -433,10 +433,8 @@ public class ForestMethod<T> implements VariableScope {
      */
     private List<RequestNameValue> getNameValueListFromObject(Object obj) throws InvocationTargetException, IllegalAccessException {
         Class clazz = obj.getClass();
-//        Field[] fields = clazz.getDeclaredFields();
         Method[] methods = clazz.getDeclaredMethods();
         List<RequestNameValue> nameValueList = new ArrayList<RequestNameValue>();
-        ForestJsonConverter jsonConverter = configuration.getJsonCoverter();
         for (int i = 0; i < methods.length; i++) {
             Method mtd = methods[i];
             String getterName = StringUtils.getGetterName(mtd);
