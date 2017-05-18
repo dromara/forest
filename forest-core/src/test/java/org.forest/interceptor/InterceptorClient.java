@@ -17,6 +17,11 @@ public interface InterceptorClient {
     )
     String simple();
 
-
+    @Request(
+            url = "http://localhost:5000/hello/user?username=foo",
+            headers = {"Accept:text/plan"},
+            interceptor = {SimpleInterceptor.class, Simple2Interceptor.class}
+    )
+    String multiple();
 
 }

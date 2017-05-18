@@ -52,6 +52,13 @@ public class TestInterceptor {
     }
 
     @Test
+    public void testMultipleInterceptor() {
+        String result = interceptorClient.multiple();
+        assertNotNull(result);
+        assertEquals("YY: XX: " + GetMockServer.EXPECTED, result);
+    }
+
+    @Test
     public void testWrongInterceptorClass() {
         boolean error = false;
         try {

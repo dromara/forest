@@ -42,6 +42,7 @@ public class InterceptorChain implements Interceptor {
         Iterator<Interceptor> iter = interceptors.iterator();
         for (; iter.hasNext(); ) {
             Interceptor item = iter.next();
+            data = response.getResult();
             item.onSuccess(data, request, response);
         }
     }
