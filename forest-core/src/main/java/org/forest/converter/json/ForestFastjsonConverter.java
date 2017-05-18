@@ -30,7 +30,8 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
 
     public void setSerializerFeatureName(String serializerFeatureName) {
         this.serializerFeatureName = serializerFeatureName;
-        setSerializerFeature(SerializerFeature.valueOf(serializerFeatureName));
+        SerializerFeature feature = SerializerFeature.valueOf(serializerFeatureName);
+        setSerializerFeature(feature);
     }
 
     public SerializerFeature getSerializerFeature() {
@@ -43,7 +44,12 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
 
     public void setSerializerFeature(SerializerFeature serializerFeature) {
         this.serializerFeature = serializerFeature;
-        this.serializerFeatureName = serializerFeature.name();
+        if (serializerFeature == null) {
+            this.serializerFeatureName = null;
+        }
+        else {
+            this.serializerFeatureName = serializerFeature.name();
+        }
     }
 
     public <T> T convertToJavaObject(String source, Class<T> targetType) {

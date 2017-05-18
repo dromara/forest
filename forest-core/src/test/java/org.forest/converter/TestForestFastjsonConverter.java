@@ -9,6 +9,8 @@ import org.forest.converter.json.ForestFastjsonConverter;
 import org.forest.exceptions.ForestRuntimeException;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
@@ -50,6 +52,23 @@ public class TestForestFastjsonConverter {
         ForestFastjsonConverter forestFastjsonConverter = new ForestFastjsonConverter();
         String text = forestFastjsonConverter.convertToJson(new Integer[] {100, 10});
         assertEquals("[100,10]", text);
+
+        Map map = new LinkedHashMap();
+        map.put("a", 1);
+        text = forestFastjsonConverter.convertToJson(map);
+        assertEquals("{\"a\":1}", text);
+
+        Map sub = new LinkedHashMap();
+        sub.put("x", 0);
+        map.put("s1", sub);
+        map.put("s2", sub);
+        text = forestFastjsonConverter.convertToJson(map);
+        assertEquals("{\"a\":1,\"s1\":{\"x\":0},\"s2\":{\"x\":0}}", text);
+
+        forestFastjsonConverter.setSerializerFeature(null);
+        text = forestFastjsonConverter.convertToJson(new Integer[] {100, 10});
+        assertEquals("[100,10]", text);
+
     }
 
     @Test
