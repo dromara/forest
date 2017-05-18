@@ -2,6 +2,8 @@ package org.forest.converter;
 
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import junit.framework.Assert;
 import org.forest.converter.json.ForestFastjsonConverter;
 import org.forest.exceptions.ForestRuntimeException;
@@ -18,6 +20,7 @@ import static junit.framework.Assert.assertTrue;
  * @since 2017-05-08 23:13
  */
 public class TestForestFastjsonConverter {
+
 
     @Test
     public void testSerializerFeature() {
@@ -67,7 +70,6 @@ public class TestForestFastjsonConverter {
         assertNotNull(result);
         assertEquals(1, result.get("a"));
         assertEquals(2, result.get("b"));
-
     }
 
     @Test
