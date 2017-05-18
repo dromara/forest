@@ -20,10 +20,10 @@ public class ForestJaxbConverter implements ForestXmlConverter {
 
     @Override
     public String convertToXml(Object obj) {
-        JAXBContext jaxbContext = null;
         try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(obj.getClass());
             StringWriter writer = new StringWriter();
-            createMarshaller(jaxbContext, null).marshal(obj, writer);
+            createMarshaller(jaxbContext, "UTF-8").marshal(obj, writer);
             return writer.toString();
         } catch (JAXBException e) {
             throw new ForestRuntimeException(e);
