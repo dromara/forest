@@ -69,9 +69,13 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         }
     };
 
+    protected void prepareBodyBuilder() {
+        bodyBuilder = new HttpclientNonBodyBuilder();
+    }
+
     protected void prepare() {
         httpRequest = buildRequest();
-        bodyBuilder = new HttpclientBodyBuilder<>();
+        prepareBodyBuilder();
         setupHeaders();
         setupBody();
     }
@@ -93,6 +97,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
     }
 
     public void setupBody() {
+        bodyBuilder.buildBody(httpRequest, request);
     }
 
     protected HttpClient getHttpClient() {

@@ -22,7 +22,7 @@ import java.util.*;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-19 14:52
  */
-public class HttpclientBodyBuilder<T extends HttpRequestBase> implements BodyBuilder<T> {
+public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> implements BodyBuilder<T> {
 
     @Override
     public void buildBody(T httpRequest, ForestRequest request) {

@@ -40,11 +40,10 @@ public abstract class AbstractEntityHttpExecutor<T extends HttpEntityEnclosingRe
         super(connectionManager, requst);
     }
 
-
-    @Override
-    public void setupBody() {
-        bodyBuilder.buildBody(httpRequest, request);
+    protected void prepareBodyBuilder() {
+        bodyBuilder = new HttpclientBodyBuilder<>();
     }
+
 
     @Override
     protected String getLogContentForBody(T httpReq) {
