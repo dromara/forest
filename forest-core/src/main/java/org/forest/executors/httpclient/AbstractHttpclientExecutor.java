@@ -13,6 +13,7 @@ import org.apache.http.impl.cookie.BrowserCompatSpec;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.params.HttpParams;
 import org.forest.converter.json.ForestJsonConverter;
+import org.forest.executors.url.URLBuilder;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
 import org.forest.utils.RequestNameValue;
@@ -40,43 +41,17 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
     protected final String typeName;
     protected T httpRequest;
 
-
     protected T buildRequest() {
         return getRequestProvider().getRequest(url);
     }
 
     protected abstract HttpclientRequestProvider<T> getRequestProvider();
 
+    protected abstract URLBuilder getURLBuilder();
+
 
     protected String buildUrl() {
-        String url = request.getUrl();
-        List<RequestNameValue> data = request.getDataNameValueList();
-        StringBuilder paramBuilder = new StringBuilder();
-        ForestJsonConverter jsonConverter = request.getConfiguration().getJsonCoverter();
-        for (int i = 0; i < data.size(); i++) {
-            RequestNameValue nameValue = data.get(i);
-            paramBuilder.append(nameValue.getName());
-            String value = MappingTemplate.getParameterValue(jsonConverter, nameValue.getValue());
-            paramBuilder.append('=');
-            if (StringUtils.isNotEmpty(value)) {
-                String encodedValue = null;
-                try {
-                    encodedValue = URLEncoder.encode(value, "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                }
-                if (encodedValue != null) {
-                    paramBuilder.append(encodedValue);
-                }
-            }
-            if (i < data.size() - 1) {
-                paramBuilder.append('&');
-            }
-        }
-        String query = paramBuilder.toString();
-        if (StringUtils.isNotEmpty(query)) {
-            return url + "?" + query;
-        }
-        return url;
+        return getURLBuilder().buildUrl(request);
     }
 
 

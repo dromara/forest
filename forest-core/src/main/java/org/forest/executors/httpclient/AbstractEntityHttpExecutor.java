@@ -38,10 +38,6 @@ public abstract class AbstractEntityHttpExecutor<T extends HttpEntityEnclosingRe
         super(connectionManager, requst);
     }
 
-    @Override
-    protected String buildUrl() {
-        return request.getUrl();
-    }
 
     @Override
     public void setupBody() {
