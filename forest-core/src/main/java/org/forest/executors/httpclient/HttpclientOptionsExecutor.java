@@ -1,6 +1,7 @@
 package org.forest.executors.httpclient;
 
 import org.apache.http.client.methods.HttpOptions;
+import org.forest.executors.url.URLBuilder;
 import org.forest.http.ForestRequest;
 
 /**
@@ -17,10 +18,17 @@ public class HttpclientOptionsExecutor extends AbstractHttpclientExecutor<HttpOp
                 }
             };
 
+
     @Override
     protected HttpclientRequestProvider<HttpOptions> getRequestProvider() {
         return httpOptionsProvider;
     }
+
+    @Override
+    protected URLBuilder getURLBuilder() {
+        return URLBuilder.getQueryableURLBuilder();
+    }
+
 
     public HttpclientOptionsExecutor(HttpclientConnectionManager connectionManager, ForestRequest request) {
         super(connectionManager, request);

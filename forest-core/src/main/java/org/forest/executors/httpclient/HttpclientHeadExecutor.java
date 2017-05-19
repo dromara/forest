@@ -1,6 +1,7 @@
 package org.forest.executors.httpclient;
 
 import org.apache.http.client.methods.HttpHead;
+import org.forest.executors.url.URLBuilder;
 import org.forest.http.ForestRequest;
 
 /**
@@ -20,6 +21,11 @@ public class HttpclientHeadExecutor extends AbstractHttpclientExecutor<HttpHead>
     @Override
     protected HttpclientRequestProvider<HttpHead> getRequestProvider() {
         return httpHeadProvider;
+    }
+
+    @Override
+    protected URLBuilder getURLBuilder() {
+        return URLBuilder.getQueryableURLBuilder();
     }
 
     public HttpclientHeadExecutor(HttpclientConnectionManager connectionManager, ForestRequest request) {

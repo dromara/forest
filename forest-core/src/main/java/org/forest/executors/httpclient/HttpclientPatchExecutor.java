@@ -1,6 +1,7 @@
 package org.forest.executors.httpclient;
 
 import org.apache.http.client.methods.HttpPut;
+import org.forest.executors.url.URLBuilder;
 import org.forest.http.ForestRequest;
 
 /**
@@ -20,6 +21,11 @@ public class HttpclientPatchExecutor extends AbstractEntityHttpExecutor<Httpclie
     @Override
     protected HttpclientRequestProvider<HttpPatch> getRequestProvider() {
         return httpPatchProvider;
+    }
+
+    @Override
+    protected URLBuilder getURLBuilder() {
+        return URLBuilder.getSimpleURLBuilder();
     }
 
     public HttpclientPatchExecutor(HttpclientConnectionManager connectionManager, ForestRequest requst) {

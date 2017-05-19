@@ -2,7 +2,7 @@ package org.forest.executors.httpclient;
 
 
 import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpPut;
+import org.forest.executors.url.URLBuilder;
 import org.forest.http.ForestRequest;
 
 /**
@@ -22,6 +22,11 @@ public class HttpclientDeleteExecutor extends AbstractHttpclientExecutor<HttpDel
     @Override
     protected HttpclientRequestProvider<HttpDelete> getRequestProvider() {
         return httpDeleteProvider;
+    }
+
+    @Override
+    protected URLBuilder getURLBuilder() {
+        return URLBuilder.getQueryableURLBuilder();
     }
 
     public HttpclientDeleteExecutor(HttpclientConnectionManager connectionManager, ForestRequest request) {
