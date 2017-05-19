@@ -30,35 +30,38 @@ public class MethodResponseHandler<T> implements ResponseHandler {
 
     @Override
     public void handle(ForestRequest request, ForestResponse response) {
-        ResultHandler resultHandler = new DefaultResultHandlerAdaptor();
-        Type returnType = method.getReturnType();
-        Class resultType = method.getResultType();
-        Object resultData = resultHandler.getResult(request, response, returnType);
-        response.setResult(resultData);
-        if (response.isSuccess()) {
-            Object data = resultData;
-            request.getInterceptorChain().onSuccess(data, request, response);
-            data = resultData = response.getResult();
-            OnSuccess onSuccess = request.getOnSuccess();
-            if (onSuccess != null) {
-                if (onSuccessClassGenericType != null) {
-                    data = resultHandler.getResult(request, response, onSuccessClassGenericType);
+        try {
+            ResultHandler resultHandler = new DefaultResultHandlerAdaptor();
+            Type returnType = method.getReturnType();
+            Class returnClass = method.getReturnClass();
+            Object resultData = resultHandler.getResult(request, response, returnType);
+            response.setResult(resultData);
+            if (response.isSuccess()) {
+                request.getInterceptorChain().onSuccess(resultData, request, response);
+                OnSuccess onSuccess = request.getOnSuccess();
+                if (onSuccess != null) {
+                    if (onSuccessClassGenericType != null) {
+                        resultData = resultHandler.getResult(request, response, onSuccessClassGenericType);
+                    } else if (void.class.isAssignableFrom(returnClass)) {
+                        resultData = resultHandler.getResult(request, response, String.class);
+                    }
+                    onSuccess.onSuccess(resultData, request, response);
                 }
-                else if (void.class.isAssignableFrom(resultType)) {
-                    data = resultHandler.getResult(request, response, String.class);
+                resultData = response.getResult();
+            } else {
+                if (request.getOnError() != null) {
+                    ForestNetworkException networkException = new ForestNetworkException("", response.getStatusCode());
+                    ForestRuntimeException e = new ForestRuntimeException(networkException);
+                    request.getInterceptorChain().onError(e, request, response);
+                    request.getOnError().onError(e, request);
                 }
-                onSuccess.onSuccess(data, request, response);
             }
+            this.resultData = (T) resultData;
+        } catch (Throwable e) {
+            throw e;
+        } finally {
+            request.getInterceptorChain().afterExecute(request, response);
         }
-        else {
-            if (request.getOnError() != null) {
-                ForestNetworkException networkException = new ForestNetworkException("", response.getStatusCode());
-                ForestRuntimeException e = new ForestRuntimeException(networkException);
-                request.getInterceptorChain().onError(e, request, response);
-                request.getOnError().onError(e, request);
-            }
-        }
-        this.resultData = (T) resultData;
     }
 
     public T getResultData() {

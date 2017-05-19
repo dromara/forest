@@ -10,12 +10,7 @@ import org.forest.callback.OnSuccess;
 import org.forest.config.ForestConfiguration;
 import org.forest.config.VariableScope;
 import org.forest.converter.json.ForestJsonConverter;
-import org.forest.exceptions.ForestNetworkException;
 import org.forest.exceptions.ForestRuntimeException;
-import org.forest.handler.DefaultResultHandlerAdaptor;
-import org.forest.handler.ResponseHandler;
-import org.forest.handler.ResultHandler;
-import org.forest.http.ForestResponse;
 import org.forest.interceptor.Interceptor;
 import org.forest.mapping.*;
 import org.forest.http.ForestRequest;
@@ -41,7 +36,7 @@ public class ForestMethod<T> implements VariableScope {
     private final InterfaceProxyHandler interfaceProxyHandler;
     private final ForestConfiguration configuration;
     private final Method method;
-    private Class resultType;
+    private Class returnClass;
     private MappingTemplate urlTemplate;
     private MappingTemplate typeTemplate;
     private MappingTemplate dataTypeTemplate;
@@ -82,8 +77,8 @@ public class ForestMethod<T> implements VariableScope {
     }
 
 
-    public Class getResultType() {
-        return resultType;
+    public Class getReturnClass() {
+        return returnClass;
     }
 
 
@@ -155,7 +150,7 @@ public class ForestMethod<T> implements VariableScope {
                 }
             }
         }
-        resultType = method.getReturnType();
+        returnClass = method.getReturnType();
     }
 
 
