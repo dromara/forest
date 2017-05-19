@@ -9,14 +9,17 @@ import org.forest.http.ForestRequest;
  */
 public class HttpclientPostExecutor extends AbstractEntityHttpExecutor<HttpPost> {
 
+    private final static HttpclientRequestProvider<HttpPost> httpPostProvider =
+            new HttpclientRequestProvider<HttpPost>() {
+                @Override
+                public HttpPost getRequest(String url) {
+                    return new HttpPost(url);
+                }
+            };
+
     @Override
     protected HttpclientRequestProvider<HttpPost> getRequestProvider() {
-        return new HttpclientRequestProvider<HttpPost>() {
-            @Override
-            public HttpPost getRequest(String url) {
-                return new HttpPost(url);
-            }
-        };
+        return httpPostProvider;
     }
 
     public HttpclientPostExecutor(HttpclientConnectionManager connectionManager, ForestRequest requst) {

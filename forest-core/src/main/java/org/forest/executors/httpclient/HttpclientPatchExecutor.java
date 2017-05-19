@@ -9,14 +9,17 @@ import org.forest.http.ForestRequest;
  */
 public class HttpclientPatchExecutor extends AbstractEntityHttpExecutor<HttpclientPatchExecutor.HttpPatch> {
 
+    private final static HttpclientRequestProvider<HttpPatch> httpPatchProvider =
+            new HttpclientRequestProvider<HttpPatch>() {
+                @Override
+                public HttpPatch getRequest(String url) {
+                    return new HttpPatch(url);
+                }
+            };
+
     @Override
     protected HttpclientRequestProvider<HttpPatch> getRequestProvider() {
-        return new HttpclientRequestProvider<HttpPatch>() {
-            @Override
-            public HttpPatch getRequest(String url) {
-                return new HttpPatch(url);
-            }
-        };
+        return httpPatchProvider;
     }
 
     public HttpclientPatchExecutor(HttpclientConnectionManager connectionManager, ForestRequest requst) {

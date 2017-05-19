@@ -9,14 +9,17 @@ import org.forest.http.ForestRequest;
  */
 public class HttpclientHeadExecutor extends AbstractHttpclientExecutor<HttpHead> {
 
+    private final static HttpclientRequestProvider<HttpHead> httpHeadProvider =
+            new HttpclientRequestProvider<HttpHead>() {
+                @Override
+                public HttpHead getRequest(String url) {
+                    return new HttpHead(url);
+                }
+            };
+
     @Override
     protected HttpclientRequestProvider<HttpHead> getRequestProvider() {
-        return new HttpclientRequestProvider<HttpHead>() {
-            @Override
-            public HttpHead getRequest(String url) {
-                return new HttpHead(url);
-            }
-        };
+        return httpHeadProvider;
     }
 
     public HttpclientHeadExecutor(HttpclientConnectionManager connectionManager, ForestRequest request) {

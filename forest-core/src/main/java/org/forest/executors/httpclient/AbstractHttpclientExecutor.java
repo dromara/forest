@@ -81,7 +81,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
 
 
     private final static CookieSpecFactory defaultCookieSF = new CookieSpecFactory() {
-public CookieSpec newInstance(HttpParams params) {
+        public CookieSpec newInstance(HttpParams params) {
             return new BrowserCompatSpec() {
                 @Override
                 public void validate(Cookie cookie, CookieOrigin origin)

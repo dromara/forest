@@ -9,6 +9,8 @@ import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
+import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -73,6 +75,11 @@ public class HttpclientConnectionManager {
 
     public HttpClient getHttpClient() {
         return new DefaultHttpClient(connectionManager, httpParams);
+    }
+
+
+    public CloseableHttpAsyncClient getHttpAsyncClient() {
+        return HttpAsyncClients.createDefault();
     }
 
 }
