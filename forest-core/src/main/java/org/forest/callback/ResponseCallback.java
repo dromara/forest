@@ -8,7 +8,7 @@ import org.forest.http.ForestRequest;
  * @author gongjun
  * @since 2016-05-03
  */
-public interface RequestCallback<T> {
+public interface ResponseCallback<T> {
 
     /**
      * callback method on success

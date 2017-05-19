@@ -9,12 +9,12 @@ import org.forest.callback.OnError;
 import org.forest.callback.OnSuccess;
 import org.forest.config.ForestConfiguration;
 import org.forest.config.VariableScope;
-import org.forest.converter.ForestConverter;
 import org.forest.converter.json.ForestJsonConverter;
 import org.forest.exceptions.ForestNetworkException;
 import org.forest.exceptions.ForestRuntimeException;
-import org.forest.handler.DefaultResponseHandlerAdaptor;
+import org.forest.handler.DefaultResultHandlerAdaptor;
 import org.forest.handler.ResponseHandler;
+import org.forest.handler.ResultHandler;
 import org.forest.http.ForestResponse;
 import org.forest.interceptor.Interceptor;
 import org.forest.mapping.*;
@@ -56,7 +56,6 @@ public class ForestMethod<T> implements VariableScope {
     private MappingParameter onSuccessParameter = null;
     private MappingParameter onErrorParameter = null;
     private List<Interceptor> interceptorList;
-    private Class onSuccessClass = null;
     private Class onSuccessClassGenericType = null;
     private boolean async = false;
     private boolean logEnable = true;
@@ -72,13 +71,6 @@ public class ForestMethod<T> implements VariableScope {
         return configuration;
     }
 
-    public ForestConverter getDataConverter(ForestDataType dataType) {
-        ForestConverter converter = configuration.getConverter(dataType);
-        if (converter == null) {
-            throw new ForestRuntimeException("Can not found converter for type " + dataType.name());
-        }
-        return converter;
-    }
 
     public Object getVariableValue(String name) {
         Object value = configuration.getVariableValue(name);
@@ -89,9 +81,6 @@ public class ForestMethod<T> implements VariableScope {
         return new MappingTemplate(text, this);
     }
 
-    public MappingParameter[] getParameterTemplateArray() {
-        return parameterTemplateArray;
-    }
 
     public Class getResultType() {
         return resultType;
@@ -186,7 +175,6 @@ public class ForestMethod<T> implements VariableScope {
             parameterTemplateArray[i] = parameter;
             if (OnSuccess.class.isAssignableFrom(paramType)) {
                 onSuccessParameter = parameter;
-                onSuccessClass = paramType;
                 Type genType = genericParamTypes[i];
                 onSuccessClassGenericType = getGenericClass(genType, 0);
             }
@@ -328,10 +316,10 @@ public class ForestMethod<T> implements VariableScope {
 
         // create and initialize http instance
         ForestRequest<T> request = new ForestRequest(configuration);
-        request.setUrl(newUrl);
-        request.setType(renderedType);
-        request.setContentType(renderedContentType);
-        request.setLogEnable(logEnable);
+        request.setUrl(newUrl)
+                .setType(renderedType)
+                .setContentType(renderedContentType)
+                .setLogEnable(logEnable);
         if (configuration.getDefaultParameters() != null) {
             request.addData(configuration.getDefaultParameters());
         }
@@ -423,7 +411,6 @@ public class ForestMethod<T> implements VariableScope {
 
 
 
-
     /**
      * 从对象中获取键值对列表
      * @param obj
@@ -462,12 +449,12 @@ public class ForestMethod<T> implements VariableScope {
      */
     public Object invoke(Object[] args) {
         ForestRequest request = makeRequest(args);
-        return request.execute(configuration.getExecutorFactory(), this);
+        MethodResponseHandler<T> responseHandler = new MethodResponseHandler<>(
+                this, onSuccessClassGenericType);
+        request.execute(configuration.getExecutorFactory(), responseHandler);
+        return responseHandler.getResultData();
     }
 
-    public boolean onBefore(ForestRequest request) {
-        return true;
-    }
 
     /**
      * 获取泛型类型
@@ -499,34 +486,4 @@ public class ForestMethod<T> implements VariableScope {
     }
 
 
-    public T handleResponse(ForestRequest request, ForestResponse response) {
-        ResponseHandler responseHandler = new DefaultResponseHandlerAdaptor(this);
-        Type returnType = getReturnType();
-        Object resultData = responseHandler.getResult(request, response, returnType);
-        response.setResult(resultData);
-        if (response.isSuccess()) {
-            Object data = resultData;
-            request.getInterceptorChain().onSuccess(data, request, response);
-            data = resultData = response.getResult();
-            OnSuccess onSuccess = request.getOnSuccess();
-            if (onSuccess != null) {
-                if (onSuccessClassGenericType != null) {
-                    data = responseHandler.getResult(request, response, onSuccessClassGenericType);
-                }
-                else if (void.class.isAssignableFrom(resultType)) {
-                    data = responseHandler.getResult(request, response, String.class);
-                }
-                onSuccess.onSuccess(data, request, response);
-            }
-        }
-        else {
-            if (request.getOnError() != null) {
-                ForestNetworkException networkException = new ForestNetworkException("", response.getStatusCode());
-                ForestRuntimeException e = new ForestRuntimeException(networkException);
-                request.getInterceptorChain().onError(e, request, response);
-                request.getOnError().onError(e, request);
-            }
-        }
-        return (T) resultData;
-    }
 }

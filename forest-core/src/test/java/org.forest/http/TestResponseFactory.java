@@ -3,7 +3,7 @@ package org.forest.http;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.forest.config.ForestConfiguration;
-import org.forest.executors.httpclient.HttpclientForestResponseFactory;
+import org.forest.executors.httpclient.response.HttpclientForestResponseFactory;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertNotNull;

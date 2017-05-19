@@ -3,7 +3,6 @@ package org.forest.executors.httpclient.body;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
@@ -59,9 +58,7 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> imp
                 StringEntity entity = new StringEntity(text, charset);
                 entity.setContentType(contentType);
 //                        entity.setContentEncoding(HTTP.UTF_8);
-                if (httpRequest instanceof HttpEntityEnclosingRequestBase) {
-                    ((HttpEntityEnclosingRequestBase) httpRequest).setEntity(entity);
-                }
+                httpRequest.setEntity(entity);
             } catch (UnsupportedEncodingException e) {
                 throw new ForestRuntimeException(e);
             }
@@ -85,9 +82,7 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> imp
             if (StringUtils.isNotEmpty(contentType)) {
                 entity.setContentType(contentType);
             }
-            if (httpReq instanceof HttpEntityEnclosingRequestBase) {
-                ((HttpEntityEnclosingRequestBase) httpReq).setEntity(entity);
-            }
+            httpReq.setEntity(entity);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

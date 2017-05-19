@@ -5,10 +5,8 @@ import org.apache.http.util.EntityUtils;
 import org.forest.converter.ForestConverter;
 import org.forest.exceptions.ForestHandlerException;
 import org.forest.utils.ForestDataType;
-import org.forest.reflection.ForestMethod;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
-import org.forest.exceptions.ForestRuntimeException;
 
 import java.io.*;
 import java.lang.reflect.ParameterizedType;
@@ -17,12 +15,8 @@ import java.lang.reflect.Type;
 /**
  * Created by Administrator on 2016/5/25.
  */
-public class DefaultResponseHandlerAdaptor extends ResponseHandler {
+public class DefaultResultHandlerAdaptor extends ResultHandler {
 
-
-    public DefaultResponseHandlerAdaptor(ForestMethod method) {
-        super(method);
-    }
 
     private static Class typeToClass(Type genType) {
         if (genType instanceof ParameterizedType) {
@@ -62,7 +56,7 @@ public class DefaultResponseHandlerAdaptor extends ResponseHandler {
                 }
 
                 ForestDataType dataType = request.getDataType();
-                ForestConverter converter = method.getDataConverter(dataType);
+                ForestConverter converter = request.getConfiguration().getConverter(dataType);
                 return converter.convertToJavaObject(responseText, resultType);
 
             } catch (IOException e) {

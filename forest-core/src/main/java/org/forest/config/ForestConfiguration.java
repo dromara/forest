@@ -28,6 +28,7 @@ package org.forest.config;
 import org.forest.converter.ForestConverter;
 import org.forest.converter.JSONConverterSelector;
 import org.forest.converter.json.ForestJsonConverter;
+import org.forest.exceptions.ForestRuntimeException;
 import org.forest.executors.ForestExecutorFactory;
 import org.forest.executors.httpclient.HttpclientExecutorFactory;
 import org.forest.mapping.MappingVariable;
@@ -201,7 +202,11 @@ public class ForestConfiguration implements Serializable {
     }
 
     public ForestConverter getConverter(ForestDataType dataType) {
-        return getConverterMap().get(dataType);
+        ForestConverter converter = getConverterMap().get(dataType);
+        if (converter == null) {
+            throw new ForestRuntimeException("Can not found converter for type " + dataType.name());
+        }
+        return converter;
     }
 
     public Map<ForestDataType, ForestConverter> getConverterMap() {

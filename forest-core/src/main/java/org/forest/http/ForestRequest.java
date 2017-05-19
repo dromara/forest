@@ -30,6 +30,7 @@ import org.forest.config.ForestConfiguration;
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.executors.ForestExecutorFactory;
 import org.forest.executors.HttpExecutor;
+import org.forest.handler.ResponseHandler;
 import org.forest.interceptor.Interceptor;
 import org.forest.interceptor.InterceptorChain;
 import org.forest.reflection.ForestMethod;
@@ -283,16 +284,15 @@ public class ForestRequest<T> {
         return this;
     }
 
-    public T execute(ForestExecutorFactory executorFactory, ForestMethod<T> method) {
-        HttpExecutor executor  = executorFactory.create(this, method);
+    public void execute(ForestExecutorFactory executorFactory, ResponseHandler responseHandler) {
+        HttpExecutor executor  = executorFactory.create(this);
         if (executor != null) {
             ForestResponse response = null;
             try {
                 if (interceptorChain.beforeExecute(this)) {
                     executor.execute();
                     response = executor.getResponse();
-                    T data = method.handleResponse(this, response);
-                    return data;
+                    responseHandler.handle(this, response);
                 }
             } catch (ForestRuntimeException e) {
                 if (onError == null) {
@@ -309,7 +309,7 @@ public class ForestRequest<T> {
                 interceptorChain.afterExecute(this, response);
             }
         }
-        return null;
+//        return null;
     }
 
 }

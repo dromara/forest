@@ -8,7 +8,7 @@ import org.forest.http.ForestRequest;
  * @author gongjun
  * @since 2016-05-24
  */
-public class HttpclientPostExecutor extends AbstractEntityHttpExecutor<HttpPost> {
+public class HttpclientPostExecutorHttpclient extends AbstractHttpclientEntityExecutor<HttpPost> {
 
     private final static HttpclientRequestProvider<HttpPost> httpPostProvider =
             new HttpclientRequestProvider<HttpPost>() {
@@ -29,7 +29,7 @@ public class HttpclientPostExecutor extends AbstractEntityHttpExecutor<HttpPost>
     }
 
 
-    public HttpclientPostExecutor(HttpclientConnectionManager connectionManager, ForestRequest requst) {
+    public HttpclientPostExecutorHttpclient(HttpclientConnectionManager connectionManager, ForestRequest requst) {
         super(connectionManager, requst);
     }
 

@@ -58,21 +58,21 @@ public class HttpclientExecutorFactory implements ForestExecutorFactory {
         executorCreatorMap.put("POST", new HttpExecutorCreator() {
             @Override
             public HttpExecutor createExecutor(HttpclientConnectionManager connectionManager, ForestRequest request) {
-                return new HttpclientPostExecutor(connectionManager, request);
+                return new HttpclientPostExecutorHttpclient(connectionManager, request);
             }
         });
 
         executorCreatorMap.put("PUT", new HttpExecutorCreator() {
             @Override
             public HttpExecutor createExecutor(HttpclientConnectionManager connectionManager, ForestRequest request) {
-                return new HttpclientPutHttpExecutor(connectionManager, request);
+                return new HttpclientPutExecutorHttpclient(connectionManager, request);
             }
         });
 
         executorCreatorMap.put("PATCH", new HttpExecutorCreator() {
             @Override
             public HttpExecutor createExecutor(HttpclientConnectionManager connectionManager, ForestRequest request) {
-                return new HttpclientPatchExecutor(connectionManager, request);
+                return new HttpclientPatchExecutorHttpclient(connectionManager, request);
             }
         });
 
@@ -90,7 +90,7 @@ public class HttpclientExecutorFactory implements ForestExecutorFactory {
 
 
     @Override
-    public HttpExecutor create(ForestRequest request, ForestMethod method) {
+    public HttpExecutor create(ForestRequest request) {
         HttpExecutor executor  = null;
         String key = request.getType().toUpperCase();
         HttpExecutorCreator httpExecutorCreator = executorCreatorMap.get(key);

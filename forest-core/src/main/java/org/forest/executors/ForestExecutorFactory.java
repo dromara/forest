@@ -9,6 +9,6 @@ import org.forest.reflection.ForestMethod;
  */
 public interface ForestExecutorFactory {
 
-    HttpExecutor create(ForestRequest request, ForestMethod method);
+    HttpExecutor create(ForestRequest request);
 
 }

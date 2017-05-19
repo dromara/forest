@@ -1,4 +1,4 @@
-package org.forest.executors.httpclient;
+package org.forest.executors.httpclient.response;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;

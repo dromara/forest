@@ -19,20 +19,17 @@ import java.io.*;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2017-04-20 13:22
  */
-public abstract class AbstractEntityHttpExecutor<T extends HttpEntityEnclosingRequestBase> extends AbstractHttpclientExecutor<T> {
+public abstract class AbstractHttpclientEntityExecutor<T extends HttpEntityEnclosingRequestBase> extends AbstractHttpclientExecutor<T> {
 
-    private static Log log = LogFactory.getLog(HttpclientPostExecutor.class);
+    private static Log log = LogFactory.getLog(HttpclientPostExecutorHttpclient.class);
 
-
-
-    public AbstractEntityHttpExecutor(HttpclientConnectionManager connectionManager, ForestRequest requst) {
+    public AbstractHttpclientEntityExecutor(HttpclientConnectionManager connectionManager, ForestRequest requst) {
         super(connectionManager, requst);
     }
 
     protected void prepareBodyBuilder() {
         bodyBuilder = new HttpclientBodyBuilder<>();
     }
-
 
     @Override
     protected String getLogContentForBody(T httpReq) {
