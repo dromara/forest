@@ -18,7 +18,10 @@ import java.lang.reflect.Type;
 public class DefaultResultHandlerAdaptor extends ResultHandler {
 
     public Object getResult(ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
-
+        Object result = response.getResult();
+        if (result != null && resultClass.isAssignableFrom(result.getClass())) {
+            return result;
+        }
         HttpEntity entity = response.getHttpResponse().getEntity();
         if (entity != null) {
             try {
@@ -36,7 +39,13 @@ public class DefaultResultHandlerAdaptor extends ResultHandler {
                         return EntityUtils.toByteArray(entity);
                     }
                 }
-                String responseText = response.getContent();
+                String responseText = null;
+                if (result != null && CharSequence.class.isAssignableFrom(result.getClass())) {
+                    responseText = result.toString();
+                }
+                else {
+                    responseText = response.getContent();
+                }
                 response.setContent(responseText);
                 if (CharSequence.class.isAssignableFrom(resultClass)) {
                     return responseText;

@@ -1,6 +1,7 @@
 package org.forest.executors;
 
 import org.forest.executors.httpclient.HttpclientConnectionManager;
+import org.forest.handler.ResponseHandler;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
 
@@ -16,7 +17,7 @@ public interface HttpExecutor {
 
     HttpclientConnectionManager getConnectionManager();
 
-    void execute();
+    void execute(ResponseHandler responseHandler);
 
     void close();
 }

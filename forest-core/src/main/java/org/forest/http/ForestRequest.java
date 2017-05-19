@@ -290,9 +290,9 @@ public class ForestRequest<T> {
             ForestResponse response = null;
             try {
                 if (interceptorChain.beforeExecute(this)) {
-                    executor.execute();
+                    executor.execute(responseHandler);
                     response = executor.getResponse();
-                    responseHandler.handle(this, response);
+//                    responseHandler.handle(this, response);
                 }
             } catch (ForestRuntimeException e) {
                 if (onError == null) {

@@ -9,5 +9,5 @@ import org.forest.http.ForestResponse;
  */
 public interface ResponseHandler {
 
-    public void handle(ForestRequest request, ForestResponse response);
+    void handle(ForestRequest request, ForestResponse response);
 }

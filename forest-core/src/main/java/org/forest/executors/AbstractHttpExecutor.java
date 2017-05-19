@@ -2,6 +2,7 @@ package org.forest.executors;
 
 import org.forest.executors.httpclient.HttpclientConnectionManager;
 import org.forest.executors.httpclient.response.HttpclientForestResponseFactory;
+import org.forest.handler.ResponseHandler;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
 import org.forest.http.ForestResponseFactory;
@@ -42,7 +43,7 @@ public abstract class AbstractHttpExecutor implements HttpExecutor {
         this.response = response;
     }
 
-    public abstract void execute();
+    public abstract void execute(ResponseHandler responseHandler);
 
     public abstract void close();
 

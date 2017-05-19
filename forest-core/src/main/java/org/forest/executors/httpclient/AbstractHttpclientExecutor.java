@@ -16,6 +16,7 @@ import org.forest.converter.json.ForestJsonConverter;
 import org.forest.executors.BodyBuilder;
 import org.forest.executors.httpclient.body.HttpclientNonBodyBuilder;
 import org.forest.executors.url.URLBuilder;
+import org.forest.handler.ResponseHandler;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
 import org.forest.utils.RequestNameValue;
@@ -163,12 +164,13 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         logContent("Response: Status=" + response.getStatusCode());
     }
 
-    public void execute() {
-        execute(0);
+    public void execute(ResponseHandler responseHandler) {
+        execute(0, responseHandler);
+        responseHandler.handle(request, response);
     }
 
 
-    public void execute(int retryCount) {
+    public void execute(int retryCount, ResponseHandler responseHandler) {
         try {
             logRequestBegine(retryCount, httpRequest);
             HttpResponse httpResponse = client.execute(httpRequest);
@@ -185,8 +187,9 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
                 throw new ForestRuntimeException(e);
             }
             log.error(e.getMessage());
-            execute(retryCount + 1);
+            execute(retryCount + 1, responseHandler);
         }
+
     }
 
     public void close() {

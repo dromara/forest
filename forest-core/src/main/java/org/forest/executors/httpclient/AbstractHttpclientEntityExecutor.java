@@ -8,6 +8,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.forest.executors.httpclient.body.HttpclientBodyBuilder;
+import org.forest.handler.ResponseHandler;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
 import org.forest.exceptions.ForestNetworkException;
@@ -61,7 +62,7 @@ public abstract class AbstractHttpclientEntityExecutor<T extends HttpEntityEnclo
         return httpResponse;
     }
 
-    public void execute(int retryCount) {
+    public void execute(int retryCount, ResponseHandler responseHandler) {
         try {
             logRequestBegine(retryCount, httpRequest);
             httpResponse = sendRequest(client, httpRequest);
@@ -77,7 +78,7 @@ public abstract class AbstractHttpclientEntityExecutor<T extends HttpEntityEnclo
                 throw new RuntimeException(e);
             }
             log.error(e.getMessage());
-            execute(retryCount + 1);
+            execute(retryCount + 1, responseHandler);
         } catch (ForestRuntimeException e) {
             httpRequest.abort();
             throw e;
