@@ -12,10 +12,10 @@ import java.io.*;
 import java.lang.reflect.Type;
 
 /**
- * Created by Administrator on 2016/5/25.
+ * @author gongjun[jun.gong@thebeastshop.com]
+ * @since 2016-05-25
  */
 public class DefaultResultHandlerAdaptor extends ResultHandler {
-
 
     public Object getResult(ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
 
