@@ -34,16 +34,16 @@ public class MethodResponseHandler<T> implements ResponseHandler {
             ResultHandler resultHandler = new DefaultResultHandlerAdaptor();
             Type returnType = method.getReturnType();
             Class returnClass = method.getReturnClass();
-            Object resultData = resultHandler.getResult(request, response, returnType);
+            Object resultData = resultHandler.getResult(request, response, returnType, returnClass);
             response.setResult(resultData);
             if (response.isSuccess()) {
                 request.getInterceptorChain().onSuccess(resultData, request, response);
                 OnSuccess onSuccess = request.getOnSuccess();
                 if (onSuccess != null) {
                     if (onSuccessClassGenericType != null) {
-                        resultData = resultHandler.getResult(request, response, onSuccessClassGenericType);
+                        resultData = resultHandler.getResult(request, response, onSuccessClassGenericType, onSuccessClassGenericType);
                     } else if (void.class.isAssignableFrom(returnClass)) {
-                        resultData = resultHandler.getResult(request, response, String.class);
+                        resultData = resultHandler.getResult(request, response, String.class, String.class);
                     }
                     onSuccess.onSuccess(resultData, request, response);
                 }

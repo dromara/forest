@@ -6,10 +6,10 @@ import org.forest.http.ForestResponse;
 import java.lang.reflect.Type;
 
 /**
- * Created by Administrator on 2016/5/4.
+ * @author gongjun[jun.gong@thebeastshop.com]
+ * @since 2016-05-04
  */
 public abstract class ResultHandler {
 
-
-    public abstract Object getResult(ForestRequest request, ForestResponse response, Type resultType);
+    public abstract Object getResult(ForestRequest request, ForestResponse response, Type resultType, Class resultClass);
 }

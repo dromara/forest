@@ -9,7 +9,6 @@ import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
 
 import java.io.*;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 /**
@@ -18,40 +17,31 @@ import java.lang.reflect.Type;
 public class DefaultResultHandlerAdaptor extends ResultHandler {
 
 
-    private static Class typeToClass(Type genType) {
-        if (genType instanceof ParameterizedType) {
-            return (Class) ((ParameterizedType) genType).getRawType();
-        }
-        return (Class) genType;
-    }
-
-
-    public Object getResult(ForestRequest request, ForestResponse response, Type resultType) {
-        Class clazz = typeToClass(resultType);
+    public Object getResult(ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
 
         HttpEntity entity = response.getHttpResponse().getEntity();
         if (entity != null) {
             try {
-                if (void.class.isAssignableFrom(clazz)) {
+                if (void.class.isAssignableFrom(resultClass)) {
                     return null;
                 }
-                if (ForestResponse.class.isAssignableFrom(clazz)) {
+                if (ForestResponse.class.isAssignableFrom(resultClass)) {
                     return response;
                 }
-                if (boolean.class.isAssignableFrom(clazz) || Boolean.class.isAssignableFrom(clazz)) {
+                if (boolean.class.isAssignableFrom(resultClass) || Boolean.class.isAssignableFrom(resultClass)) {
                     return response.isSuccess();
                 }
-                if (clazz.isArray()) {
-                    if (byte[].class.isAssignableFrom(clazz)) {
+                if (resultClass.isArray()) {
+                    if (byte[].class.isAssignableFrom(resultClass)) {
                         return EntityUtils.toByteArray(entity);
                     }
                 }
                 String responseText = response.getContent();
                 response.setContent(responseText);
-                if (CharSequence.class.isAssignableFrom(clazz)) {
+                if (CharSequence.class.isAssignableFrom(resultClass)) {
                     return responseText;
                 }
-                if (InputStream.class.isAssignableFrom(clazz)) {
+                if (InputStream.class.isAssignableFrom(resultClass)) {
                     return entity.getContent();
                 }
 
@@ -63,7 +53,7 @@ public class DefaultResultHandlerAdaptor extends ResultHandler {
                 throw new ForestHandlerException(e, request, response);
             }
         }
-        else if (ForestResponse.class.isAssignableFrom(clazz)) {
+        else if (ForestResponse.class.isAssignableFrom(resultClass)) {
             return response;
         }
         return null;
