@@ -13,6 +13,7 @@ import org.apache.http.impl.cookie.BrowserCompatSpec;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.params.HttpParams;
 import org.forest.converter.json.ForestJsonConverter;
+import org.forest.executors.BodyBuilder;
 import org.forest.executors.url.URLBuilder;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
@@ -40,6 +41,8 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
     protected String url = buildUrl();
     protected final String typeName;
     protected T httpRequest;
+    protected BodyBuilder<T> bodyBuilder;
+
 
     protected T buildRequest() {
         return getRequestProvider().getRequest(url);
@@ -68,6 +71,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
 
     protected void prepare() {
         httpRequest = buildRequest();
+        bodyBuilder = new HttpclientBodyBuilder<>();
         setupHeaders();
         setupBody();
     }
@@ -109,7 +113,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         log.info("[Forest] " + content);
     }
 
-    public void logRequestBegine(int retryCount, HttpClient client, T httpReq) {
+    public void logRequestBegine(int retryCount, T httpReq) {
         if (!request.isLogEnable()) return;
         String requestLine = getLogContentForRequestLine(retryCount, httpReq);
         String headers = getLogContentForHeaders(httpReq);
@@ -162,7 +166,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
 
     public void execute(int retryCount) {
         try {
-            logRequestBegine(retryCount, client, httpRequest);
+            logRequestBegine(retryCount, httpRequest);
             HttpResponse httpResponse = client.execute(httpRequest);
             int statusCode = httpResponse.getStatusLine().getStatusCode();
             ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
