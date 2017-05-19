@@ -1,4 +1,4 @@
-package org.forest.executors.httpclient;
+package org.forest.executors.httpclient.body;
 
 import org.forest.executors.BodyBuilder;
 import org.forest.http.ForestRequest;

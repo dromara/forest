@@ -14,6 +14,7 @@ import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.params.HttpParams;
 import org.forest.converter.json.ForestJsonConverter;
 import org.forest.executors.BodyBuilder;
+import org.forest.executors.httpclient.body.HttpclientNonBodyBuilder;
 import org.forest.executors.url.URLBuilder;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
@@ -25,8 +26,6 @@ import org.forest.mapping.MappingTemplate;
 import org.forest.utils.StringUtils;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.List;
 
 /**

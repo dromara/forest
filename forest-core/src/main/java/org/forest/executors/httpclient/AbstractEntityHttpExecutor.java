@@ -4,27 +4,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HTTP;
-import org.forest.converter.json.ForestJsonConverter;
-import org.forest.executors.BodyBuilder;
+import org.forest.executors.httpclient.body.HttpclientBodyBuilder;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
-import org.forest.utils.RequestNameValue;
 import org.forest.exceptions.ForestNetworkException;
 import org.forest.exceptions.ForestRuntimeException;
-import org.forest.mapping.MappingTemplate;
-import org.forest.utils.StringUtils;
 
 import java.io.*;
-import java.util.*;
 
 /**
  * @author gongjun[dt_flys@hotmail.com]

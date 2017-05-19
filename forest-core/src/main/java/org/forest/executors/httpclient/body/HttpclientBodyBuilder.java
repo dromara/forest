@@ -1,4 +1,4 @@
-package org.forest.executors.httpclient;
+package org.forest.executors.httpclient.body;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
