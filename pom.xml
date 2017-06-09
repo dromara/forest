@@ -38,12 +38,26 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>2.9.1</version>
+			<scope>provided</scope>
+		</dependency>
+
 		<!-- mock server -->
 		<dependency>
 			<groupId>org.mock-server</groupId>
 			<artifactId>mockserver-netty</artifactId>
 			<version>3.10.4</version>
-			<scope>test</scope>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>xerces</groupId>
+					<artifactId>xercesImpl</artifactId>
+
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 	</dependencies>

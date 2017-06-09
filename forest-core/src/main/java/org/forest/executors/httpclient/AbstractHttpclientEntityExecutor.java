@@ -8,11 +8,13 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.forest.executors.httpclient.body.HttpclientBodyBuilder;
+import org.forest.executors.httpclient.response.HttpclientForestResponseFactory;
 import org.forest.handler.ResponseHandler;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
 import org.forest.exceptions.ForestNetworkException;
 import org.forest.exceptions.ForestRuntimeException;
+import org.forest.http.ForestResponseFactory;
 
 import java.io.*;
 
@@ -52,23 +54,14 @@ public abstract class AbstractHttpclientEntityExecutor<T extends HttpEntityEnclo
     }
 
 
-    private static HttpResponse sendRequest(HttpClient httpclient, HttpUriRequest httpPost) throws IOException {
-        HttpResponse httpResponse = null;
-        httpResponse = httpclient.execute(httpPost);
-        int statusCode = httpResponse.getStatusLine().getStatusCode();
-        if (statusCode < HttpStatus.SC_OK || statusCode > HttpStatus.SC_MULTI_STATUS) {
-            throw new ForestNetworkException(httpResponse.getStatusLine().getReasonPhrase(), statusCode);
-        }
-        return httpResponse;
-    }
 
     public void execute(int retryCount, ResponseHandler responseHandler) {
         try {
             logRequestBegine(retryCount, httpRequest);
-            httpResponse = sendRequest(client, httpRequest);
-            ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
-            logResponse(retryCount, client, httpRequest, response);
-            setResponse(response);
+            HttpResponse httpResponse = sendRequest(client, httpRequest);
+            ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
+            response = forestResponseFactory.createResponse(request, httpResponse);
+            logResponse(request, client, httpRequest, response);
             if (response.isError()) {
                 throw new ForestNetworkException(httpResponse.getStatusLine().getReasonPhrase(), response.getStatusCode());
             }

@@ -2,7 +2,9 @@ package org.forest.executors.httpclient.request;
 
 import org.apache.http.HttpRequest;
 import org.apache.http.client.HttpClient;
+import org.forest.executors.httpclient.response.HttpclientForestResponseFactory;
 import org.forest.executors.httpclient.response.HttpclientResponseHandler;
+import org.forest.http.ForestResponseFactory;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -11,6 +13,8 @@ import org.forest.executors.httpclient.response.HttpclientResponseHandler;
 public class SyncHttpclientRequestSender<T extends HttpRequest> implements HttpclientRequestSender<T> {
 
     private HttpClient client;
+
+    private final ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
 
     @Override
     public void sendRequest(T request, HttpclientResponseHandler responseHandler) {

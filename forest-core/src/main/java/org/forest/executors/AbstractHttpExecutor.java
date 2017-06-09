@@ -1,11 +1,9 @@
 package org.forest.executors;
 
 import org.forest.executors.httpclient.HttpclientConnectionManager;
-import org.forest.executors.httpclient.response.HttpclientForestResponseFactory;
 import org.forest.handler.ResponseHandler;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
-import org.forest.http.ForestResponseFactory;
 
 /**
  * @author gongjun
@@ -14,8 +12,6 @@ import org.forest.http.ForestResponseFactory;
 public abstract class AbstractHttpExecutor implements HttpExecutor {
 
     protected final HttpclientConnectionManager connectionManager;
-
-    protected final ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
 
     protected final ForestRequest request;
 
