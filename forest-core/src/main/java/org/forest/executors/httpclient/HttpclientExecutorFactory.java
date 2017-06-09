@@ -4,6 +4,10 @@ import org.forest.config.ForestConfiguration;
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.executors.HttpExecutor;
 import org.forest.executors.ForestExecutorFactory;
+import org.forest.executors.httpclient.response.AsyncHttpclientResponseHandler;
+import org.forest.executors.httpclient.response.HttpclientResponseHandler;
+import org.forest.executors.httpclient.response.SyncHttpclientResponseHandler;
+import org.forest.handler.ResponseHandler;
 import org.forest.http.ForestRequest;
 import org.forest.reflection.ForestMethod;
 
@@ -21,62 +25,76 @@ public class HttpclientExecutorFactory implements ForestExecutorFactory {
     static {
         executorCreatorMap.put("GET", new HttpExecutorCreator() {
             @Override
-            public HttpExecutor createExecutor(HttpclientConnectionManager connectionManager, ForestRequest request) {
-                return new HttpclientGetExecutor(connectionManager, request);
+            public HttpExecutor createExecutor(HttpclientConnectionManager connectionManager, ForestRequest request, ResponseHandler responseHandler) {
+                return new HttpclientGetExecutor(connectionManager, request,
+                        getHttpclientResponseHandler(request, responseHandler));
             }
         });
 
         executorCreatorMap.put("HEAD", new HttpExecutorCreator() {
             @Override
-            public HttpExecutor createExecutor(HttpclientConnectionManager connectionManager, ForestRequest request) {
-                return new HttpclientHeadExecutor(connectionManager, request);
+            public HttpExecutor createExecutor(HttpclientConnectionManager connectionManager, ForestRequest request, ResponseHandler responseHandler) {
+                return new HttpclientHeadExecutor(connectionManager, request,
+                        getHttpclientResponseHandler(request, responseHandler));
             }
         });
 
         executorCreatorMap.put("DELETE", new HttpExecutorCreator() {
             @Override
-            public HttpExecutor createExecutor(HttpclientConnectionManager connectionManager, ForestRequest request) {
-                return new HttpclientDeleteExecutor(connectionManager, request);
+            public HttpExecutor createExecutor(HttpclientConnectionManager connectionManager, ForestRequest request, ResponseHandler responseHandler) {
+                return new HttpclientDeleteExecutor(connectionManager, request,
+                        getHttpclientResponseHandler(request, responseHandler));
             }
         });
 
 
         executorCreatorMap.put("OPTIONS", new HttpExecutorCreator() {
             @Override
-            public HttpExecutor createExecutor(HttpclientConnectionManager connectionManager, ForestRequest request) {
-                return new HttpclientOptionsExecutor(connectionManager, request);
+            public HttpExecutor createExecutor(HttpclientConnectionManager connectionManager, ForestRequest request, ResponseHandler responseHandler) {
+                return new HttpclientOptionsExecutor(connectionManager, request,
+                        getHttpclientResponseHandler(request, responseHandler));
             }
         });
 
         executorCreatorMap.put("TRACE", new HttpExecutorCreator() {
             @Override
-            public HttpExecutor createExecutor(HttpclientConnectionManager connectionManager, ForestRequest request) {
-                return new HttpclientTraceExecutor(connectionManager, request);
+            public HttpExecutor createExecutor(HttpclientConnectionManager connectionManager, ForestRequest request, ResponseHandler responseHandler) {
+                return new HttpclientTraceExecutor(connectionManager, request,
+                        getHttpclientResponseHandler(request, responseHandler));
             }
         });
 
         executorCreatorMap.put("POST", new HttpExecutorCreator() {
             @Override
-            public HttpExecutor createExecutor(HttpclientConnectionManager connectionManager, ForestRequest request) {
-                return new HttpclientPostExecutorHttpclient(connectionManager, request);
+            public HttpExecutor createExecutor(HttpclientConnectionManager connectionManager, ForestRequest request, ResponseHandler responseHandler) {
+                return new HttpclientPostExecutorHttpclient(connectionManager, request,
+                        getHttpclientResponseHandler(request, responseHandler));
             }
         });
 
         executorCreatorMap.put("PUT", new HttpExecutorCreator() {
             @Override
-            public HttpExecutor createExecutor(HttpclientConnectionManager connectionManager, ForestRequest request) {
-                return new HttpclientPutExecutorHttpclient(connectionManager, request);
+            public HttpExecutor createExecutor(HttpclientConnectionManager connectionManager, ForestRequest request, ResponseHandler responseHandler) {
+                return new HttpclientPutExecutorHttpclient(connectionManager, request,
+                        getHttpclientResponseHandler(request, responseHandler));
             }
         });
 
         executorCreatorMap.put("PATCH", new HttpExecutorCreator() {
             @Override
-            public HttpExecutor createExecutor(HttpclientConnectionManager connectionManager, ForestRequest request) {
-                return new HttpclientPatchExecutorHttpclient(connectionManager, request);
+            public HttpExecutor createExecutor(HttpclientConnectionManager connectionManager, ForestRequest request, ResponseHandler responseHandler) {
+                return new HttpclientPatchExecutorHttpclient(connectionManager, request,
+                        getHttpclientResponseHandler(request, responseHandler));
             }
         });
+    }
 
 
+    private static HttpclientResponseHandler getHttpclientResponseHandler(ForestRequest request, ResponseHandler responseHandler) {
+        if (request.isAsync()) {
+            return new AsyncHttpclientResponseHandler(request, responseHandler);
+        }
+        return new SyncHttpclientResponseHandler(request, responseHandler);
     }
 
     private final ForestConfiguration configuration;
@@ -90,19 +108,17 @@ public class HttpclientExecutorFactory implements ForestExecutorFactory {
 
 
     @Override
-    public HttpExecutor create(ForestRequest request) {
-        HttpExecutor executor  = null;
+    public HttpExecutor create(ForestRequest request, ResponseHandler responseHandler) {
         String key = request.getType().toUpperCase();
         HttpExecutorCreator httpExecutorCreator = executorCreatorMap.get(key);
         if (httpExecutorCreator == null) {
             throw new ForestRuntimeException("Http request type\"" + key + "\" is not be supported.");
         }
-        executor = httpExecutorCreator.createExecutor(connectionManager, request);
+        HttpExecutor executor = httpExecutorCreator.createExecutor(connectionManager, request, responseHandler);
         return executor;
-
     }
 
     private interface HttpExecutorCreator {
-        HttpExecutor createExecutor(HttpclientConnectionManager connectionManager, ForestRequest request);
+        HttpExecutor createExecutor(HttpclientConnectionManager connectionManager, ForestRequest request, ResponseHandler responseHandler);
     }
 }

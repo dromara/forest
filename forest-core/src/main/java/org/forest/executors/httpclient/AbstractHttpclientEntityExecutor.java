@@ -2,13 +2,17 @@ package org.forest.executors.httpclient;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.forest.executors.httpclient.body.HttpclientBodyBuilder;
 import org.forest.executors.httpclient.response.HttpclientForestResponseFactory;
+import org.forest.executors.httpclient.response.HttpclientResponseHandler;
+import org.forest.executors.httpclient.response.SyncHttpclientResponseHandler;
 import org.forest.handler.ResponseHandler;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
@@ -26,8 +30,8 @@ public abstract class AbstractHttpclientEntityExecutor<T extends HttpEntityEnclo
 
     private static Log log = LogFactory.getLog(HttpclientPostExecutorHttpclient.class);
 
-    public AbstractHttpclientEntityExecutor(HttpclientConnectionManager connectionManager, ForestRequest requst) {
-        super(connectionManager, requst);
+    public AbstractHttpclientEntityExecutor(HttpclientConnectionManager connectionManager, ForestRequest requst, HttpclientResponseHandler httpclientResponseHandler) {
+        super(connectionManager, requst, httpclientResponseHandler);
     }
 
     protected void prepareBodyBuilder() {
@@ -58,13 +62,7 @@ public abstract class AbstractHttpclientEntityExecutor<T extends HttpEntityEnclo
     public void execute(int retryCount, ResponseHandler responseHandler) {
         try {
             logRequestBegine(retryCount, httpRequest);
-            HttpResponse httpResponse = sendRequest(client, httpRequest);
-            ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
-            response = forestResponseFactory.createResponse(request, httpResponse);
-            logResponse(request, client, httpRequest, response);
-            if (response.isError()) {
-                throw new ForestNetworkException(httpResponse.getStatusLine().getReasonPhrase(), response.getStatusCode());
-            }
+            response = sendRequest(request, client, httpRequest, httpclientResponseHandler);
         } catch (IOException e) {
             if (retryCount >= request.getRetryCount()) {
                 httpRequest.abort();

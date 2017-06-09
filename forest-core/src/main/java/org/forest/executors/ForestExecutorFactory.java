@@ -1,5 +1,6 @@
 package org.forest.executors;
 
+import org.forest.handler.ResponseHandler;
 import org.forest.http.ForestRequest;
 import org.forest.reflection.ForestMethod;
 
@@ -9,6 +10,6 @@ import org.forest.reflection.ForestMethod;
  */
 public interface ForestExecutorFactory {
 
-    HttpExecutor create(ForestRequest request);
+    HttpExecutor create(ForestRequest request, ResponseHandler responseHandler);
 
 }

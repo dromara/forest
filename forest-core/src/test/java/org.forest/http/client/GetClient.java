@@ -3,6 +3,7 @@ package org.forest.http.client;
 import org.forest.annotation.DataParam;
 import org.forest.annotation.DataVariable;
 import org.forest.annotation.Request;
+import org.forest.callback.OnSuccess;
 
 import java.util.Map;
 
@@ -17,6 +18,15 @@ public interface GetClient {
             headers = {"Accept:text/plan"}
     )
     String simpleGet();
+
+
+    @Request(
+            url = "http://localhost:5000/hello/user?username=foo",
+            async = true,
+            headers = {"Accept:text/plan"}
+    )
+    String asyncSimpleGet(OnSuccess<String> onSuccess);
+
 
 
     @Request(

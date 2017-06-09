@@ -285,14 +285,13 @@ public class ForestRequest<T> {
     }
 
     public void execute(ForestExecutorFactory executorFactory, ResponseHandler responseHandler) {
-        HttpExecutor executor  = executorFactory.create(this);
+        HttpExecutor executor  = executorFactory.create(this, responseHandler);
         if (executor != null) {
             ForestResponse response = null;
             try {
                 if (interceptorChain.beforeExecute(this)) {
                     executor.execute(responseHandler);
                     response = executor.getResponse();
-//                    responseHandler.handle(this, response);
                 }
             } catch (ForestRuntimeException e) {
                 if (onError == null) {
@@ -309,7 +308,6 @@ public class ForestRequest<T> {
                 interceptorChain.afterExecute(this, response);
             }
         }
-//        return null;
     }
 
 }

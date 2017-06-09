@@ -3,6 +3,7 @@ package org.forest.executors.httpclient;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
+import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
@@ -18,6 +19,8 @@ import org.forest.converter.json.ForestJsonConverter;
 import org.forest.executors.BodyBuilder;
 import org.forest.executors.httpclient.body.HttpclientNonBodyBuilder;
 import org.forest.executors.httpclient.response.HttpclientForestResponseFactory;
+import org.forest.executors.httpclient.response.HttpclientResponseHandler;
+import org.forest.executors.httpclient.response.SyncHttpclientResponseHandler;
 import org.forest.executors.url.URLBuilder;
 import org.forest.handler.ResponseHandler;
 import org.forest.http.ForestRequest;
@@ -41,7 +44,8 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
     private static Log log = LogFactory.getLog(AbstractHttpclientExecutor.class);
 
     protected HttpClient client = getHttpClient();
-    protected HttpResponse httpResponse = null;
+    protected HttpResponse httpResponse;
+    protected final HttpclientResponseHandler httpclientResponseHandler;
     protected String url = buildUrl();
     protected final String typeName;
     protected T httpRequest;
@@ -84,9 +88,10 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         prepareBody();
     }
 
-    public AbstractHttpclientExecutor(HttpclientConnectionManager connectionManager, ForestRequest request) {
+    public AbstractHttpclientExecutor(HttpclientConnectionManager connectionManager, ForestRequest request, HttpclientResponseHandler httpclientResponseHandler) {
         super(connectionManager, request);
-        typeName = request.getType().toUpperCase();
+        this.typeName = request.getType().toUpperCase();
+        this.httpclientResponseHandler = httpclientResponseHandler;
         prepare();
     }
 
@@ -173,31 +178,24 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
 
     public void execute(ResponseHandler responseHandler) {
         execute(0, responseHandler);
-        responseHandler.handle(request, response);
     }
 
-    protected static HttpResponse sendRequest(HttpClient httpclient, HttpUriRequest httpUriRequest) throws IOException {
+    protected static ForestResponse sendRequest(ForestRequest request, HttpClient httpclient, HttpUriRequest httpUriRequest, HttpclientResponseHandler responseHandler)
+            throws IOException {
         HttpResponse httpResponse = null;
         httpResponse = httpclient.execute(httpUriRequest);
-        int statusCode = httpResponse.getStatusLine().getStatusCode();
-        if (statusCode < HttpStatus.SC_OK || statusCode > HttpStatus.SC_MULTI_STATUS) {
-            throw new ForestNetworkException(httpResponse.getStatusLine().getReasonPhrase(), statusCode);
-        }
-        return httpResponse;
+        ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
+        ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
+        logResponse(request, httpclient, (HttpRequestBase) httpUriRequest, response);
+        responseHandler.handle(httpUriRequest, httpResponse, response);
+        return response;
     }
 
 
     public void execute(int retryCount, ResponseHandler responseHandler) {
         try {
             logRequestBegine(retryCount, httpRequest);
-            HttpResponse httpResponse = sendRequest(client, httpRequest);
-            int statusCode = httpResponse.getStatusLine().getStatusCode();
-            ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
-            response = forestResponseFactory.createResponse(request, httpResponse);
-            logResponse(request, client, httpRequest, response);
-            if (response.isError()) {
-                throw new ForestNetworkException(httpResponse.getStatusLine().getReasonPhrase(), statusCode);
-            }
+            response = sendRequest(request, client, httpRequest, httpclientResponseHandler);
         } catch (IOException e) {
             if (retryCount >= request.getRetryCount()) {
                 httpRequest.abort();

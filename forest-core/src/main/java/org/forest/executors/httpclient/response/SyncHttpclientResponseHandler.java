@@ -3,6 +3,8 @@ package org.forest.executors.httpclient.response;
 
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.forest.exceptions.ForestNetworkException;
 import org.forest.handler.ResponseHandler;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
@@ -14,12 +16,16 @@ import org.forest.http.ForestResponse;
 public class SyncHttpclientResponseHandler extends HttpclientResponseHandler {
 
 
-    protected SyncHttpclientResponseHandler(ForestRequest request, ResponseHandler responseHandler) {
+    public SyncHttpclientResponseHandler(ForestRequest request, ResponseHandler responseHandler) {
         super(request, responseHandler);
     }
 
     @Override
     public void handle(HttpRequest httpRequest, HttpResponse httpResponse, ForestResponse response) {
+        int statusCode = httpResponse.getStatusLine().getStatusCode();
+        if (response.isError()) {
+            throw new ForestNetworkException(httpResponse.getStatusLine().getReasonPhrase(), statusCode);
+        }
         responseHandler.handle(request, response);
     }
 }
