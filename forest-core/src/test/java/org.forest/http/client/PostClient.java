@@ -1,6 +1,7 @@
 package org.forest.http.client;
 
 import org.forest.annotation.DataParam;
+import org.forest.annotation.DataVariable;
 import org.forest.annotation.Request;
 
 import java.util.Map;
@@ -36,5 +37,15 @@ public interface PostClient {
             headers = {"Accept:text/plan"}
     )
     String annParamPost(@DataParam("username") String username, @DataParam("password") String password);
+
+
+    @Request(
+            url = "http://localhost:5000/hello",
+            type = "post",
+            data = "username=${username}&password=${password}",
+            headers = {"Accept:text/plan"}
+    )
+    String varParamPost(@DataVariable("username") String username, @DataVariable("password") String password);
+
 
 }

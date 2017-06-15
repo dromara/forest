@@ -176,7 +176,7 @@ public class ForestMethod<T> implements VariableScope {
             else if (OnError.class.isAssignableFrom(paramType)) {
                 onErrorParameter = parameter;
             }
-            processParameterAnnotation(parameter, paramType, anns);
+            processParameterAnnotation(parameter, paramType, anns, i);
         }
     }
 
@@ -186,7 +186,7 @@ public class ForestMethod<T> implements VariableScope {
      * @param paramType
      * @param anns
      */
-    private void processParameterAnnotation(MappingParameter parameter, Class paramType, Annotation[] anns) {
+    private void processParameterAnnotation(MappingParameter parameter, Class paramType, Annotation[] anns, int paramIndex) {
         for (int i = 0; i < anns.length; i++) {
             Annotation ann = anns[i];
             if (ann instanceof DataParam) {
@@ -195,14 +195,14 @@ public class ForestMethod<T> implements VariableScope {
                 parameter.setName(name);
                 namedParameters.add(parameter);
                 MappingVariable variable = new MappingVariable(name, paramType);
-                variable.setIndex(i);
+                variable.setIndex(paramIndex);
                 variables.put(dataAnn.value(), variable);
             }
             else if (ann instanceof DataVariable) {
                 DataVariable dataAnn = (DataVariable) ann;
                 String name = dataAnn.value();
                 MappingVariable variable = new MappingVariable(name, paramType);
-                variable.setIndex(i);
+                variable.setIndex(paramIndex);
                 variables.put(name, variable);
             }
             else if (ann instanceof DataObject) {

@@ -67,5 +67,14 @@ public class TestPostClient {
         assertEquals(PostMockServer.EXPECTED, result);
     }
 
+    @Test
+    public void testVarParamPost() {
+        String result = postClient.varParamPost("foo", "123456");
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(PostMockServer.EXPECTED, result);
+    }
+
+
 
 }
