@@ -49,6 +49,8 @@ public class ForestRequest<T> {
 
     private String url;
 
+    private String query;
+
     private String type;
 
     private String encode;
@@ -68,6 +70,8 @@ public class ForestRequest<T> {
     private Map<String, Object> data = new LinkedHashMap<String, Object>();
 
     private Map<String, Object> headers = new LinkedHashMap<>();
+
+    private Object[] arguments;
 
     private String requestBody;
 
@@ -93,6 +97,15 @@ public class ForestRequest<T> {
 
     public ForestRequest setUrl(String url) {
         this.url = url;
+        return this;
+    }
+
+    public String getQuery() {
+        return query;
+    }
+
+    public ForestRequest setQuery(String query) {
+        this.query = query;
         return this;
     }
 
@@ -195,7 +208,7 @@ public class ForestRequest<T> {
             Map.Entry<String, Object> entry = iterator.next();
             String name = entry.getKey();
             Object value = entry.getValue();
-            RequestNameValue nameValue = new RequestNameValue(name, value);
+            RequestNameValue nameValue = new RequestNameValue(name, value, false);
             nameValueList.add(nameValue);
         }
         return nameValueList;
@@ -205,10 +218,19 @@ public class ForestRequest<T> {
         List<RequestNameValue> nameValueList = new ArrayList<RequestNameValue>();
         for (Iterator<Map.Entry<String, Object>> iterator = headers.entrySet().iterator(); iterator.hasNext(); ) {
             Map.Entry<String, Object> entry = iterator.next();
-            RequestNameValue nameValue = new RequestNameValue(entry.getKey(), String.valueOf(entry.getValue()));
+            RequestNameValue nameValue = new RequestNameValue(entry.getKey(), String.valueOf(entry.getValue()), false);
             nameValueList.add(nameValue);
         }
         return nameValueList;
+    }
+
+    public ForestRequest<T> setArguments(Object[] arguments) {
+        this.arguments = arguments;
+        return this;
+    }
+
+    public Object getArgument(int index) {
+        return arguments[index];
     }
 
 
@@ -305,7 +327,7 @@ public class ForestRequest<T> {
                 interceptorChain.onError(e, this, response);
             } finally {
                 executor.close();
-                interceptorChain.afterExecute(this, response);
+//                interceptorChain.afterExecute(this, response);
             }
         }
     }

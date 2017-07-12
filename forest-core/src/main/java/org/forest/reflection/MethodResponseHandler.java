@@ -1,5 +1,8 @@
 package org.forest.reflection;
 
+import org.apache.http.ProtocolVersion;
+import org.apache.http.message.BasicHttpResponse;
+import org.apache.http.message.BasicStatusLine;
 import org.forest.callback.OnSuccess;
 import org.forest.exceptions.ForestNetworkException;
 import org.forest.exceptions.ForestRuntimeException;
@@ -50,7 +53,7 @@ public class MethodResponseHandler<T> implements ResponseHandler {
                 resultData = response.getResult();
             } else {
                 if (request.getOnError() != null) {
-                    ForestNetworkException networkException = new ForestNetworkException("", response.getStatusCode());
+                    ForestNetworkException networkException = new ForestNetworkException("", response.getStatusCode(), response);
                     ForestRuntimeException e = new ForestRuntimeException(networkException);
                     request.getInterceptorChain().onError(e, request, response);
                     request.getOnError().onError(e, request);

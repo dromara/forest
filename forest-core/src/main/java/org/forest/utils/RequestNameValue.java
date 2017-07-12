@@ -10,14 +10,19 @@ public class RequestNameValue {
 
     private Object value;
 
-    public RequestNameValue(String name) {
+    private final boolean inQuery;
+
+    public RequestNameValue(String name, boolean inQuery) {
         this.name = name;
+        this.inQuery = inQuery;
     }
 
-    public RequestNameValue(String name, Object value) {
+    public RequestNameValue(String name, Object value, boolean inQuery) {
         this.name = name;
         this.value = value;
+        this.inQuery = inQuery;
     }
+
 
     public String getName() {
         return name;
@@ -33,5 +38,9 @@ public class RequestNameValue {
 
     public void setValue(Object value) {
         this.value = value;
+    }
+
+    public boolean isInQuery() {
+        return inQuery;
     }
 }

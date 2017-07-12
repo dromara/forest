@@ -23,9 +23,10 @@ public class SyncHttpclientResponseHandler extends HttpclientResponseHandler {
     @Override
     public void handle(HttpRequest httpRequest, HttpResponse httpResponse, ForestResponse response) {
         int statusCode = httpResponse.getStatusLine().getStatusCode();
-        if (response.isError()) {
-            throw new ForestNetworkException(httpResponse.getStatusLine().getReasonPhrase(), statusCode);
-        }
         responseHandler.handle(request, response);
+        if (response.isError()) {
+            throw new ForestNetworkException(
+                    httpResponse.getStatusLine().getReasonPhrase(), statusCode, response);
+        }
     }
 }

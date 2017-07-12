@@ -24,6 +24,8 @@
 
 package org.forest.exceptions;
 
+import org.forest.http.ForestResponse;
+
 /**
  * @author gongjun
  * @since 2016-05-30
@@ -32,12 +34,19 @@ public class ForestNetworkException extends RuntimeException {
 
     private Integer statusCode;
 
-    public ForestNetworkException(String message, Integer statusCode) {
+    private ForestResponse response;
+
+    public ForestNetworkException(String message, Integer statusCode, ForestResponse response) {
         super("HTTP " + statusCode + " Error: " + message);
         this.statusCode = statusCode;
+        this.response = response;
     }
 
     public Integer getStatusCode() {
         return statusCode;
+    }
+
+    public ForestResponse getResponse() {
+        return response;
     }
 }

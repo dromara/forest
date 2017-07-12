@@ -2,6 +2,7 @@ package org.forest.http;
 
 import org.forest.config.ForestConfiguration;
 import org.forest.http.client.PostClient;
+import org.forest.http.model.UserParam;
 import org.forest.mock.PostMockServer;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -75,6 +76,30 @@ public class TestPostClient {
         assertEquals(PostMockServer.EXPECTED, result);
     }
 
+    @Test
+    public void testModelParamPost() {
+        UserParam userParam = new UserParam();
+        userParam.setUsername("foo");
+        userParam.setPassword("123456");
+        String result = postClient.modelParamPost(userParam);
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(PostMockServer.EXPECTED, result);
+    }
+
+
+/*
+    @Test
+    public void testModelParamNumPost() {
+        UserParam userParam = new UserParam();
+        userParam.setUsername("foo");
+        userParam.setPassword("123456");
+        String result = postClient.modelParamNumPost(userParam);
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(PostMockServer.EXPECTED, result);
+    }
+*/
 
 
 }

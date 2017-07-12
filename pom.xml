@@ -4,7 +4,7 @@
 	
 	<groupId>org.forest</groupId>
 	<artifactId>forest</artifactId>
-	<version>0.0.7</version>
+	<version>0.0.9</version>
 	<packaging>pom</packaging>
 	<name>forest</name>
 
@@ -88,6 +88,33 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<repositories>
+		<repository>
+			<id>nexus</id>
+			<name>nexus</name>
+			<url>http://118.178.236.200:8087/nexus/content/repositories/releases/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
+	<distributionManagement>
+		<repository>
+			<id>nexus-releases</id>
+			<name>Nexus Release Repository</name>
+			<url>http://118.178.236.200:8087/nexus/content/repositories/releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>nexus-snapshots</id>
+			<name>Nexus Snapshot Repository</name>
+			<url>http://118.178.236.200:8087/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 
 </project>

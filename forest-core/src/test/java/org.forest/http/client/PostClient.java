@@ -3,6 +3,7 @@ package org.forest.http.client;
 import org.forest.annotation.DataParam;
 import org.forest.annotation.DataVariable;
 import org.forest.annotation.Request;
+import org.forest.http.model.UserParam;
 
 import java.util.Map;
 
@@ -46,6 +47,35 @@ public interface PostClient {
             headers = {"Accept:text/plan"}
     )
     String varParamPost(@DataVariable("username") String username, @DataVariable("password") String password);
+
+
+    @Request(
+            url = "http://localhost:5000/hello",
+            type = "post",
+            data = "${user.argString}",
+            headers = {"Accept:text/plan"}
+    )
+    String modelParamPost(@DataVariable("user") UserParam userParam);
+
+
+    @Request(
+            url = "http://localhost:5000/complex?param=${0}",
+            type = "post",
+            data = "${1}",
+            headers = {"Accept:text/plan"}
+    )
+    String complexPost(String param, String body);
+
+
+/*
+    @Request(
+            url = "http://localhost:5000/hello",
+            type = "post",
+            data = "${$0.argString}",
+            headers = {"Accept:text/plan"}
+    )
+    String modelParamNumPost(UserParam userParam);
+*/
 
 
 }

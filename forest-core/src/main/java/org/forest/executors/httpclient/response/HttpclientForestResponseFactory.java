@@ -3,6 +3,9 @@ package org.forest.executors.httpclient.response;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.ProtocolVersion;
+import org.apache.http.message.BasicHttpResponse;
+import org.apache.http.message.BasicStatusLine;
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
@@ -30,6 +33,11 @@ public class HttpclientForestResponseFactory implements ForestResponseFactory<Ht
 
     @Override
     public ForestResponse createResponse(ForestRequest request, HttpResponse httpResponse) {
+        if (httpResponse == null) {
+            httpResponse = new BasicHttpResponse(
+                    new BasicStatusLine(
+                            new ProtocolVersion("1.1", 1, 1), 404, ""));
+        }
         ForestResponse response = new ForestResponse(request, httpResponse);
         int statusCode = httpResponse.getStatusLine().getStatusCode();
         response.setStatusCode(statusCode);

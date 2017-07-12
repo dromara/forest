@@ -21,7 +21,7 @@ public class TestExceptions {
     @Test
     public void testForestNetworkException() {
         try {
-            throw new ForestNetworkException("test network exception", 500);
+            throw new ForestNetworkException("test network exception", 500, null);
         } catch (ForestNetworkException e) {
             assertEquals("HTTP 500 Error: test network exception", e.getMessage());
             assertEquals(Integer.valueOf(500), e.getStatusCode());

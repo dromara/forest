@@ -13,6 +13,7 @@ import org.apache.http.client.params.ClientPNames;
 import org.apache.http.cookie.*;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.cookie.BrowserCompatSpec;
+import org.apache.http.nio.util.ExpandableBuffer;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.params.HttpParams;
 import org.forest.converter.json.ForestJsonConverter;
@@ -187,7 +188,16 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
         ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
         logResponse(request, httpclient, (HttpRequestBase) httpUriRequest, response);
-        responseHandler.handle(httpUriRequest, httpResponse, response);
+        try {
+            responseHandler.handle(httpUriRequest, httpResponse, response);
+        } catch (Exception ex) {
+            if (ex instanceof ForestRuntimeException) {
+                throw ex;
+            }
+            else {
+                throw new ForestRuntimeException(ex);
+            }
+        }
         return response;
     }
 
@@ -199,6 +209,9 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         } catch (IOException e) {
             if (retryCount >= request.getRetryCount()) {
                 httpRequest.abort();
+                ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
+                response = forestResponseFactory.createResponse(request, httpResponse);
+                responseHandler.handle(request, response);
                 throw new ForestRuntimeException(e);
             }
             log.error(e.getMessage());

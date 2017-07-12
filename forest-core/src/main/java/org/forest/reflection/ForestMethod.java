@@ -1,5 +1,6 @@
 package org.forest.reflection;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.forest.Forest;
 import org.forest.annotation.Request;
 import org.forest.annotation.DataObject;
@@ -234,9 +235,10 @@ public class ForestMethod<T> implements VariableScope {
         List<RequestNameValue> nameValueList = new ArrayList<RequestNameValue>();
         String baseUrl = interfaceProxyHandler.getBaseURL();
         renderedUrl = URLUtils.getValidURL(baseUrl, renderedUrl);
+        String query = "";
         try {
             URL u = new URL(renderedUrl);
-            String query = u.getQuery();
+            query = u.getQuery();
             if (StringUtils.isNotEmpty(query)) {
                 String[] params = query.split("&");
                 StringBuilder queryBuilder = new StringBuilder();
@@ -248,7 +250,7 @@ public class ForestMethod<T> implements VariableScope {
                     String[] nameValue = p.split("=");
                     String name = nameValue[0];
                     queryBuilder.append(name);
-                    RequestNameValue requestNameValue = new RequestNameValue(name);
+                    RequestNameValue requestNameValue = new RequestNameValue(name, true);
                     nameValueList.add(requestNameValue);
                     if (nameValue.length > 1) {
                         String value = nameValue[1];
@@ -286,7 +288,7 @@ public class ForestMethod<T> implements VariableScope {
                         ForestJsonConverter jsonConverter = configuration.getJsonCoverter();
                         json = jsonConverter.convertToJson(obj);
                     }
-                    nameValueList.add(new RequestNameValue(parameter.getJsonParamName(), json));
+                    nameValueList.add(new RequestNameValue(parameter.getJsonParamName(), json, false));
                 }
                 else {
                     try {
@@ -300,7 +302,7 @@ public class ForestMethod<T> implements VariableScope {
                 }
             }
             else if (parameter.getIndex() != null) {
-                RequestNameValue nameValue = new RequestNameValue(parameter.getName());
+                RequestNameValue nameValue = new RequestNameValue(parameter.getName(), false);
                 Object val = args[parameter.getIndex()];
                 if (val != null) {
                     nameValue.setValue(String.valueOf(val));
@@ -312,8 +314,10 @@ public class ForestMethod<T> implements VariableScope {
         // create and initialize http instance
         ForestRequest<T> request = new ForestRequest(configuration);
         request.setUrl(newUrl)
+                .setQuery(query)
                 .setType(renderedType)
                 .setContentType(renderedContentType)
+                .setArguments(args)
                 .setLogEnable(logEnable);
         if (configuration.getDefaultParameters() != null) {
             request.addData(configuration.getDefaultParameters());
@@ -323,16 +327,21 @@ public class ForestMethod<T> implements VariableScope {
         }
 
         List<RequestNameValue> dataNameValueList = new ArrayList<>();
+        StringBuilder bodyBuilder = new StringBuilder();
         for (int i = 0; i < dataTemplateArray.length; i++) {
             MappingTemplate dataTemplate = dataTemplateArray[i];
             String data = dataTemplate.render(args);
+            bodyBuilder.append(data);
+            if (i < dataTemplateArray.length - 1) {
+                bodyBuilder.append("&");
+            }
             String[] paramArray = data.split("&");
             for (int j = 0; j < paramArray.length; j++) {
                 String dataParam = paramArray[j];
                 String[] dataNameValue = dataParam.split("=");
                 if (dataNameValue.length > 0) {
                     String name = dataNameValue[0].trim();
-                    RequestNameValue nameValue = new RequestNameValue(name);
+                    RequestNameValue nameValue = new RequestNameValue(name, false);
                     if (dataNameValue.length == 2) {
                         nameValue.setValue(dataNameValue[1].trim());
                     }
@@ -342,8 +351,8 @@ public class ForestMethod<T> implements VariableScope {
             }
         }
         request.addData(nameValueList);
-        if (dataNameValueList.size() == 1 && dataNameValueList.get(0).getValue() == null) {
-            String requestBody = dataTemplateArray[0].render(args);
+        if (bodyBuilder.length() > 0) {
+            String requestBody = bodyBuilder.toString();
             request.setRequestBody(requestBody);
         }
 
@@ -353,7 +362,7 @@ public class ForestMethod<T> implements VariableScope {
             String[] headNameValue = header.split(":");
             if (headNameValue.length > 0) {
                 String name = headNameValue[0].trim();
-                RequestNameValue nameValue = new RequestNameValue(name);
+                RequestNameValue nameValue = new RequestNameValue(name, false);
                 if (headNameValue.length == 2) {
                     nameValue.setValue(headNameValue[1].trim());
                 }
@@ -426,7 +435,7 @@ public class ForestMethod<T> implements VariableScope {
             Method getter = mtd;
             Object value = getter.invoke(obj);
             if (value != null) {
-                RequestNameValue nameValue = new RequestNameValue(getterName, value);
+                RequestNameValue nameValue = new RequestNameValue(getterName, value, false);
                 nameValueList.add(nameValue);
             }
 

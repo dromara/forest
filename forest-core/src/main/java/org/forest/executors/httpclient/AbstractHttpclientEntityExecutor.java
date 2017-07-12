@@ -66,6 +66,9 @@ public abstract class AbstractHttpclientEntityExecutor<T extends HttpEntityEnclo
         } catch (IOException e) {
             if (retryCount >= request.getRetryCount()) {
                 httpRequest.abort();
+                ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
+                response = forestResponseFactory.createResponse(request, httpResponse);
+                responseHandler.handle(request, response);
                 throw new RuntimeException(e);
             }
             log.error(e.getMessage());

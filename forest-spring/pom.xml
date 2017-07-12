@@ -6,16 +6,15 @@
 
     <groupId>org.forest</groupId>
     <artifactId>forest-spring</artifactId>
-    <version>0.0.7</version>
+    <version>0.0.9</version>
 
     <parent>
         <groupId>org.forest</groupId>
         <artifactId>forest</artifactId>
-        <version>0.0.7</version>
+        <version>0.0.9</version>
     </parent>
 
     <properties>
-        <forest.version>0.0.7</forest.version>
         <spring.version>3.2.16.RELEASE</spring.version>
     </properties>
 
@@ -23,7 +22,7 @@
         <dependency>
             <groupId>org.forest</groupId>
             <artifactId>forest-core</artifactId>
-            <version>${forest.version}</version>
+            <version>${project.parent.version}</version>
             <scope>provided</scope>
         </dependency>
 

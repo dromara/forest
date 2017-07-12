@@ -77,8 +77,8 @@ public class TestForestConfiguration {
     public void testDefaultParameters() {
         ForestConfiguration configuration = ForestConfiguration.configuration();
         List<RequestNameValue> defaultParameters = new LinkedList<>();
-        defaultParameters.add(new RequestNameValue("name", "Peter"));
-        defaultParameters.add(new RequestNameValue("age", "15"));
+        defaultParameters.add(new RequestNameValue("name", "Peter", false));
+        defaultParameters.add(new RequestNameValue("age", "15", false));
         configuration.setDefaultParameters(defaultParameters);
         assertEquals(defaultParameters, configuration.getDefaultParameters());
     }
@@ -87,7 +87,7 @@ public class TestForestConfiguration {
     public void testDefaultHeaders() {
         ForestConfiguration configuration = ForestConfiguration.configuration();
         List<RequestNameValue> defaultHeaders = new LinkedList<>();
-        defaultHeaders.add(new RequestNameValue("Accept", "text/html"));
+        defaultHeaders.add(new RequestNameValue("Accept", "text/html", false));
         configuration.setDefaultHeaders(defaultHeaders);
         assertEquals(defaultHeaders, configuration.getDefaultHeaders());
     }

@@ -31,6 +31,8 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> imp
         String[] typeGroup = contentType.split(";");
         String mineType = typeGroup[0];
         String charset = HTTP.UTF_8;
+        String requestBody = request.getRequestBody();
+
         if (StringUtils.isEmpty(mineType)) {
             mineType = "application/x-www-form-urlencoded";
         }
@@ -39,6 +41,10 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> imp
         }
 
         List<RequestNameValue> nameValueList = request.getDataNameValueList();
+        if (requestBody != null) {
+            setStringBody(httpRequest, requestBody, charset, contentType);
+            return;
+        }
 
         if (mineType.equals("application/x-www-form-urlencoded")) {
             setEntities(httpRequest, request, contentType, nameValueList, nameValuePairs);
@@ -46,31 +52,30 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> imp
         else if (mineType.equals("application/json")) {
             ForestJsonConverter jsonConverter = request.getConfiguration().getJsonCoverter();
             String text = null;
-            if (request.getRequestBody() != null) {
-                text = request.getRequestBody();
-            }
-            else {
-                Map<String, Object> map = convertNameValueListToJSON(request, nameValueList);
-                String json = jsonConverter.convertToJson(map);
-                text = json;
-            }
-            try {
-                StringEntity entity = new StringEntity(text, charset);
-                entity.setContentType(contentType);
-//                        entity.setContentEncoding(HTTP.UTF_8);
-                httpRequest.setEntity(entity);
-            } catch (UnsupportedEncodingException e) {
-                throw new ForestRuntimeException(e);
-            }
+            Map<String, Object> map = convertNameValueListToJSON(request, nameValueList);
+            String json = jsonConverter.convertToJson(map);
+            text = json;
+            setStringBody(httpRequest, text, charset, contentType);
         }
 
     }
 
 
+    private void setStringBody(T httpReq, String text, String charset, String contentType) {
+        try {
+            StringEntity entity = new StringEntity(text, charset);
+            entity.setContentType(contentType);
+            httpReq.setEntity(entity);
+        } catch (UnsupportedEncodingException e) {
+            throw new ForestRuntimeException(e);
+        }
+    }
+
     private void setEntities(T httpReq, ForestRequest request, String contentType, List<RequestNameValue> nameValueList, List<NameValuePair> nameValuePairs) {
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonCoverter();
         for (int i = 0; i < nameValueList.size(); i++) {
             RequestNameValue nameValue = nameValueList.get(i);
+            if (nameValue.isInQuery()) continue;
             String name = nameValue.getName();
             Object value = nameValue.getValue();
             NameValuePair nameValuePair = new BasicNameValuePair(name, MappingTemplate.getParameterValue(jsonConverter, value));
