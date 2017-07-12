@@ -2,6 +2,9 @@ package org.forest.executors.httpclient.request;
 
 import org.apache.http.HttpRequest;
 import org.forest.executors.httpclient.response.HttpclientResponseHandler;
+import org.forest.http.ForestRequest;
+
+import java.io.IOException;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -9,6 +12,6 @@ import org.forest.executors.httpclient.response.HttpclientResponseHandler;
  */
 public interface HttpclientRequestSender<T extends HttpRequest> {
 
-    void sendRequest(T request, HttpclientResponseHandler responseHandler);
+    void sendRequest(ForestRequest request, HttpclientResponseHandler responseHandler) throws IOException;
 
 }

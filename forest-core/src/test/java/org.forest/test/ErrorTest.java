@@ -28,10 +28,10 @@ public class ErrorTest extends TestCase {
     public void testErrorCallback() {
         final boolean[] ts = new boolean[] {false};
         errorClient.testError(new OnError() {
-            public void onError(ForestRuntimeException ex, ForestRequest requst) {
+            public void onError(ForestRuntimeException ex, ForestRequest request) {
                 ts[0] = true;
                 assertNotNull(ex);
-                assertNotNull(requst);
+                assertNotNull(request);
             }
         });
         assertTrue(ts[0]);

@@ -309,25 +309,24 @@ public class ForestRequest<T> {
     public void execute(ForestExecutorFactory executorFactory, ResponseHandler responseHandler) {
         HttpExecutor executor  = executorFactory.create(this, responseHandler);
         if (executor != null) {
-            ForestResponse response = null;
-            try {
-                if (interceptorChain.beforeExecute(this)) {
+            if (interceptorChain.beforeExecute(this)) {
+                try {
                     executor.execute(responseHandler);
-                    response = executor.getResponse();
-                }
-            } catch (ForestRuntimeException e) {
-                if (onError == null) {
+                } catch (ForestRuntimeException e) {
                     throw e;
-                }
-                ForestRuntimeException runtimeException = e;
-                if (!(e instanceof ForestRuntimeException)) {
-                    runtimeException = new ForestRuntimeException(e);
-                }
-                onError.onError(runtimeException, this);
-                interceptorChain.onError(e, this, response);
-            } finally {
-                executor.close();
+//                if (onError == null) {
+//                    throw e;
+//                }
+//                ForestRuntimeException runtimeException = e;
+//                if (!(e instanceof ForestRuntimeException)) {
+//                    runtimeException = new ForestRuntimeException(e);
+//                }
+//                onError.onError(runtimeException, this);
+//                interceptorChain.onError(e, this, response);
+                } finally {
+                    executor.close();
 //                interceptorChain.afterExecute(this, response);
+                }
             }
         }
     }

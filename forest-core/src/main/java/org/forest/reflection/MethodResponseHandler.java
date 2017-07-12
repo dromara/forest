@@ -52,11 +52,14 @@ public class MethodResponseHandler<T> implements ResponseHandler {
                 }
                 resultData = response.getResult();
             } else {
+                ForestNetworkException networkException = new ForestNetworkException("", response.getStatusCode(), response);
+                ForestRuntimeException e = new ForestRuntimeException(networkException);
+                request.getInterceptorChain().onError(e, request, response);
                 if (request.getOnError() != null) {
-                    ForestNetworkException networkException = new ForestNetworkException("", response.getStatusCode(), response);
-                    ForestRuntimeException e = new ForestRuntimeException(networkException);
-                    request.getInterceptorChain().onError(e, request, response);
                     request.getOnError().onError(e, request);
+                }
+                else {
+                    throw e;
                 }
             }
             this.resultData = (T) resultData;

@@ -28,7 +28,6 @@ import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
 import org.forest.http.ForestResponseFactory;
 import org.forest.utils.RequestNameValue;
-import org.forest.exceptions.ForestNetworkException;
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.executors.AbstractHttpExecutor;
 import org.forest.mapping.MappingTemplate;
@@ -205,19 +204,22 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
     public void execute(int retryCount, ResponseHandler responseHandler) {
         try {
             logRequestBegine(retryCount, httpRequest);
-            response = sendRequest(request, client, httpRequest, httpclientResponseHandler);
+            sendRequest(request, client, httpRequest, httpclientResponseHandler);
         } catch (IOException e) {
             if (retryCount >= request.getRetryCount()) {
                 httpRequest.abort();
                 ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
-                response = forestResponseFactory.createResponse(request, httpResponse);
+                response = forestResponseFactory.createResponse(request, null);
                 responseHandler.handle(request, response);
-                throw new ForestRuntimeException(e);
+//                throw new ForestRuntimeException(e);
+                return;
             }
             log.error(e.getMessage());
             execute(retryCount + 1, responseHandler);
+        } catch (ForestRuntimeException e) {
+            httpRequest.abort();
+            throw e;
         }
-
     }
 
     public void close() {
