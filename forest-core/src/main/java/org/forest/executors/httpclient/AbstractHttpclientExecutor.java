@@ -3,29 +3,19 @@ package org.forest.executors.httpclient;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.params.ClientPNames;
 import org.apache.http.cookie.*;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.cookie.BrowserCompatSpec;
-import org.apache.http.nio.util.ExpandableBuffer;
-import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.params.HttpParams;
 import org.forest.converter.json.ForestJsonConverter;
 import org.forest.executors.BodyBuilder;
 import org.forest.executors.httpclient.body.HttpclientNonBodyBuilder;
+import org.forest.executors.httpclient.request.HttpclientRequestSender;
 import org.forest.executors.httpclient.response.HttpclientForestResponseFactory;
 import org.forest.executors.httpclient.response.HttpclientResponseHandler;
-import org.forest.executors.httpclient.response.SyncHttpclientResponseHandler;
 import org.forest.executors.url.URLBuilder;
 import org.forest.handler.ResponseHandler;
 import org.forest.http.ForestRequest;
-import org.forest.http.ForestResponse;
 import org.forest.http.ForestResponseFactory;
 import org.forest.utils.RequestNameValue;
 import org.forest.exceptions.ForestRuntimeException;
@@ -43,8 +33,6 @@ import java.util.List;
 public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> extends AbstractHttpExecutor {
     private static Log log = LogFactory.getLog(AbstractHttpclientExecutor.class);
 
-    protected HttpClient client = getHttpClient();
-    protected HttpResponse httpResponse;
     protected final HttpclientResponseHandler httpclientResponseHandler;
     protected String url = buildUrl();
     protected final String typeName;
@@ -66,17 +54,6 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
     }
 
 
-    private final static CookieSpecFactory defaultCookieSF = new CookieSpecFactory() {
-        public CookieSpec newInstance(HttpParams params) {
-            return new BrowserCompatSpec() {
-                @Override
-                public void validate(Cookie cookie, CookieOrigin origin)
-                        throws MalformedCookieException {
-                }
-            };
-        }
-    };
-
     protected void prepareBodyBuilder() {
         bodyBuilder = new HttpclientNonBodyBuilder();
     }
@@ -88,8 +65,8 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         prepareBody();
     }
 
-    public AbstractHttpclientExecutor(HttpclientConnectionManager connectionManager, ForestRequest request, HttpclientResponseHandler httpclientResponseHandler) {
-        super(connectionManager, request);
+    public AbstractHttpclientExecutor(ForestRequest request, HttpclientResponseHandler httpclientResponseHandler, HttpclientRequestSender requestSender) {
+        super(request, requestSender);
         this.typeName = request.getType().toUpperCase();
         this.httpclientResponseHandler = httpclientResponseHandler;
         prepare();
@@ -109,25 +86,12 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         bodyBuilder.buildBody(httpRequest, request);
     }
 
-    protected HttpClient getHttpClient() {
-        HttpClient client = connectionManager.getHttpClient();
-        setupHttpClient(client);
-        return client;
-    }
-
-    protected void setupHttpClient(HttpClient client) {
-        client.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, request.getTimeout());
-        if (client instanceof DefaultHttpClient) {
-            ((DefaultHttpClient) client).getCookieSpecs().register("default", defaultCookieSF);
-            client.getParams().setParameter(ClientPNames.COOKIE_POLICY, "default");
-        }
-    }
 
     protected static void logContent(String content) {
         log.info("[Forest] " + content);
     }
 
-    public void logRequestBegine(int retryCount, T httpReq) {
+    public void logRequest(int retryCount, T httpReq) {
         if (!request.isLogEnable()) return;
         String requestLine = getLogContentForRequestLine(retryCount, httpReq);
         String headers = getLogContentForHeaders(httpReq);
@@ -168,43 +132,16 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         return null;
     }
 
-    public static void logResponse(ForestRequest request, HttpClient client, HttpRequestBase httpReq, ForestResponse response) {
-        if (!request.isLogEnable()) return;
-        logContent("Response: Status=" + response.getStatusCode());
-        if (response.isSuccess()) {
-            logContent("Response: Content=" + response.getContent());
-        }
-    }
 
     public void execute(ResponseHandler responseHandler) {
         execute(0, responseHandler);
     }
 
-    protected static ForestResponse sendRequest(ForestRequest request, HttpClient httpclient, HttpUriRequest httpUriRequest, HttpclientResponseHandler responseHandler)
-            throws IOException {
-        HttpResponse httpResponse = null;
-        httpResponse = httpclient.execute(httpUriRequest);
-        ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
-        ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
-        logResponse(request, httpclient, (HttpRequestBase) httpUriRequest, response);
-        try {
-            responseHandler.handle(httpUriRequest, httpResponse, response);
-        } catch (Exception ex) {
-            if (ex instanceof ForestRuntimeException) {
-                throw ex;
-            }
-            else {
-                throw new ForestRuntimeException(ex);
-            }
-        }
-        return response;
-    }
-
 
     public void execute(int retryCount, ResponseHandler responseHandler) {
         try {
-            logRequestBegine(retryCount, httpRequest);
-            sendRequest(request, client, httpRequest, httpclientResponseHandler);
+            logRequest(retryCount, httpRequest);
+            requestSender.sendRequest(request, httpclientResponseHandler, httpRequest);
         } catch (IOException e) {
             if (retryCount >= request.getRetryCount()) {
                 httpRequest.abort();

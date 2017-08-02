@@ -3,6 +3,7 @@ package org.forest.executors.httpclient;
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.params.ConnManagerParams;
 import org.apache.http.conn.params.ConnPerRouteBean;
+import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
@@ -11,6 +12,11 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
+import org.apache.http.impl.nio.conn.PoolingNHttpClientConnectionManager;
+import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
+import org.apache.http.nio.client.HttpAsyncClient;
+import org.apache.http.nio.reactor.ConnectingIOReactor;
+import org.apache.http.nio.reactor.IOReactorException;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -22,7 +28,9 @@ import org.forest.config.ForestConfiguration;
  */
 public class HttpclientConnectionManager {
     private HttpParams httpParams;
-    private ThreadSafeClientConnManager connectionManager;
+    private static ThreadSafeClientConnManager tsConnectionManager;
+
+    private static PoolingNHttpClientConnectionManager asyncConnectionManager;
 
     /**
      * maximum number of conntections allowed
@@ -42,10 +50,18 @@ public class HttpclientConnectionManager {
     public final static int DEFAULT_READ_TIMEOUT = 10000;
 
     public HttpclientConnectionManager(ForestConfiguration configuration) {
-        init(configuration);
+        synchronized (HttpclientConnectionManager.class) {
+            if (tsConnectionManager == null) {
+                try {
+                    init(configuration);
+                } catch (IOReactorException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
-    public void init(ForestConfiguration configuration) {
+    public void init(ForestConfiguration configuration) throws IOReactorException {
         httpParams = new BasicHttpParams();
 
         // set maximum number of conntections allowed
@@ -70,16 +86,33 @@ public class HttpclientConnectionManager {
         registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
         registry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
 
-        connectionManager = new ThreadSafeClientConnManager(httpParams, registry);
+        tsConnectionManager = new ThreadSafeClientConnManager(httpParams, registry);
+
+
+
+        /// init async connection manager
+        boolean supportAsync = true;
+        try {
+            Class.forName("org.apache.http.nio.client.HttpAsyncClient");
+        } catch (ClassNotFoundException e) {
+            supportAsync = false;
+        }
+        if (supportAsync) {
+            ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor();
+            if (asyncConnectionManager == null) {
+                asyncConnectionManager = new PoolingNHttpClientConnectionManager(ioReactor);
+                asyncConnectionManager.setMaxTotal(maxConnections);
+            }
+        }
     }
 
     public HttpClient getHttpClient() {
-        return new DefaultHttpClient(connectionManager, httpParams);
+        return new DefaultHttpClient(tsConnectionManager, httpParams);
     }
 
 
     public CloseableHttpAsyncClient getHttpAsyncClient() {
-        return HttpAsyncClients.createDefault();
+        return HttpAsyncClients.custom().setConnectionManager(asyncConnectionManager).build();
     }
 
 }

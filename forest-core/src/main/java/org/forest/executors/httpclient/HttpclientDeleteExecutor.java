@@ -2,6 +2,7 @@ package org.forest.executors.httpclient;
 
 
 import org.apache.http.client.methods.HttpDelete;
+import org.forest.executors.httpclient.request.HttpclientRequestSender;
 import org.forest.executors.httpclient.response.HttpclientResponseHandler;
 import org.forest.executors.url.URLBuilder;
 import org.forest.http.ForestRequest;
@@ -30,8 +31,8 @@ public class HttpclientDeleteExecutor extends AbstractHttpclientExecutor<HttpDel
         return URLBuilder.getQueryableURLBuilder();
     }
 
-    public HttpclientDeleteExecutor(HttpclientConnectionManager connectionManager, ForestRequest request, HttpclientResponseHandler httpclientResponseHandler) {
-        super(connectionManager, request, httpclientResponseHandler);
+    public HttpclientDeleteExecutor(ForestRequest request, HttpclientResponseHandler httpclientResponseHandler, HttpclientRequestSender requestSender) {
+        super(request, httpclientResponseHandler, requestSender);
     }
 
 }

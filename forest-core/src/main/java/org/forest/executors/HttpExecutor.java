@@ -15,7 +15,6 @@ public interface HttpExecutor {
 
     ForestResponse getResponse();
 
-    HttpclientConnectionManager getConnectionManager();
 
     void execute(ResponseHandler responseHandler);
 

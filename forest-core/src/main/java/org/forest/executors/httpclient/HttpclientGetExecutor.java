@@ -1,6 +1,7 @@
 package org.forest.executors.httpclient;
 
 import org.apache.http.client.methods.HttpGet;
+import org.forest.executors.httpclient.request.HttpclientRequestSender;
 import org.forest.executors.httpclient.response.HttpclientResponseHandler;
 import org.forest.executors.url.URLBuilder;
 import org.forest.http.ForestRequest;
@@ -29,8 +30,8 @@ public class HttpclientGetExecutor extends AbstractHttpclientExecutor<HttpGet> {
         return URLBuilder.getQueryableURLBuilder();
     }
 
-    public HttpclientGetExecutor(HttpclientConnectionManager connectionManager, ForestRequest request, HttpclientResponseHandler httpclientResponseHandler) {
-        super(connectionManager, request, httpclientResponseHandler);
+    public HttpclientGetExecutor(ForestRequest request, HttpclientResponseHandler httpclientResponseHandler, HttpclientRequestSender requestSender) {
+        super(request, httpclientResponseHandler, requestSender);
     }
 
 

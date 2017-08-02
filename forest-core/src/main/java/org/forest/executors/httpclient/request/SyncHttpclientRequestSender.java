@@ -1,8 +1,5 @@
 package org.forest.executors.httpclient.request;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -14,7 +11,6 @@ import org.apache.http.impl.cookie.BrowserCompatSpec;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.params.HttpParams;
 import org.forest.exceptions.ForestRuntimeException;
-import org.forest.executors.httpclient.AbstractHttpclientExecutor;
 import org.forest.executors.httpclient.HttpclientConnectionManager;
 import org.forest.executors.httpclient.response.HttpclientForestResponseFactory;
 import org.forest.executors.httpclient.response.HttpclientResponseHandler;
@@ -28,25 +24,13 @@ import java.io.IOException;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-19 20:16
  */
-public class SyncHttpclientRequestSender<T extends HttpRequest> implements HttpclientRequestSender<T> {
-
-    private static Log log = LogFactory.getLog(SyncHttpclientRequestSender.class);
-
-    protected final HttpclientConnectionManager connectionManager;
-
-    private ForestRequest request;
+public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender {
 
     private HttpClient client;
 
-    private T httpRequest;
-
-    private final ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
-
     public SyncHttpclientRequestSender(HttpclientConnectionManager connectionManager, ForestRequest request) {
-        this.connectionManager = connectionManager;
-        this.request = request;
+        super(connectionManager, request);
     }
-
 
     protected HttpClient getHttpClient() {
         HttpClient client = connectionManager.getHttpClient();
@@ -74,10 +58,6 @@ public class SyncHttpclientRequestSender<T extends HttpRequest> implements Httpc
     };
 
 
-    protected static void logContent(String content) {
-        log.info("[Forest] " + content);
-    }
-
 
     public static void logResponse(ForestRequest request, HttpClient client, HttpRequestBase httpReq, ForestResponse response) {
         if (!request.isLogEnable()) return;
@@ -89,10 +69,11 @@ public class SyncHttpclientRequestSender<T extends HttpRequest> implements Httpc
 
 
     @Override
-    public void sendRequest(ForestRequest request, HttpclientResponseHandler responseHandler)
+    public void sendRequest(ForestRequest request, HttpclientResponseHandler responseHandler, HttpUriRequest httpRequest)
             throws IOException {
         HttpResponse httpResponse = null;
-        httpResponse = client.execute((HttpUriRequest) httpRequest);
+        client = getHttpClient();
+        httpResponse = client.execute(httpRequest);
         ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
         ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
         logResponse(request, client, (HttpRequestBase) httpRequest, response);

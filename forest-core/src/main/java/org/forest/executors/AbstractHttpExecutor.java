@@ -1,6 +1,9 @@
 package org.forest.executors;
 
+import org.apache.http.HttpRequest;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.forest.executors.httpclient.HttpclientConnectionManager;
+import org.forest.executors.httpclient.request.HttpclientRequestSender;
 import org.forest.handler.ResponseHandler;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
@@ -11,9 +14,10 @@ import org.forest.http.ForestResponse;
  */
 public abstract class AbstractHttpExecutor implements HttpExecutor {
 
-    protected final HttpclientConnectionManager connectionManager;
 
     protected final ForestRequest request;
+
+    protected HttpclientRequestSender requestSender;
 
     protected ForestResponse response;
 
@@ -21,14 +25,9 @@ public abstract class AbstractHttpExecutor implements HttpExecutor {
         return request;
     }
 
-    public AbstractHttpExecutor(HttpclientConnectionManager connectionManager, ForestRequest request) {
-        this.connectionManager = connectionManager;
+    public AbstractHttpExecutor(ForestRequest request, HttpclientRequestSender requestSender) {
         this.request = request;
-    }
-
-    @Override
-    public HttpclientConnectionManager getConnectionManager() {
-        return connectionManager;
+        this.requestSender = requestSender;
     }
 
     public ForestResponse getResponse() {

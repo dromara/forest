@@ -10,6 +10,7 @@ import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.forest.executors.httpclient.body.HttpclientBodyBuilder;
+import org.forest.executors.httpclient.request.HttpclientRequestSender;
 import org.forest.executors.httpclient.response.HttpclientForestResponseFactory;
 import org.forest.executors.httpclient.response.HttpclientResponseHandler;
 import org.forest.executors.httpclient.response.SyncHttpclientResponseHandler;
@@ -30,8 +31,8 @@ public abstract class AbstractHttpclientEntityExecutor<T extends HttpEntityEnclo
 
     private static Log log = LogFactory.getLog(HttpclientPostExecutorHttpclient.class);
 
-    public AbstractHttpclientEntityExecutor(HttpclientConnectionManager connectionManager, ForestRequest requst, HttpclientResponseHandler httpclientResponseHandler) {
-        super(connectionManager, requst, httpclientResponseHandler);
+    public AbstractHttpclientEntityExecutor(ForestRequest request, HttpclientResponseHandler httpclientResponseHandler, HttpclientRequestSender requestSender) {
+        super(request, httpclientResponseHandler, requestSender);
     }
 
     protected void prepareBodyBuilder() {
@@ -58,25 +59,4 @@ public abstract class AbstractHttpclientEntityExecutor<T extends HttpEntityEnclo
     }
 
 
-
-    public void execute(int retryCount, ResponseHandler responseHandler) {
-        try {
-            logRequestBegine(retryCount, httpRequest);
-            sendRequest(request, client, httpRequest, httpclientResponseHandler);
-        } catch (IOException e) {
-            if (retryCount >= request.getRetryCount()) {
-                httpRequest.abort();
-                ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
-                response = forestResponseFactory.createResponse(request, null);
-                responseHandler.handle(request, response);
-//                throw new RuntimeException(e);
-                return;
-            }
-            log.error(e.getMessage());
-            execute(retryCount + 1, responseHandler);
-        } catch (ForestRuntimeException e) {
-            httpRequest.abort();
-            throw e;
-        }
-    }
 }

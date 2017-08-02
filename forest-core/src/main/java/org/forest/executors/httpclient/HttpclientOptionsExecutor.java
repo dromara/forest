@@ -1,6 +1,7 @@
 package org.forest.executors.httpclient;
 
 import org.apache.http.client.methods.HttpOptions;
+import org.forest.executors.httpclient.request.HttpclientRequestSender;
 import org.forest.executors.httpclient.response.HttpclientResponseHandler;
 import org.forest.executors.url.URLBuilder;
 import org.forest.http.ForestRequest;
@@ -31,8 +32,8 @@ public class HttpclientOptionsExecutor extends AbstractHttpclientExecutor<HttpOp
     }
 
 
-    public HttpclientOptionsExecutor(HttpclientConnectionManager connectionManager, ForestRequest request, HttpclientResponseHandler httpclientResponseHandler) {
-        super(connectionManager, request, httpclientResponseHandler);
+    public HttpclientOptionsExecutor(ForestRequest request, HttpclientResponseHandler httpclientResponseHandler, HttpclientRequestSender requestSender) {
+        super(request, httpclientResponseHandler, requestSender);
     }
 
 }

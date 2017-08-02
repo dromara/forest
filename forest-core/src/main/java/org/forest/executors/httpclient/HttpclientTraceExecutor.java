@@ -1,6 +1,7 @@
 package org.forest.executors.httpclient;
 
 import org.apache.http.client.methods.HttpTrace;
+import org.forest.executors.httpclient.request.HttpclientRequestSender;
 import org.forest.executors.httpclient.response.HttpclientResponseHandler;
 import org.forest.executors.url.URLBuilder;
 import org.forest.http.ForestRequest;
@@ -29,8 +30,8 @@ public class HttpclientTraceExecutor extends AbstractHttpclientExecutor<HttpTrac
         return URLBuilder.getQueryableURLBuilder();
     }
 
-    public HttpclientTraceExecutor(HttpclientConnectionManager connectionManager, ForestRequest request, HttpclientResponseHandler httpclientResponseHandler) {
-        super(connectionManager, request, httpclientResponseHandler);
+    public HttpclientTraceExecutor(ForestRequest request, HttpclientResponseHandler httpclientResponseHandler, HttpclientRequestSender requestSender) {
+        super(request, httpclientResponseHandler, requestSender);
     }
 
 }
