@@ -102,6 +102,7 @@ public class HttpclientConnectionManager {
                     asyncConnectionManager = new PoolingNHttpClientConnectionManager(ioReactor);
                     asyncConnectionManager.setMaxTotal(maxConnections);
                 } catch (Throwable t) {
+                    supportAsync = false;
                 }
             }
         }
