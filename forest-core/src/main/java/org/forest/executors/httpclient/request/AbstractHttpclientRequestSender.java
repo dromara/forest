@@ -2,7 +2,7 @@ package org.forest.executors.httpclient.request;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.forest.executors.httpclient.HttpclientConnectionManager;
+import org.forest.executors.httpclient.conn.HttpclientConnectionManager;
 import org.forest.http.ForestRequest;
 
 

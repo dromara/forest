@@ -1,5 +1,6 @@
 package org.forest.http;
 
+import org.forest.callback.OnSuccess;
 import org.forest.config.ForestConfiguration;
 import org.forest.http.client.GetClient;
 import org.forest.mock.GetMockServer;
@@ -11,9 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]

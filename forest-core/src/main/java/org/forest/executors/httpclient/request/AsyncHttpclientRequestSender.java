@@ -7,15 +7,20 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicStatusLine;
-import org.forest.executors.httpclient.HttpclientConnectionManager;
+import org.forest.exceptions.ForestNetworkException;
+import org.forest.exceptions.ForestRuntimeException;
+import org.forest.executors.httpclient.conn.HttpclientConnectionManager;
 import org.forest.executors.httpclient.response.HttpclientForestResponseFactory;
 import org.forest.executors.httpclient.response.HttpclientResponseHandler;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
 import org.forest.http.ForestResponseFactory;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -23,7 +28,7 @@ import java.io.IOException;
  */
 public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSender {
 
-
+    ExecutorService executorService = Executors.newFixedThreadPool(200);
 
     public AsyncHttpclientRequestSender(HttpclientConnectionManager connectionManager, ForestRequest request) {
         super(connectionManager, request);
@@ -34,7 +39,8 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
         CloseableHttpAsyncClient client = connectionManager.getHttpAsyncClient();
         client.start();
         final ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
-        client.execute(httpRequest, new FutureCallback<HttpResponse>() {
+
+        final Future<HttpResponse> future = client.execute(httpRequest, new FutureCallback<HttpResponse>() {
 
             public void completed(final HttpResponse httpResponse) {
                 ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
@@ -50,8 +56,27 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
             }
 
             public void cancelled() {
+                System.out.println("cancelled");
             }
         });
+
+/*
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    HttpResponse httpResponse = future.get();
+                    ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
+                    responseHandler.handle(httpRequest, httpResponse, response);
+                } catch (InterruptedException e) {
+                    throw new ForestRuntimeException(e);
+                } catch (ExecutionException e) {
+                    throw new ForestRuntimeException(e);
+                }
+            }
+        });
+*/
+
     }
 
 }

@@ -101,6 +101,7 @@ public class ForestMethod<T> implements VariableScope {
                 typeTemplate = makeTemplate(reqAnn.type());
                 dataTypeTemplate = makeTemplate(reqAnn.dataType());
                 contentTypeTemplate = makeTemplate(reqAnn.contentType());
+                async = reqAnn.async();
                 String[] dataArray = reqAnn.data();
                 String[] headerArray = reqAnn.headers();
                 int tout = reqAnn.timeout();
@@ -318,7 +319,8 @@ public class ForestMethod<T> implements VariableScope {
                 .setType(renderedType)
                 .setContentType(renderedContentType)
                 .setArguments(args)
-                .setLogEnable(logEnable);
+                .setLogEnable(logEnable)
+                .setAsync(async);
         if (configuration.getDefaultParameters() != null) {
             request.addData(configuration.getDefaultParameters());
         }

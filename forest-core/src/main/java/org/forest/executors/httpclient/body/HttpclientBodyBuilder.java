@@ -62,13 +62,13 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> imp
 
 
     private void setStringBody(T httpReq, String text, String charset, String contentType) {
-        try {
+//        try {
             StringEntity entity = new StringEntity(text, charset);
             entity.setContentType(contentType);
             httpReq.setEntity(entity);
-        } catch (UnsupportedEncodingException e) {
-            throw new ForestRuntimeException(e);
-        }
+//        } catch (UnsupportedEncodingException e) {
+//            throw new ForestRuntimeException(e);
+//        }
     }
 
     private void setEntities(T httpReq, ForestRequest request, String contentType, List<RequestNameValue> nameValueList, List<NameValuePair> nameValuePairs) {

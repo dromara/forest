@@ -1,8 +1,5 @@
 package org.forest.executors;
 
-import org.apache.http.HttpRequest;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.forest.executors.httpclient.HttpclientConnectionManager;
 import org.forest.executors.httpclient.request.HttpclientRequestSender;
 import org.forest.handler.ResponseHandler;
 import org.forest.http.ForestRequest;

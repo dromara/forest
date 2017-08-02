@@ -1,6 +1,5 @@
 package org.forest.executors;
 
-import org.forest.executors.httpclient.HttpclientConnectionManager;
 import org.forest.handler.ResponseHandler;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;

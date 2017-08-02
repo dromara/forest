@@ -4,15 +4,14 @@ import org.forest.config.ForestConfiguration;
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.executors.HttpExecutor;
 import org.forest.executors.ForestExecutorFactory;
+import org.forest.executors.httpclient.conn.HttpclientConnectionManager;
 import org.forest.executors.httpclient.request.AsyncHttpclientRequestSender;
 import org.forest.executors.httpclient.request.HttpclientRequestSender;
 import org.forest.executors.httpclient.request.SyncHttpclientRequestSender;
-import org.forest.executors.httpclient.response.AsyncHttpclientResponseHandler;
 import org.forest.executors.httpclient.response.HttpclientResponseHandler;
 import org.forest.executors.httpclient.response.SyncHttpclientResponseHandler;
 import org.forest.handler.ResponseHandler;
 import org.forest.http.ForestRequest;
-import org.forest.reflection.ForestMethod;
 
 import java.util.HashMap;
 import java.util.Map;

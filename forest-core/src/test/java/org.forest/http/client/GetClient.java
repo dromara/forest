@@ -6,6 +6,7 @@ import org.forest.annotation.Request;
 import org.forest.callback.OnSuccess;
 
 import java.util.Map;
+import java.util.concurrent.Future;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -27,6 +28,12 @@ public interface GetClient {
     )
     String asyncSimpleGet(OnSuccess<String> onSuccess);
 
+    @Request(
+            url = "http://localhost:5000/hello/user?username=foo",
+            async = true,
+            headers = {"Accept:text/plan"}
+    )
+    Future<String> asyncSimpleGetWithFuture();
 
 
     @Request(

@@ -2,6 +2,7 @@ package org.forest.executors.httpclient.response;
 
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
+import org.forest.exceptions.ForestNetworkException;
 import org.forest.handler.ResponseHandler;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
@@ -18,6 +19,11 @@ public class AsyncHttpclientResponseHandler extends HttpclientResponseHandler {
 
     @Override
     public void handle(HttpRequest httpRequest, HttpResponse httpResponse, ForestResponse response) {
-
+        int statusCode = httpResponse.getStatusLine().getStatusCode();
+        responseHandler.handle(request, response);
+        if (response.isError()) {
+            throw new ForestNetworkException(
+                    httpResponse.getStatusLine().getReasonPhrase(), statusCode, response);
+        }
     }
 }

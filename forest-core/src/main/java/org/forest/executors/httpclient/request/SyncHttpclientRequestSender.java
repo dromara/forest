@@ -11,7 +11,7 @@ import org.apache.http.impl.cookie.BrowserCompatSpec;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.params.HttpParams;
 import org.forest.exceptions.ForestRuntimeException;
-import org.forest.executors.httpclient.HttpclientConnectionManager;
+import org.forest.executors.httpclient.conn.HttpclientConnectionManager;
 import org.forest.executors.httpclient.response.HttpclientForestResponseFactory;
 import org.forest.executors.httpclient.response.HttpclientResponseHandler;
 import org.forest.http.ForestRequest;

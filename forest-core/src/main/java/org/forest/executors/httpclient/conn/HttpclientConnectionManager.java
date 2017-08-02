@@ -1,9 +1,8 @@
-package org.forest.executors.httpclient;
+package org.forest.executors.httpclient.conn;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.params.ConnManagerParams;
 import org.apache.http.conn.params.ConnPerRouteBean;
-import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
@@ -14,7 +13,6 @@ import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.impl.nio.conn.PoolingNHttpClientConnectionManager;
 import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
-import org.apache.http.nio.client.HttpAsyncClient;
 import org.apache.http.nio.reactor.ConnectingIOReactor;
 import org.apache.http.nio.reactor.IOReactorException;
 import org.apache.http.params.BasicHttpParams;
@@ -100,8 +98,11 @@ public class HttpclientConnectionManager {
         if (supportAsync) {
             ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor();
             if (asyncConnectionManager == null) {
-                asyncConnectionManager = new PoolingNHttpClientConnectionManager(ioReactor);
-                asyncConnectionManager.setMaxTotal(maxConnections);
+                try {
+                    asyncConnectionManager = new PoolingNHttpClientConnectionManager(ioReactor);
+                    asyncConnectionManager.setMaxTotal(maxConnections);
+                } catch (Throwable t) {
+                }
             }
         }
     }
@@ -112,6 +113,9 @@ public class HttpclientConnectionManager {
 
 
     public CloseableHttpAsyncClient getHttpAsyncClient() {
+        if (asyncConnectionManager == null) {
+            return null;
+        }
         return HttpAsyncClients.custom().setConnectionManager(asyncConnectionManager).build();
     }
 
