@@ -19,6 +19,7 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.forest.config.ForestConfiguration;
+import org.forest.exceptions.ForestUnsupportException;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -114,7 +115,7 @@ public class HttpclientConnectionManager {
 
     public CloseableHttpAsyncClient getHttpAsyncClient() {
         if (asyncConnectionManager == null) {
-            return null;
+            throw new ForestUnsupportException("Async forest request is unsupported.");
         }
         return HttpAsyncClients.custom().setConnectionManager(asyncConnectionManager).build();
     }
