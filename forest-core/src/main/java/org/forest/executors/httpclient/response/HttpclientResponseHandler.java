@@ -46,8 +46,9 @@ public class HttpclientResponseHandler {
 
 
     public void handleSuccess(ForestResponse response) {
-        responseHandler.handleResultType(request, response);
-        responseHandler.handleSuccess(request, response);
+        Class onSuccessGenericType = responseHandler.getOnSuccessClassGenericType();
+        Object resultData = responseHandler.handleResultType(request, response, onSuccessGenericType, onSuccessGenericType);
+        responseHandler.handleSuccess(resultData, request, response);
     }
 
     public void handleError(ForestResponse response, Exception ex) {

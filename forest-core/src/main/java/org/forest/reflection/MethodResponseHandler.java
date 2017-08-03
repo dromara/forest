@@ -30,7 +30,7 @@ public class MethodResponseHandler<T> implements ResponseHandler {
 
     private final ResultHandler resultHandler = new DefaultResultHandler();
 
-    private T resultData;
+    private volatile T resultData;
 
     public MethodResponseHandler(ForestMethod method, Class onSuccessClassGenericType) {
         this.method = method;
@@ -44,7 +44,7 @@ public class MethodResponseHandler<T> implements ResponseHandler {
         try {
             Object resultData = handleResultType(request, response, returnType, returnClass);
             if (response.isSuccess()) {
-                resultData = handleSuccess(request, response);
+                resultData = handleSuccess(resultData, request, response);
             } else {
                 handleError(request, response);
             }
@@ -63,7 +63,7 @@ public class MethodResponseHandler<T> implements ResponseHandler {
 
 
     @Override
-    public Object handleResultType(ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
+    public synchronized Object handleResultType(ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
         Object resultData = resultHandler.getResult(request, response, resultType, resultClass);
         response.setResult(resultData);
         this.resultData = (T) resultData;
@@ -71,10 +71,9 @@ public class MethodResponseHandler<T> implements ResponseHandler {
     }
 
     @Override
-    public Object handleSuccess(ForestRequest request, ForestResponse response) {
+    public Object handleSuccess(Object resultData, ForestRequest request, ForestResponse response) {
         request.getInterceptorChain().onSuccess(resultData, request, response);
         OnSuccess onSuccess = request.getOnSuccess();
-        Object resultData = null;
         if (onSuccess != null) {
             if (onSuccessClassGenericType != null) {
                 resultData = resultHandler.getResult(request, response, onSuccessClassGenericType, onSuccessClassGenericType);
@@ -83,7 +82,7 @@ public class MethodResponseHandler<T> implements ResponseHandler {
             }
             onSuccess.onSuccess(resultData, request, response);
         }
-        resultData = response.getResult();
+//        resultData = response.getResult();
         return resultData;
     }
 
@@ -119,11 +118,17 @@ public class MethodResponseHandler<T> implements ResponseHandler {
     }
 
 
+    @Override
     public Type getReturnType() {
         return returnType;
     }
 
     public T getResultData() {
         return resultData;
+    }
+
+    @Override
+    public Class getOnSuccessClassGenericType() {
+        return onSuccessClassGenericType;
     }
 }

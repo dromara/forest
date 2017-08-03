@@ -20,7 +20,7 @@ public interface ResponseHandler {
 
     Object handleResultType(ForestRequest request, ForestResponse response, Type resultType, Class resultClass);
 
-    Object handleSuccess(ForestRequest request, ForestResponse response);
+    Object handleSuccess(Object resultData, ForestRequest request, ForestResponse response);
 
     void handleError(ForestRequest request, ForestResponse response);
 
@@ -28,6 +28,7 @@ public interface ResponseHandler {
 
     Object handleResult(Object resultData);
 
+    Class getOnSuccessClassGenericType();
 
     Type getReturnType();
 

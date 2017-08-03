@@ -20,22 +20,6 @@ public interface GetClient {
     )
     String simpleGet();
 
-
-    @Request(
-            url = "http://localhost:5000/hello/user?username=foo",
-            async = true,
-            headers = {"Accept:text/plan"}
-    )
-    String asyncSimpleGet(OnSuccess<String> onSuccess);
-
-    @Request(
-            url = "http://localhost:5000/hello/user?username=foo",
-            async = true,
-            headers = {"Accept:text/plan"}
-    )
-    Future<String> asyncSimpleGetWithFuture();
-
-
     @Request(
             url = "http://localhost:5000/hello/user",
             dataType = "json",
@@ -74,6 +58,29 @@ public interface GetClient {
     )
     String varParamGet(@DataVariable("username") String username);
 
+
+    @Request(
+            url = "http://localhost:5000/hello/user?username=foo",
+            async = true,
+            headers = {"Accept:text/plan"}
+    )
+    void asyncSimpleGet(OnSuccess<String> onSuccess);
+
+    @Request(
+            url = "http://localhost:5000/hello/user?username=foo",
+            async = true,
+            headers = {"Accept:text/plan"}
+    )
+    Future<String> asyncSimpleGetWithFuture();
+
+
+    @Request(
+            url = "http://localhost:5000/hello/user",
+            async = true,
+            headers = {"Accept:text/plan"},
+            data = "username=${username}"
+    )
+    Future<String> asyncVarParamGet(@DataVariable("username") String username, OnSuccess onSuccess);
 
 
 

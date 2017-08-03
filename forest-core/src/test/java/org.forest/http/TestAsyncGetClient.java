@@ -78,4 +78,25 @@ public class TestAsyncGetClient {
         assertEquals(AsyncGetMockServer.EXPECTED, data);
     }
 
+
+    @Test
+    public void testAsyncVarParamGet() throws InterruptedException, ExecutionException {
+        final AtomicBoolean success = new AtomicBoolean(false);
+        Future<String> future = getClient.asyncVarParamGet("foo", new OnSuccess<Object>() {
+            @Override
+            public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
+                log.info("data: " + data);
+                success.set(true);
+                assertEquals(AsyncGetMockServer.EXPECTED, data);
+            }
+        });
+        log.info("send async get request");
+        assertFalse(success.get());
+        assertNotNull(future);
+        Thread.sleep(2000L);
+        assertTrue(success.get());
+        assertTrue(future.isDone());
+        assertEquals(AsyncGetMockServer.EXPECTED, future.get());
+    }
+
 }
