@@ -30,7 +30,7 @@ import org.forest.http.ForestResponse;
  * @author gongjun
  * @since 2016-05-30
  */
-public class ForestNetworkException extends RuntimeException {
+public class ForestNetworkException extends ForestRuntimeException {
 
     private Integer statusCode;
 

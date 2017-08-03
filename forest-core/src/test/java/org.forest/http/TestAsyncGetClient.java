@@ -14,6 +14,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.Int;
 
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -125,6 +126,10 @@ public class TestAsyncGetClient {
                     public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
                         error.set(true);
                         success.set(false);
+                        assertTrue(ex instanceof ForestNetworkException);
+                        int statusCode = ((ForestNetworkException) ex).getStatusCode();
+                        log.error("status code = " + statusCode);
+                        assertEquals(404, statusCode);
                     }
                 });
         log.info("send async get request");
