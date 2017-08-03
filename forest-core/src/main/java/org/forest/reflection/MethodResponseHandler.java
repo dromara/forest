@@ -75,11 +75,7 @@ public class MethodResponseHandler<T> implements ResponseHandler {
         request.getInterceptorChain().onSuccess(resultData, request, response);
         OnSuccess onSuccess = request.getOnSuccess();
         if (onSuccess != null) {
-            if (onSuccessClassGenericType != null) {
-                resultData = resultHandler.getResult(request, response, onSuccessClassGenericType, onSuccessClassGenericType);
-            } else {
-                resultData = resultHandler.getResult(request, response, Object.class, Object.class);
-            }
+            resultData = resultHandler.getResult(request, response, onSuccessClassGenericType, onSuccessClassGenericType);
             onSuccess.onSuccess(resultData, request, response);
         }
         resultData = response.getResult();
