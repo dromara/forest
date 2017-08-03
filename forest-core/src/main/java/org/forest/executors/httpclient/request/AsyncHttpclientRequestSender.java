@@ -1,6 +1,9 @@
 package org.forest.executors.httpclient.request;
 
+import com.twitter.finagle.Http;
+import org.apache.http.HttpEntity;
 import org.apache.http.ProtocolVersion;
+import org.apache.http.concurrent.BasicFuture;
 import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -10,6 +13,7 @@ import org.apache.http.message.BasicStatusLine;
 import org.forest.exceptions.ForestNetworkException;
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.executors.httpclient.conn.HttpclientConnectionManager;
+import org.forest.executors.httpclient.response.AsyncHttpclientResponseHandler;
 import org.forest.executors.httpclient.response.HttpclientForestResponseFactory;
 import org.forest.executors.httpclient.response.HttpclientResponseHandler;
 import org.forest.http.ForestRequest;
@@ -17,10 +21,7 @@ import org.forest.http.ForestResponse;
 import org.forest.http.ForestResponseFactory;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -28,7 +29,7 @@ import java.util.concurrent.Future;
  */
 public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSender {
 
-    ExecutorService executorService = Executors.newFixedThreadPool(200);
+    private volatile boolean completed = false;
 
     public AsyncHttpclientRequestSender(HttpclientConnectionManager connectionManager, ForestRequest request) {
         super(connectionManager, request);
@@ -41,42 +42,31 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
         final ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
 
         final Future<HttpResponse> future = client.execute(httpRequest, new FutureCallback<HttpResponse>() {
-
             public void completed(final HttpResponse httpResponse) {
+                completed = true;
+//                AsyncHttpclientRequestSender.this.notifyAll();
                 ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
-                responseHandler.handle(httpRequest, httpResponse, response);
+                responseHandler.handleSuccess(response);
             }
 
             public void failed(final Exception ex) {
-                HttpResponse httpResponse = new BasicHttpResponse(
-                        new BasicStatusLine(
-                                new ProtocolVersion("1.1", 1, 1), 404, ""));
-                ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
-                responseHandler.handle(httpRequest, httpResponse, response);
+                completed = true;
+//                AsyncHttpclientRequestSender.this.notifyAll();
+                ForestResponse response = forestResponseFactory.createResponse(request, null);
+                responseHandler.handleError(response, ex);
             }
 
             public void cancelled() {
-                System.out.println("cancelled");
+                completed = true;
+//                AsyncHttpclientRequestSender.this.notifyAll();
             }
         });
 
-/*
-        executorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    HttpResponse httpResponse = future.get();
-                    ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
-                    responseHandler.handle(httpRequest, httpResponse, response);
-                } catch (InterruptedException e) {
-                    throw new ForestRuntimeException(e);
-                } catch (ExecutionException e) {
-                    throw new ForestRuntimeException(e);
-                }
-            }
-        });
-*/
+        responseHandler.handleFuture(this, future, forestResponseFactory);
 
     }
 
+    public boolean isCompleted() {
+        return completed;
+    }
 }

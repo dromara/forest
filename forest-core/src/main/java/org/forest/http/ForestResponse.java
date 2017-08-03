@@ -34,9 +34,9 @@ public class ForestResponse<T> {
 
     private ForestRequest request;
     private HttpResponse httpResponse;
-    private Integer statusCode;
-    private String content;
-    private T result;
+    private volatile Integer statusCode;
+    private volatile String content;
+    private volatile T result;
 
     public ForestResponse(ForestRequest request, HttpResponse httpResponse) {
         this.request = request;
@@ -51,7 +51,7 @@ public class ForestResponse<T> {
         return httpResponse;
     }
 
-    public void setContent(String content) {
+    public synchronized void setContent(String content) {
         this.content = content;
     }
 

@@ -13,6 +13,7 @@ import org.forest.http.ForestResponseFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -21,6 +22,7 @@ import java.io.InputStream;
 public class HttpclientForestResponseFactory implements ForestResponseFactory<HttpResponse> {
 
     private String responseContent;
+
 
     private String getString(String encode, HttpEntity entity) throws IOException {
         if (responseContent == null) {
@@ -32,7 +34,7 @@ public class HttpclientForestResponseFactory implements ForestResponseFactory<Ht
 
 
     @Override
-    public ForestResponse createResponse(ForestRequest request, HttpResponse httpResponse) {
+    public synchronized ForestResponse createResponse(ForestRequest request, HttpResponse httpResponse) {
         if (httpResponse == null) {
             httpResponse = new BasicHttpResponse(
                     new BasicStatusLine(

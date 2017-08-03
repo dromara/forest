@@ -1,10 +1,22 @@
 package org.forest.executors.httpclient.response;
 
+import org.apache.commons.collections.iterators.ObjectArrayIterator;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
+import org.apache.http.util.Args;
+import org.forest.exceptions.ForestNetworkException;
+import org.forest.executors.httpclient.request.AsyncHttpclientRequestSender;
 import org.forest.handler.ResponseHandler;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
+import org.forest.http.ForestResponseFactory;
+
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 
 /**
@@ -23,5 +35,92 @@ public abstract class HttpclientResponseHandler {
     }
 
     public abstract void handle(HttpRequest httpRequest, HttpResponse httpResponse, ForestResponse response);
+
+    public void handleSuccess(ForestResponse response) {
+        responseHandler.handleResultType(request, response);
+        responseHandler.handleSuccess(request, response);
+    }
+
+    public void handleError(ForestResponse response, Exception ex) {
+        responseHandler.handleError(request, response, ex);
+    }
+
+
+    public void handleFuture(AsyncHttpclientRequestSender sender,
+                             final Future<HttpResponse> httpResponseFuture,
+                             ForestResponseFactory forestResponseFactory) {
+        Type returnType = responseHandler.getReturnType();
+        Type paramType;
+        Class paramClass = null;
+        if (returnType instanceof ParameterizedType) {
+            Type rawType = ((ParameterizedType) returnType).getRawType();
+            if (!Future.class.isAssignableFrom((Class<?>) rawType)) {
+                return;
+            }
+            paramType = ((ParameterizedType) returnType).getActualTypeArguments()[0];
+            if (paramType == null) {
+                paramType = Object.class;
+            }
+            paramClass = (Class) paramType;
+        }
+        else if (returnType instanceof Class) {
+            if (!Future.class.isAssignableFrom((Class<?>) returnType)) {
+                return;
+            }
+            paramClass = Object.class;
+        }
+        handleFutureResult(sender, httpResponseFuture, paramClass, forestResponseFactory);
+
+    }
+
+
+    private  <T> void handleFutureResult(
+            final AsyncHttpclientRequestSender sender,
+            final Future<HttpResponse> httpResponseFuture,
+            final Class<T> innerType,
+            final ForestResponseFactory forestResponseFactory) {
+        responseHandler.handleResult(new Future<T>() {
+            @Override
+            public boolean cancel(boolean mayInterruptIfRunning) {
+                return httpResponseFuture.cancel(mayInterruptIfRunning);
+            }
+
+            @Override
+            public boolean isCancelled() {
+                return httpResponseFuture.isCancelled();
+            }
+
+            @Override
+            public boolean isDone() {
+                return httpResponseFuture.isDone();
+            }
+
+            private T getResult(HttpResponse httpResponse) throws InterruptedException {
+                synchronized (sender) {
+                    while (!sender.isCompleted()) {
+                        sender.wait();
+                    }
+                }
+                ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
+                Object ret = responseHandler.handleResultType(request, response, innerType, innerType);
+                return (T) ret;
+            }
+
+            @Override
+            public T get() throws InterruptedException, ExecutionException {
+                HttpResponse httpResponse = httpResponseFuture.get();
+                return getResult(httpResponse);
+            }
+
+            @Override
+            public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+                HttpResponse httpResponse = httpResponseFuture.get(timeout, unit);
+                return getResult(httpResponse);
+            }
+
+
+        });
+    }
+
 
 }

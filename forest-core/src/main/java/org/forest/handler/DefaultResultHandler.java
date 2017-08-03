@@ -15,7 +15,7 @@ import java.lang.reflect.Type;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2016-05-25
  */
-public class DefaultResultHandlerAdaptor extends ResultHandler {
+public class DefaultResultHandler extends ResultHandler {
 
     public Object getResult(ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
         Object result = response.getResult();
