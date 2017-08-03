@@ -35,7 +35,7 @@ public class HttpclientResponseHandler {
         this.responseHandler = responseHandler;
     }
 
-    public void handle(HttpRequest httpRequest, HttpResponse httpResponse, ForestResponse response) {
+    public void handle(HttpResponse httpResponse, ForestResponse response) {
         int statusCode = httpResponse.getStatusLine().getStatusCode();
         responseHandler.handle(request, response);
         if (response.isError()) {
