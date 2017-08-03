@@ -28,7 +28,7 @@ public class HttpclientResponseHandler {
         this.responseHandler = responseHandler;
     }
 
-    public void handle(HttpResponse httpResponse, ForestResponse response) {
+    public void handleSync(HttpResponse httpResponse, ForestResponse response) {
         int statusCode = httpResponse.getStatusLine().getStatusCode();
         responseHandler.handleSync(request, response);
         if (response.isError()) {
