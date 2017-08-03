@@ -82,7 +82,7 @@ public class MethodResponseHandler<T> implements ResponseHandler {
             }
             onSuccess.onSuccess(resultData, request, response);
         }
-//        resultData = response.getResult();
+        resultData = response.getResult();
         return resultData;
     }
 
