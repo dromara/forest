@@ -46,9 +46,9 @@ public abstract class HttpclientResponseHandler {
     }
 
 
-    public void handleFuture(AsyncHttpclientRequestSender sender,
-                             final Future<HttpResponse> httpResponseFuture,
-                             ForestResponseFactory forestResponseFactory) {
+    public void handleFuture(
+                     final Future<HttpResponse> httpResponseFuture,
+                     ForestResponseFactory forestResponseFactory) {
         Type returnType = responseHandler.getReturnType();
         Type paramType;
         Class paramClass = null;
@@ -69,13 +69,12 @@ public abstract class HttpclientResponseHandler {
             }
             paramClass = Object.class;
         }
-        handleFutureResult(sender, httpResponseFuture, paramClass, forestResponseFactory);
+        handleFutureResult(httpResponseFuture, paramClass, forestResponseFactory);
 
     }
 
 
     private  <T> void handleFutureResult(
-            final AsyncHttpclientRequestSender sender,
             final Future<HttpResponse> httpResponseFuture,
             final Class<T> innerType,
             final ForestResponseFactory forestResponseFactory) {
@@ -96,11 +95,6 @@ public abstract class HttpclientResponseHandler {
             }
 
             private T getResult(HttpResponse httpResponse) throws InterruptedException {
-                synchronized (sender) {
-                    while (!sender.isCompleted()) {
-                        sender.wait();
-                    }
-                }
                 ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
                 Object ret = responseHandler.handleResultType(request, response, innerType, innerType);
                 return (T) ret;

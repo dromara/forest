@@ -1,19 +1,10 @@
 package org.forest.executors.httpclient.request;
 
-import com.twitter.finagle.Http;
-import org.apache.http.HttpEntity;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.concurrent.BasicFuture;
 import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
-import org.apache.http.message.BasicHttpResponse;
-import org.apache.http.message.BasicStatusLine;
-import org.forest.exceptions.ForestNetworkException;
-import org.forest.exceptions.ForestRuntimeException;
 import org.forest.executors.httpclient.conn.HttpclientConnectionManager;
-import org.forest.executors.httpclient.response.AsyncHttpclientResponseHandler;
 import org.forest.executors.httpclient.response.HttpclientForestResponseFactory;
 import org.forest.executors.httpclient.response.HttpclientResponseHandler;
 import org.forest.http.ForestRequest;
@@ -29,7 +20,6 @@ import java.util.concurrent.*;
  */
 public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSender {
 
-    private volatile boolean completed = false;
 
     public AsyncHttpclientRequestSender(HttpclientConnectionManager connectionManager, ForestRequest request) {
         super(connectionManager, request);
@@ -43,30 +33,20 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
 
         final Future<HttpResponse> future = client.execute(httpRequest, new FutureCallback<HttpResponse>() {
             public void completed(final HttpResponse httpResponse) {
-                completed = true;
-//                AsyncHttpclientRequestSender.this.notifyAll();
                 ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
                 responseHandler.handleSuccess(response);
             }
 
             public void failed(final Exception ex) {
-                completed = true;
-//                AsyncHttpclientRequestSender.this.notifyAll();
                 ForestResponse response = forestResponseFactory.createResponse(request, null);
                 responseHandler.handleError(response, ex);
             }
 
             public void cancelled() {
-                completed = true;
-//                AsyncHttpclientRequestSender.this.notifyAll();
             }
         });
 
-        responseHandler.handleFuture(this, future, forestResponseFactory);
+        responseHandler.handleFuture(future, forestResponseFactory);
 
-    }
-
-    public boolean isCompleted() {
-        return completed;
     }
 }

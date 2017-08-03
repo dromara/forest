@@ -23,6 +23,8 @@ public class HttpclientForestResponseFactory implements ForestResponseFactory<Ht
 
     private String responseContent;
 
+    private volatile ForestResponse resultResponse;
+
 
     private String getString(String encode, HttpEntity entity) throws IOException {
         if (responseContent == null) {
@@ -35,6 +37,9 @@ public class HttpclientForestResponseFactory implements ForestResponseFactory<Ht
 
     @Override
     public synchronized ForestResponse createResponse(ForestRequest request, HttpResponse httpResponse) {
+        if (resultResponse != null) {
+            return resultResponse;
+        }
         if (httpResponse == null) {
             httpResponse = new BasicHttpResponse(
                     new BasicStatusLine(
@@ -53,6 +58,7 @@ public class HttpclientForestResponseFactory implements ForestResponseFactory<Ht
                 throw new ForestRuntimeException(e);
             }
         }
+        this.resultResponse = response;
         return response;
     }
 
