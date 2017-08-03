@@ -2,24 +2,11 @@ package org.forest.executors.httpclient;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.forest.executors.httpclient.body.HttpclientBodyBuilder;
 import org.forest.executors.httpclient.request.HttpclientRequestSender;
-import org.forest.executors.httpclient.response.HttpclientForestResponseFactory;
 import org.forest.executors.httpclient.response.HttpclientResponseHandler;
-import org.forest.executors.httpclient.response.SyncHttpclientResponseHandler;
-import org.forest.handler.ResponseHandler;
 import org.forest.http.ForestRequest;
-import org.forest.http.ForestResponse;
-import org.forest.exceptions.ForestNetworkException;
-import org.forest.exceptions.ForestRuntimeException;
-import org.forest.http.ForestResponseFactory;
 
 import java.io.*;
 

@@ -24,18 +24,26 @@ import java.util.concurrent.TimeoutException;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-19 15:46
  */
-public abstract class HttpclientResponseHandler {
+public class HttpclientResponseHandler {
 
     protected final ForestRequest request;
 
     protected final ResponseHandler responseHandler;
 
-    protected HttpclientResponseHandler(ForestRequest request, ResponseHandler responseHandler) {
+    public HttpclientResponseHandler(ForestRequest request, ResponseHandler responseHandler) {
         this.request = request;
         this.responseHandler = responseHandler;
     }
 
-    public abstract void handle(HttpRequest httpRequest, HttpResponse httpResponse, ForestResponse response);
+    public void handle(HttpRequest httpRequest, HttpResponse httpResponse, ForestResponse response) {
+        int statusCode = httpResponse.getStatusLine().getStatusCode();
+        responseHandler.handle(request, response);
+        if (response.isError()) {
+            throw new ForestNetworkException(
+                    httpResponse.getStatusLine().getReasonPhrase(), statusCode, response);
+        }
+    }
+
 
     public void handleSuccess(ForestResponse response) {
         responseHandler.handleResultType(request, response);
