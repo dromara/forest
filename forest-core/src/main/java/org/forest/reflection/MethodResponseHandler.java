@@ -89,8 +89,7 @@ public class MethodResponseHandler<T> implements ResponseHandler {
     @Override
     public void handleError(ForestRequest request, ForestResponse response) {
         ForestNetworkException networkException = new ForestNetworkException("", response.getStatusCode(), response);
-        ForestRuntimeException e = new ForestRuntimeException(networkException);
-        handleError(request, response, e);
+        handleError(request, response, networkException);
     }
 
     @Override
@@ -104,7 +103,7 @@ public class MethodResponseHandler<T> implements ResponseHandler {
         }
         request.getInterceptorChain().onError(e, request, response);
         if (request.getOnError() != null) {
-            request.getOnError().onError(e, request);
+            request.getOnError().onError(e, request, response);
         }
         else {
             throw e;

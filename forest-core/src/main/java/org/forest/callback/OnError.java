@@ -26,6 +26,7 @@ package org.forest.callback;
 
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.http.ForestRequest;
+import org.forest.http.ForestResponse;
 
 /**
  * @author gongjun
@@ -33,6 +34,6 @@ import org.forest.http.ForestRequest;
  */
 public interface OnError {
 
-    void onError(ForestRuntimeException ex, ForestRequest request);
+    void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response);
 
 }

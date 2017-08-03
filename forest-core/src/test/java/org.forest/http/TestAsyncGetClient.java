@@ -1,7 +1,10 @@
 package org.forest.http;
 
+import org.forest.callback.OnError;
 import org.forest.callback.OnSuccess;
 import org.forest.config.ForestConfiguration;
+import org.forest.exceptions.ForestNetworkException;
+import org.forest.exceptions.ForestRuntimeException;
 import org.forest.http.client.GetClient;
 import org.forest.mock.AsyncGetMockServer;
 import org.forest.mock.GetMockServer;
@@ -52,14 +55,15 @@ public class TestAsyncGetClient {
     @Test
     public void testAsyncSimpleGet() throws InterruptedException {
         final AtomicBoolean success = new AtomicBoolean(false);
-        getClient.asyncSimpleGet(new OnSuccess<String>() {
-            @Override
-            public void onSuccess(String data, ForestRequest request, ForestResponse response) {
-                log.info("data: " + data);
-                success.set(true);
-                assertEquals(AsyncGetMockServer.EXPECTED, data);
-            }
-        });
+        getClient.asyncSimpleGet(
+                new OnSuccess<String>() {
+                    @Override
+                    public void onSuccess(String data, ForestRequest request, ForestResponse response) {
+                        log.info("data: " + data);
+                        success.set(true);
+                        assertEquals(AsyncGetMockServer.EXPECTED, data);
+                    }
+                });
         log.info("send async get request");
         assertFalse(success.get());
         Thread.sleep(2000L);
@@ -89,6 +93,10 @@ public class TestAsyncGetClient {
                 success.set(true);
                 assertEquals(AsyncGetMockServer.EXPECTED, data);
             }
+        }, new OnError() {
+            @Override
+            public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
+            }
         });
         log.info("send async get request");
         assertFalse(success.get());
@@ -97,6 +105,35 @@ public class TestAsyncGetClient {
         assertTrue(success.get());
         assertTrue(future.isDone());
         assertEquals(AsyncGetMockServer.EXPECTED, future.get());
+    }
+
+
+    @Test
+    public void testAsyncVarParamGetError() throws InterruptedException {
+        final AtomicBoolean success = new AtomicBoolean(false);
+        final AtomicBoolean error = new AtomicBoolean(false);
+        Future<String> future = getClient.asyncVarParamGet(
+                "error param",
+                new OnSuccess<Object>() {
+                    @Override
+                    public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
+                        error.set(false);
+                        success.set(true);
+                    }
+                }, new OnError() {
+                    @Override
+                    public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
+                        error.set(true);
+                        success.set(false);
+                    }
+                });
+        log.info("send async get request");
+        assertFalse(error.get());
+        assertNotNull(future);
+        Thread.sleep(2000L);
+        assertFalse(success.get());
+        assertTrue(error.get());
+
     }
 
 }
