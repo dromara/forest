@@ -7,6 +7,7 @@ import org.apache.http.util.Args;
 import org.forest.exceptions.ForestNetworkException;
 import org.forest.executors.httpclient.request.AsyncHttpclientRequestSender;
 import org.forest.handler.ResponseHandler;
+import org.forest.http.ForestFuture;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
 import org.forest.http.ForestResponseFactory;
@@ -78,42 +79,9 @@ public abstract class HttpclientResponseHandler {
             final Future<HttpResponse> httpResponseFuture,
             final Class<T> innerType,
             final ForestResponseFactory forestResponseFactory) {
-        responseHandler.handleResult(new Future<T>() {
-            @Override
-            public boolean cancel(boolean mayInterruptIfRunning) {
-                return httpResponseFuture.cancel(mayInterruptIfRunning);
-            }
-
-            @Override
-            public boolean isCancelled() {
-                return httpResponseFuture.isCancelled();
-            }
-
-            @Override
-            public boolean isDone() {
-                return httpResponseFuture.isDone();
-            }
-
-            private T getResult(HttpResponse httpResponse) throws InterruptedException {
-                ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
-                Object ret = responseHandler.handleResultType(request, response, innerType, innerType);
-                return (T) ret;
-            }
-
-            @Override
-            public T get() throws InterruptedException, ExecutionException {
-                HttpResponse httpResponse = httpResponseFuture.get();
-                return getResult(httpResponse);
-            }
-
-            @Override
-            public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-                HttpResponse httpResponse = httpResponseFuture.get(timeout, unit);
-                return getResult(httpResponse);
-            }
-
-
-        });
+        ForestFuture<T> future = new ForestFuture<>(
+                request, innerType, responseHandler, httpResponseFuture, forestResponseFactory);
+        responseHandler.handleResult(future);
     }
 
 
