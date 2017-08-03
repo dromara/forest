@@ -51,6 +51,10 @@ public class HttpclientResponseHandler {
         responseHandler.handleSuccess(resultData, request, response);
     }
 
+    public void handleError(ForestResponse response) {
+        responseHandler.handleError(request, response);
+    }
+
     public void handleError(ForestResponse response, Exception ex) {
         responseHandler.handleError(request, response, ex);
     }

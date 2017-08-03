@@ -3,6 +3,7 @@ package org.forest.http.client;
 import org.forest.annotation.DataParam;
 import org.forest.annotation.DataVariable;
 import org.forest.annotation.Request;
+import org.forest.callback.OnError;
 import org.forest.callback.OnSuccess;
 
 import java.util.Map;
@@ -80,7 +81,7 @@ public interface GetClient {
             headers = {"Accept:text/plan"},
             data = "username=${username}"
     )
-    Future<String> asyncVarParamGet(@DataVariable("username") String username, OnSuccess onSuccess);
+    Future<String> asyncVarParamGet(@DataVariable("username") String username, OnSuccess onSuccess, OnError onError);
 
 
 

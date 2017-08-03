@@ -6,6 +6,7 @@ import org.forest.config.ForestConfiguration;
 import org.forest.http.ForestRequest;
 import org.forest.callback.OnError;
 import org.forest.exceptions.ForestRuntimeException;
+import org.forest.http.ForestResponse;
 
 /**
  * @author gongjun
@@ -28,7 +29,7 @@ public class ErrorTest extends TestCase {
     public void testErrorCallback() {
         final boolean[] ts = new boolean[] {false};
         errorClient.testError(new OnError() {
-            public void onError(ForestRuntimeException ex, ForestRequest request) {
+            public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
                 ts[0] = true;
                 assertNotNull(ex);
                 assertNotNull(request);
