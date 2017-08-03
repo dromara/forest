@@ -14,7 +14,7 @@ import java.util.concurrent.Future;
  */
 public interface ResponseHandler {
 
-    void handle(ForestRequest request, ForestResponse response);
+    void handleSync(ForestRequest request, ForestResponse response);
 
     Object handleResultType(ForestRequest request, ForestResponse response);
 

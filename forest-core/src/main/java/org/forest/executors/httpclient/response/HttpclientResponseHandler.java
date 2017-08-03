@@ -1,11 +1,7 @@
 package org.forest.executors.httpclient.response;
 
-import org.apache.commons.collections.iterators.ObjectArrayIterator;
-import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
-import org.apache.http.util.Args;
 import org.forest.exceptions.ForestNetworkException;
-import org.forest.executors.httpclient.request.AsyncHttpclientRequestSender;
 import org.forest.handler.ResponseHandler;
 import org.forest.http.ForestFuture;
 import org.forest.http.ForestRequest;
@@ -14,10 +10,7 @@ import org.forest.http.ForestResponseFactory;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 
 /**
@@ -37,7 +30,7 @@ public class HttpclientResponseHandler {
 
     public void handle(HttpResponse httpResponse, ForestResponse response) {
         int statusCode = httpResponse.getStatusLine().getStatusCode();
-        responseHandler.handle(request, response);
+        responseHandler.handleSync(request, response);
         if (response.isError()) {
             throw new ForestNetworkException(
                     httpResponse.getStatusLine().getReasonPhrase(), statusCode, response);

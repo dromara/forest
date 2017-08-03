@@ -4,9 +4,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
 import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.cookie.*;
-import org.apache.http.impl.cookie.BrowserCompatSpec;
-import org.apache.http.params.HttpParams;
 import org.forest.converter.json.ForestJsonConverter;
 import org.forest.executors.BodyBuilder;
 import org.forest.executors.httpclient.body.HttpclientNonBodyBuilder;
@@ -147,7 +144,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
                 httpRequest.abort();
                 ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
                 response = forestResponseFactory.createResponse(request, null);
-                responseHandler.handle(request, response);
+                responseHandler.handleSync(request, response);
 //                throw new ForestRuntimeException(e);
                 return;
             }

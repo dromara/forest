@@ -40,7 +40,7 @@ public class MethodResponseHandler<T> implements ResponseHandler {
     }
 
     @Override
-    public void handle(ForestRequest request, ForestResponse response) {
+    public void handleSync(ForestRequest request, ForestResponse response) {
         try {
             Object resultData = handleResultType(request, response, returnType, returnClass);
             if (response.isSuccess()) {
