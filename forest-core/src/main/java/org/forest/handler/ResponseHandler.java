@@ -1,7 +1,12 @@
 package org.forest.handler;
 
+import org.apache.http.HttpResponse;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
+
+import java.lang.reflect.Type;
+import java.util.concurrent.Future;
+
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -10,4 +15,20 @@ import org.forest.http.ForestResponse;
 public interface ResponseHandler {
 
     void handle(ForestRequest request, ForestResponse response);
+
+    Object handleResultType(ForestRequest request, ForestResponse response);
+
+    Object handleResultType(ForestRequest request, ForestResponse response, Type resultType, Class resultClass);
+
+    Object handleSuccess(ForestRequest request, ForestResponse response);
+
+    void handleError(ForestRequest request, ForestResponse response);
+
+    void handleError(ForestRequest request, ForestResponse response, Exception ex);
+
+    Object handleResult(Object resultData);
+
+
+    Type getReturnType();
+
 }

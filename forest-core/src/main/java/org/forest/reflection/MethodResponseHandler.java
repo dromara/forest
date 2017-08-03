@@ -1,18 +1,18 @@
 package org.forest.reflection;
 
-import org.apache.http.ProtocolVersion;
-import org.apache.http.message.BasicHttpResponse;
-import org.apache.http.message.BasicStatusLine;
+import org.apache.http.HttpResponse;
 import org.forest.callback.OnSuccess;
 import org.forest.exceptions.ForestNetworkException;
 import org.forest.exceptions.ForestRuntimeException;
-import org.forest.handler.DefaultResultHandlerAdaptor;
+import org.forest.handler.DefaultResultHandler;
 import org.forest.handler.ResponseHandler;
 import org.forest.handler.ResultHandler;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
 
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.concurrent.*;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -22,52 +22,105 @@ public class MethodResponseHandler<T> implements ResponseHandler {
 
     private final ForestMethod method;
 
+    private final Type returnType;
+
+    private final Class returnClass;
+
     private final Class onSuccessClassGenericType;
+
+    private final ResultHandler resultHandler = new DefaultResultHandler();
 
     private T resultData;
 
     public MethodResponseHandler(ForestMethod method, Class onSuccessClassGenericType) {
         this.method = method;
         this.onSuccessClassGenericType = onSuccessClassGenericType;
+        this.returnType = method.getReturnType();
+        this.returnClass = method.getReturnClass();
     }
 
     @Override
     public void handle(ForestRequest request, ForestResponse response) {
         try {
-            ResultHandler resultHandler = new DefaultResultHandlerAdaptor();
-            Type returnType = method.getReturnType();
-            Class returnClass = method.getReturnClass();
-            Object resultData = resultHandler.getResult(request, response, returnType, returnClass);
-            response.setResult(resultData);
+            Object resultData = handleResultType(request, response, returnType, returnClass);
             if (response.isSuccess()) {
-                request.getInterceptorChain().onSuccess(resultData, request, response);
-                OnSuccess onSuccess = request.getOnSuccess();
-                if (onSuccess != null) {
-                    if (onSuccessClassGenericType != null) {
-                        resultData = resultHandler.getResult(request, response, onSuccessClassGenericType, onSuccessClassGenericType);
-                    } else if (void.class.isAssignableFrom(returnClass)) {
-                        resultData = resultHandler.getResult(request, response, String.class, String.class);
-                    }
-                    onSuccess.onSuccess(resultData, request, response);
-                }
-                resultData = response.getResult();
+                resultData = handleSuccess(request, response);
             } else {
-                ForestNetworkException networkException = new ForestNetworkException("", response.getStatusCode(), response);
-                ForestRuntimeException e = new ForestRuntimeException(networkException);
-                request.getInterceptorChain().onError(e, request, response);
-                if (request.getOnError() != null) {
-                    request.getOnError().onError(e, request);
-                }
-                else {
-                    throw e;
-                }
+                handleError(request, response);
             }
-            this.resultData = (T) resultData;
+            handleResult(resultData);
         } catch (Throwable e) {
             throw e;
         } finally {
             request.getInterceptorChain().afterExecute(request, response);
         }
+    }
+
+    @Override
+    public Object handleResultType(ForestRequest request, ForestResponse response) {
+        return handleResultType(request, response, returnType, returnClass);
+    }
+
+
+    @Override
+    public Object handleResultType(ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
+        Object resultData = resultHandler.getResult(request, response, resultType, resultClass);
+        response.setResult(resultData);
+        this.resultData = (T) resultData;
+        return resultData;
+    }
+
+    @Override
+    public Object handleSuccess(ForestRequest request, ForestResponse response) {
+        request.getInterceptorChain().onSuccess(resultData, request, response);
+        OnSuccess onSuccess = request.getOnSuccess();
+        Object resultData = null;
+        if (onSuccess != null) {
+            if (onSuccessClassGenericType != null) {
+                resultData = resultHandler.getResult(request, response, onSuccessClassGenericType, onSuccessClassGenericType);
+            } else {
+                resultData = resultHandler.getResult(request, response, Object.class, Object.class);
+            }
+            onSuccess.onSuccess(resultData, request, response);
+        }
+        resultData = response.getResult();
+        return resultData;
+    }
+
+    @Override
+    public void handleError(ForestRequest request, ForestResponse response) {
+        ForestNetworkException networkException = new ForestNetworkException("", response.getStatusCode(), response);
+        ForestRuntimeException e = new ForestRuntimeException(networkException);
+        handleError(request, response, e);
+    }
+
+    @Override
+    public void handleError(ForestRequest request, ForestResponse response, Exception ex) {
+        ForestRuntimeException e = null;
+        if (ex instanceof ForestRuntimeException) {
+            e = (ForestRuntimeException) ex;
+        }
+        else {
+            e = new ForestRuntimeException(ex);
+        }
+        request.getInterceptorChain().onError(e, request, response);
+        if (request.getOnError() != null) {
+            request.getOnError().onError(e, request);
+        }
+        else {
+            throw e;
+        }
+    }
+
+    @Override
+    public Object handleResult(Object resultData) {
+        this.resultData = (T) resultData;
+        return resultData;
+    }
+
+
+    public Type getReturnType() {
+        return returnType;
     }
 
     public T getResultData() {

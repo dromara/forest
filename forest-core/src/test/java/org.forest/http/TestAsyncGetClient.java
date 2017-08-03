@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.Assert.*;
@@ -55,6 +57,7 @@ public class TestAsyncGetClient {
             public void onSuccess(String data, ForestRequest request, ForestResponse response) {
                 log.info("data: " + data);
                 success.set(true);
+                assertEquals(AsyncGetMockServer.EXPECTED, data);
             }
         });
         log.info("send async get request");
@@ -64,8 +67,15 @@ public class TestAsyncGetClient {
     }
 
 
-    public void testAsyncSimpleGetWithFuture() {
-
+    @Test
+    public void testAsyncSimpleGetWithFuture() throws ExecutionException, InterruptedException {
+        Future<String> future = getClient.asyncSimpleGetWithFuture();
+        log.info("send async get request");
+        assertNotNull(future);
+        String data = future.get();
+        log.info("data: " + data);
+        assertNotNull(data);
+        assertEquals(AsyncGetMockServer.EXPECTED, data);
     }
 
 }
