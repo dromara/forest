@@ -78,7 +78,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
         ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
         logResponse(request, client, (HttpRequestBase) httpRequest, response);
         try {
-            responseHandler.handle(httpRequest, httpResponse, response);
+            responseHandler.handle(httpResponse, response);
         } catch (Exception ex) {
             if (ex instanceof ForestRuntimeException) {
                 throw ex;
