@@ -110,12 +110,10 @@ public class HttpclientExecutorFactory implements ForestExecutorFactory {
         return new SyncHttpclientRequestSender(connectionManager, request);
     }
 
-    private final ForestConfiguration configuration;
 
     private final HttpclientConnectionManager connectionManager;
 
     public HttpclientExecutorFactory(ForestConfiguration configuration) {
-        this.configuration = configuration;
         this.connectionManager = new HttpclientConnectionManager(configuration);
     }
 
