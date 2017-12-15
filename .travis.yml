@@ -1,5 +1,5 @@
 language: java
-jdk: oraclejdk8
+jdk: oraclejdk7
 sudo: required
 script: "mvn cobertura:cobertura"
 after_success:
