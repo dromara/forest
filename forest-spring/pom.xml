@@ -6,7 +6,7 @@
 
     <groupId>org.forest</groupId>
     <artifactId>forest-spring</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
 
     <parent>
         <groupId>org.forest</groupId>
