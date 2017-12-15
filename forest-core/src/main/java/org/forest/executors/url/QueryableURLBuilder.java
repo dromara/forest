@@ -21,7 +21,7 @@ public class QueryableURLBuilder extends URLBuilder {
         String url = request.getUrl();
         List<RequestNameValue> data = request.getDataNameValueList();
         StringBuilder paramBuilder = new StringBuilder();
-        ForestJsonConverter jsonConverter = request.getConfiguration().getJsonCoverter();
+        ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         for (int i = 0; i < data.size(); i++) {
             RequestNameValue nameValue = data.get(i);
             paramBuilder.append(nameValue.getName());

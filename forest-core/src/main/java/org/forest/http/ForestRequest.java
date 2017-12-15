@@ -30,6 +30,7 @@ import org.forest.config.ForestConfiguration;
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.executors.ForestExecutorFactory;
 import org.forest.executors.HttpExecutor;
+import org.forest.filter.Filter;
 import org.forest.handler.ResponseHandler;
 import org.forest.interceptor.Interceptor;
 import org.forest.interceptor.InterceptorChain;

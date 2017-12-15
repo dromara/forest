@@ -1,6 +1,5 @@
 package org.forest.reflection;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.forest.Forest;
 import org.forest.annotation.Request;
 import org.forest.annotation.DataObject;
@@ -12,6 +11,7 @@ import org.forest.config.ForestConfiguration;
 import org.forest.config.VariableScope;
 import org.forest.converter.json.ForestJsonConverter;
 import org.forest.exceptions.ForestRuntimeException;
+import org.forest.filter.Filter;
 import org.forest.interceptor.Interceptor;
 import org.forest.mapping.*;
 import org.forest.http.ForestRequest;
@@ -194,34 +194,49 @@ public class ForestMethod<T> implements VariableScope {
             if (ann instanceof DataParam) {
                 DataParam dataAnn = (DataParam) ann;
                 String name = dataAnn.value();
+                String filterName = dataAnn.filter();
                 parameter.setName(name);
+                processParameterFilter(parameter, filterName);
                 namedParameters.add(parameter);
                 MappingVariable variable = new MappingVariable(name, paramType);
+                processParameterFilter(variable, filterName);
                 variable.setIndex(paramIndex);
                 variables.put(dataAnn.value(), variable);
             }
             else if (ann instanceof DataVariable) {
                 DataVariable dataAnn = (DataVariable) ann;
                 String name = dataAnn.value();
+                String filterName = dataAnn.filter();
                 MappingVariable variable = new MappingVariable(name, paramType);
+                processParameterFilter(variable, filterName);
                 variable.setIndex(paramIndex);
                 variables.put(name, variable);
             }
             else if (ann instanceof DataObject) {
-//                DataObject dataAnn = (DataObject) ann;
-                String jsonParamName = ((DataObject) ann).jsonParam();
+                DataObject dataAnn = (DataObject) ann;
+                String jsonParamName = dataAnn.jsonParam();
+                String filterName = dataAnn.filter();
                 boolean isJsonParam = StringUtils.isNotEmpty(jsonParamName);
                 parameter.setObjectProperties(true);
                 parameter.setJsonParam(isJsonParam);
                 if (isJsonParam) {
                     parameter.setJsonParamName(jsonParamName);
                 }
+                processParameterFilter(parameter, filterName);
                 namedParameters.add(parameter);
             }
         }
     }
 
-
+    private void processParameterFilter(MappingParameter parameter, String filterName) {
+        if (StringUtils.isNotEmpty(filterName)) {
+            String[] filterNameArray = filterName.split(",");
+            for (String name : filterNameArray) {
+                Filter filter = configuration.newFilterInstance(name);
+                parameter.addFilter(filter);
+            }
+        }
+    }
 
     /**
      * 创建请求
@@ -286,10 +301,15 @@ public class ForestMethod<T> implements VariableScope {
                 if (parameter.isJsonParam()) {
                     String  json = "";
                     if (obj != null) {
-                        ForestJsonConverter jsonConverter = configuration.getJsonCoverter();
+                        ForestJsonConverter jsonConverter = configuration.getJsonConverter();
+                        obj = parameter.getFilterChain().doFilter(configuration, obj);
                         json = jsonConverter.convertToJson(obj);
                     }
                     nameValueList.add(new RequestNameValue(parameter.getJsonParamName(), json, false));
+                }
+                else if (!parameter.getFilterChain().isEmpty()) {
+                    obj = parameter.getFilterChain().doFilter(configuration, obj);
+                    nameValueList.add(new RequestNameValue(null, obj, false));
                 }
                 else {
                     try {

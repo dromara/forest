@@ -1,6 +1,5 @@
 package org.forest.conf;
 
-import junit.framework.Assert;
 import org.forest.config.ForestConfiguration;
 import org.forest.converter.ForestConverter;
 import org.forest.converter.JSONConverterSelector;
@@ -36,7 +35,7 @@ public class TestForestConfiguration {
         assertEquals(Integer.valueOf(500), configuration.getMaxConnections());
         assertEquals(Integer.valueOf(500), configuration.getMaxRouteConnections());
         assertNotNull(configuration.getJsonConverterSelector());
-        assertNotNull(configuration.getJsonCoverter());
+        assertNotNull(configuration.getJsonConverter());
     }
 
 

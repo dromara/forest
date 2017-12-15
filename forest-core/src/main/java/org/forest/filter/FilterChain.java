@@ -1,5 +1,6 @@
 package org.forest.filter;
 
+import org.forest.config.ForestConfiguration;
 import org.forest.http.ForestRequest;
 import org.forest.interceptor.Interceptor;
 
@@ -15,13 +16,21 @@ public class FilterChain implements Filter {
     private LinkedList<Filter> filters = new LinkedList<>();
 
     @Override
-    public Object doFilter(ForestRequest request, Object data) {
+    public Object doFilter(ForestConfiguration configuration, Object data) {
         Iterator<Filter> iter = filters.iterator();
         Object result = data;
         for ( ; iter.hasNext(); ) {
             Filter filter = iter.next();
-            result = filter.doFilter(request, result);
+            result = filter.doFilter(configuration, result);
         }
         return result;
+    }
+
+    public void addFilter(Filter filter) {
+        filters.add(filter);
+    }
+
+    public boolean isEmpty() {
+        return filters.isEmpty();
     }
 }

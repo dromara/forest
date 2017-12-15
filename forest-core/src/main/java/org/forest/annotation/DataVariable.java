@@ -37,4 +37,5 @@ import java.lang.annotation.Target;
 @Target(value = ElementType.PARAMETER)
 public @interface DataVariable {
     String value();
+    String filter() default "";
 }

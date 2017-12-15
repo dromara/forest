@@ -1,6 +1,6 @@
 package org.forest.filter;
 
-import org.forest.http.ForestRequest;
+import org.forest.config.ForestConfiguration;
 
 /**
  * @author gongjun[dt_flys@hotmail.com]
@@ -8,5 +8,5 @@ import org.forest.http.ForestRequest;
  */
 public interface Filter {
 
-    Object doFilter(ForestRequest request, Object data);
+    Object doFilter(ForestConfiguration configuration, Object data);
 }

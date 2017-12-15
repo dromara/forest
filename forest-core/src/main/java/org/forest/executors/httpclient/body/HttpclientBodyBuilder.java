@@ -7,7 +7,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.forest.converter.json.ForestJsonConverter;
-import org.forest.exceptions.ForestRuntimeException;
+import org.forest.converter.xml.ForestXmlConverter;
 import org.forest.executors.BodyBuilder;
 import org.forest.http.ForestRequest;
 import org.forest.mapping.MappingTemplate;
@@ -50,12 +50,22 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> imp
             setEntities(httpRequest, request, contentType, nameValueList, nameValuePairs);
         }
         else if (mineType.equals("application/json")) {
-            ForestJsonConverter jsonConverter = request.getConfiguration().getJsonCoverter();
+            ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
             String text = null;
             Map<String, Object> map = convertNameValueListToJSON(request, nameValueList);
             String json = jsonConverter.convertToJson(map);
             text = json;
             setStringBody(httpRequest, text, charset, contentType);
+        }
+        else  {
+            Map<String, Object> map = convertNameValueListToJSON(request, nameValueList);
+            StringBuilder builder = new StringBuilder();
+            for (Iterator<Map.Entry<String, Object>> iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
+                Map.Entry<String, Object> entry = iterator.next();
+                Object value = entry.getValue();
+                builder.append(value);
+            }
+            setStringBody(httpRequest, builder.toString(), charset, contentType);
         }
 
     }
@@ -72,7 +82,7 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> imp
     }
 
     private void setEntities(T httpReq, ForestRequest request, String contentType, List<RequestNameValue> nameValueList, List<NameValuePair> nameValuePairs) {
-        ForestJsonConverter jsonConverter = request.getConfiguration().getJsonCoverter();
+        ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         for (int i = 0; i < nameValueList.size(); i++) {
             RequestNameValue nameValue = nameValueList.get(i);
             if (nameValue.isInQuery()) continue;
@@ -94,7 +104,7 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> imp
     }
 
     private Map<String, Object> convertNameValueListToJSON(ForestRequest request, List<RequestNameValue> nameValueList) {
-        ForestJsonConverter jsonConverter = request.getConfiguration().getJsonCoverter();
+        ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         Map<String, Object> map = new LinkedHashMap<String, Object>();
         for (int i = 0; i < nameValueList.size(); i++) {
             RequestNameValue nameValue = nameValueList.get(i);

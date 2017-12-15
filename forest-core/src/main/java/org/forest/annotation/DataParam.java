@@ -41,5 +41,5 @@ public @interface DataParam {
     String value();
     String encoding() default "";
     String type() default "text";
-    Class<Filter>[] filter() default {};
+    String filter() default "";
 }

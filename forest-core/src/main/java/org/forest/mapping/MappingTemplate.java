@@ -118,7 +118,7 @@ public class MappingTemplate {
     }
 
     public String render(Object[] args) {
-        ForestJsonConverter jsonConverter = variableScope.getConfiguration().getJsonCoverter();
+        ForestJsonConverter jsonConverter = variableScope.getConfiguration().getJsonConverter();
         int len = exprList.size();
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < len; i++) {

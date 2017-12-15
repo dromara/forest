@@ -28,9 +28,15 @@ package org.forest.config;
 import org.forest.converter.ForestConverter;
 import org.forest.converter.JSONConverterSelector;
 import org.forest.converter.json.ForestJsonConverter;
+import org.forest.converter.xml.ForestJaxbConverter;
+import org.forest.converter.xml.ForestXmlConverter;
 import org.forest.exceptions.ForestRuntimeException;
+import org.forest.exceptions.ForestUnsupportException;
 import org.forest.executors.ForestExecutorFactory;
 import org.forest.executors.httpclient.HttpclientExecutorFactory;
+import org.forest.filter.Filter;
+import org.forest.filter.JsonFilter;
+import org.forest.filter.XmlFilter;
 import org.forest.mapping.MappingVariable;
 import org.forest.utils.ForestDataType;
 import org.forest.utils.RequestNameValue;
@@ -85,6 +91,8 @@ public class ForestConfiguration implements Serializable {
 
     private JSONConverterSelector jsonConverterSelector;
 
+    private Map<String, Class> filterRegisterMap = new HashMap<>();
+
 
     private Map<String, Object> variables = new HashMap<String, Object>();
 
@@ -95,12 +103,15 @@ public class ForestConfiguration implements Serializable {
         ForestConfiguration configuration = new ForestConfiguration();
         configuration.setId("forestConfiguration" + configuration.hashCode());
         configuration.setJsonConverterSelector(new JSONConverterSelector());
+        configuration.setXmlConverter(new ForestJaxbConverter());
         setupJSONConverter(configuration);
         setupExecutorFactory(configuration);
         configuration.setTimeout(3000);
         configuration.setConnectTimeout(2000);
         configuration.setMaxConnections(500);
         configuration.setMaxRouteConnections(500);
+        configuration.registerFilter("json", JsonFilter.class);
+        configuration.registerFilter("xml", XmlFilter.class);
         return configuration;
     }
 
@@ -112,6 +123,7 @@ public class ForestConfiguration implements Serializable {
         JSONConverterSelector jsonConverterSelector = new JSONConverterSelector();
         configuration.setJsonConverter(jsonConverterSelector.select());
     }
+
 
     public String getId() {
         return id;
@@ -181,8 +193,16 @@ public class ForestConfiguration implements Serializable {
         getConverterMap().put(ForestDataType.JSON, converter);
     }
 
-    public ForestJsonConverter getJsonCoverter() {
+    public ForestJsonConverter getJsonConverter() {
         return (ForestJsonConverter) getConverterMap().get(ForestDataType.JSON);
+    }
+
+    public void setXmlConverter(ForestXmlConverter converter) {
+        getConverterMap().put(ForestDataType.XML, converter);
+    }
+
+    public ForestXmlConverter getXmlConverter() {
+        return (ForestXmlConverter) getConverterMap().get(ForestDataType.XML);
     }
 
     public <T> ProxyFactory<T> getProxyFactory(Class<T> clazz) {
@@ -242,4 +262,32 @@ public class ForestConfiguration implements Serializable {
     public void setJsonConverterSelector(JSONConverterSelector jsonConverterSelector) {
         this.jsonConverterSelector = jsonConverterSelector;
     }
+
+
+
+    public void registerFilter(String name, Class filterClass) {
+        if (!(Filter.class.isAssignableFrom(filterClass))) {
+            throw new ForestRuntimeException("Cannot register class \"" + filterClass.getName()
+                    + "\" as a filter, filter class must implement Filter interface!");
+        }
+        if (filterRegisterMap.containsKey(name)) {
+            throw new ForestRuntimeException("filter \"" + name + "\" already exists!");
+        }
+        filterRegisterMap.put(name, filterClass);
+    }
+
+    public Filter newFilterInstance(String name) {
+        Class filterClass = filterRegisterMap.get(name);
+        if (filterClass == null) {
+            throw new ForestRuntimeException("filter \"" + name + "\" does not exists!");
+        }
+        try {
+            return (Filter) filterClass.newInstance();
+        } catch (InstantiationException e) {
+            throw new ForestRuntimeException("An error occurred the initialization of filter \"" + name + "\" ! cause: " + e.getMessage(), e);
+        } catch (IllegalAccessException e) {
+            throw new ForestRuntimeException("An error occurred the initialization of filter \"" + name + "\" ! cause: " + e.getMessage(), e);
+        }
+    }
+
 }

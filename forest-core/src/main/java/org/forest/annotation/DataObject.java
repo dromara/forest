@@ -36,5 +36,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface DataObject {
+    @Deprecated
     String jsonParam() default "";
+    String filter() default "";
 }

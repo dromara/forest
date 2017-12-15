@@ -1,9 +1,12 @@
 package org.forest.http.client;
 
+import org.forest.annotation.DataObject;
 import org.forest.annotation.DataParam;
 import org.forest.annotation.DataVariable;
 import org.forest.annotation.Request;
 import org.forest.http.model.UserParam;
+import org.forest.http.model.XmlTestParam;
+import org.forest.test.XmlTest;
 
 import java.util.Map;
 
@@ -65,6 +68,14 @@ public interface PostClient {
             headers = {"Accept:text/plan"}
     )
     String complexPost(String param, String body);
+
+
+    @Request(
+            url = "http://localhost:5000/xml",
+            type = "post",
+            contentType = "application/xml"
+    )
+    String postXml(@DataObject(filter = "xml") XmlTestParam testParam);
 
 
 /*

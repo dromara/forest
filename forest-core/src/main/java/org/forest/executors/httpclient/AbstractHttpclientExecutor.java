@@ -70,7 +70,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
     }
 
     public void prepareHeaders() {
-        ForestJsonConverter jsonConverter = request.getConfiguration().getJsonCoverter();
+        ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         List<RequestNameValue> headerList = request.getHeaderNameValueList();
         if (headerList != null && !headerList.isEmpty()) {
             for (RequestNameValue nameValue : headerList) {

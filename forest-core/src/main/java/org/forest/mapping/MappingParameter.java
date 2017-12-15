@@ -1,5 +1,8 @@
 package org.forest.mapping;
 
+import org.forest.filter.Filter;
+import org.forest.filter.FilterChain;
+
 /**
  * Created by Administrator on 2016/5/17.
  */
@@ -14,6 +17,8 @@ public class MappingParameter {
     private boolean isJsonParam = false;
 
     private String jsonParamName;
+
+    private FilterChain filterChain = new FilterChain();
 
     public Integer getIndex() {
         return index;
@@ -53,5 +58,13 @@ public class MappingParameter {
 
     public void setJsonParamName(String jsonParamName) {
         this.jsonParamName = jsonParamName;
+    }
+
+    public FilterChain getFilterChain() {
+        return filterChain;
+    }
+
+    public void addFilter(Filter filter) {
+        filterChain.addFilter(filter);
     }
 }
