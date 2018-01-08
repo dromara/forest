@@ -43,9 +43,7 @@ import org.forest.utils.RequestNameValue;
 import org.forest.proxy.ProxyFactory;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * global configuration
@@ -274,6 +272,21 @@ public class ForestConfiguration implements Serializable {
             throw new ForestRuntimeException("filter \"" + name + "\" already exists!");
         }
         filterRegisterMap.put(name, filterClass);
+    }
+
+
+    public List<String> getRegisteredFilterNames() {
+        Set<String> nameSet = filterRegisterMap.keySet();
+        List<String> names = new ArrayList<>();
+        Iterator<String> iterator = nameSet.iterator();
+        for (; iterator.hasNext(); ) {
+            names.add(iterator.next());
+        }
+        return names;
+    }
+
+    public boolean hasFilter(String name) {
+        return filterRegisterMap.containsKey(name);
     }
 
     public Filter newFilterInstance(String name) {

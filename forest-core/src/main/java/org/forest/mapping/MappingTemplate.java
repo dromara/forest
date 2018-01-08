@@ -5,6 +5,7 @@ import org.forest.config.VariableScope;
 import org.forest.converter.json.ForestJsonConverter;
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.reflection.ForestMethod;
+import org.forest.utils.StringUtils;
 
 import java.util.*;
 
@@ -110,9 +111,6 @@ public class MappingTemplate {
                     if (expr == null) {
                         expr = parseExpr(buffer);
                     }
-//                    else {
-//                        expr = new MappingDot(variableScope, expr, buffer.toString());
-//                    }
                     return expr;
                 case '\'':
                     nextChar();
@@ -135,17 +133,16 @@ public class MappingTemplate {
                     }
                     String right = parseIdentity();
                     expr = new MappingDot(variableScope, expr, right);
-                    buffer = new StringBuffer();
                     break;
                 case '(':
                     nextChar();
                     String methodName = buffer.toString();
-//                    if (StringUtils.isEmpty(methodName)) {
-//                        throw new ForestRuntimeException("Template Expression Parse Error:\n Character '" + ch + "', column " + readIndex + " at \"" + template + "\"");
-//                    }
-                    if (expr instanceof MappingDot && ((MappingDot) expr).right != null) {
+                    if (expr != null && expr instanceof MappingDot && ((MappingDot) expr).right != null) {
                         methodName = ((MappingDot) expr).right;
                         expr = ((MappingDot) expr).left;
+                    }
+                    if (StringUtils.isEmpty(methodName)) {
+                        throw new ForestRuntimeException("Template Expression Parse Error:\n Character '" + ch + "', column " + readIndex + " at \"" + template + "\"");
                     }
                     expr = parseInvokeParams(variableScope, expr, methodName);
                     match(')');
@@ -210,6 +207,9 @@ public class MappingTemplate {
         char ch = watch(1);
         switch (ch) {
             case ')':
+                if (left == null) {
+                    return new MappingFilterInvoke(variableScope, name, argExprList);
+                }
                 return new MappingInvoke(variableScope, left, name, argExprList);
             case ',':
                 nextChar();
