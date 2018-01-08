@@ -3,7 +3,9 @@ package org.forest.mapping;
 
 import org.forest.config.VariableScope;
 import org.forest.converter.json.ForestJsonConverter;
+import org.forest.exceptions.ForestRuntimeException;
 import org.forest.reflection.ForestMethod;
+import org.forest.utils.StringUtils;
 
 import java.util.*;
 
@@ -27,7 +29,17 @@ public class MappingTemplate {
         return template.charAt(readIndex);
     }
 
-    private char watchChar(int i) {
+    private void match(char except) {
+        if (isEnd()) {
+            throw new ForestRuntimeException("Template Expression Parse Error:\n Not found '" + except + "', column " + readIndex + " at \"" + template + "\"");
+        }
+        char real = nextChar();
+        if (except != real) {
+            throw new ForestRuntimeException("Template Expression Parse Error:\n It need '" + except + "', But found '" + except + "', column " + readIndex + " at \"" + template + "\"");
+        }
+    }
+
+    private char watch(int i) {
         return template.charAt(readIndex + i);
     }
 
@@ -45,7 +57,7 @@ public class MappingTemplate {
         while (!isEnd()) {
             char ch = nextChar();
             if (ch == '$') {
-                if (watchChar(1) == '{') {
+                if (watch(1) == '{') {
                     nextChar();
                     if (buffer.length() > 0) {
                         MappingString str = new MappingString(buffer.toString());
@@ -53,7 +65,8 @@ public class MappingTemplate {
                     }
 
                     buffer = new StringBuffer();
-                    MappingExpr expr = parseVariable();
+                    MappingExpr expr = parseExpression();
+                    match('}');
                     if (expr != null) {
                         exprList.add(expr);
                     }
@@ -70,12 +83,13 @@ public class MappingTemplate {
         }
     }
 
-    public MappingExpr parseVariable() {
+    public MappingExpr parseExpression() {
         StringBuffer buffer = new StringBuffer();
         MappingExpr expr = null;
         while (!isEnd()) {
-            char ch = nextChar();
+            char ch = watch(1);
             switch (ch) {
+                case ')':
                 case '}':
                     if (expr == null) {
                         expr = parseExpr(buffer);
@@ -85,6 +99,7 @@ public class MappingTemplate {
                     }
                     return expr;
                 case '.':
+                    nextChar();
                     if (expr == null) {
                         expr = parseExpr(buffer);
                     }
@@ -93,13 +108,43 @@ public class MappingTemplate {
                     }
                     buffer = new StringBuffer();
                     break;
+                case '(':
+                    nextChar();
+                    String methodName = buffer.toString();
+                    if (StringUtils.isEmpty(methodName)) {
+                        throw new ForestRuntimeException("Template Expression Parse Error:\n Character '" + ch + "', column " + readIndex + " at \"" + template + "\"");
+                    }
+                    expr = parseMethodParams(variableScope, expr, methodName);
+                    match(')');
+                    break;
                 default:
+                    nextChar();
                     buffer.append(ch);
                     break;
             }
 
         }
         return expr;
+    }
+
+
+    public MappingMethod parseMethodParams(VariableScope variableScope, MappingExpr left, String name) {
+        return parseMethodParams_inner(variableScope, left, name, new ArrayList<MappingExpr>());
+    }
+
+
+    public MappingMethod parseMethodParams_inner(VariableScope variableScope, MappingExpr left, String name, List<MappingExpr> argExprList) {
+        char ch = watch(1);
+        switch (ch) {
+            case ')':
+                return new MappingMethod(variableScope, left, name, argExprList);
+            case ',':
+                nextChar();
+                MappingExpr expr = parseExpression();
+                argExprList.add(expr);
+                return parseMethodParams_inner(variableScope, left, name, argExprList);
+        }
+        throw new ForestRuntimeException("Template Expression Parse Error:\n Character '" + ch + "', column " + readIndex + " at \"" + template + "\"");
     }
 
     public MappingExpr parseExpr(StringBuffer buffer) {

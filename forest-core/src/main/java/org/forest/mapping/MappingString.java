@@ -16,6 +16,11 @@ public class MappingString extends MappingExpr {
     }
 
     @Override
+    public Object render(Object[] args) {
+        return getText();
+    }
+
+    @Override
     public String toString() {
         return text.toString();
     }
