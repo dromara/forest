@@ -11,6 +11,11 @@ public class MappingIndex extends MappingExpr {
         this.index = index;
     }
 
+    @Override
+    public Object render(Object[] args) {
+        return args[index];
+    }
+
     public Integer getIndex() {
         return index;
     }

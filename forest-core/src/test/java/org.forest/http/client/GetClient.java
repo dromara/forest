@@ -33,7 +33,7 @@ public interface GetClient {
     @Request(
             url = "http://localhost:5000/hello/user",
             headers = {"Accept:text/plan"},
-            data = "username=${0}"
+            data = "username=${$0.toString()}"
     )
     String textParamGet(String username);
 
@@ -79,7 +79,7 @@ public interface GetClient {
             url = "http://localhost:5000/hello/user",
             async = true,
             headers = {"Accept:text/plan"},
-            data = "username=${username}"
+            data = "username=${ username.toString() }"
     )
     Future<String> asyncVarParamGet(@DataVariable("username") String username, OnSuccess onSuccess, OnError onError);
 

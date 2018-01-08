@@ -13,11 +13,11 @@ import java.util.List;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2018-01-08 18:21
  */
-public class MappingMethod extends MappingDot {
+public class MappingInvoke extends MappingDot {
 
     private List<MappingExpr> argList;
 
-    public MappingMethod(VariableScope variableScope, MappingExpr left, String name, List<MappingExpr> argList) {
+    public MappingInvoke(VariableScope variableScope, MappingExpr left, String name, List<MappingExpr> argList) {
         super(variableScope, left, name);
         this.argList = argList;
     }
@@ -53,5 +53,10 @@ public class MappingMethod extends MappingDot {
             throw new ForestRuntimeException(e);
         }
 
+    }
+
+    @Override
+    public String toString() {
+        return "[Invoke: " + left.toString() + "." + right + "]";
     }
 }

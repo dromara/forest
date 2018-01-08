@@ -5,7 +5,6 @@ import org.forest.config.VariableScope;
 import org.forest.converter.json.ForestJsonConverter;
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.reflection.ForestMethod;
-import org.forest.utils.StringUtils;
 
 import java.util.*;
 
@@ -29,13 +28,24 @@ public class MappingTemplate {
         return template.charAt(readIndex);
     }
 
+    private void skipSpaces() {
+        if (isEnd()) {
+            return;
+        }
+        char ch = watch(1);
+        while ((ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r') && !isEnd()) {
+            nextChar();
+            ch = watch(1);
+        }
+    }
+
     private void match(char except) {
         if (isEnd()) {
             throw new ForestRuntimeException("Template Expression Parse Error:\n Not found '" + except + "', column " + readIndex + " at \"" + template + "\"");
         }
         char real = nextChar();
         if (except != real) {
-            throw new ForestRuntimeException("Template Expression Parse Error:\n It need '" + except + "', But found '" + except + "', column " + readIndex + " at \"" + template + "\"");
+            throw new ForestRuntimeException("Template Expression Parse Error:\n It need '" + except + "', But found '" + real + "', column " + readIndex + " at \"" + template + "\"");
         }
     }
 
@@ -89,32 +99,55 @@ public class MappingTemplate {
         while (!isEnd()) {
             char ch = watch(1);
             switch (ch) {
+                case ' ':
+                case '\t':
+                case '\r':
+                case '\n':
+                    skipSpaces();
+                    break;
                 case ')':
                 case '}':
                     if (expr == null) {
                         expr = parseExpr(buffer);
                     }
-                    else {
-                        expr = new MappingDot(variableScope, expr, buffer.toString());
-                    }
+//                    else {
+//                        expr = new MappingDot(variableScope, expr, buffer.toString());
+//                    }
                     return expr;
+                case '\'':
+                    nextChar();
+                    expr = parseString(ch);
+                    match('\'');
+                    break;
+                case '\"':
+                    nextChar();
+                    expr = parseString(ch);
+                    match('\"');
+                    break;
+                case '$':
+                    nextChar();
+                    expr = parseIndex();
+                    break;
                 case '.':
                     nextChar();
                     if (expr == null) {
                         expr = parseExpr(buffer);
                     }
-                    else {
-                        expr = new MappingDot(variableScope, expr, buffer.toString());
-                    }
+                    String right = parseIdentity();
+                    expr = new MappingDot(variableScope, expr, right);
                     buffer = new StringBuffer();
                     break;
                 case '(':
                     nextChar();
                     String methodName = buffer.toString();
-                    if (StringUtils.isEmpty(methodName)) {
-                        throw new ForestRuntimeException("Template Expression Parse Error:\n Character '" + ch + "', column " + readIndex + " at \"" + template + "\"");
+//                    if (StringUtils.isEmpty(methodName)) {
+//                        throw new ForestRuntimeException("Template Expression Parse Error:\n Character '" + ch + "', column " + readIndex + " at \"" + template + "\"");
+//                    }
+                    if (expr instanceof MappingDot && ((MappingDot) expr).right != null) {
+                        methodName = ((MappingDot) expr).right;
+                        expr = ((MappingDot) expr).left;
                     }
-                    expr = parseMethodParams(variableScope, expr, methodName);
+                    expr = parseInvokeParams(variableScope, expr, methodName);
                     match(')');
                     break;
                 default:
@@ -128,16 +161,56 @@ public class MappingTemplate {
     }
 
 
-    public MappingMethod parseMethodParams(VariableScope variableScope, MappingExpr left, String name) {
+    public String parseIdentity() {
+        char ch = watch(1);
+        StringBuilder builder = new StringBuilder();
+        while (Character.isAlphabetic(ch)) {
+            builder.append(ch);
+            nextChar();
+            ch = watch(1);
+        }
+        return builder.toString();
+    }
+
+
+    public MappingIndex parseIndex() {
+        char ch = watch(1);
+        int index = 0;
+        int n = 0;
+        while (Character.isDigit(ch)) {
+            int x = ch - '0';
+            index = 10 * n + x;
+            n++;
+            nextChar();
+            ch = watch(1);
+        }
+        return new MappingIndex(index);
+    }
+
+
+    public MappingString parseString(char quoteChar) {
+        StringBuilder builder = new StringBuilder();
+        char ch = watch(1);
+        while (ch != quoteChar && !isEnd()) {
+            builder.append(ch);
+            nextChar();
+            ch = watch(1);
+        }
+        return new MappingString(builder.toString());
+    }
+
+
+    public MappingInvoke parseInvokeParams(VariableScope variableScope, MappingExpr left, String name) {
         return parseMethodParams_inner(variableScope, left, name, new ArrayList<MappingExpr>());
     }
 
 
-    public MappingMethod parseMethodParams_inner(VariableScope variableScope, MappingExpr left, String name, List<MappingExpr> argExprList) {
+    public MappingInvoke parseMethodParams_inner(VariableScope variableScope, MappingExpr left, String name, List<MappingExpr> argExprList) {
+        skipSpaces();
         char ch = watch(1);
         switch (ch) {
             case ')':
-                return new MappingMethod(variableScope, left, name, argExprList);
+                return new MappingInvoke(variableScope, left, name, argExprList);
             case ',':
                 nextChar();
                 MappingExpr expr = parseExpression();
