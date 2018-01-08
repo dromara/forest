@@ -7,7 +7,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.forest.converter.json.ForestJsonConverter;
-import org.forest.converter.xml.ForestXmlConverter;
 import org.forest.executors.BodyBuilder;
 import org.forest.http.ForestRequest;
 import org.forest.mapping.MappingTemplate;
@@ -52,13 +51,13 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> imp
         else if (mineType.equals("application/json")) {
             ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
             String text = null;
-            Map<String, Object> map = convertNameValueListToJSON(request, nameValueList);
+            Map<String, Object> map = convertNameValueListToMap(request, nameValueList);
             String json = jsonConverter.convertToJson(map);
             text = json;
             setStringBody(httpRequest, text, charset, contentType);
         }
         else  {
-            Map<String, Object> map = convertNameValueListToJSON(request, nameValueList);
+            Map<String, Object> map = convertNameValueListToMap(request, nameValueList);
             StringBuilder builder = new StringBuilder();
             for (Iterator<Map.Entry<String, Object>> iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
                 Map.Entry<String, Object> entry = iterator.next();
@@ -103,7 +102,7 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> imp
         }
     }
 
-    private Map<String, Object> convertNameValueListToJSON(ForestRequest request, List<RequestNameValue> nameValueList) {
+    private Map<String, Object> convertNameValueListToMap(ForestRequest request, List<RequestNameValue> nameValueList) {
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         Map<String, Object> map = new LinkedHashMap<String, Object>();
         for (int i = 0; i < nameValueList.size(); i++) {
