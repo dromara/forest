@@ -14,8 +14,8 @@ import java.lang.reflect.Method;
  */
 public class MappingDot extends MappingExpr {
 
-    private MappingExpr left;
-    private String right;
+    protected MappingExpr left;
+    protected String right;
 
     public MappingDot(VariableScope variableScope, MappingExpr left, String right) {
         this.variableScope = variableScope;
@@ -26,12 +26,19 @@ public class MappingDot extends MappingExpr {
     public Object render(Object[] args) {
         Object obj = left.render(args);
         String getterName = StringUtils.toGetterName(right);
+        Method method = null;
         try {
-            Method method = obj.getClass().getDeclaredMethod(getterName);
+            method = obj.getClass().getDeclaredMethod(getterName);
+        } catch (NoSuchMethodException e) {
+            try {
+                method = obj.getClass().getDeclaredMethod(right);
+            } catch (NoSuchMethodException e1) {
+                e1.printStackTrace();
+            }
+        }
+        try {
             Object result = method.invoke(obj);
             return result;
-        } catch (NoSuchMethodException e) {
-            throw new ForestRuntimeException(e);
         } catch (InvocationTargetException e) {
             throw new ForestRuntimeException(e);
         } catch (IllegalAccessException e) {

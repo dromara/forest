@@ -43,6 +43,7 @@ public class ForestMethod<T> implements VariableScope {
     private MappingTemplate dataTypeTemplate;
     private Integer timeout = null;
     private Integer retryNumber = null;
+    private MappingTemplate encodeTemplate = null;
     private MappingTemplate contentTypeTemplate;
     private MappingTemplate[] dataTemplateArray;
     private MappingTemplate[] headerTemplateArray;
@@ -101,6 +102,7 @@ public class ForestMethod<T> implements VariableScope {
                 typeTemplate = makeTemplate(reqAnn.type());
                 dataTypeTemplate = makeTemplate(reqAnn.dataType());
                 contentTypeTemplate = makeTemplate(reqAnn.contentType());
+                encodeTemplate = makeTemplate(reqAnn.contentEncoding());
                 async = reqAnn.async();
                 String[] dataArray = reqAnn.data();
                 String[] headerArray = reqAnn.headers();
@@ -246,6 +248,7 @@ public class ForestMethod<T> implements VariableScope {
     private ForestRequest makeRequest(Object[] args) {
         String renderedUrl = urlTemplate.render(args);
         String renderedType = typeTemplate.render(args);
+        String encode = encodeTemplate.render(args);
         String renderedContentType = contentTypeTemplate.render(args).trim();
         String newUrl = "";
         List<RequestNameValue> nameValueList = new ArrayList<RequestNameValue>();
@@ -337,6 +340,7 @@ public class ForestMethod<T> implements VariableScope {
         request.setUrl(newUrl)
                 .setQuery(query)
                 .setType(renderedType)
+                .setEncode(encode)
                 .setContentType(renderedContentType)
                 .setArguments(args)
                 .setLogEnable(logEnable)

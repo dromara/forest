@@ -30,7 +30,7 @@ public class QueryableURLBuilder extends URLBuilder {
             if (StringUtils.isNotEmpty(value)) {
                 String encodedValue = null;
                 try {
-                    encodedValue = URLEncoder.encode(value, "UTF-8");
+                    encodedValue = URLEncoder.encode(value, request.getEncode());
                 } catch (UnsupportedEncodingException e) {
                 }
                 if (encodedValue != null) {
