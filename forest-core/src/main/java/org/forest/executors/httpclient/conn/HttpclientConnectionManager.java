@@ -1,12 +1,20 @@
 package org.forest.executors.httpclient.conn;
 
+import org.apache.http.Consts;
+import org.apache.http.auth.AuthSchemeProvider;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.AuthSchemes;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.config.ConnectionConfig;
+import org.apache.http.config.Lookup;
+import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.params.ConnManagerParams;
 import org.apache.http.conn.params.ConnPerRouteBean;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.impl.auth.*;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
@@ -23,6 +31,7 @@ import org.forest.exceptions.ForestRuntimeException;
 import org.forest.exceptions.ForestUnsupportException;
 
 import java.io.IOException;
+import java.nio.charset.CodingErrorAction;
 import java.security.*;
 import java.security.cert.CertificateException;
 
@@ -35,6 +44,10 @@ public class HttpclientConnectionManager {
     private static ThreadSafeClientConnManager tsConnectionManager;
 
     private static PoolingNHttpClientConnectionManager asyncConnectionManager;
+
+    private static Lookup<AuthSchemeProvider> authSchemeRegistry;
+
+    private static RequestConfig requestConfig;
 
     /**
      * maximum number of conntections allowed
@@ -67,13 +80,14 @@ public class HttpclientConnectionManager {
 
     public void init(ForestConfiguration configuration) throws IOReactorException {
         httpParams = new BasicHttpParams();
-        Integer maxConnections = null;
-
+        Integer maxConnections = DEFAULT_MAX_TOTAL_CONNECTIONS;
+        Integer maxRouteConnections = 10;
+        Integer connectTimeout = DEFAULT_CONNECT_TIMEOUT;
         try {
             KeyStore trustStore = KeyStore.getInstance(KeyStore
                     .getDefaultType());
             trustStore.load(null, null);
-            SSLSocketFactory sf = new SSLSocketFactoryEx(trustStore);
+            SSLSocketFactory sf = new SSLSocketFactoryExtension(trustStore);
             //允许所有主机的验证
             sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 
@@ -84,12 +98,12 @@ public class HttpclientConnectionManager {
             // set timeout in milliseconds
             ConnManagerParams.setTimeout(httpParams, DEFAULT_TIMEOUT);
             // set maximum number of connections allowed per route
-            Integer maxRouteConnections = configuration.getMaxRouteConnections() != null ?
+            maxRouteConnections = configuration.getMaxRouteConnections() != null ?
                     configuration.getMaxRouteConnections() : maxConnections;
             ConnPerRouteBean connPerRoute = new ConnPerRouteBean(maxRouteConnections);
             ConnManagerParams.setMaxConnectionsPerRoute(httpParams,connPerRoute);
             // set connect timeout
-            Integer connectTimeout = configuration.getConnectTimeout() != null ?
+            connectTimeout = configuration.getConnectTimeout() != null ?
                     configuration.getConnectTimeout() : DEFAULT_CONNECT_TIMEOUT;
             HttpConnectionParams.setConnectionTimeout(httpParams, connectTimeout);
             // set read timeout
@@ -127,8 +141,28 @@ public class HttpclientConnectionManager {
             ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor();
             if (asyncConnectionManager == null) {
                 try {
+                    requestConfig = RequestConfig.custom()
+                            .setConnectTimeout(connectTimeout)
+                            .setSocketTimeout(DEFAULT_READ_TIMEOUT).build();
+
+                    ConnectionConfig connectionConfig = ConnectionConfig.custom()
+                            .setMalformedInputAction(CodingErrorAction.IGNORE)
+                            .setUnmappableInputAction(CodingErrorAction.IGNORE)
+                            .setCharset(Consts.UTF_8).build();
+
+                    authSchemeRegistry = RegistryBuilder
+                            .<AuthSchemeProvider> create()
+                            .register(AuthSchemes.BASIC, new BasicSchemeFactory())
+                            .register(AuthSchemes.DIGEST, new DigestSchemeFactory())
+                            .register(AuthSchemes.NTLM, new NTLMSchemeFactory())
+                            .register(AuthSchemes.SPNEGO, new SPNegoSchemeFactory())
+                            .register(AuthSchemes.KERBEROS, new KerberosSchemeFactory())
+                            .build();
+
                     asyncConnectionManager = new PoolingNHttpClientConnectionManager(ioReactor);
                     asyncConnectionManager.setMaxTotal(maxConnections);
+                    asyncConnectionManager.setDefaultMaxPerRoute(maxRouteConnections);
+                    asyncConnectionManager.setDefaultConnectionConfig(connectionConfig);
                 } catch (Throwable t) {
                 }
             }
@@ -144,7 +178,11 @@ public class HttpclientConnectionManager {
         if (asyncConnectionManager == null) {
             throw new ForestUnsupportException("Async forest request is unsupported.");
         }
-        return HttpAsyncClients.custom().setConnectionManager(asyncConnectionManager).build();
+        return HttpAsyncClients.custom()
+                .setConnectionManager(asyncConnectionManager)
+                .setDefaultAuthSchemeRegistry(authSchemeRegistry)
+                .setDefaultRequestConfig(requestConfig)
+                .build();
     }
 
 }

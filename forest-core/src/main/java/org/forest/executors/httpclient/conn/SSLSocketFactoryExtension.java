@@ -15,11 +15,11 @@ import java.security.*;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-12-26 16:15
  */
-class SSLSocketFactoryEx extends SSLSocketFactory {
+class SSLSocketFactoryExtension extends SSLSocketFactory {
 
     SSLContext sslContext = SSLContext.getInstance("TLS");
 
-    public SSLSocketFactoryEx(KeyStore truststore)
+    public SSLSocketFactoryExtension(KeyStore truststore)
             throws NoSuchAlgorithmException, KeyManagementException,
             KeyStoreException, UnrecoverableKeyException {
         super(truststore);
