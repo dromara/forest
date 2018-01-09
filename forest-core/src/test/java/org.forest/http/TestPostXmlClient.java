@@ -1,6 +1,8 @@
 package org.forest.http;
 
+import org.forest.callback.OnError;
 import org.forest.config.ForestConfiguration;
+import org.forest.exceptions.ForestRuntimeException;
 import org.forest.http.client.PostClient;
 import org.forest.http.model.XmlTestParam;
 import org.forest.mock.PostComplexMockServer;
@@ -15,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -54,6 +57,19 @@ public class TestPostXmlClient {
         assertNotNull(result);
         assertEquals(PostMockServer.EXPECTED, result);
     }
+
+
+    @Test
+    public void testXmlPost2() {
+        XmlTestParam testParam = new XmlTestParam();
+        testParam.setA(1);
+        testParam.setB(2);
+        String result = postClient.postXml2(testParam);
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(PostMockServer.EXPECTED, result);
+    }
+
 
 
 

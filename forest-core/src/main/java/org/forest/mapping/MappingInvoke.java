@@ -17,7 +17,7 @@ public class MappingInvoke extends MappingDot {
 
     private List<MappingExpr> argList;
 
-    public MappingInvoke(VariableScope variableScope, MappingExpr left, String name, List<MappingExpr> argList) {
+    public MappingInvoke(VariableScope variableScope, MappingExpr left, MappingIdentity name, List<MappingExpr> argList) {
         super(variableScope, left, name);
         this.argList = argList;
     }
@@ -29,7 +29,7 @@ public class MappingInvoke extends MappingDot {
     @Override
     public Object render(Object[] args) {
         Object obj = left.render(args);
-        String methodName = right;
+        String methodName = right.getName();
         try {
             Method method = obj.getClass().getDeclaredMethod(methodName);
             Object result = null;
@@ -57,6 +57,6 @@ public class MappingInvoke extends MappingDot {
 
     @Override
     public String toString() {
-        return "[Invoke: " + left.toString() + "." + right + "]";
+        return "[Invoke: " + left.toString() + "." + right + " ()]";
     }
 }

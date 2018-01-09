@@ -94,8 +94,13 @@ public class MappingTemplate {
         }
     }
 
+
+    private void syntaxErrorWatch1(char ch) {
+        throw new ForestRuntimeException("Template Expression Parse Error:\n Character '" + ch +
+                "', column " + (readIndex + 2) + " at \"" + template + "\"");
+    }
+
     public MappingExpr parseExpression() {
-        StringBuffer buffer = new StringBuffer();
         MappingExpr expr = null;
         while (!isEnd()) {
             char ch = watch(1);
@@ -109,7 +114,13 @@ public class MappingTemplate {
                 case ')':
                 case '}':
                     if (expr == null) {
-                        expr = parseExpr(buffer);
+                        syntaxErrorWatch1(ch);
+                    }
+                    if (expr instanceof MappingInteger) {
+                        return new MappingIndex(((MappingInteger) expr).getNumber());
+                    }
+                    if (expr instanceof MappingIdentity) {
+                        return new MappingReference(variableScope, ((MappingIdentity) expr).getName());
                     }
                     return expr;
                 case '\'':
@@ -128,28 +139,37 @@ public class MappingTemplate {
                     break;
                 case '.':
                     nextChar();
-                    if (expr == null) {
-                        expr = parseExpr(buffer);
+//                    if (expr == null) {
+//                        expr = parseExpr(buffer);
+//                    }
+                    if (expr instanceof MappingIdentity) {
+                        expr = new MappingReference(variableScope, ((MappingIdentity) expr).getName());
                     }
-                    String right = parseIdentity();
+                    MappingIdentity right = parseIdentity();
                     expr = new MappingDot(variableScope, expr, right);
                     break;
                 case '(':
                     nextChar();
-                    String methodName = buffer.toString();
-                    if (expr != null && expr instanceof MappingDot && ((MappingDot) expr).right != null) {
+                    MappingIdentity methodName = null;
+                    if (expr == null) {
+                        syntaxErrorWatch1(ch);
+                    }
+                    if (expr instanceof MappingDot && ((MappingDot) expr).right != null) {
                         methodName = ((MappingDot) expr).right;
                         expr = ((MappingDot) expr).left;
                     }
-                    if (StringUtils.isEmpty(methodName)) {
-                        throw new ForestRuntimeException("Template Expression Parse Error:\n Character '" + ch + "', column " + readIndex + " at \"" + template + "\"");
+                    else if (expr instanceof MappingIdentity) {
+                        methodName = (MappingIdentity) expr;
+                        expr = null;
+                    }
+                    if (methodName == null || StringUtils.isEmpty(methodName.getName())) {
+                        syntaxErrorWatch1(ch);
                     }
                     expr = parseInvokeParams(variableScope, expr, methodName);
                     match(')');
                     break;
                 default:
-                    nextChar();
-                    buffer.append(ch);
+                    expr = parseConstant();
                     break;
             }
 
@@ -158,15 +178,23 @@ public class MappingTemplate {
     }
 
 
-    public String parseIdentity() {
+    public MappingIdentity parseIdentity() {
         char ch = watch(1);
         StringBuilder builder = new StringBuilder();
-        while (Character.isAlphabetic(ch)) {
-            builder.append(ch);
-            nextChar();
-            ch = watch(1);
+        if (Character.isAlphabetic(ch) || ch == '_') {
+            do {
+                builder.append(ch);
+                nextChar();
+                ch = watch(1);
+            } while (Character.isAlphabetic(ch) || Character.isDigit(ch) || ch == '_');
         }
-        return builder.toString();
+        return new MappingIdentity(builder.toString());
+    }
+
+
+    public MappingReference parseReference() {
+        MappingIdentity identity = parseIdentity();
+        return new MappingReference(variableScope, identity.getName());
     }
 
 
@@ -197,12 +225,12 @@ public class MappingTemplate {
     }
 
 
-    public MappingInvoke parseInvokeParams(VariableScope variableScope, MappingExpr left, String name) {
+    public MappingInvoke parseInvokeParams(VariableScope variableScope, MappingExpr left, MappingIdentity name) {
         return parseMethodParams_inner(variableScope, left, name, new ArrayList<MappingExpr>());
     }
 
 
-    public MappingInvoke parseMethodParams_inner(VariableScope variableScope, MappingExpr left, String name, List<MappingExpr> argExprList) {
+    public MappingInvoke parseMethodParams_inner(VariableScope variableScope, MappingExpr left, MappingIdentity name, List<MappingExpr> argExprList) {
         skipSpaces();
         char ch = watch(1);
         switch (ch) {
@@ -216,24 +244,36 @@ public class MappingTemplate {
                 MappingExpr expr = parseExpression();
                 argExprList.add(expr);
                 return parseMethodParams_inner(variableScope, left, name, argExprList);
+            default:
+                MappingExpr expr2 = parseExpression();
+                argExprList.add(expr2);
+                return parseMethodParams_inner(variableScope, left, name, argExprList);
         }
-        throw new ForestRuntimeException("Template Expression Parse Error:\n Character '" + ch + "', column " + readIndex + " at \"" + template + "\"");
     }
 
-    public MappingExpr parseExpr(StringBuffer buffer) {
-        String str = buffer.toString();
-        Integer num = null;
-        try {
-            num = Integer.parseInt(str);
-        } catch (Exception ex) {
+
+
+    public MappingExpr parseConstant() {
+        char ch = watch(1);
+        if (Character.isDigit(ch)) {
+            int number = 0;
+            int n = 0;
+            while (Character.isDigit(ch)) {
+                int x = ch - '0';
+                number = 10 * n + x;
+                n++;
+                nextChar();
+                ch = watch(1);
+            }
+            return new MappingInteger(number);
         }
-        if (num != null) {
-            return new MappingIndex(Integer.parseInt(str));
+        else if (Character.isAlphabetic(ch) || ch == '_') {
+            return parseIdentity();
         }
-        else {
-            return new MappingReference(variableScope, buffer.toString());
-        }
+        syntaxErrorWatch1(ch);
+        return null;
     }
+
 
     public String render(Object[] args) {
         ForestJsonConverter jsonConverter = variableScope.getConfiguration().getJsonConverter();

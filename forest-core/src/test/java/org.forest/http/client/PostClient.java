@@ -4,6 +4,7 @@ import org.forest.annotation.DataObject;
 import org.forest.annotation.DataParam;
 import org.forest.annotation.DataVariable;
 import org.forest.annotation.Request;
+import org.forest.callback.OnError;
 import org.forest.http.model.UserParam;
 import org.forest.http.model.XmlTestParam;
 import org.forest.test.XmlTest;
@@ -76,6 +77,17 @@ public interface PostClient {
             contentType = "application/xml"
     )
     String postXml(@DataObject(filter = "xml") XmlTestParam testParam);
+
+
+    @Request(
+            url = "http://localhost:5000/xml",
+            type = "post",
+            contentType = "application/xml",
+            data = "${xml($0)}"
+    )
+    String postXml2(XmlTestParam testParam);
+
+
 
 
 /*

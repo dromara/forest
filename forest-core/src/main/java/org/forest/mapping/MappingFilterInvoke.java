@@ -16,14 +16,19 @@ import java.util.List;
  */
 public class MappingFilterInvoke extends MappingInvoke {
 
-    public MappingFilterInvoke(VariableScope variableScope, String name, List<MappingExpr> argList) {
+    public MappingFilterInvoke(VariableScope variableScope, MappingIdentity name, List<MappingExpr> argList) {
         super(variableScope, null, name, argList);
     }
 
     @Override
     public Object render(Object[] args) {
         ForestConfiguration configuration = variableScope.getConfiguration();
-        Filter filter = configuration.newFilterInstance(right);
+        Filter filter = configuration.newFilterInstance(right.getName());
         return filter.doFilter(configuration, args[0]);
+    }
+
+    @Override
+    public String toString() {
+        return "[FInvoke: " + right + " ()]";
     }
 }
