@@ -9,6 +9,7 @@ public class MappingIdentity extends MappingExpr {
     private String name;
 
     public MappingIdentity(String name) {
+        super(Token.ID);
         this.name = name;
     }
 

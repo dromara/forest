@@ -9,6 +9,7 @@ public class MappingLong extends MappingExpr {
     private final long number;
 
     public MappingLong(long number) {
+        super(Token.LONG);
         this.number = number;
     }
 

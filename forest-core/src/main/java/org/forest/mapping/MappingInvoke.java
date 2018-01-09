@@ -18,7 +18,11 @@ public class MappingInvoke extends MappingDot {
     private List<MappingExpr> argList;
 
     public MappingInvoke(VariableScope variableScope, MappingExpr left, MappingIdentity name, List<MappingExpr> argList) {
-        super(variableScope, left, name);
+        this(Token.INVOKE, variableScope, left, name, argList);
+    }
+
+    protected MappingInvoke(Token token, VariableScope variableScope, MappingExpr left, MappingIdentity name, List<MappingExpr> argList) {
+        super(token, variableScope, left, name);
         this.argList = argList;
     }
 

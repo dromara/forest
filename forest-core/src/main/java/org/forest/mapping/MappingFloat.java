@@ -9,6 +9,7 @@ public class MappingFloat extends MappingExpr {
     private final float number;
 
     public MappingFloat(float number) {
+        super(Token.FLOAT);
         this.number = number;
     }
 

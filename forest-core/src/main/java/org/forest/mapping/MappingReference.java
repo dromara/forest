@@ -1,7 +1,6 @@
 package org.forest.mapping;
 
 import org.forest.config.VariableScope;
-import org.forest.reflection.ForestMethod;
 
 /**
  * Created by Administrator on 2016/5/26.
@@ -11,6 +10,7 @@ public class MappingReference extends MappingExpr {
     private String name;
 
     public MappingReference(VariableScope variableScope, String name) {
+        super(Token.REF);
         this.variableScope = variableScope;
         this.name = name;
     }

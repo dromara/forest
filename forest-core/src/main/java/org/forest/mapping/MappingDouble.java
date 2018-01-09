@@ -9,6 +9,7 @@ public class MappingDouble extends MappingExpr {
     private final double number;
 
     public MappingDouble(double number) {
+        super(Token.DOUBLE);
         this.number = number;
     }
 

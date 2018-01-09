@@ -12,6 +12,7 @@ public class MappingString extends MappingExpr {
     }
 
     public MappingString(String text) {
+        super(Token.STRING);
         this.text = text;
     }
 

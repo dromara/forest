@@ -1,7 +1,6 @@
 package org.forest.mapping;
 
 import org.forest.config.VariableScope;
-import org.forest.reflection.ForestMethod;
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.utils.StringUtils;
 
@@ -14,14 +13,20 @@ import java.lang.reflect.Method;
  */
 public class MappingDot extends MappingExpr {
 
-    protected MappingExpr left;
-    protected MappingIdentity right;
+    protected final MappingExpr left;
+    protected final MappingIdentity right;
 
     public MappingDot(VariableScope variableScope, MappingExpr left, MappingIdentity right) {
+        this(Token.DOT, variableScope, left, right);
+    }
+
+    protected MappingDot(Token token, VariableScope variableScope, MappingExpr left, MappingIdentity right) {
+        super(token);
         this.variableScope = variableScope;
         this.left = left;
         this.right = right;
     }
+
 
     public Object render(Object[] args) {
         Object obj = left.render(args);

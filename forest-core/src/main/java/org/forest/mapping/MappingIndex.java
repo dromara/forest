@@ -8,6 +8,7 @@ public class MappingIndex extends MappingExpr {
     private final Integer index;
 
     public MappingIndex(Integer index) {
+        super(Token.INDEX);
         this.index = index;
     }
 

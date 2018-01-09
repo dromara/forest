@@ -46,11 +46,20 @@ public class MappingTemplate {
         }
         char real = nextChar();
         if (except != real) {
-            throw new ForestRuntimeException("Template Expression Parse Error:\n It need '" + except + "', But found '" + real + "', column " + readIndex + " at \"" + template + "\"");
+            throw new ForestRuntimeException("Template Expression Parse Error:\n It except '" + except + "', But found '" + real + "', column " + readIndex + " at \"" + template + "\"");
+        }
+    }
+
+    private void matchToken(MappingExpr expr, Token token) {
+        if (expr.token != token) {
+            throw new ForestRuntimeException("Template Expression Parse Error:\n It except " + token.getName() + ", But found " + expr.token.getName() + ", column " + readIndex + " at \"" + template + "\"");
         }
     }
 
     private char watch(int i) {
+        if (template.length() <= readIndex + i) {
+            syntaxErrorWatchN(template.charAt(template.length() - 1), i);
+        }
         return template.charAt(readIndex + i);
     }
 
@@ -107,6 +116,13 @@ public class MappingTemplate {
                 "', column " + (readIndex + 2) + " at \"" + template + "\"");
     }
 
+
+    private void syntaxErrorWatchN(char ch, int n) {
+        throw new ForestRuntimeException("Template Expression Parse Error:\n Character '" + ch +
+                "', column " + (readIndex + n + 1) + " at \"" + template + "\"");
+    }
+
+
     public MappingExpr parseExpression() {
         MappingExpr expr = null;
         while (!isEnd()) {
@@ -149,8 +165,9 @@ public class MappingTemplate {
                     if (expr instanceof MappingIdentity) {
                         expr = new MappingReference(variableScope, ((MappingIdentity) expr).getName());
                     }
-                    MappingIdentity right = parseIdentity();
-                    expr = new MappingDot(variableScope, expr, right);
+                    MappingExpr right = parseIdentity();
+                    matchToken(right, Token.ID);
+                    expr = new MappingDot(variableScope, expr, (MappingIdentity) right);
                     break;
                 case '(':
                     nextChar();
@@ -158,11 +175,11 @@ public class MappingTemplate {
                     if (expr == null) {
                         syntaxErrorWatch1(ch);
                     }
-                    if (expr instanceof MappingDot && ((MappingDot) expr).right != null) {
+                    if (expr.token == Token.DOT && ((MappingDot) expr).right != null) {
                         methodName = ((MappingDot) expr).right;
                         expr = ((MappingDot) expr).left;
                     }
-                    else if (expr instanceof MappingIdentity) {
+                    else if (expr.token == Token.ID) {
                         methodName = (MappingIdentity) expr;
                         expr = null;
                     }
@@ -182,7 +199,7 @@ public class MappingTemplate {
     }
 
 
-    public MappingIdentity parseIdentity() {
+    public MappingExpr parseIdentity() {
         char ch = watch(1);
         StringBuilder builder = new StringBuilder();
         if (Character.isAlphabetic(ch) || ch == '_') {
@@ -192,13 +209,14 @@ public class MappingTemplate {
                 ch = watch(1);
             } while (Character.isAlphabetic(ch) || Character.isDigit(ch) || ch == '_');
         }
-        return new MappingIdentity(builder.toString());
-    }
-
-
-    public MappingReference parseReference() {
-        MappingIdentity identity = parseIdentity();
-        return new MappingReference(variableScope, identity.getName());
+        String text = builder.toString();
+        if ("true".equals(text)) {
+            return new MappingBoolean(true);
+        }
+        if ("false".equals(text)) {
+            return new MappingBoolean(false);
+        }
+        return new MappingIdentity(text);
     }
 
 

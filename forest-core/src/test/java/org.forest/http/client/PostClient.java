@@ -83,22 +83,20 @@ public interface PostClient {
             url = "http://localhost:5000/xml",
             type = "post",
             contentType = "application/xml",
+            data = "${xml(test)}"
+    )
+    String postXml2(@DataVariable("test") XmlTestParam testParam);
+
+
+    @Request(
+            url = "http://localhost:5000/xml",
+            type = "post",
+            contentType = "application/xml",
             data = "${xml($0)}"
     )
-    String postXml2(XmlTestParam testParam);
+    String postXml3(XmlTestParam testParam);
 
 
-
-
-/*
-    @Request(
-            url = "http://localhost:5000/hello",
-            type = "post",
-            data = "${$0.argString}",
-            headers = {"Accept:text/plan"}
-    )
-    String modelParamNumPost(UserParam userParam);
-*/
 
 
 }

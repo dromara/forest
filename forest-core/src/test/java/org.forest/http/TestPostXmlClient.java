@@ -71,6 +71,16 @@ public class TestPostXmlClient {
     }
 
 
+    @Test
+    public void testXmlPost3() {
+        XmlTestParam testParam = new XmlTestParam();
+        testParam.setA(1);
+        testParam.setB(2);
+        String result = postClient.postXml3(testParam);
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(PostMockServer.EXPECTED, result);
+    }
 
 
 }

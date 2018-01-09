@@ -8,7 +8,13 @@ import org.forest.config.VariableScope;
  */
 public abstract class MappingExpr {
 
+    final Token token;
+
     protected VariableScope variableScope;
+
+    protected MappingExpr(Token token) {
+        this.token = token;
+    }
 
     public Object render(Object[] args) {
         return null;

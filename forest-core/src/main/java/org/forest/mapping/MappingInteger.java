@@ -8,6 +8,7 @@ public class MappingInteger extends MappingExpr {
     private final int number;
 
     public MappingInteger(int number) {
+        super(Token.INT);
         this.number = number;
     }
 
