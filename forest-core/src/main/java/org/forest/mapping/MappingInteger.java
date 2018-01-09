@@ -5,18 +5,18 @@ package org.forest.mapping;
  */
 public class MappingInteger extends MappingExpr {
 
-    private final Integer number;
+    private final int number;
 
-    public MappingInteger(Integer number) {
+    public MappingInteger(int number) {
         this.number = number;
     }
 
     @Override
     public Object render(Object[] args) {
-        return args[number];
+        return number;
     }
 
-    public Integer getNumber() {
+    public int getNumber() {
         return number;
     }
 

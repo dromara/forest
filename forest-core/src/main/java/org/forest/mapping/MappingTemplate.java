@@ -84,6 +84,13 @@ public class MappingTemplate {
                     continue;
                 }
             }
+            else if (ch == '\\') {
+                nextChar();
+                buffer.append(ch);
+                if (watch(1) == '$') {
+                    nextChar();
+                }
+            }
             buffer.append(ch);
         }
 
@@ -139,9 +146,6 @@ public class MappingTemplate {
                     break;
                 case '.':
                     nextChar();
-//                    if (expr == null) {
-//                        expr = parseExpr(buffer);
-//                    }
                     if (expr instanceof MappingIdentity) {
                         expr = new MappingReference(variableScope, ((MappingIdentity) expr).getName());
                     }
@@ -256,16 +260,39 @@ public class MappingTemplate {
     public MappingExpr parseConstant() {
         char ch = watch(1);
         if (Character.isDigit(ch)) {
-            int number = 0;
-            int n = 0;
-            while (Character.isDigit(ch)) {
-                int x = ch - '0';
-                number = 10 * n + x;
-                n++;
+            StringBuilder builder = new StringBuilder();
+            do {
+                builder.append(ch);
                 nextChar();
                 ch = watch(1);
+            } while (Character.isDigit(ch));
+            if (ch == '.') {
+                char ch2 = watch(2);
+                if (Character.isDigit(ch2)) {
+                    builder.append('.');
+                    nextChar();
+                    do {
+                        builder.append(ch);
+                        nextChar();
+                        ch = watch(1);
+                    } while (Character.isDigit(ch));
+                    if (ch == 'f' || ch == 'F') {
+                        nextChar();
+                        return new MappingFloat(Float.valueOf(builder.toString()));
+                    }
+                    if (ch == 'd' || ch == 'D') {
+                        nextChar();
+                        return new MappingDouble(Double.valueOf(builder.toString()));
+                    }
+                    return new MappingFloat(Float.valueOf(builder.toString()));
+                }
             }
-            return new MappingInteger(number);
+            else if (ch == 'l' || ch == 'L') {
+                return new MappingLong(Long.valueOf(builder.toString()));
+            }
+            else {
+                return new MappingInteger(Integer.valueOf(builder.toString()));
+            }
         }
         else if (Character.isAlphabetic(ch) || ch == '_') {
             return parseIdentity();
