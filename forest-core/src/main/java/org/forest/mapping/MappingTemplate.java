@@ -77,7 +77,8 @@ public class MappingTemplate {
         while (!isEnd()) {
             char ch = nextChar();
             if (ch == '$') {
-                if (watch(1) == '{') {
+                char ch1 = watch(1);
+                if (ch1 == '{') {
                     nextChar();
                     if (buffer.length() > 0) {
                         MappingString str = new MappingString(buffer.toString());
@@ -165,9 +166,8 @@ public class MappingTemplate {
                     if (expr instanceof MappingIdentity) {
                         expr = new MappingReference(variableScope, ((MappingIdentity) expr).getName());
                     }
-                    MappingExpr right = parseIdentity();
-                    matchToken(right, Token.ID);
-                    expr = new MappingDot(variableScope, expr, (MappingIdentity) right);
+                    MappingIdentity id = parseIdentity();
+                    expr = new MappingDot(variableScope, expr, id);
                     break;
                 case '(':
                     nextChar();
@@ -190,16 +190,24 @@ public class MappingTemplate {
                     match(')');
                     break;
                 default:
-                    expr = parseConstant();
+                    expr = parseLiteral();
                     break;
             }
-
         }
         return expr;
     }
 
 
-    public MappingExpr parseIdentity() {
+
+
+    public MappingIdentity parseIdentity() {
+        MappingExpr expr = parseTextToken();
+        matchToken(expr, Token.ID);
+        return (MappingIdentity) expr;
+    }
+
+
+    public MappingExpr parseTextToken() {
         char ch = watch(1);
         StringBuilder builder = new StringBuilder();
         if (Character.isAlphabetic(ch) || ch == '_') {
@@ -275,7 +283,7 @@ public class MappingTemplate {
 
 
 
-    public MappingExpr parseConstant() {
+    public MappingExpr parseLiteral() {
         char ch = watch(1);
         if (Character.isDigit(ch)) {
             StringBuilder builder = new StringBuilder();
@@ -313,7 +321,7 @@ public class MappingTemplate {
             }
         }
         else if (Character.isAlphabetic(ch) || ch == '_') {
-            return parseIdentity();
+            return parseTextToken();
         }
         syntaxErrorWatch1(ch);
         return null;
