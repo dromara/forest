@@ -31,13 +31,11 @@ import org.forest.converter.json.ForestJsonConverter;
 import org.forest.converter.xml.ForestJaxbConverter;
 import org.forest.converter.xml.ForestXmlConverter;
 import org.forest.exceptions.ForestRuntimeException;
-import org.forest.exceptions.ForestUnsupportException;
 import org.forest.executors.ForestExecutorFactory;
 import org.forest.executors.httpclient.HttpclientExecutorFactory;
 import org.forest.filter.Filter;
-import org.forest.filter.JsonFilter;
+import org.forest.filter.JSONFilter;
 import org.forest.filter.XmlFilter;
-import org.forest.mapping.MappingVariable;
 import org.forest.utils.ForestDataType;
 import org.forest.utils.RequestNameValue;
 import org.forest.proxy.ProxyFactory;
@@ -108,7 +106,7 @@ public class ForestConfiguration implements Serializable {
         configuration.setConnectTimeout(2000);
         configuration.setMaxConnections(500);
         configuration.setMaxRouteConnections(500);
-        configuration.registerFilter("json", JsonFilter.class);
+        configuration.registerFilter("json", JSONFilter.class);
         configuration.registerFilter("xml", XmlFilter.class);
         return configuration;
     }
