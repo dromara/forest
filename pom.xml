@@ -17,6 +17,21 @@
 		<httpasyncclient.version>4.0.1</httpasyncclient.version>
 	</properties>
 
+	<developers>
+		<developer>
+			<id>gongjun</id>
+			<name>gongjun</name>
+			<email>dt_flys@hotmail.com</email>
+		</developer>
+	</developers>
+
+	<licenses>
+		<license>
+			<name>The MIT License (MIT)</name>
+			<url>https://mit-license.org</url>
+		</license>
+	</licenses>
+
 
 	<modules>
 		<module>forest-core</module>
