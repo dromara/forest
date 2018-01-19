@@ -2,5 +2,7 @@ language: java
 jdk: oraclejdk8
 sudo: required
 script: "mvn cobertura:cobertura"
+before_install:
+  - pip install --user codecov
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - codecov
