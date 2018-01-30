@@ -8,6 +8,8 @@ import org.forest.callback.OnError;
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.http.ForestResponse;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * @author gongjun
  * @date 2016-06-01
@@ -27,14 +29,15 @@ public class ErrorTest extends TestCase {
     }
 
     public void testErrorCallback() {
+        final AtomicInteger count = new AtomicInteger(0);
         final boolean[] ts = new boolean[] {false};
         errorClient.testError(new OnError() {
             public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
-                ts[0] = true;
+                count.incrementAndGet();
                 assertNotNull(ex);
                 assertNotNull(request);
             }
         });
-        assertTrue(ts[0]);
+        assertEquals(1, count.get());
     }
 }

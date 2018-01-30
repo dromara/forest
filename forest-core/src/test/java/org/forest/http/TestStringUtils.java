@@ -16,7 +16,7 @@ import static junit.framework.Assert.assertTrue;
 public class TestStringUtils {
 
     @Test
-    public void testIsEmpty() {
+    public void testIsEmpty() throws InterruptedException {
         String s1 = null;
         String s2 = "";
         String s3 = "a";

@@ -8,6 +8,7 @@ import org.forest.executors.httpclient.conn.HttpclientConnectionManager;
 import org.forest.executors.httpclient.request.AsyncHttpclientRequestSender;
 import org.forest.executors.httpclient.request.HttpclientRequestSender;
 import org.forest.executors.httpclient.request.SyncHttpclientRequestSender;
+import org.forest.executors.httpclient.request.SyncHttpclientRequestSender2;
 import org.forest.executors.httpclient.response.HttpclientResponseHandler;
 import org.forest.handler.ResponseHandler;
 import org.forest.http.ForestRequest;
@@ -107,7 +108,7 @@ public class HttpclientExecutorFactory implements ForestExecutorFactory {
         if (request.isAsync()) {
             return new AsyncHttpclientRequestSender(connectionManager, request);
         }
-        return new SyncHttpclientRequestSender(connectionManager, request);
+        return new SyncHttpclientRequestSender2(connectionManager, request);
     }
 
 

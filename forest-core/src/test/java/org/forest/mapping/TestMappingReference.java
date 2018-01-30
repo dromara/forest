@@ -33,6 +33,5 @@ public class TestMappingReference {
         Mockito.verify(forestMethod, Mockito.never()).getVariableValue("motherName");
         Assert.assertEquals("Linda", motherNameRef.render(new Object[] {"Peter", 15}));
         Mockito.verify(forestMethod).getVariableValue("motherName");
-
     }
 }

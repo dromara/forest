@@ -24,6 +24,7 @@ import java.io.IOException;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-19 20:16
  */
+@Deprecated
 public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender {
 
     private HttpClient client;
@@ -59,7 +60,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
 
 
 
-    public static void logResponse(ForestRequest request, HttpClient client, HttpRequestBase httpReq, ForestResponse response) {
+    public static void logResponse(ForestRequest request, ForestResponse response) {
         if (!request.isLogEnable()) return;
         logContent("Response: Status=" + response.getStatusCode());
         if (response.isSuccess()) {
@@ -76,7 +77,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
         httpResponse = client.execute(httpRequest);
         ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
         ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
-        logResponse(request, client, (HttpRequestBase) httpRequest, response);
+        logResponse(request, response);
         try {
             responseHandler.handleSync(httpResponse, response);
         } catch (Exception ex) {

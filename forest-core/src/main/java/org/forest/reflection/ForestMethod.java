@@ -255,6 +255,7 @@ public class ForestMethod<T> implements VariableScope {
         String baseUrl = interfaceProxyHandler.getBaseURL();
         renderedUrl = URLUtils.getValidURL(baseUrl, renderedUrl);
         String query = "";
+        String protocol = "";
         try {
             URL u = new URL(renderedUrl);
             query = u.getQuery();
@@ -282,7 +283,7 @@ public class ForestMethod<T> implements VariableScope {
                     }
                 }
             }
-            String protocol = u.getProtocol();
+            protocol = u.getProtocol();
             int port = u.getPort();
             newUrl = protocol + "://" + u.getHost();
             if (port != 80 && port > -1) {
@@ -337,7 +338,8 @@ public class ForestMethod<T> implements VariableScope {
 
         // create and initialize http instance
         ForestRequest<T> request = new ForestRequest(configuration);
-        request.setUrl(newUrl)
+        request.setProtocol(protocol)
+                .setUrl(newUrl)
                 .setQuery(query)
                 .setType(renderedType)
                 .setEncode(encode)

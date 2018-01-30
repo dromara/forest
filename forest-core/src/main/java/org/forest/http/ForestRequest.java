@@ -30,14 +30,14 @@ import org.forest.config.ForestConfiguration;
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.executors.ForestExecutorFactory;
 import org.forest.executors.HttpExecutor;
-import org.forest.filter.Filter;
 import org.forest.handler.ResponseHandler;
 import org.forest.interceptor.Interceptor;
 import org.forest.interceptor.InterceptorChain;
-import org.forest.reflection.ForestMethod;
+import org.forest.ssl.ForestKeyStore;
 import org.forest.utils.ForestDataType;
 import org.forest.utils.RequestNameValue;
 
+import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -47,6 +47,8 @@ import java.util.*;
 public class ForestRequest<T> {
 
     private final ForestConfiguration configuration;
+
+    private String protocol;
 
     private String url;
 
@@ -76,6 +78,8 @@ public class ForestRequest<T> {
 
     private String requestBody;
 
+    private InputStream certificateInputStream;
+
     private OnSuccess onSuccess;
 
     private OnError onError;
@@ -84,12 +88,23 @@ public class ForestRequest<T> {
 
     private boolean logEnable = true;
 
+    private ForestKeyStore keyStore;
+
     public ForestRequest(ForestConfiguration configuration) {
         this.configuration = configuration;
     }
 
     public ForestConfiguration getConfiguration() {
         return configuration;
+    }
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public ForestRequest setProtocol(String protocol) {
+        this.protocol = protocol;
+        return this;
     }
 
     public String getUrl() {
@@ -270,6 +285,14 @@ public class ForestRequest<T> {
         return this;
     }
 
+    public InputStream getCertificateInputStream() {
+        return certificateInputStream;
+    }
+
+    public void setCertificateInputStream(InputStream certificateInputStream) {
+        this.certificateInputStream = certificateInputStream;
+    }
+
     public OnSuccess getOnSuccess() {
         return onSuccess;
     }
@@ -305,6 +328,14 @@ public class ForestRequest<T> {
     public ForestRequest setLogEnable(boolean logEnable) {
         this.logEnable = logEnable;
         return this;
+    }
+
+    public ForestKeyStore getKeyStore() {
+        return keyStore;
+    }
+
+    public void setKeyStore(ForestKeyStore keyStore) {
+        this.keyStore = keyStore;
     }
 
     public void execute(ForestExecutorFactory executorFactory, ResponseHandler responseHandler) {

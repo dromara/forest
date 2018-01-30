@@ -27,8 +27,11 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
 
     @Override
     public void sendRequest(final ForestRequest request, final HttpclientResponseHandler responseHandler, final HttpUriRequest httpRequest) throws IOException {
-        CloseableHttpAsyncClient client = connectionManager.getHttpAsyncClient();
+        final CloseableHttpAsyncClient client = connectionManager.getHttpAsyncClient(request);
         client.start();
+        while (!client.isRunning()) {
+            client.start();
+        }
         final ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
 
         final Future<HttpResponse> future = client.execute(httpRequest, new FutureCallback<HttpResponse>() {
@@ -48,6 +51,7 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
             }
 
             public void cancelled() {
+
             }
         });
 
