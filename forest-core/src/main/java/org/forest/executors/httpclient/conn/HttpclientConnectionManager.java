@@ -97,7 +97,7 @@ public class HttpclientConnectionManager {
             KeyStore trustStore = KeyStore.getInstance(KeyStore
                     .getDefaultType());
             trustStore.load(null, null);
-            SSLSocketFactory sf = new EmptySSLSocketFactory(trustStore);
+            SSLSocketFactory sf = new ForestSSLSocketFactory(trustStore);
             //允许所有主机的验证
             sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 

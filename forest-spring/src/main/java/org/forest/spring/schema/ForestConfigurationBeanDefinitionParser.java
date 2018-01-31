@@ -80,14 +80,14 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
                 }
             }
         }
-        parseChildren(id, element.getChildNodes(), beanDefinition);
+        parseChildren(element.getChildNodes(), beanDefinition);
         log.info("[Forest] Created Forest Configuration Bean: " + beanDefinition);
         return beanDefinition;
 
     }
 
 
-    public void parseChildren(String parentId, NodeList nodeList, RootBeanDefinition beanDefinition) {
+    public void parseChildren(NodeList nodeList, RootBeanDefinition beanDefinition) {
         int nodesLength = nodeList.getLength();
         if (nodesLength > 0) {
             ManagedMap<String, Object> varMap = new ManagedMap<String, Object>();
@@ -101,7 +101,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
                         parseVariable(elem, varMap);
                     }
                     else if (elemName.equals("ssl-keystore")) {
-                        parseSSLKeyStore(parentId, elem, sslKeyStoreMap);
+                        parseSSLKeyStore(elem, sslKeyStoreMap);
                     }
                 }
             }
@@ -117,12 +117,11 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         varMap.put(name, value);
     }
 
-    public void parseSSLKeyStore(String parentId, Element elem, ManagedMap<String, BeanDefinition> sslKeyStoreMap) {
+    public void parseSSLKeyStore(Element elem, ManagedMap<String, BeanDefinition> sslKeyStoreMap) {
         String id = elem.getAttribute("id");
         String filePath = elem.getAttribute("file");
         String keystoreType = elem.getAttribute("type");
         String keystorePass = elem.getAttribute("pass");
-        InputStream inputStream = null;
 
         if (StringUtils.isEmpty(keystoreType)) {
             keystoreType = SSLKeyStore.DEFAULT_KEYSTORE_TYPE;
@@ -131,38 +130,6 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
             throw new ForestRuntimeException(
                     "The file of SSL KeyStore \"" + id + "\" is empty!");
         }
-
-        if (filePath.indexOf(":/") == 1 ||
-                filePath.indexOf(":\\") == 1 ||
-                filePath.startsWith("/")) {
-            File file = new File(filePath);
-            if (!file.exists()) {
-                throw new ForestRuntimeException(
-                        "The file of SSL KeyStore \"" + id + "\" " + filePath + " cannot be found!");
-            }
-            try {
-                inputStream = new FileInputStream(file);
-            } catch (FileNotFoundException e) {
-                throw new ForestRuntimeException(
-                        "An error occurred while reading he file of SSL KeyStore \"\" + id + \"\"", e);
-            }
-        }
-        else {
-            ClassPathResource resource = new ClassPathResource(filePath);
-            if (!resource.exists()) {
-                throw new ForestRuntimeException(
-                        "The file of SSL KeyStore \"" + id + "\" " + filePath + " cannot be found!");
-            }
-            try {
-                inputStream = resource.getInputStream();
-            } catch (IOException e) {
-                throw new ForestRuntimeException(
-                        "An error occurred while reading he file of SSL KeyStore \"\" + id + \"\"", e);
-            }
-        }
-//        SSLKeyStore sslKeyStore = new SSLKeyStore(id, keystoreType);
-//        sslKeyStore.setInputStream(inputStream);
-//        sslKeyStore.setKeystorePass(keystorePass);
 
         BeanDefinition beanDefinition = new GenericBeanDefinition();
         beanDefinition.setBeanClassName(sslKeyStoreBeanClass.getName());
