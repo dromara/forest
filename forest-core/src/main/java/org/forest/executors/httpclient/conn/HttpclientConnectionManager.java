@@ -34,12 +34,12 @@ import org.forest.config.ForestConfiguration;
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.exceptions.ForestUnsupportException;
 import org.forest.http.ForestRequest;
-import org.forest.ssl.ForestKeyStore;
+import org.forest.ssl.SSLKeyStore;
+import org.forest.utils.StringUtils;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.CodingErrorAction;
@@ -189,10 +189,14 @@ public class HttpclientConnectionManager {
         SSLContext sc = null;
         InputStream instream = null;
         KeyStore trustStore = null;
-        ForestKeyStore keyStore = request.getKeyStore();
+        SSLKeyStore keyStore = request.getKeyStore();
         if (keyStore != null) {
             try {
-                trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+                String keyStoreType = keyStore.getKeystoreType();
+                if (StringUtils.isEmpty(keyStoreType)) {
+                    keyStoreType = KeyStore.getDefaultType();
+                }
+                trustStore = KeyStore.getInstance(keyStoreType);
                 instream = keyStore.getInputStream();
                 String keyStorepass = keyStore.getKeystorePass();
                 if (keyStorepass == null) {

@@ -15,7 +15,6 @@ import org.forest.http.ForestResponseFactory;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -45,51 +44,52 @@ public class SyncHttpclientRequestSender2 extends AbstractHttpclientRequestSende
         final AtomicReference<ForestResponse> forestResponseRef = new AtomicReference<>();
         final AtomicReference<Exception> exceptionRef = new AtomicReference<>();
         final ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
-        Future<HttpResponse> future = client.execute(httpRequest, new FutureCallback<HttpResponse>() {
-            public void completed(final HttpResponse httpResponse) {
-                ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
-                forestResponseRef.set(response);
-            }
-
-            public void failed(final Exception ex) {
-                ForestResponse response = forestResponseFactory.createResponse(request, null);
-                forestResponseRef.set(response);
-                exceptionRef.set(ex);
-            }
-
-            public void cancelled() {
-            }
-        });
-        HttpResponse httpResponse = null;
-
         try {
-            httpResponse = future.get();
-        } catch (InterruptedException e) {
-        } catch (ExecutionException e) {
-        }
-        ForestResponse response = forestResponseRef.get();
-        if (response.isSuccess()) {
-            logResponse(request, response);
+            Future<HttpResponse> future = client.execute(httpRequest, new FutureCallback<HttpResponse>() {
+                public void completed(final HttpResponse httpResponse) {
+                    ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
+                    forestResponseRef.set(response);
+                }
+
+                public void failed(final Exception ex) {
+                    ForestResponse response = forestResponseFactory.createResponse(request, null);
+                    forestResponseRef.set(response);
+                    exceptionRef.set(ex);
+                }
+
+                public void cancelled() {
+                }
+            });
+            HttpResponse httpResponse = null;
+
             try {
-                responseHandler.handleSync(httpResponse, response);
-            } catch (Exception ex) {
-                if (ex instanceof ForestRuntimeException) {
-                    throw ex;
+                httpResponse = future.get();
+            } catch (InterruptedException e) {
+            } catch (ExecutionException e) {
+            }
+            ForestResponse response = forestResponseRef.get();
+            if (response.isSuccess()) {
+                logResponse(request, response);
+                try {
+                    responseHandler.handleSync(httpResponse, response);
+                } catch (Exception ex) {
+                    if (ex instanceof ForestRuntimeException) {
+                        throw ex;
+                    } else {
+                        throw new ForestRuntimeException(ex);
+                    }
+                }
+            } else {
+                Exception ex = exceptionRef.get();
+                if (ex == null) {
+                    responseHandler.handleError(response);
                 } else {
-                    throw new ForestRuntimeException(ex);
+                    responseHandler.handleError(response, ex);
                 }
             }
+        } finally {
+            client.close();
         }
-        else {
-            Exception ex = exceptionRef.get();
-            if (ex == null) {
-                responseHandler.handleError(response);
-            }
-            else {
-                responseHandler.handleError(response, ex);
-            }
-        }
-
 /*
         if (failed.get()) {
             response = forestResponseFactory.createResponse(request, null);
@@ -109,4 +109,5 @@ public class SyncHttpclientRequestSender2 extends AbstractHttpclientRequestSende
         }
 */
     }
+
 }

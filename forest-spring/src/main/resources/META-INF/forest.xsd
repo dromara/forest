@@ -20,6 +20,16 @@
         </xsd:annotation>
     </xsd:element>
 
+    <xsd:element name="ssl-keystore" type="sslKeystoreType">
+        <xsd:annotation>
+            <xsd:documentation>
+                <![CDATA[
+                    The SSL KeyStore for the forest definition.
+                ]]>
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
     <xsd:element name="var" type="variableType">
         <xsd:annotation>
             <xsd:documentation>
@@ -40,6 +50,7 @@
     <xsd:complexType name="configurationType">
         <xsd:sequence>
             <xsd:element ref="var" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="ssl-keystore" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="id" type="xsd:ID" use="optional">
         </xsd:attribute>
@@ -111,6 +122,17 @@
         <xsd:attribute name="configuration" type="xsd:string" use="required">
         </xsd:attribute>
         <xsd:attribute name="class" type="xsd:string" use="required">
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="sslKeystoreType" mixed="true">
+        <xsd:attribute name="id" type="xsd:string" use="required">
+        </xsd:attribute>
+        <xsd:attribute name="type" type="xsd:string" use="optional" default="jks">
+        </xsd:attribute>
+        <xsd:attribute name="file" type="xsd:string" use="required">
+        </xsd:attribute>
+        <xsd:attribute name="pass" type="xsd:string" use="required">
         </xsd:attribute>
     </xsd:complexType>
 

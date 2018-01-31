@@ -16,6 +16,7 @@ import org.forest.interceptor.Interceptor;
 import org.forest.mapping.*;
 import org.forest.http.ForestRequest;
 import org.forest.proxy.InterfaceProxyHandler;
+import org.forest.ssl.SSLKeyStore;
 import org.forest.utils.ForestDataType;
 import org.forest.utils.RequestNameValue;
 import org.forest.utils.StringUtils;
@@ -45,6 +46,7 @@ public class ForestMethod<T> implements VariableScope {
     private Integer retryNumber = null;
     private MappingTemplate encodeTemplate = null;
     private MappingTemplate contentTypeTemplate;
+    private String sslKeyStoreId;
     private MappingTemplate[] dataTemplateArray;
     private MappingTemplate[] headerTemplateArray;
     private MappingParameter[] parameterTemplateArray;
@@ -102,6 +104,7 @@ public class ForestMethod<T> implements VariableScope {
                 typeTemplate = makeTemplate(reqAnn.type());
                 dataTypeTemplate = makeTemplate(reqAnn.dataType());
                 contentTypeTemplate = makeTemplate(reqAnn.contentType());
+                sslKeyStoreId = reqAnn.keyStore();
                 encodeTemplate = makeTemplate(reqAnn.contentEncoding());
                 async = reqAnn.async();
                 String[] dataArray = reqAnn.data();
@@ -336,12 +339,19 @@ public class ForestMethod<T> implements VariableScope {
             }
         }
 
+        // setup ssl keystore
+        SSLKeyStore sslKeyStore = null;
+        if (StringUtils.isNotEmpty(sslKeyStoreId)) {
+            sslKeyStore = configuration.getKeyStore(sslKeyStoreId);
+        }
+
         // create and initialize http instance
         ForestRequest<T> request = new ForestRequest(configuration);
         request.setProtocol(protocol)
                 .setUrl(newUrl)
                 .setQuery(query)
                 .setType(renderedType)
+                .setKeyStore(sslKeyStore)
                 .setEncode(encode)
                 .setContentType(renderedContentType)
                 .setArguments(args)

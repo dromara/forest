@@ -36,6 +36,7 @@ import org.forest.executors.httpclient.HttpclientExecutorFactory;
 import org.forest.filter.Filter;
 import org.forest.filter.JSONFilter;
 import org.forest.filter.XmlFilter;
+import org.forest.ssl.SSLKeyStore;
 import org.forest.utils.ForestDataType;
 import org.forest.utils.RequestNameValue;
 import org.forest.proxy.ProxyFactory;
@@ -89,8 +90,9 @@ public class ForestConfiguration implements Serializable {
 
     private Map<String, Class> filterRegisterMap = new HashMap<>();
 
-
     private Map<String, Object> variables = new HashMap<String, Object>();
+
+    private Map<String, SSLKeyStore> sslKeyStores = new HashMap<>();
 
     public ForestConfiguration() {
     }
@@ -215,6 +217,27 @@ public class ForestConfiguration implements Serializable {
 
     public Object getVariableValue(String name) {
         return getVariables().get(name);
+    }
+
+    public Map<String, SSLKeyStore> getSslKeyStores() {
+        return sslKeyStores;
+    }
+
+    public void setSslKeyStores(Map<String, SSLKeyStore> sslKeyStores) {
+        this.sslKeyStores = sslKeyStores;
+    }
+
+    /**
+     * register a SSL KeyStore object
+     * @param id
+     * @param keyStore
+     */
+    public void registerKeyStore(String id, SSLKeyStore keyStore) {
+        sslKeyStores.put(id, keyStore);
+    }
+
+    public SSLKeyStore getKeyStore(String id) {
+        return sslKeyStores.get(id);
     }
 
     public ForestConverter getConverter(ForestDataType dataType) {

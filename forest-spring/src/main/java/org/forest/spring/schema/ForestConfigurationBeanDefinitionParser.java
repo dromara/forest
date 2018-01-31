@@ -3,16 +3,21 @@ package org.forest.spring.schema;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.forest.config.ForestConfiguration;
+import org.forest.exceptions.ForestRuntimeException;
+import org.forest.ssl.SSLKeyStore;
 import org.forest.utils.StringUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.core.io.ClassPathResource;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Map;
@@ -84,16 +89,22 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         int nodesLength = nodeList.getLength();
         if (nodesLength > 0) {
             ManagedMap<String, Object> varMap = new ManagedMap<String, Object>();
+            ManagedMap<String, SSLKeyStore> sslKeyStoreMap = new ManagedMap<>();
             for (int i = 0; i < nodesLength; i++) {
                 Node node = nodeList.item(i);
                 if (node instanceof Element) {
                     Element elem = (Element) node;
-                    if (elem.getLocalName().equals("var")) {
+                    String elemName = elem.getLocalName();
+                    if (elemName.equals("var")) {
                         parseVariable(elem, varMap);
+                    }
+                    else if (elemName.equals("ssl-keystore")) {
+                        parseSSLKeyStore(elem, sslKeyStoreMap);
                     }
                 }
             }
             beanDefinition.getPropertyValues().addPropertyValue("variables", varMap);
+            beanDefinition.getPropertyValues().addPropertyValue("sslKeyStores", sslKeyStoreMap);
         }
     }
 
@@ -102,5 +113,38 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         String name = elem.getAttribute("name");
         String value = elem.getAttribute("value");
         varMap.put(name, value);
+    }
+
+    public void parseSSLKeyStore(Element elem, ManagedMap<String, SSLKeyStore> sslKeyStoreMap) {
+        String id = elem.getAttribute("id");
+        String file = elem.getAttribute("file");
+        String keystoreType = elem.getAttribute("type");
+        String keystorePass = elem.getAttribute("pass");
+        if (StringUtils.isEmpty(keystoreType)) {
+            keystoreType = SSLKeyStore.DEFAULT_KEYSTORE_TYPE;
+        }
+        if (StringUtils.isEmpty(file)) {
+            throw new ForestRuntimeException(
+                    "The file of SSL KeyStore \"" + id + "\" is empty!");
+        }
+
+        ClassPathResource resource = new ClassPathResource(file);
+        if (!resource.exists()) {
+            throw new ForestRuntimeException(
+                    "The file of SSL KeyStore \"" + id + "\" " + file + " cannot be found!");
+        }
+        InputStream inputStream = null;
+        try {
+            inputStream = resource.getInputStream();
+
+        } catch (IOException e) {
+            throw new ForestRuntimeException(
+                    "An error occurred while reading he file of SSL KeyStore \"\" + id + \"\"", e);
+        }
+
+        SSLKeyStore sslKeyStore = new SSLKeyStore(id, keystoreType);
+        sslKeyStore.setInputStream(inputStream);
+        sslKeyStore.setKeystorePass(keystorePass);
+        sslKeyStoreMap.put(id, sslKeyStore);
     }
 }

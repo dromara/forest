@@ -63,5 +63,7 @@ public @interface Request {
 
     String[] data() default {};
 
+    String keyStore() default "";
+
     boolean logEnable() default true;
 }

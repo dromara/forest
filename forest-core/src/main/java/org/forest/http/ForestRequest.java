@@ -33,7 +33,7 @@ import org.forest.executors.HttpExecutor;
 import org.forest.handler.ResponseHandler;
 import org.forest.interceptor.Interceptor;
 import org.forest.interceptor.InterceptorChain;
-import org.forest.ssl.ForestKeyStore;
+import org.forest.ssl.SSLKeyStore;
 import org.forest.utils.ForestDataType;
 import org.forest.utils.RequestNameValue;
 
@@ -88,7 +88,7 @@ public class ForestRequest<T> {
 
     private boolean logEnable = true;
 
-    private ForestKeyStore keyStore;
+    private SSLKeyStore keyStore;
 
     public ForestRequest(ForestConfiguration configuration) {
         this.configuration = configuration;
@@ -330,12 +330,13 @@ public class ForestRequest<T> {
         return this;
     }
 
-    public ForestKeyStore getKeyStore() {
+    public SSLKeyStore getKeyStore() {
         return keyStore;
     }
 
-    public void setKeyStore(ForestKeyStore keyStore) {
+    public ForestRequest setKeyStore(SSLKeyStore keyStore) {
         this.keyStore = keyStore;
+        return this;
     }
 
     public void execute(ForestExecutorFactory executorFactory, ResponseHandler responseHandler) {

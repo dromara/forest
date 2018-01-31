@@ -29,18 +29,15 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
     public void sendRequest(final ForestRequest request, final HttpclientResponseHandler responseHandler, final HttpUriRequest httpRequest) throws IOException {
         final CloseableHttpAsyncClient client = connectionManager.getHttpAsyncClient(request);
         client.start();
-        while (!client.isRunning()) {
-            client.start();
-        }
         final ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
 
         final Future<HttpResponse> future = client.execute(httpRequest, new FutureCallback<HttpResponse>() {
             public void completed(final HttpResponse httpResponse) {
+                System.out.println("[Forest Test] Thread: " + Thread.currentThread().getName());
                 ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
                 if (response.isSuccess()) {
                     responseHandler.handleSuccess(response);
-                }
-                else {
+                } else {
                     responseHandler.handleError(response);
                 }
             }
@@ -48,14 +45,23 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
             public void failed(final Exception ex) {
                 ForestResponse response = forestResponseFactory.createResponse(request, null);
                 responseHandler.handleError(response, ex);
+                synchronized (client) {
+                    try {
+                        client.close();
+                    } catch (IOException e) {
+                    }
+                }
             }
 
             public void cancelled() {
-
+                synchronized (client) {
+                    try {
+                        client.close();
+                    } catch (IOException e) {
+                    }
+                }
             }
         });
-
         responseHandler.handleFuture(future, forestResponseFactory);
-
     }
 }

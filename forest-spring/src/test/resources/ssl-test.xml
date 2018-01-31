@@ -15,14 +15,10 @@
             maxConnections="500"
             maxRouteConnections="500">
 
-        <forest:var name="baseUrl" value="http://www.thebeastshop.com"/>
-        <forest:var name="x" value="0"/>
-        <forest:var name="y" value="1"/>
+        <forest:ssl-keystore id="keystore1" file="test.keystore" pass="21929331"/>
 
     </forest:configuration>
 
-
-    <!--<forest:scan configuration="forestConfiguration"-->
-                 <!--base-package="org.forest.spring.test.client"/>-->
+    <forest:client id="beastshopClient" configuration="forestConfiguration" class="org.forest.spring.test.client.BeastshopClient"/>
 
 </beans>

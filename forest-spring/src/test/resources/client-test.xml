@@ -21,6 +21,7 @@
 
     </forest:configuration>
 
-    <forest:client id="beastshopClient" configuration="forestConfiguration" class="org.forest.spring.client.BeastshopClient"/>
+    <forest:client id="beastshopClient" configuration="forestConfiguration" class="org.forest.spring.test.client.BeastshopClient"/>
+
 
 </beans>
