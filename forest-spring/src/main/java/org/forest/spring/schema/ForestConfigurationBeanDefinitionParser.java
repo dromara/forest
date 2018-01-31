@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.forest.config.ForestConfiguration;
 import org.forest.exceptions.ForestRuntimeException;
+import org.forest.spring.ssl.SpringSSLKeyStore;
 import org.forest.ssl.SSLKeyStore;
 import org.forest.utils.StringUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -31,7 +32,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
     private static Log log = LogFactory.getLog(ForestConfigurationBeanDefinitionParser.class);
 
     private final Class configurationBeanClass = ForestConfiguration.class;
-    private final Class sslKeyStoreBeanClass = SSLKeyStore.class;
+    private final Class sslKeyStoreBeanClass = SpringSSLKeyStore.class;
 
 
     public ForestConfigurationBeanDefinitionParser() {
@@ -167,7 +168,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         beanDefinition.setBeanClassName(sslKeyStoreBeanClass.getName());
         beanDefinition.getConstructorArgumentValues().addGenericArgumentValue(id);
         beanDefinition.getConstructorArgumentValues().addGenericArgumentValue(keystoreType);
-        beanDefinition.getPropertyValues().add("inputStream", inputStream);
+        beanDefinition.getConstructorArgumentValues().addGenericArgumentValue(filePath);
         beanDefinition.getPropertyValues().add("keystorePass", keystorePass);
         sslKeyStoreMap.put(id, beanDefinition);
     }

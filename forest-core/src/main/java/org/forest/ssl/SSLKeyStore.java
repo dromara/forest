@@ -4,8 +4,7 @@ import org.apache.commons.io.IOUtils;
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.utils.StringUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 /**
  * SSL keyStore
@@ -16,19 +15,23 @@ public class SSLKeyStore {
 
     public final static String DEFAULT_KEYSTORE_TYPE = "jks";
 
-    private final String id;
+    protected final String id;
 
-    private final String keystoreType;
+    protected final String keystoreType;
 
-    private InputStream inputStream;
+    protected String filePath;
 
-    private String keystorePass;
+    protected InputStream inputStream;
 
-    private volatile String fileContentCache;
+    protected String keystorePass;
 
-    public SSLKeyStore(String id, String keystoreType) {
+    protected volatile String fileContentCache;
+
+    public SSLKeyStore(String id, String keystoreType, String filePath) {
         this.id = id;
         this.keystoreType = keystoreType;
+        this.filePath = filePath;
+        init();
     }
 
     public String getId() {
@@ -39,12 +42,30 @@ public class SSLKeyStore {
         return keystoreType;
     }
 
-    public InputStream getInputStream() {
-        return inputStream;
+    public String getFilePath() {
+        return filePath;
     }
 
-    public void setInputStream(InputStream inputStream) {
-        this.inputStream = inputStream;
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public void init() {
+        File file = new File(filePath);
+        if (!file.exists()) {
+            throw new ForestRuntimeException(
+                    "The file of SSL KeyStore \"" + id + "\" " + filePath + " cannot be found!");
+        }
+        try {
+            inputStream = new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            throw new ForestRuntimeException(
+                    "An error occurred while reading he file of SSL KeyStore \"\" + id + \"\"", e);
+        }
+    }
+
+    public InputStream getInputStream() {
+        return inputStream;
     }
 
     public String getKeystorePass() {
