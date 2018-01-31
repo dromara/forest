@@ -7,6 +7,8 @@ import org.forest.exceptions.ForestRuntimeException;
 import org.forest.ssl.SSLKeyStore;
 import org.forest.utils.StringUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.ChildBeanDefinition;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
@@ -28,7 +30,8 @@ import java.util.Map;
 public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionParser {
     private static Log log = LogFactory.getLog(ForestConfigurationBeanDefinitionParser.class);
 
-    private final Class beanClass = ForestConfiguration.class;
+    private final Class configurationBeanClass = ForestConfiguration.class;
+    private final Class sslKeyStoreBeanClass = SSLKeyStore.class;
 
 
     public ForestConfigurationBeanDefinitionParser() {
@@ -37,12 +40,12 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
     public BeanDefinition parse(Element element, ParserContext parserContext) {
         RootBeanDefinition beanDefinition = new RootBeanDefinition();
 
-        beanDefinition.setBeanClass(beanClass);
+        beanDefinition.setBeanClass(configurationBeanClass);
         beanDefinition.setLazyInit(false);
         beanDefinition.setFactoryMethodName("configuration");
         String id = element.getAttribute("id");
         if (id == null || id.length() == 0) {
-            String generatedBeanName = beanClass.getName();
+            String generatedBeanName = configurationBeanClass.getName();
             id = generatedBeanName;
             int counter = 2;
             while(parserContext.getRegistry().containsBeanDefinition(id)) {
@@ -56,7 +59,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
             parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);
         }
 
-        Method[] methods = beanClass.getMethods();
+        Method[] methods = configurationBeanClass.getMethods();
         for (Method method : methods) {
             String methodName = method.getName();
             Class[] paramTypes = method.getParameterTypes();
@@ -76,19 +79,18 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
                 }
             }
         }
-
-        parseChildren(element.getChildNodes(), beanDefinition);
+        parseChildren(id, element.getChildNodes(), beanDefinition);
         log.info("[Forest] Created Forest Configuration Bean: " + beanDefinition);
         return beanDefinition;
 
     }
 
 
-    public void parseChildren(NodeList nodeList, RootBeanDefinition beanDefinition) {
+    public void parseChildren(String parentId, NodeList nodeList, RootBeanDefinition beanDefinition) {
         int nodesLength = nodeList.getLength();
         if (nodesLength > 0) {
             ManagedMap<String, Object> varMap = new ManagedMap<String, Object>();
-            ManagedMap<String, SSLKeyStore> sslKeyStoreMap = new ManagedMap<>();
+            ManagedMap<String, BeanDefinition> sslKeyStoreMap = new ManagedMap<>();
             for (int i = 0; i < nodesLength; i++) {
                 Node node = nodeList.item(i);
                 if (node instanceof Element) {
@@ -98,7 +100,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
                         parseVariable(elem, varMap);
                     }
                     else if (elemName.equals("ssl-keystore")) {
-                        parseSSLKeyStore(elem, sslKeyStoreMap);
+                        parseSSLKeyStore(parentId, elem, sslKeyStoreMap);
                     }
                 }
             }
@@ -114,7 +116,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         varMap.put(name, value);
     }
 
-    public void parseSSLKeyStore(Element elem, ManagedMap<String, SSLKeyStore> sslKeyStoreMap) {
+    public void parseSSLKeyStore(String parentId, Element elem, ManagedMap<String, BeanDefinition> sslKeyStoreMap) {
         String id = elem.getAttribute("id");
         String filePath = elem.getAttribute("file");
         String keystoreType = elem.getAttribute("type");
@@ -157,9 +159,16 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
                         "An error occurred while reading he file of SSL KeyStore \"\" + id + \"\"", e);
             }
         }
-        SSLKeyStore sslKeyStore = new SSLKeyStore(id, keystoreType);
-        sslKeyStore.setInputStream(inputStream);
-        sslKeyStore.setKeystorePass(keystorePass);
-        sslKeyStoreMap.put(id, sslKeyStore);
+//        SSLKeyStore sslKeyStore = new SSLKeyStore(id, keystoreType);
+//        sslKeyStore.setInputStream(inputStream);
+//        sslKeyStore.setKeystorePass(keystorePass);
+
+        BeanDefinition beanDefinition = new GenericBeanDefinition();
+        beanDefinition.setBeanClassName(sslKeyStoreBeanClass.getName());
+        beanDefinition.getConstructorArgumentValues().addGenericArgumentValue(id);
+        beanDefinition.getConstructorArgumentValues().addGenericArgumentValue(keystoreType);
+        beanDefinition.getPropertyValues().add("inputStream", inputStream);
+        beanDefinition.getPropertyValues().add("keystorePass", keystorePass);
+        sslKeyStoreMap.put(id, beanDefinition);
     }
 }
