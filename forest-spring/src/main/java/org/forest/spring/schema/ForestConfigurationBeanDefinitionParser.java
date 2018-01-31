@@ -16,8 +16,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Map;
@@ -117,31 +116,47 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
 
     public void parseSSLKeyStore(Element elem, ManagedMap<String, SSLKeyStore> sslKeyStoreMap) {
         String id = elem.getAttribute("id");
-        String file = elem.getAttribute("file");
+        String filePath = elem.getAttribute("file");
         String keystoreType = elem.getAttribute("type");
         String keystorePass = elem.getAttribute("pass");
+        InputStream inputStream = null;
+
         if (StringUtils.isEmpty(keystoreType)) {
             keystoreType = SSLKeyStore.DEFAULT_KEYSTORE_TYPE;
         }
-        if (StringUtils.isEmpty(file)) {
+        if (StringUtils.isEmpty(filePath)) {
             throw new ForestRuntimeException(
                     "The file of SSL KeyStore \"" + id + "\" is empty!");
         }
 
-        ClassPathResource resource = new ClassPathResource(file);
-        if (!resource.exists()) {
-            throw new ForestRuntimeException(
-                    "The file of SSL KeyStore \"" + id + "\" " + file + " cannot be found!");
+        if (filePath.indexOf(":/") == 1 ||
+                filePath.indexOf(":\\") == 1 ||
+                filePath.startsWith("/")) {
+            File file = new File(filePath);
+            if (!file.exists()) {
+                throw new ForestRuntimeException(
+                        "The file of SSL KeyStore \"" + id + "\" " + filePath + " cannot be found!");
+            }
+            try {
+                inputStream = new FileInputStream(file);
+            } catch (FileNotFoundException e) {
+                throw new ForestRuntimeException(
+                        "An error occurred while reading he file of SSL KeyStore \"\" + id + \"\"", e);
+            }
         }
-        InputStream inputStream = null;
-        try {
-            inputStream = resource.getInputStream();
-
-        } catch (IOException e) {
-            throw new ForestRuntimeException(
-                    "An error occurred while reading he file of SSL KeyStore \"\" + id + \"\"", e);
+        else {
+            ClassPathResource resource = new ClassPathResource(filePath);
+            if (!resource.exists()) {
+                throw new ForestRuntimeException(
+                        "The file of SSL KeyStore \"" + id + "\" " + filePath + " cannot be found!");
+            }
+            try {
+                inputStream = resource.getInputStream();
+            } catch (IOException e) {
+                throw new ForestRuntimeException(
+                        "An error occurred while reading he file of SSL KeyStore \"\" + id + \"\"", e);
+            }
         }
-
         SSLKeyStore sslKeyStore = new SSLKeyStore(id, keystoreType);
         sslKeyStore.setInputStream(inputStream);
         sslKeyStore.setKeystorePass(keystorePass);

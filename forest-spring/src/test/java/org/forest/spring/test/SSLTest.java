@@ -14,7 +14,7 @@ public class SSLTest extends TestCase {
 
     private ClassPathXmlApplicationContext applicationContext;
 
-    public void testScan() {
+    public void testSSL() {
         applicationContext = new ClassPathXmlApplicationContext(
                 new String[] { "classpath:ssl-test.xml" });
         ForestConfiguration configuration =
