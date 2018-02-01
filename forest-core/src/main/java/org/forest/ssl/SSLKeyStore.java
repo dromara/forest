@@ -5,6 +5,10 @@ import org.forest.exceptions.ForestRuntimeException;
 import org.forest.utils.StringUtils;
 
 import java.io.*;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 
 /**
  * SSL keyStore
@@ -26,6 +30,8 @@ public class SSLKeyStore {
     protected String keystorePass;
 
     protected volatile String fileContentCache;
+
+    protected KeyStore trustStore;
 
     public SSLKeyStore(String id, String keystoreType, String filePath) {
         this.id = id;
@@ -62,6 +68,8 @@ public class SSLKeyStore {
             throw new ForestRuntimeException(
                     "An error occurred while reading he file of SSL KeyStore \"\" + id + \"\"", e);
         }
+
+        loadTrustStore();
     }
 
     public InputStream getInputStream() {
@@ -77,6 +85,37 @@ public class SSLKeyStore {
     }
 
 
+    private void loadTrustStore() {
+        if (inputStream != null) {
+            try {
+                trustStore = KeyStore.getInstance(keystoreType);
+                String pass = this.keystorePass;
+                if (pass == null) {
+                    pass = "";
+                }
+                trustStore.load(inputStream, pass.toCharArray());
+            } catch (KeyStoreException e) {
+                throw new ForestRuntimeException(e);
+            } catch (CertificateException e) {
+                throw new ForestRuntimeException(e);
+            } catch (NoSuchAlgorithmException e) {
+                throw new ForestRuntimeException(e);
+            } catch (IOException e) {
+                throw new ForestRuntimeException(e);
+            } finally {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public KeyStore getTrustStore() {
+        return trustStore;
+    }
+
     public String getFileContent() {
         try {
             if (StringUtils.isEmpty(fileContentCache)) {
@@ -91,5 +130,8 @@ public class SSLKeyStore {
             throw new ForestRuntimeException(e);
         }
     }
+
+
+
 
 }

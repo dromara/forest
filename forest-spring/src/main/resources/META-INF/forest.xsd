@@ -130,6 +130,10 @@
         </xsd:attribute>
         <xsd:attribute name="type" type="xsd:string" use="optional" default="jks">
         </xsd:attribute>
+        <xsd:attribute name="protocols" type="xsd:string" use="optional">
+        </xsd:attribute>
+        <xsd:attribute name="cipher-suites" type="xsd:string" use="optional">
+        </xsd:attribute>
         <xsd:attribute name="file" type="xsd:string" use="required">
         </xsd:attribute>
         <xsd:attribute name="pass" type="xsd:string" use="required">

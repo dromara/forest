@@ -237,34 +237,19 @@ public class HttpclientConnectionManager {
      */
     private static SSLContext customSSL(ForestRequest request) {
         SSLContext sc = null;
-        InputStream instream = null;
-        KeyStore trustStore = null;
         SSLKeyStore keyStore = request.getKeyStore();
-        if (keyStore != null) {
+        KeyStore trustStore = keyStore.getTrustStore();
+        if (trustStore != null) {
             try {
-                String keyStoreType = keyStore.getKeystoreType();
-                if (StringUtils.isEmpty(keyStoreType)) {
-                    keyStoreType = KeyStore.getDefaultType();
-                }
-                trustStore = KeyStore.getInstance(keyStoreType);
-                instream = keyStore.getInputStream();
-                String keyStorepass = keyStore.getKeystorePass();
-                if (keyStorepass == null) {
-                    keyStorepass = "";
-                }
-                trustStore.load(instream, keyStorepass.toCharArray());
                 sc = SSLContexts.custom()
                         .loadTrustMaterial(trustStore, new TrustSelfSignedStrategy())
                         .build();
-            } catch (KeyStoreException | NoSuchAlgorithmException| CertificateException | IOException | KeyManagementException e) {
+            } catch (NoSuchAlgorithmException e) {
                 throw new ForestRuntimeException(e);
-            } finally {
-                if (instream != null) {
-                    try {
-                        instream.close();
-                    } catch (IOException e) {
-                    }
-                }
+            } catch (KeyManagementException e) {
+                throw new ForestRuntimeException(e);
+            } catch (KeyStoreException e) {
+                throw new ForestRuntimeException(e);
             }
         }
         return sc;
