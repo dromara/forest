@@ -38,6 +38,7 @@ public class SSLKeyStore {
         this.keystoreType = keystoreType;
         this.filePath = filePath;
         init();
+        loadTrustStore();
     }
 
     public String getId() {
@@ -68,8 +69,6 @@ public class SSLKeyStore {
             throw new ForestRuntimeException(
                     "An error occurred while reading he file of SSL KeyStore \"\" + id + \"\"", e);
         }
-
-        loadTrustStore();
     }
 
     public InputStream getInputStream() {
