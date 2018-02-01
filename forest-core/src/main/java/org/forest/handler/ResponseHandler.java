@@ -16,6 +16,8 @@ public interface ResponseHandler {
 
     void handleSync(ForestRequest request, ForestResponse response);
 
+    void handleSyncWitchException(ForestRequest request, ForestResponse response, Exception ex);
+
     Object handleResultType(ForestRequest request, ForestResponse response);
 
     Object handleResultType(ForestRequest request, ForestResponse response, Type resultType, Class resultClass);

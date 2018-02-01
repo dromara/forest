@@ -41,12 +41,22 @@ public class MethodResponseHandler<T> implements ResponseHandler {
 
     @Override
     public void handleSync(ForestRequest request, ForestResponse response) {
+        handleSyncWitchException(request, response, null);
+    }
+
+    @Override
+    public void handleSyncWitchException(ForestRequest request, ForestResponse response, Exception ex) {
         try {
             Object resultData = handleResultType(request, response, returnType, returnClass);
             if (response.isSuccess()) {
                 resultData = handleSuccess(resultData, request, response);
             } else {
-                handleError(request, response);
+                if (ex != null) {
+                    handleError(request, response, ex);
+                }
+                else {
+                    handleError(request, response);
+                }
             }
             handleResult(resultData);
         } catch (Throwable e) {

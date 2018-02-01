@@ -144,7 +144,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
                 httpRequest.abort();
                 ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
                 response = forestResponseFactory.createResponse(request, null);
-                responseHandler.handleSync(request, response);
+                responseHandler.handleSyncWitchException(request, response, e);
 //                throw new ForestRuntimeException(e);
                 return;
             }

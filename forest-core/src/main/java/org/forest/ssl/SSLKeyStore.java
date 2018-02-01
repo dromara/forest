@@ -39,7 +39,7 @@ public class SSLKeyStore {
         this.filePath = filePath;
         this.keystorePass = keystorePass;
         init();
-        loadTrustStore();
+//        loadTrustStore();
     }
 
     public String getId() {
@@ -84,8 +84,7 @@ public class SSLKeyStore {
         this.keystorePass = keystorePass;
     }
 
-
-    private void loadTrustStore() {
+    public void loadTrustStore() {
         if (inputStream != null) {
             try {
                 trustStore = KeyStore.getInstance(keystoreType);
@@ -95,13 +94,13 @@ public class SSLKeyStore {
                 }
                 trustStore.load(inputStream, pass.toCharArray());
             } catch (KeyStoreException e) {
-//                throw new ForestRuntimeException(e);
+                throw new ForestRuntimeException(e);
             } catch (CertificateException e) {
-//                throw new ForestRuntimeException(e);
+                throw new ForestRuntimeException(e);
             } catch (NoSuchAlgorithmException e) {
-//                throw new ForestRuntimeException(e);
+                throw new ForestRuntimeException(e);
             } catch (IOException e) {
-//                throw new ForestRuntimeException(e);
+                throw new ForestRuntimeException(e);
             } finally {
                 try {
                     inputStream.close();

@@ -15,10 +15,7 @@ import org.apache.http.conn.params.ConnPerRouteBean;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContexts;
-import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.conn.ssl.*;
 import org.apache.http.impl.auth.*;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -51,6 +48,7 @@ import java.io.InputStream;
 import java.nio.charset.CodingErrorAction;
 import java.security.*;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -188,8 +186,8 @@ public class HttpclientConnectionManager {
                 .setConnectionManager(tsConnectionManager);
         if ("https".equals(request.getProtocol())) {
             try {
-                SSLContext sc = getSSLContext(request);
-                SSLConnectionSocketFactory sslsf = getSSLConnectionSocketFactory(sc);
+                SSLContext sslContext = getSSLContext(request);
+                SSLConnectionSocketFactory sslsf = getSSLConnectionSocketFactory(sslContext);
                 builder.setSSLSocketFactory(sslsf);
             } catch (KeyManagementException e) {
                 throw new ForestRuntimeException(e);
@@ -217,14 +215,14 @@ public class HttpclientConnectionManager {
         return builder
                 .setDefaultRequestConfig(requestConfig)
                 .build();
-//        return new DefaultHttpClient(tsConnectionManager, httpParams);
     }
 
 
-    private static SSLConnectionSocketFactory getSSLConnectionSocketFactory(SSLContext sc) {
+    private static SSLConnectionSocketFactory getSSLConnectionSocketFactory(SSLContext sslContext) {
         SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
-                sc,
-                new String[] { "TLSv1" }, null,
+                sslContext,
+                new String[] { "TLSv1" },
+                null,
                 SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
         return sslsf;
     }
@@ -236,18 +234,20 @@ public class HttpclientConnectionManager {
      * @return
      */
     private static SSLContext customSSL(ForestRequest request) {
-        SSLContext sc = null;
+        SSLContext sslContext = null;
         SSLKeyStore keyStore = request.getKeyStore();
-        KeyStore trustStore = keyStore.getTrustStore();
+        keyStore.loadTrustStore();
+        final KeyStore trustStore = keyStore.getTrustStore();
         String keystorePass = keyStore.getKeystorePass();
         if (trustStore != null) {
             try {
+                SSLContextBuilder scBuilder = SSLContexts.custom();
                 if (keystorePass != null) {
-                    sc = SSLContexts.custom()
+                    sslContext = scBuilder
                             .loadKeyMaterial(trustStore, keystorePass.toCharArray())
                             .build();
                 } else {
-                    sc = SSLContexts.custom()
+                    sslContext = scBuilder
                             .loadTrustMaterial(trustStore, new TrustSelfSignedStrategy())
                             .build();
                 }
@@ -261,7 +261,7 @@ public class HttpclientConnectionManager {
                 throw new ForestRuntimeException(e);
             }
         }
-        return sc;
+        return sslContext;
     }
 
     /**
