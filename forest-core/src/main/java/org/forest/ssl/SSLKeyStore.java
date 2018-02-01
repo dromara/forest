@@ -33,10 +33,11 @@ public class SSLKeyStore {
 
     protected KeyStore trustStore;
 
-    public SSLKeyStore(String id, String keystoreType, String filePath) {
+    public SSLKeyStore(String id, String keystoreType, String filePath, String keystorePass) {
         this.id = id;
         this.keystoreType = keystoreType;
         this.filePath = filePath;
+        this.keystorePass = keystorePass;
         init();
         loadTrustStore();
     }
@@ -94,13 +95,13 @@ public class SSLKeyStore {
                 }
                 trustStore.load(inputStream, pass.toCharArray());
             } catch (KeyStoreException e) {
-                throw new ForestRuntimeException(e);
+//                throw new ForestRuntimeException(e);
             } catch (CertificateException e) {
-                throw new ForestRuntimeException(e);
+//                throw new ForestRuntimeException(e);
             } catch (NoSuchAlgorithmException e) {
-                throw new ForestRuntimeException(e);
+//                throw new ForestRuntimeException(e);
             } catch (IOException e) {
-                throw new ForestRuntimeException(e);
+//                throw new ForestRuntimeException(e);
             } finally {
                 try {
                     inputStream.close();
@@ -114,23 +115,6 @@ public class SSLKeyStore {
     public KeyStore getTrustStore() {
         return trustStore;
     }
-
-    public String getFileContent() {
-        try {
-            if (StringUtils.isEmpty(fileContentCache)) {
-                synchronized (this) {
-                    if (StringUtils.isEmpty(fileContentCache)) {
-                        fileContentCache = IOUtils.toString(inputStream);
-                    }
-                }
-            }
-            return fileContentCache;
-        } catch (IOException e) {
-            throw new ForestRuntimeException(e);
-        }
-    }
-
-
 
 
 }

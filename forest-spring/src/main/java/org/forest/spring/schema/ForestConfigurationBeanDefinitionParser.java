@@ -136,7 +136,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         beanDefinition.getConstructorArgumentValues().addGenericArgumentValue(id);
         beanDefinition.getConstructorArgumentValues().addGenericArgumentValue(keystoreType);
         beanDefinition.getConstructorArgumentValues().addGenericArgumentValue(filePath);
-        beanDefinition.getPropertyValues().add("keystorePass", keystorePass);
+        beanDefinition.getConstructorArgumentValues().addGenericArgumentValue(keystorePass);
         sslKeyStoreMap.put(id, beanDefinition);
     }
 }

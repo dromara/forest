@@ -25,8 +25,6 @@ public class SSLTest extends TestCase {
         assertEquals("keystore1", keyStore.getId());
         assertEquals("21929331", keyStore.getKeystorePass());
         assertEquals("jks", keyStore.getKeystoreType());
-        String content = keyStore.getFileContent();
-        assertEquals("this is a test keystore file.", content);
     }
 
 }
