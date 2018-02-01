@@ -39,7 +39,7 @@ public class SSLKeyStore {
         this.filePath = filePath;
         this.keystorePass = keystorePass;
         init();
-//        loadTrustStore();
+        loadTrustStore();
     }
 
     public String getId() {

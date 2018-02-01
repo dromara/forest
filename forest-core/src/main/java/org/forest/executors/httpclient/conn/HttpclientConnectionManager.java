@@ -127,9 +127,9 @@ public class HttpclientConnectionManager {
 //            registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
 //            registry.register(new Scheme("https", sf, 443));
 
-            tsConnectionManager = new PoolingHttpClientConnectionManager();
-            tsConnectionManager.setMaxTotal(maxConnections);
-            tsConnectionManager.setDefaultMaxPerRoute(maxRouteConnections);
+        tsConnectionManager = new PoolingHttpClientConnectionManager();
+        tsConnectionManager.setMaxTotal(maxConnections);
+        tsConnectionManager.setDefaultMaxPerRoute(maxRouteConnections);
 
 //        } catch (IOException e) {
 //            throw new ForestRuntimeException(e);
@@ -183,7 +183,6 @@ public class HttpclientConnectionManager {
 
     public HttpClient getHttpClient(ForestRequest request) {
         HttpClientBuilder builder = HttpClients.custom();
-//                .setConnectionManager(tsConnectionManager);
         if ("https".equals(request.getProtocol())) {
             try {
                 SSLContext sslContext = getSSLContext(request);
@@ -194,6 +193,8 @@ public class HttpclientConnectionManager {
             } catch (NoSuchAlgorithmException e) {
                 throw new ForestRuntimeException(e);
             }
+        } else {
+            builder.setConnectionManager(tsConnectionManager);
         }
 
         RequestConfig.Builder configBuilder = RequestConfig.custom();
@@ -236,7 +237,6 @@ public class HttpclientConnectionManager {
     private static SSLContext customSSL(ForestRequest request) {
         SSLContext sslContext = null;
         SSLKeyStore keyStore = request.getKeyStore();
-        keyStore.loadTrustStore();
         final KeyStore trustStore = keyStore.getTrustStore();
         String keystorePass = keyStore.getKeystorePass();
         if (trustStore != null) {
