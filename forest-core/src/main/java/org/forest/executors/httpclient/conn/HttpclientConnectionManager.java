@@ -15,6 +15,7 @@ import org.apache.http.conn.params.ConnPerRouteBean;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
@@ -187,7 +188,9 @@ public class HttpclientConnectionManager {
                 .setConnectionManager(tsConnectionManager);
         if ("https".equals(request.getProtocol())) {
             try {
-                builder.setSslcontext(getSSLContext(request));
+                SSLContext sc = getSSLContext(request);
+                SSLConnectionSocketFactory sslsf = getSSLConnectionSocketFactory(sc);
+                builder.setSSLSocketFactory(sslsf);
             } catch (KeyManagementException e) {
                 throw new ForestRuntimeException(e);
             } catch (NoSuchAlgorithmException e) {
@@ -218,6 +221,15 @@ public class HttpclientConnectionManager {
     }
 
 
+    private static SSLConnectionSocketFactory getSSLConnectionSocketFactory(SSLContext sc) {
+        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+                sc,
+                new String[] { "TLSv1" }, null,
+                SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
+        return sslsf;
+    }
+
+
     /**
      * 自定义SSL证书
      * @param request
@@ -241,7 +253,9 @@ public class HttpclientConnectionManager {
                     keyStorepass = "";
                 }
                 trustStore.load(instream, keyStorepass.toCharArray());
-                sc = SSLContexts.custom().loadTrustMaterial(trustStore, new TrustSelfSignedStrategy()).build();
+                sc = SSLContexts.custom()
+                        .loadTrustMaterial(trustStore, new TrustSelfSignedStrategy())
+                        .build();
             } catch (KeyStoreException | NoSuchAlgorithmException| CertificateException | IOException | KeyManagementException e) {
                 throw new ForestRuntimeException(e);
             } finally {
