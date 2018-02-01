@@ -59,7 +59,7 @@ public class SSLKeyStore {
     }
 
     public void init() {
-        File file = new File(filePath);
+        File file = new File(filePath.trim());
         if (!file.exists()) {
             throw new ForestRuntimeException(
                     "The file of SSL KeyStore \"" + id + "\" " + filePath + " cannot be found!");
@@ -90,9 +90,11 @@ public class SSLKeyStore {
                 trustStore = KeyStore.getInstance(keystoreType);
                 String pass = this.keystorePass;
                 if (pass == null) {
-                    pass = "";
+                    trustStore.load(inputStream, null);
                 }
-                trustStore.load(inputStream, pass.toCharArray());
+                else {
+                    trustStore.load(inputStream, pass.trim().toCharArray());
+                }
             } catch (KeyStoreException e) {
                 throw new ForestRuntimeException(e);
             } catch (CertificateException e) {
