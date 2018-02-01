@@ -239,16 +239,25 @@ public class HttpclientConnectionManager {
         SSLContext sc = null;
         SSLKeyStore keyStore = request.getKeyStore();
         KeyStore trustStore = keyStore.getTrustStore();
+        String keystorePass = keyStore.getKeystorePass();
         if (trustStore != null) {
             try {
-                sc = SSLContexts.custom()
-                        .loadTrustMaterial(trustStore, new TrustSelfSignedStrategy())
-                        .build();
+                if (keystorePass != null) {
+                    sc = SSLContexts.custom()
+                            .loadKeyMaterial(trustStore, keystorePass.toCharArray())
+                            .build();
+                } else {
+                    sc = SSLContexts.custom()
+                            .loadTrustMaterial(trustStore, new TrustSelfSignedStrategy())
+                            .build();
+                }
             } catch (NoSuchAlgorithmException e) {
                 throw new ForestRuntimeException(e);
             } catch (KeyManagementException e) {
                 throw new ForestRuntimeException(e);
             } catch (KeyStoreException e) {
+                throw new ForestRuntimeException(e);
+            } catch (UnrecoverableKeyException e) {
                 throw new ForestRuntimeException(e);
             }
         }
