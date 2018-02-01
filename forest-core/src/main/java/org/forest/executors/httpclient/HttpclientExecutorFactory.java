@@ -108,7 +108,7 @@ public class HttpclientExecutorFactory implements ForestExecutorFactory {
         if (request.isAsync()) {
             return new AsyncHttpclientRequestSender(connectionManager, request);
         }
-        return new SyncHttpclientRequestSender2(connectionManager, request);
+        return new SyncHttpclientRequestSender(connectionManager, request);
     }
 
 
