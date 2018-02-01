@@ -182,8 +182,8 @@ public class HttpclientConnectionManager {
     }
 
     public HttpClient getHttpClient(ForestRequest request) {
-        HttpClientBuilder builder = HttpClients.custom()
-                .setConnectionManager(tsConnectionManager);
+        HttpClientBuilder builder = HttpClients.custom();
+//                .setConnectionManager(tsConnectionManager);
         if ("https".equals(request.getProtocol())) {
             try {
                 SSLContext sslContext = getSSLContext(request);
@@ -223,7 +223,7 @@ public class HttpclientConnectionManager {
                 sslContext,
                 new String[] { "TLSv1" },
                 null,
-                SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
+                SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
         return sslsf;
     }
 
