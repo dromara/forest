@@ -1,8 +1,8 @@
-package org.forest.http;
+package org.forest.test.http;
 
 import org.forest.config.ForestConfiguration;
-import org.forest.http.client.PostClient;
-import org.forest.http.model.UserParam;
+import org.forest.test.http.client.PostClient;
+import org.forest.test.http.model.UserParam;
 import org.forest.test.mock.PostMockServer;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -13,8 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockserver.model.HttpRequest.request;
-import static org.mockserver.model.HttpResponse.response;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]

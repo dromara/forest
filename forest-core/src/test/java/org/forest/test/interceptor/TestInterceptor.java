@@ -3,7 +3,7 @@ package org.forest.test.interceptor;
 import org.forest.Forest;
 import org.forest.config.ForestConfiguration;
 import org.forest.exceptions.ForestRuntimeException;
-import org.forest.http.TestGetClient;
+import org.forest.test.http.TestGetClient;
 import org.forest.interceptor.Interceptor;
 import org.forest.test.mock.GetMockServer;
 import org.junit.Before;

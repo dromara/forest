@@ -1,11 +1,13 @@
-package org.forest.http;
+package org.forest.test.http;
 
 import org.forest.callback.OnError;
 import org.forest.callback.OnSuccess;
 import org.forest.config.ForestConfiguration;
 import org.forest.exceptions.ForestNetworkException;
 import org.forest.exceptions.ForestRuntimeException;
-import org.forest.http.client.GetClient;
+import org.forest.http.ForestRequest;
+import org.forest.http.ForestResponse;
+import org.forest.test.http.client.GetClient;
 import org.forest.test.mock.AsyncGetMockServer;
 import org.junit.Before;
 import org.junit.BeforeClass;

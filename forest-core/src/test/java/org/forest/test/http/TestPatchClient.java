@@ -1,7 +1,7 @@
-package org.forest.http;
+package org.forest.test.http;
 
 import org.forest.config.ForestConfiguration;
-import org.forest.http.client.PatchClient;
+import org.forest.test.http.client.PatchClient;
 import org.forest.test.mock.PatchMockServer;
 import org.forest.test.mock.PutMockServer;
 import org.junit.Before;

@@ -1,7 +1,7 @@
 package org.forest.test.proxy;
 
 import org.forest.config.ForestConfiguration;
-import org.forest.http.client.GetClient;
+import org.forest.test.http.client.GetClient;
 import org.forest.proxy.ProxyFactory;
 import org.junit.Test;
 

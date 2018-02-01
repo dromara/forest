@@ -1,7 +1,7 @@
-package org.forest.http;
+package org.forest.test.http;
 
 import org.forest.config.ForestConfiguration;
-import org.forest.http.client.PutClient;
+import org.forest.test.http.client.PutClient;
 import org.forest.test.mock.PutMockServer;
 import org.junit.*;
 import org.slf4j.Logger;

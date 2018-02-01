@@ -1,11 +1,11 @@
-package org.forest.http.client;
+package org.forest.test.http.client;
 
 import org.forest.annotation.DataObject;
 import org.forest.annotation.DataParam;
 import org.forest.annotation.DataVariable;
 import org.forest.annotation.Request;
-import org.forest.http.model.UserParam;
-import org.forest.http.model.XmlTestParam;
+import org.forest.test.http.model.UserParam;
+import org.forest.test.http.model.XmlTestParam;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]

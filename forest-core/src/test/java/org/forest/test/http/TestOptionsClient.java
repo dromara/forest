@@ -1,8 +1,9 @@
-package org.forest.http;
+package org.forest.test.http;
 
 import org.apache.http.HttpHeaders;
 import org.forest.config.ForestConfiguration;
-import org.forest.http.client.OptionsClient;
+import org.forest.http.ForestResponse;
+import org.forest.test.http.client.OptionsClient;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -13,8 +14,8 @@ import org.mockserver.model.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 

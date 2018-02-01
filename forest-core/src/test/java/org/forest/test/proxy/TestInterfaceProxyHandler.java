@@ -3,7 +3,7 @@ package org.forest.test.proxy;
 import org.forest.annotation.BaseURL;
 import org.forest.annotation.Request;
 import org.forest.config.ForestConfiguration;
-import org.forest.http.client.GetClient;
+import org.forest.test.http.client.GetClient;
 import org.forest.proxy.InterfaceProxyHandler;
 import org.forest.proxy.ProxyFactory;
 import org.junit.Test;

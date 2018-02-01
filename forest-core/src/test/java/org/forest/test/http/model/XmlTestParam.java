@@ -1,4 +1,4 @@
-package org.forest.http.model;
+package org.forest.test.http.model;
 
 import javax.xml.bind.annotation.XmlRootElement;
 

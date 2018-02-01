@@ -1,7 +1,7 @@
-package org.forest.http;
+package org.forest.test.http;
 
 import org.forest.config.ForestConfiguration;
-import org.forest.http.client.PostClient;
+import org.forest.test.http.client.PostClient;
 import org.forest.test.mock.PostComplexMockServer;
 import org.forest.test.mock.PostMockServer;
 import org.junit.Before;

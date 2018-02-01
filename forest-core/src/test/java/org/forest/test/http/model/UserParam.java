@@ -1,4 +1,4 @@
-package org.forest.http.model;
+package org.forest.test.http.model;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]

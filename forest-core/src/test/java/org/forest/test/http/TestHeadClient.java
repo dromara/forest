@@ -1,7 +1,8 @@
-package org.forest.http;
+package org.forest.test.http;
 
 import org.forest.config.ForestConfiguration;
-import org.forest.http.client.HeadClient;
+import org.forest.http.ForestResponse;
+import org.forest.test.http.client.HeadClient;
 import org.forest.test.mock.HeadMockServer;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -11,8 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static junit.framework.Assert.*;
-import static org.mockserver.model.HttpRequest.request;
-import static org.mockserver.model.HttpResponse.response;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]

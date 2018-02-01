@@ -2,6 +2,7 @@ package org.forest.executors.httpclient.conn;
 
 import org.apache.http.Consts;
 import org.apache.http.auth.AuthSchemeProvider;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.config.CookieSpecs;
@@ -18,7 +19,11 @@ import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.auth.*;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
@@ -52,7 +57,7 @@ import java.security.cert.CertificateException;
  */
 public class HttpclientConnectionManager {
     private HttpParams httpParams;
-    private static ThreadSafeClientConnManager tsConnectionManager;
+    private static PoolingHttpClientConnectionManager tsConnectionManager;
 
     private static PoolingNHttpClientConnectionManager asyncConnectionManager;
 
@@ -93,51 +98,53 @@ public class HttpclientConnectionManager {
         Integer maxConnections = DEFAULT_MAX_TOTAL_CONNECTIONS;
         Integer maxRouteConnections = 10;
         Integer connectTimeout = DEFAULT_CONNECT_TIMEOUT;
-        try {
-            KeyStore trustStore = KeyStore.getInstance(KeyStore
-                    .getDefaultType());
-            trustStore.load(null, null);
-            SSLSocketFactory sf = new ForestSSLSocketFactory(trustStore);
-            //允许所有主机的验证
-            sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+//        try {
+//            KeyStore trustStore = KeyStore.getInstance(KeyStore
+//                    .getDefaultType());
+//            trustStore.load(null, null);
+//            SSLSocketFactory sf = new ForestSSLSocketFactory(trustStore);
+//            //允许所有主机的验证
+//            sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+//
+//            // set maximum number of conntections allowed
+//            maxConnections = configuration.getMaxConnections() != null ?
+//                    configuration.getMaxConnections() : DEFAULT_MAX_TOTAL_CONNECTIONS;
+//            ConnManagerParams.setMaxTotalConnections(httpParams, maxConnections);
+//            // set timeout in milliseconds
+//            ConnManagerParams.setTimeout(httpParams, DEFAULT_TIMEOUT);
+//            // set maximum number of connections allowed per route
+//            maxRouteConnections = configuration.getMaxRouteConnections() != null ?
+//                    configuration.getMaxRouteConnections() : maxConnections;
+//            ConnPerRouteBean connPerRoute = new ConnPerRouteBean(maxRouteConnections);
+//            ConnManagerParams.setMaxConnectionsPerRoute(httpParams,connPerRoute);
+//            // set connect timeout
+//            connectTimeout = configuration.getConnectTimeout() != null ?
+//                    configuration.getConnectTimeout() : DEFAULT_CONNECT_TIMEOUT;
+//            HttpConnectionParams.setConnectionTimeout(httpParams, connectTimeout);
+//            // set read timeout
+//            HttpConnectionParams.setSoTimeout(httpParams, DEFAULT_READ_TIMEOUT);
+//
+//            SchemeRegistry registry = new SchemeRegistry();
+//            registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+//            registry.register(new Scheme("https", sf, 443));
 
-            // set maximum number of conntections allowed
-            maxConnections = configuration.getMaxConnections() != null ?
-                    configuration.getMaxConnections() : DEFAULT_MAX_TOTAL_CONNECTIONS;
-            ConnManagerParams.setMaxTotalConnections(httpParams, maxConnections);
-            // set timeout in milliseconds
-            ConnManagerParams.setTimeout(httpParams, DEFAULT_TIMEOUT);
-            // set maximum number of connections allowed per route
-            maxRouteConnections = configuration.getMaxRouteConnections() != null ?
-                    configuration.getMaxRouteConnections() : maxConnections;
-            ConnPerRouteBean connPerRoute = new ConnPerRouteBean(maxRouteConnections);
-            ConnManagerParams.setMaxConnectionsPerRoute(httpParams,connPerRoute);
-            // set connect timeout
-            connectTimeout = configuration.getConnectTimeout() != null ?
-                    configuration.getConnectTimeout() : DEFAULT_CONNECT_TIMEOUT;
-            HttpConnectionParams.setConnectionTimeout(httpParams, connectTimeout);
-            // set read timeout
-            HttpConnectionParams.setSoTimeout(httpParams, DEFAULT_READ_TIMEOUT);
+            tsConnectionManager = new PoolingHttpClientConnectionManager();
+            tsConnectionManager.setMaxTotal(maxConnections);
+            tsConnectionManager.setDefaultMaxPerRoute(maxRouteConnections);
 
-            SchemeRegistry registry = new SchemeRegistry();
-            registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-            registry.register(new Scheme("https", sf, 443));
-
-            tsConnectionManager = new ThreadSafeClientConnManager(httpParams, registry);
-
-        } catch (IOException e) {
-            throw new ForestRuntimeException(e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new ForestRuntimeException(e);
-        } catch (CertificateException e) {
-            throw new ForestRuntimeException(e);
-        } catch (UnrecoverableKeyException e) {
-            throw new ForestRuntimeException(e);
-        } catch (KeyStoreException e) {
-            throw new ForestRuntimeException(e);
-        } catch (KeyManagementException e) {
-            throw new ForestRuntimeException(e);
-        }
+//        } catch (IOException e) {
+//            throw new ForestRuntimeException(e);
+//        } catch (NoSuchAlgorithmException e) {
+//            throw new ForestRuntimeException(e);
+//        } catch (CertificateException e) {
+//            throw new ForestRuntimeException(e);
+//        } catch (UnrecoverableKeyException e) {
+//            throw new ForestRuntimeException(e);
+//        } catch (KeyStoreException e) {
+//            throw new ForestRuntimeException(e);
+//        } catch (KeyManagementException e) {
+//            throw new ForestRuntimeException(e);
+//        }
 
 
         /// init async connection manager
@@ -175,8 +182,39 @@ public class HttpclientConnectionManager {
         }
     }
 
-    public HttpClient getHttpClient() {
-        return new DefaultHttpClient(tsConnectionManager, httpParams);
+    public HttpClient getHttpClient(ForestRequest request) {
+        HttpClientBuilder builder = HttpClients.custom()
+                .setConnectionManager(tsConnectionManager);
+        if ("https".equals(request.getProtocol())) {
+            try {
+                builder.setSslcontext(getSSLContext(request));
+            } catch (KeyManagementException e) {
+                throw new ForestRuntimeException(e);
+            } catch (NoSuchAlgorithmException e) {
+                throw new ForestRuntimeException(e);
+            }
+        }
+
+        RequestConfig.Builder configBuilder = RequestConfig.custom();
+        // 设置连接超时
+        configBuilder.setConnectTimeout(request.getTimeout());
+        // 设置读取超时
+
+        Integer timeout = request.getTimeout();
+        if (timeout == null) {
+            timeout = request.getConfiguration().getTimeout();
+        }
+        configBuilder.setSocketTimeout(timeout);
+        // 设置从连接池获取连接实例的超时
+        configBuilder.setConnectionRequestTimeout(DEFAULT_READ_TIMEOUT);
+        // 在提交请求之前 测试连接是否可用
+        configBuilder.setStaleConnectionCheckEnabled(true);
+        RequestConfig requestConfig = configBuilder.build();
+
+        return builder
+                .setDefaultRequestConfig(requestConfig)
+                .build();
+//        return new DefaultHttpClient(tsConnectionManager, httpParams);
     }
 
 
@@ -207,9 +245,11 @@ public class HttpclientConnectionManager {
             } catch (KeyStoreException | NoSuchAlgorithmException| CertificateException | IOException | KeyManagementException e) {
                 throw new ForestRuntimeException(e);
             } finally {
-                try {
-                    instream.close();
-                } catch (IOException e) {
+                if (instream != null) {
+                    try {
+                        instream.close();
+                    } catch (IOException e) {
+                    }
                 }
             }
         }

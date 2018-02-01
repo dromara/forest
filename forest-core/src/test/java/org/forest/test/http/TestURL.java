@@ -1,4 +1,4 @@
-package org.forest.http;
+package org.forest.test.http;
 
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.utils.URLUtils;

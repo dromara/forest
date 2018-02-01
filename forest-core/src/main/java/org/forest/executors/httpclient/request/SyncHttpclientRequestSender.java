@@ -34,17 +34,17 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
     }
 
     protected HttpClient getHttpClient() {
-        HttpClient client = connectionManager.getHttpClient();
+        HttpClient client = connectionManager.getHttpClient(request);
         setupHttpClient(client);
         return client;
     }
 
     protected void setupHttpClient(HttpClient client) {
-        client.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, request.getTimeout());
-        if (client instanceof DefaultHttpClient) {
-            ((DefaultHttpClient) client).getCookieSpecs().register("default", defaultCookieSF);
-            client.getParams().setParameter(ClientPNames.COOKIE_POLICY, "default");
-        }
+//        client.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, request.getTimeout());
+//        if (client instanceof DefaultHttpClient) {
+//            ((DefaultHttpClient) client).getCookieSpecs().register("default", defaultCookieSF);
+//            client.getParams().setParameter(ClientPNames.COOKIE_POLICY, "default");
+//        }
     }
 
     private final static CookieSpecFactory defaultCookieSF = new CookieSpecFactory() {

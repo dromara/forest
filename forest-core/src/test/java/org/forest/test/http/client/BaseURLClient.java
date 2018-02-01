@@ -1,4 +1,4 @@
-package org.forest.http.client;
+package org.forest.test.http.client;
 
 import org.forest.annotation.BaseURL;
 import org.forest.annotation.Request;

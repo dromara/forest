@@ -1,4 +1,4 @@
-package org.forest.http;
+package org.forest.test.http;
 
 import org.forest.utils.StringUtils;
 import org.junit.Test;
