@@ -171,6 +171,7 @@ public class HttpclientConnectionManager {
     }
 
 
+/*
     private static SSLConnectionSocketFactory getSSLConnectionSocketFactory(SSLContext sslContext) {
         SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
                 sslContext,
@@ -179,6 +180,7 @@ public class HttpclientConnectionManager {
                 SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
         return sslsf;
     }
+*/
 
 
     public void afterConnect() {
@@ -191,6 +193,7 @@ public class HttpclientConnectionManager {
      * @param request
      * @return
      */
+/*
     private static SSLContext customSSL(ForestRequest request) {
         SSLContext sslContext = null;
         SSLKeyStore keyStore = request.getKeyStore();
@@ -220,6 +223,7 @@ public class HttpclientConnectionManager {
         }
         return sslContext;
     }
+*/
 
     /**
      * 绕过SSL验证
@@ -228,6 +232,7 @@ public class HttpclientConnectionManager {
      * @throws NoSuchAlgorithmException
      * @throws KeyManagementException
      */
+/*
     private static SSLContext createIgnoreVerifySSL() throws NoSuchAlgorithmException, KeyManagementException {
         SSLContext sc = SSLContext.getInstance("SSLv3");
         X509TrustManager trustManager = new X509TrustManager() {
@@ -251,18 +256,21 @@ public class HttpclientConnectionManager {
         sc.init(null, new TrustManager[] { trustManager }, null);
         return sc;
     }
+*/
 
     /**
      * 获取SSL上下文
      * @param request
      * @return
      */
+/*
     private static SSLContext getSSLContext(ForestRequest request) throws KeyManagementException, NoSuchAlgorithmException {
         if (request.getKeyStore() == null) {
             return createIgnoreVerifySSL();
         }
         return customSSL(request);
     }
+*/
 
 
 
@@ -272,6 +280,7 @@ public class HttpclientConnectionManager {
         }
 
         HttpAsyncClientBuilder builder = HttpAsyncClients.custom();
+/*
         if ("https".equals(request.getProtocol())) {
             try {
                 builder.setSSLContext(getSSLContext(request));
@@ -281,6 +290,7 @@ public class HttpclientConnectionManager {
                 throw new ForestRuntimeException(e);
             }
         }
+*/
 
         Integer timeout = request.getTimeout();
         if (timeout == null) {
