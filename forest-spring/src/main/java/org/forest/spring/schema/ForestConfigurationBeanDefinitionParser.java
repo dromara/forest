@@ -122,6 +122,8 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         String filePath = elem.getAttribute("file");
         String keystoreType = elem.getAttribute("type");
         String keystorePass = elem.getAttribute("pass");
+        String protocolsStr = elem.getAttribute("protocols");
+        String cipherSuitesStr = elem.getAttribute("cipher-suites");
 
         if (StringUtils.isEmpty(keystoreType)) {
             keystoreType = SSLKeyStore.DEFAULT_KEYSTORE_TYPE;
@@ -137,6 +139,22 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         beanDefinition.getConstructorArgumentValues().addGenericArgumentValue(keystoreType);
         beanDefinition.getConstructorArgumentValues().addGenericArgumentValue(filePath);
         beanDefinition.getConstructorArgumentValues().addGenericArgumentValue(keystorePass);
+        if (StringUtils.isNotEmpty(protocolsStr)) {
+            String[] strs = protocolsStr.split(",");
+            String[] protocols = new String[strs.length];
+            for (int i = 0; i < strs.length; i++) {
+                protocols[i] = strs[i].trim();
+            }
+            beanDefinition.getPropertyValues().add("protocols", protocols);
+        }
+        if (StringUtils.isNotEmpty(cipherSuitesStr)) {
+            String[] strs = cipherSuitesStr.split(",");
+            String[] cipherSuites = new String[strs.length];
+            for (int i = 0; i < strs.length; i++) {
+                cipherSuites[i] = strs[i].trim();
+            }
+            beanDefinition.getPropertyValues().add("cipherSuites", cipherSuites);
+        }
         sslKeyStoreMap.put(id, beanDefinition);
     }
 }

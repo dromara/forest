@@ -2,27 +2,21 @@ package org.forest.executors.httpclient.conn;
 
 import org.apache.http.Consts;
 import org.apache.http.auth.AuthSchemeProvider;
-import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.ConnectionConfig;
 import org.apache.http.config.Lookup;
+import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.params.ConnManagerParams;
-import org.apache.http.conn.params.ConnPerRouteBean;
-import org.apache.http.conn.scheme.PlainSocketFactory;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.*;
 import org.apache.http.impl.auth.*;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
@@ -31,24 +25,19 @@ import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
 import org.apache.http.nio.reactor.ConnectingIOReactor;
 import org.apache.http.nio.reactor.IOReactorException;
 import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.forest.config.ForestConfiguration;
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.exceptions.ForestUnsupportException;
 import org.forest.http.ForestRequest;
 import org.forest.ssl.SSLKeyStore;
-import org.forest.utils.StringUtils;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.CodingErrorAction;
 import java.security.*;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -62,7 +51,7 @@ public class HttpclientConnectionManager {
 
     private static Lookup<AuthSchemeProvider> authSchemeRegistry;
 
-
+    private final ForestSSLConnectFactory sslConnectFactory = new ForestSSLConnectFactory();
     /**
      * maximum number of conntections allowed
      */
@@ -127,9 +116,16 @@ public class HttpclientConnectionManager {
 //            registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
 //            registry.register(new Scheme("https", sf, 443));
 
-        tsConnectionManager = new PoolingHttpClientConnectionManager();
+        Registry<ConnectionSocketFactory> socketFactoryRegistry =
+                RegistryBuilder.<ConnectionSocketFactory> create()
+                .register("https", sslConnectFactory)
+                .register("http", new PlainConnectionSocketFactory())
+                .build();
+
+        tsConnectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
         tsConnectionManager.setMaxTotal(maxConnections);
         tsConnectionManager.setDefaultMaxPerRoute(maxRouteConnections);
+
 
 //        } catch (IOException e) {
 //            throw new ForestRuntimeException(e);
@@ -183,7 +179,8 @@ public class HttpclientConnectionManager {
 
     public HttpClient getHttpClient(ForestRequest request) {
         HttpClientBuilder builder = HttpClients.custom();
-        if ("https".equals(request.getProtocol())) {
+        builder.setConnectionManager(tsConnectionManager);
+        /*if ("https".equals(request.getProtocol())) {
             try {
                 SSLContext sslContext = getSSLContext(request);
                 SSLConnectionSocketFactory sslsf = getSSLConnectionSocketFactory(sslContext);
@@ -195,7 +192,7 @@ public class HttpclientConnectionManager {
             }
         } else {
             builder.setConnectionManager(tsConnectionManager);
-        }
+        }*/
 
         RequestConfig.Builder configBuilder = RequestConfig.custom();
         // 设置连接超时
@@ -212,7 +209,7 @@ public class HttpclientConnectionManager {
         // 在提交请求之前 测试连接是否可用
         configBuilder.setStaleConnectionCheckEnabled(true);
         RequestConfig requestConfig = configBuilder.build();
-
+        sslConnectFactory.setCurrentRequest(request);
         return builder
                 .setDefaultRequestConfig(requestConfig)
                 .build();
@@ -224,8 +221,13 @@ public class HttpclientConnectionManager {
                 sslContext,
                 new String[] { "TLSv1" },
                 null,
-                SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+                SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
         return sslsf;
+    }
+
+
+    public void afterConnect() {
+        sslConnectFactory.removeCurrentRequest();
     }
 
 

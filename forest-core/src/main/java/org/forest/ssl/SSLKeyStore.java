@@ -29,9 +29,12 @@ public class SSLKeyStore {
 
     protected String keystorePass;
 
-    protected volatile String fileContentCache;
 
     protected KeyStore trustStore;
+
+    protected String[] protocols;
+
+    protected String[] cipherSuites;
 
     public SSLKeyStore(String id, String keystoreType, String filePath, String keystorePass) {
         this.id = id;
@@ -56,6 +59,23 @@ public class SSLKeyStore {
 
     public void setFilePath(String filePath) {
         this.filePath = filePath;
+    }
+
+
+    public String[] getProtocols() {
+        return protocols;
+    }
+
+    public void setProtocols(String[] protocols) {
+        this.protocols = protocols;
+    }
+
+    public String[] getCipherSuites() {
+        return cipherSuites;
+    }
+
+    public void setCipherSuites(String[] cipherSuites) {
+        this.cipherSuites = cipherSuites;
     }
 
     public void init() {
