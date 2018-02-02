@@ -22,9 +22,9 @@ import org.forest.ssl.SSLKeyStore;
 
 @ThreadSafe
 public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactory {
-    public static final X509HostnameVerifier ALLOW_ALL_HOSTNAME_VERIFIER = new AllowAllHostnameVerifier();
+
     public static final X509HostnameVerifier BROWSER_COMPATIBLE_HOSTNAME_VERIFIER = new BrowserCompatHostnameVerifier();
-    public static final X509HostnameVerifier STRICT_HOSTNAME_VERIFIER = new StrictHostnameVerifier();
+
 //    private final SSLSocketFactory socketfactory;
     private ThreadLocal<ForestRequest> requestLocal = new ThreadLocal<>();
     private final X509HostnameVerifier hostnameVerifier;
@@ -220,9 +220,11 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
         return sslsock;
     }
 
+/*
     X509HostnameVerifier getHostnameVerifier() {
         return this.hostnameVerifier;
     }
+*/
 
     private void verifyHostname(SSLSocket sslsock, String hostname) throws IOException {
         try {
