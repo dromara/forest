@@ -205,13 +205,15 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
                 .createSocket(socket, target, port, true);
         if (request != null) {
             SSLKeyStore keyStore = request.getKeyStore();
-            String[] protocols = keyStore.getProtocols();
-            String[] cipherSuites = keyStore.getCipherSuites();
-            if (protocols != null) {
-                sslsock.setEnabledProtocols(protocols);
-            }
-            if (cipherSuites != null) {
-                sslsock.setEnabledCipherSuites(cipherSuites);
+            if (keyStore != null) {
+                String[] protocols = keyStore.getProtocols();
+                String[] cipherSuites = keyStore.getCipherSuites();
+                if (protocols != null) {
+                    sslsock.setEnabledProtocols(protocols);
+                }
+                if (cipherSuites != null) {
+                    sslsock.setEnabledCipherSuites(cipherSuites);
+                }
             }
         }
         this.prepareSocket(sslsock);
