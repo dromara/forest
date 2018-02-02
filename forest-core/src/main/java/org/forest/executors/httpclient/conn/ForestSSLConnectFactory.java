@@ -105,8 +105,7 @@ public class ForestSSLConnectFactory implements LayeredConnectionSocketFactory {
     }
 
 
-    private SSLSocketFactory getCurrentSocketFactory() {
-        ForestRequest request = getCurrentRequest();
+    private SSLSocketFactory getCurrentSocketFactory(ForestRequest request) {
         if (request == null) {
             return null;
         }
@@ -202,7 +201,8 @@ public class ForestSSLConnectFactory implements LayeredConnectionSocketFactory {
 
     public Socket createLayeredSocket(Socket socket, String target, int port, HttpContext context) throws IOException {
         ForestRequest request = getCurrentRequest();
-        SSLSocket sslsock = (SSLSocket)this.getCurrentSocketFactory().createSocket(socket, target, port, true);
+        SSLSocket sslsock = (SSLSocket)this.getCurrentSocketFactory(request)
+                .createSocket(socket, target, port, true);
         if (request != null) {
             SSLKeyStore keyStore = request.getKeyStore();
             String[] protocols = keyStore.getProtocols();
