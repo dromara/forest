@@ -73,12 +73,16 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
     public void sendRequest(ForestRequest request, HttpclientResponseHandler responseHandler, HttpUriRequest httpRequest)
             throws IOException {
         HttpResponse httpResponse = null;
+        ForestResponse response = null;
         client = getHttpClient();
-        httpResponse = client.execute(httpRequest);
-        ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
-        ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
-        logResponse(request, response);
-        connectionManager.afterConnect();
+        try {
+            httpResponse = client.execute(httpRequest);
+            ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
+            response = forestResponseFactory.createResponse(request, httpResponse);
+            logResponse(request, response);
+        } finally {
+            connectionManager.afterConnect();
+        }
         try {
             responseHandler.handleSync(httpResponse, response);
         } catch (Exception ex) {

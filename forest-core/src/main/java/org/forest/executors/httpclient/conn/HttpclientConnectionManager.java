@@ -133,6 +133,7 @@ public class HttpclientConnectionManager {
     }
 
     public HttpClient getHttpClient(ForestRequest request) {
+        sslConnectFactory.setCurrentRequest(request);
         HttpClientBuilder builder = HttpClients.custom();
         builder.setConnectionManager(tsConnectionManager);
         /*if ("https".equals(request.getProtocol())) {
@@ -164,7 +165,7 @@ public class HttpclientConnectionManager {
         // 在提交请求之前 测试连接是否可用
         configBuilder.setStaleConnectionCheckEnabled(true);
         RequestConfig requestConfig = configBuilder.build();
-        sslConnectFactory.setCurrentRequest(request);
+
         return builder
                 .setDefaultRequestConfig(requestConfig)
                 .build();
