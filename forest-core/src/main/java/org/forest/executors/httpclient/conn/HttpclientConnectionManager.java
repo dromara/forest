@@ -51,7 +51,7 @@ public class HttpclientConnectionManager {
 
     private static Lookup<AuthSchemeProvider> authSchemeRegistry;
 
-    private final ForestSSLConnectFactory sslConnectFactory = new ForestSSLConnectFactory();
+    private final ForestSSLConnectionFactory sslConnectFactory = new ForestSSLConnectionFactory();
     /**
      * maximum number of conntections allowed
      */
@@ -86,35 +86,6 @@ public class HttpclientConnectionManager {
         Integer maxConnections = DEFAULT_MAX_TOTAL_CONNECTIONS;
         Integer maxRouteConnections = 10;
         Integer connectTimeout = DEFAULT_CONNECT_TIMEOUT;
-//        try {
-//            KeyStore trustStore = KeyStore.getInstance(KeyStore
-//                    .getDefaultType());
-//            trustStore.load(null, null);
-//            SSLSocketFactory sf = new ForestSSLSocketFactory(trustStore);
-//            //允许所有主机的验证
-//            sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-//
-//            // set maximum number of conntections allowed
-//            maxConnections = configuration.getMaxConnections() != null ?
-//                    configuration.getMaxConnections() : DEFAULT_MAX_TOTAL_CONNECTIONS;
-//            ConnManagerParams.setMaxTotalConnections(httpParams, maxConnections);
-//            // set timeout in milliseconds
-//            ConnManagerParams.setTimeout(httpParams, DEFAULT_TIMEOUT);
-//            // set maximum number of connections allowed per route
-//            maxRouteConnections = configuration.getMaxRouteConnections() != null ?
-//                    configuration.getMaxRouteConnections() : maxConnections;
-//            ConnPerRouteBean connPerRoute = new ConnPerRouteBean(maxRouteConnections);
-//            ConnManagerParams.setMaxConnectionsPerRoute(httpParams,connPerRoute);
-//            // set connect timeout
-//            connectTimeout = configuration.getConnectTimeout() != null ?
-//                    configuration.getConnectTimeout() : DEFAULT_CONNECT_TIMEOUT;
-//            HttpConnectionParams.setConnectionTimeout(httpParams, connectTimeout);
-//            // set read timeout
-//            HttpConnectionParams.setSoTimeout(httpParams, DEFAULT_READ_TIMEOUT);
-//
-//            SchemeRegistry registry = new SchemeRegistry();
-//            registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-//            registry.register(new Scheme("https", sf, 443));
 
         Registry<ConnectionSocketFactory> socketFactoryRegistry =
                 RegistryBuilder.<ConnectionSocketFactory> create()
@@ -125,22 +96,6 @@ public class HttpclientConnectionManager {
         tsConnectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
         tsConnectionManager.setMaxTotal(maxConnections);
         tsConnectionManager.setDefaultMaxPerRoute(maxRouteConnections);
-
-
-//        } catch (IOException e) {
-//            throw new ForestRuntimeException(e);
-//        } catch (NoSuchAlgorithmException e) {
-//            throw new ForestRuntimeException(e);
-//        } catch (CertificateException e) {
-//            throw new ForestRuntimeException(e);
-//        } catch (UnrecoverableKeyException e) {
-//            throw new ForestRuntimeException(e);
-//        } catch (KeyStoreException e) {
-//            throw new ForestRuntimeException(e);
-//        } catch (KeyManagementException e) {
-//            throw new ForestRuntimeException(e);
-//        }
-
 
         /// init async connection manager
         boolean supportAsync = true;

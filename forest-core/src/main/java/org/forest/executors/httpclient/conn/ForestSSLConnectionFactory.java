@@ -21,7 +21,7 @@ import org.forest.http.ForestRequest;
 import org.forest.ssl.SSLKeyStore;
 
 @ThreadSafe
-public class ForestSSLConnectFactory implements LayeredConnectionSocketFactory {
+public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactory {
     public static final X509HostnameVerifier ALLOW_ALL_HOSTNAME_VERIFIER = new AllowAllHostnameVerifier();
     public static final X509HostnameVerifier BROWSER_COMPATIBLE_HOSTNAME_VERIFIER = new BrowserCompatHostnameVerifier();
     public static final X509HostnameVerifier STRICT_HOSTNAME_VERIFIER = new StrictHostnameVerifier();
@@ -41,12 +41,12 @@ public class ForestSSLConnectFactory implements LayeredConnectionSocketFactory {
         return new org.apache.http.conn.ssl.SSLConnectionSocketFactory((SSLSocketFactory)SSLSocketFactory.getDefault(), split(System.getProperty("https.protocols")), split(System.getProperty("https.cipherSuites")), BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
     }
 
-    public ForestSSLConnectFactory() {
+    public ForestSSLConnectionFactory() {
         this(BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
     }
 
 
-    public ForestSSLConnectFactory(X509HostnameVerifier hostnameVerifier) {
+    public ForestSSLConnectionFactory(X509HostnameVerifier hostnameVerifier) {
         this.hostnameVerifier = hostnameVerifier != null?hostnameVerifier:BROWSER_COMPATIBLE_HOSTNAME_VERIFIER;
     }
 
