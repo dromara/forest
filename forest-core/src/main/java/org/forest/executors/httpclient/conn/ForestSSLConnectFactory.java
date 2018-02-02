@@ -22,17 +22,12 @@ import org.forest.ssl.SSLKeyStore;
 
 @ThreadSafe
 public class ForestSSLConnectFactory implements LayeredConnectionSocketFactory {
-    public static final String TLS = "TLS";
-    public static final String SSL = "SSL";
-    public static final String SSLV2 = "SSLv2";
     public static final X509HostnameVerifier ALLOW_ALL_HOSTNAME_VERIFIER = new AllowAllHostnameVerifier();
     public static final X509HostnameVerifier BROWSER_COMPATIBLE_HOSTNAME_VERIFIER = new BrowserCompatHostnameVerifier();
     public static final X509HostnameVerifier STRICT_HOSTNAME_VERIFIER = new StrictHostnameVerifier();
 //    private final SSLSocketFactory socketfactory;
     private ThreadLocal<ForestRequest> requestLocal = new ThreadLocal<>();
     private final X509HostnameVerifier hostnameVerifier;
-    private final String[] supportedProtocols;
-    private final String[] supportedCipherSuites;
 
     public static org.apache.http.conn.ssl.SSLConnectionSocketFactory getSocketFactory() throws SSLInitializationException {
         return new org.apache.http.conn.ssl.SSLConnectionSocketFactory(SSLContexts.createDefault(), BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
@@ -52,13 +47,6 @@ public class ForestSSLConnectFactory implements LayeredConnectionSocketFactory {
 
 
     public ForestSSLConnectFactory(X509HostnameVerifier hostnameVerifier) {
-        this((String[])null, (String[])null, hostnameVerifier);
-    }
-
-    public ForestSSLConnectFactory(String[] supportedProtocols, String[] supportedCipherSuites, X509HostnameVerifier hostnameVerifier) {
-//        this.socketfactory = (SSLSocketFactory)Args.notNull(socketfactory, "SSL socket factory");
-        this.supportedProtocols = supportedProtocols;
-        this.supportedCipherSuites = supportedCipherSuites;
         this.hostnameVerifier = hostnameVerifier != null?hostnameVerifier:BROWSER_COMPATIBLE_HOSTNAME_VERIFIER;
     }
 
