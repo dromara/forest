@@ -124,7 +124,7 @@ public class HttpclientBackend implements HttpBackend {
 
     @Override
     public String getName() {
-        return "HttpClient";
+        return "httpclient";
     }
 
     @Override
