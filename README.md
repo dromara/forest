@@ -98,8 +98,7 @@ public interface Client {
 ```java
 
 ForestConfiguration configuration = ForestConfiguration.configuration();
-ProxyFactory<Client> factory = configuration.getProxyFactory(Client.class);
-Client client = factory.createInstance();
+Client client = configuration.createInstance(Client.class);
 Map result = client.getShortUrl("https://github.com/mySingleLive/forest");
 System.out.println(result);
 
