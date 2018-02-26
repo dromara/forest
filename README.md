@@ -33,7 +33,7 @@ Forest是一个高层的、极简的HTTP调用API框架。<br>
 * 已支持的JSON转换框架: Fastjson, Jackson, Gson
 * 已支持Spring集成
 * 已支持JAXB形式的XML转换
-* 现只支持文本和JSON两种响应解析方式
+* 已支持JSON解析
 * 支持Commons-Log, SLF4j, Log4J等日志框架
 * 异步请求方式还不够完善
 * 暂未发布中央仓库
