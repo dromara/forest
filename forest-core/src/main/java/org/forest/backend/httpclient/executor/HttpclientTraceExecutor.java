@@ -1,6 +1,7 @@
-package org.forest.backend.httpclient;
+package org.forest.backend.httpclient.executor;
 
 import org.apache.http.client.methods.HttpTrace;
+import org.forest.backend.httpclient.HttpclientRequestProvider;
 import org.forest.backend.httpclient.request.HttpclientRequestSender;
 import org.forest.backend.httpclient.response.HttpclientResponseHandler;
 import org.forest.backend.url.URLBuilder;

@@ -1,6 +1,7 @@
-package org.forest.backend.httpclient;
+package org.forest.backend.httpclient.executor;
 
 import org.apache.http.client.methods.HttpPost;
+import org.forest.backend.httpclient.HttpclientRequestProvider;
 import org.forest.backend.httpclient.request.HttpclientRequestSender;
 import org.forest.backend.httpclient.response.HttpclientResponseHandler;
 import org.forest.backend.url.URLBuilder;
@@ -10,7 +11,7 @@ import org.forest.http.ForestRequest;
  * @author gongjun
  * @since 2016-05-24
  */
-public class HttpclientPostExecutorHttpclient extends AbstractHttpclientEntityExecutor<HttpPost> {
+public class HttpclientPostExecutor extends AbstractHttpclientEntityExecutor<HttpPost> {
 
     private final static HttpclientRequestProvider<HttpPost> httpPostProvider =
             new HttpclientRequestProvider<HttpPost>() {
@@ -31,7 +32,7 @@ public class HttpclientPostExecutorHttpclient extends AbstractHttpclientEntityEx
     }
 
 
-    public HttpclientPostExecutorHttpclient(ForestRequest requst, HttpclientResponseHandler httpclientResponseHandler, HttpclientRequestSender requestSender) {
+    public HttpclientPostExecutor(ForestRequest requst, HttpclientResponseHandler httpclientResponseHandler, HttpclientRequestSender requestSender) {
         super(requst, httpclientResponseHandler, requestSender);
     }
 

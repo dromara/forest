@@ -1,5 +1,6 @@
 package org.forest.backend.httpclient;
 
+import org.forest.backend.httpclient.executor.*;
 import org.forest.backend.httpclient.handler.DefaultHttpclientResultHandler;
 import org.forest.config.ForestConfiguration;
 import org.forest.exceptions.ForestRuntimeException;
@@ -75,7 +76,7 @@ public class HttpclientBackend implements HttpBackend {
         executorCreatorMap.put("POST", new HttpExecutorCreator() {
             @Override
             public HttpExecutor createExecutor(HttpclientConnectionManager connectionManager, ForestRequest request, ResponseHandler responseHandler) {
-                return new HttpclientPostExecutorHttpclient(request,
+                return new HttpclientPostExecutor(request,
                         getHttpclientResponseHandler(request, responseHandler),
                         getRequestSender(connectionManager, request));
             }
@@ -84,7 +85,7 @@ public class HttpclientBackend implements HttpBackend {
         executorCreatorMap.put("PUT", new HttpExecutorCreator() {
             @Override
             public HttpExecutor createExecutor(HttpclientConnectionManager connectionManager, ForestRequest request, ResponseHandler responseHandler) {
-                return new HttpclientPutExecutorHttpclient(request,
+                return new HttpclientPutExecutor(request,
                         getHttpclientResponseHandler(request, responseHandler),
                         getRequestSender(connectionManager, request));
             }
@@ -93,7 +94,7 @@ public class HttpclientBackend implements HttpBackend {
         executorCreatorMap.put("PATCH", new HttpExecutorCreator() {
             @Override
             public HttpExecutor createExecutor(HttpclientConnectionManager connectionManager, ForestRequest request, ResponseHandler responseHandler) {
-                return new HttpclientPatchExecutorHttpclient(request,
+                return new HttpclientPatchExecutor(request,
                         getHttpclientResponseHandler(request, responseHandler),
                         getRequestSender(connectionManager, request));
             }

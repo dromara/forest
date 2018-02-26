@@ -1,4 +1,4 @@
-package org.forest.backend.httpclient;
+package org.forest.backend.httpclient.executor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,7 +16,7 @@ import java.io.*;
  */
 public abstract class AbstractHttpclientEntityExecutor<T extends HttpEntityEnclosingRequestBase> extends AbstractHttpclientExecutor<T> {
 
-    private static Log log = LogFactory.getLog(HttpclientPostExecutorHttpclient.class);
+    private static Log log = LogFactory.getLog(HttpclientPostExecutor.class);
 
     public AbstractHttpclientEntityExecutor(ForestRequest request, HttpclientResponseHandler httpclientResponseHandler, HttpclientRequestSender requestSender) {
         super(request, httpclientResponseHandler, requestSender);

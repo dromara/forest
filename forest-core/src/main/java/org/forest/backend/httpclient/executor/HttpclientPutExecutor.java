@@ -1,6 +1,7 @@
-package org.forest.backend.httpclient;
+package org.forest.backend.httpclient.executor;
 
 import org.apache.http.client.methods.HttpPut;
+import org.forest.backend.httpclient.HttpclientRequestProvider;
 import org.forest.backend.httpclient.request.HttpclientRequestSender;
 import org.forest.backend.httpclient.response.HttpclientResponseHandler;
 import org.forest.backend.url.URLBuilder;
@@ -10,7 +11,7 @@ import org.forest.http.ForestRequest;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2017-04-20 14:28
  */
-public class HttpclientPutExecutorHttpclient extends AbstractHttpclientEntityExecutor<HttpPut> {
+public class HttpclientPutExecutor extends AbstractHttpclientEntityExecutor<HttpPut> {
 
     private final static HttpclientRequestProvider<HttpPut> httpPutProvider =
             new HttpclientRequestProvider<HttpPut>() {
@@ -30,7 +31,7 @@ public class HttpclientPutExecutorHttpclient extends AbstractHttpclientEntityExe
         return URLBuilder.getSimpleURLBuilder();
     }
 
-    public HttpclientPutExecutorHttpclient(ForestRequest requst, HttpclientResponseHandler httpclientResponseHandler, HttpclientRequestSender requestSender) {
+    public HttpclientPutExecutor(ForestRequest requst, HttpclientResponseHandler httpclientResponseHandler, HttpclientRequestSender requestSender) {
         super(requst, httpclientResponseHandler, requestSender);
     }
 
