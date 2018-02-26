@@ -24,7 +24,6 @@
 
 package org.forest.http;
 
-import org.apache.http.HttpResponse;
 
 /**
  * @author gongjun[dt_flys@hotmail.com]
@@ -32,23 +31,17 @@ import org.apache.http.HttpResponse;
  */
 public class ForestResponse<T> {
 
-    private ForestRequest request;
-    private HttpResponse httpResponse;
-    private volatile Integer statusCode;
-    private volatile String content;
-    private volatile T result;
+    protected ForestRequest request;
+    protected volatile Integer statusCode;
+    protected volatile String content;
+    protected volatile T result;
 
-    public ForestResponse(ForestRequest request, HttpResponse httpResponse) {
+    public ForestResponse(ForestRequest request) {
         this.request = request;
-        this.httpResponse = httpResponse;
     }
 
     public ForestRequest getRequest() {
         return request;
-    }
-
-    public HttpResponse getHttpResponse() {
-        return httpResponse;
     }
 
     public synchronized void setContent(String content) {

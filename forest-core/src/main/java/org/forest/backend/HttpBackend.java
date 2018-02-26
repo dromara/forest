@@ -1,6 +1,7 @@
 package org.forest.backend;
 
 import org.forest.handler.ResponseHandler;
+import org.forest.handler.ResultHandler;
 import org.forest.http.ForestRequest;
 
 /**
@@ -11,6 +12,8 @@ import org.forest.http.ForestRequest;
 public interface HttpBackend {
 
     String getName();
+
+    ResultHandler getDefaultResultHandler();
 
     HttpExecutor createExecutor(ForestRequest request, ResponseHandler responseHandler);
 

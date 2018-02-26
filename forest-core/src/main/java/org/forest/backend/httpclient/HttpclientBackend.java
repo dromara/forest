@@ -1,5 +1,6 @@
 package org.forest.backend.httpclient;
 
+import org.forest.backend.httpclient.handler.DefaultHttpclientResultHandler;
 import org.forest.config.ForestConfiguration;
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.backend.HttpExecutor;
@@ -10,6 +11,7 @@ import org.forest.backend.httpclient.request.HttpclientRequestSender;
 import org.forest.backend.httpclient.request.SyncHttpclientRequestSender;
 import org.forest.backend.httpclient.response.HttpclientResponseHandler;
 import org.forest.handler.ResponseHandler;
+import org.forest.handler.ResultHandler;
 import org.forest.http.ForestRequest;
 
 import java.util.HashMap;
@@ -122,6 +124,11 @@ public class HttpclientBackend implements HttpBackend {
     @Override
     public String getName() {
         return "HttpClient";
+    }
+
+    @Override
+    public ResultHandler getDefaultResultHandler() {
+        return new DefaultHttpclientResultHandler();
     }
 
     @Override

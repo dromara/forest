@@ -1,9 +1,11 @@
-package org.forest.handler;
+package org.forest.backend.httpclient.handler;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.util.EntityUtils;
+import org.forest.backend.httpclient.response.HttpclientForestResponse;
 import org.forest.converter.ForestConverter;
 import org.forest.exceptions.ForestHandlerException;
+import org.forest.handler.ResultHandler;
 import org.forest.utils.ForestDataType;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
@@ -15,14 +17,15 @@ import java.lang.reflect.Type;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2016-05-25
  */
-public class DefaultResultHandler extends ResultHandler {
+public class DefaultHttpclientResultHandler extends ResultHandler {
 
     public Object getResult(ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
         Object result = response.getResult();
         if (result != null && resultClass.isAssignableFrom(result.getClass())) {
             return result;
         }
-        HttpEntity entity = response.getHttpResponse().getEntity();
+        HttpclientForestResponse httpclientForestResponse = (HttpclientForestResponse) response;
+        HttpEntity entity = httpclientForestResponse.getHttpResponse().getEntity();
         if (entity != null) {
             try {
                 if (void.class.isAssignableFrom(resultClass)) {

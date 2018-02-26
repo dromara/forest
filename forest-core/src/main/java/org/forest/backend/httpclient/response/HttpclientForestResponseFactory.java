@@ -44,7 +44,7 @@ public class HttpclientForestResponseFactory implements ForestResponseFactory<Ht
                     new BasicStatusLine(
                             new ProtocolVersion("1.1", 1, 1), 404, ""));
         }
-        ForestResponse response = new ForestResponse(request, httpResponse);
+        HttpclientForestResponse response = new HttpclientForestResponse(request, httpResponse);
         int statusCode = httpResponse.getStatusLine().getStatusCode();
         response.setStatusCode(statusCode);
         httpResponse.getAllHeaders();

@@ -1,18 +1,16 @@
 package org.forest.reflection;
 
-import org.apache.http.HttpResponse;
 import org.forest.callback.OnSuccess;
+import org.forest.config.ForestConfiguration;
 import org.forest.exceptions.ForestNetworkException;
 import org.forest.exceptions.ForestRuntimeException;
-import org.forest.handler.DefaultResultHandler;
+import org.forest.backend.httpclient.handler.DefaultHttpclientResultHandler;
 import org.forest.handler.ResponseHandler;
 import org.forest.handler.ResultHandler;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
 
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.concurrent.*;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -22,21 +20,25 @@ public class MethodResponseHandler<T> implements ResponseHandler {
 
     private final ForestMethod method;
 
+    private final ForestConfiguration configuration;
+
     private final Type returnType;
 
     private final Class returnClass;
 
     private final Class onSuccessClassGenericType;
 
-    private final ResultHandler resultHandler = new DefaultResultHandler();
+    private final ResultHandler resultHandler;
 
     private volatile T resultData;
 
-    public MethodResponseHandler(ForestMethod method, Class onSuccessClassGenericType) {
+    public MethodResponseHandler(ForestMethod method, ForestConfiguration configuration, Class onSuccessClassGenericType) {
         this.method = method;
+        this.configuration = configuration;
         this.onSuccessClassGenericType = onSuccessClassGenericType;
         this.returnType = method.getReturnType();
         this.returnClass = method.getReturnClass();
+        this.resultHandler = configuration.getBackend().getDefaultResultHandler();
     }
 
     @Override
