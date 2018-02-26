@@ -1,4 +1,4 @@
-package org.forest.converter;
+package org.forest.converter.json;
 
 import org.forest.converter.json.ForestFastjsonConverter;
 import org.forest.converter.json.ForestGsonConverter;

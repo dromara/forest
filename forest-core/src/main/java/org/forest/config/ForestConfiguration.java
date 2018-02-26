@@ -26,7 +26,7 @@ package org.forest.config;
 
 
 import org.forest.converter.ForestConverter;
-import org.forest.converter.JSONConverterSelector;
+import org.forest.converter.json.JSONConverterSelector;
 import org.forest.converter.json.ForestJsonConverter;
 import org.forest.converter.xml.ForestJaxbConverter;
 import org.forest.converter.xml.ForestXmlConverter;
