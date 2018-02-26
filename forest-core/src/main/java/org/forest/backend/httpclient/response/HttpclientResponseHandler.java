@@ -3,7 +3,6 @@ package org.forest.backend.httpclient.response;
 import org.apache.http.HttpResponse;
 import org.forest.exceptions.ForestNetworkException;
 import org.forest.handler.ResponseHandler;
-import org.forest.http.ForestFuture;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
 import org.forest.http.ForestResponseFactory;
@@ -85,7 +84,7 @@ public class HttpclientResponseHandler {
             final Future<HttpResponse> httpResponseFuture,
             final Class<T> innerType,
             final ForestResponseFactory forestResponseFactory) {
-        ForestFuture<T> future = new ForestFuture<>(
+        HttpclientForestFuture<T> future = new HttpclientForestFuture<>(
                 request, innerType, responseHandler, httpResponseFuture, forestResponseFactory);
         responseHandler.handleResult(future);
     }

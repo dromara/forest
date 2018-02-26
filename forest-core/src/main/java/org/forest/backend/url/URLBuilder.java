@@ -4,6 +4,7 @@ package org.forest.backend.url;
 import org.forest.http.ForestRequest;
 
 /**
+ * URL构造器
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-19 14:09
  */

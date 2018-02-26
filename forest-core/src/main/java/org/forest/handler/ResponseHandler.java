@@ -1,11 +1,9 @@
 package org.forest.handler;
 
-import org.apache.http.HttpResponse;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
 
 import java.lang.reflect.Type;
-import java.util.concurrent.Future;
 
 
 /**

@@ -11,6 +11,7 @@ import java.net.URLEncoder;
 import java.util.List;
 
 /**
+ * 带查询参数的URL构造器
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-19 14:11
  */

@@ -1,7 +1,10 @@
-package org.forest.http;
+package org.forest.backend.httpclient.response;
 
 import org.apache.http.HttpResponse;
 import org.forest.handler.ResponseHandler;
+import org.forest.http.ForestRequest;
+import org.forest.http.ForestResponse;
+import org.forest.http.ForestResponseFactory;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -12,18 +15,18 @@ import java.util.concurrent.TimeoutException;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-08-03 14:53
  */
-public class ForestFuture<T> implements Future<T> {
+public class HttpclientForestFuture<T> implements Future<T> {
     private final ForestRequest request;
     private final Class<T> innerType;
     private final ResponseHandler responseHandler;
     private final Future<HttpResponse> httpResponseFuture;
     private final ForestResponseFactory forestResponseFactory;
 
-    public ForestFuture(ForestRequest request,
-                        Class<T> innerType,
-                        ResponseHandler responseHandler,
-                        Future<HttpResponse> httpResponseFuture,
-                        ForestResponseFactory forestResponseFactory) {
+    public HttpclientForestFuture(ForestRequest request,
+                                  Class<T> innerType,
+                                  ResponseHandler responseHandler,
+                                  Future<HttpResponse> httpResponseFuture,
+                                  ForestResponseFactory forestResponseFactory) {
         this.request = request;
         this.innerType = innerType;
         this.responseHandler = responseHandler;
