@@ -73,7 +73,7 @@ Forest是一个高层的、极简的HTTP调用API框架。<br>
 import org.forest.annotation.Request;
 import org.forest.annotation.DataParam;
 
-public interface Www {
+public interface Client {
 
     /**
      * 百度短链接API
@@ -98,9 +98,9 @@ public interface Www {
 ```java
 
 ForestConfiguration configuration = ForestConfiguration.configuration();
-ProxyFactory<Www> factory = configuration.getProxyFactory(Www.class);
-Www www = factory.createInstance();
-Map result = www.getShortUrl("https://github.com/mySingleLive/forest");
+ProxyFactory<Client> factory = configuration.getProxyFactory(Client.class);
+Client client = factory.createInstance();
+Map result = client.getShortUrl("https://github.com/mySingleLive/forest");
 System.out.println(result);
 
 ```
