@@ -3,7 +3,7 @@ package org.forest.test.http;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.forest.config.ForestConfiguration;
-import org.forest.executors.httpclient.response.HttpclientForestResponseFactory;
+import org.forest.backend.httpclient.response.HttpclientForestResponseFactory;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
 import org.junit.Test;

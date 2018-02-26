@@ -345,7 +345,7 @@ public class ForestMethod<T> implements VariableScope {
             sslKeyStore = configuration.getKeyStore(sslKeyStoreId);
         }
 
-        // create and initialize http instance
+        // createExecutor and initialize http instance
         ForestRequest<T> request = new ForestRequest(configuration);
         request.setProtocol(protocol)
                 .setUrl(newUrl)
@@ -493,7 +493,7 @@ public class ForestMethod<T> implements VariableScope {
         ForestRequest request = makeRequest(args);
         MethodResponseHandler<T> responseHandler = new MethodResponseHandler<>(
                 this, onSuccessClassGenericType);
-        request.execute(configuration.getExecutorFactory(), responseHandler);
+        request.execute(configuration.getBackend(), responseHandler);
         return responseHandler.getResultData();
     }
 

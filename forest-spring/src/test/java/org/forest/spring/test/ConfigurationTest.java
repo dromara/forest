@@ -18,7 +18,7 @@ public class ConfigurationTest extends TestCase {
         ForestConfiguration forestConfiguration =
                 (ForestConfiguration) applicationContext.getBean("forestConfiguration");
         assertNotNull(forestConfiguration);
-        assertNotNull(forestConfiguration.getExecutorFactory());
+        assertNotNull(forestConfiguration.getBackend());
         assertEquals(forestConfiguration.getTimeout(), new Integer(30000));
         assertEquals(forestConfiguration.getConnectTimeout(), new Integer(10000));
         assertEquals(forestConfiguration.getMaxConnections(), new Integer(500));

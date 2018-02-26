@@ -31,8 +31,8 @@ import org.forest.converter.json.ForestJsonConverter;
 import org.forest.converter.xml.ForestJaxbConverter;
 import org.forest.converter.xml.ForestXmlConverter;
 import org.forest.exceptions.ForestRuntimeException;
-import org.forest.executors.ForestExecutorFactory;
-import org.forest.executors.httpclient.HttpclientExecutorFactory;
+import org.forest.backend.HttpBackend;
+import org.forest.backend.httpclient.HttpclientBackend;
 import org.forest.filter.Filter;
 import org.forest.filter.JSONFilter;
 import org.forest.filter.XmlFilter;
@@ -78,7 +78,7 @@ public class ForestConfiguration implements Serializable {
      */
     private Integer retryCount;
 
-    private ForestExecutorFactory executorFactory;
+    private HttpBackend backend;
 
     private List<RequestNameValue> defaultParameters;
 
@@ -103,7 +103,7 @@ public class ForestConfiguration implements Serializable {
         configuration.setJsonConverterSelector(new JSONConverterSelector());
         configuration.setXmlConverter(new ForestJaxbConverter());
         setupJSONConverter(configuration);
-        setupExecutorFactory(configuration);
+        setupBackend(configuration);
         configuration.setTimeout(3000);
         configuration.setConnectTimeout(2000);
         configuration.setMaxConnections(500);
@@ -113,8 +113,8 @@ public class ForestConfiguration implements Serializable {
         return configuration;
     }
 
-    private static void setupExecutorFactory(ForestConfiguration configuration) {
-        configuration.executorFactory = new HttpclientExecutorFactory(configuration);
+    private static void setupBackend(ForestConfiguration configuration) {
+        configuration.backend = new HttpclientBackend(configuration);
     }
 
     private static void setupJSONConverter(ForestConfiguration configuration) {
@@ -207,8 +207,8 @@ public class ForestConfiguration implements Serializable {
         return new ProxyFactory<T>(this, clazz);
     }
 
-    public ForestExecutorFactory getExecutorFactory() {
-        return executorFactory;
+    public HttpBackend getBackend() {
+        return backend;
     }
 
     public void setVariableValue(String name, Object value) {

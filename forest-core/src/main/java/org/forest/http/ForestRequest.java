@@ -28,8 +28,8 @@ import org.forest.callback.OnError;
 import org.forest.callback.OnSuccess;
 import org.forest.config.ForestConfiguration;
 import org.forest.exceptions.ForestRuntimeException;
-import org.forest.executors.ForestExecutorFactory;
-import org.forest.executors.HttpExecutor;
+import org.forest.backend.HttpBackend;
+import org.forest.backend.HttpExecutor;
 import org.forest.handler.ResponseHandler;
 import org.forest.interceptor.Interceptor;
 import org.forest.interceptor.InterceptorChain;
@@ -339,8 +339,8 @@ public class ForestRequest<T> {
         return this;
     }
 
-    public void execute(ForestExecutorFactory executorFactory, ResponseHandler responseHandler) {
-        HttpExecutor executor  = executorFactory.create(this, responseHandler);
+    public void execute(HttpBackend backend, ResponseHandler responseHandler) {
+        HttpExecutor executor  = backend.createExecutor(this, responseHandler);
         if (executor != null) {
             if (interceptorChain.beforeExecute(this)) {
                 try {
