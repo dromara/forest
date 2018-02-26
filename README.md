@@ -8,11 +8,12 @@
 项目介绍：
 -------------------------------------
 
-Forest是一个通过动态代理模式实现的HTTP客户端框架。<br>
+Forest是一个高层的、极简的HTTP调用API框架。<br>
 相比直接使用Httpclient您不再用写一大堆重复的代码了，只需像调用本地方法一样调用HTTP链接。
 
 项目特点：
 -----
+* 以Httpclient、以及以后OkHttp为后端框架
 * 通过调用本地方法的方式去发送Http请求
 * 基于本地接口方法的定义
 * 基于注解、配置化的方式定义Http请求
@@ -34,22 +35,15 @@ Forest是一个通过动态代理模式实现的HTTP客户端框架。<br>
 * 已支持JAXB形式的XML转换
 * 现只支持文本和JSON两种响应解析方式
 * 支持Commons-Log, SLF4j, Log4J等日志框架
-* 暂不支持异步请求方式 (计划中)
-
+* 异步请求方式还不够完善
+* 暂未发布中央仓库
 
 如何获取：
 -------------------------------------
 
 ### Maven配置
 
-设置maven仓库地址
-
-```xml
-    <repository>
-        <id>mySingleLive-maven-repo</id>
-        <url>https://raw.githubusercontent.com/mySingleLive/maven-repo/master/repository</url>
-    </repository>
-```
+* 由于暂未发布到中央仓库，所以请将代码pull到本地后install或deploy到私有仓库
 
 依赖配置
 
