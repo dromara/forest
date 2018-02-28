@@ -1,6 +1,5 @@
 package org.forest.backend.httpclient.response;
 
-import org.apache.http.HttpResponse;
 import org.forest.handler.ResponseHandler;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
@@ -15,17 +14,17 @@ import java.util.concurrent.TimeoutException;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-08-03 14:53
  */
-public class HttpclientForestFuture<T> implements Future<T> {
+public class HttpclientForestFuture<T, R> implements Future<T> {
     private final ForestRequest request;
     private final Class<T> innerType;
     private final ResponseHandler responseHandler;
-    private final Future<HttpResponse> httpResponseFuture;
+    private final Future<R> httpResponseFuture;
     private final ForestResponseFactory forestResponseFactory;
 
     public HttpclientForestFuture(ForestRequest request,
                                   Class<T> innerType,
                                   ResponseHandler responseHandler,
-                                  Future<HttpResponse> httpResponseFuture,
+                                  Future<R> httpResponseFuture,
                                   ForestResponseFactory forestResponseFactory) {
         this.request = request;
         this.innerType = innerType;
@@ -49,7 +48,10 @@ public class HttpclientForestFuture<T> implements Future<T> {
         return httpResponseFuture.isDone();
     }
 
-    private T getResult(HttpResponse httpResponse) throws InterruptedException {
+    private T getResult(R httpResponse) throws InterruptedException {
+        if (httpResponse != null && innerType.isAssignableFrom(httpResponse.getClass())) {
+            return (T) httpResponse;
+        }
         ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
         Object ret = responseHandler.handleResultType(request, response, innerType, innerType);
         return (T) ret;
@@ -57,13 +59,13 @@ public class HttpclientForestFuture<T> implements Future<T> {
 
     @Override
     public T get() throws InterruptedException, ExecutionException {
-        HttpResponse httpResponse = httpResponseFuture.get();
+        R httpResponse = httpResponseFuture.get();
         return getResult(httpResponse);
     }
 
     @Override
     public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        HttpResponse httpResponse = httpResponseFuture.get(timeout, unit);
+        R httpResponse = httpResponseFuture.get(timeout, unit);
         return getResult(httpResponse);
     }
 }

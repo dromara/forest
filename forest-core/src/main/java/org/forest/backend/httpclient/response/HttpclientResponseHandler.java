@@ -1,7 +1,7 @@
 package org.forest.backend.httpclient.response;
 
 import org.apache.http.HttpResponse;
-import org.forest.exceptions.ForestNetworkException;
+import org.forest.backend.BackbendResponseHandler;
 import org.forest.handler.ResponseHandler;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
@@ -16,45 +16,22 @@ import java.util.concurrent.Future;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-19 15:46
  */
-public class HttpclientResponseHandler {
-
-    protected final ForestRequest request;
-
-    protected final ResponseHandler responseHandler;
+public class HttpclientResponseHandler extends BackbendResponseHandler<HttpResponse> {
 
     public HttpclientResponseHandler(ForestRequest request, ResponseHandler responseHandler) {
-        this.request = request;
-        this.responseHandler = responseHandler;
+        super(request, responseHandler);
     }
 
     public void handleSync(HttpResponse httpResponse, ForestResponse response) {
         int statusCode = httpResponse.getStatusLine().getStatusCode();
-        responseHandler.handleSync(request, response);
-        if (response.isError()) {
-            throw new ForestNetworkException(
-                    httpResponse.getStatusLine().getReasonPhrase(), statusCode, response);
-        }
-    }
-
-
-    public void handleSuccess(ForestResponse response) {
-        Class onSuccessGenericType = responseHandler.getOnSuccessClassGenericType();
-        Object resultData = responseHandler.handleResultType(request, response, onSuccessGenericType, onSuccessGenericType);
-        responseHandler.handleSuccess(resultData, request, response);
-    }
-
-    public void handleError(ForestResponse response) {
-        responseHandler.handleError(request, response);
-    }
-
-    public void handleError(ForestResponse response, Exception ex) {
-        responseHandler.handleError(request, response, ex);
+        String msg = httpResponse.getStatusLine().getReasonPhrase();
+        handleSync(response, statusCode, msg);
     }
 
 
     public void handleFuture(
-                     final Future<HttpResponse> httpResponseFuture,
-                     ForestResponseFactory forestResponseFactory) {
+            final Future httpResponseFuture,
+            ForestResponseFactory forestResponseFactory) {
         Type returnType = responseHandler.getReturnType();
         Type paramType;
         Class paramClass = null;
@@ -76,18 +53,13 @@ public class HttpclientResponseHandler {
             paramClass = Object.class;
         }
         handleFutureResult(httpResponseFuture, paramClass, forestResponseFactory);
-
     }
 
 
-    private  <T> void handleFutureResult(
-            final Future<HttpResponse> httpResponseFuture,
-            final Class<T> innerType,
-            final ForestResponseFactory forestResponseFactory) {
-        HttpclientForestFuture<T> future = new HttpclientForestFuture<>(
+    protected void handleFutureResult(Future httpResponseFuture, Class innerType, ForestResponseFactory forestResponseFactory) {
+        HttpclientForestFuture<HttpResponse, HttpResponse> future = new HttpclientForestFuture<>(
                 request, innerType, responseHandler, httpResponseFuture, forestResponseFactory);
         responseHandler.handleResult(future);
     }
-
 
 }

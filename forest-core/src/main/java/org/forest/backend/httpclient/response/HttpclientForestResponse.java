@@ -1,8 +1,14 @@
 package org.forest.backend.httpclient.response;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
+import org.forest.exceptions.ForestRuntimeException;
 import org.forest.http.ForestRequest;
 import org.forest.http.ForestResponse;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -10,14 +16,33 @@ import org.forest.http.ForestResponse;
  */
 public class HttpclientForestResponse extends ForestResponse {
 
-    private HttpResponse httpResponse;
+    private final HttpResponse httpResponse;
+
+    private final HttpEntity entity;
 
     public HttpclientForestResponse(ForestRequest request, HttpResponse httpResponse) {
         super(request);
         this.httpResponse = httpResponse;
+        this.entity = httpResponse.getEntity();
+        this.statusCode = httpResponse.getStatusLine().getStatusCode();
     }
 
     public HttpResponse getHttpResponse() {
         return httpResponse;
+    }
+
+    @Override
+    public boolean isReceivedResponseData() {
+        return entity != null;
+    }
+
+    @Override
+    public byte[] getReceivedDataAsByteArray() throws IOException {
+        return EntityUtils.toByteArray(entity);
+    }
+
+    @Override
+    public InputStream getReceivedDataAsInputStream() throws IOException {
+        return entity.getContent();
     }
 }

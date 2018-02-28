@@ -45,9 +45,9 @@ public class HttpclientForestResponseFactory implements ForestResponseFactory<Ht
                             new ProtocolVersion("1.1", 1, 1), 404, ""));
         }
         HttpclientForestResponse response = new HttpclientForestResponse(request, httpResponse);
-        int statusCode = httpResponse.getStatusLine().getStatusCode();
-        response.setStatusCode(statusCode);
-        httpResponse.getAllHeaders();
+//        int statusCode = httpResponse.getStatusLine().getStatusCode();
+//        response.setStatusCode(statusCode);
+//        httpResponse.getAllHeaders();
         HttpEntity entity = response.getHttpResponse().getEntity();
         if (entity != null) {
             try {

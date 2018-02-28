@@ -1,5 +1,6 @@
 package org.forest.test.http;
 
+import org.forest.backend.okhttp3.OkHttp3Backend;
 import org.forest.callback.OnSuccess;
 import org.forest.config.ForestConfiguration;
 import org.forest.http.ForestRequest;
@@ -37,6 +38,7 @@ public class TestCallbackClient {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
+        configuration.setBackend(new OkHttp3Backend());
         callbackClient = configuration.createInstance(CallbackClient.class);
     }
 

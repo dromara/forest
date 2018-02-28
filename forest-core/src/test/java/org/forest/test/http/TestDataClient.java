@@ -1,5 +1,6 @@
 package org.forest.test.http;
 
+import org.forest.backend.HttpBackend;
 import org.forest.config.ForestConfiguration;
 import org.forest.test.http.client.DataClient;
 import org.forest.test.mock.DataMockServer;
@@ -17,7 +18,7 @@ import static junit.framework.Assert.assertNotNull;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-06-06 16:12
  */
-public class TestDataClient {
+public class TestDataClient extends BaseClientTest {
 
     private final static Logger log = LoggerFactory.getLogger(TestDataClient.class);
 
@@ -32,9 +33,12 @@ public class TestDataClient {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
-        dataClient = configuration.createInstance(DataClient.class);
     }
 
+    public TestDataClient(HttpBackend backend) {
+        super(backend, configuration);
+        dataClient = configuration.createInstance(DataClient.class);
+    }
 
     @Before
     public void prepareMockServer() {

@@ -1,6 +1,8 @@
 package org.forest.test.http;
 
 import org.apache.http.HttpHeaders;
+import org.forest.backend.HttpBackend;
+import org.forest.backend.okhttp3.OkHttp3Backend;
 import org.forest.config.ForestConfiguration;
 import org.forest.http.ForestResponse;
 import org.forest.test.http.client.OptionsClient;
@@ -23,7 +25,7 @@ import static org.mockserver.model.HttpResponse.response;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-11 18:26
  */
-public class TestOptionsClient {
+public class TestOptionsClient extends BaseClientTest {
 
     private final static Logger log = LoggerFactory.getLogger(TestOptionsClient.class);
 
@@ -38,6 +40,10 @@ public class TestOptionsClient {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
+    }
+
+    public TestOptionsClient(HttpBackend backend) {
+        super(backend, configuration);
         optionsClient = configuration.createInstance(OptionsClient.class);
     }
 

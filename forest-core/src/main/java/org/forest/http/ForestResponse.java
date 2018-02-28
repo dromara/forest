@@ -25,11 +25,13 @@
 package org.forest.http;
 
 
+import java.io.InputStream;
+
 /**
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-03-25 16:33
  */
-public class ForestResponse<T> {
+public abstract class ForestResponse<T> {
 
     protected ForestRequest request;
     protected volatile Integer statusCode;
@@ -76,5 +78,11 @@ public class ForestResponse<T> {
     public boolean isError() {
         return !isSuccess();
     }
+
+    public abstract boolean isReceivedResponseData();
+
+    public abstract byte[] getReceivedDataAsByteArray() throws Exception;
+
+    public abstract InputStream getReceivedDataAsInputStream() throws Exception;
 
 }

@@ -1,7 +1,10 @@
 package org.forest.test.http;
 
+import org.forest.backend.HttpBackend;
+import org.forest.backend.okhttp3.OkHttp3Backend;
 import org.forest.config.ForestConfiguration;
 import org.forest.http.ForestResponse;
+import org.forest.test.http.client.GetClient;
 import org.forest.test.http.client.HeadClient;
 import org.forest.test.mock.HeadMockServer;
 import org.junit.Before;
@@ -17,7 +20,7 @@ import static junit.framework.Assert.*;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-11 17:50
  */
-public class TestHeadClient {
+public class TestHeadClient extends BaseClientTest {
 
     private final static Logger log = LoggerFactory.getLogger(TestHeadClient.class);
 
@@ -32,9 +35,13 @@ public class TestHeadClient {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
-        headClient = configuration.createInstance(HeadClient.class);
     }
 
+    public TestHeadClient(HttpBackend backend) {
+        super(backend, configuration);
+        headClient = configuration.createInstance(HeadClient.class);
+
+    }
 
     @Before
     public void prepareMockServer() {

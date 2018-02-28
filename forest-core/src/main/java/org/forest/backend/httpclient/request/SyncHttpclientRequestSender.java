@@ -80,6 +80,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             connectionManager.afterConnect();
         }
         try {
+
             responseHandler.handleSync(httpResponse, response);
         } catch (Exception ex) {
             if (ex instanceof ForestRuntimeException) {

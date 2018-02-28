@@ -11,10 +11,6 @@ import org.forest.http.ForestResponse;
  */
 public interface HttpExecutor {
 
-    ForestRequest getRequest();
-
-    ForestResponse getResponse();
-
     void execute(ResponseHandler responseHandler);
 
     void close();

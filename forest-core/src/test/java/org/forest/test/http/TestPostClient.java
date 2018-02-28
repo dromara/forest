@@ -1,5 +1,7 @@
 package org.forest.test.http;
 
+import org.forest.backend.HttpBackend;
+import org.forest.backend.okhttp3.OkHttp3Backend;
 import org.forest.config.ForestConfiguration;
 import org.forest.test.http.client.PostClient;
 import org.forest.test.http.model.UserParam;
@@ -18,7 +20,7 @@ import static org.junit.Assert.assertNotNull;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-11 16:55
  */
-public class TestPostClient {
+public class TestPostClient extends BaseClientTest {
 
     private final static Logger log = LoggerFactory.getLogger(TestPostClient.class);
 
@@ -33,9 +35,12 @@ public class TestPostClient {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
-        postClient = configuration.createInstance(PostClient.class);
     }
 
+    public TestPostClient(HttpBackend backend) {
+        super(backend, configuration);
+        postClient = configuration.createInstance(PostClient.class);
+    }
 
     @Before
     public void prepareMockServer() {

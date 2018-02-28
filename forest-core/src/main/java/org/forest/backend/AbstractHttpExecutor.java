@@ -18,22 +18,26 @@ public abstract class AbstractHttpExecutor implements HttpExecutor {
 
     protected ForestResponse response;
 
+/*
     public ForestRequest getRequest() {
         return request;
     }
+*/
 
     public AbstractHttpExecutor(ForestRequest request, HttpclientRequestSender requestSender) {
         this.request = request;
         this.requestSender = requestSender;
     }
 
-    public ForestResponse getResponse() {
-        return response;
-    }
+//    public ForestResponse getResponse() {
+//        return response;
+//    }
 
+/*
     public void setResponse(ForestResponse response) {
         this.response = response;
     }
+*/
 
     public abstract void execute(ResponseHandler responseHandler);
 

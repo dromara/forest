@@ -1,5 +1,6 @@
 package org.forest.test.http;
 
+import org.forest.backend.okhttp3.OkHttp3Backend;
 import org.forest.callback.OnError;
 import org.forest.callback.OnSuccess;
 import org.forest.config.ForestConfiguration;
@@ -41,6 +42,7 @@ public class TestAsyncGetClient {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
+        configuration.setBackend(new OkHttp3Backend());
         getClient = configuration.createInstance(GetClient.class);
     }
 

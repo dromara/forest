@@ -25,6 +25,7 @@ import org.apache.http.nio.reactor.ConnectingIOReactor;
 import org.apache.http.nio.reactor.IOReactorException;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
+import org.forest.backend.ForestConnectionManager;
 import org.forest.config.ForestConfiguration;
 import org.forest.exceptions.ForestUnsupportException;
 import org.forest.http.ForestRequest;
@@ -32,11 +33,15 @@ import org.forest.http.ForestRequest;
 import java.nio.charset.CodingErrorAction;
 import java.security.*;
 
+import static org.forest.backend.HttpConnectionConstants.DEFAULT_CONNECT_TIMEOUT;
+import static org.forest.backend.HttpConnectionConstants.DEFAULT_MAX_TOTAL_CONNECTIONS;
+import static org.forest.backend.HttpConnectionConstants.DEFAULT_READ_TIMEOUT;
+
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-04-20 17:23
  */
-public class HttpclientConnectionManager {
+public class HttpclientConnectionManager implements ForestConnectionManager {
     private HttpParams httpParams;
     private static PoolingHttpClientConnectionManager tsConnectionManager;
 
@@ -45,28 +50,12 @@ public class HttpclientConnectionManager {
     private static Lookup<AuthSchemeProvider> authSchemeRegistry;
 
     private final ForestSSLConnectionFactory sslConnectFactory = new ForestSSLConnectionFactory();
-    /**
-     * maximum number of conntections allowed
-     */
-    public final static int DEFAULT_MAX_TOTAL_CONNECTIONS = 500;
-    /**
-     * timeout in milliseconds used when retrieving
-     */
-    public final static int DEFAULT_TIMEOUT = 60000;
-    /**
-     * connect timeout
-     */
-    public final static int DEFAULT_CONNECT_TIMEOUT = 10000;
-    /**
-     * read timeout
-     */
-    public final static int DEFAULT_READ_TIMEOUT = 10000;
 
-    public HttpclientConnectionManager(ForestConfiguration configuration) {
+    public HttpclientConnectionManager() {
         synchronized (HttpclientConnectionManager.class) {
             if (tsConnectionManager == null) {
                 try {
-                    init(configuration);
+                    init();
                 } catch (IOReactorException e) {
                     e.printStackTrace();
                 }
@@ -74,7 +63,7 @@ public class HttpclientConnectionManager {
         }
     }
 
-    public void init(ForestConfiguration configuration) throws IOReactorException {
+    public void init() throws IOReactorException {
         httpParams = new BasicHttpParams();
         Integer maxConnections = DEFAULT_MAX_TOTAL_CONNECTIONS;
         Integer maxRouteConnections = 10;

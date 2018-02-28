@@ -1,5 +1,7 @@
 package org.forest.test.http;
 
+import org.forest.backend.HttpBackend;
+import org.forest.backend.okhttp3.OkHttp3Backend;
 import org.forest.config.ForestConfiguration;
 import org.forest.test.http.client.PatchClient;
 import org.forest.test.mock.PatchMockServer;
@@ -18,7 +20,7 @@ import static junit.framework.Assert.assertNotNull;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-11 17:13
  */
-public class TestPatchClient {
+public class TestPatchClient extends BaseClientTest {
 
     private final static Logger log = LoggerFactory.getLogger(TestPatchClient.class);
 
@@ -33,6 +35,10 @@ public class TestPatchClient {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
+    }
+
+    public TestPatchClient(HttpBackend backend) {
+        super(backend, configuration);
         patchClient = configuration.createInstance(PatchClient.class);
     }
 
@@ -42,24 +48,24 @@ public class TestPatchClient {
     }
 
     @Test
-    public void testSimplePut() {
-        String result = patchClient.simplePut();
+    public void testSimplePatch() {
+        String result = patchClient.simplePatch();
         log.info("response: " + result);
         assertNotNull(result);
         assertEquals(PutMockServer.EXPECTED, result);
     }
 
     @Test
-    public void testTextParamPut() {
-        String result = patchClient.textParamPut("foo", "123456");
+    public void testTextParamPatch() {
+        String result = patchClient.textParamPatch("foo", "123456");
         log.info("response: " + result);
         assertNotNull(result);
         assertEquals(PutMockServer.EXPECTED, result);
     }
 
     @Test
-    public void testAnnParamPut() {
-        String result = patchClient.annParamPut("foo", "123456");
+    public void testAnnParamPatch() {
+        String result = patchClient.annParamPatch("foo", "123456");
         log.info("response: " + result);
         assertNotNull(result);
         assertEquals(PutMockServer.EXPECTED, result);

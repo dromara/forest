@@ -18,7 +18,7 @@ public interface DeleteClient {
 
 
     @Request(
-            url = "http://localhost:5000/xx/user",
+            url = "http://localhost:5000/xx/user/data",
             type = "delete",
             headers = {"Accept:text/plan"},
             data = "username=${0}"
@@ -27,7 +27,7 @@ public interface DeleteClient {
 
 
     @Request(
-            url = "http://localhost:5000/xx/user",
+            url = "http://localhost:5000/xx/user/data",
             type = "delete",
             headers = {"Accept:text/plan"}
     )

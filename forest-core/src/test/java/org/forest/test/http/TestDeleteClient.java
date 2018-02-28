@@ -1,8 +1,11 @@
 package org.forest.test.http;
 
 import org.apache.http.HttpHeaders;
+import org.forest.backend.HttpBackend;
+import org.forest.backend.okhttp3.OkHttp3Backend;
 import org.forest.config.ForestConfiguration;
 import org.forest.test.http.client.DeleteClient;
+import org.forest.test.http.client.GetClient;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -22,7 +25,7 @@ import static org.mockserver.model.HttpResponse.response;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-11 17:24
  */
-public class TestDeleteClient {
+public class TestDeleteClient extends BaseClientTest {
 
     private final static Logger log = LoggerFactory.getLogger(TestDeleteClient.class);
 
@@ -39,6 +42,10 @@ public class TestDeleteClient {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
+    }
+
+    public TestDeleteClient(HttpBackend backend) {
+        super(backend, configuration);
         deleteClient = configuration.createInstance(DeleteClient.class);
     }
 
@@ -56,6 +63,19 @@ public class TestDeleteClient {
                         .withStatusCode(200)
                         .withBody(expected)
         );
+
+        mockClient.when(
+                request()
+                        .withPath("/xx/user/data")
+                        .withMethod("DELETE")
+                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plan"))
+                        .withBody("username=foo")
+        ).respond(
+                response()
+                        .withStatusCode(200)
+                        .withBody(expected)
+        );
+
     }
 
     @Test

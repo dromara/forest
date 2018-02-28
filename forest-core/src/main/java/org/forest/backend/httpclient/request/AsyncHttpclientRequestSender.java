@@ -33,10 +33,11 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
 
         final Future<HttpResponse> future = client.execute(httpRequest, new FutureCallback<HttpResponse>() {
             public void completed(final HttpResponse httpResponse) {
-                System.out.println("[Forest Test] Thread: " + Thread.currentThread().getName());
                 ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
                 if (response.isSuccess()) {
-                    responseHandler.handleSuccess(response);
+                    if (request.getOnSuccess() != null) {
+                        responseHandler.handleSuccess(response);
+                    }
                 } else {
                     responseHandler.handleError(response);
                 }

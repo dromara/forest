@@ -1,5 +1,6 @@
 package org.forest.test.http;
 
+import org.forest.backend.HttpBackend;
 import org.forest.config.ForestConfiguration;
 import org.forest.test.http.client.BaseURLClient;
 import org.forest.test.http.client.BaseURLVarClient;
@@ -17,7 +18,7 @@ import static junit.framework.Assert.assertEquals;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-17 16:12
  */
-public class TestBaseURLClient {
+public class TestBaseURLClient extends BaseClientTest {
 
 
     private final static Logger log = LoggerFactory.getLogger(TestGetClient.class);
@@ -35,10 +36,13 @@ public class TestBaseURLClient {
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
         configuration.setVariableValue("baseURL", "http://localhost:5000/");
+    }
+
+    public TestBaseURLClient(HttpBackend backend) {
+        super(backend, configuration);
         baseURLClient = configuration.createInstance(BaseURLClient.class);
         baseURLVarClient = configuration.createInstance(BaseURLVarClient.class);
     }
-
 
     @Before
     public void prepareMockServer() {

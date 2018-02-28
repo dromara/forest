@@ -7,7 +7,7 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.forest.backend.httpclient.HttpclientRequestProvider;
 import org.forest.converter.json.ForestJsonConverter;
 import org.forest.backend.BodyBuilder;
-import org.forest.backend.httpclient.body.HttpclientNonBodyBuilder;
+import org.forest.backend.NoneBodyBuilder;
 import org.forest.backend.httpclient.request.HttpclientRequestSender;
 import org.forest.backend.httpclient.response.HttpclientForestResponseFactory;
 import org.forest.backend.httpclient.response.HttpclientResponseHandler;
@@ -53,7 +53,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
 
 
     protected void prepareBodyBuilder() {
-        bodyBuilder = new HttpclientNonBodyBuilder();
+        bodyBuilder = new NoneBodyBuilder();
     }
 
     protected void prepare() {

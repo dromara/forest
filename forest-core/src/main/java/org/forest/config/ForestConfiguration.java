@@ -114,7 +114,11 @@ public class ForestConfiguration implements Serializable {
     }
 
     private static void setupBackend(ForestConfiguration configuration) {
-        configuration.backend = new HttpclientBackend(configuration);
+        configuration.backend = new HttpclientBackend();
+    }
+
+    public void setBackend(HttpBackend backend) {
+        this.backend = backend;
     }
 
     private static void setupJSONConverter(ForestConfiguration configuration) {

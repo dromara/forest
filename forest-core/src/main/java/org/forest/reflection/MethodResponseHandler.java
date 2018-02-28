@@ -4,7 +4,6 @@ import org.forest.callback.OnSuccess;
 import org.forest.config.ForestConfiguration;
 import org.forest.exceptions.ForestNetworkException;
 import org.forest.exceptions.ForestRuntimeException;
-import org.forest.backend.httpclient.handler.DefaultHttpclientResultHandler;
 import org.forest.handler.ResponseHandler;
 import org.forest.handler.ResultHandler;
 import org.forest.http.ForestRequest;
@@ -28,7 +27,7 @@ public class MethodResponseHandler<T> implements ResponseHandler {
 
     private final Class onSuccessClassGenericType;
 
-    private final ResultHandler resultHandler;
+    private static final ResultHandler resultHandler = new ResultHandler();
 
     private volatile T resultData;
 
@@ -38,16 +37,15 @@ public class MethodResponseHandler<T> implements ResponseHandler {
         this.onSuccessClassGenericType = onSuccessClassGenericType;
         this.returnType = method.getReturnType();
         this.returnClass = method.getReturnClass();
-        this.resultHandler = configuration.getBackend().getDefaultResultHandler();
     }
 
     @Override
-    public void handleSync(ForestRequest request, ForestResponse response) {
-        handleSyncWitchException(request, response, null);
+    public Object handleSync(ForestRequest request, ForestResponse response) {
+        return handleSyncWitchException(request, response, null);
     }
 
     @Override
-    public void handleSyncWitchException(ForestRequest request, ForestResponse response, Exception ex) {
+    public Object handleSyncWitchException(ForestRequest request, ForestResponse response, Exception ex) {
         try {
             Object resultData = handleResultType(request, response, returnType, returnClass);
             if (response.isSuccess()) {
@@ -61,6 +59,7 @@ public class MethodResponseHandler<T> implements ResponseHandler {
                 }
             }
             handleResult(resultData);
+            return resultData;
         } catch (Throwable e) {
             throw e;
         } finally {

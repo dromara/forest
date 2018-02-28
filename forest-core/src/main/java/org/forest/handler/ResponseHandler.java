@@ -12,9 +12,9 @@ import java.lang.reflect.Type;
  */
 public interface ResponseHandler {
 
-    void handleSync(ForestRequest request, ForestResponse response);
+    Object handleSync(ForestRequest request, ForestResponse response);
 
-    void handleSyncWitchException(ForestRequest request, ForestResponse response, Exception ex);
+    Object handleSyncWitchException(ForestRequest request, ForestResponse response, Exception ex);
 
     Object handleResultType(ForestRequest request, ForestResponse response);
 

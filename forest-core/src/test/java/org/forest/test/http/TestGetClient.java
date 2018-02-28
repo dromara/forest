@@ -1,5 +1,6 @@
 package org.forest.test.http;
 
+import org.forest.backend.HttpBackend;
 import org.forest.config.ForestConfiguration;
 import org.forest.test.http.client.GetClient;
 import org.forest.test.mock.GetMockServer;
@@ -7,6 +8,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +21,7 @@ import static org.junit.Assert.*;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-11 15:02
  */
-public class TestGetClient {
+public class TestGetClient extends BaseClientTest {
 
     private final static Logger log = LoggerFactory.getLogger(TestGetClient.class);
 
@@ -27,14 +30,20 @@ public class TestGetClient {
 
     private static ForestConfiguration configuration;
 
-    private static GetClient getClient;
+    private GetClient getClient;
 
 
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
+    }
+
+
+    public TestGetClient(HttpBackend backend) {
+        super(backend, configuration);
         getClient = configuration.createInstance(GetClient.class);
     }
+
 
 
     @Before

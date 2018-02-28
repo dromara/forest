@@ -4,7 +4,7 @@
 	
 	<groupId>org.forest</groupId>
 	<artifactId>forest</artifactId>
-	<version>0.1.4</version>
+	<version>0.1.5</version>
 	<packaging>pom</packaging>
 	<name>forest</name>
 
@@ -116,6 +116,14 @@
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpasyncclient</artifactId>
 			<version>${httpasyncclient.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>3.4.1</version>
 			<scope>provided</scope>
 		</dependency>
 
