@@ -23,7 +23,7 @@ public class SSLTest extends TestCase {
         assertNotNull(keyStore);
         assertNotNull(keyStore.getInputStream());
         assertEquals("keystore1", keyStore.getId());
-        assertEquals("21929331", keyStore.getKeystorePass());
+        assertEquals("123456", keyStore.getKeystorePass());
         assertEquals("jks", keyStore.getKeystoreType());
     }
 
