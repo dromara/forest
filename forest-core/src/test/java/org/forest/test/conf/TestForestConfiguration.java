@@ -1,4 +1,4 @@
-package org.forest.conf;
+package org.forest.test.conf;
 
 import org.forest.config.ForestConfiguration;
 import org.forest.converter.ForestConverter;

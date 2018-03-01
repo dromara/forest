@@ -54,6 +54,17 @@
         </xsd:sequence>
         <xsd:attribute name="id" type="xsd:ID" use="optional">
         </xsd:attribute>
+        <xsd:attribute name="backend" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           Supported http backends: <br/>
+                           1. httpclient -> Using Httpclient framework. <br/>
+                           2. okhttp3 -> Using OkHttp3 framework.
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="timeout" type="xsd:string" use="optional">
             <xsd:annotation>
                 <xsd:documentation>

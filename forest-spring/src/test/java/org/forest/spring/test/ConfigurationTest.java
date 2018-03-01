@@ -26,6 +26,7 @@ public class ConfigurationTest extends TestCase {
         assertEquals(forestConfiguration.getVariableValue("baseUrl"), "http://www.thebeastshop.com");
         assertEquals(forestConfiguration.getVariableValue("x"), "0");
         assertEquals(forestConfiguration.getVariableValue("y"), "1");
+        assertEquals(forestConfiguration.getBackend().getName(), "httpclient");
     }
 
 }

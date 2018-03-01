@@ -28,11 +28,6 @@ public abstract class BaseClientTest {
         configuration.setBackend(backend);
     }
 
-    @Before
-    public void logBackendName() {
-        log.info("Backend: " + backend.getName());
-    }
-
     @Parameterized.Parameters
     public static Collection backendList() {
         return Arrays.asList(

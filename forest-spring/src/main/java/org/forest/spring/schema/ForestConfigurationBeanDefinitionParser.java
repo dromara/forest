@@ -76,7 +76,12 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
                 String attributeName = methodName.substring(3, 4).toLowerCase() + methodName.substring(4);
                 String attributeValue = element.getAttribute(attributeName);
                 if (StringUtils.isNotEmpty(attributeValue)) {
-                    beanDefinition.getPropertyValues().addPropertyValue(attributeName, attributeValue);
+                    if ("backend".equals(attributeName)) {
+                        beanDefinition.getPropertyValues().addPropertyValue("backendName", attributeValue);
+                    }
+                    else {
+                        beanDefinition.getPropertyValues().addPropertyValue(attributeName, attributeValue);
+                    }
                 }
             }
         }

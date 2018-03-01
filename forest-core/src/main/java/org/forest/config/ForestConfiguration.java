@@ -25,6 +25,9 @@
 package org.forest.config;
 
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.forest.backend.HttpBackendSelector;
 import org.forest.converter.ForestConverter;
 import org.forest.converter.json.JSONConverterSelector;
 import org.forest.converter.json.ForestJsonConverter;
@@ -32,7 +35,6 @@ import org.forest.converter.xml.ForestJaxbConverter;
 import org.forest.converter.xml.ForestXmlConverter;
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.backend.HttpBackend;
-import org.forest.backend.httpclient.HttpclientBackend;
 import org.forest.filter.Filter;
 import org.forest.filter.JSONFilter;
 import org.forest.filter.XmlFilter;
@@ -50,6 +52,8 @@ import java.util.*;
  * @since 2016-03-24
  */
 public class ForestConfiguration implements Serializable {
+
+    private static Log log = LogFactory.getLog(ForestConfiguration.class);
 
     private String id;
 
@@ -78,7 +82,9 @@ public class ForestConfiguration implements Serializable {
      */
     private Integer retryCount;
 
-    private HttpBackend backend;
+    private volatile HttpBackend backend;
+
+    private String backendName;
 
     private List<RequestNameValue> defaultParameters;
 
@@ -103,7 +109,6 @@ public class ForestConfiguration implements Serializable {
         configuration.setJsonConverterSelector(new JSONConverterSelector());
         configuration.setXmlConverter(new ForestJaxbConverter());
         setupJSONConverter(configuration);
-        setupBackend(configuration);
         configuration.setTimeout(3000);
         configuration.setConnectTimeout(2000);
         configuration.setMaxConnections(500);
@@ -113,13 +118,36 @@ public class ForestConfiguration implements Serializable {
         return configuration;
     }
 
-    private static void setupBackend(ForestConfiguration configuration) {
-        configuration.backend = new HttpclientBackend();
+    private void setupBackend() {
+        backend = HttpBackendSelector.select(this);
+        log.info("[Forest] Http Backend: " + this.backend.getName());
     }
 
     public void setBackend(HttpBackend backend) {
         this.backend = backend;
+        log.info("[Forest] Http Backend: " + this.backend.getName());
     }
+
+    public void setBackendName(String backendName) {
+        this.backendName = backendName;
+    }
+
+
+    public String getBackendName() {
+        return backendName;
+    }
+
+    public HttpBackend getBackend() {
+        if (backend == null) {
+            synchronized (this) {
+                if (backend == null) {
+                    setupBackend();
+                }
+            }
+        }
+        return backend;
+    }
+
 
     private static void setupJSONConverter(ForestConfiguration configuration) {
         JSONConverterSelector jsonConverterSelector = new JSONConverterSelector();
@@ -211,9 +239,6 @@ public class ForestConfiguration implements Serializable {
         return new ProxyFactory<T>(this, clazz);
     }
 
-    public HttpBackend getBackend() {
-        return backend;
-    }
 
     public void setVariableValue(String name, Object value) {
         getVariables().put(name, value);

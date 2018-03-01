@@ -9,6 +9,7 @@
 
     <forest:configuration
             id="forestConfiguration"
+            backend="httpclient"
             timeout="30000"
             retryCount="3"
             connectTimeout="10000"

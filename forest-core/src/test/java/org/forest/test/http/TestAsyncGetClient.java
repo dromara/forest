@@ -1,5 +1,6 @@
 package org.forest.test.http;
 
+import org.forest.backend.HttpBackend;
 import org.forest.backend.okhttp3.OkHttp3Backend;
 import org.forest.callback.OnError;
 import org.forest.callback.OnSuccess;
@@ -27,7 +28,7 @@ import static org.junit.Assert.*;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-11 15:02
  */
-public class TestAsyncGetClient {
+public class TestAsyncGetClient extends BaseClientTest {
 
     private final static Logger log = LoggerFactory.getLogger(TestAsyncGetClient.class);
 
@@ -42,10 +43,12 @@ public class TestAsyncGetClient {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
-        configuration.setBackend(new OkHttp3Backend());
-        getClient = configuration.createInstance(GetClient.class);
     }
 
+    public TestAsyncGetClient(HttpBackend backend) {
+        super(backend, configuration);
+        getClient = configuration.createInstance(GetClient.class);
+    }
 
     @Before
     public void prepareMockServer() {

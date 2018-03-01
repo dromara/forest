@@ -3,7 +3,6 @@ package org.forest.backend.okhttp3.conn;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import org.forest.backend.ForestConnectionManager;
-import org.forest.config.ForestConfiguration;
 import org.forest.http.ForestRequest;
 
 import java.util.concurrent.TimeUnit;
