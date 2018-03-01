@@ -1,5 +1,6 @@
 package org.forest.test.conf;
 
+import com.twitter.finagle.Http;
 import org.forest.backend.HttpBackend;
 import org.forest.backend.HttpBackendSelector;
 import org.forest.config.ForestConfiguration;
@@ -9,15 +10,24 @@ import org.forest.converter.json.ForestFastjsonConverter;
 import org.forest.converter.json.ForestGsonConverter;
 import org.forest.converter.json.ForestJacksonConverter;
 import org.forest.converter.json.ForestJsonConverter;
+import org.forest.exceptions.ForestRuntimeException;
 import org.forest.utils.ForestDataType;
 import org.forest.utils.RequestNameValue;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.PowerMockUtils;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import static junit.framework.Assert.*;
 
@@ -27,14 +37,37 @@ import static junit.framework.Assert.*;
  */
 public class TestForestConfiguration {
 
+
     @Test
-    public void testBackend() {
+    public void testBackend() throws ClassNotFoundException {
         ForestConfiguration configuration = ForestConfiguration.configuration();
         configuration.setBackendName("okhttp3");
         assertEquals("okhttp3", configuration.getBackend().getName());
         configuration.setBackend(null);
         configuration.setBackendName("httpclient");
         assertEquals("httpclient", configuration.getBackend().getName());
+
+        HttpBackendSelector originSelector = new HttpBackendSelector();
+        HttpBackendSelector selector = Mockito.spy(originSelector);
+        configuration.setHttpBackendSelector(selector);
+        Mockito.when(selector.findOkHttp3BackendInstance()).thenReturn(null);
+
+        configuration.setBackendName(null);
+        configuration.setBackend(null);
+        assertEquals("httpclient", configuration.getBackend().getName());
+
+        Mockito.when(selector.findHttpclientBackendInstance()).thenReturn(null);
+        configuration.setBackendName(null);
+        configuration.setBackend(null);
+
+        boolean thrown = false;
+        try {
+            HttpBackend backend = configuration.getBackend();
+            System.out.print(backend);
+        } catch (ForestRuntimeException e) {
+            thrown = true;
+        }
+        assertTrue(thrown);
     }
 
     @Test

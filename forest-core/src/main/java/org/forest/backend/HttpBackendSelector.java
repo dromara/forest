@@ -18,8 +18,8 @@ public class HttpBackendSelector {
     private final static String HTTPCLIENT_BACKEND_NAME = "httpclient";
     private final static String OKHTTP3_BACKEND_NAME = "okhttp3";
 
-    private final static String HTTPCLIENT_CLIENT_CLASS_NAME = "org.apache.http.client.HttpClient";
-    private final static String OKHTTP3_CLIENT_CLASS_NAME = "okhttp3.OkHttpClient";
+    public final static String HTTPCLIENT_CLIENT_CLASS_NAME = "org.apache.http.client.HttpClient";
+    public final static String OKHTTP3_CLIENT_CLASS_NAME = "okhttp3.OkHttpClient";
 
     private final static String HTTPCLIENT_BACKEND_CLASS_NAME = "org.forest.backend.httpclient.HttpclientBackend";
     private final static String OKHTTP3_BACKEND_CLASS_NAME = "org.forest.backend.okhttp3.OkHttp3Backend";
@@ -32,7 +32,7 @@ public class HttpBackendSelector {
         backendMap.put(OKHTTP3_BACKEND_NAME, OKHTTP3_BACKEND_CREATOR);
     }
 
-    public static HttpBackend select(ForestConfiguration configuration) {
+    public HttpBackend select(ForestConfiguration configuration) {
         String name = configuration.getBackendName();
         if (StringUtils.isNotEmpty(name)) {
             HttpBackendCreator backendCreator = backendMap.get(name);
@@ -42,18 +42,31 @@ public class HttpBackendSelector {
             return backendCreator.create();
         }
 
-        try {
-            Class.forName(OKHTTP3_CLIENT_CLASS_NAME);
-            return OKHTTP3_BACKEND_CREATOR.create();
-        } catch (ClassNotFoundException e) {
-        }
+        HttpBackend backend = null;
+        backend = findOkHttp3BackendInstance();
+        if (backend != null) return backend;
+        backend = findHttpclientBackendInstance();
+        if (backend != null) return backend;
+        throw new ForestRuntimeException("Http Backed is undefined.");
+    }
 
+
+    public HttpBackend findHttpclientBackendInstance() {
         try {
             Class.forName(HTTPCLIENT_CLIENT_CLASS_NAME);
             return HTTPCLIENT_BACKEND_CREATOR.create();
         } catch (ClassNotFoundException e) {
         }
-        throw new ForestRuntimeException("Http Backed is undefined.");
+        return null;
+    }
+
+    public HttpBackend findOkHttp3BackendInstance() {
+        try {
+            Class.forName(OKHTTP3_CLIENT_CLASS_NAME);
+            return OKHTTP3_BACKEND_CREATOR.create();
+        } catch (ClassNotFoundException e) {
+        }
+        return null;
     }
 
 

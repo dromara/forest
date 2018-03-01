@@ -94,6 +94,8 @@ public class ForestConfiguration implements Serializable {
 
     private JSONConverterSelector jsonConverterSelector;
 
+    private HttpBackendSelector httpBackendSelector = new HttpBackendSelector();
+
     private Map<String, Class> filterRegisterMap = new HashMap<>();
 
     private Map<String, Object> variables = new HashMap<String, Object>();
@@ -119,7 +121,7 @@ public class ForestConfiguration implements Serializable {
     }
 
     private void setupBackend() {
-        backend = HttpBackendSelector.select(this);
+        backend = httpBackendSelector.select(this);
         log.info("[Forest] Http Backend: " + this.backend.getName());
     }
 
@@ -139,6 +141,7 @@ public class ForestConfiguration implements Serializable {
         return backendName;
     }
 
+
     public HttpBackend getBackend() {
         if (backend == null) {
             synchronized (this) {
@@ -150,6 +153,13 @@ public class ForestConfiguration implements Serializable {
         return backend;
     }
 
+    public HttpBackendSelector getHttpBackendSelector() {
+        return httpBackendSelector;
+    }
+
+    public void setHttpBackendSelector(HttpBackendSelector httpBackendSelector) {
+        this.httpBackendSelector = httpBackendSelector;
+    }
 
     private static void setupJSONConverter(ForestConfiguration configuration) {
         JSONConverterSelector jsonConverterSelector = new JSONConverterSelector();
