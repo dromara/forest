@@ -3,8 +3,6 @@ package org.forest.backend.httpclient.conn;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.security.*;
-import java.security.cert.CertificateException;
 import javax.net.SocketFactory;
 import javax.net.ssl.*;
 import javax.net.ssl.SSLSocketFactory;
@@ -16,9 +14,9 @@ import org.apache.http.conn.ssl.*;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.Args;
 import org.apache.http.util.TextUtils;
-import org.forest.exceptions.ForestRuntimeException;
 import org.forest.http.ForestRequest;
 import org.forest.ssl.SSLKeyStore;
+import org.forest.ssl.SSLUtils;
 
 @ThreadSafe
 public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactory {
@@ -105,103 +103,10 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
     }
 
 
-    private SSLSocketFactory getCurrentSocketFactory(ForestRequest request) {
-        if (request == null) {
-            return null;
-        }
-        try {
-            SSLContext sslContext = getSSLContext(request);
-            return (SSLSocketFactory)((SSLContext)Args.notNull(sslContext, "SSL context")).getSocketFactory();
-        } catch (KeyManagementException e) {
-            throw new ForestRuntimeException(e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new ForestRuntimeException(e);
-        }
-    }
-
-
-    /**
-     * 自定义SSL证书
-     * @param request
-     * @return
-     */
-    private SSLContext customSSL(ForestRequest request) {
-        SSLContext sslContext = null;
-        SSLKeyStore keyStore = request.getKeyStore();
-        final KeyStore trustStore = keyStore.getTrustStore();
-        String keystorePass = keyStore.getKeystorePass();
-        if (trustStore != null) {
-            try {
-                SSLContextBuilder scBuilder = SSLContexts.custom();
-                if (keystorePass != null) {
-                    sslContext = scBuilder
-                            .loadKeyMaterial(trustStore, keystorePass.toCharArray())
-                            .build();
-                } else {
-                    sslContext = scBuilder
-                            .loadTrustMaterial(trustStore, new TrustSelfSignedStrategy())
-                            .build();
-                }
-            } catch (NoSuchAlgorithmException e) {
-                throw new ForestRuntimeException(e);
-            } catch (KeyManagementException e) {
-                throw new ForestRuntimeException(e);
-            } catch (KeyStoreException e) {
-                throw new ForestRuntimeException(e);
-            } catch (UnrecoverableKeyException e) {
-                throw new ForestRuntimeException(e);
-            }
-        }
-        return sslContext;
-    }
-
-    /**
-     * 绕过SSL验证
-     *
-     * @return
-     * @throws NoSuchAlgorithmException
-     * @throws KeyManagementException
-     */
-    private static SSLContext createIgnoreVerifySSL() throws NoSuchAlgorithmException, KeyManagementException {
-        SSLContext sc = SSLContext.getInstance("SSLv3");
-        X509TrustManager trustManager = new X509TrustManager() {
-            @Override
-            public void checkClientTrusted(
-                    java.security.cert.X509Certificate[] paramArrayOfX509Certificate,
-                    String paramString) throws CertificateException {
-            }
-
-            @Override
-            public void checkServerTrusted(
-                    java.security.cert.X509Certificate[] paramArrayOfX509Certificate,
-                    String paramString) throws CertificateException {
-            }
-
-            @Override
-            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                return null;
-            }
-        };
-        sc.init(null, new TrustManager[] { trustManager }, null);
-        return sc;
-    }
-
-    /**
-     * 获取SSL上下文
-     * @param request
-     * @return
-     */
-    private SSLContext getSSLContext(ForestRequest request) throws KeyManagementException, NoSuchAlgorithmException {
-        if (request.getKeyStore() == null) {
-            return createIgnoreVerifySSL();
-        }
-        return customSSL(request);
-    }
-
 
     public Socket createLayeredSocket(Socket socket, String target, int port, HttpContext context) throws IOException {
         ForestRequest request = getCurrentRequest();
-        SSLSocket sslsock = (SSLSocket)this.getCurrentSocketFactory(request)
+        SSLSocket sslsock = (SSLSocket)SSLUtils.getSSLSocketFactory(request)
                 .createSocket(socket, target, port, true);
         if (request != null) {
             SSLKeyStore keyStore = request.getKeyStore();
