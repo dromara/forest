@@ -1,5 +1,7 @@
 package org.forest.test.conf;
 
+import org.forest.backend.HttpBackend;
+import org.forest.backend.HttpBackendSelector;
 import org.forest.config.ForestConfiguration;
 import org.forest.converter.ForestConverter;
 import org.forest.converter.json.JSONConverterSelector;
@@ -24,6 +26,16 @@ import static junit.framework.Assert.*;
  * @since 2017-05-08 12:40
  */
 public class TestForestConfiguration {
+
+    @Test
+    public void testBackend() {
+        ForestConfiguration configuration = ForestConfiguration.configuration();
+        configuration.setBackendName("okhttp3");
+        assertEquals("okhttp3", configuration.getBackend().getName());
+        configuration.setBackend(null);
+        configuration.setBackendName("httpclient");
+        assertEquals("httpclient", configuration.getBackend().getName());
+    }
 
     @Test
     public void testDefault() {
