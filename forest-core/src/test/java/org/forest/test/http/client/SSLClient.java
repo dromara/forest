@@ -9,8 +9,8 @@ import org.forest.annotation.Request;
 public interface SSLClient {
 
     @Request(
-            url = "https://localhost:5000/hello/user?username=foo",
-            headers = {"Accept:text/plan"}
+            url = "http://localhost:5000/hello/user"
+//            keyStore = "test"
     )
     String truestAllGet();
 

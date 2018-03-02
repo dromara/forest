@@ -34,6 +34,11 @@ public class SSLKeyStore {
 
     protected String[] cipherSuites;
 
+
+    public SSLKeyStore(String id, String filePath, String keystorePass) {
+        this(id, DEFAULT_KEYSTORE_TYPE, filePath, keystorePass);
+    }
+
     public SSLKeyStore(String id, String keystoreType, String filePath, String keystorePass) {
         this.id = id;
         this.keystoreType = keystoreType;
@@ -77,10 +82,20 @@ public class SSLKeyStore {
     }
 
     public void init() {
-        File file = new File(filePath.trim());
+        String path = filePath.trim();
+        File file = new File(path);
         if (!file.exists()) {
-            throw new ForestRuntimeException(
-                    "The file of SSL KeyStore \"" + id + "\" " + filePath + " cannot be found!");
+            java.net.URL url = getClass().getClassLoader().getResource(path);
+            if (url == null) {
+                throw new ForestRuntimeException(
+                        "The file of SSL KeyStore \"" + id + "\" " + filePath + " cannot be found!");
+            }
+            path = url.getFile();
+            file = new File(path);
+            if (!file.exists()) {
+                throw new ForestRuntimeException(
+                        "The file of SSL KeyStore \"" + id + "\" " + filePath + " cannot be found!");
+            }
         }
         try {
             inputStream = new FileInputStream(file);

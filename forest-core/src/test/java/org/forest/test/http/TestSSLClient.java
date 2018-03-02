@@ -1,17 +1,24 @@
 package org.forest.test.http;
 
+import com.github.dreamhead.moco.HttpServer;
+import com.github.dreamhead.moco.HttpsCertificate;
+import com.github.dreamhead.moco.HttpsServer;
+import com.github.dreamhead.moco.Runner;
+import com.github.dreamhead.moco.config.MocoRequestConfig;
+import com.github.dreamhead.moco.config.MocoResponseConfig;
 import org.forest.backend.HttpBackend;
 import org.forest.config.ForestConfiguration;
+import org.forest.ssl.SSLKeyStore;
 import org.forest.test.http.client.SSLClient;
 import org.forest.test.mock.GetMockServer;
 import org.forest.test.mock.SSLMockServer;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.github.dreamhead.moco.Moco.*;
+import static com.github.dreamhead.moco.Runner.runner;
+import static com.github.dreamhead.moco.HttpsCertificate.certificate;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -24,8 +31,21 @@ public class TestSSLClient extends BaseClientTest {
 
     private final static Logger log = LoggerFactory.getLogger(TestSSLClient.class);
 
-    @Rule
-    public SSLMockServer server = new SSLMockServer(this);
+//    private static HttpsServer server;
+//    private final static HttpsCertificate certificate = certificate(pathResource("test.keystore"), "123456", "123456");
+    private static HttpServer server;
+
+    public final static String EXPECTED = "{\"status\": \"ok\"}";
+
+    private Runner runner;
+
+    static {
+        server = httpServer(5000);
+        server
+                .get(by(uri("/hello/user")))
+                .response(EXPECTED);
+    }
+
 
     private static ForestConfiguration configuration;
 
@@ -35,6 +55,8 @@ public class TestSSLClient extends BaseClientTest {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
+        SSLKeyStore sslKeyStore = new SSLKeyStore("test", "test.keystore", "123456");
+        configuration.registerKeyStore("test", sslKeyStore);
     }
 
 
@@ -47,8 +69,16 @@ public class TestSSLClient extends BaseClientTest {
 
     @Before
     public void prepareMockServer() {
-        server.initServer();
+//        server.initServer();
+        runner = runner(server);
+        runner.start();
     }
+
+    @After
+    public void tearDown() {
+        runner.stop();
+    }
+
 
     @Test
     public void truestAllGet() {

@@ -6,10 +6,10 @@ import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.http.ForestRequest;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
+import javax.net.ssl.*;
 import java.security.*;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -29,23 +29,32 @@ public class SSLUtils {
         String keystorePass = keyStore.getKeystorePass();
         if (trustStore != null) {
             try {
-                SSLContextBuilder scBuilder = SSLContexts.custom();
-                if (keystorePass != null) {
-                    sslContext = scBuilder
-                            .loadKeyMaterial(trustStore, keystorePass.toCharArray())
-                            .build();
-                } else {
-                    sslContext = scBuilder
-                            .loadTrustMaterial(trustStore, new TrustSelfSignedStrategy())
-                            .build();
-                }
+
+                sslContext = SSLContext.getInstance("TLS");
+                TrustManagerFactory tmf = TrustManagerFactory
+                        .getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                tmf.init(trustStore);
+
+                X509TrustManager defaultTrustManager = (X509TrustManager) tmf
+                        .getTrustManagers()[0];
+                SavingTrustManager tm = new SavingTrustManager(defaultTrustManager);
+                sslContext.init(null, new TrustManager[] { tm }, null);
+
+//                SSLContextBuilder scBuilder = SSLContexts.custom();
+//                if (keystorePass != null) {
+//                    sslContext = scBuilder
+//                            .loadKeyMaterial(trustStore, keystorePass.toCharArray())
+//                            .build();
+//                } else {
+//                    sslContext = scBuilder
+//                            .loadTrustMaterial(trustStore, new TrustSelfSignedStrategy())
+//                            .build();
+//                }
             } catch (NoSuchAlgorithmException e) {
                 throw new ForestRuntimeException(e);
             } catch (KeyManagementException e) {
                 throw new ForestRuntimeException(e);
             } catch (KeyStoreException e) {
-                throw new ForestRuntimeException(e);
-            } catch (UnrecoverableKeyException e) {
                 throw new ForestRuntimeException(e);
             }
         }
@@ -97,5 +106,30 @@ public class SSLUtils {
         }
     }
 
+
+    private static class SavingTrustManager implements X509TrustManager {
+
+        private final X509TrustManager tm;
+        private X509Certificate[] chain;
+
+        SavingTrustManager(X509TrustManager tm) {
+            this.tm = tm;
+        }
+
+        public X509Certificate[] getAcceptedIssuers() {
+            throw new UnsupportedOperationException();
+        }
+
+        public void checkClientTrusted(X509Certificate[] chain, String authType)
+                throws CertificateException {
+            throw new UnsupportedOperationException();
+        }
+
+        public void checkServerTrusted(X509Certificate[] chain, String authType)
+                throws CertificateException {
+            this.chain = chain;
+            tm.checkServerTrusted(chain, authType);
+        }
+    }
 
 }

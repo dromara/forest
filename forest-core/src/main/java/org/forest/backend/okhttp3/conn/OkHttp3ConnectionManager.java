@@ -8,7 +8,11 @@ import org.forest.http.ForestRequest;
 import org.forest.ssl.*;
 
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -42,6 +46,17 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
         }
     }
 
+
+    public X509TrustManager getTrustManager(KeyStore keyStore, ForestRequest request) throws Exception {
+        TrustManagerFactory tmf = TrustManagerFactory
+                .getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        tmf.init(keyStore);
+
+        X509TrustManager defaultTrustManager = (X509TrustManager) tmf
+                .getTrustManagers()[0];
+        return null;
+    }
+
     public OkHttpClient getClient(ForestRequest request) {
         Integer timeout = request.getTimeout();
         if (timeout == null) {
@@ -55,6 +70,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
 
         if ("https".equals(request.getProtocol())) {
             SSLSocketFactory sslSocketFactory = SSLUtils.getSSLSocketFactory(request);
+
             builder
                     .sslSocketFactory(sslSocketFactory, getX509TrustManager(request))
                     .hostnameVerifier(TrustAllHostnameVerifier.DEFAULT);

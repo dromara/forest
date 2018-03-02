@@ -74,10 +74,47 @@
 				<exclusion>
 					<groupId>xerces</groupId>
 					<artifactId>xercesImpl</artifactId>
-
 				</exclusion>
+				<exclusion>
+					<groupId>io.netty</groupId>
+					<artifactId>netty-buffer</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>io.netty</groupId>
+					<artifactId>netty-codec</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>io.netty</groupId>
+					<artifactId>netty-codec-http</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>io.netty</groupId>
+					<artifactId>netty-codec-socks</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>io.netty</groupId>
+					<artifactId>netty-common</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>io.netty</groupId>
+					<artifactId>netty-handler</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>io.netty</groupId>
+					<artifactId>netty-transport</artifactId>
+				</exclusion>
+
 			</exclusions>
 		</dependency>
+
+
+		<dependency>
+			<groupId>com.github.dreamhead</groupId>
+			<artifactId>moco-core</artifactId>
+			<version>0.12.0</version>
+			<scope>test</scope>
+		</dependency>
+
 
 
 		<dependency>
