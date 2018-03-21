@@ -31,16 +31,16 @@ public class TestSSLClient extends BaseClientTest {
 
     private final static Logger log = LoggerFactory.getLogger(TestSSLClient.class);
 
-//    private static HttpsServer server;
-//    private final static HttpsCertificate certificate = certificate(pathResource("test.keystore"), "123456", "123456");
-    private static HttpServer server;
+    private static HttpsServer server;
+    private final static HttpsCertificate certificate = certificate(pathResource("test.keystore"), "123456", "123456");
+//    private static HttpServer server;
 
     public final static String EXPECTED = "{\"status\": \"ok\"}";
 
     private Runner runner;
 
     static {
-        server = httpServer(5000);
+        server = httpsServer(5000, certificate);
         server
                 .get(by(uri("/hello/user")))
                 .response(EXPECTED);
@@ -69,7 +69,6 @@ public class TestSSLClient extends BaseClientTest {
 
     @Before
     public void prepareMockServer() {
-//        server.initServer();
         runner = runner(server);
         runner.start();
     }
