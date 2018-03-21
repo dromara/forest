@@ -14,6 +14,7 @@ import org.apache.http.conn.ssl.*;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.Args;
 import org.apache.http.util.TextUtils;
+import org.forest.exceptions.ForestRuntimeException;
 import org.forest.http.ForestRequest;
 import org.forest.ssl.SSLKeyStore;
 import org.forest.ssl.SSLUtils;
@@ -24,7 +25,7 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
     public static final X509HostnameVerifier BROWSER_COMPATIBLE_HOSTNAME_VERIFIER = new BrowserCompatHostnameVerifier();
 
 //    private final SSLSocketFactory socketfactory;
-    private ThreadLocal<ForestRequest> requestLocal = new ThreadLocal<>();
+    private final static ThreadLocal<ForestRequest> requestLocal = new ThreadLocal<>();
     private final X509HostnameVerifier hostnameVerifier;
 
     public static org.apache.http.conn.ssl.SSLConnectionSocketFactory getSocketFactory() throws SSLInitializationException {
@@ -56,6 +57,7 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
     }
 
     public Socket connectSocket(int connectTimeout, Socket socket, HttpHost host, InetSocketAddress remoteAddress, InetSocketAddress localAddress, HttpContext context) throws IOException {
+        System.out.println("current request: " + getCurrentRequest());
         Args.notNull(host, "HTTP host");
         Args.notNull(remoteAddress, "Remote address");
         Socket sock = socket != null?socket:this.createSocket(context);
@@ -87,18 +89,21 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
 
 
     private ForestRequest getCurrentRequest() {
-        return requestLocal.get();
+        ForestRequest request = requestLocal.get();
+        System.out.println("getCurrentRequest[" + Thread.currentThread().getName() + "][" + requestLocal.hashCode() + "]: " + request);
+        return request;
     }
 
 
     public void setCurrentRequest(ForestRequest request) {
+        System.out.println("setCurrentRequest[" + Thread.currentThread().getName() + "][" + requestLocal.hashCode() + "]: " + request);
         requestLocal.set(request);
     }
 
 
     public ForestRequest removeCurrentRequest() {
         ForestRequest request = requestLocal.get();
-        requestLocal.remove();
+//        requestLocal.remove();
         return request;
     }
 
@@ -106,6 +111,9 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
 
     public Socket createLayeredSocket(Socket socket, String target, int port, HttpContext context) throws IOException {
         ForestRequest request = getCurrentRequest();
+        if (request == null) {
+            throw new ForestRuntimeException("Current request is NULL!");
+        }
         SSLSocket sslsock = (SSLSocket)SSLUtils.getSSLSocketFactory(request)
                 .createSocket(socket, target, port, true);
         if (request != null) {

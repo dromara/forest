@@ -6,6 +6,7 @@ import com.github.dreamhead.moco.Runner;
 import org.forest.backend.HttpBackend;
 import org.forest.config.ForestConfiguration;
 import org.forest.ssl.SSLKeyStore;
+import org.forest.test.http.client.GetClient;
 import org.forest.test.http.client.SSLClient;
 import org.forest.test.mock.GetMockServer;
 import org.junit.*;
@@ -31,12 +32,18 @@ public class TestSSLClient extends BaseClientTest {
     private final static HttpsCertificate serverCertificate = certificate(pathResource("ssl_server.keystore"), "server", "123456");
 //    private static HttpServer server;
 
+    @Rule
+    public GetMockServer getServer = new GetMockServer(this);
+
+    private GetClient getClient;
+
+
     public final static String EXPECTED = "{\"status\": \"ok\", \"ssl\": \"true\"}";
 
     private Runner runner;
 
     static {
-        server = httpsServer(5000, serverCertificate);
+        server = httpsServer(5555, serverCertificate);
         server
                 .get(by(uri("/hello/user")))
                 .response(EXPECTED);
@@ -60,6 +67,7 @@ public class TestSSLClient extends BaseClientTest {
     public TestSSLClient(HttpBackend backend) {
         super(backend, configuration);
         sslClient = configuration.createInstance(SSLClient.class);
+        getClient = configuration.createInstance(GetClient.class);
     }
 
 
@@ -68,6 +76,7 @@ public class TestSSLClient extends BaseClientTest {
     public void prepareMockServer() {
         runner = runner(server);
         runner.start();
+        getServer.initServer();
     }
 
     @After
@@ -78,10 +87,25 @@ public class TestSSLClient extends BaseClientTest {
 
     @Test
     public void truestAllGet() {
+        sslClient.truestAllGet();
         String result = sslClient.truestAllGet();
         log.info("response: " + result);
         assertNotNull(result);
         assertEquals(EXPECTED, result);
     }
+
+
+    @Test
+    public void mixAllGet() {
+        for (int i = 0; i < 10; i++) {
+            String simpleResult = getClient.simpleGet();
+            assertEquals(GetMockServer.EXPECTED, simpleResult);
+            String result = sslClient.truestAllGet();
+            log.info("response: " + result);
+            assertNotNull(result);
+            assertEquals(EXPECTED, result);
+        }
+    }
+
 
 }

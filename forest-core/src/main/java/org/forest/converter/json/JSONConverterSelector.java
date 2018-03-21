@@ -1,10 +1,5 @@
 package org.forest.converter.json;
 
-import org.forest.converter.json.ForestFastjsonConverter;
-import org.forest.converter.json.ForestGsonConverter;
-import org.forest.converter.json.ForestJacksonConverter;
-import org.forest.converter.json.ForestJsonConverter;
-
 import java.io.Serializable;
 
 /**
@@ -41,17 +36,17 @@ public class JSONConverterSelector implements Serializable {
         try {
             checkFastJSONClass();
             return new ForestFastjsonConverter();
-        } catch (ClassNotFoundException e) {
+        } catch (Throwable e) {
         }
         try {
             checkJacsonClass();
             return new ForestJacksonConverter();
-        } catch (ClassNotFoundException e1) {
+        } catch (Throwable e1) {
         }
         try {
             checkGsonClass();
             return new ForestGsonConverter();
-        } catch (ClassNotFoundException e) {
+        } catch (Throwable e) {
         }
         return null;
     }
