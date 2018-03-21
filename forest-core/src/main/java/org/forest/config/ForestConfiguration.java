@@ -102,7 +102,7 @@ public class ForestConfiguration implements Serializable {
 
     private Map<String, SSLKeyStore> sslKeyStores = new HashMap<>();
 
-    public ForestConfiguration() {
+    private ForestConfiguration() {
     }
 
     public static ForestConfiguration configuration() {
