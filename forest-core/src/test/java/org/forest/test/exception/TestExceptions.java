@@ -1,4 +1,4 @@
-package org.forest.exception;
+package org.forest.test.exception;
 
 import org.forest.exceptions.ForestHandlerException;
 import org.forest.exceptions.ForestNetworkException;

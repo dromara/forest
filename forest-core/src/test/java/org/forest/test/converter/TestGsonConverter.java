@@ -1,4 +1,4 @@
-package org.forest.converter;
+package org.forest.test.converter;
 
 import com.google.gson.reflect.TypeToken;
 import junit.framework.Assert;
