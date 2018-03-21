@@ -27,6 +27,7 @@ public class SSLKeyStore {
 
     protected String keystorePass;
 
+    protected String certPass;
 
     protected KeyStore trustStore;
 
@@ -35,15 +36,16 @@ public class SSLKeyStore {
     protected String[] cipherSuites;
 
 
-    public SSLKeyStore(String id, String filePath, String keystorePass) {
-        this(id, DEFAULT_KEYSTORE_TYPE, filePath, keystorePass);
+    public SSLKeyStore(String id, String filePath, String keystorePass, String certPass) {
+        this(id, DEFAULT_KEYSTORE_TYPE, filePath, keystorePass, certPass);
     }
 
-    public SSLKeyStore(String id, String keystoreType, String filePath, String keystorePass) {
+    public SSLKeyStore(String id, String keystoreType, String filePath, String keystorePass, String certPass) {
         this.id = id;
         this.keystoreType = keystoreType;
         this.filePath = filePath;
         this.keystorePass = keystorePass;
+        this.certPass = certPass;
         init();
         loadTrustStore();
     }
@@ -63,7 +65,6 @@ public class SSLKeyStore {
     public void setFilePath(String filePath) {
         this.filePath = filePath;
     }
-
 
     public String[] getProtocols() {
         return protocols;
@@ -111,6 +112,10 @@ public class SSLKeyStore {
 
     public String getKeystorePass() {
         return keystorePass;
+    }
+
+    public String getCertPass() {
+        return certPass;
     }
 
     public void setKeystorePass(String keystorePass) {

@@ -1,8 +1,5 @@
 package org.forest.ssl;
 
-import org.apache.http.conn.ssl.SSLContextBuilder;
-import org.apache.http.conn.ssl.SSLContexts;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.http.ForestRequest;
 
@@ -24,21 +21,27 @@ public class SSLUtils {
      */
     public static SSLContext customSSL(ForestRequest request) {
         SSLContext sslContext = null;
-        SSLKeyStore keyStore = request.getKeyStore();
-        final KeyStore trustStore = keyStore.getTrustStore();
-        String keystorePass = keyStore.getKeystorePass();
-        if (trustStore != null) {
+        SSLKeyStore fKeyStore = request.getKeyStore();
+        final KeyStore keyStore = fKeyStore.getTrustStore();
+        String certPass = fKeyStore.getCertPass();
+        if (keyStore != null) {
             try {
 
                 sslContext = SSLContext.getInstance("TLS");
+
+                //密钥库
+                KeyManagerFactory kmf = KeyManagerFactory.getInstance("sunx509");
+                kmf.init(keyStore, certPass.toCharArray());
+
                 TrustManagerFactory tmf = TrustManagerFactory
                         .getInstance(TrustManagerFactory.getDefaultAlgorithm());
-                tmf.init(trustStore);
+                tmf.init(keyStore);
 
                 X509TrustManager defaultTrustManager = (X509TrustManager) tmf
                         .getTrustManagers()[0];
-                SavingTrustManager tm = new SavingTrustManager(defaultTrustManager);
-                sslContext.init(null, new TrustManager[] { tm }, null);
+//                SavingTrustManager tm = new SavingTrustManager(defaultTrustManager);
+//                sslContext.init(kmf.getKeyManagers(), new TrustManager[] { tm }, null);
+                sslContext.init(null, tmf.getTrustManagers(), null);
 
 //                SSLContextBuilder scBuilder = SSLContexts.custom();
 //                if (keystorePass != null) {
@@ -55,6 +58,8 @@ public class SSLUtils {
             } catch (KeyManagementException e) {
                 throw new ForestRuntimeException(e);
             } catch (KeyStoreException e) {
+                throw new ForestRuntimeException(e);
+            } catch (UnrecoverableKeyException e) {
                 throw new ForestRuntimeException(e);
             }
         }

@@ -10,7 +10,7 @@ public interface SSLClient {
 
     @Request(
             url = "https://localhost:5000/hello/user",
-            keyStore = "test"
+            keyStore = "ssl_client"
     )
     String truestAllGet();
 

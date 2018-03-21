@@ -12,8 +12,8 @@ import java.io.*;
  */
 public class SpringSSLKeyStore extends SSLKeyStore {
 
-    public SpringSSLKeyStore(String id, String keystoreType, String filePath, String keystorePass) {
-        super(id, keystoreType, filePath, keystorePass);
+    public SpringSSLKeyStore(String id, String keystoreType, String filePath, String keystorePass, String certPass) {
+        super(id, keystoreType, filePath, keystorePass, certPass);
     }
 
     @Override

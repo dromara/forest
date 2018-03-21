@@ -1,17 +1,13 @@
 package org.forest.test.http;
 
-import com.github.dreamhead.moco.HttpServer;
 import com.github.dreamhead.moco.HttpsCertificate;
 import com.github.dreamhead.moco.HttpsServer;
 import com.github.dreamhead.moco.Runner;
-import com.github.dreamhead.moco.config.MocoRequestConfig;
-import com.github.dreamhead.moco.config.MocoResponseConfig;
 import org.forest.backend.HttpBackend;
 import org.forest.config.ForestConfiguration;
 import org.forest.ssl.SSLKeyStore;
 import org.forest.test.http.client.SSLClient;
 import org.forest.test.mock.GetMockServer;
-import org.forest.test.mock.SSLMockServer;
 import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,15 +28,15 @@ public class TestSSLClient extends BaseClientTest {
     private final static Logger log = LoggerFactory.getLogger(TestSSLClient.class);
 
     private static HttpsServer server;
-    private final static HttpsCertificate certificate = certificate(pathResource("test.keystore"), "123456", "123456");
+    private final static HttpsCertificate serverCertificate = certificate(pathResource("ssl_server.keystore"), "server", "123456");
 //    private static HttpServer server;
 
-    public final static String EXPECTED = "{\"status\": \"ok\"}";
+    public final static String EXPECTED = "{\"status\": \"ok\", \"ssl\": \"true\"}";
 
     private Runner runner;
 
     static {
-        server = httpsServer(5000, certificate);
+        server = httpsServer(5000, serverCertificate);
         server
                 .get(by(uri("/hello/user")))
                 .response(EXPECTED);
@@ -55,8 +51,9 @@ public class TestSSLClient extends BaseClientTest {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
-        SSLKeyStore sslKeyStore = new SSLKeyStore("test", "test.keystore", "123456");
-        configuration.registerKeyStore("test", sslKeyStore);
+        SSLKeyStore sslKeyStore = new SSLKeyStore(
+                "ssl_client", "ssl_client.keystore", "client", "456789");
+        configuration.registerKeyStore("ssl_client", sslKeyStore);
     }
 
 
@@ -84,7 +81,7 @@ public class TestSSLClient extends BaseClientTest {
         String result = sslClient.truestAllGet();
         log.info("response: " + result);
         assertNotNull(result);
-        assertEquals(GetMockServer.EXPECTED, result);
+        assertEquals(EXPECTED, result);
     }
 
 }

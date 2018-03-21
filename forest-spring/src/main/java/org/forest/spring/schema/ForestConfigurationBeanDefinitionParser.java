@@ -8,6 +8,7 @@ import org.forest.spring.ssl.SpringSSLKeyStore;
 import org.forest.ssl.SSLKeyStore;
 import org.forest.utils.StringUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.ChildBeanDefinition;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.support.ManagedMap;
@@ -126,7 +127,8 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         String id = elem.getAttribute("id");
         String filePath = elem.getAttribute("file");
         String keystoreType = elem.getAttribute("type");
-        String keystorePass = elem.getAttribute("pass");
+        String keystorePass = elem.getAttribute("keystorePass");
+        String certPass = elem.getAttribute("certPass");
         String protocolsStr = elem.getAttribute("protocols");
         String cipherSuitesStr = elem.getAttribute("cipher-suites");
 
@@ -140,10 +142,12 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
 
         BeanDefinition beanDefinition = new GenericBeanDefinition();
         beanDefinition.setBeanClassName(sslKeyStoreBeanClass.getName());
-        beanDefinition.getConstructorArgumentValues().addGenericArgumentValue(id);
-        beanDefinition.getConstructorArgumentValues().addGenericArgumentValue(keystoreType);
-        beanDefinition.getConstructorArgumentValues().addGenericArgumentValue(filePath);
-        beanDefinition.getConstructorArgumentValues().addGenericArgumentValue(keystorePass);
+        ConstructorArgumentValues beanDefValues = beanDefinition.getConstructorArgumentValues();
+        beanDefValues.addGenericArgumentValue(id);
+        beanDefValues.addGenericArgumentValue(keystoreType);
+        beanDefValues.addGenericArgumentValue(filePath);
+        beanDefValues.addGenericArgumentValue(keystorePass);
+        beanDefValues.addGenericArgumentValue(certPass);
         if (StringUtils.isNotEmpty(protocolsStr)) {
             String[] strs = protocolsStr.split(",");
             String[] protocols = new String[strs.length];

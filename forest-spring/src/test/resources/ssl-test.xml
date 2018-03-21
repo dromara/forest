@@ -15,7 +15,7 @@
             maxConnections="500"
             maxRouteConnections="500">
 
-        <forest:ssl-keystore id="keystore1" file="test.keystore" pass="123456"/>
+        <forest:ssl-keystore id="keystore1" file="test.keystore" keystorePass="123456"/>
 
     </forest:configuration>
 

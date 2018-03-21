@@ -147,7 +147,9 @@
         </xsd:attribute>
         <xsd:attribute name="file" type="xsd:string" use="required">
         </xsd:attribute>
-        <xsd:attribute name="pass" type="xsd:string" use="required">
+        <xsd:attribute name="keystorePass" type="xsd:string" use="optional">
+        </xsd:attribute>
+        <xsd:attribute name="certPass" type="xsd:string" use="optional">
         </xsd:attribute>
     </xsd:complexType>
 
