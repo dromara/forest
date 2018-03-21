@@ -270,11 +270,10 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * register a SSL KeyStore object
-     * @param id
      * @param keyStore
      */
-    public void registerKeyStore(String id, SSLKeyStore keyStore) {
-        sslKeyStores.put(id, keyStore);
+    public void registerKeyStore(SSLKeyStore keyStore) {
+        sslKeyStores.put(keyStore.getId(), keyStore);
     }
 
     public SSLKeyStore getKeyStore(String id) {
