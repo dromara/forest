@@ -12,7 +12,7 @@ public class JSONConverterSelector implements Serializable {
      * check FastJSON
      * @return
      */
-    public Class checkFastJSONClass() throws ClassNotFoundException {
+    public Class checkFastJSONClass() throws Throwable {
         return Class.forName("com.alibaba.fastjson.JSON");
     }
 
@@ -20,7 +20,7 @@ public class JSONConverterSelector implements Serializable {
      * check Jaskon
      * @return
      */
-    public Class checkJacsonClass() throws ClassNotFoundException {
+    public Class checkJacsonClass() throws Throwable {
         return Class.forName("com.fasterxml.jackson.databind.ObjectMapper");
     }
 
@@ -28,7 +28,7 @@ public class JSONConverterSelector implements Serializable {
      * check Gson
      * @return
      */
-    public Class checkGsonClass() throws ClassNotFoundException {
+    public Class checkGsonClass() throws Throwable {
         return Class.forName("com.google.gson.JsonParser");
     }
 
