@@ -49,7 +49,7 @@ Forest是一个高层的、极简的HTTP调用API框架。<br>
 import org.forest.annotation.Request;
 import org.forest.annotation.DataParam;
 
-public interface Client {
+public interface MyClient {
 
     /**
      * 百度短链接API
@@ -74,8 +74,8 @@ public interface Client {
 ```java
 
 ForestConfiguration configuration = ForestConfiguration.configuration();
-Client client = configuration.createInstance(Client.class);
-Map result = client.getShortUrl("https://gitee.com/dt_flys/forest");
+MyClient myClient = configuration.createInstance(MyClient.class);
+Map result = myClient.getShortUrl("https://gitee.com/dt_flys/forest");
 System.out.println(result);
 
 ```
@@ -84,11 +84,11 @@ System.out.println(result);
 
 ```java
 @Autowired
-Client client;
+MyClient myClient;
 
 ...
 
-Map result = client.getShortUrl("https://gitee.com/dt_flys/forest");
+Map result = myClient.getShortUrl("https://gitee.com/dt_flys/forest");
 
 ```
 
