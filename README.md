@@ -76,11 +76,24 @@ public interface Client {
 
 ForestConfiguration configuration = ForestConfiguration.configuration();
 Client client = configuration.createInstance(Client.class);
-Map result = client.getShortUrl("https://github.com/mySingleLive/forest");
+Map result = client.getShortUrl("https://gitee.com/dt_flys/forest");
 System.out.println(result);
 
 ```
 
+#### 或者在Spring中调用
+
+```java
+@Autowired
+Client client;
+
+...
+
+Map result = client.getShortUrl("https://gitee.com/dt_flys/forest");
+
+```
+
+如何在Spring中配置请参见[在Spring中使用](https://gitee.com/dt_flys/forest/blob/master/forest-core/src/main/doc/SPRING.md)
 
 详细文档:<br>
 * [变量/参数](https://gitee.com/dt_flys/forest/blob/master/forest-core/src/main/doc/DOCUMENTATION.md)<br>
