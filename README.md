@@ -12,7 +12,7 @@ Forest是一个高层的、极简的HTTP调用API框架。<br>
 
 项目特点：
 -----
-* 以Httpclient、以及以后OkHttp为后端框架
+* 以Httpclient和OkHttp为后端框架
 * 通过调用本地方法的方式去发送Http请求
 * 支持灵活的模板表达式
 * 支持过滤器来过滤传入的数据
