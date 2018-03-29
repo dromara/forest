@@ -42,6 +42,7 @@ public class TestWxHttpClient extends BaseClientTest {
                 "apiclient_cert.p12",
                 "1217660101",
                 "1217660101");
+        sslKeyStore.setProtocols(new String[] {"TLSv1"});
         configuration.registerKeyStore(sslKeyStore);
     }
 
