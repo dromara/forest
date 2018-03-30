@@ -44,6 +44,8 @@ Quick Start
 -------------------------------------
 ### 创建一个Interface作为远程调用接口
 
+一个栗子：访问百度短链接RESTFUL接口
+
 ```java
 
 import org.forest.annotation.Request;
