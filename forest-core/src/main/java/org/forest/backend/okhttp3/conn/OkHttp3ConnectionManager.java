@@ -3,6 +3,7 @@ package org.forest.backend.okhttp3.conn;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import org.forest.backend.ForestConnectionManager;
+import org.forest.config.ForestConfiguration;
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.http.ForestRequest;
 import org.forest.ssl.*;
@@ -27,12 +28,8 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
     private ConnectionPool pool;
 
     public OkHttp3ConnectionManager() {
-        init();
     }
 
-    public void init() {
-        pool = new ConnectionPool();
-    }
 
     public X509TrustManager getX509TrustManager(ForestRequest request) {
         try {
@@ -79,4 +76,8 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
         return builder.build();
     }
 
+    @Override
+    public void init(ForestConfiguration configuration) {
+        pool = new ConnectionPool();
+    }
 }

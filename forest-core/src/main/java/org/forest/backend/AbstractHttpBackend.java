@@ -1,6 +1,7 @@
 package org.forest.backend;
 
 
+import org.forest.config.ForestConfiguration;
 import org.forest.exceptions.ForestRuntimeException;
 import org.forest.handler.ResponseHandler;
 import org.forest.http.ForestRequest;
@@ -14,13 +15,25 @@ import java.util.Map;
  */
 public abstract class AbstractHttpBackend implements HttpBackend {
 
+    private volatile boolean initialized = false;
+
     private final Map<String, HttpExecutorCreator> executorCreatorMap = new HashMap<>();
 
     private final ForestConnectionManager connectionManager;
 
     public AbstractHttpBackend(ForestConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
-        init();
+    }
+
+    @Override
+    public void init(ForestConfiguration configuration) {
+        synchronized (this) {
+            if (!initialized) {
+                this.connectionManager.init(configuration);
+                init();
+                initialized = true;
+            }
+        }
     }
 
     protected abstract HttpExecutor createHeadExecutor(ForestConnectionManager connectionManager, ForestRequest request, ResponseHandler responseHandler);

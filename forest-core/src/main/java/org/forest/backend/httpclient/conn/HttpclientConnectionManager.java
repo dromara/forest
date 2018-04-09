@@ -27,6 +27,7 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 import org.forest.backend.ForestConnectionManager;
 import org.forest.config.ForestConfiguration;
+import org.forest.exceptions.ForestRuntimeException;
 import org.forest.exceptions.ForestUnsupportException;
 import org.forest.http.ForestRequest;
 
@@ -52,65 +53,71 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
     private final ForestSSLConnectionFactory sslConnectFactory = new ForestSSLConnectionFactory();
 
     public HttpclientConnectionManager() {
-        synchronized (HttpclientConnectionManager.class) {
-            if (tsConnectionManager == null) {
-                try {
-                    init();
-                } catch (IOReactorException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+//        synchronized (HttpclientConnectionManager.class) {
+//            if (tsConnectionManager == null) {
+//                try {
+//                    init();
+//                } catch (IOReactorException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
     }
 
-    public void init() throws IOReactorException {
-        httpParams = new BasicHttpParams();
-        Integer maxConnections = DEFAULT_MAX_TOTAL_CONNECTIONS;
-        Integer maxRouteConnections = 10;
-        Integer connectTimeout = DEFAULT_CONNECT_TIMEOUT;
-
-        Registry<ConnectionSocketFactory> socketFactoryRegistry =
-                RegistryBuilder.<ConnectionSocketFactory> create()
-                .register("https", sslConnectFactory)
-                .register("http", new PlainConnectionSocketFactory())
-                .build();
-
-        tsConnectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
-        tsConnectionManager.setMaxTotal(maxConnections);
-        tsConnectionManager.setDefaultMaxPerRoute(maxRouteConnections);
-
-        /// init async connection manager
-        boolean supportAsync = true;
+    @Override
+    public void init(ForestConfiguration configuration) {
         try {
-            Class.forName("org.apache.http.nio.client.HttpAsyncClient");
-        } catch (ClassNotFoundException e) {
-            supportAsync = false;
-        }
-        if (supportAsync) {
-            ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor();
-            if (asyncConnectionManager == null) {
-                try {
-                    ConnectionConfig connectionConfig = ConnectionConfig.custom()
-                            .setMalformedInputAction(CodingErrorAction.IGNORE)
-                            .setUnmappableInputAction(CodingErrorAction.IGNORE)
-                            .setCharset(Consts.UTF_8).build();
+            httpParams = new BasicHttpParams();
+            Integer maxConnections = configuration.getMaxConnections() != null ?
+                    configuration.getMaxConnections() : DEFAULT_MAX_TOTAL_CONNECTIONS;
+            Integer maxRouteConnections = configuration.getMaxRouteConnections() != null ?
+                    configuration.getMaxRouteConnections() : DEFAULT_MAX_TOTAL_CONNECTIONS;
 
-                    authSchemeRegistry = RegistryBuilder
-                            .<AuthSchemeProvider> create()
-                            .register(AuthSchemes.BASIC, new BasicSchemeFactory())
-                            .register(AuthSchemes.DIGEST, new DigestSchemeFactory())
-                            .register(AuthSchemes.NTLM, new NTLMSchemeFactory())
-                            .register(AuthSchemes.SPNEGO, new SPNegoSchemeFactory())
-                            .register(AuthSchemes.KERBEROS, new KerberosSchemeFactory())
+            Registry<ConnectionSocketFactory> socketFactoryRegistry =
+                    RegistryBuilder.<ConnectionSocketFactory>create()
+                            .register("https", sslConnectFactory)
+                            .register("http", new PlainConnectionSocketFactory())
                             .build();
 
-                    asyncConnectionManager = new PoolingNHttpClientConnectionManager(ioReactor);
-                    asyncConnectionManager.setMaxTotal(maxConnections);
-                    asyncConnectionManager.setDefaultMaxPerRoute(maxRouteConnections);
-                    asyncConnectionManager.setDefaultConnectionConfig(connectionConfig);
-                } catch (Throwable t) {
+            tsConnectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
+            tsConnectionManager.setMaxTotal(maxConnections);
+            tsConnectionManager.setDefaultMaxPerRoute(maxRouteConnections);
+
+            /// init async connection manager
+            boolean supportAsync = true;
+            try {
+                Class.forName("org.apache.http.nio.client.HttpAsyncClient");
+            } catch (ClassNotFoundException e) {
+                supportAsync = false;
+            }
+            if (supportAsync) {
+                ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor();
+                if (asyncConnectionManager == null) {
+                    try {
+                        ConnectionConfig connectionConfig = ConnectionConfig.custom()
+                                .setMalformedInputAction(CodingErrorAction.IGNORE)
+                                .setUnmappableInputAction(CodingErrorAction.IGNORE)
+                                .setCharset(Consts.UTF_8).build();
+
+                        authSchemeRegistry = RegistryBuilder
+                                .<AuthSchemeProvider>create()
+                                .register(AuthSchemes.BASIC, new BasicSchemeFactory())
+                                .register(AuthSchemes.DIGEST, new DigestSchemeFactory())
+                                .register(AuthSchemes.NTLM, new NTLMSchemeFactory())
+                                .register(AuthSchemes.SPNEGO, new SPNegoSchemeFactory())
+                                .register(AuthSchemes.KERBEROS, new KerberosSchemeFactory())
+                                .build();
+
+                        asyncConnectionManager = new PoolingNHttpClientConnectionManager(ioReactor);
+                        asyncConnectionManager.setMaxTotal(maxConnections);
+                        asyncConnectionManager.setDefaultMaxPerRoute(maxRouteConnections);
+                        asyncConnectionManager.setDefaultConnectionConfig(connectionConfig);
+                    } catch (Throwable t) {
+                    }
                 }
             }
+        } catch (Throwable th) {
+            throw new ForestRuntimeException(th);
         }
     }
 
