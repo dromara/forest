@@ -103,7 +103,7 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
 
     public ForestRequest removeCurrentRequest() {
         ForestRequest request = requestLocal.get();
-//        requestLocal.remove();
+        requestLocal.remove();
         return request;
     }
 
