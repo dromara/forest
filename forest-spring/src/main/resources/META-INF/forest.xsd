@@ -31,17 +31,6 @@
     </xsd:element>
 
 
-    <xsd:element name="request-template" type="requestTemplateType">
-        <xsd:annotation>
-            <xsd:documentation>
-                <![CDATA[
-                    The template of forest request definition.
-                ]]>
-            </xsd:documentation>
-        </xsd:annotation>
-
-    </xsd:element>
-
     <xsd:element name="var" type="variableType">
         <xsd:annotation>
             <xsd:documentation>
