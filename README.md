@@ -48,7 +48,7 @@ Quick Start
 
 ```xml
 <dependency>
-	<groupId>com.dtflys</groupId>
+	<groupId>com.dtflys.forest</groupId>
 	<artifactId>forest</artifactId>
 	<version>1.0.0</version>
 </dependency>

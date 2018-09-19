@@ -9,7 +9,7 @@ Maven中除了forest-core和spring外，还要加入以下依赖
 ```xml
 
     <dependency>
-        <groupId>com.dtflys</groupId>
+        <groupId>com.dtflys.forest</groupId>
         <artifactId>forest-spring</artifactId>
         <version>1.0.0</version>
     </dependency>
