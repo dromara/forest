@@ -19,11 +19,11 @@ Maven中除了forest-core和spring外，还要加入以下依赖
  * 打开spring的上下文配置文件，在beans开头定义的属性中加入Forest的Schema
 
 ```
-xmlns:forest="http://forest.org/schema/forest-spring" xmlns:util="http://www.springframework.org/schema/util"
+xmlns:forest="http://www.dtflys.com/schema/forest" xmlns:util="http://www.springframework.org/schema/util"
    ...
 xsi:schemaLocation=" ...
-http://forest.org/schema/forest-spring
-http://forest.org/schema/forest-spring.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+http://www.dtflys.com/schema/forest
+http://www.dtflys.com/schema/forest/forest-spring.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
 ..."
 ```
 
@@ -33,11 +33,11 @@ http://forest.org/schema/forest-spring.xsd http://www.springframework.org/schema
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:forest="http://forest.org/schema/forest-spring" xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:forest="http://www.dtflys.com/schema/forest"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://forest.org/schema/forest-spring
-       http://forest.org/schema/forest-spring.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+       http://www.dtflys.com/schema/forest
+       http://www.dtflys.com/schema/forest/forest-spring.xsd">
 
    ...
 
