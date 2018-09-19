@@ -4,7 +4,7 @@
 	
 	<groupId>org.forest</groupId>
 	<artifactId>forest</artifactId>
-	<version>0.1.6</version>
+	<version>1.0.0</version>
 	<packaging>pom</packaging>
 	<name>forest</name>
 

@@ -33,6 +33,7 @@ import org.forest.backend.HttpExecutor;
 import org.forest.handler.ResponseHandler;
 import org.forest.interceptor.Interceptor;
 import org.forest.interceptor.InterceptorChain;
+import org.forest.mapping.MappingTemplate;
 import org.forest.ssl.SSLKeyStore;
 import org.forest.utils.ForestDataType;
 import org.forest.utils.RequestNameValue;
@@ -263,6 +264,7 @@ public class ForestRequest<T> {
         this.headers.put(nameValue.getName(), nameValue.getValue());
         return this;
     }
+
 
     public ForestRequest addHeaders(List<RequestNameValue> headers) {
         putMapAddList(this.headers, headers);

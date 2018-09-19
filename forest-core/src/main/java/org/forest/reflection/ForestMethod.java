@@ -256,6 +256,7 @@ public class ForestMethod<T> implements VariableScope {
         String newUrl = "";
         List<RequestNameValue> nameValueList = new ArrayList<RequestNameValue>();
         String baseUrl = interfaceProxyHandler.getBaseURL();
+        MappingTemplate[] baseHeaders = interfaceProxyHandler.getBaseHeaders();
         renderedUrl = URLUtils.getValidURL(baseUrl, renderedUrl);
         String query = "";
         String protocol = "";
@@ -359,6 +360,15 @@ public class ForestMethod<T> implements VariableScope {
                 .setAsync(async);
         if (configuration.getDefaultParameters() != null) {
             request.addData(configuration.getDefaultParameters());
+        }
+        if (baseHeaders != null && baseHeaders.length > 0) {
+            for (MappingTemplate baseHeader : baseHeaders) {
+                String headerText = baseHeader.render(args);
+                String[] headerNameValue = headerText.split(":");
+                if (headerNameValue.length > 1) {
+                    request.addHeader(headerNameValue[0].trim(), headerNameValue[1].trim());
+                }
+            }
         }
         if (configuration.getDefaultHeaders() != null) {
             request.addHeaders(configuration.getDefaultHeaders());

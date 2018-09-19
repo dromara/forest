@@ -1,5 +1,6 @@
 package org.forest.proxy;
 
+import org.forest.annotation.BaseRequest;
 import org.forest.annotation.BaseURL;
 import org.forest.config.ForestConfiguration;
 import org.forest.config.VariableScope;
@@ -30,6 +31,16 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
 
     private String baseURL;
 
+    private String baseContentType;
+
+    private MappingTemplate[] baseHeaders;
+
+    private Class[] baseInterceptorClasses;
+
+    private Integer baseTimeout;
+
+    private Integer baseRetryCount;
+
     public ProxyFactory getProxyFactory() {
         return proxyFactory;
     }
@@ -38,12 +49,12 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         this.configuration = configuration;
         this.proxyFactory = proxyFactory;
         this.interfaceClass = interfaceClass;
-        prepareBaseURL();
+        prepareBaseInfo();
         initMethods();
     }
 
 
-    private void prepareBaseURL() {
+    private void prepareBaseInfo() {
         Annotation[] annotations = interfaceClass.getAnnotations();
         for (int i = 0; i < annotations.length; i++) {
             Annotation annotation = annotations[i];
@@ -61,8 +72,26 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
                 }
                 baseURL = URLUtils.getValidBaseURL(baseURL);
             }
+            if (annotation instanceof BaseRequest) {
+                BaseRequest baseRequestAnn = (BaseRequest) annotation;
+                baseContentType = baseRequestAnn.contentType();
+                String [] headerArray = baseRequestAnn.headers();
+                if (headerArray != null && headerArray.length > 0) {
+                    baseHeaders = new MappingTemplate[headerArray.length];
+                    for (int j = 0; j < baseHeaders.length; j++) {
+                        MappingTemplate header = new MappingTemplate(headerArray[j], this);
+                        baseHeaders[j] = header;
+                    }
+                }
+                baseTimeout = baseRequestAnn.timeout();
+                baseTimeout = baseTimeout == -1 ? null : baseTimeout;
+                baseRetryCount = baseRequestAnn.retryCount();
+                baseRetryCount = baseRetryCount == -1 ? null : baseRetryCount;
+                baseInterceptorClasses = baseRequestAnn.interceptor();
+            }
         }
     }
+
 
 
     private void initMethods() {
@@ -86,6 +115,26 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
 
     public String getBaseURL() {
         return baseURL;
+    }
+
+    public MappingTemplate[] getBaseHeaders() {
+        return baseHeaders;
+    }
+
+    public Class[] getBaseInterceptorClasses() {
+        return baseInterceptorClasses;
+    }
+
+    public Integer getBaseTimeout() {
+        return baseTimeout;
+    }
+
+    public String getBaseContentType() {
+        return baseContentType;
+    }
+
+    public Integer getBaseRetryCount() {
+        return baseRetryCount;
     }
 
     @Override
