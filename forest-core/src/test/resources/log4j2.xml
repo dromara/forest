@@ -7,7 +7,7 @@
     </Appenders>
     
     <Loggers>
-        <logger name="org.forest" level="info"/>
+        <logger name="com.dtflys" level="info"/>
         <Root level="info">
             <AppenderRef ref="Console" />
         </Root>

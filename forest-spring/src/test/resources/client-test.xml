@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:forest="http://forest.org/schema/forest-spring" xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:forest="http://www.dtflys.com/schema/forest"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://forest.org/schema/forest-spring
-       http://forest.org/schema/forest-spring.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+       http://www.dtflys.com/schema/forest
+       http://www.dtflys.com/schema/forest/forest-spring.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
     <forest:configuration
             id="forestConfiguration"
@@ -21,7 +23,7 @@
 
     </forest:configuration>
 
-    <forest:client id="beastshopClient" configuration="forestConfiguration" class="org.forest.spring.test.client.BeastshopClient"/>
+    <forest:client id="beastshopClient" configuration="forestConfiguration" class="com.dtflys.spring.test.client.BeastshopClient"/>
 
 
 </beans>

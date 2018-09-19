@@ -19,8 +19,8 @@
 
 ```java
 
-import org.forest.annotation.Request;
-import org.forest.annotation.DataParam;
+import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.annotation.DataParam;
 
 public interface MyClient {
     

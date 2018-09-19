@@ -1,1 +1,1 @@
-http\://forest.org/schema/forest-spring=org.forest.spring.schema.ForestNamespaceHandler
+http\://www.dtflys.com/schema/forest=com.dtflys.forest.schema.ForestNamespaceHandler
