@@ -43,6 +43,17 @@ Forest是一个高层的、极简的HTTP调用API框架。<br>
 Quick Start
 -------------------------------------
 
+
+### Maven依赖
+
+```xml
+<dependency>
+	<groupId>com.dtflys</groupId>
+	<artifactId>forest</artifactId>
+	<version>1.0.0</version>
+</dependency>
+```
+
 一个栗子：访问百度短链接REST接口
 
 ### 创建一个Interface作为远程调用接口
