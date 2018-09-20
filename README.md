@@ -55,6 +55,16 @@ Quick Start
 </dependency>
 ```
 
+如果您使用了spring
+
+```xml
+<dependency>
+  <groupId>com.dtflys.forest</groupId>
+  <artifactId>forest-spring</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
+
 一个栗子：访问百度短链接REST接口
 
 ### 创建一个Interface作为远程调用接口
