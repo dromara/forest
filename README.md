@@ -106,6 +106,21 @@ System.out.println(result);
 
 ```
 
+如果写在main方法中是介样子滴
+
+```java
+public class TestForest {
+    
+    private final static ForestConfiguration configuration = ForestConfiguration.configuration();
+    private final static MyClient myClient = configuration.createInstance(MyClient.class);
+    
+    public static void main(String[] args) {
+        Map result = myClient.getShortUrl("https://gitee.com/dt_flys/forest");
+        System.out.println(result);
+    }
+}
+```
+
 #### 或者在Spring中调用
 
 ```java
