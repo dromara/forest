@@ -49,9 +49,9 @@ Quick Start
 
 ```xml
 <dependency>
-	<groupId>com.dtflys.forest</groupId>
-	<artifactId>forest-core</artifactId>
-	<version>1.0.0</version>
+    <groupId>com.dtflys.forest</groupId>
+    <artifactId>forest-core</artifactId>
+    <version>1.0.0</version>
 </dependency>
 ```
 
@@ -59,9 +59,9 @@ Quick Start
 
 ```xml
 <dependency>
-  <groupId>com.dtflys.forest</groupId>
-  <artifactId>forest-spring</artifactId>
-  <version>1.0.0</version>
+    <groupId>com.dtflys.forest</groupId>
+    <artifactId>forest-spring</artifactId>
+    <version>1.0.0</version>
 </dependency>
 ```
 
