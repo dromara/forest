@@ -37,8 +37,8 @@ Forest是一个高层的、极简的HTTP调用API框架。<br>
 * 已支持JAXB形式的XML转换
 * 已支持JSON解析
 * 支持Commons-Log, SLF4j, Log4J等日志框架
+* 1.0.0版本已布中央仓库
 * 异步请求方式还不够完善
-* 暂未发布中央仓库
 
 
 Quick Start
@@ -50,7 +50,7 @@ Quick Start
 ```xml
 <dependency>
 	<groupId>com.dtflys.forest</groupId>
-	<artifactId>forest</artifactId>
+	<artifactId>forest-core</artifactId>
 	<version>1.0.0</version>
 </dependency>
 ```
@@ -111,9 +111,9 @@ Map result = myClient.getShortUrl("https://gitee.com/dt_flys/forest");
 如何在Spring中配置请参见[在Spring中使用](https://gitee.com/dt_flys/forest/blob/master/forest-core/src/main/doc/SPRING.md)
 
 ### 详细文档:<br>
-* [变量/参数](https://gitee.com/dt_flys/forest/blob/master/forest-core/src/main/doc/DOCUMENTATION.md)<br>
-* [回调方法](https://gitee.com/dt_flys/forest/blob/master/forest-core/src/main/doc/CALLBACK.md)<br>
-* [在Spring中使用](https://gitee.com/dt_flys/forest/blob/master/forest-core/src/main/doc/SPRING.md)
+* [变量/参数](forest-core/src/main/doc/DOCUMENTATION.md)<br>
+* [回调方法](forest-core/src/main/doc/CALLBACK.md)<br>
+* [在Spring中使用](forest-core/src/main/doc/SPRING.md)
 
 
 项目协议
