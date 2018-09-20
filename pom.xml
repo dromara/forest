@@ -7,7 +7,33 @@
 	<version>1.0.0</version>
 	<packaging>pom</packaging>
 	<name>forest</name>
+	<description>A easy HTTP client framework for Java</description>
+	<url>https://github.com/mySingleLive/forest</url>
 
+
+	<licenses>
+		<license>
+			<name>The MIT License (MIT)</name>
+			<url>https://mit-license.org</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<id>gongjun</id>
+			<name>gongjun</name>
+			<email>dt_flys@hotmail.com</email>
+			<url>http://www.dtflys.com</url>
+		</developer>
+	</developers>
+
+	<scm>
+		<url>https://github.com/mySingleLive/forest</url>
+		<connection>scm:git:https://github.com/mySingleLive/forest.git</connection>
+		<developerConnection>http://www.dtflys.com</developerConnection>
+		<tag>1.0.0-RELEASE</tag>
+	</scm>
 
 	<properties>
 		<slf4j.version>1.7.10</slf4j.version>
@@ -16,22 +42,6 @@
 		<httpclient.version>4.3.2</httpclient.version>
 		<httpasyncclient.version>4.0.1</httpasyncclient.version>
 	</properties>
-
-	<developers>
-		<developer>
-			<id>gongjun</id>
-			<name>gongjun</name>
-			<email>dt_flys@hotmail.com</email>
-		</developer>
-	</developers>
-
-	<licenses>
-		<license>
-			<name>The MIT License (MIT)</name>
-			<url>https://mit-license.org</url>
-		</license>
-	</licenses>
-
 
 	<modules>
 		<module>forest-core</module>
@@ -194,32 +204,68 @@
 		</plugins>
 	</build>
 
-	<repositories>
-		<repository>
-			<id>nexus</id>
-			<name>nexus</name>
-			<url>http://118.178.236.200:8087/nexus/content/repositories/releases/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
-
 	<distributionManagement>
-		<repository>
-			<id>nexus-releases</id>
-			<name>Nexus Release Repository</name>
-			<url>http://118.178.236.200:8087/nexus/content/repositories/releases/</url>
-		</repository>
 		<snapshotRepository>
-			<id>nexus-snapshots</id>
-			<name>Nexus Snapshot Repository</name>
-			<url>http://118.178.236.200:8087/nexus/content/repositories/snapshots/</url>
+			<id>oss-snapshot</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 		</snapshotRepository>
+		<repository>
+			<id>oss-release</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+		</repository>
 	</distributionManagement>
 
+
+	<profiles>
+		<profile>
+			<id>oss-release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>2.1.2</version>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>2.8.1</version>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.5</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>
