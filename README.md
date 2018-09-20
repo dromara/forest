@@ -141,8 +141,15 @@ Map result = myClient.getShortUrl("https://gitee.com/dt_flys/forest");
 * [在Spring中使用](forest-core/src/main/doc/SPRING.md)
 
 
+### 技术支持:<br>
+微信群:
+
+<img width="150" height="150" src="http://www.dtflys.com/images/forest/forest_wx.png"/>
+
 项目协议
 --------------------------
 The MIT License (MIT)
 
 Copyright (c) 2016 Jun Gong
+
+
