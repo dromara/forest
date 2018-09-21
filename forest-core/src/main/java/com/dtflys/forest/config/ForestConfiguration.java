@@ -158,17 +158,12 @@ public class ForestConfiguration implements Serializable {
         return backend;
     }
 
-    public HttpBackendSelector getHttpBackendSelector() {
-        return httpBackendSelector;
-    }
-
     public void setHttpBackendSelector(HttpBackendSelector httpBackendSelector) {
         this.httpBackendSelector = httpBackendSelector;
     }
 
     private static void setupJSONConverter(ForestConfiguration configuration) {
-        JSONConverterSelector jsonConverterSelector = new JSONConverterSelector();
-        configuration.setJsonConverter(jsonConverterSelector.select());
+        configuration.setJsonConverter(configuration.jsonConverterSelector.select());
     }
 
 
@@ -319,11 +314,8 @@ public class ForestConfiguration implements Serializable {
         return proxyFactory.createInstance();
     }
 
-    public JSONConverterSelector getJsonConverterSelector() {
-        return jsonConverterSelector;
-    }
 
-    public void setJsonConverterSelector(JSONConverterSelector jsonConverterSelector) {
+    private void setJsonConverterSelector(JSONConverterSelector jsonConverterSelector) {
         this.jsonConverterSelector = jsonConverterSelector;
     }
 
