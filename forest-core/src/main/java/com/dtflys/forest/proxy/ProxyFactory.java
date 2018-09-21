@@ -11,7 +11,7 @@ import java.util.Map;
  * @since 2016-03-25 18:17
  */
 public class ProxyFactory<T> {
-    private Map<Class<T>, T> instanceCache = new HashMap<Class<T>, T>();
+    private static Map<Class, Object> instanceCache = new HashMap<>();
     private ForestConfiguration configuration;
     private Class<T> interfaceClass;
 
@@ -28,15 +28,21 @@ public class ProxyFactory<T> {
         this.interfaceClass = interfaceClass;
     }
 
-    public synchronized T createInstance() {
-        T instance = instanceCache.get(interfaceClass);
+    public T createInstance() {
+        T instance = (T) instanceCache.get(interfaceClass);
         if (instance != null) {
             return instance;
         }
-        InterfaceProxyHandler<T> interfaceProxyHandler = new InterfaceProxyHandler<T>(configuration, this, interfaceClass);
-        instance = (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class[] {interfaceClass}, interfaceProxyHandler);
-        instanceCache.put(interfaceClass, instance);
-        return instance;
+        synchronized (instanceCache) {
+            instance = (T) instanceCache.get(interfaceClass);
+            if (instance != null) {
+                return instance;
+            }
+            InterfaceProxyHandler<T> interfaceProxyHandler = new InterfaceProxyHandler<T>(configuration, this, interfaceClass);
+            instance = (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class[]{interfaceClass}, interfaceProxyHandler);
+            instanceCache.put(interfaceClass, instance);
+            return instance;
+        }
     }
 
 }
