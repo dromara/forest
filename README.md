@@ -47,13 +47,20 @@ Quick Start
 
 ### Maven依赖
 
-因为forest是一个只做前端api的框架，所以需要添加一个后端http框架的依赖，这里我们使用OkHttp3（除此之外也可以用HttpClient）
+因为forest是一个只做前端api的框架，所以需要添加一个后端http框架的依赖，这里我们使用OkHttp3（除此之外也可以用HttpClient）<br>
+同时需要加上JSON解析包的依赖
 
 ```xml
 <dependency>
   <groupId>com.squareup.okhttp3</groupId>
   <artifactId>okhttp</artifactId>
   <version>3.3.0</version>
+</dependency>
+
+<dependency>
+    <groupId>com.alibaba</groupId>
+    <artifactId>fastjson</artifactId>
+    <version>1.2.47</version>
 </dependency>
 ```
 
