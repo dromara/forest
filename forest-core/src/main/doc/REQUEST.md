@@ -2,8 +2,7 @@
 
 ### HTTP请求
 
-简单的GET请求只要定义好url和dataType，type默认为"get"所以可以不填。
-
+简单的GET请求只要定义好url和dataType，type默认为"get"所以可以不填。<br>
 这里的dataType指定了response返回的数据类型，可以是json或是xml，forest会根据数据类型自动解析成对应类型的对象。
 
 ```java
@@ -12,7 +11,7 @@
     url = "http://localhost:8080/hello",
     dataType = "json"
 )
-public MyResp getHello();
+MyResp getHello();
 ```
 
 其它类型请求有包括 POST, PUT, HEAD 等，都可通过@Request注解的type属性设置。
@@ -23,7 +22,7 @@ public MyResp getHello();
     type = "post",   // 此处类型值为字符串，大小写不敏感
     dataType = "json"
 )
-public MyResp postHello();
+MyResp postHello();
 
 
 @Request(
@@ -31,7 +30,7 @@ public MyResp postHello();
     type = "put",
     dataType = "json"
 )
-public MyResp putHello();
+MyResp putHello();
 
 
 @Request(
@@ -39,7 +38,7 @@ public MyResp putHello();
     type = "head",
     dataType = "json"
 )
-public MyResp headHello();
+MyResp headHello();
 
 
 ```
@@ -47,14 +46,10 @@ public MyResp headHello();
 
 ### @DataParam
 
-Forest定义参数的方法有很多，但最常用的还是使用@DataParam注解和参数下标。
-
-@DataParam注解需只需要定义好参数名即可，随后在调用该方法时，会自动把传入的参数值绑定到request参数上。
-
-@DataParam注解的定义无需关心request类型是GET还是POST还是其它，其定义的形式都是不变的。
-
-在GET类型的request中，@DataParam绑定的参数值绑定到URL的Query部分（也就是?后面那串东西），
-
+Forest定义参数的方法有很多，但最常用的还是使用@DataParam注解和参数下标。<br>
+@DataParam注解需只需要定义好参数名即可，随后在调用该方法时，会自动把传入的参数值绑定到request参数上。<br>
+@DataParam注解的定义无需关心request类型是GET还是POST还是其它，其定义的形式都是不变的。<br>
+在GET类型的request中，@DataParam绑定的参数值绑定到URL的Query部分（也就是?后面那串东西），<br>
 而在POST或PUT类型的request中，参数会被绑定到HTTP请求的Body部分中。
 
 ```java
@@ -96,8 +91,7 @@ MyResp send(
 
 ### Headers
 
-Forest支持在请求中定义请求头，其通过@Request注解中headers属性进行设置。
-
+Forest支持在请求中定义请求头，其通过@Request注解中headers属性进行设置。<br>
 请求头设置的格式为："key: value"字符串形式，key和value以冒号分割。
 
 ```java
@@ -171,8 +165,7 @@ MyResp send(String un, String pw, String da, String sm);
 
 ### @BaseURL和@BaseRequest
 
-当定义了很多Request请求方法后，自然就会有很多重复的信息。抽象代码、提高代码重用性就变成必不可少的工作。
-
+当定义了很多Request请求方法后，自然就会有很多重复的信息。抽象代码、提高代码重用性就变成必不可少的工作。<br>
 Forest提供了@BaseURL和@BaseRequest来帮助您定义公用的URL和重复请求信息。
 
 
@@ -187,14 +180,12 @@ public interface Sender {
         dataType = "json"
     )
     MyResp send(String un, String pw, String da, String sm);
-    
-    
+        
     @Request(
         url = "/receive?un=${0}",
         dataType = "json"
     )
     MyResp receive(String un);
-
 }
 
 ```
