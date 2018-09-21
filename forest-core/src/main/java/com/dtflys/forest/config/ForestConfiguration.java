@@ -42,10 +42,6 @@ import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.filter.JSONFilter;
 import com.dtflys.forest.filter.XmlFilter;
-import com.dtflys.forest.ssl.SSLKeyStore;
-import com.dtflys.forest.utils.ForestDataType;
-import com.dtflys.forest.utils.RequestNameValue;
-import com.dtflys.forest.proxy.ProxyFactory;
 
 import java.io.Serializable;
 import java.util.*;
