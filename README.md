@@ -100,8 +100,6 @@ public interface MyClient {
         dataType = "json"
     )
     Map getShortUrl(@DataParam("url") String url);
-
-
 }
 
 
@@ -151,7 +149,8 @@ Map result = myClient.getShortUrl("https://gitee.com/dt_flys/forest");
 * [HTTP请求](forest-core/src/main/doc/REQUEST.md)<br>
 * [变量/参数](forest-core/src/main/doc/DOCUMENTATION.md)<br>
 * [回调方法](forest-core/src/main/doc/CALLBACK.md)<br>
-* [在Spring中使用](forest-core/src/main/doc/SPRING.md)
+* [在Spring中使用](forest-core/src/main/doc/SPRING.md)<br>
+* [拦截器](forest-core/src/main/doc/INTERCEPTOR.md)
 
 
 ### 技术支持:<br>
