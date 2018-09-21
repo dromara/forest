@@ -47,7 +47,7 @@ MyResp headHello();
 ### @DataParam
 
 Forest定义参数的方法有很多，但最常用的还是使用@DataParam注解和参数下标。<br>
-@DataParam注解需只需要定义好参数名即可，随后在调用该方法时，会自动把传入的参数值绑定到request参数上。<br>
+@DataParam注解只需要定义好参数名即可，随后在调用该方法时，会自动把传入的参数值绑定到request参数上。<br>
 @DataParam注解的定义无需关心request类型是GET还是POST还是其它，其定义的形式都是不变的。<br>
 在GET类型的request中，@DataParam绑定的参数值绑定到URL的Query部分（也就是?后面那串东西），<br>
 而在POST或PUT类型的request中，参数会被绑定到HTTP请求的Body部分中。
