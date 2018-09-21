@@ -75,7 +75,6 @@ public MyResp send(
 ```java
 @Request(
     url = "http://localhost:8080/send?un=${1}&pw=${2}&da=${3}&sm=${4}",
-    retryCount = 3,     // 如果失败，最多重试3次
     dataType = "json"
 )
 MyResp send(
