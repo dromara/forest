@@ -37,12 +37,30 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface Request {
 
+    /**
+     * target http url
+     * @return
+     */
     String url();
 
+    /**
+     * http method type: <br>
+     *     GET POST PUT HEAD OPTIONS DELETE PATCH TRACE
+     * @return
+     */
     String type() default "GET";
 
+    /**
+     * type of response data: <br>
+     *     text json xml
+     * @return
+     */
     String dataType() default "text";
 
+    /**
+     * whether can use async http request or not
+     * @return
+     */
     boolean async() default false;
 
     int timeout() default -1;
@@ -57,6 +75,32 @@ public @interface Request {
 
     String contentEncoding() default "UTF-8";
 
+    /**
+     * reqest headers: <br>
+     *     use the key-value format: key: value <br>
+     *     <pre>
+     *         ...
+     *         headers = "Content-Type: application/json"
+     *         ...
+     *     </pre>
+     *     multiple headers <br>
+     *     <pre>
+     *         ...
+     *         headers = {
+     *            "Content-Type: application/json",
+     *            "Accept: text/plan"
+     *         }
+     *         ...
+     *     </pre>
+     *     variables and parameters <br>
+     *     <pre>
+     *         ...
+     *         headers = {"Accept: ${value}"}
+     *         ...
+     *     <pre/>
+     *
+     * @return
+     */
     String[] headers() default {};
 
     Class<?>[] interceptor() default {};
