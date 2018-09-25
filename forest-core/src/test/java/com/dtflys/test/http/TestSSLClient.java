@@ -7,9 +7,6 @@ import com.dtflys.test.mock.GetMockServer;
 import com.github.dreamhead.moco.HttpsCertificate;
 import com.github.dreamhead.moco.HttpsServer;
 import com.github.dreamhead.moco.Runner;
-import com.dtflys.forest.backend.HttpBackend;
-import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.test.http.client.GetClient;
 import com.dtflys.test.http.client.SSLClient;
 import org.junit.*;
@@ -19,8 +16,6 @@ import org.slf4j.LoggerFactory;
 import static com.github.dreamhead.moco.Moco.*;
 import static com.github.dreamhead.moco.Runner.runner;
 import static com.github.dreamhead.moco.HttpsCertificate.certificate;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -32,7 +27,8 @@ public class TestSSLClient extends BaseClientTest {
     private final static Logger log = LoggerFactory.getLogger(TestSSLClient.class);
 
     private static HttpsServer server;
-    private final static HttpsCertificate serverCertificate = certificate(pathResource("ssl_server.keystore"), "server", "123456");
+    private final static HttpsCertificate serverCertificate = certificate(
+            pathResource("ssl_server.keystore"), "server", "123456");
 //    private static HttpServer server;
 
     @Rule
