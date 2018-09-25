@@ -129,7 +129,7 @@ public class ForestConfiguration implements Serializable {
 
     private ForestConfiguration setupBackend() {
         setBackend(httpBackendSelector.select(this));
-        log.info("[Forest] Http Backend: " + this.backend.getName());
+//        log.info("[Forest] Http Backend: " + this.backend.getName());
         return this;
     }
 

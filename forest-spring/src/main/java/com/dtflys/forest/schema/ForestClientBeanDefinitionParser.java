@@ -38,7 +38,7 @@ public class ForestClientBeanDefinitionParser implements BeanDefinitionParser {
 
         ClientFactoryBeanUtils.setupClientFactoryBean(beanDefinition, configurationId, clientClassName);
         log.info("[Forest] Created Forest Client Bean with name '" + id
-                + "' and Proxy of '" + clientClassName + "' client0 interface");
+                + "' and Proxy of '" + clientClassName + "' client interface");
 
         return beanDefinition;
     }

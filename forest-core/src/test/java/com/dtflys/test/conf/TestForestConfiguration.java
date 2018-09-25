@@ -65,7 +65,8 @@ public class TestForestConfiguration {
     @Test
     public void testDefault() {
         ForestConfiguration configuration = ForestConfiguration.configuration();
-        assertTrue(configuration.getId().startsWith("forestConfiguration"));
+        assertEquals("forestConfiguration" + configuration.hashCode(),
+                configuration.getId());
         assertEquals(Integer.valueOf(3000), configuration.getTimeout());
         assertEquals(Integer.valueOf(2000), configuration.getConnectTimeout());
         assertEquals(Integer.valueOf(500), configuration.getMaxConnections());

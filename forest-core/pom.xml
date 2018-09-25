@@ -6,7 +6,7 @@
 
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-core</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 
     <parent>
         <groupId>com.dtflys.forest</groupId>
@@ -29,7 +29,7 @@
 <!--
         <dependency>
             <groupId>com.ning</groupId>
-            <artifactId>async-http-client0</artifactId>
+            <artifactId>async-http-client</artifactId>
             <version>1.9.36</version>
             <scope>provided</scope>
         </dependency>

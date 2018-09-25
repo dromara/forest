@@ -61,13 +61,13 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
 
             if (logger.isDebugEnabled()) {
                 logger.debug("[Forest] Creating Forest Client Bean with name '" + holder.getBeanName()
-                        + "' and Proxy of '" + definition.getBeanClassName() + "' client0 interface");
+                        + "' and Proxy of '" + definition.getBeanClassName() + "' client interface");
             }
 
             String beanClassName = definition.getBeanClassName();
             ClientFactoryBeanUtils.setupClientFactoryBean(definition, configurationId, beanClassName);
             logger.info("[Forest] Created Forest Client Bean with name '" + holder.getBeanName()
-                    + "' and Proxy of '" + beanClassName + "' client0 interface");
+                    + "' and Proxy of '" + beanClassName + "' client interface");
 
         }
     }
@@ -82,7 +82,7 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
     public Set<BeanDefinitionHolder> doScan(String... basePackages) {
         Set<BeanDefinitionHolder> beanDefinitions = super.doScan(basePackages);
         if (beanDefinitions.isEmpty()) {
-            logger.warn("[Forest] No Forest client0 was found in '" + Arrays.toString(basePackages) + "' package.");
+            logger.warn("[Forest] No Forest client was found in '" + Arrays.toString(basePackages) + "' package.");
         }
         processBeanDefinitions(beanDefinitions);
         return beanDefinitions;

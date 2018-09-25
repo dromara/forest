@@ -18,7 +18,7 @@ public class HttpBackendSelector {
     private final static String HTTPCLIENT_BACKEND_NAME = "httpclient";
     private final static String OKHTTP3_BACKEND_NAME = "okhttp3";
 
-    public final static String HTTPCLIENT_CLIENT_CLASS_NAME = "org.apache.http.client0.HttpClient";
+    public final static String HTTPCLIENT_CLIENT_CLASS_NAME = "org.apache.http.client.HttpClient";
     public final static String OKHTTP3_CLIENT_CLASS_NAME = "okhttp3.OkHttpClient";
 
     private final static String HTTPCLIENT_BACKEND_CLASS_NAME = "com.dtflys.forest.backend.httpclient.HttpclientBackend";
