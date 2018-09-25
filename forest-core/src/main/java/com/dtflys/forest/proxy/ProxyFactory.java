@@ -39,7 +39,7 @@ public class ProxyFactory<T> {
                 return instance;
             }
             InterfaceProxyHandler<T> interfaceProxyHandler = new InterfaceProxyHandler<T>(configuration, this, interfaceClass);
-            instance = (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class[]{interfaceClass}, interfaceProxyHandler);
+            instance = (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class[]{interfaceClass, ForestClientProxy.class}, interfaceProxyHandler);
             instanceCache.put(interfaceClass, instance);
             return instance;
         }

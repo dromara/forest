@@ -1,7 +1,7 @@
 package com.dtflys.spring.test;
 
 import junit.framework.TestCase;
-import com.dtflys.spring.test.client.BeastshopClient;
+import com.dtflys.spring.test.client0.BeastshopClient;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**

@@ -22,7 +22,7 @@
     </forest:configuration>
 
     <forest:scan configuration="forestConfiguration"
-                 base-package="com.dtflys.spring.test.client"/>
+                 base-package="com.dtflys.spring.test.client0"/>
 
 
 </beans>

@@ -36,10 +36,10 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
     }
 
     protected void setupHttpClient(HttpClient client) {
-//        client.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, request.getTimeout());
-//        if (client instanceof DefaultHttpClient) {
-//            ((DefaultHttpClient) client).getCookieSpecs().register("default", defaultCookieSF);
-//            client.getParams().setParameter(ClientPNames.COOKIE_POLICY, "default");
+//        client0.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, request.getTimeout());
+//        if (client0 instanceof DefaultHttpClient) {
+//            ((DefaultHttpClient) client0).getCookieSpecs().register("default", defaultCookieSF);
+//            client0.getParams().setParameter(ClientPNames.COOKIE_POLICY, "default");
 //        }
     }
 

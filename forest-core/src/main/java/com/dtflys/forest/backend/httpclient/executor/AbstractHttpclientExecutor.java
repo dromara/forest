@@ -173,7 +173,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
                 e.printStackTrace();
             }
         }
-        client.getConnectionManager().closeExpiredConnections();
+        client0.getConnectionManager().closeExpiredConnections();
 */
     }
 

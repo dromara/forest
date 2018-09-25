@@ -24,14 +24,7 @@ public class ForestClientBeanDefinitionParser implements BeanDefinitionParser {
 
         beanDefinition.setLazyInit(false);
         String id = element.getAttribute("id");
-        if (id == null || id.length() == 0) {
-            String generatedBeanName = factoryBeanClass.getName();
-            id = generatedBeanName;
-            int counter = 2;
-            while(parserContext.getRegistry().containsBeanDefinition(id)) {
-                id = generatedBeanName + (counter ++);
-            }
-        }
+        id = ClientFactoryBeanUtils.getBeanId(id, factoryBeanClass, parserContext);
         if (id != null && id.length() > 0) {
             if (parserContext.getRegistry().containsBeanDefinition(id))  {
                 throw new IllegalStateException("Duplicate spring bean id " + id);
@@ -45,7 +38,7 @@ public class ForestClientBeanDefinitionParser implements BeanDefinitionParser {
 
         ClientFactoryBeanUtils.setupClientFactoryBean(beanDefinition, configurationId, clientClassName);
         log.info("[Forest] Created Forest Client Bean with name '" + id
-                + "' and Proxy of '" + clientClassName + "' client interface");
+                + "' and Proxy of '" + clientClassName + "' client0 interface");
 
         return beanDefinition;
     }

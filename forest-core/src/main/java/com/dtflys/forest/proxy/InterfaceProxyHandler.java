@@ -93,7 +93,6 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
     }
 
 
-
     private void initMethods() {
         Method[] methods = interfaceClass.getDeclaredMethods();
         for (int i = 0; i < methods.length; i++) {
@@ -104,6 +103,9 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
     }
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        if (method.getName().equals("getProxyHandler") && (args == null || args.length == 0)) {
+            return this;
+        }
         ForestMethod forestMethod = forestMethodMap.get(method);
         return forestMethod.invoke(args);
     }

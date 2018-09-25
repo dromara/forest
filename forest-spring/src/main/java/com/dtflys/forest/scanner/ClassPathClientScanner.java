@@ -1,5 +1,7 @@
 package com.dtflys.forest.scanner;
 
+import com.dtflys.forest.beans.ClientFactoryBean;
+import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.utils.ClientFactoryBeanUtils;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -59,13 +61,13 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
 
             if (logger.isDebugEnabled()) {
                 logger.debug("[Forest] Creating Forest Client Bean with name '" + holder.getBeanName()
-                        + "' and Proxy of '" + definition.getBeanClassName() + "' client interface");
+                        + "' and Proxy of '" + definition.getBeanClassName() + "' client0 interface");
             }
 
             String beanClassName = definition.getBeanClassName();
             ClientFactoryBeanUtils.setupClientFactoryBean(definition, configurationId, beanClassName);
             logger.info("[Forest] Created Forest Client Bean with name '" + holder.getBeanName()
-                    + "' and Proxy of '" + beanClassName + "' client interface");
+                    + "' and Proxy of '" + beanClassName + "' client0 interface");
 
         }
     }
@@ -77,10 +79,10 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
      * @return
      */
     @Override
-    protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
+    public Set<BeanDefinitionHolder> doScan(String... basePackages) {
         Set<BeanDefinitionHolder> beanDefinitions = super.doScan(basePackages);
         if (beanDefinitions.isEmpty()) {
-            logger.warn("[Forest] No Forest client was found in '" + Arrays.toString(basePackages) + "' package.");
+            logger.warn("[Forest] No Forest client0 was found in '" + Arrays.toString(basePackages) + "' package.");
         }
         processBeanDefinitions(beanDefinitions);
         return beanDefinitions;

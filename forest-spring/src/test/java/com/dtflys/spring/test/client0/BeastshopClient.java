@@ -1,4 +1,4 @@
-package com.dtflys.spring.test.client;
+package com.dtflys.spring.test.client0;
 
 
 import com.dtflys.forest.annotation.Request;
@@ -13,5 +13,5 @@ public interface BeastshopClient {
             url = "http://www.thebeastshop.com/",
             timeout = 80000
     )
-    public String index();
+    String index();
 }

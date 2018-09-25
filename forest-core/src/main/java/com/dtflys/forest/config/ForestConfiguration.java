@@ -55,6 +55,8 @@ public class ForestConfiguration implements Serializable {
 
     private static Log log = LogFactory.getLog(ForestConfiguration.class);
 
+    private static ForestConfiguration defaultConfiguration = configuration();
+
     private String id;
 
     /**
@@ -105,6 +107,11 @@ public class ForestConfiguration implements Serializable {
     private ForestConfiguration() {
     }
 
+
+    public static ForestConfiguration getDefaultConfiguration() {
+        return defaultConfiguration;
+    }
+
     public static ForestConfiguration configuration() {
         ForestConfiguration configuration = new ForestConfiguration();
         configuration.setId("forestConfiguration" + configuration.hashCode());
@@ -120,21 +127,24 @@ public class ForestConfiguration implements Serializable {
         return configuration;
     }
 
-    private void setupBackend() {
+    private ForestConfiguration setupBackend() {
         setBackend(httpBackendSelector.select(this));
         log.info("[Forest] Http Backend: " + this.backend.getName());
+        return this;
     }
 
-    public void setBackend(HttpBackend backend) {
+    public ForestConfiguration setBackend(HttpBackend backend) {
         this.backend = backend;
         if (backend != null) {
             backend.init(this);
             log.info("[Forest] Http Backend: " + this.backend.getName());
         }
+        return this;
     }
 
-    public void setBackendName(String backendName) {
+    public ForestConfiguration setBackendName(String backendName) {
         this.backendName = backendName;
+        return this;
     }
 
 
@@ -154,8 +164,9 @@ public class ForestConfiguration implements Serializable {
         return backend;
     }
 
-    public void setHttpBackendSelector(HttpBackendSelector httpBackendSelector) {
+    public ForestConfiguration setHttpBackendSelector(HttpBackendSelector httpBackendSelector) {
         this.httpBackendSelector = httpBackendSelector;
+        return this;
     }
 
     private static void setupJSONConverter(ForestConfiguration configuration) {
@@ -167,76 +178,86 @@ public class ForestConfiguration implements Serializable {
         return id;
     }
 
-    public void setId(String id) {
+    private ForestConfiguration setId(String id) {
         this.id = id;
+        return this;
     }
 
     public Integer getMaxConnections() {
         return maxConnections;
     }
 
-    public void setMaxConnections(Integer maxConnections) {
+    public ForestConfiguration setMaxConnections(Integer maxConnections) {
         this.maxConnections = maxConnections;
+        return this;
     }
 
     public Integer getMaxRouteConnections() {
         return maxRouteConnections;
     }
 
-    public void setMaxRouteConnections(Integer maxRouteConnections) {
+    public ForestConfiguration setMaxRouteConnections(Integer maxRouteConnections) {
         this.maxRouteConnections = maxRouteConnections;
+        return this;
     }
 
     public Integer getTimeout() {
         return timeout;
     }
 
-    public void setTimeout(Integer timeout) {
+    public ForestConfiguration setTimeout(Integer timeout) {
         this.timeout = timeout;
+        return this;
     }
 
     public Integer getConnectTimeout() {
         return connectTimeout;
     }
 
-    public void setConnectTimeout(Integer connectTimeout) {
+    public ForestConfiguration setConnectTimeout(Integer connectTimeout) {
         this.connectTimeout = connectTimeout;
+        return this;
     }
 
     public Integer getRetryCount() {
         return retryCount;
     }
 
-    public void setRetryCount(Integer retryCount) {
+    public ForestConfiguration setRetryCount(Integer retryCount) {
         this.retryCount = retryCount;
+        return this;
     }
 
     public List<RequestNameValue> getDefaultParameters() {
         return defaultParameters;
     }
 
-    public void setDefaultParameters(List<RequestNameValue> defaultParameters) {
+    public ForestConfiguration setDefaultParameters(List<RequestNameValue> defaultParameters) {
         this.defaultParameters = defaultParameters;
+        return this;
     }
 
     public List<RequestNameValue> getDefaultHeaders() {
         return defaultHeaders;
     }
 
-    public void setDefaultHeaders(List<RequestNameValue> defaultHeaders) {
+    public ForestConfiguration setDefaultHeaders(List<RequestNameValue> defaultHeaders) {
         this.defaultHeaders = defaultHeaders;
+        return this;
     }
 
-    public void setJsonConverter(ForestJsonConverter converter) {
+    public ForestConfiguration setJsonConverter(ForestJsonConverter converter) {
         getConverterMap().put(ForestDataType.JSON, converter);
+        return this;
     }
 
     public ForestJsonConverter getJsonConverter() {
         return (ForestJsonConverter) getConverterMap().get(ForestDataType.JSON);
     }
 
-    public void setXmlConverter(ForestXmlConverter converter) {
+    public ForestConfiguration setXmlConverter(ForestXmlConverter converter) {
         getConverterMap().put(ForestDataType.XML, converter);
+        return this;
     }
 
     public ForestXmlConverter getXmlConverter() {
@@ -248,8 +269,9 @@ public class ForestConfiguration implements Serializable {
     }
 
 
-    public void setVariableValue(String name, Object value) {
+    public ForestConfiguration setVariableValue(String name, Object value) {
         getVariables().put(name, value);
+        return this;
     }
 
     public Object getVariableValue(String name) {
@@ -260,16 +282,18 @@ public class ForestConfiguration implements Serializable {
         return sslKeyStores;
     }
 
-    public void setSslKeyStores(Map<String, SSLKeyStore> sslKeyStores) {
+    public ForestConfiguration setSslKeyStores(Map<String, SSLKeyStore> sslKeyStores) {
         this.sslKeyStores = sslKeyStores;
+        return this;
     }
 
     /**
      * register a SSL KeyStore object
      * @param keyStore
      */
-    public void registerKeyStore(SSLKeyStore keyStore) {
+    public ForestConfiguration registerKeyStore(SSLKeyStore keyStore) {
         sslKeyStores.put(keyStore.getId(), keyStore);
+        return this;
     }
 
     public SSLKeyStore getKeyStore(String id) {
@@ -291,8 +315,9 @@ public class ForestConfiguration implements Serializable {
         return converterMap;
     }
 
-    public void setConverterMap(Map<ForestDataType, ForestConverter> converterMap) {
+    public ForestConfiguration setConverterMap(Map<ForestDataType, ForestConverter> converterMap) {
         this.converterMap = converterMap;
+        return this;
     }
 
 
@@ -300,8 +325,9 @@ public class ForestConfiguration implements Serializable {
         return variables;
     }
 
-    public void setVariables(Map<String, Object> variables) {
+    public ForestConfiguration setVariables(Map<String, Object> variables) {
         this.variables = variables;
+        return this;
     }
 
 
@@ -311,13 +337,14 @@ public class ForestConfiguration implements Serializable {
     }
 
 
-    private void setJsonConverterSelector(JSONConverterSelector jsonConverterSelector) {
+    private ForestConfiguration setJsonConverterSelector(JSONConverterSelector jsonConverterSelector) {
         this.jsonConverterSelector = jsonConverterSelector;
+        return this;
     }
 
 
 
-    public void registerFilter(String name, Class filterClass) {
+    public ForestConfiguration registerFilter(String name, Class filterClass) {
         if (!(Filter.class.isAssignableFrom(filterClass))) {
             throw new ForestRuntimeException("Cannot register class \"" + filterClass.getName()
                     + "\" as a filter, filter class must implement Filter interface!");
@@ -326,6 +353,7 @@ public class ForestConfiguration implements Serializable {
             throw new ForestRuntimeException("filter \"" + name + "\" already exists!");
         }
         filterRegisterMap.put(name, filterClass);
+        return this;
     }
 
 

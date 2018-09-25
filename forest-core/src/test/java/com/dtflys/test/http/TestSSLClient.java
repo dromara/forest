@@ -64,7 +64,7 @@ public class TestSSLClient extends BaseClientTest {
         SSLKeyStore sslKeyStore = new SSLKeyStore(
                 "ssl_client",
                 "ssl_client.keystore",
-                "client",
+                "client0",
                 "456789");
         configuration.registerKeyStore(sslKeyStore);
     }

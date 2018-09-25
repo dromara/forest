@@ -36,7 +36,7 @@
 	</scm>
 
 	<properties>
-		<spring-boot.version>2.0.3.RELEASE</spring-boot.version>
+		<spring-boot.version>1.5.1.RELEASE</spring-boot.version>
 		<slf4j.version>1.7.10</slf4j.version>
 		<log4j.version>2.4.1</log4j.version>
 		<httpcore.version>4.3.2</httpcore.version>
@@ -64,7 +64,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.10</version>
+			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -197,6 +197,24 @@
 					</exclusion>
 				</exclusions>
 			</dependency>
+
+
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-test</artifactId>
+				<version>1.5.1.RELEASE</version>
+				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<!-- Import dependency management from Spring Boot -->
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>${spring-boot.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
 

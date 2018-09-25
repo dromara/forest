@@ -1,6 +1,7 @@
 package com.dtflys.forest.schema;
 
 import com.dtflys.forest.ssl.SpringSSLKeyStore;
+import com.dtflys.forest.utils.ClientFactoryBeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import com.dtflys.forest.config.ForestConfiguration;
@@ -43,14 +44,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         beanDefinition.setLazyInit(false);
         beanDefinition.setFactoryMethodName("configuration");
         String id = element.getAttribute("id");
-        if (id == null || id.length() == 0) {
-            String generatedBeanName = configurationBeanClass.getName();
-            id = generatedBeanName;
-            int counter = 2;
-            while(parserContext.getRegistry().containsBeanDefinition(id)) {
-                id = generatedBeanName + (counter ++);
-            }
-        }
+        id = ClientFactoryBeanUtils.getBeanId(id, configurationBeanClass, parserContext);
         if (id != null && id.length() > 0) {
             if (parserContext.getRegistry().containsBeanDefinition(id))  {
                 throw new IllegalStateException("Duplicate spring bean id " + id);

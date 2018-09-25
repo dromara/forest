@@ -10,7 +10,7 @@ public class ForestNamespaceHandler extends NamespaceHandlerSupport {
 
     public void init() {
         registerBeanDefinitionParser("configuration", new ForestConfigurationBeanDefinitionParser());
-        registerBeanDefinitionParser("client", new ForestClientBeanDefinitionParser());
+        registerBeanDefinitionParser("client0", new ForestClientBeanDefinitionParser());
         registerBeanDefinitionParser("scan", new ForestScanBeanDefinitionParser());
     }
 }

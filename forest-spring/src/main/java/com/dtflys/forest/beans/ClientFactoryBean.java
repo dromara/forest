@@ -1,13 +1,19 @@
 package com.dtflys.forest.beans;
 
 import com.dtflys.forest.config.ForestConfiguration;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-04-24 18:47
  */
-public class ClientFactoryBean<T> implements FactoryBean<T> {
+public class ClientFactoryBean<T> implements FactoryBean<T>, ApplicationContextAware {
+
+    private static ApplicationContext applicationContext;
+
 
     private ForestConfiguration forestConfiguration;
 
@@ -30,6 +36,19 @@ public class ClientFactoryBean<T> implements FactoryBean<T> {
     }
 
     public T getObject() throws Exception {
+        if (forestConfiguration == null) {
+            synchronized (this) {
+                if (forestConfiguration == null) {
+                    try {
+                        forestConfiguration = applicationContext.getBean(ForestConfiguration.class);
+                    } catch (Throwable th) {
+                    }
+                    if (forestConfiguration == null) {
+                        forestConfiguration = ForestConfiguration.getDefaultConfiguration();
+                    }
+                }
+            }
+        }
         return forestConfiguration.createInstance(interfaceClass);
     }
 
@@ -39,5 +58,10 @@ public class ClientFactoryBean<T> implements FactoryBean<T> {
 
     public boolean isSingleton() {
         return true;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext context) throws BeansException {
+        applicationContext = context;
     }
 }
