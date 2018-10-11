@@ -32,7 +32,7 @@
 		<url>https://github.com/mySingleLive/forest</url>
 		<connection>scm:git:https://github.com/mySingleLive/forest.git</connection>
 		<developerConnection>http://www.dtflys.com</developerConnection>
-		<tag>1.0.0-RELEASE</tag>
+		<tag>1.1.0-RELEASE</tag>
 	</scm>
 
 	<properties>
