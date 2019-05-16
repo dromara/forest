@@ -70,7 +70,7 @@ Quick Start
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-core</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.2</version>
 </dependency>
 ```
 
@@ -80,7 +80,7 @@ Quick Start
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-spring</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.2</version>
 </dependency>
 ```
 
