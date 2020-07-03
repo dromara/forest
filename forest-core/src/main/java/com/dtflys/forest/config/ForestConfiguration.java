@@ -27,6 +27,7 @@ package com.dtflys.forest.config;
 
 import com.dtflys.forest.proxy.ProxyFactory;
 import com.dtflys.forest.ssl.SSLKeyStore;
+import com.dtflys.forest.ssl.SSLUtils;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import org.apache.commons.logging.Log;
@@ -84,6 +85,16 @@ public class ForestConfiguration implements Serializable {
      */
     private Integer retryCount;
 
+    /**
+     * default SSL protocol
+     */
+    private String sslProtocol = SSLUtils.TLSv1_2;
+
+    /**
+     * Enable log forest request info
+     */
+    private boolean logEnabled = true;
+
     private volatile HttpBackend backend;
 
     private String backendName;
@@ -122,6 +133,7 @@ public class ForestConfiguration implements Serializable {
         configuration.setConnectTimeout(2000);
         configuration.setMaxConnections(500);
         configuration.setMaxRouteConnections(500);
+        configuration.setSslProtocol(SSLUtils.TLSv1_2);
         configuration.registerFilter("json", JSONFilter.class);
         configuration.registerFilter("xml", XmlFilter.class);
         return configuration;
@@ -226,6 +238,22 @@ public class ForestConfiguration implements Serializable {
     public ForestConfiguration setRetryCount(Integer retryCount) {
         this.retryCount = retryCount;
         return this;
+    }
+
+    public String getSslProtocol() {
+        return sslProtocol;
+    }
+
+    public void setSslProtocol(String sslProtocol) {
+        this.sslProtocol = sslProtocol;
+    }
+
+    public boolean isLogEnabled() {
+        return logEnabled;
+    }
+
+    public void setLogEnabled(boolean logEnabled) {
+        this.logEnabled = logEnabled;
     }
 
     public List<RequestNameValue> getDefaultParameters() {
