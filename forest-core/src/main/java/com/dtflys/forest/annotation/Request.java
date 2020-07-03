@@ -109,5 +109,5 @@ public @interface Request {
 
     String keyStore() default "";
 
-    boolean logEnable() default true;
+    boolean logEnabled() default false;
 }
