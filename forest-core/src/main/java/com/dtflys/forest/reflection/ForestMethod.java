@@ -119,7 +119,11 @@ public class ForestMethod<T> implements VariableScope {
                 if (rtnum > 0) {
                     retryNumber = rtnum;
                 }
-                logEnable = reqAnn.logEnable();
+                logEnable = configuration.isLogEnabled();
+                if (!logEnable) {
+                    logEnable = reqAnn.logEnabled();
+                }
+
                 Class[] paramTypes = method.getParameterTypes();
                 Type[] genericParamTypes = method.getGenericParameterTypes();
                 TypeVariable<Method>[] typeVariables = method.getTypeParameters();
@@ -170,7 +174,6 @@ public class ForestMethod<T> implements VariableScope {
      * @param paramAnns
      */
     private void processParameters(Class[] paramTypes, Type[] genericParamTypes, Annotation[][] paramAnns) {
-
         for (int i = 0; i < paramTypes.length; i++) {
             Class paramType = paramTypes[i];
             Annotation[] anns = paramAnns[i];
