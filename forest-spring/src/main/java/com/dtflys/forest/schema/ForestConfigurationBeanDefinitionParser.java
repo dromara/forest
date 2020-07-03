@@ -30,8 +30,8 @@ import java.util.Map;
 public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionParser {
     private static Log log = LogFactory.getLog(ForestConfigurationBeanDefinitionParser.class);
 
-    private final Class configurationBeanClass = ForestConfiguration.class;
-    private final Class sslKeyStoreBeanClass = SpringSSLKeyStore.class;
+    private final static Class configurationBeanClass = ForestConfiguration.class;
+    private final static Class sslKeyStoreBeanClass = SpringSSLKeyStore.class;
 
 
     public ForestConfigurationBeanDefinitionParser() {
@@ -130,7 +130,21 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
             throw new ForestRuntimeException(
                     "The file of SSL KeyStore \"" + id + "\" is empty!");
         }
+        BeanDefinition beanDefinition = createSSLKeyStoreBean(
+                id, keystoreType, filePath, keystorePass, certPass, protocolsStr, cipherSuitesStr);
+        sslKeyStoreMap.put(id, beanDefinition);
+    }
 
+
+
+
+    public static BeanDefinition createSSLKeyStoreBean(String id,
+                                                       String keystoreType,
+                                                        String filePath,
+                                                        String keystorePass,
+                                                        String certPass,
+                                                        String protocolsStr,
+                                                        String cipherSuitesStr) {
         BeanDefinition beanDefinition = new GenericBeanDefinition();
         beanDefinition.setBeanClassName(sslKeyStoreBeanClass.getName());
         ConstructorArgumentValues beanDefValues = beanDefinition.getConstructorArgumentValues();
@@ -140,7 +154,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         beanDefValues.addGenericArgumentValue(keystorePass);
         beanDefValues.addGenericArgumentValue(certPass);
         if (StringUtils.isNotEmpty(protocolsStr)) {
-            String[] strs = protocolsStr.split(",");
+            String[] strs = protocolsStr.split("[ /t]*,[ /t]*");
             String[] protocols = new String[strs.length];
             for (int i = 0; i < strs.length; i++) {
                 protocols[i] = strs[i].trim();
@@ -148,13 +162,13 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
             beanDefinition.getPropertyValues().add("protocols", protocols);
         }
         if (StringUtils.isNotEmpty(cipherSuitesStr)) {
-            String[] strs = cipherSuitesStr.split(",");
+            String[] strs = cipherSuitesStr.split("[ /t]*,[ /t]*");
             String[] cipherSuites = new String[strs.length];
             for (int i = 0; i < strs.length; i++) {
                 cipherSuites[i] = strs[i].trim();
             }
             beanDefinition.getPropertyValues().add("cipherSuites", cipherSuites);
         }
-        sslKeyStoreMap.put(id, beanDefinition);
+        return beanDefinition;
     }
 }
