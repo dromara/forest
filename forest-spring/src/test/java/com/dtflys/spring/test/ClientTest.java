@@ -18,6 +18,8 @@ public class ClientTest extends TestCase {
         BeastshopClient beastshopClient =
                 (BeastshopClient) applicationContext.getBean("beastshopClient");
         assertNotNull(beastshopClient);
+        String result = beastshopClient.index();
+        assertNotNull(result);
     }
 
 }

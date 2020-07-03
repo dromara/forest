@@ -1,5 +1,6 @@
 package com.dtflys.spring.test;
 
+import com.dtflys.forest.ssl.SSLUtils;
 import junit.framework.TestCase;
 import com.dtflys.forest.config.ForestConfiguration;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -23,6 +24,7 @@ public class ConfigurationTest extends TestCase {
         assertEquals(forestConfiguration.getConnectTimeout(), new Integer(10000));
         assertEquals(forestConfiguration.getMaxConnections(), new Integer(500));
         assertEquals(forestConfiguration.getMaxRouteConnections(), new Integer(500));
+        assertEquals(forestConfiguration.getSslProtocol(), "SSLv3");
         assertEquals(forestConfiguration.getVariableValue("baseUrl"), "http://www.thebeastshop.com");
         assertEquals(forestConfiguration.getVariableValue("x"), "0");
         assertEquals(forestConfiguration.getVariableValue("y"), "1");

@@ -23,7 +23,6 @@ public class BootTest {
 
     @Test
     public void testBootConfig0() {
-        assertTrue(true);
         ForestClientProxy client = (ForestClientProxy) getClient(BeastshopClient.class, BootConfig0.class);
         assertNotNull(client.getProxyHandler());
     }
@@ -31,14 +30,12 @@ public class BootTest {
 
     @Test
     public void testBootConfig1() {
-        assertTrue(true);
         ForestClientProxy client = (ForestClientProxy) getClient(BaiduClient.class, BootConfig1.class);
         assertEquals("httpclient", client.getProxyHandler().getConfiguration().getBackend().getName());
     }
 
     @Test
     public void testBootConfig2() {
-        assertTrue(true);
         ForestClientProxy client = (ForestClientProxy) getClient(GithubClient.class, BootConfig2.class);
         assertEquals("okhttp3", client.getProxyHandler().getConfiguration().getBackend().getName());
     }
