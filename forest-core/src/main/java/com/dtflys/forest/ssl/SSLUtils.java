@@ -17,6 +17,14 @@ import java.security.cert.X509Certificate;
  */
 public class SSLUtils {
 
+//    public final static String DEFAULT_PROTOCOL = "SSLv3"; // 已弃用
+    public final static String SSLv2 = "SSLv2";
+    public final static String SSLv3 = "SSLv3";
+    public final static String TLSv1_0 = "TLSv1.0";
+    public final static String TLSv1_1 = "TLSv1.1";
+    public final static String TLSv1_2 = "TLSv1.2";
+    public final static String TLSv1_3 = "TLSv1.3";
+
     /**
      * 自定义SSL证书
      * @param request
@@ -76,13 +84,13 @@ public class SSLUtils {
 
 
     /**
-     * 绕过SSL验证
+     * 默认的单向验证HTTPS请求绕过SSL验证，使用默认SSL协议
      * @return
      * @throws NoSuchAlgorithmException
      * @throws KeyManagementException
      */
-    public static SSLContext createIgnoreVerifySSL() throws NoSuchAlgorithmException, KeyManagementException {
-        SSLContext sc = SSLContext.getInstance("SSLv3");
+    public static SSLContext createIgnoreVerifySSL(String sslProtocol) throws NoSuchAlgorithmException, KeyManagementException {
+        SSLContext sc = SSLContext.getInstance(sslProtocol);
         TrustAllManager trustManager = new TrustAllManager();
         sc.init(null, new TrustManager[] { trustManager }, null);
         return sc;
@@ -97,7 +105,7 @@ public class SSLUtils {
      */
     public static SSLContext getSSLContext(ForestRequest request) throws KeyManagementException, NoSuchAlgorithmException {
         if (request.getKeyStore() == null) {
-            return SSLUtils.createIgnoreVerifySSL();
+            return SSLUtils.createIgnoreVerifySSL(request.getConfiguration().getSslProtocol());
         }
         return SSLUtils.customSSL(request);
     }
