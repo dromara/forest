@@ -12,6 +12,7 @@
             backend="httpclient"
             timeout="30000"
             retryCount="3"
+            sslProtocol="SSLv3"
             connectTimeout="10000"
             maxConnections="500"
             maxRouteConnections="500">
