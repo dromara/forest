@@ -4,12 +4,11 @@
 	
 	<groupId>com.dtflys.forest</groupId>
 	<artifactId>forest</artifactId>
-	<version>1.1.2</version>
+	<version>1.2.0</version>
 	<packaging>pom</packaging>
 	<name>forest</name>
 	<description>A easy HTTP client framework for Java</description>
 	<url>https://github.com/mySingleLive/forest</url>
-
 
 	<licenses>
 		<license>
@@ -32,10 +31,11 @@
 		<url>https://github.com/mySingleLive/forest</url>
 		<connection>scm:git:https://github.com/mySingleLive/forest.git</connection>
 		<developerConnection>http://www.dtflys.com</developerConnection>
-		<tag>1.1.2</tag>
+		<tag>1.2.0</tag>
 	</scm>
 
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring-boot.version>1.5.1.RELEASE</spring-boot.version>
 		<slf4j.version>1.7.10</slf4j.version>
 		<log4j.version>2.4.1</log4j.version>
@@ -47,6 +47,7 @@
 	<modules>
 		<module>forest-core</module>
 		<module>forest-spring</module>
+		<module>spring-boot-starter-forest</module>
   	</modules>
 
 	<dependencies>
@@ -206,6 +207,7 @@
 				<scope>test</scope>
 			</dependency>
 
+
 			<dependency>
 				<!-- Import dependency management from Spring Boot -->
 				<groupId>org.springframework.boot</groupId>
@@ -214,6 +216,7 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
+
 
 		</dependencies>
 	</dependencyManagement>
@@ -259,9 +262,26 @@
 
 	<profiles>
 		<profile>
+			<id>disable-javadoc-doclint</id>
+			<activation>
+				<jdk>[1.8,)</jdk>
+			</activation>
+			<properties>
+				<additionalparam>-Xdoclint:none</additionalparam>
+			</properties>
+		</profile>
+		<profile>
 			<id>oss-release</id>
 			<build>
 				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<configuration>
+							<source>1.8</source>
+							<target>1.8</target>
+						</configuration>
+					</plugin>
 
 					<plugin>
 						<groupId>org.sonatype.plugins</groupId>

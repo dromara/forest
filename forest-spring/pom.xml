@@ -6,12 +6,12 @@
 
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-spring</artifactId>
-    <version>1.1.2</version>
+    <version>1.2.0</version>
 
     <parent>
         <groupId>com.dtflys.forest</groupId>
         <artifactId>forest</artifactId>
-        <version>1.1.2</version>
+        <version>1.2.0</version>
     </parent>
 
     <properties>
@@ -93,9 +93,6 @@
             <version>${log4j.version}</version>
             <scope>test</scope>
         </dependency>
-
-
-
     </dependencies>
 
 
@@ -129,15 +126,6 @@
                 </executions>
             </plugin>
 -->
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                </configuration>
-            </plugin>
 
         </plugins>
 
