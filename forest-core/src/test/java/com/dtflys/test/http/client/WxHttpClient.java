@@ -2,8 +2,6 @@ package com.dtflys.test.http.client;
 
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.test.http.model.WxReverseRequest;
-import com.dtflys.forest.annotation.Request;
-import com.dtflys.test.http.model.WxReverseRequest;
 
 
 /**
@@ -23,7 +21,7 @@ public interface WxHttpClient {
             type = "POST",
             contentType = "application/xml",
             dataType = "xml",
-            logEnable = false,
+            logEnabled = false,
             keyStore = "bla-weixin-keystore",
             data = "${xml($0)}")
     String blaReverse(WxReverseRequest request);
