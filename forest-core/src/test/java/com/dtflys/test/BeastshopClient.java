@@ -11,7 +11,7 @@ public interface BeastshopClient {
     @Request(
             url = "http://www.thebeastshop.com",
             timeout = 80000,
-            logEnable = false
+            logEnabled = false
     )
     public String index();
 }
