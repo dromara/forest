@@ -109,6 +109,16 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="sslProtocol" type="xsd:string" default="TLSv1.2">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           Default ssl protocol for https requests.
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+
     </xsd:complexType>
 
 
