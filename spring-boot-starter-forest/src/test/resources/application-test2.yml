@@ -1,0 +1,9 @@
+
+forest:
+  backend: okhttp3
+  max-connections: 6000
+  max-route-connections: 6600
+  timeout: 6000
+  connect-timeout: 5000
+  retry-count: 0
+

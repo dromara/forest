@@ -1,0 +1,14 @@
+
+forest:
+  bean-id: config0
+  backend: okhttp3
+  max-connections: 1200
+  max-route-connections: 1100
+  timeout: 1000
+  connect-timeout: 1123
+  retry-count: 5
+  ssl-protocol: SSLv3
+  variables:
+    baseUrl: http://www.thebeastshop.com
+    a: 1
+    b: 2

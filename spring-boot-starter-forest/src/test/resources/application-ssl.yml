@@ -1,0 +1,14 @@
+
+forest:
+  bean-id: sslConfig
+  max-connections: 300
+  max-route-connections: 300
+  timeout: 3000
+  connect-timeout: 3000
+  retry-count: 2
+  ssl-key-stores:
+    - id: keystore1
+      file: test.keystore
+      keystore-pass: 123456
+      cert-pass: 123456
+      protocols: SSLv3

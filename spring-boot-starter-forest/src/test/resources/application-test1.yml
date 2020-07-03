@@ -1,0 +1,7 @@
+
+forest:
+  max-connections: 5000
+  max-route-connections: 5500
+  timeout: 5000
+  connect-timeout: 4000
+  retry-count: 0
