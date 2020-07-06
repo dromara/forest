@@ -24,18 +24,16 @@
 
 package com.dtflys.forest.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * @author gongjun
  * @since 2016-05-24
  */
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = ElementType.PARAMETER)
 public @interface DataVariable {
-    String value();
+    String value() default "";
     String filter() default "";
 }
