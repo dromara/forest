@@ -1,4 +1,4 @@
-# Forest - HTTP客户端访问框架
+# Forest - 轻量级HTTP客户端访问框架
 
 
 [![Build Status](https://api.travis-ci.org/mySingleLive/forest.svg?branch=master)](https://travis-ci.org/mySingleLive/forest)
@@ -8,12 +8,13 @@
 项目介绍：
 -------------------------------------
 
-Forest是一个高层的、极简的HTTP调用API框架。<br>
+Forest是一个高层的、极简的轻量级HTTP调用API框架。<br>
 相比于直接使用Httpclient您不再用写一大堆重复的代码了，而是像调用本地方法一样去发送HTTP请求。
 
 项目特点：
 -----
 * 以Httpclient和OkHttp为后端框架
+* 比Feign更轻量，不依赖Spring Cloud和任何注册中心
 * 通过调用本地方法的方式去发送Http请求
 * 支持灵活的模板表达式
 * 支持过滤器来过滤传入的数据
@@ -25,71 +26,50 @@ Forest是一个高层的、极简的HTTP调用API框架。<br>
 * 可以通过OnSuccess和OnError接口参数实现请求结果的回调
 * 配置简单，一般只需要@Request一个注解就能完成绝大多数请求的定义
 * 实现了业务逻辑与Http协议之间的解耦
-
-
-项目状态：
--------------------------------------
-
-* 主流程已完成
-* 已支持所有请求方法：GET, HEAD, OPTIONS, TRACE, POST, DELETE, PUT, PATCH
-* 已支持的JSON转换框架: Fastjson, Jackson, Gson
-* 已支持Spring集成
-* 已支持JAXB形式的XML转换
-* 已支持JSON解析
-* 支持Commons-Log, SLF4j, Log4J等日志框架
-* 1.0.0版本已布中央仓库
-* 异步请求方式还不够完善
+* 支持所有请求方法：GET, HEAD, OPTIONS, TRACE, POST, DELETE, PUT, PATCH
+* 支持JSON转换框架: Fastjson, Jackson, Gson
+* 支持JAXB形式的XML转换
+* 支持Spring和Springboot集成
+* 支持异步请求调用
 
 
 Quick Start
 -------------------------------------
+以下例子基于Springboot
 
+### 依赖
 
-### Maven依赖
-
-因为forest是一个只做前端api的框架，所以需要添加一个后端http框架的依赖，这里我们使用OkHttp3（除此之外也可以用HttpClient）<br>
-同时需要加上JSON解析包的依赖。
-
-```xml
-<dependency>
-  <groupId>com.squareup.okhttp3</groupId>
-  <artifactId>okhttp</artifactId>
-  <version>3.3.0</version>
-</dependency>
-
-<dependency>
-    <groupId>com.alibaba</groupId>
-    <artifactId>fastjson</artifactId>
-    <version>1.2.47</version>
-</dependency>
-```
-
-然后添加forest核心包依赖
+直接添加以下maven依赖即可
 
 ```xml
 <dependency>
     <groupId>com.dtflys.forest</groupId>
-    <artifactId>forest-core</artifactId>
+    <artifactId>spring-boot-starter-forest</artifactId>
     <version>1.2.0</version>
 </dependency>
 ```
 
-如果您使用了spring
+### 配置
 
-```xml
-<dependency>
-    <groupId>com.dtflys.forest</groupId>
-    <artifactId>forest-spring</artifactId>
-    <version>1.2.0</version>
-</dependency>
+application.properties
+```properties
+forest.enabled = true
 ```
 
-举一个栗子：访问百度短链接REST接口
+或者在application.yml
+```yaml
+forest:
+    enabled: true
+```
+
+###一个栗子：访问百度短链接REST接口
 
 ### 创建一个Interface作为远程调用接口
 
 
 ```java
+
+package com.yourproject.pkg;
 
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.annotation.DataParam;
@@ -109,48 +89,41 @@ public interface MyClient {
     Map getShortUrl(@DataParam("url") String url);
 }
 
-
 ```
 
+### 扫描接口
 
-### 调用远程接口
-```java
-
-ForestConfiguration configuration = ForestConfiguration.configuration();
-MyClient myClient = configuration.createInstance(MyClient.class);
-Map result = myClient.getShortUrl("https://gitee.com/dt_flys/forest");
-System.out.println(result);
-
-```
-
-如果写在main方法中是介样子滴
+在Springboot的配置类或者启动类上加上@ForestScan注解，并在basePackages属性里填上远程接口的所在的包名
 
 ```java
-public class TestForest {
-    
-    private final static ForestConfiguration configuration = ForestConfiguration.configuration();
-    private final static MyClient myClient = configuration.createInstance(MyClient.class);
-    
-    public static void main(String[] args) {
-        Map result = myClient.getShortUrl("https://gitee.com/dt_flys/forest");
-        System.out.println(result);
-    }
+
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Configuration;
+import com.dtflys.forest.annotation.ForestScan;
+
+@SpringBootApplication
+@Configuration
+@ForestScan(basePackages = "com.yourproject.pkg")
+public class MyConfiguration {
+ ...
 }
 ```
 
-#### 或者在Spring中调用
+### 调用接口
+
+OK，终于可以愉快地调用接口了
 
 ```java
 @Autowired
-MyClient myClient;
+private MyClient myClient;
 
-...
 
-Map result = myClient.getShortUrl("https://gitee.com/dt_flys/forest");
-
+public void testClient() {
+    Map result = myClient.getShortUrl("https://gitee.com/dt_flys/forest");
+    System.out.println(result);
+}
 ```
 
-如何在Spring中配置请参见[在Spring中使用](https://gitee.com/dt_flys/forest/blob/master/forest-core/src/main/doc/SPRING.md)
 
 ### 详细文档:<br>
 * [HTTP请求](forest-core/src/main/doc/REQUEST.md)<br>
