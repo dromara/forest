@@ -1,26 +1,44 @@
 package com.dtflys.forest.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2018-03-30 16:59
  */
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface BaseRequest {
 
+    /**
+     * Base URL
+     * @return
+     */
     String baseURL() default "";
 
+    /**
+     * Base Content Type
+     * @return
+     */
     String contentType() default "";
 
+    /**
+     * Base Content Encoding
+     * @return
+     */
     String contentEncoding() default "";
 
+    /**
+     * Base Headers
+     * @return
+     */
     String[] headers() default {};
 
+    /**
+     * Base Interceptor
+     * @return
+     */
     Class<?>[] interceptor() default {};
 
     int timeout() default -1;
