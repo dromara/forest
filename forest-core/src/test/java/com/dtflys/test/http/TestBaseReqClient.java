@@ -52,5 +52,11 @@ public class TestBaseReqClient extends BaseClientTest {
         assertEquals(GetMockServer.EXPECTED, result);
     }
 
+    @Test
+    public void testBaseURL2() {
+        String result = baseReqClient.simpleGet2();
+        assertEquals(GetMockServer.EXPECTED, result);
+    }
+
 
 }
