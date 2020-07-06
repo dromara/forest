@@ -30,10 +30,13 @@ public class TestInterceptor {
 
     private static InterceptorClient interceptorClient;
 
+    private static BaseInterceptorClient baseInterceptorClient;
+
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
         interceptorClient = configuration.createInstance(InterceptorClient.class);
+        baseInterceptorClient = configuration.createInstance(BaseInterceptorClient.class);
     }
 
 
@@ -76,5 +79,19 @@ public class TestInterceptor {
         assertNull(result);
     }
 
+
+    @Test
+    public void testBaseNoneInterceptor() {
+        String result = baseInterceptorClient.none();
+        assertNotNull(result);
+        assertEquals("Base: " + GetMockServer.EXPECTED, result);
+    }
+
+    @Test
+    public void testBaseSimpleInterceptor() {
+        String result = baseInterceptorClient.simple();
+        assertNotNull(result);
+        assertEquals("XX: Base: " + GetMockServer.EXPECTED, result);
+    }
 
 }
