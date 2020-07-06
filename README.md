@@ -133,9 +133,9 @@ public void testClient() {
 * [拦截器](forest-core/src/main/doc/INTERCEPTOR.md)
 
 
-### 技术支持:<br>
+### 微信交流群:<br>
 
-QQ群：930773917
+![avatar](https://dt_flys.gitee.io/forest/media/wechat_qr.png)
 
 项目协议
 --------------------------
