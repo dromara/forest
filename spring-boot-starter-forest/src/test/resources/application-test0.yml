@@ -1,5 +1,6 @@
 
 forest:
+  enabled: true
   bean-id: config0
   backend: okhttp3
   max-connections: 1200

@@ -1,5 +1,6 @@
 
 forest:
+  enabled: true
   bean-id: sslConfig
   max-connections: 300
   max-route-connections: 300

@@ -1,5 +1,6 @@
 
 forest:
+  enabled: true
   backend: okhttp3
   max-connections: 6000
   max-route-connections: 6600

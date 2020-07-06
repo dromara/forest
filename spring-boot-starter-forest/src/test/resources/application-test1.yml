@@ -1,5 +1,6 @@
 
 forest:
+  enabled: true
   max-connections: 5000
   max-route-connections: 5500
   timeout: 5000
