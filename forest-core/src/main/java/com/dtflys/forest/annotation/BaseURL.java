@@ -34,6 +34,7 @@ import java.lang.annotation.Target;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-16 17:09
  */
+@Deprecated
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface BaseURL {

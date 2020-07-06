@@ -13,6 +13,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface BaseRequest {
 
+    String baseURL() default "";
+
     String contentType() default "";
 
     String contentEncoding() default "";
@@ -27,6 +29,6 @@ public @interface BaseRequest {
 
     String keyStore() default "";
 
-    boolean[] logEnable() default {};
+//    boolean[] logEnable() default {};
 
 }
