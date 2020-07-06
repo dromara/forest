@@ -1,7 +1,6 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
-import com.dtflys.forest.config.VariableScope;
 
 /**
  * @author gongjun
