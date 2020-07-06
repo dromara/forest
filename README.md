@@ -14,8 +14,8 @@ Forest是一个高层的、极简的轻量级HTTP调用API框架。<br>
 项目特点：
 -----
 * 以Httpclient和OkHttp为后端框架
-* 比Feign更轻量，不依赖Spring Cloud和任何注册中心
 * 通过调用本地方法的方式去发送Http请求
+* 相比Feign更轻量，不依赖Spring Cloud和任何注册中心
 * 支持灵活的模板表达式
 * 支持过滤器来过滤传入的数据
 * 基于注解、配置化的方式定义Http请求
