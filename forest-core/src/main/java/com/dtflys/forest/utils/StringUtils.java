@@ -18,6 +18,27 @@ public final class StringUtils {
         return !isEmpty(text);
     }
 
+    public static boolean isBlank(String text) {
+        if (text == null) {
+            return true;
+        }
+        int strLen = text.length();
+        if (text != null && strLen != 0) {
+            for (int i = 0; i < strLen; ++i) {
+                if (!Character.isWhitespace(text.charAt(i))) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return true;
+        }
+    }
+
+    public static boolean isNotBlank(String text) {
+        return !isBlank(text);
+    }
+
     public static String getGetterName(Method mtd) {
         String name = mtd.getName();
         if (name.startsWith("get")) {

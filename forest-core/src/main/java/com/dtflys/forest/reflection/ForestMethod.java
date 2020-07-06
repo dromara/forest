@@ -41,12 +41,15 @@ public class ForestMethod<T> implements VariableScope {
     private final ForestConfiguration configuration;
     private final Method method;
     private Class returnClass;
+    private MappingTemplate baseUrlTemplate;
     private MappingTemplate urlTemplate;
     private MappingTemplate typeTemplate;
     private MappingTemplate dataTypeTemplate;
     private Integer timeout = null;
     private Integer retryNumber = null;
+    private MappingTemplate baseEncodeTemplate = null;
     private MappingTemplate encodeTemplate = null;
+    private MappingTemplate baseContentTypeTemplate;
     private MappingTemplate contentTypeTemplate;
     private String sslKeyStoreId;
     private MappingTemplate[] dataTemplateArray;
@@ -65,6 +68,7 @@ public class ForestMethod<T> implements VariableScope {
         this.interfaceProxyHandler = interfaceProxyHandler;
         this.configuration = configuration;
         this.method = method;
+        processBaseProperties();
         processInterfaceMethods();
     }
 
@@ -92,12 +96,26 @@ public class ForestMethod<T> implements VariableScope {
         return variables.get(name);
     }
 
+    private void processBaseProperties() {
+        String baseUrl = interfaceProxyHandler.getBaseURL();
+        if (StringUtils.isNotBlank(baseUrl)) {
+            baseUrlTemplate = makeTemplate(baseUrl);
+        }
+        String baseContentEncoding = interfaceProxyHandler.getBaseContentEncoding();
+        if (StringUtils.isNotBlank(baseContentEncoding)) {
+            baseEncodeTemplate = makeTemplate(baseContentEncoding);
+        }
+        String baseContentType = interfaceProxyHandler.getBaseContentType();
+        if (StringUtils.isNotBlank(baseContentType)) {
+            baseContentTypeTemplate = makeTemplate(baseContentType);
+        }
+    }
+
     /**
      * 处理接口中定义的方法
      */
     private void processInterfaceMethods() {
         Annotation[] annotations = method.getAnnotations();
-
         for (int i = 0; i < annotations.length; i++) {
             Annotation ann = annotations[i];
             if (ann instanceof Request) {
@@ -254,13 +272,30 @@ public class ForestMethod<T> implements VariableScope {
      * @return
      */
     private ForestRequest makeRequest(Object[] args) {
+        String baseUrl = null;
+        if (baseUrlTemplate != null) {
+            baseUrl = baseUrlTemplate.render(args);
+        }
         String renderedUrl = urlTemplate.render(args);
         String renderedType = typeTemplate.render(args);
+        String baseEncode = null;
+        if (baseEncodeTemplate != null) {
+            baseEncode = baseEncodeTemplate.render(args);
+        }
         String encode = encodeTemplate.render(args);
+        if (StringUtils.isEmpty(encode)) {
+            encode = baseEncode;
+        }
+        String baseContentType = null;
+        if (baseContentTypeTemplate != null) {
+            baseContentType = baseContentTypeTemplate.render(args);
+        }
         String renderedContentType = contentTypeTemplate.render(args).trim();
+        if (StringUtils.isEmpty(renderedContentType)) {
+            renderedContentType = baseContentType;
+        }
         String newUrl = "";
         List<RequestNameValue> nameValueList = new ArrayList<RequestNameValue>();
-        String baseUrl = interfaceProxyHandler.getBaseURL();
         MappingTemplate[] baseHeaders = interfaceProxyHandler.getBaseHeaders();
         renderedUrl = URLUtils.getValidURL(baseUrl, renderedUrl);
         String query = "";

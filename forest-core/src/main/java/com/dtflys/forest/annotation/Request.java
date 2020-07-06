@@ -67,9 +67,11 @@ public @interface Request {
 
     int retryCount() default -1;
 
-    String username() default "";
+//    @Deprecated
+//    String username() default "";
 
-    String password() default "";
+//    @Deprecated
+//    String password() default "";
 
     String contentType() default "application/x-www-form-urlencoded";
 

@@ -8,6 +8,7 @@ import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.URLUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
@@ -32,6 +33,8 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
     private String baseURL;
 
     private String baseContentType;
+
+    private String baseContentEncoding;
 
     private MappingTemplate[] baseHeaders;
 
@@ -74,6 +77,18 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
             }
             if (annotation instanceof BaseRequest) {
                 BaseRequest baseRequestAnn = (BaseRequest) annotation;
+                String baseURLValue = baseRequestAnn.baseURL();
+                if (StringUtils.isNotBlank(baseURLValue)) {
+                    MappingTemplate template = new MappingTemplate(baseURLValue.trim(), this);
+                    template.compile();
+                    baseURL = template.render(new Object[]{});
+                    if (!URLUtils.hasProtocol(baseURL)) {
+                        baseURL = "http://" + baseURL;
+                    }
+                    baseURL = URLUtils.getValidBaseURL(baseURL);
+                }
+
+                baseContentEncoding = baseRequestAnn.contentEncoding();
                 baseContentType = baseRequestAnn.contentType();
                 String [] headerArray = baseRequestAnn.headers();
                 if (headerArray != null && headerArray.length > 0) {
@@ -133,6 +148,10 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
 
     public String getBaseContentType() {
         return baseContentType;
+    }
+
+    public String getBaseContentEncoding() {
+        return baseContentEncoding;
     }
 
     public Integer getBaseRetryCount() {
