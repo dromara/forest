@@ -14,22 +14,20 @@ Forest是一个高层的、极简的轻量级HTTP调用API框架。<br>
 项目特点：
 -----
 * 以Httpclient和OkHttp为后端框架
-* 通过调用本地方法的方式去发送Http请求
+* 通过调用本地方法的方式去发送Http请求, 实现了业务逻辑与Http协议之间的解耦
 * 相比Feign更轻量，不依赖Spring Cloud和任何注册中心
+* 支持所有请求方法：GET, HEAD, OPTIONS, TRACE, POST, DELETE, PUT, PATCH
 * 支持灵活的模板表达式
 * 支持过滤器来过滤传入的数据
 * 基于注解、配置化的方式定义Http请求
-* 支持Spring集成：除了基本信息配置，它能自动扫描、注入到你自己的代码中
+* 支持Spring和Springboot集成
 * JSON字符串到Java对象的自动化解析
 * XML文本到Java对象的自动化解析
 * JSON、XML或其他类型转换器可以随意扩展和替换
 * 可以通过OnSuccess和OnError接口参数实现请求结果的回调
 * 配置简单，一般只需要@Request一个注解就能完成绝大多数请求的定义
-* 实现了业务逻辑与Http协议之间的解耦
-* 支持所有请求方法：GET, HEAD, OPTIONS, TRACE, POST, DELETE, PUT, PATCH
 * 支持JSON转换框架: Fastjson, Jackson, Gson
 * 支持JAXB形式的XML转换
-* 支持Spring和Springboot集成
 * 支持异步请求调用
 
 
