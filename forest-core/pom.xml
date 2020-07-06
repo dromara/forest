@@ -20,7 +20,7 @@
         <jgitflow-plugin.version>1.0-m4.3</jgitflow-plugin.version>
         <versions-plugin.version>2.1</versions-plugin.version>
         <slf4j.version>1.7.10</slf4j.version>
-        <log4j.version>2.4.1</log4j.version>
+        <log4j.version>2.13.3</log4j.version>
     </properties>
 
     <dependencies>
