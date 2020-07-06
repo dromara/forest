@@ -45,7 +45,9 @@ public class ForestMethod<T> implements VariableScope {
     private MappingTemplate urlTemplate;
     private MappingTemplate typeTemplate;
     private MappingTemplate dataTypeTemplate;
+    private Integer baseTimeout = null;
     private Integer timeout = null;
+    private Integer baseRetryNumber = null;
     private Integer retryNumber = null;
     private MappingTemplate baseEncodeTemplate = null;
     private MappingTemplate encodeTemplate = null;
@@ -59,6 +61,7 @@ public class ForestMethod<T> implements VariableScope {
     private Map<String, MappingVariable> variables = new HashMap<String, MappingVariable>();
     private MappingParameter onSuccessParameter = null;
     private MappingParameter onErrorParameter = null;
+    private List<Interceptor> baseInterceptorList;
     private List<Interceptor> interceptorList;
     private Class onSuccessClassGenericType = null;
     private boolean async = false;
@@ -109,6 +112,21 @@ public class ForestMethod<T> implements VariableScope {
         if (StringUtils.isNotBlank(baseContentType)) {
             baseContentTypeTemplate = makeTemplate(baseContentType);
         }
+        baseTimeout = interfaceProxyHandler.getBaseTimeout();
+        baseRetryNumber = interfaceProxyHandler.getBaseRetryCount();
+        Class[] baseInterceptorClasses = interfaceProxyHandler.getBaseInterceptorClasses();
+        if (baseInterceptorClasses != null && baseInterceptorClasses.length > 0) {
+            baseInterceptorList = new LinkedList<>();
+            for (int cidx = 0, len = baseInterceptorClasses.length; cidx < len; cidx++) {
+                Class clazz = baseInterceptorClasses[cidx];
+                if (!Interceptor.class.isAssignableFrom(clazz) || clazz.isInterface()) {
+                    throw new ForestRuntimeException("Class [" + clazz.getName() + "] is not a implement of [" +
+                            Interceptor.class.getName() + "] interface.");
+                }
+                Interceptor interceptor = Forest.getInterceptor(clazz);
+                baseInterceptorList.add(interceptor);
+            }
+        }
     }
 
     /**
@@ -116,6 +134,11 @@ public class ForestMethod<T> implements VariableScope {
      */
     private void processInterfaceMethods() {
         Annotation[] annotations = method.getAnnotations();
+        Class[] paramTypes = method.getParameterTypes();
+        Type[] genericParamTypes = method.getGenericParameterTypes();
+        TypeVariable<Method>[] typeVariables = method.getTypeParameters();
+        Annotation[][] paramAnns = method.getParameterAnnotations();
+        Parameter[] parameters = method.getParameters();
         for (int i = 0; i < annotations.length; i++) {
             Annotation ann = annotations[i];
             if (ann instanceof Request) {
@@ -142,15 +165,12 @@ public class ForestMethod<T> implements VariableScope {
                     logEnable = reqAnn.logEnabled();
                 }
 
-                Class[] paramTypes = method.getParameterTypes();
-                Type[] genericParamTypes = method.getGenericParameterTypes();
-                TypeVariable<Method>[] typeVariables = method.getTypeParameters();
                 for (TypeVariable<Method> typeVariable : typeVariables) {
                     System.out.println(typeVariable.getName());
                 }
-                Annotation[][] paramAnns = method.getParameterAnnotations();
+
                 parameterTemplateArray = new MappingParameter[paramTypes.length];
-                processParameters(paramTypes, genericParamTypes, paramAnns);
+                processParameters(parameters, genericParamTypes, paramAnns);
 
                 dataTemplateArray = new MappingTemplate[dataArray.length];
                 for (int j = 0; j < dataArray.length; j++) {
@@ -187,16 +207,18 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 处理参数列表
-     * @param paramTypes
+     * @param parameters
      * @param genericParamTypes
      * @param paramAnns
      */
-    private void processParameters(Class[] paramTypes, Type[] genericParamTypes, Annotation[][] paramAnns) {
-        for (int i = 0; i < paramTypes.length; i++) {
-            Class paramType = paramTypes[i];
+    private void processParameters(Parameter[] parameters, Type[] genericParamTypes, Annotation[][] paramAnns) {
+        for (int i = 0; i < parameters.length; i++) {
+            Parameter param = parameters[i];
+            Class paramType = param.getType();
             Annotation[] anns = paramAnns[i];
             MappingParameter parameter = new MappingParameter();
             parameter.setIndex(i);
+            parameter.setName(param.getName());
             parameterTemplateArray[i] = parameter;
             if (OnSuccess.class.isAssignableFrom(paramType)) {
                 onSuccessParameter = parameter;
@@ -206,6 +228,7 @@ public class ForestMethod<T> implements VariableScope {
             else if (OnError.class.isAssignableFrom(paramType)) {
                 onErrorParameter = parameter;
             }
+
             processParameterAnnotation(parameter, paramType, anns, i);
         }
     }
@@ -230,17 +253,18 @@ public class ForestMethod<T> implements VariableScope {
                 processParameterFilter(variable, filterName);
                 variable.setIndex(paramIndex);
                 variables.put(dataAnn.value(), variable);
-            }
-            else if (ann instanceof DataVariable) {
+            } else if (ann instanceof DataVariable) {
                 DataVariable dataAnn = (DataVariable) ann;
                 String name = dataAnn.value();
+                if (StringUtils.isEmpty(name)) {
+                    name = parameter.getName();
+                }
                 String filterName = dataAnn.filter();
                 MappingVariable variable = new MappingVariable(name, paramType);
                 processParameterFilter(variable, filterName);
                 variable.setIndex(paramIndex);
                 variables.put(name, variable);
-            }
-            else if (ann instanceof DataObject) {
+            } else if (ann instanceof DataObject) {
                 DataObject dataAnn = (DataObject) ann;
                 String jsonParamName = dataAnn.jsonParam();
                 String filterName = dataAnn.filter();
@@ -461,15 +485,17 @@ public class ForestMethod<T> implements VariableScope {
 
         if (timeout != null) {
             request.setTimeout(timeout);
-        }
-        else if (configuration.getTimeout() != null) {
+        } else if (baseTimeout != null) {
+            request.setTimeout(baseTimeout);
+        } else if (configuration.getTimeout() != null) {
             request.setTimeout(configuration.getTimeout());
         }
 
         if (retryNumber != null) {
             request.setRetryCount(retryNumber);
-        }
-        else if (configuration.getRetryCount() != null) {
+        } else if (baseRetryNumber != null) {
+            request.setRetryCount(baseRetryNumber);
+        } else if (configuration.getRetryCount() != null) {
             request.setRetryCount(configuration.getRetryCount());
         }
 
@@ -492,12 +518,17 @@ public class ForestMethod<T> implements VariableScope {
             request.setDataType(forestDataType);
         }
 
+        if (baseInterceptorList != null && baseInterceptorList.size() > 0) {
+            for (Interceptor item : baseInterceptorList) {
+                request.addInterceptor(item);
+            }
+        }
+
         if (interceptorList != null && interceptorList.size() > 0) {
             for (Interceptor item : interceptorList) {
                 request.addInterceptor(item);
             }
         }
-
         return request;
     }
 
