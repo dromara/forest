@@ -88,6 +88,8 @@ Forest 1.0.x和Forest 1.1.x基于JDK 1.7, Forest 1.2.x基于JDK 1.8
 
 ## 3.1 在SpringBoot项目中配置
 
+若您的项目依赖spring boot，并加入了spring-boot-starter-forest依赖，就可以通过application.yml/application.properties方式定义配置。
+
 ### 3.1.1 配置forest启动开关
 在application.yml中设置forest.enabled为true，便能开启forest。若设为false，springboot便不会再扫描forest。
 
@@ -148,3 +150,4 @@ forest:
 
 ## 3.1 在普通项目中配置
 
+###
