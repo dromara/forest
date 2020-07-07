@@ -129,7 +129,9 @@ forest:
 private ForestConfiguration config0;
 ```
 
-### 3.1.4 其他的基本配置
+### 3.1.4 全局基本配置
+
+在application.yaml / application.properties中配置的HTTP基本参数
 
 ```yaml
 forest:
