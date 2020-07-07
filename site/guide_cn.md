@@ -194,7 +194,7 @@ configuration.setSslProtocol(SSLUtils.SSLv3);
 
 # 四. 定义请求接口
 
-### 4.1 简单请求定义
+## 4.1 简单请求定义
 
 创建一个interface，并用@Request注解修饰接口方法。
 
@@ -211,7 +211,7 @@ public interface MyClient {
 其URL为http://localhost:5000/hello，并默认使用GET方式，且将请求响应的数据以String的方式返回给调用者。
 
 
-### 4.2 稍复杂点的请求定义
+## 4.2 稍复杂点的请求定义
 
 ```java
 public interface MyClient {
