@@ -296,7 +296,7 @@ client.sendRequest("foo");
     HEADER:
         Accept:text/plan
 
-## 4.3 改变请求方式
+## 4.3 改变HTTP Method
 
 使用POST方式
 
@@ -491,7 +491,39 @@ myClient.send("Xxxxxx");
     
 
 
+# 五. 创建和获取请求接口
 
+## 5.1 在SpringBoot项目中获取接口实例
 
+若您已有定义好的Forest请求接口名为 com.yoursite.client.MyClient，
 
+只要在Springboot的配置类或者启动类上加上@ForestScan注解，并在basePackages属性里填上远程接口的所在的包名
 
+```java
+@SpringBootApplication
+@Configuration
+@ForestScan(basePackages = "com.yoursite.client.MyClient")
+public class MyApp {
+ ...
+}
+```
+
+Forest会扫描@ForestScan注解中basePackages属性指定的包下面所有的interface，然后会将符合条件的接口进行动态代理并注入到Spring的上下文中。
+
+然后便能在其他代码中从Spring上下文注入MyClient接口实例
+
+```java
+@Component
+public class MyService {
+    @Autowired
+    private MyClient myClient;
+}
+```
+
+## 5.2 在普通项目中获取接口实例
+
+通过ForestConfiguration的静态方法createInstance(Class clazz)实例化接口。
+
+```java
+MyClient myClient = configuration.createInstance(MyClient.class);
+```

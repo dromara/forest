@@ -67,7 +67,7 @@ forest:
 
 ```java
 
-package com.yourproject.pkg;
+package com.yoursite.client;
 
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.annotation.DataParam;
@@ -96,7 +96,7 @@ public interface MyClient {
 ```java
 @SpringBootApplication
 @Configuration
-@ForestScan(basePackages = "com.yourproject.pkg")
+@ForestScan(basePackages = "com.yoursite.client")
 public class MyApp {
  ...
 }
