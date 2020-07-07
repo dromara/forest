@@ -13,7 +13,7 @@ Forest是一个开源的Java HTTP客户端框架，它能够将HTTP的所有请�
 
 ![avater](media/architect.png)
 
-Forest分为前端和后端部分，Forest本身是前端框架，是对后端HTTP Api框架的进一步封装。
+我们讲HTTP发送请求的过程分为前端部分和后端部分，Forest本身是处理前端过程的框架，是对后端HTTP Api框架的进一步封装。
 
 ## 对应的Java版本
 
