@@ -208,7 +208,8 @@ public interface MyClient {
 ```
 
 通过@Request注解，将上面的MyClient接口中的simpleRequest()方法绑定了一个HTTP请求，
-其URL为http://localhost:5000/hello，并默认使用GET方式，且将请求响应的数据以String的方式返回给调用者。
+其URL为http://localhost:5000/hello
+，并默认使用GET方式，且将请求响应的数据以String的方式返回给调用者。
 
 
 ## 4.2 稍复杂点的请求定义
