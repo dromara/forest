@@ -307,6 +307,99 @@ public interface MyClient {
 }
 ```
 
+## 4.4 绑定参数
+
+### 4.4.1 方法一：${数字}
+
+您可以使用${数字}的方式引用对应顺序的参数，其中${...}的语法是模板表达式。
+
+```java
+
+@Request(
+    url = "${0}/send?un=${1}&pw=${2}&da=${3}&sm=${4}",
+    type = "get",
+    dataType = "json"
+)
+public Map send(
+    String base,
+    String userName,
+    String password,
+    String phoneList,
+    String content
+);
+```
+
+如果调用方代码如下所示：
+
+```java
+myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
+```
+
+实际产生的HTTP请求如下：
+
+    GET http://localhost:8080/send?un=DT&pw=123456&da=123888888&sm=Hahaha
+
+
+### 4.4.2 方法二：@DataParam
+
+
+
+```java
+
+@Request(
+    url = "${0}/send",
+    type = "get",
+    dataType = "json"
+)
+public Map send(
+    String base,
+    @DataParam("un") String userName,
+    @DataParam("pw") String password,
+    @DataParam("da") String phoneList,
+    @DataParam("sm") String content
+);
+```
+
+如果调用方代码如下所示：
+
+```java
+myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
+```
+
+实际产生的HTTP请求如下：
+
+    GET http://localhost:8080/send?un=DT&pw=123456&da=123888888&sm=Hahaha
+
+
+
+### 4.4.3 方法三：@DataVariable
+
+```java
+
+@Request(
+    url = "${base}/send?un=${un}&pw=${pw}&da=${da}&sm=${sm}",
+    type = "get",
+    dataType = "json"
+)
+public Map send(
+    @DataVariable("base") String base,
+    @DataVariable("un") String userName,
+    @DataVariable("pw") String password,
+    @DataVariable("da") String phoneList,
+    @DataVariable("sm") String content
+);
+```
+
+如果调用方代码如下所示：
+
+```java
+myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
+```
+
+实际产生的HTTP请求如下：
+
+    GET http://localhost:8080/send?un=DT&pw=123456&da=123888888&sm=Hahaha
+
 
 
 
