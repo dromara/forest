@@ -94,11 +94,6 @@ public interface MyClient {
 在Springboot的配置类或者启动类上加上@ForestScan注解，并在basePackages属性里填上远程接口的所在的包名
 
 ```java
-
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Configuration;
-import com.dtflys.forest.annotation.ForestScan;
-
 @SpringBootApplication
 @Configuration
 @ForestScan(basePackages = "com.yourproject.pkg")
