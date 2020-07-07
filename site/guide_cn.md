@@ -148,11 +148,27 @@ forest:
   ssl-protocol: SSLv3                     # 单向验证的HTTPS的默认SSL协议，默认为SSLv3
 ```
 
-## 3.1 在普通项目中配置
+### 3.1.5 全局变量定义
+
+forest可以在forest.variables属性下自定义全局变量。
+
+其中key为变量名，value为变量值。
+
+全局变量可以在任何模板表达式中进行数据绑定。
+
+```yaml
+forest:
+  enabled: true
+  variables:
+    username: foo
+    userpwd: bar
+```
+
+## 3.2 在普通项目中配置
 
 若您的项目不是spring boot项目，或者没有依赖spring-boot-starter-forest，可以通过下面方式定义forest配置。
 
-### 3.1.1 创建ForestConfiguration对象
+### 3.2.1 创建ForestConfiguration对象
 
 ForestConfiguration为forest的全局配置对象类，所有的forest的全局基本配置信息由此类进行管理。
 
@@ -162,7 +178,7 @@ ForestConfiguration对象的创建方式：调用静态方法ForestConfiguration
 ForestConfiguration configuration = ForestConfiguration.configuration();
 ```
 
-### 3.1.2 配置后端HTTP API
+### 3.2.2 配置后端HTTP API
 
 ```java
 configuration.setBackendName("okhttp3");
@@ -175,7 +191,7 @@ configuration.setBackendName("okhttp3");
 configuration.setBackendName("httpclient");
 ```
 
-### 3.1.3 全局基本配置
+### 3.2.3 全局基本配置
 
 ```java
 // 连接池最大连接数，默认值为500
@@ -190,6 +206,21 @@ configuration.setConnectTimeout(2000);
 configuration.setRetryCount(3);
 // 单向验证的HTTPS的默认SSL协议，默认为SSLv3
 configuration.setSslProtocol(SSLUtils.SSLv3);
+```
+
+### 3.2.4 全局变量定义
+
+forest可以通过ForestConfiguration对象的setVariableValue方法自定义全局变量。
+
+其中第一个参数为变量名，第二个为变量值。
+
+全局变量可以在任何模板表达式中进行数据绑定。
+
+```java
+ForestConfiguration configuration = ForestConfiguration.configuration();
+...
+configuration.setVariableValue("username", "foo");
+configuration.setVariableValue("userpwd", "bar");
 ```
 
 ## 3.3 配置层级
@@ -333,9 +364,11 @@ public interface MyClient {
 }
 ```
 
-## 4.4 绑定参数
+## 4.4 数据绑定
 
-### 4.4.1 方法一：${数字}
+Forest提供多种方式进行数据绑定。
+
+### 4.4.1 参数序号绑定
 
 您可以使用${数字}的方式引用对应顺序的参数，其中${...}的语法是模板表达式。
 
@@ -366,7 +399,7 @@ myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
     GET http://localhost:8080/send?un=DT&pw=123456&da=123888888&sm=Hahaha
 
 
-### 4.4.2 方法二：@DataParam
+### 4.4.2 @DataParam参数绑定
 
 
 ```java
@@ -397,7 +430,7 @@ myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
 
 
 
-### 4.4.3 方法三：@DataVariable
+### 4.4.3 @DataVariable参数绑定
 
 ```java
 
@@ -425,7 +458,37 @@ myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
 
     GET http://localhost:8080/send?un=DT&pw=123456&da=123888888&sm=Hahaha
 
+### 4.4.4 全局变量绑定
 
+若您已经定义好全局变量（关于如何定义全局变量请参见[SpringBoot全局变量定义](###-3.1.5-全局变量定义)，或[普通项目全局变量定义](###-3.2.4-全局变量定义)），那便可以直接在请求定义中绑定全局变量了。
+
+若有全局变量：
+
+    basetUrl: http://localhost:5050
+    usrename: foo
+    userpwd: bar
+    phoneList: 123888888
+ 
+```java
+
+@Request(
+        url = "${base}/send?un=${un}&pw=${pw}&da=${da}&sm=${sm}",
+        type = "get",
+        dataType = "json"
+)
+Map testVar(@DataVariable("sm") String content);
+```
+
+如果调用方代码如下所示：
+
+```java
+myClient.send("Xxxxxx");
+```
+
+实际产生的HTTP请求如下：
+
+    GET http://localhost:5050/send?un=foo&pw=bar&da=123888888&sm=Xxxxxx
+    
 
 
 
