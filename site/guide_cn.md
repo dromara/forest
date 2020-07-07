@@ -191,3 +191,56 @@ configuration.setRetryCount(3);
 // 单向验证的HTTPS的默认SSL协议，默认为SSLv3
 configuration.setSslProtocol(SSLUtils.SSLv3);
 ```
+
+# 四. 定义请求接口
+
+### 4.1 简单请求定义
+
+创建一个interface，并用@Request注解修饰接口方法。
+
+```java
+public interface MyClient {
+
+    @Request(url = "http://localhost:5000/hello")
+    String simpleRequest();
+
+}
+```
+
+通过@Request注解，将上面的MyClient接口中的simpleRequest()方法绑定了一个HTTP请求，
+其URL为http://localhost:5000/hello，并默认使用GET方式，且将请求响应的数据以String的方式返回给调用者。
+
+
+### 4.2 稍复杂点的请求定义
+
+```java
+public interface MyClient {
+
+    @Request(
+            url = "http://localhost:5000/hello/user",
+            headers = {"Accept:text/plan"}
+    )
+    String sendRequest(@DataParam("uname") String username);
+
+}
+```
+上面的sendRequest方法绑定的HTTP请求，定义了URL信息，以及把Accept:text/plan加到了请求头中，
+方法的参数String username绑定了注解@DataParam("uname")，它的作用是将调用者传入入参username时，自动将username的值加入到HTTP的请求参数uname中。
+
+如果调用方代码如下所示：
+```java
+MyClient client;
+...
+client.sendRequest("foo");
+```
+这段调用所实际产生的HTTP请求如下：
+
+    GET http://localhost:5000/hello/user?uname=foo
+    HEADER:
+        Accept:text/plan
+
+
+
+
+
+
