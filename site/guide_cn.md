@@ -88,6 +88,7 @@ Forest 1.0.x和Forest 1.1.x基于JDK 1.7, Forest 1.2.x基于JDK 1.8
 
 ## 3.1 在SpringBoot项目中配置
 
+### 3.1.1 配置forest启动开关
 在application.yml中设置forest.enabled为true，便能开启forest。若设为false，springboot便不会再扫描forest。
 
 ```yaml
@@ -95,7 +96,7 @@ forest:
   enabled: true
 ```
 
-配置后端HTTP API
+### 3.1.2 配置后端HTTP API
 
 ```yaml
 forest:
@@ -112,7 +113,8 @@ forest:
   backend: httpclient         # 配置后端HTTP API为 httpclient
 ```
 
-Forest运行您在yaml文件中配置bean id，它对应着ForestConfiguration对象在spring上下文中的bean名称。
+### 3.1.3 配置Bean ID 
+Forest允许您在yaml文件中配置bean id，它对应着ForestConfiguration对象在spring上下文中的bean名称。
 
 ```yaml
 forest:
@@ -127,7 +129,7 @@ forest:
 private ForestConfiguration config0;
 ```
 
-其他的基本配置
+### 3.1.4 其他的基本配置
 
 ```yaml
 forest:
