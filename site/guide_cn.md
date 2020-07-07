@@ -26,6 +26,10 @@ Forest是一个开源的Java HTTP客户端框架，它能够将HTTP的所有请�
 7. 过滤器： 用于动态过滤和处理传入HTTP请求的相关数据。
 8. SSL： Forest支持单向和双向验证的HTTPS请求，此模块用于处理SSL相关协议的内容。
 
+后端部分：
+
+后端为实际执行HTTP请求发送的第三方框架，目前支持 Ok Http 3和Httpclient两种后端API。
+
 ## 对应的Java版本
 
 Forest 1.0.x和Forest 1.1.x基于JDK 1.7, Forest 1.2.x基于JDK 1.8
