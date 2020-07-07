@@ -5,6 +5,7 @@ import com.dtflys.forest.backend.HttpBackendSelector;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.ssl.SSLUtils;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import junit.framework.Assert;
@@ -88,6 +89,8 @@ public class TestForestConfiguration {
         assertEquals(Integer.valueOf(222), configuration.getMaxRouteConnections());
         configuration.setTimeout(12000);
         assertEquals(Integer.valueOf(12000), configuration.getTimeout());
+        configuration.setSslProtocol(SSLUtils.SSLv3);
+        configuration.setConnectTimeout(2000);
     }
 
     @Test
