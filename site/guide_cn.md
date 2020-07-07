@@ -239,7 +239,7 @@ client.sendRequest("foo");
     HEADER:
         Accept:text/plan
 
-## 改变请求方式
+## 4.3 改变请求方式
 
 使用POST方式
 
