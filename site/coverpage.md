@@ -7,4 +7,4 @@
 
 [Gitee](https://gitee.com/dt_flys/forest)
 [GitHub](https://github.com/mySingleLive/forest)
-[新手介绍](# 一. 新手介绍)
+[新手介绍](#一-新手介绍)

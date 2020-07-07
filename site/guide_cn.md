@@ -48,8 +48,6 @@ Forest 1.0.x和Forest 1.1.x基于JDK 1.7, Forest 1.2.x基于JDK 1.8
 
 ## 2.2 在普通项目中安装
 
-### 依赖
-
 先添加后端HTTP API的依赖：okhttp3 或 httpclient 4.3.x.
 以及JSON解析框架：jackson、fastjson或Gson
 ```xml
