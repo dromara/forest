@@ -28,7 +28,7 @@ Forest是一个开源的Java HTTP客户端框架，它能够将HTTP的所有请�
 
 <b>后端部分：</b>
 
-后端为实际执行HTTP请求发送的第三方框架，目前支持 Ok Http 3和Httpclient两种后端API。
+后端为实际执行HTTP请求发送过程的第三方HTTP Api，目前支持 Ok Http 3和Httpclient两种后端API。
 
 <b>Spring Boot Starter Forest:</b>
 
