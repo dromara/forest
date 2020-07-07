@@ -1,15 +1,14 @@
 
 forest:
-  enabled: true
-  bean-id: config0
-  backend: okhttp3
-  max-connections: 1200
-  max-route-connections: 1100
-  timeout: 1000
-  connect-timeout: 1123
-  retry-count: 5
-  ssl-protocol: SSLv3
-  variables:
-    baseUrl: http://www.thebeastshop.com
-    a: 1
-    b: 2
+  enabled: true                           # forest开关
+  bean-id: config0                        # 在spring上下文中bean的id
+  backend: okhttp3                        # 后端HTTP API： okhttp3
+  max-connections: 1200                   # 连接池最大连接数
+  max-route-connections: 1100             # 每个路由的最大连接数
+  timeout: 1000                           # 请求超时时间
+  connect-timeout: 1123                   # 连接超时时间
+  retry-count: 5                          # 请求失败后重试次数
+  ssl-protocol: SSLv3                     # 单向验证的HTTPS的默认SSL协议
+  variables:                              # 自定义全局变量：key为变量名，value为值，可以在任何模板表达式中引用
+    myName: xxx
+    myCount: 12

@@ -60,3 +60,59 @@ Forest 1.1.x基于JDK1.7, Forest 1.2.x基于JDK 1.8
 
 # 三. 配置
 
+## 3.1 在SpringBoot项目中配置
+
+在application.yml中设置forest.enabled为true，便能开启forest。若设为false，springboot便不会再扫描forest。
+
+```yaml
+forest:
+  enabled: true
+```
+
+配置后端HTTP API
+
+```yaml
+forest:
+  enabled: true       
+  backend: okhttp3         # 配置后端HTTP API为 okhttp3
+```
+
+目前Forest支持okhttp3和httpclient两种后端HTTP API，若不配置该属性，默认为okhttp3.
+当然，您也可以改为httpclient
+
+```yaml
+forest:
+  enabled: true       
+  backend: httpclient         # 配置后端HTTP API为 httpclient
+```
+
+Forest运行您在yaml文件中配置bean id，它对应着ForestConfiguration对象在spring上下文中的bean名称，可以在spring中通过bean的名称引用到它。
+
+```yaml
+forest:
+  enabled: true
+  bean-id: config0
+```
+
+```java
+@Resource(name = "config0")
+private ForestConfiguration config0;
+```
+
+其他的基本配置
+
+```yaml
+forest:
+  enabled: true                           # forest开关
+  bean-id: config0                        # 在spring上下文中bean的id
+  backend: okhttp3                        # 后端HTTP API： okhttp3
+  max-connections: 3000                   # 连接池最大连接数
+  max-route-connections: 3000             # 每个路由的最大连接数
+  timeout: 3000                           # 请求超时时间
+  connect-timeout: 3000                   # 连接超时时间
+  retry-count: 1                          # 请求失败后重试次数
+  ssl-protocol: SSLv3                     # 单向验证的HTTPS的默认SSL协议
+  variables:                              # 自定义全局变量：key为变量名，value为值，可以在任何模板表达式中引用
+    myName: xxx
+    myCount: 12
+```
