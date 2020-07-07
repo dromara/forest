@@ -15,7 +15,7 @@ Forest是一个开源的Java HTTP客户端框架，它能够将HTTP的所有请�
 
 我们讲HTTP发送请求的过程分为前端部分和后端部分，Forest本身是处理前端过程的框架，是对后端HTTP Api框架的进一步封装。
 
-前端部分：
+<b>前端部分：</b>
 
 1. Forest配置： 负责管理HTTP发送请求所需的配置。
 2. Forest注解： 用于定义HTTP发送请求的所有相关信息，一般定义在interface上和其方法上。
@@ -26,9 +26,14 @@ Forest是一个开源的Java HTTP客户端框架，它能够将HTTP的所有请�
 7. 过滤器： 用于动态过滤和处理传入HTTP请求的相关数据。
 8. SSL： Forest支持单向和双向验证的HTTPS请求，此模块用于处理SSL相关协议的内容。
 
-后端部分：
+<b>后端部分：</b>
 
 后端为实际执行HTTP请求发送的第三方框架，目前支持 Ok Http 3和Httpclient两种后端API。
+
+<b>Spring Boot Starter Forest:</b>
+
+提供对Spring Boot的支持
+
 
 ## 对应的Java版本
 
