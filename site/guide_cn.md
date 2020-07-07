@@ -192,6 +192,31 @@ configuration.setRetryCount(3);
 configuration.setSslProtocol(SSLUtils.SSLv3);
 ```
 
+## 3.3 配置层级
+
+上面介绍的application.yml/application.properties配置以及通过ForestConfiguration对象设置的配置都是全局配置。
+
+除了全局配置，Forest还提供了接口配置和请求配置。
+
+这三种配置的作用域和读取优先级各不相同。
+
+作用域： 配置作用域指的是配置所影响的请求范围。
+
+优先级： 优先级值的是是否优先读取该配置，比如您优先级最高@Request中定义了timeout为500，那么即便在全局配置中定了timeout为1000，最终该请求实际的timeout为优先级配置最高的@Request中定义的500。
+
+具体的配置层级如图所示：
+
+![avarter](media/config.png)
+
+
+全局配置：针对全局所有请求，作用域最大，配置读取的优先级最小。
+
+接口配置： 作用域为某一个interface中定义的请求，读取的优先级最小。您可以通过在interface上修饰@BaseRequest注解进行配置。
+
+请求配置： 作用域为某一个具体的请求，读取的优先级最高。您可以在接口的方法上修饰@Request注解进行HTTP信息配置的定义。
+
+
+
 # 四. 定义请求接口
 
 ## 4.1 简单请求定义
@@ -341,7 +366,6 @@ myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
 
 
 ### 4.4.2 方法二：@DataParam
-
 
 
 ```java
