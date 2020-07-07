@@ -102,7 +102,7 @@ import com.dtflys.forest.annotation.ForestScan;
 @SpringBootApplication
 @Configuration
 @ForestScan(basePackages = "com.yourproject.pkg")
-public class MyConfiguration {
+public class MyApp {
  ...
 }
 ```
