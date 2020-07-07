@@ -493,7 +493,7 @@ myClient.send("Xxxxxx");
 
 # 五. 创建和获取请求接口
 
-## 5.1 在SpringBoot项目中获取接口实例
+## 5.1 在SpringBoot项目中创建接口实例
 
 若您已有定义好的Forest请求接口名为 com.yoursite.client.MyClient，
 
@@ -520,7 +520,7 @@ public class MyService {
 }
 ```
 
-## 5.2 在普通项目中获取接口实例
+## 5.2 在普通项目中创建接口实例
 
 通过ForestConfiguration的静态方法createInstance(Class clazz)实例化接口。
 
