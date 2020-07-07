@@ -102,13 +102,15 @@ forest:
   backend: httpclient         # 配置后端HTTP API为 httpclient
 ```
 
-Forest运行您在yaml文件中配置bean id，它对应着ForestConfiguration对象在spring上下文中的bean名称，可以在spring中通过bean的名称引用到它。
+Forest运行您在yaml文件中配置bean id，它对应着ForestConfiguration对象在spring上下文中的bean名称。
 
 ```yaml
 forest:
   enabled: true
-  bean-id: config0
+  bean-id: config0            # 在spring上下文中bean的id，默认值为forestConfiguration
 ```
+
+然后便可以在spring中通过bean的名称引用到它
 
 ```java
 @Resource(name = "config0")
@@ -120,14 +122,14 @@ private ForestConfiguration config0;
 ```yaml
 forest:
   enabled: true                           # forest开关
-  bean-id: config0                        # 在spring上下文中bean的id
+  bean-id: config0                        # 在spring上下文中bean的id, 默认值为forestConfiguration
   backend: okhttp3                        # 后端HTTP API： okhttp3
-  max-connections: 3000                   # 连接池最大连接数
-  max-route-connections: 3000             # 每个路由的最大连接数
-  timeout: 3000                           # 请求超时时间
-  connect-timeout: 3000                   # 连接超时时间
-  retry-count: 1                          # 请求失败后重试次数
-  ssl-protocol: SSLv3                     # 单向验证的HTTPS的默认SSL协议
+  max-connections: 1000                   # 连接池最大连接数，默认值为500
+  max-route-connections: 500              # 每个路由的最大连接数，默认值为500
+  timeout: 3000                           # 请求超时时间，单位为毫秒, 默认值为3000
+  connect-timeout: 3000                   # 连接超时时间，单位为毫秒, 默认值为2000
+  retry-count: 1                          # 请求失败后重试次数，默认为0次不重试
+  ssl-protocol: SSLv3                     # 单向验证的HTTPS的默认SSL协议，默认为SSLv3
 ```
 
 ## 3.1 在普通项目中配置
