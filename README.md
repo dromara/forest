@@ -30,6 +30,7 @@ Forest是一个高层的、极简的轻量级HTTP调用API框架。<br>
 * 配置简单，一般只需要@Request一个注解就能完成绝大多数请求的定义
 * 支持异步请求调用
 
+### 详细文档请点击：[中文文档](https://dt_flys.gitee.io/forest) 
 
 Quick Start
 -------------------------------------
@@ -116,14 +117,6 @@ public void testClient() {
     System.out.println(result);
 }
 ```
-
-
-### 详细文档:<br>
-* [HTTP请求](forest-core/src/main/doc/REQUEST.md)<br>
-* [变量/参数](forest-core/src/main/doc/DOCUMENTATION.md)<br>
-* [回调方法](forest-core/src/main/doc/CALLBACK.md)<br>
-* [在Spring中使用](forest-core/src/main/doc/SPRING.md)<br>
-* [拦截器](forest-core/src/main/doc/INTERCEPTOR.md)
 
 
 ### 微信交流群:<br>
