@@ -150,4 +150,44 @@ forest:
 
 ## 3.1 在普通项目中配置
 
-###
+若您的项目不是spring boot项目，或者没有依赖spring-boot-starter-forest，可以通过下面方式定义forest配置。
+
+### 3.1.1 创建ForestConfiguration对象
+
+ForestConfiguration为forest的全局配置对象类，所有的forest的全局基本配置信息由此类进行管理。
+
+ForestConfiguration对象的创建方式：调用静态方法ForestConfiguration.configuration()，此方法会创建ForestConfiguration对象并初始化默认值。
+
+```java
+ForestConfiguration configuration = ForestConfiguration.configuration();
+```
+
+### 3.1.2 配置后端HTTP API
+
+```java
+configuration.setBackendName("okhttp3");
+```
+
+目前Forest支持okhttp3和httpclient两种后端HTTP API，若不配置该属性，默认为okhttp3.
+当然，您也可以改为httpclient
+
+```java
+configuration.setBackendName("httpclient");
+```
+
+### 3.1.3 全局基本配置
+
+```java
+// 连接池最大连接数，默认值为500
+configuration.setMaxConnections(123);
+// 每个路由的最大连接数，默认值为500
+configuration.setMaxRouteConnections(222);
+// 请求超时时间，单位为毫秒, 默认值为3000
+configuration.setTimeout(3000);
+// 连接超时时间，单位为毫秒, 默认值为2000
+configuration.setConnectTimeout(2000);
+// 请求失败后重试次数，默认为0次不重试
+configuration.setRetryCount(3);
+// 单向验证的HTTPS的默认SSL协议，默认为SSLv3
+configuration.setSslProtocol(SSLUtils.SSLv3);
+```
