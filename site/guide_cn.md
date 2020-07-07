@@ -9,15 +9,22 @@ Forest是一个开源的Java HTTP客户端框架，它能够将HTTP的所有请�
 
 使用Forest就像使用类似Dubbo那样的RPC框架一样，只需要定义接口，调用接口即可，不必关心具体发送HTTP请求的细节。同时将HTTP请求信息与业务代码解耦，方便您统一管理大量HTTP的URL、Header等信息。而请求的调用方完全不必在意HTTP的具体内容，即使该HTTP请求信息发生变更，大多数情况也不需要修改调用发送请求的代码。
 
+## Forest的架构
+
+![avater](media/architect.png)
+
+Forest分为前端和后端部分，Forest本身是前端框架，是对后端HTTP Api框架的进一步封装。
+
 ## 对应的Java版本
 
-Forest 1.1.x基于JDK1.7, Forest 1.2.x基于JDK 1.8
+Forest 1.0.x和Forest 1.1.x基于JDK 1.7, Forest 1.2.x基于JDK 1.8
 
 # 二. 安装
 
 ## 2.1 在SpringBoot项目中安装
 
-### 依赖
+若您的项目已经依赖了spring boot，那只要添加下面一个maven依赖便可。
+
 ```xml
 <dependency>
     <groupId>com.dtflys.forest</groupId>
@@ -112,7 +119,7 @@ forest:
   connect-timeout: 3000                   # 连接超时时间
   retry-count: 1                          # 请求失败后重试次数
   ssl-protocol: SSLv3                     # 单向验证的HTTPS的默认SSL协议
-  variables:                              # 自定义全局变量：key为变量名，value为值，可以在任何模板表达式中引用
-    myName: xxx
-    myCount: 12
 ```
+
+## 3.1 在普通项目中配置
+
