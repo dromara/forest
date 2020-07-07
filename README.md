@@ -24,10 +24,10 @@ Forest是一个高层的、极简的轻量级HTTP调用API框架。<br>
 * JSON字符串到Java对象的自动化解析
 * XML文本到Java对象的自动化解析
 * JSON、XML或其他类型转换器可以随意扩展和替换
-* 可以通过OnSuccess和OnError接口参数实现请求结果的回调
-* 配置简单，一般只需要@Request一个注解就能完成绝大多数请求的定义
 * 支持JSON转换框架: Fastjson, Jackson, Gson
 * 支持JAXB形式的XML转换
+* 可以通过OnSuccess和OnError接口参数实现请求结果的回调
+* 配置简单，一般只需要@Request一个注解就能完成绝大多数请求的定义
 * 支持异步请求调用
 
 
