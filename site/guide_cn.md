@@ -472,7 +472,7 @@ myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
 ```java
 
 @Request(
-        url = "${base}/send?un=${un}&pw=${pw}&da=${da}&sm=${sm}",
+        url = "${basetUrl}/send?un=${usrename}&pw=${userpwd}&da=${phoneList}&sm=${sm}",
         type = "get",
         dataType = "json"
 )
