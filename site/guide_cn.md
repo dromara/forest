@@ -222,7 +222,6 @@ public interface MyClient {
             headers = {"Accept:text/plan"}
     )
     String sendRequest(@DataParam("uname") String username);
-
 }
 ```
 上面的sendRequest方法绑定的HTTP请求，定义了URL信息，以及把Accept:text/plan加到了请求头中，
@@ -239,6 +238,76 @@ client.sendRequest("foo");
     GET http://localhost:5000/hello/user?uname=foo
     HEADER:
         Accept:text/plan
+
+## 改变请求方式
+
+使用POST方式
+
+```java
+public interface MyClient {
+
+    @Request(
+            url = "http://localhost:5000/hello",
+            type = "POST"
+    )
+    String simplePost();
+}
+```
+如果上面代码所示，可以通过@Request注解的type参数指定HTTP请求的方式。
+
+除了POST，也可以指定成其他几种HTTP请求方式。
+
+其中type属性的大小写不敏感，写成POST和post效果相同。
+
+```java
+public interface MyClient {
+
+    // GET请求
+    @Request(
+            url = "http://localhost:5000/hello",
+            type = "get"
+    )
+    String simpleGet();
+
+    // POST请求
+    @Request(
+            url = "http://localhost:5000/hello",
+            type = "post"
+    )
+    String simplePost();
+
+    // PUT请求
+    @Request(
+            url = "http://localhost:5000/hello",
+            type = "put"
+    )
+    String simplePut();
+
+    // HEAD请求
+    @Request(
+            url = "http://localhost:5000/hello",
+            type = "head"
+    )
+    String simpleHead();
+
+    // Options请求
+    @Request(
+            url = "http://localhost:5000/hello",
+            type = "options"
+    )
+    String simpleOptions();
+
+    // Delete请求
+    @Request(
+            url = "http://localhost:5000/hello",
+            type = "delete"
+    )
+    String simpleDelete();
+
+}
+```
+
+
 
 
 
