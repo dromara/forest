@@ -82,6 +82,7 @@ Forest 1.0.x和Forest 1.1.x基于JDK 1.7, Forest 1.2.x基于JDK 1.8
     <version>1.2.0</version>
 </dependency>
 ```
+最新版本为<font color=red>*1.2.0*</font>，为稳定版本
 
 # 三. 配置
 
