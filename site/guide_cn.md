@@ -21,7 +21,7 @@ Forest是一个开源的Java HTTP客户端框架，它能够将HTTP的所有请�
 2. Forest注解： 用于定义HTTP发送请求的所有相关信息，一般定义在interface上和其方法上。
 3. 动态代理： 用户定义好的HTTP请求的`interface`将通过动态代理产生实际执行发送请求过程的代理类。
 4. 模板表达式： 模板表达式可以嵌入在几乎所有的HTTP请求参数定义中，它能够将用户通过参数或全局变量传入的数据动态绑定到HTTP请求信息中。
-5. 数据转换： 此模块将字符串数据和`JSON`或`XML`形式数据进行互转。目前JSON转换器支持`Jackson`、`Fastjson`、`Gson`三种，XML仅支持`JAXB`一种。
+5. 数据转换： 此模块将字符串数据和`JSON`或`XML`形式数据进行互转。目前JSON转换器支持`Jackson`、`Fastjson`、`Gson`三种，XML支持`JAXB`一种。
 6. 拦截器： 用户可以自定义拦截器，拦截指定的一个或一批请求的开始、成功返回数据、失败、完成等生命周期中的各个环节，以插入自定义的逻辑进行处理。
 7. 过滤器： 用于动态过滤和处理传入HTTP请求的相关数据。
 8. SSL： Forest支持单向和双向验证的HTTPS请求，此模块用于处理SSL相关协议的内容。
@@ -371,7 +371,7 @@ Forest提供多种方式进行数据绑定。
 
 ### 4.4.1 参数序号绑定
 
-您可以使用${数字}的方式引用对应顺序的参数，其中${...}的语法是模板表达式。
+您可以使用`${数字}`的方式引用对应顺序的参数，其中`${...}`是模板表达式的语法形式。
 
 ```java
 
@@ -400,7 +400,7 @@ myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
     GET http://localhost:8080/send?un=DT&pw=123456&da=123888888&sm=Hahaha
 
 
-### 4.4.2 @DataParam参数绑定
+### 4.4.2 `@DataParam`参数绑定
 
 
 ```java
@@ -431,7 +431,7 @@ myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
 
 
 
-### 4.4.3 @DataVariable参数绑定
+### 4.4.3 `@DataVariable`参数绑定
 
 ```java
 
@@ -494,7 +494,7 @@ myClient.send("Xxxxxx");
 
 # 五. 创建和获取请求接口实例
 
-## 5.1 在SpringBoot项目中创建接口实例
+## 5.1 在Spring Boot项目中创建接口实例
 
 若您已有定义好的Forest请求接口名为 com.yoursite.client.MyClient，
 
