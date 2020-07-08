@@ -43,7 +43,7 @@ Forest 1.0.x和Forest 1.1.x基于JDK 1.7, Forest 1.2.x基于JDK 1.8
 
 ## 2.1 在SpringBoot项目中安装
 
-若您的项目已经依赖了spring boot，那只要添加下面一个maven依赖便可。
+若您的项目基于`Spring Boot`，那只要添加下面一个maven依赖便可。
 
 ```xml
 <dependency>
@@ -57,8 +57,8 @@ Forest 1.0.x和Forest 1.1.x基于JDK 1.7, Forest 1.2.x基于JDK 1.8
 
 ## 2.2 在普通项目中安装
 
-先添加后端HTTP API的依赖：okhttp3 或 httpclient 4.3.x.
-以及JSON解析框架：jackson、fastjson或Gson
+先添加后端HTTP API的依赖：`okhttp3` 或 `httpclient`.
+以及JSON解析框架：`Jackson`、`Fastjson`或`Gson`
 ```xml
 <dependency>
   <groupId>com.squareup.okhttp3</groupId>
@@ -88,10 +88,10 @@ Forest 1.0.x和Forest 1.1.x基于JDK 1.7, Forest 1.2.x基于JDK 1.8
 
 ## 3.1 在SpringBoot项目中配置
 
-若您的项目依赖spring boot，并加入了spring-boot-starter-forest依赖，就可以通过application.yml/application.properties方式定义配置。
+若您的项目依赖`Spring Boot`，并加入了`spring-boot-starter-forest`依赖，就可以通过application.yml/application.properties方式定义配置。
 
 ### 3.1.1 配置forest启动开关
-在application.yml中设置forest.enabled为true，便能开启forest。若设为false，springboot便不会再扫描forest。
+在`application.yml`中设置`forest.enabled`为`true`，便能开启forest。若设为false，Spring Boot便不会再扫描forest。
 
 ```yaml
 forest:
@@ -106,7 +106,7 @@ forest:
   backend: okhttp3         # 配置后端HTTP API为 okhttp3
 ```
 
-目前Forest支持okhttp3和httpclient两种后端HTTP API，若不配置该属性，默认为okhttp3.
+目前Forest支持`okhttp3`和`httpclient`两种后端HTTP API，若不配置该属性，默认为`okhttp3`.
 当然，您也可以改为httpclient
 
 ```yaml
@@ -133,7 +133,7 @@ private ForestConfiguration config0;
 
 ### 3.1.4 全局基本配置
 
-在application.yaml / application.properties中配置的HTTP基本参数
+在`application.yaml` / `application.properties`中配置的HTTP基本参数
 
 ```yaml
 forest:
@@ -150,7 +150,7 @@ forest:
 
 ### 3.1.5 全局变量定义
 
-forest可以在forest.variables属性下自定义全局变量。
+Forest可以在`forest.variables`属性下自定义全局变量。
 
 其中key为变量名，value为变量值。
 
@@ -166,13 +166,13 @@ forest:
 
 ## 3.2 在普通项目中配置
 
-若您的项目不是spring boot项目，或者没有依赖spring-boot-starter-forest，可以通过下面方式定义forest配置。
+若您的项目不是Spring Boot项目，或者没有依赖`spring-boot-starter-forest`，可以通过下面方式定义Forest配置。
 
-### 3.2.1 创建ForestConfiguration对象
+### 3.2.1 创建`ForestConfiguration`对象
 
-ForestConfiguration为forest的全局配置对象类，所有的forest的全局基本配置信息由此类进行管理。
+`ForestConfiguration`为Forest的全局配置对象类，所有的Forest的全局基本配置信息由此类进行管理。
 
-ForestConfiguration对象的创建方式：调用静态方法ForestConfiguration.configuration()，此方法会创建ForestConfiguration对象并初始化默认值。
+`ForestConfiguration`对象的创建方式：调用静态方法`ForestConfiguration.configuration()`，此方法会创建ForestConfiguration对象并初始化默认值。
 
 ```java
 ForestConfiguration configuration = ForestConfiguration.configuration();
@@ -184,8 +184,9 @@ ForestConfiguration configuration = ForestConfiguration.configuration();
 configuration.setBackendName("okhttp3");
 ```
 
-目前Forest支持okhttp3和httpclient两种后端HTTP API，若不配置该属性，默认为okhttp3.
-当然，您也可以改为httpclient
+目前Forest支持`okhttp3`和`httpclient`两种后端HTTP API，若不配置该属性，默认为`okhttp3`。
+
+当然，您也可以改为`httpclient`
 
 ```java
 configuration.setBackendName("httpclient");
@@ -210,7 +211,7 @@ configuration.setSslProtocol(SSLUtils.SSLv3);
 
 ### 3.2.4 全局变量定义
 
-forest可以通过ForestConfiguration对象的setVariableValue方法自定义全局变量。
+Forest可以通过`ForestConfiguration`对象的`setVariableValue`方法自定义全局变量。
 
 其中第一个参数为变量名，第二个为变量值。
 
@@ -225,7 +226,7 @@ configuration.setVariableValue("userpwd", "bar");
 
 ## 3.3 配置层级
 
-上面介绍的application.yml/application.properties配置以及通过ForestConfiguration对象设置的配置都是全局配置。
+上面介绍的`application.yml` / `application.properties`配置以及通过`ForestConfiguration`对象设置的配置都是全局配置。
 
 除了全局配置，Forest还提供了接口配置和请求配置。
 
@@ -233,7 +234,7 @@ configuration.setVariableValue("userpwd", "bar");
 
 作用域： 配置作用域指的是配置所影响的请求范围。
 
-优先级： 优先级值的是是否优先读取该配置，比如您优先级最高@Request中定义了timeout为500，那么即便在全局配置中定了timeout为1000，最终该请求实际的timeout为优先级配置最高的@Request中定义的500。
+优先级： 优先级值的是是否优先读取该配置。比如您优先级最高`@Request`中定义了`timeout`为`500`，那么即便在全局配置中定了`timeout`为`1000`，最终该请求实际的`timeout`为优先级配置最高的`@Request`中定义的`500`。
 
 具体的配置层级如图所示：
 
@@ -253,7 +254,7 @@ Forest的配置层级介绍：
 
 ## 4.1 简单请求定义
 
-创建一个interface，并用@Request注解修饰接口方法。
+创建一个`interface`，并用`@Request`注解修饰接口方法。
 
 ```java
 public interface MyClient {
@@ -508,9 +509,9 @@ public class MyApp {
 }
 ```
 
-Forest会扫描@ForestScan注解中basePackages属性指定的包下面所有的interface，然后会将符合条件的接口进行动态代理并注入到Spring的上下文中。
+Forest会扫描`@ForestScan`注解中`basePackages`属性指定的包下面所有的interface，然后会将符合条件的接口进行动态代理并注入到Spring的上下文中。
 
-然后便能在其他代码中从Spring上下文注入MyClient接口实例
+然后便能在其他代码中从Spring上下文注入接口实例
 
 ```java
 @Component
@@ -522,7 +523,7 @@ public class MyService {
 
 ## 5.2 在普通项目中创建接口实例
 
-通过ForestConfiguration的静态方法createInstance(Class clazz)实例化接口。
+通过`ForestConfiguration`的静态方法`createInstance`实例化接口。
 
 ```java
 MyClient myClient = configuration.createInstance(MyClient.class);

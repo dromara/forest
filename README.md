@@ -50,12 +50,14 @@ Quick Start
 
 ### 配置
 
-application.properties
+在`application.properties`中加入:
+
 ```properties
 forest.enabled = true
 ```
 
-或者在application.yml
+或者在`application.yml`中加入：
+
 ```yaml
 forest:
     enabled: true
@@ -63,7 +65,7 @@ forest:
 
 ### 一个栗子：访问百度短链接REST接口
 
-### 创建一个Interface作为远程调用接口
+### 创建一个`interface`作为远程调用接口
 
 
 ```java
@@ -92,7 +94,7 @@ public interface MyClient {
 
 ### 扫描接口
 
-在Springboot的配置类或者启动类上加上@ForestScan注解，并在basePackages属性里填上远程接口的所在的包名
+在Spring Boot的配置类或者启动类上加上`@ForestScan`注解，并在`basePackages`属性里填上远程接口的所在的包名
 
 ```java
 @SpringBootApplication
