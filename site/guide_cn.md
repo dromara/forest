@@ -365,7 +365,7 @@ public interface MyClient {
 }
 ```
 
-## 4.4 数据绑定
+# 五 数据绑定
 
 上面已经介绍了如何创建可以发送HTTP请求的接口，并绑定到某个接口方法上，已经可以实现简单请求的发送和接受。
 
@@ -374,7 +374,7 @@ public interface MyClient {
 这时候就需要`数据绑定`来实现这些功能，
 Forest提供多种方式进行`数据绑定`。
 
-### 4.4.1 参数序号绑定
+## 4.1 参数序号绑定
 
 您可以使用`${数字}`的方式引用对应顺序的参数，其中`${...}`是模板表达式的语法形式。
 
@@ -411,7 +411,7 @@ myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
     GET http://localhost:8080/send?un=DT&pw=123456&da=123888888&sm=Hahaha
 
 
-### 4.4.2 @DataParam参数绑定
+## 4.2 @DataParam参数绑定
 
 
 ```java
@@ -442,7 +442,7 @@ myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
 
 
 
-### 4.4.3 @DataVariable参数绑定
+## 4.3 @DataVariable参数绑定
 
 在接口方法中定义的参数前加上`@DataVariable`注解并`value`中输入一个名称，便可以实现参数的`变量名`绑定。
 
@@ -476,7 +476,7 @@ myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
 
     GET http://localhost:8080/send?un=DT&pw=123456&da=123888888&sm=Hahaha
 
-### 4.4.4 全局变量绑定
+## 4.4 全局变量绑定
 
 若您已经定义好全局变量（关于如何定义全局变量请参见[SpringBoot全局变量定义](###_315-全局变量定义)，或[普通项目全局变量定义](###_324-全局变量定义)），那便可以直接在请求定义中绑定全局变量了。
 
@@ -509,9 +509,9 @@ myClient.send("Xxxxxx");
     
 
 
-# 五. 创建和获取请求接口实例
+# 六. 创建和获取请求接口实例
 
-## 5.1 在Spring Boot项目中创建接口实例
+## 6.1 在Spring Boot项目中创建接口实例
 
 若您已有定义好的Forest请求接口名为 `com.yoursite.client.MyClient`，
 
@@ -538,7 +538,7 @@ public class MyService {
 }
 ```
 
-## 5.2 在普通项目中创建接口实例
+## 6.2 在普通项目中创建接口实例
 
 通过`ForestConfiguration`的静态方法`createInstance`实例化接口。
 
