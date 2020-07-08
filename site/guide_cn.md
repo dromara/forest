@@ -311,9 +311,9 @@ public interface MyClient {
     String simplePost();
 }
 ```
-如果上面代码所示，可以通过@Request注解的type参数指定HTTP请求的方式。
+如果上面代码所示，可以通过`@Request`注解的`type`参数指定HTTP请求的方式。
 
-除了`POST`，也可以指定成其他几种HTTP请求方式(GET, PUT, HEAD, OPTIONS, DELETE等)。
+除了`GET`和`POST`，也可以指定成其他几种HTTP请求方式(`PUT`, `HEAD`, `OPTIONS`, `DELETE`)。
 
 其中`type`属性的大小写不敏感，写成`POST`和`post`效果相同。
 
