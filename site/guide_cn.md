@@ -168,7 +168,7 @@ forest:
 
 若您的项目不是`Spring Boot`项目，或者没有依赖`spring-boot-starter-forest`，可以通过下面方式定义Forest配置。
 
-### 3.2.1 创建`ForestConfiguration`对象
+### 3.2.1 创建ForestConfiguration对象
 
 `ForestConfiguration`为Forest的全局配置对象类，所有的Forest的全局基本配置信息由此类进行管理。
 
