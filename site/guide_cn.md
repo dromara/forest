@@ -13,26 +13,26 @@ Forest是一个开源的Java HTTP客户端框架，它能够将HTTP的所有请�
 
 ![avater](media/architect.png)
 
-我们讲HTTP发送请求的过程分为前端部分和后端部分，Forest本身是处理前端过程的框架，是对后端HTTP Api框架的进一步封装。
+我们讲HTTP发送请求的过程分为前端部分和后端部分，Forest本身是处理前端过程的框架，是对后端HTTP API框架的进一步封装。
 
 <b>前端部分：</b>
 
 1. Forest配置： 负责管理HTTP发送请求所需的配置。
 2. Forest注解： 用于定义HTTP发送请求的所有相关信息，一般定义在interface上和其方法上。
-3. 动态代理： 用户定义好的HTTP请求的interface将通过动态代理产生实际执行发送请求过程的代理类。
+3. 动态代理： 用户定义好的HTTP请求的`interface`将通过动态代理产生实际执行发送请求过程的代理类。
 4. 模板表达式： 模板表达式可以嵌入在几乎所有的HTTP请求参数定义中，它能够将用户通过参数或全局变量传入的数据动态绑定到HTTP请求信息中。
-5. 数据转换： 此模块将字符串数据和JSON或XML形式数据进行互转。目前JSON转换器支持Jackson、Fastjson、Gson三种，XML仅支持JAXB一种。
+5. 数据转换： 此模块将字符串数据和`JSON`或`XML`形式数据进行互转。目前JSON转换器支持`Jackson`、`Fastjson`、`Gson`三种，XML仅支持`JAXB`一种。
 6. 拦截器： 用户可以自定义拦截器，拦截指定的一个或一批请求的开始、成功返回数据、失败、完成等生命周期中的各个环节，以插入自定义的逻辑进行处理。
 7. 过滤器： 用于动态过滤和处理传入HTTP请求的相关数据。
 8. SSL： Forest支持单向和双向验证的HTTPS请求，此模块用于处理SSL相关协议的内容。
 
 <b>后端部分：</b>
 
-后端为实际执行HTTP请求发送过程的第三方HTTP Api，目前支持 Ok Http 3和Httpclient两种后端API。
+后端为实际执行HTTP请求发送过程的第三方HTTP API，目前支持`okHttp3`和`httpclient`两种后端API。
 
 <b>Spring Boot Starter Forest:</b>
 
-提供对Spring Boot的支持
+提供对`Spring Boot`的支持
 
 
 ## 对应的Java版本
@@ -73,7 +73,7 @@ Forest 1.0.x和Forest 1.1.x基于JDK 1.7, Forest 1.2.x基于JDK 1.8
 </dependency>
 ```
 
-然后添加forest核心包依赖
+然后添加Forest核心包依赖
 
 ```xml
 <dependency>
@@ -91,7 +91,7 @@ Forest 1.0.x和Forest 1.1.x基于JDK 1.7, Forest 1.2.x基于JDK 1.8
 若您的项目依赖`Spring Boot`，并加入了`spring-boot-starter-forest`依赖，就可以通过application.yml/application.properties方式定义配置。
 
 ### 3.1.1 配置forest启动开关
-在`application.yml`中设置`forest.enabled`为`true`，便能开启forest。若设为false，Spring Boot便不会再扫描forest。
+在`application.yml`中设置`forest.enabled`为`true`，便能开启Forest。若设为false，`Spring Boot`便不会再扫描Forest。
 
 ```yaml
 forest:
@@ -107,7 +107,7 @@ forest:
 ```
 
 目前Forest支持`okhttp3`和`httpclient`两种后端HTTP API，若不配置该属性，默认为`okhttp3`.
-当然，您也可以改为httpclient
+当然，您也可以改为`httpclient`
 
 ```yaml
 forest:
@@ -116,7 +116,7 @@ forest:
 ```
 
 ### 3.1.3 配置Bean ID 
-Forest允许您在yaml文件中配置bean id，它对应着ForestConfiguration对象在spring上下文中的bean名称。
+Forest允许您在yaml文件中配置Bean Id，它对应着`ForestConfiguration`对象在Spring上下文中的Bean名称。
 
 ```yaml
 forest:
@@ -124,7 +124,7 @@ forest:
   bean-id: config0            # 在spring上下文中bean的id，默认值为forestConfiguration
 ```
 
-然后便可以在spring中通过bean的名称引用到它
+然后便可以在Spring中通过Bean的名称引用到它
 
 ```java
 @Resource(name = "config0")
@@ -166,7 +166,7 @@ forest:
 
 ## 3.2 在普通项目中配置
 
-若您的项目不是Spring Boot项目，或者没有依赖`spring-boot-starter-forest`，可以通过下面方式定义Forest配置。
+若您的项目不是`Spring Boot`项目，或者没有依赖`spring-boot-starter-forest`，可以通过下面方式定义Forest配置。
 
 ### 3.2.1 创建`ForestConfiguration`对象
 
