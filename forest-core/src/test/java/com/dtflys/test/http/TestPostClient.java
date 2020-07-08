@@ -3,12 +3,9 @@ package com.dtflys.test.http;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.test.mock.PostMockServer;
-import com.dtflys.forest.backend.HttpBackend;
-import com.dtflys.forest.backend.okhttp3.OkHttp3Backend;
-import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.test.http.client.PostClient;
 import com.dtflys.test.http.model.UserParam;
-import com.dtflys.test.mock.PostMockServer;
+import com.dtflys.test.mock.PutMockServer;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -67,14 +64,6 @@ public class TestPostClient extends BaseClientTest {
     }
 
     @Test
-    public void testAnnParamPost() {
-        String result = postClient.textParamPost("foo", "123456");
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(PostMockServer.EXPECTED, result);
-    }
-
-    @Test
     public void testVarParamPost() {
         String result = postClient.varParamPost("foo", "123456");
         log.info("response: " + result);
@@ -91,6 +80,14 @@ public class TestPostClient extends BaseClientTest {
         log.info("response: " + result);
         assertNotNull(result);
         assertEquals(PostMockServer.EXPECTED, result);
+    }
+
+    @Test
+    public void testAnnParamPost() {
+        String result = postClient.annParamPost("foo", "123456");
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(PutMockServer.EXPECTED, result);
     }
 
 
