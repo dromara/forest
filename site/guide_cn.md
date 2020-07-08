@@ -246,7 +246,7 @@ Forest的配置层级介绍：
 
 2. 接口配置： 作用域为某一个interface中定义的请求，读取的优先级最小。您可以通过在interface上修饰@BaseRequest注解进行配置。
 
-3. 请求配置： 作用域为某一个具体的请求，读取的优先级最高。您可以在接口的方法上修饰@Request注解进行HTTP信息配置的定义。
+3. 请求配置： 作用域为某一个具体的请求，读取的优先级最高。您可以在接口的方法上修饰`@Request`注解进行HTTP信息配置的定义。
 
 
 
@@ -265,9 +265,9 @@ public interface MyClient {
 }
 ```
 
-通过@Request注解，将上面的MyClient接口中的simpleRequest()方法绑定了一个HTTP请求，
-其URL为http://localhost:5000/hello
-，并默认使用GET方式，且将请求响应的数据以String的方式返回给调用者。
+通过`@Request`注解，将上面的`MyClient`接口中的`simpleRequest()`方法绑定了一个HTTP请求，
+其URL为`http://localhost:5000/hello`
+，并默认使用`GET`方式，且将请求响应的数据以`String`的方式返回给调用者。
 
 
 ## 4.2 稍复杂点的请求定义
@@ -282,8 +282,8 @@ public interface MyClient {
     String sendRequest(@DataParam("uname") String username);
 }
 ```
-上面的sendRequest方法绑定的HTTP请求，定义了URL信息，以及把Accept:text/plan加到了请求头中，
-方法的参数String username绑定了注解@DataParam("uname")，它的作用是将调用者传入入参username时，自动将username的值加入到HTTP的请求参数uname中。
+上面的`sendRequest`方法绑定的HTTP请求，定义了URL信息，以及把`Accept:text/plan`加到了请求头中，
+方法的参数`String username`绑定了注解`@DataParam("uname")`，它的作用是将调用者传入入参username时，自动将`username`的值加入到HTTP的请求参数`uname`中。
 
 如果调用方代码如下所示：
 ```java
@@ -299,7 +299,7 @@ client.sendRequest("foo");
 
 ## 4.3 改变HTTP Method
 
-使用POST方式
+使用`POST`方式
 
 ```java
 public interface MyClient {
@@ -313,9 +313,9 @@ public interface MyClient {
 ```
 如果上面代码所示，可以通过@Request注解的type参数指定HTTP请求的方式。
 
-除了POST，也可以指定成其他几种HTTP请求方式。
+除了`POST`，也可以指定成其他几种HTTP请求方式(GET, PUT, HEAD, OPTIONS, DELETE等)。
 
-其中type属性的大小写不敏感，写成POST和post效果相同。
+其中`type`属性的大小写不敏感，写成`POST`和`post`效果相同。
 
 ```java
 public interface MyClient {
@@ -496,7 +496,7 @@ myClient.send("Xxxxxx");
 
 ## 5.1 在Spring Boot项目中创建接口实例
 
-若您已有定义好的Forest请求接口名为 com.yoursite.client.MyClient，
+若您已有定义好的Forest请求接口名为 `com.yoursite.client.MyClient`，
 
 只要在`Spring Boot`的配置类或者启动类上加上`@ForestScan`注解，并在`basePackages`属性里填上远程接口的所在的包名
 
