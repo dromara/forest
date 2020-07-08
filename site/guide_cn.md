@@ -379,7 +379,7 @@ public interface MyClient {
 }
 ```
 
-## 4.4 设置HTTP请求头
+## 4.4 设置HTTP Header
 
 在[4.2](##_42-稍复杂点的请求定义)的例子中，我们已经知道了可以通过`@Request`注解的`headers`属性设置一条HTTP请求头。
 
@@ -450,8 +450,60 @@ myClient.bindingHeader("gbk");
         Accept-Charset:gbk
         Content-Type:text/plain
 
-## 4.5 data属性
+## 4.5 添加HTTP Body
 
+在`POST`和`PUT`等请求方法中，通常使用HTTP请求体进行传输数据。在Forest中有两种方式设置请求体。
+
+通过`data`属性设置：
+
+```java
+public interface MyClient {
+
+    @Request(
+            url = "http://localhost:5000/hello/user",
+            type = "post",
+            data = "username=foo&password=bar",
+            headers = {"Accept:text/plan"}
+    )
+    String dataPost();
+}
+```
+
+该接口调用后所实际产生的HTTP请求如下：
+
+    GET http://localhost:5000/hello/user
+    HEADER:
+        Accept:text/plan
+    BODY:
+        username=foo&password=bar
+        
+结合`数据绑定`和`data`属性设置请求体(如何进行数据绑定请参见[[五 数据绑定](#五-数据绑定)])：
+
+```java
+public interface MyClient {
+
+    @Request(
+            url = "http://localhost:5000/hello/user",
+            type = "post",
+            data = "username=${0}&password=${1}",
+            headers = {"Accept:text/plan"}
+    )
+    String dataPost(String username, String password);
+}
+```
+
+如果调用方代码如下所示：
+```java
+myClient.dataPost("foo", "bar");
+```
+
+这段调用所实际产生的HTTP请求如下：
+
+    GET http://localhost:5000/hello/user
+    HEADER:
+        Accept:text/plan
+    BODY:
+        username=foo&password=bar
 
 
 # 五 数据绑定
