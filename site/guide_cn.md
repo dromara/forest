@@ -51,7 +51,7 @@ Forest 1.0.x和Forest 1.1.x基于JDK 1.7, Forest 1.2.x基于JDK 1.8
 
 # 二. 安装
 
-## 2.1 在SpringBoot项目中安装
+## 2.1 在Spring Boot项目中安装
 
 若您的项目基于`Spring Boot`，那只要添加下面一个maven依赖便可。
 
@@ -96,7 +96,7 @@ Forest 1.0.x和Forest 1.1.x基于JDK 1.7, Forest 1.2.x基于JDK 1.8
 
 # 三. 配置
 
-## 3.1 在SpringBoot项目中配置
+## 3.1 在Spring Boot项目中配置
 
 若您的项目依赖`Spring Boot`，并加入了`spring-boot-starter-forest`依赖，就可以通过application.yml/application.properties方式定义配置。
 
@@ -291,7 +291,7 @@ public interface MyClient {
 
     @Request(
             url = "http://localhost:5000/hello/user",
-            headers = {"Accept:text/plan"}
+            headers = "Accept:text/plan"
     )
     String sendRequest(@DataParam("uname") String username);
 }
@@ -378,6 +378,81 @@ public interface MyClient {
 
 }
 ```
+
+## 4.4 设置HTTP请求头
+
+在[4.2](##_42-稍复杂点的请求定义)的例子中，我们已经知道了可以通过`@Request`注解的`headers`属性设置一条HTTP请求头。
+
+现在我们来看看如何添加多条请求头
+
+其中`headers`属性接受的是一个字符串数组，在接受多个请求头信息时以以下形式填入请求头:
+
+```java
+{
+    "请求头名称1:请求头值1",
+    "请求头名称2:请求头值2",
+    "请求头名称3:请求头值3",
+    ...
+ }
+```
+
+其中组数每一项都是一个字符串，每个字符串代表一个请求头。请求头的名称和值用``:`分割。
+
+具体代码请看如下示例：
+
+```java
+public interface MyClient {
+
+    @Request(
+            url = "http://localhost:5000/hello/user",
+            headers = {
+                "Accept-Charset:utf-8",
+                "Content-Type:text/plain"
+            }
+    )
+    String multipleHeaders();
+}
+```
+
+该接口调用后所实际产生的HTTP请求如下：
+
+    GET http://localhost:5000/hello/user
+    HEADER:
+        Accept-Charset:utf-8
+        Content-Type:text/plain
+
+
+如果要每次请求传入不同的请求头内容，可以在`headers`属性的请求头定义中加入`数据绑定`(如何进行数据绑定请参见[[五 数据绑定](#五-数据绑定)])。
+
+```java
+public interface MyClient {
+
+    @Request(
+            url = "http://localhost:5000/hello/user",
+            headers = {
+                "Accept-Charset:${encoding}",
+                "Content-Type:text/plain"
+            }
+    )
+    String bindingHeader(@DataVariable("encoding") String encoding);
+}
+```
+
+如果调用方代码如下所示：
+```java
+MyClient client;
+...
+client.bindingHeader("gbk");
+```
+
+这段调用所实际产生的HTTP请求如下：
+
+    GET http://localhost:5000/hello/user
+    HEADER:
+        Accept-Charset:gbk
+        Content-Type:text/plain
+
+
 
 # 五 数据绑定
 
@@ -492,7 +567,7 @@ myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
 
 ## 4.4 全局变量绑定
 
-若您已经定义好全局变量（关于如何定义全局变量请参见[SpringBoot全局变量定义](###_315-全局变量定义)，或[普通项目全局变量定义](###_324-全局变量定义)），那便可以直接在请求定义中绑定全局变量了。
+若您已经定义好全局变量（关于如何定义全局变量请参见[Spring Boot全局变量定义](###_315-全局变量定义)，或[普通项目全局变量定义](###_324-全局变量定义)），那便可以直接在请求定义中绑定全局变量了。
 
 若有全局变量：
 
@@ -521,7 +596,6 @@ myClient.send("Xxxxxx");
 
     GET http://localhost:5050/send?un=foo&pw=bar&da=123888888&sm=Xxxxxx
     
-
 
 # 六. 创建和获取请求接口实例
 
