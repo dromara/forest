@@ -301,9 +301,9 @@ public interface MyClient {
 
 如果调用方代码如下所示：
 ```java
-MyClient client;
+MyClient myClient;
 ...
-client.sendRequest("foo");
+myClient.sendRequest("foo");
 ```
 这段调用所实际产生的HTTP请求如下：
 
@@ -440,9 +440,7 @@ public interface MyClient {
 
 如果调用方代码如下所示：
 ```java
-MyClient client;
-...
-client.bindingHeader("gbk");
+myClient.bindingHeader("gbk");
 ```
 
 这段调用所实际产生的HTTP请求如下：
@@ -451,6 +449,8 @@ client.bindingHeader("gbk");
     HEADER:
         Accept-Charset:gbk
         Content-Type:text/plain
+
+## 4.5 data属性
 
 
 
