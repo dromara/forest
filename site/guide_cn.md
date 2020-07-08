@@ -498,7 +498,7 @@ myClient.send("Xxxxxx");
 
 若您已有定义好的Forest请求接口名为 com.yoursite.client.MyClient，
 
-只要在Springboot的配置类或者启动类上加上@ForestScan注解，并在basePackages属性里填上远程接口的所在的包名
+只要在`Spring Boot`的配置类或者启动类上加上`@ForestScan`注解，并在`basePackages`属性里填上远程接口的所在的包名
 
 ```java
 @SpringBootApplication
@@ -509,7 +509,7 @@ public class MyApp {
 }
 ```
 
-Forest会扫描`@ForestScan`注解中`basePackages`属性指定的包下面所有的interface，然后会将符合条件的接口进行动态代理并注入到Spring的上下文中。
+Forest会扫描`@ForestScan`注解中`basePackages`属性指定的包下面所有的接口，然后会将符合条件的接口进行动态代理并注入到Spring的上下文中。
 
 然后便能在其他代码中从Spring上下文注入接口实例
 
