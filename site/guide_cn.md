@@ -400,7 +400,7 @@ myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
     GET http://localhost:8080/send?un=DT&pw=123456&da=123888888&sm=Hahaha
 
 
-### 4.4.2 `@DataParam`参数绑定
+### 4.4.2 @DataParam参数绑定
 
 
 ```java
@@ -431,7 +431,7 @@ myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
 
 
 
-### 4.4.3 `@DataVariable`参数绑定
+### 4.4.3 @DataVariable参数绑定
 
 ```java
 
