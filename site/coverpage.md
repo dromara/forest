@@ -3,7 +3,7 @@
 
 # **Forest**
 
-* forest能够帮助您用更简单的方式编写Java的HTTP客户端
+* Forest能够帮助您用更简单的方式编写Java的HTTP客户端
 
 [Gitee](https://gitee.com/dt_flys/forest)
 [GitHub](https://github.com/mySingleLive/forest)
