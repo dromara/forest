@@ -4,7 +4,7 @@
 [![license](https://img.shields.io/badge/license-MIT%20License-blue.svg)](https://opensource.org/licenses/mit-license.php)
 [![Maven Central](https://img.shields.io/badge/maven%20central-1.0.0-brightgreen.svg)](https://search.maven.org/search?q=g:com.dtflys.forest)
 
-文档:
+文档：
 -------------------------------------
 [中文文档](https://dt_flys.gitee.io/forest) 
 
