@@ -454,7 +454,9 @@ myClient.bindingHeader("gbk");
 
 在`POST`和`PUT`等请求方法中，通常使用HTTP请求体进行传输数据。在Forest中有多种方式设置请求体数据。
 
-通过`data`属性设置：
+### 4.5.1 通过data属性添加请求体
+
+您可以通过`@Request`注解的`data`属性把数据添加到请求体：
 
 ```java
 public interface MyClient {
@@ -506,7 +508,7 @@ myClient.dataPost("foo", "bar");
         username=foo&password=bar
 
 
-把JSON数据加入到请求体中，其中`header`设置为`Content-Type: application/json`：
+您可以直接把JSON数据加入到请求体中，其中`header`设置为`Content-Type: application/json`：
 
 ```java
 public interface MyClient {
@@ -561,7 +563,83 @@ myClient.postXml("foo", "bar");
     BODY:
         <misc><username>foo</username><password>bar</password></misc>
         
-        
+### 4.5.1 通过@DataParam注解
+
+除了`data`属性外，您还可以通过`@DataParam`注解修饰参数的方式，将传入参数的数据绑定到HTTP请求体中。
+
+只需两步就能实现参数到请求体的绑定：
+
+第一步：设置HTTP Method为`POST`、`PUT`、`PATCH`这类允许带有请求体的方法。
+
+第二步：给参数加上`@DataParam`注解并定义名称，关于`@DataParam`注解具体使用可以参见[[4.2 @DataParam参数绑定](##_42-dataparam参数绑定)]。
+
+```java
+public interface MyClient {
+
+    @Request(
+            url = "http://localhost:5000/hello/user",
+            type = "post",
+            headers = {"Accept:text/plan"}
+    )
+    String postBody(@DataParam("username") String username, @DataParam("password") String password);
+}
+```
+
+如果调用方代码如下所示：
+
+```java
+myClient.postBody("foo", "bar");
+```
+
+实际产生的HTTP请求如下：
+
+    GET http://localhost:5000/hello/user
+    HEADER:
+        Accept: text/plan
+    BODY:
+        username=foo&password=bar
+
+若要将Body中的数据内容转换成JSON格式，只要设置`contentType`属性为`application/json`即可
+
+```java
+public interface MyClient {
+
+    @Request(
+            url = "http://localhost:5000/hello/user",
+            type = "post",
+            contentType = "application/json"
+    )
+    String postBody(@DataParam("username") String username, @DataParam("password") String password);
+}
+```
+
+如果调用方代码如下所示：
+
+```java
+myClient.postBody("foo", "bar");
+```
+
+实际产生的HTTP请求如下：
+
+    GET http://localhost:5000/hello/user
+    HEADER:
+        Content-Type: application/json
+    BODY:
+        {"username":"foo","password":"bar"}
+
+或者不用`contentType`属性，使用请求头`Content-Type: application/json`效果相同
+
+```java
+public interface MyClient {
+
+    @Request(
+            url = "http://localhost:5000/hello/user",
+            type = "post",
+            headers = {"Content-Type: application/json"}
+    )
+    String postBody(@DataParam("username") String username, @DataParam("password") String password);
+}
+```
 
 
 # 五 数据绑定
