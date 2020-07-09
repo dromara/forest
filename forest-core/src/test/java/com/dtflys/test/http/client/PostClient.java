@@ -74,6 +74,22 @@ public interface PostClient {
 
 
     @Request(
+            url = "http://localhost:5000/json",
+            type = "post",
+            data = "{\"username\": \"${0}\", \"password\": \"${1}\"}",
+            contentType = "application/json"
+    )
+    String postJson(String username, String password);
+
+    @Request(
+            url = "http://localhost:5000/json",
+            type = "post",
+            data = "{\"username\": \"${0}\", \"password\": \"${1}\"}",
+            headers = {"Content-Type: application/json"}
+    )
+    String postJson2(String username, String password);
+
+    @Request(
             url = "http://localhost:5000/xml",
             type = "post",
             contentType = "application/xml"
