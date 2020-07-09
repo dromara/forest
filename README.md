@@ -1,9 +1,12 @@
 # Forest - 轻量级HTTP客户端访问框架
 
-
 [![Build Status](https://api.travis-ci.org/mySingleLive/forest.svg?branch=master)](https://travis-ci.org/mySingleLive/forest)
 [![license](https://img.shields.io/badge/license-MIT%20License-blue.svg)](https://opensource.org/licenses/mit-license.php)
 [![Maven Central](https://img.shields.io/badge/maven%20central-1.0.0-brightgreen.svg)](https://search.maven.org/search?q=g:com.dtflys.forest)
+
+文档:
+-------------------------------------
+[中文文档](https://dt_flys.gitee.io/forest) 
 
 项目介绍：
 -------------------------------------
@@ -29,8 +32,6 @@ Forest是一个高层的、极简的轻量级HTTP调用API框架。<br>
 * 可以通过OnSuccess和OnError接口参数实现请求结果的回调
 * 配置简单，一般只需要@Request一个注解就能完成绝大多数请求的定义
 * 支持异步请求调用
-
-### 详细文档请点击：[中文文档](https://dt_flys.gitee.io/forest) 
 
 Quick Start
 -------------------------------------
