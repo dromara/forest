@@ -577,7 +577,7 @@ myClient.postXml("foo", "bar");
 
 具体`contentType`和Body数据格式的对应关系如下表所示：
 
-| `contentType` | 数据格式 |
+| `contentType` / `Content-Type` | 数据格式 |
 |--------------|----------|
 | 不设置 | 标准表单格式 |
 | `application/x-www-form-urlencoded` | 标准表单格式 |
