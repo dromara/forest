@@ -27,7 +27,7 @@ public class PostJsonMockServer extends MockServerRule {
                         .withPath("/json")
                         .withMethod("POST")
                         .withHeader(new Header(HttpHeaders.CONTENT_TYPE, "application/json; charset=utf-8"))
-                        .withBody("{\"username\": \"foo\", \"password\": \"123456\"}")
+                        .withBody("{\"username\":\"foo\",\"password\":\"123456\"}")
         ).respond(
                 response()
                         .withStatusCode(200)
