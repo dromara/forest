@@ -38,6 +38,7 @@ import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
+import com.dtflys.forest.utils.StringUtils;
 
 import java.io.InputStream;
 import java.util.*;
@@ -257,6 +258,9 @@ public class ForestRequest<T> {
     }
 
     public ForestRequest addHeader(String name, Object value) {
+        if (StringUtils.isEmpty(name)) {
+            return this;
+        }
         this.headers.put(name, value);
         return this;
     }

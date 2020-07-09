@@ -26,6 +26,15 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
 
     protected void setStringBody(T httpReq, String text, String charset, String contentType) {
             StringEntity entity = new StringEntity(text, charset);
+            if (StringUtils.isNotEmpty(charset)) {
+                if (!contentType.contains("charset=")) {
+                    contentType = contentType + "; charset=" + charset.toLowerCase();
+                } else {
+                    String[] strs = contentType.split("charset=");
+                    contentType = strs[0] + " charset=" + charset.toLowerCase();
+                }
+                entity.setContentEncoding(charset);
+            }
             entity.setContentType(contentType);
             httpReq.setEntity(entity);
     }

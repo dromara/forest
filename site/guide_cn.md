@@ -291,7 +291,7 @@ public interface MyClient {
 
     @Request(
             url = "http://localhost:5000/hello/user",
-            headers = "Accept:text/plan"
+            headers = "Accept: text/plan"
     )
     String sendRequest(@DataParam("uname") String username);
 }
@@ -309,7 +309,7 @@ myClient.sendRequest("foo");
 
     GET http://localhost:5000/hello/user?uname=foo
     HEADER:
-        Accept:text/plan
+        Accept: text/plan
 
 ## 4.3 改变HTTP Method
 
@@ -389,9 +389,9 @@ public interface MyClient {
 
 ```java
 {
-    "请求头名称1:请求头值1",
-    "请求头名称2:请求头值2",
-    "请求头名称3:请求头值3",
+    "请求头名称1: 请求头值1",
+    "请求头名称2: 请求头值2",
+    "请求头名称3: 请求头值3",
     ...
  }
 ```
@@ -406,8 +406,8 @@ public interface MyClient {
     @Request(
             url = "http://localhost:5000/hello/user",
             headers = {
-                "Accept-Charset:utf-8",
-                "Content-Type:text/plain"
+                "Accept-Charset: utf-8",
+                "Content-Type: text/plain"
             }
     )
     String multipleHeaders();
@@ -418,8 +418,8 @@ public interface MyClient {
 
     GET http://localhost:5000/hello/user
     HEADER:
-        Accept-Charset:utf-8
-        Content-Type:text/plain
+        Accept-Charset: utf-8
+        Content-Type: text/plain
 
 
 如果要每次请求传入不同的请求头内容，可以在`headers`属性的请求头定义中加入`数据绑定`(如何进行数据绑定请参见[[五 数据绑定](#五-数据绑定)])。
@@ -430,8 +430,8 @@ public interface MyClient {
     @Request(
             url = "http://localhost:5000/hello/user",
             headers = {
-                "Accept-Charset:${encoding}",
-                "Content-Type:text/plain"
+                "Accept-Charset: ${encoding}",
+                "Content-Type: text/plain"
             }
     )
     String bindingHeader(@DataVariable("encoding") String encoding);
@@ -447,8 +447,8 @@ myClient.bindingHeader("gbk");
 
     GET http://localhost:5000/hello/user
     HEADER:
-        Accept-Charset:gbk
-        Content-Type:text/plain
+        Accept-Charset: gbk
+        Content-Type: text/plain
 
 ## 4.5 添加HTTP Body
 
@@ -501,9 +501,13 @@ myClient.dataPost("foo", "bar");
 
     GET http://localhost:5000/hello/user
     HEADER:
-        Accept:text/plan
+        Accept: text/plan
     BODY:
         username=foo&password=bar
+
+
+加入JSON到请求体中：
+
 
 
 # 五 数据绑定
@@ -680,7 +684,7 @@ public class MyService {
 
 ## 6.2 在普通项目中创建接口实例
 
-通过`ForestConfiguration`的静态方法`createInstance`实例化接口。
+通过`ForestConfiguration`的静态方法`createInstance(Class clazz)`实例化接口。
 
 ```java
 MyClient myClient = configuration.createInstance(MyClient.class);

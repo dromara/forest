@@ -71,7 +71,7 @@ public @interface Request {
 //    @Deprecated
 //    String password() default "";
 
-    String contentType() default "application/x-www-form-urlencoded";
+    String contentType() default "";
 
     String contentEncoding() default "UTF-8";
 

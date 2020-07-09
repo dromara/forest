@@ -14,20 +14,41 @@ import java.util.*;
  */
 public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
 
+    public final static String TYPE_APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
+    public final static String TYPE_APPLICATION_JSON = "application/json";
+
     @Override
     public void buildBody(T httpRequest, ForestRequest request) {
         String contentType = request.getContentType();
+        if (StringUtils.isEmpty(contentType)) {
+            Object value = request.getHeaders().get("Content-Type");
+            if (value != null) {
+                String str = value.toString();
+                if (str.length() > 0) {
+                    contentType = str;
+                }
+                request.getHeaders().remove("Content-Type");
+            }
+        }
 
-        String[] typeGroup = contentType.split(";");
+        if (StringUtils.isEmpty(contentType)) {
+            contentType = TYPE_APPLICATION_X_WWW_FORM_URLENCODED;
+        }
+
+        String[] typeGroup = contentType.split("charset=");
         String mineType = typeGroup[0];
-        String charset = "UTF-8";
+        String charset = request.getEncode();
+        if (StringUtils.isEmpty(charset)) {
+            if (typeGroup.length > 1) {
+                charset = typeGroup[1];
+            } else {
+                charset = "UTF-8";
+            }
+        }
         String requestBody = request.getRequestBody();
 
         if (StringUtils.isEmpty(mineType)) {
-            mineType = "application/x-www-form-urlencoded";
-        }
-        if (typeGroup.length > 1) {
-            charset = typeGroup[1];
+            mineType = TYPE_APPLICATION_X_WWW_FORM_URLENCODED;
         }
 
         List<RequestNameValue> nameValueList = request.getDataNameValueList();
@@ -36,10 +57,10 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
             return;
         }
 
-        if (mineType.equals("application/x-www-form-urlencoded")) {
+        if (mineType.equals(TYPE_APPLICATION_X_WWW_FORM_URLENCODED)) {
             setFormData(httpRequest, request, charset, contentType, nameValueList);
         }
-        else if (mineType.equals("application/json")) {
+        else if (mineType.equals(TYPE_APPLICATION_JSON)) {
             ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
             String text = null;
             Map<String, Object> map = convertNameValueListToMap(request, nameValueList);

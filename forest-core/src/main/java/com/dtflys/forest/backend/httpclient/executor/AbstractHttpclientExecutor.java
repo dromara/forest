@@ -82,7 +82,11 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         List<RequestNameValue> headerList = request.getHeaderNameValueList();
         if (headerList != null && !headerList.isEmpty()) {
             for (RequestNameValue nameValue : headerList) {
-                httpRequest.setHeader(nameValue.getName(), MappingTemplate.getParameterValue(jsonConverter, nameValue.getValue()));
+                String name = nameValue.getName();
+                if (name.equals("Content-Type")) {
+                    continue;
+                }
+                httpRequest.setHeader(name, MappingTemplate.getParameterValue(jsonConverter, nameValue.getValue()));
             }
         }
     }
