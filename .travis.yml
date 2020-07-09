@@ -1,6 +1,8 @@
 language: java
-jdk: oraclejdk8
-sudo: required
+dist: trusty
+sudo: false
+jdk:
+  - openjdk8
 script: "mvn cobertura:cobertura"
 before_install:
   - pip install --user codecov
