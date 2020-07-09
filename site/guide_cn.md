@@ -582,7 +582,7 @@ myClient.postXml("foo", "bar");
 | 不设置 | 标准表单格式 |
 | `application/x-www-form-urlencoded` | 标准表单格式 |
 | `application/json` | `JSON`格式 |
-| `application/xml` | `xml`格式 |
+| `application/xml` | `XML`格式 |
 
 
 具体代码如下所示，因为传输的Body是标准表单格式，所以就不设置`cotentType`或请求头`Content-Type`了：
