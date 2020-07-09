@@ -90,6 +90,14 @@ public interface PostClient {
     String postJson2(String username, String password);
 
     @Request(
+            url = "http://localhost:5000/json",
+            type = "post",
+            data = "{\"username\": \"${0}\", \"password\": \"${1}\"}",
+            contentType = "application/json"
+    )
+    String postJson3(@DataParam("username") String username, @DataParam("password") String password);
+
+    @Request(
             url = "http://localhost:5000/xml",
             type = "post",
             contentType = "application/xml"
