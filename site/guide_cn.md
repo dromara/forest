@@ -452,7 +452,7 @@ myClient.bindingHeader("gbk");
 
 ## 4.5 添加HTTP Body
 
-在`POST`和`PUT`等请求方法中，通常使用HTTP请求体进行传输数据。在Forest中有两种方式设置请求体。
+在`POST`和`PUT`等请求方法中，通常使用HTTP请求体进行传输数据。在Forest中有多种方式设置请求体数据。
 
 通过`data`属性设置：
 
@@ -497,7 +497,7 @@ public interface MyClient {
 myClient.dataPost("foo", "bar");
 ```
 
-这段调用所实际产生的HTTP请求如下：
+实际产生的HTTP请求如下：
 
     GET http://localhost:5000/hello/user
     HEADER:
@@ -506,8 +506,62 @@ myClient.dataPost("foo", "bar");
         username=foo&password=bar
 
 
-加入JSON到请求体中：
+把JSON数据加入到请求体中，其中`header`设置为`Content-Type: application/json`：
 
+```java
+public interface MyClient {
+
+    @Request(
+            url = "http://localhost:5000/hello/user",
+            type = "post",
+            data = "{\"username\": \"${0}\", \"password\": \"${1}\"}",
+            headers = {"Content-Type: application/json"}
+    )
+    String postJson(String username, String password);
+}
+```
+如果调用方代码如下所示：
+```java
+myClient.postJson("foo", "bar");
+```
+
+实际产生的HTTP请求如下：
+
+    GET http://localhost:5000/hello/user
+    HEADER:
+        Content-Type: application/json
+    BODY:
+        {"username": "foo", "password": "bar"}
+
+
+把XML数据加入到请求体中，其中`header`设置为`Content-Type: application/json`：
+
+```java
+public interface MyClient {
+
+    @Request(
+            url = "http://localhost:5000/hello/user",
+            type = "post",
+            data = "<misc><username>${0}</username><password>${1}</password></misc>",
+            headers = {"Content-Type: application/json"}
+    )
+    String postXml(String username, String password);
+}
+```
+如果调用方代码如下所示：
+```java
+myClient.postXml("foo", "bar");
+```
+
+实际产生的HTTP请求如下：
+
+    GET http://localhost:5000/hello/user
+    HEADER:
+        Content-Type: application/json
+    BODY:
+        <misc><username>foo</username><password>bar</password></misc>
+        
+        
 
 
 # 五 数据绑定
