@@ -456,7 +456,7 @@ myClient.bindingHeader("gbk");
 
 ### 4.5.1 通过data属性添加请求体
 
-您可以通过`@Request`注解的`data`属性把数据添加到请求体：
+您可以通过`@Request`注解的`data`属性把数据添加到请求体。
 
 ```java
 public interface MyClient {
@@ -508,7 +508,7 @@ myClient.dataPost("foo", "bar");
         username=foo&password=bar
 
 
-您可以直接把JSON数据加入到请求体中，其中`header`设置为`Content-Type: application/json`：
+您可以直接把JSON数据加入到请求体中，其中`header`设置为`Content-Type: application/json`
 
 ```java
 public interface MyClient {
@@ -536,7 +536,7 @@ myClient.postJson("foo", "bar");
         {"username": "foo", "password": "bar"}
 
 
-把XML数据加入到请求体中，其中`header`设置为`Content-Type: application/json`：
+把XML数据加入到请求体中，其中`header`设置为`Content-Type: application/json`
 
 ```java
 public interface MyClient {
@@ -567,11 +567,25 @@ myClient.postXml("foo", "bar");
 
 除了`data`属性外，您还可以通过`@DataParam`注解修饰参数的方式，将传入参数的数据绑定到HTTP请求体中。
 
-只需两步就能实现参数到请求体的绑定：
+只需三步就能实现参数到请求体的绑定：
 
 第一步：设置HTTP Method为`POST`、`PUT`、`PATCH`这类允许带有请求体的方法。
 
 第二步：给参数加上`@DataParam`注解并定义名称，关于`@DataParam`注解具体使用可以参见[[4.2 @DataParam参数绑定](##_42-dataparam参数绑定)]。
+
+第三步：设置`contentType`或请求头`ContentType`，要设置成什么`contentType`取决于你想要Body中数据是什么格式。
+
+具体`contentType`和Body数据格式的对应关系如下表所示：
+
+| `contentType` | 数据格式 |
+|--------------|----------|
+| 不设置 | 标准表单格式 |
+| `application/x-www-form-urlencoded` | 标准表单格式 |
+| `application/json` | `JSON`格式 |
+| `application/xml` | `xml`格式 |
+
+
+具体代码如下所示，因为传输的Body是标准表单格式，所以就不设置`cotentType`或请求头`Content-Type`了：
 
 ```java
 public interface MyClient {
