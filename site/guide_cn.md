@@ -156,6 +156,7 @@ forest:
   connect-timeout: 3000                   # 连接超时时间，单位为毫秒, 默认值为2000
   retry-count: 1                          # 请求失败后重试次数，默认为0次不重试
   ssl-protocol: SSLv3                     # 单向验证的HTTPS的默认SSL协议，默认为SSLv3
+  logEnabled: true                        # 打开或关闭日志，默认为true
 ```
 
 ### 3.1.5 全局变量定义
@@ -217,6 +218,8 @@ configuration.setConnectTimeout(2000);
 configuration.setRetryCount(3);
 // 单向验证的HTTPS的默认SSL协议，默认为SSLv3
 configuration.setSslProtocol(SSLUtils.SSLv3);
+// 打开或关闭日志，默认为true
+configuration.setLogEnabled(true);
 ```
 
 ### 3.2.4 全局变量定义
@@ -585,7 +588,7 @@ myClient.postXml("foo", "bar");
 | `application/xml` | `XML`格式 |
 
 
-具体代码如下所示，因为传输的Body是标准表单格式，所以就不设置`cotentType`或请求头`Content-Type`了：
+若传输的Body数据是标准表单格式，就不用设置`cotentType`或请求头`Content-Type`了
 
 ```java
 public interface MyClient {
@@ -704,6 +707,11 @@ myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
 
 ## 4.2 @DataParam参数绑定
 
+在接口方法的参数前加上`@DataParam`注解并在`value`属性中给予一个名词，就能实现参数绑定。
+
+被`@DataParam`注解修饰的参数数据的绑定位置较为灵活多变，它可以出现在请求`url`的参数部分，也可以出现在请求Body中。
+
+具体出现位置取决于由`type`属性定义的HTTP Method。
 
 ```java
 
@@ -740,6 +748,8 @@ myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
 `@DataVariable`注解的`value`的值便是该参数在Forest请求中对应的`变量名`。
 
 意思就是在`@Request`的多个不同属性（`url`, `headers`, `data`）中通过`${变量名}`的模板表达式的语法形式引用之前在`@DataVariable`注解上定义的`变量名`，实际引用到的值就是调用该方法时传入该参数的实际值。
+
+`@DataVariable`注解修饰的参数数据可以出现在请求的任意部分（`url`, `header`, `data`），具体在哪个部分取决于您在哪里引用它。如果没有任何地方引用该变量名，该变量的值就不会出现在任何地方。
 
 ```java
 
