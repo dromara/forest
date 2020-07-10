@@ -1,5 +1,6 @@
-package com.dtflys.forest.backend;
+package com.dtflys.forest.backend.body;
 
+import com.dtflys.forest.backend.BodyBuilder;
 import com.dtflys.forest.http.ForestRequest;
 
 /**
@@ -9,5 +10,5 @@ import com.dtflys.forest.http.ForestRequest;
 public class NoneBodyBuilder implements BodyBuilder {
     @Override
     public void buildBody(Object req, ForestRequest request) {
-}
+    }
 }
