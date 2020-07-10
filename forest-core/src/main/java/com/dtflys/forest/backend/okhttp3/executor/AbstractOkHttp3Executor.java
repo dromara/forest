@@ -19,6 +19,7 @@ import com.dtflys.forest.mapping.MappingTemplate;
 import okio.BufferedSink;
 import okio.Okio;
 import okio.Sink;
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -127,7 +128,11 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
         logContent(content);
     }
 
-
+    public void logResponse(StopWatch stopWatch,  ForestResponse response) {
+        if (!request.isLogEnable()) return;
+        stopWatch.stop();
+        logContent("Response: Status = " + response.getStatusCode() + ", Time = " + stopWatch.getTime() + "ms");
+    }
 
     protected AbstractOkHttp3Executor(ForestRequest request, OkHttp3ConnectionManager connectionManager, OkHttp3ResponseHandler okHttp3ResponseHandler) {
         this.request = request;
@@ -180,6 +185,8 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
         Call call = okHttpClient.newCall(okRequest);
         final OkHttp3ForestResponseFactory factory = new OkHttp3ForestResponseFactory();
         logRequest(0, okRequest);
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         if (request.isAsync()) {
             final OkHttp3ResponseFuture future = new OkHttp3ResponseFuture();
             call.enqueue(new Callback() {
@@ -187,12 +194,14 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
                 public void onFailure(Call call, IOException e) {
                     future.failed(e);
                     ForestResponse response = factory.createResponse(request, null);
+                    logResponse(stopWatch, response);
                     responseHandler.handleError(request, response, e);
                 }
 
                 @Override
                 public void onResponse(Call call, Response okResponse) throws IOException {
                     ForestResponse response = factory.createResponse(request, okResponse);
+                    logResponse(stopWatch, response);
                     Object result = null;
                     if (response.isSuccess()) {
                         if (request.getOnSuccess() != null) {

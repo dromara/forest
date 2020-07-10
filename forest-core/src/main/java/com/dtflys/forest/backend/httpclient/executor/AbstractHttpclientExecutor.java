@@ -6,9 +6,11 @@ import com.dtflys.forest.backend.body.NoneBodyBuilder;
 import com.dtflys.forest.backend.httpclient.HttpclientRequestProvider;
 import com.dtflys.forest.backend.url.URLBuilder;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
@@ -108,6 +110,12 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         logContent(content);
     }
 
+    public void logResponse(StopWatch stopWatch, ForestResponse response) {
+        if (!request.isLogEnable()) return;
+        stopWatch.stop();
+        logContent("Response: Status = " + response.getStatusCode() + ", Time = " + stopWatch.getTime() + "ms");
+    }
+
     protected String getLogContentForRequestLine(int retryCount, T httpReq) {
         if (retryCount == 0) {
             return httpReq.getRequestLine().toString();
@@ -141,14 +149,17 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
 
 
     public void execute(int retryCount, ResponseHandler responseHandler) {
+        StopWatch stopWatch = new StopWatch();
         try {
             logRequest(retryCount, httpRequest);
+            stopWatch.start();
             requestSender.sendRequest(request, httpclientResponseHandler, httpRequest);
         } catch (IOException e) {
             if (retryCount >= request.getRetryCount()) {
                 httpRequest.abort();
                 ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
                 response = forestResponseFactory.createResponse(request, null);
+                logResponse(stopWatch, response);
                 responseHandler.handleSyncWitchException(request, response, e);
 //                throw new ForestRuntimeException(e);
                 return;
