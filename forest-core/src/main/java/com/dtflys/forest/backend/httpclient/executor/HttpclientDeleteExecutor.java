@@ -15,12 +15,7 @@ import com.dtflys.forest.http.ForestRequest;
 public class HttpclientDeleteExecutor extends AbstractHttpclientEntityExecutor<HttpclientDelete> {
 
     private final static HttpclientRequestProvider<HttpclientDelete> httpDeleteProvider =
-            new HttpclientRequestProvider<HttpclientDelete>() {
-                @Override
-                public HttpclientDelete getRequest(String url) {
-                    return new HttpclientDelete(url);
-                }
-            };
+            url -> new HttpclientDelete(url);
 
 
     @Override

@@ -14,12 +14,7 @@ import org.apache.http.client.methods.HttpTrace;
 public class HttpclientTraceExecutor extends AbstractHttpclientExecutor<HttpTrace> {
 
     private final static HttpclientRequestProvider<HttpTrace> httpTraceProvider =
-            new HttpclientRequestProvider<HttpTrace>() {
-                @Override
-                public HttpTrace getRequest(String url) {
-                    return new HttpTrace(url);
-                }
-            };
+            url -> new HttpTrace(url);
 
     @Override
     protected HttpclientRequestProvider<HttpTrace> getRequestProvider() {

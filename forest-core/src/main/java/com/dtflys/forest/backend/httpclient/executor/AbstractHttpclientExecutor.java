@@ -2,7 +2,7 @@ package com.dtflys.forest.backend.httpclient.executor;
 
 import com.dtflys.forest.backend.AbstractHttpExecutor;
 import com.dtflys.forest.backend.BodyBuilder;
-import com.dtflys.forest.backend.NoneBodyBuilder;
+import com.dtflys.forest.backend.body.NoneBodyBuilder;
 import com.dtflys.forest.backend.httpclient.HttpclientRequestProvider;
 import com.dtflys.forest.backend.url.URLBuilder;
 import com.dtflys.forest.http.ForestRequest;
@@ -14,19 +14,12 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
 import org.apache.http.client.methods.HttpRequestBase;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
-import com.dtflys.forest.backend.BodyBuilder;
-import com.dtflys.forest.backend.NoneBodyBuilder;
 import com.dtflys.forest.backend.httpclient.request.HttpclientRequestSender;
 import com.dtflys.forest.backend.httpclient.response.HttpclientForestResponseFactory;
 import com.dtflys.forest.backend.httpclient.response.HttpclientResponseHandler;
 import com.dtflys.forest.handler.ResponseHandler;
-import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.http.ForestResponseFactory;
-import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.backend.AbstractHttpExecutor;
 import com.dtflys.forest.mapping.MappingTemplate;
-import com.dtflys.forest.utils.StringUtils;
 
 import java.io.IOException;
 import java.util.List;

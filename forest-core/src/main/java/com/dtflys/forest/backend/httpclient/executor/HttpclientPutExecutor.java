@@ -14,12 +14,7 @@ import org.apache.http.client.methods.HttpPut;
 public class HttpclientPutExecutor extends AbstractHttpclientEntityExecutor<HttpPut> {
 
     private final static HttpclientRequestProvider<HttpPut> httpPutProvider =
-            new HttpclientRequestProvider<HttpPut>() {
-                @Override
-                public HttpPut getRequest(String url) {
-                    return new HttpPut(url);
-                }
-            };
+            url -> new HttpPut(url);
 
     @Override
     protected HttpclientRequestProvider<HttpPut> getRequestProvider() {

@@ -14,12 +14,7 @@ import org.apache.http.client.methods.HttpPost;
 public class HttpclientPostExecutor extends AbstractHttpclientEntityExecutor<HttpPost> {
 
     private final static HttpclientRequestProvider<HttpPost> httpPostProvider =
-            new HttpclientRequestProvider<HttpPost>() {
-                @Override
-                public HttpPost getRequest(String url) {
-                    return new HttpPost(url);
-                }
-            };
+            url -> new HttpPost(url);
 
     @Override
     protected HttpclientRequestProvider<HttpPost> getRequestProvider() {

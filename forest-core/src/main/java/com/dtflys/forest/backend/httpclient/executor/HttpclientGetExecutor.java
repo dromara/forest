@@ -14,12 +14,7 @@ import org.apache.http.client.methods.HttpGet;
 public class HttpclientGetExecutor extends AbstractHttpclientExecutor<HttpGet> {
 
     private final static HttpclientRequestProvider<HttpGet> httpGetProvider =
-            new HttpclientRequestProvider<HttpGet>() {
-        @Override
-        public HttpGet getRequest(String url) {
-            return new HttpGet(url);
-        }
-    };
+            url -> new HttpGet(url);
 
     @Override
     protected HttpclientRequestProvider<HttpGet> getRequestProvider() {
