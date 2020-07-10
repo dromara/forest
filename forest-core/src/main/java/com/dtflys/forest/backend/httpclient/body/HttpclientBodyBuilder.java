@@ -1,6 +1,6 @@
 package com.dtflys.forest.backend.httpclient.body;
 
-import com.dtflys.forest.backend.AbstractBodyBuilder;
+import com.dtflys.forest.backend.body.AbstractBodyBuilder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.mapping.MappingTemplate;
