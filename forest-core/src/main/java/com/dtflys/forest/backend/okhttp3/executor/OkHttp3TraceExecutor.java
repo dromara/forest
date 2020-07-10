@@ -1,7 +1,7 @@
 package com.dtflys.forest.backend.okhttp3.executor;
 
 import com.dtflys.forest.backend.BodyBuilder;
-import com.dtflys.forest.backend.NoneBodyBuilder;
+import com.dtflys.forest.backend.body.NoneBodyBuilder;
 import com.dtflys.forest.backend.okhttp3.conn.OkHttp3ConnectionManager;
 import com.dtflys.forest.backend.okhttp3.response.OkHttp3ResponseHandler;
 import com.dtflys.forest.backend.url.QueryableURLBuilder;
