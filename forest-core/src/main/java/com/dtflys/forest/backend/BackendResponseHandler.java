@@ -14,13 +14,13 @@ import java.util.concurrent.Future;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-19 15:46
  */
-public abstract class BackbendResponseHandler<R> {
+public abstract class BackendResponseHandler<R> {
 
     protected final ForestRequest request;
 
     protected final ResponseHandler responseHandler;
 
-    public BackbendResponseHandler(ForestRequest request, ResponseHandler responseHandler) {
+    public BackendResponseHandler(ForestRequest request, ResponseHandler responseHandler) {
         this.request = request;
         this.responseHandler = responseHandler;
     }

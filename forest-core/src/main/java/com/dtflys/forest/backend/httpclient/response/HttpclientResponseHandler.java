@@ -1,6 +1,6 @@
 package com.dtflys.forest.backend.httpclient.response;
 
-import com.dtflys.forest.backend.BackbendResponseHandler;
+import com.dtflys.forest.backend.BackendResponseHandler;
 import com.dtflys.forest.handler.ResponseHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
@@ -16,7 +16,7 @@ import java.util.concurrent.Future;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-19 15:46
  */
-public class HttpclientResponseHandler extends BackbendResponseHandler<HttpResponse> {
+public class HttpclientResponseHandler extends BackendResponseHandler<HttpResponse> {
 
     public HttpclientResponseHandler(ForestRequest request, ResponseHandler responseHandler) {
         super(request, responseHandler);
