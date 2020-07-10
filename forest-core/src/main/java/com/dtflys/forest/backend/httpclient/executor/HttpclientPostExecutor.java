@@ -13,12 +13,10 @@ import org.apache.http.client.methods.HttpPost;
  */
 public class HttpclientPostExecutor extends AbstractHttpclientEntityExecutor<HttpPost> {
 
-    private final static HttpclientRequestProvider<HttpPost> httpPostProvider =
-            url -> new HttpPost(url);
 
     @Override
     protected HttpclientRequestProvider<HttpPost> getRequestProvider() {
-        return httpPostProvider;
+        return url -> new HttpPost(url);
     }
 
     @Override

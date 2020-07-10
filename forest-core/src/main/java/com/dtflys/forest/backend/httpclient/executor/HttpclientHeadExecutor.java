@@ -13,12 +13,9 @@ import org.apache.http.client.methods.HttpHead;
  */
 public class HttpclientHeadExecutor extends AbstractHttpclientExecutor<HttpHead> {
 
-    private final static HttpclientRequestProvider<HttpHead> httpHeadProvider =
-            url -> new HttpHead(url);
-
     @Override
     protected HttpclientRequestProvider<HttpHead> getRequestProvider() {
-        return httpHeadProvider;
+        return url -> new HttpHead(url);
     }
 
     @Override

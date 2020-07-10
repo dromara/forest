@@ -13,13 +13,9 @@ import org.apache.http.client.methods.HttpOptions;
  */
 public class HttpclientOptionsExecutor extends AbstractHttpclientExecutor<HttpOptions> {
 
-    private final static HttpclientRequestProvider<HttpOptions> httpOptionsProvider =
-            url -> new HttpOptions(url);
-
-
     @Override
     protected HttpclientRequestProvider<HttpOptions> getRequestProvider() {
-        return httpOptionsProvider;
+        return url -> new HttpOptions(url);
     }
 
     @Override

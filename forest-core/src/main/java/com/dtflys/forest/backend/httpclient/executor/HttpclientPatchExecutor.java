@@ -13,12 +13,9 @@ import org.apache.http.client.methods.HttpPut;
  */
 public class HttpclientPatchExecutor extends AbstractHttpclientEntityExecutor<HttpclientPatchExecutor.HttpPatch> {
 
-    private final static HttpclientRequestProvider<HttpPatch> httpPatchProvider =
-            url -> new HttpPatch(url);
-
     @Override
     protected HttpclientRequestProvider<HttpPatch> getRequestProvider() {
-        return httpPatchProvider;
+        return  url -> new HttpPatch(url);
     }
 
     @Override
