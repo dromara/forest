@@ -572,11 +572,11 @@ myClient.postXml("foo", "bar");
 
 只需三步就能实现参数到请求体的绑定：
 
-第一步：设置HTTP Method为`POST`、`PUT`、`PATCH`这类允许带有请求体的方法。
+第一步：设置HTTP Method为`POST`、`PUT`、`PATCH`这类允许带有请求体的方法(具体哪些HTTP Method能够绑定到请求体请参见[[4.2.1](_421-数据绑定位置)])。
 
 第二步：给参数加上`@DataParam`注解并定义名称，关于`@DataParam`注解具体使用可以参见[[4.2 @DataParam参数绑定](##_42-dataparam参数绑定)]。
 
-第三步：设置`contentType`或请求头`ContentType`，要设置成什么`contentType`取决于你想要Body中数据是什么格式。
+第三步：设置`contentType`或请求头`ContentType`，要设置成什么`contentType`取决于你想要Body中数据是什么格式(关于`contentType`和数据格式的对应关系请参见[[4.2.2](_422-数据绑定格式)])。
 
 
 
@@ -630,13 +630,11 @@ myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
 
 在接口方法的参数前加上`@DataParam`注解并在`value`属性中给予一个名词，就能实现参数绑定。
 
-被`@DataParam`注解修饰的参数数据的绑定位置较为灵活多变，它可以出现在请求`url`的参数部分，也可以出现在请求Body中。
-
-具体出现位置取决于由`type`属性定义的HTTP Method。
-
 ### 4.2.1 数据绑定位置
 
-`@DataParam`注解的参数绑定的位置如下表：
+被`@DataParam`注解修饰的参数数据的绑定位置较为灵活多变，它可以出现在请求`url`的参数部分，也可以出现在请求Body中。
+
+具体出现位置取决于由`type`属性定义的HTTP Method，其绑定的具体位置如下表：
 
 | type     | `@ParaParam`注解绑定位置 |
 |----------|-------------------------|
