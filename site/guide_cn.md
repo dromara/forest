@@ -879,7 +879,7 @@ myClient.send("Xxxxxx");
 ```java
 @SpringBootApplication
 @Configuration
-@ForestScan(basePackages = "com.yoursite.client.MyClient")
+@ForestScan(basePackages = "com.yoursite.client")
 public class MyApp {
  ...
 }
