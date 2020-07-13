@@ -3,6 +3,8 @@ package com.dtflys.test.http;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.test.mock.OptionsMockServer;
+import junit.framework.Assert;
 import org.apache.http.HttpHeaders;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
@@ -31,8 +33,9 @@ public class TestOptionsClient extends BaseClientTest {
 
     private final static Logger log = LoggerFactory.getLogger(TestOptionsClient.class);
 
+
     @Rule
-    public MockServerRule server = new MockServerRule(this, 5000);
+    public OptionsMockServer server = new OptionsMockServer(this);
 
     private static ForestConfiguration configuration;
 
@@ -52,17 +55,7 @@ public class TestOptionsClient extends BaseClientTest {
 
     @Before
     public void prepareMockServer() {
-        MockServerClient mockClient = new MockServerClient("localhost", 5000);
-        mockClient.when(
-                request()
-                        .withPath("/hello/user")
-                        .withMethod("OPTIONS")
-                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plan"))
-                        .withQueryStringParameter("username",  "foo")
-        ).respond(
-                response()
-                        .withStatusCode(200)
-        );
+        server.initServer();
     }
 
 
@@ -73,5 +66,19 @@ public class TestOptionsClient extends BaseClientTest {
         assertEquals(200, response.getStatusCode());
     }
 
+
+    @Test
+    public void testTextParamOptions() {
+        String result = optionsClient.textParamOptions("foo");
+        assertNotNull(result);
+        assertEquals(OptionsMockServer.EXPECTED, result);
+    }
+
+    @Test
+    public void testAnnParamOptions() {
+        String result = optionsClient.annParamOptions("foo");
+        assertNotNull(result);
+        assertEquals(OptionsMockServer.EXPECTED, result);
+    }
 
 }

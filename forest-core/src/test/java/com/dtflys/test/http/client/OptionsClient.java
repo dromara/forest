@@ -1,5 +1,6 @@
 package com.dtflys.test.http.client;
 
+import com.dtflys.forest.annotation.DataParam;
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.annotation.Request;
@@ -17,5 +18,22 @@ public interface OptionsClient {
             headers = {"Accept:text/plan"}
     )
     ForestResponse simpleOptions();
+
+    @Request(
+            url = "http://localhost:5000/hello/user",
+            type = "options",
+            headers = {"Accept:text/plan"},
+            data = "username=${0}"
+    )
+    String textParamOptions(String username);
+
+
+    @Request(
+            url = "http://localhost:5000/hello/user",
+            type = "options",
+            headers = {"Accept:text/plan"}
+    )
+    String annParamOptions(@DataParam("username") String username);
+
 
 }
