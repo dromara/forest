@@ -1,6 +1,6 @@
 package com.dtflys.test.interceptor;
 
-import com.dtflys.forest.Forest;
+import com.dtflys.forest.interceptor.DefaultInterceptorFactory;
 import com.dtflys.forest.annotation.Request;
 
 /**
@@ -12,7 +12,7 @@ public interface WrongInterceptorClient {
     @Request(
             url = "http://localhost:5000/hello/user?username=foo",
             headers = {"Accept:text/plan"},
-            interceptor = Forest.class
+            interceptor = DefaultInterceptorFactory.class
     )
     String wrongClass();
 

@@ -1,7 +1,7 @@
 package com.dtflys.test.interceptor;
 
 import com.dtflys.test.mock.GetMockServer;
-import com.dtflys.forest.Forest;
+import com.dtflys.forest.interceptor.DefaultInterceptorFactory;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.test.http.TestGetClient;
@@ -67,7 +67,7 @@ public class TestInterceptor {
         } catch (ForestRuntimeException e) {
             error = true;
             log.error(e.getMessage());
-            assertEquals("Class [" + Forest.class.getName() + "] is not a implement of [" +
+            assertEquals("Class [" + DefaultInterceptorFactory.class.getName() + "] is not a implement of [" +
                     Interceptor.class.getName() + "] interface.", e.getMessage());
         }
         assertTrue(error);

@@ -7,4 +7,6 @@ forest:
   timeout: 6000
   connect-timeout: 5000
   retry-count: 0
+  interceptors:
+    com.dtflys.forest.springboot.test.interceptor.GlobalInterceptor
 
