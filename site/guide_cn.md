@@ -578,15 +578,142 @@ myClient.postXml("foo", "bar");
 
 第三步：设置`contentType`或请求头`ContentType`，要设置成什么`contentType`取决于你想要Body中数据是什么格式。
 
-具体`contentType`和Body数据格式的对应关系如下表所示：
+
+
+# 五 数据绑定
+
+上面已经介绍了如何创建可以发送HTTP请求的接口，并绑定到某个接口方法上，已经可以实现简单请求的发送和接受。
+
+但问题是这些绑定的HTTP请求信息如URL和HEAD信息都是静态的不能动态改变，而我们在业务中大多数时候都需要动态地将数据传入到HTTP请求的各个部分（如URL、参数、HEAD、BODY等等），并发送到远端服务器。
+
+这时候就需要`数据绑定`来实现这些功能，
+Forest提供多种方式进行`数据绑定`。
+
+## 4.1 参数序号绑定
+
+您可以使用`${数字}`的方式引用对应顺序的参数，其中`${...}`是模板表达式的语法形式。
+
+序号所对应的参数在接口方法调用时传入的值，会被自动绑定到`${数字}`所在的位置。
+
+`注`：参数序号从`0`开始计数。
+
+比如`${0}`表示的就是第一个参数，`${1}`表示的第二个参数，以此类推。
+
+```java
+
+@Request(
+    url = "${0}/send?un=${1}&pw=${2}&da=${3}&sm=${4}",
+    type = "get",
+    dataType = "json"
+)
+public Map send(
+    String base,
+    String userName,
+    String password,
+    String phoneList,
+    String content
+);
+```
+
+如果调用方代码如下所示：
+
+```java
+myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
+```
+
+实际产生的HTTP请求如下：
+
+    GET http://localhost:8080/send?un=DT&pw=123456&da=123888888&sm=Hahaha
+
+
+## 4.2 @DataParam参数绑定
+
+在接口方法的参数前加上`@DataParam`注解并在`value`属性中给予一个名词，就能实现参数绑定。
+
+被`@DataParam`注解修饰的参数数据的绑定位置较为灵活多变，它可以出现在请求`url`的参数部分，也可以出现在请求Body中。
+
+具体出现位置取决于由`type`属性定义的HTTP Method。
+
+### 4.2.1 数据绑定位置
+
+`@DataParam`注解的参数绑定的位置如下表：
+
+| type     | `@ParaParam`注解绑定位置 |
+|----------|-------------------------|
+| `GET`     |  `url`参数部分           |
+| `POST`    |  请求体                 |
+| `PUT`     |  请求体                 |
+| `PATCH`   |  请求体                 |
+| `HEAD`    |  `url`参数部分           |
+| `OPTIONS` |  `url`参数部分           |
+| `DELETE`  |  `url`参数部分           |
+| `TRACE`   |  `url`参数部分           |
+
+`GET`、`HEAD`等方法会将参数值直接绑定到URL的参数中。
+
+```java
+
+@Request(
+    url = "${0}/send",
+    type = "get",
+    dataType = "json"
+)
+public Map send(
+    String base,
+    @DataParam("un") String userName,
+    @DataParam("pw") String password,
+    @DataParam("da") String phoneList,
+    @DataParam("sm") String content
+);
+```
+
+如果调用方代码如下所示：
+
+```java
+myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
+```
+
+实际产生的HTTP请求如下：
+
+    GET http://localhost:8080/send?un=DT&pw=123456&da=123888888&sm=Hahaha
+
+
+`POST`、`PUT`等方法会将参数值绑定到请求体中，同时在请求中的数据在`默认`情况下按`x-www-form-urlencoded`格式绑定。
+
+```java
+@Request(
+        url = "http://localhost:5000/hello",
+        type = "post",
+        headers = {"Accept:text/plan"}
+)
+String send(@DataParam("username") String username, @DataParam("password") String password);
+```
+
+如果调用方代码如下所示：
+
+```java
+myClient.send("foo", "bar");
+```
+
+实际产生的HTTP请求如下：
+
+    GET http://localhost:5000/hello
+    HEADER:
+        Accept: text/plan
+    BODY:
+        username=foo&password=bar
+
+### 4.2.2 数据绑定格式
+
+若您想参数值在请求中传输`JSON`或`XML`等格式绑定，可以通过修改`contentType`或`Content-Type`请求头来实现对应的数据格式，
+具体数据格式和`contentType`属性的关系请参考下表：
 
 | `contentType` / `Content-Type` | 数据格式 |
 |--------------|----------|
-| 不设置 | 标准表单格式 |
-| `application/x-www-form-urlencoded` | 标准表单格式 |
+| 不设置 | `x-www-form-urlencoded`表单格式 |
+| `application/x-www-form-urlencoded` | `x-www-form-urlencoded`表单格式 |
 | `application/json` | `JSON`格式 |
 | `application/xml` | `XML`格式 |
-
 
 若传输的Body数据是标准表单格式，就不用设置`cotentType`或请求头`Content-Type`了
 
@@ -657,87 +784,6 @@ public interface MyClient {
     String postBody(@DataParam("username") String username, @DataParam("password") String password);
 }
 ```
-
-
-# 五 数据绑定
-
-上面已经介绍了如何创建可以发送HTTP请求的接口，并绑定到某个接口方法上，已经可以实现简单请求的发送和接受。
-
-但问题是这些绑定的HTTP请求信息如URL和HEAD信息都是静态的不能动态改变，而我们在业务中大多数时候都需要动态地将数据传入到HTTP请求的各个部分（如URL、参数、HEAD、BODY等等），并发送到远端服务器。
-
-这时候就需要`数据绑定`来实现这些功能，
-Forest提供多种方式进行`数据绑定`。
-
-## 4.1 参数序号绑定
-
-您可以使用`${数字}`的方式引用对应顺序的参数，其中`${...}`是模板表达式的语法形式。
-
-序号所对应的参数在接口方法调用时传入的值，会被自动绑定到`${数字}`所在的位置。
-
-`注`：参数序号从`0`开始计数。
-
-比如`${0}`表示的就是第一个参数，`${1}`表示的第二个参数，以此类推。
-
-```java
-
-@Request(
-    url = "${0}/send?un=${1}&pw=${2}&da=${3}&sm=${4}",
-    type = "get",
-    dataType = "json"
-)
-public Map send(
-    String base,
-    String userName,
-    String password,
-    String phoneList,
-    String content
-);
-```
-
-如果调用方代码如下所示：
-
-```java
-myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
-```
-
-实际产生的HTTP请求如下：
-
-    GET http://localhost:8080/send?un=DT&pw=123456&da=123888888&sm=Hahaha
-
-
-## 4.2 @DataParam参数绑定
-
-在接口方法的参数前加上`@DataParam`注解并在`value`属性中给予一个名词，就能实现参数绑定。
-
-被`@DataParam`注解修饰的参数数据的绑定位置较为灵活多变，它可以出现在请求`url`的参数部分，也可以出现在请求Body中。
-
-具体出现位置取决于由`type`属性定义的HTTP Method。
-
-```java
-
-@Request(
-    url = "${0}/send",
-    type = "get",
-    dataType = "json"
-)
-public Map send(
-    String base,
-    @DataParam("un") String userName,
-    @DataParam("pw") String password,
-    @DataParam("da") String phoneList,
-    @DataParam("sm") String content
-);
-```
-
-如果调用方代码如下所示：
-
-```java
-myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
-```
-
-实际产生的HTTP请求如下：
-
-    GET http://localhost:8080/send?un=DT&pw=123456&da=123888888&sm=Hahaha
 
 
 
