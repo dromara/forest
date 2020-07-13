@@ -16,7 +16,6 @@ import okhttp3.Request;
 public class OkHttp3TraceExecutor extends AbstractOkHttp3Executor {
 
     private static final BodyBuilder bodyBuilder = new NoneBodyBuilder();
-    private static final URLBuilder urlBuilder = new QueryableURLBuilder();
 
     public OkHttp3TraceExecutor(OkHttp3ConnectionManager connectionManager, OkHttp3ResponseHandler okHttp3ResponseHandler, ForestRequest request) {
         super(request, connectionManager, okHttp3ResponseHandler);
@@ -34,6 +33,6 @@ public class OkHttp3TraceExecutor extends AbstractOkHttp3Executor {
 
     @Override
     protected URLBuilder getURLBuilder() {
-        return urlBuilder;
+        return URLBuilder.getQueryableURLBuilder();
     }
 }

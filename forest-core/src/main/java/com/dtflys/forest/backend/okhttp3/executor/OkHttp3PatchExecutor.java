@@ -16,7 +16,6 @@ import okhttp3.Request;
 public class OkHttp3PatchExecutor extends AbstractOkHttp3Executor {
 
     private static final BodyBuilder bodyBuilder = new OkHttp3PatchBodyBuilder();
-    private static final URLBuilder urlBuilder = new SimpleURLBuilder();
 
     public OkHttp3PatchExecutor(OkHttp3ConnectionManager connectionManager, OkHttp3ResponseHandler okHttp3ResponseHandler, ForestRequest request) {
         super(request, connectionManager, okHttp3ResponseHandler);
@@ -29,6 +28,6 @@ public class OkHttp3PatchExecutor extends AbstractOkHttp3Executor {
 
     @Override
     protected URLBuilder getURLBuilder() {
-        return urlBuilder;
+        return URLBuilder.getSimpleURLBuilder();
     }
 }
