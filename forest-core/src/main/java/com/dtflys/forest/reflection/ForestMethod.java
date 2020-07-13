@@ -1,6 +1,5 @@
 package com.dtflys.forest.reflection;
 
-import com.dtflys.forest.Forest;
 import com.dtflys.forest.annotation.DataObject;
 import com.dtflys.forest.annotation.DataParam;
 import com.dtflys.forest.annotation.DataVariable;
@@ -14,6 +13,7 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.interceptor.Interceptor;
+import com.dtflys.forest.interceptor.InterceptorFactory;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingVariable;
@@ -39,6 +39,7 @@ public class ForestMethod<T> implements VariableScope {
 
     private final InterfaceProxyHandler interfaceProxyHandler;
     private final ForestConfiguration configuration;
+    private InterceptorFactory interceptorFactory;
     private final Method method;
     private Class returnClass;
     private MappingTemplate baseUrlTemplate;
@@ -61,6 +62,7 @@ public class ForestMethod<T> implements VariableScope {
     private Map<String, MappingVariable> variables = new HashMap<String, MappingVariable>();
     private MappingParameter onSuccessParameter = null;
     private MappingParameter onErrorParameter = null;
+    private List<Interceptor> globalInterceptorList;
     private List<Interceptor> baseInterceptorList;
     private List<Interceptor> interceptorList;
     private Class onSuccessClassGenericType = null;
@@ -71,6 +73,7 @@ public class ForestMethod<T> implements VariableScope {
         this.interfaceProxyHandler = interfaceProxyHandler;
         this.configuration = configuration;
         this.method = method;
+        this.interceptorFactory = configuration.getInterceptorFactory();
         processBaseProperties();
         processInterfaceMethods();
     }
@@ -114,6 +117,20 @@ public class ForestMethod<T> implements VariableScope {
         }
         baseTimeout = interfaceProxyHandler.getBaseTimeout();
         baseRetryNumber = interfaceProxyHandler.getBaseRetryCount();
+
+        List<Class> globalInterceptorClasses = configuration.getInterceptors();
+        if (globalInterceptorClasses != null && globalInterceptorClasses.size() > 0) {
+            globalInterceptorList = new LinkedList<>();
+            for (Class clazz : globalInterceptorClasses) {
+                if (!Interceptor.class.isAssignableFrom(clazz) || clazz.isInterface()) {
+                    throw new ForestRuntimeException("Class [" + clazz.getName() + "] is not a implement of [" +
+                            Interceptor.class.getName() + "] interface.");
+                }
+                Interceptor interceptor = interceptorFactory.getInterceptor(clazz);
+                globalInterceptorList.add(interceptor);
+            }
+        }
+
         Class[] baseInterceptorClasses = interfaceProxyHandler.getBaseInterceptorClasses();
         if (baseInterceptorClasses != null && baseInterceptorClasses.length > 0) {
             baseInterceptorList = new LinkedList<>();
@@ -123,7 +140,7 @@ public class ForestMethod<T> implements VariableScope {
                     throw new ForestRuntimeException("Class [" + clazz.getName() + "] is not a implement of [" +
                             Interceptor.class.getName() + "] interface.");
                 }
-                Interceptor interceptor = Forest.getInterceptor(clazz);
+                Interceptor interceptor = interceptorFactory.getInterceptor(clazz);
                 baseInterceptorList.add(interceptor);
             }
         }
@@ -195,7 +212,7 @@ public class ForestMethod<T> implements VariableScope {
                             throw new ForestRuntimeException("Class [" + clazz.getName() + "] is not a implement of [" +
                                     Interceptor.class.getName() + "] interface.");
                         }
-                        Interceptor interceptor = Forest.getInterceptor(clazz);
+                        Interceptor interceptor = interceptorFactory.getInterceptor(clazz);
                         interceptorList.add(interceptor);
                     }
                 }
@@ -516,6 +533,12 @@ public class ForestMethod<T> implements VariableScope {
             dataType = dataType.toUpperCase();
             ForestDataType forestDataType = ForestDataType.valueOf(dataType);
             request.setDataType(forestDataType);
+        }
+
+        if (globalInterceptorList != null && globalInterceptorList.size() > 0) {
+            for (Interceptor item : globalInterceptorList) {
+                request.addInterceptor(item);
+            }
         }
 
         if (baseInterceptorList != null && baseInterceptorList.size() > 0) {

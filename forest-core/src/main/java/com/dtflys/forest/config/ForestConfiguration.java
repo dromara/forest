@@ -25,6 +25,8 @@
 package com.dtflys.forest.config;
 
 
+import com.dtflys.forest.interceptor.DefaultInterceptorFactory;
+import com.dtflys.forest.interceptor.InterceptorFactory;
 import com.dtflys.forest.proxy.ProxyFactory;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.ssl.SSLUtils;
@@ -103,9 +105,13 @@ public class ForestConfiguration implements Serializable {
 
     private List<RequestNameValue> defaultHeaders;
 
+    private List<Class> interceptors;
+
     private Map<ForestDataType, ForestConverter> converterMap;
 
     private JSONConverterSelector jsonConverterSelector;
+
+    private InterceptorFactory interceptorFactory;
 
     private HttpBackendSelector httpBackendSelector = new HttpBackendSelector();
 
@@ -174,6 +180,21 @@ public class ForestConfiguration implements Serializable {
             }
         }
         return backend;
+    }
+
+    public InterceptorFactory getInterceptorFactory() {
+        if (interceptorFactory == null) {
+            synchronized (this) {
+                if (interceptorFactory == null) {
+                    interceptorFactory = new DefaultInterceptorFactory();
+                }
+            }
+        }
+        return interceptorFactory;
+    }
+
+    public void setInterceptorFactory(InterceptorFactory interceptorFactory) {
+        this.interceptorFactory = interceptorFactory;
     }
 
     public ForestConfiguration setHttpBackendSelector(HttpBackendSelector httpBackendSelector) {
@@ -272,6 +293,14 @@ public class ForestConfiguration implements Serializable {
     public ForestConfiguration setDefaultHeaders(List<RequestNameValue> defaultHeaders) {
         this.defaultHeaders = defaultHeaders;
         return this;
+    }
+
+    public List<Class> getInterceptors() {
+        return interceptors;
+    }
+
+    public void setInterceptors(List<Class> interceptors) {
+        this.interceptors = interceptors;
     }
 
     public ForestConfiguration setJsonConverter(ForestJsonConverter converter) {

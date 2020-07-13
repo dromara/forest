@@ -22,11 +22,9 @@
  * SOFTWARE.
  */
 
-package com.dtflys.forest;
+package com.dtflys.forest.interceptor;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.interceptor.Interceptor;
-import com.dtflys.forest.interceptor.InterceptorChain;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,32 +33,40 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-15 11:18
  */
-public class Forest {
+public class DefaultInterceptorFactory implements InterceptorFactory {
 
-    private final static Map<Class, Interceptor> interceptorMap = new ConcurrentHashMap<>();
+    protected final Map<Class, Interceptor> interceptorMap = new ConcurrentHashMap<>();
 
-    private static InterceptorChain interceptorChain = new InterceptorChain();
+    protected InterceptorChain interceptorChain = new InterceptorChain();
 
-    public static InterceptorChain getInterceptorChain() {
+    @Override
+    public InterceptorChain getInterceptorChain() {
         return interceptorChain;
     }
 
-    public static <T extends Interceptor> Interceptor getInterceptor(Class<T> clazz) {
+    @Override
+    public <T extends Interceptor> T getInterceptor(Class<T> clazz) {
         Interceptor interceptor = interceptorMap.get(clazz);
         if (interceptor == null) {
-            synchronized (Forest.class) {
+            synchronized (DefaultInterceptorFactory.class) {
                 interceptor = interceptorMap.get(clazz);
                 if (interceptor == null) {
-                    try {
-                        interceptor = clazz.newInstance();
-                        interceptorMap.put(clazz, interceptor);
-                    } catch (InstantiationException e) {
-                        throw new ForestRuntimeException(e);
-                    } catch (IllegalAccessException e) {
-                        throw new ForestRuntimeException(e);
-                    }
+                    interceptor = createInterceptor(clazz);
                 }
             }
+        }
+        return (T) interceptor;
+    }
+
+    protected <T extends Interceptor> Interceptor createInterceptor(Class<T> clazz) {
+        Interceptor interceptor;
+        try {
+            interceptor = clazz.newInstance();
+            interceptorMap.put(clazz, interceptor);
+        } catch (InstantiationException e) {
+            throw new ForestRuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new ForestRuntimeException(e);
         }
         return interceptor;
     }

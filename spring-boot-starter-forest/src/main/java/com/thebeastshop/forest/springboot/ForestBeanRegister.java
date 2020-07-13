@@ -2,6 +2,7 @@ package com.thebeastshop.forest.springboot;
 
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.interceptor.SpringInterceptorFactory;
 import com.dtflys.forest.schema.ForestConfigurationBeanDefinitionParser;
 import com.thebeastshop.forest.springboot.properties.ForestConfigurationProperties;
 import com.thebeastshop.forest.springboot.properties.ForestSSLKeyStoreProperties;
@@ -37,10 +38,14 @@ public class ForestBeanRegister {
                 .addPropertyValue("connectTimeout", forestConfigurationProperties.getConnectTimeout())
                 .addPropertyValue("retryCount", forestConfigurationProperties.getRetryCount())
                 .addPropertyValue("backendName", forestConfigurationProperties.getBackend())
+                .addPropertyValue("interceptors", forestConfigurationProperties.getInterceptors())
                 .addPropertyValue("sslProtocol", forestConfigurationProperties.getSslProtocol())
                 .addPropertyValue("variables", forestConfigurationProperties.getVariables())
                 .setLazyInit(false)
                 .setFactoryMethod("configuration");
+
+        BeanDefinition interceptorFactoryBeanDefinition = registerInterceptorFactoryBean();
+        beanDefinitionBuilder.addPropertyValue("interceptorFactory", interceptorFactoryBeanDefinition);
 
         List<ForestSSLKeyStoreProperties> sslKeyStorePropertiesList = forestConfigurationProperties.getSslKeyStores();
         ManagedMap<String, BeanDefinition> sslKeystoreMap = new ManagedMap<>();
@@ -54,7 +59,16 @@ public class ForestBeanRegister {
         BeanDefinitionRegistry beanFactory = (BeanDefinitionRegistry) applicationContext.getBeanFactory();
         beanFactory.registerBeanDefinition(id, beanDefinition);
 
-        return applicationContext.getBean(id, ForestConfiguration.class);
+        ForestConfiguration configuration = applicationContext.getBean(id, ForestConfiguration.class);
+        return configuration;
+    }
+
+    public BeanDefinition registerInterceptorFactoryBean() {
+        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(SpringInterceptorFactory.class);
+        BeanDefinition beanDefinition = beanDefinitionBuilder.getRawBeanDefinition();
+        BeanDefinitionRegistry beanFactory = (BeanDefinitionRegistry) applicationContext.getBeanFactory();
+        beanFactory.registerBeanDefinition("forestInterceptorFactory", beanDefinition);
+        return beanDefinition;
     }
 
     public BeanDefinition registerSSLKeyStoreBean(ManagedMap<String, BeanDefinition> map, ForestSSLKeyStoreProperties sslKeyStoreProperties) {

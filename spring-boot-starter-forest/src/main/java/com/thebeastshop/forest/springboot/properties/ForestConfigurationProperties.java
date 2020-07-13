@@ -61,6 +61,14 @@ public class ForestConfigurationProperties {
      */
     private Map<String, Object> variables = new HashMap<>();
 
+    /**
+     * Class list of interceptors
+     */
+    private List<Class> interceptors = new ArrayList<>();
+
+    /**
+     * SSL Key Stores
+     */
     private List<ForestSSLKeyStoreProperties> sslKeyStores = new ArrayList<>();
 
     public boolean isEnabled() {
@@ -141,6 +149,14 @@ public class ForestConfigurationProperties {
 
     public void setVariables(Map<String, Object> variables) {
         this.variables = variables;
+    }
+
+    public List<Class> getInterceptors() {
+        return interceptors;
+    }
+
+    public void setInterceptors(List<Class> interceptors) {
+        this.interceptors = interceptors;
     }
 
     public List<ForestSSLKeyStoreProperties> getSslKeyStores() {
