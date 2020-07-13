@@ -48,13 +48,18 @@ public class Forest {
     public static <T extends Interceptor> Interceptor getInterceptor(Class<T> clazz) {
         Interceptor interceptor = interceptorMap.get(clazz);
         if (interceptor == null) {
-            try {
-                interceptor = clazz.newInstance();
-                interceptorMap.put(clazz, interceptor);
-            } catch (InstantiationException e) {
-                throw new ForestRuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new ForestRuntimeException(e);
+            synchronized (Forest.class) {
+                interceptor = interceptorMap.get(clazz);
+                if (interceptor == null) {
+                    try {
+                        interceptor = clazz.newInstance();
+                        interceptorMap.put(clazz, interceptor);
+                    } catch (InstantiationException e) {
+                        throw new ForestRuntimeException(e);
+                    } catch (IllegalAccessException e) {
+                        throw new ForestRuntimeException(e);
+                    }
+                }
             }
         }
         return interceptor;
