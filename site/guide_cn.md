@@ -572,11 +572,11 @@ myClient.postXml("foo", "bar");
 
 只需三步就能实现参数到请求体的绑定：
 
-第一步：设置HTTP Method为`POST`、`PUT`、`PATCH`这类允许带有请求体的方法(具体哪些HTTP Method能够绑定到请求体请参见[[4.2.1](###_421-数据绑定位置)])。
+第一步：设置HTTP Method为`POST`、`PUT`、`PATCH`这类允许带有请求体的方法(具体哪些HTTP Method能够绑定到请求体请参见[[4.2.1](###_521-数据绑定位置)])。
 
 第二步：给参数加上`@DataParam`注解并定义名称，关于`@DataParam`注解具体使用可以参见[[4.2 @DataParam参数绑定](##_42-dataparam参数绑定)]。
 
-第三步：设置`contentType`或请求头`ContentType`，要设置成什么`contentType`取决于你想要Body中数据是什么格式(关于`contentType`和数据格式的对应关系请参见[[4.2.2](###_422-数据绑定格式)])。
+第三步：设置`contentType`或请求头`ContentType`，要设置成什么`contentType`取决于你想要Body中数据是什么格式(关于`contentType`和数据格式的对应关系请参见[[5.2.2](###_522-数据绑定格式)])。
 
 
 
@@ -589,7 +589,7 @@ myClient.postXml("foo", "bar");
 这时候就需要`数据绑定`来实现这些功能，
 Forest提供多种方式进行`数据绑定`。
 
-## 4.1 参数序号绑定
+## 5.1 参数序号绑定
 
 您可以使用`${数字}`的方式引用对应顺序的参数，其中`${...}`是模板表达式的语法形式。
 
@@ -626,11 +626,11 @@ myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
     GET http://localhost:8080/send?un=DT&pw=123456&da=123888888&sm=Hahaha
 
 
-## 4.2 @DataParam参数绑定
+## 5.2 @DataParam参数绑定
 
 在接口方法的参数前加上`@DataParam`注解并在`value`属性中给予一个名词，就能实现参数绑定。
 
-### 4.2.1 数据绑定位置
+### 5.2.1 数据绑定位置
 
 被`@DataParam`注解修饰的参数数据的绑定位置较为灵活多变，它可以出现在请求`url`的参数部分，也可以出现在请求Body中。
 
@@ -701,7 +701,7 @@ myClient.send("foo", "bar");
     BODY:
         username=foo&password=bar
 
-### 4.2.2 数据绑定格式
+### 5.2.2 数据绑定格式
 
 若您想参数值在请求中传输`JSON`或`XML`等格式绑定，可以通过修改`contentType`或`Content-Type`请求头来实现对应的数据格式，
 具体数据格式和`contentType`属性的关系请参考下表：
