@@ -853,11 +853,11 @@ myClient.send("Xxxxxx");
     GET http://localhost:5050/send?un=foo&pw=bar&da=123888888&sm=Xxxxxx
     
 
-# 六. 创建和获取请求接口实例
+# 六. 调用接口
 
-## 6.1 在Spring Boot项目中创建接口实例
+若您已有定义好的Forest请求接口名为 `com.yoursite.client.MyClient`，并且一切配置都已准备好，那就可以开始愉快使用它了。
 
-若您已有定义好的Forest请求接口名为 `com.yoursite.client.MyClient`，
+## 6.1 在Spring Boot项目中调用接口
 
 只要在`Spring Boot`的配置类或者启动类上加上`@ForestScan`注解，并在`basePackages`属性里填上远程接口的所在的包名
 
@@ -872,20 +872,31 @@ public class MyApp {
 
 Forest会扫描`@ForestScan`注解中`basePackages`属性指定的包下面所有的接口，然后会将符合条件的接口进行动态代理并注入到Spring的上下文中。
 
-然后便能在其他代码中从Spring上下文注入接口实例
+然后便能在其他代码中从Spring上下文注入接口实例，然后如调用普通接口那样调用即可。
 
 ```java
 @Component
 public class MyService {
     @Autowired
     private MyClient myClient;
+
+    public void testClient() {
+        Map result = myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
+        System.out.println(result);
+    }
+
 }
 ```
 
-## 6.2 在普通项目中创建接口实例
+## 6.2 在普通项目中调用接口
 
-通过`ForestConfiguration`的静态方法`createInstance(Class clazz)`实例化接口。
+通过`ForestConfiguration`的静态方法`createInstance(Class clazz)`实例化接口，然后如调用普通接口那样调用即可。
 
 ```java
 MyClient myClient = configuration.createInstance(MyClient.class);
+
+...
+
+Map result = myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
+System.out.println(result);
 ```
