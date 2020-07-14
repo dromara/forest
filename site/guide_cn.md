@@ -867,7 +867,6 @@ myClient.send("Xxxxxx");
 
     GET http://localhost:5050/send?un=foo&pw=bar&da=123888888&sm=Xxxxxx
     
-
 # 六. 使用请求接口
 
 若您已有定义好的Forest请求接口(比如名为 `com.yoursite.client.MyClient`)，并且一切配置都已准备好，那就可以开始愉快使用它了。
