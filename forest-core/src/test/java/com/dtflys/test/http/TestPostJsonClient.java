@@ -1,8 +1,13 @@
 package com.dtflys.test.http;
 
+import com.alibaba.fastjson.parser.Feature;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestFastjsonConverter;
 import com.dtflys.test.http.client.PostClient;
+import com.dtflys.test.http.model.SimpleUser;
+import com.dtflys.test.http.model.UserParam;
 import com.dtflys.test.mock.PostJsonMockServer;
 import org.junit.*;
 import org.slf4j.Logger;
@@ -29,6 +34,9 @@ public class TestPostJsonClient extends BaseClientTest {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
+        ForestFastjsonConverter fastjsonConverter = new ForestFastjsonConverter();
+        fastjsonConverter.setSerializerFeature(SerializerFeature.SortField);
+        configuration.setJsonConverter(fastjsonConverter);
     }
 
     public TestPostJsonClient(HttpBackend backend) {
@@ -72,6 +80,31 @@ public class TestPostJsonClient extends BaseClientTest {
         assertNotNull(result);
         Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
     }
+
+/*
+    @Test
+    public void testJsonPost5() {
+        SimpleUser user = new SimpleUser();
+        user.setUsername("foo");
+        user.setPassword("123456");
+        String result = postClient.postJson5(user);
+        log.info("response: " + result);
+        assertNotNull(result);
+        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
+    }
+
+    @Test
+    public void testJsonPost6() {
+        SimpleUser user = new SimpleUser();
+        user.setUsername("foo");
+        user.setPassword("123456");
+        String result = postClient.postJson6(user);
+        log.info("response: " + result);
+        assertNotNull(result);
+        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
+    }
+*/
+
 
 
 }
