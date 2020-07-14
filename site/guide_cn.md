@@ -176,7 +176,7 @@ forest:
     userpwd: bar
 ```
 
-## 3.2 在普通项目中配置
+## 3.2 在非 Spring Boot 项目中配置
 
 若您的项目不是`Spring Boot`项目，或者没有依赖`spring-boot-starter-forest`，可以通过下面方式定义 Forest 配置。
 
@@ -499,7 +499,6 @@ public interface MyClient {
     BODY:
         username=foo&password=bar
 
-
 结合`数据绑定`和`data`属性设置请求体(如何进行数据绑定请参见[[五 数据绑定](#五-数据绑定)])：
 
 ```java
@@ -586,7 +585,6 @@ myClient.postXml("foo", "bar");
         Content-Type: application/json
     BODY:
         <misc><username>foo</username><password>bar</password></misc>
-
 
 ### 4.5.1 通过@DataParam 注解
 
@@ -839,7 +837,7 @@ myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
 
 ## 4.4 全局变量绑定
 
-若您已经定义好全局变量（关于如何定义全局变量请参见[Spring Boot 全局变量定义](###_315-全局变量定义)，或[普通项目全局变量定义](###_324-全局变量定义)），那便可以直接在请求定义中绑定全局变量了。
+若您已经定义好全局变量（关于如何定义全局变量请参见[Spring Boot 项目全局变量定义](###_315-全局变量定义)，或[非 Spring Boot 项目全局变量定义](###_324-全局变量定义)），那便可以直接在请求定义中绑定全局变量了。
 
 若有全局变量：
 
