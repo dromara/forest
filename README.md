@@ -82,7 +82,9 @@ public interface AmapClient {
 @Configuration
 @ForestScan(basePackages = "com.yoursite.client")
 public class MyApplication {
- ...
+  public static void main(String[] args) {
+      SpringApplication.run(MyApplication.class, args);
+   }
 }
 ```
 
