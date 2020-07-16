@@ -34,8 +34,16 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = ElementType.PARAMETER)
 public @interface DataParam {
+
+    /**
+     * Parameter name in request URL or request body.
+     * @return
+     */
     String value();
-    String encoding() default "";
-    String type() default "text";
+
+    /**
+     * The filters will do some processing for the parameter value before sending request.
+     * @return
+     */
     String filter() default "";
 }
