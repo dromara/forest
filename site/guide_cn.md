@@ -97,18 +97,9 @@ Forest 1.0.x 和 Forest 1.1.x 基于 JDK 1.7, Forest 1.2.x 基于 JDK 1.8
 
 ## 3.1 在 Spring Boot 项目中配置
 
-若您的项目依赖`Spring Boot`，并加入了`spring-boot-starter-forest`依赖，就可以通过 application.yml/application.properties 方式定义配置。
+若您的项目依赖`Spring Boot`，并加入了`spring-boot-starter-forest`依赖，就可以通过 `application.yml`/`application.properties` 方式定义配置。
 
-### 3.1.1 配置 forest 启动开关
-
-在`application.yml`中设置`forest.enabled`为`true`，便能开启 Forest。若设为 false，`Spring Boot`便不会再扫描 Forest。
-
-```yaml
-forest:
-  enabled: true
-```
-
-### 3.1.2 配置后端 HTTP API
+### 3.1.1 配置后端 HTTP API
 
 ```yaml
 forest:
@@ -125,24 +116,7 @@ forest:
   backend: httpclient # 配置后端HTTP API为 httpclient
 ```
 
-### 3.1.3 配置 Bean ID
-
-Forest 允许您在 yaml 文件中配置 Bean Id，它对应着`ForestConfiguration`对象在 Spring 上下文中的 Bean 名称。
-
-```yaml
-forest:
-  enabled: true
-  bean-id: config0 # 在spring上下文中bean的id，默认值为forestConfiguration
-```
-
-然后便可以在 Spring 中通过 Bean 的名称引用到它
-
-```java
-@Resource(name = "config0")
-private ForestConfiguration config0;
-```
-
-### 3.1.4 全局基本配置
+### 3.1.2 全局基本配置
 
 在`application.yaml` / `application.properties`中配置的 HTTP 基本参数
 
@@ -160,7 +134,7 @@ forest:
   logEnabled: true # 打开或关闭日志，默认为true
 ```
 
-### 3.1.5 全局变量定义
+### 3.1.3 全局变量定义
 
 Forest 可以在`forest.variables`属性下自定义全局变量。
 
@@ -175,6 +149,25 @@ forest:
     username: foo
     userpwd: bar
 ```
+
+### 3.1.4 配置 Bean ID
+
+Forest 允许您在 yaml 文件中配置 Bean Id，它对应着`ForestConfiguration`对象在 Spring 上下文中的 Bean 名称。
+
+```yaml
+forest:
+  enabled: true
+  bean-id: config0 # 在spring上下文中bean的id，默认值为forestConfiguration
+```
+
+然后便可以在 Spring 中通过 Bean 的名称引用到它
+
+```java
+@Resource(name = "config0")
+private ForestConfiguration config0;
+```
+
+
 
 ## 3.2 在非 Spring Boot 项目中配置
 
@@ -930,6 +923,56 @@ public interface Gitee {
 }
 ```
 
+Forest的单向验证的默认协议为`SSLv3`，如果一些站点的API不支持该协议，您可以在全局配置中将`ssl-protocol`属性修改为其它协议，如：`TLSv1.1`, `TLSv1.2`, `SSLv2`等等。  
 
+```yaml
+forest:
+  ...
+  ssl-protocol: TLSv1.2
+```
+ 若是需要在Forest中进行双向验证的HTTPS请求，也很简单。
+ 
+ 在全局配置中添加`keystore`配置：
+ 
+ ```yaml
+forest:
+  ...
+  ssl-key-stores:
+    - id: keystore1           # id为该keystore的名称，必填
+      file: test.keystore     # 公钥文件地址
+      keystore-pass: 123456   # keystore秘钥
+      cert-pass: 123456       # cert秘钥
+      protocols: SSLv3        # SSL协议
+```
 
+接着，在`@Request`中引入该`keystore`的`id`即可
 
+```java
+@Request(
+    url = "https://localhost:5555/hello/user",
+    keyStore = "keystore1"
+)
+String send();
+```
+
+另外，您也可以在全局配置中配多个`keystore`：
+
+```yaml
+forest:
+  ...
+  ssl-key-stores:
+    - id: keystore1          # 第一个keystore
+      file: test1.keystore    
+      keystore-pass: 123456  
+      cert-pass: 123456      
+      protocols: SSLv3       
+
+    - id: keystore2          # 第一个keystore
+      file: test2.keystore    
+      keystore-pass: abcdef  
+      cert-pass: abcdef      
+      protocols: SSLv3       
+      ...
+```
+
+随后在某个具体`@Request`中配置其中任意一个`keystore`的`id`都可以
