@@ -8,33 +8,29 @@ import java.math.BigDecimal;
  */
 public class Coordinate {
 
-    private BigDecimal longitude;
+    private String longitude;
 
-    private BigDecimal latitude;
+    private String latitude;
 
-    public Coordinate(BigDecimal longitude, BigDecimal latitude) {
+    public Coordinate(String longitude, String latitude) {
         this.longitude = longitude;
         this.latitude = latitude;
     }
 
-    public Coordinate(String longitude, String latitude) {
-        this.longitude = new BigDecimal(longitude);
-        this.latitude = new BigDecimal(latitude);
-    }
 
-    public BigDecimal getLongitude() {
+    public String getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(BigDecimal longitude) {
+    public void setLongitude(String longitude) {
         this.longitude = longitude;
     }
 
-    public BigDecimal getLatitude() {
+    public String getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(BigDecimal latitude) {
+    public void setLatitude(String latitude) {
         this.latitude = latitude;
     }
 }
