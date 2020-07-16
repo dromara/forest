@@ -65,10 +65,10 @@ import com.dtflys.forest.annotation.DataParam;
 public interface AmapClient {
 
     @Request(
-        url = "http://ditu.amap.com/service/regeo",
+        url = "http://ditu.amap.com/service/regeo?longitude=${0}&latitude=${1}",
         dataType = "json"
     )
-    Map getLocation(@DataParam("longitude") String longitude, @DataParam("latitude") String latitude);
+    Map getLocation(String longitude, String latitude);
 }
 
 ```
@@ -100,6 +100,7 @@ Map result = amapClient.getLocation("121.475078", "31.223577");
 System.out.println(result);
 ```
 
+#### 详细文档请看：[dt_flys.gitee.io/forest](https://dt_flys.gitee.io/forest)
 
 ### 微信交流群:<br>
 
