@@ -82,7 +82,7 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
     public Set<BeanDefinitionHolder> doScan(String... basePackages) {
         Set<BeanDefinitionHolder> beanDefinitions = super.doScan(basePackages);
         if (beanDefinitions.isEmpty()) {
-            logger.warn("[Forest] No Forest client was found in '" + Arrays.toString(basePackages) + "' package.");
+            logger.warn("[Forest] No Forest client is found in package '" + Arrays.toString(basePackages) + "'.");
         }
         processBeanDefinitions(beanDefinitions);
         return beanDefinitions;
