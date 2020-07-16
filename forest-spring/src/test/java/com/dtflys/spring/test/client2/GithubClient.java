@@ -9,7 +9,7 @@ import com.dtflys.forest.annotation.Request;
 public interface GithubClient {
 
     @Request(
-            url = "http://www.github.com",
+            url = "https://www.github.com",
             timeout = 80000
     )
     String index();

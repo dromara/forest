@@ -913,3 +913,23 @@ MyClient myClient = configuration.createInstance(MyClient.class);
 Map result = myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
 System.out.println(result);
 ```
+
+## 七. HTTPS
+
+为保证网络访问的安全性，现在大多数企业都会加入SSL验证来提高网站的安全性。
+ 
+所以Forest自然也加入了对HTTPS的处理，现在支持单向认证和双向认证的HTTPS请求。
+
+如果访问的目标站点的SSL证书由信任的Root CA发布的，那么您无需做任何事情便可以自动信任
+
+```java
+
+public interface Gitee {
+    @Request(url = "https://gitee.com")
+    String index();
+}
+```
+
+
+
+
