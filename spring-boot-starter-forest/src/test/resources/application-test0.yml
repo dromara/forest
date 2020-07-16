@@ -10,5 +10,6 @@ forest:
   retry-count: 5                          # 请求失败后重试次数
   ssl-protocol: SSLv3                     # 单向验证的HTTPS的默认SSL协议
   variables:                              # 自定义全局变量：key为变量名，value为值，可以在任何模板表达式中引用
+    baseUrl: http://www.thebeastshop.com
     myName: xxx
     myCount: 12

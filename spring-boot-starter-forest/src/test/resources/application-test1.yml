@@ -1,8 +1,9 @@
 
 forest:
-  enabled: true
   max-connections: 5000
   max-route-connections: 5500
   timeout: 5000
   connect-timeout: 4000
   retry-count: 0
+  filters:
+    test: com.dtflys.forest.springboot.test.filter.TestFilter
