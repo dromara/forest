@@ -34,7 +34,13 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface DataObject {
+
     @Deprecated
     String jsonParam() default "";
+
+    /**
+     * The filters will do some processing for the object value before sending request.
+     * @return
+     */
     String filter() default "";
 }
