@@ -4,18 +4,16 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.interceptor.SpringInterceptorFactory;
 import com.dtflys.forest.schema.ForestConfigurationBeanDefinitionParser;
+import com.dtflys.forest.utils.StringUtils;
 import com.thebeastshop.forest.springboot.properties.ForestConfigurationProperties;
 import com.thebeastshop.forest.springboot.properties.ForestSSLKeyStoreProperties;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ForestBeanRegister {
 
