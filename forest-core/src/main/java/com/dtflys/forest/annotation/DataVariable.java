@@ -34,6 +34,16 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = ElementType.PARAMETER)
 public @interface DataVariable {
+
+    /**
+     * The name of the variable. The variable name can be referenced in some places (ex. request URL, Body, Headers)
+     * @return
+     */
     String value() default "";
+
+    /**
+     * The filters will do some processing for the variable value before sending request.
+     * @return
+     */
     String filter() default "";
 }
