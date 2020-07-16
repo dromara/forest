@@ -7,8 +7,8 @@ import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.reflection.ForestMethod;
+import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;

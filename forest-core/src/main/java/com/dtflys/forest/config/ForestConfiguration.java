@@ -60,6 +60,8 @@ public class ForestConfiguration implements Serializable {
 
     private static ForestConfiguration defaultConfiguration = configuration();
 
+    private Map<Class, Object> instanceCache = new HashMap<>();
+
     private String id;
 
     /**
@@ -96,6 +98,11 @@ public class ForestConfiguration implements Serializable {
      * Enable log forest request info
      */
     private boolean logEnabled = true;
+
+    /**
+     * Enable cache of request interface instance
+     */
+    private boolean cacheEnabled = true;
 
     private volatile HttpBackend backend;
 
@@ -143,6 +150,10 @@ public class ForestConfiguration implements Serializable {
         configuration.registerFilter("json", JSONFilter.class);
         configuration.registerFilter("xml", XmlFilter.class);
         return configuration;
+    }
+
+    public Map<Class, Object> getInstanceCache() {
+        return instanceCache;
     }
 
     private ForestConfiguration setupBackend() {
@@ -275,6 +286,14 @@ public class ForestConfiguration implements Serializable {
 
     public void setLogEnabled(boolean logEnabled) {
         this.logEnabled = logEnabled;
+    }
+
+    public boolean isCacheEnabled() {
+        return cacheEnabled;
+    }
+
+    public void setCacheEnabled(boolean cacheEnabled) {
+        this.cacheEnabled = cacheEnabled;
     }
 
     public List<RequestNameValue> getDefaultParameters() {
