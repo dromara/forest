@@ -12,9 +12,9 @@ import java.util.Map;
 public class ForestConfigurationProperties {
 
     /**
-     * Enable forest
+     * Enable forest, default true
      */
-    private boolean enabled = false;
+//    private boolean enabled = true;
 
     /**
      * spring bean id of forest configuration
@@ -71,6 +71,7 @@ public class ForestConfigurationProperties {
      */
     private List<ForestSSLKeyStoreProperties> sslKeyStores = new ArrayList<>();
 
+/*
     public boolean isEnabled() {
         return enabled;
     }
@@ -78,6 +79,7 @@ public class ForestConfigurationProperties {
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
+*/
 
     public String getBeanId() {
         return beanId;
