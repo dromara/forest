@@ -913,6 +913,8 @@ System.out.println(result);
  
 所以Forest自然也加入了对HTTPS的处理，现在支持单向认证和双向认证的HTTPS请求。
 
+## 7.1 单向认证
+
 如果访问的目标站点的SSL证书由信任的Root CA发布的，那么您无需做任何事情便可以自动信任
 
 ```java
@@ -930,6 +932,9 @@ forest:
   ...
   ssl-protocol: TLSv1.2
 ```
+
+## 7.2 双向认证
+
  若是需要在Forest中进行双向验证的HTTPS请求，也很简单。
  
  在全局配置中添加`keystore`配置：
