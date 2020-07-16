@@ -103,7 +103,6 @@ Forest 1.0.x 和 Forest 1.1.x 基于 JDK 1.7, Forest 1.2.x 基于 JDK 1.8
 
 ```yaml
 forest:
-  enabled: true
   backend: okhttp3 # 配置后端HTTP API为 okhttp3
 ```
 
@@ -112,7 +111,6 @@ forest:
 
 ```yaml
 forest:
-  enabled: true
   backend: httpclient # 配置后端HTTP API为 httpclient
 ```
 
@@ -122,7 +120,6 @@ forest:
 
 ```yaml
 forest:
-  enabled: true # forest开关
   bean-id: config0 # 在spring上下文中bean的id, 默认值为forestConfiguration
   backend: okhttp3 # 后端HTTP API： okhttp3
   max-connections: 1000 # 连接池最大连接数，默认值为500
@@ -144,7 +141,6 @@ Forest 可以在`forest.variables`属性下自定义全局变量。
 
 ```yaml
 forest:
-  enabled: true
   variables:
     username: foo
     userpwd: bar
@@ -156,7 +152,6 @@ Forest 允许您在 yaml 文件中配置 Bean Id，它对应着`ForestConfigurat
 
 ```yaml
 forest:
-  enabled: true
   bean-id: config0 # 在spring上下文中bean的id，默认值为forestConfiguration
 ```
 
