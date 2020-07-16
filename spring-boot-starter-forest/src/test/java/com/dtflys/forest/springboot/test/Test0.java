@@ -39,8 +39,8 @@ public class Test0 {
         assertEquals("okhttp3", config0.getBackend().getName());
         assertEquals("SSLv3", config0.getSslProtocol());
         assertEquals("http://www.thebeastshop.com", config0.getVariableValue("baseUrl"));
-        assertEquals(Integer.valueOf(1), config0.getVariableValue("a"));
-        assertEquals(Integer.valueOf(2), config0.getVariableValue("b"));
+        assertEquals("xxx", config0.getVariableValue("myName"));
+        assertEquals(Integer.valueOf(12), config0.getVariableValue("myCount"));
     }
 
     @Test
