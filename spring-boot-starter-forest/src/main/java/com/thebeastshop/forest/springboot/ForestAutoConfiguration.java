@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableConfigurationProperties({ForestConfigurationProperties.class})
-@ConditionalOnProperty(prefix = "forest", name = "enabled", havingValue = "true")
 public class ForestAutoConfiguration {
 
     private final ForestConfigurationProperties forestConfigurationProperties;
