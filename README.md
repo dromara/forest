@@ -33,11 +33,11 @@ Forest是一个高层的、极简的轻量级HTTP调用API框架。<br>
 * 配置简单，一般只需要@Request一个注解就能完成绝大多数请求的定义
 * 支持异步请求调用
 
-Quick Start
+极速开始
 -------------------------------------
-以下例子基于Springboot
+以下例子基于Spring Boot
 
-### 依赖
+### 第一步：添加Maven依赖
 
 直接添加以下maven依赖即可
 
@@ -49,25 +49,11 @@ Quick Start
 </dependency>
 ```
 
-### 配置
 
-在`application.properties`中加入:
 
-```properties
-forest.enabled = true
-```
+### 第二步：创建一个`interface`
 
-或者在`application.yml`中加入：
-
-```yaml
-forest:
-    enabled: true
-```
-
-### 一个栗子：访问百度短链接REST接口
-
-### 创建一个`interface`作为远程调用接口
-
+就以高德地图API为栗子吧
 
 ```java
 
@@ -76,24 +62,18 @@ package com.yoursite.client;
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.annotation.DataParam;
 
-public interface MyClient {
+public interface AmapClient {
 
-    /**
-     * 百度短链接API
-     * @param url
-     * @return
-     */
     @Request(
-        url = "http://dwz.cn/create.php",
-        type = "post",
+        url = "http://ditu.amap.com/service/regeo",
         dataType = "json"
     )
-    Map getShortUrl(@DataParam("url") String url);
+    Map getLocation(@DataParam("longitude") String longitude, @DataParam("latitude") String latitude);
 }
 
 ```
 
-### 扫描接口
+### 第三步：扫描接口
 
 在Spring Boot的配置类或者启动类上加上`@ForestScan`注解，并在`basePackages`属性里填上远程接口的所在的包名
 
@@ -101,24 +81,23 @@ public interface MyClient {
 @SpringBootApplication
 @Configuration
 @ForestScan(basePackages = "com.yoursite.client")
-public class MyApp {
+public class MyApplication {
  ...
 }
 ```
 
-### 调用接口
+### 第四步：调用接口
 
 OK，终于可以愉快地调用接口了
 
 ```java
+// 注入接口实例
 @Autowired
-private MyClient myClient;
-
-
-public void testClient() {
-    Map result = myClient.getShortUrl("https://gitee.com/dt_flys/forest");
-    System.out.println(result);
-}
+private AmapClient amapClient;
+...
+// 调用接口
+Map result = amapClient.getLocation("121.475078", "31.223577");
+System.out.println(result);
 ```
 
 
