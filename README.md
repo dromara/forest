@@ -2,7 +2,7 @@
 
 [![Build Status](https://api.travis-ci.org/mySingleLive/forest.svg?branch=master)](https://travis-ci.org/mySingleLive/forest)
 [![license](https://img.shields.io/badge/license-MIT%20License-blue.svg)](https://opensource.org/licenses/mit-license.php)
-[![Maven Central](https://img.shields.io/badge/maven%20central-1.2.0-brightgreen.svg)](https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.2.0/jar)
+[![Maven Central](https://img.shields.io/badge/maven%20central-1.3.0-brightgreen.svg)](https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.2.0/jar)
 
 文档：
 -------------------------------------
@@ -45,7 +45,7 @@ Quick Start
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>spring-boot-starter-forest</artifactId>
-    <version>1.2.0</version>
+    <version>1.3.0</version>
 </dependency>
 ```
 
