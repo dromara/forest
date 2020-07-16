@@ -1,7 +1,7 @@
 package com.dtflys.forest.backend.url;
 
 import com.dtflys.forest.http.ForestRequest;
-import org.apache.commons.lang3.StringUtils;
+import com.dtflys.forest.utils.StringUtils;
 
 
 /**
