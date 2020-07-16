@@ -12,7 +12,7 @@ import com.dtflys.forest.http.ForestResponse;
 public interface HeadClient {
 
     @Request(
-            url = "http://localhost:5000/hello/user?username=foo",
+            url = "http://localhost:${port}/hello/user?username=foo",
             type = "head",
             headers = {"Accept:text/plan"}
     )
@@ -20,7 +20,7 @@ public interface HeadClient {
 
 
     @Request(
-            url = "http://localhost:5000/hello/user?username=foo",
+            url = "http://localhost:${port}/hello/user?username=foo",
             type = "head",
             headers = {"Accept:text/plan"}
     )

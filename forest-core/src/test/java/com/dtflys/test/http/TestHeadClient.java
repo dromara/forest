@@ -36,6 +36,7 @@ public class TestHeadClient extends BaseClientTest {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
+        configuration.setVariableValue("port", HeadMockServer.port);
     }
 
     public TestHeadClient(HttpBackend backend) {

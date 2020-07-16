@@ -16,7 +16,7 @@ import java.util.Map;
 public interface DataClient {
 
     @Request(
-            url = "http://localhost:3000/hello/data",
+            url = "http://localhost:${port}/hello/data",
             headers = {"Accept:text/plan"},
             dataType = "json"
     )

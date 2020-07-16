@@ -33,6 +33,7 @@ public class TestPutClient extends BaseClientTest {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
+        configuration.setVariableValue("port", PutMockServer.port);
     }
 
     public TestPutClient(HttpBackend backend) {

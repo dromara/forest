@@ -9,7 +9,7 @@ import com.dtflys.forest.annotation.Request;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-17 15:31
  */
-@BaseURL("http://localhost:5000")
+@BaseURL("http://localhost:${port}")
 public interface BaseURLClient {
 
     @Request(

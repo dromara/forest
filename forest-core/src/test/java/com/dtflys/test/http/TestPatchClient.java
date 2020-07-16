@@ -40,6 +40,7 @@ public class TestPatchClient extends BaseClientTest {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
+        configuration.setVariableValue("port", PatchMockServer.port);
     }
 
     public TestPatchClient(HttpBackend backend) {

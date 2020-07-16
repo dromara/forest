@@ -14,12 +14,14 @@ import static org.mockserver.model.HttpResponse.response;
  */
 public class HeadMockServer extends MockServerRule {
 
+    public final static Integer port = 5003;
+
     public HeadMockServer(Object target) {
-        super(target, 5000);
+        super(target, port);
     }
 
     public void initServer() {
-        MockServerClient mockClient = new MockServerClient("localhost", 5000);
+        MockServerClient mockClient = new MockServerClient("localhost", port);
         mockClient.when(
                 request()
                         .withPath("/hello/user")

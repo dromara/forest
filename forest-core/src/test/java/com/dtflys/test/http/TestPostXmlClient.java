@@ -38,6 +38,7 @@ public class TestPostXmlClient extends BaseClientTest {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
+        configuration.setVariableValue("port", PostXmlMockServer.port);
     }
 
     public TestPostXmlClient(HttpBackend backend) {

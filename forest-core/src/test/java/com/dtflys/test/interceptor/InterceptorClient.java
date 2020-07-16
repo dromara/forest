@@ -10,14 +10,14 @@ import com.dtflys.forest.annotation.Request;
 public interface InterceptorClient {
 
     @Request(
-            url = "http://localhost:5000/hello/user?username=foo",
+            url = "http://localhost:${port}/hello/user?username=foo",
             headers = {"Accept:text/plan"},
             interceptor = SimpleInterceptor.class
     )
     String simple();
 
     @Request(
-            url = "http://localhost:5000/hello/user?username=foo",
+            url = "http://localhost:${port}/hello/user?username=foo",
             headers = {"Accept:text/plan"},
             interceptor = {SimpleInterceptor.class, Simple2Interceptor.class}
     )
@@ -25,7 +25,7 @@ public interface InterceptorClient {
 
 
     @Request(
-            url = "http://localhost:5000/hello/user?username=foo",
+            url = "http://localhost:${port}/hello/user?username=foo",
             headers = {"Accept:text/plan"},
             interceptor = FalseInterceptor.class
     )

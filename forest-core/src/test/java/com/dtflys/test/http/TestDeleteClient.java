@@ -32,7 +32,7 @@ public class TestDeleteClient extends BaseClientTest {
     private final static Logger log = LoggerFactory.getLogger(TestDeleteClient.class);
 
     @Rule
-    public MockServerRule server = new MockServerRule(this, 5000);
+    public MockServerRule server = new MockServerRule(this, 4999);
 
     private static ForestConfiguration configuration;
 
@@ -53,7 +53,7 @@ public class TestDeleteClient extends BaseClientTest {
 
     @Before
     public void prepareMockServer() {
-        MockServerClient mockClient = new MockServerClient("localhost", 5000);
+        MockServerClient mockClient = new MockServerClient("localhost", 4999);
         mockClient.when(
                 request()
                         .withPath("/xx/user")

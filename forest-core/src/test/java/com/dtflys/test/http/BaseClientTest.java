@@ -29,6 +29,7 @@ public abstract class BaseClientTest {
 
     public BaseClientTest(HttpBackend backend, ForestConfiguration configuration) {
         this.backend = backend;
+        configuration.setCacheEnabled(false);
         configuration.setBackend(backend);
     }
 

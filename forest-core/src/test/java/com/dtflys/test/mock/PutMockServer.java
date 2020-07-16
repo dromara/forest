@@ -16,12 +16,14 @@ public class PutMockServer extends MockServerRule {
 
     public final static String EXPECTED = "{\"status\": \"ok\"}";
 
+    public final static Integer port = 5010;
+
     public PutMockServer(Object target) {
-        super(target, 5000);
+        super(target, port);
     }
 
     public void initServer() {
-        MockServerClient mockClient = new MockServerClient("localhost", 5000);
+        MockServerClient mockClient = new MockServerClient("localhost", port);
         mockClient.when(
                 request()
                         .withPath("/hello")

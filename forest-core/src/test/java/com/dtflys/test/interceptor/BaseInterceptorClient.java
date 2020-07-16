@@ -9,13 +9,13 @@ import com.dtflys.forest.annotation.Request;
 public interface BaseInterceptorClient {
 
     @Request(
-            url = "http://localhost:5000/hello/user?username=foo",
+            url = "http://localhost:${port}/hello/user?username=foo",
             headers = {"Accept:text/plan"}
     )
     String none();
 
     @Request(
-            url = "http://localhost:5000/hello/user?username=foo",
+            url = "http://localhost:${port}/hello/user?username=foo",
             headers = {"Accept:text/plan"},
             interceptor = SimpleInterceptor.class
     )

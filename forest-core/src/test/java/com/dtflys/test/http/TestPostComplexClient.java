@@ -36,6 +36,8 @@ public class TestPostComplexClient extends BaseClientTest {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
+        configuration.setCacheEnabled(false);
+        configuration.setVariableValue("port", PostComplexMockServer.port);
     }
 
     public TestPostComplexClient(HttpBackend backend) {

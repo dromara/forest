@@ -14,12 +14,14 @@ public class PostXmlMockServer extends MockServerRule {
 
     public final static String EXPECTED = "{\"status\": \"ok\"}";
 
+    public final static Integer port = 5009;
+
     public PostXmlMockServer(Object target) {
-        super(target, 5000);
+        super(target, port);
     }
 
     public void initServer() {
-        MockServerClient mockClient = new MockServerClient("localhost", 5000);
+        MockServerClient mockClient = new MockServerClient("localhost", port);
         mockClient.when(
                 request()
                         .withPath("/xml")

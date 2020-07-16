@@ -38,13 +38,15 @@ public class TestBaseURLClient extends BaseClientTest {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
-        configuration.setVariableValue("baseURL", "http://localhost:5000/");
+        configuration.setVariableValue("baseURL", "http://localhost:" + GetMockServer.port);
+        configuration.setVariableValue("port", GetMockServer.port);
     }
 
     public TestBaseURLClient(HttpBackend backend) {
         super(backend, configuration);
         baseURLClient = configuration.createInstance(BaseURLClient.class);
         baseURLVarClient = configuration.createInstance(BaseURLVarClient.class);
+
     }
 
     @Before

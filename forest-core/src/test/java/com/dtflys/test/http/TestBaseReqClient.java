@@ -34,6 +34,7 @@ public class TestBaseReqClient extends BaseClientTest {
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
         configuration.setVariableValue("baseURL", "http://localhost:5000/");
+        configuration.setVariableValue("port", GetMockServer.port);
     }
 
     public TestBaseReqClient(HttpBackend backend) {

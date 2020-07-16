@@ -16,12 +16,14 @@ public class OptionsMockServer extends MockServerRule {
 
     public final static String EXPECTED = "{\"status\": \"ok\"}";
 
+    public final static Integer port = 5004;
+
     public OptionsMockServer(Object target) {
-        super(target, 5000);
+        super(target, port);
     }
 
     public void initServer() {
-        MockServerClient mockClient = new MockServerClient("localhost", 5000);
+        MockServerClient mockClient = new MockServerClient("localhost", port);
         mockClient.when(
                 request()
                         .withPath("/hello/user")

@@ -20,7 +20,7 @@ public interface PostClient {
 
 
     @Request(
-            url = "http://localhost:5000/hello",
+            url = "http://localhost:${port}/hello",
             type = "post",
             data = "username=foo&password=123456",
             headers = {"Accept:text/plan"}
@@ -29,7 +29,7 @@ public interface PostClient {
 
 
     @Request(
-            url = "http://localhost:5000/hello",
+            url = "http://localhost:${port}/hello",
             type = "post",
             data = "username=${0}&password=${1}",
             headers = {"Accept:text/plan"}
@@ -38,7 +38,7 @@ public interface PostClient {
 
 
     @Request(
-            url = "http://localhost:5000/hello",
+            url = "http://localhost:${port}/hello",
             type = "post",
             headers = {"Accept:text/plan"}
     )
@@ -46,7 +46,7 @@ public interface PostClient {
 
 
     @Request(
-            url = "http://localhost:5000/hello",
+            url = "http://localhost:${port}/hello",
             type = "post",
             data = "username=${username}&password=${password}",
             headers = {"Accept:text/plan"}
@@ -55,7 +55,7 @@ public interface PostClient {
 
 
     @Request(
-            url = "http://localhost:5000/hello",
+            url = "http://localhost:${port}/hello",
             type = "post",
             data = "${user.argString}",
             headers = {"Accept:text/plan"}
@@ -64,7 +64,7 @@ public interface PostClient {
 
 
     @Request(
-            url = "http://localhost:5000/complex?param=${0}",
+            url = "http://localhost:${port}/complex?param=${0}",
             type = "post",
             data = "${1}",
             headers = {"Accept:text/plan"}
@@ -73,7 +73,7 @@ public interface PostClient {
 
 
     @Request(
-            url = "http://localhost:5000/json",
+            url = "http://localhost:${port}/json",
             type = "post",
             data = "{\"username\":\"${0}\",\"password\":\"${1}\"}",
             contentType = "application/json"
@@ -81,7 +81,7 @@ public interface PostClient {
     String postJson(String username, String password);
 
     @Request(
-            url = "http://localhost:5000/json",
+            url = "http://localhost:${port}/json",
             type = "post",
             data = "{\"username\":\"${0}\",\"password\":\"${1}\"}",
             headers = {"Content-Type: application/json"}
@@ -89,14 +89,14 @@ public interface PostClient {
     String postJson2(String username, String password);
 
     @Request(
-            url = "http://localhost:5000/json",
+            url = "http://localhost:${port}/json",
             type = "post",
             contentType = "application/json"
     )
     String postJson3(@DataParam("username") String username, @DataParam("password") String password);
 
     @Request(
-            url = "http://localhost:5000/json",
+            url = "http://localhost:${port}/json",
             type = "post",
             headers = {"Content-Type: application/json"}
     )
@@ -119,7 +119,7 @@ public interface PostClient {
 
 
     @Request(
-            url = "http://localhost:5000/xml",
+            url = "http://localhost:${port}/xml",
             type = "post",
             contentType = "application/xml"
     )
@@ -127,7 +127,7 @@ public interface PostClient {
 
 
     @Request(
-            url = "http://localhost:5000/xml",
+            url = "http://localhost:${port}/xml",
             type = "post",
             contentType = "application/xml",
             data = "${xml(misc)}"
@@ -136,7 +136,7 @@ public interface PostClient {
 
 
     @Request(
-            url = "http://localhost:5000/xml",
+            url = "http://localhost:${port}/xml",
             type = "post",
             contentType = "application/xml",
             data = "${xml($0)}"

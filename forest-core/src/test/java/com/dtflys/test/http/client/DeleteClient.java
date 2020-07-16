@@ -12,7 +12,7 @@ import com.dtflys.forest.annotation.Request;
 public interface DeleteClient {
 
     @Request(
-            url = "http://localhost:5000/xx/user?username=foo",
+            url = "http://localhost:4999/xx/user?username=foo",
             type = "delete",
             headers = {"Accept:text/plan"}
     )
@@ -20,7 +20,7 @@ public interface DeleteClient {
 
 
     @Request(
-            url = "http://localhost:5000/xx/user/data",
+            url = "http://localhost:4999/xx/user/data",
             type = "delete",
             headers = {"Accept:text/plan"},
             data = "username=${0}"
@@ -29,7 +29,7 @@ public interface DeleteClient {
 
 
     @Request(
-            url = "http://localhost:5000/xx/user/data",
+            url = "http://localhost:4999/xx/user/data",
             type = "delete",
             headers = {"Accept:text/plan"}
     )

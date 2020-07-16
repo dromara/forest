@@ -43,6 +43,7 @@ public class TestCallbackClient extends BaseClientTest {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
+        configuration.setVariableValue("port", GetMockServer.port);
     }
 
     public TestCallbackClient(HttpBackend backend) {

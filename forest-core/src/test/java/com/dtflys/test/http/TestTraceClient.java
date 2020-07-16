@@ -37,6 +37,7 @@ public class TestTraceClient extends BaseClientTest {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
+        configuration.setVariableValue("port", TraceMockServer.port);
     }
 
     public TestTraceClient(HttpBackend backend) {

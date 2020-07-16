@@ -21,13 +21,13 @@ import java.util.concurrent.Future;
 public interface GetClient {
 
     @Request(
-            url = "http://localhost:5000/hello/user?username=foo",
+            url = "http://localhost:${port}/hello/user?username=foo",
             headers = {"Accept:text/plan"}
     )
     String simpleGet();
 
     @Request(
-            url = "http://localhost:5000/hello/user",
+            url = "http://localhost:${port}/hello/user",
             dataType = "json",
             headers = {"Accept:text/plan"},
             data = "username=foo"
@@ -36,7 +36,7 @@ public interface GetClient {
 
 
     @Request(
-            url = "http://localhost:5000/hello/user",
+            url = "http://localhost:${port}/hello/user",
             headers = {"Accept:text/plan"},
             data = "username=${$0.toString()}"
     )
@@ -44,21 +44,21 @@ public interface GetClient {
 
 
     @Request(
-            url = "http://localhost:5000/hello/user?username=${0}",
+            url = "http://localhost:${port}/hello/user?username=${0}",
             headers = {"Accept:text/plan"}
     )
     String textParamInPathGet(String username);
 
 
     @Request(
-            url = "http://localhost:5000/hello/user",
+            url = "http://localhost:${port}/hello/user",
             headers = {"Accept:text/plan"}
     )
     String annParamGet(@DataParam("username") String username);
 
 
     @Request(
-            url = "http://localhost:5000/hello/user",
+            url = "http://localhost:${port}/hello/user",
             headers = {"Accept:text/plan"},
             data = "username=${username}"
     )

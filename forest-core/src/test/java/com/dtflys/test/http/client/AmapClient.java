@@ -1,4 +1,4 @@
-package com.dtflys.test;
+package com.dtflys.test.http.client;
 
 import com.dtflys.forest.annotation.DataObject;
 import com.dtflys.forest.annotation.DataParam;
@@ -22,13 +22,13 @@ import java.util.Map;
  * @author gongjun
  * @since 2016-06-01
  */
-public interface MapClient {
+public interface AmapClient {
 
     @Request(
         url = "http://ditu.amap.com/service/regeo",
         dataType = "json"
     )
-    Map getLocation(@DataParam("longitude") BigDecimal longitude, @DataParam("latitude") BigDecimal latitude);
+    Map getLocation(@DataParam("longitude") String longitude, @DataParam("latitude") String latitude);
 
 
     @Request(

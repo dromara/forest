@@ -11,14 +11,14 @@ import com.dtflys.forest.http.ForestResponse;
 public interface TraceClient {
 
     @Request(
-            url = "http://localhost:5000/hello/user?username=foo",
+            url = "http://localhost:${port}/hello/user?username=foo",
             type = "trace",
             headers = {"Accept:text/plan"}
     )
     ForestResponse simpleTrace();
 
     @Request(
-            url = "http://localhost:5000/hello/user",
+            url = "http://localhost:${port}/hello/user",
             type = "trace",
             headers = {"Accept:text/plan"},
             data = "username=${0}"
@@ -27,7 +27,7 @@ public interface TraceClient {
 
 
     @Request(
-            url = "http://localhost:5000/hello/user",
+            url = "http://localhost:${port}/hello/user",
             type = "trace",
             headers = {"Accept:text/plan"}
     )

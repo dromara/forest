@@ -13,14 +13,14 @@ import com.dtflys.forest.http.ForestResponse;
 public interface OptionsClient {
 
     @Request(
-            url = "http://localhost:5000/hello/user?username=foo",
+            url = "http://localhost:${port}/hello/user?username=foo",
             type = "options",
             headers = {"Accept:text/plan"}
     )
     ForestResponse simpleOptions();
 
     @Request(
-            url = "http://localhost:5000/hello/user",
+            url = "http://localhost:${port}/hello/user",
             type = "options",
             headers = {"Accept:text/plan"},
             data = "username=${0}"
@@ -29,7 +29,7 @@ public interface OptionsClient {
 
 
     @Request(
-            url = "http://localhost:5000/hello/user",
+            url = "http://localhost:${port}/hello/user",
             type = "options",
             headers = {"Accept:text/plan"}
     )

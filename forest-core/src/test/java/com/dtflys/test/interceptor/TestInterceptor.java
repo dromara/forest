@@ -35,6 +35,8 @@ public class TestInterceptor {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
+        configuration.setCacheEnabled(false);
+        configuration.setVariableValue("port", GetMockServer.port);
         interceptorClient = configuration.createInstance(InterceptorClient.class);
         baseInterceptorClient = configuration.createInstance(BaseInterceptorClient.class);
     }

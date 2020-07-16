@@ -34,6 +34,7 @@ public class TestPostJsonClient extends BaseClientTest {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
+        configuration.setVariableValue("port", PostJsonMockServer.port);
         ForestFastjsonConverter fastjsonConverter = new ForestFastjsonConverter();
         fastjsonConverter.setSerializerFeature(SerializerFeature.SortField);
         configuration.setJsonConverter(fastjsonConverter);

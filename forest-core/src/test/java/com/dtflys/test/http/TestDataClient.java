@@ -36,6 +36,7 @@ public class TestDataClient extends BaseClientTest {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
+        configuration.setVariableValue("port", DataMockServer.port);
     }
 
     public TestDataClient(HttpBackend backend) {

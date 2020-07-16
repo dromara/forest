@@ -13,7 +13,7 @@ public interface PutClient {
 
 
     @Request(
-            url = "http://localhost:5000/hello",
+            url = "http://localhost:${port}/hello",
             type = "put",
             data = "username=foo&password=123456",
             headers = {"Accept:text/plan"}
@@ -21,7 +21,7 @@ public interface PutClient {
     String simplePut();
 
     @Request(
-            url = "http://localhost:5000/hello",
+            url = "http://localhost:${port}/hello",
             type = "put",
             data = "username=${0}&password=${1}",
             headers = {"Accept:text/plan"}
@@ -29,7 +29,7 @@ public interface PutClient {
     String textParamPut(String username, String password);
 
     @Request(
-            url = "http://localhost:5000/hello",
+            url = "http://localhost:${port}/hello",
             type = "put",
             headers = {"Accept:text/plan"}
     )

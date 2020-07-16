@@ -45,6 +45,7 @@ public class TestOptionsClient extends BaseClientTest {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
+        configuration.setVariableValue("port", OptionsMockServer.port);
     }
 
     public TestOptionsClient(HttpBackend backend) {

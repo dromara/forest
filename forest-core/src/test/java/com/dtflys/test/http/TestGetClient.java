@@ -34,6 +34,7 @@ public class TestGetClient extends BaseClientTest {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
+        configuration.setVariableValue("port", GetMockServer.port);
     }
 
 

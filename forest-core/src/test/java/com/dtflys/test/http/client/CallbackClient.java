@@ -16,7 +16,7 @@ import java.util.Map;
 public interface CallbackClient {
 
     @Request(
-            url = "http://localhost:5000/hello/user",
+            url = "http://localhost:${port}/hello/user",
             headers = {"Accept:text/plan"},
             data = "username=${username}"
     )
@@ -24,7 +24,7 @@ public interface CallbackClient {
 
 
     @Request(
-            url = "http://localhost:5000/hello/user",
+            url = "http://localhost:${port}/hello/user",
             headers = {"Accept:text/plan"},
             data = "username=${username}",
             dataType = "json"

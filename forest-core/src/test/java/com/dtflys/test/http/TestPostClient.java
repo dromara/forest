@@ -35,6 +35,7 @@ public class TestPostClient extends BaseClientTest {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
+        configuration.setVariableValue("port", PostMockServer.port);
     }
 
     public TestPostClient(HttpBackend backend) {
