@@ -88,7 +88,7 @@ public class MyApplication {
 
 ### 第四步：调用接口
 
-OK，终于可以愉快地调用接口了
+OK，我们可以愉快地调用接口了
 
 ```java
 // 注入接口实例
