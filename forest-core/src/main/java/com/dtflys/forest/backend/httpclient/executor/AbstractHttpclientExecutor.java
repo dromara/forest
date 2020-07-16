@@ -10,7 +10,6 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
-import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
@@ -24,6 +23,7 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.mapping.MappingTemplate;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -110,10 +110,11 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         logContent(content);
     }
 
-    public void logResponse(StopWatch stopWatch, ForestResponse response) {
+    public void logResponse(long startTime, ForestResponse response) {
         if (!request.isLogEnable()) return;
-        stopWatch.stop();
-        logContent("Response: Status = " + response.getStatusCode() + ", Time = " + stopWatch.getTime() + "ms");
+        long endTime = new Date().getTime();
+        long time = endTime - startTime;
+        logContent("Response: Status = " + response.getStatusCode() + ", Time = " + time + "ms");
     }
 
     protected String getLogContentForRequestLine(int retryCount, T httpReq) {
@@ -149,17 +150,17 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
 
 
     public void execute(int retryCount, ResponseHandler responseHandler) {
-        StopWatch stopWatch = new StopWatch();
+        Date startDate = new Date();
+        long startTime = startDate.getTime();
         try {
             logRequest(retryCount, httpRequest);
-            stopWatch.start();
             requestSender.sendRequest(request, httpclientResponseHandler, httpRequest);
         } catch (IOException e) {
             if (retryCount >= request.getRetryCount()) {
                 httpRequest.abort();
                 ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
                 response = forestResponseFactory.createResponse(request, null);
-                logResponse(stopWatch, response);
+                logResponse(startTime, response);
                 responseHandler.handleSyncWitchException(request, response, e);
 //                throw new ForestRuntimeException(e);
                 return;

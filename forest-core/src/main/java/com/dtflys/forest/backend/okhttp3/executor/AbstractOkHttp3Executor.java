@@ -19,11 +19,11 @@ import com.dtflys.forest.mapping.MappingTemplate;
 import okio.BufferedSink;
 import okio.Okio;
 import okio.Sink;
-import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.*;
+import java.util.Date;
 import java.util.List;
 
 
@@ -128,10 +128,11 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
         logContent(content);
     }
 
-    public void logResponse(StopWatch stopWatch,  ForestResponse response) {
+    public void logResponse(long startTime,  ForestResponse response) {
         if (!request.isLogEnable()) return;
-        stopWatch.stop();
-        logContent("Response: Status = " + response.getStatusCode() + ", Time = " + stopWatch.getTime() + "ms");
+        long endTime = new Date().getTime();
+        long time = endTime - startTime;
+        logContent("Response: Status = " + response.getStatusCode() + ", Time = " + time + "ms");
     }
 
     protected AbstractOkHttp3Executor(ForestRequest request, OkHttp3ConnectionManager connectionManager, OkHttp3ResponseHandler okHttp3ResponseHandler) {
@@ -185,8 +186,8 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
         Call call = okHttpClient.newCall(okRequest);
         final OkHttp3ForestResponseFactory factory = new OkHttp3ForestResponseFactory();
         logRequest(0, okRequest);
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
+        Date startDate = new Date();
+        long startTime = startDate.getTime();
         if (request.isAsync()) {
             final OkHttp3ResponseFuture future = new OkHttp3ResponseFuture();
             call.enqueue(new Callback() {
@@ -194,14 +195,14 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
                 public void onFailure(Call call, IOException e) {
                     future.failed(e);
                     ForestResponse response = factory.createResponse(request, null);
-                    logResponse(stopWatch, response);
+                    logResponse(startTime, response);
                     responseHandler.handleError(request, response, e);
                 }
 
                 @Override
                 public void onResponse(Call call, Response okResponse) throws IOException {
                     ForestResponse response = factory.createResponse(request, okResponse);
-                    logResponse(stopWatch, response);
+                    logResponse(startTime, response);
                     Object result = null;
                     if (response.isSuccess()) {
                         if (request.getOnSuccess() != null) {
