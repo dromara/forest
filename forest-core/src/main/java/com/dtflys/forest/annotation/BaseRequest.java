@@ -3,6 +3,7 @@ package com.dtflys.forest.annotation;
 import java.lang.annotation.*;
 
 /**
+ * The annotation must be on interface. It allow you to make some configurations shared for all the requests in this interface.
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2018-03-30 16:59
  */
