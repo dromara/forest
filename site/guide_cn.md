@@ -504,7 +504,7 @@ User getUser(Integer id)
 ```
 
 !>  **注意**：
-Forest需要指明返回类型（如`User`）的同时，也需要指明数据类型`dataType`为`json`。
+Forest需要指明返回类型（如`User`）的同时，也需要指明数据类型`dataType`为`json`或其他类型。
 
 
 # 四. 配置
