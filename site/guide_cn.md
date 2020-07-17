@@ -333,7 +333,7 @@ public interface MyClient {
     BODY:
         username=foo&password=bar
 
-结合`数据绑定`和`data`属性设置请求体：
+在`data`属性中进行数据绑定：
 
 ```java
 public interface MyClient {
