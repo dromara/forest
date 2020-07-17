@@ -1164,7 +1164,7 @@ String send(int num);
 
     http://localhost:8080/hello?p1=100
 
-这时我们所看到`${$0.toString()}`就我们所期望的`num`参数经过调用`toString()`方法最终返回结果了。
+这时我们所看到`${$0.toString()}`就我们所期望的`num`参数经过调用`toString()`方法最终返回的结果了。
 
 #### 8.2.2.1 简化与非简化
 
