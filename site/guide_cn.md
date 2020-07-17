@@ -100,7 +100,7 @@ Forest 1.0.x 和 Forest 1.1.x 基于 JDK 1.7, Forest 1.2.x及以上版本基于 
 
 在 Forest 中，所有的 HTTP 请求信息都要绑定到某一个接口的方法上，不需要编写具体的代码去发送请求。请求发送方通过调用事先定义好 HTTP 请求信息的接口方法，自动去执行 HTTP 发送请求的过程，其具体发送请求信息就是该方法对应绑定的 HTTP 请求信息。
 
-## 3.1 简单请求定义
+## 3.1 简单请求
 
 创建一个`interface`，并用`@Request`注解修饰接口方法。
 
@@ -117,7 +117,7 @@ public interface MyClient {
 其 URL 为`http://localhost:5000/hello`
 ，并默认使用`GET`方式，且将请求响应的数据以`String`的方式返回给调用者。
 
-## 3.2 稍复杂点的请求定义
+## 3.2 稍复杂点的请求
 
 ```java
 public interface MyClient {
