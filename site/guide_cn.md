@@ -333,7 +333,7 @@ public interface MyClient {
     BODY:
         username=foo&password=bar
 
-结合`数据绑定`和`data`属性设置请求体(如何进行数据绑定请参见[[五 数据绑定](#五-数据绑定)])：
+结合`数据绑定`和`data`属性设置请求体：
 
 ```java
 public interface MyClient {
@@ -347,6 +347,8 @@ public interface MyClient {
     String dataPost(String username, String password);
 }
 ```
+
+?> 如何进行数据绑定请参见 [五 数据绑定](#五-数据绑定)
 
 如果调用方代码如下所示：
 
