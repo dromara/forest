@@ -93,173 +93,14 @@ Forest 1.0.x 和 Forest 1.1.x 基于 JDK 1.7, Forest 1.2.x 基于 JDK 1.8
 
 最新版本为<font color=red>_1.3.0_</font>，为稳定版本
 
-# 三. 配置
 
-## 3.1 在 Spring Boot 项目中配置
-
-若您的项目依赖`Spring Boot`，并加入了`spring-boot-starter-forest`依赖，就可以通过 `application.yml`/`application.properties` 方式定义配置。
-
-### 3.1.1 配置后端 HTTP API
-
-```yaml
-forest:
-  backend: okhttp3 # 配置后端HTTP API为 okhttp3
-```
-
-目前 Forest 支持`okhttp3`和`httpclient`两种后端 HTTP API，若不配置该属性，默认为`okhttp3`.
-当然，您也可以改为`httpclient`
-
-```yaml
-forest:
-  backend: httpclient # 配置后端HTTP API为 httpclient
-```
-
-### 3.1.2 全局基本配置
-
-在`application.yaml` / `application.properties`中配置的 HTTP 基本参数
-
-```yaml
-forest:
-  bean-id: config0 # 在spring上下文中bean的id, 默认值为forestConfiguration
-  backend: okhttp3 # 后端HTTP API： okhttp3
-  max-connections: 1000 # 连接池最大连接数，默认值为500
-  max-route-connections: 500 # 每个路由的最大连接数，默认值为500
-  timeout: 3000 # 请求超时时间，单位为毫秒, 默认值为3000
-  connect-timeout: 3000 # 连接超时时间，单位为毫秒, 默认值为2000
-  retry-count: 1 # 请求失败后重试次数，默认为0次不重试
-  ssl-protocol: SSLv3 # 单向验证的HTTPS的默认SSL协议，默认为SSLv3
-  logEnabled: true # 打开或关闭日志，默认为true
-```
-
-`特别注意`: 这里`retry-count`只是简单机械的请求失败后的重试次数，所以一般建议设置为`0`.
-如果一定要多次重试，一定要在保证`幂等性`的基础上进行重试，否则容易引发生产事故！
-
-### 3.1.3 全局变量定义
-
-Forest 可以在`forest.variables`属性下自定义全局变量。
-
-其中 key 为变量名，value 为变量值。
-
-全局变量可以在任何模板表达式中进行数据绑定。
-
-```yaml
-forest:
-  variables:
-    username: foo
-    userpwd: bar
-```
-
-### 3.1.4 配置 Bean ID
-
-Forest 允许您在 yaml 文件中配置 Bean Id，它对应着`ForestConfiguration`对象在 Spring 上下文中的 Bean 名称。
-
-```yaml
-forest:
-  bean-id: config0 # 在spring上下文中bean的id，默认值为forestConfiguration
-```
-
-然后便可以在 Spring 中通过 Bean 的名称引用到它
-
-```java
-@Resource(name = "config0")
-private ForestConfiguration config0;
-```
-
-
-
-## 3.2 在非 Spring Boot 项目中配置
-
-若您的项目不是`Spring Boot`项目，或者没有依赖`spring-boot-starter-forest`，可以通过下面方式定义 Forest 配置。
-
-### 3.2.1 创建 ForestConfiguration 对象
-
-`ForestConfiguration`为 Forest 的全局配置对象类，所有的 Forest 的全局基本配置信息由此类进行管理。
-
-`ForestConfiguration`对象的创建方式：调用静态方法`ForestConfiguration.configuration()`，此方法会创建 ForestConfiguration 对象并初始化默认值。
-
-```java
-ForestConfiguration configuration = ForestConfiguration.configuration();
-```
-
-### 3.2.2 配置后端 HTTP API
-
-```java
-configuration.setBackendName("okhttp3");
-```
-
-目前 Forest 支持`okhttp3`和`httpclient`两种后端 HTTP API，若不配置该属性，默认为`okhttp3`。
-
-当然，您也可以改为`httpclient`
-
-```java
-configuration.setBackendName("httpclient");
-```
-
-### 3.2.3 全局基本配置
-
-```java
-// 连接池最大连接数，默认值为500
-configuration.setMaxConnections(123);
-// 每个路由的最大连接数，默认值为500
-configuration.setMaxRouteConnections(222);
-// 请求超时时间，单位为毫秒, 默认值为3000
-configuration.setTimeout(3000);
-// 连接超时时间，单位为毫秒, 默认值为2000
-configuration.setConnectTimeout(2000);
-// 请求失败后重试次数，默认为0次不重试
-configuration.setRetryCount(3);
-// 单向验证的HTTPS的默认SSL协议，默认为SSLv3
-configuration.setSslProtocol(SSLUtils.SSLv3);
-// 打开或关闭日志，默认为true
-configuration.setLogEnabled(true);
-```
-
-### 3.2.4 全局变量定义
-
-Forest 可以通过`ForestConfiguration`对象的`setVariableValue`方法自定义全局变量。
-
-其中第一个参数为变量名，第二个为变量值。
-
-全局变量可以在任何模板表达式中进行数据绑定。
-
-```java
-ForestConfiguration configuration = ForestConfiguration.configuration();
-...
-configuration.setVariableValue("username", "foo");
-configuration.setVariableValue("userpwd", "bar");
-```
-
-## 3.3 配置层级
-
-上面介绍的`application.yml` / `application.properties`配置以及通过`ForestConfiguration`对象设置的配置都是全局配置。
-
-除了全局配置，Forest 还提供了接口配置和请求配置。
-
-这三种配置的作用域和读取优先级各不相同。
-
-作用域： 配置作用域指的是配置所影响的请求范围。
-
-优先级： 优先级值的是是否优先读取该配置。比如您优先级最高`@Request`中定义了`timeout`为`500`，那么即便在全局配置中定了`timeout`为`1000`，最终该请求实际的`timeout`为优先级配置最高的`@Request`中定义的`500`。
-
-具体的配置层级如图所示：
-
-![avatar](media/config.png)
-
-Forest 的配置层级介绍：
-
-1. 全局配置：针对全局所有请求，作用域最大，配置读取的优先级最小。
-
-2. 接口配置： 作用域为某一个`interface`中定义的请求，读取的优先级最小。您可以通过在`interface`上修饰`@BaseRequest`注解进行配置。
-
-3. 请求配置： 作用域为某一个具体的请求，读取的优先级最高。您可以在接口的方法上修饰`@Request`注解进行 HTTP 信息配置的定义。
-
-# 四. 构建请求接口
+# 三. 构建请求接口
 
 在 Forest 基本配置好之后，就可以构建 HTTP 请求的接口了。
 
 在 Forest 中，所有的 HTTP 请求信息都要绑定到某一个接口的方法上，不需要编写具体的代码去发送请求。请求发送方通过调用事先定义好 HTTP 请求信息的接口方法，自动去执行 HTTP 发送请求的过程，其具体发送请求信息就是该方法对应绑定的 HTTP 请求信息。
 
-## 4.1 简单请求定义
+## 3.1 简单请求定义
 
 创建一个`interface`，并用`@Request`注解修饰接口方法。
 
@@ -276,7 +117,7 @@ public interface MyClient {
 其 URL 为`http://localhost:5000/hello`
 ，并默认使用`GET`方式，且将请求响应的数据以`String`的方式返回给调用者。
 
-## 4.2 稍复杂点的请求定义
+## 3.2 稍复杂点的请求定义
 
 ```java
 public interface MyClient {
@@ -306,7 +147,7 @@ myClient.sendRequest("foo");
     HEADER:
         Accept: text/plan
 
-## 4.3 改变 HTTP Method
+## 3.3 改变 HTTP Method
 
 使用`POST`方式
 
@@ -375,7 +216,7 @@ public interface MyClient {
 }
 ```
 
-## 4.4 设置 HTTP Header
+## 3.4 设置 HTTP Header
 
 在[4.2](##_42-稍复杂点的请求定义)的例子中，我们已经知道了可以通过`@Request`注解的`headers`属性设置一条 HTTP 请求头。
 
@@ -446,11 +287,11 @@ myClient.bindingHeader("gbk");
         Accept-Charset: gbk
         Content-Type: text/plain
 
-## 4.5 添加 HTTP Body
+## 3.5 添加 HTTP Body
 
 在`POST`和`PUT`等请求方法中，通常使用 HTTP 请求体进行传输数据。在 Forest 中有多种方式设置请求体数据。
 
-### 4.5.1 通过 data 属性添加请求体
+### 3.5.1 通过 data 属性添加请求体
 
 您可以通过`@Request`注解的`data`属性把数据添加到请求体。需要注意的是只有当`type`为`POST`、`PUT`、`PATCH`这类 HTTP Method 时，`data`属性中的值才会绑定到请求体中，而`GET`请求在有些情况会绑定到`url`的参数中。
 
@@ -577,7 +418,7 @@ myClient.postXml("foo", "bar");
     BODY:
         <misc><username>foo</username><password>bar</password></misc>
 
-### 4.5.1 通过@DataParam 注解
+### 3.5.1 通过@DataParam 注解
 
 除了`data`属性外，您还可以通过`@DataParam`注解修饰参数的方式，将传入参数的数据绑定到 HTTP 请求体中。
 
@@ -589,7 +430,7 @@ myClient.postXml("foo", "bar");
 
 第三步：设置`contentType`或请求头`ContentType`，要设置成什么`contentType`取决于你想要 Body 中数据是什么格式(关于`contentType`和数据格式的对应关系请参见[[5.2.2](###_522-数据绑定格式)])。
 
-## 4.5 响应数据类型
+## 3.5 响应数据类型
 
 Forest请求会自动将响应的返回数据反序列化成您要的数据类型。想要接受指定类型的数据需要完成两步操作：
 
@@ -653,6 +494,169 @@ User getUser(Integer id)
 ```
 
 这里需要`注意`的是：Forest需要指明返回类型（如`User`）的同时，也需要指明数据类型`dataType`为`json`。
+
+
+# 四. 配置
+
+## 4.1 在 Spring Boot 项目中配置
+
+若您的项目依赖`Spring Boot`，并加入了`spring-boot-starter-forest`依赖，就可以通过 `application.yml`/`application.properties` 方式定义配置。
+
+### 4.1.1 配置后端 HTTP API
+
+```yaml
+forest:
+  backend: okhttp3 # 配置后端HTTP API为 okhttp3
+```
+
+目前 Forest 支持`okhttp3`和`httpclient`两种后端 HTTP API，若不配置该属性，默认为`okhttp3`.
+当然，您也可以改为`httpclient`
+
+```yaml
+forest:
+  backend: httpclient # 配置后端HTTP API为 httpclient
+```
+
+### 4.1.2 全局基本配置
+
+在`application.yaml` / `application.properties`中配置的 HTTP 基本参数
+
+```yaml
+forest:
+  bean-id: config0 # 在spring上下文中bean的id, 默认值为forestConfiguration
+  backend: okhttp3 # 后端HTTP API： okhttp3
+  max-connections: 1000 # 连接池最大连接数，默认值为500
+  max-route-connections: 500 # 每个路由的最大连接数，默认值为500
+  timeout: 3000 # 请求超时时间，单位为毫秒, 默认值为3000
+  connect-timeout: 3000 # 连接超时时间，单位为毫秒, 默认值为2000
+  retry-count: 1 # 请求失败后重试次数，默认为0次不重试
+  ssl-protocol: SSLv3 # 单向验证的HTTPS的默认SSL协议，默认为SSLv3
+  logEnabled: true # 打开或关闭日志，默认为true
+```
+
+`特别注意`: 这里`retry-count`只是简单机械的请求失败后的重试次数，所以一般建议设置为`0`.
+如果一定要多次重试，一定要在保证`幂等性`的基础上进行重试，否则容易引发生产事故！
+
+### 4.1.3 全局变量定义
+
+Forest 可以在`forest.variables`属性下自定义全局变量。
+
+其中 key 为变量名，value 为变量值。
+
+全局变量可以在任何模板表达式中进行数据绑定。
+
+```yaml
+forest:
+  variables:
+    username: foo
+    userpwd: bar
+```
+
+### 4.1.4 配置 Bean ID
+
+Forest 允许您在 yaml 文件中配置 Bean Id，它对应着`ForestConfiguration`对象在 Spring 上下文中的 Bean 名称。
+
+```yaml
+forest:
+  bean-id: config0 # 在spring上下文中bean的id，默认值为forestConfiguration
+```
+
+然后便可以在 Spring 中通过 Bean 的名称引用到它
+
+```java
+@Resource(name = "config0")
+private ForestConfiguration config0;
+```
+
+
+
+## 4.2 在非 Spring Boot 项目中配置
+
+若您的项目不是`Spring Boot`项目，或者没有依赖`spring-boot-starter-forest`，可以通过下面方式定义 Forest 配置。
+
+### 4.2.1 创建 ForestConfiguration 对象
+
+`ForestConfiguration`为 Forest 的全局配置对象类，所有的 Forest 的全局基本配置信息由此类进行管理。
+
+`ForestConfiguration`对象的创建方式：调用静态方法`ForestConfiguration.configuration()`，此方法会创建 ForestConfiguration 对象并初始化默认值。
+
+```java
+ForestConfiguration configuration = ForestConfiguration.configuration();
+```
+
+### 4.2.2 配置后端 HTTP API
+
+```java
+configuration.setBackendName("okhttp3");
+```
+
+目前 Forest 支持`okhttp3`和`httpclient`两种后端 HTTP API，若不配置该属性，默认为`okhttp3`。
+
+当然，您也可以改为`httpclient`
+
+```java
+configuration.setBackendName("httpclient");
+```
+
+### 4.2.3 全局基本配置
+
+```java
+// 连接池最大连接数，默认值为500
+configuration.setMaxConnections(123);
+// 每个路由的最大连接数，默认值为500
+configuration.setMaxRouteConnections(222);
+// 请求超时时间，单位为毫秒, 默认值为3000
+configuration.setTimeout(3000);
+// 连接超时时间，单位为毫秒, 默认值为2000
+configuration.setConnectTimeout(2000);
+// 请求失败后重试次数，默认为0次不重试
+configuration.setRetryCount(3);
+// 单向验证的HTTPS的默认SSL协议，默认为SSLv3
+configuration.setSslProtocol(SSLUtils.SSLv3);
+// 打开或关闭日志，默认为true
+configuration.setLogEnabled(true);
+```
+
+### 4.2.4 全局变量定义
+
+Forest 可以通过`ForestConfiguration`对象的`setVariableValue`方法自定义全局变量。
+
+其中第一个参数为变量名，第二个为变量值。
+
+全局变量可以在任何模板表达式中进行数据绑定。
+
+```java
+ForestConfiguration configuration = ForestConfiguration.configuration();
+...
+configuration.setVariableValue("username", "foo");
+configuration.setVariableValue("userpwd", "bar");
+```
+
+## 4.3 配置层级
+
+上面介绍的`application.yml` / `application.properties`配置以及通过`ForestConfiguration`对象设置的配置都是全局配置。
+
+除了全局配置，Forest 还提供了接口配置和请求配置。
+
+这三种配置的作用域和读取优先级各不相同。
+
+作用域： 配置作用域指的是配置所影响的请求范围。
+
+优先级： 优先级值的是是否优先读取该配置。比如您优先级最高`@Request`中定义了`timeout`为`500`，那么即便在全局配置中定了`timeout`为`1000`，最终该请求实际的`timeout`为优先级配置最高的`@Request`中定义的`500`。
+
+具体的配置层级如图所示：
+
+![avatar](media/config.png)
+
+Forest 的配置层级介绍：
+
+1. 全局配置：针对全局所有请求，作用域最大，配置读取的优先级最小。
+
+2. 接口配置： 作用域为某一个`interface`中定义的请求，读取的优先级最小。您可以通过在`interface`上修饰`@BaseRequest`注解进行配置。
+
+3. 请求配置： 作用域为某一个具体的请求，读取的优先级最高。您可以在接口的方法上修饰`@Request`注解进行 HTTP 信息配置的定义。
+
+
 
 # 五 数据绑定
 
