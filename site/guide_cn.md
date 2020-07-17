@@ -987,7 +987,7 @@ forest:
 
 Forest的模板表达式是在普通的Java字符串中嵌入`${}`来实现字符串和数据的动态绑定.
 
-嵌入的表达式由`$`符 + 左花括号`{`开始，到右花括号`}`结束，在两边花括号中间填写的内容时表达式的本体。
+嵌入的表达式由`$`符 + 左花括号`{`开始，到右花括号`}`结束，在两边花括号中间填写的内容是表达式的本体。
 
 最简单的表达式可以是一个`@DataVariable`标注的变量名，或是一个全局配置中定义的全局变量名。
 
@@ -998,10 +998,41 @@ Forest的模板表达式是在普通的Java字符串中嵌入`${}`来实现字�
 String send(@DataVariable("name") String name);
 ```
 
-若在调用`send`方法时传入参数为`"Foo"`，那么这时被表达式绑定`url`属性则会变成：
+若在调用`send`方法时传入参数为`"world"`，那么这时被表达式绑定`url`属性则会变成：
 
-    http://localhost:8080/hello/Foo
+    http://localhost:8080/hello/world
     
+## 8.2 引用数据
+
+模板表达式最原始的目的就是各种各样的数据动态绑定到HTTP请求的各个属性中，要完成这一步就要实现对外部数据的引用。
+
+Forest的模板表达式提供了两种最基本的数据引用方式：
+
+### 8.2.1 变量名引用
+
+如上面Hello World例子所示，表达式中可以直接引用`@DataVariable`所标注的变量名。除此之外也可以直接引用全局配置中定义的全局变量名。
+
+```yaml
+forest:
+  variables:
+    a: foo
+    b: bar
+```
+
+我们在全局配置中定义了两个全局变量，分别为`a`和`b`。接着就可以在`@Request`中同时引用这两个变量。
+
+```java
+@Request(url = "http://localhost:8080/${a}/${b}")
+String send();
+```
+
+调用`send()`方法后产生的`url`的值为：
+
+    http://localhost:8080/foo/bar
+
+这里因为是全局变量，`${a}`和`${b}`的值分别来自全局配置中的变量`a`和`b`的值，也就是`foo`和`bar`，所以并不需要在方法中传入额外的参数。
+
+### 8.2.2 参数序号引用
 
 
 `
@@ -1074,4 +1105,10 @@ public interface SimpleClient {
     String simple();
 }
 ```
+
+# 十. 项目协议
+
+The MIT License (MIT)
+
+Copyright (c) 2016 Jun Gong
 
