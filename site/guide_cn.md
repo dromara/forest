@@ -589,6 +589,71 @@ myClient.postXml("foo", "bar");
 
 第三步：设置`contentType`或请求头`ContentType`，要设置成什么`contentType`取决于你想要 Body 中数据是什么格式(关于`contentType`和数据格式的对应关系请参见[[5.2.2](###_522-数据绑定格式)])。
 
+### 4.5.2 反序列化
+
+Forest请求的会自动将响应的返回数据反序列化成你要的数据类型。要完成反序列化需要做两步操作：
+
+第一步：定义`dataType`属性
+
+`dataType`属性指定了该请求响应返回的数据类型，目前可选的数据类型有三种: `text`, `json`, `xml`
+
+Forest会根据您指定的`dataType`属性选择不同的反序列化方式。其中`dataType`的默认值为`text`，如果您不指定其他数据类型，那么Forest就不会做任何形式的序列化，并以文本字符串的形式返回给你数据。
+
+```java
+/**
+ * dataType为text或不填时，请求响应的数据将以文本字符串的形式返回回来
+ */
+@Request(
+    url = "http://localhost:8080/text/data",
+    dataType = "text"
+)
+String getData();
+```
+
+若您指定为`json`或`xml`，那就告诉了Forest该请求的响应数据类型为JSON或XML形式的数据，就会以相应的形式进行反序列化。
+
+```java
+/**
+ * dataType为json或xml时，Forest会进行相应的反序列化
+ */
+@Request(
+    url = "http://localhost:8080/text/data",
+    dataType = "json"
+)
+Map getData();
+```
+
+第二步：指定反序列化的目标类型
+
+反序列化需要一个目标类型，而该类型其实就是方法的返回值类型，如返回值为`String`就会反序列成`String`字符串，返回值为`Map`就会反序列化成一个HashMap对象，您也可以指定为自定义的Class类型。
+
+```java
+public class User {
+    private String username;
+    private String score;
+    
+    // Setter和Getter ...
+}
+```
+
+如有上面这样的User类，并把它指定为方法的返回类型，而且相应返回的数据这样一段JSON：
+
+```json
+{"username":  "Foo", "score":  "82"}
+```
+
+那请求接口就应该定义成这样：
+
+```java
+@Request(
+    url = "http://localhost:8080/user?id=${0}",
+    dataType = "json"
+)
+User getUser(Integer id)
+```
+
+这里需要`注意`的是：Forest需要指明返回类型（如`User`）的同时，也需要指明数据类型`dataType`为`json`。
+
 # 五 数据绑定
 
 上面已经介绍了如何创建可以发送 HTTP 请求的接口，并绑定到某个接口方法上，已经可以实现简单请求的发送和接受。
