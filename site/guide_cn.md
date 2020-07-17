@@ -428,11 +428,17 @@ myClient.postXml("foo", "bar");
 
 只需三步就能实现参数到请求体的绑定：
 
-第一步：设置 HTTP Method 为`POST`、`PUT`、`PATCH`这类允许带有请求体的方法(具体哪些 HTTP Method 能够绑定到请求体请参见[[4.2.1](###_521-数据绑定位置)])。
+第一步：设置 HTTP Method 为`POST`、`PUT`、`PATCH`这类允许带有请求体的方法。
 
-第二步：给参数加上`@DataParam`注解并定义名称，关于`@DataParam`注解具体使用可以参见[[4.2 @DataParam 参数绑定](##_42-dataparam参数绑定)]。
+?> 具体哪些 HTTP Method 能够绑定到请求体请参见 [5.2.1 数据绑定位置](###_521-数据绑定位置)
 
-第三步：设置`contentType`或请求头`ContentType`，要设置成什么`contentType`取决于你想要 Body 中数据是什么格式(关于`contentType`和数据格式的对应关系请参见[[5.2.2](###_522-数据绑定格式)])。
+第二步：给参数加上`@DataParam`注解并定义名称。
+
+?> 关于`@DataParam`注解具体使用可以参见 [5.2 @DataParam 参数绑定](##_52-dataparam-参数绑定)
+
+第三步：设置`contentType`或请求头`ContentType`，要设置成什么`contentType`取决于你想要 Body 中数据是什么格式。
+
+?> 关于`contentType`和数据格式的对应关系请参见 [5.2.2 数据绑定格式](###_522-数据绑定格式)
 
 ## 3.6 响应数据类型
 
