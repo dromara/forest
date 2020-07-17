@@ -493,9 +493,8 @@ public class User {
 User getUser(Integer id)
 ```
 
->  **注意**
->
-> Forest需要指明返回类型（如`User`）的同时，也需要指明数据类型`dataType`为`json`。
+!>  **注意**：
+Forest需要指明返回类型（如`User`）的同时，也需要指明数据类型`dataType`为`json`。
 
 
 # 四. 配置
@@ -535,7 +534,7 @@ forest:
   ssl-protocol: SSLv3 # 单向验证的HTTPS的默认SSL协议，默认为SSLv3
   logEnabled: true # 打开或关闭日志，默认为true
 ```
-!>  **注意** 
+!>  **注意**：
 这里`retry-count`只是简单机械的请求失败后的重试次数，所以一般建议设置为`0`.
 如果一定要多次重试，一定要在保证`幂等性`的基础上进行重试，否则容易引发生产事故！
 
