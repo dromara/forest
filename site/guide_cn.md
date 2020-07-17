@@ -1241,8 +1241,8 @@ String getUser(@DataVariable("user") User user, @DataVariable("phoneIndex") int 
 也可以结合参数序号形式：
 
 ```java
-@Request(url = "http://localhost:8080/user/phone_number/${user.getPhoneList().get($1).getNumber()}")
-String getUser(@DataVariable("user") User user, int phoneIndex);
+@Request(url = "http://localhost:8080/user/phone_number/${$0.getPhoneList().get($1).getNumber()}")
+String getUser(User user, int phoneIndex);
 ```
 
 结合属性引用，进一步简化：
