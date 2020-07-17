@@ -1201,6 +1201,57 @@ String send(int num);
 String getUser(@DataVariable("user") User user);
 ```
 
+现在我们调用`getUser()`方法，并传入一个`User`类的对象，那么`${user.username}`得到的结果就是调用user对象的`Getter`方法`getUsername()`所得到的值。
+
+模板表达式支持连续的属性引用
+
+```java
+@Request(url = "http://localhost:8080/user/phone_number/${user.phone.number}")
+String getUser(@DataVariable("user") User user);
+```
+这里`${user.phone.number}`的结果就相当于调用`user.getPhone().getNumber()`的结果。
+
+### 8.2.3 对象方法调用
+
+既然模板表示能支持对象属性的引用，那也支持对象方法的调用吗？答案是肯定的，且调用方法的语法与`Java`的一致。
+
+```java
+@Request(url = "http://localhost:8080/user/phone_number/${user.getUsername()}")
+String getUser(@DataVariable("user") User user);
+```
+
+这里的`${user.getUsername()}`的运行结果和`Java`中调用`user.getUsername()`执行效果是一样的。
+
+此外，模板表达式有个特别的语法，即当调用的方法中没有参数时可以把括号`()`省去。
+
+```java
+@Request(url = "http://localhost:8080/user/phone_number/${user.getUsername}")
+String getUser(@DataVariable("user") User user);
+```
+
+这里的`${user.getUsername}`和上面的`${user.getUsername()}`是等价的。
+
+传入参数的形式也和`Java`中的一样：
+
+```java
+@Request(url = "http://localhost:8080/user/phone_number/${user.getPhoneList().get(phoneIndex).getNumber()}")
+String getUser(@DataVariable("user") User user, @DataVariable("phoneIndex") int phoneIndex);
+```
+
+也可以结合参数序号形式：
+
+```java
+@Request(url = "http://localhost:8080/user/phone_number/${user.getPhoneList().get($1).getNumber()}")
+String getUser(@DataVariable("user") User user, int phoneIndex);
+```
+
+结合属性引用，进一步简化：
+
+```java
+@Request(url = "http://localhost:8080/user/phone_number/${$0.phoneList.get($1).number}")
+String getUser(User user, int phoneIndex);
+```
+
 
 # 九. 拦截器
 
