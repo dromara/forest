@@ -147,7 +147,7 @@ myClient.sendRequest("foo");
     HEADER:
         Accept: text/plan
 
-## 3.3 改变 HTTP Method
+## 3.3 HTTP Method
 
 使用`POST`方式
 
@@ -216,7 +216,7 @@ public interface MyClient {
 }
 ```
 
-## 3.4 设置 HTTP Header
+## 3.4 HTTP Header
 
 在[4.2](##_42-稍复杂点的请求定义)的例子中，我们已经知道了可以通过`@Request`注解的`headers`属性设置一条 HTTP 请求头。
 
@@ -289,7 +289,7 @@ myClient.bindingHeader("gbk");
         Accept-Charset: gbk
         Content-Type: text/plain
 
-## 3.5 添加 HTTP Body
+## 3.5 HTTP Body
 
 在`POST`和`PUT`等请求方法中，通常使用 HTTP 请求体进行传输数据。在 Forest 中有多种方式设置请求体数据。
 
