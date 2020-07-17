@@ -17,7 +17,7 @@ import java.util.List;
  * @author guihuo   (E-mail:1620657419@qq.com)
  * @since 2018-09-25 11:59
  */
-public class ForestScannerRegistrar implements ImportBeanDefinitionRegistrar, ResourceLoaderAware {
+public class ForestScannerRegister implements ImportBeanDefinitionRegistrar, ResourceLoaderAware {
 
 
     private ResourceLoader resourceLoader;

@@ -11,7 +11,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
-@Import({ForestScannerRegistrar.class})
+@Import({ForestScannerRegister.class})
 public @interface ForestScan {
 
     String[] value() default {};
