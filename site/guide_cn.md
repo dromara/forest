@@ -967,7 +967,7 @@ forest:
       cert-pass: 123456      
       protocols: SSLv3       
 
-    - id: keystore2          # 第一个keystore
+    - id: keystore2          # 第二个keystore
       file: test2.keystore    
       keystore-pass: abcdef  
       cert-pass: abcdef      
@@ -977,14 +977,41 @@ forest:
 
 随后在某个具体`@Request`中配置其中任意一个`keystore`的`id`都可以
 
-# 八. 拦截器
+# 八. 模板表达式
 
+在`@Request`的各大属性中大多数都是用`String`字符串填值的，如果要在这些字符串属性中动态地关联参数数据，用Java原生字符串连接(如`+`)是不行的，而且也不够直观。
+
+所以Forest为了帮助您参数数据动态绑定到这些属性上，提供了模板表达式。
+
+##  8.1 表达式Hello World
+
+Forest的模板表达式是在普通的Java字符串中嵌入`${}`来实现字符串和数据的动态绑定.
+
+嵌入的表达式由`$`符 + 左花括号`{`开始，到右花括号`}`结束，在两边花括号中间填写的内容时表达式的本体。
+
+最简单的表达式可以是一个`@DataVariable`标注的变量名，或是一个全局配置中定义的全局变量名。
+
+让我们来看一个最简单的模板表达式Hello World的例子吧
+
+```java
+@Request(url = "http://localhost:8080/hello/${name}")
+String send(@DataVariable("name") String name);
+```
+
+若在调用`send`方法时传入参数为`"Foo"`，那么这时被表达式绑定`url`属性则会变成：
+
+    http://localhost:8080/hello/Foo
+    
+
+
+`
+# 九. 拦截器
 
 用过Spring MVC的朋友一定对Spring的拦截器并不陌生，Forest也同样支持针对Forest请求的拦截器。
 
 如果您想在很多个请求发送之前或之后做一些事情（如下日志、计数等等），拦截器就是您的好帮手。
 
-## 8.1 构建拦截器
+## 9.1 构建拦截器
 
 定义一个拦截器需要实现com.dtflys.forest.interceptor.Interceptor接口
 
@@ -1031,7 +1058,7 @@ public class SimpleInterceptor implements Interceptor<String> {
 `Interceptor`接口带有一个泛型参数，其表示的是请求响应后返回的数据类型。
 Interceptor<String>即代表返回的数据类型为`String`。
 
-## 8.2 调用拦截器
+## 9.2 调用拦截器
 
 需要调用拦截器的地方，只需要在该方法的@Request注解中设置`interceptor`属性即可。
 
