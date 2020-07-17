@@ -44,7 +44,7 @@ Forest 会将您定义好的接口通过动态代理的方式生成一个具体�
 
 ## 对应的 Java 版本
 
-Forest 1.0.x 和 Forest 1.1.x 基于 JDK 1.7, Forest 1.2.x 基于 JDK 1.8
+Forest 1.0.x 和 Forest 1.1.x 基于 JDK 1.7, Forest 1.2.x及以上版本基于 JDK 1.8
 
 # 二. 安装
 
