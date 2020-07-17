@@ -258,7 +258,9 @@ public interface MyClient {
         Accept-Charset: utf-8
         Content-Type: text/plain
 
-如果要每次请求传入不同的请求头内容，可以在`headers`属性的请求头定义中加入`数据绑定`(如何进行数据绑定请参见[[五 数据绑定](#五-数据绑定)])。
+如果要每次请求传入不同的请求头内容，可以在`headers`属性的请求头定义中加入`数据绑定`。
+
+?> 如何进行数据绑定请参见 [五. 数据绑定](#五-数据绑定)
 
 ```java
 public interface MyClient {
