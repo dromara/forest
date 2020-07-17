@@ -628,6 +628,11 @@ configuration.setSslProtocol(SSLUtils.SSLv3);
 configuration.setLogEnabled(true);
 ```
 
+!>  **注意**：
+这里`setRetryCount`只是简单机械的请求失败后的重试次数，所以一般建议设置为`0`。
+如果一定要多次重试，请一定要在保证服务端的`幂等性`的基础上进行重试，否则容易引发生产事故！
+
+
 ### 4.2.4 全局变量定义
 
 Forest 可以通过`ForestConfiguration`对象的`setVariableValue`方法自定义全局变量。
