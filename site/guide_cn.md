@@ -1209,9 +1209,17 @@ public interface SimpleClient {
 }
 ```
 
-# 十. 项目协议
+# 十. 联系作者
+
+您如有问题可以扫码加入微信的技术交流群
+
+![avatar](https://dt_flys.gitee.io/forest/media/wechat_qr.png)
+
+
+# 十一. 项目协议
 
 The MIT License (MIT)
 
 Copyright (c) 2016 Jun Gong
+
 
