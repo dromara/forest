@@ -430,7 +430,7 @@ myClient.postXml("foo", "bar");
 
 第三步：设置`contentType`或请求头`ContentType`，要设置成什么`contentType`取决于你想要 Body 中数据是什么格式(关于`contentType`和数据格式的对应关系请参见[[5.2.2](###_522-数据绑定格式)])。
 
-## 3.5 响应数据类型
+## 3.6 响应数据类型
 
 Forest请求会自动将响应的返回数据反序列化成您要的数据类型。想要接受指定类型的数据需要完成两步操作：
 
@@ -493,7 +493,7 @@ public class User {
 User getUser(Integer id)
 ```
 
-> ### **注意**
+>  **注意**
 >
 > Forest需要指明返回类型（如`User`）的同时，也需要指明数据类型`dataType`为`json`。
 
@@ -535,7 +535,7 @@ forest:
   ssl-protocol: SSLv3 # 单向验证的HTTPS的默认SSL协议，默认为SSLv3
   logEnabled: true # 打开或关闭日志，默认为true
 ```
-> ### **注意**
+>  **注意**
 >
 > 这里`retry-count`只是简单机械的请求失败后的重试次数，所以一般建议设置为`0`.
 > 如果一定要多次重试，一定要在保证`幂等性`的基础上进行重试，否则容易引发生产事故！
