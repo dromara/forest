@@ -3,15 +3,17 @@
 [![license](https://img.shields.io/badge/license-MIT%20License-blue.svg)](https://opensource.org/licenses/mit-license.php)
 [![Maven Central](https://img.shields.io/badge/maven%20central-1.3.0-brightgreen.svg)](https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.3.0/jar)
 
-文档：
--------------------------------------
-[中文文档](https://dt_flys.gitee.io/forest) 
-
 项目介绍：
 -------------------------------------
 
 Forest是一个高层的、极简的轻量级HTTP调用API框架。<br>
 相比于直接使用Httpclient您不再用写一大堆重复的代码了，而是像调用本地方法一样去发送HTTP请求。
+
+文档和示例：
+-------------------------------------
+* [中文文档](https://dt_flys.gitee.io/forest) 
+
+* [Demo工程](https://gitee.com/dt_flys/forest-example)
 
 项目特点：
 -----
