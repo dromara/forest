@@ -1,8 +1,8 @@
 
 
-<p align="center">
-    <h2>Forest - 轻量级HTTP客户端框架</h2>
-</p>
+
+<h1 align="center">Forest - 轻量级HTTP客户端框架</h1>
+
 <p align="center">
 <a href="https://travis-ci.org/github/mySingleLive/forest">
     <img src="https://api.travis-ci.org/mySingleLive/forest.svg?branch=master&status=passed" alt="Build">
@@ -123,7 +123,7 @@ System.out.println(result);
 
 ### 微信交流群:<br>
 
-![avatar](https://dt_flys.gitee.io/forest/media/wechat_qr.png)
+![avatar](https://images.gitee.com/uploads/images/2020/0721/153853_a66ca21c_1216742.png)
 
 项目协议
 --------------------------
