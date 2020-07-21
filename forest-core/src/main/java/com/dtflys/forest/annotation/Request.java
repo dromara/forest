@@ -65,6 +65,10 @@ public @interface Request {
 
     int retryCount() default -1;
 
+    int retryInterval() default -1;
+
+    int maxRetryInterval() default -1;
+
 //    @Deprecated
 //    String username() default "";
 

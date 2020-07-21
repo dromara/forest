@@ -24,6 +24,7 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.retryer.Retryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnSuccess;
@@ -88,6 +89,8 @@ public class ForestRequest<T> {
     private OnError onError;
 
     private InterceptorChain interceptorChain = new InterceptorChain();
+
+    private Retryer retryer;
 
     private boolean logEnable = true;
 
@@ -327,6 +330,13 @@ public class ForestRequest<T> {
         return interceptorChain;
     }
 
+    public Retryer getRetryer() {
+        return retryer;
+    }
+
+    public void setRetryer(Retryer retryer) {
+        this.retryer = retryer;
+    }
 
     public boolean isLogEnable() {
         return logEnable;
