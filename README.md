@@ -1,9 +1,9 @@
 # Forest - 轻量级HTTP客户端访问框架
 
 [![build](https://api.travis-ci.org/mySingleLive/forest.svg?branch=master&status=passed)](https://travis-ci.org/github/mySingleLive/forest)
-[![license](https://img.shields.io/badge/license-MIT%20License-blue.svg)](https://opensource.org/licenses/mit-license.php)
 [![Maven Central](https://img.shields.io/badge/maven%20central-1.3.0-brightgreen.svg)](https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.3.0/jar)
 [![codecov](https://codecov.io/gh/mySingleLive/forest/branch/master/graphs/badge.svg?branch=master)](https://codecov.io/gh/mySingleLive/forest)
+[![license](https://img.shields.io/badge/license-MIT%20License-blue.svg)](https://opensource.org/licenses/mit-license.php)
 
 项目介绍：
 -------------------------------------
