@@ -1,4 +1,4 @@
-# Forest - 轻量级HTTP客户端访问框架
+# Forest - 轻量级HTTP客户端框架
 
 [![build](https://api.travis-ci.org/mySingleLive/forest.svg?branch=master&status=passed)](https://travis-ci.org/github/mySingleLive/forest)
 [![Maven Central](https://img.shields.io/badge/maven%20central-1.3.0-brightgreen.svg)](https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.3.0/jar)
