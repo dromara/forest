@@ -35,7 +35,7 @@ public class Test1 {
         assertEquals(Integer.valueOf(5000), forestConfiguration.getTimeout());
         assertEquals(Integer.valueOf(4000), forestConfiguration.getConnectTimeout());
         assertEquals(Integer.valueOf(0), forestConfiguration.getRetryCount());
-        assertEquals("httpclient", forestConfiguration.getBackend().getName());
+        assertEquals("okhttp3", forestConfiguration.getBackend().getName());
         assertEquals("TLSv1.2", forestConfiguration.getSslProtocol());
     }
 
