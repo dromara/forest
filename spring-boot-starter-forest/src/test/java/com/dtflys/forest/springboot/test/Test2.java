@@ -3,7 +3,7 @@ package com.dtflys.forest.springboot.test;
 import com.thebeastshop.forest.springboot.annotation.ForestScan;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.interceptor.SpringInterceptorFactory;
-import com.dtflys.forest.springboot.test.client2.GithubClient;
+import com.dtflys.forest.springboot.test.client2.GiteeClient;
 import com.dtflys.forest.springboot.test.interceptor.GlobalInterceptor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,12 +21,12 @@ import static org.junit.Assert.*;
 @ActiveProfiles("test2")
 @SpringBootTest(classes = Test2.class)
 @ComponentScan(basePackageClasses = GlobalInterceptor.class)
-//@ForestScan(basePackageClasses = GithubClient.class)
+@ForestScan(basePackageClasses = GiteeClient.class)
 @EnableAutoConfiguration
 public class Test2 {
 
     @Autowired
-    private GithubClient githubClient;
+    private GiteeClient giteeClient;
 
     @Autowired
     private ForestConfiguration forestConfiguration;
@@ -46,7 +46,7 @@ public class Test2 {
 
     @Test
     public void testClient2() {
-        String result = githubClient.index();
+        String result = giteeClient.index();
         assertNotNull(result);
         assertTrue(result.startsWith("Global: "));
     }
