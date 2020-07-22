@@ -62,7 +62,7 @@ Forest是一个高层的、极简的轻量级HTTP调用API框架。<br>
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>spring-boot-starter-forest</artifactId>
-    <version>1.3.0</version>
+    <version>1.3.1</version>
 </dependency>
 ```
 
