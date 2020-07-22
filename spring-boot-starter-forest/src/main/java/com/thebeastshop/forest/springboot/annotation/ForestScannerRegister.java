@@ -1,8 +1,14 @@
-package com.dtflys.forest.annotation;
+package com.thebeastshop.forest.springboot.annotation;
 
 import com.dtflys.forest.scanner.ClassPathClientScanner;
+import com.thebeastshop.forest.springboot.ForestAutoConfiguration;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.ResourceLoaderAware;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.io.ResourceLoader;
@@ -22,6 +28,9 @@ public class ForestScannerRegister implements ImportBeanDefinitionRegistrar, Res
 
     private ResourceLoader resourceLoader;
 
+    public static List<String> basePackages;
+
+    public static String configurationId;
 
     @Override
     public void setResourceLoader(ResourceLoader resourceLoader) {
@@ -50,16 +59,18 @@ public class ForestScannerRegister implements ImportBeanDefinitionRegistrar, Res
             basePackages.add(ClassUtils.getPackageName(clazz));
         }
 
-        String configurationId = annoAttrs.getString("configuration");
+        ForestScannerRegister.basePackages = basePackages;
 
-        ClassPathClientScanner scanner = new ClassPathClientScanner(configurationId, registry);
-        // this check is needed in Spring 3.1
-        if (resourceLoader != null) {
-            scanner.setResourceLoader(resourceLoader);
-        }
+        configurationId = annoAttrs.getString("configuration");
 
-        scanner.registerFilters();
-        scanner.doScan(StringUtils.toStringArray(basePackages));
+//        ClassPathClientScanner scanner = new ClassPathClientScanner(configurationId, registry);
+//        // this check is needed in Spring 3.1
+//        if (resourceLoader != null) {
+//            scanner.setResourceLoader(resourceLoader);
+//        }
+//
+//        scanner.registerFilters();
+//        scanner.doScan(StringUtils.toStringArray(basePackages));
 
     }
 

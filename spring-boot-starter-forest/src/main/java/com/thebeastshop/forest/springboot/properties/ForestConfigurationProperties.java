@@ -2,12 +2,14 @@ package com.thebeastshop.forest.springboot.properties;
 
 import com.dtflys.forest.ssl.SSLUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Component
 @ConfigurationProperties(prefix = "forest", ignoreUnknownFields = true)
 public class ForestConfigurationProperties {
 
