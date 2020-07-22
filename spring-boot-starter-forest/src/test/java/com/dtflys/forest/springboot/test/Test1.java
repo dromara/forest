@@ -1,6 +1,6 @@
 package com.dtflys.forest.springboot.test;
 
-import com.dtflys.forest.annotation.ForestScan;
+import com.thebeastshop.forest.springboot.annotation.ForestScan;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.springboot.test.client1.BaiduClient;
 import org.junit.Test;

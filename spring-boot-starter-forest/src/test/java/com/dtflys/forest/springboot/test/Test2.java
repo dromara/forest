@@ -1,9 +1,8 @@
 package com.dtflys.forest.springboot.test;
 
-import com.dtflys.forest.annotation.ForestScan;
+import com.thebeastshop.forest.springboot.annotation.ForestScan;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.interceptor.SpringInterceptorFactory;
-import com.dtflys.forest.springboot.test.client1.BaiduClient;
 import com.dtflys.forest.springboot.test.client2.GithubClient;
 import com.dtflys.forest.springboot.test.interceptor.GlobalInterceptor;
 import org.junit.Test;
@@ -22,7 +21,7 @@ import static org.junit.Assert.*;
 @ActiveProfiles("test2")
 @SpringBootTest(classes = Test2.class)
 @ComponentScan(basePackageClasses = GlobalInterceptor.class)
-@ForestScan(basePackageClasses = GithubClient.class)
+//@ForestScan(basePackageClasses = GithubClient.class)
 @EnableAutoConfiguration
 public class Test2 {
 

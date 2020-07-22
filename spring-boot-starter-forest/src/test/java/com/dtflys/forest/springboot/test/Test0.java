@@ -1,6 +1,6 @@
 package com.dtflys.forest.springboot.test;
 
-import com.dtflys.forest.annotation.ForestScan;
+import com.thebeastshop.forest.springboot.annotation.ForestScan;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.springboot.test.client0.BeastshopClient;
 import org.junit.Test;
@@ -48,5 +48,12 @@ public class Test0 {
         String result = beastshopClient.shops();
         assertNotNull(result);
     }
+
+    @Test
+    public void testBug() {
+        String result = beastshopClient.testBug(1);
+        assertNotNull(result);
+    }
+
 
 }
