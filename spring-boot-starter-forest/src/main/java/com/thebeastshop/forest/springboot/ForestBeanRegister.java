@@ -3,25 +3,46 @@ package com.thebeastshop.forest.springboot;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.interceptor.SpringInterceptorFactory;
+import com.dtflys.forest.scanner.ClassPathClientScanner;
 import com.dtflys.forest.schema.ForestConfigurationBeanDefinitionParser;
 import com.dtflys.forest.utils.StringUtils;
+import com.thebeastshop.forest.springboot.annotation.ForestScannerRegister;
 import com.thebeastshop.forest.springboot.properties.ForestConfigurationProperties;
 import com.thebeastshop.forest.springboot.properties.ForestSSLKeyStoreProperties;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.ManagedMap;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.ResourceLoaderAware;
+import org.springframework.core.io.ResourceLoader;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class ForestBeanRegister {
+public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcessor {
 
     private final ConfigurableApplicationContext applicationContext;
 
-    public ForestBeanRegister(ConfigurableApplicationContext applicationContext) {
+    private ResourceLoader resourceLoader;
+
+    private ForestConfigurationProperties forestConfigurationProperties;
+
+
+    public ForestBeanRegister(ConfigurableApplicationContext applicationContext, ForestConfigurationProperties forestConfigurationProperties) {
         this.applicationContext = applicationContext;
+        this.forestConfigurationProperties = forestConfigurationProperties;
     }
+
+    @Override
+    public void setResourceLoader(ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
+    }
+
 
     public ForestConfiguration registerForestConfiguration(ForestConfigurationProperties forestConfigurationProperties) {
         BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(ForestConfiguration.class);
@@ -89,6 +110,31 @@ public class ForestBeanRegister {
         );
         map.put(id, beanDefinition);
         return beanDefinition;
+    }
+
+    public ClassPathClientScanner registerScanner(ForestConfigurationProperties forestConfigurationProperties) {
+        List<String> basePackages = ForestScannerRegister.basePackages;
+        String configurationId = ForestScannerRegister.configurationId;
+
+        BeanDefinitionRegistry registry = (BeanDefinitionRegistry) applicationContext.getBeanFactory();
+
+        ClassPathClientScanner scanner = new ClassPathClientScanner(configurationId, registry);
+        // this check is needed in Spring 3.1
+        if (resourceLoader != null) {
+            scanner.setResourceLoader(resourceLoader);
+        }
+        scanner.registerFilters();
+        if (basePackages == null || basePackages.size() == 0) {
+            return scanner;
+        }
+        scanner.doScan(org.springframework.util.StringUtils.toStringArray(basePackages));
+        return scanner;
+    }
+
+
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        registerForestConfiguration(forestConfigurationProperties);
+        registerScanner(forestConfigurationProperties);
     }
 
 }

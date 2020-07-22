@@ -3,6 +3,7 @@ package com.dtflys.forest.beans;
 import com.dtflys.forest.config.ForestConfiguration;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -13,7 +14,6 @@ import org.springframework.context.ApplicationContextAware;
 public class ClientFactoryBean<T> implements FactoryBean<T>, ApplicationContextAware {
 
     private static ApplicationContext applicationContext;
-
 
     private ForestConfiguration forestConfiguration;
 
