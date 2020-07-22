@@ -56,7 +56,7 @@ Forest 1.0.x 和 Forest 1.1.x 基于 JDK 1.7, Forest 1.2.x及以上版本基于 
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>spring-boot-starter-forest</artifactId>
-    <version>1.3.1</version>
+    <version>1.3.1-BETA1</version>
 </dependency>
 ```
 
@@ -87,7 +87,7 @@ Forest 1.0.x 和 Forest 1.1.x 基于 JDK 1.7, Forest 1.2.x及以上版本基于 
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-core</artifactId>
-    <version>1.3.1</version>
+    <version>1.3.1-BETA1</version>
 </dependency>
 ```
 
