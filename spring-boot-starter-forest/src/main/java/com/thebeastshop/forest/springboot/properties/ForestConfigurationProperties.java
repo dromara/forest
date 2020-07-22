@@ -56,7 +56,7 @@ public class ForestConfigurationProperties {
     /**
      * backend of forest: httpclient, okhttp3
      */
-    private String backend = "httpclient";
+    private String backend = "okhttp3";
 
     /**
      * global variables
