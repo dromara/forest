@@ -1,6 +1,5 @@
 
 forest:
-  enabled: true                           # forest开关
   bean-id: config0                        # 在spring上下文中bean的id
   backend: okhttp3                        # 后端HTTP API： okhttp3
   max-connections: 1200                   # 连接池最大连接数
@@ -11,7 +10,8 @@ forest:
 #  retry-interval: 500                     # 起始重试之间间隔时间
 #  max-retry-interval: 2000                # 最大重试之间间隔时间
   ssl-protocol: SSLv3                     # 单向验证的HTTPS的默认SSL协议
-    variables:                              # 自定义全局变量：key为变量名，value为值，可以在任何模板表达式中引用
+  variables:                              # 自定义全局变量：key为变量名，value为值，可以在任何模板表达式中引用
     baseUrl: http://www.thebeastshop.com
     myName: xxx
     myCount: 12
+    idServiceUrl: http://www.thebeastshop.com

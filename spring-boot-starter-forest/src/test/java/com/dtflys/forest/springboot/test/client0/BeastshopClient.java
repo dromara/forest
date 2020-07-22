@@ -1,6 +1,7 @@
 package com.dtflys.forest.springboot.test.client0;
 
 
+import com.dtflys.forest.annotation.DataParam;
 import com.dtflys.forest.annotation.Request;
 
 /**
@@ -14,4 +15,11 @@ public interface BeastshopClient {
             timeout = 80000
     )
     String shops();
+
+    @Request(
+            url = "${idServiceUrl}",
+            logEnabled = true
+    )
+    String testBug(@DataParam("num") Integer num);
+
 }
