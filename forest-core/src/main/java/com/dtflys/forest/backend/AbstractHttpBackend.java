@@ -108,7 +108,7 @@ public abstract class AbstractHttpBackend implements HttpBackend {
         String key = request.getType().toUpperCase();
         HttpExecutorCreator httpExecutorCreator = executorCreatorMap.get(key);
         if (httpExecutorCreator == null) {
-            throw new ForestRuntimeException("Http request type\"" + key + "\" is not be supported.");
+            throw new ForestRuntimeException("Http request type \"" + key + "\" is not be supported.");
         }
         HttpExecutor executor = httpExecutorCreator.createExecutor(connectionManager, request, responseHandler);
         return executor;
