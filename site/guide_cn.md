@@ -60,7 +60,7 @@ Forest 1.0.x 和 Forest 1.1.x 基于 JDK 1.7, Forest 1.2.x及以上版本基于 
 </dependency>
 ```
 
-最新版本为<font color=red>_1.3.0_</font>，为稳定版本
+最新版本为<font color=red>_1.3.1_</font>，为稳定版本
 
 ## 2.2 在非 Spring Boot 项目中安装
 
@@ -91,7 +91,7 @@ Forest 1.0.x 和 Forest 1.1.x 基于 JDK 1.7, Forest 1.2.x及以上版本基于 
 </dependency>
 ```
 
-最新版本为<font color=red>_1.3.0_</font>，为稳定版本
+最新版本为<font color=red>_1.3.1_</font>，为稳定版本
 
 
 # 三. 构建请求接口
