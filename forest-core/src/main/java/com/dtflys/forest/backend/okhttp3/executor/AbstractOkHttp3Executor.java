@@ -171,10 +171,7 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
         prepareBody(builder);
     }
 
-
-
-    @Override
-    public void execute(final ResponseHandler responseHandler) {
+    public void execute(final ResponseHandler responseHandler, int retryCount) {
         OkHttpClient okHttpClient = getClient(request);
         URLBuilder urlBuilder = getURLBuilder();
         String url = urlBuilder.buildUrl(request);
@@ -213,8 +210,12 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
                         }
                         future.completed(result);
                     } else {
-                        future.failed(new ForestNetworkException(okResponse.message(), okResponse.code(), response));
-                        okHttp3ResponseHandler.handleError(response);
+                        if (retryCount > request.getRetryCount()) {
+                            future.failed(new ForestNetworkException(okResponse.message(), okResponse.code(), response));
+                            okHttp3ResponseHandler.handleError(response);
+                            return;
+                        }
+                        execute(responseHandler, retryCount + 1);
                     }
                 }
             });
@@ -225,12 +226,23 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
             try {
                 okResponse = call.execute();
             } catch (IOException e) {
-                responseHandler.handleError(request, null, e);
-                return;
+                if (retryCount >= request.getRetryCount()) {
+                    ForestResponse response = factory.createResponse(request, okResponse);
+                    logResponse(startTime, response);
+                    responseHandler.handleError(request, response, e);
+                    return;
+                }
+                execute(responseHandler, retryCount + 1);
             }
             ForestResponse response = factory.createResponse(request, okResponse);
             okHttp3ResponseHandler.handleSync(okResponse, response);
         }
+    }
+
+
+    @Override
+    public void execute(final ResponseHandler responseHandler) {
+        execute(responseHandler, 0);
     }
 
     @Override
