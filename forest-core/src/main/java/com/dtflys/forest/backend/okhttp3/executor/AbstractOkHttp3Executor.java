@@ -227,7 +227,7 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
                 okResponse = call.execute();
             } catch (IOException e) {
                 if (retryCount >= request.getRetryCount()) {
-                    ForestResponse response = factory.createResponse(request, okResponse);
+                    ForestResponse response = factory.createResponse(request, null);
                     logResponse(startTime, response);
                     responseHandler.handleError(request, response, e);
                     return;

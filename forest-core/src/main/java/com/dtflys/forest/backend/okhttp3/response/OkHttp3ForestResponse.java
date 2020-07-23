@@ -22,14 +22,19 @@ public class OkHttp3ForestResponse extends ForestResponse {
     public OkHttp3ForestResponse(ForestRequest request, Response okResponse) {
         super(request);
         this.okResponse = okResponse;
-        this.body = okResponse.body();
-        this.statusCode = okResponse.code();
-        if (body != null) {
-            try {
-                this.content = body.string();
-            } catch (IOException e) {
-                throw new ForestRuntimeException(e);
+        if (okResponse != null) {
+            this.body = okResponse.body();
+            this.statusCode = okResponse.code();
+            if (body != null) {
+                try {
+                    this.content = body.string();
+                } catch (IOException e) {
+                    throw new ForestRuntimeException(e);
+                }
             }
+        } else {
+            this.body = null;
+            this.statusCode = 404;
         }
     }
 
