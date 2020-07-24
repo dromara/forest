@@ -65,7 +65,7 @@ public class ForestMethod<T> implements VariableScope {
     private List<Interceptor> globalInterceptorList;
     private List<Interceptor> baseInterceptorList;
     private List<Interceptor> interceptorList;
-    private Class onSuccessClassGenericType = null;
+    private Type onSuccessClassGenericType = null;
     private boolean async = false;
     private boolean logEnable = true;
 
@@ -240,7 +240,7 @@ public class ForestMethod<T> implements VariableScope {
             if (OnSuccess.class.isAssignableFrom(paramType)) {
                 onSuccessParameter = parameter;
                 Type genType = genericParamTypes[i];
-                onSuccessClassGenericType = getGenericClass(genType, 0);
+                onSuccessClassGenericType = getGenericClassOrType(genType, 0);
             }
             else if (OnError.class.isAssignableFrom(paramType)) {
                 onErrorParameter = parameter;
@@ -608,7 +608,7 @@ public class ForestMethod<T> implements VariableScope {
      * @param index
      * @return
      */
-    private static Class getGenericClass(Type genType, final int index) {
+    private static Type getGenericClassOrType(Type genType, final int index) {
 
         if (!(genType instanceof ParameterizedType)) {
             return Object.class;
@@ -618,10 +618,12 @@ public class ForestMethod<T> implements VariableScope {
         if (index >= params.length || index < 0) {
             return Object.class;
         }
+        if (params[index] instanceof ParameterizedType) {
+            return params[index];
+        }
         if (!(params[index] instanceof Class)) {
             return Object.class;
         }
-
         return (Class) params[index];
     }
 

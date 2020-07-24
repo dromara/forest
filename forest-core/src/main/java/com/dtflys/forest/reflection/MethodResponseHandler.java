@@ -8,6 +8,8 @@ import com.dtflys.forest.handler.ResponseHandler;
 import com.dtflys.forest.handler.ResultHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.utils.ReflectUtil;
+import sun.reflect.Reflection;
 
 import java.lang.reflect.Type;
 
@@ -25,13 +27,13 @@ public class MethodResponseHandler<T> implements ResponseHandler {
 
     private final Class returnClass;
 
-    private final Class onSuccessClassGenericType;
+    private final Type onSuccessClassGenericType;
 
     private static final ResultHandler resultHandler = new ResultHandler();
 
     private volatile T resultData;
 
-    public MethodResponseHandler(ForestMethod method, ForestConfiguration configuration, Class onSuccessClassGenericType) {
+    public MethodResponseHandler(ForestMethod method, ForestConfiguration configuration, Type onSuccessClassGenericType) {
         this.method = method;
         this.configuration = configuration;
         this.onSuccessClassGenericType = onSuccessClassGenericType;
@@ -86,7 +88,7 @@ public class MethodResponseHandler<T> implements ResponseHandler {
         request.getInterceptorChain().onSuccess(resultData, request, response);
         OnSuccess onSuccess = request.getOnSuccess();
         if (onSuccess != null) {
-            resultData = resultHandler.getResult(request, response, onSuccessClassGenericType, onSuccessClassGenericType);
+            resultData = resultHandler.getResult(request, response, onSuccessClassGenericType, ReflectUtil.getClassByType(onSuccessClassGenericType));
             onSuccess.onSuccess(resultData, request, response);
         }
         resultData = response.getResult();
@@ -134,7 +136,7 @@ public class MethodResponseHandler<T> implements ResponseHandler {
     }
 
     @Override
-    public Class getOnSuccessClassGenericType() {
+    public Type getOnSuccessClassGenericType() {
         return onSuccessClassGenericType;
     }
 }

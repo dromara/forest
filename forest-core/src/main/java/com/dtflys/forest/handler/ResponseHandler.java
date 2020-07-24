@@ -28,7 +28,7 @@ public interface ResponseHandler {
 
     Object handleResult(Object resultData);
 
-    Class getOnSuccessClassGenericType();
+    Type getOnSuccessClassGenericType();
 
     Type getReturnType();
 

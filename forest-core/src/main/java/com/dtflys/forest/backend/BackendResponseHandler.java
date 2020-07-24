@@ -6,7 +6,9 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
 import com.dtflys.forest.handler.ResponseHandler;
+import com.dtflys.forest.utils.ReflectUtil;
 
+import java.lang.reflect.Type;
 import java.util.concurrent.Future;
 
 
@@ -37,8 +39,8 @@ public abstract class BackendResponseHandler<R> {
 
 
     public Object handleSuccess(ForestResponse response) {
-        Class onSuccessGenericType = responseHandler.getOnSuccessClassGenericType();
-        Object resultData = responseHandler.handleResultType(request, response, onSuccessGenericType, onSuccessGenericType);
+        Type onSuccessGenericType = responseHandler.getOnSuccessClassGenericType();
+        Object resultData = responseHandler.handleResultType(request, response, onSuccessGenericType, ReflectUtil.getClassByType(onSuccessGenericType));
         return responseHandler.handleSuccess(resultData, request, response);
     }
 
