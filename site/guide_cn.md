@@ -510,7 +510,7 @@ Forest需要指明返回类型（如`User`）的同时，也需要指明数据�
 
 在Forest中的回调函数使用单方法的接口定义，这样可以使您在 `Java 8` 或 `Kotlin` 语言中方便使用 `Lambda` 表达式。
 
-使用的时候只需在接口方法加入`OnSuccess<T>`类型或`OnError<T>`类型的参数：
+使用的时候只需在接口方法加入`OnSuccess<T>`类型或`OnError`类型的参数：
 
 ```java
 @Request(
