@@ -539,7 +539,7 @@ myClient.send("foo", (String resText) -> {
 ?> 提示：
 在异步请求中只能通`OnSuccess<T>`回调函数接或`Future`返回值接受数据。
 而在同步请求中，`OnSuccess<T>`回调函数和任何类型的返回值都能接受到请求响应的数据。
-`OnError`可以用于异常处理，使用`try-catch`也能达到同样的效果。
+`OnError`可以用于异常处理，一般在同步请求中使用`try-catch`也能达到同样的效果。
 
 
 # 四. 配置
