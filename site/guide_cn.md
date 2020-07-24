@@ -543,7 +543,53 @@ myClient.send("foo", (String resText) -> {
 
 ## 3.8 异步请求
 
+在Forest使用异步请求，可以通过设置`@Request`注解的`async`属性为`true`实现，不设置或设置为`false`即为同步请求。
 
+```java
+@Request(
+        url = "http://localhost:5000/hello/user?username=foo",
+        async = true,
+        headers = {"Accept:text/plan"}
+)
+void asyncGet(OnSuccess<String> onSuccess);
+```
+
+一般情况下，异步请求都通过`OnSuccess<T>`回调函数来接受响应返回的数据，而不是通过接口方法的返回值，所以一般返回值类型会定义为`void`。
+
+?> 关于回调函数的使用请参见 [3.7 回调函数](##_37-回调函数)
+
+```java
+// 异步执行
+myClient.asyncGet(result -> {
+    // 处理响应结果
+    System.out.println(result);
+});
+```
+
+此外，若有些小伙伴不习惯这种函数式的编程方式，也可以用`Future<T>`类型定义方法返回值的方式来接受响应数据。
+
+```java
+@Request(
+        url = "http://localhost:5000/hello/user?username=foo",
+        async = true,
+        headers = {"Accept:text/plan"}
+)
+Future<String> asyncFuture();
+```
+
+这里`Future<T>`类就是`JDK`自带的`java.util.concurrent.Future`类, 其泛型参数`T`代表您想接受的响应数据的类型。
+
+关于如何使用`Future`类，这里不再赘述。
+
+```java
+// 异步执行
+Future<String> future = myClient.asyncFuture();
+
+// 做一些其它事情
+
+// 等待数据
+String result = future.get();
+```
 
 # 四. 配置
 
