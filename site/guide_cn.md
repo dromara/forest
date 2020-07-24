@@ -547,11 +547,11 @@ myClient.send("foo", (String resText) -> {
 
 ```java
 @Request(
-        url = "http://localhost:5000/hello/user?username=foo",
+        url = "http://localhost:5000/hello/user?username=${0}",
         async = true,
         headers = {"Accept:text/plan"}
 )
-void asyncGet(OnSuccess<String> onSuccess);
+void asyncGet(String username， OnSuccess<String> onSuccess);
 ```
 
 一般情况下，异步请求都通过`OnSuccess<T>`回调函数来接受响应返回的数据，而不是通过接口方法的返回值，所以这里的返回值类型一般会定义为`void`。
@@ -560,7 +560,7 @@ void asyncGet(OnSuccess<String> onSuccess);
 
 ```java
 // 异步执行
-myClient.asyncGet(result -> {
+myClient.asyncGet("foo", result -> {
     // 处理响应结果
     System.out.println(result);
 });
