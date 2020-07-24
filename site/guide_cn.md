@@ -440,7 +440,7 @@ myClient.postXml("foo", "bar");
 
 ?> 关于`contentType`和数据格式的对应关系请参见 [5.2.2 数据绑定格式](###_522-数据绑定格式)
 
-## 3.6 响应数据类型
+## 3.6 接受数据
 
 Forest请求会自动将响应的返回数据反序列化成您要的数据类型。想要接受指定类型的数据需要完成两步操作：
 
@@ -505,6 +505,41 @@ User getUser(Integer id)
 
 !>  **注意**：
 Forest需要指明返回类型（如`User`）的同时，也需要指明数据类型`dataType`为`json`或其他类型。
+
+## 3.7 回调函数
+
+在Forest中的回调函数使用单方法的接口定义，这样可以使你在 `Java 8` 或 `Kotline` 中方便使用 `Lambda` 表达式。
+
+使用的时候只需在接口方法加入`OnSuccess<T>`类型或`OnError<T>`类型的参数：
+
+```java
+@Request(
+        url = "http://localhost:5000/hello/user",
+        headers = {"Accept:text/plan"},
+        data = "username=${username}"
+)
+String send(@DataVariable("username") String username, OnSuccess<String> onSuccess, OnError onError);
+```
+
+如这两个回调函数的类名所示的含义一样，`OnSuccess<T>`在请求成功调用响应时会被调用，而`OnError`在失败或出现错误的时候被调用。
+
+其中`OnSuccess<T>`的泛型参数`T`定义为请求响应返回结果的数据类型。
+
+```java
+myClient.send("foo", (String resText) -> {
+        // 成功响应回调
+        System.out.println(resText);    
+    },
+    (ForestRuntimeException ex, ForestRequest request, ForestResponse response) -> {
+        // 异常回调
+        System.out.println(ex.getMessage());
+    });
+```
+
+?> 提示：
+在异步请求中只能通`OnSuccess<T>`回调函数接或`Future`返回值接受数据。
+而在同步请求中，`OnSuccess<T>`回调函数和任何类型的返回值都能接受到请求响应的数据。
+`OnError`可以用于异常处理，使用`try-catch`也能达到同样的效果。
 
 
 # 四. 配置
