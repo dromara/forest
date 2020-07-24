@@ -5,6 +5,8 @@ import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestFastjsonConverter;
 import com.dtflys.test.http.client.PostClient;
+import com.dtflys.test.http.model.JsonTestUser;
+import com.dtflys.test.mock.PostJson2MockServer;
 import com.dtflys.test.mock.PostJsonMockServer;
 import org.junit.*;
 import org.slf4j.Logger;
@@ -16,12 +18,12 @@ import static org.junit.Assert.assertNotNull;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-11 16:55
  */
-public class TestPostJsonClient extends BaseClientTest {
+public class TestPostJson2Client extends BaseClientTest {
 
-    private final static Logger log = LoggerFactory.getLogger(TestPostJsonClient.class);
+    private final static Logger log = LoggerFactory.getLogger(TestPostJson2Client.class);
 
     @Rule
-    public PostJsonMockServer server = new PostJsonMockServer(this);
+    public PostJson2MockServer server = new PostJson2MockServer(this);
 
     private static ForestConfiguration configuration;
 
@@ -31,13 +33,13 @@ public class TestPostJsonClient extends BaseClientTest {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
-        configuration.setVariableValue("port", PostJsonMockServer.port);
+        configuration.setVariableValue("port", PostJson2MockServer.port);
         ForestFastjsonConverter fastjsonConverter = new ForestFastjsonConverter();
         fastjsonConverter.setSerializerFeature(SerializerFeature.SortField);
         configuration.setJsonConverter(fastjsonConverter);
     }
 
-    public TestPostJsonClient(HttpBackend backend) {
+    public TestPostJson2Client(HttpBackend backend) {
         super(backend, configuration);
         postClient = configuration.createInstance(PostClient.class);
     }
@@ -47,44 +49,11 @@ public class TestPostJsonClient extends BaseClientTest {
         server.initServer();
     }
 
-    @Test
-    public void testJsonPost() {
-        String result = postClient.postJson("foo", "123456");
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
-    }
 
-    @Test
-    public void testJsonPost2() {
-        String result = postClient.postJson2("foo", "123456");
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
-    }
-
-    @Test
-    public void testJsonPost3() {
-        String result = postClient.postJson3("foo", "123456");
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
-    }
-
-    @Test
-    public void testJsonPost4() {
-        String result = postClient.postJson4("foo", "123456");
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
-    }
-
-/*
     @Test
     public void testJsonPost5() {
-        SimpleUser user = new SimpleUser();
+        JsonTestUser user = new JsonTestUser();
         user.setUsername("foo");
-        user.setPassword("123456");
         String result = postClient.postJson5(user);
         log.info("response: " + result);
         assertNotNull(result);
@@ -93,15 +62,13 @@ public class TestPostJsonClient extends BaseClientTest {
 
     @Test
     public void testJsonPost6() {
-        SimpleUser user = new SimpleUser();
+        JsonTestUser user = new JsonTestUser();
         user.setUsername("foo");
-        user.setPassword("123456");
         String result = postClient.postJson6(user);
         log.info("response: " + result);
         assertNotNull(result);
         Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
     }
-*/
 
 
 

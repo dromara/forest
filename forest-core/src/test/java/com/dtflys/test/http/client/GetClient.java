@@ -1,8 +1,6 @@
 package com.dtflys.test.http.client;
 
-import com.dtflys.forest.annotation.DataParam;
-import com.dtflys.forest.annotation.DataVariable;
-import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.annotation.*;
 import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.annotation.DataParam;
@@ -10,6 +8,7 @@ import com.dtflys.forest.annotation.DataVariable;
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnSuccess;
+import com.dtflys.test.http.model.JsonTestUser;
 
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -55,6 +54,12 @@ public interface GetClient {
             headers = {"Accept:text/plan"}
     )
     String annParamGet(@DataParam("username") String username);
+
+    @Request(
+            url = "http://localhost:${port}/hello/user",
+            headers = {"Accept:text/plan"}
+    )
+    String annObjectGet(@DataObject JsonTestUser user);
 
 
     @Request(

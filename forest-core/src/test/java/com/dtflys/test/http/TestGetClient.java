@@ -2,6 +2,7 @@ package com.dtflys.test.http;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.test.http.model.JsonTestUser;
 import com.dtflys.test.mock.GetMockServer;
 import com.dtflys.test.http.client.GetClient;
 import org.junit.Before;
@@ -85,7 +86,6 @@ public class TestGetClient extends BaseClientTest {
     }
 
 
-
     @Test
     public void testAnnParamGet() {
         String result = getClient.annParamGet("foo");
@@ -93,6 +93,17 @@ public class TestGetClient extends BaseClientTest {
         assertNotNull(result);
         assertEquals(GetMockServer.EXPECTED, result);
     }
+
+    @Test
+    public void testAnnObjectGet() {
+        JsonTestUser user = new JsonTestUser();
+        user.setUsername("foo");
+        String result = getClient.annObjectGet(user);
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(GetMockServer.EXPECTED, result);
+    }
+
 
     @Test
     public void testVarParamGet() {

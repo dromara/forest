@@ -5,10 +5,6 @@ import com.dtflys.forest.annotation.DataParam;
 import com.dtflys.forest.annotation.DataVariable;
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.test.http.model.*;
-import com.dtflys.forest.annotation.DataObject;
-import com.dtflys.forest.annotation.DataParam;
-import com.dtflys.forest.annotation.DataVariable;
-import com.dtflys.forest.annotation.Request;
 import com.dtflys.test.http.model.UserParam;
 import com.dtflys.test.http.model.XmlTestParam;
 
@@ -103,18 +99,18 @@ public interface PostClient {
     String postJson4(@DataParam("username") String username, @DataParam("password") String password);
 
     @Request(
-            url = "http://localhost:5000/json",
+            url = "http://localhost:${port}/json",
             type = "post",
             contentType = "application/json"
     )
-    String postJson5(@DataObject SimpleUser user);
+    String postJson5(@DataObject JsonTestUser user);
 
     @Request(
-            url = "http://localhost:5000/json",
+            url = "http://localhost:${port}/json",
             type = "post",
             headers = {"Content-Type: application/json"}
     )
-    String postJson6(@DataObject SimpleUser user);
+    String postJson6(@DataObject JsonTestUser user);
 
 
 

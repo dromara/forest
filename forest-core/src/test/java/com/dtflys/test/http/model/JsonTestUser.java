@@ -1,10 +1,8 @@
 package com.dtflys.test.http.model;
 
-public class SimpleUser {
+public class JsonTestUser {
 
     private String username;
-
-    private String password;
 
     public String getUsername() {
         return username;
@@ -14,11 +12,4 @@ public class SimpleUser {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }

@@ -16,9 +16,9 @@ import static org.junit.Assert.assertNotNull;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-11 16:55
  */
-public class TestPostJsonClient extends BaseClientTest {
+public class TestGetJsonClient extends BaseClientTest {
 
-    private final static Logger log = LoggerFactory.getLogger(TestPostJsonClient.class);
+    private final static Logger log = LoggerFactory.getLogger(TestGetJsonClient.class);
 
     @Rule
     public PostJsonMockServer server = new PostJsonMockServer(this);
@@ -37,7 +37,7 @@ public class TestPostJsonClient extends BaseClientTest {
         configuration.setJsonConverter(fastjsonConverter);
     }
 
-    public TestPostJsonClient(HttpBackend backend) {
+    public TestGetJsonClient(HttpBackend backend) {
         super(backend, configuration);
         postClient = configuration.createInstance(PostClient.class);
     }
