@@ -327,7 +327,7 @@ public interface MyClient {
 
 该接口调用后所实际产生的 HTTP 请求如下：
 
-    GET http://localhost:5000/hello/user
+    POST http://localhost:5000/hello/user
     HEADER:
         Accept:text/plan
     BODY:
@@ -358,7 +358,7 @@ myClient.dataPost("foo", "bar");
 
 实际产生的 HTTP 请求如下：
 
-    GET http://localhost:5000/hello/user
+    POST http://localhost:5000/hello/user
     HEADER:
         Accept: text/plan
     BODY:
@@ -387,7 +387,7 @@ myClient.postJson("foo", "bar");
 
 实际产生的 HTTP 请求如下：
 
-    GET http://localhost:5000/hello/user
+    POST http://localhost:5000/hello/user
     HEADER:
         Content-Type: application/json
     BODY:
@@ -402,7 +402,7 @@ public interface MyClient {
             url = "http://localhost:5000/hello/user",
             type = "post",
             data = "<misc><username>${0}</username><password>${1}</password></misc>",
-            headers = {"Content-Type: application/json"}
+            headers = {"Content-Type: application/xml"}
     )
     String postXml(String username, String password);
 }
@@ -416,9 +416,9 @@ myClient.postXml("foo", "bar");
 
 实际产生的 HTTP 请求如下：
 
-    GET http://localhost:5000/hello/user
+    POST http://localhost:5000/hello/user
     HEADER:
-        Content-Type: application/json
+        Content-Type: application/xml
     BODY:
         <misc><username>foo</username><password>bar</password></misc>
 
@@ -787,7 +787,7 @@ myClient.send("foo", "bar");
 
 实际产生的 HTTP 请求如下：
 
-    GET http://localhost:5000/hello
+    POST http://localhost:5000/hello
     HEADER:
         Accept: text/plan
     BODY:
@@ -827,7 +827,7 @@ myClient.postBody("foo", "bar");
 
 实际产生的 HTTP 请求如下：
 
-    GET http://localhost:5000/hello/user
+    POST http://localhost:5000/hello/user
     HEADER:
         Accept: text/plan
     BODY:
@@ -855,7 +855,7 @@ myClient.postBody("foo", "bar");
 
 实际产生的 HTTP 请求如下：
 
-    GET http://localhost:5000/hello/user
+    POST http://localhost:5000/hello/user
     HEADER:
         Content-Type: application/json
     BODY:
@@ -875,7 +875,7 @@ public interface MyClient {
 }
 ```
 
-## 4.3 @DataVariable 参数绑定
+## 5.3 @DataVariable 参数绑定
 
 在接口方法中定义的参数前加上`@DataVariable`注解并`value`中输入一个名称，便可以实现参数的`变量名`绑定。
 
@@ -910,8 +910,135 @@ myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
 实际产生的 HTTP 请求如下：
 
     GET http://localhost:8080/send?un=DT&pw=123456&da=123888888&sm=Hahaha
+    
+## 5.4 @DataObject 对象绑定
 
-## 4.4 全局变量绑定
+上面的提到的`@DataParam`绑定，以及在`data`属性中的绑定可以方便解决大部分数据传输要求。
+但缺点是参数要一个一个写，如果有很多参数或属性会写的十分复杂，而且请求要传输一个十分复杂的对象就会变得非常无能为力。
+
+所以为了解决这个问题，Forest引入了`@DataObject`注解针对对象进行数据绑定。
+
+请看下面的例子：
+
+```java
+@Request(url = "http://localhost:5000/hello/user")
+String send(@DataObject User user);
+```
+
+如果我们调用请求接口`send`方法，并传入一个`User`类的对象，会得到以下结果：
+
+    GET http://localhost:5000/hello/user?username=foo&password=bar
+
+如上所示，`@DataObject`注解会将传入的对象拆成一个一个属性键值对放入`url`的`query`参数部分。用这种方式，即使有十几二十个参数，接口的参数也只需传一个对象即可。
+
+`@DataObject`绑定的数据不仅可以出现在`url`参数上，还可以出现在请求体中，不仅可以产生`query`参数的数据格式,也可以变成`json`格式或是`xml`格式。
+
+具体数据绑定的出现位置请看下表：
+
+| `type`    | 数据绑定的位置 |
+| -----    | -------------- |
+| `GET`     | `url`参数部分   |
+| `POST`    | 请求体         |
+| `PUT`     | 请求体         |
+| `PATCH`   | 请求体         |
+| `HEAD`    | `url`参数部分   |
+| `OPTIONS` | `url`参数部分   |
+| `DELETE`  | `url`参数部分   |
+| `TRACE`   | `url`参数部分   |
+
+### 5.4.1 绑定到请求体
+
+来看一个绑定到请求体的例子：
+
+```java
+@Request(
+    url = "http://localhost:5000/hello/user",
+    type = "post"
+)
+String send(@DataObject User user);
+```
+
+调用后产生的结果如下：
+
+    POST http://localhost:5000/hello/user
+    BODY:
+        username=foo&password=bar
+        
+如上所示，`User`对象的数据出现在了Body中。这里出现的是`x-www-form-urlencoded`表单的数据格式，也是在没指定内容格式情况下的默认格式。
+
+若要以其它形式(比如`JSON`)传输数据，需要做一些改动。        
+
+### 5.4.2 绑定为JSON格式
+
+要让`@DataObject`绑定的对象转换成`JSON`格式也非常简单，只要将`contentType`属性或`Content-Type`请求头指定为`application/json`便可。
+
+```java
+@Request(
+    url = "http://localhost:5000/hello/user",
+    contentType = "application/json", 
+    type = "post"
+)
+String send(@DataObject User user);
+```
+调用后产生的结果如下：
+
+    POST http://localhost:5000/hello/user
+    HEADER:
+        Content-Type: application/json
+    BODY:
+        {"username": "foo", "password": "bar"}
+        
+### 5.4.3 绑定为XML格式        
+
+`@DataObject`较为特殊，除了指定`contentType`属性或`Content-Type`请求头为`application/xml`外，还需要设置`@DataObject`的`filter`属性为`xml`。
+
+```java
+@Request(
+    url = "http://localhost:5000/hello/user",
+    contentType = "application/xml", 
+    type = "post"
+)
+String send(@DataObject(filter = "xml") User user);
+```
+
+此外，这里的`User`对象也要绑定`JAXB`注解：
+
+```java
+@XmlRootElement(name = "misc")
+public User {
+
+    private String usrname;
+
+    private String password;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+}
+```
+
+调用传入`User`对象后的结果如下：
+
+    POST http://localhost:5000/hello/user
+    HEADER:
+        Content-Type: application/xml
+    BODY:
+        <misc><username>foo</username><password>bar</password></misc>
+
+
+## 5.5 全局变量绑定
 
 若您已经定义好全局变量，那便可以直接在请求定义中绑定全局变量了。
 
