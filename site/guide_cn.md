@@ -56,11 +56,11 @@ Forest 1.0.x 和 Forest 1.1.x 基于 JDK 1.7, Forest 1.2.x及以上版本基于 
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>spring-boot-starter-forest</artifactId>
-    <version>1.3.1</version>
+    <version>1.3.2</version>
 </dependency>
 ```
 
-最新版本为<font color=red>_1.3.1_</font>，为稳定版本
+最新版本为<font color=red>_1.3.2_</font>，为稳定版本
 
 ## 2.2 在非 Spring Boot 项目中安装
 
@@ -87,11 +87,11 @@ Forest 1.0.x 和 Forest 1.1.x 基于 JDK 1.7, Forest 1.2.x及以上版本基于 
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-core</artifactId>
-    <version>1.3.1</version>
+    <version>1.3.2</version>
 </dependency>
 ```
 
-最新版本为<font color=red>_1.3.1_</font>，为稳定版本
+最新版本为<font color=red>_1.3.2_</font>，为稳定版本
 
 
 # 三. 构建请求接口
@@ -526,7 +526,7 @@ String send(@DataVariable("username") String username, OnSuccess<String> onSucce
 其中`OnSuccess<T>`的泛型参数`T`定义为请求响应返回结果的数据类型。
 
 ```java
-myClient.send("foo", (String resText) -> {
+myClient.send("foo", (String resText, ForestRequest request, ForestResponse response) -> {
         // 成功响应回调
         System.out.println(resText);    
     },
@@ -560,7 +560,7 @@ void asyncGet(String username， OnSuccess<String> onSuccess);
 
 ```java
 // 异步执行
-myClient.asyncGet("foo", result -> {
+myClient.asyncGet("foo", (result, request, response) -> {
     // 处理响应结果
     System.out.println(result);
 });
