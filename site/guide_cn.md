@@ -218,7 +218,7 @@ public interface MyClient {
 
 ## 3.4 HTTP Header
 
-在[4.2](##_42-稍复杂点的请求定义)的例子中，我们已经知道了可以通过`@Request`注解的`headers`属性设置一条 HTTP 请求头。
+在[4.2](###_42-稍复杂点的请求定义)的例子中，我们已经知道了可以通过`@Request`注解的`headers`属性设置一条 HTTP 请求头。
 
 现在我们来看看如何添加多条请求头
 
@@ -434,7 +434,7 @@ myClient.postXml("foo", "bar");
 
 第二步：给参数加上`@DataParam`注解并定义名称。
 
-?> 关于`@DataParam`注解具体使用可以参见 [5.2 @DataParam 参数绑定](##_52-dataparam-参数绑定)
+?> 关于`@DataParam`注解具体使用可以参见 [5.2 @DataParam 参数绑定](###_52-dataparam-参数绑定)
 
 第三步：设置`contentType`或请求头`ContentType`，要设置成什么`contentType`取决于你想要 Body 中数据是什么格式。
 
