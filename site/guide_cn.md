@@ -964,7 +964,7 @@ String send(@DataObject User user);
     BODY:
         username=foo&password=bar
         
-如上所示，`User`对象的数据出现在了Body中。这里出现的是`x-www-form-urlencoded`表单的数据格式，也是在没指定内容格式情况下的默认格式。
+如上所示，`User`对象的数据出现在了Body中。这里出现的是`x-www-form-urlencoded`表单数据格式，是在没指定内容格式情况下的默认格式。
 
 若要以其它形式(比如`JSON`)传输数据，需要做一些改动。        
 
