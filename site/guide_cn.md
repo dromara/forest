@@ -508,7 +508,7 @@ Forest需要指明返回类型（如`User`）的同时，也需要指明数据�
 
 ## 3.7 回调函数
 
-在Forest中的回调函数使用单方法的接口定义，这样可以使你在 `Java 8` 或 `Kotline` 中方便使用 `Lambda` 表达式。
+在Forest中的回调函数使用单方法的接口定义，这样可以使您在 `Java 8` 或 `Kotlin` 语言中方便使用 `Lambda` 表达式。
 
 使用的时候只需在接口方法加入`OnSuccess<T>`类型或`OnError<T>`类型的参数：
 
@@ -540,6 +540,9 @@ myClient.send("foo", (String resText) -> {
 在异步请求中只能通`OnSuccess<T>`回调函数接或`Future`返回值接受数据。
 而在同步请求中，`OnSuccess<T>`回调函数和任何类型的返回值都能接受到请求响应的数据。
 `OnError`回调函数可以用于异常处理，一般在同步请求中使用`try-catch`也能达到同样的效果。
+
+## 3.8 异步请求
+
 
 
 # 四. 配置
