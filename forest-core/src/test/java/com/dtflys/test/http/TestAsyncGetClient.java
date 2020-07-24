@@ -18,6 +18,8 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.client.GetClient;
+import com.dtflys.test.model.Result;
+import com.dtflys.test.model.TestResult;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -81,6 +83,22 @@ public class TestAsyncGetClient extends BaseClientTest {
         Thread.sleep(2000L);
         assertTrue(success.get());
     }
+
+    @Test
+    public void testAsyncSimpleGet2() throws InterruptedException {
+        final AtomicBoolean success = new AtomicBoolean(false);
+        getClient.asyncSimpleGet2(
+                (data, request, response) -> {
+                    log.info("data: " + data.getStatus());
+                    success.set(true);
+                    assertEquals(AsyncGetMockServer.EXPECTED, data);
+                });
+        log.info("send async get request");
+        assertFalse(success.get());
+        Thread.sleep(2000L);
+        assertTrue(success.get());
+    }
+
 
 
     @Test

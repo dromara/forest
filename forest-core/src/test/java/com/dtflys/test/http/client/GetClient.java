@@ -9,6 +9,7 @@ import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.test.http.model.JsonTestUser;
+import com.dtflys.test.model.TestResult;
 
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -76,6 +77,22 @@ public interface GetClient {
             headers = {"Accept:text/plan"}
     )
     void asyncSimpleGet(OnSuccess<String> onSuccess);
+
+    @Request(
+            url = "http://localhost:5000/hello/user?username=foo",
+            dataType = "json",
+            async = true,
+            headers = {"Accept:text/plan"}
+    )
+    void asyncSimpleGet2(OnSuccess<TestResult> onSuccess);
+
+    @Request(
+            url = "http://localhost:5000/hello/user?username=foo",
+            dataType = "json",
+            async = true,
+            headers = {"Accept:text/plan"}
+    )
+    void asyncSimpleGet3(OnSuccess<TestResult<JsonTestUser>> onSuccess);
 
     @Request(
             url = "http://localhost:5000/hello/user?username=foo",
