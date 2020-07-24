@@ -554,7 +554,7 @@ myClient.send("foo", (String resText) -> {
 void asyncGet(OnSuccess<String> onSuccess);
 ```
 
-一般情况下，异步请求都通过`OnSuccess<T>`回调函数来接受响应返回的数据，而不是通过接口方法的返回值，所以一般返回值类型会定义为`void`。
+一般情况下，异步请求都通过`OnSuccess<T>`回调函数来接受响应返回的数据，而不是通过接口方法的返回值，所以这里的返回值类型一般会定义为`void`。
 
 ?> 关于回调函数的使用请参见 [3.7 回调函数](##_37-回调函数)
 
