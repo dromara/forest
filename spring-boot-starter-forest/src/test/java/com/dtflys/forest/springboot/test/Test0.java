@@ -13,8 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test0")
@@ -40,6 +39,7 @@ public class Test0 {
         assertEquals("SSLv3", config0.getSslProtocol());
         assertEquals("http://www.thebeastshop.com", config0.getVariableValue("baseUrl"));
         assertEquals("xxx", config0.getVariableValue("myName"));
+        assertTrue(!config0.isLogEnabled());
         assertEquals(Integer.valueOf(12), config0.getVariableValue("myCount"));
     }
 
