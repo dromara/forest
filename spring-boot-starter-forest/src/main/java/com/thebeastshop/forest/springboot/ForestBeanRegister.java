@@ -56,6 +56,7 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
                 .addPropertyValue("timeout", forestConfigurationProperties.getTimeout())
                 .addPropertyValue("connectTimeout", forestConfigurationProperties.getConnectTimeout())
                 .addPropertyValue("retryCount", forestConfigurationProperties.getRetryCount())
+                .addPropertyValue("logEnabled", forestConfigurationProperties.isLogEnabled())
                 .addPropertyValue("backendName", forestConfigurationProperties.getBackend())
                 .addPropertyValue("interceptors", forestConfigurationProperties.getInterceptors())
                 .addPropertyValue("sslProtocol", forestConfigurationProperties.getSslProtocol())

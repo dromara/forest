@@ -10,8 +10,6 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
 import org.apache.http.client.methods.HttpRequestBase;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
@@ -21,6 +19,8 @@ import com.dtflys.forest.backend.httpclient.response.HttpclientResponseHandler;
 import com.dtflys.forest.handler.ResponseHandler;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.mapping.MappingTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Date;
@@ -31,7 +31,7 @@ import java.util.List;
  * @since 2016-06-14
  */
 public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> extends AbstractHttpExecutor {
-    private static Log log = LogFactory.getLog(AbstractHttpclientExecutor.class);
+    private static Logger log = LoggerFactory.getLogger(AbstractHttpclientExecutor.class);
 
     protected final HttpclientResponseHandler httpclientResponseHandler;
     protected String url = buildUrl();

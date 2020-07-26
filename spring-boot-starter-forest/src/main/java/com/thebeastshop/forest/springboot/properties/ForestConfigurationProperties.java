@@ -49,6 +49,11 @@ public class ForestConfigurationProperties {
     private int retryCount = 0;
 
     /**
+     * Enable print log of request
+     */
+    private boolean logEnabled = true;
+
+    /**
      * default SSL protocol for https requests
      */
     private String sslProtocol = SSLUtils.TLSv1_2;
@@ -129,6 +134,14 @@ public class ForestConfigurationProperties {
 
     public void setRetryCount(int retryCount) {
         this.retryCount = retryCount;
+    }
+
+    public boolean isLogEnabled() {
+        return logEnabled;
+    }
+
+    public void setLogEnabled(boolean logEnabled) {
+        this.logEnabled = logEnabled;
     }
 
     public String getSslProtocol() {

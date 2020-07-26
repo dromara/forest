@@ -32,8 +32,6 @@ import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.ssl.SSLUtils;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import com.dtflys.forest.backend.HttpBackendSelector;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.json.JSONConverterSelector;
@@ -45,6 +43,8 @@ import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.filter.JSONFilter;
 import com.dtflys.forest.filter.XmlFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.*;
@@ -56,7 +56,7 @@ import java.util.*;
  */
 public class ForestConfiguration implements Serializable {
 
-    private static Log log = LogFactory.getLog(ForestConfiguration.class);
+    private static Logger log = LoggerFactory.getLogger(ForestConfiguration.class);
 
     private static ForestConfiguration defaultConfiguration = configuration();
 

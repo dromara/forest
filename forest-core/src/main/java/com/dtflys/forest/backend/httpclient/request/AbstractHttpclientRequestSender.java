@@ -4,6 +4,8 @@ import com.dtflys.forest.backend.httpclient.conn.HttpclientConnectionManager;
 import com.dtflys.forest.http.ForestRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -11,7 +13,7 @@ import org.apache.commons.logging.LogFactory;
  * @since 2017-07-21 15:53
  */
 public abstract class AbstractHttpclientRequestSender implements HttpclientRequestSender {
-    private static Log log = LogFactory.getLog(AbstractHttpclientRequestSender.class);
+    private static Logger log = LoggerFactory.getLogger(AbstractHttpclientRequestSender.class);
 
     protected final HttpclientConnectionManager connectionManager;
 
