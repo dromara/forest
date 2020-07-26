@@ -5,12 +5,10 @@ import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.mapping.MappingTemplate;
+import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
-import okhttp3.FormBody;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
+import okhttp3.*;
 import okhttp3.internal.Util;
 
 import java.nio.charset.Charset;
@@ -24,6 +22,7 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
 
 
     protected abstract void setBody(Request.Builder builder, RequestBody body);
+
     @Override
     protected void setStringBody(Request.Builder builder, String text, String charset, String contentType) {
         MediaType mediaType = MediaType.parse(contentType);
@@ -50,7 +49,7 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
     }
 
     @Override
-    protected void setFormData(Request.Builder builder, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList) {
+    protected void setFormBody(Request.Builder builder, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList) {
         FormBody.Builder bodyBuilder = new FormBody.Builder();
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         for (int i = 0; i < nameValueList.size(); i++) {
@@ -65,5 +64,27 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
         setBody(builder, body);
     }
 
+    @Override
+    protected void setFileBody(Request.Builder builder, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList, List<ForestMultipart> multiparts) {
+        MultipartBody.Builder bodyBuilder = new MultipartBody.Builder();
+        MediaType mediaType = MediaType.parse(contentType);
+        bodyBuilder.setType(mediaType);
+        MultipartBody body = bodyBuilder.build();
 
+        ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
+        for (int i = 0; i < nameValueList.size(); i++) {
+            RequestNameValue nameValue = nameValueList.get(i);
+            if (nameValue.isInQuery()) continue;
+            String name = nameValue.getName();
+            Object value = nameValue.getValue();
+            bodyBuilder.addFormDataPart(name, MappingTemplate.getParameterValue(jsonConverter, value));
+        }
+        for (ForestMultipart multipart : multiparts) {
+            MediaType fileMediaType = MediaType.parse(multipart.getContentType());
+            RequestBody fileBody = RequestBody.create(fileMediaType, multipart.getBytes());
+            bodyBuilder.addFormDataPart(multipart.getName(), multipart.getOriginalFileName(), fileBody);
+        }
+
+        setBody(builder, body);
+    }
 }

@@ -39,7 +39,7 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
             httpReq.setEntity(entity);
     }
 
-    protected void setFormData(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList) {
+    protected void setFormBody(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList) {
         List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         for (int i = 0; i < nameValueList.size(); i++) {

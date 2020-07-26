@@ -1,9 +1,6 @@
 package com.dtflys.forest.reflection;
 
-import com.dtflys.forest.annotation.DataObject;
-import com.dtflys.forest.annotation.DataParam;
-import com.dtflys.forest.annotation.DataVariable;
-import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.annotation.*;
 import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.config.ForestConfiguration;
@@ -17,6 +14,7 @@ import com.dtflys.forest.interceptor.InterceptorFactory;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingVariable;
+import com.dtflys.forest.multipart.ForestMultipartFactory;
 import com.dtflys.forest.proxy.InterfaceProxyHandler;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.utils.ForestDataType;
@@ -58,7 +56,8 @@ public class ForestMethod<T> implements VariableScope {
     private MappingTemplate[] dataTemplateArray;
     private MappingTemplate[] headerTemplateArray;
     private MappingParameter[] parameterTemplateArray;
-    private List<MappingParameter> namedParameters = new ArrayList<MappingParameter>();
+    private List<MappingParameter> namedParameters = new ArrayList<>();
+    private List<ForestMultipartFactory> multipartFactories = new ArrayList<>();
     private Map<String, MappingVariable> variables = new HashMap<String, MappingVariable>();
     private MappingParameter onSuccessParameter = null;
     private MappingParameter onErrorParameter = null;
@@ -293,6 +292,12 @@ public class ForestMethod<T> implements VariableScope {
                 }
                 processParameterFilter(parameter, filterName);
                 namedParameters.add(parameter);
+            } else if (ann instanceof DataFile) {
+                DataFile dataAnn = (DataFile) ann;
+                String name = dataAnn.value();
+                String fileName = dataAnn.fileName();
+                ForestMultipartFactory factory = ForestMultipartFactory.getFactory(paramType);
+                multipartFactories.add(factory);
             }
         }
     }

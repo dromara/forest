@@ -24,6 +24,7 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.retryer.Retryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.callback.OnError;
@@ -35,8 +36,6 @@ import com.dtflys.forest.backend.HttpExecutor;
 import com.dtflys.forest.handler.ResponseHandler;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorChain;
-import com.dtflys.forest.mapping.MappingTemplate;
-import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
@@ -77,6 +76,8 @@ public class ForestRequest<T> {
     private Map<String, Object> data = new LinkedHashMap<String, Object>();
 
     private Map<String, Object> headers = new LinkedHashMap<>();
+
+    private List<ForestMultipart> multiparts = new LinkedList<>();
 
     private Object[] arguments;
 
@@ -277,6 +278,14 @@ public class ForestRequest<T> {
     public ForestRequest addHeaders(List<RequestNameValue> headers) {
         putMapAddList(this.headers, headers);
         return this;
+    }
+
+    public List<ForestMultipart> getMultiparts() {
+        return multiparts;
+    }
+
+    public void setMultiparts(List<ForestMultipart> multiparts) {
+        this.multiparts = multiparts;
     }
 
     private void putMapAddList(Map<String, Object> map, List<RequestNameValue> source) {
