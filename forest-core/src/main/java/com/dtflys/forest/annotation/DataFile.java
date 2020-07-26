@@ -10,4 +10,8 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface DataFile {
+
+    String value();
+
+    String fileName() default "";
 }
