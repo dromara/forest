@@ -138,4 +138,13 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
         registerScanner(forestConfigurationProperties);
     }
 
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        return bean;
+    }
+
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        return bean;
+    }
 }
