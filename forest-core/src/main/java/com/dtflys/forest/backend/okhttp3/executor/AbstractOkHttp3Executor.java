@@ -19,8 +19,8 @@ import com.dtflys.forest.mapping.MappingTemplate;
 import okio.BufferedSink;
 import okio.Okio;
 import okio.Sink;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Date;
@@ -33,7 +33,7 @@ import java.util.List;
  */
 public abstract class AbstractOkHttp3Executor implements HttpExecutor {
 
-    private final static Log log = LogFactory.getLog(AbstractOkHttp3Executor.class);
+    private final static Logger log = LoggerFactory.getLogger(AbstractOkHttp3Executor.class);
 
     protected final ForestRequest request;
 
@@ -235,6 +235,7 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
                 execute(responseHandler, retryCount + 1);
             }
             ForestResponse response = factory.createResponse(request, okResponse);
+            logResponse(startTime, response);
             okHttp3ResponseHandler.handleSync(okResponse, response);
         }
     }

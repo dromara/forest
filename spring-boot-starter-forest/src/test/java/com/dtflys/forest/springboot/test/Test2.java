@@ -39,6 +39,7 @@ public class Test2 {
         assertEquals(Integer.valueOf(6000), forestConfiguration.getTimeout());
         assertEquals(Integer.valueOf(5000), forestConfiguration.getConnectTimeout());
         assertEquals(Integer.valueOf(0), forestConfiguration.getRetryCount());
+        assertTrue(forestConfiguration.isLogEnabled());
         assertEquals(SpringInterceptorFactory.class, forestConfiguration.getInterceptorFactory().getClass());
         assertEquals(1, forestConfiguration.getInterceptors().size());
         assertEquals(GlobalInterceptor.class, forestConfiguration.getInterceptors().get(0));

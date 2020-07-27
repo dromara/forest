@@ -2,12 +2,12 @@ package com.dtflys.forest.schema;
 
 import com.dtflys.forest.ssl.SpringSSLKeyStore;
 import com.dtflys.forest.utils.ClientFactoryBeanUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
@@ -28,7 +28,7 @@ import java.util.Map;
  * @since 2017-04-21 14:49
  */
 public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionParser {
-    private static Log log = LogFactory.getLog(ForestConfigurationBeanDefinitionParser.class);
+    private static Logger log = LoggerFactory.getLogger(ForestConfigurationBeanDefinitionParser.class);
 
     private final static Class configurationBeanClass = ForestConfiguration.class;
     private final static Class sslKeyStoreBeanClass = SpringSSLKeyStore.class;

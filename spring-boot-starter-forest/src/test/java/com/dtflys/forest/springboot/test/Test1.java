@@ -11,8 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 
 @RunWith(SpringRunner.class)
@@ -35,6 +34,7 @@ public class Test1 {
         assertEquals(Integer.valueOf(5000), forestConfiguration.getTimeout());
         assertEquals(Integer.valueOf(4000), forestConfiguration.getConnectTimeout());
         assertEquals(Integer.valueOf(0), forestConfiguration.getRetryCount());
+        assertTrue(forestConfiguration.isLogEnabled());
         assertEquals("okhttp3", forestConfiguration.getBackend().getName());
         assertEquals("TLSv1.2", forestConfiguration.getSslProtocol());
     }

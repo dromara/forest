@@ -7,8 +7,8 @@
 <a href="https://travis-ci.org/github/mySingleLive/forest">
     <img src="https://api.travis-ci.org/mySingleLive/forest.svg?branch=master&status=passed" alt="Build">
 </a>
-<a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.3.2/jar">
-    <img src="https://img.shields.io/badge/maven%20central-1.3.2-brightgreen.svg" alt="Maven Central">
+<a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.3.3/jar">
+    <img src="https://img.shields.io/badge/maven%20central-1.3.3-brightgreen.svg" alt="Maven Central">
 </a>
 <a href="https://codecov.io/gh/mySingleLive/forest">
     <img src="https://codecov.io/gh/mySingleLive/forest/branch/master/graphs/badge.svg?branch=master" alt="Codecov">
@@ -62,7 +62,7 @@ Forest是一个高层的、极简的轻量级HTTP调用API框架。<br>
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>spring-boot-starter-forest</artifactId>
-    <version>1.3.2</version>
+    <version>1.3.3</version>
 </dependency>
 ```
 
@@ -121,9 +121,11 @@ System.out.println(result);
 
 #### 详细文档请看：[dt_flys.gitee.io/forest](https://dt_flys.gitee.io/forest)
 
-### 微信交流群:<br>
+### 联系作者:<br>
 
-![avatar](https://images.gitee.com/uploads/images/2020/0721/153853_a66ca21c_1216742.png)
+亲，进群前记得先star一下哦~
+
+![avatar](https://dt_flys.gitee.io/forest/media/wechat_qr.png)
 
 项目协议
 --------------------------

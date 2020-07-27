@@ -2,8 +2,8 @@ package com.dtflys.forest.schema;
 
 import com.dtflys.forest.beans.ClientFactoryBean;
 import com.dtflys.forest.utils.ClientFactoryBeanUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
@@ -15,7 +15,7 @@ import org.w3c.dom.Element;
  * @since 2017-04-24 19:49
  */
 public class ForestClientBeanDefinitionParser implements BeanDefinitionParser {
-    private static Log log = LogFactory.getLog(ForestConfigurationBeanDefinitionParser.class);
+    private static Logger log = LoggerFactory.getLogger(ForestConfigurationBeanDefinitionParser.class);
 
     private final Class factoryBeanClass = ClientFactoryBean.class;
 

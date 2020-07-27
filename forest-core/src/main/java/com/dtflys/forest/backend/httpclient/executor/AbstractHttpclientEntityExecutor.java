@@ -2,11 +2,11 @@ package com.dtflys.forest.backend.httpclient.executor;
 
 import com.dtflys.forest.backend.httpclient.body.HttpclientBodyBuilder;
 import com.dtflys.forest.http.ForestRequest;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import com.dtflys.forest.backend.httpclient.request.HttpclientRequestSender;
 import com.dtflys.forest.backend.httpclient.response.HttpclientResponseHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 
@@ -16,7 +16,7 @@ import java.io.*;
  */
 public abstract class AbstractHttpclientEntityExecutor<T extends HttpEntityEnclosingRequestBase> extends AbstractHttpclientExecutor<T> {
 
-    private static Log log = LogFactory.getLog(HttpclientPostExecutor.class);
+    private static Logger log = LoggerFactory.getLogger(HttpclientPostExecutor.class);
 
     public AbstractHttpclientEntityExecutor(ForestRequest request, HttpclientResponseHandler httpclientResponseHandler, HttpclientRequestSender requestSender) {
         super(request, httpclientResponseHandler, requestSender);

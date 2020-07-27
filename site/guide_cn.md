@@ -56,11 +56,11 @@ Forest 1.0.x 和 Forest 1.1.x 基于 JDK 1.7, Forest 1.2.x及以上版本基于 
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>spring-boot-starter-forest</artifactId>
-    <version>1.3.2</version>
+    <version>1.3.3</version>
 </dependency>
 ```
 
-最新版本为<font color=red>_1.3.2_</font>，为稳定版本
+最新版本为<font color=red>_1.3.3_</font>，为稳定版本
 
 ## 2.2 在非 Spring Boot 项目中安装
 
@@ -87,11 +87,11 @@ Forest 1.0.x 和 Forest 1.1.x 基于 JDK 1.7, Forest 1.2.x及以上版本基于 
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-core</artifactId>
-    <version>1.3.2</version>
+    <version>1.3.3</version>
 </dependency>
 ```
 
-最新版本为<font color=red>_1.3.2_</font>，为稳定版本
+最新版本为<font color=red>_1.3.3_</font>，为稳定版本
 
 
 # 三. 构建请求接口
@@ -218,7 +218,7 @@ public interface MyClient {
 
 ## 3.4 HTTP Header
 
-在[4.2](##_42-稍复杂点的请求定义)的例子中，我们已经知道了可以通过`@Request`注解的`headers`属性设置一条 HTTP 请求头。
+在[4.2](###_42-稍复杂点的请求定义)的例子中，我们已经知道了可以通过`@Request`注解的`headers`属性设置一条 HTTP 请求头。
 
 现在我们来看看如何添加多条请求头
 
@@ -434,7 +434,7 @@ myClient.postXml("foo", "bar");
 
 第二步：给参数加上`@DataParam`注解并定义名称。
 
-?> 关于`@DataParam`注解具体使用可以参见 [5.2 @DataParam 参数绑定](##_52-dataparam-参数绑定)
+?> 关于`@DataParam`注解具体使用可以参见 [5.2 @DataParam 参数绑定](###_52-dataparam-参数绑定)
 
 第三步：设置`contentType`或请求头`ContentType`，要设置成什么`contentType`取决于你想要 Body 中数据是什么格式。
 
@@ -510,7 +510,7 @@ Forest需要指明返回类型（如`User`）的同时，也需要指明数据�
 
 在Forest中的回调函数使用单方法的接口定义，这样可以使您在 `Java 8` 或 `Kotlin` 语言中方便使用 `Lambda` 表达式。
 
-使用的时候只需在接口方法加入`OnSuccess<T>`类型或`OnError<T>`类型的参数：
+使用的时候只需在接口方法加入`OnSuccess<T>`类型或`OnError`类型的参数：
 
 ```java
 @Request(
@@ -556,7 +556,7 @@ void asyncGet(String username， OnSuccess<String> onSuccess);
 
 一般情况下，异步请求都通过`OnSuccess<T>`回调函数来接受响应返回的数据，而不是通过接口方法的返回值，所以这里的返回值类型一般会定义为`void`。
 
-?> 关于回调函数的使用请参见 [3.7 回调函数](##_37-回调函数)
+?> 关于回调函数的使用请参见 [3.7 回调函数](###_37-回调函数)
 
 ```java
 // 异步执行
