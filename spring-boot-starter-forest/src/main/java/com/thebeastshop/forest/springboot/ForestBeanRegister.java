@@ -124,7 +124,7 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
         if (resourceLoader != null) {
             scanner.setResourceLoader(resourceLoader);
         }
-        scanner.registerFilters();
+//        scanner.registerFilters();
         if (basePackages == null || basePackages.size() == 0) {
             return scanner;
         }
@@ -138,4 +138,13 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
         registerScanner(forestConfigurationProperties);
     }
 
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        return bean;
+    }
+
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        return bean;
+    }
 }
