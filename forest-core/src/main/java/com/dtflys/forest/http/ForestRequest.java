@@ -284,8 +284,9 @@ public class ForestRequest<T> {
         return multiparts;
     }
 
-    public void setMultiparts(List<ForestMultipart> multiparts) {
+    public ForestRequest setMultiparts(List<ForestMultipart> multiparts) {
         this.multiparts = multiparts;
+        return this;
     }
 
     private void putMapAddList(Map<String, Object> map, List<RequestNameValue> source) {

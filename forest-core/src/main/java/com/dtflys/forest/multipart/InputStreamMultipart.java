@@ -1,5 +1,6 @@
 package com.dtflys.forest.multipart;
 
+import java.io.File;
 import java.io.InputStream;
 
 public class InputStreamMultipart implements ForestMultipart {
@@ -33,6 +34,16 @@ public class InputStreamMultipart implements ForestMultipart {
     @Override
     public InputStream getInputStream() {
         return inputStream;
+    }
+
+    @Override
+    public boolean isFile() {
+        return false;
+    }
+
+    @Override
+    public File getFile() {
+        return null;
     }
 
 }

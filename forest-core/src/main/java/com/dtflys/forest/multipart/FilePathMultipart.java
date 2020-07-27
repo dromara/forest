@@ -31,8 +31,8 @@ public class FilePathMultipart implements ForestMultipart {
         if (StringUtils.isNotBlank(fileName)) {
             return fileName;
         }
-        filePath.split("(/|\\\\\\\\)");
-        return null;
+        String[] strs = filePath.split("(/|\\\\)");
+        return strs[strs.length - 1];
     }
 
     @Override
@@ -42,7 +42,7 @@ public class FilePathMultipart implements ForestMultipart {
 
     @Override
     public InputStream getInputStream() {
-        File file = new File(filePath);
+        File file = getFile();
         if (!file.exists()) {
             throw new ForestFileNotFoundException(filePath);
         }
@@ -51,5 +51,16 @@ public class FilePathMultipart implements ForestMultipart {
         } catch (FileNotFoundException e) {
             throw new ForestRuntimeException(e);
         }
+    }
+
+    @Override
+    public boolean isFile() {
+        return true;
+    }
+
+    @Override
+    public File getFile() {
+        File file = new File(filePath);
+        return file;
     }
 }

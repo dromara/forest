@@ -50,4 +50,14 @@ public class FileMultipart implements ForestMultipart {
         }
     }
 
+    @Override
+    public boolean isFile() {
+        return true;
+    }
+
+    @Override
+    public File getFile() {
+        return file;
+    }
+
 }

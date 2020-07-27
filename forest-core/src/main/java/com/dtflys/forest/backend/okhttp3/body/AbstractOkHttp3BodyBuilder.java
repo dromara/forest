@@ -69,7 +69,6 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
         MultipartBody.Builder bodyBuilder = new MultipartBody.Builder();
         MediaType mediaType = MediaType.parse(contentType);
         bodyBuilder.setType(mediaType);
-        MultipartBody body = bodyBuilder.build();
 
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         for (int i = 0; i < nameValueList.size(); i++) {
@@ -81,10 +80,16 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
         }
         for (ForestMultipart multipart : multiparts) {
             MediaType fileMediaType = MediaType.parse(multipart.getContentType());
-            RequestBody fileBody = RequestBody.create(fileMediaType, multipart.getBytes());
+            RequestBody fileBody;
+            if (multipart.isFile()) {
+                fileBody = RequestBody.create(fileMediaType, multipart.getFile());
+            } else {
+                fileBody = RequestBody.create(fileMediaType, multipart.getBytes());
+            }
             bodyBuilder.addFormDataPart(multipart.getName(), multipart.getOriginalFileName(), fileBody);
         }
 
+        MultipartBody body = bodyBuilder.build();
         setBody(builder, body);
     }
 }

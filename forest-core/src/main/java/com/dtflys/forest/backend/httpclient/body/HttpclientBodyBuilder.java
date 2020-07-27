@@ -4,6 +4,7 @@ import com.dtflys.forest.backend.body.AbstractBodyBuilder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.mapping.MappingTemplate;
+import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.http.NameValuePair;
@@ -62,6 +63,10 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
         }
     }
 
+    @Override
+    protected void setFileBody(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList, List<ForestMultipart> multiparts) {
+
+    }
 
 
 }

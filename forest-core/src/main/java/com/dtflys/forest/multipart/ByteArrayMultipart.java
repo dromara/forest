@@ -1,6 +1,7 @@
 package com.dtflys.forest.multipart;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 
 public class ByteArrayMultipart implements ForestMultipart {
@@ -40,6 +41,16 @@ public class ByteArrayMultipart implements ForestMultipart {
     public InputStream getInputStream() {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
         return byteArrayInputStream;
+    }
+
+    @Override
+    public boolean isFile() {
+        return false;
+    }
+
+    @Override
+    public File getFile() {
+        return null;
     }
 
     @Override

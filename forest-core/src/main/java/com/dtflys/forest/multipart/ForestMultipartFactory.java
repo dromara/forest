@@ -14,7 +14,8 @@ public abstract class ForestMultipartFactory<T> {
 
     private static Map<Class, Class> multipartFactoryMap = new HashMap<>();
 
-    protected ForestMultipartFactory(MappingTemplate nameTemplate, MappingTemplate fileNameTemplate, MappingTemplate contentTypeTemplate) {
+    protected ForestMultipartFactory(int index, MappingTemplate nameTemplate, MappingTemplate fileNameTemplate, MappingTemplate contentTypeTemplate) {
+        this.index = index;
         this.nameTemplate = nameTemplate;
         this.fileNameTemplate = fileNameTemplate;
         this.contentTypeTemplate = contentTypeTemplate;
@@ -27,14 +28,15 @@ public abstract class ForestMultipartFactory<T> {
 
     public static <P, R extends ForestMultipartFactory<P>> ForestMultipartFactory<P> getFactory(
             Class<P> paramType,
+            int index,
             MappingTemplate nameTemplate,
             MappingTemplate fileNameTemplate,
             MappingTemplate contentTypeTemplate) {
         Class<R> factoryClass = multipartFactoryMap.get(paramType);
         if (factoryClass != null) {
             try {
-                Constructor<R> constructor = factoryClass.getConstructor(MappingTemplate.class, MappingTemplate.class, MappingTemplate.class);
-                R factory = constructor.newInstance(nameTemplate, fileNameTemplate, contentTypeTemplate);
+                Constructor<R> constructor = factoryClass.getConstructor(int.class, MappingTemplate.class, MappingTemplate.class, MappingTemplate.class);
+                R factory = constructor.newInstance(index, nameTemplate, fileNameTemplate, contentTypeTemplate);
                 return factory;
             } catch (NoSuchMethodException e) {
                 throw new ForestRuntimeException(e);
@@ -56,11 +58,17 @@ public abstract class ForestMultipartFactory<T> {
         registerFactory(byte[].class, ByteArrayMultipartFactory.class);
     }
 
+    private final int index;
+
     private final MappingTemplate nameTemplate;
 
     private final MappingTemplate fileNameTemplate;
 
     private final MappingTemplate contentTypeTemplate;
+
+    public int getIndex() {
+        return index;
+    }
 
     public MappingTemplate getNameTemplate() {
         return nameTemplate;
@@ -78,8 +86,8 @@ public abstract class ForestMultipartFactory<T> {
 
     public static class FileMultipartFactory extends ForestMultipartFactory<File> {
 
-        public FileMultipartFactory(MappingTemplate nameTemplate, MappingTemplate fileNameTemplate, MappingTemplate contentTypeTemplate) {
-            super(nameTemplate, fileNameTemplate, contentTypeTemplate);
+        public FileMultipartFactory(int index, MappingTemplate nameTemplate, MappingTemplate fileNameTemplate, MappingTemplate contentTypeTemplate) {
+            super(index, nameTemplate, fileNameTemplate, contentTypeTemplate);
         }
 
         @Override
@@ -91,8 +99,8 @@ public abstract class ForestMultipartFactory<T> {
 
     public static class FilePathMultipartFactory extends ForestMultipartFactory<String> {
 
-        public FilePathMultipartFactory(MappingTemplate nameTemplate, MappingTemplate fileNameTemplate, MappingTemplate contentTypeTemplate) {
-            super(nameTemplate, fileNameTemplate, contentTypeTemplate);
+        public FilePathMultipartFactory(int index, MappingTemplate nameTemplate, MappingTemplate fileNameTemplate, MappingTemplate contentTypeTemplate) {
+            super(index, nameTemplate, fileNameTemplate, contentTypeTemplate);
         }
 
         @Override
@@ -103,8 +111,8 @@ public abstract class ForestMultipartFactory<T> {
 
     public static class InputStreamMultipartFactory extends ForestMultipartFactory<InputStream> {
 
-        public InputStreamMultipartFactory(MappingTemplate nameTemplate, MappingTemplate fileNameTemplate, MappingTemplate contentTypeTemplate) {
-            super(nameTemplate, fileNameTemplate, contentTypeTemplate);
+        public InputStreamMultipartFactory(int index, MappingTemplate nameTemplate, MappingTemplate fileNameTemplate, MappingTemplate contentTypeTemplate) {
+            super(index, nameTemplate, fileNameTemplate, contentTypeTemplate);
         }
 
         @Override
@@ -115,8 +123,8 @@ public abstract class ForestMultipartFactory<T> {
 
     public static class ByteArrayMultipartFactory extends ForestMultipartFactory<byte[]> {
 
-        public ByteArrayMultipartFactory(MappingTemplate nameTemplate, MappingTemplate fileNameTemplate, MappingTemplate contentTypeTemplate) {
-            super(nameTemplate, fileNameTemplate, contentTypeTemplate);
+        public ByteArrayMultipartFactory(int index, MappingTemplate nameTemplate, MappingTemplate fileNameTemplate, MappingTemplate contentTypeTemplate) {
+            super(index, nameTemplate, fileNameTemplate, contentTypeTemplate);
         }
 
         @Override

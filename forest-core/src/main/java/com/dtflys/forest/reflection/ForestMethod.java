@@ -14,6 +14,7 @@ import com.dtflys.forest.interceptor.InterceptorFactory;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingVariable;
+import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.multipart.ForestMultipartFactory;
 import com.dtflys.forest.proxy.InterfaceProxyHandler;
 import com.dtflys.forest.ssl.SSLKeyStore;
@@ -299,7 +300,7 @@ public class ForestMethod<T> implements VariableScope {
                 MappingTemplate nameTemplate = makeTemplate(name);
                 MappingTemplate fileNameTemplate = makeTemplate(fileName);
                 ForestMultipartFactory factory = ForestMultipartFactory.getFactory(
-                        paramType, nameTemplate, fileNameTemplate, contentTypeTemplate);
+                        paramType, paramIndex, nameTemplate, fileNameTemplate, contentTypeTemplate);
                 multipartFactories.add(factory);
             }
         }
@@ -429,9 +430,32 @@ public class ForestMethod<T> implements VariableScope {
             }
         }
 
+        List<ForestMultipart> multiparts = new ArrayList<>(multipartFactories.size());
+
         for (int i = 0; i < multipartFactories.size(); i++) {
             ForestMultipartFactory factory = multipartFactories.get(i);
             MappingTemplate nameTemplate = factory.getNameTemplate();
+            MappingTemplate fileNameTemplate = factory.getFileNameTemplate();
+            MappingTemplate contentTypeTemplate = factory.getContentTypeTemplate();
+            int index = factory.getIndex();
+            String name = null;
+            String fileName = null;
+            String contentType = null;
+            if (nameTemplate != null) {
+                name = nameTemplate.render(args);
+            }
+            if (fileNameTemplate != null) {
+                fileName = fileNameTemplate.render(args);
+            }
+            if (contentTypeTemplate != null) {
+                contentType = contentTypeTemplate.render(args);
+            }
+            Object data = args[index];
+            if (data == null) {
+                continue;
+            }
+            ForestMultipart multipart = factory.create(name, fileName, data, contentType);
+            multiparts.add(multipart);
         }
 
         // setup ssl keystore
@@ -451,6 +475,7 @@ public class ForestMethod<T> implements VariableScope {
                 .setContentType(renderedContentType)
                 .setArguments(args)
                 .setLogEnable(logEnable)
+                .setMultiparts(multiparts)
                 .setAsync(async);
         if (configuration.getDefaultParameters() != null) {
             request.addData(configuration.getDefaultParameters());
