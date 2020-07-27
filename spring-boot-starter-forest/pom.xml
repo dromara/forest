@@ -6,12 +6,12 @@
 
     <groupId>com.dtflys.forest</groupId>
     <artifactId>spring-boot-starter-forest</artifactId>
-    <version>1.3.3</version>
+    <version>1.3.4</version>
 
     <parent>
         <groupId>com.dtflys.forest</groupId>
         <artifactId>forest</artifactId>
-        <version>1.3.3</version>
+        <version>1.3.4</version>
     </parent>
 
     <properties>
@@ -43,6 +43,12 @@
             <artifactId>forest-spring</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
