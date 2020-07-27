@@ -296,7 +296,10 @@ public class ForestMethod<T> implements VariableScope {
                 DataFile dataAnn = (DataFile) ann;
                 String name = dataAnn.value();
                 String fileName = dataAnn.fileName();
-                ForestMultipartFactory factory = ForestMultipartFactory.getFactory(paramType);
+                MappingTemplate nameTemplate = makeTemplate(name);
+                MappingTemplate fileNameTemplate = makeTemplate(fileName);
+                ForestMultipartFactory factory = ForestMultipartFactory.getFactory(
+                        paramType, nameTemplate, fileNameTemplate, contentTypeTemplate);
                 multipartFactories.add(factory);
             }
         }
@@ -424,6 +427,11 @@ public class ForestMethod<T> implements VariableScope {
                     nameValueList.add(nameValue);
                 }
             }
+        }
+
+        for (int i = 0; i < multipartFactories.size(); i++) {
+            ForestMultipartFactory factory = multipartFactories.get(i);
+            MappingTemplate nameTemplate = factory.getNameTemplate();
         }
 
         // setup ssl keystore

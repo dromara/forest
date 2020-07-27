@@ -6,12 +6,12 @@
 
     <groupId>com.dtflys.forest</groupId>
     <artifactId>spring-boot-starter-forest</artifactId>
-    <version>1.3.3</version>
+    <version>1.4.0-ALPHA1</version>
 
     <parent>
         <groupId>com.dtflys.forest</groupId>
         <artifactId>forest</artifactId>
-        <version>1.3.3</version>
+        <version>1.4.0-ALPHA1</version>
     </parent>
 
     <properties>
