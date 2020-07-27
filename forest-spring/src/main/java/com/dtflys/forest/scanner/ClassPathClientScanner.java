@@ -1,7 +1,5 @@
 package com.dtflys.forest.scanner;
 
-import com.dtflys.forest.beans.ClientFactoryBean;
-import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.utils.ClientFactoryBeanUtils;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
