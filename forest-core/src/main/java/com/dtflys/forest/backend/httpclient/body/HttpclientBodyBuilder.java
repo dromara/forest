@@ -23,8 +23,6 @@ import java.util.*;
 public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> extends AbstractBodyBuilder<T> {
 
 
-
-
     protected void setStringBody(T httpReq, String text, String charset, String contentType) {
             StringEntity entity = new StringEntity(text, charset);
             if (StringUtils.isNotEmpty(charset)) {
@@ -65,6 +63,8 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
 
     @Override
     protected void setFileBody(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList, List<ForestMultipart> multiparts) {
+
+
 
     }
 
