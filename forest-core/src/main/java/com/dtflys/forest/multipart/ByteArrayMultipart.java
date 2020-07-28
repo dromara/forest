@@ -1,5 +1,8 @@
 package com.dtflys.forest.multipart;
 
+import com.dtflys.forest.exceptions.ForestNoFileNameException;
+import com.dtflys.forest.utils.StringUtils;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
@@ -29,7 +32,10 @@ public class ByteArrayMultipart implements ForestMultipart {
 
     @Override
     public String getOriginalFileName() {
-        return name;
+        if (StringUtils.isBlank(fileName)) {
+            throw new ForestNoFileNameException(byte[].class);
+        }
+        return fileName;
     }
 
     @Override

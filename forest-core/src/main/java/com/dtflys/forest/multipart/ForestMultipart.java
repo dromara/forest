@@ -36,6 +36,13 @@ public interface ForestMultipart {
             return byteArrayOutputStream.toByteArray();
         } catch (IOException e) {
             throw new ForestRuntimeException(e);
+        } finally {
+            try {
+                inputStream.close();
+                byteArrayOutputStream.close();
+            } catch (IOException e) {
+                throw new ForestRuntimeException(e);
+            }
         }
     }
 

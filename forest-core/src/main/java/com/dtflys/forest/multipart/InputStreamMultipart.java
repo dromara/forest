@@ -1,5 +1,8 @@
 package com.dtflys.forest.multipart;
 
+import com.dtflys.forest.exceptions.ForestNoFileNameException;
+import com.dtflys.forest.utils.StringUtils;
+
 import java.io.File;
 import java.io.InputStream;
 
@@ -23,6 +26,9 @@ public class InputStreamMultipart implements ForestMultipart {
 
     @Override
     public String getOriginalFileName() {
+        if (StringUtils.isBlank(fileName)) {
+            throw new ForestNoFileNameException(inputStream.getClass());
+        }
         return fileName;
     }
 
