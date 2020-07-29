@@ -1278,13 +1278,79 @@ forest:
 
 随后在某个具体`@Request`中配置其中任意一个`keystore`的`id`都可以
 
-# 八. 模板表达式
+# 八. 异常处理
+
+发送HTTP请求不会总是成功的，总会有失败的情况。Forest提供多种异常处理的方法来处理请求失败的过程，最常用的直接通过`try-catch`，如示例代码所示：
+
+```java
+/**
+ * try-catch方式：捕获ForestNetworkException类的异常对象
+ */
+try {
+    String result = myClient.send();
+} catch (ForestNetworkException ex) {
+    int status = ex.getStatusCode(); // 获取请求响应状态码
+    ForestResponse response = ex.getResponse(); // 获取Response对象
+    String content = response.getContent(); // 获取请求的响应内容
+}
+```
+
+第二种是用回调函数方式，如示例代码所示：
+
+```java
+/**
+ * 在请求接口中定义OnError回调函数类型参数
+ */
+@Request(
+        url = "http://localhost:5000/hello/user",
+        headers = {"Accept:text/plan"},
+        data = "username=${username}"
+)
+String send(@DataVariable("username") String username, OnError onError);
+```
+
+调用的代码如下：
+
+```java
+// 在调用接口时，在Lambda中处理错误结果
+myClient.send("foo",  (ex, request, response) -> {
+    int status = response.getStatusCode(); // 获取请求响应状态码
+    String content = response.getContent(); // 获取请求的响应内容
+});
+```
+
+第三种，用`ForestResponse`类作为请求方法的返回值类型，示例代码如下：
+
+```java
+/**
+ * 用`ForestResponse`类作为请求方法的返回值类型, 其泛型参数代表实际返回数据的类型
+ */
+@Request(
+        url = "http://localhost:5000/hello/user",
+        headers = {"Accept:text/plan"},
+        data = "username=${username}"
+)
+ForestResponse<String> send(@DataVariable("username") String username);
+```
+
+调用和处理的过程如下：
+
+```java
+ForestResponse<String> response = myClient.send("foo");
+// 用isError方法判断请求是否失败, 比如404, 500等情况
+if (response.isError()) {
+    int status = response.getStatusCode(); // 获取请求响应状态码
+    String content = response.getContent(); // 获取请求的响应内容
+}
+```
+
+# 九. 模板表达式
 
 在`@Request`的各大属性中大多数都是用`String`字符串填值的，如果要在这些字符串属性中动态地关联参数数据，用Java原生字符串连接(如`+`)是不行的，而且也不够直观。
 
 所以Forest为了帮助您参数数据动态绑定到这些属性上，提供了模板表达式。
 
-##  8.1 表达式Hello World
+##  9.1 表达式Hello World
 
 Forest的模板表达式是在普通的Java字符串中嵌入`${}`来实现字符串和数据的动态绑定.
 
@@ -1303,13 +1369,13 @@ String send(@DataVariable("name") String name);
 
     http://localhost:8080/hello/world
     
-## 8.2 引用数据
+## 9.2 引用数据
 
 模板表达式最原始的目的就是各种各样的数据动态绑定到HTTP请求的各个属性中，要完成这一步就要实现对外部数据的引用。
 
 Forest的模板表达式提供了两种最基本的数据引用方式：
 
-### 8.2.1 变量名引用
+### 9.2.1 变量名引用
 
 如上面Hello World例子所示，表达式中可以直接引用`@DataVariable`所标注的变量名。除此之外也可以直接引用全局配置中定义的全局变量名。
 
@@ -1334,7 +1400,7 @@ String send();
 这里因为是全局变量，`${a}`和`${b}`的值分别来自全局配置中的变量`a`和`b`的值，也就是`foo`和`bar`，所以并不需要在方法中传入额外的参数。
 
 
-### 8.2.2 参数序号引用
+### 9.2.2 参数序号引用
 
 直接在`${}`中填入从`0`开始的数字，其中的数字代表方法参数的序号，比如`${0}`代表方法的第一个参数，`${1}`代表第二个参数，第n个参数引用用`${n-1}`表示（这里的n是数字，并不是变量名）
 
@@ -1379,7 +1445,7 @@ String send(int num);
 
 这时我们所看到`${$0.toString()}`就我们所期望的`num`参数经过调用`toString()`方法最终返回的结果了。
 
-#### 8.2.2.1 简化与非简化
+#### 9.2.2.1 简化与非简化
 
 说到这里，可能我们有些小伙伴就凌乱了。什么简化的？非简化的？不都是参数序号吗？怎么又变成数字了呢？
 
@@ -1395,13 +1461,13 @@ String send(int num);
 !> 还有不要忘了参数序号只能是`整数`，并且`不能是负的`。
 
 
-#### 8.2.2.1 参数序号总结
+#### 9.2.2.1 参数序号总结
 
 用参数序号方式比变量名方式更为简洁，因为不用定义`@DataVariable`注解，也不用引用冗长的变量名，是目前比较推荐的引用方式。
 
 不过它也有缺点，就是在参数较多的时候较难立刻对应起来，不够直观，比较影响代码可读性。所以还请根据场景和入参的多寡来决定用哪种引用方式。
 
-### 8.2.3 引用对象属性
+### 9.2.3 引用对象属性
 
 模板表达式中除了可以引用变量和参数序号外，还可以引用它们的属性。 
 
@@ -1422,7 +1488,7 @@ String getUser(@DataVariable("user") User user);
 ```
 这里`${user.phone.number}`的结果就相当于调用`user.getPhone().getNumber()`的结果。
 
-### 8.2.3 对象方法调用
+### 9.2.3 对象方法调用
 
 既然模板表示能支持对象属性的引用，那也支持对象方法的调用吗？答案是肯定的，且调用方法的语法与`Java`的一致。
 
@@ -1464,13 +1530,13 @@ String getUser(User user, int phoneIndex);
 ```
 
 
-# 九. 拦截器
+# 十. 拦截器
 
 用过Spring MVC的朋友一定对Spring的拦截器并不陌生，Forest也同样支持针对Forest请求的拦截器。
 
 如果您想在很多个请求发送之前或之后做一些事情（如下日志、计数等等），拦截器就是您的好帮手。
 
-## 9.1 构建拦截器
+## 10.1 构建拦截器
 
 定义一个拦截器需要实现com.dtflys.forest.interceptor.Interceptor接口
 
@@ -1517,7 +1583,7 @@ public class SimpleInterceptor implements Interceptor<String> {
 `Interceptor`接口带有一个泛型参数，其表示的是请求响应后返回的数据类型。
 Interceptor<String>即代表返回的数据类型为`String`。
 
-## 9.2 调用拦截器
+## 10.2 调用拦截器
 
 需要调用拦截器的地方，只需要在该方法的@Request注解中设置`interceptor`属性即可。
 
@@ -1534,14 +1600,14 @@ public interface SimpleClient {
 }
 ```
 
-# 十. 联系作者
+# 十一. 联系作者
 
 您如有问题可以扫码加入微信的技术交流群
 
 ![avatar](https://dt_flys.gitee.io/forest/media/wechat_qr.png)
 
 
-# 十一. 项目协议
+# 十二. 项目协议
 
 The MIT License (MIT)
 
