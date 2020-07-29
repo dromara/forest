@@ -1288,7 +1288,7 @@ forest:
 
 ```java
 /**
- * try-catch方式：捕获ForestNetworkException类的异常对象
+ * try-catch方式：捕获ForestNetworkException异常类的对象
  */
 try {
     String result = myClient.send();
