@@ -8,6 +8,7 @@ import com.dtflys.forest.annotation.DataVariable;
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnSuccess;
+import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.model.JsonTestUser;
 import com.dtflys.test.model.TestResult;
 
@@ -25,6 +26,20 @@ public interface GetClient {
             headers = {"Accept:text/plan"}
     )
     String simpleGet();
+
+
+    @Request(
+            url = "http://localhost:${port}/hello/user?username=foo",
+            headers = {"Accept:text/plan"}
+    )
+    String errorGet(OnError onError);
+
+    @Request(
+            url = "http://localhost:${port}/hello/user?username=foo",
+            headers = {"Accept:text/plan"}
+    )
+    ForestResponse<String> errorGet2();
+
 
     @Request(
             url = "http://localhost:${port}/hello/user",

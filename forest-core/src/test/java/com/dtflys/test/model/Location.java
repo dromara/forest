@@ -41,7 +41,7 @@ public class Location {
 
     private String country;
 
-    private List cross_list;
+    private List<AmapCross> cross_list;
 
     private List road_list;
 
@@ -183,11 +183,11 @@ public class Location {
         this.country = country;
     }
 
-    public List getCross_list() {
+    public List<AmapCross> getCross_list() {
         return cross_list;
     }
 
-    public void setCross_list(List cross_list) {
+    public void setCross_list(List<AmapCross> cross_list) {
         this.cross_list = cross_list;
     }
 
