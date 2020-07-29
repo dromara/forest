@@ -144,6 +144,21 @@ public interface PostClient {
     )
     String postJson10(JsonTestList user);
 
+    @Request(
+            url = "http://localhost:${port}/json",
+            type = "post",
+            data = "${json(user)}",
+            headers = {"Content-Type: application/json"}
+    )
+    String postJson11(@DataVariable("user") JsonTestUser2 user);
+
+    @Request(
+            url = "http://localhost:${port}/json",
+            type = "post",
+            headers = {"Content-Type: application/json"}
+    )
+    String postJson12(@DataObject JsonTestUser2 user);
+
 
     @Request(
             url = "http://localhost:${port}/xml",
