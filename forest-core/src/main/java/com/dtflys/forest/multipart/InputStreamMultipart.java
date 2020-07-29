@@ -6,23 +6,9 @@ import com.dtflys.forest.utils.StringUtils;
 import java.io.File;
 import java.io.InputStream;
 
-public class InputStreamMultipart implements ForestMultipart {
-    private final String name;
-    private final String fileName;
-    private final InputStream inputStream;
-    private final String contentType;
+public class InputStreamMultipart extends ForestMultipart<InputStream> {
 
-    public InputStreamMultipart(String name, String fileName, InputStream inputStream, String contentType) {
-        this.name = name;
-        this.fileName = fileName;
-        this.inputStream = inputStream;
-        this.contentType = contentType;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
+    private InputStream inputStream;
 
     @Override
     public String getOriginalFileName() {
@@ -32,9 +18,10 @@ public class InputStreamMultipart implements ForestMultipart {
         return fileName;
     }
 
+
     @Override
-    public String getContentType() {
-        return contentType;
+    public void setData(InputStream data) {
+        this.inputStream = data;
     }
 
     @Override

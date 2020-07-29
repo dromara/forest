@@ -6,24 +6,10 @@ import com.dtflys.forest.utils.StringUtils;
 
 import java.io.*;
 
-public class FileMultipart implements ForestMultipart {
+public class FileMultipart extends ForestMultipart<File> {
 
-    private final String name;
-    private final String fileName;
-    private final File file;
-    private final String contentType;
+    private File file;
 
-    public FileMultipart(String name, String fileName, File file, String contentType) {
-        this.name = name;
-        this.fileName = fileName;
-        this.file = file;
-        this.contentType = contentType;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
 
     @Override
     public String getOriginalFileName() {
@@ -33,9 +19,10 @@ public class FileMultipart implements ForestMultipart {
         return file.getName();
     }
 
+
     @Override
-    public String getContentType() {
-        return contentType;
+    public void setData(File data) {
+        this.file = data;
     }
 
     @Override

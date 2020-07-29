@@ -7,28 +7,11 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 
-public class ByteArrayMultipart implements ForestMultipart {
+public class ByteArrayMultipart extends ForestMultipart<byte[]> {
 
-    private final String name;
-
-    private final String fileName;
-
-    private final byte[] bytes;
-
-    private final String contentType;
-
-    public ByteArrayMultipart(String name, String fileName, byte[] bytes, String contentType) {
-        this.name = name;
-        this.fileName = fileName;
-        this.bytes = bytes;
-        this.contentType = contentType;
-    }
+    private byte[] bytes;
 
 
-    @Override
-    public String getName() {
-        return name;
-    }
 
     @Override
     public String getOriginalFileName() {
@@ -42,6 +25,12 @@ public class ByteArrayMultipart implements ForestMultipart {
     public String getContentType() {
         return contentType;
     }
+
+    @Override
+    public void setData(byte[] data) {
+        this.bytes = data;
+    }
+
 
     @Override
     public InputStream getInputStream() {
@@ -58,6 +47,7 @@ public class ByteArrayMultipart implements ForestMultipart {
     public File getFile() {
         return null;
     }
+
 
     @Override
     public byte[] getBytes() {

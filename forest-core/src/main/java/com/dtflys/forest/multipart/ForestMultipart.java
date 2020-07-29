@@ -7,23 +7,52 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-public interface ForestMultipart {
+public abstract class ForestMultipart<T> {
 
-    int BUFFER_SIZE = 1024;
+    private int BUFFER_SIZE = 4096;
 
-    String getName();
+    protected String name;
 
-    String getOriginalFileName();
+    protected String fileName;
 
-    String getContentType();
+    protected String contentType;
 
-    InputStream getInputStream();
 
-    boolean isFile();
+    public String getName() {
+        return name;
+    }
 
-    File getFile();
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    default byte[] getBytes() {
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
+    public abstract void setData(T data);
+
+    public abstract String getOriginalFileName();
+
+    public abstract InputStream getInputStream();
+
+    public abstract boolean isFile();
+
+    public abstract File getFile();
+
+    protected byte[] getBytes() {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         InputStream inputStream = getInputStream();
         byte[] buffer = new byte[BUFFER_SIZE];

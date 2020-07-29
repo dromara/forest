@@ -299,7 +299,7 @@ public class ForestMethod<T> implements VariableScope {
                 String fileName = dataAnn.fileName();
                 MappingTemplate nameTemplate = makeTemplate(name);
                 MappingTemplate fileNameTemplate = makeTemplate(fileName);
-                ForestMultipartFactory factory = ForestMultipartFactory.getFactory(
+                ForestMultipartFactory factory = ForestMultipartFactory.createFactory(
                         paramType, paramIndex, nameTemplate, fileNameTemplate, contentTypeTemplate);
                 multipartFactories.add(factory);
             }
