@@ -1617,7 +1617,7 @@ public class SimpleInterceptor implements Interceptor<String> {
 `Interceptor`接口带有一个泛型参数，其表示的是请求响应后返回的数据类型。
 Interceptor<String>即代表返回的数据类型为`String`。
 
-## 10.2 调用拦截器
+## 10.2 配置拦截器
 
 Forest有三个地方可以添加拦截器：`@Request`、`@BaseRequest`、全局配置，这三个地方代表三个不同的作用域。
 
