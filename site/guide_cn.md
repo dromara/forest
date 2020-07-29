@@ -1327,6 +1327,7 @@ myClient.send("foo",  (ex, request, response) -> {
 
 !> 需要注意的是：加上`OnError`回调函数后变不会再向上抛出异常，所有错误信息均通过`OnError`回调函数的参数获得。
 
+
 ## 8.3 ForestResponse返回类型方式
 
 第三种，用`ForestResponse`类作为请求方法的返回值类型，示例代码如下：
@@ -1355,6 +1356,45 @@ if (response.isError()) {
 ```
 
 !> 以`ForestResponse`类为返回值类型的方法也不会向上抛出异常，错误信息均通过`ForestResponse`对象获得。
+
+
+## 8.4 拦截器方式
+
+若要批量处理各种不同请求的异常情况，可以使用拦截器, 并在拦截器的`onError`方法中处理异常，示例代码如下：
+
+````java
+public class ErrorInterceptor implements Interceptor<String> {
+
+    @Override
+    public boolean beforeExecute(ForestRequest request) {
+         // ...
+         return true;
+    }
+
+    @Override
+    public void onSuccess(String data, ForestRequest request, ForestResponse response) {
+        // ...
+         return true;
+    }
+
+    @Override
+    public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
+        int status = response.getStatusCode(); // 获取请求响应状态码
+        String content = response.getContent(); // 获取请求的响应内容
+    }
+
+    /**
+     * 该方法在请求发送之后被调用
+     */
+    @Override
+    public void afterExecute(ForestRequest request, ForestResponse response) {
+        // ...
+    }
+}
+````
+
+?> 关于具体如何使用拦截器请参见 [十. 拦截器](###_十-拦截器)
+
 
 # 九. 模板表达式
 
