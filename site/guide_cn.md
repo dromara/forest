@@ -1375,7 +1375,7 @@ public class ErrorInterceptor implements Interceptor<String> {
 }
 ````
 
-?> 关于具体如何使用拦截器请参见 [十. 拦截器](###_十-拦截器)
+?> 关于具体如何使用拦截器请参见 [十. 拦截器](###十-拦截器)
 
 
 # 九. 模板表达式
