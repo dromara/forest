@@ -1325,7 +1325,7 @@ myClient.send("foo",  (ex, request, response) -> {
 });
 ```
 
-!> 需要注意的是：加上`OnError`回调函数后变不会再向上抛出异常，所有错误信息均通过`OnError`回调函数的参数获得。
+!> 需要注意的是：加上`OnError`回调函数后便不会再向上抛出异常，所有错误信息均通过`OnError`回调函数的参数获得。
 
 
 ## 8.3 ForestResponse返回类型方式
