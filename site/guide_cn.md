@@ -56,11 +56,11 @@ Forest 1.0.x 和 Forest 1.1.x 基于 JDK 1.7, Forest 1.2.x及以上版本基于 
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>spring-boot-starter-forest</artifactId>
-    <version>1.3.4</version>
+    <version>1.3.5</version>
 </dependency>
 ```
 
-最新版本为<font color=red>_1.3.4_</font>，为稳定版本
+最新版本为<font color=red>_1.3.5_</font>，为稳定版本
 
 ## 2.2 在非 Spring Boot 项目中安装
 
@@ -87,11 +87,11 @@ Forest 1.0.x 和 Forest 1.1.x 基于 JDK 1.7, Forest 1.2.x及以上版本基于 
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-core</artifactId>
-    <version>1.3.4</version>
+    <version>1.3.5</version>
 </dependency>
 ```
 
-最新版本为<font color=red>_1.3.4_</font>，为稳定版本
+最新版本为<font color=red>_1.3.5_</font>，为稳定版本
 
 
 # 三. 构建请求接口
