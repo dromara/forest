@@ -1365,30 +1365,12 @@ if (response.isError()) {
 ````java
 public class ErrorInterceptor implements Interceptor<String> {
 
-    @Override
-    public boolean beforeExecute(ForestRequest request) {
-         // ...
-         return true;
-    }
-
-    @Override
-    public void onSuccess(String data, ForestRequest request, ForestResponse response) {
-        // ...
-         return true;
-    }
+    // ... ...
 
     @Override
     public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
         int status = response.getStatusCode(); // 获取请求响应状态码
         String content = response.getContent(); // 获取请求的响应内容
-    }
-
-    /**
-     * 该方法在请求发送之后被调用
-     */
-    @Override
-    public void afterExecute(ForestRequest request, ForestResponse response) {
-        // ...
     }
 }
 ````
