@@ -1621,7 +1621,7 @@ Interceptor<String>即代表返回的数据类型为`String`。
 
 Forest有三个地方可以添加拦截器：`@Request`、`@BaseRequest`、全局配置，这三个地方代表三个不同的作用域。
 
-### 10.2.1 `@Request`上的拦截器
+### 10.2.1 @Request上的拦截器
 
 若您想要指定的拦截器只作用在指定的请求上，只需要在该请求方法的`@Request`注解中设置`interceptor`属性即可。
 
@@ -1652,7 +1652,7 @@ public interface SimpleClient {
 
 ?> `@Request`上的拦截器只会拦截指定的请求
 
-### 10.2.2 `@BaseRequest`上的拦截器
+### 10.2.2 @BaseRequest 上的拦截器
 
 若您想使一个`interface`内的所有请求方法都指定某一个拦截器，可以在`@BaseRequest`的`interceptor`中设置
 
