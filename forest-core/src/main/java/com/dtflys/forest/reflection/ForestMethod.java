@@ -19,10 +19,7 @@ import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.proxy.InterfaceProxyHandler;
 import com.dtflys.forest.ssl.SSLKeyStore;
-import com.dtflys.forest.utils.ForestDataType;
-import com.dtflys.forest.utils.RequestNameValue;
-import com.dtflys.forest.utils.StringUtils;
-import com.dtflys.forest.utils.URLUtils;
+import com.dtflys.forest.utils.*;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
@@ -337,6 +334,7 @@ public class ForestMethod<T> implements VariableScope {
         }
         String newUrl = "";
         List<RequestNameValue> nameValueList = new ArrayList<RequestNameValue>();
+        List<Object> bodyList = new ArrayList<>();
         MappingTemplate[] baseHeaders = interfaceProxyHandler.getBaseHeaders();
         renderedUrl = URLUtils.getValidURL(baseUrl, renderedUrl);
         String query = "";
@@ -399,6 +397,11 @@ public class ForestMethod<T> implements VariableScope {
                 else if (!parameter.getFilterChain().isEmpty()) {
                     obj = parameter.getFilterChain().doFilter(configuration, obj);
                     nameValueList.add(new RequestNameValue(null, obj, false));
+                }
+                else if (obj instanceof List ||
+                        obj.getClass().isArray() ||
+                        ReflectUtil.isPrimaryType(obj.getClass())) {
+                    bodyList.add(obj);
                 }
                 else {
                     try {
@@ -480,6 +483,7 @@ public class ForestMethod<T> implements VariableScope {
             }
         }
         request.addData(nameValueList);
+        request.setBodyList(bodyList);
         if (bodyBuilder.length() > 0) {
             String requestBody = bodyBuilder.toString();
             request.setRequestBody(requestBody);

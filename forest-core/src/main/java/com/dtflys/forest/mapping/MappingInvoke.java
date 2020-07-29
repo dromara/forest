@@ -2,7 +2,6 @@ package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
-import org.apache.commons.collections.CollectionUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -36,7 +35,7 @@ public class MappingInvoke extends MappingDot {
         try {
             Method method = obj.getClass().getDeclaredMethod(methodName);
             Object result = null;
-            if (CollectionUtils.isEmpty(argList)) {
+            if (argList == null || argList.isEmpty()) {
                 result = method.invoke(obj);
             }
             else {

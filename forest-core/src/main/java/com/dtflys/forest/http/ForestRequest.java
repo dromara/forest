@@ -76,6 +76,8 @@ public class ForestRequest<T> {
 
     private Map<String, Object> data = new LinkedHashMap<String, Object>();
 
+    private List<?> bodyList = new LinkedList<>();
+
     private Map<String, Object> headers = new LinkedHashMap<>();
 
     private Object[] arguments;
@@ -167,6 +169,14 @@ public class ForestRequest<T> {
         return this;
     }
 
+    public List<?> getBodyList() {
+        return bodyList;
+    }
+
+    public void setBodyList(List<?> bodyList) {
+        this.bodyList = bodyList;
+    }
+
     public ForestDataType getDataType() {
         return dataType;
     }
@@ -225,13 +235,15 @@ public class ForestRequest<T> {
     }
 
     public List<RequestNameValue> getDataNameValueList() {
-        List<RequestNameValue> nameValueList = new ArrayList<RequestNameValue>();
+        List<RequestNameValue> nameValueList = new ArrayList<>();
         for (Iterator<Map.Entry<String, Object>> iterator = data.entrySet().iterator(); iterator.hasNext(); ) {
             Map.Entry<String, Object> entry = iterator.next();
             String name = entry.getKey();
             Object value = entry.getValue();
-            RequestNameValue nameValue = new RequestNameValue(name, value, false);
-            nameValueList.add(nameValue);
+            if (value != null) {
+                RequestNameValue nameValue = new RequestNameValue(name, value, false);
+                nameValueList.add(nameValue);
+            }
         }
         return nameValueList;
     }

@@ -63,10 +63,16 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
         }
         else if (mineType.equals(TYPE_APPLICATION_JSON)) {
             ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
-            String text = null;
+            List bodyList = request.getBodyList();
             Map<String, Object> map = convertNameValueListToMap(request, nameValueList);
-            String json = jsonConverter.convertToJson(map);
-            text = json;
+            if (map != null && !map.isEmpty()) {
+                bodyList.add(map);
+            }
+            Object toJsonObj = bodyList;
+            if (bodyList.size() == 1) {
+                toJsonObj = bodyList.get(0);
+            }
+            String text = jsonConverter.convertToJson(toJsonObj);
             setStringBody(httpRequest, text, charset, contentType);
         }
         else  {
@@ -85,9 +91,23 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
 
     protected abstract void setFormData(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList);
 
+    private List convertNameValueListToList(ForestRequest request, List<RequestNameValue> nameValueList) {
+        List list = new LinkedList();
+        for (int i = 0; i < nameValueList.size(); i++) {
+            RequestNameValue nameValue = nameValueList.get(i);
+            String name = nameValue.getName();
+            Object value = nameValue.getValue();
+            if (StringUtils.isNotEmpty(name) && value == null) {
+                list.add(name);
+            }
+        }
+        return list;
+    }
+
+
     private Map<String, Object> convertNameValueListToMap(ForestRequest request, List<RequestNameValue> nameValueList) {
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
-        Map<String, Object> map = new LinkedHashMap<String, Object>();
+        Map<String, Object> map = new LinkedHashMap<>();
         for (int i = 0; i < nameValueList.size(); i++) {
             RequestNameValue nameValue = nameValueList.get(i);
             String name = nameValue.getName();
@@ -96,11 +116,13 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                 value = MappingTemplate.getParameterValue(jsonConverter, value);
             }
             if (value == null && StringUtils.isNotEmpty(name)) {
-                Map nameMap = jsonConverter.convertToJavaObject(name, Map.class);
-                if (nameMap != null && nameMap.size() > 0) {
-                    map.putAll(nameMap);
-                } else {
-                    map.put(name, value);
+                if (name.charAt(0) == '{') {
+                    Map nameMap = jsonConverter.convertToJavaObject(name, Map.class);
+                    if (nameMap != null && nameMap.size() > 0) {
+                        map.putAll(nameMap);
+                    } else {
+                        map.put(name, value);
+                    }
                 }
             }
             else {
