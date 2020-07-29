@@ -1619,7 +1619,11 @@ Interceptor<String>即代表返回的数据类型为`String`。
 
 ## 10.2 调用拦截器
 
-需要调用拦截器的地方，只需要在该方法的@Request注解中设置`interceptor`属性即可。
+Forest有三个地方可以添加拦截器：`@Request`、`@BaseRequest`、全局配置，这三个地方代表三个不同的作用域。
+
+### 10.2.1 `@Request`上的拦截器
+
+若您想要指定的拦截器只作用在指定的请求上，只需要在该请求方法的`@Request`注解中设置`interceptor`属性即可。
 
 ```java
 
@@ -1633,6 +1637,45 @@ public interface SimpleClient {
     String simple();
 }
 ```
+
+
+?> `@Request`上的拦截器只会拦截指定的请求
+
+### 10.2.2 `@BaseRequest`上的拦截器
+
+若您想使一个`interface`内的所有请求方法都指定某一个拦截器，可以在`@BaseRequest`的`interceptor`中设置
+
+```java
+
+@BaseRquest(baseURL = "http://localhost:8080", interceptor = SimpleInterceptor.class)
+public interface SimpleClient {
+
+    @Request(url = "/hello/user1?username=foo" )
+    String send1();
+
+    @Request(url = "/hello/user2?username=foo" )
+    String send2();
+
+    @Request(url = "/hello/user3?username=foo" )
+    String send3();
+}
+
+```
+
+如以上代码所示，`SimpleClient`接口中的`send1`、`send2`、`send3`方法都被会`SimpleInterceptor`拦截器拦截
+
+
+### 10.2.2 全局拦截器
+
+若要配置能拦截项目范围所有Forest请求的拦截器也很简单，只要在全局配置中加上`interceptors`属性即可
+
+```yaml
+forest:
+  ...
+  interceptors:
+     com.your.site.client.SimpleInterceptor
+```
+
 
 # 十一. 联系作者
 
