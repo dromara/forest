@@ -50,6 +50,10 @@ public class MethodResponseHandler<T> implements ResponseHandler {
     public Object handleSyncWitchException(ForestRequest request, ForestResponse response, Exception ex) {
         try {
             Object resultData = handleResultType(request, response, returnType, returnClass);
+            if (resultData instanceof ForestResponse) {
+                handleResult(resultData);
+                return resultData;
+            }
             if (response.isSuccess()) {
                 resultData = handleSuccess(resultData, request, response);
             } else {
