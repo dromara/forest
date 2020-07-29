@@ -1638,6 +1638,17 @@ public interface SimpleClient {
 }
 ```
 
+`@Request`中拦截器可以配置多个:
+
+```java
+    @Request(
+            url = "http://localhost:8080/hello/user?username=foo",
+            headers = {"Accept:text/plan"},
+            interceptor = {SimpleInterceptor1.class, SimpleInterceptor2.class, ...}
+    )
+    String simple();
+```
+
 
 ?> `@Request`上的拦截器只会拦截指定的请求
 
@@ -1664,6 +1675,16 @@ public interface SimpleClient {
 
 如以上代码所示，`SimpleClient`接口中的`send1`、`send2`、`send3`方法都被会`SimpleInterceptor`拦截器拦截
 
+`@BaseRequest`也如`@Request`中的`interceptor`属性一样，可以配1到多个拦截器，如代码所示：
+
+```java
+@BaseRquest(
+    baseURL = "http://localhost:8080", 
+    interceptor = {SimpleInterceptor1.class, SimpleInterceptor2.class, ...})
+public interface SimpleClient {
+    // ... ...
+}
+```
 
 ### 10.2.2 全局拦截器
 
@@ -1672,8 +1693,10 @@ public interface SimpleClient {
 ```yaml
 forest:
   ...
-  interceptors:
-     com.your.site.client.SimpleInterceptor
+  interceptors:                   # 可配置1到多个拦截器
+     com.your.site.client.SimpleInterceptor1
+     com.your.site.client.SimpleInterceptor2
+     ...
 ```
 
 
