@@ -1280,7 +1280,11 @@ forest:
 
 # 八. 异常处理
 
-发送HTTP请求不会总是成功的，总会有失败的情况。Forest提供多种异常处理的方法来处理请求失败的过程，最常用的直接通过`try-catch`，如示例代码所示：
+发送HTTP请求不会总是成功的，总会有失败的情况。Forest提供多种异常处理的方法来处理请求失败的过程。
+
+## 8.1 try-catch方式
+
+最常用的直接通过`try-catch`， Forest请求失败的时候通常会以抛异常的方式报告错误， 获取错误信息只需捕获ForestNetworkException类的异常对象，如示例代码所示：
 
 ```java
 /**
@@ -1295,7 +1299,9 @@ try {
 }
 ```
 
-第二种是用回调函数方式，如示例代码所示：
+## 8.2 回调函数方式
+
+第二种方式是使用`OnError`回调函数，如示例代码所示：
 
 ```java
 /**
@@ -1318,6 +1324,10 @@ myClient.send("foo",  (ex, request, response) -> {
     String content = response.getContent(); // 获取请求的响应内容
 });
 ```
+
+!> 需要注意的是：加上`OnError`回调函数后变不会再向上抛出异常，所有错误信息均通过`OnError`回调函数的参数获得。
+
+## 8.3 ForestResponse返回类型方式
 
 第三种，用`ForestResponse`类作为请求方法的返回值类型，示例代码如下：
 
@@ -1343,6 +1353,8 @@ if (response.isError()) {
     String content = response.getContent(); // 获取请求的响应内容
 }
 ```
+
+!> 以`ForestResponse`类为返回值类型的方法也不会向上抛出异常，错误信息均通过`ForestResponse`对象获得。
 
 # 九. 模板表达式
 
