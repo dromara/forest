@@ -1360,7 +1360,7 @@ if (response.isError()) {
 
 ## 8.4 拦截器方式
 
-若要批量处理各种不同请求的异常情况，可以使用拦截器, 并在拦截器的`onError`方法中处理异常，示例代码如下：
+若要批量处理各种不同请求的异常情况，可以定义一个拦截器, 并在拦截器的`onError`方法中处理异常，示例代码如下：
 
 ````java
 public class ErrorInterceptor implements Interceptor<String> {
