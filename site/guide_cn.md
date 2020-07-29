@@ -1284,7 +1284,7 @@ forest:
 
 ## 8.1 try-catch方式
 
-最常用的直接通过`try-catch`， Forest请求失败的时候通常会以抛异常的方式报告错误， 获取错误信息只需捕获ForestNetworkException类的异常对象，如示例代码所示：
+最常用的是直接用`try-catch`， Forest请求失败的时候通常会以抛异常的方式报告错误， 获取错误信息只需捕获ForestNetworkException类的异常对象，如示例代码所示：
 
 ```java
 /**
