@@ -8,6 +8,8 @@ import com.dtflys.test.http.model.*;
 import com.dtflys.test.http.model.UserParam;
 import com.dtflys.test.http.model.XmlTestParam;
 
+import java.util.List;
+
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-11 16:55
@@ -112,6 +114,35 @@ public interface PostClient {
     )
     String postJson6(@DataObject JsonTestUser user);
 
+    @Request(
+            url = "http://localhost:${port}/json",
+            type = "post",
+            headers = {"Content-Type: application/json"}
+    )
+    String postJson7(@DataObject List<JsonTestList> user);
+
+    @Request(
+            url = "http://localhost:${port}/json",
+            data = "${json($0)}",
+            type = "post",
+            headers = {"Content-Type: application/json"}
+    )
+    String postJson8(List<JsonTestList> user);
+
+    @Request(
+            url = "http://localhost:${port}/json",
+            type = "post",
+            headers = {"Content-Type: application/json"}
+    )
+    String postJson9(@DataObject JsonTestList user);
+
+    @Request(
+            url = "http://localhost:${port}/json",
+            data = "${json($0)}",
+            type = "post",
+            headers = {"Content-Type: application/json"}
+    )
+    String postJson10(JsonTestList user);
 
 
     @Request(

@@ -3,6 +3,8 @@ package com.dtflys.forest.utils;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 public class ReflectUtil {
 
@@ -28,6 +30,37 @@ public class ReflectUtil {
             Class clz = (Class) genericType;
             return clz;
         }
+    }
+
+    public static boolean isPrimaryType(Class type) {
+        if (byte.class.isAssignableFrom(type) || Byte.class.isAssignableFrom(type)) {
+            return true;
+        }
+        if (int.class.isAssignableFrom(type) || Integer.class.isAssignableFrom(type)) {
+            return true;
+        }
+        if (long.class.isAssignableFrom(type) || Long.class.isAssignableFrom(type)) {
+            return true;
+        }
+        if (short.class.isAssignableFrom(type) || Short.class.isAssignableFrom(type)) {
+            return true;
+        }
+        if (float.class.isAssignableFrom(type) || Float.class.isAssignableFrom(type)) {
+            return true;
+        }
+        if (double.class.isAssignableFrom(type) || Double.class.isAssignableFrom(type)) {
+            return true;
+        }
+        if (BigDecimal.class.isAssignableFrom(type)) {
+            return true;
+        }
+        if (BigInteger.class.isAssignableFrom(type)) {
+            return true;
+        }
+        if (CharSequence.class.isAssignableFrom(type)) {
+            return true;
+        }
+        return false;
     }
 
 }

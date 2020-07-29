@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Created by Administrator on 2016/6/20.
  */
-public class Location {
+public class AmapLocation<T> {
 
     private String timestamp;
 
@@ -41,7 +41,7 @@ public class Location {
 
     private String country;
 
-    private List<AmapCross> cross_list;
+    private List<T> cross_list;
 
     private List road_list;
 
@@ -183,11 +183,11 @@ public class Location {
         this.country = country;
     }
 
-    public List<AmapCross> getCross_list() {
+    public List<T> getCross_list() {
         return cross_list;
     }
 
-    public void setCross_list(List<AmapCross> cross_list) {
+    public void setCross_list(List<T> cross_list) {
         this.cross_list = cross_list;
     }
 

@@ -30,7 +30,10 @@ public abstract class BackendResponseHandler<R> {
 
     public Object handleSync(ForestResponse response, int statusCode, String msg) {
         Object result = responseHandler.handleSync(request, response);
-        if (response.isError()) {
+        if (result instanceof ForestResponse) {
+            return result;
+        }
+        if (response.isError() && response.getRequest().getOnError() == null) {
             throw new ForestNetworkException(
                     msg, statusCode, response);
         }
