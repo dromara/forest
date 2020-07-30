@@ -7,10 +7,16 @@ import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
+import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.ContentBody;
+import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.io.UnsupportedEncodingException;
@@ -63,9 +69,30 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
 
     @Override
     protected void setFileBody(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList, List<ForestMultipart> multiparts) {
+        MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
+        ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
+        for (int i = 0; i < nameValueList.size(); i++) {
+            RequestNameValue nameValue = nameValueList.get(i);
+            if (nameValue.isInQuery()) continue;
+            String name = nameValue.getName();
+            Object value = nameValue.getValue();
+            entityBuilder.addTextBody(name, MappingTemplate.getParameterValue(jsonConverter, value));
+        }
 
-
-
+        for (int i = 0; i < multiparts.size(); i++) {
+            ForestMultipart multipart = multiparts.get(i);
+            String name = multipart.getName();
+            String fileName = multipart.getFileName();
+            ContentType ctype = ContentType.create(multipart.getContentType());
+            if (multipart.isFile()) {
+                ContentBody body = new FileBody(multipart.getFile(), ctype, multipart.getFileName());
+                entityBuilder.addPart(multipart.getName(), body);
+            } else {
+                entityBuilder.addBinaryBody(name, multipart.getInputStream(), ctype, fileName);
+            }
+        }
+        HttpEntity entity = entityBuilder.build();
+        httpReq.setEntity(entity);
     }
 
 
