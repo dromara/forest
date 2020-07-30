@@ -5,8 +5,11 @@ import com.dtflys.forest.exceptions.ForestHandlerException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.ForestDataType;
+import com.dtflys.forest.utils.ReflectUtil;
+import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import java.io.InputStream;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 /**
@@ -32,6 +35,16 @@ public class ResultHandler {
                     return null;
                 }
                 if (ForestResponse.class.isAssignableFrom(resultClass)) {
+                    if (resultType instanceof ParameterizedType) {
+                        ParameterizedType parameterizedType = (ParameterizedType) resultType;
+                        Class rowClass = (Class) parameterizedType.getRawType();
+                        if (ForestResponse.class.isAssignableFrom(rowClass)) {
+                            Type realType = parameterizedType.getActualTypeArguments()[0];
+                            Class realClass = ReflectUtil.getClassByType(parameterizedType.getActualTypeArguments()[0]);
+                            Object realResult = getResult(request, response, realType, realClass);
+                            response.setResult(realResult);
+                        }
+                    }
                     return response;
                 }
                 if (boolean.class.isAssignableFrom(resultClass) || Boolean.class.isAssignableFrom(resultClass)) {
