@@ -4,30 +4,33 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.multipart.ForestMultipartFactory;
 import com.dtflys.forest.utils.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class SpringMultipartFile extends ForestMultipart<MultipartFile> {
+public class SpringResource extends ForestMultipart<Resource> {
 
-    private MultipartFile multipartFile;
+    private Resource resource;
 
     @Override
-    public void setData(MultipartFile data) {
-        this.multipartFile = data;
+    public void setData(Resource data) {
+        this.resource = data;
     }
 
     @Override
     public String getOriginalFileName() {
-        return multipartFile.getOriginalFilename();
+        if (StringUtils.isNotBlank(fileName)) {
+            return fileName;
+        }
+        return resource.getFilename();
     }
 
     @Override
     public InputStream getInputStream() {
         try {
-            return multipartFile.getInputStream();
+            return resource.getInputStream();
         } catch (IOException e) {
             throw new ForestRuntimeException(e);
         }
@@ -35,18 +38,13 @@ public class SpringMultipartFile extends ForestMultipart<MultipartFile> {
 
     @Override
     public boolean isFile() {
-        return false;
+        return true;
     }
 
     @Override
     public File getFile() {
-        throw new ForestRuntimeException("[Forest] SpringMultipartFile instances are not files");
-    }
-
-    @Override
-    public byte[] getBytes() {
         try {
-            return multipartFile.getBytes();
+            return resource.getFile();
         } catch (IOException e) {
             throw new ForestRuntimeException(e);
         }

@@ -2,6 +2,8 @@ package com.dtflys.forest.converter.json;
 
 import com.dtflys.forest.converter.ForestConverter;
 
+import java.util.Map;
+
 /**
  * Json消息转换接口
  * @author gongjun
@@ -15,5 +17,7 @@ public interface ForestJsonConverter extends ForestConverter {
      * @return
      */
     String convertToJson(Object obj);
+
+    Map convertToJsonMap(Object obj);
 
 }

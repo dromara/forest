@@ -1,14 +1,20 @@
 package com.dtflys.forest.scanner;
 
+import com.dtflys.forest.file.SpringMultipartFile;
+import com.dtflys.forest.file.SpringResource;
+import com.dtflys.forest.multipart.ForestMultipart;
+import com.dtflys.forest.multipart.ForestMultipartFactory;
 import com.dtflys.forest.utils.ClientFactoryBeanUtils;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
+import org.springframework.core.io.Resource;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.core.type.filter.TypeFilter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -28,6 +34,15 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
         super(registry, false);
         this.configurationId = configurationId;
         registerFilters();
+        registerMultipartTypes();
+    }
+
+    /**
+     * 注册能上传下载的文件类型
+     */
+    public void registerMultipartTypes() {
+        ForestMultipartFactory.registerFactory(Resource.class, SpringResource.class);
+        ForestMultipartFactory.registerFactory(MultipartFile.class, SpringMultipartFile.class);
     }
 
     /**

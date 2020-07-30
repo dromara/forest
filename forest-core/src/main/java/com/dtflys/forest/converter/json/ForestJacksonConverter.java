@@ -1,5 +1,6 @@
 package com.dtflys.forest.converter.json;
 
+import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
@@ -7,6 +8,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -40,7 +45,6 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     }
 
     public <T> T convertToJavaObject(String source, Class<?> parametrized, Class<?> ...parameterClasses) {
-        ObjectMapper mapper = new ObjectMapper();
         try {
             JavaType javaType = mapper.getTypeFactory().constructParametricType(parametrized, parameterClasses);
             return mapper.readValue(source, javaType);
@@ -50,7 +54,6 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     }
 
     public <T> T convertToJavaObject(String source, JavaType javaType) {
-        ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.readValue(source, javaType);
         } catch (IOException e) {
@@ -62,11 +65,21 @@ public class ForestJacksonConverter implements ForestJsonConverter {
 
 
     public String convertToJson(Object obj) {
-        ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.writeValueAsString(obj);
         } catch (Throwable e) {
             throw new ForestRuntimeException(e);
         }
+    }
+
+    @Override
+    public Map convertToJsonMap(Object obj) {
+        if (obj instanceof Map) {
+            return (Map) obj;
+        }
+        if (obj instanceof List) {
+            throw new ForestConvertException("can not convert " + obj.getClass().getName() + " to " + Map.class.getName());
+        }
+        return mapper.convertValue(obj, HashMap.class);
     }
 }

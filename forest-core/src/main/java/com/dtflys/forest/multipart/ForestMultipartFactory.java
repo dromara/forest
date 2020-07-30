@@ -7,11 +7,12 @@ import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ForestMultipartFactory<T> {
 
-    private static Map<Class, Class> multipartTypeMap = new HashMap<>();
+    private static Map<Class, Class> multipartTypeMap = new LinkedHashMap<>();
 
     private final Class<T> paramType;
 
@@ -41,7 +42,12 @@ public class ForestMultipartFactory<T> {
         if (multipartTypeMap.containsKey(paramType)) {
             return new ForestMultipartFactory<>(paramType, index, nameTemplate, fileNameTemplate, contentTypeTemplate);
         }
-        throw new ForestRuntimeException("[Forest] Can not find Multipart factory of type \"" + paramType.getName() + "\"");
+        for (Class<P> pType : multipartTypeMap.keySet()) {
+            if (pType.isAssignableFrom(paramType)) {
+                return new ForestMultipartFactory<>(paramType, index, nameTemplate, fileNameTemplate, contentTypeTemplate);
+            }
+        }
+        throw new ForestRuntimeException("[Forest] Can not wrap parameter type \"" + paramType.getName() + "\" in ForestMultipart");
     }
 
     static {
@@ -79,13 +85,16 @@ public class ForestMultipartFactory<T> {
         Class<M> multipartType = multipartTypeMap.get(paramType);
         try {
             M multipart = multipartType.newInstance();
-
+            multipart.setName(name);
+            multipart.setFileName(fileName);
+            multipart.setData(data);
+            multipart.setContentType(contentType);
+            return multipart;
         } catch (InstantiationException e) {
             throw new ForestRuntimeException(e);
         } catch (IllegalAccessException e) {
             throw new ForestRuntimeException(e);
         }
-        return null;
     }
 
 

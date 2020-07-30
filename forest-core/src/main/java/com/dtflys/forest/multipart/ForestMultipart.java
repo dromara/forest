@@ -52,7 +52,7 @@ public abstract class ForestMultipart<T> {
 
     public abstract File getFile();
 
-    protected byte[] getBytes() {
+    public byte[] getBytes() {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         InputStream inputStream = getInputStream();
         byte[] buffer = new byte[BUFFER_SIZE];
