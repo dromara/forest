@@ -12,6 +12,9 @@ import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -59,6 +62,17 @@ public class TestPostJson2Client extends BaseClientTest {
         assertNotNull(result);
         Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
     }
+
+    @Test
+    public void testJsonPost5Map() {
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("username", "foo");
+        String result = postClient.postJson5Map(userMap);
+        log.info("response: " + result);
+        assertNotNull(result);
+        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
+    }
+
 
     @Test
     public void testJsonPost6() {

@@ -65,7 +65,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
 
     public AbstractHttpclientExecutor(ForestRequest request, HttpclientResponseHandler httpclientResponseHandler, HttpclientRequestSender requestSender) {
         super(request, requestSender);
-        this.typeName = request.getType().toUpperCase();
+        this.typeName = request.getType().getName();
         this.httpclientResponseHandler = httpclientResponseHandler;
         prepare();
     }

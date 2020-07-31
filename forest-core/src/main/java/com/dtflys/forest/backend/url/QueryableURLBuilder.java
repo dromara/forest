@@ -20,7 +20,7 @@ public class QueryableURLBuilder extends URLBuilder {
     @Override
     public String buildUrl(ForestRequest request) {
         String url = request.getUrl();
-        List<RequestNameValue> data = request.getDataNameValueList();
+        List<RequestNameValue> data = request.getQueryNameValueList();
         StringBuilder paramBuilder = new StringBuilder();
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         for (int i = 0; i < data.size(); i++) {

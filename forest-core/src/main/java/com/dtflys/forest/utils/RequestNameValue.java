@@ -12,6 +12,7 @@ public class RequestNameValue {
 
     private final boolean inQuery;
 
+
     public RequestNameValue(String name, boolean inQuery) {
         this.name = name;
         this.inQuery = inQuery;

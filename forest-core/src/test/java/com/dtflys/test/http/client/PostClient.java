@@ -10,6 +10,7 @@ import com.dtflys.test.http.model.XmlTestParam;
 import com.dtflys.test.interceptor.PostHeadInterceptor;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -69,6 +70,14 @@ public interface PostClient {
             headers = {"Accept:text/plan"}
     )
     String complexPost(String param, String body);
+
+
+    @Request(
+            url = "http://localhost:${port}/complex?param=${0}",
+            type = "post",
+            headers = {"Accept:text/plan"}
+    )
+    String complexPost2(String param, @DataParam("username") String username, @DataParam("password") String password);
 
 
     @Request(
@@ -132,6 +141,13 @@ public interface PostClient {
     @Request(
             url = "http://localhost:${port}/json",
             type = "post",
+            contentType = "application/json"
+    )
+    String postJson5Map(@DataObject Map user);
+
+    @Request(
+            url = "http://localhost:${port}/json",
+            type = "post",
             headers = {"Content-Type: application/json"}
     )
     String postJson6(@DataObject JsonTestUser user);
@@ -165,6 +181,8 @@ public interface PostClient {
             headers = {"Content-Type: application/json"}
     )
     String postJson10(JsonTestList user);
+
+
 
     @Request(
             url = "http://localhost:${port}/json",

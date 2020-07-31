@@ -55,9 +55,9 @@ public class ForestRequest<T> {
 
     private String url;
 
-    private String query;
+    private Map<String, Object> query = new LinkedHashMap<>();
 
-    private String type;
+    private ForestRequestType type;
 
     private String encode;
 
@@ -125,20 +125,42 @@ public class ForestRequest<T> {
         return this;
     }
 
-    public String getQuery() {
+    public Map<String, Object> getQueryMap() {
         return query;
     }
 
-    public ForestRequest setQuery(String query) {
-        this.query = query;
+    public Object getQuery(String name) {
+        return query.get(name);
+    }
+
+    public String getQueryString() {
+        StringBuilder builder = new StringBuilder();
+        Iterator<String> iterator = query.keySet().iterator();
+        while (iterator.hasNext()) {
+            String name  = iterator.next();
+            Object value = query.get(name);
+            if (value != null) {
+                builder.append(name);
+                builder.append("=");
+                builder.append(value);
+            }
+            if (iterator.hasNext()) {
+                builder.append("&");
+            }
+        }
+        return builder.toString();
+    }
+
+    public ForestRequest addQuery(String name, Object value) {
+        this.query.put(name, value);
         return this;
     }
 
-    public String getType() {
+    public ForestRequestType getType() {
         return type;
     }
 
-    public ForestRequest setType(String type) {
+    public ForestRequest setType(ForestRequestType type) {
         this.type = type;
         return this;
     }
@@ -235,6 +257,21 @@ public class ForestRequest<T> {
         return this;
     }
 
+    public List<RequestNameValue> getQueryNameValueList() {
+        List<RequestNameValue> nameValueList = new ArrayList<>();
+        for (Iterator<Map.Entry<String, Object>> iterator = query.entrySet().iterator(); iterator.hasNext(); ) {
+            Map.Entry<String, Object> entry = iterator.next();
+            String name = entry.getKey();
+            Object value = entry.getValue();
+            if (value != null) {
+                RequestNameValue nameValue = new RequestNameValue(name, value, true);
+                nameValueList.add(nameValue);
+            }
+        }
+        return nameValueList;
+
+    }
+
     public List<RequestNameValue> getDataNameValueList() {
         List<RequestNameValue> nameValueList = new ArrayList<>();
         for (Iterator<Map.Entry<String, Object>> iterator = data.entrySet().iterator(); iterator.hasNext(); ) {
@@ -248,6 +285,7 @@ public class ForestRequest<T> {
         }
         return nameValueList;
     }
+
 
     public List<RequestNameValue> getHeaderNameValueList() {
         List<RequestNameValue> nameValueList = new ArrayList<RequestNameValue>();
@@ -304,7 +342,11 @@ public class ForestRequest<T> {
     private void putMapAddList(Map<String, Object> map, List<RequestNameValue> source) {
         for (int i = 0; i < source.size(); i++) {
             RequestNameValue nameValue = source.get(i);
-            map.put(nameValue.getName(), nameValue.getValue());
+            if (nameValue.isInQuery()) {
+                addQuery(nameValue.getName(), nameValue.getValue());
+            } else {
+                map.put(nameValue.getName(), nameValue.getValue());
+            }
         }
     }
 
