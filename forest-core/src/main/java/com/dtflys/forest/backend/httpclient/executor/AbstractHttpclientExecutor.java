@@ -61,8 +61,6 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
     protected void prepare() {
         httpRequest = buildRequest();
         prepareBodyBuilder();
-        prepareHeaders();
-        prepareBody();
     }
 
     public AbstractHttpclientExecutor(ForestRequest request, HttpclientResponseHandler httpclientResponseHandler, HttpclientRequestSender requestSender) {
@@ -145,6 +143,8 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
 
 
     public void execute(ResponseHandler responseHandler) {
+        prepareHeaders();
+        prepareBody();
         execute(0, responseHandler);
     }
 
