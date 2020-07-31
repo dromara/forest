@@ -3,6 +3,8 @@ package com.dtflys.forest.backend.url;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.utils.StringUtils;
 
+import java.util.Map;
+
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -13,9 +15,9 @@ public class SimpleURLBuilder extends URLBuilder {
     @Override
     public String buildUrl(ForestRequest request) {
         String url = request.getUrl();
-        String query = request.getQuery();
-        if (StringUtils.isNotBlank(query)) {
-            url += "?" + query;
+        String queryString = request.getQueryString();
+        if (StringUtils.isNotBlank(queryString)) {
+            url += "?" + queryString;
         }
         return url;
     }

@@ -12,6 +12,7 @@ import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorFactory;
 import com.dtflys.forest.mapping.MappingParameter;
@@ -316,6 +317,7 @@ public class ForestMethod<T> implements VariableScope {
         }
         String renderedUrl = urlTemplate.render(args);
         String renderedType = typeTemplate.render(args);
+        ForestRequestType type = ForestRequestType.findType(renderedType);
         String baseEncode = null;
         if (baseEncodeTemplate != null) {
             baseEncode = baseEncodeTemplate.render(args);
@@ -403,9 +405,18 @@ public class ForestMethod<T> implements VariableScope {
                         ReflectUtil.isPrimaryType(obj.getClass())) {
                     bodyList.add(obj);
                 }
+                else if (obj instanceof Map) {
+                    Map map = (Map) obj;
+                    for (Object key : map.keySet()) {
+                        if (key instanceof CharSequence) {
+                            Object value = map.get(key);
+                            nameValueList.add(new RequestNameValue(String.valueOf(key), value, false));
+                        }
+                    }
+                }
                 else {
                     try {
-                        List<RequestNameValue> list = getNameValueListFromObject(obj);
+                        List<RequestNameValue> list = getNameValueListFromObject(obj, type);
                         nameValueList.addAll(list);
                     } catch (InvocationTargetException e) {
                         throw new ForestRuntimeException(e);
@@ -415,7 +426,7 @@ public class ForestMethod<T> implements VariableScope {
                 }
             }
             else if (parameter.getIndex() != null) {
-                RequestNameValue nameValue = new RequestNameValue(parameter.getName(), false);
+                RequestNameValue nameValue = new RequestNameValue(parameter.getName(), type.isDefaultParamInQuery());
                 Object val = args[parameter.getIndex()];
                 if (val != null) {
                     nameValue.setValue(String.valueOf(val));
@@ -434,8 +445,7 @@ public class ForestMethod<T> implements VariableScope {
         ForestRequest<T> request = new ForestRequest(configuration);
         request.setProtocol(protocol)
                 .setUrl(newUrl)
-                .setQuery(query)
-                .setType(renderedType)
+                .setType(type)
                 .setKeyStore(sslKeyStore)
                 .setEncode(encode)
                 .setContentType(renderedContentType)
@@ -473,7 +483,7 @@ public class ForestMethod<T> implements VariableScope {
                 String[] dataNameValue = dataParam.split("=");
                 if (dataNameValue.length > 0) {
                     String name = dataNameValue[0].trim();
-                    RequestNameValue nameValue = new RequestNameValue(name, false);
+                    RequestNameValue nameValue = new RequestNameValue(name, type.isDefaultParamInQuery());
                     if (dataNameValue.length == 2) {
                         nameValue.setValue(dataNameValue[1].trim());
                     }
@@ -568,7 +578,7 @@ public class ForestMethod<T> implements VariableScope {
      * @throws InvocationTargetException
      * @throws IllegalAccessException
      */
-    private List<RequestNameValue> getNameValueListFromObject(Object obj) throws InvocationTargetException, IllegalAccessException {
+    private List<RequestNameValue> getNameValueListFromObject(Object obj, ForestRequestType type) throws InvocationTargetException, IllegalAccessException {
         Class clazz = obj.getClass();
         Method[] methods = clazz.getDeclaredMethods();
         List<RequestNameValue> nameValueList = new ArrayList<RequestNameValue>();
@@ -581,7 +591,7 @@ public class ForestMethod<T> implements VariableScope {
             Method getter = mtd;
             Object value = getter.invoke(obj);
             if (value != null) {
-                RequestNameValue nameValue = new RequestNameValue(getterName, value, false);
+                RequestNameValue nameValue = new RequestNameValue(getterName, value, type.isDefaultParamInQuery());
                 nameValueList.add(nameValue);
             }
 
