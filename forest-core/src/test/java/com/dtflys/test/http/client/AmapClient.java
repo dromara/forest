@@ -4,6 +4,7 @@ import com.dtflys.forest.annotation.DataObject;
 import com.dtflys.forest.annotation.DataParam;
 import com.dtflys.forest.annotation.DataVariable;
 import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.model.*;
 import com.dtflys.forest.annotation.DataVariable;
 import com.dtflys.test.model.Coordinate;
@@ -48,6 +49,11 @@ public interface AmapClient {
     Result<AmapLocation<AmapCross>> getLocationWithJavaObject2(@DataObject Coordinate coordinate);
 
 
+    @Request(
+            url = "http://ditu.amap.com/service/regeo",
+            dataType = "json"
+    )
+    ForestResponse<Result<AmapLocation<AmapCross>>> getLocationWithJavaObject3(@DataObject Coordinate coordinate);
 
     @Request(
         url = "http://ditu.amap.com/service/regeo",

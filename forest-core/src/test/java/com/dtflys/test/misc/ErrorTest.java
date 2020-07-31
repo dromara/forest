@@ -38,6 +38,7 @@ public class ErrorTest extends TestCase {
         final boolean[] ts = new boolean[] {false};
         errorClient.testError(new OnError() {
             public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
+                int status = response.getStatusCode();
                 count.incrementAndGet();
                 assertNotNull(ex);
                 assertNotNull(request);

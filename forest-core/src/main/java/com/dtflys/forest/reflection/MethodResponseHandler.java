@@ -82,7 +82,9 @@ public class MethodResponseHandler<T> implements ResponseHandler {
     @Override
     public synchronized Object handleResultType(ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
         Object resultData = resultHandler.getResult(request, response, resultType, resultClass);
-        response.setResult(resultData);
+        if (!(resultData instanceof ForestResponse)) {
+            response.setResult(resultData);
+        }
         this.resultData = (T) resultData;
         return resultData;
     }

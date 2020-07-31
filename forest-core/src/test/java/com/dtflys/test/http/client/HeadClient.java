@@ -14,7 +14,10 @@ public interface HeadClient {
     @Request(
             url = "http://localhost:${port}/hello/user?username=foo",
             type = "head",
-            headers = {"Accept:text/plan"}
+            headers = {
+                "Accept:text/plan",
+                "accessToken:11111111"
+            }
     )
     void simpleHead();
 
@@ -22,7 +25,10 @@ public interface HeadClient {
     @Request(
             url = "http://localhost:${port}/hello/user?username=foo",
             type = "head",
-            headers = {"Accept:text/plan"}
+            headers = {
+                "Accept:text/plan",
+                "accessToken:11111111"
+            }
     )
     ForestResponse responseHead();
 

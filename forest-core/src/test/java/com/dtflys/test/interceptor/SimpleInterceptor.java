@@ -4,6 +4,7 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.interceptor.Interceptor;
+import org.apache.http.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,7 @@ public class SimpleInterceptor implements Interceptor<String> {
     @Override
     public boolean beforeExecute(ForestRequest request) {
         log.info("invoke Simple beforeExecute");
+        request.addHeader(HttpHeaders.ACCEPT, "text/plan");
         return true;
     }
 

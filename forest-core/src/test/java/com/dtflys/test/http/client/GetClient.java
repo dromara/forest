@@ -40,6 +40,12 @@ public interface GetClient {
     )
     ForestResponse<String> errorGet2();
 
+    @Request(
+            url = "http://localhost:${port}/hello/user?username=foo",
+            headers = {"Accept:text/plan"}
+    )
+    Map errorGet3();
+
 
     @Request(
             url = "http://localhost:${port}/hello/user",
