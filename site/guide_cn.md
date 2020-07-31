@@ -1296,6 +1296,7 @@ try {
     int status = ex.getStatusCode(); // 获取请求响应状态码
     ForestResponse response = ex.getResponse(); // 获取Response对象
     String content = response.getContent(); // 获取请求的响应内容
+    String resResult = response.getResult(); // 获取方法返回类型对应的最终数据结果
 }
 ```
 
@@ -1322,6 +1323,7 @@ String send(@DataVariable("username") String username, OnError onError);
 myClient.send("foo",  (ex, request, response) -> {
     int status = response.getStatusCode(); // 获取请求响应状态码
     String content = response.getContent(); // 获取请求的响应内容
+    String result = response.getResult(); // 获取方法返回类型对应的最终数据结果
 });
 ```
 
@@ -1352,6 +1354,7 @@ ForestResponse<String> response = myClient.send("foo");
 if (response.isError()) {
     int status = response.getStatusCode(); // 获取请求响应状态码
     String content = response.getContent(); // 获取请求的响应内容
+    String result = response.getResult(); // 获取方法返回类型对应的最终数据结果
 }
 ```
 
@@ -1585,7 +1588,9 @@ public class SimpleInterceptor implements Interceptor<String> {
     @Override
     public boolean beforeExecute(ForestRequest request) {
         log.info("invoke Simple beforeExecute");
-        return true;
+        // 执行在发送请求之前处理的代码
+        request.addHeader("accessToken", "11111111");  // 添加Header
+        return true;  // 继续执行请求返回true
     }
 
     /**
@@ -1594,6 +1599,12 @@ public class SimpleInterceptor implements Interceptor<String> {
     @Override
     public void onSuccess(String data, ForestRequest request, ForestResponse response) {
         log.info("invoke Simple onSuccess");
+        // 执行成功接收响应后处理的代码
+        int status = response.getStatusCode(); // 获取请求响应状态码
+        String content = response.getContent(); // 获取请求的响应内容
+        String result = data;  // data参数是方法返回类型对应的返回数据结果
+        result = response.getResult(); // getResult()也可以获取返回的数据结果
+        response.setResult("修改后的结果: " + result);  // 可以修改请求响应的返回数据结果
     }
 
     /**
@@ -1602,6 +1613,10 @@ public class SimpleInterceptor implements Interceptor<String> {
     @Override
     public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
         log.info("invoke Simple onError");
+        // 执行发送请求失败后处理的代码
+        int status = response.getStatusCode(); // 获取请求响应状态码
+        String content = response.getContent(); // 获取请求的响应内容
+        String result = response.getResult(); // 获取方法返回类型对应的返回数据结果
     }
 
     /**
@@ -1610,6 +1625,10 @@ public class SimpleInterceptor implements Interceptor<String> {
     @Override
     public void afterExecute(ForestRequest request, ForestResponse response) {
         log.info("invoke Simple afterExecute");
+        // 执行在发送请求之后处理的代码
+        int status = response.getStatusCode(); // 获取请求响应状态码
+        String content = response.getContent(); // 获取请求的响应内容
+        String result = response.getResult(); // 获取方法返回类型对应的最终数据结果
     }
 }
 
