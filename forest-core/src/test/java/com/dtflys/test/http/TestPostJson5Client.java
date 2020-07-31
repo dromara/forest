@@ -54,17 +54,6 @@ public class TestPostJson5Client extends BaseClientTest {
     }
 
 
-    @Test
-    public void testJsonPost7() {
-        JsonTestUser user = new JsonTestUser();
-        user.setUsername("foo");
-        JsonTestList testList = new JsonTestList();
-        testList.setUserList(Arrays.asList(user));
-        String result = postClient.postJson9(testList);
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
-    }
 
 
     @Test
@@ -77,6 +66,7 @@ public class TestPostJson5Client extends BaseClientTest {
         Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
     }
 
+/*
     @Test
     public void testJsonPost9() {
         JsonTestUser2 user = new JsonTestUser2();
@@ -86,6 +76,7 @@ public class TestPostJson5Client extends BaseClientTest {
         assertNotNull(result);
         Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
     }
+*/
 
 
 }

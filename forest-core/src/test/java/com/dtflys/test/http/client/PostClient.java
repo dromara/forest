@@ -7,6 +7,7 @@ import com.dtflys.forest.annotation.Request;
 import com.dtflys.test.http.model.*;
 import com.dtflys.test.http.model.UserParam;
 import com.dtflys.test.http.model.XmlTestParam;
+import com.dtflys.test.interceptor.PostHeadInterceptor;
 
 import java.util.List;
 
@@ -68,6 +69,27 @@ public interface PostClient {
             headers = {"Accept:text/plan"}
     )
     String complexPost(String param, String body);
+
+
+    @Request(
+            url = "http://localhost:${port}/hello/user",
+            type = "post",
+            data = "${0}",
+            headers = {
+                "Accept:text/plan",
+                "accessToken:11111111",
+            }
+    )
+    String postHead(String body);
+
+    @Request(
+            url = "http://localhost:${port}/hello/user",
+            type = "post",
+            data = "${0}",
+            headers = { "Accept:text/plan"},
+            interceptor = PostHeadInterceptor.class
+    )
+    String postHead2(String body);
 
 
     @Request(

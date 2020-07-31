@@ -16,7 +16,6 @@ public interface BaseInterceptorClient {
 
     @Request(
             url = "http://localhost:${port}/hello/user?username=foo",
-            headers = {"Accept:text/plan"},
             interceptor = SimpleInterceptor.class
     )
     String simple();
