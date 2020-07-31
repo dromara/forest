@@ -2,6 +2,8 @@ package com.dtflys.test.http;
 
 import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJacksonConverter;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.client.AmapClient;
 import com.dtflys.test.model.*;
@@ -24,6 +26,7 @@ public class TestAmapClient {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
+        configuration.setJsonConverter(new ForestJacksonConverter());
         configuration.setCacheEnabled(false);
         amapClient = configuration.createInstance(AmapClient.class);
     }
@@ -59,19 +62,19 @@ public class TestAmapClient {
 
     @Test
     public void testGetLocation5() {
-        ForestResponse<Result<AmapLocation<AmapCross>>> response =
+        ForestResponse<Result<AmapLocation<AmapLocation.AmapCross>>> response =
                 amapClient.getLocationWithJavaObject3(
                         new Coordinate("121.475078", "31.223577"));
         assertNotNull(response);
-        Result<AmapLocation<AmapCross>> result = response.getResult();
+        Result<AmapLocation<AmapLocation.AmapCross>> result = response.getResult();
         assertNotNull(result);
         assertTrue(result instanceof Result);
-        AmapLocation<AmapCross> location = result.getData();
+        AmapLocation<AmapLocation.AmapCross> location = result.getData();
         assertNotNull(location);
         assertTrue(location instanceof AmapLocation);
-        List<AmapCross> crossList = location.getCross_list();
+        List<AmapLocation.AmapCross> crossList = location.getCross_list();
         assertNotNull(crossList);
-        assertTrue(crossList.get(0) instanceof AmapCross);
+        assertTrue(crossList.get(0) instanceof AmapLocation.AmapCross);
         System.out.println(JSON.toJSONString(result));
     }
 

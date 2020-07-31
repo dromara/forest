@@ -53,7 +53,7 @@ public interface AmapClient {
             url = "http://ditu.amap.com/service/regeo",
             dataType = "json"
     )
-    ForestResponse<Result<AmapLocation<AmapCross>>> getLocationWithJavaObject3(@DataObject Coordinate coordinate);
+    ForestResponse<Result<AmapLocation<AmapLocation.AmapCross>>> getLocationWithJavaObject3(@DataObject Coordinate coordinate);
 
     @Request(
         url = "http://ditu.amap.com/service/regeo",
