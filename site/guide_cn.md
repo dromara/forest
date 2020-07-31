@@ -1374,6 +1374,7 @@ public class ErrorInterceptor implements Interceptor<String> {
     public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
         int status = response.getStatusCode(); // 获取请求响应状态码
         String content = response.getContent(); // 获取请求的响应内容
+        Object result = response.getResult(); // 获取方法返回类型对应的返回数据结果
     }
 }
 ````
