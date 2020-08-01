@@ -15,7 +15,7 @@ public interface BaseInterceptorClient {
     String none();
 
     @Request(
-            url = "http://localhost:${port}/hello/user?username=foo",
+            url = "http://localhost:${port}/hello/user",
             interceptor = SimpleInterceptor.class
     )
     String simple();

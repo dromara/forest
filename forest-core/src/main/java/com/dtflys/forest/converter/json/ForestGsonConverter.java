@@ -136,10 +136,10 @@ public class ForestGsonConverter implements ForestJsonConverter {
     }
 
     @Override
-    public Map convertToJsonMap(Object obj) {
+    public Map<String, Object> convertObjectToMap(Object obj) {
         Gson gson = new Gson();
-        JsonElement element = gson.toJsonTree(obj);
-        return gson.fromJson(element, HashMap.class);
+        JsonElement jsonElement = gson.toJsonTree(obj);
+        return toMap(jsonElement.getAsJsonObject());
     }
 
     public String convertToJson(Object obj, Type type) {

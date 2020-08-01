@@ -34,13 +34,14 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
     private static Logger log = LoggerFactory.getLogger(AbstractHttpclientExecutor.class);
 
     protected final HttpclientResponseHandler httpclientResponseHandler;
-    protected String url = buildUrl();
+    protected String url;
     protected final String typeName;
     protected T httpRequest;
     protected BodyBuilder<T> bodyBuilder;
 
 
     protected T buildRequest() {
+        url = buildUrl();
         return getRequestProvider().getRequest(url);
     }
 
@@ -61,13 +62,14 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
     protected void prepare() {
         httpRequest = buildRequest();
         prepareBodyBuilder();
+        prepareHeaders();
+        prepareBody();
     }
 
     public AbstractHttpclientExecutor(ForestRequest request, HttpclientResponseHandler httpclientResponseHandler, HttpclientRequestSender requestSender) {
         super(request, requestSender);
         this.typeName = request.getType().getName();
         this.httpclientResponseHandler = httpclientResponseHandler;
-        prepare();
     }
 
     public void prepareHeaders() {
@@ -143,8 +145,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
 
 
     public void execute(ResponseHandler responseHandler) {
-        prepareHeaders();
-        prepareBody();
+        prepare();
         execute(0, responseHandler);
     }
 

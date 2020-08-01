@@ -1,6 +1,5 @@
 package com.dtflys.forest.converter.json;
 
-import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
@@ -8,9 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -73,13 +70,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     }
 
     @Override
-    public Map convertToJsonMap(Object obj) {
-        if (obj instanceof Map) {
-            return (Map) obj;
-        }
-        if (obj instanceof List) {
-            throw new ForestConvertException("can not convert " + obj.getClass().getName() + " to " + Map.class.getName());
-        }
-        return mapper.convertValue(obj, HashMap.class);
+    public Map<String, Object> convertObjectToMap(Object obj) {
+        return mapper.convertValue(obj, LinkedHashMap.class);
     }
 }

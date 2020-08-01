@@ -6,11 +6,7 @@ import com.dtflys.forest.annotation.DataVariable;
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.model.*;
-import com.dtflys.forest.annotation.DataVariable;
 import com.dtflys.test.model.Coordinate;
-import com.dtflys.forest.annotation.Request;
-import com.dtflys.forest.annotation.DataObject;
-import com.dtflys.forest.annotation.DataParam;
 import com.dtflys.test.model.Result;
 
 import java.math.BigDecimal;
@@ -35,6 +31,12 @@ public interface AmapClient {
         dataType = "json"
     )
     Map getLocation(@DataObject Coordinate coordinate);
+
+    @Request(
+            url = "http://ditu.amap.com/service/regeo",
+            dataType = "json"
+    )
+    Map getLocation(@DataObject SubCoordinate coordinate);
 
     @Request(
             url = "http://ditu.amap.com/service/regeo",

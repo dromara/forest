@@ -18,6 +18,5 @@ public interface ForestJsonConverter extends ForestConverter {
      */
     String convertToJson(Object obj);
 
-    Map convertToJsonMap(Object obj);
-
+    Map<String, Object> convertObjectToMap(Object obj);
 }
