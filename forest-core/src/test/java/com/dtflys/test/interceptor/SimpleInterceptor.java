@@ -20,6 +20,7 @@ public class SimpleInterceptor implements Interceptor<String> {
     public boolean beforeExecute(ForestRequest request) {
         log.info("invoke Simple beforeExecute");
         request.addHeader(HttpHeaders.ACCEPT, "text/plan");
+        request.addQuery("username", "foo");
         return true;
     }
 

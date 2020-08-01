@@ -1,5 +1,7 @@
 package com.dtflys.test.converter;
 
+import com.dtflys.test.model.Coordinate;
+import com.dtflys.test.model.SubCoordinate;
 import com.google.gson.reflect.TypeToken;
 import junit.framework.Assert;
 import com.dtflys.forest.converter.json.ForestGsonConverter;
@@ -128,6 +130,26 @@ public class TestGsonConverter {
             assertNotNull(e.getCause());
         }
         assertTrue(error);
+    }
+
+    @Test
+    public void testJavaObjectToMap() {
+        Coordinate coordinate = new Coordinate("11.11111", "22.22222");
+        ForestGsonConverter gsonConverter = new ForestGsonConverter();
+        Map map = gsonConverter.convertObjectToMap(coordinate);
+        assertNotNull(map);
+        assertEquals("11.11111", map.get("longitude"));
+        assertEquals("22.22222", map.get("latitude"));
+    }
+
+    @Test
+    public void testJavaObjectToMap2() {
+        SubCoordinate coordinate = new SubCoordinate("11.11111", "22.22222");
+        ForestGsonConverter gsonConverter = new ForestGsonConverter();
+        Map map = gsonConverter.convertObjectToMap(coordinate);
+        assertNotNull(map);
+        assertEquals("11.11111", map.get("longitude"));
+        assertEquals("22.22222", map.get("latitude"));
     }
 
 

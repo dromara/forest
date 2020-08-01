@@ -78,4 +78,12 @@ public class TestAmapClient {
         System.out.println(JSON.toJSONString(result));
     }
 
+    @Test
+    public void testGetLocation6() {
+        Map result = amapClient.getLocation(new SubCoordinate("121.475078", "31.223577"));
+        assertNotNull(result);
+        System.out.println(JSON.toJSONString(result));
+    }
+
+
 }

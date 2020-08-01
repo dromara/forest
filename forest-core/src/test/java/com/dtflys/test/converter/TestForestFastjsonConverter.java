@@ -2,6 +2,8 @@ package com.dtflys.test.converter;
 
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.dtflys.test.model.Coordinate;
+import com.dtflys.test.model.SubCoordinate;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import junit.framework.Assert;
@@ -139,7 +141,27 @@ public class TestForestFastjsonConverter {
             assertNotNull(e.getCause());
         }
         assertTrue(error);
-
     }
+
+    @Test
+    public void testJavaObjectToMap() {
+        Coordinate coordinate = new Coordinate("11.11111", "22.22222");
+        ForestFastjsonConverter forestFastjsonConverter = new ForestFastjsonConverter();
+        Map map = forestFastjsonConverter.convertObjectToMap(coordinate);
+        assertNotNull(map);
+        assertEquals("11.11111", map.get("longitude"));
+        assertEquals("22.22222", map.get("latitude"));
+    }
+
+    @Test
+    public void testJavaObjectToMap2() {
+        SubCoordinate coordinate = new SubCoordinate("11.11111", "22.22222");
+        ForestFastjsonConverter forestFastjsonConverter = new ForestFastjsonConverter();
+        Map map = forestFastjsonConverter.convertObjectToMap(coordinate);
+        assertNotNull(map);
+        assertEquals("11.11111", map.get("longitude"));
+        assertEquals("22.22222", map.get("latitude"));
+    }
+
 
 }

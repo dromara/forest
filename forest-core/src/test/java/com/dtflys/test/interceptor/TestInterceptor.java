@@ -1,5 +1,7 @@
 package com.dtflys.test.interceptor;
 
+import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.test.http.BaseClientTest;
 import com.dtflys.test.mock.GetMockServer;
 import com.dtflys.forest.interceptor.DefaultInterceptorFactory;
 import com.dtflys.forest.config.ForestConfiguration;
@@ -19,7 +21,7 @@ import static junit.framework.Assert.*;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-18 16:57
  */
-public class TestInterceptor {
+public class TestInterceptor extends BaseClientTest {
 
     private final static Logger log = LoggerFactory.getLogger(TestGetClient.class);
 
@@ -32,13 +34,17 @@ public class TestInterceptor {
 
     private static BaseInterceptorClient baseInterceptorClient;
 
+    public TestInterceptor(HttpBackend backend) {
+        super(backend, configuration);
+        interceptorClient = configuration.createInstance(InterceptorClient.class);
+        baseInterceptorClient = configuration.createInstance(BaseInterceptorClient.class);
+    }
+
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
         configuration.setCacheEnabled(false);
         configuration.setVariableValue("port", GetMockServer.port);
-        interceptorClient = configuration.createInstance(InterceptorClient.class);
-        baseInterceptorClient = configuration.createInstance(BaseInterceptorClient.class);
     }
 
 
