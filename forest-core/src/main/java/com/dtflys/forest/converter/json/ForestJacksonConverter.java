@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 
 /**
@@ -40,7 +42,6 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     }
 
     public <T> T convertToJavaObject(String source, Class<?> parametrized, Class<?> ...parameterClasses) {
-        ObjectMapper mapper = new ObjectMapper();
         try {
             JavaType javaType = mapper.getTypeFactory().constructParametricType(parametrized, parameterClasses);
             return mapper.readValue(source, javaType);
@@ -50,7 +51,6 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     }
 
     public <T> T convertToJavaObject(String source, JavaType javaType) {
-        ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.readValue(source, javaType);
         } catch (IOException e) {
@@ -62,11 +62,15 @@ public class ForestJacksonConverter implements ForestJsonConverter {
 
 
     public String convertToJson(Object obj) {
-        ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.writeValueAsString(obj);
         } catch (Throwable e) {
             throw new ForestRuntimeException(e);
         }
+    }
+
+    @Override
+    public Map<String, Object> convertObjectToMap(Object obj) {
+        return mapper.convertValue(obj, LinkedHashMap.class);
     }
 }

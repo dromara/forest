@@ -416,12 +416,10 @@ public class ForestMethod<T> implements VariableScope {
                 }
                 else {
                     try {
-                        List<RequestNameValue> list = getNameValueListFromObject(obj, type);
+                        List<RequestNameValue> list = getNameValueListFromObjectWithJSON(obj, type);
                         nameValueList.addAll(list);
-                    } catch (InvocationTargetException e) {
-                        throw new ForestRuntimeException(e);
-                    } catch (IllegalAccessException e) {
-                        throw new ForestRuntimeException(e);
+                    } catch (Throwable th) {
+                        throw new ForestRuntimeException(th);
                     }
                 }
             }
@@ -580,8 +578,12 @@ public class ForestMethod<T> implements VariableScope {
      */
     private List<RequestNameValue> getNameValueListFromObject(Object obj, ForestRequestType type) throws InvocationTargetException, IllegalAccessException {
         Class clazz = obj.getClass();
+        if (clazz.equals(Object.class)) {
+            return new ArrayList<>();
+        }
+
         Method[] methods = clazz.getDeclaredMethods();
-        List<RequestNameValue> nameValueList = new ArrayList<RequestNameValue>();
+        List<RequestNameValue> nameValueList = new ArrayList<>();
         for (int i = 0; i < methods.length; i++) {
             Method mtd = methods[i];
             String getterName = StringUtils.getGetterName(mtd);
@@ -591,7 +593,7 @@ public class ForestMethod<T> implements VariableScope {
             Method getter = mtd;
             Object value = getter.invoke(obj);
             if (value != null) {
-                RequestNameValue nameValue = new RequestNameValue(getterName, value, type.isDefaultParamInQuery());
+                RequestNameValue nameValue = new RequestNameValue(getterName ,value, type.isDefaultParamInQuery());
                 nameValueList.add(nameValue);
             }
 
@@ -601,6 +603,19 @@ public class ForestMethod<T> implements VariableScope {
 
 
 
+    private List<RequestNameValue> getNameValueListFromObjectWithJSON(Object obj, ForestRequestType type) {
+        Map<String, Object> propMap = configuration.getJsonConverter().convertObjectToMap(obj);
+        List<RequestNameValue> nameValueList = new ArrayList<>();
+        for (Map.Entry<String, Object> entry : propMap.entrySet()) {
+            String name = entry.getKey();
+            Object value = entry.getValue();
+            if (value != null) {
+                RequestNameValue nameValue = new RequestNameValue(name ,value, type.isDefaultParamInQuery());
+                nameValueList.add(nameValue);
+            }
+        }
+        return nameValueList;
+    }
 
     /**
      * 调用方法

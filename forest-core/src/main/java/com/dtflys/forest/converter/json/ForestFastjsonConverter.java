@@ -1,11 +1,14 @@
 package com.dtflys.forest.converter.json;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 
 import java.lang.reflect.Type;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 
 /**
@@ -88,5 +91,14 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         } catch (Throwable th) {
             throw new ForestRuntimeException(th);
         }
+    }
+
+    @Override
+    public Map<String, Object> convertObjectToMap(Object obj) {
+        Object jsonObj = JSON.toJSON(obj);
+        if (jsonObj instanceof JSONObject) {
+            return (Map<String, Object>) jsonObj;
+        }
+        return null;
     }
 }
