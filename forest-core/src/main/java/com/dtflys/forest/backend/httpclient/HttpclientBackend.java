@@ -9,7 +9,7 @@ import com.dtflys.forest.backend.httpclient.request.AsyncHttpclientRequestSender
 import com.dtflys.forest.backend.httpclient.request.HttpclientRequestSender;
 import com.dtflys.forest.backend.httpclient.request.SyncHttpclientRequestSender;
 import com.dtflys.forest.backend.httpclient.response.HttpclientResponseHandler;
-import com.dtflys.forest.handler.ResponseHandler;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 
 
@@ -20,67 +20,67 @@ import com.dtflys.forest.http.ForestRequest;
 public class HttpclientBackend extends AbstractHttpBackend {
 
     @Override
-    protected HttpExecutor createHeadExecutor(ForestConnectionManager connectionManager, ForestRequest request, ResponseHandler responseHandler) {
+    protected HttpExecutor createHeadExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         return new HttpclientHeadExecutor(request,
-                getHttpclientResponseHandler(request, responseHandler),
+                getHttpclientResponseHandler(request, lifeCycleHandler),
                 getRequestSender(connectionManager, request));
     }
 
     @Override
-    protected HttpExecutor createGetExecutor(ForestConnectionManager connectionManager, ForestRequest request, ResponseHandler responseHandler) {
+    protected HttpExecutor createGetExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         return new HttpclientGetExecutor(request,
-                getHttpclientResponseHandler(request, responseHandler),
+                getHttpclientResponseHandler(request, lifeCycleHandler),
                 getRequestSender(connectionManager, request));
     }
 
     @Override
-    protected HttpExecutor createPostExecutor(ForestConnectionManager connectionManager, ForestRequest request, ResponseHandler responseHandler) {
+    protected HttpExecutor createPostExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         return new HttpclientPostExecutor(request,
-                getHttpclientResponseHandler(request, responseHandler),
+                getHttpclientResponseHandler(request, lifeCycleHandler),
                 getRequestSender(connectionManager, request));
 
     }
 
     @Override
-    protected HttpExecutor createPutExecutor(ForestConnectionManager connectionManager, ForestRequest request, ResponseHandler responseHandler) {
+    protected HttpExecutor createPutExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         return new HttpclientPutExecutor(request,
-                getHttpclientResponseHandler(request, responseHandler),
+                getHttpclientResponseHandler(request, lifeCycleHandler),
                 getRequestSender(connectionManager, request));
 
     }
 
     @Override
-    protected HttpExecutor createDeleteExecutor(ForestConnectionManager connectionManager, ForestRequest request, ResponseHandler responseHandler) {
+    protected HttpExecutor createDeleteExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         return new HttpclientDeleteExecutor(request,
-                getHttpclientResponseHandler(request, responseHandler),
+                getHttpclientResponseHandler(request, lifeCycleHandler),
                 getRequestSender(connectionManager, request));
 
     }
 
     @Override
-    protected HttpExecutor createOptionsExecutor(ForestConnectionManager connectionManager, ForestRequest request, ResponseHandler responseHandler) {
+    protected HttpExecutor createOptionsExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         return new HttpclientOptionsExecutor(request,
-                getHttpclientResponseHandler(request, responseHandler),
+                getHttpclientResponseHandler(request, lifeCycleHandler),
                 getRequestSender(connectionManager, request));
     }
 
     @Override
-    protected HttpExecutor createTraceExecutor(ForestConnectionManager connectionManager, ForestRequest request, ResponseHandler responseHandler) {
+    protected HttpExecutor createTraceExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         return new HttpclientTraceExecutor(request,
-                getHttpclientResponseHandler(request, responseHandler),
+                getHttpclientResponseHandler(request, lifeCycleHandler),
                 getRequestSender(connectionManager, request));
     }
 
     @Override
-    protected HttpExecutor createPatchExecutor(ForestConnectionManager connectionManager, ForestRequest request, ResponseHandler responseHandler) {
+    protected HttpExecutor createPatchExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         return new HttpclientPatchExecutor(request,
-                getHttpclientResponseHandler(request, responseHandler),
+                getHttpclientResponseHandler(request, lifeCycleHandler),
                 getRequestSender(connectionManager, request));
     }
 
 
-    private static HttpclientResponseHandler getHttpclientResponseHandler(ForestRequest request, ResponseHandler responseHandler) {
-        return new HttpclientResponseHandler(request, responseHandler);
+    private static HttpclientResponseHandler getHttpclientResponseHandler(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
+        return new HttpclientResponseHandler(request, lifeCycleHandler);
     }
 
     @SuppressWarnings("deprecation")
