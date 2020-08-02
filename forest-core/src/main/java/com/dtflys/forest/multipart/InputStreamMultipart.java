@@ -4,6 +4,7 @@ import com.dtflys.forest.exceptions.ForestNoFileNameException;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 
 public class InputStreamMultipart extends ForestMultipart<InputStream> {
@@ -27,6 +28,11 @@ public class InputStreamMultipart extends ForestMultipart<InputStream> {
     @Override
     public InputStream getInputStream() {
         return inputStream;
+    }
+
+    @Override
+    public long getSize() {
+        return -1;
     }
 
     @Override
