@@ -24,6 +24,8 @@
 
 package com.dtflys.forest.annotation;
 
+import com.twitter.finagle.http.path.$tilde;
+
 import java.lang.annotation.*;
 
 /**
@@ -69,12 +71,6 @@ public @interface Request {
 
     int maxRetryInterval() default -1;
 
-//    @Deprecated
-//    String username() default "";
-
-//    @Deprecated
-//    String password() default "";
-
     String contentType() default "";
 
     String contentEncoding() default "UTF-8";
@@ -110,6 +106,8 @@ public @interface Request {
     Class<?>[] interceptor() default {};
 
     String[] data() default {};
+
+    long progressStep() default -1L;
 
     String keyStore() default "";
 
