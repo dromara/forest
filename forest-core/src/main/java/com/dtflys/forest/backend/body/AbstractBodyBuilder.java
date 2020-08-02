@@ -2,7 +2,7 @@ package com.dtflys.forest.backend.body;
 
 import com.dtflys.forest.backend.BodyBuilder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
-import com.dtflys.forest.handler.ResponseHandler;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.multipart.ForestMultipart;
@@ -22,7 +22,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
     public final static String TYPE_MULTIPART_FORM_DATA = "multipart/form-data";
 
     @Override
-    public void buildBody(T httpRequest, ForestRequest request, ResponseHandler responseHandler) {
+    public void buildBody(T httpRequest, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         String contentType = request.getContentType();
         if (StringUtils.isEmpty(contentType)) {
             Object value = request.getHeaders().get("Content-Type");
@@ -79,7 +79,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
         }
         else if (mineType.equals(TYPE_MULTIPART_FORM_DATA)) {
             List<ForestMultipart> multiparts = request.getMultiparts();
-            setFileBody(httpRequest, request, charset, contentType, nameValueList, multiparts, responseHandler);
+            setFileBody(httpRequest, request, charset, contentType, nameValueList, multiparts, lifeCycleHandler);
         }
         else  {
             Map<String, Object> map = convertNameValueListToMap(request, nameValueList);
@@ -97,7 +97,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
 
     protected abstract void setFormBody(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList);
 
-    protected abstract void setFileBody(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList,  List<ForestMultipart> multiparts, ResponseHandler responseHandler);
+    protected abstract void setFileBody(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList,  List<ForestMultipart> multiparts, LifeCycleHandler lifeCycleHandler);
 
     private List convertNameValueListToList(ForestRequest request, List<RequestNameValue> nameValueList) {
         List list = new LinkedList();
