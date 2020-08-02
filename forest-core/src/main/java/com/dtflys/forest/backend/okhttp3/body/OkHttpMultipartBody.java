@@ -1,10 +1,9 @@
 package com.dtflys.forest.backend.okhttp3.body;
 
-import com.dtflys.forest.callback.OnProgress;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.utils.ForestProgress;
 import okhttp3.MediaType;
-import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okio.Buffer;
 import okio.BufferedSink;
@@ -12,46 +11,80 @@ import okio.ForwardingSink;
 import okio.Okio;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class OkHttpMultipartBody extends RequestBody {
 
     private final ForestRequest request;
 
-    private final MultipartBody multipartBody;
+    private final RequestBody requestBody;
 
-    private final OnProgress onProgress;
+    private final LifeCycleHandler handler;
+
+    private long contentLength = -1;
 
     private long writtenBytes;
 
     private BufferedSink bufferedSink;
 
-    public OkHttpMultipartBody(ForestRequest request, MultipartBody multipartBody, OnProgress onProgress) {
+    private final long progressStep;
+
+    private long currentStep = 0;
+
+    public OkHttpMultipartBody(ForestRequest request, RequestBody requestBody, LifeCycleHandler handler) {
         this.request = request;
-        this.multipartBody = multipartBody;
-        this.onProgress = onProgress;
+        this.requestBody = requestBody;
+        this.handler = handler;
+        this.progressStep = request.getProgressStep();
     }
 
     @Override
     public MediaType contentType() {
-        return multipartBody.contentType();
+        return requestBody.contentType();
     }
 
     @Override
-    public long contentLength() throws IOException {
-        return multipartBody.contentLength();
+    public long contentLength() {
+        if (contentLength < 0) {
+            try {
+                contentLength = requestBody.contentLength();
+            } catch (IOException ex) {
+                contentLength = -1;
+            }
+        }
+        return contentLength;
     }
 
     private ForwardingSink getSink(BufferedSink sink) {
+        final OkHttpMultipartBody self = this;
+        AtomicReference<ForestProgress> progressReference = new AtomicReference<>(null);
+
         ForwardingSink forwardingSink = new ForwardingSink(sink) {
             @Override
             public void write(Buffer source, long byteCount) throws IOException {
                 // increment current length of written bytes
-                writtenBytes += byteCount;
-                long totalLength = contentLength();
-                // invoke callback function
-                if (onProgress != null) {
-                    ForestProgress progress = new ForestProgress(request, writtenBytes, totalLength, writtenBytes == totalLength);
-                    onProgress.onProgress(progress);
+                self.writtenBytes += byteCount;
+                long totalLength = self.contentLength();
+                ForestProgress progress = progressReference.get();
+                if (progress == null) {
+                    progress = new ForestProgress(self.request, totalLength);
+                    progressReference.set(progress);
+                }
+                progress.setCurrentBytes(self.writtenBytes);
+                if (totalLength >= 0) {
+                    self.currentStep += byteCount;
+                    if (self.writtenBytes == totalLength) {
+                        // progress is done
+                        progress.setDone(true);
+                        self.handler.handleProgress(self.request, progress);
+                    } else {
+                        while (self.currentStep >= self.progressStep) {
+                            self.currentStep = self.currentStep - self.progressStep;
+                            progress.setDone(false);
+                            // invoke progress listener
+                            self.handler.handleProgress(self.request, progress);
+                        }
+                    }
                 }
                 super.write(source, byteCount);
             }
@@ -67,7 +100,7 @@ public class OkHttpMultipartBody extends RequestBody {
             bufferedSink = Okio.buffer(forwardingSink);
         }
         // write to buffered sink
-        multipartBody.writeTo(bufferedSink);
+        requestBody.writeTo(bufferedSink);
         bufferedSink.flush();
     }
 }

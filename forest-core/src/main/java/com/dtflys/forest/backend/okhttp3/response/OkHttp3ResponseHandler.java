@@ -5,7 +5,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
 import okhttp3.Response;
-import com.dtflys.forest.handler.ResponseHandler;
+import com.dtflys.forest.handler.LifeCycleHandler;
 
 import java.util.concurrent.Future;
 
@@ -16,8 +16,8 @@ import java.util.concurrent.Future;
  */
 public class OkHttp3ResponseHandler extends BackendResponseHandler<Object> {
 
-    public OkHttp3ResponseHandler(ForestRequest request, ResponseHandler responseHandler) {
-        super(request, responseHandler);
+    public OkHttp3ResponseHandler(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
+        super(request, lifeCycleHandler);
     }
 
     public Object handleSync(Response okResponse, ForestResponse response) {
@@ -28,7 +28,7 @@ public class OkHttp3ResponseHandler extends BackendResponseHandler<Object> {
 
     @Override
     public void handleFuture(Future<Object> httpResponseFuture, ForestResponseFactory forestResponseFactory) {
-        responseHandler.handleResult(httpResponseFuture);
+        lifeCycleHandler.handleResult(httpResponseFuture);
     }
 
 
