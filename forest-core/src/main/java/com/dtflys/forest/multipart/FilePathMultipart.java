@@ -5,11 +5,17 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class FilePathMultipart extends ForestMultipart<String> {
 
     private String filePath;
 
+    private Path path;
+
+    private File file;
 
     @Override
     public String getOriginalFileName() {
@@ -28,6 +34,16 @@ public class FilePathMultipart extends ForestMultipart<String> {
     @Override
     public void setData(String data) {
         this.filePath = data;
+        this.path = Paths.get(data).normalize();
+    }
+
+    @Override
+    public long getSize() {
+        try {
+            return Files.size(this.path);
+        } catch (IOException e) {
+            throw new ForestRuntimeException(e);
+        }
     }
 
     @Override
@@ -50,7 +66,10 @@ public class FilePathMultipart extends ForestMultipart<String> {
 
     @Override
     public File getFile() {
-        File file = new File(filePath);
+        if (file != null) {
+            return file;
+        }
+        file = path.toFile();
         return file;
     }
 }

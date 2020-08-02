@@ -39,6 +39,11 @@ public class ByteArrayMultipart extends ForestMultipart<byte[]> {
     }
 
     @Override
+    public long getSize() {
+        return bytes.length;
+    }
+
+    @Override
     public boolean isFile() {
         return false;
     }

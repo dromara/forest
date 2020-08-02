@@ -38,6 +38,11 @@ public class FileMultipart extends ForestMultipart<File> {
     }
 
     @Override
+    public long getSize() {
+        return file.length();
+    }
+
+    @Override
     public boolean isFile() {
         return true;
     }

@@ -37,6 +37,15 @@ public class SpringResource extends ForestMultipart<Resource> {
     }
 
     @Override
+    public long getSize() {
+        try {
+            return resource.contentLength();
+        } catch (IOException e) {
+            throw new ForestRuntimeException(e);
+        }
+    }
+
+    @Override
     public boolean isFile() {
         return true;
     }

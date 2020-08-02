@@ -2,7 +2,6 @@ package com.dtflys.forest.file;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.multipart.ForestMultipart;
-import com.dtflys.forest.multipart.ForestMultipartFactory;
 import com.dtflys.forest.utils.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,6 +20,9 @@ public class SpringMultipartFile extends ForestMultipart<MultipartFile> {
 
     @Override
     public String getOriginalFileName() {
+        if (StringUtils.isNotBlank(fileName)) {
+            return fileName;
+        }
         return multipartFile.getOriginalFilename();
     }
 
@@ -31,6 +33,11 @@ public class SpringMultipartFile extends ForestMultipart<MultipartFile> {
         } catch (IOException e) {
             throw new ForestRuntimeException(e);
         }
+    }
+
+    @Override
+    public long getSize() {
+        return multipartFile.getSize();
     }
 
     @Override
