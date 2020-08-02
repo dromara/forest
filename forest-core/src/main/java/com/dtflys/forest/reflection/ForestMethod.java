@@ -663,7 +663,7 @@ public class ForestMethod<T> implements VariableScope {
     public Object invoke(Object[] args) {
         ForestRequest request = makeRequest(args);
         MethodResponseHandler<T> responseHandler = new MethodResponseHandler<>(
-                this, configuration, onSuccessClassGenericType);
+                this, onSuccessClassGenericType);
         request.execute(configuration.getBackend(), responseHandler);
         return responseHandler.getResultData();
     }
@@ -691,7 +691,7 @@ public class ForestMethod<T> implements VariableScope {
         if (!(params[index] instanceof Class)) {
             return Object.class;
         }
-        return (Class) params[index];
+        return params[index];
     }
 
 

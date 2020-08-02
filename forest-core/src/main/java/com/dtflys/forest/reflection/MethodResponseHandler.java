@@ -19,10 +19,6 @@ import java.lang.reflect.Type;
  */
 public class MethodResponseHandler<T> implements ResponseHandler {
 
-    private final ForestMethod method;
-
-    private final ForestConfiguration configuration;
-
     private final Type returnType;
 
     private final Class returnClass;
@@ -33,9 +29,7 @@ public class MethodResponseHandler<T> implements ResponseHandler {
 
     private volatile T resultData;
 
-    public MethodResponseHandler(ForestMethod method, ForestConfiguration configuration, Type onSuccessClassGenericType) {
-        this.method = method;
-        this.configuration = configuration;
+    public MethodResponseHandler(ForestMethod method, Type onSuccessClassGenericType) {
         this.onSuccessClassGenericType = onSuccessClassGenericType;
         this.returnType = method.getReturnType();
         this.returnClass = method.getReturnClass();

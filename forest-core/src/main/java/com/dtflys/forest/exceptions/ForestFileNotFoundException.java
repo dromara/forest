@@ -1,7 +1,5 @@
 package com.dtflys.forest.exceptions;
 
-import java.io.FileNotFoundException;
-
 public class ForestFileNotFoundException extends ForestRuntimeException {
 
     private String filePath;
