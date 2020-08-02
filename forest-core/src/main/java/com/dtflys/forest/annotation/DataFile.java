@@ -11,7 +11,15 @@ import java.lang.annotation.*;
 @Target(ElementType.PARAMETER)
 public @interface DataFile {
 
+    /**
+     * The parameter name in request
+     * @return
+     */
     String value();
 
+    /**
+     * The name of file to upload (Optional)
+     * @return
+     */
     String fileName() default "";
 }
