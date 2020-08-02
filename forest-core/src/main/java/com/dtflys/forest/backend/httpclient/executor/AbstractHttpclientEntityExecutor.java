@@ -2,6 +2,7 @@ package com.dtflys.forest.backend.httpclient.executor;
 
 import com.dtflys.forest.backend.httpclient.body.HttpclientBodyBuilder;
 import com.dtflys.forest.http.ForestRequest;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import com.dtflys.forest.backend.httpclient.request.HttpclientRequestSender;
 import com.dtflys.forest.backend.httpclient.response.HttpclientResponseHandler;
@@ -29,7 +30,20 @@ public abstract class AbstractHttpclientEntityExecutor<T extends HttpEntityEnclo
     @Override
     protected String getLogContentForBody(T httpReq) {
         try {
-            InputStream in = httpReq.getEntity().getContent();
+            HttpEntity entity = httpReq.getEntity();
+            if (entity.getContentType().getValue().startsWith("multipart/")) {
+                Long contentLength = null;
+                try {
+                    contentLength = entity.getContentLength();
+                } catch (Throwable th) {
+                }
+                String result = "[" + entity.getContentType().getValue();
+                if (contentLength != null) {
+                    result += "; length=" + contentLength;
+                }
+                return result + "]";
+            }
+            InputStream in = entity.getContent();
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             StringBuffer buffer = new StringBuffer();
             String line;
