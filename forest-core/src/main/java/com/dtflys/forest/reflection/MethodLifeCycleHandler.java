@@ -1,15 +1,15 @@
 package com.dtflys.forest.reflection;
 
+import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.callback.OnSuccess;
-import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestNetworkException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.handler.ResponseHandler;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.handler.ResultHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.utils.ForestProgress;
 import com.dtflys.forest.utils.ReflectUtil;
-import sun.reflect.Reflection;
 
 import java.lang.reflect.Type;
 
@@ -17,7 +17,7 @@ import java.lang.reflect.Type;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-19 17:00
  */
-public class MethodResponseHandler<T> implements ResponseHandler {
+public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
 
     private final Type returnType;
 
@@ -29,7 +29,7 @@ public class MethodResponseHandler<T> implements ResponseHandler {
 
     private volatile T resultData;
 
-    public MethodResponseHandler(ForestMethod method, Type onSuccessClassGenericType) {
+    public MethodLifeCycleHandler(ForestMethod method, Type onSuccessClassGenericType) {
         this.onSuccessClassGenericType = onSuccessClassGenericType;
         this.returnType = method.getReturnType();
         this.returnClass = method.getReturnClass();
@@ -116,6 +116,15 @@ public class MethodResponseHandler<T> implements ResponseHandler {
         }
         else {
             throw e;
+        }
+    }
+
+    @Override
+    public void handleProgress(ForestRequest request, ForestProgress progress) {
+//        request.getInterceptorChain().onProgress(progress);
+        OnProgress onProgress = request.getOnProgress();
+        if (onProgress != null) {
+            onProgress.onProgress(progress);
         }
     }
 
