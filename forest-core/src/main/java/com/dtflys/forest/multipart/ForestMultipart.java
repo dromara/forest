@@ -7,6 +7,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * <p>Forest对上传下载的文件、流、二进制数值等内容的封装抽象类，
+ * 提供针对用于上传下载等用途资源的公共接口</p>
+ * @param <T>
+ * @author gongjun[dt_flys@hotmail.com]
+ * @since 2020-08-02 15:01
+ */
 public abstract class ForestMultipart<T> {
 
     private int BUFFER_SIZE = 4096;
@@ -26,10 +33,6 @@ public abstract class ForestMultipart<T> {
         this.name = name;
     }
 
-    public String getFileName() {
-        return fileName;
-    }
-
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
@@ -47,6 +50,8 @@ public abstract class ForestMultipart<T> {
     public abstract String getOriginalFileName();
 
     public abstract InputStream getInputStream();
+
+    public abstract long getSize();
 
     public abstract boolean isFile();
 
