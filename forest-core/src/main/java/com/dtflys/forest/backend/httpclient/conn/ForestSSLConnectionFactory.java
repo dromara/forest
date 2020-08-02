@@ -12,14 +12,14 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.ssl.SSLUtils;
 import org.apache.http.HttpHost;
-import org.apache.http.annotation.ThreadSafe;
+//import org.apache.http.annotation.ThreadSafe;
 import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
 import org.apache.http.conn.ssl.*;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.Args;
 import org.apache.http.util.TextUtils;
 
-@ThreadSafe
+//@ThreadSafe
 public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactory {
 
     public static final X509HostnameVerifier BROWSER_COMPATIBLE_HOSTNAME_VERIFIER = new BrowserCompatHostnameVerifier();
