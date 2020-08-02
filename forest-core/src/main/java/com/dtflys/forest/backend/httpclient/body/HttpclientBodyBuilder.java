@@ -2,6 +2,7 @@ package com.dtflys.forest.backend.httpclient.body;
 
 import com.dtflys.forest.backend.body.AbstractBodyBuilder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.multipart.ForestMultipart;
@@ -13,16 +14,17 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.ContentBody;
-import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.AbstractContentBody;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.*;
 
 /**
+ * HttpClient后端的请求Body构造器
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-19 14:52
  */
@@ -68,8 +70,18 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
     }
 
     @Override
-    protected void setFileBody(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList, List<ForestMultipart> multiparts) {
+    protected void setFileBody(T httpReq,
+                               ForestRequest request,
+                               String charset,
+                               String contentType,
+                               List<RequestNameValue> nameValueList,
+                               List<ForestMultipart> multiparts,
+                               LifeCycleHandler lifeCycleHandler) {
         MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
+        // 解决文件名乱码问题
+        Charset httpCharset = Charset.forName(charset);
+        entityBuilder.setCharset(httpCharset);
+        entityBuilder.setMode(HttpMultipartMode.RFC6532);
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         for (int i = 0; i < nameValueList.size(); i++) {
             RequestNameValue nameValue = nameValueList.get(i);
@@ -82,14 +94,17 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
         for (int i = 0; i < multiparts.size(); i++) {
             ForestMultipart multipart = multiparts.get(i);
             String name = multipart.getName();
-            String fileName = multipart.getFileName();
-            ContentType ctype = ContentType.create(multipart.getContentType());
+            String fileName = multipart.getOriginalFileName();
+            ContentType ctype = ContentType.create(multipart.getContentType(), httpCharset);
+            AbstractContentBody contentBody = null;
             if (multipart.isFile()) {
-                ContentBody body = new FileBody(multipart.getFile(), ctype, multipart.getFileName());
-                entityBuilder.addPart(multipart.getName(), body);
+                contentBody = new HttpclientMultipartFileBody(request, multipart.getFile(), ctype, fileName, lifeCycleHandler);
+//                entityBuilder.addBinaryBody(name, multipart.getFile(), ctype, fileName);
             } else {
-                entityBuilder.addBinaryBody(name, multipart.getInputStream(), ctype, fileName);
+                contentBody = new HttpclientMultipartCommonBody(request, multipart, ctype, fileName, lifeCycleHandler);
+//                entityBuilder.addBinaryBody(name, multipart.getInputStream(), ctype, fileName);
             }
+            entityBuilder.addPart(name, contentBody);
         }
         HttpEntity entity = entityBuilder.build();
         httpReq.setEntity(entity);
