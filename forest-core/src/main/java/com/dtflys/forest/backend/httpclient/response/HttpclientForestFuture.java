@@ -1,6 +1,6 @@
 package com.dtflys.forest.backend.httpclient.response;
 
-import com.dtflys.forest.handler.ResponseHandler;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
@@ -17,18 +17,18 @@ import java.util.concurrent.TimeoutException;
 public class HttpclientForestFuture<T, R> implements Future<T> {
     private final ForestRequest request;
     private final Class<T> innerType;
-    private final ResponseHandler responseHandler;
+    private final LifeCycleHandler lifeCycleHandler;
     private final Future<R> httpResponseFuture;
     private final ForestResponseFactory forestResponseFactory;
 
     public HttpclientForestFuture(ForestRequest request,
                                   Class<T> innerType,
-                                  ResponseHandler responseHandler,
+                                  LifeCycleHandler lifeCycleHandler,
                                   Future<R> httpResponseFuture,
                                   ForestResponseFactory forestResponseFactory) {
         this.request = request;
         this.innerType = innerType;
-        this.responseHandler = responseHandler;
+        this.lifeCycleHandler = lifeCycleHandler;
         this.httpResponseFuture = httpResponseFuture;
         this.forestResponseFactory = forestResponseFactory;
     }
@@ -53,7 +53,7 @@ public class HttpclientForestFuture<T, R> implements Future<T> {
             return (T) httpResponse;
         }
         ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
-        Object ret = responseHandler.handleResultType(request, response, innerType, innerType);
+        Object ret = lifeCycleHandler.handleResultType(request, response, innerType, innerType);
         return (T) ret;
     }
 

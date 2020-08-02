@@ -1,7 +1,7 @@
 package com.dtflys.forest.backend.httpclient.response;
 
 import com.dtflys.forest.backend.BackendResponseHandler;
-import com.dtflys.forest.handler.ResponseHandler;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
@@ -18,8 +18,8 @@ import java.util.concurrent.Future;
  */
 public class HttpclientResponseHandler extends BackendResponseHandler<HttpResponse> {
 
-    public HttpclientResponseHandler(ForestRequest request, ResponseHandler responseHandler) {
-        super(request, responseHandler);
+    public HttpclientResponseHandler(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
+        super(request, lifeCycleHandler);
     }
 
     public void handleSync(HttpResponse httpResponse, ForestResponse response) {
@@ -32,7 +32,7 @@ public class HttpclientResponseHandler extends BackendResponseHandler<HttpRespon
     public void handleFuture(
             final Future httpResponseFuture,
             ForestResponseFactory forestResponseFactory) {
-        Type returnType = responseHandler.getReturnType();
+        Type returnType = lifeCycleHandler.getReturnType();
         Type paramType;
         Class paramClass = null;
         if (returnType instanceof ParameterizedType) {
@@ -58,8 +58,8 @@ public class HttpclientResponseHandler extends BackendResponseHandler<HttpRespon
 
     protected void handleFutureResult(Future httpResponseFuture, Class innerType, ForestResponseFactory forestResponseFactory) {
         HttpclientForestFuture<HttpResponse, HttpResponse> future = new HttpclientForestFuture<>(
-                request, innerType, responseHandler, httpResponseFuture, forestResponseFactory);
-        responseHandler.handleResult(future);
+                request, innerType, lifeCycleHandler, httpResponseFuture, forestResponseFactory);
+        lifeCycleHandler.handleResult(future);
     }
 
 }
