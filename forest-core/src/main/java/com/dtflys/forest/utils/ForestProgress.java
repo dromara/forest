@@ -6,23 +6,24 @@ public class ForestProgress {
 
     private final ForestRequest request;
 
-    private final long currentBytes;
+    private long currentBytes;
 
     private final long totalBytes;
 
-    private final boolean isDone;
+    private boolean isDone;
 
-    public ForestProgress(ForestRequest request, long currentBytes, long totalBytes, boolean isDone) {
+    public ForestProgress(ForestRequest request, long totalBytes) {
         this.request = request;
-        this.currentBytes = currentBytes;
         this.totalBytes = totalBytes;
-        this.isDone = isDone;
     }
 
     public ForestRequest getRequest() {
         return request;
     }
 
+    public void setCurrentBytes(long currentBytes) {
+        this.currentBytes = currentBytes;
+    }
 
     public long getCurrentBytes() {
         return currentBytes;
@@ -34,7 +35,14 @@ public class ForestProgress {
     }
 
     public double getRate() {
+        if (totalBytes < 0) {
+            return 0;
+        }
         return currentBytes * 1.0F / totalBytes;
+    }
+
+    public void setDone(boolean done) {
+        isDone = done;
     }
 
     public boolean isDone() {
