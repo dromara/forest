@@ -24,6 +24,7 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.retryer.Retryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
@@ -33,7 +34,7 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.backend.HttpExecutor;
-import com.dtflys.forest.handler.ResponseHandler;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorChain;
 import com.dtflys.forest.utils.ForestDataType;
@@ -48,6 +49,8 @@ import java.util.*;
  * @since 2016-03-24
  */
 public class ForestRequest<T> {
+
+    private final static long DEFAULT_PROGRESS_STEP = 1024 * 10;
 
     private final ForestConfiguration configuration;
 
@@ -90,6 +93,10 @@ public class ForestRequest<T> {
     private OnSuccess onSuccess;
 
     private OnError onError;
+
+    private long progressStep = DEFAULT_PROGRESS_STEP;
+
+    private OnProgress onProgress;
 
     private InterceptorChain interceptorChain = new InterceptorChain();
 
@@ -385,6 +392,24 @@ public class ForestRequest<T> {
         return this;
     }
 
+    public long getProgressStep() {
+        return progressStep;
+    }
+
+    public ForestRequest setProgressStep(long progressStep) {
+        this.progressStep = progressStep;
+        return this;
+    }
+
+    public OnProgress getOnProgress() {
+        return onProgress;
+    }
+
+    public ForestRequest setOnProgress(OnProgress onProgress) {
+        this.onProgress = onProgress;
+        return this;
+    }
+
     public ForestRequest<T> addInterceptor(Interceptor interceptor) {
         interceptorChain.addInterceptor(interceptor);
         return this;
@@ -420,12 +445,12 @@ public class ForestRequest<T> {
         return this;
     }
 
-    public void execute(HttpBackend backend, ResponseHandler responseHandler) {
-        HttpExecutor executor  = backend.createExecutor(this, responseHandler);
+    public void execute(HttpBackend backend, LifeCycleHandler lifeCycleHandler) {
+        HttpExecutor executor  = backend.createExecutor(this, lifeCycleHandler);
         if (executor != null) {
             if (interceptorChain.beforeExecute(this)) {
                 try {
-                    executor.execute(responseHandler);
+                    executor.execute(lifeCycleHandler);
                 } catch (ForestRuntimeException e) {
                     throw e;
 //                if (onError == null) {
