@@ -2,6 +2,7 @@ package com.dtflys.forest.reflection;
 
 import com.dtflys.forest.annotation.*;
 import com.dtflys.forest.callback.OnError;
+import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.VariableScope;
@@ -51,6 +52,7 @@ public class ForestMethod<T> implements VariableScope {
     private MappingTemplate encodeTemplate = null;
     private MappingTemplate baseContentTypeTemplate;
     private MappingTemplate contentTypeTemplate;
+    private long progressStep = -1;
     private String sslKeyStoreId;
     private MappingTemplate[] dataTemplateArray;
     private MappingTemplate[] headerTemplateArray;
@@ -60,6 +62,7 @@ public class ForestMethod<T> implements VariableScope {
     private Map<String, MappingVariable> variables = new HashMap<String, MappingVariable>();
     private MappingParameter onSuccessParameter = null;
     private MappingParameter onErrorParameter = null;
+    private MappingParameter onProgressParameter = null;
     private List<Interceptor> globalInterceptorList;
     private List<Interceptor> baseInterceptorList;
     private List<Interceptor> interceptorList;
@@ -164,6 +167,7 @@ public class ForestMethod<T> implements VariableScope {
                 contentTypeTemplate = makeTemplate(reqAnn.contentType());
                 sslKeyStoreId = reqAnn.keyStore();
                 encodeTemplate = makeTemplate(reqAnn.contentEncoding());
+                progressStep = reqAnn.progressStep();
                 async = reqAnn.async();
                 String[] dataArray = reqAnn.data();
                 String[] headerArray = reqAnn.headers();
@@ -239,9 +243,10 @@ public class ForestMethod<T> implements VariableScope {
                 onSuccessParameter = parameter;
                 Type genType = genericParamTypes[i];
                 onSuccessClassGenericType = getGenericClassOrType(genType, 0);
-            }
-            else if (OnError.class.isAssignableFrom(paramType)) {
+            } else if (OnError.class.isAssignableFrom(paramType)) {
                 onErrorParameter = parameter;
+            } else if (OnProgress.class.isAssignableFrom(paramType)) {
+                onProgressParameter = parameter;
             }
 
             processParameterAnnotation(parameter, paramType, anns, i);
@@ -488,6 +493,10 @@ public class ForestMethod<T> implements VariableScope {
                 .setLogEnable(logEnable)
                 .setMultiparts(multiparts)
                 .setAsync(async);
+
+        if (progressStep >= 0) {
+            request.setProgressStep(progressStep);
+        }
         if (configuration.getDefaultParameters() != null) {
             request.addData(configuration.getDefaultParameters());
         }
@@ -573,6 +582,10 @@ public class ForestMethod<T> implements VariableScope {
         if (onErrorParameter != null) {
             OnError onErrorCallback = (OnError) args[onErrorParameter.getIndex()];
             request.setOnError(onErrorCallback);
+        }
+        if (onProgressParameter != null) {
+            OnProgress onProgressCallback = (OnProgress) args[onProgressParameter.getIndex()];
+            request.setOnProgress(onProgressCallback);
         }
 
         String dataType = dataTypeTemplate.render(args);
@@ -662,7 +675,7 @@ public class ForestMethod<T> implements VariableScope {
      */
     public Object invoke(Object[] args) {
         ForestRequest request = makeRequest(args);
-        MethodResponseHandler<T> responseHandler = new MethodResponseHandler<>(
+        MethodLifeCycleHandler<T> responseHandler = new MethodLifeCycleHandler<>(
                 this, onSuccessClassGenericType);
         request.execute(configuration.getBackend(), responseHandler);
         return responseHandler.getResultData();
