@@ -16,7 +16,7 @@ import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.backend.httpclient.request.HttpclientRequestSender;
 import com.dtflys.forest.backend.httpclient.response.HttpclientForestResponseFactory;
 import com.dtflys.forest.backend.httpclient.response.HttpclientResponseHandler;
-import com.dtflys.forest.handler.ResponseHandler;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.mapping.MappingTemplate;
 import org.slf4j.Logger;
@@ -59,11 +59,11 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         bodyBuilder = new NoneBodyBuilder();
     }
 
-    protected void prepare() {
+    protected void prepare(LifeCycleHandler lifeCycleHandler) {
         httpRequest = buildRequest();
         prepareBodyBuilder();
         prepareHeaders();
-        prepareBody();
+        prepareBody(lifeCycleHandler);
     }
 
     public AbstractHttpclientExecutor(ForestRequest request, HttpclientResponseHandler httpclientResponseHandler, HttpclientRequestSender requestSender) {
@@ -86,8 +86,8 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         }
     }
 
-    public void prepareBody() {
-        bodyBuilder.buildBody(httpRequest, request);
+    public void prepareBody(LifeCycleHandler lifeCycleHandler) {
+        bodyBuilder.buildBody(httpRequest, request, lifeCycleHandler);
     }
 
 
@@ -144,13 +144,13 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
     }
 
 
-    public void execute(ResponseHandler responseHandler) {
-        prepare();
-        execute(0, responseHandler);
+    public void execute(LifeCycleHandler lifeCycleHandler) {
+        prepare(lifeCycleHandler);
+        execute(0, lifeCycleHandler);
     }
 
 
-    public void execute(int retryCount, ResponseHandler responseHandler) {
+    public void execute(int retryCount, LifeCycleHandler lifeCycleHandler) {
         Date startDate = new Date();
         long startTime = startDate.getTime();
         try {
@@ -162,12 +162,12 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
                 ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
                 response = forestResponseFactory.createResponse(request, null);
                 logResponse(startTime, response);
-                responseHandler.handleSyncWitchException(request, response, e);
+                lifeCycleHandler.handleSyncWitchException(request, response, e);
 //                throw new ForestRuntimeException(e);
                 return;
             }
             log.error(e.getMessage());
-            execute(retryCount + 1, responseHandler);
+            execute(retryCount + 1, lifeCycleHandler);
         } catch (ForestRuntimeException e) {
             httpRequest.abort();
             throw e;
