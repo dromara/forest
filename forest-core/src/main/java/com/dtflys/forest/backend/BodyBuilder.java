@@ -1,5 +1,6 @@
 package com.dtflys.forest.backend;
 
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 
 /**
@@ -8,5 +9,5 @@ import com.dtflys.forest.http.ForestRequest;
  */
 public interface BodyBuilder<R> {
 
-    void buildBody(R req, ForestRequest request);
+    void buildBody(R req, ForestRequest request, LifeCycleHandler lifeCycleHandler);
 }
