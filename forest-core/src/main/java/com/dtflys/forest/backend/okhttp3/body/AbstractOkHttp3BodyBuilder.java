@@ -3,6 +3,7 @@ package com.dtflys.forest.backend.okhttp3.body;
 import com.dtflys.forest.backend.body.AbstractBodyBuilder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.multipart.ForestMultipart;
@@ -65,7 +66,12 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
     }
 
     @Override
-    protected void setFileBody(Request.Builder builder, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList, List<ForestMultipart> multiparts) {
+    protected void setFileBody(Request.Builder builder,
+                               ForestRequest request,
+                               String charset, String contentType,
+                               List<RequestNameValue> nameValueList,
+                               List<ForestMultipart> multiparts,
+                               LifeCycleHandler lifeCycleHandler) {
         MultipartBody.Builder bodyBuilder = new MultipartBody.Builder();
         MediaType mediaType = MediaType.parse(contentType);
         bodyBuilder.setType(mediaType);
@@ -79,17 +85,25 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
             bodyBuilder.addFormDataPart(name, MappingTemplate.getParameterValue(jsonConverter, value));
         }
         for (ForestMultipart multipart : multiparts) {
-            MediaType fileMediaType = MediaType.parse(multipart.getContentType());
-            RequestBody fileBody;
-            if (multipart.isFile()) {
-                fileBody = RequestBody.create(fileMediaType, multipart.getFile());
-            } else {
-                fileBody = RequestBody.create(fileMediaType, multipart.getBytes());
-            }
+            RequestBody fileBody = createFileBody(request, multipart, lifeCycleHandler);
             bodyBuilder.addFormDataPart(multipart.getName(), multipart.getOriginalFileName(), fileBody);
         }
 
         MultipartBody body = bodyBuilder.build();
         setBody(builder, body);
     }
+
+    private RequestBody createFileBody(ForestRequest request, ForestMultipart multipart, LifeCycleHandler lifeCycleHandler) {
+        MediaType fileMediaType = MediaType.parse(multipart.getContentType());
+        RequestBody wrappedBody, requestBody;
+        if (multipart.isFile()) {
+            requestBody = RequestBody.create(fileMediaType, multipart.getFile());
+        } else {
+            requestBody = RequestBody.create(fileMediaType, multipart.getBytes());
+        }
+
+        wrappedBody = new OkHttpMultipartBody(request, requestBody, lifeCycleHandler);
+        return wrappedBody;
+    }
+
 }

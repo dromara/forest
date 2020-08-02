@@ -14,7 +14,7 @@ import com.dtflys.forest.backend.okhttp3.response.OkHttp3ResponseFuture;
 import com.dtflys.forest.backend.okhttp3.response.OkHttp3ResponseHandler;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestNetworkException;
-import com.dtflys.forest.handler.ResponseHandler;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.mapping.MappingTemplate;
 import okio.BufferedSink;
 import okio.Okio;
@@ -74,6 +74,21 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
         RequestBody requestBody = okRequest.body();
         if (requestBody == null) {
             return null;
+        }
+        if (requestBody instanceof MultipartBody) {
+            MultipartBody multipartBody = (MultipartBody) requestBody;
+            String contentType = multipartBody.type().toString();
+            String boundary = multipartBody.boundary();
+            Long contentLength = null;
+            try {
+                contentLength = multipartBody.contentLength();
+            } catch (IOException e) {
+            }
+            String result = "[" + contentType +"; boundary=" + boundary ;
+            if (contentLength != null) {
+                result += "; length=" + contentLength;
+            }
+            return result + "]";
         }
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Sink sink = Okio.sink(out);
@@ -149,6 +164,9 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
         return connectionManager.getClient(request);
     }
 
+    protected void prepareMethod(Request.Builder builder) {
+    }
+
     protected void prepareHeaders(Request.Builder builder) {
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         List<RequestNameValue> headerList = request.getHeaderNameValueList();
@@ -163,21 +181,18 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
         }
     }
 
-    protected void prepareBody(Request.Builder builder) {
-        getBodyBuilder().buildBody(builder, request);
+    protected void prepareBody(Request.Builder builder, final LifeCycleHandler lifeCycleHandler) {
+        getBodyBuilder().buildBody(builder, request, lifeCycleHandler);
     }
 
-    protected void requestMethod(Request.Builder builder) {
-        prepareBody(builder);
-    }
-
-    public void execute(final ResponseHandler responseHandler, int retryCount) {
+    public void execute(final LifeCycleHandler lifeCycleHandler, int retryCount) {
         OkHttpClient okHttpClient = getClient(request);
         URLBuilder urlBuilder = getURLBuilder();
         String url = urlBuilder.buildUrl(request);
         Request.Builder builder = new Request.Builder().url(url);
+        prepareMethod(builder);
         prepareHeaders(builder);
-        requestMethod(builder);
+        prepareBody(builder, lifeCycleHandler);
 
         final Request okRequest = builder.build();
         Call call = okHttpClient.newCall(okRequest);
@@ -193,7 +208,7 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
                     future.failed(e);
                     ForestResponse response = factory.createResponse(request, null);
                     logResponse(startTime, response);
-                    responseHandler.handleError(request, response, e);
+                    lifeCycleHandler.handleError(request, response, e);
                 }
 
                 @Override
@@ -215,7 +230,7 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
                             okHttp3ResponseHandler.handleError(response);
                             return;
                         }
-                        execute(responseHandler, retryCount + 1);
+                        execute(lifeCycleHandler, retryCount + 1);
                     }
                 }
             });
@@ -229,10 +244,10 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
                 if (retryCount >= request.getRetryCount()) {
                     ForestResponse response = factory.createResponse(request, null);
                     logResponse(startTime, response);
-                    responseHandler.handleError(request, response, e);
+                    lifeCycleHandler.handleError(request, response, e);
                     return;
                 }
-                execute(responseHandler, retryCount + 1);
+                execute(lifeCycleHandler, retryCount + 1);
             }
             ForestResponse response = factory.createResponse(request, okResponse);
             logResponse(startTime, response);
@@ -242,8 +257,8 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
 
 
     @Override
-    public void execute(final ResponseHandler responseHandler) {
-        execute(responseHandler, 0);
+    public void execute(final LifeCycleHandler lifeCycleHandler) {
+        execute(lifeCycleHandler, 0);
     }
 
     @Override
