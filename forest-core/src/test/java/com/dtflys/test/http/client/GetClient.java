@@ -101,7 +101,6 @@ public interface GetClient {
 
     @Request(
             url = "http://localhost:5000/hello/user?username=foo",
-            dataType = "json",
             async = true,
             headers = {"Accept:text/plan"}
     )
@@ -109,7 +108,6 @@ public interface GetClient {
 
     @Request(
             url = "http://localhost:5000/hello/user?username=foo",
-            dataType = "json",
             async = true,
             headers = {"Accept:text/plan"}
     )
@@ -129,7 +127,7 @@ public interface GetClient {
             headers = {"Accept:text/plan"},
             data = "username=${ username.toString() }"
     )
-    Future<String> asyncVarParamGet(@DataVariable("username") String username, OnSuccess onSuccess, OnError onError);
+    Future<String> asyncVarParamGet(@DataVariable("username") String username, OnSuccess<String> onSuccess, OnError onError);
 
 
 
