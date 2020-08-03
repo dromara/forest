@@ -4,7 +4,7 @@
 	
 	<groupId>com.dtflys.forest</groupId>
 	<artifactId>forest</artifactId>
-	<version>1.4.0-BETA1</version>
+	<version>1.4.0-BETA2</version>
 	<packaging>pom</packaging>
 	<name>forest</name>
 	<description>A easy HTTP client framework for Java</description>
@@ -31,7 +31,7 @@
 		<url>https://github.com/mySingleLive/forest</url>
 		<connection>scm:git:https://github.com/mySingleLive/forest.git</connection>
 		<developerConnection>http://www.dtflys.com</developerConnection>
-		<tag>1.4.0-BETA1</tag>
+		<tag>1.4.0-BETA2</tag>
 	</scm>
 
 	<properties>
@@ -39,7 +39,7 @@
 		<spring-boot.version>1.5.1.RELEASE</spring-boot.version>
 		<slf4j.version>1.7.10</slf4j.version>
 		<log4j.version>2.4.1</log4j.version>
-		<okhttp.version>3.4.1</okhttp.version>
+		<okhttp.version>3.11.0</okhttp.version>
 		<httpcore.version>4.4.5</httpcore.version>
 		<httpnio.version>4.4.5</httpnio.version>
 		<httpclient.version>4.5.2</httpclient.version>
