@@ -1,15 +1,13 @@
 package com.dtflys.forest.converter.auto;
 
-import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ForestConverter;
-import com.dtflys.forest.http.ForestRequestType;
+import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.ForestDataType;
+import com.dtflys.forest.utils.ReflectUtil;
 
 import java.io.InputStream;
 import java.lang.reflect.Type;
-import java.util.HashSet;
-import java.util.Set;
 
 public class DefaultAutoConverter implements ForestConverter<Object> {
 
@@ -34,16 +32,20 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
             char ch = trimmedStr.charAt(0);
             try {
                 if (ch == '{' || ch == '[') {
-                    result = tryConvert(source, targetType, ForestDataType.JSON);
+                    result = tryConvert(trimmedStr, targetType, ForestDataType.JSON);
                 } else if (ch == '<') {
-                    result = tryConvert(source, targetType, ForestDataType.XML);
+                    result = tryConvert(trimmedStr, targetType, ForestDataType.XML);
                 } else if (Character.isDigit(ch)) {
-                    result = tryConvert(source, targetType, ForestDataType.JSON);
+                    try {
+                        result = tryConvert(trimmedStr, targetType, ForestDataType.JSON);
+                    } catch (Throwable th) {
+                        result = tryConvert(source, targetType, ForestDataType.TEXT);
+                    }
                 } else {
                     result = tryConvert(source, targetType, ForestDataType.TEXT);
                 }
             } catch (Throwable th) {
-                result = tryConvert(source, targetType, ForestDataType.TEXT);
+                throw new ForestRuntimeException(th);
             }
         }
         return result;
@@ -53,9 +55,44 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
         return (T) configuration.getConverterMap().get(dataType).convertToJavaObject(source, targetType);
     }
 
+    private <T> T tryConvert(Object source, Type targetType, ForestDataType dataType) {
+        return (T) configuration.getConverterMap().get(dataType).convertToJavaObject(source, targetType);
+    }
+
+
     @Override
     public <T> T convertToJavaObject(Object source, Type targetType) {
-        return null;
+        if (source instanceof InputStream) {
+            return tryConvert(source, targetType, ForestDataType.BINARY);
+        }
+        T result = null;
+        Class clazz = ReflectUtil.getClassByType(targetType);
+        if (source instanceof CharSequence) {
+            String str = source.toString();
+            if (String.class.isAssignableFrom(clazz)) {
+                return (T) str;
+            }
+            String trimmedStr = str.trim();
+            char ch = trimmedStr.charAt(0);
+            try {
+                if (ch == '{' || ch == '[') {
+                    result = tryConvert(trimmedStr, targetType, ForestDataType.JSON);
+                } else if (ch == '<') {
+                    result = tryConvert(trimmedStr, targetType, ForestDataType.XML);
+                } else if (Character.isDigit(ch)) {
+                    try {
+                        result = tryConvert(trimmedStr, targetType, ForestDataType.JSON);
+                    } catch (Throwable th) {
+                        result = tryConvert(source, targetType, ForestDataType.TEXT);
+                    }
+                } else {
+                    result = tryConvert(source, targetType, ForestDataType.TEXT);
+                }
+            } catch (Throwable th) {
+                result = tryConvert(source, targetType, ForestDataType.TEXT);
+            }
+        }
+        return result;
     }
 
 }
