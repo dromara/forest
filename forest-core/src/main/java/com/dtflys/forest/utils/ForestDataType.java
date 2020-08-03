@@ -30,11 +30,15 @@ package com.dtflys.forest.utils;
  */
 public enum ForestDataType {
 
+    AUTO("auto"),
+
     TEXT("text"),
 
     JSON("json"),
 
-    XML("xml")
+    XML("xml"),
+
+    BINARY("binary"),
 
     ;
 
