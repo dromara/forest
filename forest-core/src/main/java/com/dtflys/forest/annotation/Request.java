@@ -52,10 +52,11 @@ public @interface Request {
 
     /**
      * type of response data: <br>
-     *     text json xml
+     *     text json xml <br>
+     * default value is "auto"
      * @return
      */
-    String dataType() default "text";
+    String dataType() default "auto";
 
     /**
      * whether can use async http request or not
