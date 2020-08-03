@@ -7,7 +7,7 @@ import com.dtflys.forest.converter.ForestConverter;
  * @author gongjun
  * @since 2016-05-30
  */
-public interface ForestXmlConverter extends ForestConverter {
+public interface ForestXmlConverter extends ForestConverter<String> {
 
     /**
      * 将Java对象转换为XML字符串
