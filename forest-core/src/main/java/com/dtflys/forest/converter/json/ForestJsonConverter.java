@@ -9,7 +9,7 @@ import java.util.Map;
  * @author gongjun
  * @since 2016-05-30
  */
-public interface ForestJsonConverter extends ForestConverter {
+public interface ForestJsonConverter extends ForestConverter<String> {
 
     /**
      * 将Java对象转换为JSON字符串
