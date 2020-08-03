@@ -116,17 +116,11 @@ public class TestAsyncGetClient extends BaseClientTest {
     @Test
     public void testAsyncVarParamGet() throws InterruptedException, ExecutionException {
         final AtomicBoolean success = new AtomicBoolean(false);
-        Future<String> future = getClient.asyncVarParamGet("foo", new OnSuccess<Object>() {
-            @Override
-            public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
-                log.info("data: " + data);
-                success.set(true);
-                assertEquals(AsyncGetMockServer.EXPECTED, data);
-            }
-        }, new OnError() {
-            @Override
-            public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
-            }
+        Future<String> future = getClient.asyncVarParamGet("foo", (data, request, response) -> {
+            log.info("data: " + data);
+            success.set(true);
+            assertEquals(AsyncGetMockServer.EXPECTED, data);
+        }, (ex, request, response) -> {
         });
         log.info("send async get request");
         assertFalse(success.get());
@@ -144,22 +138,16 @@ public class TestAsyncGetClient extends BaseClientTest {
         final AtomicBoolean error = new AtomicBoolean(false);
         Future<String> future = getClient.asyncVarParamGet(
                 "error param",
-                new OnSuccess<Object>() {
-                    @Override
-                    public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
-                        error.set(false);
-                        success.set(true);
-                    }
-                }, new OnError() {
-                    @Override
-                    public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
-                        error.set(true);
-                        success.set(false);
-                        assertTrue(ex instanceof ForestNetworkException);
-                        int statusCode = ((ForestNetworkException) ex).getStatusCode();
-                        log.error("status code = " + statusCode);
-                        assertEquals(404, statusCode);
-                    }
+                (data, request, response) -> {
+                    error.set(false);
+                    success.set(true);
+                }, (ex, request, response) -> {
+                    error.set(true);
+                    success.set(false);
+                    assertTrue(ex instanceof ForestNetworkException);
+                    int statusCode = ((ForestNetworkException) ex).getStatusCode();
+                    log.error("status code = " + statusCode);
+                    assertEquals(404, statusCode);
                 });
         log.info("send async get request");
         assertFalse(error.get());
