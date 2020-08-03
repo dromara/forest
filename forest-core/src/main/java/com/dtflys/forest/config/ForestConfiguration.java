@@ -25,6 +25,9 @@
 package com.dtflys.forest.config;
 
 
+import com.dtflys.forest.converter.auto.DefaultAutoConverter;
+import com.dtflys.forest.converter.binary.DefaultBinaryConverter;
+import com.dtflys.forest.converter.text.DefaultTextConverter;
 import com.dtflys.forest.interceptor.DefaultInterceptorFactory;
 import com.dtflys.forest.interceptor.InterceptorFactory;
 import com.dtflys.forest.proxy.ProxyFactory;
@@ -141,6 +144,9 @@ public class ForestConfiguration implements Serializable {
         configuration.setId("forestConfiguration" + configuration.hashCode());
         configuration.setJsonConverterSelector(new JSONConverterSelector());
         configuration.setXmlConverter(new ForestJaxbConverter());
+        configuration.setTextConverter();
+        configuration.getConverterMap().put(ForestDataType.AUTO, new DefaultAutoConverter(configuration));
+        configuration.getConverterMap().put(ForestDataType.BINARY, new DefaultBinaryConverter());
         setupJSONConverter(configuration);
         configuration.setTimeout(3000);
         configuration.setConnectTimeout(2000);
@@ -335,6 +341,12 @@ public class ForestConfiguration implements Serializable {
         getConverterMap().put(ForestDataType.XML, converter);
         return this;
     }
+
+    private ForestConfiguration setTextConverter() {
+        getConverterMap().put(ForestDataType.TEXT, new DefaultTextConverter());
+        return this;
+    }
+
 
     public ForestXmlConverter getXmlConverter() {
         return (ForestXmlConverter) getConverterMap().get(ForestDataType.XML);
