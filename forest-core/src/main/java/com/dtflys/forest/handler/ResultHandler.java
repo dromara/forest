@@ -71,9 +71,6 @@ public class ResultHandler {
                 }
 
                 ForestDataType dataType = request.getDataType();
-                if (dataType.equals(ForestDataType.TEXT)) {
-                    return responseText;
-                }
                 ForestConverter converter = request.getConfiguration().getConverter(dataType);
                 return converter.convertToJavaObject(responseText, resultType);
 
