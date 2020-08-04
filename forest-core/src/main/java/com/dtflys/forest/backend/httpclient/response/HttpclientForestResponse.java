@@ -1,7 +1,11 @@
 package com.dtflys.forest.backend.httpclient.response;
 
+import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.utils.StringUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
@@ -19,11 +23,30 @@ public class HttpclientForestResponse extends ForestResponse {
 
     private final HttpEntity entity;
 
+
+
     public HttpclientForestResponse(ForestRequest request, HttpResponse httpResponse) {
         super(request);
         this.httpResponse = httpResponse;
-        this.entity = httpResponse.getEntity();
-        this.statusCode = httpResponse.getStatusLine().getStatusCode();
+        if (httpResponse != null) {
+            this.entity = httpResponse.getEntity();
+            this.statusCode = httpResponse.getStatusLine().getStatusCode();
+            if (entity != null) {
+                Header type = entity.getContentType();
+                if (type != null) {
+                    this.contentType = type.getValue();
+                }
+                this.contentLength = entity.getContentLength();
+                Header encoding = entity.getContentEncoding();
+                if (encoding != null) {
+                    this.contentEncoding = encoding.getValue();
+                }
+                this.content = buildContent();
+            }
+        } else {
+            this.entity = null;
+            this.statusCode = 404;
+        }
     }
 
     public HttpResponse getHttpResponse() {
@@ -35,13 +58,44 @@ public class HttpclientForestResponse extends ForestResponse {
         return entity != null;
     }
 
+    private String buildContent() {
+        if (content == null) {
+            if (StringUtils.isEmpty(contentType)) {
+                return null;
+            }
+            if (contentType.startsWith("application/") ||
+                    contentType.startsWith("text/")) {
+                InputStream inputStream = null;
+                try {
+                    inputStream = entity.getContent();
+                    content = IOUtils.toString(inputStream, contentEncoding);
+                } catch (IOException e) {
+                    throw new ForestRuntimeException(e);
+                }
+            } else {
+                StringBuilder builder = new StringBuilder();
+                builder.append("[content-type: ")
+                        .append(contentType);
+                if (contentEncoding != null) {
+                    builder.append("; encoding: ")
+                            .append(contentEncoding);
+                }
+                builder.append("; length: ")
+                        .append(contentLength)
+                        .append("]");
+                return builder.toString();
+            }
+        }
+        return content;
+    }
+
     @Override
-    public byte[] getReceivedDataAsByteArray() throws IOException {
+    public byte[] getByteArray() throws IOException {
         return EntityUtils.toByteArray(entity);
     }
 
     @Override
-    public InputStream getReceivedDataAsInputStream() throws IOException {
+    public InputStream getInputStream() throws IOException {
         return entity.getContent();
     }
 }
