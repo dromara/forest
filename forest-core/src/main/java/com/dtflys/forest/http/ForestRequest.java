@@ -105,6 +105,8 @@ public class ForestRequest<T> {
 
     private Retryer retryer;
 
+    private Map<String, Object> attachments = new HashMap<>();
+
     private boolean logEnable = true;
 
     private SSLKeyStore keyStore;
@@ -462,6 +464,14 @@ public class ForestRequest<T> {
 
     public void setRetryer(Retryer retryer) {
         this.retryer = retryer;
+    }
+
+    public void addAttachment(String name, Object value) {
+        attachments.put(name, value);
+    }
+
+    public Object getAttachment(String name) {
+        return attachments.get(name);
     }
 
     public boolean isLogEnable() {
