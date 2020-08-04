@@ -7,6 +7,7 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
 
+import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -63,8 +64,13 @@ public class ResultHandler {
                 }
                 if (resultClass.isArray()) {
                     if (byte[].class.isAssignableFrom(resultClass)) {
-                        return response.getReceivedDataAsByteArray();
+                        return response.getByteArray();
                     }
+                }
+                Object attFile = request.getAttachment("file");
+                if (attFile != null && attFile instanceof File) {
+                    ForestConverter converter = request.getConfiguration().getConverter(ForestDataType.JSON);
+                    return converter.convertToJavaObject(attFile, resultClass);
                 }
                 String responseText = null;
                 if (result != null && CharSequence.class.isAssignableFrom(result.getClass())) {
@@ -78,7 +84,7 @@ public class ResultHandler {
                     return responseText;
                 }
                 if (InputStream.class.isAssignableFrom(resultClass)) {
-                    return response.getReceivedDataAsInputStream();
+                    return response.getInputStream();
                 }
 
                 ForestDataType dataType = request.getDataType();
