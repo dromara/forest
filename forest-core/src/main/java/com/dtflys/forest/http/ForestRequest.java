@@ -25,6 +25,7 @@
 package com.dtflys.forest.http;
 
 import com.dtflys.forest.callback.OnProgress;
+import com.dtflys.forest.interceptor.InterceptorAttributes;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.retryer.Retryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
@@ -99,6 +100,8 @@ public class ForestRequest<T> {
     private OnProgress onProgress;
 
     private InterceptorChain interceptorChain = new InterceptorChain();
+
+    private Map<Class, InterceptorAttributes> interceptorAttributes = new HashMap<>();
 
     private Retryer retryer;
 
@@ -418,6 +421,40 @@ public class ForestRequest<T> {
     public InterceptorChain getInterceptorChain() {
         return interceptorChain;
     }
+
+    public ForestRequest addInterceptorAttributes(Class interceptorClass, InterceptorAttributes attributes) {
+        interceptorAttributes.put(interceptorClass, attributes);
+        return this;
+    }
+
+    public ForestRequest addInterceptorAttribute(Class interceptorClass, String attributeName, Object attributeValue) {
+        InterceptorAttributes attributes = getInterceptorAttributes(interceptorClass);
+        if (attributes == null) {
+            attributes = new InterceptorAttributes(interceptorClass, new HashMap<>());
+        }
+        attributes.addAttribute(attributeName, attributeValue);
+        return this;
+    }
+
+
+    public Map<Class, InterceptorAttributes> getInterceptorAttributes() {
+        return interceptorAttributes;
+    }
+
+
+    public InterceptorAttributes getInterceptorAttributes(Class interceptorClass) {
+        return interceptorAttributes.get(interceptorClass);
+    }
+
+
+    public Object getInterceptorAttribute(Class interceptorClass, String attributeName) {
+        InterceptorAttributes attributes = interceptorAttributes.get(interceptorClass);
+        if (attributes == null) {
+            return null;
+        }
+        return attributes.getAttribute(attributeName);
+    }
+
 
     public Retryer getRetryer() {
         return retryer;
