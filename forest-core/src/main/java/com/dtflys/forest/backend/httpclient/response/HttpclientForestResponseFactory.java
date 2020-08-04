@@ -25,7 +25,7 @@ public class HttpclientForestResponseFactory implements ForestResponseFactory<Ht
     private volatile ForestResponse resultResponse;
 
 
-    private String getString(String encode, HttpEntity entity) throws IOException {
+    private String getStringContent(String encode, HttpEntity entity) throws IOException {
         if (responseContent == null) {
             InputStream inputStream = entity.getContent();
             responseContent = IOUtils.toString(inputStream, encode);
@@ -48,15 +48,15 @@ public class HttpclientForestResponseFactory implements ForestResponseFactory<Ht
 //        int statusCode = httpResponse.getStatusLine().getStatusCode();
 //        response.setStatusCode(statusCode);
 //        httpResponse.getAllHeaders();
-        HttpEntity entity = response.getHttpResponse().getEntity();
-        if (entity != null) {
-            try {
-                String responseText = getString(request.getResponseEncode(), entity);
-                response.setContent(responseText);
-            } catch (IOException e) {
-                throw new ForestRuntimeException(e);
-            }
-        }
+//        HttpEntity entity = response.getHttpResponse().getEntity();
+//        if (entity != null) {
+//            try {
+//                String responseText = getStringContent(request.getResponseEncode(), entity);
+//                response.setContent(responseText);
+//            } catch (IOException e) {
+//                throw new ForestRuntimeException(e);
+//            }
+//        }
         this.resultResponse = response;
         return response;
     }
