@@ -98,10 +98,13 @@ public class MappingTemplate {
                 }
             }
             else if (ch == '\\') {
-                nextChar();
-                buffer.append(ch);
+//                char ch2 = nextChar();
+//                buffer.append(ch);
                 if (watch(1) == '$') {
-                    nextChar();
+                    ch = nextChar();
+                    buffer.append(ch);
+                } else {
+                    buffer.append(ch);
                 }
             }
             buffer.append(ch);
