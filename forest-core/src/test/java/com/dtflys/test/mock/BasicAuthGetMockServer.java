@@ -18,7 +18,7 @@ public class BasicAuthGetMockServer extends MockServerRule {
 
     public final static String AUTHORIZATION = "Basic Zm9vOmJhcg==";
 
-    public final static Integer port = 5002;
+    public final static Integer port = 5024;
 
     public BasicAuthGetMockServer(Object target) {
         super(target, port);

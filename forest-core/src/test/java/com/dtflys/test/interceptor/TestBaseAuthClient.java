@@ -5,7 +5,6 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.test.http.BaseClientTest;
 import com.dtflys.test.http.TestGetClient;
 import com.dtflys.test.mock.BasicAuthGetMockServer;
-import com.dtflys.test.mock.GetMockServer;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -16,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 
-public class TestBasicAuthClient extends BaseClientTest {
+public class TestBaseAuthClient extends BaseClientTest {
 
     private final static Logger log = LoggerFactory.getLogger(TestGetClient.class);
 
@@ -25,12 +24,12 @@ public class TestBasicAuthClient extends BaseClientTest {
 
     private static ForestConfiguration configuration;
 
-    private static BasicAuthClient basicAuthClient;
+    private static BaseAuthClient baseAuthClient;
 
 
-    public TestBasicAuthClient(HttpBackend backend) {
+    public TestBaseAuthClient(HttpBackend backend) {
         super(backend, configuration);
-        basicAuthClient = configuration.createInstance(BasicAuthClient.class);
+        baseAuthClient = configuration.createInstance(BaseAuthClient.class);
     }
 
     @Before
@@ -47,8 +46,12 @@ public class TestBasicAuthClient extends BaseClientTest {
     }
 
     @Test
-    public void testBasicAuth() {
-        String result = basicAuthClient.send("foo");
+    public void testBaseAuth() {
+        String result = baseAuthClient.send("foo");
+        assertNotNull(result);
+        assertEquals(BasicAuthGetMockServer.EXPECTED, result);
+
+        result = baseAuthClient.send2("foo");
         assertNotNull(result);
         assertEquals(BasicAuthGetMockServer.EXPECTED, result);
     }
