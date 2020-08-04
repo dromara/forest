@@ -148,6 +148,11 @@ public class ForestMethod<T> implements VariableScope {
                 baseInterceptorList.add(interceptor);
             }
         }
+
+        List<Annotation> baseAnnotationList = interfaceProxyHandler.getBaseAnnotations();
+        for (Annotation annotation : baseAnnotationList) {
+            addCustomizedAnnotation(annotation);
+        }
     }
 
     private void addInterceptor(Class interceptorClass) {
@@ -160,6 +165,34 @@ public class ForestMethod<T> implements VariableScope {
         }
         Interceptor interceptor = interceptorFactory.getInterceptor(interceptorClass);
         interceptorList.add(interceptor);
+    }
+
+    /**
+     * 添加自定义注释
+     * @param annotation
+     */
+    private void addCustomizedAnnotation(Annotation annotation) {
+        InterceptorClass icClass = annotation.annotationType().getAnnotation(InterceptorClass.class);
+        if (icClass != null) {
+            Class interceptorClass = icClass.value();
+            if (!Interceptor.class.isAssignableFrom(interceptorClass)) {
+                throw new ForestInterceptorDefineException(interceptorClass);
+            }
+            Map<String, Object> attrTemplates = ReflectUtils.getAttributesFromAnnotation(annotation);
+            for (String key : attrTemplates.keySet()) {
+                Object value = attrTemplates.get(key);
+                if (value instanceof CharSequence) {
+                    MappingTemplate template = makeTemplate(value.toString());
+                    attrTemplates.put(key, template);
+                }
+            }
+            InterceptorAttributes attributes = new InterceptorAttributes(interceptorClass, attrTemplates);
+            if (interceptorAttributesList == null) {
+                interceptorAttributesList = new LinkedList<>();
+            }
+            interceptorAttributesList.add(attributes);
+            addInterceptor(interceptorClass);
+        }
     }
 
 
@@ -229,27 +262,8 @@ public class ForestMethod<T> implements VariableScope {
                     }
                 }
             } else {
-                InterceptorClass interceptorTag = ann.annotationType().getAnnotation(InterceptorClass.class);
-                if (interceptorTag != null) {
-                    Class interceptorClass = interceptorTag.value();
-                    if (!Interceptor.class.isAssignableFrom(interceptorClass)) {
-                        throw new ForestInterceptorDefineException(interceptorClass);
-                    }
-                    Map<String, Object> attrTemplates = ReflectUtils.getAttributesFromAnnotation(ann);
-                    for (String key : attrTemplates.keySet()) {
-                        Object value = attrTemplates.get(key);
-                        if (value instanceof CharSequence) {
-                            MappingTemplate template = makeTemplate(value.toString());
-                            attrTemplates.put(key, template);
-                        }
-                    }
-                    InterceptorAttributes attributes = new InterceptorAttributes(interceptorClass, attrTemplates);
-                    if (interceptorAttributesList == null) {
-                        interceptorAttributesList = new LinkedList<>();
-                    }
-                    interceptorAttributesList.add(attributes);
-                    addInterceptor(interceptorClass);
-                }
+                // 添加自定义注解
+                addCustomizedAnnotation(ann);
             }
         }
         returnClass = method.getReturnType();
