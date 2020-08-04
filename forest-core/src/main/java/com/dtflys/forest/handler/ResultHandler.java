@@ -5,8 +5,7 @@ import com.dtflys.forest.exceptions.ForestHandlerException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.ForestDataType;
-import com.dtflys.forest.utils.ReflectUtil;
-import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
+import com.dtflys.forest.utils.ReflectUtils;
 
 import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
@@ -41,7 +40,7 @@ public class ResultHandler {
                         Class rowClass = (Class) parameterizedType.getRawType();
                         if (ForestResponse.class.isAssignableFrom(rowClass)) {
                             Type realType = parameterizedType.getActualTypeArguments()[0];
-                            Class realClass = ReflectUtil.getClassByType(parameterizedType.getActualTypeArguments()[0]);
+                            Class realClass = ReflectUtils.getClassByType(parameterizedType.getActualTypeArguments()[0]);
                             Object realResult = getResult(request, response, realType, realClass);
                             response.setResult(realResult);
                         }
@@ -54,7 +53,7 @@ public class ResultHandler {
                         Class rowClass = (Class) parameterizedType.getRawType();
                         if (Future.class.isAssignableFrom(rowClass)) {
                             Type realType = parameterizedType.getActualTypeArguments()[0];
-                            Class realClass = ReflectUtil.getClassByType(parameterizedType.getActualTypeArguments()[0]);
+                            Class realClass = ReflectUtils.getClassByType(parameterizedType.getActualTypeArguments()[0]);
                             return getResult(request, response, realType, realClass);
                         }
                     }

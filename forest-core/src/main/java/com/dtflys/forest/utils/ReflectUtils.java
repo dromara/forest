@@ -1,12 +1,17 @@
 package com.dtflys.forest.utils;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
+import com.dtflys.forest.exceptions.ForestRuntimeException;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-public class ReflectUtil {
+public class ReflectUtils {
 
     /**
      * 从Type获取Class
@@ -61,6 +66,44 @@ public class ReflectUtil {
             return true;
         }
         return false;
+    }
+
+    public static Map<String, Object> getAttributesFromAnnotation(Annotation ann) {
+        Set<String> excludeMethodNames = new HashSet<>();
+        excludeMethodNames.add("equals");
+        excludeMethodNames.add("getClass");
+        excludeMethodNames.add("annotationType");
+        excludeMethodNames.add("notify");
+        excludeMethodNames.add("notifyAll");
+        excludeMethodNames.add("wait");
+        excludeMethodNames.add("hashCode");
+        excludeMethodNames.add("toString");
+        excludeMethodNames.add("newProxyInstance");
+        excludeMethodNames.add("newProxyClass");
+        excludeMethodNames.add("getInvocationHandler");
+
+        Map<String, Object> results = new HashMap<>();
+        Class clazz = ann.getClass();
+        Method[] methods = clazz.getMethods();
+        Object[] args = new Object[0];
+        for (Method method : methods) {
+            String name = method.getName();
+            if (excludeMethodNames.contains(name)) {
+                continue;
+            }
+            if (method.getParameters().length > 0) {
+                continue;
+            }
+            try {
+                Object value = method.invoke(ann, args);
+                results.put(name, value);
+            } catch (IllegalAccessException e) {
+                throw new ForestRuntimeException(e);
+            } catch (InvocationTargetException e) {
+                throw new ForestRuntimeException(e);
+            }
+        }
+        return results;
     }
 
 }
