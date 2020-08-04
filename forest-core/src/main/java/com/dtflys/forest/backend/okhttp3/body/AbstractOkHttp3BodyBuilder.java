@@ -27,7 +27,7 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
     @Override
     protected void setStringBody(Request.Builder builder, String text, String charset, String contentType) {
         MediaType mediaType = MediaType.parse(contentType);
-        Charset cs = Util.UTF_8;
+        Charset cs = Charset.forName("UTF-8");
         if (StringUtils.isNotEmpty(charset)) {
             try {
                 cs = Charset.forName(charset);
