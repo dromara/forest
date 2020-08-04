@@ -1,13 +1,23 @@
 package com.dtflys.forest.interceptor.extension;
 
-import com.dtflys.forest.annotation.InterceptorTag;
+import com.dtflys.forest.annotation.InterceptorClass;
 
 import java.lang.annotation.*;
 
 @Documented
-@InterceptorTag(DownloadInterceptor.class)
+@InterceptorClass(DownloadInterceptor.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
+@Target(ElementType.METHOD)
 public @interface DownloadFile {
-    String value();
+    /**
+     * The directory path of file you want to save
+     * @return
+     */
+    String dir();
+
+    /**
+     * The file name you want to save
+     * @return
+     */
+    String filename() default "";
 }
