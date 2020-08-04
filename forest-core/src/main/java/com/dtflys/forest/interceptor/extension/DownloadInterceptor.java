@@ -8,6 +8,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.utils.ForestDataType;
+import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -34,26 +35,24 @@ public class DownloadInterceptor implements Interceptor<Object> {
         if (!dir.exists()) {
             dir.mkdirs();
         }
-        ForestConverter converter = request.getConfiguration().getConverter(ForestDataType.BINARY);
-        InputStream in = (InputStream) converter.convertToJavaObject(data, InputStream.class);
-        byte[] buffer = new byte[4096];
-        int len;
-        String path = dir.getPath() + File.separator + filename;
-        try (FileOutputStream out = new FileOutputStream(path)) {
-            while ((len = in.read(buffer)) != -1) {
-                out.write(buffer, 0, len);
-            }
-            addAttribute(request, "filePath", path);
-        } catch (FileNotFoundException e) {
+        InputStream in = null;
+        try {
+            in = response.getInputStream();
+        } catch (Exception e) {
             throw new ForestRuntimeException(e);
+        }
+        String path = dir.getPath() + File.separator + filename;
+        File file = new File(path);
+        try {
+            FileUtils.copyInputStreamToFile(in, file);
+            request.addAttachment("file", file);
+            if (data != null) {
+                ForestConverter converter = request.getConfiguration().getConverterMap().get(ForestDataType.BINARY);
+                data = converter.convertToJavaObject(file, data.getClass());
+                response.setResult(data);
+            }
         } catch (IOException e) {
             throw new ForestRuntimeException(e);
-        } finally {
-            try {
-                in.close();
-            } catch (IOException e) {
-                throw new ForestRuntimeException(e);
-            }
         }
 
     }
