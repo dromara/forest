@@ -2,6 +2,7 @@ package com.dtflys.forest.handler;
 
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.ForestProgress;
 
 import java.lang.reflect.Type;
@@ -23,6 +24,8 @@ public interface LifeCycleHandler {
     Object handleResultType(ForestRequest request, ForestResponse response, Type resultType, Class resultClass);
 
     Object handleSuccess(Object resultData, ForestRequest request, ForestResponse response);
+
+    void handleInvokeMethod(ForestRequest request, ForestMethod method, Object[] args);
 
     void handleError(ForestRequest request, ForestResponse response);
 
