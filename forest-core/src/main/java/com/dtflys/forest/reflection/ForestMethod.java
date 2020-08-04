@@ -7,11 +7,13 @@ import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
+import com.dtflys.forest.exceptions.ForestInterceptorDefineException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.interceptor.Interceptor;
+import com.dtflys.forest.interceptor.InterceptorAttributes;
 import com.dtflys.forest.interceptor.InterceptorFactory;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingTemplate;
@@ -66,6 +68,7 @@ public class ForestMethod<T> implements VariableScope {
     private List<Interceptor> globalInterceptorList;
     private List<Interceptor> baseInterceptorList;
     private List<Interceptor> interceptorList;
+    private List<InterceptorAttributes> interceptorAttributesList;
     private Type onSuccessClassGenericType = null;
     private boolean async = false;
     private boolean logEnable = true;
@@ -147,6 +150,19 @@ public class ForestMethod<T> implements VariableScope {
         }
     }
 
+    private void addInterceptor(Class interceptorClass) {
+        if (interceptorList == null) {
+            interceptorList = new LinkedList<>();
+        }
+        if (!Interceptor.class.isAssignableFrom(interceptorClass) || interceptorClass.isInterface()) {
+            throw new ForestRuntimeException("Class [" + interceptorClass.getName() + "] is not a implement of [" +
+                    Interceptor.class.getName() + "] interface.");
+        }
+        Interceptor interceptor = interceptorFactory.getInterceptor(interceptorClass);
+        interceptorList.add(interceptor);
+    }
+
+
     /**
      * 处理接口中定义的方法
      */
@@ -207,16 +223,32 @@ public class ForestMethod<T> implements VariableScope {
 
                 Class[] interceptorClasses = reqAnn.interceptor();
                 if (interceptorClasses != null && interceptorClasses.length > 0) {
-                    interceptorList = new LinkedList<>();
                     for (int cidx = 0, len = interceptorClasses.length; cidx < len; cidx++) {
-                        Class clazz = interceptorClasses[cidx];
-                        if (!Interceptor.class.isAssignableFrom(clazz) || clazz.isInterface()) {
-                            throw new ForestRuntimeException("Class [" + clazz.getName() + "] is not a implement of [" +
-                                    Interceptor.class.getName() + "] interface.");
-                        }
-                        Interceptor interceptor = interceptorFactory.getInterceptor(clazz);
-                        interceptorList.add(interceptor);
+                        Class interceptorClass = interceptorClasses[cidx];
+                        addInterceptor(interceptorClass);
                     }
+                }
+            } else {
+                InterceptorClass interceptorTag = ann.annotationType().getAnnotation(InterceptorClass.class);
+                if (interceptorTag != null) {
+                    Class interceptorClass = interceptorTag.value();
+                    if (!Interceptor.class.isAssignableFrom(interceptorClass)) {
+                        throw new ForestInterceptorDefineException(interceptorClass);
+                    }
+                    Map<String, Object> attrTemplates = ReflectUtils.getAttributesFromAnnotation(ann);
+                    for (String key : attrTemplates.keySet()) {
+                        Object value = attrTemplates.get(key);
+                        if (value instanceof CharSequence) {
+                            MappingTemplate template = makeTemplate(value.toString());
+                            attrTemplates.put(key, template);
+                        }
+                    }
+                    InterceptorAttributes attributes = new InterceptorAttributes(interceptorClass, attrTemplates);
+                    if (interceptorAttributesList == null) {
+                        interceptorAttributesList = new LinkedList<>();
+                    }
+                    interceptorAttributesList.add(attributes);
+                    addInterceptor(interceptorClass);
                 }
             }
         }
@@ -416,7 +448,7 @@ public class ForestMethod<T> implements VariableScope {
                 }
                 else if (obj instanceof List ||
                         obj.getClass().isArray() ||
-                        ReflectUtil.isPrimaryType(obj.getClass())) {
+                        ReflectUtils.isPrimaryType(obj.getClass())) {
                     bodyList.add(obj);
                 }
                 else if (obj instanceof Map) {
@@ -424,7 +456,7 @@ public class ForestMethod<T> implements VariableScope {
                     for (Object key : map.keySet()) {
                         if (key instanceof CharSequence) {
                             Object value = map.get(key);
-                            nameValueList.add(new RequestNameValue(String.valueOf(key), value, false));
+                            nameValueList.add(new RequestNameValue(String.valueOf(key), value, type.isDefaultParamInQuery()));
                         }
                     }
                 }
@@ -598,6 +630,13 @@ public class ForestMethod<T> implements VariableScope {
             request.setDataType(forestDataType);
         }
 
+        if (interceptorAttributesList != null && interceptorAttributesList.size() > 0) {
+            for (InterceptorAttributes attributes : interceptorAttributesList) {
+                attributes.render(args);
+                request.addInterceptorAttributes(attributes.getInterceptorClass(), attributes);
+            }
+        }
+
         if (globalInterceptorList != null && globalInterceptorList.size() > 0) {
             for (Interceptor item : globalInterceptorList) {
                 request.addInterceptor(item);
@@ -675,10 +714,11 @@ public class ForestMethod<T> implements VariableScope {
      */
     public Object invoke(Object[] args) {
         ForestRequest request = makeRequest(args);
-        MethodLifeCycleHandler<T> responseHandler = new MethodLifeCycleHandler<>(
+        MethodLifeCycleHandler<T> lifeCycleHandler = new MethodLifeCycleHandler<>(
                 this, onSuccessClassGenericType);
-        request.execute(configuration.getBackend(), responseHandler);
-        return responseHandler.getResultData();
+        lifeCycleHandler.handleInvokeMethod(request, this, args);
+        request.execute(configuration.getBackend(), lifeCycleHandler);
+        return lifeCycleHandler.getResultData();
     }
 
 
