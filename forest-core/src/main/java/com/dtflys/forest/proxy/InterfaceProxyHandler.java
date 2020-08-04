@@ -2,6 +2,7 @@ package com.dtflys.forest.proxy;
 
 import com.dtflys.forest.annotation.BaseRequest;
 import com.dtflys.forest.annotation.BaseURL;
+import com.dtflys.forest.annotation.InterceptorClass;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.mapping.MappingTemplate;
@@ -14,6 +15,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,6 +42,8 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
     private MappingTemplate[] baseHeaders;
 
     private Class[] baseInterceptorClasses;
+
+    private List<Annotation> baseAnnotations = new LinkedList<>();
 
     private Integer baseTimeout;
 
@@ -103,6 +108,11 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
                 baseRetryCount = baseRequestAnn.retryCount();
                 baseRetryCount = baseRetryCount == -1 ? null : baseRetryCount;
                 baseInterceptorClasses = baseRequestAnn.interceptor();
+            } else {
+                InterceptorClass icAnn = annotation.annotationType().getAnnotation(InterceptorClass.class);
+                if (icAnn != null) {
+                    baseAnnotations.add(annotation);
+                }
             }
         }
     }
@@ -118,8 +128,12 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
     }
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (method.getName().equals("getProxyHandler") && (args == null || args.length == 0)) {
+        String methodName = method.getName();
+        if (methodName.equals("getProxyHandler") && (args == null || args.length == 0)) {
             return this;
+        }
+        if (methodName.equals("toString") && (args == null || args.length == 0)) {
+            return "{Forest Proxy Object of " + interfaceClass.getName() + "}";
         }
         ForestMethod forestMethod = forestMethodMap.get(method);
         return forestMethod.invoke(args);
@@ -152,6 +166,10 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
 
     public String getBaseContentEncoding() {
         return baseContentEncoding;
+    }
+
+    public List<Annotation> getBaseAnnotations() {
+        return baseAnnotations;
     }
 
     public Integer getBaseRetryCount() {
