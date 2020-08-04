@@ -36,6 +36,10 @@ public abstract class ForestResponse<T> {
     protected ForestRequest request;
     protected volatile Integer statusCode;
     protected volatile String content;
+    protected volatile String filename;
+    protected volatile String contentType;
+    protected volatile String contentEncoding;
+    protected volatile long contentLength;
     protected volatile T result;
 
     public ForestResponse(ForestRequest request) {
@@ -71,9 +75,22 @@ public abstract class ForestResponse<T> {
         return this;
     }
 
+    public String getContentType() {
+        return contentType;
+    }
+
+    public String getContentEncoding() {
+        return contentEncoding;
+    }
+
+    public long getContentLength() {
+        return contentLength;
+    }
+
     public boolean isSuccess() {
         return getStatusCode() >= HttpStatus.OK && getStatusCode() < HttpStatus.MULTIPLE_CHOICES;
     }
+
 
     public boolean isError() {
         return !isSuccess();
@@ -81,8 +98,8 @@ public abstract class ForestResponse<T> {
 
     public abstract boolean isReceivedResponseData();
 
-    public abstract byte[] getReceivedDataAsByteArray() throws Exception;
+    public abstract byte[] getByteArray() throws Exception;
 
-    public abstract InputStream getReceivedDataAsInputStream() throws Exception;
+    public abstract InputStream getInputStream() throws Exception;
 
 }
