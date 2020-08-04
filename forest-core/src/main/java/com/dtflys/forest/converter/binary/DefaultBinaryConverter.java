@@ -3,41 +3,64 @@ package com.dtflys.forest.converter.binary;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.ForestProgress;
+import com.dtflys.forest.utils.ReflectUtils;
+import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.lang.reflect.Type;
 
-public class DefaultBinaryConverter implements ForestConverter<InputStream> {
+public class DefaultBinaryConverter implements ForestConverter<Object> {
 
 
     @Override
-    public <T> T convertToJavaObject(InputStream source, Class<T> targetType) {
-        if (InputStream.class.isAssignableFrom(targetType)) {
-            return (T) source;
-        }
-        if (byte[].class.isAssignableFrom(targetType)) {
-            return (T) inputStreamToByteArray(source);
-        }
-        if (String.class.isAssignableFrom(targetType)) {
-            byte[] tmp = inputStreamToByteArray(source);
-            String result = new String(tmp);
-            return (T) result;
+    public <T> T convertToJavaObject(Object source, Class<T> targetType) {
+        if (source instanceof InputStream) {
+            InputStream in = (InputStream) source;
+            if (InputStream.class.isAssignableFrom(targetType)) {
+                return (T) source;
+            }
+            if (byte[].class.isAssignableFrom(targetType)) {
+                return (T) inputStreamToByteArray(in);
+            }
+            if (String.class.isAssignableFrom(targetType)) {
+                byte[] tmp = inputStreamToByteArray(in);
+                String result = new String(tmp);
+                return (T) result;
+            }
+        } else if (source instanceof File) {
+            File file = (File) source;
+            if (File.class.isAssignableFrom(targetType)) {
+                return (T) file;
+            }
+            try {
+                if (InputStream.class.isAssignableFrom(targetType)) {
+                    return (T) FileUtils.openInputStream(file);
+                }
+                if (byte[].class.isAssignableFrom(targetType)) {
+                        return (T) FileUtils.readFileToByteArray(file);
+                }
+                if (String.class.isAssignableFrom(targetType)) {
+                        return (T) FileUtils.readFileToString(file);
+                }
+            } catch (IOException e) {
+                throw new ForestRuntimeException(e);
+            }
         }
         return convertToJavaObjectEx(source, targetType);
     }
 
 
-    protected <T> T convertToJavaObjectEx(InputStream source, Class<T> targetType) {
+    protected <T> T convertToJavaObjectEx(Object source, Class<T> targetType) {
         return null;
     }
 
 
-    private byte[] inputStreamToByteArray(InputStream source) {
+    private byte[] inputStreamToByteArray(InputStream in) {
         byte[] tmp = new byte[4096];
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
             int len;
-            while((len = source.read(tmp)) != -1) {
+            while((len = in.read(tmp)) != -1) {
                 out.write(tmp, 0, len);
             }
             out.flush();
@@ -46,7 +69,7 @@ public class DefaultBinaryConverter implements ForestConverter<InputStream> {
             throw new ForestRuntimeException(e);
         } finally {
             try {
-                source.close();
+                in.close();
             } catch (IOException e) {
                 throw new ForestRuntimeException(e);
             }
@@ -54,8 +77,9 @@ public class DefaultBinaryConverter implements ForestConverter<InputStream> {
     }
 
     @Override
-    public <T> T convertToJavaObject(InputStream source, Type targetType) {
-        return null;
+    public <T> T convertToJavaObject(Object source, Type targetType) {
+        Class clazz = ReflectUtils.getClassByType(targetType);
+        return (T) convertToJavaObject(source, clazz);
     }
 
 }
