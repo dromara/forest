@@ -9,11 +9,12 @@ import com.dtflys.forest.handler.ResultHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.ForestProgress;
-import com.dtflys.forest.utils.ReflectUtil;
+import com.dtflys.forest.utils.ReflectUtils;
 
 import java.lang.reflect.Type;
 
 /**
+ * 请求方法生命周期处理器
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-19 17:00
  */
@@ -83,16 +84,23 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
         return resultData;
     }
 
+
+
     @Override
     public Object handleSuccess(Object resultData, ForestRequest request, ForestResponse response) {
         request.getInterceptorChain().onSuccess(resultData, request, response);
         OnSuccess onSuccess = request.getOnSuccess();
         if (onSuccess != null) {
-            resultData = resultHandler.getResult(request, response, onSuccessClassGenericType, ReflectUtil.getClassByType(onSuccessClassGenericType));
+            resultData = resultHandler.getResult(request, response, onSuccessClassGenericType, ReflectUtils.getClassByType(onSuccessClassGenericType));
             onSuccess.onSuccess(resultData, request, response);
         }
         resultData = response.getResult();
         return resultData;
+    }
+
+    @Override
+    public void handleInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
+        request.getInterceptorChain().onInvokeMethod(request, method, args);
     }
 
     @Override
