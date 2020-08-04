@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -103,6 +104,17 @@ public class TestGetClient extends BaseClientTest {
         assertNotNull(result);
         assertEquals(GetMockServer.EXPECTED, result);
     }
+
+    @Test
+    public void testAnnObjectGet2() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("username", "foo");
+        String result = getClient.annObjectGet(map);
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(GetMockServer.EXPECTED, result);
+    }
+
 
 
     @Test
