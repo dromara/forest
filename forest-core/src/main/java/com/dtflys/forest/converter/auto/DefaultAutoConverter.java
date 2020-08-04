@@ -4,7 +4,7 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.ForestDataType;
-import com.dtflys.forest.utils.ReflectUtil;
+import com.dtflys.forest.utils.ReflectUtils;
 
 import java.io.InputStream;
 import java.lang.reflect.Type;
@@ -66,7 +66,7 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
             return tryConvert(source, targetType, ForestDataType.BINARY);
         }
         T result = null;
-        Class clazz = ReflectUtil.getClassByType(targetType);
+        Class clazz = ReflectUtils.getClassByType(targetType);
         if (source instanceof CharSequence) {
             String str = source.toString();
             if (String.class.isAssignableFrom(clazz)) {
