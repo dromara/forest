@@ -1,8 +1,6 @@
-package com.dtflys.forest.interceptor.extension;
+package com.dtflys.forest.extensions;
 
-import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ForestConverter;
-import com.dtflys.forest.converter.binary.DefaultBinaryConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
@@ -13,8 +11,6 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.lang.reflect.Type;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class DownloadInterceptor implements Interceptor<Object> {
 
