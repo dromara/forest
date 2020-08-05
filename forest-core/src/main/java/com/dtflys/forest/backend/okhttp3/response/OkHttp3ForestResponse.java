@@ -39,8 +39,8 @@ public class OkHttp3ForestResponse extends ForestResponse {
                 }
                 if (StringUtils.isEmpty(contentType)) {
                     content = null;
-                } else if (contentType.startsWith("application") ||
-                        contentType.startsWith("text")) {
+                } else if (contentType.startsWith("application")
+                        || contentType.startsWith("text")) {
                     try {
                         this.content = body.string();
                     } catch (IOException e) {
