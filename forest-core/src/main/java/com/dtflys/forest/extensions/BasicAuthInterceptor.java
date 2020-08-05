@@ -1,4 +1,4 @@
-package com.dtflys.forest.interceptor.extension;
+package com.dtflys.forest.extensions;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
