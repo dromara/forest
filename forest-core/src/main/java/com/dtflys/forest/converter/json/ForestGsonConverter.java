@@ -36,8 +36,8 @@ public class ForestGsonConverter implements ForestJsonConverter {
 
     public <T> T convertToJavaObject(String source, Type targetType) {
         try {
-            if (targetType instanceof ParameterizedType ||
-                    targetType.getClass().getName().startsWith("com.google.gson")) {
+            if (targetType instanceof ParameterizedType
+                    || targetType.getClass().getName().startsWith("com.google.gson")) {
                 Gson gson = new Gson();
                 return gson.fromJson(source, targetType);
             }
