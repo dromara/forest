@@ -7,15 +7,22 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.interceptor.Interceptor;
+import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.ForestDataType;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class DownloadInterceptor implements Interceptor<Object> {
 
+    @Override
+    public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
+        Type resultType = method.getReturnType();
+        addAttribute(request, "resultType", resultType);
+    }
 
     @Override
     public void afterExecute(ForestRequest request, ForestResponse response) {
@@ -31,24 +38,29 @@ public class DownloadInterceptor implements Interceptor<Object> {
     public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
         String dirPath = getAttributeAsString(request, "dir");
         String filename = getAttributeAsString(request, "filename");
+        Type resultType = getAttribute(request, "resultType", Type.class);
         File dir = new File(dirPath);
         if (!dir.exists()) {
             dir.mkdirs();
         }
         InputStream in = null;
-        try {
-            in = response.getInputStream();
-        } catch (Exception e) {
-            throw new ForestRuntimeException(e);
+        if (data != null && data instanceof byte[]) {
+            in = new ByteArrayInputStream((byte[]) data);
+        } else {
+            try {
+                in = response.getInputStream();
+            } catch (Exception e) {
+                throw new ForestRuntimeException(e);
+            }
         }
         String path = dir.getPath() + File.separator + filename;
         File file = new File(path);
         try {
             FileUtils.copyInputStreamToFile(in, file);
             request.addAttachment("file", file);
-            if (data != null) {
-                ForestConverter converter = request.getConfiguration().getConverterMap().get(ForestDataType.BINARY);
-                data = converter.convertToJavaObject(file, data.getClass());
+            if (resultType != null) {
+                ForestConverter converter = request.getConfiguration().getConverterMap().get(ForestDataType.AUTO);
+                data = converter.convertToJavaObject(file, resultType);
                 response.setResult(data);
             }
         } catch (IOException e) {
