@@ -65,7 +65,9 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
 
     @Override
     public <T> T convertToJavaObject(Object source, Type targetType) {
-        if (source instanceof InputStream) {
+        if (source instanceof InputStream
+                || source instanceof byte[]
+                || source instanceof File) {
             return tryConvert(source, targetType, ForestDataType.BINARY);
         }
         T result = null;
