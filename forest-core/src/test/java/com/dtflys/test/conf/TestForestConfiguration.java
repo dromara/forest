@@ -141,7 +141,7 @@ public class TestForestConfiguration {
     }
 
     @Test
-    public void testJSONCOnvertSelectCheck() throws Throwable {
+    public void testJSONConvertSelectCheck() throws Throwable {
         JSONConverterSelector jsonConverterSelector = new JSONConverterSelector();
         try {
             Class fastJsonClass = jsonConverterSelector.checkFastJSONClass();
