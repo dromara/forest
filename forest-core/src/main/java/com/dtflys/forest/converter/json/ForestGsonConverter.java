@@ -88,8 +88,8 @@ public class ForestGsonConverter implements ForestJsonConverter {
                 if (num.compareTo(new BigDecimal(Long.MIN_VALUE)) == -1) {
                     return num;
                 }
-                if (num.compareTo(new BigDecimal(Integer.MAX_VALUE)) == 1 ||
-                        num.compareTo(new BigDecimal(Integer.MIN_VALUE)) == -1) {
+                if (num.compareTo(new BigDecimal(Integer.MAX_VALUE)) == 1
+                        || num.compareTo(new BigDecimal(Integer.MIN_VALUE)) == -1) {
                     return jsonPrimitive.getAsLong();
                 }
                 return jsonPrimitive.getAsInt();

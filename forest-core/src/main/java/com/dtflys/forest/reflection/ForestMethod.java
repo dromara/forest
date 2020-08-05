@@ -460,9 +460,9 @@ public class ForestMethod<T> implements VariableScope {
                     obj = parameter.getFilterChain().doFilter(configuration, obj);
                     nameValueList.add(new RequestNameValue(null, obj, false));
                 }
-                else if (obj instanceof List ||
-                        obj.getClass().isArray() ||
-                        ReflectUtils.isPrimaryType(obj.getClass())) {
+                else if (obj instanceof List
+                        || obj.getClass().isArray()
+                        || ReflectUtils.isPrimaryType(obj.getClass())) {
                     bodyList.add(obj);
                 }
                 else if (obj instanceof Map) {
@@ -646,8 +646,8 @@ public class ForestMethod<T> implements VariableScope {
 
         if (interceptorAttributesList != null && interceptorAttributesList.size() > 0) {
             for (InterceptorAttributes attributes : interceptorAttributesList) {
-                attributes.render(args);
                 request.addInterceptorAttributes(attributes.getInterceptorClass(), attributes);
+                request.getInterceptorAttributes(attributes.getInterceptorClass()).render(args);
             }
         }
 

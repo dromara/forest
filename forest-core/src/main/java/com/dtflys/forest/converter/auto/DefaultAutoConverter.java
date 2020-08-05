@@ -6,6 +6,7 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
 
+import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 
@@ -19,7 +20,9 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
 
     @Override
     public <T> T convertToJavaObject(Object source, Class<T> targetType) {
-        if (source instanceof InputStream) {
+        if (source instanceof InputStream
+                || source instanceof byte[]
+                || source instanceof File) {
             return tryConvert(source, targetType, ForestDataType.BINARY);
         }
         T result = null;
