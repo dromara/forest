@@ -1,5 +1,6 @@
 package com.dtflys.forest.backend.httpclient.response;
 
+import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
@@ -34,7 +35,7 @@ public class HttpclientForestResponse extends ForestResponse {
             if (entity != null) {
                 Header type = entity.getContentType();
                 if (type != null) {
-                    this.contentType = type.getValue();
+                    this.contentType = new ContentType(type.getValue());
                 }
                 this.contentLength = entity.getContentLength();
                 Header encoding = entity.getContentEncoding();
@@ -60,11 +61,10 @@ public class HttpclientForestResponse extends ForestResponse {
 
     private String buildContent() {
         if (content == null) {
-            if (StringUtils.isEmpty(contentType)) {
+            if (contentType == null || contentType.isEmpty()) {
                 return null;
             }
-            if (contentType.startsWith("application/")
-                    || contentType.startsWith("text/")) {
+            if (contentType.canReadAsString()) {
                 InputStream inputStream = null;
                 try {
                     inputStream = entity.getContent();

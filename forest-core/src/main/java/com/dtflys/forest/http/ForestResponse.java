@@ -25,6 +25,8 @@
 package com.dtflys.forest.http;
 
 
+import com.dtflys.forest.backend.ContentType;
+
 import java.io.InputStream;
 
 /**
@@ -37,7 +39,7 @@ public abstract class ForestResponse<T> {
     protected volatile Integer statusCode;
     protected volatile String content;
     protected volatile String filename;
-    protected volatile String contentType;
+    protected volatile ContentType contentType;
     protected volatile String contentEncoding;
     protected volatile long contentLength;
     protected volatile T result;
@@ -75,8 +77,12 @@ public abstract class ForestResponse<T> {
         return this;
     }
 
-    public String getContentType() {
+    public ContentType getContentType() {
         return contentType;
+    }
+
+    public void setContentType(ContentType contentType) {
+        this.contentType = contentType;
     }
 
     public String getContentEncoding() {

@@ -1,5 +1,6 @@
 package com.dtflys.forest.backend.okhttp3.response;
 
+import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
@@ -22,6 +23,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
 
     private final ResponseBody body;
 
+
     public OkHttp3ForestResponse(ForestRequest request, Response okResponse) {
         super(request);
         this.okResponse = okResponse;
@@ -31,16 +33,17 @@ public class OkHttp3ForestResponse extends ForestResponse {
             if (body != null) {
                 MediaType mediaType = body.contentType();
                 if (mediaType != null) {
-                    this.contentType = mediaType.type();
+                    String type = mediaType.type();
+                    String subType = mediaType.subtype();
+                    this.contentType = new ContentType(type, subType);
                     Charset charset = mediaType.charset();
                     if (charset != null) {
                         this.contentEncoding = charset.name();
                     }
                 }
-                if (StringUtils.isEmpty(contentType)) {
+                if (contentType.isEmpty()) {
                     content = null;
-                } else if (contentType.startsWith("application")
-                        || contentType.startsWith("text")) {
+                } else if (!request.isDownloadFile() || contentType.canReadAsString()) {
                     try {
                         this.content = body.string();
                     } catch (IOException e) {
@@ -49,7 +52,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
                 } else {
                     StringBuilder builder = new StringBuilder();
                     builder.append("[content-type: ")
-                            .append(contentType);
+                            .append(contentType.toString());
                     if (contentEncoding != null) {
                         builder.append("; encoding: ")
                                 .append(contentEncoding);
@@ -57,13 +60,20 @@ public class OkHttp3ForestResponse extends ForestResponse {
                     builder.append("; length: ")
                             .append(contentLength)
                             .append("]");
-                    this.contentType = builder.toString();
+                    this.content = builder.toString();
                 }
             }
         } else {
             this.body = null;
             this.statusCode = 404;
         }
+    }
+
+    public boolean isText() {
+        if (contentType == null) {
+            return false;
+        }
+        return false;
     }
 
     @Override
