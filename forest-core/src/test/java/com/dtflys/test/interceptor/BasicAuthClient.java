@@ -2,7 +2,7 @@ package com.dtflys.test.interceptor;
 
 import com.dtflys.forest.annotation.DataVariable;
 import com.dtflys.forest.annotation.Request;
-import com.dtflys.forest.interceptor.extension.BasicAuth;
+import com.dtflys.forest.extensions.BasicAuth;
 
 public interface BasicAuthClient {
 

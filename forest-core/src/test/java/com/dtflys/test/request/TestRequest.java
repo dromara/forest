@@ -3,7 +3,6 @@ package com.dtflys.test.request;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
-import com.dtflys.forest.interceptor.extension.BasicAuth;
 import com.dtflys.test.interceptor.BasicAuthClient;
 import org.junit.Test;
 
