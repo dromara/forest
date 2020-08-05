@@ -26,6 +26,9 @@ public class ResultHandler {
 
 
     public Object getResult(ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
+        if (request.isDownloadFile()) {
+            return null;
+        }
         Object result = response.getResult();
         if (result != null && resultClass.isAssignableFrom(result.getClass())) {
             return result;
