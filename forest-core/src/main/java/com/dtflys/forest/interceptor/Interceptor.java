@@ -38,12 +38,21 @@ public interface Interceptor<T> extends OnSuccess<T>, OnError, OnProgress {
     }
 
     default void addAttribute(ForestRequest request, String name, Object value) {
-        request.getInterceptorAttributes(this.getClass());
+        request.addInterceptorAttribute(this.getClass(), name, value);
     }
 
     default Object getAttribute(ForestRequest request, String name) {
         return request.getInterceptorAttribute(this.getClass(), name);
     }
+
+    default <T> T getAttribute(ForestRequest request, String name, Class<T> clazz) {
+        Object obj = request.getInterceptorAttribute(this.getClass(), name);
+        if (obj == null) {
+            return null;
+        }
+        return (T) obj;
+    }
+
 
     default String getAttributeAsString(ForestRequest request, String name) {
         Object attr = getAttribute(request, name);
