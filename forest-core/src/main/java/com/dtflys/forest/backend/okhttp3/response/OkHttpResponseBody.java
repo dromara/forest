@@ -57,7 +57,6 @@ public class OkHttpResponseBody extends ResponseBody {
     }
 
     private Source source(Source source) {
-        OkHttpResponseBody self = this;
 
         return new ForwardingSource(source) {
             long readBytes = 0L;
@@ -65,28 +64,31 @@ public class OkHttpResponseBody extends ResponseBody {
 
             @Override
             public long read(Buffer sink, long byteCount) throws IOException {
-                long totalLength = self.contentLength();
+                long totalLength = contentLength();
                 long bytesRead = super.read(sink, byteCount);
                 ForestProgress progress = progressReference.get();
                 if (progress == null) {
-                    progress = new ForestProgress(self.request, totalLength);
+                    progress = new ForestProgress(request, totalLength);
                     progressReference.set(progress);
+                }
+                if (progress.isDone()) {
+                    return bytesRead;
                 }
                 if (totalLength >= 0) {
                     long currReadBytes = bytesRead != -1 ? bytesRead : 0;
                     readBytes += currReadBytes;
                     progress.setCurrentBytes(readBytes);
-                    self.currentStep += currReadBytes;
+                    currentStep += currReadBytes;
                     if (readBytes == totalLength) {
                         // progress is done
                         progress.setDone(true);
-                        self.handler.handleProgress(self.request, progress);
+                        handler.handleProgress(request, progress);
                     } else {
-                        while (self.currentStep >= self.progressStep) {
-                            self.currentStep = self.currentStep - self.progressStep;
+                        while (currentStep >= progressStep) {
+                            currentStep = currentStep - progressStep;
                             progress.setDone(false);
                             // invoke progress listener
-                            self.handler.handleProgress(self.request, progress);
+                            handler.handleProgress(request, progress);
                         }
                     }
                 }

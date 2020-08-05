@@ -95,6 +95,8 @@ public class ForestRequest<T> {
 
     private OnError onError;
 
+    private boolean isDownloadFile = false;
+
     private long progressStep = DEFAULT_PROGRESS_STEP;
 
     private OnProgress onProgress;
@@ -395,6 +397,14 @@ public class ForestRequest<T> {
     public ForestRequest setOnError(OnError onError) {
         this.onError = onError;
         return this;
+    }
+
+    public boolean isDownloadFile() {
+        return isDownloadFile;
+    }
+
+    public void setDownloadFile(boolean downloadFile) {
+        isDownloadFile = downloadFile;
     }
 
     public long getProgressStep() {

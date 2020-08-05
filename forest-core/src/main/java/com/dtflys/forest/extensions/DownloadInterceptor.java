@@ -18,6 +18,7 @@ public class DownloadInterceptor implements Interceptor<Object> {
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
         Type resultType = method.getReturnType();
         addAttribute(request, "resultType", resultType);
+        request.setDownloadFile(true);
     }
 
     @Override
