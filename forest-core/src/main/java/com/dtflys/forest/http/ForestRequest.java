@@ -425,7 +425,18 @@ public class ForestRequest<T> {
     }
 
     public ForestRequest addInterceptorAttributes(Class interceptorClass, InterceptorAttributes attributes) {
-        interceptorAttributes.put(interceptorClass, attributes);
+        InterceptorAttributes oldAttributes = interceptorAttributes.get(interceptorClass);
+        if (oldAttributes != null) {
+            for (Map.Entry<String, Object> entry : attributes.getAttributeTemplates().entrySet()) {
+                oldAttributes.addAttribute(entry.getKey(), entry.getValue());
+            }
+
+            for (Map.Entry<String, Object> entry : attributes.getAttributes().entrySet()) {
+                oldAttributes.addAttribute(entry.getKey(), entry.getValue());
+            }
+        } else {
+            interceptorAttributes.put(interceptorClass, attributes);
+        }
         return this;
     }
 
@@ -433,6 +444,7 @@ public class ForestRequest<T> {
         InterceptorAttributes attributes = getInterceptorAttributes(interceptorClass);
         if (attributes == null) {
             attributes = new InterceptorAttributes(interceptorClass, new HashMap<>());
+            addInterceptorAttributes(interceptorClass, attributes);
         }
         attributes.addAttribute(attributeName, attributeValue);
         return this;

@@ -37,6 +37,10 @@ public class InterceptorAttributes {
         return attributes;
     }
 
+    public Map<String, Object> getAttributeTemplates() {
+        return attributeTemplates;
+    }
+
     public Map<String, Object> getAttributes() {
         return attributes;
     }
