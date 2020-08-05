@@ -17,9 +17,9 @@ public class SpringSSLKeyStore extends SSLKeyStore {
 
     @Override
     public void init() {
-        if (filePath.indexOf(":/") == 1 ||
-                filePath.indexOf(":\\") == 1 ||
-                filePath.startsWith("/")) {
+        if (filePath.indexOf(":/") == 1
+                || filePath.indexOf(":\\") == 1
+                || filePath.startsWith("/")) {
             File file = new File(filePath);
             if (!file.exists()) {
                 throw new ForestRuntimeException(
