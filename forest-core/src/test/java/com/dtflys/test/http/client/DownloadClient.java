@@ -17,4 +17,9 @@ public interface DownloadClient {
     @DownloadFile(dir = "${dir}", filename = "${filename}")
     File downloadImage(@DataVariable("dir") String dir, @DataVariable("filename") String filename, OnProgress onProgress);
 
+
+    @Request(url = "http://forspeed.onlinedown.net/down/QQliveSetup_20_731.exe")
+    @DownloadFile(dir = "${dir}", filename = "${filename}")
+    File downloadFile(@DataVariable("dir") String dir, @DataVariable("filename") String filename, OnProgress onProgress);
+
 }

@@ -46,4 +46,20 @@ public class TestDownloadClient extends BaseClientTest {
         assertEquals("D:\\TestDownload\\temp-img.png", file.getAbsolutePath());
     }
 
+    @Test
+    public void testDownloadFile() {
+        File file = downloadClient.downloadFile("D:\\TestDownload", "QQliveSetup_20_731.exe", progress -> {
+            System.out.println("------------------------------------------");
+            System.out.println("total bytes: " + progress.getTotalBytes());
+            System.out.println("current bytes: " + progress.getCurrentBytes());
+            System.out.println("progress: " + Math.round(progress.getRate() * 100) + "%");
+            if (progress.isDone()) {
+                System.out.println("--------   Download Completed!   --------");
+            }
+        });
+        assertNotNull(file);
+        assertEquals("D:\\TestDownload\\QQliveSetup_20_731.exe", file.getAbsolutePath());
+    }
+
+
 }
