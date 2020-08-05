@@ -63,8 +63,8 @@ public class HttpclientForestResponse extends ForestResponse {
             if (StringUtils.isEmpty(contentType)) {
                 return null;
             }
-            if (contentType.startsWith("application/") ||
-                    contentType.startsWith("text/")) {
+            if (contentType.startsWith("application/")
+                    || contentType.startsWith("text/")) {
                 InputStream inputStream = null;
                 try {
                     inputStream = entity.getContent();
