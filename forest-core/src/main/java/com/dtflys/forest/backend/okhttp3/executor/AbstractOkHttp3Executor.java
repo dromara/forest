@@ -160,8 +160,8 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
 
     protected abstract URLBuilder getURLBuilder();
 
-    protected OkHttpClient getClient(ForestRequest request) {
-        return connectionManager.getClient(request);
+    protected OkHttpClient getClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
+        return connectionManager.getClient(request, lifeCycleHandler);
     }
 
     protected void prepareMethod(Request.Builder builder) {
@@ -186,7 +186,7 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
     }
 
     public void execute(final LifeCycleHandler lifeCycleHandler, int retryCount) {
-        OkHttpClient okHttpClient = getClient(request);
+        OkHttpClient okHttpClient = getClient(request, lifeCycleHandler);
         URLBuilder urlBuilder = getURLBuilder();
         String url = urlBuilder.buildUrl(request);
         Request.Builder builder = new Request.Builder().url(url);
