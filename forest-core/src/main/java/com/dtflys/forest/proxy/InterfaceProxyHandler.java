@@ -13,6 +13,7 @@ import com.dtflys.forest.utils.URLUtils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -118,8 +119,21 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
     }
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (method.getName().equals("getProxyHandler") && (args == null || args.length == 0)) {
+        String methodName = method.getName();
+        if (methodName.equals("getProxyHandler") && (args == null || args.length == 0)) {
             return this;
+        }
+        if (methodName.equals("toString") && (args == null || args.length == 0)) {
+            return "{Forest Proxy Object of " + interfaceClass.getName() + "}";
+        }
+        if (methodName.equals("equals") && (args != null && args.length == 1)) {
+            Object obj = args[0];
+            if (Proxy.isProxyClass(obj.getClass())) {
+                InvocationHandler h1 = Proxy.getInvocationHandler(proxy);
+                InvocationHandler h2 = Proxy.getInvocationHandler(obj);
+                return h1.equals(h2);
+            }
+            return false;
         }
         ForestMethod forestMethod = forestMethodMap.get(method);
         return forestMethod.invoke(args);
