@@ -11,6 +11,7 @@ import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.concurrent.Future;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -46,6 +47,17 @@ public class ResultHandler {
                         }
                     }
                     return response;
+                }
+                if (Future.class.isAssignableFrom(resultClass)) {
+                    if (resultType instanceof ParameterizedType) {
+                        ParameterizedType parameterizedType = (ParameterizedType) resultType;
+                        Class rowClass = (Class) parameterizedType.getRawType();
+                        if (Future.class.isAssignableFrom(rowClass)) {
+                            Type realType = parameterizedType.getActualTypeArguments()[0];
+                            Class realClass = ReflectUtil.getClassByType(parameterizedType.getActualTypeArguments()[0]);
+                            return getResult(request, response, realType, realClass);
+                        }
+                    }
                 }
                 if (boolean.class.isAssignableFrom(resultClass) || Boolean.class.isAssignableFrom(resultClass)) {
                     return response.isSuccess();
