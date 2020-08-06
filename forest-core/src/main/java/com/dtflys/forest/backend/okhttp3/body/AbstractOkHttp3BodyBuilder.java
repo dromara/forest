@@ -10,7 +10,6 @@ import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import okhttp3.*;
-import okhttp3.internal.Util;
 
 import java.nio.charset.Charset;
 import java.util.List;
@@ -21,13 +20,15 @@ import java.util.List;
  */
 public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
 
+    private static Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
+
 
     protected abstract void setBody(Request.Builder builder, RequestBody body);
 
     @Override
     protected void setStringBody(Request.Builder builder, String text, String charset, String contentType) {
         MediaType mediaType = MediaType.parse(contentType);
-        Charset cs = Charset.forName("UTF-8");
+        Charset cs = DEFAULT_CHARSET;
         if (StringUtils.isNotEmpty(charset)) {
             try {
                 cs = Charset.forName(charset);
