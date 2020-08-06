@@ -41,7 +41,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
                         this.contentEncoding = charset.name();
                     }
                 }
-                if (contentType.isEmpty()) {
+                if (contentType == null || contentType.isEmpty()) {
                     content = null;
                 } else if (!request.isDownloadFile() || contentType.canReadAsString()) {
                     try {
