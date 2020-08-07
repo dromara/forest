@@ -80,14 +80,13 @@ compile group: 'com.dtflys.forest', name: 'spring-boot-starter-forest', version:
 </dependency>
 ```
 
+最新版本为<font color=red>1.3.11</font>，为稳定版本
+
 如果您用的是Gradle:
 
 ```gradle
 compile group: 'com.dtflys.forest', name: 'forest-core', version: '1.3.11'
 ```
-
-
-最新版本为<font color=red>_1.3.11_</font>，为稳定版本
 
 
 # 三. 构建请求接口
