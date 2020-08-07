@@ -60,7 +60,7 @@ Forest 1.0.x 和 Forest 1.1.x 基于 JDK 1.7, Forest 1.2.x及以上版本基于 
 </dependency>
 ```
 
-最新版本为<font color=red>_1.3.11</font>，为稳定版本
+最新版本为<font color=red>1.3.11</font>，为稳定版本
 
 如果您用的是Gradle:
 
