@@ -64,7 +64,7 @@ Forest 1.0.x 和 Forest 1.1.x 基于 JDK 1.7, Forest 1.2.x及以上版本基于 
 
 如果您用的是Gradle:
 
-```groovy
+```gradle
 compile group: 'com.dtflys.forest', name: 'spring-boot-starter-forest', version: '1.3.11'
 ```
 
@@ -82,7 +82,7 @@ compile group: 'com.dtflys.forest', name: 'spring-boot-starter-forest', version:
 
 如果您用的是Gradle:
 
-```groovy
+```gradle
 compile group: 'com.dtflys.forest', name: 'forest-core', version: '1.3.11'
 ```
 
