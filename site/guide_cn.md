@@ -60,26 +60,15 @@ Forest 1.0.x 和 Forest 1.1.x 基于 JDK 1.7, Forest 1.2.x及以上版本基于 
 </dependency>
 ```
 
-最新版本为<font color=red>_1.3.810</font>，为稳定版本
+最新版本为<font color=red>_1.3.11</font>，为稳定版本
+
+如果您用的是Gradle:
+
+```groovy
+compile group: 'com.dtflys.forest', name: 'spring-boot-starter-forest', version: '1.3.11'
+```
 
 ## 2.2 在非 Spring Boot 项目中安装
-
-先添加后端 HTTP API 的依赖：`okhttp3` 或 `httpclient`.
-以及 JSON 解析框架：`Jackson`、`Fastjson`或`Gson`
-
-```xml
-<dependency>
-  <groupId>com.squareup.okhttp3</groupId>
-  <artifactId>okhttp</artifactId>
-  <version>3.3.0</version>
-</dependency>
-
-<dependency>
-    <groupId>com.alibaba</groupId>
-    <artifactId>fastjson</artifactId>
-    <version>1.2.47</version>
-</dependency>
-```
 
 然后添加 Forest 核心包依赖
 
@@ -90,6 +79,13 @@ Forest 1.0.x 和 Forest 1.1.x 基于 JDK 1.7, Forest 1.2.x及以上版本基于 
     <version>1.3.11</version>
 </dependency>
 ```
+
+如果您用的是Gradle:
+
+```groovy
+compile group: 'com.dtflys.forest', name: 'forest-core', version: '1.3.11'
+```
+
 
 最新版本为<font color=red>_1.3.11_</font>，为稳定版本
 
