@@ -70,7 +70,7 @@ compile group: 'com.dtflys.forest', name: 'spring-boot-starter-forest', version:
 
 ## 2.2 在非 Spring Boot 项目中安装
 
-然后添加 Forest 核心包依赖
+添加 Forest 核心包依赖
 
 ```xml
 <dependency>
