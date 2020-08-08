@@ -139,6 +139,10 @@ public class ForestConfiguration implements Serializable {
         return defaultConfiguration;
     }
 
+    /**
+     * 实例化ForestConfiguration对象，并初始化默认值
+     * @return
+     */
     public static ForestConfiguration configuration() {
         ForestConfiguration configuration = new ForestConfiguration();
         configuration.setId("forestConfiguration" + configuration.hashCode());
