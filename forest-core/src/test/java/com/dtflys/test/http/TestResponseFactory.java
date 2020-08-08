@@ -2,8 +2,11 @@ package com.dtflys.test.http;
 
 import com.dtflys.forest.backend.httpclient.response.HttpclientForestResponseFactory;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.reflection.MethodLifeCycleHandler;
+import com.dtflys.forest.reflection.NoneLifeCycleHandler;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import com.dtflys.forest.config.ForestConfiguration;
@@ -30,7 +33,8 @@ public class TestResponseFactory {
         StatusLine statusLine = mock(StatusLine.class);
         when(statusLine.getStatusCode()).thenReturn(200);
         when(httpResponse.getStatusLine()).thenReturn(statusLine);
-        ForestResponse response = responseFactory.createResponse(request, httpResponse);
+        LifeCycleHandler lifeCycleHandler = new NoneLifeCycleHandler();
+        ForestResponse response = responseFactory.createResponse(request, httpResponse, lifeCycleHandler);
         assertNotNull(response);
         assertNull(response.getContent());
     }
