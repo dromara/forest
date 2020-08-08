@@ -12,6 +12,7 @@ import com.dtflys.forest.utils.StringUtils;
 import java.util.*;
 
 /**
+ * 通用的请求体构造器抽象类
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2018-02-27 18:06
  */

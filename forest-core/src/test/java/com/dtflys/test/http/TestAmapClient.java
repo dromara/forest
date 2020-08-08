@@ -85,5 +85,19 @@ public class TestAmapClient {
         System.out.println(JSON.toJSONString(result));
     }
 
+    @Test
+    public void testGetLocationWithDecoder() {
+        Map result = amapClient.getLocationWithDecoder(new SubCoordinate("121.475078", "31.223577"));
+        assertNotNull(result);
+        System.out.println(JSON.toJSONString(result));
+    }
+
+    @Test
+    public void testGetLocationWithDecoder2() {
+        Map result = amapClient.getLocationWithDecoder2(new SubCoordinate("121.475078", "31.223577"));
+        assertNotNull(result);
+        System.out.println(JSON.toJSONString(result));
+    }
+
 
 }
