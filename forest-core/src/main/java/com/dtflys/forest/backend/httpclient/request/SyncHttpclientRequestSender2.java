@@ -1,6 +1,7 @@
 package com.dtflys.forest.backend.httpclient.request;
 
 import com.dtflys.forest.backend.httpclient.conn.HttpclientConnectionManager;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
@@ -38,7 +39,7 @@ public class SyncHttpclientRequestSender2 extends AbstractHttpclientRequestSende
 
 
     @Override
-    public void sendRequest(final ForestRequest request, final HttpclientResponseHandler responseHandler, final HttpUriRequest httpRequest) throws IOException {
+    public void sendRequest(final ForestRequest request, final HttpclientResponseHandler responseHandler, final HttpUriRequest httpRequest, LifeCycleHandler lifeCycleHandler) throws IOException {
         final CloseableHttpAsyncClient client = connectionManager.getHttpAsyncClient(request);
         client.start();
         final AtomicReference<ForestResponse> forestResponseRef = new AtomicReference<>();
@@ -47,12 +48,12 @@ public class SyncHttpclientRequestSender2 extends AbstractHttpclientRequestSende
         try {
             Future<HttpResponse> future = client.execute(httpRequest, new FutureCallback<HttpResponse>() {
                 public void completed(final HttpResponse httpResponse) {
-                    ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
+                    ForestResponse response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler);
                     forestResponseRef.set(response);
                 }
 
                 public void failed(final Exception ex) {
-                    ForestResponse response = forestResponseFactory.createResponse(request, null);
+                    ForestResponse response = forestResponseFactory.createResponse(request, null, lifeCycleHandler);
                     forestResponseRef.set(response);
                     exceptionRef.set(ex);
                 }

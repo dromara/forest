@@ -155,12 +155,12 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         long startTime = startDate.getTime();
         try {
             logRequest(retryCount, httpRequest);
-            requestSender.sendRequest(request, httpclientResponseHandler, httpRequest);
+            requestSender.sendRequest(request, httpclientResponseHandler, httpRequest, lifeCycleHandler);
         } catch (IOException e) {
             if (retryCount >= request.getRetryCount()) {
                 httpRequest.abort();
                 ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
-                response = forestResponseFactory.createResponse(request, null);
+                response = forestResponseFactory.createResponse(request, null, lifeCycleHandler);
                 logResponse(startTime, response);
                 lifeCycleHandler.handleSyncWitchException(request, response, e);
 //                throw new ForestRuntimeException(e);

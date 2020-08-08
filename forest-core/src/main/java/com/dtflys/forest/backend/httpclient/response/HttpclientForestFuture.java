@@ -52,7 +52,7 @@ public class HttpclientForestFuture<T, R> implements Future<T> {
         if (httpResponse != null && innerType.isAssignableFrom(httpResponse.getClass())) {
             return (T) httpResponse;
         }
-        ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
+        ForestResponse response = forestResponseFactory.createResponse(request, httpResponse, this.lifeCycleHandler);
         Object ret = lifeCycleHandler.handleResultType(request, response, innerType, innerType);
         return (T) ret;
     }

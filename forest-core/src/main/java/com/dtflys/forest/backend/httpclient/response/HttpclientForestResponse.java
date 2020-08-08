@@ -26,11 +26,11 @@ public class HttpclientForestResponse extends ForestResponse {
 
 
 
-    public HttpclientForestResponse(ForestRequest request, HttpResponse httpResponse) {
+    public HttpclientForestResponse(ForestRequest request, HttpResponse httpResponse, HttpEntity entity) {
         super(request);
         this.httpResponse = httpResponse;
+        this.entity = entity;
         if (httpResponse != null) {
-            this.entity = httpResponse.getEntity();
             this.statusCode = httpResponse.getStatusLine().getStatusCode();
             if (entity != null) {
                 Header type = entity.getContentType();
@@ -45,7 +45,6 @@ public class HttpclientForestResponse extends ForestResponse {
                 this.content = buildContent();
             }
         } else {
-            this.entity = null;
             this.statusCode = 404;
         }
     }

@@ -206,14 +206,14 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
                 @Override
                 public void onFailure(Call call, IOException e) {
                     future.failed(e);
-                    ForestResponse response = factory.createResponse(request, null);
+                    ForestResponse response = factory.createResponse(request, null, lifeCycleHandler);
                     logResponse(startTime, response);
                     lifeCycleHandler.handleError(request, response, e);
                 }
 
                 @Override
                 public void onResponse(Call call, Response okResponse) throws IOException {
-                    ForestResponse response = factory.createResponse(request, okResponse);
+                    ForestResponse response = factory.createResponse(request, okResponse, lifeCycleHandler);
                     logResponse(startTime, response);
                     Object result = null;
                     if (response.isSuccess()) {
@@ -242,14 +242,14 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
                 okResponse = call.execute();
             } catch (IOException e) {
                 if (retryCount >= request.getRetryCount()) {
-                    ForestResponse response = factory.createResponse(request, null);
+                    ForestResponse response = factory.createResponse(request, null, lifeCycleHandler);
                     logResponse(startTime, response);
                     lifeCycleHandler.handleError(request, response, e);
                     return;
                 }
                 execute(lifeCycleHandler, retryCount + 1);
             }
-            ForestResponse response = factory.createResponse(request, okResponse);
+            ForestResponse response = factory.createResponse(request, okResponse, lifeCycleHandler);
             logResponse(startTime, response);
             okHttp3ResponseHandler.handleSync(okResponse, response);
         }

@@ -1,6 +1,6 @@
 package com.dtflys.forest.backend.httpclient.response;
 
-import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
@@ -35,7 +35,7 @@ public class HttpclientForestResponseFactory implements ForestResponseFactory<Ht
 
 
     @Override
-    public synchronized ForestResponse createResponse(ForestRequest request, HttpResponse httpResponse) {
+    public synchronized ForestResponse createResponse(ForestRequest request, HttpResponse httpResponse, LifeCycleHandler lifeCycleHandler) {
         if (resultResponse != null) {
             return resultResponse;
         }
@@ -44,7 +44,14 @@ public class HttpclientForestResponseFactory implements ForestResponseFactory<Ht
                     new BasicStatusLine(
                             new ProtocolVersion("1.1", 1, 1), 404, ""));
         }
-        HttpclientForestResponse response = new HttpclientForestResponse(request, httpResponse);
+        HttpEntity entity = null;
+        if (httpResponse != null) {
+            entity = httpResponse.getEntity();
+            if (entity != null) {
+                entity = new HttpclientEntity(request, entity, lifeCycleHandler);
+            }
+        }
+        HttpclientForestResponse response = new HttpclientForestResponse(request, httpResponse, entity);
 //        int statusCode = httpResponse.getStatusLine().getStatusCode();
 //        response.setStatusCode(statusCode);
 //        httpResponse.getAllHeaders();

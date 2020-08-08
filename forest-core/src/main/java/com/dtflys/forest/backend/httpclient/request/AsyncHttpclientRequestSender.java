@@ -3,6 +3,7 @@ package com.dtflys.forest.backend.httpclient.request;
 import com.dtflys.forest.backend.httpclient.conn.HttpclientConnectionManager;
 import com.dtflys.forest.backend.httpclient.response.HttpclientForestResponseFactory;
 import com.dtflys.forest.backend.httpclient.response.HttpclientResponseHandler;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
@@ -26,14 +27,14 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
     }
 
     @Override
-    public void sendRequest(final ForestRequest request, final HttpclientResponseHandler responseHandler, final HttpUriRequest httpRequest) throws IOException {
+    public void sendRequest(final ForestRequest request, final HttpclientResponseHandler responseHandler, final HttpUriRequest httpRequest, LifeCycleHandler lifeCycleHandler) throws IOException {
         final CloseableHttpAsyncClient client = connectionManager.getHttpAsyncClient(request);
         client.start();
         final ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
 
         final Future<HttpResponse> future = client.execute(httpRequest, new FutureCallback<HttpResponse>() {
             public void completed(final HttpResponse httpResponse) {
-                ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
+                ForestResponse response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler);
                 if (response.isSuccess()) {
                     if (request.getOnSuccess() != null) {
                         responseHandler.handleSuccess(response);
@@ -44,7 +45,7 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
             }
 
             public void failed(final Exception ex) {
-                ForestResponse response = forestResponseFactory.createResponse(request, null);
+                ForestResponse response = forestResponseFactory.createResponse(request, null, lifeCycleHandler);
                 responseHandler.handleError(response, ex);
                 synchronized (client) {
                     try {

@@ -4,6 +4,7 @@ import com.dtflys.forest.backend.httpclient.conn.HttpclientConnectionManager;
 import com.dtflys.forest.backend.httpclient.response.HttpclientForestResponseFactory;
 import com.dtflys.forest.backend.httpclient.response.HttpclientResponseHandler;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
@@ -66,7 +67,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
 
 
     @Override
-    public void sendRequest(ForestRequest request, HttpclientResponseHandler responseHandler, HttpUriRequest httpRequest)
+    public void sendRequest(ForestRequest request, HttpclientResponseHandler responseHandler, HttpUriRequest httpRequest, LifeCycleHandler lifeCycleHandler)
             throws IOException {
         HttpResponse httpResponse = null;
         ForestResponse response = null;
@@ -74,7 +75,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
         try {
             httpResponse = client.execute(httpRequest);
             ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
-            response = forestResponseFactory.createResponse(request, httpResponse);
+            response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler);
             logResponse(request, response);
         } finally {
             connectionManager.afterConnect();
