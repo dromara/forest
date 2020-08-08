@@ -19,7 +19,7 @@ import java.lang.reflect.Type;
 public class ForestJaxbConverter implements ForestXmlConverter {
 
     @Override
-    public String convertToXml(Object obj) {
+    public String encodeToString(Object obj) {
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(obj.getClass());
             StringWriter writer = new StringWriter();

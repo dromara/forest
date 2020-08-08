@@ -4,11 +4,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.dtflys.test.model.Coordinate;
 import com.dtflys.test.model.SubCoordinate;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import junit.framework.Assert;
 import com.dtflys.forest.converter.json.ForestFastjsonConverter;
-import com.dtflys.forest.converter.json.ForestJacksonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import org.junit.Test;
 
@@ -53,23 +49,23 @@ public class TestForestFastjsonConverter {
     @Test
     public void testConvertToJson() {
         ForestFastjsonConverter forestFastjsonConverter = new ForestFastjsonConverter();
-        String text = forestFastjsonConverter.convertToJson(new Integer[] {100, 10});
+        String text = forestFastjsonConverter.encodeToString(new Integer[] {100, 10});
         assertEquals("[100,10]", text);
 
         Map map = new LinkedHashMap();
         map.put("a", 1);
-        text = forestFastjsonConverter.convertToJson(map);
+        text = forestFastjsonConverter.encodeToString(map);
         assertEquals("{\"a\":1}", text);
 
         Map sub = new LinkedHashMap();
         sub.put("x", 0);
         map.put("s1", sub);
         map.put("s2", sub);
-        text = forestFastjsonConverter.convertToJson(map);
+        text = forestFastjsonConverter.encodeToString(map);
         assertEquals("{\"a\":1,\"s1\":{\"x\":0},\"s2\":{\"x\":0}}", text);
 
         forestFastjsonConverter.setSerializerFeature(null);
-        text = forestFastjsonConverter.convertToJson(new Integer[] {100, 10});
+        text = forestFastjsonConverter.encodeToString(new Integer[] {100, 10});
         assertEquals("[100,10]", text);
     }
 
@@ -81,7 +77,7 @@ public class TestForestFastjsonConverter {
 
         boolean error = false;
         try {
-            forestFastjsonConverter.convertToJson(map);
+            forestFastjsonConverter.encodeToString(map);
         } catch (ForestRuntimeException e) {
             error = true;
             assertNotNull(e.getCause());

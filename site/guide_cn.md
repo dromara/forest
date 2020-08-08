@@ -1716,14 +1716,87 @@ forest:
 ```
 
 
-# 十一. 联系作者
+### 十一. 数据转换
+
+Forest支持JSON、XML、普通文本等数据转换形式。不需要接口调用者自己写具体的数据转换代码。
+
+#### 11。1 序列化
+
+几乎所有数据格式的转换都包含序列化和反序列化，Forest的数据转换同样如此。
+
+Forest中对数据进行序列化可以通过指定`contentType`属性或`Content-Type`头指定内容格式。
+
+```java
+
+@Request(
+        url = "http://localhost:5000/hello/user",
+        type = "post",
+        contentType = "application/json"    // 指定contentType为application/json
+)
+String postJson(@DataObject MyUser user);   // 自动将user对象序列化为JSON格式
+```
+
+同理，指定为`application/xml`会将参数序列化为`XML`格式，`text/plain`则为文本，默认的`application/x-www-form-urlencoded`则为表格格式。
+
+#### 11.2 反序列化
+
+HTTP请求响应后返回结果的数据同样需要转换，Forest则会将返回结果自动转换为您通过方法返回类型指定对象类型。这个过程就是反序列化，您可以通过`dataType`指定返回数据的反序列化格式。
+
+```java
+@Request(
+    url = "http://localhost:8080/data",
+    dataType = "json"        // 指定dataType为json，将按JSON格式反序列化数据
+)
+Map getData();               // 请求响应的结果将被转换为Map类型对象
+```
+
+#### 11.3 自定义转换器
+
+在Forest中，每个转换类型都对应一个转换器对象，比如`JSON`格式的转换器有`com.dtflys.forest.converter.json.ForestFastjsonConverter`、`com.dtflys.forest.converter.json.ForestGsonConverter`、`com.dtflys.forest.converter.json.ForestJacksonConverter`三种，分别是基于`FastJson`、`Gson`、`Jackson`三种不同的`JSON`序列化框架。
+
+当然，您也可以自定义自己的转换器，以适应自己项目的需要。只需三步便可完成自定义扩展转换器。
+
+第一步. 定义一个转换器类，并实现`com.dtflys.forest.converter.ForestConverter`接口
+
+```java
+/**
+ *  自定义一个Protobuf的转换器，并实现ForestConverter接口下的convertToJavaObject方法
+ */
+public class MyProtobufConverter implements ForestConverter {
+
+    <T> T convertToJavaObject(String source, Class<T> targetType) {
+        // 将字符串参数source转换成目标Class对象
+    }
+
+    <T> T convertToJavaObject(String source, Type targetType) {
+        // 将字符串参数source转换成目标Type(可能是一个泛型类型)对象
+    }
+
+}
+```
+
+第二步. 注册您定义好的转换器类到`ForestConfiguration`
+
+```java
+
+@Autowired
+private ForestConfiguration configuration;
+
+...
+
+configuration
+
+```
+
+
+# 十二. 联系作者
 
 您如有问题可以扫码加入微信的技术交流群
 
 ![avatar](https://dt_flys.gitee.io/forest/media/wechat_qr.png)
 
 
-# 十二. 项目协议
+# 十三. 项目协议
 
 The MIT License (MIT)
 

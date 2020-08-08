@@ -74,7 +74,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
             if (bodyList.size() == 1) {
                 toJsonObj = bodyList.get(0);
             }
-            String text = jsonConverter.convertToJson(toJsonObj);
+            String text = jsonConverter.encodeToString(toJsonObj);
             setStringBody(httpRequest, text, charset, contentType);
         }
         else if (mineType.startsWith("multipart/")) {

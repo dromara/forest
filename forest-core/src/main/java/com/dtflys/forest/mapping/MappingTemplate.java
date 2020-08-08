@@ -4,11 +4,8 @@ package com.dtflys.forest.mapping;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.StringUtils;
-import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.reflection.ForestMethod;
-import com.dtflys.forest.utils.StringUtils;
 
 import java.util.*;
 
@@ -368,7 +365,7 @@ public class MappingTemplate {
             return "";
         }
         if (obj instanceof Map || obj instanceof Collection) {
-            return jsonConverter.convertToJson(obj);
+            return jsonConverter.encodeToString(obj);
         }
         if (obj instanceof Date) {
             return String.valueOf(((Date) obj).getTime());

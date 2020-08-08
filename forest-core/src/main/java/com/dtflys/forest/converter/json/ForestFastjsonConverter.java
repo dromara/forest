@@ -82,7 +82,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
 
 
 
-    public String convertToJson(Object obj) {
+    public String encodeToString(Object obj) {
         try {
             if (serializerFeature == null) {
                 return JSON.toJSONString(obj);

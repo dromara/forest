@@ -130,7 +130,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
         return list;
     }
 
-    public String convertToJson(Object obj) {
+    public String encodeToString(Object obj) {
         Gson gson = new Gson();
         return gson.toJson(obj);
     }

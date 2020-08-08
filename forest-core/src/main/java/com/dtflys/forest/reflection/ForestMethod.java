@@ -452,7 +452,7 @@ public class ForestMethod<T> implements VariableScope {
                     if (obj != null) {
                         ForestJsonConverter jsonConverter = configuration.getJsonConverter();
                         obj = parameter.getFilterChain().doFilter(configuration, obj);
-                        json = jsonConverter.convertToJson(obj);
+                        json = jsonConverter.encodeToString(obj);
                     }
                     nameValueList.add(new RequestNameValue(parameter.getJsonParamName(), json, false));
                 }
