@@ -6,6 +6,7 @@ import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.VariableScope;
+import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestInterceptorDefineException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
@@ -55,6 +56,7 @@ public class ForestMethod<T> implements VariableScope {
     private MappingTemplate baseContentTypeTemplate;
     private MappingTemplate contentTypeTemplate;
     private long progressStep = -1;
+    private ForestConverter decoder = null;
     private String sslKeyStoreId;
     private MappingTemplate[] dataTemplateArray;
     private MappingTemplate[] headerTemplateArray;
@@ -218,6 +220,7 @@ public class ForestMethod<T> implements VariableScope {
                 encodeTemplate = makeTemplate(reqAnn.contentEncoding());
                 progressStep = reqAnn.progressStep();
                 async = reqAnn.async();
+                Class decoderClass = reqAnn.decoder();
                 String[] dataArray = reqAnn.data();
                 String[] headerArray = reqAnn.headers();
                 int tout = reqAnn.timeout();
@@ -259,6 +262,16 @@ public class ForestMethod<T> implements VariableScope {
                     for (int cidx = 0, len = interceptorClasses.length; cidx < len; cidx++) {
                         Class interceptorClass = interceptorClasses[cidx];
                         addInterceptor(interceptorClass);
+                    }
+                }
+
+                if (decoderClass != null && ForestConverter.class.isAssignableFrom(decoderClass)) {
+                    try {
+                        this.decoder = (ForestConverter) decoderClass.newInstance();
+                    } catch (InstantiationException e) {
+                        throw new ForestRuntimeException(e);
+                    } catch (IllegalAccessException e) {
+                        throw new ForestRuntimeException(e);
                     }
                 }
             } else {
@@ -539,6 +552,10 @@ public class ForestMethod<T> implements VariableScope {
                 .setLogEnable(logEnable)
                 .setMultiparts(multiparts)
                 .setAsync(async);
+
+        if (decoder != null) {
+            request.setDecoder(decoder);
+        }
 
         if (progressStep >= 0) {
             request.setProgressStep(progressStep);

@@ -24,8 +24,6 @@
 
 package com.dtflys.forest.annotation;
 
-import com.twitter.finagle.http.path.$tilde;
-
 import java.lang.annotation.*;
 
 /**
@@ -72,32 +70,34 @@ public @interface Request {
 
     int maxRetryInterval() default -1;
 
+    /**
+     * Content Type
+     * @return
+     */
     String contentType() default "";
 
+    /**
+     * Content Encoding
+     * @return
+     */
     String contentEncoding() default "UTF-8";
 
     /**
      * reqest headers: <br>
      *     use the key-value format: key: value <br>
      *     <pre>
-     *         ...
      *         headers = "Content-Type: application/json"
-     *         ...
      *     </pre>
      *     multiple headers <br>
      *     <pre>
-     *         ...
      *         headers = {
      *            "Content-Type: application/json",
      *            "Accept: text/plan"
      *         }
-     *         ...
      *     </pre>
      *     variables and parameters <br>
      *     <pre>
-     *         ...
      *         headers = {"Accept: ${value}"}
-     *         ...
      *     <pre/>
      *
      * @return
@@ -110,6 +110,12 @@ public @interface Request {
 
     long progressStep() default -1L;
 
+    Class<?> decoder() default Object.class;
+
+    /**
+     * KeyStore Id
+     * @return
+     */
     String keyStore() default "";
 
     boolean logEnabled() default false;

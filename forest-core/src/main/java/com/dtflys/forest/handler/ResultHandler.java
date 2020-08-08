@@ -90,6 +90,10 @@ public class ResultHandler {
                     return response.getInputStream();
                 }
 
+                if (request.getDecoder() != null) {
+                    return request.getDecoder().convertToJavaObject(responseText, resultType);
+                }
+
                 ForestDataType dataType = request.getDataType();
                 ForestConverter converter = request.getConfiguration().getConverter(dataType);
                 return converter.convertToJavaObject(responseText, resultType);
