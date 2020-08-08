@@ -25,6 +25,7 @@
 package com.dtflys.forest.http;
 
 import com.dtflys.forest.callback.OnProgress;
+import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.retryer.Retryer;
@@ -108,6 +109,8 @@ public class ForestRequest<T> {
     private Retryer retryer;
 
     private Map<String, Object> attachments = new HashMap<>();
+
+    private ForestConverter decoder;
 
     private boolean logEnable = true;
 
@@ -484,16 +487,27 @@ public class ForestRequest<T> {
         return retryer;
     }
 
-    public void setRetryer(Retryer retryer) {
+    public ForestRequest setRetryer(Retryer retryer) {
         this.retryer = retryer;
+        return this;
     }
 
-    public void addAttachment(String name, Object value) {
+    public ForestRequest addAttachment(String name, Object value) {
         attachments.put(name, value);
+        return this;
     }
 
     public Object getAttachment(String name) {
         return attachments.get(name);
+    }
+
+    public ForestConverter getDecoder() {
+        return decoder;
+    }
+
+    public ForestRequest setDecoder(ForestConverter decoder) {
+        this.decoder = decoder;
+        return this;
     }
 
     public boolean isLogEnable() {
@@ -514,6 +528,11 @@ public class ForestRequest<T> {
         return this;
     }
 
+    /**
+     * Execute request
+     * @param backend
+     * @param lifeCycleHandler
+     */
     public void execute(HttpBackend backend, LifeCycleHandler lifeCycleHandler) {
         HttpExecutor executor  = backend.createExecutor(this, lifeCycleHandler);
         if (executor != null) {
@@ -522,18 +541,8 @@ public class ForestRequest<T> {
                     executor.execute(lifeCycleHandler);
                 } catch (ForestRuntimeException e) {
                     throw e;
-//                if (onError == null) {
-//                    throw e;
-//                }
-//                ForestRuntimeException runtimeException = e;
-//                if (!(e instanceof ForestRuntimeException)) {
-//                    runtimeException = new ForestRuntimeException(e);
-//                }
-//                onError.onError(runtimeException, this);
-//                interceptorChain.onError(e, this, response);
                 } finally {
                     executor.close();
-//                interceptorChain.afterExecute(this, response);
                 }
             }
         }
