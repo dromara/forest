@@ -1,5 +1,6 @@
 package com.dtflys.forest.springboot.test;
 
+import com.dtflys.forest.retryer.BackOffRetryer;
 import com.thebeastshop.forest.springboot.annotation.ForestScan;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.springboot.test.client0.BeastshopClient;
@@ -41,6 +42,10 @@ public class Test0 {
         assertEquals("xxx", config0.getVariableValue("myName"));
         assertTrue(!config0.isLogEnabled());
         assertEquals(Integer.valueOf(12), config0.getVariableValue("myCount"));
+        assertEquals(BackOffRetryer.class, config0.getRetryer());
+        assertEquals(Integer.valueOf(5), config0.getRetryCount());
+        assertEquals(Long.valueOf(2000), Long.valueOf(config0.getMaxRetryInterval()));
+
     }
 
     @Test
