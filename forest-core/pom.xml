@@ -6,12 +6,12 @@
 
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-core</artifactId>
-    <version>1.4.0-BETA3</version>
+    <version>1.4.0-RC1</version>
 
     <parent>
         <groupId>com.dtflys.forest</groupId>
         <artifactId>forest</artifactId>
-        <version>1.4.0-BETA3</version>
+        <version>1.4.0-RC1</version>
     </parent>
 
     <properties>
