@@ -46,6 +46,14 @@ public interface GetClient {
     )
     Map errorGet3();
 
+    @Request(
+            url = "http://localhost:${port}/hello/user?username=foo",
+            retryCount = 3,
+            maxRetryInterval = 50000,
+            headers = {"Accept:text/plan"}
+    )
+    String errorGetWithRetry(OnError onError);
+
 
     @Request(
             url = "http://localhost:${port}/hello/user",

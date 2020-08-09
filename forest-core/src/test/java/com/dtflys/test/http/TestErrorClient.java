@@ -5,6 +5,7 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestNetworkException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.test.http.client.GetClient;
 import com.dtflys.test.mock.ErrorMockServer;
 import com.dtflys.test.mock.GetMockServer;
@@ -94,6 +95,20 @@ public class TestErrorClient extends BaseClientTest {
             assertEquals(ErrorMockServer.EXPECTED, content);
         }
         assertTrue(hasError);
+    }
+
+
+    @Test
+    public void testErrorGetWithRetry() {
+        AtomicReference<BackOffRetryer> retryerAtomicReference = new AtomicReference<>(null);
+        getClient.errorGetWithRetry((ex, request, response) -> {
+            retryerAtomicReference.set((BackOffRetryer) request.getRetryer());
+        });
+        BackOffRetryer retryer = retryerAtomicReference.get();
+        assertNotNull(retryer);
+        assertEquals(3, retryer.getMaxRetryCount());
+        assertEquals(50000, retryer.getMaxRetryInterval());
+        assertEquals(1000 + 2000 + 4000, retryer.getWaitedTime());
     }
 
 
