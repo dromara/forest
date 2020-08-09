@@ -48,7 +48,11 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
 
     private Integer baseTimeout;
 
+    private Class baseRetryerClass;
+
     private Integer baseRetryCount;
+
+    private Long baseMaxRetryInterval;
 
     public ProxyFactory getProxyFactory() {
         return proxyFactory;
@@ -106,8 +110,13 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
                 }
                 baseTimeout = baseRequestAnn.timeout();
                 baseTimeout = baseTimeout == -1 ? null : baseTimeout;
+                baseRetryerClass = baseRequestAnn.retryer();
                 baseRetryCount = baseRequestAnn.retryCount();
                 baseRetryCount = baseRetryCount == -1 ? null : baseRetryCount;
+                baseMaxRetryInterval = baseRequestAnn.maxRetryInterval();
+                if (baseMaxRetryInterval < 0) {
+                    baseMaxRetryInterval = null;
+                }
                 baseInterceptorClasses = baseRequestAnn.interceptor();
             } else {
                 InterceptorClass icAnn = annotation.annotationType().getAnnotation(InterceptorClass.class);
@@ -178,12 +187,21 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         return baseContentEncoding;
     }
 
+
     public List<Annotation> getBaseAnnotations() {
         return baseAnnotations;
     }
 
+    public Class getBaseRetryerClass() {
+        return baseRetryerClass;
+    }
+
     public Integer getBaseRetryCount() {
         return baseRetryCount;
+    }
+
+    public Long getBaseMaxRetryInterval() {
+        return baseMaxRetryInterval;
     }
 
     @Override

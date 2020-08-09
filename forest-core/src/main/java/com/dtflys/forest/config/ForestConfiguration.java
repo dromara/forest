@@ -31,6 +31,8 @@ import com.dtflys.forest.converter.text.DefaultTextConverter;
 import com.dtflys.forest.interceptor.DefaultInterceptorFactory;
 import com.dtflys.forest.interceptor.InterceptorFactory;
 import com.dtflys.forest.proxy.ProxyFactory;
+import com.dtflys.forest.retryer.BackOffRetryer;
+import com.dtflys.forest.retryer.Retryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.ssl.SSLUtils;
 import com.dtflys.forest.utils.ForestDataType;
@@ -88,9 +90,19 @@ public class ForestConfiguration implements Serializable {
     private Integer connectTimeout;
 
     /**
+     * Class of retryer
+     */
+    private Class retryer;
+
+    /**
      * count of retry times
      */
     private Integer retryCount;
+
+    /**
+     * max interval of retrying request
+     */
+    private long maxRetryInterval;
 
     /**
      * default SSL protocol
@@ -156,6 +168,9 @@ public class ForestConfiguration implements Serializable {
         configuration.setConnectTimeout(2000);
         configuration.setMaxConnections(500);
         configuration.setMaxRouteConnections(500);
+        configuration.setRetryer(BackOffRetryer.class);
+        configuration.setRetryCount(0);
+        configuration.setMaxRetryInterval(0);
         configuration.setSslProtocol(SSLUtils.TLSv1_2);
         configuration.registerFilter("json", JSONFilter.class);
         configuration.registerFilter("xml", XmlFilter.class);
@@ -273,6 +288,14 @@ public class ForestConfiguration implements Serializable {
         return this;
     }
 
+    public Class getRetryer() {
+        return retryer;
+    }
+
+    public void setRetryer(Class retryer) {
+        this.retryer = retryer;
+    }
+
     public Integer getRetryCount() {
         return retryCount;
     }
@@ -280,6 +303,14 @@ public class ForestConfiguration implements Serializable {
     public ForestConfiguration setRetryCount(Integer retryCount) {
         this.retryCount = retryCount;
         return this;
+    }
+
+    public long getMaxRetryInterval() {
+        return maxRetryInterval;
+    }
+
+    public void setMaxRetryInterval(long maxRetryInterval) {
+        this.maxRetryInterval = maxRetryInterval;
     }
 
     public String getSslProtocol() {

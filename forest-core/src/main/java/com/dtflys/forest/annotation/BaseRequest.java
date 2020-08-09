@@ -50,13 +50,11 @@ public @interface BaseRequest {
      * Class of retryer
      * @return
      */
-    Class retryer() default NoneRetryer.class;
-
-    int retryInterval() default -1;
-
-    int maxRetryInterval() default -1;
+    Class retryer() default Object.class;
 
     int retryCount() default -1;
+
+    long maxRetryInterval() default -1;
 
     String keyStore() default "";
 

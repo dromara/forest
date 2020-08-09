@@ -50,7 +50,9 @@ public class ForestMethod<T> implements VariableScope {
     private MappingTemplate dataTypeTemplate;
     private Integer baseTimeout = null;
     private Integer timeout = null;
-    private Integer baseRetryNumber = null;
+    private Class baseRetryerClass = null;
+    private Integer baseRetryCount = null;
+    private Long baseMaxRetryInterval;
     private Integer retryCount = null;
     private long maxRetryInterval;
     private MappingTemplate baseEncodeTemplate = null;
@@ -125,7 +127,9 @@ public class ForestMethod<T> implements VariableScope {
             baseContentTypeTemplate = makeTemplate(baseContentType);
         }
         baseTimeout = interfaceProxyHandler.getBaseTimeout();
-        baseRetryNumber = interfaceProxyHandler.getBaseRetryCount();
+        baseRetryerClass = interfaceProxyHandler.getBaseRetryerClass();
+        baseRetryCount = interfaceProxyHandler.getBaseRetryCount();
+        baseMaxRetryInterval = interfaceProxyHandler.getBaseMaxRetryInterval();
 
         List<Class> globalInterceptorClasses = configuration.getInterceptors();
         if (globalInterceptorClasses != null && globalInterceptorClasses.size() > 0) {
@@ -384,6 +388,23 @@ public class ForestMethod<T> implements VariableScope {
         }
     }
 
+    private void setRetryerToRequest(Class retryerClass, ForestRequest request) {
+        try {
+            Constructor constructor = retryerClass.getConstructor(ForestRequest.class);
+            Retryer retryer = (Retryer) constructor.newInstance(request);
+            request.setRetryer(retryer);
+        } catch (NoSuchMethodException e) {
+            throw new ForestRuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new ForestRuntimeException(e);
+        } catch (InstantiationException e) {
+            throw new ForestRuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new ForestRuntimeException(e);
+        }
+
+    }
+
     /**
      * 创建请求
      * @param args
@@ -638,30 +659,29 @@ public class ForestMethod<T> implements VariableScope {
 
         if (retryCount != null) {
             request.setRetryCount(retryCount);
-        } else if (baseRetryNumber != null) {
-            request.setRetryCount(baseRetryNumber);
+        } else if (baseRetryCount != null) {
+            request.setRetryCount(baseRetryCount);
         } else if (configuration.getRetryCount() != null) {
             request.setRetryCount(configuration.getRetryCount());
         }
 
-        request.setMaxRetryInterval(maxRetryInterval);
-
-        if (retryerClass != null && Retryer.class.isAssignableFrom(retryerClass)) {
-            try {
-                Constructor constructor = retryerClass.getConstructor(ForestRequest.class);
-                Retryer retryer = (Retryer) constructor.newInstance(request);
-                request.setRetryer(retryer);
-            } catch (NoSuchMethodException e) {
-                throw new ForestRuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new ForestRuntimeException(e);
-            } catch (InstantiationException e) {
-                throw new ForestRuntimeException(e);
-            } catch (InvocationTargetException e) {
-                throw new ForestRuntimeException(e);
-            }
+        if (maxRetryInterval >= 0) {
+            request.setMaxRetryInterval(maxRetryInterval);
+        } else if (baseMaxRetryInterval != null) {
+            request.setMaxRetryInterval(baseMaxRetryInterval);
+        } else if (configuration.getMaxRetryInterval() >= 0) {
+            request.setMaxRetryInterval(configuration.getMaxRetryInterval());
         }
 
+        Class globalRetryerClass = configuration.getRetryer();
+
+        if (retryerClass != null && Retryer.class.isAssignableFrom(retryerClass)) {
+            setRetryerToRequest(retryerClass, request);
+        } else if (baseRetryerClass != null && Retryer.class.isAssignableFrom(baseRetryerClass)) {
+            setRetryerToRequest(baseRetryerClass, request);
+        } else if (globalRetryerClass != null && Retryer.class.isAssignableFrom(globalRetryerClass)) {
+            setRetryerToRequest(globalRetryerClass, request);
+        }
 
         if (onSuccessParameter != null) {
             OnSuccess<?> onSuccessCallback = (OnSuccess<?>) args[onSuccessParameter.getIndex()];
