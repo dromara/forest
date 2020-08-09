@@ -13,6 +13,6 @@ import java.io.IOException;
  */
 public interface HttpclientRequestSender {
 
-    void sendRequest(ForestRequest request, HttpclientResponseHandler responseHandler, HttpUriRequest httpRequest, LifeCycleHandler lifeCycleHandler) throws IOException;
+    void sendRequest(ForestRequest request, HttpclientResponseHandler responseHandler, HttpUriRequest httpRequest, LifeCycleHandler lifeCycleHandler, long startTime, int retryCount) throws IOException;
 
 }

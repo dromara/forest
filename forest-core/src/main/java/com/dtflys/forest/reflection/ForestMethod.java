@@ -22,6 +22,7 @@ import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.multipart.ForestMultipartFactory;
 import com.dtflys.forest.proxy.InterfaceProxyHandler;
+import com.dtflys.forest.retryer.Retryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.utils.*;
 
@@ -50,7 +51,8 @@ public class ForestMethod<T> implements VariableScope {
     private Integer baseTimeout = null;
     private Integer timeout = null;
     private Integer baseRetryNumber = null;
-    private Integer retryNumber = null;
+    private Integer retryCount = null;
+    private long maxRetryInterval;
     private MappingTemplate baseEncodeTemplate = null;
     private MappingTemplate encodeTemplate = null;
     private MappingTemplate baseContentTypeTemplate;
@@ -72,6 +74,7 @@ public class ForestMethod<T> implements VariableScope {
     private List<Interceptor> interceptorList;
     private List<InterceptorAttributes> interceptorAttributesList;
     private Type onSuccessClassGenericType = null;
+    private Class retryerClass = null;
     private boolean async = false;
     private boolean logEnable = true;
 
@@ -220,6 +223,7 @@ public class ForestMethod<T> implements VariableScope {
                 encodeTemplate = makeTemplate(reqAnn.contentEncoding());
                 progressStep = reqAnn.progressStep();
                 async = reqAnn.async();
+                retryerClass = reqAnn.retryer();
                 Class decoderClass = reqAnn.decoder();
                 String[] dataArray = reqAnn.data();
                 String[] headerArray = reqAnn.headers();
@@ -229,8 +233,9 @@ public class ForestMethod<T> implements VariableScope {
                 }
                 int rtnum = reqAnn.retryCount();
                 if (rtnum > 0) {
-                    retryNumber = rtnum;
+                    retryCount = rtnum;
                 }
+                maxRetryInterval = reqAnn.maxRetryInterval();
                 logEnable = configuration.isLogEnabled();
                 if (!logEnable) {
                     logEnable = reqAnn.logEnabled();
@@ -264,6 +269,7 @@ public class ForestMethod<T> implements VariableScope {
                         addInterceptor(interceptorClass);
                     }
                 }
+
 
                 if (decoderClass != null && ForestConverter.class.isAssignableFrom(decoderClass)) {
                     try {
@@ -553,10 +559,10 @@ public class ForestMethod<T> implements VariableScope {
                 .setMultiparts(multiparts)
                 .setAsync(async);
 
+
         if (decoder != null) {
             request.setDecoder(decoder);
         }
-
         if (progressStep >= 0) {
             request.setProgressStep(progressStep);
         }
@@ -630,13 +636,32 @@ public class ForestMethod<T> implements VariableScope {
             request.setTimeout(configuration.getTimeout());
         }
 
-        if (retryNumber != null) {
-            request.setRetryCount(retryNumber);
+        if (retryCount != null) {
+            request.setRetryCount(retryCount);
         } else if (baseRetryNumber != null) {
             request.setRetryCount(baseRetryNumber);
         } else if (configuration.getRetryCount() != null) {
             request.setRetryCount(configuration.getRetryCount());
         }
+
+        request.setMaxRetryInterval(maxRetryInterval);
+
+        if (retryerClass != null && Retryer.class.isAssignableFrom(retryerClass)) {
+            try {
+                Constructor constructor = retryerClass.getConstructor(ForestRequest.class);
+                Retryer retryer = (Retryer) constructor.newInstance(request);
+                request.setRetryer(retryer);
+            } catch (NoSuchMethodException e) {
+                throw new ForestRuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new ForestRuntimeException(e);
+            } catch (InstantiationException e) {
+                throw new ForestRuntimeException(e);
+            } catch (InvocationTargetException e) {
+                throw new ForestRuntimeException(e);
+            }
+        }
+
 
         if (onSuccessParameter != null) {
             OnSuccess<?> onSuccessCallback = (OnSuccess<?>) args[onSuccessParameter.getIndex()];

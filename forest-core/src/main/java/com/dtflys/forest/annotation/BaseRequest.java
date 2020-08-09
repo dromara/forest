@@ -1,5 +1,7 @@
 package com.dtflys.forest.annotation;
 
+import com.dtflys.forest.retryer.NoneRetryer;
+
 import java.lang.annotation.*;
 
 /**
@@ -43,6 +45,16 @@ public @interface BaseRequest {
     Class<?>[] interceptor() default {};
 
     int timeout() default -1;
+
+    /**
+     * Class of retryer
+     * @return
+     */
+    Class retryer() default NoneRetryer.class;
+
+    int retryInterval() default -1;
+
+    int maxRetryInterval() default -1;
 
     int retryCount() default -1;
 

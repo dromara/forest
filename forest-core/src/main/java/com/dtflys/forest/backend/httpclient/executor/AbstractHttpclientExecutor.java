@@ -155,7 +155,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         long startTime = startDate.getTime();
         try {
             logRequest(retryCount, httpRequest);
-            requestSender.sendRequest(request, httpclientResponseHandler, httpRequest, lifeCycleHandler);
+            requestSender.sendRequest(request, httpclientResponseHandler, httpRequest, lifeCycleHandler, startTime, 0);
         } catch (IOException e) {
             if (retryCount >= request.getRetryCount()) {
                 httpRequest.abort();
@@ -167,7 +167,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
                 return;
             }
             log.error(e.getMessage());
-            execute(retryCount + 1, lifeCycleHandler);
+//            execute(retryCount + 1, lifeCycleHandler);
         } catch (ForestRuntimeException e) {
             httpRequest.abort();
             throw e;

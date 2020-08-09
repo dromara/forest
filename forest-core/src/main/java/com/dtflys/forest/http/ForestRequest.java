@@ -78,6 +78,8 @@ public class ForestRequest<T> {
 
     private int retryCount = 0;
 
+    private long maxRetryInterval = 0;
+
     private Map<String, Object> data = new LinkedHashMap<String, Object>();
 
     private List<?> bodyList = new LinkedList<>();
@@ -250,6 +252,15 @@ public class ForestRequest<T> {
 
     public ForestRequest setRetryCount(int retryCount) {
         this.retryCount = retryCount;
+        return this;
+    }
+
+    public long getMaxRetryInterval() {
+        return maxRetryInterval;
+    }
+
+    public ForestRequest setMaxRetryInterval(long maxRetryInterval) {
+        this.maxRetryInterval = maxRetryInterval;
         return this;
     }
 

@@ -24,6 +24,9 @@
 
 package com.dtflys.forest.annotation;
 
+import com.dtflys.forest.retryer.BackOffRetryer;
+import com.dtflys.forest.retryer.NoneRetryer;
+
 import java.lang.annotation.*;
 
 /**
@@ -64,9 +67,17 @@ public @interface Request {
 
     int timeout() default -1;
 
-    int retryCount() default -1;
+    /**
+     * Class of retryer
+     * @return
+     */
+    Class retryer() default BackOffRetryer.class;
 
-    int retryInterval() default -1;
+    /**
+     * max count to retry
+     * @return
+     */
+    int retryCount() default 0;
 
     int maxRetryInterval() default -1;
 

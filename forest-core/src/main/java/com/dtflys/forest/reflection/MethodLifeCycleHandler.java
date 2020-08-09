@@ -3,11 +3,13 @@ package com.dtflys.forest.reflection;
 import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.exceptions.ForestNetworkException;
+import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.handler.ResultHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.retryer.Retryer;
 import com.dtflys.forest.utils.ForestProgress;
 import com.dtflys.forest.utils.ReflectUtils;
 
@@ -110,7 +112,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
     }
 
     @Override
-    public void handleError(ForestRequest request, ForestResponse response, Exception ex) {
+    public void handleError(ForestRequest request, ForestResponse response, Throwable ex) {
         ForestRuntimeException e = null;
         if (ex instanceof ForestRuntimeException) {
             e = (ForestRuntimeException) ex;
@@ -125,6 +127,11 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
         else {
             throw e;
         }
+    }
+
+    @Override
+    public void handleTry(ForestRetryException ex, Retryer retryer) throws Throwable {
+        retryer.canRetry(ex);
     }
 
     @Override

@@ -52,7 +52,7 @@ public abstract class BackendResponseHandler<R> {
         lifeCycleHandler.handleError(request, response);
     }
 
-    public void handleError(ForestResponse response, Exception ex) {
+    public void handleError(ForestResponse response, Throwable ex) {
         lifeCycleHandler.handleError(request, response, ex);
     }
 

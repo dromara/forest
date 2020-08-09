@@ -1,8 +1,10 @@
 package com.dtflys.forest.reflection;
 
+import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.retryer.Retryer;
 import com.dtflys.forest.utils.ForestProgress;
 
 import java.lang.reflect.Type;
@@ -48,7 +50,12 @@ public class NoneLifeCycleHandler implements LifeCycleHandler {
     }
 
     @Override
-    public void handleError(ForestRequest request, ForestResponse response, Exception ex) {
+    public void handleError(ForestRequest request, ForestResponse response, Throwable ex) {
+
+    }
+
+    @Override
+    public void handleTry(ForestRetryException ex, Retryer retryer) throws Throwable {
 
     }
 

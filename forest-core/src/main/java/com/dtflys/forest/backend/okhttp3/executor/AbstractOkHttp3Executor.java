@@ -3,6 +3,7 @@ package com.dtflys.forest.backend.okhttp3.executor;
 import com.dtflys.forest.backend.BodyBuilder;
 import com.dtflys.forest.backend.HttpExecutor;
 import com.dtflys.forest.backend.url.URLBuilder;
+import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.RequestNameValue;
@@ -205,10 +206,24 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
             call.enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
+                    ForestRetryException retryException = new ForestRetryException(
+                            e, request, request.getRetryCount(), retryCount);
+                    try {
+                        request.getRetryer().canRetry(retryException);
+                    } catch (Throwable throwable) {
+                        future.failed(e);
+                        ForestResponse response = factory.createResponse(request, null, lifeCycleHandler);
+                        logResponse(startTime, response);
+                        lifeCycleHandler.handleError(request, response, e);
+                        return;
+                    }
+                    execute(lifeCycleHandler, retryCount + 1);
+/*
                     future.failed(e);
                     ForestResponse response = factory.createResponse(request, null, lifeCycleHandler);
                     logResponse(startTime, response);
                     lifeCycleHandler.handleError(request, response, e);
+*/
                 }
 
                 @Override
@@ -225,12 +240,21 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
                         }
                         future.completed(result);
                     } else {
-                        if (retryCount > request.getRetryCount()) {
+                        retryOrDoError(response, okResponse, future, lifeCycleHandler, retryCount, startTime);
+/*
+                        ForestNetworkException networkException =
+                                new ForestNetworkException(okResponse.message(), okResponse.code(), response);
+                        ForestRetryException retryException = new ForestRetryException(
+                                networkException, AbstractOkHttp3Executor.this, request, request.getRetryCount(), retryCount);
+                        try {
+                            request.getRetryer().canRetry(retryException);
+                        } catch (Throwable throwable) {
                             future.failed(new ForestNetworkException(okResponse.message(), okResponse.code(), response));
                             okHttp3ResponseHandler.handleError(response);
                             return;
                         }
                         execute(lifeCycleHandler, retryCount + 1);
+*/
                     }
                 }
             });
@@ -241,20 +265,50 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
             try {
                 okResponse = call.execute();
             } catch (IOException e) {
-                if (retryCount >= request.getRetryCount()) {
+                ForestRetryException retryException = new ForestRetryException(
+                        e, request, request.getRetryCount(), retryCount);
+                try {
+                    request.getRetryer().canRetry(retryException);
+                } catch (Throwable throwable) {
                     ForestResponse response = factory.createResponse(request, null, lifeCycleHandler);
                     logResponse(startTime, response);
                     lifeCycleHandler.handleError(request, response, e);
                     return;
                 }
                 execute(lifeCycleHandler, retryCount + 1);
+                return;
             }
             ForestResponse response = factory.createResponse(request, okResponse, lifeCycleHandler);
             logResponse(startTime, response);
+            if (response.isError()) {
+                retryOrDoError(response, okResponse, null, lifeCycleHandler, retryCount, startTime);
+                return;
+            }
             okHttp3ResponseHandler.handleSync(okResponse, response);
         }
     }
 
+
+    private void retryOrDoError(
+            ForestResponse response, Response okResponse,
+            OkHttp3ResponseFuture future, LifeCycleHandler lifeCycleHandler,
+            int retryCount, long startTime) {
+        ForestNetworkException networkException =
+                new ForestNetworkException(okResponse.message(), okResponse.code(), response);
+        ForestRetryException retryException = new ForestRetryException(
+                networkException, request, request.getRetryCount(), retryCount);
+        try {
+            request.getRetryer().canRetry(retryException);
+        } catch (Throwable throwable) {
+            if (future != null) {
+                future.failed(new ForestNetworkException(okResponse.message(), okResponse.code(), response));
+            }
+            logResponse(startTime, response);
+            okHttp3ResponseHandler.handleSync(okResponse, response);
+            return;
+        }
+        execute(lifeCycleHandler, retryCount + 1);
+    }
 
     @Override
     public void execute(final LifeCycleHandler lifeCycleHandler) {

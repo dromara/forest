@@ -1,8 +1,10 @@
 package com.dtflys.forest.handler;
 
+import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.reflection.ForestMethod;
+import com.dtflys.forest.retryer.Retryer;
 import com.dtflys.forest.utils.ForestProgress;
 
 import java.lang.reflect.Type;
@@ -29,7 +31,9 @@ public interface LifeCycleHandler {
 
     void handleError(ForestRequest request, ForestResponse response);
 
-    void handleError(ForestRequest request, ForestResponse response, Exception ex);
+    void handleError(ForestRequest request, ForestResponse response, Throwable ex);
+
+    void handleTry(ForestRetryException ex, Retryer retryer) throws Throwable;
 
     void handleProgress(ForestRequest request, ForestProgress progress);
 
