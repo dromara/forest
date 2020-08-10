@@ -7,6 +7,7 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.ForestDataType;
+import com.dtflys.forest.utils.StringUtils;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
@@ -36,6 +37,12 @@ public class DownloadInterceptor implements Interceptor<Object> {
         String dirPath = getAttributeAsString(request, "dir");
         String filename = getAttributeAsString(request, "filename");
         Type resultType = getAttribute(request, "resultType", Type.class);
+
+        if (StringUtils.isBlank(filename)) {
+            String[] strs = request.getUrl().split("/");
+            filename = strs[strs.length - 1];
+        }
+
         File dir = new File(dirPath);
         if (!dir.exists()) {
             dir.mkdirs();
