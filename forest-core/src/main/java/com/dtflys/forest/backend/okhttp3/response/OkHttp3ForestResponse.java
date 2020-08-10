@@ -43,7 +43,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
                 }
                 if (contentType == null || contentType.isEmpty()) {
                     content = null;
-                } else if (!request.isDownloadFile() || contentType.canReadAsString()) {
+                } else if (!request.isDownloadFile() && contentType.canReadAsString()) {
                     try {
                         this.content = body.string();
                     } catch (IOException e) {
