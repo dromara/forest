@@ -88,6 +88,8 @@ public class ForestRequest<T> {
 
     private List<ForestMultipart> multiparts = new LinkedList<>();
 
+    private String filename;
+
     private Object[] arguments;
 
     private String requestBody;
@@ -182,6 +184,18 @@ public class ForestRequest<T> {
     public ForestRequest setType(ForestRequestType type) {
         this.type = type;
         return this;
+    }
+
+    public String getFilename() {
+        if (filename == null) {
+            synchronized (this) {
+                if (filename == null) {
+                    String[] strs = getUrl().split("/");
+                    filename = strs[strs.length - 1];
+                }
+            }
+        }
+        return filename;
     }
 
     public String getEncode() {

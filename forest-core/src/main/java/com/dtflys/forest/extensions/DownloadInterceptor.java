@@ -39,8 +39,7 @@ public class DownloadInterceptor implements Interceptor<Object> {
         Type resultType = getAttribute(request, "resultType", Type.class);
 
         if (StringUtils.isBlank(filename)) {
-            String[] strs = request.getUrl().split("/");
-            filename = strs[strs.length - 1];
+            filename = request.getFilename();
         }
 
         File dir = new File(dirPath);
