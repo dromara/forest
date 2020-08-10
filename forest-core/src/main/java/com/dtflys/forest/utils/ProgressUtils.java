@@ -8,13 +8,13 @@ public class ProgressUtils {
         ForestRequest request = progress.getRequest();
 //        System.out.println("Download \"" + request.getFilename() + "\"");
 //        System.out.println();
-        Object barLen = request.getAttachment("barLen");
-        if (barLen != null) {
-            printToPre(109);
-        }
+//        Object barLen = request.getAttachment("barLen");
+//        if (barLen != null) {
+//            printToPre(109);
+//        }
         String bar = buildBar(progress);
-        System.out.print(bar);
-        request.addAttachment("barLen", bar.length());
+        System.out.println(bar);
+//        request.addAttachment("barLen", bar.length());
         if (progress.isDone()) {
             System.out.println("\nFile \"" + request.getFilename() + "\" Download Completed.");
         }
