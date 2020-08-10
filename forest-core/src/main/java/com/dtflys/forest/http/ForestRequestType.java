@@ -43,7 +43,7 @@ public enum ForestRequestType {
                 return type;
             }
         }
-        throw new ForestRuntimeException("Http request type \"" + name + "\" is not be supported.");
+        return null;
     }
 
 }

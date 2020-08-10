@@ -10,6 +10,8 @@ public class ForestProgress {
 
     private final long totalBytes;
 
+    private boolean isBegin;
+
     private boolean isDone;
 
     public ForestProgress(ForestRequest request, long totalBytes) {
@@ -39,6 +41,14 @@ public class ForestProgress {
             return 0;
         }
         return currentBytes * 1.0F / totalBytes;
+    }
+
+    public boolean isBegin() {
+        return isBegin;
+    }
+
+    public void setBegin(boolean begin) {
+        isBegin = begin;
     }
 
     public void setDone(boolean done) {

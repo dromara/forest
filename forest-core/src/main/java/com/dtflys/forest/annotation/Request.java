@@ -47,7 +47,7 @@ public @interface Request {
      *     GET POST PUT HEAD OPTIONS DELETE PATCH TRACE
      * @return
      */
-    String type() default "GET";
+    String type() default "";
 
     /**
      * type of response data: <br>

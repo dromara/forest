@@ -56,7 +56,7 @@ public class HttpclientMultipartFileBody extends FileBody {
         ForestProgress progress = new ForestProgress(request, contentLength);
         try {
             byte[] tmp = new byte[4096];
-
+            progress.setBegin(true);
             int len;
             while((len = in.read(tmp)) != -1) {
                 // increment current length of written bytes
@@ -68,12 +68,14 @@ public class HttpclientMultipartFileBody extends FileBody {
                         // progress is done
                         progress.setDone(true);
                         handler.handleProgress(request, progress);
+                        progress.setBegin(false);
                     } else {
                         while (currentStep >= progressStep) {
                             currentStep = currentStep - progressStep;
                             progress.setDone(false);
                             // invoke progress listener
                             handler.handleProgress(request, progress);
+                            progress.setBegin(false);
                         }
                     }
                 }

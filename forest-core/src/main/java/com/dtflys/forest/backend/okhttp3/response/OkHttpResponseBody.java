@@ -61,9 +61,16 @@ public class OkHttpResponseBody extends ResponseBody {
         return new ForwardingSource(source) {
             long readBytes = 0L;
             AtomicReference<ForestProgress> progressReference = new AtomicReference<>(null);
+            final Boolean[] isBegin = {null};
 
             @Override
             public long read(Buffer sink, long byteCount) throws IOException {
+                if (isBegin[0] == null) {
+                    isBegin[0] = true;
+                } else {
+                    isBegin[0] = false;
+                }
+
                 long totalLength = contentLength();
                 long bytesRead = super.read(sink, byteCount);
                 ForestProgress progress = progressReference.get();
@@ -71,6 +78,7 @@ public class OkHttpResponseBody extends ResponseBody {
                     progress = new ForestProgress(request, totalLength);
                     progressReference.set(progress);
                 }
+                progress.setBegin(isBegin[0]);
                 if (progress.isDone()) {
                     return bytesRead;
                 }

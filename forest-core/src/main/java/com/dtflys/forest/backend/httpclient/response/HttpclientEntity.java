@@ -68,7 +68,7 @@ public class HttpclientEntity implements HttpEntity {
             ForestProgress progress = new ForestProgress(request, contentLength);
             try {
                 byte[] tmp = new byte[4096];
-
+                progress.setBegin(true);
                 int len;
                 while((len = in.read(tmp)) != -1) {
                     // increment current length of written bytes
@@ -86,9 +86,11 @@ public class HttpclientEntity implements HttpEntity {
                                 progress.setDone(false);
                                 // invoke progress listener
                                 handler.handleProgress(request, progress);
+
                             }
                         }
                     }
+                    progress.setBegin(false);
                     out.write(tmp, 0, len);
                 }
                 out.flush();

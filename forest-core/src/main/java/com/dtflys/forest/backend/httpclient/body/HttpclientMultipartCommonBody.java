@@ -75,6 +75,7 @@ public class HttpclientMultipartCommonBody extends AbstractContentBody {
         try {
             byte[] tmp = new byte[4096];
             int len;
+            progress.setBegin(true);
             while((len = in.read(tmp)) != -1) {
                 // increment current length of written bytes
                 writtenBytes += len;
@@ -91,10 +92,11 @@ public class HttpclientMultipartCommonBody extends AbstractContentBody {
                             progress.setDone(false);
                             // invoke progress listener
                             handler.handleProgress(request, progress);
+
                         }
                     }
                 }
-
+                progress.setBegin(false);
                 out.write(tmp, 0, len);
             }
 

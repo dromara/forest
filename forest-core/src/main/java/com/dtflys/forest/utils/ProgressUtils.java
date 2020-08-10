@@ -6,18 +6,19 @@ public class ProgressUtils {
 
     public static void printProgressBar(ForestProgress progress) {
         ForestRequest request = progress.getRequest();
-//        System.out.println("Download \"" + request.getFilename() + "\"");
-//        System.out.println();
-//        Object barLen = request.getAttachment("barLen");
-//        if (barLen != null) {
-//            printToPre(109);
-//        }
-        String bar = buildBar(progress);
-        System.out.println(bar);
-//        request.addAttachment("barLen", bar.length());
-        if (progress.isDone()) {
-            System.out.println("\nFile \"" + request.getFilename() + "\" Download Completed.");
+        if (progress.isBegin()) {
+            System.out.println("Download \"" + request.getFilename() + "\"\n");
         }
+
+        System.out.print("\033[200D\033[1A\033[K");
+        String pre = stringToPre(200);
+        String bar = buildBar(progress);
+        System.out.print(pre + bar);
+//        System.out.print("\033[1A");
+        if (progress.isDone()) {
+            System.out.println("\n\nFile \"" + request.getFilename() + "\" Download Completed.");
+        }
+//        System.out.print("\033[?25h");
     }
 
     private static String buildBar(ForestProgress progress) {
@@ -34,33 +35,33 @@ public class ProgressUtils {
                 break;
         }
         barBuilder.append(percentage);
-        barBuilder.append(" [");
+        barBuilder.append("\u001b[34m");
+        barBuilder.append("  ");
         for (int i = 0; i <= 100; i++) {
-            if (i > 0 && i <= rate) {
-                barBuilder.append("=");
+            if (i <= rate) {
+                barBuilder.append("█");
             } else {
-                barBuilder.append(" ");
+                barBuilder.append("-");
             }
         }
-        barBuilder.append("]");
+        barBuilder.append(" ");
+        barBuilder.append("\u001b[0m");
         return barBuilder.toString();
     }
 
     // 将光标后移 num 位
     private static void printToPre(int num) {
+        for (int i = 0; i < num; i++) {
+            System.out.print("\b");
+        }
+    }
+
+    private static String stringToPre(int num) {
         StringBuilder builder = new StringBuilder();
         for(int i = 0; i < num; i++){
             builder.append("\b");
         }
-        System.out.print(builder.toString());
+        return builder.toString();
     }
 
-    // 在光标位开始 即索引在第一个 - 时 开始输出num个 >
-    private static void  printEnd(int num) {
-        StringBuilder builder = new StringBuilder();
-        for(int i = 0; i < num; i++ ) {
-            builder.append(">");
-        }
-        System.out.print(builder.toString());
-    }
 }

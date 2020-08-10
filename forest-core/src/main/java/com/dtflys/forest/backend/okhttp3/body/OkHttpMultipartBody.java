@@ -58,14 +58,21 @@ public class OkHttpMultipartBody extends RequestBody {
     private ForwardingSink getSink(BufferedSink sink) {
         final OkHttpMultipartBody self = this;
         AtomicReference<ForestProgress> progressReference = new AtomicReference<>(null);
-
+        final Boolean[] isBegin = {null};
         ForwardingSink forwardingSink = new ForwardingSink(sink) {
             @Override
             public void write(Buffer source, long byteCount) throws IOException {
+                if (isBegin[0] == null) {
+                    isBegin[0] = true;
+                } else {
+                    isBegin[0] = false;
+                }
+
                 // increment current length of written bytes
                 self.writtenBytes += byteCount;
                 long totalLength = self.contentLength();
                 ForestProgress progress = progressReference.get();
+                progress.setBegin(isBegin[0]);
                 if (progress == null) {
                     progress = new ForestProgress(self.request, totalLength);
                     progressReference.set(progress);
