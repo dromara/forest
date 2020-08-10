@@ -1,9 +1,6 @@
 package com.dtflys.test.http.client;
 
-import com.dtflys.forest.annotation.DataObject;
-import com.dtflys.forest.annotation.DataParam;
-import com.dtflys.forest.annotation.DataVariable;
-import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.annotation.*;
 import com.dtflys.test.http.model.*;
 import com.dtflys.test.http.model.UserParam;
 import com.dtflys.test.http.model.XmlTestParam;
@@ -79,6 +76,23 @@ public interface PostClient {
     )
     String complexPost2(String param, @DataParam("username") String username, @DataParam("password") String password);
 
+    @Request(
+            url = "http://localhost:${port}/complex",
+            type = "post",
+            headers = {"Accept:text/plan"}
+    )
+    String complexPost3(@DataQuery("param") String param,
+                        @DataBody("username") String username,
+                        @DataBody("password") String password);
+
+    @Request(
+            url = "http://localhost:${port}/complex",
+            type = "post",
+            headers = {"Accept:text/plan"}
+    )
+    String complexPost4(@DataQuery("param") String param,
+                        @DataParam("username") String username,
+                        @DataParam("password") String password);
 
     @Request(
             url = "http://localhost:${port}/hello/user",

@@ -20,6 +20,11 @@ public interface DownloadClient {
 
     @Request(url = "http://forspeed.onlinedown.net/down/QQliveSetup_20_731.exe")
     @DownloadFile(dir = "${dir}")
-    File downloadFile(@DataVariable("dir") String dir, @DataVariable("filename") String filename, OnProgress onProgress);
+    File downloadFile(@DataVariable("dir") String dir, OnProgress onProgress);
+
+
+    @Request(url = "http://forspeed.onlinedown.net/down/QQliveSetup_20_731.exe")
+//    @DownloadFile(dir = "${dir}")
+    byte[] downloadFileToBytes(@DataVariable("dir") String dir, OnProgress onProgress);
 
 }
