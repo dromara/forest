@@ -121,14 +121,16 @@ System.out.println(result);
 
 #### 详细文档请看：[dt_flys.gitee.io/forest](https://dt_flys.gitee.io/forest)
 
-### 联系作者:<br>
+联系作者:
+-----------------------------------
 
 亲，进群前记得先star一下哦~
 
 ![avatar](https://dt_flys.gitee.io/forest/media/wechat_qr.png)
 
 
-### 参与贡献
+参与贡献
+-----------------------------------
 
 1. 提issue，如果在gitee的issue中已经有您想解决的问题，可以直接将该issue分配给您自己。如若没有，可以自己在gitee上创建一个issue。
 2. Fork 本项目的仓库
@@ -140,7 +142,7 @@ System.out.println(result);
 8. 欢迎小伙伴们多提issue和PR，被接纳PR的小伙伴我会列在`README`上的贡献者列表中:）
 
 项目协议
---------------------------
+-----------------------------------
 The MIT License (MIT)
 
 Copyright (c) 2016 Jun Gong
