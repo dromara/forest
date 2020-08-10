@@ -71,9 +71,4 @@ public class TestDownloadClient extends BaseClientTest {
         assertNotNull(bytes);
     }
 
-    @Test
-    public void testPrint() {
-        System.out.print("HahahaWoWoWo\b\b\b===");
-        System.out.print("\b\b\b++++++");
-    }
 }
