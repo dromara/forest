@@ -2,6 +2,7 @@ package com.dtflys.test.http;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.utils.ProgressUtils;
 import com.dtflys.test.http.client.DownloadClient;
 import com.dtflys.test.http.client.GetClient;
 import com.dtflys.test.mock.GetMockServer;
@@ -50,15 +51,7 @@ public class TestDownloadClient extends BaseClientTest {
     @Test
     public void testDownloadFile() {
         String dir = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "TestDownload";
-        File file = downloadClient.downloadFile(dir, progress -> {
-            System.out.println("------------------------------------------");
-            System.out.println("total bytes: " + progress.getTotalBytes());
-            System.out.println("current bytes: " + progress.getCurrentBytes());
-            System.out.println("progress: " + Math.round(progress.getRate() * 100) + "%");
-            if (progress.isDone()) {
-                System.out.println("--------   Download Completed!   --------");
-            }
-        });
+        File file = downloadClient.downloadFile(dir, ProgressUtils::printProgressBar);
         assertNotNull(file);
         assertTrue(file.exists());
     }
@@ -78,5 +71,9 @@ public class TestDownloadClient extends BaseClientTest {
         assertNotNull(bytes);
     }
 
-
+    @Test
+    public void testPrint() {
+        System.out.print("HahahaWoWoWo\b\b\b===");
+        System.out.print("\b\b\b++++++");
+    }
 }
