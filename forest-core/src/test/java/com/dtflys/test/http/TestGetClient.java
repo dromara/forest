@@ -96,6 +96,15 @@ public class TestGetClient extends BaseClientTest {
     }
 
     @Test
+    public void testAnnQueryGet() {
+        String result = getClient.annQueryGet("foo");
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(GetMockServer.EXPECTED, result);
+    }
+
+
+    @Test
     public void testAnnObjectGet() {
         JsonTestUser user = new JsonTestUser();
         user.setUsername("foo");

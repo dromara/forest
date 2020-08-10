@@ -66,5 +66,20 @@ public class TestPostComplexClient extends BaseClientTest {
         Assert.assertEquals(PostMockServer.EXPECTED, result);
     }
 
+    @Test
+    public void testComplexPost3() {
+        String result = postClient.complexPost3("1", "foo", "123456");
+        log.info("response: " + result);
+        assertNotNull(result);
+        Assert.assertEquals(PostMockServer.EXPECTED, result);
+    }
+
+    @Test
+    public void testComplexPost4() {
+        String result = postClient.complexPost4("1", "foo", "123456");
+        log.info("response: " + result);
+        assertNotNull(result);
+        Assert.assertEquals(PostMockServer.EXPECTED, result);
+    }
 
 }

@@ -89,6 +89,12 @@ public interface GetClient {
             url = "http://localhost:${port}/hello/user",
             headers = {"Accept:text/plan"}
     )
+    String annQueryGet(@DataQuery("username") String username);
+
+    @Request(
+            url = "http://localhost:${port}/hello/user",
+            headers = {"Accept:text/plan"}
+    )
     String annObjectGet(@DataObject JsonTestUser user);
 
     @Request(
