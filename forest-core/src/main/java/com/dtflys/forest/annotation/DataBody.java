@@ -4,12 +4,13 @@ import java.lang.annotation.*;
 
 /**
  * @author gongjun
- * @since 2020-08-03
+ * @since 2020-08-10
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
-public @interface DataQuery {
+public @interface DataBody {
+
     /**
      * URL query name
      * @return

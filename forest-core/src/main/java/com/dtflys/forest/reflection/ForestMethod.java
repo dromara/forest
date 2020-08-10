@@ -342,6 +342,30 @@ public class ForestMethod<T> implements VariableScope {
                 processParameterFilter(variable, filterName);
                 variable.setIndex(paramIndex);
                 variables.put(dataAnn.value(), variable);
+            } else if (ann instanceof DataQuery) {
+                DataQuery dataAnn = (DataQuery) ann;
+                String name = dataAnn.value();
+                String filterName = dataAnn.filter();
+                parameter.setName(name);
+                processParameterFilter(parameter, filterName);
+                parameter.setQuery(true);
+                namedParameters.add(parameter);
+                MappingVariable variable = new MappingVariable(name, paramType);
+                processParameterFilter(variable, filterName);
+                variable.setIndex(paramIndex);
+                variables.put(dataAnn.value(), variable);
+            } else if (ann instanceof DataBody) {
+                DataBody dataAnn = (DataBody) ann;
+                String name = dataAnn.value();
+                String filterName = dataAnn.filter();
+                parameter.setName(name);
+                processParameterFilter(parameter, filterName);
+                parameter.setQuery(false);
+                namedParameters.add(parameter);
+                MappingVariable variable = new MappingVariable(name, paramType);
+                processParameterFilter(variable, filterName);
+                variable.setIndex(paramIndex);
+                variables.put(dataAnn.value(), variable);
             } else if (ann instanceof DataVariable) {
                 DataVariable dataAnn = (DataVariable) ann;
                 String name = dataAnn.value();
@@ -485,7 +509,9 @@ public class ForestMethod<T> implements VariableScope {
 
         for (int i = 0; i < namedParameters.size(); i++) {
             MappingParameter parameter = namedParameters.get(i);
+            boolean isQuery;
             if (parameter.isObjectProperties()) {
+                isQuery = parameter.getQuery() == null ? false : parameter.getQuery();
                 Object obj = args[parameter.getIndex()];
                 if (parameter.isJsonParam()) {
                     String  json = "";
@@ -494,11 +520,11 @@ public class ForestMethod<T> implements VariableScope {
                         obj = parameter.getFilterChain().doFilter(configuration, obj);
                         json = jsonConverter.encodeToString(obj);
                     }
-                    nameValueList.add(new RequestNameValue(parameter.getJsonParamName(), json, false));
+                    nameValueList.add(new RequestNameValue(parameter.getJsonParamName(), json, isQuery));
                 }
                 else if (!parameter.getFilterChain().isEmpty()) {
                     obj = parameter.getFilterChain().doFilter(configuration, obj);
-                    nameValueList.add(new RequestNameValue(null, obj, false));
+                    nameValueList.add(new RequestNameValue(null, obj, isQuery));
                 }
                 else if (obj instanceof List
                         || obj.getClass().isArray()
@@ -510,13 +536,14 @@ public class ForestMethod<T> implements VariableScope {
                     for (Object key : map.keySet()) {
                         if (key instanceof CharSequence) {
                             Object value = map.get(key);
-                            nameValueList.add(new RequestNameValue(String.valueOf(key), value, type.isDefaultParamInQuery()));
+                            isQuery = parameter.getQuery() == null ? type.isDefaultParamInQuery() : parameter.getQuery();
+                            nameValueList.add(new RequestNameValue(String.valueOf(key), value, isQuery));
                         }
                     }
                 }
                 else {
                     try {
-                        List<RequestNameValue> list = getNameValueListFromObjectWithJSON(obj, type);
+                        List<RequestNameValue> list = getNameValueListFromObjectWithJSON(parameter, obj, type);
                         nameValueList.addAll(list);
                     } catch (Throwable th) {
                         throw new ForestRuntimeException(th);
@@ -524,7 +551,8 @@ public class ForestMethod<T> implements VariableScope {
                 }
             }
             else if (parameter.getIndex() != null) {
-                RequestNameValue nameValue = new RequestNameValue(parameter.getName(), type.isDefaultParamInQuery());
+                isQuery = parameter.getQuery() == null ? type.isDefaultParamInQuery() : parameter.getQuery();
+                RequestNameValue nameValue = new RequestNameValue(parameter.getName(), isQuery);
                 Object val = args[parameter.getIndex()];
                 if (val != null) {
                     nameValue.setValue(String.valueOf(val));
@@ -768,15 +796,15 @@ public class ForestMethod<T> implements VariableScope {
     }
 
 
-
-    private List<RequestNameValue> getNameValueListFromObjectWithJSON(Object obj, ForestRequestType type) {
+    private List<RequestNameValue> getNameValueListFromObjectWithJSON(MappingParameter parameter, Object obj, ForestRequestType type) {
         Map<String, Object> propMap = configuration.getJsonConverter().convertObjectToMap(obj);
+        boolean isQuery = parameter.getQuery() == null ? type.isDefaultParamInQuery() : parameter.getQuery();
         List<RequestNameValue> nameValueList = new ArrayList<>();
         for (Map.Entry<String, Object> entry : propMap.entrySet()) {
             String name = entry.getKey();
             Object value = entry.getValue();
             if (value != null) {
-                RequestNameValue nameValue = new RequestNameValue(name ,value, type.isDefaultParamInQuery());
+                RequestNameValue nameValue = new RequestNameValue(name ,value, isQuery);
                 nameValueList.add(nameValue);
             }
         }

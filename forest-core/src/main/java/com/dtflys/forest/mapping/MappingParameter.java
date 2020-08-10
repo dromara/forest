@@ -12,6 +12,8 @@ public class MappingParameter {
 
     protected String name;
 
+    private Boolean query;
+
     private boolean objectProperties = false;
 
     private boolean isJsonParam = false;
@@ -34,6 +36,14 @@ public class MappingParameter {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Boolean getQuery() {
+        return query;
+    }
+
+    public void setQuery(Boolean query) {
+        this.query = query;
     }
 
     public boolean isObjectProperties() {
