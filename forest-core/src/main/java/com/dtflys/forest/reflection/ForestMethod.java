@@ -43,6 +43,7 @@ public class ForestMethod<T> implements VariableScope {
     private final ForestConfiguration configuration;
     private InterceptorFactory interceptorFactory;
     private final Method method;
+    private String[] methodNameItems;
     private Class returnClass;
     private MappingTemplate baseUrlTemplate;
     private MappingTemplate urlTemplate;
@@ -85,6 +86,7 @@ public class ForestMethod<T> implements VariableScope {
         this.configuration = configuration;
         this.method = method;
         this.interceptorFactory = configuration.getInterceptorFactory();
+        this.methodNameItems = NameUtils.splitCamelName(method.getName());
         processBaseProperties();
         processInterfaceMethods();
     }
@@ -430,6 +432,28 @@ public class ForestMethod<T> implements VariableScope {
     }
 
     /**
+     * 获得最终的请求类型
+     * @param args
+     * @return
+     */
+    private ForestRequestType type(Object[] args) {
+        String renderedType = typeTemplate.render(args);
+        if (StringUtils.isBlank(renderedType)) {
+            String typeFromName = methodNameItems[0];
+            ForestRequestType type = ForestRequestType.findType(typeFromName);
+            if (type != null) {
+                return type;
+            }
+            return ForestRequestType.GET;
+        }
+        ForestRequestType type = ForestRequestType.findType(renderedType);
+        if (type != null) {
+            return type;
+        }
+        throw new ForestRuntimeException("Http request type \"" + renderedType + "\" is not be supported.");
+    }
+
+    /**
      * 创建请求
      * @param args
      * @return
@@ -440,8 +464,7 @@ public class ForestMethod<T> implements VariableScope {
             baseUrl = baseUrlTemplate.render(args);
         }
         String renderedUrl = urlTemplate.render(args);
-        String renderedType = typeTemplate.render(args);
-        ForestRequestType type = ForestRequestType.findType(renderedType);
+        ForestRequestType type = type(args);
         String baseEncode = null;
         if (baseEncodeTemplate != null) {
             baseEncode = baseEncodeTemplate.render(args);
