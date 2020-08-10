@@ -13,6 +13,12 @@ public interface DeleteClient {
 
     @Request(
             url = "http://localhost:4999/xx/user?username=foo",
+            headers = {"Accept:text/plan"}
+    )
+    String deleteUser();
+
+    @Request(
+            url = "http://localhost:4999/xx/user?username=foo",
             type = "delete",
             headers = {"Accept:text/plan"}
     )

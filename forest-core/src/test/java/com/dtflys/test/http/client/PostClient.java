@@ -18,6 +18,13 @@ public interface PostClient {
 
     @Request(
             url = "http://localhost:${port}/hello",
+            data = "username=foo&password=123456",
+            headers = {"Accept:text/plan"}
+    )
+    String postHello();
+
+    @Request(
+            url = "http://localhost:${port}/hello",
             type = "post",
             data = "username=foo&password=123456",
             headers = {"Accept:text/plan"}

@@ -11,6 +11,12 @@ import com.dtflys.forest.annotation.Request;
  */
 public interface PatchClient {
 
+    @Request(
+            url = "http://localhost:${port}/hello",
+            data = "username=foo&password=123456",
+            headers = {"Accept:text/plan"}
+    )
+    String patchHello();
 
     @Request(
             url = "http://localhost:${port}/hello",

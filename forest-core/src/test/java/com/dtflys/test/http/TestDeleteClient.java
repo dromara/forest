@@ -77,8 +77,16 @@ public class TestDeleteClient extends BaseClientTest {
                         .withStatusCode(200)
                         .withBody(expected)
         );
-
     }
+
+    @Test
+    public void testDeleteUser() {
+        String result = deleteClient.deleteUser();
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(expected, result);
+    }
+
 
     @Test
     public void testSimpleDelete() {

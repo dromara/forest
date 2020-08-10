@@ -52,6 +52,11 @@ public class TestHeadClient extends BaseClientTest {
 
 
     @Test
+    public void testHeadHelloUser() {
+        headClient.headHelloUser();
+    }
+
+    @Test
     public void testSimpleHead() {
         headClient.simpleHead();
     }

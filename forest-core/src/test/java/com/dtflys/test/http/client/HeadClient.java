@@ -13,6 +13,15 @@ public interface HeadClient {
 
     @Request(
             url = "http://localhost:${port}/hello/user?username=foo",
+            headers = {
+                    "Accept:text/plan",
+                    "accessToken:11111111"
+            }
+    )
+    void headHelloUser();
+
+    @Request(
+            url = "http://localhost:${port}/hello/user?username=foo",
             type = "head",
             headers = {
                 "Accept:text/plan",
