@@ -26,11 +26,10 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
     public void buildBody(T httpRequest, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         String contentType = request.getContentType();
         if (StringUtils.isEmpty(contentType)) {
-            Object value = request.getHeaders().get("Content-Type");
+            String value = request.getHeaders().getValue("Content-Type");
             if (value != null) {
-                String str = value.toString();
-                if (str.length() > 0) {
-                    contentType = str;
+                if (value.length() > 0) {
+                    contentType = value;
                 }
                 request.getHeaders().remove("Content-Type");
             }
