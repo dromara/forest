@@ -18,6 +18,15 @@
 </a>
 </p>
 
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?173bf9e16a6ad12a8675a58266603cc9";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
 
 项目介绍：
 -------------------------------------
