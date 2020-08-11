@@ -6,12 +6,12 @@
 
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-spring</artifactId>
-    <version>1.4.0-RC2</version>
+    <version>1.4.0-RC3</version>
 
     <parent>
         <groupId>com.dtflys.forest</groupId>
         <artifactId>forest</artifactId>
-        <version>1.4.0-RC2</version>
+        <version>1.4.0-RC3</version>
     </parent>
 
     <properties>

@@ -72,11 +72,11 @@ public class OkHttpMultipartBody extends RequestBody {
                 self.writtenBytes += byteCount;
                 long totalLength = self.contentLength();
                 ForestProgress progress = progressReference.get();
-                progress.setBegin(isBegin[0]);
                 if (progress == null) {
                     progress = new ForestProgress(self.request, totalLength);
                     progressReference.set(progress);
                 }
+                progress.setBegin(isBegin[0]);
                 progress.setCurrentBytes(self.writtenBytes);
                 if (totalLength >= 0) {
                     self.currentStep += byteCount;
