@@ -1720,6 +1720,8 @@ forest:
 
 您如有问题可以扫码加入微信的技术交流群
 
+扫描关注公众号，回复关键字 <font color=red>forest</font> 即可加群
+
 ![avatar](https://dt_flys.gitee.io/forest/media/wechat_qr.png)
 
 
