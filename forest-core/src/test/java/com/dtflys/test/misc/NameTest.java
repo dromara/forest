@@ -9,7 +9,7 @@ import junit.framework.TestCase;
  */
 public class NameTest extends TestCase {
 
-    public void testSplitCamelName(){
+    public void testSplitCamelName() {
         String name = "getUserName";
         String[] result = NameUtils.splitCamelName(name);
         assertEquals(3, result.length);
