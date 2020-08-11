@@ -43,6 +43,8 @@ public class HttpclientForestResponse extends ForestResponse {
                 Header encoding = entity.getContentEncoding();
                 if (encoding != null) {
                     this.contentEncoding = encoding.getValue();
+                } else {
+                    this.contentEncoding = contentType.getCharset();
                 }
                 this.content = buildContent();
             }
@@ -76,8 +78,7 @@ public class HttpclientForestResponse extends ForestResponse {
         if (content == null) {
             if (contentType == null || contentType.isEmpty()) {
                 return null;
-            }
-            if (contentType.canReadAsString()) {
+            } else if (!request.isDownloadFile() && contentType.canReadAsString()) {
                 InputStream inputStream = null;
                 try {
                     inputStream = entity.getContent();

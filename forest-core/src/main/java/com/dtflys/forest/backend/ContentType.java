@@ -12,18 +12,30 @@ public class ContentType {
 
     private final String subType;
 
+    private String charset;
+
     public ContentType(String type, String subType) {
         this.type = type;
         this.subType = subType;
     }
 
     public ContentType(String contentType) {
-        String[] strs = contentType.split("/");
+        String[] group = contentType.split(";");
+        String cty = group[0].trim();
+        String[] strs = cty.split("/");
         this.type = strs[0];
         if (strs.length > 1) {
             this.subType = strs[1];
         } else {
             this.subType = null;
+        }
+        if (group.length > 1) {
+            String chartExpr = group[1];
+            String[] expr = chartExpr.split("=");
+            if (expr[0].trim().equalsIgnoreCase("charset")
+                    && expr.length > 1) {
+                this.charset = expr[1].trim();
+            }
         }
     }
 
@@ -33,6 +45,10 @@ public class ContentType {
 
     public String getSubType() {
         return subType;
+    }
+
+    public String getCharset() {
+        return charset;
     }
 
     public boolean isEmpty() {
