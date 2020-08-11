@@ -38,8 +38,11 @@ public class MappingDot extends MappingExpr {
             try {
                 method = obj.getClass().getDeclaredMethod(right.getName());
             } catch (NoSuchMethodException e1) {
-                e1.printStackTrace();
+                throw new ForestRuntimeException(e1);
             }
+        }
+        if (method == null) {
+            throw new ForestRuntimeException(new NoSuchMethodException(getterName));
         }
         try {
             Object result = method.invoke(obj);
