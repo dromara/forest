@@ -28,6 +28,7 @@ package com.dtflys.forest.http;
 import com.dtflys.forest.backend.ContentType;
 
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * @author gongjun[dt_flys@hotmail.com]
@@ -42,6 +43,7 @@ public abstract class ForestResponse<T> {
     protected volatile ContentType contentType;
     protected volatile String contentEncoding;
     protected volatile long contentLength;
+    protected volatile ForestHeaderMap headers = new ForestHeaderMap();
     protected volatile T result;
 
     public ForestResponse(ForestRequest request) {
@@ -108,4 +110,23 @@ public abstract class ForestResponse<T> {
 
     public abstract InputStream getInputStream() throws Exception;
 
+    public ForestHeader getHeader(String name) {
+        return headers.getHeader(name);
+    }
+
+    public List<ForestHeader> getHeaders(String name) {
+        return headers.getHeaders(name);
+    }
+
+    public String getHeaderValue(String name) {
+        return headers.getValue(name);
+    }
+
+    public List<String> getHeaderValues(String name) {
+        return headers.getValues(name);
+    }
+
+    public ForestHeaderMap getHeaders() {
+        return headers;
+    }
 }

@@ -5,6 +5,7 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.StringUtils;
+import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
@@ -12,6 +13,8 @@ import okhttp3.ResponseBody;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -30,6 +33,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
         if (okResponse != null) {
             this.body = okResponse.body();
             this.statusCode = okResponse.code();
+            setupHeaders();
             if (body != null) {
                 MediaType mediaType = body.contentType();
                 if (mediaType != null) {
@@ -69,6 +73,15 @@ public class OkHttp3ForestResponse extends ForestResponse {
         }
     }
 
+    private void setupHeaders() {
+        if (okResponse != null) {
+            Headers hs = okResponse.headers();
+            for (String name : hs.names()) {
+                headers.addHeader(name, hs.get(name));
+            }
+        }
+    }
+
     public boolean isText() {
         if (contentType == null) {
             return false;
@@ -90,4 +103,5 @@ public class OkHttp3ForestResponse extends ForestResponse {
     public InputStream getInputStream() throws Exception {
         return body.byteStream();
     }
+
 }

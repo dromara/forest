@@ -7,6 +7,7 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
+import org.apache.http.HeaderIterator;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
@@ -31,6 +32,7 @@ public class HttpclientForestResponse extends ForestResponse {
         this.httpResponse = httpResponse;
         this.entity = entity;
         if (httpResponse != null) {
+            setupHeaders();
             this.statusCode = httpResponse.getStatusLine().getStatusCode();
             if (entity != null) {
                 Header type = entity.getContentType();
@@ -46,6 +48,18 @@ public class HttpclientForestResponse extends ForestResponse {
             }
         } else {
             this.statusCode = 404;
+        }
+    }
+
+    private void setupHeaders() {
+        if (httpResponse != null) {
+            HeaderIterator it = httpResponse.headerIterator();
+            if (it != null) {
+                for (; it.hasNext(); ) {
+                    Header header = it.nextHeader();
+                    headers.addHeader(header.getName(), header.getValue());
+                }
+            }
         }
     }
 
