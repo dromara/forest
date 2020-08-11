@@ -51,7 +51,12 @@ public class TestDownloadClient extends BaseClientTest {
     @Test
     public void testDownloadFile() {
         String dir = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "TestDownload";
-        File file = downloadClient.downloadFile(dir, ProgressUtils::printProgressBar);
+        File file = downloadClient.downloadFile(dir, progress -> {
+            System.out.println("------------------------------------------");
+            System.out.println("total bytes: " + progress.getTotalBytes());
+            System.out.println("current bytes: " + progress.getCurrentBytes());
+            System.out.println("progress: " + Math.round(progress.getRate() * 100) + "%");
+        });
         assertNotNull(file);
         assertTrue(file.exists());
     }
