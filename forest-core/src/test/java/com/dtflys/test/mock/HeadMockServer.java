@@ -30,6 +30,7 @@ public class HeadMockServer extends MockServerRule {
                         .withQueryStringParameter("username", "foo")
         ).respond(
                 response()
+                        .withHeader("server", "mock server")
                         .withStatusCode(200)
         );
     }

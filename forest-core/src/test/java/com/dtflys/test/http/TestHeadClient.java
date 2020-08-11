@@ -69,6 +69,8 @@ public class TestHeadClient extends BaseClientTest {
         assertEquals(200, response.getStatusCode());
         assertTrue(response.isSuccess());
         assertFalse(response.isError());
+        assertEquals("mock server", response.getHeaderValue("server"));
+        assertEquals("0", response.getHeaderValue("content-length"));
     }
 
 }
