@@ -124,9 +124,9 @@ System.out.println(result);
 联系作者:
 -----------------------------------
 
-亲，进群前记得先 <font color=yellow>star</font> 一下哦~
+亲，进群前记得先 <font color="yellow">star</font> 一下哦~
 
-扫描关注公众号，回复关键字 <font color=red>forest</font> 即可加群
+扫描关注公众号，回复关键字 <font color="red">forest</font> 即可加群
 
 ![avatar](https://dt_flys.gitee.io/forest/media/wechat_qr.png)
 
