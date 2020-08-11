@@ -84,7 +84,7 @@ public class ForestRequest<T> {
 
     private List<?> bodyList = new LinkedList<>();
 
-    private Map<String, Object> headers = new LinkedHashMap<>();
+    private ForestHeaderMap headers = new ForestHeaderMap();
 
     private List<ForestMultipart> multiparts = new LinkedList<>();
 
@@ -331,9 +331,9 @@ public class ForestRequest<T> {
 
     public List<RequestNameValue> getHeaderNameValueList() {
         List<RequestNameValue> nameValueList = new ArrayList<RequestNameValue>();
-        for (Iterator<Map.Entry<String, Object>> iterator = headers.entrySet().iterator(); iterator.hasNext(); ) {
-            Map.Entry<String, Object> entry = iterator.next();
-            RequestNameValue nameValue = new RequestNameValue(entry.getKey(), String.valueOf(entry.getValue()), false);
+        for (Iterator<ForestHeader> iterator = headers.headerIterator(); iterator.hasNext(); ) {
+            ForestHeader header = iterator.next();
+            RequestNameValue nameValue = new RequestNameValue(header.getName(), header.getValue(), false);
             nameValueList.add(nameValue);
         }
         return nameValueList;
@@ -349,7 +349,7 @@ public class ForestRequest<T> {
     }
 
 
-    public Map<String, Object> getHeaders() {
+    public ForestHeaderMap getHeaders() {
         return headers;
     }
 
@@ -357,18 +357,20 @@ public class ForestRequest<T> {
         if (StringUtils.isEmpty(name)) {
             return this;
         }
-        this.headers.put(name, value);
+        this.headers.setHeader(name, String.valueOf(value));
         return this;
     }
 
     public ForestRequest addHeader(RequestNameValue nameValue) {
-        this.headers.put(nameValue.getName(), nameValue.getValue());
+        this.addHeader(nameValue.getName(), nameValue.getValue());
         return this;
     }
 
 
-    public ForestRequest addHeaders(List<RequestNameValue> headers) {
-        putMapAddList(this.headers, headers);
+    public ForestRequest addHeaders(List<RequestNameValue> nameValues) {
+        for (RequestNameValue nameValue : nameValues) {
+            this.addHeader(nameValue.getName(), nameValue.getValue());
+        }
         return this;
     }
 
