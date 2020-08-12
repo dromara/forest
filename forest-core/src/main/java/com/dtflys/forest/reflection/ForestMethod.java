@@ -344,8 +344,8 @@ public class ForestMethod<T> implements VariableScope {
                 processParameterFilter(variable, filterName);
                 variable.setIndex(paramIndex);
                 variables.put(dataAnn.value(), variable);
-            } else if (ann instanceof DataQuery) {
-                DataQuery dataAnn = (DataQuery) ann;
+            } else if (ann instanceof Query) {
+                Query dataAnn = (Query) ann;
                 String name = dataAnn.value();
                 String filterName = dataAnn.filter();
                 parameter.setName(name);
@@ -356,8 +356,8 @@ public class ForestMethod<T> implements VariableScope {
                 processParameterFilter(variable, filterName);
                 variable.setIndex(paramIndex);
                 variables.put(dataAnn.value(), variable);
-            } else if (ann instanceof DataBody) {
-                DataBody dataAnn = (DataBody) ann;
+            } else if (ann instanceof Body) {
+                Body dataAnn = (Body) ann;
                 String name = dataAnn.value();
                 String filterName = dataAnn.filter();
                 parameter.setName(name);
