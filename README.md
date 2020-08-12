@@ -4,15 +4,6 @@
 <h1 align="center">Forest - 轻量级HTTP客户端框架</h1>
 
 <p align="center">
-<script>
-var _hmt = _hmt || [];
-(function() {
-  var hm = document.createElement("script");
-  hm.src = "https://hm.baidu.com/hm.js?1e550d0c3ef19b59ec7b8a85e673b593";
-  var s = document.getElementsByTagName("script")[0]; 
-  s.parentNode.insertBefore(hm, s);
-})();
-</script>
 <a href="https://travis-ci.org/github/mySingleLive/forest">
     <img src="https://api.travis-ci.org/mySingleLive/forest.svg?branch=master&status=passed" alt="Build">
 </a>
