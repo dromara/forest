@@ -88,16 +88,16 @@ public interface PostClient {
             type = "post",
             headers = {"Accept:text/plan"}
     )
-    String complexPost3(@DataQuery("param") String param,
-                        @DataBody("username") String username,
-                        @DataBody("password") String password);
+    String complexPost3(@Query("param") String param,
+                        @Body("username") String username,
+                        @Body("password") String password);
 
     @Request(
             url = "http://localhost:${port}/complex",
             type = "post",
             headers = {"Accept:text/plan"}
     )
-    String complexPost4(@DataQuery("param") String param,
+    String complexPost4(@Query("param") String param,
                         @DataParam("username") String username,
                         @DataParam("password") String password);
 

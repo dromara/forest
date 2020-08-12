@@ -6,8 +6,6 @@ import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.annotation.DataParam;
 import com.dtflys.forest.annotation.DataVariable;
 import com.dtflys.forest.annotation.Request;
-import com.dtflys.forest.callback.OnError;
-import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.model.JsonTestUser;
 import com.dtflys.test.model.TestResult;
@@ -89,7 +87,7 @@ public interface GetClient {
             url = "http://localhost:${port}/hello/user",
             headers = {"Accept:text/plan"}
     )
-    String annQueryGet(@DataQuery("username") String username);
+    String annQueryGet(@Query("username") String username);
 
     @Request(
             url = "http://localhost:${port}/hello/user",
