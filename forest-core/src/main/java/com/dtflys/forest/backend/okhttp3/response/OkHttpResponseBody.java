@@ -78,10 +78,10 @@ public class OkHttpResponseBody extends ResponseBody {
                     progress = new ForestProgress(request, totalLength);
                     progressReference.set(progress);
                 }
-                progress.setBegin(isBegin[0]);
                 if (progress.isDone()) {
                     return bytesRead;
                 }
+                progress.setBegin(isBegin[0]);
                 if (totalLength >= 0) {
                     long currReadBytes = bytesRead != -1 ? bytesRead : 0;
                     readBytes += currReadBytes;
