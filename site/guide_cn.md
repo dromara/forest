@@ -119,13 +119,13 @@ public interface MyClient {
 
     @Request(
             url = "http://localhost:5000/hello/user",
-            headers = "Accept: text/plan"
+            headers = "Accept: text/plain"
     )
     String sendRequest(@DataParam("uname") String username);
 }
 ```
 
-上面的`sendRequest`方法绑定的 HTTP 请求，定义了 URL 信息，以及把`Accept:text/plan`加到了请求头中，
+上面的`sendRequest`方法绑定的 HTTP 请求，定义了 URL 信息，以及把`Accept:text/plain`加到了请求头中，
 方法的参数`String username`绑定了注解`@DataParam("uname")`，它的作用是将调用者传入入参 username 时，自动将`username`的值加入到 HTTP 的请求参数`uname`中。
 
 如果调用方代码如下所示：
@@ -140,7 +140,7 @@ myClient.sendRequest("foo");
 
     GET http://localhost:5000/hello/user?uname=foo
     HEADER:
-        Accept: text/plan
+        Accept: text/plain
 
 ## 3.3 HTTP Method
 
@@ -314,7 +314,7 @@ public interface MyClient {
             url = "http://localhost:5000/hello/user",
             type = "post",
             data = "username=foo&password=bar",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String dataPost();
 }
@@ -324,7 +324,7 @@ public interface MyClient {
 
     POST http://localhost:5000/hello/user
     HEADER:
-        Accept:text/plan
+        Accept:text/plain
     BODY:
         username=foo&password=bar
 
@@ -337,7 +337,7 @@ public interface MyClient {
             url = "http://localhost:5000/hello/user",
             type = "post",
             data = "username=${0}&password=${1}",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String dataPost(String username, String password);
 }
@@ -355,7 +355,7 @@ myClient.dataPost("foo", "bar");
 
     POST http://localhost:5000/hello/user
     HEADER:
-        Accept: text/plan
+        Accept: text/plain
     BODY:
         username=foo&password=bar
 
@@ -510,7 +510,7 @@ Forest需要指明返回类型（如`User`）的同时，也需要指明数据�
 ```java
 @Request(
         url = "http://localhost:5000/hello/user",
-        headers = {"Accept:text/plan"},
+        headers = {"Accept:text/plain"},
         data = "username=${username}"
 )
 String send(@DataVariable("username") String username, OnSuccess<String> onSuccess, OnError onError);
@@ -544,7 +544,7 @@ myClient.send("foo", (String resText, ForestRequest request, ForestResponse resp
 @Request(
         url = "http://localhost:5000/hello/user?username=${0}",
         async = true,
-        headers = {"Accept:text/plan"}
+        headers = {"Accept:text/plain"}
 )
 void asyncGet(String username， OnSuccess<String> onSuccess);
 ```
@@ -567,7 +567,7 @@ myClient.asyncGet("foo", (result, request, response) -> {
 @Request(
         url = "http://localhost:5000/hello/user?username=foo",
         async = true,
-        headers = {"Accept:text/plan"}
+        headers = {"Accept:text/plain"}
 )
 Future<String> asyncFuture();
 ```
@@ -853,7 +853,7 @@ myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
 @Request(
         url = "http://localhost:5000/hello",
         type = "post",
-        headers = {"Accept:text/plan"}
+        headers = {"Accept:text/plain"}
 )
 String send(@DataParam("username") String username, @DataParam("password") String password);
 ```
@@ -868,7 +868,7 @@ myClient.send("foo", "bar");
 
     POST http://localhost:5000/hello
     HEADER:
-        Accept: text/plan
+        Accept: text/plain
     BODY:
         username=foo&password=bar
 
@@ -892,7 +892,7 @@ public interface MyClient {
     @Request(
             url = "http://localhost:5000/hello/user",
             type = "post",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String postBody(@DataParam("username") String username, @DataParam("password") String password);
 }
@@ -908,7 +908,7 @@ myClient.postBody("foo", "bar");
 
     POST http://localhost:5000/hello/user
     HEADER:
-        Accept: text/plan
+        Accept: text/plain
     BODY:
         username=foo&password=bar
 
@@ -1305,7 +1305,7 @@ try {
  */
 @Request(
         url = "http://localhost:5000/hello/user",
-        headers = {"Accept:text/plan"},
+        headers = {"Accept:text/plain"},
         data = "username=${username}"
 )
 String send(@DataVariable("username") String username, OnError onError);
@@ -1335,7 +1335,7 @@ myClient.send("foo",  (ex, request, response) -> {
  */
 @Request(
         url = "http://localhost:5000/hello/user",
-        headers = {"Accept:text/plan"},
+        headers = {"Accept:text/plain"},
         data = "username=${username}"
 )
 ForestResponse<String> send(@DataVariable("username") String username);
@@ -1647,7 +1647,7 @@ public interface SimpleClient {
 
     @Request(
             url = "http://localhost:8080/hello/user?username=foo",
-            headers = {"Accept:text/plan"},
+            headers = {"Accept:text/plain"},
             interceptor = SimpleInterceptor.class
     )
     String simple();
@@ -1659,7 +1659,7 @@ public interface SimpleClient {
 ```java
     @Request(
             url = "http://localhost:8080/hello/user?username=foo",
-            headers = {"Accept:text/plan"},
+            headers = {"Accept:text/plain"},
             interceptor = {SimpleInterceptor1.class, SimpleInterceptor2.class, ...}
     )
     String simple();
