@@ -38,4 +38,26 @@ public class NameUtils {
         return names.toArray(result);
     }
 
+    public static String setterName(String name) {
+        String[] strs = splitCamelName(name);
+        String prefix = strs[0];
+        if (prefix.equals("set")) {
+            return name;
+        } else if (prefix.equals("is")) {
+            StringBuilder builder = new StringBuilder("set");
+            for (int i = 1; i < strs.length; i++) {
+                String str = strs[i];
+                builder.append(Character.toUpperCase(str.charAt(0)) + str.substring(1));
+            }
+            return builder.toString();
+        } else {
+            StringBuilder builder = new StringBuilder("set");
+            for (int i = 0; i < strs.length; i++) {
+                String str = strs[i];
+                builder.append(Character.toUpperCase(str.charAt(0)) + str.substring(1));
+            }
+            return builder.toString();
+        }
+    }
+
 }

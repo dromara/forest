@@ -64,7 +64,7 @@ public interface SimpleClient {
 
     @Request(
             url = "http://localhost:8080/hello/user?username=foo",
-            headers = {"Accept:text/plan"},
+            headers = {"Accept:text/plain"},
             interceptor = SimpleInterceptor.class
     )
     String simple();

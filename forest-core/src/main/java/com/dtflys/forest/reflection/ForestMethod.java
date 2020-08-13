@@ -45,6 +45,7 @@ public class ForestMethod<T> implements VariableScope {
     private final Method method;
     private String[] methodNameItems;
     private Class returnClass;
+    private MetaRequest metaRequest;
     private MappingTemplate baseUrlTemplate;
     private MappingTemplate urlTemplate;
     private MappingTemplate typeTemplate;
@@ -172,7 +173,7 @@ public class ForestMethod<T> implements VariableScope {
         }
     }
 
-    private void addInterceptor(Class interceptorClass) {
+    private Interceptor addInterceptor(Class interceptorClass) {
         if (interceptorList == null) {
             interceptorList = new LinkedList<>();
         }
@@ -182,6 +183,7 @@ public class ForestMethod<T> implements VariableScope {
         }
         Interceptor interceptor = interceptorFactory.getInterceptor(interceptorClass);
         interceptorList.add(interceptor);
+        return interceptor;
     }
 
     /**
@@ -196,6 +198,7 @@ public class ForestMethod<T> implements VariableScope {
             if (!Interceptor.class.isAssignableFrom(interceptorClass)) {
                 throw new ForestInterceptorDefineException(interceptorClass);
             }
+
             RequestAttributes requestAttributesAnn = annType.getAnnotation(RequestAttributes.class);
             if (requestAttributesAnn != null) {
                 Map<String, Object> attrTemplates = ReflectUtils.getAttributesFromAnnotation(annotation);
@@ -206,13 +209,29 @@ public class ForestMethod<T> implements VariableScope {
                         attrTemplates.put(key, template);
                     }
                 }
+
                 InterceptorAttributes attributes = new InterceptorAttributes(interceptorClass, attrTemplates);
                 if (interceptorAttributesList == null) {
                     interceptorAttributesList = new LinkedList<>();
                 }
                 interceptorAttributesList.add(attributes);
             }
-            addInterceptor(interceptorClass);
+            Interceptor interceptor = addInterceptor(interceptorClass);
+            if (interceptor instanceof MetaRequestLifeCycle) {
+                MetaRequestLifeCycle lifeCycle = (MetaRequestLifeCycle) interceptor;
+                MetaRequest metaReq = lifeCycle.buildMetaRequest(annotation);
+
+                if (metaReq != null) {
+                    if (metaRequest != null) {
+                        throw new ForestRuntimeException("[Forest] annotation \""
+                                + annType.getName() + "\" can not be added on method \""
+                                + method.getName() + "\", because a similar annotation \""
+                                + metaRequest.getRequestAnnotation().annotationType().getName() + "\" has already been attached to this method.");
+                    }
+                    metaRequest = metaReq;
+                    processMetaRequest(metaRequest);
+                }
+            }
         }
     }
 
@@ -222,31 +241,21 @@ public class ForestMethod<T> implements VariableScope {
      */
     private void processInterfaceMethods() {
         Annotation[] annotations = method.getAnnotations();
+        for (int i = 0; i < annotations.length; i++) {
+            Annotation ann = annotations[i];
+            // 添加自定义注解
+            addCustomizedAnnotation(ann);
+        }
+        returnClass = method.getReturnType();
+    }
+
+    private void processMetaRequest(MetaRequest metaRequest) {
         Class[] paramTypes = method.getParameterTypes();
         Type[] genericParamTypes = method.getGenericParameterTypes();
         TypeVariable<Method>[] typeVariables = method.getTypeParameters();
         Annotation[][] paramAnns = method.getParameterAnnotations();
         Parameter[] parameters = method.getParameters();
-        for (int i = 0; i < annotations.length; i++) {
-            Annotation ann = annotations[i];
-            if (ann instanceof Request) {
-                Request reqAnn = (Request) ann;
-                processMetaRequest(reqAnn, paramTypes, genericParamTypes, typeVariables);
-            } else {
-                // 添加自定义注解
-                addCustomizedAnnotation(ann);
-            }
-        }
-        returnClass = method.getReturnType();
-    }
 
-    private void processMetaRequest(
-            MetaRequest metaRequest,
-            Class[] paramTypes,
-            Type[] genericParamTypes,
-            TypeVariable<Method>[] typeVariables,
-            Annotation[][] paramAnns,
-            Parameter[] parameters) {
         urlTemplate = makeTemplate(metaRequest.getUrl());
         typeTemplate = makeTemplate(metaRequest.getType());
         dataTypeTemplate = makeTemplate(metaRequest.getDataType());
@@ -295,7 +304,7 @@ public class ForestMethod<T> implements VariableScope {
             headerTemplateArray[j] = headerTemplate;
         }
 
-        Class[] interceptorClasses = metaRequest.interceptor();
+        Class[] interceptorClasses = metaRequest.getInterceptor();
         if (interceptorClasses != null && interceptorClasses.length > 0) {
             for (int cidx = 0, len = interceptorClasses.length; cidx < len; cidx++) {
                 Class interceptorClass = interceptorClasses[cidx];

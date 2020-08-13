@@ -1,6 +1,7 @@
 package com.dtflys.forest.utils;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.fasterxml.jackson.databind.util.BeanUtil;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
@@ -104,6 +105,32 @@ public class ReflectUtils {
             }
         }
         return results;
+    }
+
+
+    public static void copyAnnotationAttributes(Annotation source, Object target) {
+        if (target == null) {
+            return;
+        }
+        Map<String, Object> attrs = getAttributesFromAnnotation(source);
+        Class targetClass = target.getClass();
+        for (String name : attrs.keySet()) {
+            String methodName = NameUtils.setterName(name);
+            try {
+                Method setterMethod = null;
+                for (Method method : targetClass.getMethods()) {
+                    if (method.getName().equals(methodName) && method.getParameterTypes().length == 1) {
+                        setterMethod = method;
+                        break;
+                    }
+                }
+                if (setterMethod != null) {
+                    setterMethod.invoke(target, attrs.get(name));
+                }
+            } catch (IllegalAccessException e) {
+            } catch (InvocationTargetException e) {
+            }
+        }
     }
 
 }

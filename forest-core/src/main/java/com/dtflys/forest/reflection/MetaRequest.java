@@ -1,6 +1,10 @@
 package com.dtflys.forest.reflection;
 
+import java.lang.annotation.Annotation;
+
 public class MetaRequest {
+
+    private Annotation requestAnnotation;
 
     /**
      * target http url
@@ -80,6 +84,21 @@ public class MetaRequest {
     private String keyStore;
 
     private boolean logEnabled;
+
+    public MetaRequest(Annotation requestAnnotation) {
+        this.requestAnnotation = requestAnnotation;
+    }
+
+    public MetaRequest() {
+    }
+
+    public Annotation getRequestAnnotation() {
+        return requestAnnotation;
+    }
+
+    public void setRequestAnnotation(Annotation requestAnnotation) {
+        this.requestAnnotation = requestAnnotation;
+    }
 
     public String getUrl() {
         return url;
