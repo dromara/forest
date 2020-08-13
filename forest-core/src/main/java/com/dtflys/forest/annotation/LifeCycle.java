@@ -5,7 +5,7 @@ import com.dtflys.forest.reflection.MetaLifeCycle;
 import java.lang.annotation.*;
 
 /**
- * Interceptor Class Annotation
+ * Life Cycle Class Annotation
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
