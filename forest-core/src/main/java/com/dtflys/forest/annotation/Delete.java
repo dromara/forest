@@ -1,7 +1,6 @@
 package com.dtflys.forest.annotation;
 
 import com.dtflys.forest.lifecycles.DeleteRequestLifeCycle;
-import com.dtflys.forest.lifecycles.PutRequestLifeCycle;
 
 import java.lang.annotation.*;
 

@@ -169,7 +169,7 @@ public class ForestMethod<T> implements VariableScope {
 
         List<Annotation> baseAnnotationList = interfaceProxyHandler.getBaseAnnotations();
         for (Annotation annotation : baseAnnotationList) {
-            addCustomizedAnnotation(annotation);
+            addMetaRequestAnnotation(annotation);
         }
     }
 
@@ -187,14 +187,14 @@ public class ForestMethod<T> implements VariableScope {
     }
 
     /**
-     * 添加自定义注释
+     * 添加元请求注释
      * @param annotation
      */
-    private void addCustomizedAnnotation(Annotation annotation) {
+    private void addMetaRequestAnnotation(Annotation annotation) {
         Class<? extends Annotation> annType = annotation.annotationType();
         LifeCycle icClass = annType.getAnnotation(LifeCycle.class);
         if (icClass != null) {
-            Class<? extends MetaRequestLifeCycle> interceptorClass = icClass.value();
+            Class<? extends MetaLifeCycle> interceptorClass = icClass.value();
             if (!Interceptor.class.isAssignableFrom(interceptorClass)) {
                 throw new ForestInterceptorDefineException(interceptorClass);
             }
@@ -217,8 +217,8 @@ public class ForestMethod<T> implements VariableScope {
                 interceptorAttributesList.add(attributes);
             }
             Interceptor interceptor = addInterceptor(interceptorClass);
-            if (interceptor instanceof MetaRequestLifeCycle) {
-                MetaRequestLifeCycle lifeCycle = (MetaRequestLifeCycle) interceptor;
+            if (interceptor instanceof MetaLifeCycle) {
+                MetaLifeCycle lifeCycle = (MetaLifeCycle) interceptor;
                 MetaRequest metaReq = lifeCycle.buildMetaRequest(annotation);
 
                 if (metaReq != null) {
@@ -244,7 +244,7 @@ public class ForestMethod<T> implements VariableScope {
         for (int i = 0; i < annotations.length; i++) {
             Annotation ann = annotations[i];
             // 添加自定义注解
-            addCustomizedAnnotation(ann);
+            addMetaRequestAnnotation(ann);
         }
         returnClass = method.getReturnType();
     }

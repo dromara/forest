@@ -5,9 +5,8 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.extensions.DownloadFile;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.reflection.ForestMethod;
-import com.dtflys.forest.reflection.MetaRequestLifeCycle;
+import com.dtflys.forest.reflection.MetaLifeCycle;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.commons.io.FileUtils;
@@ -15,7 +14,7 @@ import org.apache.commons.io.FileUtils;
 import java.io.*;
 import java.lang.reflect.Type;
 
-public class DownloadLifeCycle implements MetaRequestLifeCycle<DownloadFile, Object> {
+public class DownloadLifeCycle implements MetaLifeCycle<DownloadFile, Object> {
 
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {

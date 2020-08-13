@@ -4,12 +4,10 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.extensions.BasicAuth;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.interceptor.Interceptor;
-import com.dtflys.forest.reflection.MetaRequest;
-import com.dtflys.forest.reflection.MetaRequestLifeCycle;
+import com.dtflys.forest.reflection.MetaLifeCycle;
 import com.dtflys.forest.utils.Base64Utils;
 
-public class BasicAuthLifeCycle implements MetaRequestLifeCycle<BasicAuth, Object> {
+public class BasicAuthLifeCycle implements MetaLifeCycle<BasicAuth, Object> {
 
     @Override
     public boolean beforeExecute(ForestRequest request) {

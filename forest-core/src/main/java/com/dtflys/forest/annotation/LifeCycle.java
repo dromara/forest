@@ -1,6 +1,6 @@
 package com.dtflys.forest.annotation;
 
-import com.dtflys.forest.reflection.MetaRequestLifeCycle;
+import com.dtflys.forest.reflection.MetaLifeCycle;
 
 import java.lang.annotation.*;
 
@@ -11,5 +11,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.ANNOTATION_TYPE)
 public @interface LifeCycle {
-    Class<? extends MetaRequestLifeCycle> value();
+    Class<? extends MetaLifeCycle> value();
 }

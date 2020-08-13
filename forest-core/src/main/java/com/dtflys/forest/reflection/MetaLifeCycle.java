@@ -8,7 +8,7 @@ import com.dtflys.forest.utils.ForestProgress;
 
 import java.lang.annotation.Annotation;
 
-public interface MetaRequestLifeCycle<A extends Annotation, I> extends Interceptor<I> {
+public interface MetaLifeCycle<A extends Annotation, I> extends Interceptor<I> {
 
     default MetaRequest buildMetaRequest(A annotation) {
         return null;

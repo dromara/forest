@@ -1,7 +1,6 @@
 package com.dtflys.forest.annotation;
 
 import com.dtflys.forest.lifecycles.OptionsRequestLifeCycle;
-import com.dtflys.forest.lifecycles.TraceRequestLifeCycle;
 
 import java.lang.annotation.*;
 

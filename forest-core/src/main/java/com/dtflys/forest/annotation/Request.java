@@ -34,7 +34,7 @@ import java.lang.annotation.*;
  * @since 2016-05-12
  */
 @Documented
-@LifeCycle(RequestLifeCycle.class)
+@com.dtflys.forest.annotation.LifeCycle(RequestLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Request {
