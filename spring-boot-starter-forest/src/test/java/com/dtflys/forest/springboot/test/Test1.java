@@ -33,6 +33,7 @@ public class Test1 {
         assertEquals(Integer.valueOf(5500), forestConfiguration.getMaxRouteConnections());
         assertEquals(Integer.valueOf(5000), forestConfiguration.getTimeout());
         assertEquals(Integer.valueOf(4000), forestConfiguration.getConnectTimeout());
+        assertEquals("GBK", forestConfiguration.getCharset());
         assertEquals(Integer.valueOf(0), forestConfiguration.getRetryCount());
         assertTrue(forestConfiguration.isLogEnabled());
         assertEquals("okhttp3", forestConfiguration.getBackend().getName());

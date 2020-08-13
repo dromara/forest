@@ -143,6 +143,7 @@ public interface GetClient {
             url = "http://localhost:5000/hello/user",
             async = true,
             headers = {"Accept:text/plan"},
+            timeout = 3000,
             data = "username=${ username.toString() }"
     )
     Future<String> asyncVarParamGet(@DataVariable("username") String username, OnSuccess<String> onSuccess, OnError onError);
