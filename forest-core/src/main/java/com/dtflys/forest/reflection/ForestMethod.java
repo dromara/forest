@@ -194,7 +194,7 @@ public class ForestMethod<T> implements VariableScope {
         Class<? extends Annotation> annType = annotation.annotationType();
         LifeCycle icClass = annType.getAnnotation(LifeCycle.class);
         if (icClass != null) {
-            Class<? extends MetaLifeCycle> interceptorClass = icClass.value();
+            Class<? extends AnnotationLifeCycle> interceptorClass = icClass.value();
             if (!Interceptor.class.isAssignableFrom(interceptorClass)) {
                 throw new ForestInterceptorDefineException(interceptorClass);
             }
@@ -217,8 +217,8 @@ public class ForestMethod<T> implements VariableScope {
                 interceptorAttributesList.add(attributes);
             }
             Interceptor interceptor = addInterceptor(interceptorClass);
-            if (interceptor instanceof MetaLifeCycle) {
-                MetaLifeCycle lifeCycle = (MetaLifeCycle) interceptor;
+            if (interceptor instanceof AnnotationLifeCycle) {
+                AnnotationLifeCycle lifeCycle = (AnnotationLifeCycle) interceptor;
                 MetaRequest metaReq = lifeCycle.buildMetaRequest(annotation);
 
                 if (metaReq != null) {
