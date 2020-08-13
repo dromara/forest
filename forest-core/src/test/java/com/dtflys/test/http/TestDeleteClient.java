@@ -97,6 +97,24 @@ public class TestDeleteClient extends BaseClientTest {
     }
 
     @Test
+    public void testSimpleDelete2() {
+        String result = deleteClient.simpleDelete2();
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void testSimpleDelete3() {
+        String result = deleteClient.simpleDelete3();
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(expected, result);
+    }
+
+
+
+    @Test
     public void testTextParamDelete() {
         String result = deleteClient.textParamDelete("foo");
         log.info("response: " + result);

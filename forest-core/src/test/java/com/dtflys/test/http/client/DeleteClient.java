@@ -1,7 +1,6 @@
 package com.dtflys.test.http.client;
 
-import com.dtflys.forest.annotation.DataParam;
-import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.annotation.*;
 import com.dtflys.forest.annotation.DataParam;
 import com.dtflys.forest.annotation.Request;
 
@@ -24,6 +23,17 @@ public interface DeleteClient {
     )
     String simpleDelete();
 
+    @Delete(
+            url = "http://localhost:4999/xx/user?username=foo",
+            headers = {"Accept:text/plain"}
+    )
+    String simpleDelete2();
+
+    @DeleteRequest(
+            url = "http://localhost:4999/xx/user?username=foo",
+            headers = {"Accept:text/plain"}
+    )
+    String simpleDelete3();
 
     @Request(
             url = "http://localhost:4999/xx/user/data",

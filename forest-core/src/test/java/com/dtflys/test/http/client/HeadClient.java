@@ -1,6 +1,6 @@
 package com.dtflys.test.http.client;
 
-import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.annotation.*;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.http.ForestResponse;
@@ -30,6 +30,23 @@ public interface HeadClient {
     )
     void simpleHead();
 
+    @Head(
+            url = "http://localhost:${port}/hello/user?username=foo",
+            headers = {
+                    "Accept:text/plain",
+                    "accessToken:11111111"
+            }
+    )
+    void simpleHead2();
+
+    @HeadRequest(
+            url = "http://localhost:${port}/hello/user?username=foo",
+            headers = {
+                    "Accept:text/plain",
+                    "accessToken:11111111"
+            }
+    )
+    void simpleHead3();
 
     @Request(
             url = "http://localhost:${port}/hello/user?username=foo",

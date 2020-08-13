@@ -19,7 +19,7 @@ public class SimpleInterceptor implements Interceptor<String> {
     @Override
     public boolean beforeExecute(ForestRequest request) {
         log.info("invoke Simple beforeExecute");
-        request.addHeader(HttpHeaders.ACCEPT, "text/plan");
+        request.addHeader(HttpHeaders.ACCEPT, "text/plain");
         request.addQuery("username", "foo");
         return true;
     }

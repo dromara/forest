@@ -25,8 +25,7 @@ public interface GetClient {
     )
     String simpleGet();
 
-    @Get(
-            url = "http://localhost:${port}/hello/user?username=foo",
+    @Get(url = "http://localhost:${port}/hello/user?username=foo",
             headers = {"Accept:text/plain"}
     )
     String simpleGet2();

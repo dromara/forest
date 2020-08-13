@@ -1,7 +1,6 @@
 package com.dtflys.test.http.client;
 
-import com.dtflys.forest.annotation.DataParam;
-import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.annotation.*;
 import com.dtflys.forest.annotation.DataParam;
 import com.dtflys.forest.annotation.Request;
 
@@ -25,6 +24,20 @@ public interface PutClient {
             headers = {"Accept:text/plain"}
     )
     String simplePut();
+
+    @Put(
+            url = "http://localhost:${port}/hello",
+            data = "username=foo&password=123456",
+            headers = {"Accept:text/plain"}
+    )
+    String simplePut2();
+
+    @PutRequest(
+            url = "http://localhost:${port}/hello",
+            data = "username=foo&password=123456",
+            headers = {"Accept:text/plain"}
+    )
+    String simplePut3();
 
     @Request(
             url = "http://localhost:${port}/hello",

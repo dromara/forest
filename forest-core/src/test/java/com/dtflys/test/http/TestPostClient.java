@@ -56,7 +56,6 @@ public class TestPostClient extends BaseClientTest {
         assertEquals(PostMockServer.EXPECTED, result);
     }
 
-
     @Test
     public void testSimplePost() {
         String result = postClient.simplePost();
@@ -64,6 +63,23 @@ public class TestPostClient extends BaseClientTest {
         assertNotNull(result);
         assertEquals(PostMockServer.EXPECTED, result);
     }
+
+    @Test
+    public void testSimplePost2() {
+        String result = postClient.simplePost2();
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(PostMockServer.EXPECTED, result);
+    }
+
+    @Test
+    public void testSimplePost3() {
+        String result = postClient.simplePost3();
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(PostMockServer.EXPECTED, result);
+    }
+
 
     @Test
     public void testTextParamPost() {

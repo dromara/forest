@@ -67,6 +67,21 @@ public class TestOptionsClient extends BaseClientTest {
         assertEquals(200, response.getStatusCode());
     }
 
+    @Test
+    public void testSimpleOptions2() {
+        ForestResponse response = optionsClient.simpleOptions2();
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode());
+    }
+
+    @Test
+    public void testSimpleOptions3() {
+        ForestResponse response = optionsClient.simpleOptions3();
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode());
+    }
+
+
 
     @Test
     public void testTextParamOptions() {

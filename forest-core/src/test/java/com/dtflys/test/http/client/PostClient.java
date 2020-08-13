@@ -31,6 +31,19 @@ public interface PostClient {
     )
     String simplePost();
 
+    @Post(
+            url = "http://localhost:${port}/hello",
+            data = "username=foo&password=123456",
+            headers = {"Accept:text/plain"}
+    )
+    String simplePost2();
+
+    @PostRequest(
+            url = "http://localhost:${port}/hello",
+            data = "username=foo&password=123456",
+            headers = {"Accept:text/plain"}
+    )
+    String simplePost3();
 
     @Request(
             url = "http://localhost:${port}/hello",

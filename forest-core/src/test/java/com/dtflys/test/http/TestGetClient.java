@@ -60,6 +60,22 @@ public class TestGetClient extends BaseClientTest {
         assertEquals(GetMockServer.EXPECTED, result);
     }
 
+    @Test
+    public void testGet2() {
+        String result = getClient.simpleGet2();
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(GetMockServer.EXPECTED, result);
+    }
+
+    @Test
+    public void testGet3() {
+        String result = getClient.simpleGet3();
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(GetMockServer.EXPECTED, result);
+    }
+
 
     @Test
     public void testJsonMapGet() {
