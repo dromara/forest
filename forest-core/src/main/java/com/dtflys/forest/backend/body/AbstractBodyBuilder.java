@@ -41,7 +41,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
 
         String[] typeGroup = contentType.split("charset=");
         String mineType = typeGroup[0];
-        String charset = request.getEncode();
+        String charset = request.getCharset();
         if (StringUtils.isEmpty(charset)) {
             if (typeGroup.length > 1) {
                 charset = typeGroup[1];
