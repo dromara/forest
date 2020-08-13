@@ -11,7 +11,7 @@ public interface WrongInterceptorClient {
 
     @Request(
             url = "http://localhost:5000/hello/user?username=foo",
-            headers = {"Accept:text/plan"},
+            headers = {"Accept:text/plain"},
             interceptor = DefaultInterceptorFactory.class
     )
     String wrongClass();

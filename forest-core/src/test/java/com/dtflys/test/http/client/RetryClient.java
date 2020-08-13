@@ -6,7 +6,7 @@ public interface RetryClient {
 
     @Request(
             url = "http://localhost:${port}/hello/user?username=foo",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String simpleRetry();
 }

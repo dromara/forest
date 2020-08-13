@@ -58,7 +58,7 @@ public class TestDeleteClient extends BaseClientTest {
                 request()
                         .withPath("/xx/user")
                         .withMethod("DELETE")
-                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plan"))
+                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plain"))
                         .withQueryStringParameter("username", "foo")
         ).respond(
                 response()
@@ -70,7 +70,7 @@ public class TestDeleteClient extends BaseClientTest {
                 request()
                         .withPath("/xx/user/data")
                         .withMethod("DELETE")
-                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plan"))
+                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plain"))
                         .withBody("username=foo")
         ).respond(
                 response()

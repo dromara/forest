@@ -19,7 +19,7 @@ public interface PostClient {
     @Request(
             url = "http://localhost:${port}/hello",
             data = "username=foo&password=123456",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String postHello();
 
@@ -27,7 +27,7 @@ public interface PostClient {
             url = "http://localhost:${port}/hello",
             type = "post",
             data = "username=foo&password=123456",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String simplePost();
 
@@ -36,7 +36,7 @@ public interface PostClient {
             url = "http://localhost:${port}/hello",
             type = "post",
             data = "username=${0}&password=${1}",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String textParamPost(String username, String password);
 
@@ -44,7 +44,7 @@ public interface PostClient {
     @Request(
             url = "http://localhost:${port}/hello",
             type = "post",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String annParamPost(@DataParam("username") String username, @DataParam("password") String password);
 
@@ -53,7 +53,7 @@ public interface PostClient {
             url = "http://localhost:${port}/hello",
             type = "post",
             data = "username=${username}&password=${password}",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String varParamPost(@DataVariable("username") String username, @DataVariable("password") String password);
 
@@ -62,7 +62,7 @@ public interface PostClient {
             url = "http://localhost:${port}/hello",
             type = "post",
             data = "${user.argString}",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String modelParamPost(@DataVariable("user") UserParam userParam);
 
@@ -71,7 +71,7 @@ public interface PostClient {
             url = "http://localhost:${port}/complex?param=${0}",
             type = "post",
             data = "${1}",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String complexPost(String param, String body);
 
@@ -79,14 +79,14 @@ public interface PostClient {
     @Request(
             url = "http://localhost:${port}/complex?param=${0}",
             type = "post",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String complexPost2(String param, @DataParam("username") String username, @DataParam("password") String password);
 
     @Request(
             url = "http://localhost:${port}/complex",
             type = "post",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String complexPost3(@Query("param") String param,
                         @Body("username") String username,
@@ -95,7 +95,7 @@ public interface PostClient {
     @Request(
             url = "http://localhost:${port}/complex",
             type = "post",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String complexPost4(@Query("param") String param,
                         @DataParam("username") String username,
@@ -106,7 +106,7 @@ public interface PostClient {
             type = "post",
             data = "${0}",
             headers = {
-                "Accept:text/plan",
+                "Accept:text/plain",
                 "accessToken:11111111",
             }
     )
@@ -116,7 +116,7 @@ public interface PostClient {
             url = "http://localhost:${port}/hello/user",
             type = "post",
             data = "${0}",
-            headers = { "Accept:text/plan"},
+            headers = { "Accept:text/plain"},
             interceptor = PostHeadInterceptor.class
     )
     String postHead2(String body);

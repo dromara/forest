@@ -14,7 +14,7 @@ public interface PatchClient {
     @Request(
             url = "http://localhost:${port}/hello",
             data = "username=foo&password=123456",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String patchHello();
 
@@ -22,7 +22,7 @@ public interface PatchClient {
             url = "http://localhost:${port}/hello",
             type = "patch",
             data = "username=foo&password=123456",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String simplePatch();
 
@@ -30,7 +30,7 @@ public interface PatchClient {
             url = "http://localhost:${port}/hello",
             type = "patch",
             data = "username=${0}&password=${1}",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String textParamPatch(String username, String password);
 

@@ -28,7 +28,7 @@ public class PostComplexMockServer extends MockServerRule {
                 request()
                         .withPath("/complex")
                         .withMethod("POST")
-                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plan"))
+                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plain"))
                         .withQueryStringParameter("param", "1")
                         .withBody("username=foo&password=123456")
         ).respond(

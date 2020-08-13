@@ -28,7 +28,7 @@ public class TraceMockServer extends MockServerRule {
                 request()
                         .withPath("/hello/user")
                         .withMethod("TRACE")
-                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plan"))
+                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plain"))
                         .withQueryStringParameter("username", "foo")
         ).respond(
                 response()

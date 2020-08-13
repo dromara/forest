@@ -28,7 +28,7 @@ public class PutMockServer extends MockServerRule {
                 request()
                         .withPath("/hello")
                         .withMethod("PUT")
-                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plan"))
+                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plain"))
                         .withBody("username=foo&password=123456")
         ).respond(
                 response()

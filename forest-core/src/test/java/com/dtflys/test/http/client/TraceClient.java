@@ -13,14 +13,14 @@ public interface TraceClient {
     @Request(
             url = "http://localhost:${port}/hello/user?username=foo",
             type = "trace",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     ForestResponse simpleTrace();
 
     @Request(
             url = "http://localhost:${port}/hello/user",
             type = "trace",
-            headers = {"Accept:text/plan"},
+            headers = {"Accept:text/plain"},
             data = "username=${0}"
     )
     String textParamTrace(String username);
@@ -29,7 +29,7 @@ public interface TraceClient {
     @Request(
             url = "http://localhost:${port}/hello/user",
             type = "trace",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String annParamTrace(@DataParam("username") String username);
 

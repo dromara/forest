@@ -28,7 +28,7 @@ public class PostMockServer extends MockServerRule {
                 request()
                         .withPath("/hello")
                         .withMethod("POST")
-                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plan"))
+                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plain"))
                         .withBody("username=foo&password=123456")
         ).respond(
                 response()
