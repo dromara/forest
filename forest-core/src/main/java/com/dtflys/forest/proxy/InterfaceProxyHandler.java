@@ -2,7 +2,7 @@ package com.dtflys.forest.proxy;
 
 import com.dtflys.forest.annotation.BaseRequest;
 import com.dtflys.forest.annotation.BaseURL;
-import com.dtflys.forest.annotation.InterceptorClass;
+import com.dtflys.forest.annotation.LifeCycle;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.mapping.MappingTemplate;
@@ -39,6 +39,8 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
     private String baseContentType;
 
     private String baseContentEncoding;
+
+    private String baseCharset;
 
     private MappingTemplate[] baseHeaders;
 
@@ -99,6 +101,7 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
                 }
 
                 baseContentEncoding = baseRequestAnn.contentEncoding();
+                baseCharset = baseRequestAnn.charset();
                 baseContentType = baseRequestAnn.contentType();
                 String [] headerArray = baseRequestAnn.headers();
                 if (headerArray != null && headerArray.length > 0) {
@@ -119,7 +122,7 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
                 }
                 baseInterceptorClasses = baseRequestAnn.interceptor();
             } else {
-                InterceptorClass icAnn = annotation.annotationType().getAnnotation(InterceptorClass.class);
+                LifeCycle icAnn = annotation.annotationType().getAnnotation(LifeCycle.class);
                 if (icAnn != null) {
                     baseAnnotations.add(annotation);
                 }
@@ -187,6 +190,9 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         return baseContentEncoding;
     }
 
+    public String getBaseCharset() {
+        return baseCharset;
+    }
 
     public List<Annotation> getBaseAnnotations() {
         return baseAnnotations;

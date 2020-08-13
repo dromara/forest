@@ -85,6 +85,11 @@ public class ForestConfiguration implements Serializable {
     private Integer timeout;
 
     /**
+     * request charset
+     */
+    private String charset = "UTF-8";
+
+    /**
      * connect timeout in milliseconds
      */
     private Integer connectTimeout;
@@ -277,6 +282,14 @@ public class ForestConfiguration implements Serializable {
     public ForestConfiguration setTimeout(Integer timeout) {
         this.timeout = timeout;
         return this;
+    }
+
+    public String getCharset() {
+        return charset;
+    }
+
+    public void setCharset(String charset) {
+        this.charset = charset;
     }
 
     public Integer getConnectTimeout() {

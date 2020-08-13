@@ -32,6 +32,8 @@ public @interface BaseRequest {
      */
     String contentEncoding() default "";
 
+    String charset() default "UTF-8";
+
     /**
      * Base Headers
      * @return

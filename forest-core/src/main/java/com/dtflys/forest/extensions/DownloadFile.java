@@ -1,11 +1,14 @@
 package com.dtflys.forest.extensions;
 
-import com.dtflys.forest.annotation.InterceptorClass;
+import com.dtflys.forest.annotation.RequestAttributes;
+import com.dtflys.forest.annotation.LifeCycle;
+import com.dtflys.forest.lifecycles.DownloadLifeCycle;
 
 import java.lang.annotation.*;
 
 @Documented
-@InterceptorClass(DownloadInterceptor.class)
+@LifeCycle(DownloadLifeCycle.class)
+@RequestAttributes
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface DownloadFile {

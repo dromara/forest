@@ -1,12 +1,15 @@
-package com.dtflys.forest.extensions;
+package com.dtflys.forest.lifecycles;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.extensions.BasicAuth;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.interceptor.Interceptor;
+import com.dtflys.forest.reflection.MetaRequest;
+import com.dtflys.forest.reflection.MetaRequestLifeCycle;
 import com.dtflys.forest.utils.Base64Utils;
 
-public class BasicAuthInterceptor implements Interceptor<Object> {
+public class BasicAuthLifeCycle implements MetaRequestLifeCycle<BasicAuth, Object> {
 
     @Override
     public boolean beforeExecute(ForestRequest request) {
@@ -16,6 +19,7 @@ public class BasicAuthInterceptor implements Interceptor<Object> {
         request.addHeader("Authorization", basic);
         return true;
     }
+
 
 
     @Override

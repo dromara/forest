@@ -54,6 +54,7 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
                 .addPropertyValue("maxRouteConnections", forestConfigurationProperties.getMaxRouteConnections())
                 .addPropertyValue("timeout", forestConfigurationProperties.getTimeout())
                 .addPropertyValue("connectTimeout", forestConfigurationProperties.getConnectTimeout())
+                .addPropertyValue("charset", forestConfigurationProperties.getCharset())
                 .addPropertyValue("retryer", forestConfigurationProperties.getRetryer())
                 .addPropertyValue("retryCount", forestConfigurationProperties.getRetryCount())
                 .addPropertyValue("maxRetryInterval", forestConfigurationProperties.getMaxRetryInterval())

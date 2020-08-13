@@ -45,6 +45,11 @@ public class ForestConfigurationProperties {
     private int connectTimeout = 2000;
 
     /**
+     * request charset
+     */
+    private String charset = "UTF-8";
+
+    /**
      * Class of retryer
      */
     private Class retryer = BackOffRetryer.class;
@@ -137,6 +142,14 @@ public class ForestConfigurationProperties {
 
     public void setConnectTimeout(int connectTimeout) {
         this.connectTimeout = connectTimeout;
+    }
+
+    public String getCharset() {
+        return charset;
+    }
+
+    public void setCharset(String charset) {
+        this.charset = charset;
     }
 
     public Class getRetryer() {

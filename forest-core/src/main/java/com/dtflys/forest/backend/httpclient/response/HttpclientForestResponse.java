@@ -43,7 +43,7 @@ public class HttpclientForestResponse extends ForestResponse {
                 Header encoding = entity.getContentEncoding();
                 if (encoding != null) {
                     this.contentEncoding = encoding.getValue();
-                } else {
+                } else if (contentType != null) {
                     this.contentEncoding = contentType.getCharset();
                 }
                 this.content = buildContent();

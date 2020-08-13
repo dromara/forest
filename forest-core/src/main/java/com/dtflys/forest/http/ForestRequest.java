@@ -64,7 +64,9 @@ public class ForestRequest<T> {
 
     private ForestRequestType type;
 
-    private String encode;
+    private String contentEncoding;
+
+    private String charset;
 
     private String responseEncode = "UTF-8";
 
@@ -198,12 +200,21 @@ public class ForestRequest<T> {
         return filename;
     }
 
-    public String getEncode() {
-        return encode;
+    public String getContentEncoding() {
+        return contentEncoding;
     }
 
-    public ForestRequest setEncode(String encode) {
-        this.encode = encode;
+    public ForestRequest setContentEncoding(String contentEncoding) {
+        this.contentEncoding = contentEncoding;
+        return this;
+    }
+
+    public String getCharset() {
+        return charset;
+    }
+
+    public ForestRequest setCharset(String charset) {
+        this.charset = charset;
         return this;
     }
 

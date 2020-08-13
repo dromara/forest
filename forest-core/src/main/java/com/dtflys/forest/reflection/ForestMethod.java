@@ -58,7 +58,9 @@ public class ForestMethod<T> implements VariableScope {
     private long maxRetryInterval;
     private MappingTemplate baseEncodeTemplate = null;
     private MappingTemplate encodeTemplate = null;
+    private MappingTemplate charsetTemplate = null;
     private MappingTemplate baseContentTypeTemplate;
+    private MappingTemplate baseCharsetTemplate;
     private MappingTemplate contentTypeTemplate;
     private long progressStep = -1;
     private ForestConverter decoder = null;
@@ -128,6 +130,10 @@ public class ForestMethod<T> implements VariableScope {
         if (StringUtils.isNotBlank(baseContentType)) {
             baseContentTypeTemplate = makeTemplate(baseContentType);
         }
+        String baseCharset = interfaceProxyHandler.getBaseCharset();
+        if (StringUtils.isNotBlank(baseCharset)) {
+            baseCharsetTemplate = makeTemplate(baseCharset);
+        }
         baseTimeout = interfaceProxyHandler.getBaseTimeout();
         baseRetryerClass = interfaceProxyHandler.getBaseRetryerClass();
         baseRetryCount = interfaceProxyHandler.getBaseRetryCount();
@@ -183,25 +189,29 @@ public class ForestMethod<T> implements VariableScope {
      * @param annotation
      */
     private void addCustomizedAnnotation(Annotation annotation) {
-        InterceptorClass icClass = annotation.annotationType().getAnnotation(InterceptorClass.class);
+        Class<? extends Annotation> annType = annotation.annotationType();
+        LifeCycle icClass = annType.getAnnotation(LifeCycle.class);
         if (icClass != null) {
-            Class interceptorClass = icClass.value();
+            Class<? extends MetaRequestLifeCycle> interceptorClass = icClass.value();
             if (!Interceptor.class.isAssignableFrom(interceptorClass)) {
                 throw new ForestInterceptorDefineException(interceptorClass);
             }
-            Map<String, Object> attrTemplates = ReflectUtils.getAttributesFromAnnotation(annotation);
-            for (String key : attrTemplates.keySet()) {
-                Object value = attrTemplates.get(key);
-                if (value instanceof CharSequence) {
-                    MappingTemplate template = makeTemplate(value.toString());
-                    attrTemplates.put(key, template);
+            RequestAttributes requestAttributesAnn = annType.getAnnotation(RequestAttributes.class);
+            if (requestAttributesAnn != null) {
+                Map<String, Object> attrTemplates = ReflectUtils.getAttributesFromAnnotation(annotation);
+                for (String key : attrTemplates.keySet()) {
+                    Object value = attrTemplates.get(key);
+                    if (value instanceof CharSequence) {
+                        MappingTemplate template = makeTemplate(value.toString());
+                        attrTemplates.put(key, template);
+                    }
                 }
+                InterceptorAttributes attributes = new InterceptorAttributes(interceptorClass, attrTemplates);
+                if (interceptorAttributesList == null) {
+                    interceptorAttributesList = new LinkedList<>();
+                }
+                interceptorAttributesList.add(attributes);
             }
-            InterceptorAttributes attributes = new InterceptorAttributes(interceptorClass, attrTemplates);
-            if (interceptorAttributesList == null) {
-                interceptorAttributesList = new LinkedList<>();
-            }
-            interceptorAttributesList.add(attributes);
             addInterceptor(interceptorClass);
         }
     }
@@ -221,71 +231,7 @@ public class ForestMethod<T> implements VariableScope {
             Annotation ann = annotations[i];
             if (ann instanceof Request) {
                 Request reqAnn = (Request) ann;
-                urlTemplate = makeTemplate(reqAnn.url());
-                typeTemplate = makeTemplate(reqAnn.type());
-                dataTypeTemplate = makeTemplate(reqAnn.dataType());
-                contentTypeTemplate = makeTemplate(reqAnn.contentType());
-                sslKeyStoreId = reqAnn.keyStore();
-                encodeTemplate = makeTemplate(reqAnn.contentEncoding());
-                progressStep = reqAnn.progressStep();
-                async = reqAnn.async();
-                retryerClass = reqAnn.retryer();
-                Class decoderClass = reqAnn.decoder();
-                String[] dataArray = reqAnn.data();
-                String[] headerArray = reqAnn.headers();
-                int tout = reqAnn.timeout();
-                if (tout > 0) {
-                    timeout = tout;
-                }
-                int rtnum = reqAnn.retryCount();
-                if (rtnum > 0) {
-                    retryCount = rtnum;
-                }
-                maxRetryInterval = reqAnn.maxRetryInterval();
-                logEnable = configuration.isLogEnabled();
-                if (!logEnable) {
-                    logEnable = reqAnn.logEnabled();
-                }
-
-                for (TypeVariable<Method> typeVariable : typeVariables) {
-                    System.out.println(typeVariable.getName());
-                }
-
-                parameterTemplateArray = new MappingParameter[paramTypes.length];
-                processParameters(parameters, genericParamTypes, paramAnns);
-
-                dataTemplateArray = new MappingTemplate[dataArray.length];
-                for (int j = 0; j < dataArray.length; j++) {
-                    String data = dataArray[j];
-                    MappingTemplate dataTemplate = makeTemplate(data);
-                    dataTemplateArray[j] = dataTemplate;
-                }
-
-                headerTemplateArray = new MappingTemplate[headerArray.length];
-                for (int j = 0; j < headerArray.length; j++) {
-                    String header = headerArray[j];
-                    MappingTemplate headerTemplate = makeTemplate(header);
-                    headerTemplateArray[j] = headerTemplate;
-                }
-
-                Class[] interceptorClasses = reqAnn.interceptor();
-                if (interceptorClasses != null && interceptorClasses.length > 0) {
-                    for (int cidx = 0, len = interceptorClasses.length; cidx < len; cidx++) {
-                        Class interceptorClass = interceptorClasses[cidx];
-                        addInterceptor(interceptorClass);
-                    }
-                }
-
-
-                if (decoderClass != null && ForestConverter.class.isAssignableFrom(decoderClass)) {
-                    try {
-                        this.decoder = (ForestConverter) decoderClass.newInstance();
-                    } catch (InstantiationException e) {
-                        throw new ForestRuntimeException(e);
-                    } catch (IllegalAccessException e) {
-                        throw new ForestRuntimeException(e);
-                    }
-                }
+                processMetaRequest(reqAnn, paramTypes, genericParamTypes, typeVariables);
             } else {
                 // 添加自定义注解
                 addCustomizedAnnotation(ann);
@@ -294,6 +240,81 @@ public class ForestMethod<T> implements VariableScope {
         returnClass = method.getReturnType();
     }
 
+    private void processMetaRequest(
+            MetaRequest metaRequest,
+            Class[] paramTypes,
+            Type[] genericParamTypes,
+            TypeVariable<Method>[] typeVariables,
+            Annotation[][] paramAnns,
+            Parameter[] parameters) {
+        urlTemplate = makeTemplate(metaRequest.getUrl());
+        typeTemplate = makeTemplate(metaRequest.getType());
+        dataTypeTemplate = makeTemplate(metaRequest.getDataType());
+        contentTypeTemplate = makeTemplate(metaRequest.getContentType());
+        sslKeyStoreId = metaRequest.getKeyStore();
+        encodeTemplate = makeTemplate(metaRequest.getContentEncoding());
+        charsetTemplate = makeTemplate(metaRequest.getCharset());
+        progressStep = metaRequest.getProgressStep();
+        async = metaRequest.isAsync();
+        retryerClass = metaRequest.getRetryer();
+        Class decoderClass = metaRequest.getDecoder();
+        String[] dataArray = metaRequest.getData();
+        String[] headerArray = metaRequest.getHeaders();
+        int tout = metaRequest.getTimeout();
+        if (tout > 0) {
+            timeout = tout;
+        }
+        int rtnum = metaRequest.getRetryCount();
+        if (rtnum > 0) {
+            retryCount = rtnum;
+        }
+        maxRetryInterval = metaRequest.getMaxRetryInterval();
+        logEnable = configuration.isLogEnabled();
+        if (!logEnable) {
+            logEnable = metaRequest.isLogEnabled();
+        }
+
+        for (TypeVariable<Method> typeVariable : typeVariables) {
+            System.out.println(typeVariable.getName());
+        }
+
+        parameterTemplateArray = new MappingParameter[paramTypes.length];
+        processParameters(parameters, genericParamTypes, paramAnns);
+
+        dataTemplateArray = new MappingTemplate[dataArray.length];
+        for (int j = 0; j < dataArray.length; j++) {
+            String data = dataArray[j];
+            MappingTemplate dataTemplate = makeTemplate(data);
+            dataTemplateArray[j] = dataTemplate;
+        }
+
+        headerTemplateArray = new MappingTemplate[headerArray.length];
+        for (int j = 0; j < headerArray.length; j++) {
+            String header = headerArray[j];
+            MappingTemplate headerTemplate = makeTemplate(header);
+            headerTemplateArray[j] = headerTemplate;
+        }
+
+        Class[] interceptorClasses = metaRequest.interceptor();
+        if (interceptorClasses != null && interceptorClasses.length > 0) {
+            for (int cidx = 0, len = interceptorClasses.length; cidx < len; cidx++) {
+                Class interceptorClass = interceptorClasses[cidx];
+                addInterceptor(interceptorClass);
+            }
+        }
+
+
+        if (decoderClass != null && ForestConverter.class.isAssignableFrom(decoderClass)) {
+            try {
+                this.decoder = (ForestConverter) decoderClass.newInstance();
+            } catch (InstantiationException e) {
+                throw new ForestRuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new ForestRuntimeException(e);
+            }
+        }
+
+    }
 
     /**
      * 处理参数列表
@@ -477,6 +498,19 @@ public class ForestMethod<T> implements VariableScope {
         if (baseContentTypeTemplate != null) {
             baseContentType = baseContentTypeTemplate.render(args);
         }
+
+        String charset = null;
+        String renderedCharset = charsetTemplate.render(args);
+        if (StringUtils.isNotBlank(renderedCharset)) {
+            charset = renderedCharset;
+        } else if (baseCharsetTemplate != null) {
+            charset = baseCharsetTemplate.render(args);
+        } else if (StringUtils.isNotBlank(configuration.getCharset())) {
+            charset = configuration.getCharset();
+        } else {
+            charset = "UTF-8";
+        }
+
         String renderedContentType = contentTypeTemplate.render(args).trim();
         if (StringUtils.isEmpty(renderedContentType)) {
             renderedContentType = baseContentType;
@@ -624,7 +658,8 @@ public class ForestMethod<T> implements VariableScope {
                 .setUrl(newUrl)
                 .setType(type)
                 .setKeyStore(sslKeyStore)
-                .setEncode(encode)
+                .setContentEncoding(encode)
+                .setCharset(charset)
                 .setContentType(renderedContentType)
                 .setArguments(args)
                 .setLogEnable(logEnable)

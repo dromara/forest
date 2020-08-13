@@ -89,7 +89,13 @@ public @interface Request {
      * Content Encoding
      * @return
      */
-    String contentEncoding() default "UTF-8";
+    String contentEncoding() default "";
+
+    /**
+     * Charset, Default is UTF-8
+     * @return
+     */
+    String charset() default "";
 
     /**
      * reqest headers: <br>
