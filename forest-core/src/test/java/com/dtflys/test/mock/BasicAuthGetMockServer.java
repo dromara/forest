@@ -31,7 +31,7 @@ public class BasicAuthGetMockServer extends MockServerRule {
                         .withPath("/hello/user")
                         .withMethod("GET")
                         .withHeader("Authorization", AUTHORIZATION)
-                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plan"))
+                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plain"))
                         .withQueryStringParameter("username",  "foo")
         )
         .respond(

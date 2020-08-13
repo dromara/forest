@@ -12,7 +12,7 @@ import com.dtflys.test.mock.GetMockServer;
  */
 @BaseRequest(
         baseURL = "http://localhost:${port}",
-        headers = {"Accept:text/plan"},
+        headers = {"Accept:text/plain"},
         timeout = 2000
 )
 public interface BaseReqClient {

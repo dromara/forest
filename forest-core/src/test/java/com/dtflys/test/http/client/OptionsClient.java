@@ -15,14 +15,14 @@ public interface OptionsClient {
     @Request(
             url = "http://localhost:${port}/hello/user?username=foo",
             type = "options",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     ForestResponse simpleOptions();
 
     @Request(
             url = "http://localhost:${port}/hello/user",
             type = "options",
-            headers = {"Accept:text/plan"},
+            headers = {"Accept:text/plain"},
             data = "username=${0}"
     )
     String textParamOptions(String username);
@@ -31,7 +31,7 @@ public interface OptionsClient {
     @Request(
             url = "http://localhost:${port}/hello/user",
             type = "options",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String annParamOptions(@DataParam("username") String username);
 

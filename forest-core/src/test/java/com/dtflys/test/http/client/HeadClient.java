@@ -14,7 +14,7 @@ public interface HeadClient {
     @Request(
             url = "http://localhost:${port}/hello/user?username=foo",
             headers = {
-                    "Accept:text/plan",
+                    "Accept:text/plain",
                     "accessToken:11111111"
             }
     )
@@ -24,7 +24,7 @@ public interface HeadClient {
             url = "http://localhost:${port}/hello/user?username=foo",
             type = "head",
             headers = {
-                "Accept:text/plan",
+                "Accept:text/plain",
                 "accessToken:11111111"
             }
     )
@@ -35,7 +35,7 @@ public interface HeadClient {
             url = "http://localhost:${port}/hello/user?username=foo",
             type = "head",
             headers = {
-                "Accept:text/plan",
+                "Accept:text/plain",
                 "accessToken:11111111"
             }
     )

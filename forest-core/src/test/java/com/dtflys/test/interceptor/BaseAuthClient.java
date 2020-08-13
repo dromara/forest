@@ -15,13 +15,13 @@ public interface BaseAuthClient {
 
     @Request(
             url = "/hello/user?username=${username}",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String send(@DataVariable("username") String username);
 
     @Request(
             url = "/hello/user?username=foo",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String send2(@DataVariable("username") String username);
 

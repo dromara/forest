@@ -8,7 +8,7 @@ public interface BasicAuthClient {
 
     @Request(
             url = "http://localhost:${port}/hello/user?username=${username}",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     @BasicAuth(username = "${username}", password = "bar")
     String send(@DataVariable("username") String username);

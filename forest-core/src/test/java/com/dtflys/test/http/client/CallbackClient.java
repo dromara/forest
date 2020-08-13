@@ -17,7 +17,7 @@ public interface CallbackClient {
 
     @Request(
             url = "http://localhost:${port}/hello/user",
-            headers = {"Accept:text/plan"},
+            headers = {"Accept:text/plain"},
             data = "username=${username}"
     )
     String getOnSuccess(@DataVariable("username") String username, OnSuccess<String> onSuccess);
@@ -25,7 +25,7 @@ public interface CallbackClient {
 
     @Request(
             url = "http://localhost:${port}/hello/user",
-            headers = {"Accept:text/plan"},
+            headers = {"Accept:text/plain"},
             data = "username=${username}",
             dataType = "json"
     )

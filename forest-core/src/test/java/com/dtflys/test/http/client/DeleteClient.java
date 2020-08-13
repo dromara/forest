@@ -13,14 +13,14 @@ public interface DeleteClient {
 
     @Request(
             url = "http://localhost:4999/xx/user?username=foo",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String deleteUser();
 
     @Request(
             url = "http://localhost:4999/xx/user?username=foo",
             type = "delete",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String simpleDelete();
 
@@ -28,7 +28,7 @@ public interface DeleteClient {
     @Request(
             url = "http://localhost:4999/xx/user/data",
             type = "delete",
-            headers = {"Accept:text/plan"},
+            headers = {"Accept:text/plain"},
             data = "username=${0}"
     )
     String textParamDelete(String username);
@@ -37,7 +37,7 @@ public interface DeleteClient {
     @Request(
             url = "http://localhost:4999/xx/user",
             type = "delete",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String annParamDelete(@DataParam("username") String username);
 
