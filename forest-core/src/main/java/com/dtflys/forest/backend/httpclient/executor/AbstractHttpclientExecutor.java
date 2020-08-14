@@ -4,6 +4,7 @@ import com.dtflys.forest.backend.AbstractHttpExecutor;
 import com.dtflys.forest.backend.BodyBuilder;
 import com.dtflys.forest.backend.body.NoneBodyBuilder;
 import com.dtflys.forest.backend.httpclient.HttpclientRequestProvider;
+import com.dtflys.forest.backend.httpclient.body.HttpclientBodyBuilder;
 import com.dtflys.forest.backend.url.URLBuilder;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
@@ -56,7 +57,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
 
 
     protected void prepareBodyBuilder() {
-        bodyBuilder = new NoneBodyBuilder();
+        bodyBuilder = new HttpclientBodyBuilder();
     }
 
     protected void prepare(LifeCycleHandler lifeCycleHandler) {

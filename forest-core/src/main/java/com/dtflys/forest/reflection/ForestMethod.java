@@ -421,6 +421,13 @@ public class ForestMethod<T> implements VariableScope {
                 }
                 processParameterFilter(parameter, filterName);
                 namedParameters.add(parameter);
+            } else if (ann instanceof BodyObject) {
+                BodyObject dataAnn = (BodyObject) ann;
+                String filterName = dataAnn.filter();
+                parameter.setObjectProperties(true);
+                parameter.setQuery(false);
+                processParameterFilter(parameter, filterName);
+                namedParameters.add(parameter);
             } else if (ann instanceof DataFile) {
                 DataFile dataAnn = (DataFile) ann;
                 String name = dataAnn.value();
