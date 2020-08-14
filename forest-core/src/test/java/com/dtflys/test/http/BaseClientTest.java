@@ -38,7 +38,7 @@ public abstract class BaseClientTest {
         return Arrays.asList(
                 new HttpBackend[][] {
                         {new HttpclientBackend()},
-                        {new OkHttp3Backend()}});
+                        /*{new OkHttp3Backend()}*/});
     }
 
 }

@@ -73,6 +73,17 @@ public class TestPostJson2Client extends BaseClientTest {
         Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
     }
 
+    @Test
+    public void testJsonPost5Map2() {
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("username", "foo");
+        String result = postClient.postJson5Map2(userMap);
+        log.info("response: " + result);
+        assertNotNull(result);
+        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
+    }
+
+
 
     @Test
     public void testJsonPost6() {
@@ -84,6 +95,15 @@ public class TestPostJson2Client extends BaseClientTest {
         Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
     }
 
+    @Test
+    public void testJsonPost11() {
+        JsonTestUser user = new JsonTestUser();
+        user.setUsername("foo");
+        String result = postClient.postJson11(user);
+        log.info("response: " + result);
+        assertNotNull(result);
+        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
+    }
 
 
 }

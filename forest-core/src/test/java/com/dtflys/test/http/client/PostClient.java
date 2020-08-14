@@ -217,6 +217,23 @@ public interface PostClient {
     String postJson10(JsonTestList user);
 
 
+    @Post(
+            url = "http://localhost:${port}/json",
+            contentType = "application/json"
+    )
+    String postJson11(@BodyObject JsonTestUser user);
+
+    @Post(
+            url = "http://localhost:${port}/json",
+            headers = {"Content-Type: application/json"}
+    )
+    String postJson12(@BodyObject List<JsonTestList> user);
+
+    @Post(
+            url = "http://localhost:${port}/json",
+            contentType = "application/json"
+    )
+    String postJson5Map2(@BodyObject Map user);
 
     @Request(
             url = "http://localhost:${port}/json",
