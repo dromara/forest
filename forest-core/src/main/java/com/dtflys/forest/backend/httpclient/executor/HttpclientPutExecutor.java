@@ -20,7 +20,7 @@ public class HttpclientPutExecutor extends AbstractHttpclientEntityExecutor<Http
 
     @Override
     protected URLBuilder getURLBuilder() {
-        return URLBuilder.getSimpleURLBuilder();
+        return URLBuilder.getQueryableURLBuilder();
     }
 
     public HttpclientPutExecutor(ForestRequest requst, HttpclientResponseHandler httpclientResponseHandler, HttpclientRequestSender requestSender) {

@@ -1,22 +1,21 @@
 package com.dtflys.forest.backend.httpclient.executor;
 
-import com.dtflys.forest.backend.httpclient.HttpGetWithEntity;
+import com.dtflys.forest.backend.httpclient.entity.HttpGetWithBodyEntity;
 import com.dtflys.forest.backend.httpclient.HttpclientRequestProvider;
 import com.dtflys.forest.backend.httpclient.request.HttpclientRequestSender;
 import com.dtflys.forest.backend.httpclient.response.HttpclientResponseHandler;
 import com.dtflys.forest.backend.url.URLBuilder;
 import com.dtflys.forest.http.ForestRequest;
-import org.apache.http.client.methods.HttpGet;
 
 /**
  * @author gongjun
  * @since 2016-05-24
  */
-public class HttpclientGetExecutor extends AbstractHttpclientExecutor<HttpGetWithEntity> {
+public class HttpclientGetExecutor extends AbstractHttpclientExecutor<HttpGetWithBodyEntity> {
 
     @Override
-    protected HttpclientRequestProvider<HttpGetWithEntity> getRequestProvider() {
-        return url -> new HttpGetWithEntity(url);
+    protected HttpclientRequestProvider<HttpGetWithBodyEntity> getRequestProvider() {
+        return url -> new HttpGetWithBodyEntity(url);
     }
 
     @Override

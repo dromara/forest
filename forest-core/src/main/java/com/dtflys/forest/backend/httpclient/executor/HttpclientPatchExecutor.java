@@ -20,7 +20,7 @@ public class HttpclientPatchExecutor extends AbstractHttpclientEntityExecutor<Ht
 
     @Override
     protected URLBuilder getURLBuilder() {
-        return URLBuilder.getSimpleURLBuilder();
+        return URLBuilder.getQueryableURLBuilder();
     }
 
     public HttpclientPatchExecutor(ForestRequest request, HttpclientResponseHandler httpclientResponseHandler, HttpclientRequestSender requestSender) {
