@@ -71,7 +71,7 @@ public class ForestMethod<T> implements VariableScope {
     private MappingParameter[] parameterTemplateArray;
     private List<MappingParameter> namedParameters = new ArrayList<>();
     private List<ForestMultipartFactory> multipartFactories = new ArrayList<>();
-    private Map<String, MappingVariable> variables = new HashMap<String, MappingVariable>();
+    private Map<String, MappingVariable> variables = new HashMap<>();
     private MappingParameter onSuccessParameter = null;
     private MappingParameter onErrorParameter = null;
     private MappingParameter onProgressParameter = null;
@@ -389,7 +389,7 @@ public class ForestMethod<T> implements VariableScope {
                     parameter.setObjectProperties(true);
                 }
                 processParameterFilter(parameter, filterName);
-                parameter.setQuery(true);
+                parameter.setType(MappingParameter.TYPE_QUERY);
                 namedParameters.add(parameter);
             } else if (ann instanceof Body) {
                 Body dataAnn = (Body) ann;
@@ -398,15 +398,29 @@ public class ForestMethod<T> implements VariableScope {
                 if (StringUtils.isNotEmpty(name)) {
                     parameter.setName(name);
                     MappingVariable variable = new MappingVariable(name, paramType);
-                    processParameterFilter(variable, filterName);
+//                    processParameterFilter(variable, filterName);
                     variable.setIndex(paramIndex);
-                    variables.put(dataAnn.value(), variable);
+                    variables.put(name, variable);
                     parameter.setObjectProperties(false);
                 } else {
                     parameter.setObjectProperties(true);
                 }
                 processParameterFilter(parameter, filterName);
-                parameter.setQuery(false);
+                parameter.setType(MappingParameter.TYPE_BODY);
+                namedParameters.add(parameter);
+            } else if (ann instanceof Header) {
+                Header headerAnn = (Header) ann;
+                String name = headerAnn.value();
+                if (StringUtils.isNotEmpty(name)) {
+                    parameter.setName(name);
+                    MappingVariable variable = new MappingVariable(name, paramType);
+                    variable.setIndex(paramIndex);
+                    variables.put(name, variable);
+                    parameter.setObjectProperties(false);
+                } else {
+                    parameter.setObjectProperties(true);
+                }
+                parameter.setType(MappingParameter.TYPE_HEADER);
                 namedParameters.add(parameter);
             } else if (ann instanceof DataVariable) {
                 DataVariable dataAnn = (DataVariable) ann;
@@ -430,6 +444,7 @@ public class ForestMethod<T> implements VariableScope {
                     parameter.setJsonParamName(jsonParamName);
                 }
                 processParameterFilter(parameter, filterName);
+                parameter.setType(MappingParameter.TYPE_UNKNOWN);
                 namedParameters.add(parameter);
             } else if (ann instanceof DataFile) {
                 DataFile dataAnn = (DataFile) ann;
@@ -587,7 +602,7 @@ public class ForestMethod<T> implements VariableScope {
             MappingParameter parameter = namedParameters.get(i);
             boolean isQuery;
             if (parameter.isObjectProperties()) {
-                isQuery = parameter.getQuery() == null ? false : parameter.getQuery();
+                isQuery = parameter.isQuery();
                 Object obj = args[parameter.getIndex()];
                 if (parameter.isJsonParam()) {
                     String  json = "";
@@ -612,7 +627,7 @@ public class ForestMethod<T> implements VariableScope {
                     for (Object key : map.keySet()) {
                         if (key instanceof CharSequence) {
                             Object value = map.get(key);
-                            isQuery = parameter.getQuery() == null ? type.isDefaultParamInQuery() : parameter.getQuery();
+                            isQuery = parameter.isUnknown() ? type.isDefaultParamInQuery() : parameter.isQuery();
                             nameValueList.add(new RequestNameValue(String.valueOf(key), value, isQuery));
                         }
                     }
@@ -627,7 +642,7 @@ public class ForestMethod<T> implements VariableScope {
                 }
             }
             else if (parameter.getIndex() != null) {
-                isQuery = parameter.getQuery() == null ? type.isDefaultParamInQuery() : parameter.getQuery();
+                isQuery = parameter.isUnknown() ? type.isDefaultParamInQuery() : parameter.isQuery();
                 RequestNameValue nameValue = new RequestNameValue(parameter.getName(), isQuery);
                 Object obj = args[parameter.getIndex()];
                 if (obj != null) {
@@ -684,7 +699,6 @@ public class ForestMethod<T> implements VariableScope {
                 .setLogEnable(logEnable)
                 .setMultiparts(multiparts)
                 .setAsync(async);
-
 
         if (decoder != null) {
             request.setDecoder(decoder);
@@ -804,8 +818,7 @@ public class ForestMethod<T> implements VariableScope {
         String dataType = dataTypeTemplate.render(args);
         if (StringUtils.isEmpty(dataType)) {
             request.setDataType(ForestDataType.TEXT);
-        }
-        else {
+        } else {
             dataType = dataType.toUpperCase();
             ForestDataType forestDataType = ForestDataType.valueOf(dataType);
             request.setDataType(forestDataType);
@@ -875,7 +888,7 @@ public class ForestMethod<T> implements VariableScope {
 
     private List<RequestNameValue> getNameValueListFromObjectWithJSON(MappingParameter parameter, Object obj, ForestRequestType type) {
         Map<String, Object> propMap = configuration.getJsonConverter().convertObjectToMap(obj);
-        boolean isQuery = parameter.getQuery() == null ? type.isDefaultParamInQuery() : parameter.getQuery();
+        boolean isQuery = parameter.isUnknown() ? type.isDefaultParamInQuery() : parameter.isQuery();
         List<RequestNameValue> nameValueList = new ArrayList<>();
         for (Map.Entry<String, Object> entry : propMap.entrySet()) {
             String name = entry.getKey();
