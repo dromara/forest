@@ -8,16 +8,16 @@ import com.dtflys.forest.filter.FilterChain;
  */
 public class MappingParameter {
 
-    public final static int TYPE_UNKNOWN = 0;
-    public final static int TYPE_QUERY = 1;
-    public final static int TYPE_BODY = 2;
-    public final static int TYPE_HEADER = 3;
+    public final static int TARGET_UNKNOWN = 0;
+    public final static int TARGET_QUERY = 1;
+    public final static int TARGET_BODY = 2;
+    public final static int TARGET_HEADER = 3;
 
     protected Integer index;
 
     protected String name;
 
-    protected int type = TYPE_UNKNOWN;
+    protected int target = TARGET_UNKNOWN;
 
     private boolean objectProperties = false;
 
@@ -44,23 +44,23 @@ public class MappingParameter {
     }
 
     public boolean isUnknown() {
-        return type == TYPE_UNKNOWN;
+        return target == TARGET_UNKNOWN;
     }
 
     public boolean isQuery() {
-        return type == TYPE_QUERY;
+        return target == TARGET_QUERY;
     }
 
     public boolean isBody() {
-        return type == TYPE_BODY;
+        return target == TARGET_BODY;
     }
 
     public boolean isHeader() {
-        return type == TYPE_HEADER;
+        return target == TARGET_HEADER;
     }
 
-    public void setType(int type) {
-        this.type = type;
+    public void setTarget(int target) {
+        this.target = target;
     }
 
     public boolean isObjectProperties() {

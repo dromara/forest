@@ -389,7 +389,7 @@ public class ForestMethod<T> implements VariableScope {
                     parameter.setObjectProperties(true);
                 }
                 processParameterFilter(parameter, filterName);
-                parameter.setType(MappingParameter.TYPE_QUERY);
+                parameter.setTarget(MappingParameter.TARGET_QUERY);
                 namedParameters.add(parameter);
             } else if (ann instanceof Body) {
                 Body dataAnn = (Body) ann;
@@ -406,7 +406,7 @@ public class ForestMethod<T> implements VariableScope {
                     parameter.setObjectProperties(true);
                 }
                 processParameterFilter(parameter, filterName);
-                parameter.setType(MappingParameter.TYPE_BODY);
+                parameter.setTarget(MappingParameter.TARGET_BODY);
                 namedParameters.add(parameter);
             } else if (ann instanceof Header) {
                 Header headerAnn = (Header) ann;
@@ -420,7 +420,7 @@ public class ForestMethod<T> implements VariableScope {
                 } else {
                     parameter.setObjectProperties(true);
                 }
-                parameter.setType(MappingParameter.TYPE_HEADER);
+                parameter.setTarget(MappingParameter.TARGET_HEADER);
                 namedParameters.add(parameter);
             } else if (ann instanceof DataVariable) {
                 DataVariable dataAnn = (DataVariable) ann;
@@ -444,7 +444,7 @@ public class ForestMethod<T> implements VariableScope {
                     parameter.setJsonParamName(jsonParamName);
                 }
                 processParameterFilter(parameter, filterName);
-                parameter.setType(MappingParameter.TYPE_UNKNOWN);
+                parameter.setTarget(MappingParameter.TARGET_UNKNOWN);
                 namedParameters.add(parameter);
             } else if (ann instanceof DataFile) {
                 DataFile dataAnn = (DataFile) ann;
