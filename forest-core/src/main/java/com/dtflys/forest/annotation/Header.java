@@ -15,6 +15,7 @@ public @interface Header {
      * Request header name
      * @return
      */
-    String value();
+    String value() default "";
+
 
 }

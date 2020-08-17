@@ -15,7 +15,7 @@ public @interface Body {
      * URL query name
      * @return
      */
-    String value();
+    String value() default "";
 
     /**
      * The filters will do some processing for the query value before sending request.
