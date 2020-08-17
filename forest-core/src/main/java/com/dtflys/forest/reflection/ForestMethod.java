@@ -378,26 +378,36 @@ public class ForestMethod<T> implements VariableScope {
                 Query dataAnn = (Query) ann;
                 String name = dataAnn.value();
                 String filterName = dataAnn.filter();
-                parameter.setName(name);
+                if (StringUtils.isNotEmpty(name)) {
+                    parameter.setName(name);
+                    MappingVariable variable = new MappingVariable(name, paramType);
+                    processParameterFilter(variable, filterName);
+                    variable.setIndex(paramIndex);
+                    variables.put(dataAnn.value(), variable);
+                    parameter.setObjectProperties(false);
+                } else {
+                    parameter.setObjectProperties(true);
+                }
                 processParameterFilter(parameter, filterName);
                 parameter.setQuery(true);
                 namedParameters.add(parameter);
-                MappingVariable variable = new MappingVariable(name, paramType);
-                processParameterFilter(variable, filterName);
-                variable.setIndex(paramIndex);
-                variables.put(dataAnn.value(), variable);
             } else if (ann instanceof Body) {
                 Body dataAnn = (Body) ann;
                 String name = dataAnn.value();
                 String filterName = dataAnn.filter();
-                parameter.setName(name);
+                if (StringUtils.isNotEmpty(name)) {
+                    parameter.setName(name);
+                    MappingVariable variable = new MappingVariable(name, paramType);
+                    processParameterFilter(variable, filterName);
+                    variable.setIndex(paramIndex);
+                    variables.put(dataAnn.value(), variable);
+                    parameter.setObjectProperties(false);
+                } else {
+                    parameter.setObjectProperties(true);
+                }
                 processParameterFilter(parameter, filterName);
                 parameter.setQuery(false);
                 namedParameters.add(parameter);
-                MappingVariable variable = new MappingVariable(name, paramType);
-                processParameterFilter(variable, filterName);
-                variable.setIndex(paramIndex);
-                variables.put(dataAnn.value(), variable);
             } else if (ann instanceof DataVariable) {
                 DataVariable dataAnn = (DataVariable) ann;
                 String name = dataAnn.value();
@@ -419,13 +429,6 @@ public class ForestMethod<T> implements VariableScope {
                 if (isJsonParam) {
                     parameter.setJsonParamName(jsonParamName);
                 }
-                processParameterFilter(parameter, filterName);
-                namedParameters.add(parameter);
-            } else if (ann instanceof BodyObject) {
-                BodyObject dataAnn = (BodyObject) ann;
-                String filterName = dataAnn.filter();
-                parameter.setObjectProperties(true);
-                parameter.setQuery(false);
                 processParameterFilter(parameter, filterName);
                 namedParameters.add(parameter);
             } else if (ann instanceof DataFile) {
@@ -626,9 +629,9 @@ public class ForestMethod<T> implements VariableScope {
             else if (parameter.getIndex() != null) {
                 isQuery = parameter.getQuery() == null ? type.isDefaultParamInQuery() : parameter.getQuery();
                 RequestNameValue nameValue = new RequestNameValue(parameter.getName(), isQuery);
-                Object val = args[parameter.getIndex()];
-                if (val != null) {
-                    nameValue.setValue(String.valueOf(val));
+                Object obj = args[parameter.getIndex()];
+                if (obj != null) {
+                    nameValue.setValue(String.valueOf(obj));
                     nameValueList.add(nameValue);
                 }
             }
