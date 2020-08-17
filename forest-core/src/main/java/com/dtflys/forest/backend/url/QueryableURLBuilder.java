@@ -25,6 +25,9 @@ public class QueryableURLBuilder extends URLBuilder {
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         for (int i = 0; i < data.size(); i++) {
             RequestNameValue nameValue = data.get(i);
+            if (!nameValue.isInQuery()) {
+                continue;
+            }
             paramBuilder.append(nameValue.getName());
             String value = MappingTemplate.getParameterValue(jsonConverter, nameValue.getValue());
             paramBuilder.append('=');
