@@ -12,6 +12,8 @@ import com.dtflys.forest.http.ForestResponseFactory;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpRequestBase;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.backend.httpclient.request.HttpclientRequestSender;
@@ -23,7 +25,10 @@ import com.dtflys.forest.mapping.MappingTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.List;
 
@@ -149,7 +154,39 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
     }
 
     protected String getLogContentForBody(T httpReq) {
+        if (!(httpReq instanceof HttpEntityEnclosingRequestBase)) {
+            return null;
+        }
+        try {
+            HttpEntityEnclosingRequestBase entityEnclosingRequest = (HttpEntityEnclosingRequestBase) httpReq;
+            HttpEntity entity = entityEnclosingRequest.getEntity();
+            if (entity.getContentType().getValue().startsWith("multipart/")) {
+                Long contentLength = null;
+                try {
+                    contentLength = entity.getContentLength();
+                } catch (Throwable th) {
+                }
+                String result = "[" + entity.getContentType().getValue();
+                if (contentLength != null) {
+                    result += "; length=" + contentLength;
+                }
+                return result + "]";
+            }
+            InputStream in = entity.getContent();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            StringBuffer buffer = new StringBuffer();
+            String line;
+            String body;
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line + " ");
+            }
+            body = buffer.toString();
+            return body;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return null;
+
     }
 
 
