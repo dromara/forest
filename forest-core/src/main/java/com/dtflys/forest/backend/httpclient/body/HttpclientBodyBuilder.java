@@ -31,9 +31,9 @@ import java.util.*;
 public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> extends AbstractBodyBuilder<T> {
 
 
-    protected void setStringBody(T httpReq, String text, String charset, String contentType) {
+    protected void setStringBody(T httpReq, String text, String charset, String contentType, boolean mergeCharset) {
             StringEntity entity = new StringEntity(text, charset);
-            if (StringUtils.isNotEmpty(charset)) {
+            if (StringUtils.isNotEmpty(charset) && mergeCharset) {
                 if (!contentType.contains("charset=")) {
                     contentType = contentType + "; charset=" + charset.toLowerCase();
                 } else {

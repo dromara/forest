@@ -754,6 +754,7 @@ public class ForestMethod<T> implements VariableScope {
 
         List<RequestNameValue> dataNameValueList = new ArrayList<>();
         StringBuilder bodyBuilder = new StringBuilder();
+        boolean isQueryData = false;
         for (int i = 0; i < dataTemplateArray.length; i++) {
             MappingTemplate dataTemplate = dataTemplateArray[i];
             String data = dataTemplate.render(args);
@@ -770,6 +771,7 @@ public class ForestMethod<T> implements VariableScope {
 //                    RequestNameValue nameValue = new RequestNameValue(name, type.isDefaultParamInQuery());
                     RequestNameValue nameValue = new RequestNameValue(name, TARGET_QUERY);
                     if (dataNameValue.length == 2) {
+                        isQueryData = true;
                         nameValue.setValue(dataNameValue[1].trim());
                     }
                     nameValueList.add(nameValue);
@@ -779,7 +781,9 @@ public class ForestMethod<T> implements VariableScope {
         }
         request.addData(nameValueList);
         request.setBodyList(bodyList);
-        if (bodyBuilder.length() > 0) {
+        if ((type.getDefaultParamTarget() == TARGET_BODY
+                || (type.getDefaultParamTarget() == TARGET_QUERY && !isQueryData))
+                && bodyBuilder.length() > 0) {
             String requestBody = bodyBuilder.toString();
             request.setRequestBody(requestBody);
         }
