@@ -51,7 +51,7 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         for (int i = 0; i < nameValueList.size(); i++) {
             RequestNameValue nameValue = nameValueList.get(i);
-            if (nameValue.isInQuery()) continue;
+            if (!nameValue.isInBody()) continue;
             String name = nameValue.getName();
             Object value = nameValue.getValue();
             NameValuePair nameValuePair = new BasicNameValuePair(name, MappingTemplate.getParameterValue(jsonConverter, value));
@@ -85,7 +85,7 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         for (int i = 0; i < nameValueList.size(); i++) {
             RequestNameValue nameValue = nameValueList.get(i);
-            if (nameValue.isInQuery()) continue;
+            if (!nameValue.isInBody()) continue;
             String name = nameValue.getName();
             Object value = nameValue.getValue();
             entityBuilder.addTextBody(name, MappingTemplate.getParameterValue(jsonConverter, value));

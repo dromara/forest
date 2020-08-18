@@ -43,7 +43,7 @@ public class MappingParameter {
         this.name = name;
     }
 
-    public boolean isUnknown() {
+    public boolean isUnknownTarget() {
         return target == TARGET_UNKNOWN;
     }
 
@@ -57,6 +57,10 @@ public class MappingParameter {
 
     public boolean isHeader() {
         return target == TARGET_HEADER;
+    }
+
+    public int getTarget() {
+        return target;
     }
 
     public void setTarget(int target) {

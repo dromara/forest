@@ -1,5 +1,7 @@
 package com.dtflys.forest.utils;
 
+import static com.dtflys.forest.mapping.MappingParameter.*;
+
 /**
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-05-24
@@ -10,18 +12,18 @@ public class RequestNameValue {
 
     private Object value;
 
-    private final boolean inQuery;
+    private final int target;
 
 
-    public RequestNameValue(String name, boolean inQuery) {
+    public RequestNameValue(String name, int target) {
         this.name = name;
-        this.inQuery = inQuery;
+        this.target = target;
     }
 
-    public RequestNameValue(String name, Object value, boolean inQuery) {
+    public RequestNameValue(String name, Object value, int target) {
         this.name = name;
         this.value = value;
-        this.inQuery = inQuery;
+        this.target = target;
     }
 
 
@@ -42,6 +44,15 @@ public class RequestNameValue {
     }
 
     public boolean isInQuery() {
-        return inQuery;
+        return target == TARGET_QUERY;
     }
+
+    public boolean isInBody() {
+        return target == TARGET_BODY;
+    }
+
+    public boolean isInHeader() {
+        return target == TARGET_HEADER;
+    }
+
 }

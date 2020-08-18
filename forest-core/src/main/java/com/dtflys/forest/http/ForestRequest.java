@@ -46,6 +46,8 @@ import com.dtflys.forest.utils.StringUtils;
 import java.io.InputStream;
 import java.util.*;
 
+import static com.dtflys.forest.mapping.MappingParameter.*;
+
 /**
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-03-24
@@ -317,7 +319,7 @@ public class ForestRequest<T> {
             String name = entry.getKey();
             Object value = entry.getValue();
             if (value != null) {
-                RequestNameValue nameValue = new RequestNameValue(name, value, true);
+                RequestNameValue nameValue = new RequestNameValue(name, value, TARGET_QUERY);
                 nameValueList.add(nameValue);
             }
         }
@@ -332,7 +334,7 @@ public class ForestRequest<T> {
             String name = entry.getKey();
             Object value = entry.getValue();
             if (value != null) {
-                RequestNameValue nameValue = new RequestNameValue(name, value, false);
+                RequestNameValue nameValue = new RequestNameValue(name, value, TARGET_BODY);
                 nameValueList.add(nameValue);
             }
         }
@@ -344,7 +346,7 @@ public class ForestRequest<T> {
         List<RequestNameValue> nameValueList = new ArrayList<RequestNameValue>();
         for (Iterator<ForestHeader> iterator = headers.headerIterator(); iterator.hasNext(); ) {
             ForestHeader header = iterator.next();
-            RequestNameValue nameValue = new RequestNameValue(header.getName(), header.getValue(), false);
+            RequestNameValue nameValue = new RequestNameValue(header.getName(), header.getValue(), TARGET_HEADER);
             nameValueList.add(nameValue);
         }
         return nameValueList;
@@ -399,7 +401,7 @@ public class ForestRequest<T> {
             RequestNameValue nameValue = source.get(i);
             if (nameValue.isInQuery()) {
                 addQuery(nameValue.getName(), nameValue.getValue());
-            } else {
+            } else if (nameValue.isInBody()) {
                 map.put(nameValue.getName(), nameValue.getValue());
             }
         }
