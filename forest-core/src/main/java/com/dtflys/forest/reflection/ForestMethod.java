@@ -221,20 +221,26 @@ public class ForestMethod<T> implements VariableScope {
             Interceptor interceptor = addInterceptor(interceptorClass);
             if (interceptor instanceof AnnotationLifeCycle) {
                 AnnotationLifeCycle lifeCycle = (AnnotationLifeCycle) interceptor;
-                MetaRequest metaReq = lifeCycle.buildMetaRequest(annotation);
-
-                if (metaReq != null) {
-                    if (metaRequest != null) {
-                        throw new ForestRuntimeException("[Forest] annotation \""
-                                + annType.getName() + "\" can not be added on method \""
-                                + method.getName() + "\", because a similar annotation \""
-                                + metaRequest.getRequestAnnotation().annotationType().getName() + "\" has already been attached to this method.");
-                    }
-                    metaRequest = metaReq;
-                    processMetaRequest(metaRequest);
+                lifeCycle.onMethodInitialized(this, annotation);
+                if (this.metaRequest != null) {
+                    processMetaRequest(this.metaRequest);
                 }
             }
         }
+    }
+
+    public void setMetaRequest(MetaRequest metaRequest) {
+        if (metaRequest != null && this.metaRequest != null) {
+            throw new ForestRuntimeException("[Forest] annotation \""
+                    + metaRequest.getRequestAnnotation().annotationType().getName() + "\" can not be added on method \""
+                    + method.getName() + "\", because a similar annotation \""
+                    + metaRequest.getRequestAnnotation().annotationType().getName() + "\" has already been attached to this method.");
+        }
+        this.metaRequest = metaRequest;
+    }
+
+    public MetaRequest getMetaRequest() {
+        return metaRequest;
     }
 
 

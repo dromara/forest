@@ -15,8 +15,7 @@ import java.lang.annotation.Annotation;
  */
 public interface AnnotationLifeCycle<A extends Annotation, I> extends Interceptor<I> {
 
-    default MetaRequest buildMetaRequest(A annotation) {
-        return null;
+    default void onMethodInitialized(ForestMethod method, A annotation) {
     }
 
     @Override
