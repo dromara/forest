@@ -54,9 +54,10 @@ public class TestGetWithBodyClient extends BaseClientTest {
 
     @Test
     public void testGetWithBody1() {
-        try {
+        if (configuration.getBackend().getName().equals("httpclient")) {
             String result = getWithBodyClient.getWithBody1("1", "foo", "123456");
-        } catch (ForestNetworkException ex) {
+            assertNotNull(result);
+            assertEquals(GetWithBodyMockServer.EXPECTED, result);
         }
     }
 
