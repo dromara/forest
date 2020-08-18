@@ -8,12 +8,16 @@ import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.client.HeadClient;
+import com.dtflys.test.model.TestHeaders;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static junit.framework.Assert.*;
 
@@ -55,6 +59,29 @@ public class TestHeadClient extends BaseClientTest {
     public void testHeadHelloUser() {
         headClient.headHelloUser();
     }
+
+    @Test
+    public void testHeadHelloUser2() {
+        headClient.headHelloUser("text/plain", "11111111");
+    }
+
+    @Test
+    public void testHeadHelloUser3() {
+        Map<String, Object> headers = new HashMap<>();
+        headers.put("Accept", "text/plain");
+        headers.put("accessToken", "11111111");
+        headClient.headHelloUser(headers, "foo");
+    }
+
+    @Test
+    public void testHeadHelloUser4() {
+        TestHeaders headers = new TestHeaders();
+        headers.setAccept("text/plain");
+        headers.setAccessToken("11111111");
+        headClient.headHelloUser(headers);
+    }
+
+
 
     @Test
     public void testSimpleHead() {

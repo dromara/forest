@@ -58,7 +58,7 @@ public class TestPostClient extends BaseClientTest {
 
     @Test
     public void testSimplePost() {
-        String result = postClient.simplePost();
+        String result = postClient.simplePost("text/plain");
         log.info("response: " + result);
         assertNotNull(result);
         assertEquals(PostMockServer.EXPECTED, result);
