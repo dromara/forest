@@ -27,7 +27,7 @@ public class GetWithBodyMockServer extends MockServerRule {
         mockClient.when(
                 request()
                         .withPath("/hello/user")
-                        .withMethod("POST")
+                        .withMethod("GET")
                         .withHeader(new Header(HttpHeaders.ACCEPT, "text/plain"))
                         .withQueryStringParameter("param", "1")
                         .withBody("username=foo&password=123456")
