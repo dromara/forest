@@ -17,8 +17,6 @@ import java.io.*;
  */
 public abstract class AbstractHttpclientEntityExecutor<T extends HttpEntityEnclosingRequestBase> extends AbstractHttpclientExecutor<T> {
 
-    private static Logger log = LoggerFactory.getLogger(HttpclientPostExecutor.class);
-
     public AbstractHttpclientEntityExecutor(ForestRequest request, HttpclientResponseHandler httpclientResponseHandler, HttpclientRequestSender requestSender) {
         super(request, httpclientResponseHandler, requestSender);
     }
