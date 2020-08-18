@@ -27,37 +27,5 @@ public abstract class AbstractHttpclientEntityExecutor<T extends HttpEntityEnclo
         bodyBuilder = new HttpclientBodyBuilder<>();
     }
 
-    @Override
-    protected String getLogContentForBody(T httpReq) {
-        try {
-            HttpEntity entity = httpReq.getEntity();
-            if (entity.getContentType().getValue().startsWith("multipart/")) {
-                Long contentLength = null;
-                try {
-                    contentLength = entity.getContentLength();
-                } catch (Throwable th) {
-                }
-                String result = "[" + entity.getContentType().getValue();
-                if (contentLength != null) {
-                    result += "; length=" + contentLength;
-                }
-                return result + "]";
-            }
-            InputStream in = entity.getContent();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-            StringBuffer buffer = new StringBuffer();
-            String line;
-            String body;
-            while ((line = reader.readLine()) != null) {
-                buffer.append(line + " ");
-            }
-            body = buffer.toString();
-            return body;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
 
 }
