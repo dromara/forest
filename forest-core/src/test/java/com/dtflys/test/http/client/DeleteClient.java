@@ -36,7 +36,7 @@ public interface DeleteClient {
     String simpleDelete3();
 
     @Request(
-            url = "http://localhost:4999/xx/user/data",
+            url = "http://localhost:4999/xx/user",
             type = "delete",
             headers = {"Accept:text/plain"},
             data = "username=${0}"

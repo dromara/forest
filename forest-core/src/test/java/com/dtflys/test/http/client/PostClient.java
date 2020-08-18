@@ -188,7 +188,7 @@ public interface PostClient {
     @Request(
             url = "http://localhost:${port}/json",
             type = "post",
-            headers = {"Content-Type: application/json"}
+            headers = {"Content-Type: application/json; charset=utf-8"}
     )
     String postJson7(@DataObject List<JsonTestList> user);
 
@@ -196,7 +196,7 @@ public interface PostClient {
             url = "http://localhost:${port}/json",
             data = "${json($0)}",
             type = "post",
-            headers = {"Content-Type: application/json"}
+            contentType = "application/json; charset=utf-8"
     )
     String postJson8(List<JsonTestList> user);
 
@@ -224,7 +224,7 @@ public interface PostClient {
 
     @Post(
             url = "http://localhost:${port}/json",
-            headers = {"Content-Type: application/json"}
+            headers = {"Content-Type: application/json; charset=utf-8"}
     )
     String postJson12(@Body List<JsonTestList> user);
 
