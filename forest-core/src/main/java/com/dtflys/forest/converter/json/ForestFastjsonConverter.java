@@ -3,11 +3,16 @@ package com.dtflys.forest.converter.json;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.parser.ParserConfig;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson.util.FieldInfo;
+import com.alibaba.fastjson.util.TypeUtils;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -95,9 +100,22 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
 
     @Override
     public Map<String, Object> convertObjectToMap(Object obj) {
-        Object jsonObj = JSON.toJSON(obj);
-        if (jsonObj instanceof JSONObject) {
-            return (Map<String, Object>) jsonObj;
+        List<FieldInfo> getters = TypeUtils.computeGetters(obj.getClass(), null);
+
+        JSONObject json = new JSONObject(getters.size(), true);
+        try {
+            for (FieldInfo field : getters) {
+                Object value = field.get(obj);
+                Object jsonValue = JSON.toJSON(value);
+                json.put(field.getName(), jsonValue);
+            }
+        } catch (IllegalAccessException e) {
+            throw new ForestRuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new ForestRuntimeException(e);
+        }
+        if (json instanceof JSONObject) {
+            return (Map<String, Object>) json;
         }
         return null;
     }
