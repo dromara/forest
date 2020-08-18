@@ -76,14 +76,22 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
     public void prepareHeaders() {
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         List<RequestNameValue> headerList = request.getHeaderNameValueList();
+        String contentType = request.getContentType();
+        String contentEncoding = request.getContentEncoding();
         if (headerList != null && !headerList.isEmpty()) {
             for (RequestNameValue nameValue : headerList) {
                 String name = nameValue.getName();
-                if (name.equalsIgnoreCase("Content-Type")) {
-                    continue;
-                }
+//                if (name.equalsIgnoreCase("Content-Type")) {
+//                    continue;
+//                }
                 httpRequest.setHeader(name, MappingTemplate.getParameterValue(jsonConverter, nameValue.getValue()));
             }
+        }
+        if (StringUtils.isNotEmpty(contentType)) {
+            httpRequest.setHeader("Content-Type", contentType);
+        }
+        if (StringUtils.isNotEmpty(contentEncoding)) {
+            httpRequest.setHeader("Content-Encoding", contentEncoding);
         }
     }
 

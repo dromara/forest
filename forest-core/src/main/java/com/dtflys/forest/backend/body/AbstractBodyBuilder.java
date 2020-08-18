@@ -31,7 +31,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                 if (value.length() > 0) {
                     contentType = value;
                 }
-                request.getHeaders().remove("Content-Type");
+//                request.getHeaders().remove("Content-Type");
             }
         }
 
@@ -39,12 +39,14 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
             contentType = TYPE_APPLICATION_X_WWW_FORM_URLENCODED;
         }
 
-        String[] typeGroup = contentType.split("charset=");
+        String[] typeGroup = contentType.split(";[ ]*charset=");
         String mineType = typeGroup[0];
         String charset = request.getCharset();
+        boolean mergeCharset = false;
         if (StringUtils.isEmpty(charset)) {
             if (typeGroup.length > 1) {
                 charset = typeGroup[1];
+                mergeCharset = true;
             } else {
                 charset = "UTF-8";
             }
@@ -56,7 +58,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
         }
         List<RequestNameValue> nameValueList = request.getDataNameValueList();
         if (requestBody != null) {
-            setStringBody(httpRequest, requestBody, charset, contentType);
+            setStringBody(httpRequest, requestBody, charset, contentType, mergeCharset);
             return;
         }
 
@@ -75,7 +77,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                 toJsonObj = bodyList.get(0);
             }
             String text = jsonConverter.encodeToString(toJsonObj);
-            setStringBody(httpRequest, text, charset, contentType);
+            setStringBody(httpRequest, text, charset, contentType, mergeCharset);
         }
         else if (mineType.startsWith("multipart/")) {
             List<ForestMultipart> multiparts = request.getMultiparts();
@@ -89,11 +91,11 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                 Object value = entry.getValue();
                 builder.append(value);
             }
-            setStringBody(httpRequest, builder.toString(), charset, contentType);
+            setStringBody(httpRequest, builder.toString(), charset, contentType, mergeCharset);
         }
     }
 
-    protected abstract void setStringBody(T httpReq, String text, String charset, String contentType);
+    protected abstract void setStringBody(T httpReq, String text, String charset, String contentType, boolean mergeCharset);
 
     protected abstract void setFormBody(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList);
 

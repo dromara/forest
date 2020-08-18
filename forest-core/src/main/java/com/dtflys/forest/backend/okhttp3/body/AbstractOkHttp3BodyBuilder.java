@@ -27,7 +27,7 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
     protected abstract void setBody(Request.Builder builder, RequestBody body);
 
     @Override
-    protected void setStringBody(Request.Builder builder, String text, String charset, String contentType) {
+    protected void setStringBody(Request.Builder builder, String text, String charset, String contentType, boolean mergeCharset) {
         MediaType mediaType = MediaType.parse(contentType);
         Charset cs = DEFAULT_CHARSET;
         if (StringUtils.isNotEmpty(charset)) {
@@ -40,7 +40,7 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
         if (contentType != null) {
             Charset mtcs = mediaType.charset();
             if (mtcs == null) {
-                if (StringUtils.isNotEmpty(charset)) {
+                if (StringUtils.isNotEmpty(charset) && mergeCharset) {
                     mediaType = MediaType.parse(contentType + "; charset=" + charset.toLowerCase());
                 }
             }

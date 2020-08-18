@@ -171,11 +171,15 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
     protected void prepareHeaders(Request.Builder builder) {
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         List<RequestNameValue> headerList = request.getHeaderNameValueList();
+        String contentType = request.getContentType();
         String contentEncoding = request.getContentEncoding();
         if (headerList != null && !headerList.isEmpty()) {
             for (RequestNameValue nameValue : headerList) {
                 builder.addHeader(nameValue.getName(), MappingTemplate.getParameterValue(jsonConverter, nameValue.getValue()));
             }
+        }
+        if (StringUtils.isNotEmpty(contentType)) {
+            builder.addHeader("Content-Type", contentType);
         }
         if (StringUtils.isNotEmpty(contentEncoding)) {
             builder.addHeader("Content-Encoding", contentEncoding);
