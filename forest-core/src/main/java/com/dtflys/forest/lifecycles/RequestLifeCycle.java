@@ -19,6 +19,8 @@ public class RequestLifeCycle implements AnnotationLifeCycle<Annotation, Object>
 
     @Override
     public void onMethodInitialized(ForestMethod method, Annotation annotation) {
+        MetaRequest metaRequest = createMetaRequest(annotation);
+        method.setMetaRequest(metaRequest);
     }
 
 }
