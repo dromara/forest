@@ -146,21 +146,21 @@ public interface PostClient {
             url = "http://localhost:${port}/json",
             type = "post",
             data = "{\"username\":\"${0}\",\"password\":\"${1}\"}",
-            headers = {"Content-Type: application/json"}
+            headers = {"Content-Type: application/json; charset=utf-8"}
     )
     String postJson2(String username, String password);
 
     @Request(
             url = "http://localhost:${port}/json",
             type = "post",
-            contentType = "application/json"
+            contentType = "application/json; charset=utf-8"
     )
     String postJson3(@DataParam("username") String username, @DataParam("password") String password);
 
     @Request(
             url = "http://localhost:${port}/json",
             type = "post",
-            headers = {"Content-Type: application/json"}
+            headers = {"Content-Type: application/json; charset=utf-8"}
     )
     String postJson4(@DataParam("username") String username, @DataParam("password") String password);
 
@@ -203,7 +203,7 @@ public interface PostClient {
     @Request(
             url = "http://localhost:${port}/json",
             type = "post",
-            headers = {"Content-Type: application/json"}
+            headers = {"Content-Type: application/json; charset=utf-8"}
     )
     String postJson9(@DataObject JsonTestList user);
 
@@ -211,7 +211,7 @@ public interface PostClient {
             url = "http://localhost:${port}/json",
             data = "${json($0)}",
             type = "post",
-            headers = {"Content-Type: application/json"}
+            headers = {"Content-Type: application/json; charset=utf-8"}
     )
     String postJson10(JsonTestList user);
 
@@ -238,7 +238,7 @@ public interface PostClient {
             url = "http://localhost:${port}/json",
             type = "post",
             data = "${json(user)}",
-            headers = {"Content-Type: application/json"}
+            headers = {"Content-Type: application/json; charset=utf-8"}
     )
     String postJson11(@DataVariable("user") JsonTestUser2 user);
 
