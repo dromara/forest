@@ -1,7 +1,10 @@
 package com.dtflys.test.converter;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.test.model.Coordinate;
 import com.dtflys.test.model.SubCoordinate;
 import com.dtflys.forest.converter.json.ForestFastjsonConverter;
@@ -46,8 +49,80 @@ public class TestForestFastjsonConverter {
                 forestFastjsonConverter.getSerializerFeature());
     }
 
+    public static class TestObj {
+        @JSONField(ordinal = 1)
+        private int id;
+
+        @JSONField(ordinal = 2)
+        private int direction;
+
+        @JSONField(ordinal = 3)
+        private String type;
+
+        @JSONField(ordinal = 5)
+        private byte crc;
+
+        @JSONField(ordinal = 4)
+        private Object body;
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        public int getDirection() {
+            return direction;
+        }
+
+        public void setDirection(int direction) {
+            this.direction = direction;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public byte getCrc() {
+            return crc;
+        }
+
+        public void setCrc(byte crc) {
+            this.crc = crc;
+        }
+
+        public Object getBody() {
+            return body;
+        }
+
+        public void setBody(Object body) {
+            this.body = body;
+        }
+
+    }
+
+    @Test
+    public void testConvertToMap() {
+        TestObj testObj = new TestObj();
+        testObj.setId(1);
+        testObj.setBody("xxx");
+        testObj.setCrc(new Byte("1"));
+        testObj.setDirection(4);
+        testObj.setType("yyy");
+        ForestFastjsonConverter forestFastjsonConverter = new ForestFastjsonConverter();
+        Map<String, Object> map = forestFastjsonConverter.convertObjectToMap(testObj);
+        assertEquals("{\"id\":1,\"direction\":4,\"type\":\"yyy\",\"body\":\"xxx\",\"crc\":1}", JSON.toJSONString(map));
+    }
+
     @Test
     public void testConvertToJson() {
+
         ForestFastjsonConverter forestFastjsonConverter = new ForestFastjsonConverter();
         String text = forestFastjsonConverter.encodeToString(new Integer[] {100, 10});
         assertEquals("[100,10]", text);
