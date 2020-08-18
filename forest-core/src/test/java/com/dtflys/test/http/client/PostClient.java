@@ -138,7 +138,7 @@ public interface PostClient {
             url = "http://localhost:${port}/json",
             type = "post",
             data = "{\"username\":\"${0}\",\"password\":\"${1}\"}",
-            contentType = "application/json"
+            contentType = "application/json; charset=utf-8"
     )
     String postJson(String username, String password);
 
