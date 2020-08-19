@@ -58,7 +58,8 @@ public interface PostClient {
     @Request(
             url = "http://localhost:${port}/hello",
             type = "post",
-            headers = {"Accept:text/plain"}
+            headers = {"Accept:text/plain"},
+            contentType = "application/x-www-form-urlencoded"
     )
     String annParamPost(@DataParam("username") String username, @DataParam("password") String password);
 
