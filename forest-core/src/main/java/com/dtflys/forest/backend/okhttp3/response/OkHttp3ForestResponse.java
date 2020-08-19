@@ -34,6 +34,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
         if (okResponse != null) {
             this.body = okResponse.body();
             this.statusCode = okResponse.code();
+            String respEncodingFromHeader = okResponse.header("Content-Encoding");
             setupHeaders();
             if (body != null) {
                 MediaType mediaType = body.contentType();
@@ -46,15 +47,14 @@ public class OkHttp3ForestResponse extends ForestResponse {
                         this.contentEncoding = charset.name();
                     }
                 }
+                if (StringUtils.isEmpty(this.contentEncoding)) {
+                    this.contentEncoding = respEncodingFromHeader;
+                }
                 if (contentType == null || contentType.isEmpty()) {
                     content = null;
                 } else if (!request.isDownloadFile() && contentType.canReadAsString()) {
                     try {
-                        String encode = this.contentEncoding;
-                        if (StringUtils.isEmpty(encode)) {
-                            encode = "UTF-8";
-                        }
-                        this.content = URLDecoder.decode(body.string(), encode);
+                        this.content = body.string();
                     } catch (IOException e) {
                         throw new ForestRuntimeException(e);
                     }
