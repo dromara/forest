@@ -14,7 +14,10 @@ import static org.mockserver.model.HttpResponse.response;
  */
 public class PostJson2MockServer extends MockServerRule {
 
-    public final static String EXPECTED = "{\"status\": \"ok\"}";
+//    public final static String EXPECTED = "{\"status\": \"ok\"}";
+
+    public final static String EXPECTED = "该IP没有权限访问";
+
 
     public final static Integer port = 5015;
 

@@ -1,6 +1,7 @@
 package com.dtflys.test.http.client;
 
 import com.dtflys.forest.annotation.*;
+import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.model.*;
 import com.dtflys.test.http.model.UserParam;
 import com.dtflys.test.http.model.XmlTestParam;
@@ -13,6 +14,7 @@ import java.util.Map;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-11 16:55
  */
+@BaseRequest(baseURL = "http://localhost:${port}", contentType = "application/json")
 public interface PostClient {
 
 
@@ -165,11 +167,15 @@ public interface PostClient {
     String postJson4(@DataParam("username") String username, @DataParam("password") String password);
 
     @Request(
-            url = "http://localhost:${port}/json",
+            url = "/json",
             type = "post",
+            headers = {
+                    "Accept:application/json",
+                    "Authorization: ${token}",
+            },
             contentType = "application/json"
     )
-    String postJson5(@DataObject JsonTestUser user);
+    ForestResponse<String> postJson5(@DataParam("username") String username, @DataVariable("token") String token);
 
     @Request(
             url = "http://localhost:${port}/json",
@@ -218,6 +224,7 @@ public interface PostClient {
 
     @Post(
             url = "http://localhost:${port}/json",
+            headers = {"Accept-Encoding: UTF-8"},
             contentType = "application/json"
     )
     String postJson11(@Body JsonTestUser user);
