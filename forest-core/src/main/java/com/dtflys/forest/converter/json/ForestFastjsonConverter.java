@@ -119,12 +119,10 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
 
     @Override
     public Map<String, Object> convertObjectToMap(Object obj) {
-
+        if (nameField == null && nameMethod == null) {
+            return defaultJsonMap(obj);
+        }
         List<FieldInfo> getters = TypeUtils.computeGetters(obj.getClass(), null);
-        JSONObject jsonObject = new JSONObject(true);
-        SerializeConfig serializeConfig = new SerializeConfig();
-
-
         JSONObject json = new JSONObject(getters.size(), true);
         try {
             for (FieldInfo field : getters) {
@@ -136,14 +134,17 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
                     json.put((String) nameMethod.invoke(field), jsonValue);
                 }
             }
+            return json;
         } catch (IllegalAccessException e) {
-            throw new ForestRuntimeException(e);
+            return defaultJsonMap(obj);
         } catch (InvocationTargetException e) {
-            throw new ForestRuntimeException(e);
+            return defaultJsonMap(obj);
         }
-        if (json instanceof JSONObject) {
-            return (Map<String, Object>) json;
-        }
-        return null;
     }
+
+    public Map<String, Object> defaultJsonMap(Object obj) {
+        Object jsonObj = JSON.toJSON(obj);
+        return (Map<String, Object>) jsonObj;
+    }
+
 }
