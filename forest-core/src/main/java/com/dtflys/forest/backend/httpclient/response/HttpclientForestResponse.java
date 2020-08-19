@@ -14,6 +14,7 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLDecoder;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -82,7 +83,12 @@ public class HttpclientForestResponse extends ForestResponse {
                 InputStream inputStream = null;
                 try {
                     inputStream = entity.getContent();
-                    content = IOUtils.toString(inputStream, contentEncoding);
+                    String encode = this.contentEncoding;
+                    if (StringUtils.isEmpty(encode)) {
+                        encode = "UTF-8";
+                    }
+                    content = IOUtils.toString(inputStream, encode);
+                    content = URLDecoder.decode(content, encode);
                 } catch (IOException e) {
                     throw new ForestRuntimeException(e);
                 }

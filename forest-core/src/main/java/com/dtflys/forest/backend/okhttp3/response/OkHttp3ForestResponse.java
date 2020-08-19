@@ -12,6 +12,7 @@ import okhttp3.ResponseBody;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,7 +50,11 @@ public class OkHttp3ForestResponse extends ForestResponse {
                     content = null;
                 } else if (!request.isDownloadFile() && contentType.canReadAsString()) {
                     try {
-                        this.content = body.string();
+                        String encode = this.contentEncoding;
+                        if (StringUtils.isEmpty(encode)) {
+                            encode = "UTF-8";
+                        }
+                        this.content = URLDecoder.decode(body.string(), encode);
                     } catch (IOException e) {
                         throw new ForestRuntimeException(e);
                     }
