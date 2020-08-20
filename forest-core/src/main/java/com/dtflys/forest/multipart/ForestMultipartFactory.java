@@ -19,13 +19,11 @@ public class ForestMultipartFactory<T> {
     protected ForestMultipartFactory(Class<T> paramType,
                                      int index,
                                      MappingTemplate nameTemplate,
-                                     MappingTemplate fileNameTemplate,
-                                     MappingTemplate contentTypeTemplate) {
+                                     MappingTemplate fileNameTemplate) {
         this.paramType = paramType;
         this.index = index;
         this.nameTemplate = nameTemplate;
         this.fileNameTemplate = fileNameTemplate;
-        this.contentTypeTemplate = contentTypeTemplate;
     }
 
     public static <P, M> void registerFactory(Class<P> paramType, Class<M> multipartType) {
@@ -37,14 +35,13 @@ public class ForestMultipartFactory<T> {
             Class<P> paramType,
             int index,
             MappingTemplate nameTemplate,
-            MappingTemplate fileNameTemplate,
-            MappingTemplate contentTypeTemplate) {
+            MappingTemplate fileNameTemplate) {
         if (multipartTypeMap.containsKey(paramType)) {
-            return new ForestMultipartFactory<>(paramType, index, nameTemplate, fileNameTemplate, contentTypeTemplate);
+            return new ForestMultipartFactory<>(paramType, index, nameTemplate, fileNameTemplate);
         }
         for (Class<P> pType : multipartTypeMap.keySet()) {
             if (pType.isAssignableFrom(paramType)) {
-                return new ForestMultipartFactory<>(paramType, index, nameTemplate, fileNameTemplate, contentTypeTemplate);
+                return new ForestMultipartFactory<>(paramType, index, nameTemplate, fileNameTemplate);
             }
         }
         throw new ForestRuntimeException("[Forest] Can not wrap parameter type \"" + paramType.getName() + "\" in ForestMultipart");
@@ -63,7 +60,6 @@ public class ForestMultipartFactory<T> {
 
     private final MappingTemplate fileNameTemplate;
 
-    private final MappingTemplate contentTypeTemplate;
 
     public int getIndex() {
         return index;
@@ -75,10 +71,6 @@ public class ForestMultipartFactory<T> {
 
     public MappingTemplate getFileNameTemplate() {
         return fileNameTemplate;
-    }
-
-    public MappingTemplate getContentTypeTemplate() {
-        return contentTypeTemplate;
     }
 
     public <M extends ForestMultipart<T>> M create(String name, String fileName, T data, String contentType) {

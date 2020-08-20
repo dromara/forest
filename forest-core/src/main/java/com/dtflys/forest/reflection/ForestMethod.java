@@ -106,7 +106,7 @@ public class ForestMethod<T> implements VariableScope {
         return value;
     }
 
-    private MappingTemplate makeTemplate(String text) {
+    public MappingTemplate makeTemplate(String text) {
         return new MappingTemplate(text, this);
     }
 
@@ -175,7 +175,7 @@ public class ForestMethod<T> implements VariableScope {
         }
     }
 
-    private Interceptor addInterceptor(Class interceptorClass) {
+    private <T extends Interceptor> T addInterceptor(Class<T> interceptorClass) {
         if (interceptorList == null) {
             interceptorList = new LinkedList<>();
         }
@@ -183,7 +183,7 @@ public class ForestMethod<T> implements VariableScope {
             throw new ForestRuntimeException("Class [" + interceptorClass.getName() + "] is not a implement of [" +
                     Interceptor.class.getName() + "] interface.");
         }
-        Interceptor interceptor = interceptorFactory.getInterceptor(interceptorClass);
+        T interceptor = interceptorFactory.getInterceptor(interceptorClass);
         interceptorList.add(interceptor);
         return interceptor;
     }
@@ -194,9 +194,9 @@ public class ForestMethod<T> implements VariableScope {
      */
     private void addMetaRequestAnnotation(Annotation annotation) {
         Class<? extends Annotation> annType = annotation.annotationType();
-        LifeCycle icClass = annType.getAnnotation(LifeCycle.class);
-        if (icClass != null) {
-            Class<? extends AnnotationLifeCycle> interceptorClass = icClass.value();
+        MethodLifeCycle methodLifeCycleAnn = annType.getAnnotation(MethodLifeCycle.class);
+        if (methodLifeCycleAnn != null) {
+            Class<? extends MethodAnnotationLifeCycle> interceptorClass = methodLifeCycleAnn.value();
             if (!Interceptor.class.isAssignableFrom(interceptorClass)) {
                 throw new ForestInterceptorDefineException(interceptorClass);
             }
@@ -219,8 +219,8 @@ public class ForestMethod<T> implements VariableScope {
                 interceptorAttributesList.add(attributes);
             }
             Interceptor interceptor = addInterceptor(interceptorClass);
-            if (interceptor instanceof AnnotationLifeCycle) {
-                AnnotationLifeCycle lifeCycle = (AnnotationLifeCycle) interceptor;
+            if (interceptor instanceof MethodAnnotationLifeCycle) {
+                MethodAnnotationLifeCycle lifeCycle = (MethodAnnotationLifeCycle) interceptor;
                 lifeCycle.onMethodInitialized(this, annotation);
                 if (this.metaRequest != null) {
                     processMetaRequest(this.metaRequest);
@@ -344,7 +344,7 @@ public class ForestMethod<T> implements VariableScope {
             Parameter param = parameters[i];
             Class paramType = param.getType();
             Annotation[] anns = paramAnns[i];
-            MappingParameter parameter = new MappingParameter();
+            MappingParameter parameter = new MappingParameter(paramType);
             parameter.setIndex(i);
             parameter.setName(param.getName());
             parameterTemplateArray[i] = parameter;
@@ -357,117 +357,62 @@ public class ForestMethod<T> implements VariableScope {
             } else if (OnProgress.class.isAssignableFrom(paramType)) {
                 onProgressParameter = parameter;
             }
-
-            processParameterAnnotation(parameter, paramType, anns, i);
+            processParameterAnnotation(parameter, anns);
         }
     }
 
     /**
      * 处理参数的注解
      * @param parameter
-     * @param paramType
      * @param anns
      */
-    private void processParameterAnnotation(MappingParameter parameter, Class paramType, Annotation[] anns, int paramIndex) {
+    private void processParameterAnnotation(MappingParameter parameter, Annotation[] anns) {
         for (int i = 0; i < anns.length; i++) {
             Annotation ann = anns[i];
-            if (ann instanceof DataParam) {
-                DataParam dataAnn = (DataParam) ann;
-                String name = dataAnn.value();
-                String filterName = dataAnn.filter();
-                parameter.setName(name);
-                processParameterFilter(parameter, filterName);
-                namedParameters.add(parameter);
-                MappingVariable variable = new MappingVariable(name, paramType);
-                processParameterFilter(variable, filterName);
-                variable.setIndex(paramIndex);
-                variables.put(dataAnn.value(), variable);
-            } else if (ann instanceof Query) {
-                Query dataAnn = (Query) ann;
-                String name = dataAnn.value();
-                String filterName = dataAnn.filter();
-                if (StringUtils.isNotEmpty(name)) {
-                    parameter.setName(name);
-                    MappingVariable variable = new MappingVariable(name, paramType);
-                    processParameterFilter(variable, filterName);
-                    variable.setIndex(paramIndex);
-                    variables.put(dataAnn.value(), variable);
-                    parameter.setObjectProperties(false);
-                } else {
-                    parameter.setObjectProperties(true);
+            Class annType = ann.annotationType();
+            ParamLifeCycle paramLifeCycleAnn = (ParamLifeCycle) annType.getAnnotation(ParamLifeCycle.class);
+            if (paramLifeCycleAnn != null) {
+                Class<? extends ParameterAnnotationLifeCycle> interceptorClass = paramLifeCycleAnn.value();
+                if (!Interceptor.class.isAssignableFrom(interceptorClass)) {
+                    throw new ForestInterceptorDefineException(interceptorClass);
                 }
-                processParameterFilter(parameter, filterName);
-                parameter.setTarget(TARGET_QUERY);
-                namedParameters.add(parameter);
-            } else if (ann instanceof Body) {
-                Body dataAnn = (Body) ann;
-                String name = dataAnn.value();
-                String filterName = dataAnn.filter();
-                if (StringUtils.isNotEmpty(name)) {
-                    parameter.setName(name);
-                    MappingVariable variable = new MappingVariable(name, paramType);
-//                    processParameterFilter(variable, filterName);
-                    variable.setIndex(paramIndex);
-                    variables.put(name, variable);
-                    parameter.setObjectProperties(false);
-                } else {
-                    parameter.setObjectProperties(true);
-                }
-                processParameterFilter(parameter, filterName);
-                parameter.setTarget(MappingParameter.TARGET_BODY);
-                namedParameters.add(parameter);
-            } else if (ann instanceof Header) {
-                Header headerAnn = (Header) ann;
-                String name = headerAnn.value();
-                if (StringUtils.isNotEmpty(name)) {
-                    parameter.setName(name);
-                    MappingVariable variable = new MappingVariable(name, paramType);
-                    variable.setIndex(paramIndex);
-                    variables.put(name, variable);
-                    parameter.setObjectProperties(false);
-                } else {
-                    parameter.setObjectProperties(true);
-                }
-                parameter.setTarget(MappingParameter.TARGET_HEADER);
-                namedParameters.add(parameter);
-            } else if (ann instanceof DataVariable) {
-                DataVariable dataAnn = (DataVariable) ann;
-                String name = dataAnn.value();
-                if (StringUtils.isEmpty(name)) {
-                    name = parameter.getName();
-                }
-                String filterName = dataAnn.filter();
-                MappingVariable variable = new MappingVariable(name, paramType);
-                processParameterFilter(variable, filterName);
-                variable.setIndex(paramIndex);
-                variables.put(name, variable);
-            } else if (ann instanceof DataObject) {
-                DataObject dataAnn = (DataObject) ann;
-                String jsonParamName = dataAnn.jsonParam();
-                String filterName = dataAnn.filter();
-                boolean isJsonParam = StringUtils.isNotEmpty(jsonParamName);
-                parameter.setObjectProperties(true);
-                parameter.setJsonParam(isJsonParam);
-                if (isJsonParam) {
-                    parameter.setJsonParamName(jsonParamName);
-                }
-                processParameterFilter(parameter, filterName);
-                parameter.setTarget(MappingParameter.TARGET_UNKNOWN);
-                namedParameters.add(parameter);
-            } else if (ann instanceof DataFile) {
-                DataFile dataAnn = (DataFile) ann;
-                String name = dataAnn.value();
-                String fileName = dataAnn.fileName();
-                MappingTemplate nameTemplate = makeTemplate(name);
-                MappingTemplate fileNameTemplate = makeTemplate(fileName);
-                ForestMultipartFactory factory = ForestMultipartFactory.createFactory(
-                        paramType, paramIndex, nameTemplate, fileNameTemplate, contentTypeTemplate);
-                multipartFactories.add(factory);
+                ParameterAnnotationLifeCycle lifeCycle = addInterceptor(interceptorClass);
+                lifeCycle.onParameterInitialized(this, parameter, ann);
             }
         }
     }
 
-    private void processParameterFilter(MappingParameter parameter, String filterName) {
+    /**
+     * 添加命名参数
+     * @param parameter
+     */
+    public void addNamedParameter(MappingParameter parameter) {
+        namedParameters.add(parameter);
+    }
+
+    /**
+     * 添加变量
+     * @param name
+     * @param variable
+     */
+    public void addVariable(String name, MappingVariable variable) {
+        variables.put(name, variable);
+    }
+
+    /**
+     * 添加Mutlipart工厂
+     * @param multipartFactory
+     */
+    public void addMultipartFactory(ForestMultipartFactory multipartFactory) {
+        multipartFactories.add(multipartFactory);
+    }
+
+    /**
+     * 处理参数的过滤器
+     * @param parameter
+     * @param filterName
+     */
+    public void processParameterFilter(MappingParameter parameter, String filterName) {
         if (StringUtils.isNotEmpty(filterName)) {
             String[] filterNameArray = filterName.split(",");
             for (String name : filterNameArray) {
@@ -491,7 +436,6 @@ public class ForestMethod<T> implements VariableScope {
         } catch (InvocationTargetException e) {
             throw new ForestRuntimeException(e);
         }
-
     }
 
     /**
@@ -708,19 +652,15 @@ public class ForestMethod<T> implements VariableScope {
             ForestMultipartFactory factory = multipartFactories.get(i);
             MappingTemplate nameTemplate = factory.getNameTemplate();
             MappingTemplate fileNameTemplate = factory.getFileNameTemplate();
-            MappingTemplate contentTypeTemplate = factory.getContentTypeTemplate();
             int index = factory.getIndex();
             String name = null;
             String fileName = null;
-            String contentType = null;
+            String contentType = request.getContentType();
             if (nameTemplate != null) {
                 name = nameTemplate.render(args);
             }
             if (fileNameTemplate != null) {
                 fileName = fileNameTemplate.render(args);
-            }
-            if (contentTypeTemplate != null) {
-                contentType = contentTypeTemplate.render(args);
             }
             Object data = args[index];
             if (data == null) {

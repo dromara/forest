@@ -1,6 +1,6 @@
 package com.dtflys.forest.annotation;
 
-import com.dtflys.forest.lifecycles.TraceRequestLifeCycle;
+import com.dtflys.forest.lifecycles.method.TraceRequestLifeCycle;
 
 import java.lang.annotation.*;
 
@@ -9,7 +9,7 @@ import java.lang.annotation.*;
  * @since 2020-08-13 23:41
  */
 @Documented
-@LifeCycle(TraceRequestLifeCycle.class)
+@MethodLifeCycle(TraceRequestLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface TraceRequest {

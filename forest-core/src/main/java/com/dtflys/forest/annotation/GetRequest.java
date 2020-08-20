@@ -1,6 +1,6 @@
 package com.dtflys.forest.annotation;
 
-import com.dtflys.forest.lifecycles.GetRequestLifeCycle;
+import com.dtflys.forest.lifecycles.method.GetRequestLifeCycle;
 
 import java.lang.annotation.*;
 
@@ -9,7 +9,7 @@ import java.lang.annotation.*;
  * @since 2020-08-13 22:25
  */
 @Documented
-@LifeCycle(GetRequestLifeCycle.class)
+@MethodLifeCycle(GetRequestLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface GetRequest {

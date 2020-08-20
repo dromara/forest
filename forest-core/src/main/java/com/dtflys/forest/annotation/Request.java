@@ -25,7 +25,7 @@
 package com.dtflys.forest.annotation;
 
 
-import com.dtflys.forest.lifecycles.RequestLifeCycle;
+import com.dtflys.forest.lifecycles.method.RequestLifeCycle;
 
 import java.lang.annotation.*;
 
@@ -34,7 +34,7 @@ import java.lang.annotation.*;
  * @since 2016-05-12
  */
 @Documented
-@com.dtflys.forest.annotation.LifeCycle(RequestLifeCycle.class)
+@MethodLifeCycle(RequestLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Request {

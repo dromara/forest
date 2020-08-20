@@ -5,20 +5,16 @@ package com.dtflys.forest.mapping;
  */
 public class MappingVariable extends MappingParameter {
 
-    private Class type;
 
     public MappingVariable(String name, Class type) {
+        super(type);
         this.name = name;
-        this.type = type;
     }
 
     public String getName() {
         return name;
     }
 
-    public Class getType() {
-        return type;
-    }
 
     @Override
     public String toString() {

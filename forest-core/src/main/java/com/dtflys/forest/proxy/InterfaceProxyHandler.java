@@ -2,7 +2,7 @@ package com.dtflys.forest.proxy;
 
 import com.dtflys.forest.annotation.BaseRequest;
 import com.dtflys.forest.annotation.BaseURL;
-import com.dtflys.forest.annotation.LifeCycle;
+import com.dtflys.forest.annotation.MethodLifeCycle;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.mapping.MappingTemplate;
@@ -122,7 +122,7 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
                 }
                 baseInterceptorClasses = baseRequestAnn.interceptor();
             } else {
-                LifeCycle icAnn = annotation.annotationType().getAnnotation(LifeCycle.class);
+                MethodLifeCycle icAnn = annotation.annotationType().getAnnotation(MethodLifeCycle.class);
                 if (icAnn != null) {
                     baseAnnotations.add(annotation);
                 }

@@ -1,6 +1,6 @@
 package com.dtflys.forest.annotation;
 
-import com.dtflys.forest.reflection.AnnotationLifeCycle;
+import com.dtflys.forest.reflection.MethodAnnotationLifeCycle;
 
 import java.lang.annotation.*;
 
@@ -10,6 +10,6 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.ANNOTATION_TYPE)
-public @interface LifeCycle {
-    Class<? extends AnnotationLifeCycle> value();
+public @interface MethodLifeCycle {
+    Class<? extends MethodAnnotationLifeCycle> value();
 }

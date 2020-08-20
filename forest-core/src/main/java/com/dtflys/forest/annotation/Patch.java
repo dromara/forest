@@ -1,6 +1,6 @@
 package com.dtflys.forest.annotation;
 
-import com.dtflys.forest.lifecycles.PatchRequestLifeCycle;
+import com.dtflys.forest.lifecycles.method.PatchRequestLifeCycle;
 
 import java.lang.annotation.*;
 
@@ -9,7 +9,7 @@ import java.lang.annotation.*;
  * @since 2020-08-13 23:41
  */
 @Documented
-@LifeCycle(PatchRequestLifeCycle.class)
+@MethodLifeCycle(PatchRequestLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Patch {

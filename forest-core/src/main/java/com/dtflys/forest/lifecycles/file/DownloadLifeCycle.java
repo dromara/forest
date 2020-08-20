@@ -1,4 +1,4 @@
-package com.dtflys.forest.lifecycles;
+package com.dtflys.forest.lifecycles.file;
 
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
@@ -6,7 +6,7 @@ import com.dtflys.forest.extensions.DownloadFile;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.reflection.ForestMethod;
-import com.dtflys.forest.reflection.AnnotationLifeCycle;
+import com.dtflys.forest.reflection.MethodAnnotationLifeCycle;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.commons.io.FileUtils;
@@ -14,7 +14,7 @@ import org.apache.commons.io.FileUtils;
 import java.io.*;
 import java.lang.reflect.Type;
 
-public class DownloadLifeCycle implements AnnotationLifeCycle<DownloadFile, Object> {
+public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile, Object> {
 
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
@@ -23,15 +23,6 @@ public class DownloadLifeCycle implements AnnotationLifeCycle<DownloadFile, Obje
         request.setDownloadFile(true);
     }
 
-    @Override
-    public void afterExecute(ForestRequest request, ForestResponse response) {
-
-    }
-
-    @Override
-    public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
-
-    }
 
     @Override
     public void onSuccess(Object data, ForestRequest request, ForestResponse response) {

@@ -1,6 +1,6 @@
 package com.dtflys.forest.annotation;
 
-import com.dtflys.forest.lifecycles.PostRequestLifeCycle;
+import com.dtflys.forest.lifecycles.method.PostRequestLifeCycle;
 
 import java.lang.annotation.*;
 
@@ -9,7 +9,7 @@ import java.lang.annotation.*;
  * @since 2020-08-13 23:41
  */
 @Documented
-@LifeCycle(PostRequestLifeCycle.class)
+@MethodLifeCycle(PostRequestLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface PostRequest {

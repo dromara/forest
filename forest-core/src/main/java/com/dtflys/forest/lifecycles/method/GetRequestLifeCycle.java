@@ -1,18 +1,17 @@
-package com.dtflys.forest.lifecycles;
+package com.dtflys.forest.lifecycles.method;
 
-import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MetaRequest;
 
 import java.lang.annotation.Annotation;
 
 
-public class HeadRequestLifeCycle extends RequestLifeCycle {
+public class GetRequestLifeCycle extends RequestLifeCycle {
 
     @Override
     public void onMethodInitialized(ForestMethod method, Annotation annotation) {
         MetaRequest metaRequest = createMetaRequest(annotation);
-        metaRequest.setType(ForestRequestType.HEAD.getName());
+        metaRequest.setType("GET");
         method.setMetaRequest(metaRequest);
     }
 

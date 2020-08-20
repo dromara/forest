@@ -13,6 +13,8 @@ public class MappingParameter {
     public final static int TARGET_BODY = 2;
     public final static int TARGET_HEADER = 3;
 
+    protected final Class type;
+
     protected Integer index;
 
     protected String name;
@@ -26,6 +28,14 @@ public class MappingParameter {
     private String jsonParamName;
 
     private FilterChain filterChain = new FilterChain();
+
+    public MappingParameter(Class type) {
+        this.type = type;
+    }
+
+    public Class getType() {
+        return type;
+    }
 
     public Integer getIndex() {
         return index;

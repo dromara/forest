@@ -1,4 +1,4 @@
-package com.dtflys.forest.lifecycles;
+package com.dtflys.forest.lifecycles.method;
 
 import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.reflection.ForestMethod;

@@ -1,5 +1,7 @@
 package com.dtflys.forest.annotation;
 
+import com.dtflys.forest.lifecycles.parameter.BodyLifeCycle;
+
 import java.lang.annotation.*;
 
 /**
@@ -7,6 +9,7 @@ import java.lang.annotation.*;
  * @since 2020-08-10
  */
 @Documented
+@ParamLifeCycle(BodyLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface Body {

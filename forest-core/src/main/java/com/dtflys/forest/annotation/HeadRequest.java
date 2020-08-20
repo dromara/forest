@@ -1,6 +1,6 @@
 package com.dtflys.forest.annotation;
 
-import com.dtflys.forest.lifecycles.HeadRequestLifeCycle;
+import com.dtflys.forest.lifecycles.method.HeadRequestLifeCycle;
 
 import java.lang.annotation.*;
 
@@ -9,7 +9,7 @@ import java.lang.annotation.*;
  * @since 2020-08-13 22:17
  */
 @Documented
-@LifeCycle(HeadRequestLifeCycle.class)
+@MethodLifeCycle(HeadRequestLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface HeadRequest {

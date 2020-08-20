@@ -9,11 +9,11 @@ import com.dtflys.forest.utils.ForestProgress;
 import java.lang.annotation.Annotation;
 
 /**
- * 注解的生命周期
- * @param <A>
- * @param <I>
+ * 方法注解的生命周期
+ * @param <A> 注解类
+ * @param <I> 返回类型
  */
-public interface AnnotationLifeCycle<A extends Annotation, I> extends Interceptor<I> {
+public interface MethodAnnotationLifeCycle<A extends Annotation, I> extends Interceptor<I> {
 
     default void onMethodInitialized(ForestMethod method, A annotation) {
     }

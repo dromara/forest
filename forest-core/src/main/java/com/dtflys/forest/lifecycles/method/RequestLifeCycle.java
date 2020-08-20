@@ -1,14 +1,14 @@
-package com.dtflys.forest.lifecycles;
+package com.dtflys.forest.lifecycles.method;
 
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MetaRequest;
-import com.dtflys.forest.reflection.AnnotationLifeCycle;
+import com.dtflys.forest.reflection.MethodAnnotationLifeCycle;
 import com.dtflys.forest.utils.ReflectUtils;
 
 import java.lang.annotation.Annotation;
 
 
-public class RequestLifeCycle implements AnnotationLifeCycle<Annotation, Object> {
+public class RequestLifeCycle implements MethodAnnotationLifeCycle<Annotation, Object> {
 
     protected MetaRequest createMetaRequest(Annotation annotation) {
         MetaRequest metaRequest = new MetaRequest(annotation);
