@@ -528,14 +528,12 @@ public class ForestMethod<T> implements VariableScope {
         }
         String renderedUrl = urlTemplate.render(args);
         ForestRequestType type = type(args);
-        String baseEncode = null;
+        String baseContentEncoding = null;
         if (baseEncodeTemplate != null) {
-            baseEncode = baseEncodeTemplate.render(args);
+            baseContentEncoding = baseEncodeTemplate.render(args);
         }
-        String encode = encodeTemplate.render(args);
-        if (StringUtils.isEmpty(encode)) {
-            encode = baseEncode;
-        }
+        String contentEncoding = encodeTemplate.render(args);
+
         String baseContentType = null;
         if (baseContentTypeTemplate != null) {
             baseContentType = baseContentTypeTemplate.render(args);
@@ -554,12 +552,9 @@ public class ForestMethod<T> implements VariableScope {
         }
 
         String renderedContentType = contentTypeTemplate.render(args).trim();
-        if (StringUtils.isEmpty(renderedContentType)) {
-            renderedContentType = baseContentType;
-        }
         String newUrl = "";
         List<RequestNameValue> nameValueList = new ArrayList<>();
-        List<RequestNameValue> headerNameValueList = new ArrayList<>();
+//        List<RequestNameValue> headerNameValueList = new ArrayList<>();
         List<Object> bodyList = new ArrayList<>();
         MappingTemplate[] baseHeaders = interfaceProxyHandler.getBaseHeaders();
         renderedUrl = URLUtils.getValidURL(baseUrl, renderedUrl);
@@ -607,6 +602,19 @@ public class ForestMethod<T> implements VariableScope {
             throw new ForestRuntimeException(e);
         }
 
+        // createExecutor and initialize http instance
+        ForestRequest<T> request = new ForestRequest(configuration);
+        request.setProtocol(protocol)
+                .setUrl(newUrl)
+                .setType(type)
+                .setContentEncoding(contentEncoding)
+                .setCharset(charset)
+                .setContentType(renderedContentType)
+                .setArguments(args)
+                .setLogEnable(logEnable)
+                .setAsync(async);
+
+
         for (int i = 0; i < namedParameters.size(); i++) {
             MappingParameter parameter = namedParameters.get(i);
             if (parameter.isObjectProperties()) {
@@ -620,7 +628,7 @@ public class ForestMethod<T> implements VariableScope {
                         json = jsonConverter.encodeToString(obj);
                     }
                     if (parameter.isHeader()) {
-                        headerNameValueList.add(new RequestNameValue(parameter.getJsonParamName(), json, target));
+                        request.addHeader(new RequestNameValue(parameter.getJsonParamName(), json, target));
                     } else {
                         nameValueList.add(new RequestNameValue(parameter.getJsonParamName(), json, target));
                     }
@@ -628,7 +636,7 @@ public class ForestMethod<T> implements VariableScope {
                 else if (!parameter.getFilterChain().isEmpty()) {
                     obj = parameter.getFilterChain().doFilter(configuration, obj);
                     if (parameter.isHeader()) {
-                        headerNameValueList.add(new RequestNameValue(null, obj, target));
+                        request.addHeader(new RequestNameValue(null, obj, target));
                     } else {
                         nameValueList.add(new RequestNameValue(null, obj, target));
                     }
@@ -644,7 +652,7 @@ public class ForestMethod<T> implements VariableScope {
                         if (key instanceof CharSequence) {
                             Object value = map.get(key);
                             if (parameter.isHeader()) {
-                                headerNameValueList.add(new RequestNameValue(String.valueOf(key), value, target));
+                                request.addHeader(new RequestNameValue(String.valueOf(key), value, target));
                             } else {
                                 nameValueList.add(new RequestNameValue(String.valueOf(key), value, target));
                             }
@@ -657,7 +665,7 @@ public class ForestMethod<T> implements VariableScope {
                         List<RequestNameValue> list = getNameValueListFromObjectWithJSON(parameter, obj, type);
                         for (RequestNameValue nameValue : list) {
                             if (nameValue.isInHeader()) {
-                                headerNameValueList.add(nameValue);
+                                request.addHeader(nameValue);
                             } else {
                                 nameValueList.add(nameValue);
                             }
@@ -674,11 +682,23 @@ public class ForestMethod<T> implements VariableScope {
                 if (obj != null) {
                     nameValue.setValue(String.valueOf(obj));
                     if (parameter.isHeader()) {
-                        headerNameValueList.add(nameValue);
+                        request.addHeader(nameValue);
                     } else {
                         nameValueList.add(nameValue);
                     }
                 }
+            }
+        }
+
+        if (request.getContentType() == null) {
+            if (StringUtils.isNotEmpty(baseContentType)) {
+                request.setContentType(baseContentType);
+            }
+        }
+
+        if (request.getContentEncoding() == null) {
+            if (StringUtils.isNotEmpty(baseContentEncoding)) {
+                request.setContentEncoding(baseContentEncoding);
             }
         }
 
@@ -710,25 +730,13 @@ public class ForestMethod<T> implements VariableScope {
             multiparts.add(multipart);
         }
 
+        request.setMultiparts(multiparts);
         // setup ssl keystore
         SSLKeyStore sslKeyStore = null;
         if (StringUtils.isNotEmpty(sslKeyStoreId)) {
             sslKeyStore = configuration.getKeyStore(sslKeyStoreId);
         }
-
-        // createExecutor and initialize http instance
-        ForestRequest<T> request = new ForestRequest(configuration);
-        request.setProtocol(protocol)
-                .setUrl(newUrl)
-                .setType(type)
-                .setKeyStore(sslKeyStore)
-                .setContentEncoding(encode)
-                .setCharset(charset)
-                .setContentType(renderedContentType)
-                .setArguments(args)
-                .setLogEnable(logEnable)
-                .setMultiparts(multiparts)
-                .setAsync(async);
+        request.setKeyStore(sslKeyStore);
 
         if (decoder != null) {
             request.setDecoder(decoder);
@@ -744,7 +752,10 @@ public class ForestMethod<T> implements VariableScope {
                 String headerText = baseHeader.render(args);
                 String[] headerNameValue = headerText.split(":");
                 if (headerNameValue.length > 1) {
-                    request.addHeader(headerNameValue[0].trim(), headerNameValue[1].trim());
+                    String name = headerNameValue[0].trim();
+                    if (request.getHeader(name) == null) {
+                        request.addHeader(name, headerNameValue[1].trim());
+                    }
                 }
             }
         }
@@ -801,9 +812,9 @@ public class ForestMethod<T> implements VariableScope {
                 request.addHeader(nameValue);
             }
         }
-        for (RequestNameValue headerNameValue : headerNameValueList) {
-            request.addHeader(headerNameValue);
-        }
+//        for (RequestNameValue headerNameValue : headerNameValueList) {
+//            request.addHeader(headerNameValue);
+//        }
 
         if (timeout != null) {
             request.setTimeout(timeout);

@@ -66,8 +66,6 @@ public class ForestRequest<T> {
 
     private ForestRequestType type;
 
-    private String contentEncoding;
-
     private String charset;
 
     private String responseEncode = "UTF-8";
@@ -75,8 +73,6 @@ public class ForestRequest<T> {
     private boolean async;
 
     private ForestDataType dataType;
-
-    private String contentType;
 
     private int timeout = 3000;
 
@@ -203,11 +199,11 @@ public class ForestRequest<T> {
     }
 
     public String getContentEncoding() {
-        return contentEncoding;
+        return headers.getValue("Content-Encoding");
     }
 
     public ForestRequest setContentEncoding(String contentEncoding) {
-        this.contentEncoding = contentEncoding;
+        addHeader("Content-Encoding", contentEncoding);
         return this;
     }
 
@@ -256,11 +252,11 @@ public class ForestRequest<T> {
     }
 
     public String getContentType() {
-        return contentType;
+        return headers.getValue("Content-Type");
     }
 
     public ForestRequest setContentType(String contentType) {
-        this.contentType = contentType;
+        addHeader("Content-Type", contentType);
         return this;
     }
 
@@ -364,6 +360,14 @@ public class ForestRequest<T> {
 
     public ForestHeaderMap getHeaders() {
         return headers;
+    }
+
+    public ForestHeader getHeader(String name) {
+        return headers.getHeader(name);
+    }
+
+    public String getHeaderValue(String name) {
+        return headers.getValue(name);
     }
 
     public ForestRequest addHeader(String name, Object value) {
