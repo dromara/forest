@@ -40,6 +40,9 @@ public final class URLUtils {
     public static String getValidURL(String baseURL, String uri) {
         if (!URLUtils.hasProtocol(uri)) {
             if (StringUtils.isNotEmpty(baseURL)) {
+                if (StringUtils.isBlank(uri)) {
+                    return baseURL;
+                }
                 if (baseURL.endsWith("/")) {
                     baseURL = getValidBaseURL(baseURL);
                 }
@@ -54,5 +57,6 @@ public final class URLUtils {
         }
         return uri;
     }
+
 
 }
