@@ -16,6 +16,8 @@ import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
 import com.dtflys.forest.interceptor.InterceptorFactory;
+import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
+import com.dtflys.forest.lifecycles.ParameterAnnotationLifeCycle;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingVariable;
@@ -63,8 +65,10 @@ public class ForestMethod<T> implements VariableScope {
     private MappingTemplate encodeTemplate = null;
     private MappingTemplate charsetTemplate = null;
     private MappingTemplate baseContentTypeTemplate;
+    private MappingTemplate baseUserAgentTemplate;
     private MappingTemplate baseCharsetTemplate;
     private MappingTemplate contentTypeTemplate;
+    private MappingTemplate userAgentTemplate;
     private long progressStep = -1;
     private ForestConverter decoder = null;
     private String sslKeyStoreId;
@@ -121,26 +125,31 @@ public class ForestMethod<T> implements VariableScope {
     }
 
     private void processBaseProperties() {
-        String baseUrl = interfaceProxyHandler.getBaseURL();
+        MetaRequest baseMetaRequest = interfaceProxyHandler.getBaseMetaRequest();
+        String baseUrl = baseMetaRequest.getUrl();
         if (StringUtils.isNotBlank(baseUrl)) {
             baseUrlTemplate = makeTemplate(baseUrl);
         }
-        String baseContentEncoding = interfaceProxyHandler.getBaseContentEncoding();
+        String baseContentEncoding = baseMetaRequest.getContentEncoding();
         if (StringUtils.isNotBlank(baseContentEncoding)) {
             baseEncodeTemplate = makeTemplate(baseContentEncoding);
         }
-        String baseContentType = interfaceProxyHandler.getBaseContentType();
+        String baseContentType = baseMetaRequest.getContentType();
         if (StringUtils.isNotBlank(baseContentType)) {
             baseContentTypeTemplate = makeTemplate(baseContentType);
         }
-        String baseCharset = interfaceProxyHandler.getBaseCharset();
+        String baseUserAgent = baseMetaRequest.getUserAgent();
+        if (StringUtils.isNotBlank(baseUserAgent)) {
+            baseUserAgentTemplate = makeTemplate(baseUserAgent);
+        }
+        String baseCharset = baseMetaRequest.getCharset();
         if (StringUtils.isNotBlank(baseCharset)) {
             baseCharsetTemplate = makeTemplate(baseCharset);
         }
-        baseTimeout = interfaceProxyHandler.getBaseTimeout();
-        baseRetryerClass = interfaceProxyHandler.getBaseRetryerClass();
-        baseRetryCount = interfaceProxyHandler.getBaseRetryCount();
-        baseMaxRetryInterval = interfaceProxyHandler.getBaseMaxRetryInterval();
+        baseTimeout = baseMetaRequest.getTimeout();
+        baseRetryerClass = baseMetaRequest.getRetryer();
+        baseRetryCount = baseMetaRequest.getRetryCount();
+        baseMaxRetryInterval = baseMetaRequest.getMaxRetryInterval();
 
         List<Class> globalInterceptorClasses = configuration.getInterceptors();
         if (globalInterceptorClasses != null && globalInterceptorClasses.size() > 0) {
@@ -155,7 +164,7 @@ public class ForestMethod<T> implements VariableScope {
             }
         }
 
-        Class[] baseInterceptorClasses = interfaceProxyHandler.getBaseInterceptorClasses();
+        Class[] baseInterceptorClasses = baseMetaRequest.getInterceptor();
         if (baseInterceptorClasses != null && baseInterceptorClasses.length > 0) {
             baseInterceptorList = new LinkedList<>();
             for (int cidx = 0, len = baseInterceptorClasses.length; cidx < len; cidx++) {
@@ -229,6 +238,7 @@ public class ForestMethod<T> implements VariableScope {
         }
     }
 
+
     public void setMetaRequest(MetaRequest metaRequest) {
         if (metaRequest != null && this.metaRequest != null) {
             throw new ForestRuntimeException("[Forest] annotation \""
@@ -268,6 +278,7 @@ public class ForestMethod<T> implements VariableScope {
         typeTemplate = makeTemplate(metaRequest.getType());
         dataTypeTemplate = makeTemplate(metaRequest.getDataType());
         contentTypeTemplate = makeTemplate(metaRequest.getContentType());
+        userAgentTemplate = makeTemplate(metaRequest.getUserAgent());
         sslKeyStoreId = metaRequest.getKeyStore();
         encodeTemplate = makeTemplate(metaRequest.getContentEncoding());
         charsetTemplate = makeTemplate(metaRequest.getCharset());
@@ -466,6 +477,7 @@ public class ForestMethod<T> implements VariableScope {
      * @return
      */
     private ForestRequest makeRequest(Object[] args) {
+        MetaRequest baseMetaRequest = interfaceProxyHandler.getBaseMetaRequest();
         String baseUrl = null;
         if (baseUrlTemplate != null) {
             baseUrl = baseUrlTemplate.render(args);
@@ -482,7 +494,10 @@ public class ForestMethod<T> implements VariableScope {
         if (baseContentTypeTemplate != null) {
             baseContentType = baseContentTypeTemplate.render(args);
         }
-
+        String baseUserAgent = null;
+        if (baseUserAgent != null) {
+            baseUserAgent = baseUserAgentTemplate.render(args);
+        }
         String charset = null;
         String renderedCharset = charsetTemplate.render(args);
         if (StringUtils.isNotBlank(renderedCharset)) {
@@ -496,11 +511,20 @@ public class ForestMethod<T> implements VariableScope {
         }
 
         String renderedContentType = contentTypeTemplate.render(args).trim();
+        String renderedUserAgent = userAgentTemplate.render(args).trim();
         String newUrl = "";
         List<RequestNameValue> nameValueList = new ArrayList<>();
-//        List<RequestNameValue> headerNameValueList = new ArrayList<>();
         List<Object> bodyList = new ArrayList<>();
-        MappingTemplate[] baseHeaders = interfaceProxyHandler.getBaseHeaders();
+        String [] headerArray = baseMetaRequest.getHeaders();
+        MappingTemplate[] baseHeaders = null;
+        if (headerArray != null && headerArray.length > 0) {
+            baseHeaders = new MappingTemplate[headerArray.length];
+            for (int j = 0; j < baseHeaders.length; j++) {
+                MappingTemplate header = new MappingTemplate(headerArray[j], this);
+                baseHeaders[j] = header;
+            }
+        }
+
         renderedUrl = URLUtils.getValidURL(baseUrl, renderedUrl);
         String query = "";
         String protocol = "";
@@ -554,6 +578,7 @@ public class ForestMethod<T> implements VariableScope {
                 .setContentEncoding(contentEncoding)
                 .setCharset(charset)
                 .setContentType(renderedContentType)
+                .setUserAgent(renderedUserAgent)
                 .setArguments(args)
                 .setLogEnable(logEnable)
                 .setAsync(async);
@@ -643,6 +668,12 @@ public class ForestMethod<T> implements VariableScope {
         if (request.getContentEncoding() == null) {
             if (StringUtils.isNotEmpty(baseContentEncoding)) {
                 request.setContentEncoding(baseContentEncoding);
+            }
+        }
+
+        if (request.getUserAgent() == null) {
+            if (StringUtils.isNotEmpty(baseUserAgent)) {
+                request.setUserAgent(baseUserAgent);
             }
         }
 
