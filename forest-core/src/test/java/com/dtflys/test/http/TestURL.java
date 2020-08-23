@@ -69,6 +69,10 @@ public class TestURL {
 
         newURL = URLUtils.getValidURL(baseUrl, uri);
         assertEquals(expected, newURL);
+
+        newURL = URLUtils.getValidURL("www.xxx.com", uri);
+        assertEquals(expected, newURL);
+
     }
 
 }
