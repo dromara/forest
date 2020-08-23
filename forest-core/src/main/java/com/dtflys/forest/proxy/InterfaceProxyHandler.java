@@ -45,25 +45,8 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
 
     private String baseURL;
 
-    private String baseContentType;
-
-    private String baseContentEncoding;
-
-    private String baseUserAgent;
-
-    private String baseCharset;
-
-    private Class[] baseInterceptorClasses;
-
     private List<Annotation> baseAnnotations = new LinkedList<>();
 
-    private Integer baseTimeout;
-
-    private Class baseRetryerClass;
-
-    private Integer baseRetryCount;
-
-    private Long baseMaxRetryInterval;
 
     public ProxyFactory getProxyFactory() {
         return proxyFactory;
@@ -73,6 +56,7 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         this.configuration = configuration;
         this.proxyFactory = proxyFactory;
         this.interfaceClass = interfaceClass;
+        this.interceptorFactory = configuration.getInterceptorFactory();
         prepareBaseInfo();
         initMethods();
     }
@@ -80,6 +64,7 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
 
     private void prepareBaseInfo() {
         Annotation[] annotations = interfaceClass.getAnnotations();
+
         for (int i = 0; i < annotations.length; i++) {
             Annotation annotation = annotations[i];
             if (annotation instanceof BaseURL) {
@@ -90,70 +75,18 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
                 }
                 baseURL = value.trim();
                 baseMetaRequest.setUrl(baseURL);
-            }
-            if (annotation instanceof BaseRequest) {
-                BaseRequest baseRequestAnn = (BaseRequest) annotation;
-
-
-                String baseURLValue = baseRequestAnn.baseURL();
-                if (StringUtils.isNotBlank(baseURLValue)) {
-                    baseURL = baseURLValue.trim();
-                    baseMetaRequest.setUrl(baseURL);
-                }
-
-                baseContentType = baseRequestAnn.contentType();
-                baseContentEncoding = baseRequestAnn.contentEncoding();
-                baseUserAgent = baseRequestAnn.userAgent();
-                baseCharset = baseRequestAnn.charset();
-
-                baseMetaRequest.setContentType(baseContentType);
-                baseMetaRequest.setContentEncoding(baseContentEncoding);
-                baseMetaRequest.setUserAgent(baseUserAgent);
-                baseMetaRequest.setCharset(baseCharset);
-
-                String [] headerArray = baseRequestAnn.headers();
-
-                baseTimeout = baseRequestAnn.timeout();
-                baseTimeout = baseTimeout == -1 ? null : baseTimeout;
-                baseRetryerClass = baseRequestAnn.retryer();
-                baseRetryCount = baseRequestAnn.retryCount();
-                baseRetryCount = baseRetryCount == -1 ? null : baseRetryCount;
-                baseMaxRetryInterval = baseRequestAnn.maxRetryInterval();
-
-                if (headerArray != null) {
-                    baseMetaRequest.setHeaders(headerArray);
-                }
-
-                if (baseTimeout != null) {
-                    baseMetaRequest.setTimeout(baseTimeout);
-                }
-                baseMetaRequest.setRetryer(baseRetryerClass);
-                if (baseRetryCount != null) {
-                    baseMetaRequest.setRetryCount(baseRetryCount);
-                }
-                if (baseMaxRetryInterval != null) {
-                    baseMetaRequest.setMaxRetryInterval(baseMaxRetryInterval);
-                }
-
-                if (baseMaxRetryInterval < 0) {
-                    baseMaxRetryInterval = null;
-                }
-                baseInterceptorClasses = baseRequestAnn.interceptor();
-                baseMetaRequest.setInterceptor(baseInterceptorClasses);
-
             } else {
-//                MethodLifeCycle icAnn = annotation.annotationType().getAnnotation(MethodLifeCycle.class);
-//                if (icAnn != null) {
-//                    baseAnnotations.add(annotation);
-//                }
                 BaseLifeCycle baseLifeCycle = annotation.annotationType().getAnnotation(BaseLifeCycle.class);
-                if (baseLifeCycle != null) {
-                    Class<? extends BaseAnnotationLifeCycle> interceptorClass = baseLifeCycle.value();
-                    if (interceptorClass != null) {
-                        BaseAnnotationLifeCycle baseInterceptor = interceptorFactory.getInterceptor(interceptorClass);
-                        baseInterceptor.onProxyHandlerInitialized(this, annotation);
-                        baseAnnotations.add(annotation);
+                MethodLifeCycle methodLifeCycle = annotation.annotationType().getAnnotation(MethodLifeCycle.class);
+                if (baseLifeCycle != null || methodLifeCycle != null) {
+                    if (baseLifeCycle != null) {
+                        Class<? extends BaseAnnotationLifeCycle> interceptorClass = baseLifeCycle.value();
+                        if (interceptorClass != null) {
+                            BaseAnnotationLifeCycle baseInterceptor = interceptorFactory.getInterceptor(interceptorClass);
+                            baseInterceptor.onProxyHandlerInitialized(this, annotation);
+                        }
                     }
+                    baseAnnotations.add(annotation);
                 }
             }
         }
@@ -171,9 +104,6 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         String methodName = method.getName();
-//        if (methodName.equals("getProxyHandler") && (args == null || args.length == 0)) {
-//            return this;
-//        }
         if (methodName.equals("toString") && (args == null || args.length == 0)) {
             return "{Forest Proxy Object of " + interfaceClass.getName() + "}";
         }
