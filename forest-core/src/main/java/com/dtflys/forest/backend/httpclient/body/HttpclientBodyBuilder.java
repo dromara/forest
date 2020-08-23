@@ -90,7 +90,7 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
             Object value = nameValue.getValue();
             entityBuilder.addTextBody(name, MappingTemplate.getParameterValue(jsonConverter, value));
         }
-
+        long contentLength = 0;
         for (int i = 0; i < multiparts.size(); i++) {
             ForestMultipart multipart = multiparts.get(i);
             String name = multipart.getName();
@@ -104,7 +104,11 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
                 contentBody = new HttpclientMultipartCommonBody(request, multipart, ctype, fileName, lifeCycleHandler);
 //                entityBuilder.addBinaryBody(name, multipart.getInputStream(), ctype, fileName);
             }
+            contentLength += contentBody.getContentLength();
             entityBuilder.addPart(name, contentBody);
+        }
+        if (httpReq.getFirstHeader("Content-Type") != null) {
+            httpReq.removeHeaders("Content-Type");
         }
         HttpEntity entity = entityBuilder.build();
         httpReq.setEntity(entity);

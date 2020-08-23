@@ -101,6 +101,8 @@ public class HttpclientMultipartCommonBody extends AbstractContentBody {
             }
 
             out.flush();
+        } catch (Throwable th2) {
+            th2.printStackTrace();
         } finally {
             in.close();
         }

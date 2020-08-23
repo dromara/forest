@@ -86,10 +86,13 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         if (headerList != null && !headerList.isEmpty()) {
             for (RequestNameValue nameValue : headerList) {
                 String name = nameValue.getName();
-                httpRequest.setHeader(name, MappingTemplate.getParameterValue(jsonConverter, nameValue.getValue()));
+                if (!name.equalsIgnoreCase("Content-Type")
+                        && !name.equalsIgnoreCase("Content-Encoding")) {
+                    httpRequest.setHeader(name, MappingTemplate.getParameterValue(jsonConverter, nameValue.getValue()));
+                }
             }
         }
-        if (StringUtils.isNotEmpty(contentType)) {
+        if (StringUtils.isNotEmpty(contentType) && !contentType.startsWith("multipart/form-data")) {
             httpRequest.setHeader("Content-Type", contentType);
         }
         if (StringUtils.isNotEmpty(contentEncoding)) {
