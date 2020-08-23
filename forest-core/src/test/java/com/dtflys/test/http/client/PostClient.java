@@ -94,14 +94,16 @@ public interface PostClient {
     @Request(
             url = "http://localhost:${port}/complex?param=${0}",
             type = "post",
-            headers = {"Accept:text/plain"}
+            headers = {"Accept:text/plain"},
+            contentType = "application/x-www-form-urlencoded"
     )
     String complexPost2(String param, @DataParam("username") String username, @DataParam("password") String password);
 
     @Request(
             url = "http://localhost:${port}/complex",
             type = "post",
-            headers = {"Accept:text/plain"}
+            headers = {"Accept:text/plain"},
+            contentType = "application/x-www-form-urlencoded"
     )
     String complexPost3(@Query("param") String param,
                         @Body("username") String username,
@@ -110,7 +112,8 @@ public interface PostClient {
     @Request(
             url = "http://localhost:${port}/complex",
             type = "post",
-            headers = {"Accept:text/plain"}
+            headers = {"Accept:text/plain"},
+            contentType = "application/x-www-form-urlencoded"
     )
     String complexPost4(@Query("param") String param,
                         @DataParam("username") String username,
