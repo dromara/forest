@@ -207,6 +207,15 @@ public class ForestRequest<T> {
         return this;
     }
 
+    public String getUserAgent() {
+        return headers.getValue("User-Agent");
+    }
+
+    public ForestRequest setUserAgent(String userAgent) {
+        addHeader("User-Agent", userAgent);
+        return this;
+    }
+
     public String getCharset() {
         return charset;
     }

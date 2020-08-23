@@ -1,13 +1,18 @@
 package com.dtflys.forest.proxy;
 
+import com.dtflys.forest.annotation.BaseLifeCycle;
 import com.dtflys.forest.annotation.BaseRequest;
 import com.dtflys.forest.annotation.BaseURL;
 import com.dtflys.forest.annotation.MethodLifeCycle;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.VariableScope;
+import com.dtflys.forest.interceptor.Interceptor;
+import com.dtflys.forest.interceptor.InterceptorFactory;
+import com.dtflys.forest.lifecycles.BaseAnnotationLifeCycle;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.reflection.ForestMethod;
+import com.dtflys.forest.reflection.MetaRequest;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
 
@@ -34,15 +39,19 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
 
     private Map<Method, ForestMethod> forestMethodMap = new HashMap<Method, ForestMethod>();
 
+    private MetaRequest baseMetaRequest = new MetaRequest();
+
+    private InterceptorFactory interceptorFactory;
+
     private String baseURL;
 
     private String baseContentType;
 
     private String baseContentEncoding;
 
-    private String baseCharset;
+    private String baseUserAgent;
 
-    private MappingTemplate[] baseHeaders;
+    private String baseCharset;
 
     private Class[] baseInterceptorClasses;
 
@@ -79,52 +88,72 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
                 if (value == null || value.trim().length() == 0) {
                     continue;
                 }
-                MappingTemplate template = new MappingTemplate(value.trim(), this);
-                template.compile();
-                baseURL = template.render(new Object[] {});
-                if (!URLUtils.hasProtocol(baseURL)) {
-                    baseURL = "http://" + baseURL;
-                }
-                baseURL = URLUtils.getValidBaseURL(baseURL);
+                baseURL = value.trim();
+                baseMetaRequest.setUrl(baseURL);
             }
             if (annotation instanceof BaseRequest) {
                 BaseRequest baseRequestAnn = (BaseRequest) annotation;
+
+
                 String baseURLValue = baseRequestAnn.baseURL();
                 if (StringUtils.isNotBlank(baseURLValue)) {
-                    MappingTemplate template = new MappingTemplate(baseURLValue.trim(), this);
-                    template.compile();
-                    baseURL = template.render(new Object[]{});
-                    if (!URLUtils.hasProtocol(baseURL)) {
-                        baseURL = "http://" + baseURL;
-                    }
-                    baseURL = URLUtils.getValidBaseURL(baseURL);
+                    baseURL = baseURLValue.trim();
+                    baseMetaRequest.setUrl(baseURL);
                 }
 
-                baseContentEncoding = baseRequestAnn.contentEncoding();
-                baseCharset = baseRequestAnn.charset();
                 baseContentType = baseRequestAnn.contentType();
+                baseContentEncoding = baseRequestAnn.contentEncoding();
+                baseUserAgent = baseRequestAnn.userAgent();
+                baseCharset = baseRequestAnn.charset();
+
+                baseMetaRequest.setContentType(baseContentType);
+                baseMetaRequest.setContentEncoding(baseContentEncoding);
+                baseMetaRequest.setUserAgent(baseUserAgent);
+                baseMetaRequest.setCharset(baseCharset);
+
                 String [] headerArray = baseRequestAnn.headers();
-                if (headerArray != null && headerArray.length > 0) {
-                    baseHeaders = new MappingTemplate[headerArray.length];
-                    for (int j = 0; j < baseHeaders.length; j++) {
-                        MappingTemplate header = new MappingTemplate(headerArray[j], this);
-                        baseHeaders[j] = header;
-                    }
-                }
+
                 baseTimeout = baseRequestAnn.timeout();
                 baseTimeout = baseTimeout == -1 ? null : baseTimeout;
                 baseRetryerClass = baseRequestAnn.retryer();
                 baseRetryCount = baseRequestAnn.retryCount();
                 baseRetryCount = baseRetryCount == -1 ? null : baseRetryCount;
                 baseMaxRetryInterval = baseRequestAnn.maxRetryInterval();
+
+                if (headerArray != null) {
+                    baseMetaRequest.setHeaders(headerArray);
+                }
+
+                if (baseTimeout != null) {
+                    baseMetaRequest.setTimeout(baseTimeout);
+                }
+                baseMetaRequest.setRetryer(baseRetryerClass);
+                if (baseRetryCount != null) {
+                    baseMetaRequest.setRetryCount(baseRetryCount);
+                }
+                if (baseMaxRetryInterval != null) {
+                    baseMetaRequest.setMaxRetryInterval(baseMaxRetryInterval);
+                }
+
                 if (baseMaxRetryInterval < 0) {
                     baseMaxRetryInterval = null;
                 }
                 baseInterceptorClasses = baseRequestAnn.interceptor();
+                baseMetaRequest.setInterceptor(baseInterceptorClasses);
+
             } else {
-                MethodLifeCycle icAnn = annotation.annotationType().getAnnotation(MethodLifeCycle.class);
-                if (icAnn != null) {
-                    baseAnnotations.add(annotation);
+//                MethodLifeCycle icAnn = annotation.annotationType().getAnnotation(MethodLifeCycle.class);
+//                if (icAnn != null) {
+//                    baseAnnotations.add(annotation);
+//                }
+                BaseLifeCycle baseLifeCycle = annotation.annotationType().getAnnotation(BaseLifeCycle.class);
+                if (baseLifeCycle != null) {
+                    Class<? extends BaseAnnotationLifeCycle> interceptorClass = baseLifeCycle.value();
+                    if (interceptorClass != null) {
+                        BaseAnnotationLifeCycle baseInterceptor = interceptorFactory.getInterceptor(interceptorClass);
+                        baseInterceptor.onProxyHandlerInitialized(this, annotation);
+                        baseAnnotations.add(annotation);
+                    }
                 }
             }
         }
@@ -161,53 +190,18 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         return forestMethod.invoke(args);
     }
 
+    public MetaRequest getBaseMetaRequest() {
+        return baseMetaRequest;
+    }
+
     @Override
     public Object getVariableValue(String name) {
         return configuration.getVariableValue(name);
     }
 
-    public String getBaseURL() {
-        return baseURL;
-    }
-
-    public MappingTemplate[] getBaseHeaders() {
-        return baseHeaders;
-    }
-
-    public Class[] getBaseInterceptorClasses() {
-        return baseInterceptorClasses;
-    }
-
-    public Integer getBaseTimeout() {
-        return baseTimeout;
-    }
-
-    public String getBaseContentType() {
-        return baseContentType;
-    }
-
-    public String getBaseContentEncoding() {
-        return baseContentEncoding;
-    }
-
-    public String getBaseCharset() {
-        return baseCharset;
-    }
 
     public List<Annotation> getBaseAnnotations() {
         return baseAnnotations;
-    }
-
-    public Class getBaseRetryerClass() {
-        return baseRetryerClass;
-    }
-
-    public Integer getBaseRetryCount() {
-        return baseRetryCount;
-    }
-
-    public Long getBaseMaxRetryInterval() {
-        return baseMaxRetryInterval;
     }
 
     @Override

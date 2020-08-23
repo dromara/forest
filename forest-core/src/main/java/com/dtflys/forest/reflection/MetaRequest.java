@@ -47,7 +47,7 @@ public class MetaRequest {
      */
     private int retryCount;
 
-    private int maxRetryInterval;
+    private long maxRetryInterval;
 
     /**
      * Content Type
@@ -66,6 +66,11 @@ public class MetaRequest {
      * @return
      */
     private String charset;
+
+    /**
+     * User Agent
+     */
+    private String userAgent;
 
     private String[] headers;
 
@@ -156,11 +161,11 @@ public class MetaRequest {
         this.retryCount = retryCount;
     }
 
-    public int getMaxRetryInterval() {
+    public long getMaxRetryInterval() {
         return maxRetryInterval;
     }
 
-    public void setMaxRetryInterval(int maxRetryInterval) {
+    public void setMaxRetryInterval(long maxRetryInterval) {
         this.maxRetryInterval = maxRetryInterval;
     }
 
@@ -178,6 +183,14 @@ public class MetaRequest {
 
     public void setContentEncoding(String contentEncoding) {
         this.contentEncoding = contentEncoding;
+    }
+
+    public String getUserAgent() {
+        return userAgent;
+    }
+
+    public void setUserAgent(String userAgent) {
+        this.userAgent = userAgent;
     }
 
     public String getCharset() {
