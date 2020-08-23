@@ -4,7 +4,7 @@ import com.dtflys.forest.annotation.DataParam;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.reflection.ForestMethod;
-import com.dtflys.forest.reflection.ParameterAnnotationLifeCycle;
+import com.dtflys.forest.lifecycles.ParameterAnnotationLifeCycle;
 
 /**
  * @DataParam注解的生命周期
