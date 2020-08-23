@@ -3,6 +3,7 @@ package com.dtflys.test.proxy;
 import com.dtflys.forest.annotation.BaseURL;
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.reflection.MetaRequest;
 import com.dtflys.test.http.client.GetClient;
 import com.dtflys.forest.proxy.InterfaceProxyHandler;
 import com.dtflys.forest.proxy.ProxyFactory;
@@ -58,7 +59,8 @@ public class TestInterfaceProxyHandler {
         ProxyFactory<LocalhostBaseURLClient> getClientProxyFactory = new ProxyFactory<>(configuration, LocalhostBaseURLClient.class);
         InterfaceProxyHandler<LocalhostBaseURLClient> interfaceProxyHandler =
                 new InterfaceProxyHandler(configuration, getClientProxyFactory, LocalhostBaseURLClient.class);
-        assertEquals("http://localhost", interfaceProxyHandler.getBaseURL());
+        MetaRequest metaRequest = interfaceProxyHandler.getBaseMetaRequest();
+        assertEquals("http://localhost", metaRequest.getUrl());
 
     }
 
@@ -67,7 +69,8 @@ public class TestInterfaceProxyHandler {
         ProxyFactory<NonProtocolBaseURLClient> getClientProxyFactory = new ProxyFactory<>(configuration, NonProtocolBaseURLClient.class);
         InterfaceProxyHandler<NonProtocolBaseURLClient> interfaceProxyHandler =
                 new InterfaceProxyHandler(configuration, getClientProxyFactory, NonProtocolBaseURLClient.class);
-        assertEquals("http://localhost", interfaceProxyHandler.getBaseURL());
+        MetaRequest metaRequest = interfaceProxyHandler.getBaseMetaRequest();
+        assertEquals("localhost", metaRequest.getUrl());
     }
 
 
@@ -77,7 +80,8 @@ public class TestInterfaceProxyHandler {
         ProxyFactory<EmptyBaseURLClient> getClientProxyFactory = new ProxyFactory<>(configuration, EmptyBaseURLClient.class);
         InterfaceProxyHandler<EmptyBaseURLClient> interfaceProxyHandler =
                 new InterfaceProxyHandler(configuration, getClientProxyFactory, EmptyBaseURLClient.class);
-        assertNull(interfaceProxyHandler.getBaseURL());
+        MetaRequest metaRequest = interfaceProxyHandler.getBaseMetaRequest();
+        assertNull(metaRequest.getUrl());
     }
 
 
