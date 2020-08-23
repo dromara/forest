@@ -16,6 +16,7 @@ import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
 import com.dtflys.forest.interceptor.InterceptorFactory;
+import com.dtflys.forest.lifecycles.BaseAnnotationLifeCycle;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.lifecycles.ParameterAnnotationLifeCycle;
 import com.dtflys.forest.mapping.MappingParameter;
@@ -203,11 +204,28 @@ public class ForestMethod<T> implements VariableScope {
      */
     private void addMetaRequestAnnotation(Annotation annotation) {
         Class<? extends Annotation> annType = annotation.annotationType();
+        Class<? extends MethodAnnotationLifeCycle> interceptorClass = null;
         MethodLifeCycle methodLifeCycleAnn = annType.getAnnotation(MethodLifeCycle.class);
-        if (methodLifeCycleAnn != null) {
-            Class<? extends MethodAnnotationLifeCycle> interceptorClass = methodLifeCycleAnn.value();
-            if (!Interceptor.class.isAssignableFrom(interceptorClass)) {
-                throw new ForestInterceptorDefineException(interceptorClass);
+        if (methodLifeCycleAnn == null) {
+            BaseLifeCycle baseLifeCycle = annType.getAnnotation(BaseLifeCycle.class);
+            if (baseLifeCycle != null) {
+                Class<? extends BaseAnnotationLifeCycle> baseAnnLifeCycleClass = baseLifeCycle.value();
+                if (baseAnnLifeCycleClass != null) {
+                    if (MethodAnnotationLifeCycle.class.isAssignableFrom(baseAnnLifeCycleClass)) {
+                        interceptorClass = (Class<? extends MethodAnnotationLifeCycle>) baseAnnLifeCycleClass;
+                    } else {
+                        addInterceptor(baseAnnLifeCycleClass);
+                        return;
+                    }
+                }
+            }
+        }
+        if (methodLifeCycleAnn != null || interceptorClass != null) {
+            if (interceptorClass == null) {
+                interceptorClass = methodLifeCycleAnn.value();
+                if (!Interceptor.class.isAssignableFrom(interceptorClass)) {
+                    throw new ForestInterceptorDefineException(interceptorClass);
+                }
             }
 
             RequestAttributes requestAttributesAnn = annType.getAnnotation(RequestAttributes.class);
@@ -277,10 +295,16 @@ public class ForestMethod<T> implements VariableScope {
         urlTemplate = makeTemplate(metaRequest.getUrl());
         typeTemplate = makeTemplate(metaRequest.getType());
         dataTypeTemplate = makeTemplate(metaRequest.getDataType());
-        contentTypeTemplate = makeTemplate(metaRequest.getContentType());
-        userAgentTemplate = makeTemplate(metaRequest.getUserAgent());
+        if (StringUtils.isNotEmpty(metaRequest.getContentType())) {
+            contentTypeTemplate = makeTemplate(metaRequest.getContentType());
+        }
+        if (StringUtils.isNotEmpty(metaRequest.getUserAgent())) {
+            userAgentTemplate = makeTemplate(metaRequest.getUserAgent());
+        }
         sslKeyStoreId = metaRequest.getKeyStore();
-        encodeTemplate = makeTemplate(metaRequest.getContentEncoding());
+        if (StringUtils.isNotEmpty(metaRequest.getContentEncoding())) {
+            encodeTemplate = makeTemplate(metaRequest.getContentEncoding());
+        }
         charsetTemplate = makeTemplate(metaRequest.getCharset());
         progressStep = metaRequest.getProgressStep();
         async = metaRequest.isAsync();
@@ -488,7 +512,10 @@ public class ForestMethod<T> implements VariableScope {
         if (baseEncodeTemplate != null) {
             baseContentEncoding = baseEncodeTemplate.render(args);
         }
-        String contentEncoding = encodeTemplate.render(args);
+        String contentEncoding = null;
+        if (encodeTemplate != null) {
+            contentEncoding = encodeTemplate.render(args);
+        }
 
         String baseContentType = null;
         if (baseContentTypeTemplate != null) {
@@ -510,8 +537,14 @@ public class ForestMethod<T> implements VariableScope {
             charset = "UTF-8";
         }
 
-        String renderedContentType = contentTypeTemplate.render(args).trim();
-        String renderedUserAgent = userAgentTemplate.render(args).trim();
+        String renderedContentType = null;
+        if (contentTypeTemplate != null) {
+            renderedContentType = contentTypeTemplate.render(args).trim();
+        }
+        String renderedUserAgent = null;
+        if (userAgentTemplate != null) {
+            renderedUserAgent = userAgentTemplate.render(args).trim();
+        }
         String newUrl = "";
         List<RequestNameValue> nameValueList = new ArrayList<>();
         List<Object> bodyList = new ArrayList<>();
@@ -575,13 +608,22 @@ public class ForestMethod<T> implements VariableScope {
         request.setProtocol(protocol)
                 .setUrl(newUrl)
                 .setType(type)
-                .setContentEncoding(contentEncoding)
                 .setCharset(charset)
-                .setContentType(renderedContentType)
-                .setUserAgent(renderedUserAgent)
                 .setArguments(args)
                 .setLogEnable(logEnable)
                 .setAsync(async);
+
+        if (StringUtils.isNotEmpty(renderedContentType)) {
+            request.setContentType(renderedContentType);
+        }
+
+        if (StringUtils.isNotEmpty(contentEncoding)) {
+            request.setContentEncoding(contentEncoding);
+        }
+
+        if (StringUtils.isNotEmpty(renderedUserAgent)) {
+            request.setUserAgent(renderedUserAgent);
+        }
 
 
         for (int i = 0; i < namedParameters.size(); i++) {
