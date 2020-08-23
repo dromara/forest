@@ -1,5 +1,6 @@
 package com.dtflys.forest.annotation;
 
+import com.dtflys.forest.lifecycles.base.BaseRequestLifeCycle;
 import com.dtflys.forest.retryer.NoneRetryer;
 
 import java.lang.annotation.*;
@@ -10,6 +11,7 @@ import java.lang.annotation.*;
  * @since 2018-03-30 16:59
  */
 @Documented
+@BaseLifeCycle(BaseRequestLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface BaseRequest {
@@ -31,6 +33,12 @@ public @interface BaseRequest {
      * @return
      */
     String contentEncoding() default "";
+
+    /**
+     * Base User Agent
+     * @return
+     */
+    String userAgent() default "";
 
     String charset() default "UTF-8";
 
