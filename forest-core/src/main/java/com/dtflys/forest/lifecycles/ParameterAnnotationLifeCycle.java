@@ -1,10 +1,11 @@
-package com.dtflys.forest.reflection;
+package com.dtflys.forest.lifecycles;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.mapping.MappingParameter;
+import com.dtflys.forest.reflection.ForestMethod;
 
 import java.lang.annotation.Annotation;
 

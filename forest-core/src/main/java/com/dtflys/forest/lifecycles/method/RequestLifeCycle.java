@@ -2,7 +2,7 @@ package com.dtflys.forest.lifecycles.method;
 
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MetaRequest;
-import com.dtflys.forest.reflection.MethodAnnotationLifeCycle;
+import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.utils.ReflectUtils;
 
 import java.lang.annotation.Annotation;

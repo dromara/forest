@@ -1,6 +1,6 @@
 package com.dtflys.forest.annotation;
 
-import com.dtflys.forest.reflection.MethodAnnotationLifeCycle;
+import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 
 import java.lang.annotation.*;
 
