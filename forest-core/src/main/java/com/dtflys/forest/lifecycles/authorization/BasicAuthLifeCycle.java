@@ -10,7 +10,7 @@ import com.dtflys.forest.proxy.InterfaceProxyHandler;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.Base64Utils;
 
-public class BasicAuthLifeCycle implements MethodAnnotationLifeCycle<BasicAuth, Object>, BaseAnnotationLifeCycle<BasicAuth, Object> {
+public class BasicAuthLifeCycle implements MethodAnnotationLifeCycle<BasicAuth, Object> {
 
     @Override
     public boolean beforeExecute(ForestRequest request) {
@@ -19,12 +19,6 @@ public class BasicAuthLifeCycle implements MethodAnnotationLifeCycle<BasicAuth, 
         String basic = "Basic " + Base64Utils.encode(username + ":" + password);
         request.addHeader("Authorization", basic);
         return true;
-    }
-
-
-    @Override
-    public void onProxyHandlerInitialized(InterfaceProxyHandler interfaceProxyHandler, BasicAuth annotation) {
-
     }
 
     @Override
