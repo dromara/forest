@@ -1,11 +1,15 @@
 package com.dtflys.forest.lifecycles.parameter;
 
 import com.dtflys.forest.annotation.DataFile;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.multipart.ForestMultipartFactory;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.lifecycles.ParameterAnnotationLifeCycle;
+import com.dtflys.forest.utils.StringUtils;
+
+import static com.dtflys.forest.backend.body.AbstractBodyBuilder.TYPE_MULTIPART_FORM_DATA;
 
 /**
  * @DataFile注解的生命周期
@@ -23,6 +27,13 @@ public class DataFileLifeCycle implements ParameterAnnotationLifeCycle<DataFile,
         ForestMultipartFactory factory = ForestMultipartFactory.createFactory(
                 parameter.getType(), parameter.getIndex(), nameTemplate, fileNameTemplate);
         method.addMultipartFactory(factory);
-
     }
+
+    @Override
+    public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
+        if (StringUtils.isEmpty(request.getContentType())) {
+            request.setContentType(TYPE_MULTIPART_FORM_DATA);
+        }
+    }
+
 }
