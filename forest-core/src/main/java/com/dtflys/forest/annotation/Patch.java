@@ -69,6 +69,12 @@ public @interface Patch {
     String charset() default "";
 
     /**
+     * User Agent
+     * @return
+     */
+    String userAgent() default "";
+
+    /**
      * reqest headers: <br>
      *     use the key-value format: key: value <br>
      *     <pre>

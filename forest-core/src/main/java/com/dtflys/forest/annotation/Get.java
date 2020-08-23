@@ -63,6 +63,12 @@ public @interface Get {
     String contentEncoding() default "";
 
     /**
+     * User Agent
+     * @return
+     */
+    String userAgent() default "";
+
+    /**
      * Charset, Default is UTF-8
      * @return
      */
