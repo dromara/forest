@@ -5,13 +5,9 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.reflection.MethodLifeCycleHandler;
 import com.dtflys.forest.reflection.NoneLifeCycleHandler;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
-import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.http.ForestResponse;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertNotNull;
