@@ -7,8 +7,8 @@
 <a href="https://travis-ci.org/github/mySingleLive/forest">
     <img src="https://api.travis-ci.org/mySingleLive/forest.svg?branch=master&status=passed" alt="Build">
 </a>
-<a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.4.0-ALPHA1/jar">
-    <img src="https://img.shields.io/badge/maven%20central-1.4.0-ALPHA1-brightgreen.svg" alt="Maven Central">
+<a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.4.0/jar">
+    <img src="https://img.shields.io/badge/maven%20central-1.4.0-brightgreen.svg" alt="Maven Central">
 </a>
 <a href="https://codecov.io/gh/mySingleLive/forest">
     <img src="https://codecov.io/gh/mySingleLive/forest/branch/master/graphs/badge.svg?branch=master" alt="Codecov">
@@ -62,7 +62,7 @@ Forest是一个高层的、极简的轻量级HTTP调用API框架。<br>
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>spring-boot-starter-forest</artifactId>
-    <version>1.4.0-ALPHA1</version>
+    <version>1.4.0</version>
 </dependency>
 ```
 
