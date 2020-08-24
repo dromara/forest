@@ -35,6 +35,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
+import static com.dtflys.forest.backend.body.AbstractBodyBuilder.TYPE_MULTIPART_FORM_DATA;
 import static com.dtflys.forest.mapping.MappingParameter.*;
 
 /**
@@ -265,6 +266,22 @@ public class ForestMethod<T> implements VariableScope {
                     + metaRequest.getRequestAnnotation().annotationType().getName() + "\" has already been attached to this method.");
         }
         this.metaRequest = metaRequest;
+    }
+
+    /**
+     * 获取Java原生方法
+     * @return
+     */
+    public Method getMethod() {
+        return method;
+    }
+
+    /**
+     * 获取方法名
+     * @return
+     */
+    public String getMethodName() {
+        return method.getName();
     }
 
     public MetaRequest getMetaRequest() {
@@ -604,12 +621,11 @@ public class ForestMethod<T> implements VariableScope {
         }
 
         // createExecutor and initialize http instance
-        ForestRequest<T> request = new ForestRequest(configuration);
+        ForestRequest<T> request = new ForestRequest(configuration, args);
         request.setProtocol(protocol)
                 .setUrl(newUrl)
                 .setType(type)
                 .setCharset(charset)
-                .setArguments(args)
                 .setLogEnable(logEnable)
                 .setAsync(async);
 
@@ -721,6 +737,10 @@ public class ForestMethod<T> implements VariableScope {
 
         List<ForestMultipart> multiparts = new ArrayList<>(multipartFactories.size());
 
+        if (!multipartFactories.isEmpty() && request.getContentType() == null) {
+            request.setContentType(TYPE_MULTIPART_FORM_DATA);
+        }
+
         for (int i = 0; i < multipartFactories.size(); i++) {
             ForestMultipartFactory factory = multipartFactories.get(i);
             MappingTemplate nameTemplate = factory.getNameTemplate();
@@ -739,9 +759,10 @@ public class ForestMethod<T> implements VariableScope {
             if (data == null) {
                 continue;
             }
-            ForestMultipart multipart = factory.create(name, fileName, data, contentType);
+            ForestMultipart multipart = factory.create(name, fileName, data, TYPE_MULTIPART_FORM_DATA);
             multiparts.add(multipart);
         }
+
 
         request.setMultiparts(multiparts);
         // setup ssl keystore
