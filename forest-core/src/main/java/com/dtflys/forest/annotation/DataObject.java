@@ -24,6 +24,8 @@
 
 package com.dtflys.forest.annotation;
 
+import com.dtflys.forest.lifecycles.parameter.DataObjectLifeCycle;
+
 import java.lang.annotation.*;
 
 /**
@@ -31,6 +33,7 @@ import java.lang.annotation.*;
  * @since 2016-06-01
  */
 @Documented
+@ParamLifeCycle(DataObjectLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface DataObject {

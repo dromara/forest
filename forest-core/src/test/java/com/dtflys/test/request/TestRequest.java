@@ -1,9 +1,16 @@
 package com.dtflys.test.request;
 
-import junit.framework.Assert;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.interceptor.InterceptorAttributes;
+import com.dtflys.test.interceptor.BasicAuthClient;
 import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNotNull;
 
 /**
  * @author gongjun[dt_flys@hotmail.com]
@@ -12,12 +19,57 @@ import org.junit.Test;
 public class TestRequest {
 
     @Test
-    public void testDefaultRequst() {
+    public void testDefaultRequest() {
         ForestConfiguration configuration = ForestConfiguration.configuration();
         ForestRequest request = new ForestRequest(configuration);
-        Assert.assertEquals(configuration, request.getConfiguration());
-        Assert.assertEquals(configuration.getTimeout().intValue(),
+        assertEquals(configuration, request.getConfiguration());
+        assertEquals(configuration.getTimeout().intValue(),
                 request.getTimeout());
-        Assert.assertEquals(0, request.getRetryCount());
+        assertEquals(0, request.getRetryCount());
     }
+
+
+    @Test
+    public void testInterceptorAttribute() {
+        ForestConfiguration configuration = ForestConfiguration.configuration();
+        ForestRequest request = new ForestRequest(configuration);
+        request.addInterceptorAttribute(BasicAuthClient.class, "Xxx", "foo");
+        request.addInterceptorAttribute(BasicAuthClient.class, "Yyy", "bar");
+        Object xxxValue = request.getInterceptorAttribute(BasicAuthClient.class, "Xxx");
+        assertNotNull(xxxValue);
+        assertEquals("foo", xxxValue);
+
+        Object yyyValue = request.getInterceptorAttribute(BasicAuthClient.class, "Yyy");
+        assertNotNull(yyyValue);
+        assertEquals("bar", yyyValue);
+
+        Map<String, Object> attrMap = new HashMap<>();
+        attrMap.put("Xxx", "xxxx");
+        attrMap.put("Zzz", 1111);
+        InterceptorAttributes attributes = new InterceptorAttributes(BasicAuthClient.class, attrMap);
+        request.addInterceptorAttributes(BasicAuthClient.class, attributes);
+        xxxValue = request.getInterceptorAttribute(BasicAuthClient.class, "Xxx");
+        assertNotNull(xxxValue);
+        assertEquals("xxxx", xxxValue);
+
+        Object zzzValue = request.getInterceptorAttribute(BasicAuthClient.class, "Zzz");
+        assertNotNull(zzzValue);
+        assertEquals(Integer.valueOf(1111), zzzValue);
+    }
+
+    @Test
+    public void testAttachment() {
+        ForestConfiguration configuration = ForestConfiguration.configuration();
+        ForestRequest request = new ForestRequest(configuration);
+        request.addAttachment("Xxx", "foo");
+        request.addAttachment("Yyy", "bar");
+        Object xxxValue = request.getAttachment("Xxx");
+        Object yyyValue = request.getAttachment("Yyy");
+        assertEquals("foo", xxxValue);
+        assertEquals("bar", yyyValue);
+        request.addAttachment("Yyy", "1111");
+        yyyValue = request.getAttachment("Yyy");
+        assertEquals("1111", yyyValue);
+    }
+
 }

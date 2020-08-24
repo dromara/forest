@@ -5,9 +5,9 @@ import java.lang.reflect.Type;
 /**
  * Created by Gongjun on 2016/5/26.
  */
-public interface ForestConverter {
+public interface ForestConverter<S> {
 
-    <T> T convertToJavaObject(String source, Class<T> targetType);
+    <T> T convertToJavaObject(S source, Class<T> targetType);
 
-    <T> T convertToJavaObject(String source, Type targetType);
+    <T> T convertToJavaObject(S source, Type targetType);
 }

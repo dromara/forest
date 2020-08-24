@@ -3,6 +3,8 @@ package com.dtflys.forest.interceptor;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.reflection.ForestMethod;
+import com.dtflys.forest.utils.ForestProgress;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -23,6 +25,16 @@ public class InterceptorChain implements Interceptor {
     public int getInterceptorSize() {
         return interceptors.size();
     }
+
+    @Override
+    public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
+        Iterator<Interceptor> iter = interceptors.iterator();
+        for ( ; iter.hasNext(); ) {
+            Interceptor item = iter.next();
+            item.onInvokeMethod(request, method, args);
+        }
+    }
+
 
     @Override
     public boolean beforeExecute(ForestRequest request) {
@@ -55,6 +67,15 @@ public class InterceptorChain implements Interceptor {
         for ( ; iter.hasNext(); ) {
             Interceptor item = iter.next();
             item.onError(ex, request, response);
+        }
+    }
+
+    @Override
+    public void onProgress(ForestProgress progress) {
+        Iterator<Interceptor> iter = interceptors.iterator();
+        for (; iter.hasNext(); ) {
+            Interceptor item = iter.next();
+            item.onProgress(progress);
         }
     }
 

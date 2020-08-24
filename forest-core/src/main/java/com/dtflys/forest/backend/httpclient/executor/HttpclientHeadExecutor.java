@@ -1,6 +1,7 @@
 package com.dtflys.forest.backend.httpclient.executor;
 
 import com.dtflys.forest.backend.httpclient.HttpclientRequestProvider;
+import com.dtflys.forest.backend.httpclient.entity.HttpHeadWithBodyEntity;
 import com.dtflys.forest.backend.httpclient.request.HttpclientRequestSender;
 import com.dtflys.forest.backend.httpclient.response.HttpclientResponseHandler;
 import com.dtflys.forest.backend.url.URLBuilder;
@@ -11,11 +12,11 @@ import org.apache.http.client.methods.HttpHead;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2017-04-20 14:34
  */
-public class HttpclientHeadExecutor extends AbstractHttpclientExecutor<HttpHead> {
+public class HttpclientHeadExecutor extends AbstractHttpclientExecutor<HttpHeadWithBodyEntity> {
 
     @Override
-    protected HttpclientRequestProvider<HttpHead> getRequestProvider() {
-        return url -> new HttpHead(url);
+    protected HttpclientRequestProvider<HttpHeadWithBodyEntity> getRequestProvider() {
+        return url -> new HttpHeadWithBodyEntity(url);
     }
 
     @Override

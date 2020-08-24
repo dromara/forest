@@ -28,7 +28,7 @@ public class GetMockServer extends MockServerRule {
                 request()
                         .withPath("/hello/user")
                         .withMethod("GET")
-                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plan"))
+                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plain"))
                         .withQueryStringParameter("username",  "foo")
         )
         .respond(

@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -59,6 +60,22 @@ public class TestGetClient extends BaseClientTest {
         assertEquals(GetMockServer.EXPECTED, result);
     }
 
+    @Test
+    public void testGet2() {
+        String result = getClient.simpleGet2();
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(GetMockServer.EXPECTED, result);
+    }
+
+    @Test
+    public void testGet3() {
+        String result = getClient.simpleGet3();
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(GetMockServer.EXPECTED, result);
+    }
+
 
     @Test
     public void testJsonMapGet() {
@@ -95,6 +112,15 @@ public class TestGetClient extends BaseClientTest {
     }
 
     @Test
+    public void testAnnQueryGet() {
+        String result = getClient.annQueryGet("foo");
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(GetMockServer.EXPECTED, result);
+    }
+
+
+    @Test
     public void testAnnObjectGet() {
         JsonTestUser user = new JsonTestUser();
         user.setUsername("foo");
@@ -103,6 +129,17 @@ public class TestGetClient extends BaseClientTest {
         assertNotNull(result);
         assertEquals(GetMockServer.EXPECTED, result);
     }
+
+    @Test
+    public void testAnnObjectGet2() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("username", "foo");
+        String result = getClient.annObjectGet(map);
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(GetMockServer.EXPECTED, result);
+    }
+
 
 
     @Test

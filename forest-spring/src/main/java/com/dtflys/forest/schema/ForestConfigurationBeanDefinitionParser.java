@@ -60,8 +60,8 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
                 continue;
             }
             Class paramType = paramTypes[0];
-            if (Collections.class.isAssignableFrom(paramType) ||
-                    Map.class.isAssignableFrom(paramType)) {
+            if (Collections.class.isAssignableFrom(paramType)
+                    || Map.class.isAssignableFrom(paramType)) {
                 continue;
             }
             if (methodName.length() >= 3 && methodName.startsWith("set")) {

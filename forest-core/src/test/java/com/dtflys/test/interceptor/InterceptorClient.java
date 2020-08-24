@@ -11,14 +11,14 @@ public interface InterceptorClient {
 
     @Request(
             url = "http://localhost:${port}/hello/user?username=foo",
-            headers = {"Accept:text/plan"},
+            headers = {"Accept:text/plain"},
             interceptor = SimpleInterceptor.class
     )
     String simple();
 
     @Request(
             url = "http://localhost:${port}/hello/user?username=foo",
-            headers = {"Accept:text/plan"},
+            headers = {"Accept:text/plain"},
             interceptor = {SimpleInterceptor.class, Simple2Interceptor.class}
     )
     String multiple();
@@ -26,10 +26,10 @@ public interface InterceptorClient {
 
     @Request(
             url = "http://localhost:${port}/hello/user?username=foo",
-            headers = {"Accept:text/plan"},
+            headers = {"Accept:text/plain"},
             interceptor = FalseInterceptor.class
     )
-    String beforeFalse();
+    String beforeFalse(String arg);
 
 
 }

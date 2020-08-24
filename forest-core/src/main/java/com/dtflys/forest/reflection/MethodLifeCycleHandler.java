@@ -1,27 +1,26 @@
 package com.dtflys.forest.reflection;
 
+import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.callback.OnSuccess;
-import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestNetworkException;
+import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.handler.ResponseHandler;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.handler.ResultHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.utils.ReflectUtil;
-import sun.reflect.Reflection;
+import com.dtflys.forest.retryer.Retryer;
+import com.dtflys.forest.utils.ForestProgress;
+import com.dtflys.forest.utils.ReflectUtils;
 
 import java.lang.reflect.Type;
 
 /**
+ * 请求方法生命周期处理器
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-19 17:00
  */
-public class MethodResponseHandler<T> implements ResponseHandler {
-
-    private final ForestMethod method;
-
-    private final ForestConfiguration configuration;
+public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
 
     private final Type returnType;
 
@@ -33,9 +32,7 @@ public class MethodResponseHandler<T> implements ResponseHandler {
 
     private volatile T resultData;
 
-    public MethodResponseHandler(ForestMethod method, ForestConfiguration configuration, Type onSuccessClassGenericType) {
-        this.method = method;
-        this.configuration = configuration;
+    public MethodLifeCycleHandler(ForestMethod method, Type onSuccessClassGenericType) {
         this.onSuccessClassGenericType = onSuccessClassGenericType;
         this.returnType = method.getReturnType();
         this.returnClass = method.getReturnClass();
@@ -89,16 +86,23 @@ public class MethodResponseHandler<T> implements ResponseHandler {
         return resultData;
     }
 
+
+
     @Override
     public Object handleSuccess(Object resultData, ForestRequest request, ForestResponse response) {
         request.getInterceptorChain().onSuccess(resultData, request, response);
         OnSuccess onSuccess = request.getOnSuccess();
         if (onSuccess != null) {
-            resultData = resultHandler.getResult(request, response, onSuccessClassGenericType, ReflectUtil.getClassByType(onSuccessClassGenericType));
+            resultData = resultHandler.getResult(request, response, onSuccessClassGenericType, ReflectUtils.getClassByType(onSuccessClassGenericType));
             onSuccess.onSuccess(resultData, request, response);
         }
         resultData = response.getResult();
         return resultData;
+    }
+
+    @Override
+    public void handleInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
+        request.getInterceptorChain().onInvokeMethod(request, method, args);
     }
 
     @Override
@@ -108,7 +112,7 @@ public class MethodResponseHandler<T> implements ResponseHandler {
     }
 
     @Override
-    public void handleError(ForestRequest request, ForestResponse response, Exception ex) {
+    public void handleError(ForestRequest request, ForestResponse response, Throwable ex) {
         ForestRuntimeException e = null;
         if (ex instanceof ForestRuntimeException) {
             e = (ForestRuntimeException) ex;
@@ -122,6 +126,20 @@ public class MethodResponseHandler<T> implements ResponseHandler {
         }
         else {
             throw e;
+        }
+    }
+
+    @Override
+    public void handleTry(ForestRetryException ex, Retryer retryer) throws Throwable {
+        retryer.canRetry(ex);
+    }
+
+    @Override
+    public void handleProgress(ForestRequest request, ForestProgress progress) {
+//        request.getInterceptorChain().onProgress(progress);
+        OnProgress onProgress = request.getOnProgress();
+        if (onProgress != null) {
+            onProgress.onProgress(progress);
         }
     }
 

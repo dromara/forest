@@ -25,7 +25,10 @@
 package com.dtflys.forest.http;
 
 
+import com.dtflys.forest.backend.ContentType;
+
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * @author gongjun[dt_flys@hotmail.com]
@@ -36,6 +39,11 @@ public abstract class ForestResponse<T> {
     protected ForestRequest request;
     protected volatile Integer statusCode;
     protected volatile String content;
+    protected volatile String filename;
+    protected volatile ContentType contentType;
+    protected volatile String contentEncoding;
+    protected volatile long contentLength;
+    protected volatile ForestHeaderMap headers = new ForestHeaderMap();
     protected volatile T result;
 
     public ForestResponse(ForestRequest request) {
@@ -71,9 +79,26 @@ public abstract class ForestResponse<T> {
         return this;
     }
 
+    public ContentType getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(ContentType contentType) {
+        this.contentType = contentType;
+    }
+
+    public String getContentEncoding() {
+        return contentEncoding;
+    }
+
+    public long getContentLength() {
+        return contentLength;
+    }
+
     public boolean isSuccess() {
         return getStatusCode() >= HttpStatus.OK && getStatusCode() < HttpStatus.MULTIPLE_CHOICES;
     }
+
 
     public boolean isError() {
         return !isSuccess();
@@ -81,8 +106,27 @@ public abstract class ForestResponse<T> {
 
     public abstract boolean isReceivedResponseData();
 
-    public abstract byte[] getReceivedDataAsByteArray() throws Exception;
+    public abstract byte[] getByteArray() throws Exception;
 
-    public abstract InputStream getReceivedDataAsInputStream() throws Exception;
+    public abstract InputStream getInputStream() throws Exception;
 
+    public ForestHeader getHeader(String name) {
+        return headers.getHeader(name);
+    }
+
+    public List<ForestHeader> getHeaders(String name) {
+        return headers.getHeaders(name);
+    }
+
+    public String getHeaderValue(String name) {
+        return headers.getValue(name);
+    }
+
+    public List<String> getHeaderValues(String name) {
+        return headers.getValues(name);
+    }
+
+    public ForestHeaderMap getHeaders() {
+        return headers;
+    }
 }

@@ -24,6 +24,10 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.callback.OnProgress;
+import com.dtflys.forest.converter.ForestConverter;
+import com.dtflys.forest.interceptor.InterceptorAttributes;
+import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.retryer.Retryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.callback.OnError;
@@ -32,7 +36,7 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.backend.HttpExecutor;
-import com.dtflys.forest.handler.ResponseHandler;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorChain;
 import com.dtflys.forest.utils.ForestDataType;
@@ -42,11 +46,15 @@ import com.dtflys.forest.utils.StringUtils;
 import java.io.InputStream;
 import java.util.*;
 
+import static com.dtflys.forest.mapping.MappingParameter.*;
+
 /**
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-03-24
  */
 public class ForestRequest<T> {
+
+    private final static long DEFAULT_PROGRESS_STEP = 1024 * 10;
 
     private final ForestConfiguration configuration;
 
@@ -58,7 +66,7 @@ public class ForestRequest<T> {
 
     private ForestRequestType type;
 
-    private String encode;
+    private String charset;
 
     private String responseEncode = "UTF-8";
 
@@ -66,19 +74,23 @@ public class ForestRequest<T> {
 
     private ForestDataType dataType;
 
-    private String contentType;
-
     private int timeout = 3000;
 
     private int retryCount = 0;
 
+    private long maxRetryInterval = 0;
+
     private Map<String, Object> data = new LinkedHashMap<String, Object>();
 
-    private List<?> bodyList = new LinkedList<>();
+    private List bodyList = new LinkedList<>();
 
-    private Map<String, Object> headers = new LinkedHashMap<>();
+    private ForestHeaderMap headers = new ForestHeaderMap();
 
-    private Object[] arguments;
+    private List<ForestMultipart> multiparts = new LinkedList<>();
+
+    private String filename;
+
+    private final Object[] arguments;
 
     private String requestBody;
 
@@ -88,17 +100,35 @@ public class ForestRequest<T> {
 
     private OnError onError;
 
+    private boolean isDownloadFile = false;
+
+    private long progressStep = DEFAULT_PROGRESS_STEP;
+
+    private OnProgress onProgress;
+
     private InterceptorChain interceptorChain = new InterceptorChain();
 
+    private Map<Class, InterceptorAttributes> interceptorAttributes = new HashMap<>();
+
     private Retryer retryer;
+
+    private Map<String, Object> attachments = new HashMap<>();
+
+    private ForestConverter decoder;
 
     private boolean logEnable = true;
 
     private SSLKeyStore keyStore;
 
-    public ForestRequest(ForestConfiguration configuration) {
+    public ForestRequest(ForestConfiguration configuration, Object[] arguments) {
         this.configuration = configuration;
+        this.arguments = arguments;
     }
+
+    public ForestRequest(ForestConfiguration configuration) {
+        this(configuration, new Object[0]);
+    }
+
 
     public ForestConfiguration getConfiguration() {
         return configuration;
@@ -162,12 +192,42 @@ public class ForestRequest<T> {
         return this;
     }
 
-    public String getEncode() {
-        return encode;
+    public String getFilename() {
+        if (filename == null) {
+            synchronized (this) {
+                if (filename == null) {
+                    String[] strs = getUrl().split("/");
+                    filename = strs[strs.length - 1];
+                }
+            }
+        }
+        return filename;
     }
 
-    public ForestRequest setEncode(String encode) {
-        this.encode = encode;
+    public String getContentEncoding() {
+        return headers.getValue("Content-Encoding");
+    }
+
+    public ForestRequest setContentEncoding(String contentEncoding) {
+        addHeader("Content-Encoding", contentEncoding);
+        return this;
+    }
+
+    public String getUserAgent() {
+        return headers.getValue("User-Agent");
+    }
+
+    public ForestRequest setUserAgent(String userAgent) {
+        addHeader("User-Agent", userAgent);
+        return this;
+    }
+
+    public String getCharset() {
+        return charset;
+    }
+
+    public ForestRequest setCharset(String charset) {
+        this.charset = charset;
         return this;
     }
 
@@ -189,11 +249,11 @@ public class ForestRequest<T> {
         return this;
     }
 
-    public List<?> getBodyList() {
+    public List getBodyList() {
         return bodyList;
     }
 
-    public void setBodyList(List<?> bodyList) {
+    public void setBodyList(List bodyList) {
         this.bodyList = bodyList;
     }
 
@@ -207,11 +267,11 @@ public class ForestRequest<T> {
     }
 
     public String getContentType() {
-        return contentType;
+        return headers.getValue("Content-Type");
     }
 
     public ForestRequest setContentType(String contentType) {
-        this.contentType = contentType;
+        addHeader("Content-Type", contentType);
         return this;
     }
 
@@ -233,17 +293,27 @@ public class ForestRequest<T> {
         return this;
     }
 
+    public long getMaxRetryInterval() {
+        return maxRetryInterval;
+    }
+
+    public ForestRequest setMaxRetryInterval(long maxRetryInterval) {
+        this.maxRetryInterval = maxRetryInterval;
+        return this;
+    }
+
     public Map<String, Object> getData() {
         return data;
     }
 
 
+    @Deprecated
     public ForestRequest addData(String name, Object value) {
         this.data.put(name, value);
         return this;
     }
 
-
+    @Deprecated
     public ForestRequest addData(RequestNameValue nameValue) {
         this.data.put(nameValue.getName(), nameValue.getValue());
         return this;
@@ -254,6 +324,33 @@ public class ForestRequest<T> {
         return this;
     }
 
+    public ForestRequest addBody(Object bodyContent) {
+        bodyList.add(bodyContent);
+        return this;
+    }
+
+    public ForestRequest replaceBody(Object bodyContent) {
+        bodyList.clear();
+        bodyList.add(bodyContent);
+        return this;
+    }
+
+    public ForestRequest addBody(String name, Object value) {
+        this.data.put(name, value);
+        return this;
+    }
+
+    public ForestRequest addBody(RequestNameValue nameValue) {
+        this.data.put(nameValue.getName(), nameValue.getValue());
+        return this;
+    }
+
+    public ForestRequest addBody(List<RequestNameValue> data) {
+        putMapAddList(this.data, data);
+        return this;
+    }
+
+
     public List<RequestNameValue> getQueryNameValueList() {
         List<RequestNameValue> nameValueList = new ArrayList<>();
         for (Iterator<Map.Entry<String, Object>> iterator = query.entrySet().iterator(); iterator.hasNext(); ) {
@@ -261,7 +358,7 @@ public class ForestRequest<T> {
             String name = entry.getKey();
             Object value = entry.getValue();
             if (value != null) {
-                RequestNameValue nameValue = new RequestNameValue(name, value, true);
+                RequestNameValue nameValue = new RequestNameValue(name, value, TARGET_QUERY);
                 nameValueList.add(nameValue);
             }
         }
@@ -276,7 +373,7 @@ public class ForestRequest<T> {
             String name = entry.getKey();
             Object value = entry.getValue();
             if (value != null) {
-                RequestNameValue nameValue = new RequestNameValue(name, value, false);
+                RequestNameValue nameValue = new RequestNameValue(name, value, TARGET_BODY);
                 nameValueList.add(nameValue);
             }
         }
@@ -286,44 +383,62 @@ public class ForestRequest<T> {
 
     public List<RequestNameValue> getHeaderNameValueList() {
         List<RequestNameValue> nameValueList = new ArrayList<RequestNameValue>();
-        for (Iterator<Map.Entry<String, Object>> iterator = headers.entrySet().iterator(); iterator.hasNext(); ) {
-            Map.Entry<String, Object> entry = iterator.next();
-            RequestNameValue nameValue = new RequestNameValue(entry.getKey(), String.valueOf(entry.getValue()), false);
+        for (Iterator<ForestHeader> iterator = headers.headerIterator(); iterator.hasNext(); ) {
+            ForestHeader header = iterator.next();
+            RequestNameValue nameValue = new RequestNameValue(header.getName(), header.getValue(), TARGET_HEADER);
             nameValueList.add(nameValue);
         }
         return nameValueList;
     }
 
-    public ForestRequest<T> setArguments(Object[] arguments) {
-        this.arguments = arguments;
-        return this;
-    }
 
     public Object getArgument(int index) {
         return arguments[index];
     }
 
+    public Object[] getArguments() {
+        return arguments;
+    }
 
-    public Map<String, Object> getHeaders() {
+    public ForestHeaderMap getHeaders() {
         return headers;
+    }
+
+    public ForestHeader getHeader(String name) {
+        return headers.getHeader(name);
+    }
+
+    public String getHeaderValue(String name) {
+        return headers.getValue(name);
     }
 
     public ForestRequest addHeader(String name, Object value) {
         if (StringUtils.isEmpty(name)) {
             return this;
         }
-        this.headers.put(name, value);
+        this.headers.setHeader(name, String.valueOf(value));
         return this;
     }
 
     public ForestRequest addHeader(RequestNameValue nameValue) {
-        this.headers.put(nameValue.getName(), nameValue.getValue());
+        this.addHeader(nameValue.getName(), nameValue.getValue());
         return this;
     }
 
 
-    public ForestRequest addHeaders(List<RequestNameValue> headers) {
-        putMapAddList(this.headers, headers);
+    public ForestRequest addHeaders(List<RequestNameValue> nameValues) {
+        for (RequestNameValue nameValue : nameValues) {
+            this.addHeader(nameValue.getName(), nameValue.getValue());
+        }
+        return this;
+    }
+
+    public List<ForestMultipart> getMultiparts() {
+        return multiparts;
+    }
+
+    public ForestRequest setMultiparts(List<ForestMultipart> multiparts) {
+        this.multiparts = multiparts;
         return this;
     }
 
@@ -332,7 +447,7 @@ public class ForestRequest<T> {
             RequestNameValue nameValue = source.get(i);
             if (nameValue.isInQuery()) {
                 addQuery(nameValue.getName(), nameValue.getValue());
-            } else {
+            } else if (nameValue.isInBody()) {
                 map.put(nameValue.getName(), nameValue.getValue());
             }
         }
@@ -373,6 +488,32 @@ public class ForestRequest<T> {
         return this;
     }
 
+    public boolean isDownloadFile() {
+        return isDownloadFile;
+    }
+
+    public void setDownloadFile(boolean downloadFile) {
+        isDownloadFile = downloadFile;
+    }
+
+    public long getProgressStep() {
+        return progressStep;
+    }
+
+    public ForestRequest setProgressStep(long progressStep) {
+        this.progressStep = progressStep;
+        return this;
+    }
+
+    public OnProgress getOnProgress() {
+        return onProgress;
+    }
+
+    public ForestRequest setOnProgress(OnProgress onProgress) {
+        this.onProgress = onProgress;
+        return this;
+    }
+
     public ForestRequest<T> addInterceptor(Interceptor interceptor) {
         interceptorChain.addInterceptor(interceptor);
         return this;
@@ -382,12 +523,77 @@ public class ForestRequest<T> {
         return interceptorChain;
     }
 
+    public ForestRequest addInterceptorAttributes(Class interceptorClass, InterceptorAttributes attributes) {
+        InterceptorAttributes oldAttributes = interceptorAttributes.get(interceptorClass);
+        if (oldAttributes != null) {
+            for (Map.Entry<String, Object> entry : attributes.getAttributeTemplates().entrySet()) {
+                oldAttributes.addAttribute(entry.getKey(), entry.getValue());
+            }
+
+            for (Map.Entry<String, Object> entry : attributes.getAttributes().entrySet()) {
+                oldAttributes.addAttribute(entry.getKey(), entry.getValue());
+            }
+        } else {
+            interceptorAttributes.put(interceptorClass, attributes);
+        }
+        return this;
+    }
+
+    public ForestRequest addInterceptorAttribute(Class interceptorClass, String attributeName, Object attributeValue) {
+        InterceptorAttributes attributes = getInterceptorAttributes(interceptorClass);
+        if (attributes == null) {
+            attributes = new InterceptorAttributes(interceptorClass, new HashMap<>());
+            addInterceptorAttributes(interceptorClass, attributes);
+        }
+        attributes.addAttribute(attributeName, attributeValue);
+        return this;
+    }
+
+
+    public Map<Class, InterceptorAttributes> getInterceptorAttributes() {
+        return interceptorAttributes;
+    }
+
+
+    public InterceptorAttributes getInterceptorAttributes(Class interceptorClass) {
+        return interceptorAttributes.get(interceptorClass);
+    }
+
+
+    public Object getInterceptorAttribute(Class interceptorClass, String attributeName) {
+        InterceptorAttributes attributes = interceptorAttributes.get(interceptorClass);
+        if (attributes == null) {
+            return null;
+        }
+        return attributes.getAttribute(attributeName);
+    }
+
+
     public Retryer getRetryer() {
         return retryer;
     }
 
-    public void setRetryer(Retryer retryer) {
+    public ForestRequest setRetryer(Retryer retryer) {
         this.retryer = retryer;
+        return this;
+    }
+
+    public ForestRequest addAttachment(String name, Object value) {
+        attachments.put(name, value);
+        return this;
+    }
+
+    public Object getAttachment(String name) {
+        return attachments.get(name);
+    }
+
+    public ForestConverter getDecoder() {
+        return decoder;
+    }
+
+    public ForestRequest setDecoder(ForestConverter decoder) {
+        this.decoder = decoder;
+        return this;
     }
 
     public boolean isLogEnable() {
@@ -408,26 +614,21 @@ public class ForestRequest<T> {
         return this;
     }
 
-    public void execute(HttpBackend backend, ResponseHandler responseHandler) {
-        HttpExecutor executor  = backend.createExecutor(this, responseHandler);
+    /**
+     * Execute request
+     * @param backend
+     * @param lifeCycleHandler
+     */
+    public void execute(HttpBackend backend, LifeCycleHandler lifeCycleHandler) {
+        HttpExecutor executor  = backend.createExecutor(this, lifeCycleHandler);
         if (executor != null) {
             if (interceptorChain.beforeExecute(this)) {
                 try {
-                    executor.execute(responseHandler);
+                    executor.execute(lifeCycleHandler);
                 } catch (ForestRuntimeException e) {
                     throw e;
-//                if (onError == null) {
-//                    throw e;
-//                }
-//                ForestRuntimeException runtimeException = e;
-//                if (!(e instanceof ForestRuntimeException)) {
-//                    runtimeException = new ForestRuntimeException(e);
-//                }
-//                onError.onError(runtimeException, this);
-//                interceptorChain.onError(e, this, response);
                 } finally {
                     executor.close();
-//                interceptorChain.afterExecute(this, response);
                 }
             }
         }

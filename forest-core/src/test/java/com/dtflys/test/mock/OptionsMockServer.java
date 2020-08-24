@@ -28,7 +28,7 @@ public class OptionsMockServer extends MockServerRule {
                 request()
                         .withPath("/hello/user")
                         .withMethod("OPTIONS")
-                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plan"))
+                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plain"))
                         .withQueryStringParameter("username", "foo")
         ).respond(
                 response()

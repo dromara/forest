@@ -119,13 +119,13 @@ public interface MyClient {
 
     @Request(
             url = "http://localhost:5000/hello/user",
-            headers = "Accept: text/plan"
+            headers = "Accept: text/plain"
     )
     String sendRequest(@DataParam("uname") String username);
 }
 ```
 
-上面的`sendRequest`方法绑定的 HTTP 请求，定义了 URL 信息，以及把`Accept:text/plan`加到了请求头中，
+上面的`sendRequest`方法绑定的 HTTP 请求，定义了 URL 信息，以及把`Accept:text/plain`加到了请求头中，
 方法的参数`String username`绑定了注解`@DataParam("uname")`，它的作用是将调用者传入入参 username 时，自动将`username`的值加入到 HTTP 的请求参数`uname`中。
 
 如果调用方代码如下所示：
@@ -140,7 +140,7 @@ myClient.sendRequest("foo");
 
     GET http://localhost:5000/hello/user?uname=foo
     HEADER:
-        Accept: text/plan
+        Accept: text/plain
 
 ## 3.3 HTTP Method
 
@@ -314,7 +314,7 @@ public interface MyClient {
             url = "http://localhost:5000/hello/user",
             type = "post",
             data = "username=foo&password=bar",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String dataPost();
 }
@@ -324,7 +324,7 @@ public interface MyClient {
 
     POST http://localhost:5000/hello/user
     HEADER:
-        Accept:text/plan
+        Accept:text/plain
     BODY:
         username=foo&password=bar
 
@@ -337,7 +337,7 @@ public interface MyClient {
             url = "http://localhost:5000/hello/user",
             type = "post",
             data = "username=${0}&password=${1}",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String dataPost(String username, String password);
 }
@@ -355,7 +355,7 @@ myClient.dataPost("foo", "bar");
 
     POST http://localhost:5000/hello/user
     HEADER:
-        Accept: text/plan
+        Accept: text/plain
     BODY:
         username=foo&password=bar
 
@@ -510,7 +510,7 @@ Forest需要指明返回类型（如`User`）的同时，也需要指明数据�
 ```java
 @Request(
         url = "http://localhost:5000/hello/user",
-        headers = {"Accept:text/plan"},
+        headers = {"Accept:text/plain"},
         data = "username=${username}"
 )
 String send(@DataVariable("username") String username, OnSuccess<String> onSuccess, OnError onError);
@@ -544,7 +544,7 @@ myClient.send("foo", (String resText, ForestRequest request, ForestResponse resp
 @Request(
         url = "http://localhost:5000/hello/user?username=${0}",
         async = true,
-        headers = {"Accept:text/plan"}
+        headers = {"Accept:text/plain"}
 )
 void asyncGet(String username， OnSuccess<String> onSuccess);
 ```
@@ -567,7 +567,7 @@ myClient.asyncGet("foo", (result, request, response) -> {
 @Request(
         url = "http://localhost:5000/hello/user?username=foo",
         async = true,
-        headers = {"Accept:text/plan"}
+        headers = {"Accept:text/plain"}
 )
 Future<String> asyncFuture();
 ```
@@ -853,7 +853,7 @@ myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
 @Request(
         url = "http://localhost:5000/hello",
         type = "post",
-        headers = {"Accept:text/plan"}
+        headers = {"Accept:text/plain"}
 )
 String send(@DataParam("username") String username, @DataParam("password") String password);
 ```
@@ -868,7 +868,7 @@ myClient.send("foo", "bar");
 
     POST http://localhost:5000/hello
     HEADER:
-        Accept: text/plan
+        Accept: text/plain
     BODY:
         username=foo&password=bar
 
@@ -892,7 +892,7 @@ public interface MyClient {
     @Request(
             url = "http://localhost:5000/hello/user",
             type = "post",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String postBody(@DataParam("username") String username, @DataParam("password") String password);
 }
@@ -908,7 +908,7 @@ myClient.postBody("foo", "bar");
 
     POST http://localhost:5000/hello/user
     HEADER:
-        Accept: text/plan
+        Accept: text/plain
     BODY:
         username=foo&password=bar
 
@@ -1305,7 +1305,7 @@ try {
  */
 @Request(
         url = "http://localhost:5000/hello/user",
-        headers = {"Accept:text/plan"},
+        headers = {"Accept:text/plain"},
         data = "username=${username}"
 )
 String send(@DataVariable("username") String username, OnError onError);
@@ -1335,7 +1335,7 @@ myClient.send("foo",  (ex, request, response) -> {
  */
 @Request(
         url = "http://localhost:5000/hello/user",
-        headers = {"Accept:text/plan"},
+        headers = {"Accept:text/plain"},
         data = "username=${username}"
 )
 ForestResponse<String> send(@DataVariable("username") String username);
@@ -1647,7 +1647,7 @@ public interface SimpleClient {
 
     @Request(
             url = "http://localhost:8080/hello/user?username=foo",
-            headers = {"Accept:text/plan"},
+            headers = {"Accept:text/plain"},
             interceptor = SimpleInterceptor.class
     )
     String simple();
@@ -1659,7 +1659,7 @@ public interface SimpleClient {
 ```java
     @Request(
             url = "http://localhost:8080/hello/user?username=foo",
-            headers = {"Accept:text/plan"},
+            headers = {"Accept:text/plain"},
             interceptor = {SimpleInterceptor1.class, SimpleInterceptor2.class, ...}
     )
     String simple();
@@ -1716,7 +1716,80 @@ forest:
 ```
 
 
-# 十一. 联系作者
+### 十一. 数据转换
+
+Forest支持JSON、XML、普通文本等数据转换形式。不需要接口调用者自己写具体的数据转换代码。
+
+#### 11。1 序列化
+
+几乎所有数据格式的转换都包含序列化和反序列化，Forest的数据转换同样如此。
+
+Forest中对数据进行序列化可以通过指定`contentType`属性或`Content-Type`头指定内容格式。
+
+```java
+
+@Request(
+        url = "http://localhost:5000/hello/user",
+        type = "post",
+        contentType = "application/json"    // 指定contentType为application/json
+)
+String postJson(@DataObject MyUser user);   // 自动将user对象序列化为JSON格式
+```
+
+同理，指定为`application/xml`会将参数序列化为`XML`格式，`text/plain`则为文本，默认的`application/x-www-form-urlencoded`则为表格格式。
+
+#### 11.2 反序列化
+
+HTTP请求响应后返回结果的数据同样需要转换，Forest则会将返回结果自动转换为您通过方法返回类型指定对象类型。这个过程就是反序列化，您可以通过`dataType`指定返回数据的反序列化格式。
+
+```java
+@Request(
+    url = "http://localhost:8080/data",
+    dataType = "json"        // 指定dataType为json，将按JSON格式反序列化数据
+)
+Map getData();               // 请求响应的结果将被转换为Map类型对象
+```
+
+#### 11.3 自定义转换器
+
+在Forest中，每个转换类型都对应一个转换器对象，比如`JSON`格式的转换器有`com.dtflys.forest.converter.json.ForestFastjsonConverter`、`com.dtflys.forest.converter.json.ForestGsonConverter`、`com.dtflys.forest.converter.json.ForestJacksonConverter`三种，分别是基于`FastJson`、`Gson`、`Jackson`三种不同的`JSON`序列化框架。
+
+当然，您也可以自定义自己的转换器，以适应自己项目的需要。只需三步便可完成自定义扩展转换器。
+
+第一步. 定义一个转换器类，并实现`com.dtflys.forest.converter.ForestConverter`接口
+
+```java
+/**
+ *  自定义一个Protobuf的转换器，并实现ForestConverter接口下的convertToJavaObject方法
+ */
+public class MyProtobufConverter implements ForestConverter {
+
+    <T> T convertToJavaObject(String source, Class<T> targetType) {
+        // 将字符串参数source转换成目标Class对象
+    }
+
+    <T> T convertToJavaObject(String source, Type targetType) {
+        // 将字符串参数source转换成目标Type(可能是一个泛型类型)对象
+    }
+
+}
+```
+
+第二步. 注册您定义好的转换器类到`ForestConfiguration`
+
+```java
+
+@Autowired
+private ForestConfiguration configuration;
+
+...
+
+configuration
+
+```
+
+
+# 十二. 联系作者
 
 您如有问题可以扫码加入微信的技术交流群
 
@@ -1725,7 +1798,7 @@ forest:
 ![avatar](https://dt_flys.gitee.io/forest/media/wechat_qr.png)
 
 
-# 十二. 项目协议
+# 十三. 项目协议
 
 The MIT License (MIT)
 

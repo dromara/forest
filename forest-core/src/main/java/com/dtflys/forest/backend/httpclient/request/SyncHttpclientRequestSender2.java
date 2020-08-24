@@ -1,6 +1,10 @@
 package com.dtflys.forest.backend.httpclient.request;
 
 import com.dtflys.forest.backend.httpclient.conn.HttpclientConnectionManager;
+import com.dtflys.forest.backend.okhttp3.executor.AbstractOkHttp3Executor;
+import com.dtflys.forest.exceptions.ForestNetworkException;
+import com.dtflys.forest.exceptions.ForestRetryException;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
@@ -13,6 +17,7 @@ import com.dtflys.forest.backend.httpclient.response.HttpclientForestResponseFac
 import com.dtflys.forest.backend.httpclient.response.HttpclientResponseHandler;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
@@ -38,21 +43,22 @@ public class SyncHttpclientRequestSender2 extends AbstractHttpclientRequestSende
 
 
     @Override
-    public void sendRequest(final ForestRequest request, final HttpclientResponseHandler responseHandler, final HttpUriRequest httpRequest) throws IOException {
+    public void sendRequest(final ForestRequest request, final HttpclientResponseHandler responseHandler, final HttpUriRequest httpRequest, LifeCycleHandler lifeCycleHandler, long startTime, int retryCount) throws IOException {
         final CloseableHttpAsyncClient client = connectionManager.getHttpAsyncClient(request);
         client.start();
         final AtomicReference<ForestResponse> forestResponseRef = new AtomicReference<>();
         final AtomicReference<Exception> exceptionRef = new AtomicReference<>();
         final ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
+        Future<HttpResponse> future = null;
         try {
-            Future<HttpResponse> future = client.execute(httpRequest, new FutureCallback<HttpResponse>() {
+            future = client.execute(httpRequest, new FutureCallback<HttpResponse>() {
                 public void completed(final HttpResponse httpResponse) {
-                    ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
+                    ForestResponse response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler);
                     forestResponseRef.set(response);
                 }
 
                 public void failed(final Exception ex) {
-                    ForestResponse response = forestResponseFactory.createResponse(request, null);
+                    ForestResponse response = forestResponseFactory.createResponse(request, null, lifeCycleHandler);
                     forestResponseRef.set(response);
                     exceptionRef.set(ex);
                 }
@@ -60,42 +66,20 @@ public class SyncHttpclientRequestSender2 extends AbstractHttpclientRequestSende
                 public void cancelled() {
                 }
             });
-            HttpResponse httpResponse = null;
 
-            try {
-                httpResponse = future.get();
-            } catch (InterruptedException e) {
-            } catch (ExecutionException e) {
-            }
-            ForestResponse response = forestResponseRef.get();
-            if (response.isSuccess()) {
-                logResponse(request, response);
-                try {
-                    responseHandler.handleSync(httpResponse, response);
-                } catch (Exception ex) {
-                    if (ex instanceof ForestRuntimeException) {
-                        throw ex;
-                    } else {
-                        throw new ForestRuntimeException(ex);
-                    }
-                }
-            } else {
-                Exception ex = exceptionRef.get();
-                if (ex == null) {
-                    responseHandler.handleError(response);
-                } else {
-                    responseHandler.handleError(response, ex);
-                }
-            }
         } finally {
             client.close();
         }
-/*
-        if (failed.get()) {
-            response = forestResponseFactory.createResponse(request, null);
-            responseHandler.handleError(response, exception.get());
-        } else {
-            response = forestResponseFactory.createResponse(request, httpResponse);
+
+        HttpResponse httpResponse = null;
+        try {
+            httpResponse = future.get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (ExecutionException e) {
+        }
+        ForestResponse response = forestResponseRef.get();
+        if (response.isSuccess()) {
             logResponse(request, response);
             try {
                 responseHandler.handleSync(httpResponse, response);
@@ -106,8 +90,34 @@ public class SyncHttpclientRequestSender2 extends AbstractHttpclientRequestSende
                     throw new ForestRuntimeException(ex);
                 }
             }
+        } else {
+            Exception ex = exceptionRef.get();
+            if (ex == null) {
+                ForestNetworkException networkException =
+                        new ForestNetworkException("", response.getStatusCode(), response);
+                ForestRetryException retryException = new ForestRetryException(
+                        networkException,  request, request.getRetryCount(), retryCount);
+                try {
+                    request.getRetryer().canRetry(retryException);
+                } catch (Throwable throwable) {
+                    responseHandler.handleError(response);
+                    return;
+                }
+            } else {
+                ForestRetryException retryException = new ForestRetryException(
+                        ex,  request, request.getRetryCount(), retryCount);
+                try {
+                    request.getRetryer().canRetry(retryException);
+                } catch (Throwable th) {
+                    responseHandler.handleError(response, th);
+                    return;
+                }
+            }
+            startTime = new Date().getTime();
+            sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, startTime, retryCount + 1);
+
         }
-*/
+
     }
 
 }

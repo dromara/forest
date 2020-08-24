@@ -1,12 +1,18 @@
 package com.dtflys.forest.proxy;
 
+import com.dtflys.forest.annotation.BaseLifeCycle;
 import com.dtflys.forest.annotation.BaseRequest;
 import com.dtflys.forest.annotation.BaseURL;
+import com.dtflys.forest.annotation.MethodLifeCycle;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.VariableScope;
+import com.dtflys.forest.interceptor.Interceptor;
+import com.dtflys.forest.interceptor.InterceptorFactory;
+import com.dtflys.forest.lifecycles.BaseAnnotationLifeCycle;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.reflection.ForestMethod;
+import com.dtflys.forest.reflection.MetaRequest;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
 
@@ -15,6 +21,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,19 +39,14 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
 
     private Map<Method, ForestMethod> forestMethodMap = new HashMap<Method, ForestMethod>();
 
+    private MetaRequest baseMetaRequest = new MetaRequest();
+
+    private InterceptorFactory interceptorFactory;
+
     private String baseURL;
 
-    private String baseContentType;
+    private List<Annotation> baseAnnotations = new LinkedList<>();
 
-    private String baseContentEncoding;
-
-    private MappingTemplate[] baseHeaders;
-
-    private Class[] baseInterceptorClasses;
-
-    private Integer baseTimeout;
-
-    private Integer baseRetryCount;
 
     public ProxyFactory getProxyFactory() {
         return proxyFactory;
@@ -53,6 +56,7 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         this.configuration = configuration;
         this.proxyFactory = proxyFactory;
         this.interfaceClass = interfaceClass;
+        this.interceptorFactory = configuration.getInterceptorFactory();
         prepareBaseInfo();
         initMethods();
     }
@@ -60,6 +64,7 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
 
     private void prepareBaseInfo() {
         Annotation[] annotations = interfaceClass.getAnnotations();
+
         for (int i = 0; i < annotations.length; i++) {
             Annotation annotation = annotations[i];
             if (annotation instanceof BaseURL) {
@@ -68,42 +73,21 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
                 if (value == null || value.trim().length() == 0) {
                     continue;
                 }
-                MappingTemplate template = new MappingTemplate(value.trim(), this);
-                template.compile();
-                baseURL = template.render(new Object[] {});
-                if (!URLUtils.hasProtocol(baseURL)) {
-                    baseURL = "http://" + baseURL;
-                }
-                baseURL = URLUtils.getValidBaseURL(baseURL);
-            }
-            if (annotation instanceof BaseRequest) {
-                BaseRequest baseRequestAnn = (BaseRequest) annotation;
-                String baseURLValue = baseRequestAnn.baseURL();
-                if (StringUtils.isNotBlank(baseURLValue)) {
-                    MappingTemplate template = new MappingTemplate(baseURLValue.trim(), this);
-                    template.compile();
-                    baseURL = template.render(new Object[]{});
-                    if (!URLUtils.hasProtocol(baseURL)) {
-                        baseURL = "http://" + baseURL;
+                baseURL = value.trim();
+                baseMetaRequest.setUrl(baseURL);
+            } else {
+                BaseLifeCycle baseLifeCycle = annotation.annotationType().getAnnotation(BaseLifeCycle.class);
+                MethodLifeCycle methodLifeCycle = annotation.annotationType().getAnnotation(MethodLifeCycle.class);
+                if (baseLifeCycle != null || methodLifeCycle != null) {
+                    if (baseLifeCycle != null) {
+                        Class<? extends BaseAnnotationLifeCycle> interceptorClass = baseLifeCycle.value();
+                        if (interceptorClass != null) {
+                            BaseAnnotationLifeCycle baseInterceptor = interceptorFactory.getInterceptor(interceptorClass);
+                            baseInterceptor.onProxyHandlerInitialized(this, annotation);
+                        }
                     }
-                    baseURL = URLUtils.getValidBaseURL(baseURL);
+                    baseAnnotations.add(annotation);
                 }
-
-                baseContentEncoding = baseRequestAnn.contentEncoding();
-                baseContentType = baseRequestAnn.contentType();
-                String [] headerArray = baseRequestAnn.headers();
-                if (headerArray != null && headerArray.length > 0) {
-                    baseHeaders = new MappingTemplate[headerArray.length];
-                    for (int j = 0; j < baseHeaders.length; j++) {
-                        MappingTemplate header = new MappingTemplate(headerArray[j], this);
-                        baseHeaders[j] = header;
-                    }
-                }
-                baseTimeout = baseRequestAnn.timeout();
-                baseTimeout = baseTimeout == -1 ? null : baseTimeout;
-                baseRetryCount = baseRequestAnn.retryCount();
-                baseRetryCount = baseRetryCount == -1 ? null : baseRetryCount;
-                baseInterceptorClasses = baseRequestAnn.interceptor();
             }
         }
     }
@@ -120,9 +104,6 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         String methodName = method.getName();
-        if (methodName.equals("getProxyHandler") && (args == null || args.length == 0)) {
-            return this;
-        }
         if (methodName.equals("toString") && (args == null || args.length == 0)) {
             return "{Forest Proxy Object of " + interfaceClass.getName() + "}";
         }
@@ -139,37 +120,18 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         return forestMethod.invoke(args);
     }
 
+    public MetaRequest getBaseMetaRequest() {
+        return baseMetaRequest;
+    }
+
     @Override
     public Object getVariableValue(String name) {
         return configuration.getVariableValue(name);
     }
 
-    public String getBaseURL() {
-        return baseURL;
-    }
 
-    public MappingTemplate[] getBaseHeaders() {
-        return baseHeaders;
-    }
-
-    public Class[] getBaseInterceptorClasses() {
-        return baseInterceptorClasses;
-    }
-
-    public Integer getBaseTimeout() {
-        return baseTimeout;
-    }
-
-    public String getBaseContentType() {
-        return baseContentType;
-    }
-
-    public String getBaseContentEncoding() {
-        return baseContentEncoding;
-    }
-
-    public Integer getBaseRetryCount() {
-        return baseRetryCount;
+    public List<Annotation> getBaseAnnotations() {
+        return baseAnnotations;
     }
 
     @Override

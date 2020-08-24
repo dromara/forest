@@ -84,5 +84,19 @@ public class TestPostJson3Client extends BaseClientTest {
         Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
     }
 
+    @Test
+    public void testJsonPost12() {
+        JsonTestUser user = new JsonTestUser();
+        user.setUsername("foo");
+        JsonTestList testList = new JsonTestList();
+        testList.setUserList(Arrays.asList(user));
+        List<JsonTestList> list = new ArrayList<>();
+        list.add(testList);
+        String result = postClient.postJson12(list);
+        log.info("response: " + result);
+        assertNotNull(result);
+        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
+    }
+
 
 }

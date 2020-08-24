@@ -54,13 +54,15 @@ public class OkHttp3ResponseFuture implements Future<Object> {
             throw new TimeoutException();
         } else {
             for (;;) {
-                wait(waitTime);
-                if (this.completed) {
-                    return getResult();
-                } else {
-                    waitTime = msecs - (System.currentTimeMillis() - startTime);
-                    if (waitTime <= 0) {
-                        throw new TimeoutException();
+                synchronized (this) {
+                    wait(waitTime);
+                    if (this.completed) {
+                        return getResult();
+                    } else {
+                        waitTime = msecs - (System.currentTimeMillis() - startTime);
+                        if (waitTime <= 0) {
+                            throw new TimeoutException();
+                        }
                     }
                 }
             }

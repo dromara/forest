@@ -22,7 +22,7 @@ public class OkHttp3TraceExecutor extends AbstractOkHttp3Executor {
     }
 
     @Override
-    protected void requestMethod(Request.Builder builder) {
+    protected void prepareMethod(Request.Builder builder) {
         builder.method("TRACE", null);
     }
 

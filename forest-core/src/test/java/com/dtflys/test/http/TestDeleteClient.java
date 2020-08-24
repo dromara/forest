@@ -58,7 +58,7 @@ public class TestDeleteClient extends BaseClientTest {
                 request()
                         .withPath("/xx/user")
                         .withMethod("DELETE")
-                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plan"))
+                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plain"))
                         .withQueryStringParameter("username", "foo")
         ).respond(
                 response()
@@ -70,15 +70,23 @@ public class TestDeleteClient extends BaseClientTest {
                 request()
                         .withPath("/xx/user/data")
                         .withMethod("DELETE")
-                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plan"))
+                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plain"))
                         .withBody("username=foo")
         ).respond(
                 response()
                         .withStatusCode(200)
                         .withBody(expected)
         );
-
     }
+
+    @Test
+    public void testDeleteUser() {
+        String result = deleteClient.deleteUser();
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(expected, result);
+    }
+
 
     @Test
     public void testSimpleDelete() {
@@ -87,6 +95,24 @@ public class TestDeleteClient extends BaseClientTest {
         assertNotNull(result);
         assertEquals(expected, result);
     }
+
+    @Test
+    public void testSimpleDelete2() {
+        String result = deleteClient.simpleDelete2();
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void testSimpleDelete3() {
+        String result = deleteClient.simpleDelete3();
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(expected, result);
+    }
+
+
 
     @Test
     public void testTextParamDelete() {

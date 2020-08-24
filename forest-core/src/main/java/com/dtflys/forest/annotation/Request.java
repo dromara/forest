@@ -24,6 +24,9 @@
 
 package com.dtflys.forest.annotation;
 
+
+import com.dtflys.forest.lifecycles.method.RequestLifeCycle;
+
 import java.lang.annotation.*;
 
 /**
@@ -31,6 +34,7 @@ import java.lang.annotation.*;
  * @since 2016-05-12
  */
 @Documented
+@MethodLifeCycle(RequestLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Request {
@@ -46,14 +50,15 @@ public @interface Request {
      *     GET POST PUT HEAD OPTIONS DELETE PATCH TRACE
      * @return
      */
-    String type() default "GET";
+    String type() default "";
 
     /**
      * type of response data: <br>
-     *     text json xml
+     *     text json xml <br>
+     * default value is "auto"
      * @return
      */
-    String dataType() default "text";
+    String dataType() default "auto";
 
     /**
      * whether can use async http request or not
@@ -63,44 +68,60 @@ public @interface Request {
 
     int timeout() default -1;
 
-    int retryCount() default -1;
+    /**
+     * Class of retryer
+     * @return
+     */
+    Class retryer() default Object.class;
 
-    int retryInterval() default -1;
+    /**
+     * max count to retry
+     * @return
+     */
+    int retryCount() default 0;
 
     int maxRetryInterval() default -1;
 
-//    @Deprecated
-//    String username() default "";
-
-//    @Deprecated
-//    String password() default "";
-
+    /**
+     * Content Type
+     * @return
+     */
     String contentType() default "";
 
-    String contentEncoding() default "UTF-8";
+    /**
+     * Content Encoding
+     * @return
+     */
+    String contentEncoding() default "";
+
+    /**
+     * User Agent
+     * @return
+     */
+    String userAgent() default "";
+
+    /**
+     * Charset, Default is UTF-8
+     * @return
+     */
+    String charset() default "";
 
     /**
      * reqest headers: <br>
      *     use the key-value format: key: value <br>
      *     <pre>
-     *         ...
      *         headers = "Content-Type: application/json"
-     *         ...
      *     </pre>
      *     multiple headers <br>
      *     <pre>
-     *         ...
      *         headers = {
      *            "Content-Type: application/json",
-     *            "Accept: text/plan"
+     *            "Accept: text/plain"
      *         }
-     *         ...
      *     </pre>
      *     variables and parameters <br>
      *     <pre>
-     *         ...
      *         headers = {"Accept: ${value}"}
-     *         ...
      *     <pre/>
      *
      * @return
@@ -111,6 +132,14 @@ public @interface Request {
 
     String[] data() default {};
 
+    long progressStep() default -1L;
+
+    Class<?> decoder() default Object.class;
+
+    /**
+     * KeyStore Id
+     * @return
+     */
     String keyStore() default "";
 
     boolean logEnabled() default false;

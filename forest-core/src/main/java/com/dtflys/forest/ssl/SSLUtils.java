@@ -127,7 +127,7 @@ public class SSLUtils {
         }
     }
 
-
+/*
     private static class SavingTrustManager implements X509TrustManager {
 
         private final X509TrustManager tm;
@@ -152,5 +152,6 @@ public class SSLUtils {
             tm.checkServerTrusted(chain, authType);
         }
     }
+*/
 
 }

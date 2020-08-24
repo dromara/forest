@@ -24,6 +24,8 @@
 
 package com.dtflys.forest.annotation;
 
+import com.dtflys.forest.lifecycles.parameter.DataParamLifeCycle;
+
 import java.lang.annotation.*;
 
 /**
@@ -31,6 +33,7 @@ import java.lang.annotation.*;
  * @since 2016-03-24
  */
 @Documented
+@ParamLifeCycle(DataParamLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = ElementType.PARAMETER)
 public @interface DataParam {

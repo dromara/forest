@@ -1,12 +1,10 @@
 package com.dtflys.test.converter;
 
-import com.alibaba.fastjson.TypeReference;
 import com.dtflys.test.model.Coordinate;
 import com.dtflys.test.model.SubCoordinate;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import junit.framework.Assert;
-import com.dtflys.forest.converter.json.ForestFastjsonConverter;
 import com.dtflys.forest.converter.json.ForestJacksonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import org.junit.Test;
@@ -35,7 +33,7 @@ public class TestForestJacksonConverter {
     @Test
     public void testConvertToJson() {
         ForestJacksonConverter forestJacksonConverter = new ForestJacksonConverter();
-        String text = forestJacksonConverter.convertToJson(new Integer[] {100, 10});
+        String text = forestJacksonConverter.encodeToString(new Integer[] {100, 10});
         Assert.assertEquals("[100,10]", text);
     }
 
@@ -47,7 +45,7 @@ public class TestForestJacksonConverter {
 
         boolean error = false;
         try {
-            forestJacksonConverter.convertToJson(map);
+            forestJacksonConverter.encodeToString(map);
         } catch (ForestRuntimeException e) {
             error = true;
             assertNotNull(e.getCause());

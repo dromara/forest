@@ -82,7 +82,7 @@ public class TestJaxbConverter {
         user.setAge(32);
 
         ForestJaxbConverter forestJaxbConverter = new ForestJaxbConverter();
-        String xml = forestJaxbConverter.convertToXml(user);
+        String xml = forestJaxbConverter.encodeToString(user);
         assertNotNull(xml);
         assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
                 "<user>\n" +
@@ -122,7 +122,7 @@ public class TestJaxbConverter {
         ForestJaxbConverter forestJaxbConverter = new ForestJaxbConverter();
         boolean error = false;
         try {
-            forestJaxbConverter.convertToXml(user);
+            forestJaxbConverter.encodeToString(user);
         } catch (ForestRuntimeException e) {
             error = true;
         }

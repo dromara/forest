@@ -47,12 +47,38 @@ public class TestPutClient extends BaseClientTest {
     }
 
     @Test
+    public void testPutHello() {
+        String result = putClient.putHello();
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(PutMockServer.EXPECTED, result);
+    }
+
+    @Test
     public void testSimplePut() {
         String result = putClient.simplePut();
         log.info("response: " + result);
         assertNotNull(result);
         assertEquals(PutMockServer.EXPECTED, result);
     }
+
+    @Test
+    public void testSimplePut2() {
+        String result = putClient.simplePut2();
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(PutMockServer.EXPECTED, result);
+    }
+
+    @Test
+    public void testSimplePut3() {
+        String result = putClient.simplePut3();
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(PutMockServer.EXPECTED, result);
+    }
+
+
 
     @Test
     public void testTextParamPut() {

@@ -62,18 +62,18 @@ public class JsonTest extends TestCase {
 
 
     public void testFastjson() {
-        String jsonSource = fastjsonConverter.convertToJson(map);
+        String jsonSource = fastjsonConverter.encodeToString(map);
         assertNotNull(jsonSource);
         Map newMap = fastjsonConverter.convertToJavaObject(jsonSource, Map.class);
         assertEquals(map, newMap);
 
-        String jsonSource2 = fastjsonConverter.convertToJson(contacts);
+        String jsonSource2 = fastjsonConverter.encodeToString(contacts);
         assertNotNull(jsonSource2);
         List<Contact> newList = fastjsonConverter.convertToJavaObject(jsonSource2, new TypeReference<List<Contact>>() {});
         assertNotNull(newList);
         assertEquals(newList.get(0).getAge(), new Integer(20));
 
-        String jsonSource3 = fastjsonConverter.convertToJson(result);
+        String jsonSource3 = fastjsonConverter.encodeToString(result);
         assertNotNull(jsonSource3);
         Result<List<Contact>> newResult = fastjsonConverter.convertToJavaObject(jsonSource3, new TypeReference<Result<List<Contact>>>() {});
         assertNotNull(newResult);
@@ -86,19 +86,19 @@ public class JsonTest extends TestCase {
     }
 
     public void testJackson() {
-        String jsonSource = jacksonConverter.convertToJson(map);
+        String jsonSource = jacksonConverter.encodeToString(map);
         assertNotNull(jsonSource);
         Map newMap = jacksonConverter.convertToJavaObject(jsonSource, Map.class);
         assertEquals(map, newMap);
 
-        String jsonSource2 = jacksonConverter.convertToJson(contacts);
+        String jsonSource2 = jacksonConverter.encodeToString(contacts);
         assertNotNull(jsonSource2);
         List<Contact> newList = jacksonConverter.convertToJavaObject(jsonSource2, List.class, Contact.class);
         assertNotNull(newList);
         assertEquals(newList.get(0).getAge(), new Integer(20));
 
 
-        String jsonSource3 = jacksonConverter.convertToJson(result);
+        String jsonSource3 = jacksonConverter.encodeToString(result);
         assertNotNull(jsonSource3);
 
         ObjectMapper mapper = new ObjectMapper();
@@ -114,12 +114,12 @@ public class JsonTest extends TestCase {
     }
 
     public void testGson() {
-        String jsonSource = gsonConverter.convertToJson(map);
+        String jsonSource = gsonConverter.encodeToString(map);
         assertNotNull(jsonSource);
         Map newMap = gsonConverter.convertToJavaObject(jsonSource, Map.class);
         assertEquals(map, newMap);
 
-        String jsonSource2 = gsonConverter.convertToJson(contacts);
+        String jsonSource2 = gsonConverter.encodeToString(contacts);
         assertNotNull(jsonSource2);
         List<Contact> newList = gsonConverter.convertToJavaObject(jsonSource2, new TypeToken<List<Contact>>() {}.getType());
         assertNotNull(newList);

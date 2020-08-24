@@ -4,6 +4,7 @@ import com.dtflys.forest.annotation.BaseRequest;
 import com.dtflys.forest.annotation.BaseURL;
 import com.dtflys.forest.annotation.DataVariable;
 import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.mock.GetMockServer;
 
 /**
@@ -12,10 +13,16 @@ import com.dtflys.test.mock.GetMockServer;
  */
 @BaseRequest(
         baseURL = "http://localhost:${port}",
-        headers = {"Accept:text/plan"},
+        headers = {"Accept:text/plain"},
         timeout = 2000
 )
 public interface BaseReqClient {
+
+    @Request(
+            url = ""
+    )
+    ForestResponse simpleBaseUrl();
+
 
     @Request(
             url = "/hello/user?username=foo"

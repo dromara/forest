@@ -1,12 +1,15 @@
 package com.dtflys.forest.backend.okhttp3.conn;
 
 import com.dtflys.forest.backend.ForestConnectionManager;
+import com.dtflys.forest.backend.okhttp3.response.OkHttpResponseBody;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.ssl.*;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
+import okhttp3.Response;
 
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
@@ -52,7 +55,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
         return null;
     }
 
-    public OkHttpClient getClient(ForestRequest request) {
+    public OkHttpClient getClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         Integer timeout = request.getTimeout();
         if (timeout == null) {
             timeout = request.getConfiguration().getTimeout();
@@ -70,6 +73,14 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
                     .sslSocketFactory(sslSocketFactory, getX509TrustManager(request))
                     .hostnameVerifier(TrustAllHostnameVerifier.DEFAULT);
         }
+
+        // add default interceptor
+        builder.addNetworkInterceptor(chain -> {
+            Response response = chain.proceed(chain.request());
+            return response.newBuilder()
+                    .body(new OkHttpResponseBody(request, response.body(), lifeCycleHandler))
+                    .build();
+        });
 
         return builder.build();
     }

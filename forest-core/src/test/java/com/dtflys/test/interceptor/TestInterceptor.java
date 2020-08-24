@@ -83,7 +83,7 @@ public class TestInterceptor extends BaseClientTest {
 
     @Test
     public void testFalseInterceptor() {
-        String result = interceptorClient.beforeFalse();
+        String result = interceptorClient.beforeFalse("a");
         assertNull(result);
     }
 

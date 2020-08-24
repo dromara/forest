@@ -21,7 +21,7 @@ public class HttpclientPostExecutor extends AbstractHttpclientEntityExecutor<Htt
 
     @Override
     protected URLBuilder getURLBuilder() {
-        return URLBuilder.getSimpleURLBuilder();
+        return URLBuilder.getQueryableURLBuilder();
     }
 
 

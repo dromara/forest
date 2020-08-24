@@ -4,6 +4,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestFastjsonConverter;
+import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.client.PostClient;
 import com.dtflys.test.http.model.JsonTestUser;
 import com.dtflys.test.mock.PostJson2MockServer;
@@ -57,10 +58,11 @@ public class TestPostJson2Client extends BaseClientTest {
     public void testJsonPost5() {
         JsonTestUser user = new JsonTestUser();
         user.setUsername("foo");
-        String result = postClient.postJson5(user);
+        ForestResponse<String> response = postClient.postJson5("foo", "1111111111111");
+        String result = response.getResult();
         log.info("response: " + result);
         assertNotNull(result);
-        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
+        Assert.assertEquals(PostJson2MockServer.EXPECTED, result);
     }
 
     @Test
@@ -70,8 +72,19 @@ public class TestPostJson2Client extends BaseClientTest {
         String result = postClient.postJson5Map(userMap);
         log.info("response: " + result);
         assertNotNull(result);
-        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
+        Assert.assertEquals(PostJson2MockServer.EXPECTED, result);
     }
+
+    @Test
+    public void testJsonPost5Map2() {
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("username", "foo");
+        String result = postClient.postJson5Map2(userMap);
+        log.info("response: " + result);
+        assertNotNull(result);
+        Assert.assertEquals(PostJson2MockServer.EXPECTED, result);
+    }
+
 
 
     @Test
@@ -81,9 +94,18 @@ public class TestPostJson2Client extends BaseClientTest {
         String result = postClient.postJson6(user);
         log.info("response: " + result);
         assertNotNull(result);
-        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
+        Assert.assertEquals(PostJson2MockServer.EXPECTED, result);
     }
 
+    @Test
+    public void testJsonPost11() {
+        JsonTestUser user = new JsonTestUser();
+        user.setUsername("foo");
+        String result = postClient.postJson11(user);
+        log.info("response: " + result);
+        assertNotNull(result);
+        Assert.assertEquals(PostJson2MockServer.EXPECTED, result);
+    }
 
 
 }

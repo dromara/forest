@@ -5,8 +5,8 @@ import com.dtflys.forest.exceptions.ForestNetworkException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
-import com.dtflys.forest.handler.ResponseHandler;
-import com.dtflys.forest.utils.ReflectUtil;
+import com.dtflys.forest.handler.LifeCycleHandler;
+import com.dtflys.forest.utils.ReflectUtils;
 
 import java.lang.reflect.Type;
 import java.util.concurrent.Future;
@@ -20,16 +20,16 @@ public abstract class BackendResponseHandler<R> {
 
     protected final ForestRequest request;
 
-    protected final ResponseHandler responseHandler;
+    protected final LifeCycleHandler lifeCycleHandler;
 
-    public BackendResponseHandler(ForestRequest request, ResponseHandler responseHandler) {
+    public BackendResponseHandler(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         this.request = request;
-        this.responseHandler = responseHandler;
+        this.lifeCycleHandler = lifeCycleHandler;
     }
 
 
     public Object handleSync(ForestResponse response, int statusCode, String msg) {
-        Object result = responseHandler.handleSync(request, response);
+        Object result = lifeCycleHandler.handleSync(request, response);
         if (result instanceof ForestResponse) {
             return result;
         }
@@ -42,18 +42,18 @@ public abstract class BackendResponseHandler<R> {
 
 
     public Object handleSuccess(ForestResponse response) {
-        Type onSuccessGenericType = responseHandler.getOnSuccessClassGenericType();
-        Object resultData = responseHandler.handleResultType(request, response, onSuccessGenericType, ReflectUtil.getClassByType(onSuccessGenericType));
-        return responseHandler.handleSuccess(resultData, request, response);
+        Type onSuccessGenericType = lifeCycleHandler.getOnSuccessClassGenericType();
+        Object resultData = lifeCycleHandler.handleResultType(request, response, onSuccessGenericType, ReflectUtils.getClassByType(onSuccessGenericType));
+        return lifeCycleHandler.handleSuccess(resultData, request, response);
     }
 
 
     public void handleError(ForestResponse response) {
-        responseHandler.handleError(request, response);
+        lifeCycleHandler.handleError(request, response);
     }
 
-    public void handleError(ForestResponse response, Exception ex) {
-        responseHandler.handleError(request, response, ex);
+    public void handleError(ForestResponse response, Throwable ex) {
+        lifeCycleHandler.handleError(request, response, ex);
     }
 
 

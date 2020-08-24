@@ -27,8 +27,10 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.Assert.*;
@@ -116,22 +118,19 @@ public class TestAsyncGetClient extends BaseClientTest {
     @Test
     public void testAsyncVarParamGet() throws InterruptedException, ExecutionException {
         final AtomicBoolean success = new AtomicBoolean(false);
-        Future<String> future = getClient.asyncVarParamGet("foo", new OnSuccess<Object>() {
-            @Override
-            public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
-                log.info("data: " + data);
-                success.set(true);
-                assertEquals(AsyncGetMockServer.EXPECTED, data);
-            }
-        }, new OnError() {
-            @Override
-            public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
-            }
+        CountDownLatch latch = new CountDownLatch(1);
+        Future<String> future = getClient.asyncVarParamGet("foo", (data, request, response) -> {
+            log.info("data: " + data);
+            success.set(true);
+            assertEquals(AsyncGetMockServer.EXPECTED, data);
+            latch.countDown();
+        }, (ex, request, response) -> {
+            latch.countDown();
         });
         log.info("send async get request");
         assertFalse(success.get());
         assertNotNull(future);
-        Thread.sleep(2000L);
+        latch.await(5, TimeUnit.SECONDS);
         assertTrue(success.get());
         assertTrue(future.isDone());
         assertEquals(AsyncGetMockServer.EXPECTED, future.get());
@@ -142,29 +141,26 @@ public class TestAsyncGetClient extends BaseClientTest {
     public void testAsyncVarParamGetError() throws InterruptedException {
         final AtomicBoolean success = new AtomicBoolean(false);
         final AtomicBoolean error = new AtomicBoolean(false);
+        CountDownLatch latch = new CountDownLatch(1);
         Future<String> future = getClient.asyncVarParamGet(
                 "error param",
-                new OnSuccess<Object>() {
-                    @Override
-                    public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
-                        error.set(false);
-                        success.set(true);
-                    }
-                }, new OnError() {
-                    @Override
-                    public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
-                        error.set(true);
-                        success.set(false);
-                        assertTrue(ex instanceof ForestNetworkException);
-                        int statusCode = ((ForestNetworkException) ex).getStatusCode();
-                        log.error("status code = " + statusCode);
-                        assertEquals(404, statusCode);
-                    }
+                (data, request, response) -> {
+                    error.set(false);
+                    success.set(true);
+                    latch.countDown();
+                }, (ex, request, response) -> {
+                    error.set(true);
+                    success.set(false);
+                    assertTrue(ex instanceof ForestNetworkException);
+                    int statusCode = ((ForestNetworkException) ex).getStatusCode();
+                    log.error("status code = " + statusCode);
+                    assertEquals(404, statusCode);
+                    latch.countDown();
                 });
         log.info("send async get request");
         assertFalse(error.get());
         assertNotNull(future);
-        Thread.sleep(2000L);
+        latch.await(5, TimeUnit.SECONDS);
         assertFalse(success.get());
         assertTrue(error.get());
 

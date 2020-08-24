@@ -5,7 +5,6 @@ import com.dtflys.test.model.SubCoordinate;
 import com.google.gson.reflect.TypeToken;
 import junit.framework.Assert;
 import com.dtflys.forest.converter.json.ForestGsonConverter;
-import com.dtflys.forest.converter.json.ForestJacksonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import org.junit.Test;
 
@@ -25,7 +24,7 @@ public class TestGsonConverter {
     @Test
     public void testConvertToJson() {
         ForestGsonConverter gsonConverter = new ForestGsonConverter();
-        String text = gsonConverter.convertToJson(new Integer[] {100, 10});
+        String text = gsonConverter.encodeToString(new Integer[] {100, 10});
         Assert.assertEquals("[100,10]", text);
     }
 

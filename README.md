@@ -7,8 +7,8 @@
 <a href="https://travis-ci.org/github/mySingleLive/forest">
     <img src="https://api.travis-ci.org/mySingleLive/forest.svg?branch=master&status=passed" alt="Build">
 </a>
-<a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.3.11/jar">
-    <img src="https://img.shields.io/badge/maven%20central-1.3.11-brightgreen.svg" alt="Maven Central">
+<a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.4.0-ALPHA1/jar">
+    <img src="https://img.shields.io/badge/maven%20central-1.4.0-ALPHA1-brightgreen.svg" alt="Maven Central">
 </a>
 <a href="https://codecov.io/gh/mySingleLive/forest">
     <img src="https://codecov.io/gh/mySingleLive/forest/branch/master/graphs/badge.svg?branch=master" alt="Codecov">
@@ -62,7 +62,7 @@ Forest是一个高层的、极简的轻量级HTTP调用API框架。<br>
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>spring-boot-starter-forest</artifactId>
-    <version>1.3.11</version>
+    <version>1.4.0-ALPHA1</version>
 </dependency>
 ```
 
@@ -121,30 +121,14 @@ System.out.println(result);
 
 #### 详细文档请看：[dt_flys.gitee.io/forest](https://dt_flys.gitee.io/forest)
 
-联系作者:
------------------------------------
+### 联系作者:<br>
 
-亲，进群前记得先 <font color="yellow">star</font> 一下哦~
-
-扫描二维码关注公众号，回复关键字 `forest` 即可加群
+亲，进群前记得先star一下哦~
 
 ![avatar](https://dt_flys.gitee.io/forest/media/wechat_qr.png)
 
-
-参与贡献
------------------------------------
-
-1. 提issue，如果在gitee的issue中已经有您想解决的问题，可以直接将该issue分配给您自己。如若没有，可以自己在gitee上创建一个issue。
-2. Fork 本项目的仓库
-3. 新建分支，分支名格式为`feat_${issue的ID号}`
-4. 本地自测，提交前请通过所有的已经单元测试，以及为您要解决的问题新增单元测试。
-5. 提交代码
-6. 新建 Pull Request
-7. 我会对您的PR进行验证和测试，如通过测试，我会合到`dev`分支上随新版本发布时再合到`master`分支上。
-8. 欢迎小伙伴们多提issue和PR，被接纳PR的小伙伴我会列在`README`上的贡献者列表中:）
-
 项目协议
------------------------------------
+--------------------------
 The MIT License (MIT)
 
 Copyright (c) 2016 Jun Gong

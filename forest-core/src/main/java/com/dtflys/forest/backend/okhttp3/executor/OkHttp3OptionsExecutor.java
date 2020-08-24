@@ -21,7 +21,7 @@ public class OkHttp3OptionsExecutor extends AbstractOkHttp3Executor {
     }
 
     @Override
-    protected void requestMethod(Request.Builder builder) {
+    protected void prepareMethod(Request.Builder builder) {
         builder.method("OPTIONS", null);
     }
 

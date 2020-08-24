@@ -1,5 +1,6 @@
 package com.thebeastshop.forest.springboot.properties;
 
+import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.forest.ssl.SSLUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -44,9 +45,24 @@ public class ForestConfigurationProperties {
     private int connectTimeout = 2000;
 
     /**
+     * request charset
+     */
+    private String charset = "UTF-8";
+
+    /**
+     * Class of retryer
+     */
+    private Class retryer = BackOffRetryer.class;
+
+    /**
      * count of retry times
      */
-    private int retryCount = 0;
+    private Integer retryCount = 0;
+
+    /**
+     * max interval of retrying request
+     */
+    private long maxRetryInterval = 0;
 
     /**
      * Enable print log of request
@@ -128,12 +144,36 @@ public class ForestConfigurationProperties {
         this.connectTimeout = connectTimeout;
     }
 
+    public String getCharset() {
+        return charset;
+    }
+
+    public void setCharset(String charset) {
+        this.charset = charset;
+    }
+
+    public Class getRetryer() {
+        return retryer;
+    }
+
+    public void setRetryer(Class retryer) {
+        this.retryer = retryer;
+    }
+
     public int getRetryCount() {
         return retryCount;
     }
 
     public void setRetryCount(int retryCount) {
         this.retryCount = retryCount;
+    }
+
+    public long getMaxRetryInterval() {
+        return maxRetryInterval;
+    }
+
+    public void setMaxRetryInterval(long maxRetryInterval) {
+        this.maxRetryInterval = maxRetryInterval;
     }
 
     public boolean isLogEnabled() {

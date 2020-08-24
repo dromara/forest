@@ -4,6 +4,7 @@ forest:
   max-route-connections: 5500
   timeout: 5000
   connect-timeout: 4000
+  charset: GBK
   log-enabled: true
   retry-count: 0
   filters:

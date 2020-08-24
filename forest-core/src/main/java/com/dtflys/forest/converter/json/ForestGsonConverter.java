@@ -36,8 +36,8 @@ public class ForestGsonConverter implements ForestJsonConverter {
 
     public <T> T convertToJavaObject(String source, Type targetType) {
         try {
-            if (targetType instanceof ParameterizedType ||
-                    targetType.getClass().getName().startsWith("com.google.gson")) {
+            if (targetType instanceof ParameterizedType
+                    || targetType.getClass().getName().startsWith("com.google.gson")) {
                 Gson gson = new Gson();
                 return gson.fromJson(source, targetType);
             }
@@ -88,8 +88,8 @@ public class ForestGsonConverter implements ForestJsonConverter {
                 if (num.compareTo(new BigDecimal(Long.MIN_VALUE)) == -1) {
                     return num;
                 }
-                if (num.compareTo(new BigDecimal(Integer.MAX_VALUE)) == 1 ||
-                        num.compareTo(new BigDecimal(Integer.MIN_VALUE)) == -1) {
+                if (num.compareTo(new BigDecimal(Integer.MAX_VALUE)) == 1
+                        || num.compareTo(new BigDecimal(Integer.MIN_VALUE)) == -1) {
                     return jsonPrimitive.getAsLong();
                 }
                 return jsonPrimitive.getAsInt();
@@ -130,7 +130,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
         return list;
     }
 
-    public String convertToJson(Object obj) {
+    public String encodeToString(Object obj) {
         Gson gson = new Gson();
         return gson.toJson(obj);
     }

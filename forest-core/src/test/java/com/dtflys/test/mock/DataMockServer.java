@@ -30,7 +30,7 @@ public class DataMockServer extends MockServerRule {
                 request()
                         .withPath("/hello/data")
                         .withMethod("GET")
-                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plan"))
+                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plain"))
                         .withQueryStringParameter("type",  "data")
         ).respond(
                 response()

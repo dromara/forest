@@ -14,7 +14,10 @@ import static org.mockserver.model.HttpResponse.response;
  */
 public class PostJson2MockServer extends MockServerRule {
 
-    public final static String EXPECTED = "{\"status\": \"ok\"}";
+//    public final static String EXPECTED = "{\"status\": \"ok\"}";
+
+    public final static String EXPECTED = "成功访问";
+
 
     public final static Integer port = 5015;
 
@@ -28,10 +31,12 @@ public class PostJson2MockServer extends MockServerRule {
                 request()
                         .withPath("/json")
                         .withMethod("POST")
-                        .withHeader(new Header(HttpHeaders.CONTENT_TYPE, "application/json; charset=utf-8"))
+                        .withHeader(new Header(HttpHeaders.CONTENT_TYPE, "application/json"))
                         .withBody("{\"username\":\"foo\"}")
         ).respond(
                 response()
+                        .withHeader("Content-Type", "text/plain;charset=utf-8")
+                        .withHeader("Content-Encoding", "UTF-8")
                         .withStatusCode(200)
                         .withBody(EXPECTED)
         );

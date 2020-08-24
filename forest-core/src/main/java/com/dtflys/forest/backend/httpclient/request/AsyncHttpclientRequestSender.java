@@ -3,6 +3,9 @@ package com.dtflys.forest.backend.httpclient.request;
 import com.dtflys.forest.backend.httpclient.conn.HttpclientConnectionManager;
 import com.dtflys.forest.backend.httpclient.response.HttpclientForestResponseFactory;
 import com.dtflys.forest.backend.httpclient.response.HttpclientResponseHandler;
+import com.dtflys.forest.exceptions.ForestNetworkException;
+import com.dtflys.forest.exceptions.ForestRetryException;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
@@ -26,32 +29,48 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
     }
 
     @Override
-    public void sendRequest(final ForestRequest request, final HttpclientResponseHandler responseHandler, final HttpUriRequest httpRequest) throws IOException {
+    public void sendRequest(final ForestRequest request, final HttpclientResponseHandler responseHandler, final HttpUriRequest httpRequest, LifeCycleHandler lifeCycleHandler, long startTime, int retryCount)  {
         final CloseableHttpAsyncClient client = connectionManager.getHttpAsyncClient(request);
         client.start();
         final ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
 
         final Future<HttpResponse> future = client.execute(httpRequest, new FutureCallback<HttpResponse>() {
             public void completed(final HttpResponse httpResponse) {
-                ForestResponse response = forestResponseFactory.createResponse(request, httpResponse);
-                if (response.isSuccess()) {
-                    if (request.getOnSuccess() != null) {
-                        responseHandler.handleSuccess(response);
+                ForestResponse response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler);
+                if (response.isError()) {
+                    ForestNetworkException networkException =
+                            new ForestNetworkException("", response.getStatusCode(), response);
+                    ForestRetryException retryException = new ForestRetryException(
+                            networkException,  request, request.getRetryCount(), retryCount);
+                    try {
+                        request.getRetryer().canRetry(retryException);
+                    } catch (Throwable throwable) {
+                        responseHandler.handleError(response);
+                        return;
                     }
-                } else {
-                    responseHandler.handleError(response);
+                    sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, startTime, retryCount + 1);
+                    return;
                 }
+                responseHandler.handleSuccess(response);
             }
 
             public void failed(final Exception ex) {
-                ForestResponse response = forestResponseFactory.createResponse(request, null);
-                responseHandler.handleError(response, ex);
                 synchronized (client) {
                     try {
                         client.close();
                     } catch (IOException e) {
                     }
                 }
+                ForestResponse response = forestResponseFactory.createResponse(request, null, lifeCycleHandler);
+                ForestRetryException retryException = new ForestRetryException(
+                        ex,  request, request.getRetryCount(), retryCount);
+                try {
+                    request.getRetryer().canRetry(retryException);
+                } catch (Throwable throwable) {
+                    responseHandler.handleError(response, ex);
+                    return;
+                }
+                sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, startTime, retryCount + 1);
             }
 
             public void cancelled() {

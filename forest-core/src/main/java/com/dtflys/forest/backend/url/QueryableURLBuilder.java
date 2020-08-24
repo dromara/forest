@@ -25,13 +25,16 @@ public class QueryableURLBuilder extends URLBuilder {
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         for (int i = 0; i < data.size(); i++) {
             RequestNameValue nameValue = data.get(i);
+            if (!nameValue.isInQuery()) {
+                continue;
+            }
             paramBuilder.append(nameValue.getName());
             String value = MappingTemplate.getParameterValue(jsonConverter, nameValue.getValue());
             paramBuilder.append('=');
-            if (StringUtils.isNotEmpty(value)) {
+            if (StringUtils.isNotEmpty(value) && request.getCharset() != null) {
                 String encodedValue = null;
                 try {
-                    encodedValue = URLEncoder.encode(value, request.getEncode());
+                    encodedValue = URLEncoder.encode(value, request.getCharset());
                 } catch (UnsupportedEncodingException e) {
                 }
                 if (encodedValue != null) {

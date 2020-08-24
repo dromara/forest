@@ -1,5 +1,6 @@
 package com.dtflys.test.interceptor;
 
+import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
@@ -18,6 +19,9 @@ public class FalseInterceptor implements Interceptor {
     @Override
     public boolean beforeExecute(ForestRequest request) {
         log.info("invoke False beforeExecute");
+        Object[] args = request.getArguments();
+        args[0] = "b";
+        log.info("args: " + JSON.toJSONString(args));
         return false;
     }
 

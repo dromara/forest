@@ -3,6 +3,7 @@ package com.dtflys.forest.backend.okhttp3.executor;
 import com.dtflys.forest.backend.BodyBuilder;
 import com.dtflys.forest.backend.HttpExecutor;
 import com.dtflys.forest.backend.url.URLBuilder;
+import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.RequestNameValue;
@@ -14,7 +15,7 @@ import com.dtflys.forest.backend.okhttp3.response.OkHttp3ResponseFuture;
 import com.dtflys.forest.backend.okhttp3.response.OkHttp3ResponseHandler;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestNetworkException;
-import com.dtflys.forest.handler.ResponseHandler;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.mapping.MappingTemplate;
 import okio.BufferedSink;
 import okio.Okio;
@@ -74,6 +75,21 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
         RequestBody requestBody = okRequest.body();
         if (requestBody == null) {
             return null;
+        }
+        if (requestBody instanceof MultipartBody) {
+            MultipartBody multipartBody = (MultipartBody) requestBody;
+            String contentType = multipartBody.type().toString();
+            String boundary = multipartBody.boundary();
+            Long contentLength = null;
+            try {
+                contentLength = multipartBody.contentLength();
+            } catch (IOException e) {
+            }
+            String result = "[" + contentType +"; boundary=" + boundary ;
+            if (contentLength != null) {
+                result += "; length=" + contentLength;
+            }
+            return result + "]";
         }
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Sink sink = Okio.sink(out);
@@ -145,39 +161,47 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
 
     protected abstract URLBuilder getURLBuilder();
 
-    protected OkHttpClient getClient(ForestRequest request) {
-        return connectionManager.getClient(request);
+    protected OkHttpClient getClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
+        return connectionManager.getClient(request, lifeCycleHandler);
+    }
+
+    protected void prepareMethod(Request.Builder builder) {
     }
 
     protected void prepareHeaders(Request.Builder builder) {
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         List<RequestNameValue> headerList = request.getHeaderNameValueList();
-        String encode = request.getEncode();
+        String contentType = request.getContentType();
+        String contentEncoding = request.getContentEncoding();
         if (headerList != null && !headerList.isEmpty()) {
             for (RequestNameValue nameValue : headerList) {
-                builder.addHeader(nameValue.getName(), MappingTemplate.getParameterValue(jsonConverter, nameValue.getValue()));
+                String name = nameValue.getName();
+                if (!name.equalsIgnoreCase("Content-Type")
+                        && !name.equalsIgnoreCase("Content-Encoding")) {
+                    builder.addHeader(name, MappingTemplate.getParameterValue(jsonConverter, nameValue.getValue()));
+                }
             }
         }
-        if (StringUtils.isNotEmpty(encode)) {
-            builder.addHeader("Content-Encoding", encode);
+        if (StringUtils.isNotEmpty(contentType) && !contentType.startsWith("multipart/form-data")) {
+            builder.addHeader("Content-Type", contentType);
+        }
+        if (StringUtils.isNotEmpty(contentEncoding)) {
+            builder.addHeader("Content-Encoding", contentEncoding);
         }
     }
 
-    protected void prepareBody(Request.Builder builder) {
-        getBodyBuilder().buildBody(builder, request);
+    protected void prepareBody(Request.Builder builder, final LifeCycleHandler lifeCycleHandler) {
+        getBodyBuilder().buildBody(builder, request, lifeCycleHandler);
     }
 
-    protected void requestMethod(Request.Builder builder) {
-        prepareBody(builder);
-    }
-
-    public void execute(final ResponseHandler responseHandler, int retryCount) {
-        OkHttpClient okHttpClient = getClient(request);
+    public void execute(final LifeCycleHandler lifeCycleHandler, int retryCount) {
+        OkHttpClient okHttpClient = getClient(request, lifeCycleHandler);
         URLBuilder urlBuilder = getURLBuilder();
         String url = urlBuilder.buildUrl(request);
         Request.Builder builder = new Request.Builder().url(url);
+        prepareMethod(builder);
         prepareHeaders(builder);
-        requestMethod(builder);
+        prepareBody(builder, lifeCycleHandler);
 
         final Request okRequest = builder.build();
         Call call = okHttpClient.newCall(okRequest);
@@ -190,15 +214,29 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
             call.enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
+                    ForestRetryException retryException = new ForestRetryException(
+                            e, request, request.getRetryCount(), retryCount);
+                    try {
+                        request.getRetryer().canRetry(retryException);
+                    } catch (Throwable throwable) {
+                        future.failed(e);
+                        ForestResponse response = factory.createResponse(request, null, lifeCycleHandler);
+                        logResponse(startTime, response);
+                        lifeCycleHandler.handleError(request, response, e);
+                        return;
+                    }
+                    execute(lifeCycleHandler, retryCount + 1);
+/*
                     future.failed(e);
-                    ForestResponse response = factory.createResponse(request, null);
+                    ForestResponse response = factory.createResponse(request, null, lifeCycleHandler);
                     logResponse(startTime, response);
-                    responseHandler.handleError(request, response, e);
+                    lifeCycleHandler.handleError(request, response, e);
+*/
                 }
 
                 @Override
                 public void onResponse(Call call, Response okResponse) throws IOException {
-                    ForestResponse response = factory.createResponse(request, okResponse);
+                    ForestResponse response = factory.createResponse(request, okResponse, lifeCycleHandler);
                     logResponse(startTime, response);
                     Object result = null;
                     if (response.isSuccess()) {
@@ -210,12 +248,21 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
                         }
                         future.completed(result);
                     } else {
-                        if (retryCount > request.getRetryCount()) {
+                        retryOrDoError(response, okResponse, future, lifeCycleHandler, retryCount, startTime);
+/*
+                        ForestNetworkException networkException =
+                                new ForestNetworkException(okResponse.message(), okResponse.code(), response);
+                        ForestRetryException retryException = new ForestRetryException(
+                                networkException, AbstractOkHttp3Executor.this, request, request.getRetryCount(), retryCount);
+                        try {
+                            request.getRetryer().canRetry(retryException);
+                        } catch (Throwable throwable) {
                             future.failed(new ForestNetworkException(okResponse.message(), okResponse.code(), response));
                             okHttp3ResponseHandler.handleError(response);
                             return;
                         }
-                        execute(responseHandler, retryCount + 1);
+                        execute(lifeCycleHandler, retryCount + 1);
+*/
                     }
                 }
             });
@@ -226,24 +273,54 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
             try {
                 okResponse = call.execute();
             } catch (IOException e) {
-                if (retryCount >= request.getRetryCount()) {
-                    ForestResponse response = factory.createResponse(request, null);
+                ForestRetryException retryException = new ForestRetryException(
+                        e, request, request.getRetryCount(), retryCount);
+                try {
+                    request.getRetryer().canRetry(retryException);
+                } catch (Throwable throwable) {
+                    ForestResponse response = factory.createResponse(request, null, lifeCycleHandler);
                     logResponse(startTime, response);
-                    responseHandler.handleError(request, response, e);
+                    lifeCycleHandler.handleError(request, response, e);
                     return;
                 }
-                execute(responseHandler, retryCount + 1);
+                execute(lifeCycleHandler, retryCount + 1);
+                return;
             }
-            ForestResponse response = factory.createResponse(request, okResponse);
+            ForestResponse response = factory.createResponse(request, okResponse, lifeCycleHandler);
             logResponse(startTime, response);
+            if (response.isError()) {
+                retryOrDoError(response, okResponse, null, lifeCycleHandler, retryCount, startTime);
+                return;
+            }
             okHttp3ResponseHandler.handleSync(okResponse, response);
         }
     }
 
 
+    private void retryOrDoError(
+            ForestResponse response, Response okResponse,
+            OkHttp3ResponseFuture future, LifeCycleHandler lifeCycleHandler,
+            int retryCount, long startTime) {
+        ForestNetworkException networkException =
+                new ForestNetworkException(okResponse.message(), okResponse.code(), response);
+        ForestRetryException retryException = new ForestRetryException(
+                networkException, request, request.getRetryCount(), retryCount);
+        try {
+            request.getRetryer().canRetry(retryException);
+        } catch (Throwable throwable) {
+            if (future != null) {
+                future.failed(new ForestNetworkException(okResponse.message(), okResponse.code(), response));
+            }
+            logResponse(startTime, response);
+            okHttp3ResponseHandler.handleSync(okResponse, response);
+            return;
+        }
+        execute(lifeCycleHandler, retryCount + 1);
+    }
+
     @Override
-    public void execute(final ResponseHandler responseHandler) {
-        execute(responseHandler, 0);
+    public void execute(final LifeCycleHandler lifeCycleHandler) {
+        execute(lifeCycleHandler, 0);
     }
 
     @Override

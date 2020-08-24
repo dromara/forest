@@ -1,7 +1,7 @@
 package com.dtflys.forest.backend;
 
 import com.dtflys.forest.backend.httpclient.request.HttpclientRequestSender;
-import com.dtflys.forest.handler.ResponseHandler;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 
@@ -39,7 +39,7 @@ public abstract class AbstractHttpExecutor implements HttpExecutor {
     }
 */
 
-    public abstract void execute(ResponseHandler responseHandler);
+    public abstract void execute(LifeCycleHandler lifeCycleHandler);
 
     public abstract void close();
 

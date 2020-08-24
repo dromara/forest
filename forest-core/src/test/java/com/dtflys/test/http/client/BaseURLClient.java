@@ -14,7 +14,7 @@ public interface BaseURLClient {
 
     @Request(
             url = "/hello/user?username=foo",
-            headers = {"Accept:text/plan"}
+            headers = {"Accept:text/plain"}
     )
     String simpleGet();
 

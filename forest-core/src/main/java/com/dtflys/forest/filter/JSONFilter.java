@@ -11,7 +11,7 @@ public class JSONFilter implements Filter {
     @Override
     public Object doFilter(ForestConfiguration configuration, Object data) {
         ForestJsonConverter jsonConverter = configuration.getJsonConverter();
-        String json = jsonConverter.convertToJson(data);
+        String json = jsonConverter.encodeToString(data);
         return json;
     }
 }

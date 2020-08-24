@@ -2,14 +2,17 @@ package com.dtflys.forest.backend.body;
 
 import com.dtflys.forest.backend.BodyBuilder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.mapping.MappingTemplate;
+import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.util.*;
 
 /**
+ * 通用的请求体构造器抽象类
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2018-02-27 18:06
  */
@@ -17,18 +20,18 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
 
     public final static String TYPE_APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
     public final static String TYPE_APPLICATION_JSON = "application/json";
+    public final static String TYPE_MULTIPART_FORM_DATA = "multipart/form-data";
 
     @Override
-    public void buildBody(T httpRequest, ForestRequest request) {
+    public void buildBody(T httpRequest, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         String contentType = request.getContentType();
         if (StringUtils.isEmpty(contentType)) {
-            Object value = request.getHeaders().get("Content-Type");
+            String value = request.getHeaders().getValue("Content-Type");
             if (value != null) {
-                String str = value.toString();
-                if (str.length() > 0) {
-                    contentType = str;
+                if (value.length() > 0) {
+                    contentType = value;
                 }
-                request.getHeaders().remove("Content-Type");
+//                request.getHeaders().remove("Content-Type");
             }
         }
 
@@ -36,12 +39,14 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
             contentType = TYPE_APPLICATION_X_WWW_FORM_URLENCODED;
         }
 
-        String[] typeGroup = contentType.split("charset=");
+        String[] typeGroup = contentType.split(";[ ]*charset=");
         String mineType = typeGroup[0];
-        String charset = request.getEncode();
+        String charset = request.getCharset();
+        boolean mergeCharset = false;
         if (StringUtils.isEmpty(charset)) {
             if (typeGroup.length > 1) {
                 charset = typeGroup[1];
+                mergeCharset = true;
             } else {
                 charset = "UTF-8";
             }
@@ -51,15 +56,14 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
         if (StringUtils.isEmpty(mineType)) {
             mineType = TYPE_APPLICATION_X_WWW_FORM_URLENCODED;
         }
-
         List<RequestNameValue> nameValueList = request.getDataNameValueList();
         if (requestBody != null) {
-            setStringBody(httpRequest, requestBody, charset, contentType);
+            setStringBody(httpRequest, requestBody, charset, contentType, mergeCharset);
             return;
         }
 
         if (mineType.equals(TYPE_APPLICATION_X_WWW_FORM_URLENCODED)) {
-            setFormData(httpRequest, request, charset, contentType, nameValueList);
+            setFormBody(httpRequest, request, charset, contentType, nameValueList);
         }
         else if (mineType.equals(TYPE_APPLICATION_JSON)) {
             ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
@@ -72,8 +76,12 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
             if (bodyList.size() == 1) {
                 toJsonObj = bodyList.get(0);
             }
-            String text = jsonConverter.convertToJson(toJsonObj);
-            setStringBody(httpRequest, text, charset, contentType);
+            String text = jsonConverter.encodeToString(toJsonObj);
+            setStringBody(httpRequest, text, charset, contentType, mergeCharset);
+        }
+        else if (mineType.startsWith("multipart/")) {
+            List<ForestMultipart> multiparts = request.getMultiparts();
+            setFileBody(httpRequest, request, charset, contentType, nameValueList, multiparts, lifeCycleHandler);
         }
         else  {
             Map<String, Object> map = convertNameValueListToMap(request, nameValueList);
@@ -83,13 +91,19 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                 Object value = entry.getValue();
                 builder.append(value);
             }
-            setStringBody(httpRequest, builder.toString(), charset, contentType);
+            List bodyList = request.getBodyList();
+            for (Object bodyItem : bodyList) {
+                builder.append(bodyItem.toString());
+            }
+            setStringBody(httpRequest, builder.toString(), charset, contentType, mergeCharset);
         }
     }
 
-    protected abstract void setStringBody(T httpReq, String text, String charset, String contentType);
+    protected abstract void setStringBody(T httpReq, String text, String charset, String contentType, boolean mergeCharset);
 
-    protected abstract void setFormData(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList);
+    protected abstract void setFormBody(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList);
+
+    protected abstract void setFileBody(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList,  List<ForestMultipart> multiparts, LifeCycleHandler lifeCycleHandler);
 
     private List convertNameValueListToList(ForestRequest request, List<RequestNameValue> nameValueList) {
         List list = new LinkedList();

@@ -4,6 +4,7 @@ import com.dtflys.forest.backend.AbstractHttpExecutor;
 import com.dtflys.forest.backend.BodyBuilder;
 import com.dtflys.forest.backend.body.NoneBodyBuilder;
 import com.dtflys.forest.backend.httpclient.HttpclientRequestProvider;
+import com.dtflys.forest.backend.httpclient.body.HttpclientBodyBuilder;
 import com.dtflys.forest.backend.url.URLBuilder;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
@@ -11,18 +12,23 @@ import com.dtflys.forest.http.ForestResponseFactory;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpRequestBase;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.backend.httpclient.request.HttpclientRequestSender;
 import com.dtflys.forest.backend.httpclient.response.HttpclientForestResponseFactory;
 import com.dtflys.forest.backend.httpclient.response.HttpclientResponseHandler;
-import com.dtflys.forest.handler.ResponseHandler;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.mapping.MappingTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.List;
 
@@ -56,14 +62,14 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
 
 
     protected void prepareBodyBuilder() {
-        bodyBuilder = new NoneBodyBuilder();
+        bodyBuilder = new HttpclientBodyBuilder();
     }
 
-    protected void prepare() {
+    protected void prepare(LifeCycleHandler lifeCycleHandler) {
         httpRequest = buildRequest();
         prepareBodyBuilder();
         prepareHeaders();
-        prepareBody();
+        prepareBody(lifeCycleHandler);
     }
 
     public AbstractHttpclientExecutor(ForestRequest request, HttpclientResponseHandler httpclientResponseHandler, HttpclientRequestSender requestSender) {
@@ -75,19 +81,27 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
     public void prepareHeaders() {
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         List<RequestNameValue> headerList = request.getHeaderNameValueList();
+        String contentType = request.getContentType();
+        String contentEncoding = request.getContentEncoding();
         if (headerList != null && !headerList.isEmpty()) {
             for (RequestNameValue nameValue : headerList) {
                 String name = nameValue.getName();
-                if (name.equals("Content-Type")) {
-                    continue;
+                if (!name.equalsIgnoreCase("Content-Type")
+                        && !name.equalsIgnoreCase("Content-Encoding")) {
+                    httpRequest.setHeader(name, MappingTemplate.getParameterValue(jsonConverter, nameValue.getValue()));
                 }
-                httpRequest.setHeader(name, MappingTemplate.getParameterValue(jsonConverter, nameValue.getValue()));
             }
+        }
+        if (StringUtils.isNotEmpty(contentType) && !contentType.startsWith("multipart/form-data")) {
+            httpRequest.setHeader("Content-Type", contentType);
+        }
+        if (StringUtils.isNotEmpty(contentEncoding)) {
+            httpRequest.setHeader("Content-Encoding", contentEncoding);
         }
     }
 
-    public void prepareBody() {
-        bodyBuilder.buildBody(httpRequest, request);
+    public void prepareBody(LifeCycleHandler lifeCycleHandler) {
+        bodyBuilder.buildBody(httpRequest, request, lifeCycleHandler);
     }
 
 
@@ -140,34 +154,66 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
     }
 
     protected String getLogContentForBody(T httpReq) {
+        if (!(httpReq instanceof HttpEntityEnclosingRequestBase)) {
+            return null;
+        }
+        try {
+            HttpEntityEnclosingRequestBase entityEnclosingRequest = (HttpEntityEnclosingRequestBase) httpReq;
+            HttpEntity entity = entityEnclosingRequest.getEntity();
+            if (entity.getContentType().getValue().startsWith("multipart/")) {
+                Long contentLength = null;
+                try {
+                    contentLength = entity.getContentLength();
+                } catch (Throwable th) {
+                }
+                String result = "[" + entity.getContentType().getValue();
+                if (contentLength != null) {
+                    result += "; length=" + contentLength;
+                }
+                return result + "]";
+            }
+            InputStream in = entity.getContent();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            StringBuffer buffer = new StringBuffer();
+            String line;
+            String body;
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line + " ");
+            }
+            body = buffer.toString();
+            return body;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return null;
+
     }
 
 
-    public void execute(ResponseHandler responseHandler) {
-        prepare();
-        execute(0, responseHandler);
+    public void execute(LifeCycleHandler lifeCycleHandler) {
+        prepare(lifeCycleHandler);
+        execute(0, lifeCycleHandler);
     }
 
 
-    public void execute(int retryCount, ResponseHandler responseHandler) {
+    public void execute(int retryCount, LifeCycleHandler lifeCycleHandler) {
         Date startDate = new Date();
         long startTime = startDate.getTime();
         try {
             logRequest(retryCount, httpRequest);
-            requestSender.sendRequest(request, httpclientResponseHandler, httpRequest);
+            requestSender.sendRequest(request, httpclientResponseHandler, httpRequest, lifeCycleHandler, startTime, 0);
         } catch (IOException e) {
             if (retryCount >= request.getRetryCount()) {
                 httpRequest.abort();
                 ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
-                response = forestResponseFactory.createResponse(request, null);
+                response = forestResponseFactory.createResponse(request, null, lifeCycleHandler);
                 logResponse(startTime, response);
-                responseHandler.handleSyncWitchException(request, response, e);
+                lifeCycleHandler.handleSyncWitchException(request, response, e);
 //                throw new ForestRuntimeException(e);
                 return;
             }
             log.error(e.getMessage());
-            execute(retryCount + 1, responseHandler);
+//            execute(retryCount + 1, lifeCycleHandler);
         } catch (ForestRuntimeException e) {
             httpRequest.abort();
             throw e;

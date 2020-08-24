@@ -5,9 +5,9 @@ import com.dtflys.forest.exceptions.ForestHandlerException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.ForestDataType;
-import com.dtflys.forest.utils.ReflectUtil;
-import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
+import com.dtflys.forest.utils.ReflectUtils;
 
+import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -26,6 +26,9 @@ public class ResultHandler {
 
 
     public Object getResult(ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
+        if (request.isDownloadFile()) {
+            return null;
+        }
         Object result = response.getResult();
         if (result != null && resultClass.isAssignableFrom(result.getClass())) {
             return result;
@@ -41,7 +44,7 @@ public class ResultHandler {
                         Class rowClass = (Class) parameterizedType.getRawType();
                         if (ForestResponse.class.isAssignableFrom(rowClass)) {
                             Type realType = parameterizedType.getActualTypeArguments()[0];
-                            Class realClass = ReflectUtil.getClassByType(parameterizedType.getActualTypeArguments()[0]);
+                            Class realClass = ReflectUtils.getClassByType(parameterizedType.getActualTypeArguments()[0]);
                             Object realResult = getResult(request, response, realType, realClass);
                             response.setResult(realResult);
                         }
@@ -54,7 +57,7 @@ public class ResultHandler {
                         Class rowClass = (Class) parameterizedType.getRawType();
                         if (Future.class.isAssignableFrom(rowClass)) {
                             Type realType = parameterizedType.getActualTypeArguments()[0];
-                            Class realClass = ReflectUtil.getClassByType(parameterizedType.getActualTypeArguments()[0]);
+                            Class realClass = ReflectUtils.getClassByType(parameterizedType.getActualTypeArguments()[0]);
                             return getResult(request, response, realType, realClass);
                         }
                     }
@@ -64,8 +67,13 @@ public class ResultHandler {
                 }
                 if (resultClass.isArray()) {
                     if (byte[].class.isAssignableFrom(resultClass)) {
-                        return response.getReceivedDataAsByteArray();
+                        return response.getByteArray();
                     }
+                }
+                Object attFile = request.getAttachment("file");
+                if (attFile != null && attFile instanceof File) {
+                    ForestConverter converter = request.getConfiguration().getConverter(ForestDataType.JSON);
+                    return converter.convertToJavaObject(attFile, resultClass);
                 }
                 String responseText = null;
                 if (result != null && CharSequence.class.isAssignableFrom(result.getClass())) {
@@ -79,13 +87,14 @@ public class ResultHandler {
                     return responseText;
                 }
                 if (InputStream.class.isAssignableFrom(resultClass)) {
-                    return response.getReceivedDataAsInputStream();
+                    return response.getInputStream();
+                }
+
+                if (request.getDecoder() != null) {
+                    return request.getDecoder().convertToJavaObject(responseText, resultType);
                 }
 
                 ForestDataType dataType = request.getDataType();
-                if (dataType.equals(ForestDataType.TEXT)) {
-                    return responseText;
-                }
                 ForestConverter converter = request.getConfiguration().getConverter(dataType);
                 return converter.convertToJavaObject(responseText, resultType);
 

@@ -22,6 +22,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import static com.dtflys.forest.mapping.MappingParameter.TARGET_BODY;
+import static com.dtflys.forest.mapping.MappingParameter.TARGET_HEADER;
 import static junit.framework.Assert.*;
 
 /**
@@ -115,8 +117,8 @@ public class TestForestConfiguration {
     public void testDefaultParameters() {
         ForestConfiguration configuration = ForestConfiguration.configuration();
         List<RequestNameValue> defaultParameters = new LinkedList<>();
-        defaultParameters.add(new RequestNameValue("name", "Peter", false));
-        defaultParameters.add(new RequestNameValue("age", "15", false));
+        defaultParameters.add(new RequestNameValue("name", "Peter", TARGET_BODY));
+        defaultParameters.add(new RequestNameValue("age", "15", TARGET_BODY));
         configuration.setDefaultParameters(defaultParameters);
         assertEquals(defaultParameters, configuration.getDefaultParameters());
     }
@@ -125,7 +127,7 @@ public class TestForestConfiguration {
     public void testDefaultHeaders() {
         ForestConfiguration configuration = ForestConfiguration.configuration();
         List<RequestNameValue> defaultHeaders = new LinkedList<>();
-        defaultHeaders.add(new RequestNameValue("Accept", "text/html", false));
+        defaultHeaders.add(new RequestNameValue("Accept", "text/html", TARGET_HEADER));
         configuration.setDefaultHeaders(defaultHeaders);
         assertEquals(defaultHeaders, configuration.getDefaultHeaders());
     }
@@ -141,7 +143,7 @@ public class TestForestConfiguration {
     }
 
     @Test
-    public void testJSONCOnvertSelectCheck() throws Throwable {
+    public void testJSONConvertSelectCheck() throws Throwable {
         JSONConverterSelector jsonConverterSelector = new JSONConverterSelector();
         try {
             Class fastJsonClass = jsonConverterSelector.checkFastJSONClass();

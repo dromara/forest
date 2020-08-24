@@ -28,7 +28,7 @@ public class PatchMockServer extends MockServerRule {
                 request()
                         .withPath("/hello")
                         .withMethod("PATCH")
-                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plan"))
+                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plain"))
                         .withBody("username=foo&password=123456")
         ).respond(
                 response()

@@ -59,6 +59,19 @@ public class TestTraceClient extends BaseClientTest {
         assertEquals(200, response.getStatusCode());
     }
 
+    @Test
+    public void testSimpleOptions2() {
+        ForestResponse response = traceClient.simpleTrace2();
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode());
+    }
+
+    @Test
+    public void testSimpleOptions3() {
+        ForestResponse response = traceClient.simpleTrace3();
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode());
+    }
 
     @Test
     public void testTextParamOptions() {

@@ -54,12 +54,39 @@ public class TestPatchClient extends BaseClientTest {
     }
 
     @Test
-    public void testSimplePatch() {
-        String result = patchClient.simplePatch();
+    public void testPatchHello() {
+        String result = patchClient.patchHello();
         log.info("response: " + result);
         assertNotNull(result);
         Assert.assertEquals(PutMockServer.EXPECTED, result);
     }
+
+
+    @Test
+    public void testSimplePatch() {
+        String result = patchClient.simplePatch();
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(PutMockServer.EXPECTED, result);
+    }
+
+    @Test
+    public void testSimplePatch2() {
+        String result = patchClient.simplePatch2();
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(PutMockServer.EXPECTED, result);
+    }
+
+    @Test
+    public void testSimplePatch3() {
+        String result = patchClient.simplePatch3();
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(PutMockServer.EXPECTED, result);
+    }
+
+
 
     @Test
     public void testTextParamPatch() {

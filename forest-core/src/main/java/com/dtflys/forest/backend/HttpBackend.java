@@ -1,7 +1,7 @@
 package com.dtflys.forest.backend;
 
 import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.forest.handler.ResponseHandler;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 
 /**
@@ -13,12 +13,12 @@ public interface HttpBackend {
 
     String getName();
 
-    HttpExecutor createExecutor(ForestRequest request, ResponseHandler responseHandler);
+    HttpExecutor createExecutor(ForestRequest request, LifeCycleHandler lifeCycleHandler);
 
     void init(ForestConfiguration configuration);
 
     interface HttpExecutorCreator {
-        HttpExecutor createExecutor(ForestConnectionManager connectionManager, ForestRequest request, ResponseHandler responseHandler);
+        HttpExecutor createExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler);
     }
 
 }

@@ -17,7 +17,7 @@ public interface DataClient {
 
     @Request(
             url = "http://localhost:${port}/hello/data",
-            headers = {"Accept:text/plan"},
+            headers = {"Accept:text/plain"},
             dataType = "json"
     )
     Map<String, Object> getData(@DataParam("type") String type);

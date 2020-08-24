@@ -171,7 +171,7 @@ Forest提供了@BaseURL和@BaseRequest来帮助您定义公用的URL和重复请
 ```java
 
 @BaseURL("http://localhost:8080")
-@BaseRequest(timeout = 3000, headers = "Accept:text/plan", retryCount = 0)
+@BaseRequest(timeout = 3000, headers = "Accept:text/plain", retryCount = 0)
 public interface Sender {
     
     @Request(
