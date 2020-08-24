@@ -258,8 +258,9 @@ String simpleDeleteRequest();
 
 如上所示，请求类型是不是更一目了然了，代码也更短了。
 
-?> `@Get`和`@GetRequest`两个注解的效果是等价的，`@Post`和`@PostRequest`、`@Put`和`@PutRequest`等注解也是同理。
+`@Get`和`@GetRequest`两个注解的效果是等价的，`@Post`和`@PostRequest`、`@Put`和`@PutRequest`等注解也是同理。
 
+?> 需要注意的是，`HEAD`请求类型没有对应的`@Head`注解，只有`@HeadRequest`注解。原因是容易和`@Header`注解混淆
 
 ## 3.4 HTTP Header
 
