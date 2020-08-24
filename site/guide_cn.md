@@ -164,52 +164,102 @@ public interface MyClient {
 其中`type`属性的大小写不敏感，写成`POST`和`post`效果相同。
 
 ```java
-public interface MyClient {
+// GET请求
+@Request(
+        url = "http://localhost:5000/hello",
+        type = "get"
+)
+String simpleGet();
 
-    // GET请求
-    @Request(
-            url = "http://localhost:5000/hello",
-            type = "get"
-    )
-    String simpleGet();
+// POST请求
+@Request(
+        url = "http://localhost:5000/hello",
+        type = "post"
+)
+String simplePost();
 
-    // POST请求
-    @Request(
-            url = "http://localhost:5000/hello",
-            type = "post"
-    )
-    String simplePost();
+// PUT请求
+@Request(
+        url = "http://localhost:5000/hello",
+        type = "put"
+)
+String simplePut();
 
-    // PUT请求
-    @Request(
-            url = "http://localhost:5000/hello",
-            type = "put"
-    )
-    String simplePut();
+// HEAD请求
+@Request(
+        url = "http://localhost:5000/hello",
+        type = "head"
+)
+String simpleHead();
 
-    // HEAD请求
-    @Request(
-            url = "http://localhost:5000/hello",
-            type = "head"
-    )
-    String simpleHead();
+// Options请求
+@Request(
+        url = "http://localhost:5000/hello",
+        type = "options"
+)
+String simpleOptions();
 
-    // Options请求
-    @Request(
-            url = "http://localhost:5000/hello",
-            type = "options"
-    )
-    String simpleOptions();
-
-    // Delete请求
-    @Request(
-            url = "http://localhost:5000/hello",
-            type = "delete"
-    )
-    String simpleDelete();
-
-}
+// Delete请求
+@Request(
+        url = "http://localhost:5000/hello",
+        type = "delete"
+)
+String simpleDelete();
 ```
+
+另外，可以用`@GetRequest`, `@PostRequest`等注解代替`@Request`注解，这样就可以省去写`type`属性的麻烦了。
+
+```java
+// GET请求
+@Get(url = "http://localhost:5000/hello")
+String simpleGet();
+
+// GET请求
+@GetRequest(url = "http://localhost:5000/hello")
+String simpleGetRequest();
+
+// POST请求
+@Post(url = "http://localhost:5000/hello")
+String simplePost();
+
+// POST请求
+@PostRequest(url = "http://localhost:5000/hello")
+String simplePostRequest();
+
+// PUT请求
+@Put(url = "http://localhost:5000/hello")
+String simplePut();
+
+// PUT请求
+@PutRequest(url = "http://localhost:5000/hello")
+String simplePutRequest();
+
+// HEAD请求
+@HeadRequest(url = "http://localhost:5000/hello")
+String simpleHead();
+
+
+// Options请求
+@Options(url = "http://localhost:5000/hello")
+String simpleOptions();
+
+// Options请求
+@OptionsRequest(url = "http://localhost:5000/hello")
+String simpleOptionsRequest();
+
+// Delete请求
+@Delete(url = "http://localhost:5000/hello")
+String simpleDelete();
+
+// Delete请求
+@DeleteRequest(url = "http://localhost:5000/hello")
+String simpleDeleteRequest();
+```
+
+如上所示，请求类型是不是更一目了然了，代码也更短了。
+
+?> `@Get`和`@GetRequest`两个注解的效果是等价的，`@Post`和`@PostRequest`、`@Put`和`@PutRequest`等注解也是同理。
+
 
 ## 3.4 HTTP Header
 
