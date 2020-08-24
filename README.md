@@ -126,6 +126,18 @@ System.out.println(result);
 
 ![avatar](https://dt_flys.gitee.io/forest/media/wx_gzh.jpg)
 
+参与贡献
+-----------------------------------
+
+1. 提issue，如果在gitee的issue中已经有您想解决的问题，可以直接将该issue分配给您自己。如若没有，可以自己在gitee上创建一个issue。
+2. Fork 本项目的仓库
+3. 新建分支，分支名格式为`feat_${issue的ID号}`
+4. 本地自测，提交前请通过所有的已经单元测试，以及为您要解决的问题新增单元测试。
+5. 提交代码
+6. 新建 Pull Request
+7. 我会对您的PR进行验证和测试，如通过测试，我会合到`dev`分支上随新版本发布时再合到`master`分支上。
+8. 欢迎小伙伴们多提issue和PR，被接纳PR的小伙伴我会列在`README`上的贡献者列表中:）
+
 项目协议
 --------------------------
 The MIT License (MIT)
