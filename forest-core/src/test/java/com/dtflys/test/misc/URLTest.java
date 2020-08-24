@@ -12,11 +12,11 @@ public class URLTest extends TestCase {
         assertEquals("http://www.baidu.com/xxx", URLUtils.getValidURL("http://www.baidu.com/", "/xxx"));
         assertEquals("http://www.baidu.com/xxx", URLUtils.getValidURL("http://www.baidu.com", "/xxx"));
 
-        assertEquals("www.baidu.com", URLUtils.getValidURL("www.baidu.com", ""));
-        assertEquals("www.baidu.com/xxx", URLUtils.getValidURL("www.baidu.com", "xxx"));
-        assertEquals("www.baidu.com/xxx", URLUtils.getValidURL("www.baidu.com/", "xxx"));
-        assertEquals("www.baidu.com/xxx", URLUtils.getValidURL("www.baidu.com/", "/xxx"));
-        assertEquals("www.baidu.com/xxx", URLUtils.getValidURL("www.baidu.com", "/xxx"));
+        assertEquals("http://www.baidu.com", URLUtils.getValidURL("www.baidu.com", ""));
+        assertEquals("http://www.baidu.com/xxx", URLUtils.getValidURL("www.baidu.com", "xxx"));
+        assertEquals("http://www.baidu.com/xxx", URLUtils.getValidURL("www.baidu.com/", "xxx"));
+        assertEquals("http://www.baidu.com/xxx", URLUtils.getValidURL("www.baidu.com/", "/xxx"));
+        assertEquals("http://www.baidu.com/xxx", URLUtils.getValidURL("www.baidu.com", "/xxx"));
 
 
         assertEquals("http://www.baidu.com", URLUtils.getValidURL("http://www.baidu.com", "http://www.baidu.com"));
