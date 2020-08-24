@@ -122,7 +122,7 @@ System.out.println(result);
 
 亲，进群前记得先star一下哦~
 
-![avatar](https://dt_flys.gitee.io/forest/media/wechat_qr.png)
+![avatar](https://dt_flys.gitee.io/forest/media/wx_gzh.jpg)
 
 项目协议
 --------------------------

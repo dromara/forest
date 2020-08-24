@@ -1861,7 +1861,7 @@ configuration
 
 扫描二维码关注公众号，回复关键字 <font color=red>forest</font> 即可加群
 
-![avatar](https://dt_flys.gitee.io/forest/media/wechat_qr.png)
+![avatar](https://dt_flys.gitee.io/forest/media/wx_gzh.jpg)
 
 
 # 十三. 项目协议
