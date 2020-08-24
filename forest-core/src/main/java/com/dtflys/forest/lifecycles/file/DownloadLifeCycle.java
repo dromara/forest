@@ -17,12 +17,16 @@ import java.lang.reflect.Type;
 public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile, Object> {
 
     @Override
+    public void onMethodInitialized(ForestMethod method, DownloadFile annotation) {
+    }
+
+
+    @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
         Type resultType = method.getReturnType();
         addAttribute(request, "resultType", resultType);
         request.setDownloadFile(true);
     }
-
 
     @Override
     public void onSuccess(Object data, ForestRequest request, ForestResponse response) {

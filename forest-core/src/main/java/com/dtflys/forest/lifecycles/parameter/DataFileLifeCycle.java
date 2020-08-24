@@ -29,11 +29,4 @@ public class DataFileLifeCycle implements ParameterAnnotationLifeCycle<DataFile,
         method.addMultipartFactory(factory);
     }
 
-    @Override
-    public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
-        if (StringUtils.isEmpty(request.getContentType())) {
-            request.setContentType(TYPE_MULTIPART_FORM_DATA);
-        }
-    }
-
 }
