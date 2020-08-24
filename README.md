@@ -122,6 +122,8 @@ System.out.println(result);
 
 亲，进群前记得先star一下哦~
 
+扫描二维码关注公众号，点击菜单中的 `进群` 按钮即可进群
+
 ![avatar](https://dt_flys.gitee.io/forest/media/wx_gzh.jpg)
 
 项目协议
