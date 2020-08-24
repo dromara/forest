@@ -42,6 +42,7 @@ import com.dtflys.forest.interceptor.InterceptorChain;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.InputStream;
 import java.util.*;
@@ -366,6 +367,9 @@ public class ForestRequest<T> {
         return arguments[index];
     }
 
+    public Object[] getArguments() {
+        return Arrays.copyOf(arguments, arguments.length);
+    }
 
     public ForestHeaderMap getHeaders() {
         return headers;
