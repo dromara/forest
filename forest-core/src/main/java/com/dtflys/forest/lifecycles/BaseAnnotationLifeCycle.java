@@ -14,6 +14,12 @@ import java.lang.annotation.Annotation;
  */
 public interface BaseAnnotationLifeCycle <A extends Annotation, I> extends Interceptor<I> {
 
+    /**
+     * 在被注解修饰的接口初始化时被调用
+     * @param method
+     * @param parameter
+     * @param annotation
+     */
     default void onProxyHandlerInitialized(InterfaceProxyHandler interfaceProxyHandler, A annotation) {
     }
 
