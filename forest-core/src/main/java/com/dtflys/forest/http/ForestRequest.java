@@ -42,7 +42,6 @@ import com.dtflys.forest.interceptor.InterceptorChain;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.InputStream;
 import java.util.*;
@@ -91,7 +90,7 @@ public class ForestRequest<T> {
 
     private String filename;
 
-    private Object[] arguments;
+    private final Object[] arguments;
 
     private String requestBody;
 
@@ -121,9 +120,15 @@ public class ForestRequest<T> {
 
     private SSLKeyStore keyStore;
 
-    public ForestRequest(ForestConfiguration configuration) {
+    public ForestRequest(ForestConfiguration configuration, Object[] arguments) {
         this.configuration = configuration;
+        this.arguments = arguments;
     }
+
+    public ForestRequest(ForestConfiguration configuration) {
+        this(configuration, new Object[0]);
+    }
+
 
     public ForestConfiguration getConfiguration() {
         return configuration;
@@ -307,7 +312,6 @@ public class ForestRequest<T> {
         return this;
     }
 
-
     public ForestRequest addData(RequestNameValue nameValue) {
         this.data.put(nameValue.getName(), nameValue.getValue());
         return this;
@@ -317,6 +321,22 @@ public class ForestRequest<T> {
         putMapAddList(this.data, data);
         return this;
     }
+
+    public ForestRequest addBody(String name, Object value) {
+        this.data.put(name, value);
+        return this;
+    }
+
+    public ForestRequest addBody(RequestNameValue nameValue) {
+        this.data.put(nameValue.getName(), nameValue.getValue());
+        return this;
+    }
+
+    public ForestRequest addBody(List<RequestNameValue> data) {
+        putMapAddList(this.data, data);
+        return this;
+    }
+
 
     public List<RequestNameValue> getQueryNameValueList() {
         List<RequestNameValue> nameValueList = new ArrayList<>();
@@ -358,17 +378,13 @@ public class ForestRequest<T> {
         return nameValueList;
     }
 
-    public ForestRequest<T> setArguments(Object[] arguments) {
-        this.arguments = arguments;
-        return this;
-    }
 
     public Object getArgument(int index) {
         return arguments[index];
     }
 
     public Object[] getArguments() {
-        return Arrays.copyOf(arguments, arguments.length);
+        return arguments;
     }
 
     public ForestHeaderMap getHeaders() {
