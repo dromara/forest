@@ -29,7 +29,7 @@ public interface InterceptorClient {
             headers = {"Accept:text/plain"},
             interceptor = FalseInterceptor.class
     )
-    String beforeFalse();
+    String beforeFalse(String arg);
 
 
 }
