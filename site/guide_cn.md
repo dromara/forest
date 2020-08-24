@@ -150,7 +150,7 @@ myClient.sendRequest("foo");
 public interface MyClient {
 
     /**
-     * 通过`@Request`注解的`type`参数指定 HTTP 请求的方式。
+     * 通过` @Request 注解的 type 参数指定 HTTP 请求的方式。
      */
     @Request(
             url = "http://localhost:5000/hello",
@@ -159,13 +159,13 @@ public interface MyClient {
     String simplePost();
 
     /**
-     * 使用@Post注解，可以去掉 type = "POST" 这行属性
+     * 使用 @Post 注解，可以去掉 type = "POST" 这行属性
      */
     @Post(url = "http://localhost:5000/hello")
     String simplePost();
 
     /**
-     * 使用@PostRequest注解，和上面效果等价
+     * 使用 @PostRequest 注解，和上面效果等价
      */
     @PostRequest(url = "http://localhost:5000/hello")
     String simplePost();
