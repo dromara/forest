@@ -16,8 +16,7 @@ import java.lang.annotation.Annotation;
  */
 public interface MethodAnnotationLifeCycle<A extends Annotation, I> extends Interceptor<I> {
 
-    default void onMethodInitialized(ForestMethod method, A annotation) {
-    }
+    void onMethodInitialized(ForestMethod method, A annotation);
 
     @Override
     default void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {

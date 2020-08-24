@@ -24,8 +24,7 @@ public interface ParameterAnnotationLifeCycle<A extends Annotation, I> extends I
      * @param parameter
      * @param annotation
      */
-    default void onParameterInitialized(ForestMethod method, MappingParameter parameter, A annotation) {
-    }
+    void onParameterInitialized(ForestMethod method, MappingParameter parameter, A annotation);
 
     @Override
     default void onSuccess(I data, ForestRequest request, ForestResponse response) {
