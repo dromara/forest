@@ -13,6 +13,11 @@ import com.dtflys.forest.utils.Base64Utils;
 public class BasicAuthLifeCycle implements MethodAnnotationLifeCycle<BasicAuth, Object> {
 
     @Override
+    public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
+
+    }
+
+    @Override
     public boolean beforeExecute(ForestRequest request) {
         String username = (String) getAttribute(request, "username");
         String password = (String) getAttribute(request, "password");
@@ -21,18 +26,9 @@ public class BasicAuthLifeCycle implements MethodAnnotationLifeCycle<BasicAuth, 
         return true;
     }
 
+
     @Override
     public void onMethodInitialized(ForestMethod method, BasicAuth annotation) {
-
-    }
-
-    @Override
-    public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
-
-    }
-
-    @Override
-    public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
 
     }
 }
