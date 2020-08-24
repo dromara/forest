@@ -91,6 +91,10 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                 Object value = entry.getValue();
                 builder.append(value);
             }
+            List bodyList = request.getBodyList();
+            for (Object bodyItem : bodyList) {
+                builder.append(bodyItem.toString());
+            }
             setStringBody(httpRequest, builder.toString(), charset, contentType, mergeCharset);
         }
     }

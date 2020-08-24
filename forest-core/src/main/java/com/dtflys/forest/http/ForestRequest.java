@@ -82,7 +82,7 @@ public class ForestRequest<T> {
 
     private Map<String, Object> data = new LinkedHashMap<String, Object>();
 
-    private List<?> bodyList = new LinkedList<>();
+    private List bodyList = new LinkedList<>();
 
     private ForestHeaderMap headers = new ForestHeaderMap();
 
@@ -249,11 +249,11 @@ public class ForestRequest<T> {
         return this;
     }
 
-    public List<?> getBodyList() {
+    public List getBodyList() {
         return bodyList;
     }
 
-    public void setBodyList(List<?> bodyList) {
+    public void setBodyList(List bodyList) {
         this.bodyList = bodyList;
     }
 
@@ -307,11 +307,13 @@ public class ForestRequest<T> {
     }
 
 
+    @Deprecated
     public ForestRequest addData(String name, Object value) {
         this.data.put(name, value);
         return this;
     }
 
+    @Deprecated
     public ForestRequest addData(RequestNameValue nameValue) {
         this.data.put(nameValue.getName(), nameValue.getValue());
         return this;
@@ -319,6 +321,17 @@ public class ForestRequest<T> {
 
     public ForestRequest addData(List<RequestNameValue> data) {
         putMapAddList(this.data, data);
+        return this;
+    }
+
+    public ForestRequest addBody(Object bodyContent) {
+        bodyList.add(bodyContent);
+        return this;
+    }
+
+    public ForestRequest replaceBody(Object bodyContent) {
+        bodyList.clear();
+        bodyList.add(bodyContent);
         return this;
     }
 
