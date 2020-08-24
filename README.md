@@ -81,10 +81,7 @@ import com.dtflys.forest.annotation.DataParam;
 
 public interface AmapClient {
 
-    @Request(
-        url = "http://ditu.amap.com/service/regeo?longitude=${0}&latitude=${1}",
-        dataType = "json"
-    )
+    @Get(url = "http://ditu.amap.com/service/regeo?longitude=${0}&latitude=${1}")
     Map getLocation(String longitude, String latitude);
 }
 
