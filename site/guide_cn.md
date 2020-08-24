@@ -150,7 +150,7 @@ myClient.sendRequest("foo");
 public interface MyClient {
 
     /**
-     * 通过` @Request 注解的 type 参数指定 HTTP 请求的方式。
+     * 通过 @Request 注解的 type 参数指定 HTTP 请求的方式。
      */
     @Request(
             url = "http://localhost:5000/hello",
