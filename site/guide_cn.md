@@ -299,7 +299,7 @@ String send1(@DataVariable("myURL") String myURL);
 String send2(@DataVariable("myURL") String myURL);
 ```
 
-### 3.4.1 字符串拼接Query参数
+### 3.4.1 通过字符串模板传参
 
 HTTP的`URL`不光有协议名、域名、端口号等等基本信息，更为重要的是它能携带各种参数，称为`Query`参数，它通常包含参数名和参数值两部分。
 
