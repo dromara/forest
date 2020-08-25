@@ -164,8 +164,6 @@ File downloadFile(String dir, String filename, OnProgress onProgress);
 
 ```java
 File file = myClient.downloadFile("D:\\TestDownload", progress -> {
-    System.out.println("total bytes: " + progress.getTotalBytes());   // 文件大小
-    System.out.println("current bytes: " + progress.getCurrentBytes());   // 已下载字节数
     System.out.println("progress: " + Math.round(progress.getRate() * 100) + "%");  // 已下载百分比
     if (progress.isDone()) {   // 是否下载完成
         System.out.println("--------   Download Completed!   --------");
