@@ -720,7 +720,6 @@ Map upload(@DataFile(value = "file") Resource resource);
 /**
  * 在方法上加上@DownloadFile注解
  * dir属性表示文件下载到哪个目录
- * @DownloadFile注解的dir属性表示文件下载到哪个目录
  * filename属性表示文件下载成功后以什么名字保存，如果不填，这默认从URL中取得文件名
  * OnProgress参数为监听上传进度的回调函数
  */

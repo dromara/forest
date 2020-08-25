@@ -81,6 +81,10 @@ import com.dtflys.forest.annotation.DataParam;
 
 public interface AmapClient {
 
+    /**
+     * 聪明的你一定看出来@Get注解就是代表方法专做GET请求
+     * ${0}代表引用第一个参数，${1}代表引用第二个参数
+     */
     @Get(url = "http://ditu.amap.com/service/regeo?longitude=${0}&latitude=${1}")
     Map getLocation(String longitude, String latitude);
 }
@@ -115,6 +119,61 @@ private AmapClient amapClient;
 Map result = amapClient.getLocation("121.475078", "31.223577");
 System.out.println(result);
 ```
+
+## 文件上传
+
+```java
+/**
+ * 用@DataFile注解修饰要上传的参数对象
+ * OnProgress参数为监听上传进度的回调函数
+ */
+@Post(url = "/upload")
+Map upload(@DataFile("file") String filePath, OnProgress onProgress);
+```
+
+可以用一个方法加Lambda同时解决文件上传和上传的进度监听
+
+```java
+Map result = myClient.upload("D:\\TestUpload\\xxx.jpg", progress -> {
+    System.out.println("progress: " + Math.round(progress.getRate() * 100) + "%");  // 已上传百分比
+    if (progress.isDone()) {   // 是否上传完成
+        System.out.println("--------   Upload Completed!   --------");
+    }
+});
+```
+
+## 文件下载
+
+下载文件也是同样的简单
+
+```java
+/**
+ * 在方法上加上@DownloadFile注解
+ * dir属性表示文件下载到哪个目录
+ * filename属性表示文件下载成功后以什么名字保存，如果不填，这默认从URL中取得文件名
+ * OnProgress参数为监听上传进度的回调函数
+ * ${0}代表引用第一个参数，${1}代表引用第二个参数
+ */
+@Get(url = "http://localhost:8080/images/xxx.jpg")
+@DownloadFile(dir = "${0}", filename = "${1}")
+File downloadFile(String dir, String filename, OnProgress onProgress);
+```
+
+
+调用下载接口以及监听上传进度的代码如下：
+
+```java
+File file = myClient.downloadFile("D:\\TestDownload", progress -> {
+    System.out.println("total bytes: " + progress.getTotalBytes());   // 文件大小
+    System.out.println("current bytes: " + progress.getCurrentBytes());   // 已下载字节数
+    System.out.println("progress: " + Math.round(progress.getRate() * 100) + "%");  // 已下载百分比
+    if (progress.isDone()) {   // 是否下载完成
+        System.out.println("--------   Download Completed!   --------");
+    }
+});
+```
+
+
 
 #### 详细文档请看：[dt_flys.gitee.io/forest](https://dt_flys.gitee.io/forest)
 
