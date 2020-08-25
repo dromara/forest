@@ -13,6 +13,9 @@
 <a href="https://gitee.com/dt_flys/forest/releases/v1.4.0">
     <img src="https://img.shields.io/badge/release-v1.4.0-blue" alt="Release">
 </a>
+<a href="https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html">
+    <img src="https://img.shields.io/badge/JDK-1.8+-yellow" alt="JDK">
+</a>
 <a href="https://codecov.io/gh/mySingleLive/forest">
     <img src="https://codecov.io/gh/mySingleLive/forest/branch/master/graphs/badge.svg?branch=master" alt="Codecov">
 </a>
