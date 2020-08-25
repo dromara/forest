@@ -279,7 +279,7 @@ String simpleDeleteRequest();
 
 ## 3.4 HTTP Header
 
-在[4.2](###_42-稍复杂点的请求定义)的例子中，我们已经知道了可以通过`@Request`注解的`headers`属性设置一条 HTTP 请求头。
+在[3.2](###_32-稍复杂点的请求定义)的例子中，我们已经知道了可以通过`@Request`注解的`headers`属性设置一条 HTTP 请求头。
 
 现在我们来看看如何添加多条请求头
 
@@ -321,7 +321,7 @@ public interface MyClient {
 
 如果要每次请求传入不同的请求头内容，可以在`headers`属性的请求头定义中加入`数据绑定`。
 
-?> 如何进行数据绑定请参见 [五. 数据绑定](#五-数据绑定)
+?> 如何进行数据绑定请参见 [七. 数据绑定](#七-数据绑定)
 
 ```java
 public interface MyClient {
@@ -491,15 +491,15 @@ myClient.postXml("foo", "bar");
 
 第一步：设置 HTTP Method 为`POST`、`PUT`、`PATCH`这类允许带有请求体的方法。
 
-?> 具体哪些 HTTP Method 能够绑定到请求体请参见 [5.2.1 数据绑定位置](###_521-数据绑定位置)
+?> 具体哪些 HTTP Method 能够绑定到请求体请参见 [6.2.1 数据绑定位置](###_621-数据绑定位置)
 
 第二步：给参数加上`@DataParam`注解并定义名称。
 
-?> 关于`@DataParam`注解具体使用可以参见 [5.2 @DataParam 参数绑定](###_52-dataparam-参数绑定)
+?> 关于`@DataParam`注解具体使用可以参见 [6.2 @DataParam 参数绑定](###_62-dataparam-参数绑定)
 
 第三步：设置`contentType`或请求头`ContentType`，要设置成什么`contentType`取决于你想要 Body 中数据是什么格式。
 
-?> 关于`contentType`和数据格式的对应关系请参见 [5.2.2 数据绑定格式](###_522-数据绑定格式)
+?> 关于`contentType`和数据格式的对应关系请参见 [6.2.2 数据绑定格式](###_622-数据绑定格式)
 
 ## 3.6 接受数据
 
@@ -652,13 +652,72 @@ Future<String> future = myClient.asyncFuture();
 String result = future.get();
 ```
 
-# 四. 配置
+# 四. 上传下载
 
-## 4.1 在 Spring Boot 项目中配置
+Forest从1.4.0版本开始支持多种形式的文件上传和文件下载功能
+
+## 4.1 上传
+
+```java
+/**
+ * 用@DataFile注解修饰要上传的参数对象
+ * OnProgress参数为监听上传进度的回调函数
+ */
+@Post(url = "/upload")
+Map upload(@DataFile("file") String filePath, OnProgress onProgress);
+```
+
+调用上传接口以及监听上传进度的代码如下：
+
+```java
+Map result = myClient.upload("D:\\TestUpload\\xxx.jpg", progress -> {
+    System.out.println("total bytes: " + progress.getTotalBytes());   // 文件大小
+    System.out.println("current bytes: " + progress.getCurrentBytes());   // 已上传字节数
+    System.out.println("progress: " + Math.round(progress.getRate() * 100) + "%");  // 已上传百分比
+    if (progress.isDone()) {   // 是否上传完成
+        System.out.println("--------   Upload Completed!   --------");
+    }
+});
+```
+
+## 4.2 下载
+
+```java
+/**
+ * 在方法上加上@DownloadFile注解
+ * dir属性表示文件下载到哪个目录
+ * @DownloadFile注解的dir属性表示文件下载到哪个目录
+ * filename属性表示文件下载成功后以什么名字保存，如果不填，这默认从URL中取得文件名
+ * OnProgress参数为监听上传进度的回调函数
+ */
+@Get(url = "http://localhost:8080/images/xxx.jpg")
+@DownloadFile(dir = "${0}", filename = "${1}")
+File downloadFile(String dir, String filename, OnProgress onProgress);
+```
+
+
+调用下载接口以及监听上传进度的代码如下：
+
+```java
+File file = myClient.downloadFile("D:\\TestDownload", progress -> {
+    System.out.println("total bytes: " + progress.getTotalBytes());   // 文件大小
+    System.out.println("current bytes: " + progress.getCurrentBytes());   // 已下载字节数
+    System.out.println("progress: " + Math.round(progress.getRate() * 100) + "%");  // 已下载百分比
+    if (progress.isDone()) {   // 是否下载完成
+        System.out.println("--------   Download Completed!   --------");
+    }
+});
+```
+
+
+
+# 五. 配置
+
+## 5.1 在 Spring Boot 项目中配置
 
 若您的项目依赖`Spring Boot`，并加入了`spring-boot-starter-forest`依赖，就可以通过 `application.yml`/`application.properties` 方式定义配置。
 
-### 4.1.1 配置后端 HTTP API
+### 5.1.1 配置后端 HTTP API
 
 ```yaml
 forest:
@@ -673,7 +732,7 @@ forest:
   backend: httpclient # 配置后端HTTP API为 httpclient
 ```
 
-### 4.1.2 全局基本配置
+### 5.1.2 全局基本配置
 
 在`application.yaml` / `application.properties`中配置的 HTTP 基本参数
 
@@ -693,7 +752,7 @@ forest:
 这里`retry-count`只是简单机械的请求失败后的重试次数，所以一般建议设置为`0`。
 如果一定要多次重试，请一定要在保证服务端的`幂等性`的基础上进行重试，否则容易引发生产事故！
 
-### 4.1.3 全局变量定义
+### 5.1.3 全局变量定义
 
 Forest 可以在`forest.variables`属性下自定义全局变量。
 
@@ -708,7 +767,7 @@ forest:
     userpwd: bar
 ```
 
-### 4.1.4 配置 Bean ID
+### 5.1.4 配置 Bean ID
 
 Forest 允许您在 yaml 文件中配置 Bean Id，它对应着`ForestConfiguration`对象在 Spring 上下文中的 Bean 名称。
 
@@ -726,11 +785,11 @@ private ForestConfiguration config0;
 
 
 
-## 4.2 在非 Spring Boot 项目中配置
+## 5.2 在非 Spring Boot 项目中配置
 
 若您的项目不是`Spring Boot`项目，或者没有依赖`spring-boot-starter-forest`，可以通过下面方式定义 Forest 配置。
 
-### 4.2.1 创建 ForestConfiguration 对象
+### 5.2.1 创建 ForestConfiguration 对象
 
 `ForestConfiguration`为 Forest 的全局配置对象类，所有的 Forest 的全局基本配置信息由此类进行管理。
 
@@ -740,7 +799,7 @@ private ForestConfiguration config0;
 ForestConfiguration configuration = ForestConfiguration.configuration();
 ```
 
-### 4.2.2 配置后端 HTTP API
+### 5.2.2 配置后端 HTTP API
 
 ```java
 configuration.setBackendName("okhttp3");
@@ -754,7 +813,7 @@ configuration.setBackendName("okhttp3");
 configuration.setBackendName("httpclient");
 ```
 
-### 4.2.3 全局基本配置
+### 5.2.3 全局基本配置
 
 ```java
 // 连接池最大连接数，默认值为500
@@ -778,7 +837,7 @@ configuration.setLogEnabled(true);
 如果一定要多次重试，请一定要在保证服务端的`幂等性`的基础上进行重试，否则容易引发生产事故！
 
 
-### 4.2.4 全局变量定义
+### 5.2.4 全局变量定义
 
 Forest 可以通过`ForestConfiguration`对象的`setVariableValue`方法自定义全局变量。
 
@@ -793,7 +852,7 @@ configuration.setVariableValue("username", "foo");
 configuration.setVariableValue("userpwd", "bar");
 ```
 
-## 4.3 配置层级
+## 5.3 配置层级
 
 上面介绍的`application.yml` / `application.properties`配置以及通过`ForestConfiguration`对象设置的配置都是全局配置。
 
@@ -818,8 +877,7 @@ Forest 的配置层级介绍：
 3. 请求配置： 作用域为某一个具体的请求，读取的优先级最高。您可以在接口的方法上修饰`@Request`注解进行 HTTP 信息配置的定义。
 
 
-
-# 五 数据绑定
+# 六. 数据绑定
 
 上面已经介绍了如何创建可以发送 HTTP 请求的接口，并绑定到某个接口方法上，已经可以实现简单请求的发送和接受。
 
@@ -828,7 +886,7 @@ Forest 的配置层级介绍：
 这时候就需要`数据绑定`来实现这些功能，
 Forest 提供多种方式进行`数据绑定`。
 
-## 5.1 参数序号绑定
+## 6.1 参数序号绑定
 
 您可以使用`${数字}`的方式引用对应顺序的参数，其中`${...}`是模板表达式的语法形式。
 
@@ -864,11 +922,11 @@ myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
 
     GET http://localhost:8080/send?un=DT&pw=123456&da=123888888&sm=Hahaha
 
-## 5.2 @DataParam 参数绑定
+## 6.2 @DataParam 参数绑定
 
 在接口方法的参数前加上`@DataParam`注解并在`value`属性中给予一个名词，就能实现参数绑定。
 
-### 5.2.1 数据绑定位置
+### 6.2.1 数据绑定位置
 
 被`@DataParam`注解修饰的参数数据的绑定位置较为灵活多变，它可以出现在请求`url`的参数部分，也可以出现在请求 Body 中。
 
@@ -938,7 +996,7 @@ myClient.send("foo", "bar");
     BODY:
         username=foo&password=bar
 
-### 5.2.2 数据绑定格式
+### 6.2.2 数据绑定格式
 
 若您想参数值在请求中传输`JSON`或`XML`等格式绑定，可以通过修改`contentType`或`Content-Type`请求头来实现对应的数据格式，
 具体数据格式和`contentType`属性的关系请参考下表：
@@ -1020,7 +1078,7 @@ public interface MyClient {
 }
 ```
 
-## 5.3 @DataVariable 参数绑定
+## 6.3 @DataVariable 参数绑定
 
 在接口方法中定义的参数前加上`@DataVariable`注解并`value`中输入一个名称，便可以实现参数的`变量名`绑定。
 
@@ -1056,7 +1114,7 @@ myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
 
     GET http://localhost:8080/send?un=DT&pw=123456&da=123888888&sm=Hahaha
     
-## 5.4 @DataObject 对象绑定
+## 6.4 @DataObject 对象绑定
 
 上面的提到的`@DataParam`绑定，以及在`data`属性中的绑定可以方便解决大部分数据传输要求。
 但缺点是参数要一个一个写，如果有很多参数或属性会写的十分复杂，而且请求要传输一个十分复杂的对象就会变得非常无能为力。
@@ -1091,7 +1149,7 @@ String send(@DataObject User user);
 | `DELETE`  | `url`参数部分   |
 | `TRACE`   | `url`参数部分   |
 
-### 5.4.1 绑定到请求体
+### 6.4.1 绑定到请求体
 
 来看一个绑定到请求体的例子：
 
@@ -1113,7 +1171,7 @@ String send(@DataObject User user);
 
 若要以其它形式(比如`JSON`)传输数据，需要做一些改动。        
 
-### 5.4.2 绑定为JSON格式
+### 6.4.2 绑定为JSON格式
 
 要让`@DataObject`绑定的对象转换成`JSON`格式也非常简单，只要将`contentType`属性或`Content-Type`请求头指定为`application/json`便可。
 
@@ -1133,7 +1191,7 @@ String send(@DataObject User user);
     BODY:
         {"username": "foo", "password": "bar"}
         
-### 5.4.3 绑定为XML格式        
+### 6.4.3 绑定为XML格式        
 
 `@DataObject`较为特殊，除了指定`contentType`属性或`Content-Type`请求头为`application/xml`外，还需要设置`@DataObject`的`filter`属性为`xml`。
 
@@ -1183,11 +1241,11 @@ public User {
         <misc><username>foo</username><password>bar</password></misc>
 
 
-## 5.5 全局变量绑定
+## 6.5 全局变量绑定
 
 若您已经定义好全局变量，那便可以直接在请求定义中绑定全局变量了。
 
-?> 关于如何定义全局变量请参见[Spring Boot 项目全局变量定义](###_413-全局变量定义)，或[非 Spring Boot 项目全局变量定义](###_424-全局变量定义)
+?> 关于如何定义全局变量请参见[Spring Boot 项目全局变量定义](###_513-全局变量定义)，或[非 Spring Boot 项目全局变量定义](###_524-全局变量定义)
 
 若有全局变量：
 
@@ -1216,11 +1274,11 @@ myClient.send("Xxxxxx");
 
     GET http://localhost:5050/send?un=foo&pw=bar&da=123888888&sm=Xxxxxx
 
-# 六. 使用请求接口
+# 七. 使用请求接口
 
 若您已有定义好的 Forest 请求接口(比如名为 `com.yoursite.client.MyClient`)，并且一切配置都已准备好，那就可以开始愉快使用它了。
 
-## 6.1 在 Spring Boot 项目中调用接口
+## 7.1 在 Spring Boot 项目中调用接口
 
 只要在`Spring Boot`的配置类或者启动类上加上`@ForestScan`注解，并在`basePackages`属性里填上远程接口的所在的包名
 
@@ -1251,7 +1309,7 @@ public class MyService {
 }
 ```
 
-## 6.2 在非 Spring Boot 项目中调用接口
+## 7.2 在非 Spring Boot 项目中调用接口
 
 通过`ForestConfiguration`的静态方法`createInstance(Class clazz)`实例化接口，然后如调用普通接口那样调用即可。
 
@@ -1264,13 +1322,13 @@ Map result = myClient.send("http://localhost:8080", "DT", "123456", "123888888",
 System.out.println(result);
 ```
 
-# 七. HTTPS
+# 八. HTTPS
 
 为保证网络访问安全，现在大多数企业都会选择使用SSL验证来提高网站的安全性。
  
 所以Forest自然也加入了对HTTPS的处理，现在支持单向认证和双向认证的HTTPS请求。
 
-## 7.1 单向认证
+## 8.1 单向认证
 
 如果访问的目标站点的SSL证书由信任的Root CA发布的，那么您无需做任何事情便可以自动信任
 
@@ -1339,11 +1397,11 @@ forest:
 
 随后在某个具体`@Request`中配置其中任意一个`keystore`的`id`都可以
 
-# 八. 异常处理
+# 九. 异常处理
 
 发送HTTP请求不会总是成功的，总会有失败的情况。Forest提供多种异常处理的方法来处理请求失败的过程。
 
-## 8.1 try-catch方式
+## 9.1 try-catch方式
 
 最常用的是直接用`try-catch`。Forest请求失败的时候通常会以抛异常的方式报告错误， 获取错误信息只需捕获`ForestNetworkException`异常类的对象，如示例代码所示：
 
@@ -1361,7 +1419,7 @@ try {
 }
 ```
 
-## 8.2 回调函数方式
+## 9.2 回调函数方式
 
 第二种方式是使用`OnError`回调函数，如示例代码所示：
 
@@ -1391,7 +1449,7 @@ myClient.send("foo",  (ex, request, response) -> {
 !> 需要注意的是：加上`OnError`回调函数后便不会再向上抛出异常，所有错误信息均通过`OnError`回调函数的参数获得。
 
 
-## 8.3 ForestResponse返回类型方式
+## 9.3 ForestResponse返回类型方式
 
 第三种，用`ForestResponse`类作为请求方法的返回值类型，示例代码如下：
 
@@ -1422,7 +1480,7 @@ if (response.isError()) {
 !> 以`ForestResponse`类为返回值类型的方法也不会向上抛出异常，错误信息均通过`ForestResponse`对象获得。
 
 
-## 8.4 拦截器方式
+## 9.4 拦截器方式
 
 若要批量处理各种不同请求的异常情况，可以定义一个拦截器, 并在拦截器的`onError`方法中处理异常，示例代码如下：
 
@@ -1440,16 +1498,16 @@ public class ErrorInterceptor implements Interceptor<String> {
 }
 ````
 
-?> 关于具体如何使用拦截器请参见 [十. 拦截器](###十-拦截器)
+?> 关于具体如何使用拦截器请参见 [拦截器](###十一-拦截器)
 
 
-# 九. 模板表达式
+# 十. 模板表达式
 
 在`@Request`的各大属性中大多数都是用`String`字符串填值的，如果要在这些字符串属性中动态地关联参数数据，用Java原生字符串连接(如`+`)是不行的，而且也不够直观。
 
 所以Forest为了帮助您参数数据动态绑定到这些属性上，提供了模板表达式。
 
-##  9.1 表达式Hello World
+##  10.1 表达式Hello World
 
 Forest的模板表达式是在普通的Java字符串中嵌入`${}`来实现字符串和数据的动态绑定.
 
@@ -1468,13 +1526,13 @@ String send(@DataVariable("name") String name);
 
     http://localhost:8080/hello/world
     
-## 9.2 引用数据
+## 10.2 引用数据
 
 模板表达式最原始的目的就是各种各样的数据动态绑定到HTTP请求的各个属性中，要完成这一步就要实现对外部数据的引用。
 
 Forest的模板表达式提供了两种最基本的数据引用方式：
 
-### 9.2.1 变量名引用
+### 10.2.1 变量名引用
 
 如上面Hello World例子所示，表达式中可以直接引用`@DataVariable`所标注的变量名。除此之外也可以直接引用全局配置中定义的全局变量名。
 
@@ -1499,7 +1557,7 @@ String send();
 这里因为是全局变量，`${a}`和`${b}`的值分别来自全局配置中的变量`a`和`b`的值，也就是`foo`和`bar`，所以并不需要在方法中传入额外的参数。
 
 
-### 9.2.2 参数序号引用
+### 10.2.2 参数序号引用
 
 直接在`${}`中填入从`0`开始的数字，其中的数字代表方法参数的序号，比如`${0}`代表方法的第一个参数，`${1}`代表第二个参数，第n个参数引用用`${n-1}`表示（这里的n是数字，并不是变量名）
 
@@ -1544,7 +1602,7 @@ String send(int num);
 
 这时我们所看到`${$0.toString()}`就我们所期望的`num`参数经过调用`toString()`方法最终返回的结果了。
 
-#### 9.2.2.1 简化与非简化
+#### 10.2.2.1 简化与非简化
 
 说到这里，可能我们有些小伙伴就凌乱了。什么简化的？非简化的？不都是参数序号吗？怎么又变成数字了呢？
 
@@ -1560,13 +1618,13 @@ String send(int num);
 !> 还有不要忘了参数序号只能是`整数`，并且`不能是负的`。
 
 
-#### 9.2.2.1 参数序号总结
+#### 10.2.2.1 参数序号总结
 
 用参数序号方式比变量名方式更为简洁，因为不用定义`@DataVariable`注解，也不用引用冗长的变量名，是目前比较推荐的引用方式。
 
 不过它也有缺点，就是在参数较多的时候较难立刻对应起来，不够直观，比较影响代码可读性。所以还请根据场景和入参的多寡来决定用哪种引用方式。
 
-### 9.2.3 引用对象属性
+### 10.2.3 引用对象属性
 
 模板表达式中除了可以引用变量和参数序号外，还可以引用它们的属性。 
 
@@ -1587,7 +1645,7 @@ String getUser(@DataVariable("user") User user);
 ```
 这里`${user.phone.number}`的结果就相当于调用`user.getPhone().getNumber()`的结果。
 
-### 9.2.3 对象方法调用
+### 10.2.3 对象方法调用
 
 既然模板表示能支持对象属性的引用，那也支持对象方法的调用吗？答案是肯定的，且调用方法的语法与`Java`的一致。
 
@@ -1629,13 +1687,13 @@ String getUser(User user, int phoneIndex);
 ```
 
 
-# 十. 拦截器
+# 十一. 拦截器
 
 用过Spring MVC的朋友一定对Spring的拦截器并不陌生，Forest也同样支持针对Forest请求的拦截器。
 
 如果您想在很多个请求发送之前或之后做一些事情（如下日志、计数等等），拦截器就是您的好帮手。
 
-## 10.1 构建拦截器
+## 11.1 构建拦截器
 
 定义一个拦截器需要实现com.dtflys.forest.interceptor.Interceptor接口
 
@@ -1699,11 +1757,11 @@ public class SimpleInterceptor implements Interceptor<String> {
 `Interceptor`接口带有一个泛型参数，其表示的是请求响应后返回的数据类型。
 Interceptor<String>即代表返回的数据类型为`String`。
 
-## 10.2 配置拦截器
+## 11.2 配置拦截器
 
 Forest有三个地方可以添加拦截器：`@Request`、`@BaseRequest`、全局配置，这三个地方代表三个不同的作用域。
 
-### 10.2.1 @Request上的拦截器
+### 11.2.1 @Request上的拦截器
 
 若您想要指定的拦截器只作用在指定的请求上，只需要在该请求方法的`@Request`注解中设置`interceptor`属性即可。
 
@@ -1734,7 +1792,7 @@ public interface SimpleClient {
 
 ?> `@Request`上的拦截器只会拦截指定的请求
 
-### 10.2.2 @BaseRequest 上的拦截器
+### 11.2.2 @BaseRequest 上的拦截器
 
 若您想使一个`interface`内的所有请求方法都指定某一个拦截器，可以在`@BaseRequest`的`interceptor`中设置
 
@@ -1768,7 +1826,7 @@ public interface SimpleClient {
 }
 ```
 
-### 10.2.2 全局拦截器
+### 11.2.2 全局拦截器
 
 若要配置能拦截项目范围所有Forest请求的拦截器也很简单，只要在全局配置中加上`interceptors`属性即可
 
@@ -1782,11 +1840,11 @@ forest:
 ```
 
 
-### 十一. 数据转换
+### 十二. 数据转换
 
 Forest支持JSON、XML、普通文本等数据转换形式。不需要接口调用者自己写具体的数据转换代码。
 
-#### 11。1 序列化
+#### 12.1 序列化
 
 几乎所有数据格式的转换都包含序列化和反序列化，Forest的数据转换同样如此。
 
@@ -1804,7 +1862,7 @@ String postJson(@DataObject MyUser user);   // 自动将user对象序列化为JS
 
 同理，指定为`application/xml`会将参数序列化为`XML`格式，`text/plain`则为文本，默认的`application/x-www-form-urlencoded`则为表格格式。
 
-#### 11.2 反序列化
+#### 12.2 反序列化
 
 HTTP请求响应后返回结果的数据同样需要转换，Forest则会将返回结果自动转换为您通过方法返回类型指定对象类型。这个过程就是反序列化，您可以通过`dataType`指定返回数据的反序列化格式。
 
@@ -1816,7 +1874,7 @@ HTTP请求响应后返回结果的数据同样需要转换，Forest则会将返�
 Map getData();               // 请求响应的结果将被转换为Map类型对象
 ```
 
-#### 11.3 自定义转换器
+#### 12.3 自定义转换器
 
 在Forest中，每个转换类型都对应一个转换器对象，比如`JSON`格式的转换器有`com.dtflys.forest.converter.json.ForestFastjsonConverter`、`com.dtflys.forest.converter.json.ForestGsonConverter`、`com.dtflys.forest.converter.json.ForestJacksonConverter`三种，分别是基于`FastJson`、`Gson`、`Jackson`三种不同的`JSON`序列化框架。
 
@@ -1855,7 +1913,7 @@ configuration
 ```
 
 
-# 十二. 联系作者
+# 十三. 联系作者
 
 您如有问题可以扫码加入微信的技术交流群
 
@@ -1864,7 +1922,7 @@ configuration
 ![avatar](https://dt_flys.gitee.io/forest/media/wx_gzh.jpg)
 
 
-# 十三. 项目协议
+# 十四. 项目协议
 
 The MIT License (MIT)
 
