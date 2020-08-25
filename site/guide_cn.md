@@ -56,11 +56,11 @@ Forest 1.0.x 和 Forest 1.1.x 基于 JDK 1.7, Forest 1.2.x及以上版本基于 
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>spring-boot-starter-forest</artifactId>
-    <version>1.3.11</version>
+    <version>1.4.0</version>
 </dependency>
 ```
 
-最新版本为<font color=red>1.3.11</font>，为稳定版本
+最新版本为<font color=red>1.4.0</font>，为正式版本
 
 如果您用的是Gradle:
 
