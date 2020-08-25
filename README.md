@@ -83,7 +83,7 @@ public interface AmapClient {
 
     /**
      * 聪明的你一定看出来了@Get注解代表该方法专做GET请求
-     * 在url中的${0}代表引用第一个参数，${1}代表引用第二个参数
+     * 在url中的${0}代表引用第一个参数，${1}引用第二个参数
      */
     @Get(url = "http://ditu.amap.com/service/regeo?longitude=${0}&latitude=${1}")
     Map getLocation(String longitude, String latitude);
@@ -152,7 +152,7 @@ Map result = myClient.upload("D:\\TestUpload\\xxx.jpg", progress -> {
  * dir属性表示文件下载到哪个目录
  * filename属性表示文件下载成功后以什么名字保存，如果不填，这默认从URL中取得文件名
  * OnProgress参数为监听上传进度的回调函数
- * ${0}代表引用第一个参数，${1}代表引用第二个参数
+ * ${0}代表引用第一个参数，${1}引用第二个参数
  */
 @Get(url = "http://localhost:8080/images/xxx.jpg")
 @DownloadFile(dir = "${0}", filename = "${1}")
