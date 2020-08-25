@@ -22,7 +22,7 @@
 <a href="https://opensource.org/licenses/mit-license.php">
     <img src="https://img.shields.io/badge/license-MIT%20License-blue.svg" alt="License">
 </a>
-<a href="https://dt_flys.gitee.io/forest/#/?id=%E5%8D%81%E4%B8%89-%E8%81%94%E7%B3%BB%E4%BD%9C%E8%80%85">
+<a href="https://gitee.com/dt_flys/forest#%E8%81%94%E7%B3%BB%E4%BD%9C%E8%80%85">
     <img src="https://img.shields.io/badge/%E4%BD%9C%E8%80%85-%E5%85%AC%E5%AD%90%E9%AA%8F-7af" alt="作者">
 </a>
 </p>
