@@ -708,12 +708,14 @@ Map upload(@DataFile("file") File file, OnProgress onProgress);
 
 /**
  * byte数组
+ * 使用byte数组和Inputstream对象时一定要定义fileName属性
  */
 @Post(url = "/upload")
 Map upload(@DataFile(value = "file", fileName = "${1}") byte[] bytes, String filename);
 
 /**
  * Inputstream 对象
+ * 使用byte数组和Inputstream对象时一定要定义fileName属性
  */
 @Post(url = "/upload")
 Map upload(@DataFile(value = "file", fileName = "${1}") InputStream in, String filename);
