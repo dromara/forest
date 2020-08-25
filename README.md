@@ -10,6 +10,9 @@
 <a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.4.0/jar">
     <img src="https://img.shields.io/badge/maven%20central-1.4.0-brightgreen.svg" alt="Maven Central">
 </a>
+<a href="https://gitee.com/dt_flys/forest/releases/v1.4.0">
+    <img src="https://img.shields.io/badge/release-v1.4.0-blue" alt="Release">
+</a>
 <a href="https://codecov.io/gh/mySingleLive/forest">
     <img src="https://codecov.io/gh/mySingleLive/forest/branch/master/graphs/badge.svg?branch=master" alt="Codecov">
 </a>
