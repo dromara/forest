@@ -743,6 +743,25 @@ File file = myClient.downloadFile("D:\\TestDownload", progress -> {
 });
 ```
 
+如果您不想将文件下载到硬盘上，而是直接在内存中读取，可以去掉@DownloadFile注解，并且用以下几种方式定义接口:
+
+```java
+
+/**
+ * 返回类型用byte[]，可将下载的文件转换成字节数组
+ */
+@GetRequest(url = "http://localhost:8080/images/test-img.jpg")
+byte[] downloadImageToByteArray();
+
+/**
+ * 返回类型用InputStream，用流的方式读取文件内容
+ */
+@Request(url = "http://localhost:8080/images/test-img.jpg")
+InputStream downloadImageToInputStream();
+```
+
+!>  **注意**：
+用File类型定义的文件下载接口方法，一定要加上@DownloadFile注解
 
 
 # 五. 配置
