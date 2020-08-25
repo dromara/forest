@@ -680,6 +680,40 @@ Map result = myClient.upload("D:\\TestUpload\\xxx.jpg", progress -> {
 });
 ```
 
+在文件上传的接口定义中，除了可以使用字符串表示文件路径外，还可以用一下几种类型的对象表示要上传的文件:
+
+```java
+/**
+ * File类型对象
+ */
+@Post(url = "/upload")
+Map upload(@DataFile("file") File file, OnProgress onProgress);
+
+/**
+ * byte数组
+ */
+@Post(url = "/upload")
+Map upload(@DataFile(value = "file", fileName = "${1}") byte[] bytes, String filename);
+
+/**
+ * Inputstream 对象
+ */
+@Post(url = "/upload")
+Map upload(@DataFile(value = "file", fileName = "${1}") InputStream in, String filename);
+
+/**
+ * Spring Web MVC 中的 MultipartFile 对象
+ */
+@PostRequest(url = "/upload")
+Map upload(@DataFile(value = "file") MultipartFile multipartFile, OnProgress onProgress);
+
+/**
+ * Spring 的 Resource 对象
+ */
+@Post(url = "/upload")
+Map upload(@DataFile(value = "file") Resource resource);
+```
+
 ## 4.2 下载
 
 ```java
