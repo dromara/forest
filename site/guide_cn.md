@@ -279,7 +279,7 @@ String simpleDeleteRequest();
 
 ## 3.4 HTTP Header
 
-在[3.2](###_32-稍复杂点的请求定义)的例子中，我们已经知道了可以通过`@Request`注解的`headers`属性设置一条 HTTP 请求头。
+在[3.2](###_32-稍复杂点的请求)的例子中，我们已经知道了可以通过`@Request`注解的`headers`属性设置一条 HTTP 请求头。
 
 现在我们来看看如何添加多条请求头
 
