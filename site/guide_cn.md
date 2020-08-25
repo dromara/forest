@@ -482,8 +482,9 @@ myClient.postXml("foo", "bar");
         Content-Type: application/xml
     BODY:
         <misc><username>foo</username><password>bar</password></misc>
+        
 
-### 3.5.1 通过@DataParam 注解
+### 3.5.1 通过 @DataParam 注解
 
 除了`data`属性外，您还可以通过`@DataParam`注解修饰参数的方式，将传入参数的数据绑定到 HTTP 请求体中。
 
@@ -500,6 +501,22 @@ myClient.postXml("foo", "bar");
 第三步：设置`contentType`或请求头`ContentType`，要设置成什么`contentType`取决于你想要 Body 中数据是什么格式。
 
 ?> 关于`contentType`和数据格式的对应关系请参见 [6.2.2 数据绑定格式](###_622-数据绑定格式)
+
+### 3.5.2 通过 @Body 注解
+
+使用`@DataParam`注解太麻烦？绑定到`URL`还是`Body`搞不清楚？那您可以使用`@Body`注解修饰参数的方式，将传入参数的数据绑定到 HTTP 请求体中。
+
+`@Body`注解修饰的参数一定会绑定到请求体中，不用担心它会出现在其他地方
+
+```java
+@Post(
+    url = "http://localhost:${port}/user",
+    headers = {"Accept:text/plain"},
+    contentType = "application/x-www-form-urlencoded"
+)
+String sendPost(@Body("username") String username,  @Body("password") String password);
+```
+
 
 ## 3.6 接受数据
 
