@@ -140,6 +140,27 @@ public class TestGetClient extends BaseClientTest {
         assertEquals(GetMockServer.EXPECTED, result);
     }
 
+    @Test
+    public void testQueryObjectGet() {
+        JsonTestUser user = new JsonTestUser();
+        user.setUsername("foo");
+        String result = getClient.queryObjectGet(user);
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(GetMockServer.EXPECTED, result);
+    }
+
+    @Test
+    public void testQueryObjectGet2() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("username", "foo");
+        String result = getClient.queryObjectGet(map);
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(GetMockServer.EXPECTED, result);
+    }
+
+
 
 
     @Test

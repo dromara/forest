@@ -111,7 +111,20 @@ public interface GetClient {
             url = "http://localhost:${port}/hello/user",
             headers = {"Accept:text/plain"}
     )
+    String queryObjectGet(@Query Map<String, Object> user);
+
+    @Request(
+            url = "http://localhost:${port}/hello/user",
+            headers = {"Accept:text/plain"}
+    )
+    String queryObjectGet(@Query JsonTestUser user);
+
+    @Request(
+            url = "http://localhost:${port}/hello/user",
+            headers = {"Accept:text/plain"}
+    )
     String annObjectGet(@DataObject Map<String, Object> user);
+
 
 
     @Request(
