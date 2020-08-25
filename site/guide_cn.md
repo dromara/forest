@@ -299,7 +299,7 @@ String send1(@DataVariable("myURL") String myURL);
 String send2(@DataVariable("myURL") String myURL);
 ```
 
-## 3.4.1 字符串拼接Query参数
+### 3.4.1 字符串拼接Query参数
 
 HTTP的`URL`不光有协议名、域名、端口号等等基本信息，更为重要的是它能携带各种参数，称为`Query`参数，它通常包含参数名和参数值两部分。
 
@@ -316,7 +316,7 @@ Forest给`URL`的`Query`部分传参也有多种方式，其中最简洁直白�
 String send2(@DataVariable("a") String a, @DataVariable("b") String b);
 ```
 
-## 3.4.2 通过 @Query 注解
+### 3.4.2 通过 @Query 注解
 
 但把所有`Query`参数直接写在`url`属性的字符串里面是不是也太简单粗暴了，有没有优雅点的？有的。
 
