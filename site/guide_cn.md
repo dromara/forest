@@ -277,6 +277,93 @@ String simpleDeleteRequest();
 
 ?> 需要注意的是，`HEAD`请求类型没有对应的`@Head`注解，只有`@HeadRequest`注解。原因是容易和`@Header`注解混淆
 
+## 3.4 HTTP URL
+
+HTTP请求可以没有请求头、请求体，但一定会有`URL`，以及很多请求的参数都是直接绑定在`URL`的`Query`部分上。
+
+基本`URL`设置方法就如[3.1](###_31-简单请求)的例子所示，只要在`url`属性中填入完整的请求地址即可。
+
+除此之外，也可以从外部动态传入`URL`:
+
+```java
+/**
+ * 整个完整的URL都通过 @DataVariable 注解修饰的参数动态传入
+ */
+@Request(url = "${myURL}")
+String send1(@DataVariable("myURL") String myURL);
+
+/**
+ * 通过参数转入的值值作为URL的一部分
+ */
+@Request(url = "http://${myURL}/abc")
+String send2(@DataVariable("myURL") String myURL);
+```
+
+## 3.4.1 字符串拼接Query参数
+
+HTTP的`URL`不光有协议名、域名、端口号等等基本信息，更为重要的是它能携带各种参数，称为`Query`参数，它通常包含参数名和参数值两部分。
+
+Forest给`URL`的`Query`部分传参也有多种方式，其中最简洁直白的就数字符串拼接了。
+
+```java
+
+/**
+ * 直接在url字符串的问号后面部分直接写上 参数名=参数值 的形式
+ * 等号后面的参数值部分可以用 ${变量名} 这种字符串模板的形式替代
+ * 在发送请求时会动态拼接成一个完整的URL
+ */
+@Request(url = "http://${myURL}/abc?a=${a}&b=${b}&id=0")
+String send2(@DataVariable("a") String a, @DataVariable("b") String b);
+```
+
+## 3.4.2 通过 @Query 注解
+
+但把所有`Query`参数直接写在`url`属性的字符串里面是不是也太简单粗暴了，有没有优雅点的？有的。
+
+```java
+
+/**
+ * 使用 @Query 注解，可以直接将该注解修饰的参数动态绑定到请求url中
+ * 注解的 value 值即代表它在url的Query部分的参数名
+ */
+@Request(url = "http://${myURL}/abc?id=0")
+String send2(@Query("a") String a, @Query("b") String b);
+
+```
+
+?> @Query 与 @DataParam 不同，@Query 注解修饰的参数一定会出现在 URL 中，而 @DataParam 修饰的参数则要视情况而定。
+
+若是要传的`URL`参数太多了呢？难道要我在方法上定义十几二十个`@Query`修饰的参数？那也太难看了吧。别急，Forest还是有办法让您变的代码变得优雅的。
+
+```java
+
+/**
+ * 使用 @Query 注解，可以修饰 Map 类型的参数
+ * 很自然的，Map 的 Key 将作为 URL 的参数名， Value 将作为 URL 的参数值
+ * 这时候 @Query 注解不定义名称
+ */
+@Request(url = "http://${myURL}/abc?id=0")
+String send2(@Query Map<String, Object> map);
+
+
+/**
+ * @Query 注解也可以修饰自定义类型的对象参数
+ * 依据对象类的 Getter 和 Setter 的规则取出属性
+ * 其属性名为 URL 参数名，属性值为 URL 参数值
+ * 这时候 @Query 注解不定义名称
+ */
+@Request(url = "http://${myURL}/abc?id=0")
+String send2(@Query UserInfo user);
+
+```
+
+是不是瞬间简洁不少，但用`@Query`注解绑定参数的时候也有需要注意的地方：
+
+!> 注意：
+* 需要单个单个定义 参数名=参数值 的时候，@Query注解的value值一定要有，比如 @Query("name") String name
+* 需要绑定对象的时候，@Query注解的value值一定要空着，比如 @Query User user 或 @Query Map map
+
+
 ## 3.4 HTTP Header
 
 在[3.2](###_32-稍复杂点的请求)的例子中，我们已经知道了可以通过`@Request`注解的`headers`属性设置一条 HTTP 请求头。
