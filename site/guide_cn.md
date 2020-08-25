@@ -342,7 +342,7 @@ String send2(@Query("a") String a, @Query("b") String b);
  * 很自然的，Map 的 Key 将作为 URL 的参数名， Value 将作为 URL 的参数值
  * 这时候 @Query 注解不定义名称
  */
-@Request(url = "http://${myURL}/abc?id=0")
+@Get(url = "http://${myURL}/abc?id=0")
 String send2(@Query Map<String, Object> map);
 
 
@@ -352,7 +352,7 @@ String send2(@Query Map<String, Object> map);
  * 其属性名为 URL 参数名，属性值为 URL 参数值
  * 这时候 @Query 注解不定义名称
  */
-@Request(url = "http://${myURL}/abc?id=0")
+@Get(url = "http://${myURL}/abc?id=0")
 String send2(@Query UserInfo user);
 
 ```
