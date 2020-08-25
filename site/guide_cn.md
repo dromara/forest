@@ -360,8 +360,8 @@ String send2(@Query UserInfo user);
 是不是瞬间简洁不少，但用`@Query`注解绑定参数的时候也有需要注意的地方：
 
 !> 注意：<br>
-1. 需要单个单个定义 参数名=参数值 的时候，@Query注解的value值一定要有，比如 @Query("name") String name<br>
-2. 需要绑定对象的时候，@Query注解的value值一定要空着，比如 @Query User user 或 @Query Map map
+(1) 需要单个单个定义 参数名=参数值 的时候，@Query注解的value值一定要有，比如 @Query("name") String name<br>
+(2) 需要绑定对象的时候，@Query注解的value值一定要空着，比如 @Query User user 或 @Query Map map
 
 
 ## 3.4 HTTP Header
