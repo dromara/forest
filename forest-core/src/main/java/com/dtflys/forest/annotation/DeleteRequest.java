@@ -41,6 +41,11 @@ public @interface DeleteRequest {
     int timeout() default -1;
 
     /**
+     * SSL protocol
+     */
+    String sslProtocol() default "";
+
+    /**
      * Class of retryer
      * @return
      */

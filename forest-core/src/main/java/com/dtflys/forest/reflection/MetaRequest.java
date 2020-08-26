@@ -36,6 +36,11 @@ public class MetaRequest {
     private int timeout;
 
     /**
+     * SSL protocol
+     */
+    private String sslProtocol;
+
+    /**
      * Class of retryer
      * @return
      */
@@ -143,6 +148,14 @@ public class MetaRequest {
 
     public void setTimeout(int timeout) {
         this.timeout = timeout;
+    }
+
+    public String getSslProtocol() {
+        return sslProtocol;
+    }
+
+    public void setSslProtocol(String sslProtocol) {
+        this.sslProtocol = sslProtocol;
     }
 
     public Class getRetryer() {
