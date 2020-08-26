@@ -1,9 +1,12 @@
 package com.dtflys.forest.annotation;
 
 import com.dtflys.forest.lifecycles.base.BaseRequestLifeCycle;
-import com.dtflys.forest.retryer.NoneRetryer;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * The annotation must be on an interface. It allows you to make some configurations shared for all the requests in this interface.
