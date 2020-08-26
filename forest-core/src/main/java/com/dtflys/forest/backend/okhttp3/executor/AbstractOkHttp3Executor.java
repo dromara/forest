@@ -8,7 +8,6 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
-import okhttp3.*;
 import com.dtflys.forest.backend.okhttp3.conn.OkHttp3ConnectionManager;
 import com.dtflys.forest.backend.okhttp3.response.OkHttp3ForestResponseFactory;
 import com.dtflys.forest.backend.okhttp3.response.OkHttp3ResponseFuture;
@@ -17,6 +16,16 @@ import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestNetworkException;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.mapping.MappingTemplate;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Headers;
+import okhttp3.HttpUrl;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import okio.BufferedSink;
 import okio.Okio;
 import okio.Sink;
@@ -25,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -78,19 +88,50 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
         }
         if (requestBody instanceof MultipartBody) {
             MultipartBody multipartBody = (MultipartBody) requestBody;
-            String contentType = multipartBody.type().toString();
             String boundary = multipartBody.boundary();
             Long contentLength = null;
             try {
                 contentLength = multipartBody.contentLength();
             } catch (IOException e) {
             }
-            String result = "[" + contentType +"; boundary=" + boundary ;
+            StringBuilder builder = new StringBuilder();
+            builder.append("[")
+                    .append("boundary=")
+                    .append(boundary);
             if (contentLength != null) {
-                result += "; length=" + contentLength;
+                builder.append("; length=").append(contentLength);
             }
-            return result + "]";
+            builder.append("] parts:");
+            List<MultipartBody.Part> parts = multipartBody.parts();
+            for (MultipartBody.Part part : parts) {
+                RequestBody partBody = part.body();
+                List<String> disposition = part.headers().values("Content-Disposition");
+                builder.append("\n             -- [")
+                        .append(disposition.get(0));
+                MediaType mediaType = partBody.contentType();
+                if (mediaType == null) {
+                    builder.append("; value=\"")
+                            .append(getLogContentForStringBody(partBody))
+                            .append("\"]");
+                } else {
+                    Long length = null;
+                    try {
+                        length = partBody.contentLength();
+                    } catch (IOException e) {
+                    }
+                    if (length != null) {
+                        builder.append("; length=").append(length);
+                    }
+                    builder.append("]");
+                }
+            }
+
+            return builder.toString();
         }
+        return getLogContentForStringBody(requestBody);
+    }
+
+    private String getLogContentForStringBody(RequestBody requestBody) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Sink sink = Okio.sink(out);
         BufferedSink bufferedSink = Okio.buffer(sink);
@@ -107,14 +148,21 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
         }
         InputStream inputStream = new ByteArrayInputStream(out.toByteArray());
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder builder = new StringBuilder();
         String line;
         String body;
         try {
+            List<String> lines = new LinkedList<>();
             while ((line = reader.readLine()) != null) {
-                buffer.append(line + " ");
+                lines.add(line);
             }
-            body = buffer.toString();
+            for (int i = 0, len = lines.size(); i < len; i++) {
+                builder.append(lines.get(i));
+                if (i < len - 1) {
+                    builder.append("\\n");
+                }
+            }
+            body = builder.toString();
             return body;
         } catch (IOException ex) {
             ex.printStackTrace();

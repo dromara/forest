@@ -11,6 +11,9 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
@@ -22,6 +25,12 @@ import com.dtflys.forest.backend.httpclient.response.HttpclientResponseHandler;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.mapping.MappingTemplate;
+
+
+import org.apache.http.entity.mime.FormBodyPart;
+import org.apache.http.entity.mime.MinimalField;
+import org.apache.http.entity.mime.content.ContentBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +38,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -157,38 +171,106 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         if (!(httpReq instanceof HttpEntityEnclosingRequestBase)) {
             return null;
         }
-        try {
-            HttpEntityEnclosingRequestBase entityEnclosingRequest = (HttpEntityEnclosingRequestBase) httpReq;
-            HttpEntity entity = entityEnclosingRequest.getEntity();
-            if (entity.getContentType().getValue().startsWith("multipart/")) {
-                Long contentLength = null;
-                try {
-                    contentLength = entity.getContentLength();
-                } catch (Throwable th) {
+        HttpEntityEnclosingRequestBase entityEnclosingRequest = (HttpEntityEnclosingRequestBase) httpReq;
+        HttpEntity entity = entityEnclosingRequest.getEntity();
+        if (entity.getContentType().getValue().startsWith("multipart/")) {
+            Class[] paramTypes = new Class[0];
+            Object[] args = new Object[0];
+            List<FormBodyPart> parts = null;
+            try {
+                Method getMultipartMethod = entity.getClass().getDeclaredMethod("getMultipart", paramTypes);
+                getMultipartMethod.setAccessible(true);
+                Object multipart = getMultipartMethod.invoke(entity, args);
+                if (multipart != null) {
+                    Method getBodyPartsMethod = multipart.getClass().getDeclaredMethod("getBodyParts", paramTypes);
+                    getBodyPartsMethod.setAccessible(true);
+                    parts = (List<FormBodyPart>) getBodyPartsMethod.invoke(multipart, args);
                 }
+            } catch (NoSuchMethodException e) {
+            } catch (IllegalAccessException e) {
+            } catch (InvocationTargetException e) {
+            }
+            Long contentLength = null;
+            try {
+                contentLength = entity.getContentLength();
+            } catch (Throwable th) {
+            }
+
+            if (parts == null) {
                 String result = "[" + entity.getContentType().getValue();
                 if (contentLength != null) {
                     result += "; length=" + contentLength;
                 }
                 return result + "]";
+            } else {
+                StringBuilder builder = new StringBuilder();
+                builder.append("[")
+                        .append(entity.getContentType().getValue());
+                if (contentLength != null) {
+                    builder.append("; length=").append(contentLength);
+                }
+                builder.append("] parts:");
+                for (FormBodyPart part : parts) {
+                    ContentBody partBody = part.getBody();
+                    MinimalField disposition = part.getHeader().getField("Content-Disposition");
+                    builder.append("\n             -- [")
+                            .append(disposition.getBody());
+                    if (partBody instanceof StringBody) {
+                        Reader reader = ((StringBody) partBody).getReader();
+                        BufferedReader bufferedReader = new BufferedReader(reader);
+                        String value = null;
+                        try {
+                            value = getLogContentFormBufferedReader(bufferedReader);
+                        } catch (IOException e) {
+                        }
+                        builder.append("; value=\"")
+                                .append(value)
+                                .append("\"]");
+                    } else {
+                        Long length = null;
+                        length = partBody.getContentLength();
+                        if (length != null) {
+                            builder.append("; length=").append(length);
+                        }
+                        builder.append("]");
+                    }
+                }
+                return builder.toString();
             }
-            InputStream in = entity.getContent();
+        }
+        return getLogContentForStringBody(entity);
+    }
+
+
+    private String getLogContentForStringBody(HttpEntity entity) {
+        InputStream in = null;
+        try {
+            in = entity.getContent();
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-            StringBuffer buffer = new StringBuffer();
-            String line;
-            String body;
-            while ((line = reader.readLine()) != null) {
-                buffer.append(line + " ");
-            }
-            body = buffer.toString();
-            return body;
+            return getLogContentFormBufferedReader(reader);
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
-
     }
 
+    private String getLogContentFormBufferedReader(BufferedReader reader) throws IOException {
+        StringBuilder builder = new StringBuilder();
+        String line;
+        String body;
+        List<String> lines = new LinkedList<>();
+        while ((line = reader.readLine()) != null) {
+            lines.add(line);
+        }
+        for (int i = 0, len = lines.size(); i < len; i++) {
+            builder.append(lines.get(i));
+            if (i < len - 1) {
+                builder.append("\\n");
+            }
+        }
+        body = builder.toString();
+        return body;
+    }
 
     public void execute(LifeCycleHandler lifeCycleHandler) {
         prepare(lifeCycleHandler);
