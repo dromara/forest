@@ -10,7 +10,15 @@ import com.dtflys.forest.http.ForestRequestType;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.dtflys.forest.http.ForestRequestType.*;
+import static com.dtflys.forest.http.ForestRequestType.DELETE;
+import static com.dtflys.forest.http.ForestRequestType.GET;
+import static com.dtflys.forest.http.ForestRequestType.HEAD;
+import static com.dtflys.forest.http.ForestRequestType.OPTIONS;
+import static com.dtflys.forest.http.ForestRequestType.PATCH;
+import static com.dtflys.forest.http.ForestRequestType.POST;
+import static com.dtflys.forest.http.ForestRequestType.PUT;
+import static com.dtflys.forest.http.ForestRequestType.TRACE;
+
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]

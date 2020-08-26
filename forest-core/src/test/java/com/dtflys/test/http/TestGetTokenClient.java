@@ -2,9 +2,7 @@ package com.dtflys.test.http;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.test.http.client.GetClient;
 import com.dtflys.test.http.client.GetTokenClient;
-import com.dtflys.test.mock.GetMockServer;
 import com.dtflys.test.mock.GetTokenMockServer;
 import com.dtflys.test.model.TokenResult;
 import org.junit.Before;
