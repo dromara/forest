@@ -76,6 +76,8 @@ public class ForestRequest<T> {
 
     private int timeout = 3000;
 
+    private String sslProtocol;
+
     private int retryCount = 0;
 
     private long maxRetryInterval = 0;
@@ -281,6 +283,15 @@ public class ForestRequest<T> {
 
     public ForestRequest setTimeout(int timeout) {
         this.timeout = timeout;
+        return this;
+    }
+
+    public String getSslProtocol() {
+        return sslProtocol;
+    }
+
+    public ForestRequest setSslProtocol(String sslProtocol) {
+        this.sslProtocol = sslProtocol;
         return this;
     }
 
