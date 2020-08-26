@@ -234,5 +234,11 @@ public class TestForestFastjsonConverter {
         assertEquals("22.22222", map.get("latitude"));
     }
 
-
+    @Test
+    public void testDeepMap() {
+        String json = "{\"code\":\"000000\",\"msg\":\"success\",\"timestamp\":\"2020-08-26T12:06:55.498Z\",\"data\":[{\"id\":8,\"channelCode\":\"UMS_MINI_PAY_WEIXIN\",\"channelName\":\"银联商务小程序微信支付\",\"channelParty\":\"1\",\"terminalType\":3,\"payType\":2,\"logoUrl\":null}]}";
+        ForestFastjsonConverter forestFastjsonConverter = new ForestFastjsonConverter();
+        Map map = forestFastjsonConverter.convertToJavaObject(json, HashMap.class);
+        System.out.println(map);
+    }
 }
