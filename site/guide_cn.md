@@ -364,11 +364,13 @@ String send2(@Query UserInfo user);
 (2) 需要绑定对象的时候，@Query注解的value值一定要空着，比如 @Query User user 或 @Query Map map
 
 
-## 3.4 HTTP Header
+## 3.5 HTTP Header
 
 在[3.2](###_32-稍复杂点的请求)的例子中，我们已经知道了可以通过`@Request`注解的`headers`属性设置一条 HTTP 请求头。
 
 现在我们来看看如何添加多条请求头
+
+### 3.5.1 通过headers属性
 
 其中`headers`属性接受的是一个字符串数组，在接受多个请求头信息时以以下形式填入请求头:
 
@@ -436,12 +438,59 @@ myClient.bindingHeader("gbk");
     HEADER:
         Accept-Charset: gbk
         Content-Type: text/plain
+        
+### 3.5.2 通过 @Header 注解
 
-## 3.5 HTTP Body
+想必大家都已经了解通过 `headers` 属性设置请求头的方法了。不过这种方式虽然直观，但如要没通过参数传入到请求头中就显得比较啰嗦了。
+
+所以Forest还提供了 `@Header` 注解来帮助您把方法的参数直接绑定到请求体中。
+
+```java
+
+/**
+ * 使用 @Header 注解将参数绑定到请求头上
+ * @Header 注解的 value 指为请求头的名称，参数值为请求头的值
+ * @Header("Accept") String accept将字符串类型参数绑定到请求头 Accept 上
+ * @Header("accessToken") String accessToken将字符串类型参数绑定到请求头 accessToken 上
+ */
+@Post(url = "http://localhost:${port}/hello/user?username=foo")
+void postUser(@Header("Accept") String accept, @Header("accessToken") String accessToken);
+
+```
+
+如果有很多很多的请求头要通过参数传入，我需要定义很多很多参数吗？当然不用！
+
+```java
+/**
+ * 使用 @Header 注解可以修饰 Map 类型的参数
+ * Map 的 Key 指为请求头的名称，Value 为请求头的值
+ * 通过此方式，可以将 Map 中所有的键值对批量地绑定到请求头中
+ */
+@Post(url = "http://localhost:${port}/hello/user?username=foo")
+void headHelloUser(@Header Map<String, Object> headerMap);
+
+
+/**
+ * 使用 @Header 注解可以修饰自定义类型的对象参数
+ * 依据对象类的 Getter 和 Setter 的规则取出属性
+ * 其属性名为 URL 请求头的名称，属性值为请求头的值
+ * 以此方式，将一个对象中的所有属性批量地绑定到请求头中
+ */
+@Post(url = "http://localhost:${port}/hello/user?username=foo")
+void headHelloUser(@Header MyHeaderInfo headersInfo);
+
+```
+
+!> 注意：<br>
+(1) 需要单个单个定义请求头的时候，@Header注解的value值一定要有，比如 @Header("Content-Type") String contentType<br>
+(2) 需要绑定对象的时候，@Header注解的value值一定要空着，比如 @Header MyHeaders headers 或 @Header Map headerMap
+        
+
+## 3.6 HTTP Body
 
 在`POST`和`PUT`等请求方法中，通常使用 HTTP 请求体进行传输数据。在 Forest 中有多种方式设置请求体数据。
 
-### 3.5.1 通过 data 属性添加请求体
+### 3.6.1 通过 data 属性添加请求体
 
 您可以通过`@Request`注解的`data`属性把数据添加到请求体。需要注意的是只有当`type`为`POST`、`PUT`、`PATCH`这类 HTTP Method 时，`data`属性中的值才会绑定到请求体中，而`GET`请求在有些情况会绑定到`url`的参数中。
 
@@ -571,7 +620,7 @@ myClient.postXml("foo", "bar");
         <misc><username>foo</username><password>bar</password></misc>
         
 
-### 3.5.1 通过 @DataParam 注解
+### 3.6.2 通过 @DataParam 注解
 
 除了`data`属性外，您还可以通过`@DataParam`注解修饰参数的方式，将传入参数的数据绑定到 HTTP 请求体中。
 
@@ -589,7 +638,7 @@ myClient.postXml("foo", "bar");
 
 ?> 关于`contentType`和数据格式的对应关系请参见 [6.2.2 数据绑定格式](###_622-数据绑定格式)
 
-### 3.5.2 通过 @Body 注解
+### 3.6.3 通过 @Body 注解
 
 使用`@DataParam`注解太麻烦？绑定到`URL`还是`Body`搞不清楚？那您可以使用`@Body`注解修饰参数的方式，将传入参数的数据绑定到 HTTP 请求体中。
 
@@ -605,7 +654,7 @@ String sendPost(@Body("username") String username,  @Body("password") String pas
 ```
 
 
-## 3.6 接受数据
+## 3.7 接受数据
 
 Forest请求会自动将响应的返回数据反序列化成您要的数据类型。想要接受指定类型的数据需要完成两步操作：
 
@@ -682,7 +731,7 @@ User getUser(Integer id)
 ```
 
 
-## 3.7 回调函数
+## 3.8 回调函数
 
 在Forest中的回调函数使用单方法的接口定义，这样可以使您在 `Java 8` 或 `Kotlin` 语言中方便使用 `Lambda` 表达式。
 
@@ -717,7 +766,7 @@ myClient.send("foo", (String resText, ForestRequest request, ForestResponse resp
 而在同步请求中，`OnSuccess<T>`回调函数和任何类型的返回值都能接受到请求响应的数据。
 `OnError`回调函数可以用于异常处理，一般在同步请求中使用`try-catch`也能达到同样的效果。
 
-## 3.8 异步请求
+## 3.9 异步请求
 
 在Forest使用异步请求，可以通过设置`@Request`注解的`async`属性为`true`实现，不设置或设置为`false`即为同步请求。
 
