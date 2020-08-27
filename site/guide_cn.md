@@ -1956,7 +1956,7 @@ public interface SimpleClient {
 
 ```java
 
-@BaseRquest(baseURL = "http://localhost:8080", interceptor = SimpleInterceptor.class)
+@BaseRequest(baseURL = "http://localhost:8080", interceptor = SimpleInterceptor.class)
 public interface SimpleClient {
 
     @Request(url = "/hello/user1?username=foo" )
@@ -1976,7 +1976,7 @@ public interface SimpleClient {
 `@BaseRequest`也如`@Request`中的`interceptor`属性一样，可以配1到多个拦截器，如代码所示：
 
 ```java
-@BaseRquest(
+@BaseRequest(
     baseURL = "http://localhost:8080", 
     interceptor = {SimpleInterceptor1.class, SimpleInterceptor2.class, ...})
 public interface SimpleClient {
