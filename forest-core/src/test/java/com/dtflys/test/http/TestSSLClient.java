@@ -2,6 +2,8 @@ package com.dtflys.test.http;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.test.mock.GetMockServer;
 import com.github.dreamhead.moco.HttpsCertificate;
@@ -16,6 +18,8 @@ import org.slf4j.LoggerFactory;
 import static com.github.dreamhead.moco.Moco.*;
 import static com.github.dreamhead.moco.Runner.runner;
 import static com.github.dreamhead.moco.HttpsCertificate.certificate;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -87,16 +91,38 @@ public class TestSSLClient extends BaseClientTest {
     }
 
 
+/*
     @Test
     public void truestAllGet() {
-/*
         sslClient.truestAllGet();
         String result = sslClient.truestAllGet();
         log.info("response: " + result);
         assertNotNull(result);
         assertEquals(EXPECTED, result);
-*/
     }
+*/
+
+    @Test
+    public void truestSSLGet() {
+        ForestResponse<String> response = sslClient.truestSSLGet("SSLv3");
+        ForestRequest request = response.getRequest();
+        String protocol = request.getSslProtocol();
+        assertNotNull(protocol);
+        assertEquals("SSLv3", protocol);
+
+        response = sslClient.truestSSLGet("TLSv1.3");
+        request = response.getRequest();
+        protocol = request.getSslProtocol();
+        assertNotNull(protocol);
+        assertEquals("TLSv1.3", protocol);
+
+        response = sslClient.truestSSLGet(null);
+        request = response.getRequest();
+        protocol = request.getSslProtocol();
+        assertNotNull(protocol);
+        assertEquals("TLS", protocol);
+    }
+
 
 
     @Test

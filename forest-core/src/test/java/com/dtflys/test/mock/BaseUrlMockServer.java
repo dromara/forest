@@ -16,6 +16,8 @@ public class BaseUrlMockServer extends MockServerRule {
 
     public final static String EXPECTED = "{\"status\": \"ok\"}";
 
+    public final static String USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.75 Safari/537.36";
+
     public final static Integer port = 5052;
 
     public BaseUrlMockServer(Object target) {
@@ -27,7 +29,9 @@ public class BaseUrlMockServer extends MockServerRule {
         mockClient.when(
                 request()
                         .withMethod("GET")
+                        .withHeader(new Header(HttpHeaders.ACCEPT_CHARSET, "UTF-8"))
                         .withHeader(new Header(HttpHeaders.ACCEPT, "text/plain"))
+                        .withHeader(new Header(HttpHeaders.USER_AGENT, USER_AGENT))
                         .withQueryStringParameter("username",  "foo")
         )
         .respond(

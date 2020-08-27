@@ -42,11 +42,11 @@ public interface HeadClient {
     @HeadRequest(
             url = "http://localhost:${port}/hello/user?username=foo",
             headers = {
-                "Accept:text/plain",
-                "accessToken:11111111"
+                "Accept: text/plain",
+                "accessToken: ${accessToken}"
             }
     )
-    void simpleHead();
+    void simpleHead(@DataVariable("accessToken") String accessToken);
 
     @HeadRequest(
             url = "http://localhost:${port}/hello/user?username=foo",

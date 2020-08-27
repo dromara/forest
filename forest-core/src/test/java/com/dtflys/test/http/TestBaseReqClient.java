@@ -3,6 +3,7 @@ package com.dtflys.test.http;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.test.http.client.BaseReqClient;
+import com.dtflys.test.mock.BaseUrlMockServer;
 import com.dtflys.test.mock.GetMockServer;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -12,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -34,6 +36,7 @@ public class TestBaseReqClient extends BaseClientTest {
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
         configuration.setVariableValue("baseURL", "http://localhost:5000/");
+        configuration.setVariableValue("userAgent", BaseUrlMockServer.USER_AGENT);
         configuration.setVariableValue("port", GetMockServer.port);
     }
 
@@ -49,13 +52,21 @@ public class TestBaseReqClient extends BaseClientTest {
 
     @Test
     public void testBaseURL() {
-        String result = baseReqClient.simpleGet();
+        String result = baseReqClient.simpleGet((data, request, response) -> {
+            String userAgent = response.getRequest().getHeaderValue("User-Agent");
+            assertNotNull(userAgent);
+            assertEquals(BaseUrlMockServer.USER_AGENT, userAgent);
+        });
         assertEquals(GetMockServer.EXPECTED, result);
     }
 
     @Test
     public void testBaseURL2() {
-        String result = baseReqClient.simpleGet2();
+        String result = baseReqClient.simpleGet2((data, request, response) -> {
+            String userAgent = response.getRequest().getHeaderValue("User-Agent");
+            assertNotNull(userAgent);
+            assertEquals(BaseUrlMockServer.USER_AGENT, userAgent);
+        });
         assertEquals(GetMockServer.EXPECTED, result);
     }
 

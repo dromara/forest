@@ -85,7 +85,7 @@ public class TestHeadClient extends BaseClientTest {
 
     @Test
     public void testSimpleHead() {
-        headClient.simpleHead();
+        headClient.simpleHead("11111111");
     }
 
     @Test

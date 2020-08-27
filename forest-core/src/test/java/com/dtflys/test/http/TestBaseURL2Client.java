@@ -14,6 +14,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.collection.$colon$plus;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -39,6 +40,7 @@ public class TestBaseURL2Client extends BaseClientTest {
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
         configuration.setVariableValue("baseURL", "http://localhost:" + BaseUrlMockServer.port);
+        configuration.setVariableValue("userAgent", BaseUrlMockServer.USER_AGENT);
         configuration.setVariableValue("port", BaseUrlMockServer.port);
     }
 
@@ -54,9 +56,12 @@ public class TestBaseURL2Client extends BaseClientTest {
 
     @Test
     public void testBaseURL() {
-        ForestResponse response = baseReqClient.simpleBaseUrl();
+        ForestResponse response = baseReqClient.simpleBaseUrl("UTF-8");
         assertNotNull(response);
         assertEquals("http://localhost:" + BaseUrlMockServer.port, response.getRequest().getUrl());
+        String userAgent = response.getRequest().getHeaderValue("User-Agent");
+        assertNotNull(userAgent);
+        assertEquals(BaseUrlMockServer.USER_AGENT, userAgent);
     }
 
 
