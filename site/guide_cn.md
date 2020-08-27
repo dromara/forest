@@ -2161,7 +2161,7 @@ configuration
 
 您如有问题可以扫码加入微信的技术交流群
 
-扫描二维码关注公众号，回复关键字 <font color=red>forest</font> 即可加群
+扫描二维码关注公众号，点击菜单中的 <font color=red>进群</font> 按钮即可进群
 
 ![avatar](https://dt_flys.gitee.io/forest/media/wx_gzh.jpg)
 
