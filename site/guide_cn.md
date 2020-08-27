@@ -661,15 +661,26 @@ public class User {
 那请求接口就应该定义成这样：
 
 ```java
-@Request(
+/**
+ * dataType属性指明了返回的数据类型为JSON
+ */
+@Get(
     url = "http://localhost:8080/user?id=${0}",
     dataType = "json"
 )
 User getUser(Integer id)
 ```
 
-!>  **注意**：
-Forest需要指明返回类型（如`User`）的同时，也需要指明数据类型`dataType`为`json`或其他类型。
+从`1.4.0`版本开始，`dataType` 属性默认为 `auto`（自动判断数据类型）， 也就是说 `dataType` 属性可以完全省略不填，Forest会自行判断返回的数据类型是哪种格式。
+
+```java
+/**
+ * 省略dataType属性会自动判断返回的数据格式并进行反序列化
+ */
+@Get(url = "http://localhost:8080/user?id=${0}")
+User getUser(Integer id)
+```
+
 
 ## 3.7 回调函数
 
