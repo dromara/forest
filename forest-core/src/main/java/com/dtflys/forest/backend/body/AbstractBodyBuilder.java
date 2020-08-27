@@ -9,6 +9,8 @@ import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -73,17 +75,20 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
         }
         else if (mineType.equals(TYPE_APPLICATION_JSON)) {
             ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
-            List bodyList = request.getBodyList();
+            List srcBodyList = request.getBodyList();
+            List bodyList = new LinkedList(srcBodyList);
             Map<String, Object> map = convertNameValueListToMap(request, nameValueList);
             if (map != null && !map.isEmpty()) {
                 bodyList.add(map);
             }
-            Object toJsonObj = bodyList;
-            if (bodyList.size() == 1) {
-                toJsonObj = bodyList.get(0);
+            if (!bodyList.isEmpty()) {
+                Object toJsonObj = bodyList;
+                if (bodyList.size() == 1) {
+                    toJsonObj = bodyList.get(0);
+                }
+                String text = jsonConverter.encodeToString(toJsonObj);
+                setStringBody(httpRequest, text, charset, contentType, mergeCharset);
             }
-            String text = jsonConverter.encodeToString(toJsonObj);
-            setStringBody(httpRequest, text, charset, contentType, mergeCharset);
         }
         else if (mineType.startsWith("multipart/")) {
             List<ForestMultipart> multiparts = request.getMultiparts();
