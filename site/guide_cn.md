@@ -1506,6 +1506,32 @@ forest:
   ssl-protocol: TLSv1.2
 ```
 
+
+全局配置可以配置一个全局统一的SSL协议，但现实情况是有很多不同服务（尤其是第三方）的API会使用不同的SSL协议，这种情况需要针对不同的接口设置不同的SSL协议。
+
+```java
+/**
+ * 在某个请求接口上通过 sslProtocol 属性设置单向SSL协议
+ */
+@Get(
+    url = "https://localhost:5555/hello/user",
+    sslProtocol = "SSL"
+)
+ForestResponse<String> truestSSLGet();
+```
+
+一个个方法设置太麻烦，也可以在@BaseRequest中设置一整个接口类的SSL协议
+
+```java
+@BaseRequest(sslProtocol = "TLS")
+public interface SSLClient {
+
+    @Get(url = "https://localhost:5555/hello/user")
+    String testSend();
+
+}
+```
+
 ## 7.2 双向认证
 
  若是需要在Forest中进行双向验证的HTTPS请求，也很简单。
