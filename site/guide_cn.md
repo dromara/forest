@@ -318,7 +318,7 @@ String send2(@DataVariable("a") String a, @DataVariable("b") String b);
 
 ### 3.4.2 通过 @Query 注解
 
-但把所有`Query`参数直接写在`url`属性的字符串里面是不是也太简单粗暴了，有没有优雅点的？有的。
+但把所有`Query`参数直接写在`url`属性的字符串里面是不是也太简单粗暴了，有没有优雅点的方式？有的。
 
 ```java
 
