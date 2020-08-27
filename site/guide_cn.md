@@ -1520,7 +1520,7 @@ forest:
 ForestResponse<String> truestSSLGet();
 ```
 
-一个个方法设置太麻烦，也可以在@BaseRequest中设置一整个接口类的SSL协议
+在一个个方法上设置太麻烦，也可以在@BaseRequest中设置一整个接口类的SSL协议
 
 ```java
 @BaseRequest(sslProtocol = "TLS")
