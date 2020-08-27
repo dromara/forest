@@ -114,7 +114,7 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
         if (request == null) {
             throw new ForestRuntimeException("Current request is NULL!");
         }
-        SSLSocket sslsock = (SSLSocket) SSLUtils.getSSLSocketFactory(request)
+        SSLSocket sslsock = (SSLSocket) SSLUtils.getSSLSocketFactory(request, request.getSslProtocol())
                 .createSocket(socket, target, port, true);
         if (request != null) {
             SSLKeyStore keyStore = request.getKeyStore();

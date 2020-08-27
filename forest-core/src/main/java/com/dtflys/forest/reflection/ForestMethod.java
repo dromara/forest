@@ -66,6 +66,7 @@ public class ForestMethod<T> implements VariableScope {
     private MappingTemplate dataTypeTemplate;
     private Integer baseTimeout = null;
     private Integer timeout = null;
+    private MappingTemplate sslProtocolTemplate;
     private Class baseRetryerClass = null;
     private Integer baseRetryCount = null;
     private Long baseMaxRetryInterval;
@@ -77,6 +78,7 @@ public class ForestMethod<T> implements VariableScope {
     private MappingTemplate baseContentTypeTemplate;
     private MappingTemplate baseUserAgentTemplate;
     private MappingTemplate baseCharsetTemplate;
+    private MappingTemplate baseSslProtocolTemplate;
     private MappingTemplate contentTypeTemplate;
     private MappingTemplate userAgentTemplate;
     private long progressStep = -1;
@@ -155,6 +157,10 @@ public class ForestMethod<T> implements VariableScope {
         String baseCharset = baseMetaRequest.getCharset();
         if (StringUtils.isNotBlank(baseCharset)) {
             baseCharsetTemplate = makeTemplate(baseCharset);
+        }
+        String baseSslProtocol = baseMetaRequest.getSslProtocol();
+        if (StringUtils.isNotBlank(baseSslProtocol)) {
+            baseSslProtocolTemplate = makeTemplate(baseSslProtocol);
         }
         baseTimeout = baseMetaRequest.getTimeout();
         baseRetryerClass = baseMetaRequest.getRetryer();
@@ -331,6 +337,7 @@ public class ForestMethod<T> implements VariableScope {
             encodeTemplate = makeTemplate(metaRequest.getContentEncoding());
         }
         charsetTemplate = makeTemplate(metaRequest.getCharset());
+        sslProtocolTemplate = makeTemplate(metaRequest.getSslProtocol());
         progressStep = metaRequest.getProgressStep();
         async = metaRequest.isAsync();
         retryerClass = metaRequest.getRetryer();
@@ -547,7 +554,7 @@ public class ForestMethod<T> implements VariableScope {
             baseContentType = baseContentTypeTemplate.render(args);
         }
         String baseUserAgent = null;
-        if (baseUserAgent != null) {
+        if (baseUserAgentTemplate != null) {
             baseUserAgent = baseUserAgentTemplate.render(args);
         }
         String charset = null;
@@ -560,6 +567,16 @@ public class ForestMethod<T> implements VariableScope {
             charset = configuration.getCharset();
         } else {
             charset = "UTF-8";
+        }
+
+        String sslProtocol = null;
+        String renderedSslProtocol = sslProtocolTemplate.render(args);
+        if (StringUtils.isNotBlank(renderedSslProtocol)) {
+            sslProtocol = renderedSslProtocol;
+        } else if (baseSslProtocolTemplate != null) {
+            sslProtocol = baseSslProtocolTemplate.render(args);
+        } else {
+            sslProtocol = configuration.getSslProtocol();
         }
 
         String renderedContentType = null;
@@ -634,6 +651,7 @@ public class ForestMethod<T> implements VariableScope {
                 .setUrl(newUrl)
                 .setType(type)
                 .setCharset(charset)
+                .setSslProtocol(sslProtocol)
                 .setLogEnable(logEnable)
                 .setAsync(async);
 

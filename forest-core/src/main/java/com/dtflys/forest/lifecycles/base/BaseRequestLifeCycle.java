@@ -26,11 +26,13 @@ public class BaseRequestLifeCycle implements BaseAnnotationLifeCycle<BaseRequest
         String baseContentEncoding = annotation.contentEncoding();
         String baseUserAgent = annotation.userAgent();
         String baseCharset = annotation.charset();
+        String baseSslProtocol = annotation.sslProtocol();
 
         baseMetaRequest.setContentType(baseContentType);
         baseMetaRequest.setContentEncoding(baseContentEncoding);
         baseMetaRequest.setUserAgent(baseUserAgent);
         baseMetaRequest.setCharset(baseCharset);
+        baseMetaRequest.setSslProtocol(baseSslProtocol);
 
         String [] headerArray = annotation.headers();
 

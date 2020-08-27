@@ -103,19 +103,19 @@ public class SSLUtils {
      * @param request
      * @return
      */
-    public static SSLContext getSSLContext(ForestRequest request) throws KeyManagementException, NoSuchAlgorithmException {
+    public static SSLContext getSSLContext(ForestRequest request, String protocol) throws KeyManagementException, NoSuchAlgorithmException {
         if (request.getKeyStore() == null) {
-            return SSLUtils.createIgnoreVerifySSL(request.getConfiguration().getSslProtocol());
+            return SSLUtils.createIgnoreVerifySSL(protocol);
         }
         return SSLUtils.customSSL(request);
     }
 
-    public static SSLSocketFactory getSSLSocketFactory(ForestRequest request) {
+    public static SSLSocketFactory getSSLSocketFactory(ForestRequest request, String protocol) {
         if (request == null) {
             return null;
         }
         try {
-            SSLContext sslContext = SSLUtils.getSSLContext(request);
+            SSLContext sslContext = SSLUtils.getSSLContext(request, protocol);
             if (sslContext == null) {
                 throw new ForestRuntimeException("SSL context cannot be initialized.");
             }
