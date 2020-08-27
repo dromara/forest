@@ -4,9 +4,6 @@ import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.mock.HeadMockServer;
-import com.dtflys.forest.backend.HttpBackend;
-import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.client.HeadClient;
 import com.dtflys.test.model.TestHeaders;
 import org.junit.Before;
@@ -35,6 +32,8 @@ public class TestHeadClient extends BaseClientTest {
     private static ForestConfiguration configuration;
 
     private static HeadClient headClient;
+
+    private ThreadLocal<String> accessTokenLocal = new ThreadLocal<>();
 
 
     @BeforeClass
@@ -67,9 +66,10 @@ public class TestHeadClient extends BaseClientTest {
 
     @Test
     public void testHeadHelloUser3() {
+        accessTokenLocal.set("11111111");
         Map<String, Object> headers = new HashMap<>();
         headers.put("Accept", "text/plain");
-        headers.put("accessToken", "11111111");
+        headers.put("accessToken", accessTokenLocal.get());
         headClient.headHelloUser(headers, "foo");
     }
 
@@ -85,7 +85,8 @@ public class TestHeadClient extends BaseClientTest {
 
     @Test
     public void testSimpleHead() {
-        headClient.simpleHead("11111111");
+        accessTokenLocal.set("11111111");
+        headClient.simpleHead(accessTokenLocal.get());
     }
 
     @Test
