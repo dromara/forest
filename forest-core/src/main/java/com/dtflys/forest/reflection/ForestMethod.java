@@ -868,6 +868,15 @@ public class ForestMethod<T> implements VariableScope {
                 RequestNameValue nameValue = new RequestNameValue(name, TARGET_HEADER);
                 if (headNameValue.length == 2) {
                     nameValue.setValue(headNameValue[1].trim());
+                } else if (headNameValue.length > 2) {
+                    StringBuilder builder = new StringBuilder();
+                    for (int j = 1; j < headNameValue.length; j++) {
+                        builder.append(headNameValue[j]);
+                        if (j < headNameValue.length - 1) {
+                            builder.append(":");
+                        }
+                    }
+                    nameValue.setValue(builder.toString().trim());
                 }
                 request.addHeader(nameValue);
             }
