@@ -17,14 +17,20 @@ public interface HeadClient {
     @HeadRequest(
             url = "http://localhost:${port}/hello/user?username=foo",
             headers = {
-                    "Accept:text/plain",
-                    "accessToken:11111111"
+                    "Accept: text/plain",
+                    "accessToken: 11111111",
+                    "test: testquery:dsds",
+                    "test2: testquery2: dsds"
             }
     )
     void headHelloUser();
 
     @HeadRequest(
-            url = "http://localhost:${port}/hello/user?username=foo"
+            url = "http://localhost:${port}/hello/user?username=foo",
+            headers = {
+                    "test: testquery:dsds",
+                    "test2: testquery2: dsds"
+            }
     )
     void headHelloUser(@Header("Accept") String accept, @Header("accessToken") String accessToken);
 
@@ -43,16 +49,20 @@ public interface HeadClient {
             url = "http://localhost:${port}/hello/user?username=foo",
             headers = {
                 "Accept: text/plain",
-                "accessToken: ${accessToken}"
+                "accessToken: ${accessToken}",
+                "test: ${1}",
+                "test2: ${2}"
             }
     )
-    void simpleHead(@DataVariable("accessToken") String accessToken);
+    void simpleHead(@DataVariable("accessToken") String accessToken, String test, String test2);
 
     @HeadRequest(
             url = "http://localhost:${port}/hello/user?username=foo",
             headers = {
                     "Accept:text/plain",
-                    "accessToken:11111111"
+                    "accessToken:11111111",
+                    "test: testquery:dsds",
+                    "test2: testquery2: dsds"
             }
     )
     void simpleHead2();
@@ -61,7 +71,9 @@ public interface HeadClient {
             url = "http://localhost:${port}/hello/user?username=foo",
             headers = {
                     "Accept:text/plain",
-                    "accessToken:11111111"
+                    "accessToken:11111111",
+                    "test: testquery:dsds",
+                    "test2: testquery2: dsds"
             }
     )
     void simpleHead3();
@@ -71,7 +83,9 @@ public interface HeadClient {
             type = "head",
             headers = {
                 "Accept:text/plain",
-                "accessToken:11111111"
+                "accessToken:11111111",
+                "test: testquery:dsds",
+                "test2: testquery2: dsds"
             }
     )
     ForestResponse responseHead();

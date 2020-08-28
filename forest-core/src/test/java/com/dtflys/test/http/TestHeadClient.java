@@ -70,6 +70,8 @@ public class TestHeadClient extends BaseClientTest {
         Map<String, Object> headers = new HashMap<>();
         headers.put("Accept", "text/plain");
         headers.put("accessToken", accessTokenLocal.get());
+        headers.put("test", "testquery:dsds");
+        headers.put("test2", "testquery2: dsds");
         headClient.headHelloUser(headers, "foo");
     }
 
@@ -78,15 +80,16 @@ public class TestHeadClient extends BaseClientTest {
         TestHeaders headers = new TestHeaders();
         headers.setAccept("text/plain");
         headers.setAccessToken("11111111");
+        headers.setTest("testquery:dsds");
+        headers.setTest2("testquery2: dsds");
         headClient.headHelloUser(headers);
     }
-
 
 
     @Test
     public void testSimpleHead() {
         accessTokenLocal.set("11111111");
-        headClient.simpleHead(accessTokenLocal.get());
+        headClient.simpleHead(accessTokenLocal.get(), "testquery:dsds", "testquery2: dsds");
     }
 
     @Test
