@@ -8,6 +8,7 @@ import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.util.FieldInfo;
 import com.alibaba.fastjson.util.TypeUtils;
+import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 
 import java.lang.reflect.Field;
@@ -82,7 +83,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         try {
             return JSON.parseObject(source, targetType);
         } catch (Throwable th) {
-            throw new ForestRuntimeException(th);
+            throw new ForestConvertException("json", th);
         }
     }
 
@@ -90,7 +91,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         try {
             return JSON.parseObject(source, targetType);
         } catch (Throwable th) {
-            throw new ForestRuntimeException(th);
+            throw new ForestConvertException("json", th);
         }
 
     }
@@ -99,7 +100,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         try {
             return JSON.parseObject(source, typeReference);
         } catch (Throwable th) {
-            throw new ForestRuntimeException(th);
+            throw new ForestConvertException("json", th);
         }
 
     }

@@ -1,5 +1,6 @@
 package com.dtflys.forest.converter.xml;
 
+import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.StringUtils;
 
@@ -26,7 +27,7 @@ public class ForestJaxbConverter implements ForestXmlConverter {
             createMarshaller(jaxbContext, "UTF-8").marshal(obj, writer);
             return writer.toString();
         } catch (JAXBException e) {
-            throw new ForestRuntimeException(e);
+            throw new ForestConvertException("xml", e);
         }
 
     }
@@ -39,7 +40,7 @@ public class ForestJaxbConverter implements ForestXmlConverter {
             StringReader reader = new StringReader(source);
             return (T) createUnmarshaller(jaxbContext).unmarshal(reader);
         } catch (JAXBException e) {
-            throw new ForestRuntimeException(e);
+            throw new ForestConvertException("xml", e);
         }
 
     }

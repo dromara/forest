@@ -1,6 +1,6 @@
 package com.dtflys.forest.converter.json;
 
-import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.exceptions.ForestConvertException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,7 +28,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         try {
             return mapper.readValue(source, targetType);
         } catch (IOException e) {
-            throw new ForestRuntimeException(e);
+            throw new ForestConvertException("json", e);
         }
     }
 
@@ -36,7 +36,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         try {
             return mapper.readValue(source, mapper.getTypeFactory().constructType(targetType));
         } catch (IOException e) {
-            throw new ForestRuntimeException(e);
+            throw new ForestConvertException("json", e);
         }
 
     }
@@ -46,7 +46,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
             JavaType javaType = mapper.getTypeFactory().constructParametricType(parametrized, parameterClasses);
             return mapper.readValue(source, javaType);
         } catch (IOException e) {
-            throw new ForestRuntimeException(e);
+            throw new ForestConvertException("json", e);
         }
     }
 
@@ -54,7 +54,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         try {
             return mapper.readValue(source, javaType);
         } catch (IOException e) {
-            throw new ForestRuntimeException(e);
+            throw new ForestConvertException("json", e);
         }
     }
 
@@ -65,7 +65,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         try {
             return mapper.writeValueAsString(obj);
         } catch (Throwable e) {
-            throw new ForestRuntimeException(e);
+            throw new ForestConvertException("json", e);
         }
     }
 

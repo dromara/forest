@@ -2,7 +2,7 @@ package com.dtflys.forest.converter.auto;
 
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ForestConverter;
-import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
 
@@ -48,7 +48,7 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
                     result = tryConvert(source, targetType, ForestDataType.TEXT);
                 }
             } catch (Throwable th) {
-                throw new ForestRuntimeException(th);
+                throw new ForestConvertException("auto", th);
             }
         }
         return result;

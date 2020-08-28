@@ -1,6 +1,6 @@
 package com.dtflys.forest.converter.json;
 
-import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.exceptions.ForestConvertException;
 import com.google.gson.*;
 
 import java.lang.reflect.ParameterizedType;
@@ -30,7 +30,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
             Gson gson = new Gson();
             return (T) gson.fromJson(source, targetType);
         } catch (Throwable th) {
-            throw new ForestRuntimeException(th);
+            throw new ForestConvertException("json", th);
         }
     }
 
@@ -43,7 +43,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
             }
             return convertToJavaObject(source, (Class<? extends T>) targetType);
         } catch (Exception ex) {
-            throw new ForestRuntimeException(ex);
+            throw new ForestConvertException("json", ex);
         }
     }
 

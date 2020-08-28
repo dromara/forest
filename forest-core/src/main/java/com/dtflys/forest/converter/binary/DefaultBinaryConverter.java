@@ -1,8 +1,7 @@
 package com.dtflys.forest.converter.binary;
 
 import com.dtflys.forest.converter.ForestConverter;
-import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.utils.ForestProgress;
+import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.utils.ReflectUtils;
 import org.apache.commons.io.FileUtils;
 
@@ -43,7 +42,7 @@ public class DefaultBinaryConverter implements ForestConverter<Object> {
                         return (T) FileUtils.readFileToString(file);
                 }
             } catch (IOException e) {
-                throw new ForestRuntimeException(e);
+                throw new ForestConvertException("binary", e);
             }
         }
         return convertToJavaObjectEx(source, targetType);
@@ -66,12 +65,12 @@ public class DefaultBinaryConverter implements ForestConverter<Object> {
             out.flush();
             return out.toByteArray();
         } catch (IOException e) {
-            throw new ForestRuntimeException(e);
+            throw new ForestConvertException("binary", e);
         } finally {
             try {
                 in.close();
             } catch (IOException e) {
-                throw new ForestRuntimeException(e);
+                throw new ForestConvertException("binary", e);
             }
         }
     }
