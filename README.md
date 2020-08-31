@@ -4,7 +4,6 @@
     <img width="280" src="https://dt_flys.gitee.io/forest/media/forest_logo.png" alt="logo">
 </p>
 
-<h1 align="center">Forest - 轻量级HTTP客户端框架</h1>
 
 <p align="center">
 <a href="https://travis-ci.org/github/mySingleLive/forest">
@@ -32,6 +31,8 @@
     <img src="https://img.shields.io/badge/author-%E5%85%AC%E5%AD%90%E9%AA%8F-7af" alt="Author">
 </a>
 </p>
+
+<h1 align="center">Forest - 轻量级HTTP客户端框架</h1>
 
 
 项目介绍：
