@@ -1,7 +1,7 @@
 
 
 <p align="center">
-    <img src="forest_logo.png" alt="logo">
+    <img src="https://dt_flys.gitee.io/forest/media/forest_logo.png" alt="logo">
 </p>
 
 <h1 align="center">Forest - 轻量级HTTP客户端框架</h1>
