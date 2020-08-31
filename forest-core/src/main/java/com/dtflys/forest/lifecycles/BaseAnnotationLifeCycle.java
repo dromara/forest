@@ -16,8 +16,6 @@ public interface BaseAnnotationLifeCycle <A extends Annotation, I> extends Inter
 
     /**
      * 在被注解修饰的接口初始化时被调用
-     * @param method
-     * @param parameter
      * @param annotation
      */
     default void onProxyHandlerInitialized(InterfaceProxyHandler interfaceProxyHandler, A annotation) {
