@@ -2,7 +2,7 @@
 > 做更轻量，更简单实用的HTTP客户端框架
 
 <p align="center">
-    <img width="330" src="https://dt_flys.gitee.io/forest/media/forest_logo2.png" alt="logo">
+    <img width="500" src="https://dt_flys.gitee.io/forest/media/forest_logo2.png" alt="logo">
 </p>
 
 
