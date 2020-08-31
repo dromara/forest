@@ -11,7 +11,7 @@ Maven中除了forest-core和spring外，还要加入以下依赖
     <dependency>
         <groupId>com.dtflys.forest</groupId>
         <artifactId>forest-spring</artifactId>
-        <version>1.4.2</version>
+        <version>1.4.3</version>
     </dependency>
 
 ```
