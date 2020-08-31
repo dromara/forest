@@ -1,5 +1,8 @@
 
 
+<p align="center">
+    <img src="forest_logo.png" alt="Build">
+</p>
 
 <h1 align="center">Forest - 轻量级HTTP客户端框架</h1>
 
