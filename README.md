@@ -1,7 +1,7 @@
 
 
 <p align="center">
-    <img width="280" src="https://dt_flys.gitee.io/forest/media/forest_logo.png" alt="logo">
+    <img width="300" src="https://dt_flys.gitee.io/forest/media/forest_logo.png" alt="logo">
 </p>
 
 
