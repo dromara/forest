@@ -362,7 +362,7 @@ public class MappingTemplate {
 
     public static String getParameterValue(ForestJsonConverter jsonConverter, Object obj) {
         if (obj == null) {
-            return "";
+            return null;
         }
         if (obj instanceof Map || obj instanceof Collection) {
             return jsonConverter.encodeToString(obj);
