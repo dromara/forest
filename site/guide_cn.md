@@ -1947,7 +1947,22 @@ public class SimpleInterceptor implements Interceptor<String> {
     private final static Logger log = LoggerFactory.getLogger(SimpleInterceptor.class);
 
     /**
+     * 该方法在被调用时，并在beforeExecute前被调用 
+     * @Param request Forest请求对象
+     * @Param args 方法被调用时传入的参数数组 
+     */
+    @Override
+    public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
+        log.info("on invoke method");
+        
+        // addAttribute作用是添加和Request以及该拦截器绑定的属性
+        addAttribute(request, "A", "value1");  
+        addAttribute(request, "B", "value2");
+    }
+
+    /**
      * 该方法在请求发送之前被调用, 若返回false则不会继续发送请求
+     * @Param request Forest请求对象
      */
     @Override
     public boolean beforeExecute(ForestRequest request) {
@@ -1970,6 +1985,10 @@ public class SimpleInterceptor implements Interceptor<String> {
         String result = data;  // data参数是方法返回类型对应的返回数据结果
         result = response.getResult(); // getResult()也可以获取返回的数据结果
         response.setResult("修改后的结果: " + result);  // 可以修改请求响应的返回数据结果
+        
+        // 使用getAttributeAsString取出属性，这里只能取到与该Request对象，以及该拦截器绑定的属性
+        String attrValue1 = getAttributeAsString(request, "A1");
+
     }
 
     /**
@@ -2001,11 +2020,34 @@ public class SimpleInterceptor implements Interceptor<String> {
 `Interceptor`接口带有一个泛型参数，其表示的是请求响应后返回的数据类型。
 Interceptor<String>即代表返回的数据类型为`String`。
 
-## 11.2 配置拦截器
+
+### 11.2 拦截器与 Spring 集成
+
+若我要在拦截器中注入 Spring 的 Bean 改如何做？
+
+```java
+
+/**
+ * 在拦截器的类上加上@Component注解，并保证它能被Spring扫描到
+ */
+@Component
+public class SimpleInterceptor implements Interceptor<String> {
+
+    // 如此便能直接注入Spring上下文中所有的Bean了
+    @Resouce
+    private UserService userService;
+    
+    ... ...
+}
+
+```
+
+
+## 11.3 配置拦截器
 
 Forest有三个地方可以添加拦截器：`@Request`、`@BaseRequest`、全局配置，这三个地方代表三个不同的作用域。
 
-### 11.2.1 @Request上的拦截器
+### 11.3.1 @Request上的拦截器
 
 若您想要指定的拦截器只作用在指定的请求上，只需要在该请求方法的`@Request`注解中设置`interceptor`属性即可。
 
@@ -2036,7 +2078,7 @@ public interface SimpleClient {
 
 ?> `@Request`上的拦截器只会拦截指定的请求
 
-### 11.2.2 @BaseRequest 上的拦截器
+### 11.3.2 @BaseRequest 上的拦截器
 
 若您想使一个`interface`内的所有请求方法都指定某一个拦截器，可以在`@BaseRequest`的`interceptor`中设置
 
@@ -2070,7 +2112,7 @@ public interface SimpleClient {
 }
 ```
 
-### 11.2.2 全局拦截器
+### 11.3.3 全局拦截器
 
 若要配置能拦截项目范围所有Forest请求的拦截器也很简单，只要在全局配置中加上`interceptors`属性即可
 
