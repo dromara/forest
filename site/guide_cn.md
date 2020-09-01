@@ -2084,7 +2084,7 @@ System.out.println("name = " + forest.getQuery("name"));
 
 在拦截器中使用`addAttribute`方法和`getAttribute`方法来添加和获取`Attribute`。
 
-`Attribute` 是和请求以及所在拦截器绑定的属性值，这些属性值不通过网络请求传递到远端服务器。
+`Attribute` 是和请求以及所在拦截器绑定的属性值，这些属性值不能通过网络请求传递到远端服务器。
 
 而且，在使用`getAttribute`方法时，只能获取在相同拦截器，以及相同请求中绑定的`Attribute`，这两个条件缺一不可。
 
@@ -2104,11 +2104,12 @@ public class SimpleInterceptor implements Interceptor<String> {
         Object value1 = getAttribute(request, "methodName");  // 获取名称为methodName的Attribute，不指定返回类型
         String value2 = getAttribute(request, "methodName", String.class);  // 获取名称为methodName的Attribute，并转换为指定的Class类型
         String value3 = getAttributeAsString(request, "methodName");  // 获取名称为methodName的Attribute，并转换为String类型
-        Integer value4 = getAttributeAsInteger(request, "num");  // 获取名称为methodName的Attribute，并转换为Integer类型
+        Integer value4 = getAttributeAsInteger(request, "num");  // 获取名称为num的Attribute，并转换为Integer类型
     }
 }
 
 ```
+
 
 
 
