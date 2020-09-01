@@ -173,6 +173,7 @@ public interface GetClient {
     )
     Future<String> asyncVarParamGet(@DataVariable("username") String username, OnSuccess<String> onSuccess, OnError onError);
 
-
+    @Get(url = "http://localhost:5000?token=YmZlNDYzYmVkMWZjYzgwNjExZDVhMWM1ODZmMWRhYzg0NTcyMGEwMg==")
+    ForestResponse<String> testUrl();
 
 }

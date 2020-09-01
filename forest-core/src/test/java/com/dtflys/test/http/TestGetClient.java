@@ -2,6 +2,7 @@ package com.dtflys.test.http;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.model.JsonTestUser;
 import com.dtflys.test.mock.GetMockServer;
 import com.dtflys.test.http.client.GetClient;
@@ -12,6 +13,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -171,5 +174,13 @@ public class TestGetClient extends BaseClientTest {
         assertEquals(GetMockServer.EXPECTED, result);
     }
 
+    @Test
+    public void testUrl() throws UnsupportedEncodingException {
+        String token = "YmZlNDYzYmVkMWZjYzgwNjExZDVhMWM1ODZmMWRhYzg0NTcyMGEwMg==";
+        ForestResponse response = getClient.testUrl();
+        assertNotNull(response);
+        String reqToken = (String) response.getRequest().getQuery("token");
+        assertEquals(token, reqToken);
+    }
 
 }
