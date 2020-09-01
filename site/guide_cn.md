@@ -2021,7 +2021,7 @@ public class SimpleInterceptor implements Interceptor<String> {
 Interceptor<String>即代表返回的数据类型为`String`。
 
 
-### 11.2 拦截器与 Spring 集成
+## 11.2 拦截器与 Spring 集成
 
 若我要在拦截器中注入 Spring 的 Bean 改如何做？
 
