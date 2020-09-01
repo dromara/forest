@@ -29,9 +29,9 @@ public interface LifeCycleHandler {
 
     void handleInvokeMethod(ForestRequest request, ForestMethod method, Object[] args);
 
-    void handleError(ForestRequest request, ForestResponse response);
+    Object handleError(ForestRequest request, ForestResponse response);
 
-    void handleError(ForestRequest request, ForestResponse response, Throwable ex);
+    Object handleError(ForestRequest request, ForestResponse response, Throwable ex);
 
     void handleTry(ForestRetryException ex, Retryer retryer) throws Throwable;
 

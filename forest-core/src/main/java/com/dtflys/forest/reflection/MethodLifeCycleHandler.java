@@ -12,6 +12,7 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.retryer.Retryer;
 import com.dtflys.forest.utils.ForestProgress;
 import com.dtflys.forest.utils.ReflectUtils;
+import com.twitter.finagle.http.path.$colon$amp;
 
 import java.lang.reflect.Type;
 
@@ -47,24 +48,38 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
     public Object handleSyncWitchException(ForestRequest request, ForestResponse response, Exception ex) {
         try {
             Object resultData = handleResultType(request, response, returnType, returnClass);
-            if (resultData instanceof ForestResponse) {
-                handleResult(resultData);
-                return resultData;
-            }
             if (response.isSuccess()) {
                 resultData = handleSuccess(resultData, request, response);
             } else {
                 if (ex != null) {
-                    handleError(request, response, ex);
-                }
-                else {
-                    handleError(request, response);
+                    resultData = handleError(request, response, ex);
+                } else {
+                    resultData = handleError(request, response);
                 }
             }
             handleResult(resultData);
+            if (ForestResponse.class.isAssignableFrom(returnClass)) {
+                if (!(resultData instanceof ForestResponse)) {
+                    response.setResult(resultData);
+                    resultData = response;
+                }
+                handleResult(resultData);
+                return resultData;
+            }
             return resultData;
-        } catch (Throwable e) {
-            throw e;
+        } catch (Throwable th) {
+            Object resultData = response.getResult();
+            handleResult(resultData);
+            if (ForestResponse.class.isAssignableFrom(returnClass)) {
+                if (!(resultData instanceof ForestResponse)) {
+                    response.setResult(resultData);
+                    resultData = response;
+                }
+                handleResult(resultData);
+                return resultData;
+            } else {
+                throw th;
+            }
         } finally {
             request.getInterceptorChain().afterExecute(request, response);
         }
@@ -106,13 +121,13 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
     }
 
     @Override
-    public void handleError(ForestRequest request, ForestResponse response) {
+    public Object handleError(ForestRequest request, ForestResponse response) {
         ForestNetworkException networkException = new ForestNetworkException("", response.getStatusCode(), response);
-        handleError(request, response, networkException);
+        return handleError(request, response, networkException);
     }
 
     @Override
-    public void handleError(ForestRequest request, ForestResponse response, Throwable ex) {
+    public Object handleError(ForestRequest request, ForestResponse response, Throwable ex) {
         ForestRuntimeException e = null;
         if (ex instanceof ForestRuntimeException) {
             e = (ForestRuntimeException) ex;
@@ -121,8 +136,11 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
             e = new ForestRuntimeException(ex);
         }
         request.getInterceptorChain().onError(e, request, response);
+        Object resultData = null;
         if (request.getOnError() != null) {
             request.getOnError().onError(e, request, response);
+            resultData = response.getResult();
+            return resultData;
         }
         else {
             throw e;
