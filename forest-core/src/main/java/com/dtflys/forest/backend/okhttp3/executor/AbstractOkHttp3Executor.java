@@ -328,7 +328,7 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
                 } catch (Throwable throwable) {
                     ForestResponse response = factory.createResponse(request, null, lifeCycleHandler);
                     logResponse(startTime, response);
-                    lifeCycleHandler.handleError(request, response, e);
+                    lifeCycleHandler.handleSyncWitchException(request, response, e);
                     return;
                 }
                 execute(lifeCycleHandler, retryCount + 1);

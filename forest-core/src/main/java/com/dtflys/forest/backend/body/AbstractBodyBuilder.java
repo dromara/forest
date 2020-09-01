@@ -86,7 +86,12 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                 if (bodyList.size() == 1) {
                     toJsonObj = bodyList.get(0);
                 }
-                String text = jsonConverter.encodeToString(toJsonObj);
+                String text = null;
+                if (toJsonObj instanceof CharSequence) {
+                    text = toJsonObj.toString();
+                } else {
+                    text = jsonConverter.encodeToString(toJsonObj);
+                }
                 setStringBody(httpRequest, text, charset, contentType, mergeCharset);
             }
         }

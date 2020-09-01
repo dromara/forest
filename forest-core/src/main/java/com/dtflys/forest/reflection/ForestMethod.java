@@ -43,6 +43,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
+import static com.dtflys.forest.backend.body.AbstractBodyBuilder.TYPE_APPLICATION_X_WWW_FORM_URLENCODED;
 import static com.dtflys.forest.backend.body.AbstractBodyBuilder.TYPE_MULTIPART_FORM_DATA;
 import static com.dtflys.forest.mapping.MappingParameter.*;
 
@@ -614,14 +615,22 @@ public class ForestMethod<T> implements VariableScope {
                 }
                 for (int i = 0; i < params.length; i++) {
                     String p = params[i];
-                    String[] nameValue = p.split("=");
+                    String[] nameValue = p.split("=", 2);
                     String name = nameValue[0];
                     queryBuilder.append(name);
                     RequestNameValue requestNameValue = new RequestNameValue(name, TARGET_QUERY);
                     nameValueList.add(requestNameValue);
                     if (nameValue.length > 1) {
-                        String value = nameValue[1];
+                        StringBuilder valueBuilder = new StringBuilder();
+                        valueBuilder.append(nameValue[1]);
+                        if (nameValue.length > 2) {
+                            for (int j = 2; j < nameValue.length; j++) {
+                                valueBuilder.append("=");
+                                valueBuilder.append(nameValue[j]);
+                            }
+                        }
                         queryBuilder.append("=");
+                        String value = valueBuilder.toString();
                         queryBuilder.append(value);
                         requestNameValue.setValue(value);
                     }
@@ -810,7 +819,7 @@ public class ForestMethod<T> implements VariableScope {
         if (baseHeaders != null && baseHeaders.length > 0) {
             for (MappingTemplate baseHeader : baseHeaders) {
                 String headerText = baseHeader.render(args);
-                String[] headerNameValue = headerText.split(":");
+                String[] headerNameValue = headerText.split(":", 2);
                 if (headerNameValue.length > 1) {
                     String name = headerNameValue[0].trim();
                     if (request.getHeader(name) == null) {
@@ -826,28 +835,36 @@ public class ForestMethod<T> implements VariableScope {
         List<RequestNameValue> dataNameValueList = new ArrayList<>();
         StringBuilder bodyBuilder = new StringBuilder();
         boolean isQueryData = false;
-        for (int i = 0; i < dataTemplateArray.length; i++) {
-            MappingTemplate dataTemplate = dataTemplateArray[i];
-            String data = dataTemplate.render(args);
-            bodyBuilder.append(data);
-            if (i < dataTemplateArray.length - 1) {
-                bodyBuilder.append("&");
-            }
-            String[] paramArray = data.split("&");
-            for (int j = 0; j < paramArray.length; j++) {
-                String dataParam = paramArray[j];
-                String[] dataNameValue = dataParam.split("=");
-                if (dataNameValue.length > 0) {
-                    String name = dataNameValue[0].trim();
-//                    RequestNameValue nameValue = new RequestNameValue(name, type.isDefaultParamInQuery());
-                    RequestNameValue nameValue = new RequestNameValue(name, TARGET_QUERY);
-                    if (dataNameValue.length == 2) {
-                        isQueryData = true;
-                        nameValue.setValue(dataNameValue[1].trim());
-                    }
-                    nameValueList.add(nameValue);
-                    dataNameValueList.add(nameValue);
+        if (renderedContentType == null || renderedContentType.equalsIgnoreCase(TYPE_APPLICATION_X_WWW_FORM_URLENCODED)) {
+            for (int i = 0; i < dataTemplateArray.length; i++) {
+                MappingTemplate dataTemplate = dataTemplateArray[i];
+                String data = dataTemplate.render(args);
+                bodyBuilder.append(data);
+                if (i < dataTemplateArray.length - 1) {
+                    bodyBuilder.append("&");
                 }
+                String[] paramArray = data.split("&");
+                for (int j = 0; j < paramArray.length; j++) {
+                    String dataParam = paramArray[j];
+                    String[] dataNameValue = dataParam.split("=", 2);
+                    if (dataNameValue.length > 0) {
+                        String name = dataNameValue[0].trim();
+//                    RequestNameValue nameValue = new RequestNameValue(name, type.isDefaultParamInQuery());
+                        RequestNameValue nameValue = new RequestNameValue(name, TARGET_QUERY);
+                        if (dataNameValue.length == 2) {
+                            isQueryData = true;
+                            nameValue.setValue(dataNameValue[1].trim());
+                        }
+                        nameValueList.add(nameValue);
+                        dataNameValueList.add(nameValue);
+                    }
+                }
+            }
+        } else {
+            for (int i = 0; i < dataTemplateArray.length; i++) {
+                MappingTemplate dataTemplate = dataTemplateArray[i];
+                String data = dataTemplate.render(args);
+                bodyList.add(data);
             }
         }
         request.addData(nameValueList);
@@ -862,21 +879,12 @@ public class ForestMethod<T> implements VariableScope {
         for (int i = 0; i < headerTemplateArray.length; i++) {
             MappingTemplate headerTemplate = headerTemplateArray[i];
             String header = headerTemplate.render(args);
-            String[] headNameValue = header.split(":");
+            String[] headNameValue = header.split(":", 2);
             if (headNameValue.length > 0) {
                 String name = headNameValue[0].trim();
                 RequestNameValue nameValue = new RequestNameValue(name, TARGET_HEADER);
                 if (headNameValue.length == 2) {
                     nameValue.setValue(headNameValue[1].trim());
-                } else if (headNameValue.length > 2) {
-                    StringBuilder builder = new StringBuilder();
-                    for (int j = 1; j < headNameValue.length; j++) {
-                        builder.append(headNameValue[j]);
-                        if (j < headNameValue.length - 1) {
-                            builder.append(":");
-                        }
-                    }
-                    nameValue.setValue(builder.toString().trim());
                 }
                 request.addHeader(nameValue);
             }

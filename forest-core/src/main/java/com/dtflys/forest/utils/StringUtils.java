@@ -54,4 +54,6 @@ public final class StringUtils {
         return "get" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
     }
 
+
+
 }
