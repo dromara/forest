@@ -2144,7 +2144,7 @@ public class SimpleInterceptor2 implements Interceptor<String> {
 
 ### 11.3.3 Attribute与Attachment的区别
 
-`Attribute`和`Attachment`都能通过请求进行绑定的数据传递方式，但也有所不同。
+`Attribute`和`Attachment`都是能通过请求进行绑定的数据传递方式，但也有所不同。
 
 |             | 绑定请求 | 绑定拦截器 |
 | ----------- | ---------| ---------- |
