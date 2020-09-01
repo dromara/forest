@@ -2148,8 +2148,8 @@ public class SimpleInterceptor2 implements Interceptor<String> {
 
 |             | 绑定请求 | 绑定拦截器 |
 | ----------- | ---------| ---------- |
-| `Attribute`  | <font color=green>✔</font> | <font color=green>✔</font> |
-| `Attachment` | <font color=green>✔</font> | <font color=red>✘</font> |
+| Attribute  | <font color=green>✔</font> | <font color=green>✔</font> |
+| Attachment | <font color=green>✔</font> | <font color=red>✘</font> |
 
 
 ## 11.4 配置拦截器
