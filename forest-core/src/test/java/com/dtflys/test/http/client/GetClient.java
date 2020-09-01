@@ -8,6 +8,7 @@ import com.dtflys.forest.annotation.DataVariable;
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.model.JsonTestUser;
+import com.dtflys.test.interceptor.ErrorInterceptor;
 import com.dtflys.test.model.TestResult;
 
 import java.util.Map;
@@ -50,11 +51,19 @@ public interface GetClient {
     )
     ForestResponse<String> errorGet2();
 
+
     @Request(
             url = "http://localhost:${port}/hello/user?username=foo",
             headers = {"Accept:text/plain"}
     )
     Map errorGet3();
+
+    @Request(
+            url = "http://localhost:${port}/hello/user?username=foo",
+            headers = {"Accept:text/plain"},
+            interceptor = ErrorInterceptor.class
+    )
+    ForestResponse<String> errorGet4();
 
     @Request(
             url = "http://localhost:${port}/hello/user?username=foo",

@@ -97,6 +97,14 @@ public class TestErrorClient extends BaseClientTest {
         assertTrue(hasError);
     }
 
+    @Test
+    public void testErrorGet4() {
+        ForestResponse<String> response = getClient.errorGet4();
+        String result = response.getResult();
+        assertEquals("{\"error\": true, \"interceptor\": true}", result);
+    }
+
+
 
     @Test
     public void testErrorGetWithRetry() {
