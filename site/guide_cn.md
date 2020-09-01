@@ -2042,12 +2042,82 @@ public class SimpleInterceptor implements Interceptor<String> {
 
 ```
 
+## 11.3 在拦截器中传递数据
 
-## 11.3 配置拦截器
+在Forest中，拦截器是基于单例模式创建的，也就是说一个拦截器类最多只能对应一个拦截器实例。
+
+那么以下这种通过共享变量的方式就可能造成错误：
+
+```java
+public class SimpleInterceptor implements Interceptor<String> {
+  
+    private String name;
+   
+    @Override
+    public boolean beforeExecute(ForestRequest request) {
+        this.name = request.getQuery("name");
+    }
+
+    @Override
+    public void onSuccess(String data, ForestRequest request, ForestResponse response) {
+        System.out.println("name = " + name);
+    }
+}
+```
+
+若有两个请求同时进入该拦截器（请求1 url=...?name=A1, 请求2 url=...?name=A2）, 而最后当请求1进入`onSuccess`方法时，应该打印出 `name = A2`，却应为之前执行了请求2的`beforeExecute`方法，将类变量`name`的值改成了`A2`,
+所以最终打印出来的是 `name = A2` （其实应该是 `name = A1`），这明显是错误的。
+
+那该如何做能在传递数据的同时避免这类问题呢？ 
+
+方法也很简单，就是将您要传递的数据与请求对象绑定在一起，比如在 `onSuccess` 中调用`request.getQuery`方法。
+
+```java
+System.out.println("name = " + forest.getQuery("name"));
+```
+
+虽然这种方法能够解决并发问题，但有个明显的限制：如果要传递的数据不想出现在请求中的任何位置(包括URL、请求头、请求体)，那就无能为力了。
+
+这时候就要使用 `ForestRequest` 的扩展绑定数据的方法了。
+
+### 11.3.1 Attribute
+
+在拦截器中使用`addAttribute`方法和`getAttribute`方法来添加和获取`Attribute`。
+
+`Attribute` 是和请求以及所在拦截器绑定的属性值，这些属性值不通过网络请求传递到远端服务器。
+
+而且，在使用`getAttribute`方法时，只能获取在相同拦截器，以及相同请求中绑定的`Attribute`，这两个条件缺一不可。
+
+```java
+public class SimpleInterceptor implements Interceptor<String> {
+  
+    @Override
+    public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
+        String methodName = method.getMethodName();
+        addAttribute(request, "methodName", methodName); // 添加Attribute
+        addAttribute(request, "num", (Integer) args[0]); // 添加Attribute
+    }
+
+    @Override
+    public void onSuccess(String data, ForestRequest request, ForestResponse response) {
+        System.out.println("name = " + name);
+        Object value1 = getAttribute(request, "methodName");  // 获取名称为methodName的Attribute，不指定返回类型
+        String value2 = getAttribute(request, "methodName", String.class);  // 获取名称为methodName的Attribute，并转换为指定的Class类型
+        String value3 = getAttributeAsString(request, "methodName");  // 获取名称为methodName的Attribute，并转换为String类型
+        Integer value4 = getAttributeAsInteger(request, "num");  // 获取名称为methodName的Attribute，并转换为Integer类型
+    }
+}
+
+```
+
+
+
+
+## 11.4 配置拦截器
 
 Forest有三个地方可以添加拦截器：`@Request`、`@BaseRequest`、全局配置，这三个地方代表三个不同的作用域。
 
-### 11.3.1 @Request上的拦截器
+### 11.4.1 @Request上的拦截器
 
 若您想要指定的拦截器只作用在指定的请求上，只需要在该请求方法的`@Request`注解中设置`interceptor`属性即可。
 
@@ -2078,7 +2148,7 @@ public interface SimpleClient {
 
 ?> `@Request`上的拦截器只会拦截指定的请求
 
-### 11.3.2 @BaseRequest 上的拦截器
+### 11.4.2 @BaseRequest 上的拦截器
 
 若您想使一个`interface`内的所有请求方法都指定某一个拦截器，可以在`@BaseRequest`的`interceptor`中设置
 
@@ -2112,7 +2182,7 @@ public interface SimpleClient {
 }
 ```
 
-### 11.3.3 全局拦截器
+### 11.4.3 全局拦截器
 
 若要配置能拦截项目范围所有Forest请求的拦截器也很简单，只要在全局配置中加上`interceptors`属性即可
 
