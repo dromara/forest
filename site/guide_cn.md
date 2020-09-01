@@ -2142,14 +2142,14 @@ public class SimpleInterceptor2 implements Interceptor<String> {
 }
 ```
 
-### Attribute与Attachment的区别
+### 11.3.3 Attribute与Attachment的区别
 
 `Attribute`和`Attachment`都能通过请求进行绑定的数据传递方式，但也有所不同。
 
 |             | 绑定请求 | 绑定拦截器 |
 | ----------- | ---------| ---------- |
-| `Attribute`  |   √     |    ✘      |
-| `Attachment` |   √     |    ✘      |
+| `Attribute`  | <font color=green>✔</font> | <font color=green>✔</font> |
+| `Attachment` | <font color=green>✔</font> | <font color=red>✘</font> |
 
 
 ## 11.4 配置拦截器
