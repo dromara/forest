@@ -2100,18 +2100,48 @@ public class SimpleInterceptor implements Interceptor<String> {
 
     @Override
     public void onSuccess(String data, ForestRequest request, ForestResponse response) {
-        System.out.println("name = " + name);
         Object value1 = getAttribute(request, "methodName");  // 获取名称为methodName的Attribute，不指定返回类型
         String value2 = getAttribute(request, "methodName", String.class);  // 获取名称为methodName的Attribute，并转换为指定的Class类型
         String value3 = getAttributeAsString(request, "methodName");  // 获取名称为methodName的Attribute，并转换为String类型
         Integer value4 = getAttributeAsInteger(request, "num");  // 获取名称为num的Attribute，并转换为Integer类型
     }
 }
-
 ```
 
+### 11.3.2 Attachment
+
+可以使用`ForestRequest`对象的`addAttachment`方法和`getAttachment`方法来添加和获取`Attachment`。
+
+`Attachment` 是和请求绑定的附件属性值，这些值不能通过网络请求传递到远端服务器。
+
+而且，在使用`getAttachment`方法时，只能获取在相同请求中绑定的`Attachment`，但不必是相同的拦截器。
 
 
+```java
+public class SimpleInterceptor1 implements Interceptor<String> {
+  
+    @Override
+    public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
+        String methodName = method.getMethodName();
+        request.addAttachment("methodName", methodName); // 添加Attachment
+        request.addAttachment("num", (Integer) args[0]); // 添加Attachment
+    }
+    ... ...
+}
+
+/**
+ * Attachment不依赖任何一个拦截器，可以跨拦截器传递数据
+ */
+public class SimpleInterceptor2 implements Interceptor<String> {
+  
+    @Override
+    public void onSuccess(String data, ForestRequest request, ForestResponse response) {
+        Object value1 = request.getAttachment("methodName");  // 获取名称为methodName的Attachment
+        Object value2 = request.getAttachment("num");  // 获取名称为num的Attachment
+    }
+}
+
+```
 
 
 ## 11.4 配置拦截器
