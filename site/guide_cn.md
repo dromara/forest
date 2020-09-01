@@ -2140,8 +2140,16 @@ public class SimpleInterceptor2 implements Interceptor<String> {
         Object value2 = request.getAttachment("num");  // 获取名称为num的Attachment
     }
 }
-
 ```
+
+### Attribute与Attachment的区别
+
+`Attribute`和`Attachment`都能通过请求进行绑定的数据传递方式，但也有所不同。
+
+|             | 绑定请求 | 绑定拦截器 |
+| ----------- | ---------| ---------- |
+| `Attribute`  |   √     |    ✘      |
+| `Attachment` |   √     |    ✘      |
 
 
 ## 11.4 配置拦截器
