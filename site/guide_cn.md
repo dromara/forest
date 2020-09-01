@@ -2065,7 +2065,7 @@ public class SimpleInterceptor implements Interceptor<String> {
 }
 ```
 
-若有两个请求同时进入该拦截器（请求1 url=...?name=A1, 请求2 url=...?name=A2）, 而最后当请求1进入`onSuccess`方法时，应该打印出 `name = A2`，却应为之前执行了请求2的`beforeExecute`方法，将类变量`name`的值改成了`A2`,
+若有两个请求同时进入该拦截器（请求1 url=...?name=A1, 请求2 url=...?name=A2）, 而最后当请求1进入`onSuccess`方法时，应该打印出 `name = A2`，却因为之前执行了请求2的`beforeExecute`方法，将类变量`name`的值改成了`A2`,
 所以最终打印出来的是 `name = A2` （其实应该是 `name = A1`），这明显是错误的。
 
 那该如何做能在传递数据的同时避免这类问题呢？ 
