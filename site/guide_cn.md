@@ -2196,11 +2196,11 @@ forest:
 ```
 
 
-### 十二. 数据转换
+# 十二. 数据转换
 
 Forest支持JSON、XML、普通文本等数据转换形式。不需要接口调用者自己写具体的数据转换代码。
 
-#### 12.1 序列化
+## 12.1 序列化
 
 几乎所有数据格式的转换都包含序列化和反序列化，Forest的数据转换同样如此。
 
@@ -2218,7 +2218,7 @@ String postJson(@DataObject MyUser user);   // 自动将user对象序列化为JS
 
 同理，指定为`application/xml`会将参数序列化为`XML`格式，`text/plain`则为文本，默认的`application/x-www-form-urlencoded`则为表格格式。
 
-#### 12.2 反序列化
+## 12.2 反序列化
 
 HTTP请求响应后返回结果的数据同样需要转换，Forest则会将返回结果自动转换为您通过方法返回类型指定对象类型。这个过程就是反序列化，您可以通过`dataType`指定返回数据的反序列化格式。
 
@@ -2230,7 +2230,7 @@ HTTP请求响应后返回结果的数据同样需要转换，Forest则会将返�
 Map getData();               // 请求响应的结果将被转换为Map类型对象
 ```
 
-#### 12.3 自定义转换器
+## 12.3 自定义转换器
 
 在Forest中，每个转换类型都对应一个转换器对象，比如`JSON`格式的转换器有`com.dtflys.forest.converter.json.ForestFastjsonConverter`、`com.dtflys.forest.converter.json.ForestGsonConverter`、`com.dtflys.forest.converter.json.ForestJacksonConverter`三种，分别是基于`FastJson`、`Gson`、`Jackson`三种不同的`JSON`序列化框架。
 
