@@ -171,13 +171,12 @@ Map result = myClient.upload("D:\\TestUpload\\xxx.jpg", progress -> {
 /**
  * 在方法上加上@DownloadFile注解
  * dir属性表示文件下载到哪个目录
- * filename属性表示文件下载成功后以什么名字保存，如果不填，这默认从URL中取得文件名
  * OnProgress参数为监听上传进度的回调函数
- * ${0}代表引用第一个参数，${1}引用第二个参数
+ * ${0}代表引用第一个参数
  */
 @Get(url = "http://localhost:8080/images/xxx.jpg")
-@DownloadFile(dir = "${0}", filename = "${1}")
-File downloadFile(String dir, String filename, OnProgress onProgress);
+@DownloadFile(dir = "${0}")
+File downloadFile(String dir, OnProgress onProgress);
 ```
 
 
