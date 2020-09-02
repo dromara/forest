@@ -180,7 +180,7 @@ File downloadFile(String dir, OnProgress onProgress);
 ```
 
 
-调用下载接口以及监听上传进度的代码如下：
+调用下载接口以及监听下载进度的代码如下：
 
 ```java
 File file = myClient.downloadFile("D:\\TestDownload", progress -> {
