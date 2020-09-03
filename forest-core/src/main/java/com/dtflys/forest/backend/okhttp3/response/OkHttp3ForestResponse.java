@@ -4,18 +4,17 @@ import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.utils.GetByteEncode;
 import com.dtflys.forest.utils.StringUtils;
 import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLDecoder;
 import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -26,6 +25,11 @@ public class OkHttp3ForestResponse extends ForestResponse {
     private final Response okResponse;
 
     private final ResponseBody body;
+
+    /**
+     * 内容字节数组
+     */
+    private byte[] bytes;
 
 
     public OkHttp3ForestResponse(ForestRequest request, Response okResponse) {
@@ -54,7 +58,13 @@ public class OkHttp3ForestResponse extends ForestResponse {
                     content = null;
                 } else if (!request.isDownloadFile() && contentType.canReadAsString()) {
                     try {
-                        this.content = body.string();
+                        bytes = body.bytes();
+                        String charsetName = GetByteEncode.getCharsetName(bytes);
+                        if (charsetName.toUpperCase().startsWith("GB")) {
+                            // 返回的GB中文编码会有多种编码类型，这里统一使用GBK编码
+                            charsetName = "GBK";
+                        }
+                        this.content = new String(bytes, Charset.forName(charsetName));
                     } catch (IOException e) {
                         throw new ForestRuntimeException(e);
                     }
@@ -101,12 +111,15 @@ public class OkHttp3ForestResponse extends ForestResponse {
 
     @Override
     public byte[] getByteArray() throws Exception {
-        return body.bytes();
+        if (bytes == null) {
+            bytes = body.bytes();
+        }
+        return bytes;
     }
 
     @Override
     public InputStream getInputStream() throws Exception {
-        return body.byteStream();
+        return new ByteArrayInputStream(getByteArray());
     }
 
 }
