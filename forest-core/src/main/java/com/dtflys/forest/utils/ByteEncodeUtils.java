@@ -2,6 +2,7 @@ package com.dtflys.forest.utils;
 
 import org.mozilla.universalchardet.UniversalDetector;
 
+
 /**
  * 通过字符串字节数组获得字符串编码名称
  *
@@ -9,7 +10,7 @@ import org.mozilla.universalchardet.UniversalDetector;
  * @date 2020/9/3 0003 10:21
  * @see <a href="https://blog.csdn.net/qq_31384551/article/details/81627840">参考资料</a>
  */
-public class GetByteEncode {
+public class ByteEncodeUtils {
     /**
      * 默认的编码名称
      */
@@ -43,5 +44,7 @@ public class GetByteEncode {
         }
         return encoding;
     }
+
+
 
 }
