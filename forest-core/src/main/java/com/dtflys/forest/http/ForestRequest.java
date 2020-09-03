@@ -368,10 +368,8 @@ public class ForestRequest<T> {
             Map.Entry<String, Object> entry = iterator.next();
             String name = entry.getKey();
             Object value = entry.getValue();
-            if (value != null) {
-                RequestNameValue nameValue = new RequestNameValue(name, value, TARGET_QUERY);
-                nameValueList.add(nameValue);
-            }
+            RequestNameValue nameValue = new RequestNameValue(name, value, TARGET_QUERY);
+            nameValueList.add(nameValue);
         }
         return nameValueList;
 
