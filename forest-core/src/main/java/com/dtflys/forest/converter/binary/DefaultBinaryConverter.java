@@ -2,8 +2,11 @@ package com.dtflys.forest.converter.binary;
 
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestConvertException;
+import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.utils.ByteEncodeUtils;
 import com.dtflys.forest.utils.ReflectUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -23,8 +26,17 @@ public class DefaultBinaryConverter implements ForestConverter<Object> {
             }
             if (String.class.isAssignableFrom(targetType)) {
                 byte[] tmp = inputStreamToByteArray(in);
-                String result = new String(tmp);
-                return (T) result;
+                String result = null;
+                try {
+                    String encode = ByteEncodeUtils.getCharsetName(tmp);
+                    if (encode.toUpperCase().startsWith("GB")) {
+                        encode = "GBK";
+                    }
+                    result = IOUtils.toString(tmp, encode);
+                    return (T) result;
+                } catch (IOException e) {
+                    throw new ForestRuntimeException(e);
+                }
             }
         } else if (source instanceof File) {
             File file = (File) source;
