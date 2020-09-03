@@ -4,6 +4,7 @@ import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.utils.GetByteEncode;
 import com.dtflys.forest.utils.StringUtils;
 import okhttp3.Headers;
 import okhttp3.MediaType;
@@ -58,7 +59,12 @@ public class OkHttp3ForestResponse extends ForestResponse {
                 } else if (!request.isDownloadFile() && contentType.canReadAsString()) {
                     try {
                         bytes = body.bytes();
-                        this.content = new String(bytes);
+                        String charsetName = GetByteEncode.getCharsetName(bytes);
+                        if (charsetName.toUpperCase().startsWith("GB")) {
+                            // 返回的GB中文编码会有多种编码类型，这里统一使用GBK编码
+                            charsetName = "GBK";
+                        }
+                        this.content = new String(bytes, Charset.forName(charsetName));
                     } catch (IOException e) {
                         throw new ForestRuntimeException(e);
                     }
