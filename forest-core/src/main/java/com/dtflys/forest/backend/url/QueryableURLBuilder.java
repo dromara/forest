@@ -28,10 +28,15 @@ public class QueryableURLBuilder extends URLBuilder {
             if (!nameValue.isInQuery()) {
                 continue;
             }
-            paramBuilder.append(nameValue.getName());
+            String name = nameValue.getName();
+            if (name != null) {
+                paramBuilder.append(nameValue.getName());
+            }
             String value = MappingTemplate.getParameterValue(jsonConverter, nameValue.getValue());
             if (StringUtils.isNotEmpty(value) && request.getCharset() != null) {
-                paramBuilder.append('=');
+                if (name != null) {
+                    paramBuilder.append('=');
+                }
                 String encodedValue = null;
                 try {
                     encodedValue = URLEncoder.encode(value, request.getCharset());

@@ -27,6 +27,9 @@ public class QueryLifeCycle implements ParameterAnnotationLifeCycle<Query, Objec
             variable.setIndex(parameter.getIndex());
             method.addVariable(annotation.value(), variable);
             parameter.setObjectProperties(false);
+        } else if (CharSequence.class.isAssignableFrom(parameter.getType())) {
+            parameter.setName(null);
+            parameter.setObjectProperties(false);
         } else {
             parameter.setObjectProperties(true);
         }
