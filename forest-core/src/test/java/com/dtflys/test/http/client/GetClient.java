@@ -185,4 +185,19 @@ public interface GetClient {
     @Get(url = "http://localhost:5000?token=YmZlNDYzYmVkMWZjYzgwNjExZDVhMWM1ODZmMWRhYzg0NTcyMGEwMg==")
     ForestResponse<String> testUrl();
 
+
+    @Get(
+            url = "http://localhost:${port}/hello/user?${name}",
+            headers = {"Accept:text/plain"}
+    )
+    String getWithQueryString(@DataVariable("name") String name);
+
+    @Get(
+            url = "http://localhost:${port}/hello/user",
+            headers = {"Accept:text/plain"}
+    )
+    String getWithQueryString2(@Query String name);
+
+
+
 }
