@@ -835,6 +835,7 @@ public class ForestMethod<T> implements VariableScope {
         List<RequestNameValue> dataNameValueList = new ArrayList<>();
         StringBuilder bodyBuilder = new StringBuilder();
         boolean isQueryData = false;
+        renderedContentType = request.getContentType();
         if (renderedContentType == null || renderedContentType.equalsIgnoreCase(TYPE_APPLICATION_X_WWW_FORM_URLENCODED)) {
             for (int i = 0; i < dataTemplateArray.length; i++) {
                 MappingTemplate dataTemplate = dataTemplateArray[i];
