@@ -4,6 +4,7 @@ import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.utils.ByteEncodeUtils;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
@@ -12,9 +13,9 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLDecoder;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -26,6 +27,7 @@ public class HttpclientForestResponse extends ForestResponse {
 
     private final HttpEntity entity;
 
+    private byte[] bytes;
 
 
     public HttpclientForestResponse(ForestRequest request, HttpResponse httpResponse, HttpEntity entity) {
@@ -83,12 +85,20 @@ public class HttpclientForestResponse extends ForestResponse {
                 InputStream inputStream = null;
                 try {
                     inputStream = entity.getContent();
-                    String encode = this.contentEncoding;
-                    if (StringUtils.isEmpty(encode)) {
-                        encode = "UTF-8";
+                    bytes = IOUtils.toByteArray(inputStream);
+                    String encode = null;
+                    if (StringUtils.isNotEmpty(contentEncoding)) {
+                        // 默认从Content-Encoding获取字符编码
+                        encode = contentEncoding;
+                    } else {
+                        // Content-Encoding为空的情况下，自动判断字符编码
+                        encode = ByteEncodeUtils.getCharsetName(bytes);
                     }
-                    content = IOUtils.toString(inputStream, encode);
-                    content = URLDecoder.decode(content, encode);
+                    if (encode.toUpperCase().startsWith("GB")) {
+                        // 返回的GB中文编码会有多种编码类型，这里统一使用GBK编码
+                        encode = "GBK";
+                    }
+                    content = IOUtils.toString(bytes, encode);
                 } catch (IOException e) {
                     throw new ForestRuntimeException(e);
                 }
@@ -111,11 +121,17 @@ public class HttpclientForestResponse extends ForestResponse {
 
     @Override
     public byte[] getByteArray() throws IOException {
-        return EntityUtils.toByteArray(entity);
+        if (bytes == null) {
+            bytes = EntityUtils.toByteArray(entity);
+        }
+        return bytes;
     }
 
     @Override
     public InputStream getInputStream() throws IOException {
-        return entity.getContent();
+        if (bytes == null) {
+            return entity.getContent();
+        }
+        return new ByteArrayInputStream(bytes);
     }
 }

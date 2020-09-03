@@ -4,12 +4,13 @@ import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.utils.GetByteEncode;
+import com.dtflys.forest.utils.ByteEncodeUtils;
 import com.dtflys.forest.utils.StringUtils;
 import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -59,12 +60,19 @@ public class OkHttp3ForestResponse extends ForestResponse {
                 } else if (!request.isDownloadFile() && contentType.canReadAsString()) {
                     try {
                         bytes = body.bytes();
-                        String charsetName = GetByteEncode.getCharsetName(bytes);
-                        if (charsetName.toUpperCase().startsWith("GB")) {
-                            // 返回的GB中文编码会有多种编码类型，这里统一使用GBK编码
-                            charsetName = "GBK";
+                        String encode = null;
+                        if (StringUtils.isNotEmpty(contentEncoding)) {
+                            // 默认从Content-Encoding获取字符编码
+                            encode = contentEncoding;
+                        } else {
+                            // Content-Encoding为空的情况下，自动判断字符编码
+                            encode = ByteEncodeUtils.getCharsetName(bytes);
                         }
-                        this.content = new String(bytes, Charset.forName(charsetName));
+                        if (encode.toUpperCase().startsWith("GB")) {
+                            // 返回的GB中文编码会有多种编码类型，这里统一使用GBK编码
+                            encode = "GBK";
+                        }
+                        this.content = IOUtils.toString(bytes, encode);
                     } catch (IOException e) {
                         throw new ForestRuntimeException(e);
                     }
@@ -119,6 +127,9 @@ public class OkHttp3ForestResponse extends ForestResponse {
 
     @Override
     public InputStream getInputStream() throws Exception {
+        if (bytes == null) {
+            return body.byteStream();
+        }
         return new ByteArrayInputStream(getByteArray());
     }
 
