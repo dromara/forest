@@ -5,6 +5,7 @@ import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestFastjsonConverter;
 import com.dtflys.test.http.client.PostClient;
+import com.dtflys.test.http.model.JsonTestUser3;
 import com.dtflys.test.mock.PostJsonMockServer;
 import org.junit.Assert;
 import org.junit.Before;
@@ -83,30 +84,38 @@ public class TestGetJsonClient extends BaseClientTest {
         Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
     }
 
-/*
     @Test
-    public void testJsonPost5() {
-        SimpleUser user = new SimpleUser();
+    public void testJsonPostObj1() {
+        JsonTestUser3 user = new JsonTestUser3();
         user.setUsername("foo");
         user.setPassword("123456");
-        String result = postClient.postJson5(user);
+        String result = postClient.postJsonObj1(user);
         log.info("response: " + result);
         assertNotNull(result);
         Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
     }
 
     @Test
-    public void testJsonPost6() {
-        SimpleUser user = new SimpleUser();
+    public void testJsonPostObj2() {
+        JsonTestUser3 user = new JsonTestUser3();
         user.setUsername("foo");
         user.setPassword("123456");
-        String result = postClient.postJson6(user);
+        String result = postClient.postJsonObj2(user);
         log.info("response: " + result);
         assertNotNull(result);
         Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
     }
-*/
 
+    @Test
+    public void testJsonPostObj3() {
+        JsonTestUser3 user = new JsonTestUser3();
+        user.setUsername("foo");
+        user.setPassword("123456");
+        String result = postClient.postJsonObj3(user);
+        log.info("response: " + result);
+        assertNotNull(result);
+        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
+    }
 
 
 }

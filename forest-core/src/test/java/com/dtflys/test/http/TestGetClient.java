@@ -99,10 +99,12 @@ public class TestGetClient extends BaseClientTest {
 
     @Test
     public void testTextParamInPathGet() {
-        String result = getClient.textParamInPathGet("foo");
+        String result = getClient.textParamInPathGet("foo", (data, request, response) -> {
+            response.setResult("onSuccess is ok");
+        });
         log.info("response: " + result);
         assertNotNull(result);
-        assertEquals(GetMockServer.EXPECTED, result);
+        assertEquals("onSuccess is ok", result);
     }
 
 
