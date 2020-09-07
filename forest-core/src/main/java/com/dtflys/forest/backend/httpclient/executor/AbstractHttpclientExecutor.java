@@ -173,6 +173,9 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         }
         HttpEntityEnclosingRequestBase entityEnclosingRequest = (HttpEntityEnclosingRequestBase) httpReq;
         HttpEntity entity = entityEnclosingRequest.getEntity();
+        if (entity == null) {
+            return null;
+        }
         if (entity.getContentType().getValue().startsWith("multipart/")) {
             Class[] paramTypes = new Class[0];
             Object[] args = new Object[0];
