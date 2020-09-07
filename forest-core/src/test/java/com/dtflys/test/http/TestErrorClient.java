@@ -61,12 +61,13 @@ public class TestErrorClient extends BaseClientTest {
         AtomicReference<String> content = new AtomicReference<>(null);
         String result = getClient.errorGet((ex, request, response) -> {
             content.set(response.getContent());
+            response.setResult("onError=true");
         });
         String str = content.get();
         assertNotNull(str);
         log.info("response: " + str);
         assertEquals(ErrorMockServer.EXPECTED, str);
-        assertEquals(ErrorMockServer.EXPECTED, result);
+        assertEquals("onError=true", result);
     }
 
     @Test

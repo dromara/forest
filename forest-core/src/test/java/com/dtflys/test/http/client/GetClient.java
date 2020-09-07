@@ -93,9 +93,12 @@ public interface GetClient {
 
     @Request(
             url = "http://localhost:${port}/hello/user?username=${0}",
-            headers = {"Accept:text/plain"}
+            headers = {
+                    "Accept:text/plain",
+                    "Content-Type: application/json"
+            }
     )
-    String textParamInPathGet(String username);
+    String textParamInPathGet(String username, OnSuccess onSuccess);
 
 
     @Request(

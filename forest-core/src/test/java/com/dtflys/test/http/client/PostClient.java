@@ -170,6 +170,25 @@ public interface PostClient {
     )
     String postJson4(@DataParam("username") String username, @DataParam("password") String password);
 
+    @Post(
+            url = "http://localhost:${port}/json",
+            headers = {"Content-Type: application/json; charset=utf-8"}
+    )
+    String postJsonObj1(@Body JsonTestUser3 user);
+
+    @Post(
+            url = "http://localhost:${port}/json",
+            headers = {"Content-Type: application/json; charset=utf-8"}
+    )
+    String postJsonObj2(@DataObject JsonTestUser3 user);
+
+    @Post(
+            url = "http://localhost:${port}/json",
+            data = "{\"username\":\"${user.username}\",\"password\":\"${user.password}\"}",
+            headers = {"Content-Type: application/json; charset=utf-8"}
+    )
+    String postJsonObj3(@DataVariable("user") JsonTestUser3 user);
+
     @Request(
             url = "/json",
             type = "post",
