@@ -56,26 +56,9 @@ public class OkHttp3ForestResponse extends ForestResponse {
                     this.contentEncoding = respEncodingFromHeader;
                 }
                 if (contentType == null || contentType.isEmpty()) {
-                    content = null;
+                    this.content = readContentAsString();
                 } else if (!request.isDownloadFile() && contentType.canReadAsString()) {
-                    try {
-                        bytes = body.bytes();
-                        String encode = null;
-                        if (StringUtils.isNotEmpty(contentEncoding)) {
-                            // 默认从Content-Encoding获取字符编码
-                            encode = contentEncoding;
-                        } else {
-                            // Content-Encoding为空的情况下，自动判断字符编码
-                            encode = ByteEncodeUtils.getCharsetName(bytes);
-                        }
-                        if (encode.toUpperCase().startsWith("GB")) {
-                            // 返回的GB中文编码会有多种编码类型，这里统一使用GBK编码
-                            encode = "GBK";
-                        }
-                        this.content = IOUtils.toString(bytes, encode);
-                    } catch (IOException e) {
-                        throw new ForestRuntimeException(e);
-                    }
+                    this.content = readContentAsString();
                 } else {
                     StringBuilder builder = new StringBuilder();
                     builder.append("[content-type: ")
@@ -93,6 +76,30 @@ public class OkHttp3ForestResponse extends ForestResponse {
         } else {
             this.body = null;
             this.statusCode = 404;
+        }
+    }
+
+    private String readContentAsString() {
+        try {
+            bytes = body.bytes();
+            if (bytes == null) {
+                return null;
+            }
+            String encode = null;
+            if (StringUtils.isNotEmpty(contentEncoding)) {
+                // 默认从Content-Encoding获取字符编码
+                encode = contentEncoding;
+            } else {
+                // Content-Encoding为空的情况下，自动判断字符编码
+                encode = ByteEncodeUtils.getCharsetName(bytes);
+            }
+            if (encode.toUpperCase().startsWith("GB")) {
+                // 返回的GB中文编码会有多种编码类型，这里统一使用GBK编码
+                encode = "GBK";
+            }
+            return IOUtils.toString(bytes, encode);
+        } catch (IOException e) {
+            throw new ForestRuntimeException(e);
         }
     }
 
