@@ -297,20 +297,6 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
                         future.completed(result);
                     } else {
                         retryOrDoError(response, okResponse, future, lifeCycleHandler, retryCount, startTime);
-/*
-                        ForestNetworkException networkException =
-                                new ForestNetworkException(okResponse.message(), okResponse.code(), response);
-                        ForestRetryException retryException = new ForestRetryException(
-                                networkException, AbstractOkHttp3Executor.this, request, request.getRetryCount(), retryCount);
-                        try {
-                            request.getRetryer().canRetry(retryException);
-                        } catch (Throwable throwable) {
-                            future.failed(new ForestNetworkException(okResponse.message(), okResponse.code(), response));
-                            okHttp3ResponseHandler.handleError(response);
-                            return;
-                        }
-                        execute(lifeCycleHandler, retryCount + 1);
-*/
                     }
                 }
             });
