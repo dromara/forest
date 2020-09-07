@@ -56,16 +56,16 @@ Forest 1.0.x 和 Forest 1.1.x 基于 JDK 1.7, Forest 1.2.x及以上版本基于 
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>spring-boot-starter-forest</artifactId>
-    <version>1.4.6</version>
+    <version>1.4.7</version>
 </dependency>
 ```
 
-最新版本为<font color=red>1.4.6</font>，为稳定版本
+最新版本为<font color=red>1.4.7</font>，为稳定版本
 
 如果您用的是Gradle:
 
 ```gradle
-compile group: 'com.dtflys.forest', name: 'spring-boot-starter-forest', version: '1.4.6'
+compile group: 'com.dtflys.forest', name: 'spring-boot-starter-forest', version: '1.4.7'
 ```
 
 ## 2.2 在非 Spring Boot 项目中安装
@@ -76,16 +76,16 @@ compile group: 'com.dtflys.forest', name: 'spring-boot-starter-forest', version:
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-core</artifactId>
-    <version>1.4.6</version>
+    <version>1.4.7</version>
 </dependency>
 ```
 
-最新版本为<font color=red>1.4.6</font>，为稳定版本
+最新版本为<font color=red>1.4.7</font>，为稳定版本
 
 如果您用的是Gradle:
 
 ```gradle
-compile group: 'com.dtflys.forest', name: 'forest-core', version: '1.4.6'
+compile group: 'com.dtflys.forest', name: 'forest-core', version: '1.4.7'
 ```
 
 
