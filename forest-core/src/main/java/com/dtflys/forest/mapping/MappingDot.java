@@ -27,20 +27,36 @@ public class MappingDot extends MappingExpr {
         this.right = right;
     }
 
+    public Method getPropMethodFromClass(Class clazz, MappingIdentity right) {
+        Method method = null;
+        String getterName = StringUtils.toGetterName(right.getName());
+        Throwable th = null;
+        try {
+            method = clazz.getDeclaredMethod(getterName);
+        } catch (NoSuchMethodException e) {
+            try {
+                method = clazz.getDeclaredMethod(right.getName());
+            } catch (NoSuchMethodException e1) {
+                th = e1;
+            }
+        }
+        if (method == null) {
+            if (!Object.class.equals(clazz)) {
+                return getPropMethodFromClass(clazz.getSuperclass(), right);
+            }
+            if (th != null) {
+                throw new ForestRuntimeException(th);
+            }
+        }
+        return method;
+    }
+
+
 
     public Object render(Object[] args) {
         Object obj = left.render(args);
         String getterName = StringUtils.toGetterName(right.getName());
-        Method method = null;
-        try {
-            method = obj.getClass().getDeclaredMethod(getterName);
-        } catch (NoSuchMethodException e) {
-            try {
-                method = obj.getClass().getDeclaredMethod(right.getName());
-            } catch (NoSuchMethodException e1) {
-                throw new ForestRuntimeException(e1);
-            }
-        }
+        Method method = getPropMethodFromClass(obj.getClass(), right);
         if (method == null) {
             throw new ForestRuntimeException(new NoSuchMethodException(getterName));
         }
