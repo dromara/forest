@@ -201,6 +201,11 @@ public interface GetClient {
     )
     String getWithQueryString2(@Query String name);
 
-
+    @Get(
+            url = "http://xxxxxx:yyyy@localhost:8080/hello/user",
+            headers = {"Accept:text/plain"},
+            timeout = 100
+    )
+    ForestResponse<String> getUrlWithAt();
 
 }
