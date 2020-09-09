@@ -694,6 +694,33 @@ public interface MyClient {
 }
 ```
 
+`@BaseRequest`注解中的所有字符串属性都可以通过[模板表达式](https://dt_flys.gitee.io/forest/#/?id=%E5%8D%81-%E6%A8%A1%E6%9D%BF%E8%A1%A8%E8%BE%BE%E5%BC%8F)引用[全局变量](https://dt_flys.gitee.io/forest/#/?id=_65-%E5%85%A8%E5%B1%80%E5%8F%98%E9%87%8F%E7%BB%91%E5%AE%9A)或方法中的参数。
+
+```java
+/** 若全局变量中已定义 baseUrl 和 accept，
+ *  便会将全局变量中的值绑定到 @BaseRequest 的属性中
+ */
+@BaseRequest(
+    baseUrl = "${baseUrl}",     // 默认域名
+    headers = {
+        "Accept:${accept}"                // 默认请求头
+    }
+)
+public interface MyClient {
+
+    // 方法的URL的域名将会引用全局变量中定义的 baseUrl
+    @Get(url = "/hello/user")     
+    String send1(@Query("username") String username);
+
+    // @BaseRequest 中的属性亦可以引用方法中的绑定变量名的参数
+    @Get(url = "/hello/user")
+    String send2(@DataVariable("baseUrl") String baseUrl);
+  
+
+}
+
+```
+
 ## 3.8 接受数据
 
 Forest请求会自动将响应的返回数据反序列化成您要的数据类型。想要接受指定类型的数据需要完成两步操作：
