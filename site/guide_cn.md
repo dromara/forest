@@ -697,8 +697,9 @@ public interface MyClient {
 `@BaseRequest`注解中的所有字符串属性都可以通过[模板表达式](https://dt_flys.gitee.io/forest/#/?id=%E5%8D%81-%E6%A8%A1%E6%9D%BF%E8%A1%A8%E8%BE%BE%E5%BC%8F)引用[全局变量](https://dt_flys.gitee.io/forest/#/?id=_65-%E5%85%A8%E5%B1%80%E5%8F%98%E9%87%8F%E7%BB%91%E5%AE%9A)或方法中的参数。
 
 ```java
-/** 若全局变量中已定义 baseUrl 和 accept，
- *  便会将全局变量中的值绑定到 @BaseRequest 的属性中
+/** 
+ * 若全局变量中已定义 baseUrl 和 accept，
+ * 便会将全局变量中的值绑定到 @BaseRequest 的属性中
  */
 @BaseRequest(
     baseUrl = "${baseUrl}",     // 默认域名
