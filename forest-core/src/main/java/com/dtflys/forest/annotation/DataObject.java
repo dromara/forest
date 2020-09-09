@@ -33,9 +33,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 绑定对象数据不再建议使用该注解，
+ * 若要绑定Query数据请使用 @Query 注解， 要绑定到请求体请使用 @Body 注解
  * @author gongjun
  * @since 2016-06-01
  */
+@Deprecated
 @Documented
 @ParamLifeCycle(DataObjectLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
