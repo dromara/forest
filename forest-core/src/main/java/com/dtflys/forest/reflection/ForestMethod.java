@@ -588,7 +588,7 @@ public class ForestMethod<T> implements VariableScope {
         if (userAgentTemplate != null) {
             renderedUserAgent = userAgentTemplate.render(args).trim();
         }
-        String newUrl = "";
+        String newUrl = null;
         List<RequestNameValue> nameValueList = new ArrayList<>();
         List<Object> bodyList = new ArrayList<>();
         String [] headerArray = baseMetaRequest.getHeaders();
@@ -604,9 +604,11 @@ public class ForestMethod<T> implements VariableScope {
         renderedUrl = URLUtils.getValidURL(baseUrl, renderedUrl);
         String query = "";
         String protocol = "";
+        String userInfo = null;
         try {
             URL u = new URL(renderedUrl);
             query = u.getQuery();
+            userInfo = u.getUserInfo();
             if (StringUtils.isNotEmpty(query)) {
                 String[] params = query.split("&");
                 StringBuilder queryBuilder = new StringBuilder();
@@ -641,15 +643,20 @@ public class ForestMethod<T> implements VariableScope {
             }
             protocol = u.getProtocol();
             int port = u.getPort();
-            newUrl = protocol + "://" + u.getHost();
+            StringBuilder urlBuilder = new StringBuilder();
+            urlBuilder.append(protocol).append("://");
+            if (userInfo != null) {
+                urlBuilder.append(userInfo).append('@');
+            }
+            urlBuilder.append(u.getHost());
             if (port != 80 && port > -1) {
-                newUrl += ":" + port;
+                urlBuilder.append(':').append(port);
             }
             String path = u.getPath();
             if (StringUtils.isNotEmpty(path)) {
-                newUrl += path;
+                urlBuilder.append(path);
             }
-
+            newUrl = urlBuilder.toString();
         } catch (MalformedURLException e) {
             throw new ForestRuntimeException(e);
         }
@@ -663,6 +670,10 @@ public class ForestMethod<T> implements VariableScope {
                 .setSslProtocol(sslProtocol)
                 .setLogEnable(logEnable)
                 .setAsync(async);
+
+        if (StringUtils.isNotEmpty(userInfo)) {
+            request.setUserInfo(userInfo);
+        }
 
         if (StringUtils.isNotEmpty(renderedContentType)) {
             request.setContentType(renderedContentType);

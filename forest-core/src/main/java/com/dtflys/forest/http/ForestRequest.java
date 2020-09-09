@@ -62,6 +62,8 @@ public class ForestRequest<T> {
 
     private String url;
 
+    private String userInfo;
+
     private Map<String, Object> query = new LinkedHashMap<>();
 
     private ForestRequestType type;
@@ -151,6 +153,15 @@ public class ForestRequest<T> {
 
     public ForestRequest setUrl(String url) {
         this.url = url;
+        return this;
+    }
+
+    public String getUserInfo() {
+        return userInfo;
+    }
+
+    public ForestRequest setUserInfo(String userInfo) {
+        this.userInfo = userInfo;
         return this;
     }
 
