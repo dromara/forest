@@ -704,7 +704,7 @@ public interface MyClient {
 @BaseRequest(
     baseUrl = "${baseUrl}",     // 默认域名
     headers = {
-        "Accept:${accept}"                // 默认请求头
+        "Accept:${accept}"      // 默认请求头
     }
 )
 public interface MyClient {
