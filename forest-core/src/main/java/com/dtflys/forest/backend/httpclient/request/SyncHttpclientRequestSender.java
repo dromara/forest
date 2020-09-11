@@ -74,7 +74,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
         if (!request.isLogEnable()) {
             return;
         }
-        long endTime = new Date().getTime();
+        long endTime = System.currentTimeMillis();
         long time = endTime - startTime;
         logContent("Response: Status = " + response.getStatusCode() + ", Time = " + time + "ms");
     }
@@ -104,7 +104,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
                 lifeCycleHandler.handleSyncWitchException(request, response, e);
                 return;
             }
-            startTime = new Date().getTime();
+            startTime = System.currentTimeMillis();
             sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, startTime, retryCount + 1);
         } finally {
             connectionManager.afterConnect();

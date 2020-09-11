@@ -118,7 +118,7 @@ public class SyncHttpclientRequestSender2 extends AbstractHttpclientRequestSende
                     return;
                 }
             }
-            startTime = new Date().getTime();
+            startTime = System.currentTimeMillis();
             sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, startTime, retryCount + 1);
 
         }

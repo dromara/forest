@@ -144,7 +144,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         if (!request.isLogEnable()) {
             return;
         }
-        long endTime = new Date().getTime();
+        long endTime = System.currentTimeMillis();
         long time = endTime - startTime;
         logContent("Response: Status = " + response.getStatusCode() + ", Time = " + time + "ms");
     }
