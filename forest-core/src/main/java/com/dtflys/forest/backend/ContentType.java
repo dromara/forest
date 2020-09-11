@@ -32,7 +32,7 @@ public class ContentType {
         if (group.length > 1) {
             String chartExpr = group[1];
             String[] expr = chartExpr.split("=");
-            if (expr[0].trim().equalsIgnoreCase("charset")
+            if ("charset".equalsIgnoreCase(expr[0].trim())
                     && expr.length > 1) {
                 this.charset = expr[1].trim();
             }
@@ -56,14 +56,14 @@ public class ContentType {
     }
 
     public boolean isApplication() {
-        return type.equals("application");
+        return "application".equals(type);
     }
 
     public boolean isJson() {
         if (subType == null) {
             return false;
         }
-        return subType.equals("json");
+        return "json".equals(subType);
     }
 
     public boolean isXml() {
@@ -77,56 +77,56 @@ public class ContentType {
         if (subType == null) {
             return false;
         }
-        return subType.equals("zip");
+        return "zip".equals(subType);
     }
 
     public boolean isJavaScript() {
         if (subType == null) {
             return false;
         }
-        return subType.equals("javascript");
+        return "javascript".equals(subType);
     }
 
     public boolean isOctetStream() {
         if (subType == null) {
             return false;
         }
-        return subType.equals("octet-stream");
+        return "octet-stream".equals(subType);
     }
 
     public boolean isOgg() {
         if (subType == null) {
             return false;
         }
-        return subType.equals("ogg");
+        return "ogg".equals(subType);
     }
 
     public boolean isPdf() {
         if (subType == null) {
             return false;
         }
-        return subType.equals("pdf");
+        return "pdf".equals(subType);
     }
 
 
     public boolean isText() {
-        return type.equals("text");
+        return "text".equals(type);
     }
 
     public boolean isAudio() {
-        return type.equals("audio");
+        return "audio".equals(type);
     }
 
     public boolean isImage() {
-        return type.equals("image");
+        return "image".equals(type);
     }
 
     public boolean isMultipart() {
-        return type.equals("multipart");
+        return "multipart".equals(type);
     }
 
     public boolean isVideo() {
-        return type.equals("video");
+        return "video".equals(type);
     }
 
     public boolean canReadAsString() {

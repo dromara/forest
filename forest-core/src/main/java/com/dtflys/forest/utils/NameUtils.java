@@ -41,9 +41,9 @@ public class NameUtils {
     public static String setterName(String name) {
         String[] strs = splitCamelName(name);
         String prefix = strs[0];
-        if (prefix.equals("set")) {
+        if ("set".equals(prefix)) {
             return name;
-        } else if (prefix.equals("is")) {
+        } else if ("is".equals(prefix)) {
             StringBuilder builder = new StringBuilder("set");
             for (int i = 1; i < strs.length; i++) {
                 String str = strs[i];

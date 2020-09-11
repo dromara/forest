@@ -105,10 +105,10 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         String methodName = method.getName();
-        if (methodName.equals("toString") && (args == null || args.length == 0)) {
+        if ("toString".equals(methodName) && (args == null || args.length == 0)) {
             return "{Forest Proxy Object of " + interfaceClass.getName() + "}";
         }
-        if (methodName.equals("equals") && (args != null && args.length == 1)) {
+        if ("equals".equals(methodName) && (args != null && args.length == 1)) {
             Object obj = args[0];
             if (Proxy.isProxyClass(obj.getClass())) {
                 InvocationHandler h1 = Proxy.getInvocationHandler(proxy);
