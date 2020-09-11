@@ -124,7 +124,9 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
     }
 
     public void logRequest(int retryCount, T httpReq) {
-        if (!request.isLogEnable()) return;
+        if (!request.isLogEnable()) {
+            return;
+        }
         String requestLine = getLogContentForRequestLine(retryCount, httpReq);
         String headers = getLogContentForHeaders(httpReq);
         String body = getLogContentForBody(httpReq);
@@ -139,7 +141,9 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
     }
 
     public void logResponse(long startTime, ForestResponse response) {
-        if (!request.isLogEnable()) return;
+        if (!request.isLogEnable()) {
+            return;
+        }
         long endTime = new Date().getTime();
         long time = endTime - startTime;
         logContent("Response: Status = " + response.getStatusCode() + ", Time = " + time + "ms");

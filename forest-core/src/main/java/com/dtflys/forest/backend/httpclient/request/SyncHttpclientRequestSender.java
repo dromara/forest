@@ -61,7 +61,9 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
 
 
     public static void logResponse(ForestRequest request, ForestResponse response) {
-        if (!request.isLogEnable()) return;
+        if (!request.isLogEnable()) {
+            return;
+        }
         logContent("Response: Status=" + response.getStatusCode());
         if (response.isSuccess()) {
             logContent("Response: Content=" + response.getContent());
@@ -69,7 +71,9 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
     }
 
     public void logResponse(long startTime, ForestResponse response) {
-        if (!request.isLogEnable()) return;
+        if (!request.isLogEnable()) {
+            return;
+        }
         long endTime = new Date().getTime();
         long time = endTime - startTime;
         logContent("Response: Status = " + response.getStatusCode() + ", Time = " + time + "ms");

@@ -20,7 +20,9 @@ import java.util.concurrent.Future;
 public class ResultHandler {
 
     protected boolean isReceivedResponseData(ForestResponse response) {
-        if (response == null) return false;
+        if (response == null) {
+            return false;
+        }
         return response.isReceivedResponseData();
     }
 

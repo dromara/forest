@@ -57,7 +57,9 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         for (int i = 0; i < nameValueList.size(); i++) {
             RequestNameValue nameValue = nameValueList.get(i);
-            if (!nameValue.isInBody()) continue;
+            if (!nameValue.isInBody()) {
+                continue;
+            }
             String name = nameValue.getName();
             Object value = nameValue.getValue();
             bodyBuilder.addEncoded(name, MappingTemplate.getParameterValue(jsonConverter, value));
@@ -81,7 +83,9 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         for (int i = 0; i < nameValueList.size(); i++) {
             RequestNameValue nameValue = nameValueList.get(i);
-            if (!nameValue.isInBody()) continue;
+            if (!nameValue.isInBody()) {
+                continue;
+            }
             String name = nameValue.getName();
             Object value = nameValue.getValue();
             bodyBuilder.addFormDataPart(name, MappingTemplate.getParameterValue(jsonConverter, value));

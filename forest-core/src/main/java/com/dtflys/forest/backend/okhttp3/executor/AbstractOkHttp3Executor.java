@@ -177,7 +177,9 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
     }
 
     public void logRequest(int retryCount,  Request okRequest) {
-        if (!request.isLogEnable()) return;
+        if (!request.isLogEnable()) {
+            return;
+        }
         okRequest.url().uri().toString();
         String requestLine = getLogContentForRequestLine(retryCount, okRequest);
         String headers = getLogContentForHeaders(okRequest);
@@ -193,7 +195,9 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
     }
 
     public void logResponse(long startTime,  ForestResponse response) {
-        if (!request.isLogEnable()) return;
+        if (!request.isLogEnable()) {
+            return;
+        }
         long endTime = new Date().getTime();
         long time = endTime - startTime;
         logContent("Response: Status = " + response.getStatusCode() + ", Time = " + time + "ms");

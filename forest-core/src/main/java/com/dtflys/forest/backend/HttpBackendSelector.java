@@ -44,9 +44,13 @@ public class HttpBackendSelector {
 
         HttpBackend backend = null;
         backend = findOkHttp3BackendInstance();
-        if (backend != null) return backend;
+        if (backend != null) {
+            return backend;
+        }
         backend = findHttpclientBackendInstance();
-        if (backend != null) return backend;
+        if (backend != null) {
+            return backend;
+        }
         throw new ForestRuntimeException("Http Backed is undefined.");
     }
 

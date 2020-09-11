@@ -34,7 +34,9 @@ public class SyncHttpclientRequestSender2 extends AbstractHttpclientRequestSende
 
 
     public static void logResponse(ForestRequest request, ForestResponse response) {
-        if (!request.isLogEnable()) return;
+        if (!request.isLogEnable()) {
+            return;
+        }
         logContent("Response: Status=" + response.getStatusCode());
         if (response.isSuccess()) {
             logContent("Response: Content=" + response.getContent());
