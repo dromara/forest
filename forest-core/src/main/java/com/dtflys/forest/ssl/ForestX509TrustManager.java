@@ -54,6 +54,7 @@ public class ForestX509TrustManager implements X509TrustManager {
     /*
      * Delegate to the default trust manager.
      */
+    @Override
     public void checkClientTrusted(X509Certificate[] chain, String authType)
             throws CertificateException {
         try {
@@ -65,6 +66,7 @@ public class ForestX509TrustManager implements X509TrustManager {
     /*
      * Delegate to the default trust manager.
      */
+    @Override
     public void checkServerTrusted(X509Certificate[] chain, String authType)
             throws CertificateException {
         try {
@@ -79,6 +81,7 @@ public class ForestX509TrustManager implements X509TrustManager {
     /*
      * Merely pass this through.
      */
+    @Override
     public X509Certificate[] getAcceptedIssuers() {
         return sunJSSEX509TrustManager.getAcceptedIssuers();
     }

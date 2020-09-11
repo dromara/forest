@@ -35,6 +35,7 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
         final ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
 
         final Future<HttpResponse> future = client.execute(httpRequest, new FutureCallback<HttpResponse>() {
+            @Override
             public void completed(final HttpResponse httpResponse) {
                 ForestResponse response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler);
                 if (response.isError()) {
@@ -54,6 +55,7 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
                 responseHandler.handleSuccess(response);
             }
 
+            @Override
             public void failed(final Exception ex) {
                 synchronized (client) {
                     try {
@@ -73,6 +75,7 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
                 sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, startTime, retryCount + 1);
             }
 
+            @Override
             public void cancelled() {
                 synchronized (client) {
                     try {

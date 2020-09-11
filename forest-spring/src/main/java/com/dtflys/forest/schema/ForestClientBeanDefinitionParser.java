@@ -19,6 +19,7 @@ public class ForestClientBeanDefinitionParser implements BeanDefinitionParser {
 
     private final Class factoryBeanClass = ClientFactoryBean.class;
 
+    @Override
     public BeanDefinition parse(Element element, ParserContext parserContext) {
         RootBeanDefinition beanDefinition = new RootBeanDefinition();
 

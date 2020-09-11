@@ -113,11 +113,13 @@ public class ForestMethod<T> implements VariableScope {
         processInterfaceMethods();
     }
 
+    @Override
     public ForestConfiguration getConfiguration() {
         return configuration;
     }
 
 
+    @Override
     public Object getVariableValue(String name) {
         Object value = configuration.getVariableValue(name);
         return value;
@@ -133,6 +135,7 @@ public class ForestMethod<T> implements VariableScope {
     }
 
 
+    @Override
     public MappingVariable getVariable(String name) {
         return variables.get(name);
     }

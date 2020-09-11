@@ -52,17 +52,20 @@ public class SyncHttpclientRequestSender2 extends AbstractHttpclientRequestSende
         Future<HttpResponse> future = null;
         try {
             future = client.execute(httpRequest, new FutureCallback<HttpResponse>() {
+                @Override
                 public void completed(final HttpResponse httpResponse) {
                     ForestResponse response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler);
                     forestResponseRef.set(response);
                 }
 
+                @Override
                 public void failed(final Exception ex) {
                     ForestResponse response = forestResponseFactory.createResponse(request, null, lifeCycleHandler);
                     forestResponseRef.set(response);
                     exceptionRef.set(ex);
                 }
 
+                @Override
                 public void cancelled() {
                 }
             });

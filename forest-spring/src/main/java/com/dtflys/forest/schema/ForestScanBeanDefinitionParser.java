@@ -14,6 +14,7 @@ import org.w3c.dom.Element;
  */
 public class ForestScanBeanDefinitionParser implements BeanDefinitionParser {
 
+    @Override
     public BeanDefinition parse(Element element, ParserContext parserContext) {
         String configurationId = element.getAttribute("configuration");
         ClassPathClientScanner scanner = new ClassPathClientScanner(configurationId, parserContext.getRegistry());

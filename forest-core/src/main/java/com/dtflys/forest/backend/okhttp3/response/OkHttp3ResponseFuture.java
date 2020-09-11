@@ -94,6 +94,7 @@ public class OkHttp3ResponseFuture implements Future<Object> {
         return true;
     }
 
+    @Override
     public boolean cancel(final boolean mayInterruptIfRunning) {
         synchronized(this) {
             if (this.completed) {

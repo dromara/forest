@@ -37,6 +37,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
     public ForestConfigurationBeanDefinitionParser() {
     }
 
+    @Override
     public BeanDefinition parse(Element element, ParserContext parserContext) {
         RootBeanDefinition beanDefinition = new RootBeanDefinition();
 

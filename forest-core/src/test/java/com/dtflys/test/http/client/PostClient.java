@@ -143,32 +143,32 @@ public interface PostClient {
     @Request(
             url = "http://localhost:${port}/json",
             type = "post",
-            data = "{\"username\":\"${0}\",\"password\":\"${1}\"}",
+            data = "{\"username\":\"${0}\",\"password\":\"${1}\",\"cn_name\":\"${2}\"}",
             contentType = "application/json; charset=utf-8"
     )
-    String postJson(String username, String password);
+    String postJson(String username, String password, String cnName);
 
     @Request(
             url = "http://localhost:${port}/json",
             type = "post",
-            data = "{\"username\":\"${0}\",\"password\":\"${1}\"}",
+            data = "{\"username\":\"${0}\",\"password\":\"${1}\",\"cn_name\":\"${2}\"}",
             headers = {"Content-Type: application/json; charset=utf-8"}
     )
-    String postJson2(String username, String password);
+    String postJson2(String username, String password, String cnName);
 
     @Request(
             url = "http://localhost:${port}/json",
             type = "post",
             contentType = "application/json; charset=utf-8"
     )
-    String postJson3(@DataParam("username") String username, @DataParam("password") String password);
+    String postJson3(@DataParam("username") String username, @DataParam("password") String password, @DataParam("cn_name") String cnName);
 
     @Request(
             url = "http://localhost:${port}/json",
             type = "post",
             headers = {"Content-Type: application/json; charset=utf-8"}
     )
-    String postJson4(@DataParam("username") String username, @DataParam("password") String password);
+    String postJson4(@DataParam("username") String username, @DataParam("password") String password, @DataParam("cn_name") String cnName);
 
     @Post(
             url = "http://localhost:${port}/json",
@@ -184,10 +184,22 @@ public interface PostClient {
 
     @Post(
             url = "http://localhost:${port}/json",
-            data = "{\"username\":\"${user.username}\",\"password\":\"${user.password}\"}",
+            data = "{\"username\":\"${user.username}\",\"password\":\"${user.password}\",\"cn_name\":\"${user.cnName}\"}",
             headers = {"Content-Type: application/json; charset=utf-8"}
     )
     String postJsonObj3(@DataVariable("user") JsonTestUser3 user);
+
+    @Post(
+            url = "http://localhost:${port}/json",
+            headers = {"Content-Type: application/json; charset=utf-8"}
+    )
+    String postBodyString1(@Body String body);
+
+    @Post(
+            url = "http://localhost:${port}/json",
+            headers = {"Content-Type: application/json; charset=utf-8"}
+    )
+    String postBodyString2(@Body("") String body);
 
     @Request(
             url = "/json",

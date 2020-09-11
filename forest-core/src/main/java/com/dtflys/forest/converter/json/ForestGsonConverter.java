@@ -15,6 +15,7 @@ import java.util.*;
  */
 public class ForestGsonConverter implements ForestJsonConverter {
 
+    @Override
     public <T> T convertToJavaObject(String source, Class<T> targetType) {
         try {
             if (Map.class.isAssignableFrom(targetType)) {
@@ -34,6 +35,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
         }
     }
 
+    @Override
     public <T> T convertToJavaObject(String source, Type targetType) {
         try {
             if (targetType instanceof ParameterizedType
@@ -130,6 +132,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
         return list;
     }
 
+    @Override
     public String encodeToString(Object obj) {
         Gson gson = new Gson();
         return gson.toJson(obj);

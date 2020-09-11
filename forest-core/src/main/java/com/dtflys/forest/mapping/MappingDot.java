@@ -53,6 +53,7 @@ public class MappingDot extends MappingExpr {
 
 
 
+    @Override
     public Object render(Object[] args) {
         Object obj = left.render(args);
         String getterName = StringUtils.toGetterName(right.getName());

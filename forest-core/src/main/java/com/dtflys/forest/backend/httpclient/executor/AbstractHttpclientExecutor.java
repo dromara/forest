@@ -275,6 +275,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         return body;
     }
 
+    @Override
     public void execute(LifeCycleHandler lifeCycleHandler) {
         prepare(lifeCycleHandler);
         execute(0, lifeCycleHandler);
@@ -305,6 +306,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         }
     }
 
+    @Override
     public void close() {
 /*
         if (httpResponse != null) {

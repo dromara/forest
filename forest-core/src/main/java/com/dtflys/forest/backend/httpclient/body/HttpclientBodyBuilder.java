@@ -31,6 +31,7 @@ import java.util.*;
 public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> extends AbstractBodyBuilder<T> {
 
 
+    @Override
     protected void setStringBody(T httpReq, String text, String charset, String contentType, boolean mergeCharset) {
         StringEntity entity = new StringEntity(text, charset);
         if (StringUtils.isNotEmpty(charset) && mergeCharset) {
@@ -46,6 +47,7 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
         httpReq.setEntity(entity);
     }
 
+    @Override
     protected void setFormBody(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList) {
         List<NameValuePair> nameValuePairs = new ArrayList<>(nameValueList.size());
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();

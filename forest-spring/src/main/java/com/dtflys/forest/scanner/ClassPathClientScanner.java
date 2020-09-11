@@ -55,6 +55,7 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
         if (allInterfaces) {
             // include all interfaces
             addIncludeFilter(new TypeFilter() {
+                @Override
                 public boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory) throws IOException {
                     return true;
                 }
@@ -63,6 +64,7 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
 
         // exclude package-info.java
         addExcludeFilter(new TypeFilter() {
+            @Override
             public boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory) throws IOException {
                 String className = metadataReader.getClassMetadata().getClassName();
                 return className.endsWith("package-info");

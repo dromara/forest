@@ -35,6 +35,7 @@ public class ClientFactoryBean<T> implements FactoryBean<T>, ApplicationContextA
         this.interfaceClass = interfaceClass;
     }
 
+    @Override
     public T getObject() throws Exception {
         if (forestConfiguration == null) {
             synchronized (this) {
@@ -52,10 +53,12 @@ public class ClientFactoryBean<T> implements FactoryBean<T>, ApplicationContextA
         return forestConfiguration.createInstance(interfaceClass);
     }
 
+    @Override
     public Class<?> getObjectType() {
         return interfaceClass;
     }
 
+    @Override
     public boolean isSingleton() {
         return true;
     }

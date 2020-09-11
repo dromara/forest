@@ -54,7 +54,7 @@ public class TestGetJsonClient extends BaseClientTest {
 
     @Test
     public void testJsonPost() {
-        String result = postClient.postJson("foo", "123456");
+        String result = postClient.postJson("foo", "123456&&++===", "中文名");
         log.info("response: " + result);
         assertNotNull(result);
         Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
@@ -62,7 +62,7 @@ public class TestGetJsonClient extends BaseClientTest {
 
     @Test
     public void testJsonPost2() {
-        String result = postClient.postJson2("foo", "123456");
+        String result = postClient.postJson2("foo", "123456&&++===", "中文名");
         log.info("response: " + result);
         assertNotNull(result);
         Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
@@ -70,7 +70,7 @@ public class TestGetJsonClient extends BaseClientTest {
 
     @Test
     public void testJsonPost3() {
-        String result = postClient.postJson3("foo", "123456");
+        String result = postClient.postJson3("foo", "123456&&++===", "中文名");
         log.info("response: " + result);
         assertNotNull(result);
         Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
@@ -78,7 +78,7 @@ public class TestGetJsonClient extends BaseClientTest {
 
     @Test
     public void testJsonPost4() {
-        String result = postClient.postJson4("foo", "123456");
+        String result = postClient.postJson4("foo", "123456&&++===", "中文名");
         log.info("response: " + result);
         assertNotNull(result);
         Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
@@ -88,7 +88,8 @@ public class TestGetJsonClient extends BaseClientTest {
     public void testJsonPostObj1() {
         JsonTestUser3 user = new JsonTestUser3();
         user.setUsername("foo");
-        user.setPassword("123456");
+        user.setPassword("123456&&++===");
+        user.setCnName("中文名");
         String result = postClient.postJsonObj1(user);
         log.info("response: " + result);
         assertNotNull(result);
@@ -99,7 +100,8 @@ public class TestGetJsonClient extends BaseClientTest {
     public void testJsonPostObj2() {
         JsonTestUser3 user = new JsonTestUser3();
         user.setUsername("foo");
-        user.setPassword("123456");
+        user.setPassword("123456&&++===");
+        user.setCnName("中文名");
         String result = postClient.postJsonObj2(user);
         log.info("response: " + result);
         assertNotNull(result);
@@ -110,12 +112,28 @@ public class TestGetJsonClient extends BaseClientTest {
     public void testJsonPostObj3() {
         JsonTestUser3 user = new JsonTestUser3();
         user.setUsername("foo");
-        user.setPassword("123456");
+        user.setPassword("123456&&++===");
+        user.setCnName("中文名");
         String result = postClient.postJsonObj3(user);
         log.info("response: " + result);
         assertNotNull(result);
         Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
     }
 
+    @Test
+    public void testPostBodyString1() {
+        String result = postClient.postBodyString1("{\"username\":\"foo\",\"password\":\"123456&&++===\",\"cn_name\":\"中文名\"}");
+        log.info("response: " + result);
+        assertNotNull(result);
+        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
+    }
+
+    @Test
+    public void testPostBodyString2() {
+        String result = postClient.postBodyString2("{\"username\":\"foo\",\"password\":\"123456&&++===\",\"cn_name\":\"中文名\"}");
+        log.info("response: " + result);
+        assertNotNull(result);
+        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
+    }
 
 }

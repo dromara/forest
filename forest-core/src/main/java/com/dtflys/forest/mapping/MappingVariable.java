@@ -11,6 +11,7 @@ public class MappingVariable extends MappingParameter {
         this.name = name;
     }
 
+    @Override
     public String getName() {
         return name;
     }

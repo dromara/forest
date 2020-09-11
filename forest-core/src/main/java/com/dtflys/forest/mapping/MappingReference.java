@@ -19,6 +19,7 @@ public class MappingReference extends MappingExpr {
         return name;
     }
 
+    @Override
     public Object render(Object[] args) {
         MappingVariable variable = variableScope.getVariable(name);
         if (variable != null) {

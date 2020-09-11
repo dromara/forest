@@ -52,10 +52,12 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
     protected void prepareSocket(SSLSocket socket) throws IOException {
     }
 
+    @Override
     public Socket createSocket(HttpContext context) throws IOException {
         return SocketFactory.getDefault().createSocket();
     }
 
+    @Override
     public Socket connectSocket(int connectTimeout, Socket socket, HttpHost host, InetSocketAddress remoteAddress, InetSocketAddress localAddress, HttpContext context) throws IOException {
         System.out.println("current request: " + getCurrentRequest());
         Args.notNull(host, "HTTP host");
@@ -107,8 +109,7 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
         return request;
     }
 
-
-
+    @Override
     public Socket createLayeredSocket(Socket socket, String target, int port, HttpContext context) throws IOException {
         ForestRequest request = getCurrentRequest();
         if (request == null) {

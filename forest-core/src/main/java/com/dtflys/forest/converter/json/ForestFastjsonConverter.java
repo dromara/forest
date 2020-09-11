@@ -79,6 +79,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         }
     }
 
+    @Override
     public <T> T convertToJavaObject(String source, Class<T> targetType) {
         try {
             return JSON.parseObject(source, targetType);
@@ -87,6 +88,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         }
     }
 
+    @Override
     public <T> T convertToJavaObject(String source, Type targetType) {
         try {
             return JSON.parseObject(source, targetType);
@@ -105,8 +107,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
 
     }
 
-
-
+    @Override
     public String encodeToString(Object obj) {
         if (obj instanceof CharSequence) {
             obj.toString();

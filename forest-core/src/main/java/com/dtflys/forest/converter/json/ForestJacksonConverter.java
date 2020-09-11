@@ -24,6 +24,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         mapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
     }
 
+    @Override
     public <T> T convertToJavaObject(String source, Class<T> targetType) {
         try {
             return mapper.readValue(source, targetType);
@@ -32,6 +33,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         }
     }
 
+    @Override
     public <T> T convertToJavaObject(String source, Type targetType) {
         try {
             return mapper.readValue(source, mapper.getTypeFactory().constructType(targetType));
@@ -58,9 +60,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         }
     }
 
-
-
-
+    @Override
     public String encodeToString(Object obj) {
         try {
             return mapper.writeValueAsString(obj);

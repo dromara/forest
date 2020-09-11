@@ -39,8 +39,10 @@ public abstract class AbstractHttpExecutor implements HttpExecutor {
     }
 */
 
+    @Override
     public abstract void execute(LifeCycleHandler lifeCycleHandler);
 
+    @Override
     public abstract void close();
 
 }

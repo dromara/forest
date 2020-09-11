@@ -8,6 +8,7 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
  */
 public class ForestNamespaceHandler extends NamespaceHandlerSupport {
 
+    @Override
     public void init() {
         registerBeanDefinitionParser("configuration", new ForestConfigurationBeanDefinitionParser());
         registerBeanDefinitionParser("client", new ForestClientBeanDefinitionParser());
