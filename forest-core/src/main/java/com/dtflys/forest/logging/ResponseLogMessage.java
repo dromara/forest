@@ -2,6 +2,10 @@ package com.dtflys.forest.logging;
 
 import com.dtflys.forest.http.ForestResponse;
 
+/**
+ * @author gongjun[jun.gong@thebeastshop.com]
+ * @since 2020-09-14 17:31
+ */
 public class ResponseLogMessage {
 
     private ForestResponse response;

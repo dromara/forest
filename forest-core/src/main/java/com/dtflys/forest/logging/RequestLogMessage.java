@@ -2,19 +2,23 @@ package com.dtflys.forest.logging;
 
 import com.dtflys.forest.http.ForestRequest;
 
+import java.util.List;
+
+/**
+ * @author gongjun[jun.gong@thebeastshop.com]
+ * @since 2020-09-14 17:31
+ */
 public class RequestLogMessage {
 
     private ForestRequest request;
 
     private String type;
 
-    private String url;
+    private String requestLine;
 
-    private String protocol;
+    private List<HeaderMessage> headers;
 
-    private String header;
-
-    private String body;
+    private List<String> body;
 
     public ForestRequest getRequest() {
         return request;
@@ -32,35 +36,28 @@ public class RequestLogMessage {
         this.type = type;
     }
 
-    public String getUrl() {
-        return url;
+
+    public String getRequestLine() {
+        return requestLine;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setRequestLine(String requestLine) {
+        this.requestLine = requestLine;
     }
 
-    public String getProtocol() {
-        return protocol;
+    public List<HeaderMessage> getHeaders() {
+        return headers;
     }
 
-    public void setProtocol(String protocol) {
-        this.protocol = protocol;
+    public void setHeaders(List<HeaderMessage> headers) {
+        this.headers = headers;
     }
 
-    public String getHeader() {
-        return header;
-    }
-
-    public void setHeader(String header) {
-        this.header = header;
-    }
-
-    public String getBody() {
+    public List<String> getBody() {
         return body;
     }
 
-    public void setBody(String body) {
+    public void setBody(List<String> body) {
         this.body = body;
     }
 }
