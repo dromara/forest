@@ -6,6 +6,7 @@ import com.dtflys.forest.backend.url.URLBuilder;
 import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.logging.RequestLogMessage;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.backend.okhttp3.conn.OkHttp3ConnectionManager;
@@ -180,10 +181,12 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
         if (!request.isLogEnable()) {
             return;
         }
+        RequestLogMessage requestLogMessage = new RequestLogMessage();
         okRequest.url().uri().toString();
         String requestLine = getLogContentForRequestLine(retryCount, okRequest);
         String headers = getLogContentForHeaders(okRequest);
         String body = getLogContentForBody(okRequest);
+        requestLogMessage.setRequestLine(requestLine);
         String content = "Request: \n\t" + requestLine;
         if (StringUtils.isNotEmpty(headers)) {
             content += "\n\tHeaders: \n" + headers;
