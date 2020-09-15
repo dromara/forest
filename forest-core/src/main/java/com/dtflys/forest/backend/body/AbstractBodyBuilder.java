@@ -59,16 +59,12 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                 charset = "UTF-8";
             }
         }
-        String requestBody = request.getRequestBody();
+//        String requestBody = request.getRequestBody();
 
         if (StringUtils.isEmpty(mineType)) {
             mineType = TYPE_APPLICATION_X_WWW_FORM_URLENCODED;
         }
         List<RequestNameValue> nameValueList = request.getDataNameValueList();
-        if (requestBody != null) {
-            setStringBody(httpRequest, requestBody, charset, contentType, mergeCharset);
-            return;
-        }
 
         if (mineType.equals(TYPE_APPLICATION_X_WWW_FORM_URLENCODED)) {
             setFormBody(httpRequest, request, charset, contentType, nameValueList);
