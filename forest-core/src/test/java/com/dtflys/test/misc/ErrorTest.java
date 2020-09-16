@@ -23,7 +23,10 @@ public class ErrorTest extends TestCase {
     ForestConfiguration configuration = ForestConfiguration.configuration();
     ErrorClient errorClient = configuration.createInstance(ErrorClient.class);
 
+
+
     public void testError() {
+        configuration.setTimeout(10);
         boolean t = false;
         try {
             String result = errorClient.testError();
@@ -34,6 +37,7 @@ public class ErrorTest extends TestCase {
     }
 
     public void testErrorCallback() {
+        configuration.setTimeout(10);
         final AtomicInteger count = new AtomicInteger(0);
         final boolean[] ts = new boolean[] {false};
         errorClient.testError(new OnError() {

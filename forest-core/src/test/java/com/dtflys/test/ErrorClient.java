@@ -12,10 +12,10 @@ import com.dtflys.forest.http.ForestResponse;
  */
 public interface ErrorClient {
 
-    @Request(url = "http://this_is_a_error_address", timeout = 10)
+    @Request(url = "http://this_is_a_error_address")
     String testError();
 
-    @Request(url = "http://this_is_a_error_address", timeout = 10)
+    @Request(url = "http://this_is_a_error_address")
     String testError(OnError onError);
 
 

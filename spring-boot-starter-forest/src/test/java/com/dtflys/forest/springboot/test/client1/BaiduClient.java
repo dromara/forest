@@ -1,6 +1,7 @@
 package com.dtflys.forest.springboot.test.client1;
 
 import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.http.ForestResponse;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -9,9 +10,8 @@ import com.dtflys.forest.annotation.Request;
 public interface BaiduClient {
 
     @Request(
-            url = "http://www.baidu.com",
-            timeout = 80000
+            url = "http://132.21.17.33:2552/xxx/test"
     )
-    String index();
+    ForestResponse<String> testTimeout();
 
 }
