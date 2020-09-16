@@ -39,7 +39,6 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                 if (value.length() > 0) {
                     contentType = value;
                 }
-//                request.getHeaders().remove("Content-Type");
             }
         }
 
@@ -59,14 +58,13 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                 charset = "UTF-8";
             }
         }
-//        String requestBody = request.getRequestBody();
 
         if (StringUtils.isEmpty(mineType)) {
             mineType = TYPE_APPLICATION_X_WWW_FORM_URLENCODED;
         }
         List<RequestNameValue> nameValueList = request.getDataNameValueList();
 
-        if (mineType.equals(TYPE_APPLICATION_X_WWW_FORM_URLENCODED)) {
+        if (mineType.equals(TYPE_APPLICATION_X_WWW_FORM_URLENCODED) && !nameValueList.isEmpty()) {
             setFormBody(httpRequest, request, charset, contentType, nameValueList);
         }
         else if (mineType.equals(TYPE_APPLICATION_JSON)) {
@@ -89,6 +87,8 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                     text = jsonConverter.encodeToString(toJsonObj);
                 }
                 setStringBody(httpRequest, text, charset, contentType, mergeCharset);
+            } else {
+                setStringBody(httpRequest, "", charset, contentType, mergeCharset);
             }
         }
         else if (mineType.startsWith("multipart/")) {
@@ -116,20 +116,6 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
     protected abstract void setFormBody(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList);
 
     protected abstract void setFileBody(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList,  List<ForestMultipart> multiparts, LifeCycleHandler lifeCycleHandler);
-
-    private List convertNameValueListToList(ForestRequest request, List<RequestNameValue> nameValueList) {
-        List list = new LinkedList();
-        for (int i = 0; i < nameValueList.size(); i++) {
-            RequestNameValue nameValue = nameValueList.get(i);
-            String name = nameValue.getName();
-            Object value = nameValue.getValue();
-            if (StringUtils.isNotEmpty(name) && value == null) {
-                list.add(name);
-            }
-        }
-        return list;
-    }
-
 
     private Map<String, Object> convertNameValueListToMap(ForestRequest request, List<RequestNameValue> nameValueList) {
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
