@@ -11,11 +11,11 @@
 <a href="https://travis-ci.org/github/mySingleLive/forest">
     <img src="https://api.travis-ci.org/mySingleLive/forest.svg?branch=master&status=passed" alt="Build">
 </a>
-<a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.4.9/jar">
-    <img src="https://img.shields.io/badge/maven%20central-1.4.9-brightgreen.svg" alt="Maven Central">
+<a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.4.10/jar">
+    <img src="https://img.shields.io/badge/maven%20central-1.4.10-brightgreen.svg" alt="Maven Central">
 </a>
-<a href="https://gitee.com/dt_flys/forest/releases/v1.4.9">
-    <img src="https://img.shields.io/badge/release-v1.4.9-blue" alt="Release">
+<a href="https://gitee.com/dt_flys/forest/releases/v1.4.10">
+    <img src="https://img.shields.io/badge/release-v1.4.10-blue" alt="Release">
 </a>
 <a href="https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html">
     <img src="https://img.shields.io/badge/JDK-1.8+-yellow" alt="JDK">
@@ -83,7 +83,7 @@ Forest有哪些特性？
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>spring-boot-starter-forest</artifactId>
-    <version>1.4.9</version>
+    <version>1.4.10</version>
 </dependency>
 ```
 
