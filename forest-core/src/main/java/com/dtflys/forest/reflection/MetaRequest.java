@@ -33,7 +33,7 @@ public class MetaRequest {
      */
     private boolean async;
 
-    private int timeout;
+    private Integer timeout;
 
     /**
      * SSL protocol
@@ -142,11 +142,11 @@ public class MetaRequest {
         this.async = async;
     }
 
-    public int getTimeout() {
+    public Integer getTimeout() {
         return timeout;
     }
 
-    public void setTimeout(int timeout) {
+    public void setTimeout(Integer timeout) {
         this.timeout = timeout;
     }
 
