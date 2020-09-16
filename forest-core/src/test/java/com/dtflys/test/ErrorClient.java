@@ -4,6 +4,7 @@ import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.callback.OnError;
+import com.dtflys.forest.http.ForestResponse;
 
 /**
  * @author gongjun
@@ -18,4 +19,6 @@ public interface ErrorClient {
     String testError(OnError onError);
 
 
+    @Request(url = "http://localhost:8080", timeout = 1000)
+    ForestResponse<String> testErrorResponse();
 }

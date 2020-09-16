@@ -17,6 +17,11 @@ import java.util.Map;
 @BaseRequest(baseURL = "http://localhost:${port}", contentType = "application/json")
 public interface PostClient {
 
+    @Post(
+            url = "http://localhost:${port}/hello",
+            headers = {"Accept:text/plain"}
+    )
+    String emptyBody();
 
     @Request(
             url = "http://localhost:${port}/hello",

@@ -60,5 +60,4 @@ public class TestGetTokenClient extends BaseClientTest {
     }
 
 
-
 }

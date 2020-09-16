@@ -46,4 +46,11 @@ public class ErrorTest extends TestCase {
         });
         assertEquals(1, count.get());
     }
+
+
+    public void testErrorResponse() {
+        ForestResponse<String> response = errorClient.testErrorResponse();
+        assertNotNull(response);
+    }
+
 }

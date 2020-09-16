@@ -9,4 +9,5 @@ public interface GetTokenClient {
             headers = {"Accept:text/plain"}
     )
     TokenResult getToken();
+
 }
