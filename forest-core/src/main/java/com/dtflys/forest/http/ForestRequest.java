@@ -478,7 +478,7 @@ public class ForestRequest<T> {
     }
 
     public ForestRequest setRequestBody(String requestBody) {
-        this.requestBody = requestBody;
+        replaceBody(requestBody);
         return this;
     }
 
