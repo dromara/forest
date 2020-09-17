@@ -2158,12 +2158,21 @@ public class MyProtobufConverter implements ForestConverter {
 
 ```java
 
-@Autowired
-private ForestConfiguration configuration;
+@Autowrired
+private ForestConfiguration forestConfiguration;
 
 ...
 
-configuration
+// 设置JSON转换器
+forestConfiguration.setJsonConverter(new MyProtobufConverter());
+// 设置XML转换器
+forestConfiguration.getConverterMap().put(ForestDataType.XML, new MyProtobufConverter());
+// 设置文本转换器
+forestConfiguration.getConverterMap().put(ForestDataType.TEXT, new MyProtobufConverter());
+// 设置二进制转换器
+forestConfiguration.getConverterMap().put(ForestDataType.BINARY, new MyProtobufConverter());
+// 设置二进制转换器
+forestConfiguration.getConverterMap().put(ForestDataType.BINARY, new MyProtobufConverter());
 
 ```
 
