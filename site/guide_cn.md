@@ -643,7 +643,7 @@ String sendPost(@Body("username") String username,  @Body("password") String pas
 
 ### 3.6.3 绑定为JSON格式
 
-要让`@DataObject`绑定的对象转换成`JSON`格式也非常简单，只要将`contentType`属性或`Content-Type`请求头指定为`application/json`便可。
+要让`@Body`绑定的对象转换成`JSON`格式也非常简单，只要将`contentType`属性或`Content-Type`请求头指定为`application/json`便可。
 
 ```java
 @Request(
@@ -651,7 +651,7 @@ String sendPost(@Body("username") String username,  @Body("password") String pas
     contentType = "application/json", 
     type = "post"
 )
-String send(@DataObject User user);
+String send(@Body User user);
 ```
 调用后产生的结果如下：
 
@@ -2112,7 +2112,7 @@ Forest中对数据进行序列化可以通过指定`contentType`属性或`Conten
         type = "post",
         contentType = "application/json"    // 指定contentType为application/json
 )
-String postJson(@DataObject MyUser user);   // 自动将user对象序列化为JSON格式
+String postJson(@Body MyUser user);   // 自动将user对象序列化为JSON格式
 ```
 
 同理，指定为`application/xml`会将参数序列化为`XML`格式，`text/plain`则为文本，默认的`application/x-www-form-urlencoded`则为表格格式。
