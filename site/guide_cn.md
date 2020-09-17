@@ -534,6 +534,11 @@ public interface MyClient {
 ```java
 public interface MyClient {
 
+    /**
+     * 这里 data 属性中设置的字符串内容会绑定到请求体中
+     * 其中 ${0} 和 ${1} 为参数序号绑定，会将序号对应的参数绑定到字符串中对应的位置
+     * ${0} 会替换为 username 的值，${1} 会替换为 password 的值
+     */
     @Request(
             url = "http://localhost:5000/hello/user",
             type = "post",
@@ -543,6 +548,8 @@ public interface MyClient {
     String dataPost(String username, String password);
 }
 ```
+
+?> 其中具体的参数序号绑定内容请参见 [[6.1 参数序号绑定]](###_61-参数序号绑定)
 
 如果调用方代码如下所示：
 
