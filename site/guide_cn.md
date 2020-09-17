@@ -621,38 +621,92 @@ myClient.postXml("foo", "bar");
         <misc><username>foo</username><password>bar</password></misc>
         
 
-### 3.6.2 通过 @DataParam 注解
+### 3.6.2 通过 @Body 注解
 
-除了`data`属性外，您还可以通过`@DataParam`注解修饰参数的方式，将传入参数的数据绑定到 HTTP 请求体中。
-
-只需三步就能实现参数到请求体的绑定：
-
-第一步：设置 HTTP Method 为`POST`、`PUT`、`PATCH`这类允许带有请求体的方法。
-
-?> 具体哪些 HTTP Method 能够绑定到请求体请参见 [6.2.1 数据绑定位置](###_621-数据绑定位置)
-
-第二步：给参数加上`@DataParam`注解并定义名称。
-
-?> 关于`@DataParam`注解具体使用可以参见 [6.2 @DataParam 参数绑定](###_62-dataparam-参数绑定)
-
-第三步：设置`contentType`或请求头`ContentType`，要设置成什么`contentType`取决于你想要 Body 中数据是什么格式。
-
-?> 关于`contentType`和数据格式的对应关系请参见 [6.2.2 数据绑定格式](###_622-数据绑定格式)
-
-### 3.6.3 通过 @Body 注解
-
-使用`@DataParam`注解太麻烦？绑定到`URL`还是`Body`搞不清楚？那您可以使用`@Body`注解修饰参数的方式，将传入参数的数据绑定到 HTTP 请求体中。
+使用`data`属性太麻烦？绑定到`URL`还是`Body`搞不清楚？那您可以使用`@Body`注解修饰参数的方式，将传入参数的数据绑定到 HTTP 请求体中。
 
 `@Body`注解修饰的参数一定会绑定到请求体中，不用担心它会出现在其他地方
 
 ```java
+/**
+ * 默认body格式为 application/x-www-form-urlencoded，即以表单形式序列化数据
+ */
 @Post(
     url = "http://localhost:${port}/user",
-    headers = {"Accept:text/plain"},
-    contentType = "application/x-www-form-urlencoded"
+    headers = {"Accept:text/plain"}
 )
 String sendPost(@Body("username") String username,  @Body("password") String password);
 ```
+
+### 3.6.3 绑定为JSON格式
+
+要让`@DataObject`绑定的对象转换成`JSON`格式也非常简单，只要将`contentType`属性或`Content-Type`请求头指定为`application/json`便可。
+
+```java
+@Request(
+    url = "http://localhost:5000/hello/user",
+    contentType = "application/json", 
+    type = "post"
+)
+String send(@DataObject User user);
+```
+调用后产生的结果如下：
+
+    POST http://localhost:5000/hello/user
+    HEADER:
+        Content-Type: application/json
+    BODY:
+        {"username": "foo", "password": "bar"}
+
+
+### 3.6.4 请求体为XML格式
+
+`@Body`较为特殊，除了指定`contentType`属性或`Content-Type`请求头为`application/xml`外，还需要设置`@Body`的`filter`属性为`xml`。
+
+```java
+@Post(
+    url = "http://localhost:5000/hello/user",
+    contentType = "application/xml"
+)
+String send(@Body(filter = "xml") User user);
+```
+
+此外，这里的`User`对象也要绑定`JAXB`注解：
+
+```java
+@XmlRootElement(name = "misc")
+public User {
+
+    private String usrname;
+
+    private String password;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+}
+```
+
+调用传入`User`对象后的结果如下：
+
+    POST http://localhost:5000/hello/user
+    HEADER:
+        Content-Type: application/xml
+    BODY:
+        <misc><username>foo</username><password>bar</password></misc>
+
 
 ## 3.7 @BaseRequest
 
@@ -1208,163 +1262,8 @@ myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
 
     GET http://localhost:8080/send?un=DT&pw=123456&da=123888888&sm=Hahaha
 
-## 6.2 @DataParam 参数绑定
 
-在接口方法的参数前加上`@DataParam`注解并在`value`属性中给予一个名词，就能实现参数绑定。
-
-### 6.2.1 数据绑定位置
-
-被`@DataParam`注解修饰的参数数据的绑定位置较为灵活多变，它可以出现在请求`url`的参数部分，也可以出现在请求 Body 中。
-
-具体出现位置取决于由`type`属性定义的 HTTP Method，其绑定的具体位置如下表：
-
-| type      | `@ParaParam`注解绑定位置 |
-| --------- | ------------------------ |
-| `GET`     | `url`参数部分            |
-| `POST`    | 请求体                   |
-| `PUT`     | 请求体                   |
-| `PATCH`   | 请求体                   |
-| `HEAD`    | `url`参数部分            |
-| `OPTIONS` | `url`参数部分            |
-| `DELETE`  | `url`参数部分            |
-| `TRACE`   | `url`参数部分            |
-
-`GET`、`HEAD`等方法会将参数值直接绑定到 URL 的参数中。
-
-```java
-
-@Request(
-    url = "${0}/send",
-    type = "get",
-    dataType = "json"
-)
-public Map send(
-    String base,
-    @DataParam("un") String userName,
-    @DataParam("pw") String password,
-    @DataParam("da") String phoneList,
-    @DataParam("sm") String content
-);
-```
-
-如果调用方代码如下所示：
-
-```java
-myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
-```
-
-实际产生的 HTTP 请求如下：
-
-    GET http://localhost:8080/send?un=DT&pw=123456&da=123888888&sm=Hahaha
-
-`POST`、`PUT`等方法会将参数值绑定到请求体中，同时在请求中的数据在`默认`情况下按`x-www-form-urlencoded`格式绑定。
-
-```java
-@Request(
-        url = "http://localhost:5000/hello",
-        type = "post",
-        headers = {"Accept:text/plain"}
-)
-String send(@DataParam("username") String username, @DataParam("password") String password);
-```
-
-如果调用方代码如下所示：
-
-```java
-myClient.send("foo", "bar");
-```
-
-实际产生的 HTTP 请求如下：
-
-    POST http://localhost:5000/hello
-    HEADER:
-        Accept: text/plain
-    BODY:
-        username=foo&password=bar
-
-### 6.2.2 数据绑定格式
-
-若您想参数值在请求中传输`JSON`或`XML`等格式绑定，可以通过修改`contentType`或`Content-Type`请求头来实现对应的数据格式，
-具体数据格式和`contentType`属性的关系请参考下表：
-
-| `contentType` / `Content-Type`      | 数据格式                        |
-| ----------------------------------- | ------------------------------- |
-| 不设置                              | `x-www-form-urlencoded`表单格式 |
-| `application/x-www-form-urlencoded` | `x-www-form-urlencoded`表单格式 |
-| `application/json`                  | `JSON`格式                      |
-| `application/xml`                   | `XML`格式                       |
-
-若传输的 Body 数据是标准表单格式，就不用设置`cotentType`或请求头`Content-Type`了
-
-```java
-public interface MyClient {
-
-    @Request(
-            url = "http://localhost:5000/hello/user",
-            type = "post",
-            headers = {"Accept:text/plain"}
-    )
-    String postBody(@DataParam("username") String username, @DataParam("password") String password);
-}
-```
-
-如果调用方代码如下所示：
-
-```java
-myClient.postBody("foo", "bar");
-```
-
-实际产生的 HTTP 请求如下：
-
-    POST http://localhost:5000/hello/user
-    HEADER:
-        Accept: text/plain
-    BODY:
-        username=foo&password=bar
-
-若要将 Body 中的数据内容转换成 JSON 格式，只要设置`contentType`属性为`application/json`即可
-
-```java
-public interface MyClient {
-
-    @Request(
-            url = "http://localhost:5000/hello/user",
-            type = "post",
-            contentType = "application/json"
-    )
-    String postBody(@DataParam("username") String username, @DataParam("password") String password);
-}
-```
-
-如果调用方代码如下所示：
-
-```java
-myClient.postBody("foo", "bar");
-```
-
-实际产生的 HTTP 请求如下：
-
-    POST http://localhost:5000/hello/user
-    HEADER:
-        Content-Type: application/json
-    BODY:
-        {"username":"foo","password":"bar"}
-
-或者不用`contentType`属性，使用请求头`Content-Type: application/json`效果相同
-
-```java
-public interface MyClient {
-
-    @Request(
-            url = "http://localhost:5000/hello/user",
-            type = "post",
-            headers = {"Content-Type: application/json"}
-    )
-    String postBody(@DataParam("username") String username, @DataParam("password") String password);
-}
-```
-
-## 6.3 @DataVariable 参数绑定
+## 6.2 @DataVariable 参数绑定
 
 在接口方法中定义的参数前加上`@DataVariable`注解并`value`中输入一个名称，便可以实现参数的`变量名`绑定。
 
@@ -1399,132 +1298,15 @@ myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
 实际产生的 HTTP 请求如下：
 
     GET http://localhost:8080/send?un=DT&pw=123456&da=123888888&sm=Hahaha
-    
-## 6.4 @DataObject 对象绑定
 
-上面的提到的`@DataParam`绑定，以及在`data`属性中的绑定可以方便解决大部分数据传输要求。
-但缺点是参数要一个一个写，如果有很多参数或属性会写的十分复杂，而且请求要传输一个十分复杂的对象就会变得非常无能为力。
 
-所以为了解决这个问题，Forest引入了`@DataObject`注解针对对象进行数据绑定。
+### 6.3 绑定到请求体
 
-请看下面的例子：
+参见 [3.4 HTTP URL](###_3.4-HTTP-URL)    
 
-```java
-@Request(url = "http://localhost:5000/hello/user")
-String send(@DataObject User user);
-```
+### 6.4 绑定到请求体
 
-如果我们调用请求接口`send`方法，并传入一个`User`类的对象，会得到以下结果：
-
-    GET http://localhost:5000/hello/user?username=foo&password=bar
-
-如上所示，`@DataObject`注解会将传入的对象拆成一个一个属性键值对放入`url`的`query`参数部分。用这种方式，即使有十几二十个参数，接口的参数也只需传一个对象即可。
-
-`@DataObject`绑定的数据不仅可以出现在`url`参数上，还可以出现在请求体中，不仅可以产生`query`参数的数据格式,也可以变成`json`格式或是`xml`格式。
-
-具体数据绑定的出现位置请看下表：
-
-| `type`    | 数据绑定的位置 |
-| -----    | -------------- |
-| `GET`     | `url`参数部分   |
-| `POST`    | 请求体         |
-| `PUT`     | 请求体         |
-| `PATCH`   | 请求体         |
-| `HEAD`    | `url`参数部分   |
-| `OPTIONS` | `url`参数部分   |
-| `DELETE`  | `url`参数部分   |
-| `TRACE`   | `url`参数部分   |
-
-### 6.4.1 绑定到请求体
-
-来看一个绑定到请求体的例子：
-
-```java
-@Request(
-    url = "http://localhost:5000/hello/user",
-    type = "post"
-)
-String send(@DataObject User user);
-```
-
-调用后产生的结果如下：
-
-    POST http://localhost:5000/hello/user
-    BODY:
-        username=foo&password=bar
-        
-如上所示，`User`对象的数据出现在了Body中。这里出现的是`x-www-form-urlencoded`表单数据格式，是在没指定内容格式情况下的默认格式。
-
-若要以其它形式(比如`JSON`)传输数据，需要做一些改动。        
-
-### 6.4.2 绑定为JSON格式
-
-要让`@DataObject`绑定的对象转换成`JSON`格式也非常简单，只要将`contentType`属性或`Content-Type`请求头指定为`application/json`便可。
-
-```java
-@Request(
-    url = "http://localhost:5000/hello/user",
-    contentType = "application/json", 
-    type = "post"
-)
-String send(@DataObject User user);
-```
-调用后产生的结果如下：
-
-    POST http://localhost:5000/hello/user
-    HEADER:
-        Content-Type: application/json
-    BODY:
-        {"username": "foo", "password": "bar"}
-        
-### 6.4.3 绑定为XML格式        
-
-`@DataObject`较为特殊，除了指定`contentType`属性或`Content-Type`请求头为`application/xml`外，还需要设置`@DataObject`的`filter`属性为`xml`。
-
-```java
-@Request(
-    url = "http://localhost:5000/hello/user",
-    contentType = "application/xml", 
-    type = "post"
-)
-String send(@DataObject(filter = "xml") User user);
-```
-
-此外，这里的`User`对象也要绑定`JAXB`注解：
-
-```java
-@XmlRootElement(name = "misc")
-public User {
-
-    private String usrname;
-
-    private String password;
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-}
-```
-
-调用传入`User`对象后的结果如下：
-
-    POST http://localhost:5000/hello/user
-    HEADER:
-        Content-Type: application/xml
-    BODY:
-        <misc><username>foo</username><password>bar</password></misc>
+参见 [3.6 HTTP Body](###_3.6-HTTP-Body)    
 
 
 ## 6.5 全局变量绑定
@@ -1535,10 +1317,12 @@ public User {
 
 若有全局变量：
 
-    basetUrl: http://localhost:5050
-    usrename: foo
-    userpwd: bar
-    phoneList: 123888888
+forest:
+    variables:
+        basetUrl: http://localhost:5050
+        usrename: foo
+        userpwd: bar
+        phoneList: 123888888
 
 ```java
 
