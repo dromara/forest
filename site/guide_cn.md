@@ -1046,7 +1046,7 @@ byte[] downloadImageToByteArray();
 /**
  * 返回类型用InputStream，用流的方式读取文件内容
  */
-@Request(url = "http://localhost:8080/images/test-img.jpg")
+@GetRequest(url = "http://localhost:8080/images/test-img.jpg")
 InputStream downloadImageToInputStream();
 ```
 
