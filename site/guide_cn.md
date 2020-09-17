@@ -2129,7 +2129,7 @@ HTTP请求响应后返回结果的数据同样需要转换，Forest则会将返�
 Map getData();               // 请求响应的结果将被转换为Map类型对象
 ```
 
-## 12.4  更换转换器
+## 12.3  更换转换器
 
 在Forest中已定义好默认的转换器，比如JSON的默认转为器为`ForestFastjsonConverter`，即`FastJson`的转换器。你也可以通过如下代码进行更换：
 
@@ -2153,7 +2153,7 @@ forestConfiguration.getConverterMap().put(ForestDataType.XML, new ForestJaxbConv
 ```
 
 
-## 12.3 自定义转换器
+## 12.4 自定义转换器
 
 在Forest中，每个转换类型都对应一个转换器对象，比如`JSON`格式的转换器有`com.dtflys.forest.converter.json.ForestFastjsonConverter`、`com.dtflys.forest.converter.json.ForestGsonConverter`、`com.dtflys.forest.converter.json.ForestJacksonConverter`三种，分别是基于`FastJson`、`Gson`、`Jackson`三种不同的`JSON`序列化框架。
 
