@@ -2186,8 +2186,6 @@ private ForestConfiguration forestConfiguration;
 
 ...
 
-// 设置JSON转换器
-forestConfiguration.setJsonConverter(new MyProtobufConverter());
 // 设置XML转换器
 forestConfiguration.getConverterMap().put(ForestDataType.XML, new MyProtobufConverter());
 // 设置文本转换器
@@ -2196,6 +2194,28 @@ forestConfiguration.getConverterMap().put(ForestDataType.TEXT, new MyProtobufCon
 forestConfiguration.getConverterMap().put(ForestDataType.BINARY, new MyProtobufConverter());
 // 设置二进制转换器
 forestConfiguration.getConverterMap().put(ForestDataType.BINARY, new MyProtobufConverter());
+
+```
+
+JSON转换器和XML转换器比较特殊，需要 `implements` 的类不是 `ForestConverter`
+
+```java
+
+/**
+ *  JSON转换器需要实现 ForestJsonConverter 接口
+ */
+public class MyJsonConverter implements ForestJsonConverter {
+   ... ...
+}
+
+
+/**
+ *  XML转换器需要实现 ForestXmlConverter 接口
+ */
+public class MyXmlConverter implements ForestXmlConverter {
+   ... ...
+}
+
 
 ```
 
