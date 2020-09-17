@@ -302,7 +302,7 @@ public interface PostClient {
             type = "post",
             contentType = "application/xml"
     )
-    String postXml(@DataObject(filter = "xml") XmlTestParam testParam);
+    String postXml(@Body(filter = "xml") XmlTestParam testParam);
 
 
     @Request(
