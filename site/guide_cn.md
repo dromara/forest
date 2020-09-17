@@ -1302,11 +1302,16 @@ myClient.send("http://localhost:8080", "DT", "123456", "123888888", "Hahaha");
 
 ### 6.3 绑定到请求体
 
-参见 [3.4 HTTP URL](###_3.4-HTTP-URL)    
+参见 [3.4 HTTP URL](###_34-http-url)    
 
-### 6.4 绑定到请求体
+### 6.4 绑定到请求头
 
-参见 [3.6 HTTP Body](###_3.6-HTTP-Body)    
+参见 [3.6 HTTP Header](###_35-http-header)    
+
+
+### 6.5 绑定到请求体
+
+参见 [3.6 HTTP Body](###_36-http-body)    
 
 
 ## 6.5 全局变量绑定
