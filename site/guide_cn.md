@@ -2131,7 +2131,7 @@ Map getData();               // 请求响应的结果将被转换为Map类型对
 
 ## 12.4  更换转换器
 
-在Forest中已定义好默认的转换器，比如JSON的默认转为器为`ForestFastjsonConverter`，即`FastJSON`的转换器。你也可以通过如下代码进行更换：
+在Forest中已定义好默认的转换器，比如JSON的默认转为器为`ForestFastjsonConverter`，即`FastJson`的转换器。你也可以通过如下代码进行更换：
 
 ```java
 @Autowrired
@@ -2139,7 +2139,7 @@ private ForestConfiguration forestConfiguration;
 
 ...
 
-// 更换JSON转换器为Jackson
+// 更换JSON转换器为FastJson
 forestConfiguration.setJsonConverter(new ForestFastjsonConverter());
 // 更换JSON转换器为Jackson
 forestConfiguration.setJsonConverter(new ForestJacksonConverter());
