@@ -411,8 +411,6 @@ public interface MyClient {
 
 如果要每次请求传入不同的请求头内容，可以在`headers`属性的请求头定义中加入`数据绑定`。
 
-?> 如何进行数据绑定请参见 [六. 数据绑定](#六-数据绑定)
-
 ```java
 public interface MyClient {
 
@@ -545,8 +543,6 @@ public interface MyClient {
     String dataPost(String username, String password);
 }
 ```
-
-?> 如何进行数据绑定请参见 [五. 数据绑定](#五-数据绑定)
 
 如果调用方代码如下所示：
 
