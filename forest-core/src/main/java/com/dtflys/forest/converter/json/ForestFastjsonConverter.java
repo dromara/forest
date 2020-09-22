@@ -3,8 +3,6 @@ package com.dtflys.forest.converter.json;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.alibaba.fastjson.parser.ParserConfig;
-import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.util.FieldInfo;
 import com.alibaba.fastjson.util.TypeUtils;
@@ -15,7 +13,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -126,6 +123,9 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
     public Map<String, Object> convertObjectToMap(Object obj) {
         if (nameField == null && nameMethod == null) {
             return defaultJsonMap(obj);
+        }
+        if (obj instanceof CharSequence) {
+            return JSON.parseObject(obj.toString());
         }
         List<FieldInfo> getters = TypeUtils.computeGetters(obj.getClass(), null);
         JSONObject json = new JSONObject(getters.size(), true);
