@@ -1,12 +1,22 @@
 package com.dtflys.forest.http;
 
 /**
- * Forest包装的请求头
+ * Forest请求头
+ * <p>该类封装单个Forest请求头信息</p>
+ *
+ * @author gongjun[jun.gong@thebeastshop.com]
+ * @since 2020-08-11 12:45
  */
 public class ForestHeader {
 
+    /**
+     * 请求头名称
+     */
     private final String name;
 
+    /**
+     * 请求头的值
+     */
     private String value;
 
     public ForestHeader(String name, String value) {
