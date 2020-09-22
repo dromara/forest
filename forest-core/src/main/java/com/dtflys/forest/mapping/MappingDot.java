@@ -6,6 +6,7 @@ import com.dtflys.forest.utils.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Map;
 
 /**
  * @author gongjun
@@ -56,6 +57,12 @@ public class MappingDot extends MappingExpr {
     @Override
     public Object render(Object[] args) {
         Object obj = left.render(args);
+        if (obj == null) {
+            throw new ForestRuntimeException(new NullPointerException());
+        }
+        if (obj instanceof Map) {
+            return ((Map) obj).get(right.getName());
+        }
         String getterName = StringUtils.toGetterName(right.getName());
         Method method = getPropMethodFromClass(obj.getClass(), right);
         if (method == null) {
