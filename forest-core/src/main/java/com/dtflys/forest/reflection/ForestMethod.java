@@ -16,6 +16,8 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestType;
+import com.dtflys.forest.http.ObjectRequestBody;
+import com.dtflys.forest.http.StringRequestBody;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
 import com.dtflys.forest.interceptor.InterceptorFactory;
@@ -593,7 +595,7 @@ public class ForestMethod<T> implements VariableScope {
         }
         String newUrl = null;
         List<RequestNameValue> nameValueList = new ArrayList<>();
-        List<Object> bodyList = new ArrayList<>();
+//        List<Object> bodyList = new ArrayList<>();
         String [] headerArray = baseMetaRequest.getHeaders();
         MappingTemplate[] baseHeaders = null;
         if (headerArray != null && headerArray.length > 0) {
@@ -711,16 +713,29 @@ public class ForestMethod<T> implements VariableScope {
                 }
                 else if (!parameter.getFilterChain().isEmpty()) {
                     obj = parameter.getFilterChain().doFilter(configuration, obj);
-                    if (parameter.isHeader()) {
-                        request.addHeader(new RequestNameValue(null, obj, target));
-                    } else {
-                        nameValueList.add(new RequestNameValue(null, obj, target));
+                    if (obj != null) {
+                        if (parameter.isHeader()) {
+                            request.addHeader(new RequestNameValue(null, obj, target));
+                        } else if (parameter.isQuery()) {
+                            request.addQuery(obj.toString(), null);
+                        } else if (parameter.isBody()) {
+                            if (obj instanceof CharSequence) {
+                                request.addBody(new StringRequestBody(obj.toString()));
+                            } else {
+                                request.addBody(new ObjectRequestBody(obj));
+                            }
+                        } else {
+                            nameValueList.add(new RequestNameValue(obj.toString(), target));
+                        }
                     }
+                }
+                else if (obj instanceof CharSequence) {
+                    request.addBody(new StringRequestBody(obj.toString()));
                 }
                 else if (obj instanceof List
                         || obj.getClass().isArray()
                         || ReflectUtils.isPrimaryType(obj.getClass())) {
-                    bodyList.add(obj);
+                    request.addBody(new ObjectRequestBody(obj));
                 }
                 else if (obj instanceof Map) {
                     Map map = (Map) obj;
@@ -729,10 +744,11 @@ public class ForestMethod<T> implements VariableScope {
                             Object value = map.get(key);
                             if (parameter.isHeader()) {
                                 request.addHeader(new RequestNameValue(String.valueOf(key), value, target));
+                            } else if (target == TARGET_BODY) {
+                                request.addBody(String.valueOf(key), value);
                             } else {
-                                nameValueList.add(new RequestNameValue(String.valueOf(key), value, target));
+                                request.addQuery(String.valueOf(key), value);
                             }
-
                         }
                     }
                 }
@@ -828,7 +844,7 @@ public class ForestMethod<T> implements VariableScope {
             request.setProgressStep(progressStep);
         }
         if (configuration.getDefaultParameters() != null) {
-            request.addData(configuration.getDefaultParameters());
+            request.addNameValue(configuration.getDefaultParameters());
         }
         if (baseHeaders != null && baseHeaders.length > 0) {
             for (MappingTemplate baseHeader : baseHeaders) {
@@ -847,17 +863,12 @@ public class ForestMethod<T> implements VariableScope {
         }
 
         List<RequestNameValue> dataNameValueList = new ArrayList<>();
-        StringBuilder bodyBuilder = new StringBuilder();
         boolean isQueryData = false;
         renderedContentType = request.getContentType();
         if (renderedContentType == null || renderedContentType.equalsIgnoreCase(TYPE_APPLICATION_X_WWW_FORM_URLENCODED)) {
             for (int i = 0; i < dataTemplateArray.length; i++) {
                 MappingTemplate dataTemplate = dataTemplateArray[i];
                 String data = dataTemplate.render(args);
-                bodyBuilder.append(data);
-                if (i < dataTemplateArray.length - 1) {
-                    bodyBuilder.append("&");
-                }
                 String[] paramArray = data.split("&");
                 for (int j = 0; j < paramArray.length; j++) {
                     String dataParam = paramArray[j];
@@ -865,7 +876,7 @@ public class ForestMethod<T> implements VariableScope {
                     if (dataNameValue.length > 0) {
                         String name = dataNameValue[0].trim();
 //                    RequestNameValue nameValue = new RequestNameValue(name, type.isDefaultParamInQuery());
-                        RequestNameValue nameValue = new RequestNameValue(name, TARGET_QUERY);
+                        RequestNameValue nameValue = new RequestNameValue(name, type.getDefaultParamTarget());
                         if (dataNameValue.length == 2) {
                             isQueryData = true;
                             nameValue.setValue(dataNameValue[1].trim());
@@ -879,17 +890,11 @@ public class ForestMethod<T> implements VariableScope {
             for (int i = 0; i < dataTemplateArray.length; i++) {
                 MappingTemplate dataTemplate = dataTemplateArray[i];
                 String data = dataTemplate.render(args);
-                bodyList.add(data);
+                request.addBody(data);
             }
         }
-        request.addData(nameValueList);
-        request.setBodyList(bodyList);
-        if ((type.getDefaultParamTarget() == TARGET_BODY
-                || (type.getDefaultParamTarget() == TARGET_QUERY && !isQueryData))
-                && bodyBuilder.length() > 0) {
-            String requestBody = bodyBuilder.toString();
-            request.setRequestBody(requestBody);
-        }
+        request.addNameValue(nameValueList);
+//        request.setBodyList(bodyList);
 
         for (int i = 0; i < headerTemplateArray.length; i++) {
             MappingTemplate headerTemplate = headerTemplateArray[i];
@@ -990,7 +995,6 @@ public class ForestMethod<T> implements VariableScope {
         }
         return request;
     }
-
 
 
     /**
