@@ -71,6 +71,12 @@ public class ForestJacksonConverter implements ForestJsonConverter {
 
     @Override
     public Map<String, Object> convertObjectToMap(Object obj) {
+        if (obj == null) {
+            return null;
+        }
+        if (obj instanceof CharSequence) {
+            return convertToJavaObject(obj.toString(), LinkedHashMap.class);
+        }
         return mapper.convertValue(obj, LinkedHashMap.class);
     }
 }

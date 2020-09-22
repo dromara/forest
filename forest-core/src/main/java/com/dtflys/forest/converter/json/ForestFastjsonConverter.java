@@ -121,6 +121,9 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
 
     @Override
     public Map<String, Object> convertObjectToMap(Object obj) {
+        if (obj == null) {
+            return null;
+        }
         if (nameField == null && nameMethod == null) {
             return defaultJsonMap(obj);
         }
