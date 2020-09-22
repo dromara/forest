@@ -49,79 +49,193 @@ import java.util.*;
 import static com.dtflys.forest.mapping.MappingParameter.*;
 
 /**
+ * Forest请求对象
+ *
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-03-24
  */
 public class ForestRequest<T> {
 
+    /**
+     * 默认上传/下载进度监听的步长
+     * 每上传/下载一定的比特数，执行一次监听回调函数
+     */
     private final static long DEFAULT_PROGRESS_STEP = 1024 * 10;
 
+    /**
+     * Forest配置信息对象
+     */
     private final ForestConfiguration configuration;
 
+    /**
+     * HTTP协议
+     */
     private String protocol;
 
+    /**
+     * URL路径
+     */
     private String url;
 
+    /**
+     * 用户信息
+     * 包含在URL中的用户信息，比如：
+     * URL http://xxx:yyy@localhost:8080 中 xxx:yyy 的部分为用户信息
+     * 其中，xxx为用户名，yyy为用户密码
+     */
     private String userInfo;
 
+    /**
+     * URL中的Query参数表
+     */
     private Map<String, Object> query = new LinkedHashMap<>();
 
+    /**
+     * 请求类型
+     */
     private ForestRequestType type;
 
+    /**
+     * 请求字符集
+     */
     private String charset;
 
+    /**
+     * 请求响应返回数据的字符编码
+     */
     private String responseEncode = "UTF-8";
 
+    /**
+     * 是否异步
+     */
     private boolean async;
 
+    /**
+     * 响应数据类型
+     * 该类型决定请求响应返回的数据将以何种方式进行反序列化
+     */
     private ForestDataType dataType;
 
+    /**
+     * 请求超时时间
+     */
     private int timeout = 3000;
 
+    /**
+     * SSL协议
+     * 该字段在单向HTTPS请求发送时决定哪种SSL协议
+     */
     private String sslProtocol;
 
+    /**
+     * 请求失败后的重试次数
+     */
     private int retryCount = 0;
 
+    /**
+     * 最大请重试的时间间隔，时间单位为毫秒
+     */
     private long maxRetryInterval = 0;
 
-    private Map<String, Object> data = new LinkedHashMap<String, Object>();
+//    private Map<String, Object> data = new LinkedHashMap<String, Object>();
 
-    private List bodyList = new LinkedList<>();
+    /**
+     * 请求体
+     * 该字段为列表类型，列表每一项为请求体项
+     * 都为ForestRequestBody子类的对象实例
+     */
+    private List<ForestRequestBody> bodyItems = new LinkedList<>();
 
+
+    /**
+     * 请求体集合
+     * 所有本请求对象中的请求头都在由该请求体集合对象管理
+     */
     private ForestHeaderMap headers = new ForestHeaderMap();
 
+
+    /**
+     * 文件上传项列表
+     */
     private List<ForestMultipart> multiparts = new LinkedList<>();
 
+    /**
+     * 文件名
+     * 该字段为文件下载时，保存到本地磁盘时用到的文件名
+     */
     private String filename;
 
+    /**
+     * 参数表
+     * 接口方法调用时传入的参数表
+     */
     private final Object[] arguments;
 
-    private String requestBody;
-
-    private InputStream certificateInputStream;
-
+    /**
+     * 回调函数：请求成功时调用
+     */
     private OnSuccess onSuccess;
 
+    /**
+     * 回调函数：请求失败时调用
+     */
     private OnError onError;
 
-    private boolean isDownloadFile = false;
-
-    private long progressStep = DEFAULT_PROGRESS_STEP;
-
+    /**
+     * 回调函数：上传/下载进度监听时调用
+     * 每上传/下载传输 ${progressStep} 个比特数时，执行一次监听回调函数
+     */
     private OnProgress onProgress;
 
+
+    /**
+     * 是否下载文件
+     */
+    private boolean isDownloadFile = false;
+
+    /**
+     * 上传/下载进度监听的步长
+     * 每上传/下载一定的比特数，执行一次监听回调函数
+     */
+    private long progressStep = DEFAULT_PROGRESS_STEP;
+
+    /**
+     * 拦截器链对象
+     */
     private InterceptorChain interceptorChain = new InterceptorChain();
 
+    /**
+     * 拦截器属性
+     * 这里的属性只能在绑定的拦截器中被访问
+     */
     private Map<Class, InterceptorAttributes> interceptorAttributes = new HashMap<>();
 
+    /**
+     * 请求重试策略
+     * 可以通过该字段设定自定义的重试策略
+     */
     private Retryer retryer;
 
+    /**
+     * 附件
+     * 附件信息不回随请求发送到远端服务器，但在本地的任何地方都可以通过请求对象访问到附件信息
+     */
     private Map<String, Object> attachments = new HashMap<>();
 
+    /**
+     * 反序列化器
+     */
     private ForestConverter decoder;
 
+    /**
+     * 是否打印日志
+     */
     private boolean logEnable = true;
 
+    /**
+     * SSL KeyStore信息
+     * 在双向HTTPS请求中使用的验证信息
+     */
     private SSLKeyStore keyStore;
 
     public ForestRequest(ForestConfiguration configuration, Object[] arguments) {
@@ -262,12 +376,18 @@ public class ForestRequest<T> {
         return this;
     }
 
-    public List getBodyList() {
-        return bodyList;
+    public List<ForestRequestBody> getBody() {
+        return bodyItems;
     }
 
+    @Deprecated
+    public List getBodyList() {
+        return bodyItems;
+    }
+
+    @Deprecated
     public void setBodyList(List bodyList) {
-        this.bodyList = bodyList;
+        this.bodyItems = bodyList;
     }
 
     public ForestDataType getDataType() {
@@ -324,51 +444,146 @@ public class ForestRequest<T> {
         return this;
     }
 
+    /**
+     * 旧的获取Body数据的方法，已不建议使用
+     * @return
+     */
+    @Deprecated
     public Map<String, Object> getData() {
-        return data;
+        return null;
+    }
+
+    /**
+     * 添加Body数据
+     * @param body
+     * @return
+     */
+    public ForestRequest addBody(ForestRequestBody body) {
+        this.bodyItems.add(body);
+        return this;
     }
 
 
+    /**
+     * 添加字符串Body数据
+     * @param stringBody 请求体字符串内容
+     * @return
+     */
+    public ForestRequest addBody(String stringBody) {
+        return addBody(new StringRequestBody(stringBody));
+    }
+
+    /**
+     * 添加键值对类型Body数据
+     * @param name 字段名
+     * @param value 字段值
+     * @return
+     */
+    public ForestRequest addBody(String name, Object value) {
+        return addBody(new NameValueRequestBody(name, value));
+    }
+
+    /**
+     * 添加键值对类型Body数据
+     * @param nameValue 请求键值对对象
+     * @return
+     */
+    @Deprecated
+    public ForestRequest addBody(RequestNameValue nameValue) {
+        return addBody(new NameValueRequestBody(nameValue.getName(), nameValue.getValue()));
+    }
+
+    /**
+     * 批量添加键值对类型Body数据
+     * @param nameValueList 请求键值对对象列表
+     * @return
+     */
+    @Deprecated
+    public ForestRequest addBody(List<RequestNameValue> nameValueList) {
+        for (RequestNameValue nameValue : nameValueList) {
+            return addBody(nameValue);
+        }
+        return this;
+    }
+
+    /**
+     * 添加键值对类型Body数据, 已不再建议使用
+     * @param name
+     * @param value
+     * @return
+     */
     @Deprecated
     public ForestRequest addData(String name, Object value) {
-        this.data.put(name, value);
-        return this;
+        return addBody(name, value);
     }
 
+    /**
+     * 添加键值对类型Body数据, 已不再建议使用
+     * @param nameValue 请求键值对对象
+     * @return
+     */
     @Deprecated
     public ForestRequest addData(RequestNameValue nameValue) {
-        this.data.put(nameValue.getName(), nameValue.getValue());
-        return this;
+        return addNameValue(nameValue);
     }
 
+    /**
+     * 批量添加键值对类型Body数据, 已不再建议使用
+     * @param data 请求键值对对象列表
+     * @return
+     */
+    @Deprecated
     public ForestRequest addData(List<RequestNameValue> data) {
-        putMapAddList(this.data, data);
+        return addNameValue(data);
+    }
+
+    /**
+     * 添加键值对
+     * @param nameValue 键值对对象
+     * @return
+     */
+    public ForestRequest addNameValue(RequestNameValue nameValue) {
+        if (nameValue.isInHeader()) {
+            this.addHeader(nameValue.getName(), nameValue.getValue());
+        } else if (nameValue.isInQuery()) {
+            this.addQuery(nameValue.getName(), nameValue.getValue());
+        } else if (nameValue.isInBody()) {
+            this.addBody(nameValue.getName(), nameValue.getValue());
+        }
         return this;
     }
 
-    public ForestRequest addBody(Object bodyContent) {
-        bodyList.add(bodyContent);
+    /**
+     * 添加键值对列表
+     * @param nameValueList 键值对列表
+     * @return
+     */
+    public ForestRequest addNameValue(List<RequestNameValue> nameValueList) {
+        for (RequestNameValue nameValue : nameValueList) {
+            addNameValue(nameValue);
+        }
         return this;
     }
 
-    public ForestRequest replaceBody(Object bodyContent) {
-        bodyList.clear();
-        bodyList.add(bodyContent);
+    /**
+     * 替换Body数据，原有的Body数据将被清空
+     * @param body 请求体对象
+     * @return
+     */
+    public ForestRequest replaceBody(ForestRequestBody body) {
+        this.bodyItems.clear();
+        this.addBody(body);
         return this;
     }
 
-    public ForestRequest addBody(String name, Object value) {
-        this.data.put(name, value);
-        return this;
-    }
-
-    public ForestRequest addBody(RequestNameValue nameValue) {
-        this.data.put(nameValue.getName(), nameValue.getValue());
-        return this;
-    }
-
-    public ForestRequest addBody(List<RequestNameValue> data) {
-        putMapAddList(this.data, data);
+    /**
+     * 替换Body为新的字符串数据，原有的Body数据将被清空
+     * @param stringbody 字符串请求体
+     * @return
+     */
+    public ForestRequest replaceBody(String stringbody) {
+        this.bodyItems.clear();
+        this.addBody(stringbody);
         return this;
     }
 
@@ -388,11 +603,11 @@ public class ForestRequest<T> {
 
     public List<RequestNameValue> getDataNameValueList() {
         List<RequestNameValue> nameValueList = new ArrayList<>();
-        for (Iterator<Map.Entry<String, Object>> iterator = data.entrySet().iterator(); iterator.hasNext(); ) {
-            Map.Entry<String, Object> entry = iterator.next();
-            String name = entry.getKey();
-            Object value = entry.getValue();
-            if (value != null) {
+        for (ForestRequestBody item : bodyItems) {
+            if (item instanceof NameValueRequestBody) {
+                NameValueRequestBody nameValueRequestBody = (NameValueRequestBody) item;
+                String name = nameValueRequestBody.getName();
+                Object value = nameValueRequestBody.getValue();
                 RequestNameValue nameValue = new RequestNameValue(name, value, TARGET_BODY);
                 nameValueList.add(nameValue);
             }
@@ -473,22 +688,6 @@ public class ForestRequest<T> {
         }
     }
 
-    public String getRequestBody() {
-        return requestBody;
-    }
-
-    public ForestRequest setRequestBody(String requestBody) {
-        replaceBody(requestBody);
-        return this;
-    }
-
-    public InputStream getCertificateInputStream() {
-        return certificateInputStream;
-    }
-
-    public void setCertificateInputStream(InputStream certificateInputStream) {
-        this.certificateInputStream = certificateInputStream;
-    }
 
     public OnSuccess getOnSuccess() {
         return onSuccess;
