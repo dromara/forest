@@ -1,5 +1,7 @@
 package com.dtflys.forest.springboot.test;
 
+import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.retryer.BackOffRetryer;
 import com.thebeastshop.forest.springboot.annotation.ForestScan;
 import com.dtflys.forest.config.ForestConfiguration;
@@ -41,6 +43,7 @@ public class Test0 {
         assertEquals("SSLv3", config0.getSslProtocol());
         assertEquals("http://www.thebeastshop.com", config0.getVariableValue("baseUrl"));
         assertEquals("xxx", config0.getVariableValue("myName"));
+        assertNotNull(config0.getVariableValue("user"));
         assertTrue(!config0.isLogEnabled());
         assertEquals(Integer.valueOf(12), config0.getVariableValue("myCount"));
         assertEquals(BackOffRetryer.class, config0.getRetryer());
@@ -51,8 +54,15 @@ public class Test0 {
 
     @Test
     public void testClient0() {
-        String result = beastshopClient.shops();
-        assertNotNull(result);
+        ForestResponse<String> response = beastshopClient.shops();
+        assertNotNull(response);
+        assertNotNull(response.getResult());
+        ForestRequest request = response.getRequest();
+        assertNotNull(request);
+        String name = request.getHeaderValue("MyName");
+        String pass = request.getHeaderValue("MyPass");
+        assertEquals("foo", name);
+        assertEquals("bar", pass);
     }
 
     @Test

@@ -3,6 +3,7 @@ package com.dtflys.forest.springboot.test.client0;
 
 import com.dtflys.forest.annotation.DataParam;
 import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.http.ForestResponse;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -12,9 +13,13 @@ public interface BeastshopClient {
 
     @Request(
             url = "${baseUrl}/autopage/shops.htm",
+            headers = {
+              "MyName: ${user.name}",
+              "MyPass: ${user.password}",
+            },
             timeout = 80000
     )
-    String shops();
+    ForestResponse<String> shops();
 
     @Request(
             url = "${idServiceUrl}",
