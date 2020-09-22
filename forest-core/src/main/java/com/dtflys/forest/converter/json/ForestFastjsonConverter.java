@@ -13,6 +13,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -128,7 +129,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
             return defaultJsonMap(obj);
         }
         if (obj instanceof CharSequence) {
-            return JSON.parseObject(obj.toString());
+            return convertToJavaObject(obj.toString(), LinkedHashMap.class);
         }
         List<FieldInfo> getters = TypeUtils.computeGetters(obj.getClass(), null);
         JSONObject json = new JSONObject(getters.size(), true);
