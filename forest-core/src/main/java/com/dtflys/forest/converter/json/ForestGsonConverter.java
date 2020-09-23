@@ -10,6 +10,7 @@ import java.util.*;
 
 /**
  * 使用Gson实现的消息转换实现类
+ *
  * @author Gongjun
  * @since 2016-06-04
  */

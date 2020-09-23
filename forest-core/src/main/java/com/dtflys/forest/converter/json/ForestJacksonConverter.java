@@ -18,10 +18,18 @@ import java.util.Map;
  */
 public class ForestJacksonConverter implements ForestJsonConverter {
 
-    private ObjectMapper mapper = new ObjectMapper();
+    protected ObjectMapper mapper = new ObjectMapper();
     {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
+    }
+
+    /**
+     * 获取Jackson的Mapper对象
+     * @return
+     */
+    public ObjectMapper getMapper() {
+        return mapper;
     }
 
     @Override

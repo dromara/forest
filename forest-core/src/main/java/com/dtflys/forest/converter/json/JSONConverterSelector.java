@@ -3,6 +3,9 @@ package com.dtflys.forest.converter.json;
 import java.io.Serializable;
 
 /**
+ * JSON转换器选择策略
+ * 此类负责选择对应的可用JSON转转器供Forest使用
+ *
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2017-05-08 22:21
  */
