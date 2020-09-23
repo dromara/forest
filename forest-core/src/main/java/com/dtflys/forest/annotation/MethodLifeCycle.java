@@ -33,11 +33,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Life Cycle Class Annotation
+ * 该注解用于为方法级别的自定义注解指定生命周期类
+ * @author gongjun [dt_flys@hotmail.com]
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.ANNOTATION_TYPE)
 public @interface MethodLifeCycle {
+
+    /**
+     * 注解所绑定的生命周期类(方法级别)
+     */
     Class<? extends MethodAnnotationLifeCycle> value();
 }
