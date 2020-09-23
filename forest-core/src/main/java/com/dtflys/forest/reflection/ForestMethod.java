@@ -772,7 +772,7 @@ public class ForestMethod<T> implements VariableScope {
                 RequestNameValue nameValue = new RequestNameValue(parameter.getName(), target);
                 Object obj = args[parameter.getIndex()];
                 if (obj != null) {
-                    nameValue.setValue(String.valueOf(obj));
+                    nameValue.setValue(obj);
                     if (parameter.isHeader()) {
                         request.addHeader(nameValue);
                     } else {
