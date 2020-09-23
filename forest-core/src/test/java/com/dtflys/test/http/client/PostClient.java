@@ -277,6 +277,18 @@ public interface PostClient {
 
     @Post(
             url = "http://localhost:${port}/json",
+            headers = {"Content-Type: application/json; charset=utf-8"}
+    )
+    String postJsonObjWithList1(@Body Map data);
+
+    @Post(
+            url = "http://localhost:${port}/json",
+            headers = {"Content-Type: application/json; charset=utf-8"}
+    )
+    String postJsonObjWithList2(@Body("name") String name, @Body("data") List<String> data);
+
+    @Post(
+            url = "http://localhost:${port}/json",
             contentType = "application/json"
     )
     String postJson5Map2(@Body Map user);
