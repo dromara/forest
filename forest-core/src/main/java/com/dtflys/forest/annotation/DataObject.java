@@ -50,7 +50,6 @@ public @interface DataObject {
 
     /**
      * The filters will do some processing for the object value before sending request.
-     * @return
      */
     String filter() default "";
 }

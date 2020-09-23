@@ -2,11 +2,11 @@ package com.dtflys.forest.http;
 
 /**
  * Forest请求体
- * <p>该类为Forest请求中所有类型请求体项的父类<p/>
- * <p>该类有3个子类: </p>
- * <p>    StringRequestBody    字符串请求体</p>
- * <p>    ObjectRequestBody    对象请求体</p>
- * <p>    NameValueRequestBody 键值对请求体</p>
+ * <p>该类为Forest请求中所有类型请求体项的父类</p>
+ * <p>该类为抽象类，主要有以下3个子类: </p>
+ * <p>    {@link StringRequestBody}    字符串请求体</p>
+ * <p>    {@link ObjectRequestBody}    对象请求体</p>
+ * <p>    {@link NameValueRequestBody} 键值对请求体</p>
  *
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2020-09-22 17:30

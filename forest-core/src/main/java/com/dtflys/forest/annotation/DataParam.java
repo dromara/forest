@@ -47,13 +47,11 @@ public @interface DataParam {
 
     /**
      * Parameter name in request URL or request body.
-     * @return
      */
     String value();
 
     /**
      * The filters will do some processing for the parameter value before sending request.
-     * @return
      */
     String filter() default "";
 }

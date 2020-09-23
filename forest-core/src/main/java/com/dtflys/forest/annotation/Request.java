@@ -48,14 +48,12 @@ public @interface Request {
 
     /**
      * target http url
-     * @return
      */
     String url();
 
     /**
      * http method type: <br>
-     *     GET POST PUT HEAD OPTIONS DELETE PATCH TRACE
-     * @return
+     * GET POST PUT HEAD OPTIONS DELETE PATCH TRACE
      */
     String type() default "";
 
@@ -63,13 +61,11 @@ public @interface Request {
      * type of response data: <br>
      *     text json xml <br>
      * default value is "auto"
-     * @return 请求响应返回的数据类型
      */
     String dataType() default "auto";
 
     /**
      * whether can use async http request or not
-     * @return 是否异步
      */
     boolean async() default false;
 
@@ -82,13 +78,11 @@ public @interface Request {
 
     /**
      * Class of retryer
-     * @return
      */
     Class retryer() default Object.class;
 
     /**
      * max count to retry
-     * @return
      */
     int retryCount() default 0;
 
@@ -96,25 +90,21 @@ public @interface Request {
 
     /**
      * Content Type
-     * @return
      */
     String contentType() default "";
 
     /**
      * Content Encoding
-     * @return
      */
     String contentEncoding() default "";
 
     /**
      * User Agent
-     * @return
      */
     String userAgent() default "";
 
     /**
      * Charset, Default is UTF-8
-     * @return
      */
     String charset() default "";
 
@@ -135,8 +125,6 @@ public @interface Request {
      *     <pre>
      *         headers = {"Accept: ${value}"}
      *     </pre>
-     *
-     * @return
      */
     String[] headers() default {};
 
@@ -150,7 +138,6 @@ public @interface Request {
 
     /**
      * KeyStore Id
-     * @return
      */
     String keyStore() default "";
 

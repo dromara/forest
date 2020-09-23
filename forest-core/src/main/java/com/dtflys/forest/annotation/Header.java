@@ -38,7 +38,7 @@ import java.lang.annotation.Target;
  *
  *    （1） 键值对模式:<br><br>
  *
- *          <pre>
+ *          <pre class="code">
  *          void send(&#064;Header("Access-Token") String token, &#064;Header("Accept") String accept);
  *          </pre>
  *
@@ -46,7 +46,7 @@ import java.lang.annotation.Target;
  *
  *    （2） 对象模式：<br><br>
  *
- *          <pre>
+ *          <pre class="code">
  *          void send(&#064;Header HeaderInfo headerInfo);
  *          </pre>
  *
@@ -55,7 +55,7 @@ import java.lang.annotation.Target;
  *
  *    （3） Map模式：<br><br>
  *
- *          <pre>
+ *          <pre class="code">
  *          void send(&#064;Header Map headerMap);
  *          </pre>
  *

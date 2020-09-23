@@ -203,7 +203,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 实例化ForestConfiguration对象，并初始化默认值
-     * @return
+     * @return 新创建的ForestConfiguration实例
      */
     public static ForestConfiguration configuration() {
         ForestConfiguration configuration = new ForestConfiguration();
@@ -237,7 +237,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 配置HTTP后端
-     * @return
+     * @return 当前ForestConfiguration实例
      */
     private ForestConfiguration setupBackend() {
         setBackend(httpBackendSelector.select(this));
@@ -247,8 +247,8 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 设置HTTP后端
-     * @param backend
-     * @return
+     * @param backend HTTP后端对象
+     * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setBackend(HttpBackend backend) {
         if (backend != null) {
@@ -261,8 +261,8 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 设置HTTP后端名称
-     * @param backendName
-     * @return
+     * @param backendName HTTP后端名称
+     * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setBackendName(String backendName) {
         this.backendName = backendName;
@@ -271,7 +271,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 获取HTTP后端名称
-     * @return
+     * @return HTTP后端名称
      */
     public String getBackendName() {
         return backendName;
@@ -317,8 +317,8 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 设置HTTP后端选择器
-     * @param httpBackendSelector
-     * @return
+     * @param httpBackendSelector HTTP后端选择器
+     * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setHttpBackendSelector(HttpBackendSelector httpBackendSelector) {
         this.httpBackendSelector = httpBackendSelector;
@@ -327,7 +327,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 配置JSON数据转换器
-     * @param configuration
+     * @param configuration 全局配置对象
      */
     private static void setupJSONConverter(ForestConfiguration configuration) {
         configuration.setJsonConverter(configuration.jsonConverterSelector.select());
@@ -335,7 +335,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 获取全局配置ID
-     * @return
+     * @return 全局配置ID
      */
     public String getId() {
         return id;
@@ -343,8 +343,8 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 设置全局配置ID
-     * @param id
-     * @return
+     * @param id 全局配置ID
+     * @return 当前ForestConfiguration实例
      */
     private ForestConfiguration setId(String id) {
         this.id = id;
@@ -353,7 +353,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 获取全局的最大连接数
-     * @return
+     * @return 最大连接数
      */
     public Integer getMaxConnections() {
         return maxConnections;
@@ -361,8 +361,8 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 设置全局的最大连接数
-     * @param maxConnections
-     * @return
+     * @param maxConnections 全局的最大连接数
+     * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setMaxConnections(Integer maxConnections) {
         this.maxConnections = maxConnections;
@@ -380,7 +380,7 @@ public class ForestConfiguration implements Serializable {
     /**
      * 设置全局的最大请求路径连接数
      * @param maxRouteConnections 最大请求路径连接数
-     * @return
+     * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setMaxRouteConnections(Integer maxRouteConnections) {
         this.maxRouteConnections = maxRouteConnections;
@@ -398,7 +398,7 @@ public class ForestConfiguration implements Serializable {
     /**
      * 设置全局的请求超时时间，单位为毫秒
      * @param timeout 请求超时时间，单位为毫秒
-     * @return
+     * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setTimeout(Integer timeout) {
         this.timeout = timeout;
@@ -432,7 +432,7 @@ public class ForestConfiguration implements Serializable {
     /**
      * 设置全局的请求连接超时时间，单位为毫秒
      * @param connectTimeout 连接超时时间，单位为毫秒
-     * @return
+     * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setConnectTimeout(Integer connectTimeout) {
         this.connectTimeout = connectTimeout;
@@ -466,7 +466,7 @@ public class ForestConfiguration implements Serializable {
     /**
      * 设置全局的最大请求失败重试次数
      * @param retryCount 重试次数
-     * @return
+     * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setRetryCount(Integer retryCount) {
         this.retryCount = retryCount;
@@ -475,7 +475,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 获取全局的最大请求重试之间的时间间隔，单位为毫秒
-     * @return
+     * @return 最大请求重试之间的时间间隔
      */
     public long getMaxRetryInterval() {
         return maxRetryInterval;
@@ -483,7 +483,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 设置全局的最大请求重试之间的时间间隔，单位为毫秒
-     * @param maxRetryInterval
+     * @param maxRetryInterval 最大请求重试之间的时间间隔
      */
     public void setMaxRetryInterval(long maxRetryInterval) {
         this.maxRetryInterval = maxRetryInterval;
@@ -507,7 +507,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 是否允许打印请求日志
-     * @return
+     * @return 如果允许打印请求日志为 {@code true} , 否则为 {@code false}
      */
     public boolean isLogEnabled() {
         return logEnabled;
@@ -515,7 +515,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 设置是否允许打印请求日志
-     * @param logEnabled
+     * @param logEnabled 如果允许打印请求日志为 {@code true} , 否则为 {@code false}
      */
     public void setLogEnabled(boolean logEnabled) {
         this.logEnabled = logEnabled;
@@ -523,7 +523,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 是否缓存请求接口实例
-     * @return
+     * @return 如果允许缓存实例为 {@code true}, 否则为 {@code false}
      */
     public boolean isCacheEnabled() {
         return cacheEnabled;
@@ -531,7 +531,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 设置是否缓存请求接口实例
-     * @param cacheEnabled
+     * @param cacheEnabled 如果允许缓存实例为 {@code true}, 否则为 {@code false}
      */
     public void setCacheEnabled(boolean cacheEnabled) {
         this.cacheEnabled = cacheEnabled;
@@ -539,7 +539,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 获取全局默认请求参数列表
-     * @return
+     * @return {@link RequestNameValue} 对象列表
      */
     public List<RequestNameValue> getDefaultParameters() {
         return defaultParameters;
@@ -548,7 +548,7 @@ public class ForestConfiguration implements Serializable {
     /**
      * 设置全局默认请求参数列表
      * @param defaultParameters 请求参数列表
-     * @return
+     * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setDefaultParameters(List<RequestNameValue> defaultParameters) {
         this.defaultParameters = defaultParameters;
@@ -557,7 +557,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 获取全局默认请求头信息列表
-     * @return
+     * @return {@link RequestNameValue} 对象列表
      */
     public List<RequestNameValue> getDefaultHeaders() {
         return defaultHeaders;
@@ -566,7 +566,7 @@ public class ForestConfiguration implements Serializable {
     /**
      * 设置全局默认请求头信息列表
      * @param defaultHeaders 请求头信息列表
-     * @return
+     * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setDefaultHeaders(List<RequestNameValue> defaultHeaders) {
         this.defaultHeaders = defaultHeaders;
@@ -575,7 +575,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 获取全局拦截器列表
-     * @return
+     * @return {@link Class} 实例列表
      */
     public List<Class> getInterceptors() {
         return interceptors;
@@ -583,7 +583,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 设置全局拦截器列表
-     * @param interceptors
+     * @param interceptors 全局拦截器列表
      */
     public void setInterceptors(List<Class> interceptors) {
         this.interceptors = interceptors;
@@ -592,7 +592,7 @@ public class ForestConfiguration implements Serializable {
     /**
      * 设置全局JSON数据转换器
      * @param converter JSON数据转换器
-     * @return
+     * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setJsonConverter(ForestJsonConverter converter) {
         getConverterMap().put(ForestDataType.JSON, converter);
@@ -601,7 +601,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 获取当前全局JSON数据转换器
-     * @return
+     * @return JSON数据转换器
      */
     public ForestJsonConverter getJsonConverter() {
         return (ForestJsonConverter) getConverterMap().get(ForestDataType.JSON);
@@ -609,8 +609,8 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 设置全局XML数据转换器
-     * @param converter
-     * @return
+     * @param converter XML数据转换器
+     * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setXmlConverter(ForestXmlConverter converter) {
         getConverterMap().put(ForestDataType.XML, converter);
@@ -619,7 +619,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 获取当前全局XML数据转换器
-     * @return
+     * @return XML数据转换器
      */
     public ForestXmlConverter getXmlConverter() {
         return (ForestXmlConverter) getConverterMap().get(ForestDataType.XML);
@@ -627,7 +627,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 设置默认的全局文本数据转换器
-     * @return
+     * @return 当前ForestConfiguration实例
      */
     private ForestConfiguration setTextConverter() {
         getConverterMap().put(ForestDataType.TEXT, new DefaultTextConverter());
@@ -648,7 +648,7 @@ public class ForestConfiguration implements Serializable {
      * 设置全局变量
      * @param name   变量名
      * @param value  变量值
-     * @return
+     * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setVariableValue(String name, Object value) {
         getVariables().put(name, value);
@@ -666,7 +666,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 获取全局SSL的Key Store表
-     * @return
+     * @return SSL的Key Store表
      */
     public Map<String, SSLKeyStore> getSslKeyStores() {
         return sslKeyStores;
@@ -674,8 +674,8 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 设置全局SSL的Key Store表
-     * @param sslKeyStores
-     * @return
+     * @param sslKeyStores SSL的Key Store表
+     * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setSslKeyStores(Map<String, SSLKeyStore> sslKeyStores) {
         this.sslKeyStores = sslKeyStores;
@@ -684,7 +684,8 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 注册全局SSL的Key Store信息
-     * @param keyStore
+     * @param keyStore Key Store信息
+     * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration registerKeyStore(SSLKeyStore keyStore) {
         sslKeyStores.put(keyStore.getId(), keyStore);
@@ -693,8 +694,8 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 根据ID获取全局SSL的Key Store信息
-     * @param id
-     * @return
+     * @param id Key Store的ID
+     * @return {@link SSLKeyStore} 实例
      */
     public SSLKeyStore getKeyStore(String id) {
         return sslKeyStores.get(id);
@@ -702,8 +703,8 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 根据请求响应数据类型获取数据转换器
-     * @param dataType
-     * @return
+     * @param dataType 请求响应数据类型
+     * @return 数据转换器
      */
     public ForestConverter getConverter(ForestDataType dataType) {
         ForestConverter converter = getConverterMap().get(dataType);
@@ -715,7 +716,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 获取全局数据转换器表
-     * @return
+     * @return 数据转换器表
      */
     public Map<ForestDataType, ForestConverter> getConverterMap() {
         if (converterMap == null) {
@@ -726,17 +727,17 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 设置全局数据转换器表
-     * @param converterMap
-     * @return
+     * @param converterMap 数据转换器表
+     * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setConverterMap(Map<ForestDataType, ForestConverter> converterMap) {
         this.converterMap = converterMap;
         return this;
     }
 
-    /**
+     /**
      * 获取全局变量表
-     * @return
+     * @return 全局变量表
      */
     public Map<String, Object> getVariables() {
         return variables;
@@ -744,8 +745,8 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 设置全局变量表
-     * @param variables
-     * @return
+     * @param variables 变量表
+     * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setVariables(Map<String, Object> variables) {
         this.variables = variables;
@@ -766,7 +767,7 @@ public class ForestConfiguration implements Serializable {
     /**
      * 设置全局JSON数据转换器的选择器
      * @param jsonConverterSelector
-     * @return
+     * @return 当前ForestConfiguration实例
      */
     private ForestConfiguration setJsonConverterSelector(JSONConverterSelector jsonConverterSelector) {
         this.jsonConverterSelector = jsonConverterSelector;
@@ -776,9 +777,9 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 注册全局过滤器
-     * @param name
-     * @param filterClass
-     * @return
+     * @param name 过滤器名称
+     * @param filterClass 过滤器类
+     * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration registerFilter(String name, Class filterClass) {
         if (!(Filter.class.isAssignableFrom(filterClass))) {
@@ -809,7 +810,7 @@ public class ForestConfiguration implements Serializable {
     /**
      * 判断全局过滤器注册表是否已存在某个过滤器
      * @param name 过滤器名称
-     * @return
+     * @return 如果存在为 {@code true}, 否则为 {@code false}
      */
     public boolean hasFilter(String name) {
         return filterRegisterMap.containsKey(name);
@@ -818,7 +819,7 @@ public class ForestConfiguration implements Serializable {
     /**
      * 根据过滤器名称创建新的过滤器实例
      * @param name 过滤器名称
-     * @return
+     * @return 新的Filter实例
      */
     public Filter newFilterInstance(String name) {
         Class filterClass = filterRegisterMap.get(name);

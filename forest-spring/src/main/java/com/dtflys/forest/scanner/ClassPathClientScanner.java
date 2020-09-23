@@ -93,8 +93,8 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
 
     /**
      * 重写扫描逻辑
-     * @param basePackages
-     * @return
+     * @param basePackages 请求接口类所在的包路径，只能是第一层的包，不包含子包
+     * @return BeanDefinitionHolder实例集合
      */
     @Override
     public Set<BeanDefinitionHolder> doScan(String... basePackages) {

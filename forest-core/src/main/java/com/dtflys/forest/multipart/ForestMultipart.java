@@ -8,11 +8,15 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * <p>Forest对上传下载的文件、流、二进制数值等内容的封装抽象类，
- * 提供针对用于上传下载等用途资源的公共接口</p>
- * @param <T>
- * @author gongjun[dt_flys@hotmail.com]
+ * Forest对上传下载的文件、流、二进制数值等内容的封装抽象类
+ * 提供针对用于上传下载等用途资源的公共接口
+ * @param <T> 文件数据类型, 可以有 {@link File}, {@link InputStream}, {@link String} 以及 {@code byte[]} 这几种基本类型
+ * @author gongjun [dt_flys@hotmail.com]
  * @since 2020-08-02 15:01
+ * @see ByteArrayMultipart
+ * @see FileMultipart
+ * @see FilePathMultipart
+ * @see InputStreamMultipart
  */
 public abstract class ForestMultipart<T> {
 

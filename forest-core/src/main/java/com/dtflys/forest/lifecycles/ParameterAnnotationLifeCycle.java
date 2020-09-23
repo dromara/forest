@@ -20,9 +20,9 @@ public interface ParameterAnnotationLifeCycle<A extends Annotation, I> extends I
 
     /**
      * 在被注解修饰的方法参数初始化时被调用
-     * @param method
-     * @param parameter
-     * @param annotation
+     * @param method {@link ForestMethod}对象
+     * @param parameter {@link MappingParameter}对象
+     * @param annotation 该生命周期类所绑定的注解对象
      */
     void onParameterInitialized(ForestMethod method, MappingParameter parameter, A annotation);
 

@@ -55,13 +55,11 @@ public @interface Trace {
      * type of response data: <br>
      *     text json xml <br>
      * default value is "auto"
-     * @return 请求响应返回的数据类型
      */
     String dataType() default "auto";
 
     /**
      * whether can use async http request or not
-     * @return 是否异步
      */
     boolean async() default false;
 
@@ -74,13 +72,11 @@ public @interface Trace {
 
     /**
      * Class of retryer
-     * @return
      */
     Class retryer() default Object.class;
 
     /**
      * max count to retry
-     * @return
      */
     int retryCount() default 0;
 
@@ -88,25 +84,21 @@ public @interface Trace {
 
     /**
      * Content Type
-     * @return
      */
     String contentType() default "";
 
     /**
      * Content Encoding
-     * @return
      */
     String contentEncoding() default "";
 
     /**
      * User Agent
-     * @return
      */
     String userAgent() default "";
 
     /**
      * Charset, Default is UTF-8
-     * @return
      */
     String charset() default "";
 
@@ -127,8 +119,6 @@ public @interface Trace {
      *     <pre>
      *         headers = {"Accept: ${value}"}
      *     </pre>
-     *
-     * @return
      */
     String[] headers() default {};
 
@@ -142,7 +132,6 @@ public @interface Trace {
 
     /**
      * KeyStore Id
-     * @return
      */
     String keyStore() default "";
 

@@ -47,7 +47,6 @@ public @interface Delete {
 
     /**
      * target http url
-     * @return
      */
     String url();
 
@@ -61,7 +60,7 @@ public @interface Delete {
 
     /**
      * whether can use async http request or not
-     * @return 是否异步
+     * @return {@code true} 如果为异步请求, 默认为 {@code false}
      */
     boolean async() default false;
 
@@ -75,7 +74,6 @@ public @interface Delete {
 
     /**
      * Class of retryer
-     * @return
      */
     Class retryer() default Object.class;
 
@@ -89,19 +87,16 @@ public @interface Delete {
 
     /**
      * Content Type
-     * @return
      */
     String contentType() default "";
 
     /**
      * Content Encoding
-     * @return
      */
     String contentEncoding() default "";
 
     /**
      * User Agent
-     * @return User Agent字符串
      */
     String userAgent() default "";
 
@@ -129,8 +124,6 @@ public @interface Delete {
      *     <pre>
      *         headers = {"Accept: ${value}"}
      *     </pre>
-     *
-     * @return 请求头数组
      */
     String[] headers() default {};
 

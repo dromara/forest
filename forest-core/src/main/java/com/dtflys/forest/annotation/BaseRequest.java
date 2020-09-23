@@ -25,25 +25,21 @@ public @interface BaseRequest {
 
     /**
      * Base URL
-     * @return
      */
     String baseURL() default "";
 
     /**
      * Base Content Type
-     * @return
      */
     String contentType() default "";
 
     /**
      * Base Content Encoding
-     * @return
      */
     String contentEncoding() default "";
 
     /**
      * Base User Agent
-     * @return
      */
     String userAgent() default "";
 
@@ -51,13 +47,11 @@ public @interface BaseRequest {
 
     /**
      * Base Headers
-     * @return
      */
     String[] headers() default {};
 
     /**
      * Base Interceptor
-     * @return
      */
     Class<?>[] interceptor() default {};
 
@@ -70,7 +64,6 @@ public @interface BaseRequest {
 
     /**
      * Class of retryer
-     * @return
      */
     Class retryer() default Object.class;
 

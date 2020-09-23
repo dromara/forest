@@ -36,7 +36,6 @@ import java.lang.annotation.Target;
 /**
  * 文件参数注解
  * <p>在上传文件内容时使用，被该注解修饰的方法参数会被表示为一个文件</p>
- * <p>
  * <p>该注解可以修饰一下几种类型的参数：</p>
  *
  *     (1) 字符串类型：<br><br>
@@ -93,8 +92,6 @@ import java.lang.annotation.Target;
  *     当该注解修饰的参数为Resource对象时，此参数表示为要上传的文件对象。
  *     此时该注解的 fileName 参数可以省略。如若省略fileName，上传的文件名默认为Resource对象中对应的文件名。
  *
- * <p/>
- *
  * @author gongjun
  * @since 2020-07-26 16:40
  */
@@ -106,13 +103,11 @@ public @interface DataFile {
 
     /**
      * Multipart类型请求体中，要上传的文件所对应的参数名
-     * @return
      */
     String value();
 
     /**
      * 要上传的文件的目标文件名（可省略）
-     * @return
      */
     String fileName() default "";
 }
