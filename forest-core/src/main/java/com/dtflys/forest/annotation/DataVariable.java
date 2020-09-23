@@ -33,6 +33,18 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 变量定义注解，该注解只能修饰方法参数，被修饰的参数表示为一个可被模板字符串引用的变量，不会直接通过请求传输到服务端。
+ * 通过该注解定义变量的方式如下：
+ *
+ *     <pre>
+ *         @Get(url = "http://localhost:8080/user/${userId}")
+ *         UserInfo getUser(@DataVariable("userId") String id);
+ *     </pre>
+ *
+ *  如上所示，id参数会先被定义成一个名为"userId"的变量，然后通过@Get注解的url属性中的 "...${userId}" 部分所引用，
+ *  如果此方法被这样调用 getUser("U001") , 那么最终产生的url为 http://localhost:8080/user/U001
+ *  因为此时传入参数id为字符串"U001"，即给变量"userId"同样赋值为"U001"，最后url中的"${userId}"部分引用了该变量
+ *
  * @author gongjun
  * @since 2016-05-24
  */
