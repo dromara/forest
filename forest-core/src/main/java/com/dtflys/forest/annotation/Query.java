@@ -18,27 +18,27 @@ import java.lang.annotation.Target;
  *
  *    （1） 键值对模式:
  *
- *          send(@Query("username") String username, @Query("password") String password);
+ *          void send(@Query("username") String username, @Query("password") String password);
  *
  *          此模式的@Query注解可以修饰一个或多个参数，每个参数仅作为一个键值对。这些键值对最终会被作为一个URL的Query参数添加到请求的URL参数中
  *
  *    （2） 对象模式：
  *
- *          send(@Query UserInfo userInfo);
+ *          void send(@Query UserInfo userInfo);
  *
  *          此模式的@Query注解可以修饰一个或多个自定义对象，但不能设置名称（value属性）以表明它不是一个键值对。被修饰的参数对象会被拆成一个个字段（这个对象类中所有getter方法对应的字段），
  *          所有这些字段将像键值对一样被作为一个URL的Query参数添加到请求的URL参数中
  *
  *    （3） Map模式：
  *
- *          send(@Query Map headerMap);
+ *          void send(@Query Map headerMap);
  *
  *          此模式的@Query注解可以修饰一个或多个Map对象，但不能设置名称（value属性）以表明它不是一个键值对。被修饰的参数对象会被拆成一个个键值对（Map中的所有有值的键值对），
  *          所有这些键值对被作为一个URL的Query参数添加到请求的URL参数中
  *
  *    （4） 字符串模式：
  *
- *          send(@Query String query);
+ *          void send(@Query String query);
  *
  *          此模式的@Query注解可以修饰一个或多个String类型参数，但不能设置名称（value属性）以表明它不是一个键值对。
  *          被修饰的字符串参数将直接以 [参数值] 的形式添加到URL中的Query参数部分
