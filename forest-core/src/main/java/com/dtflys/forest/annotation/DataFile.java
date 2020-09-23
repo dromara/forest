@@ -34,59 +34,60 @@ import java.lang.annotation.Target;
 
 
 /**
- * 文件参数注解，在上传文件内容时使用，被该注解修饰的方法参数会被表示为一个文件
+ * 文件参数注解
+ * <p>在上传文件内容时使用，被该注解修饰的方法参数会被表示为一个文件</p>
  * <p>
- * 该注解可以修饰一下几种类型的参数：
+ * <p>该注解可以修饰一下几种类型的参数：</p>
  *
- *     (1) 字符串类型：
+ *     (1) 字符串类型：<br><br>
  *
  *     <pre>
- *     upload(@DataFile("file") String filePath);
+ *     void upload(@DataFile("file") String filePath);
  *     </pre>
  *
  *     当该注解修饰的参数为字符串类型时，此参数表示为要上传的文件的路径。
- *     此时该注解的 fileName 参数可以省略。如若省略fileName，上传的文件名默认为文件路径中对应的文件名。
+ *     此时该注解的 fileName 参数可以省略。如若省略fileName，上传的文件名默认为文件路径中对应的文件名。<br><br>
  *
- *     (2) File 类型对象：
+ *     (2) File 类型对象：<br><br>
  *
  *     <pre>
- *     upload(@DataFile("file") File file);
+ *     void upload(@DataFile("file") File file);
  *     </pre>
  *
  *     当该注解修饰的参数为File类型对象时，此参数表示为要上传的文件对象
- *     此时该注解的 fileName 参数可以省略。如若省略fileName，上传的文件名默认为File对象中对应的文件名。
+ *     此时该注解的 fileName 参数可以省略。如若省略fileName，上传的文件名默认为File对象中对应的文件名。<br><br>
  *
- *     (3) byte数组：
+ *     (3) byte数组：<br><br>
  *
  *     <pre>
- *     upload(@DataFile(value = "file", fileName = "xxx.jpg") byte[] bytes);
+ *     void upload(@DataFile(value = "file", fileName = "xxx.jpg") byte[] bytes);
  *     </pre>
  *
  *     当该注解修饰的参数为byte数组时，此参数表示为要上传的文件二进制字节数组
- *     此时该注解的 fileName 参数不能省略，必须指定要上传的文件名。
+ *     此时该注解的 fileName 参数不能省略，必须指定要上传的文件名。<br><br>
  *
- *     (4) InputStream 对象：
+ *     (4) InputStream 对象：<br><br>
  *
  *     <pre>
- *     upload(@DataFile(value = "file", fileName = "xxx.jpg") InputStream in);
+ *     void upload(@DataFile(value = "file", fileName = "xxx.jpg") InputStream in);
  *     </pre>
  *
  *     当该注解修饰的参数为InputStream对象时，此参数表示为要上传的文件流数据流
- *     此时该注解的 fileName 参数不能省略，必须指定要上传的文件名。
+ *     此时该注解的 fileName 参数不能省略，必须指定要上传的文件名。<br><br>
  *
- *     (5) Spring Web MVC 中的 MultipartFile 对象：
+ *     (5) Spring Web MVC 中的 MultipartFile 对象：<br><br>
  *
  *     <pre>
- *     upload(@DataFile(value = "file") MultipartFile multipartFile);
+ *     void upload(@DataFile(value = "file") MultipartFile multipartFile);
  *     </pre>
  *
  *     当该注解修饰的参数为MultipartFile对象时，此参数表示为要上传的文件对象。
- *     此时该注解的 fileName 参数可以省略。如若省略fileName，上传的文件名默认为MultipartFile对象中对应的文件名。
+ *     此时该注解的 fileName 参数可以省略。如若省略fileName，上传的文件名默认为MultipartFile对象中对应的文件名。<br><br>
  *
- *     (6) Spring 的 Resource 对象：
+ *     (6) Spring 的 Resource 对象：<br><br>
  *
  *     <pre>
- *     upload(@DataFile(value = "file") Resource resource);
+ *     void upload(@DataFile(value = "file") Resource resource);
  *     </pre>
  *
  *     当该注解修饰的参数为Resource对象时，此参数表示为要上传的文件对象。

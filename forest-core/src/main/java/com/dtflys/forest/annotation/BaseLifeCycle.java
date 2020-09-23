@@ -33,7 +33,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Base Life Cycle Class Annotation
+ * Base Life Cycle Class Annotation<br>
  * 此注解将指定一个类作为某接口级别注解的生命周期处理类
  *
  * @author gongjun[dt_flys@hotmail.com]
