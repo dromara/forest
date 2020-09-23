@@ -33,6 +33,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Delete请求信息定义注解，该注解只能修饰方法，被修饰的方法会自动被动态代理。当调用被修饰的方法时就会执行Forest动态的代理的代码，
+ * 也就会自动执行组装请求、发送请求、接受请求响应信息等任务。
+
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2020-08-13 23:41
  */
