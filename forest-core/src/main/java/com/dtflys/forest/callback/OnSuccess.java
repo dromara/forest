@@ -28,11 +28,19 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 
 /**
+ * 回调函数: 请求成功后调用
+ *
  * @author gongjun
  * @since 2016-05-18
  */
 public interface OnSuccess<T>  {
 
+    /**
+     * 请求成功后调用该方法
+     * @param data 请求响应返回后经过序列化后的数据
+     * @param request Forest请求对象
+     * @param response Forest响应对象
+     */
     void onSuccess(T data, ForestRequest request, ForestResponse response);
 
 }
