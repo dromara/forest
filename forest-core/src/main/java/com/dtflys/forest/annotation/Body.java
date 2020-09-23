@@ -41,14 +41,18 @@ import java.lang.annotation.Target;
  *
  *    （1） 键值对模式:
  *
+ *          <pre>
  *          void send(@Body("username") String username, @Body("password") String password);
+ *          </pre>
  *
  *          此模式的@Body注解可以修饰一个或多个参数，每个参数仅作为一个键值对。这些键值对最终会被合并成一个URL Encoded表单格式的字符串或是一个JSON对象。
  *          合并成哪种形式取决于请求的contentType属性或Content-Type请求头。
  *
  *    （2） 对象模式：
  *
+ *          <pre>
  *          void send(@Body UserInfo userInfo);
+ *          </pre>
  *
  *          此模式的@Body注解可以修饰一个或多个自定义对象，但不能设置名称（value属性）以表明它不是一个键值对。被修饰的参数对象会被拆成一个个字段（这个对象的类中所有getter方法对应的字段），
  *          所有这些字段将像键值对一样被合并成一个URL Encoded表单格式的字符串或是一个JSON对象。
@@ -56,7 +60,9 @@ import java.lang.annotation.Target;
  *
  *    （3） Map模式：
  *
+ *          <pre>
  *          void send(@Body Map paramMap);
+ *          </pre>
  *
  *          此模式的@Body注解可以修饰一个或多个Map对象，但不能设置名称（value属性）以表明它不是一个键值对。被修饰的参数对象会被拆成一个个键值对（Map中的所有有值的键值对），
  *          所有这些键值对被合并成一个URL Encoded表单格式的字符串或是一个JSON对象。
@@ -64,7 +70,9 @@ import java.lang.annotation.Target;
  *
  *    （4） 字符串模式：
  *
+ *          <pre>
  *          void send(@Body String body);
+ *          </pre>
  *
  *          此模式的@Body注解可以修饰一个或多个String类型参数，但不能设置名称（value属性）以表明它不是一个键值对。
  *          被修饰的字符串参数将直接以文本形式添加到请求体中。
