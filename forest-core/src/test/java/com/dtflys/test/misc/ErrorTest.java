@@ -41,6 +41,7 @@ public class ErrorTest extends TestCase {
         final AtomicInteger count = new AtomicInteger(0);
         final boolean[] ts = new boolean[] {false};
         errorClient.testError(new OnError() {
+            @Override
             public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
                 int status = response.getStatusCode();
                 count.incrementAndGet();
