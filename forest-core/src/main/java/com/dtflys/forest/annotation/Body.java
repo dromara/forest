@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  * Request Body
  * <p>该注解绑定只能绑定方法的参数。被该注解绑定的参数将作为整个请求体或请求体的一部分随请求发送到服务端。</p>
  * <p>
- * 该注解有几种模式：
+ * 该注解有两种模式：
  *
  *    （1） 键值对模式:
  *
@@ -26,9 +26,18 @@ import java.lang.annotation.Target;
  *
  *          send(@Body UserInfo userInfo);
  *
- *          此模式的@Body注解可以修饰一个对象，但不能设置名称（value属性）以表明它不是一个键值对。被修饰的参数对象会被拆成一个个字段（这个对象的类中所有getter方法对应的字段），
+ *          此模式的@Body注解可以修饰一个或多个自定义对象，但不能设置名称（value属性）以表明它不是一个键值对。被修饰的参数对象会被拆成一个个字段（这个对象的类中所有getter方法对应的字段），
  *          所有这些字段将像键值对一样被合并成一个URL Encoded表单格式的字符串或是一个JSON对象。
  *          同样，合并成哪种形式取决于请求的contentType属性或Content-Type请求头。
+ *
+ *    （3） Map模式：
+ *
+ *          send(@Body Map paramMap);
+ *
+ *          此模式的@Body注解可以修饰一个或多个Map对象，但不能设置名称（value属性）以表明它不是一个键值对。被修饰的参数对象会被拆成一个个键值对（Map中的所有有值的键值对），
+ *          所有这些键值对被合并成一个URL Encoded表单格式的字符串或是一个JSON对象。
+ *          同样，合并成哪种形式取决于请求的contentType属性或Content-Type请求头。
+ *
  * </p>
  *
  * @author gongjun
