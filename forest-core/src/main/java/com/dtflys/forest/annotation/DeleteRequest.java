@@ -47,7 +47,7 @@ public @interface DeleteRequest {
 
     /**
      * target http url
-     * @return
+     * @return HTTP URL字符串
      */
     String url();
 
@@ -55,13 +55,13 @@ public @interface DeleteRequest {
      * type of response data: <br>
      *     text json xml <br>
      * default value is "auto"
-     * @return
+     * @return 请求响应返回的数据类型
      */
     String dataType() default "auto";
 
     /**
      * whether can use async http request or not
-     * @return
+     * @return {@code true} 如果为异步
      */
     boolean async() default false;
 
@@ -127,7 +127,7 @@ public @interface DeleteRequest {
      *     variables and parameters <br>
      *     <pre>
      *         headers = {"Accept: ${value}"}
-     *     <pre/>
+     *     </pre>
      *
      * @return
      */

@@ -9,7 +9,7 @@ import java.io.IOException;
 /**
  * Base64字符串与字节码转换工具
  * @author gongjun[dt_flys@hotmail.com]
- * @date 2020-08-04
+ * @since 2020-08-04 19:05
  */
 
 public class Base64Utils {

@@ -55,13 +55,13 @@ public @interface Delete {
      * type of response data: <br>
      *     text json xml <br>
      * default value is "auto"
-     * @return
+     * @return 请求响应返回的数据类型
      */
     String dataType() default "auto";
 
     /**
      * whether can use async http request or not
-     * @return
+     * @return 是否异步
      */
     boolean async() default false;
 
@@ -69,6 +69,7 @@ public @interface Delete {
 
     /**
      * SSL protocol
+     * @return SSL协议字符串
      */
     String sslProtocol() default "";
 
@@ -80,7 +81,7 @@ public @interface Delete {
 
     /**
      * max count to retry
-     * @return
+     * @return 请求最大重试次数
      */
     int retryCount() default 0;
 
@@ -100,7 +101,7 @@ public @interface Delete {
 
     /**
      * User Agent
-     * @return
+     * @return User Agent字符串
      */
     String userAgent() default "";
 
@@ -127,9 +128,9 @@ public @interface Delete {
      *     variables and parameters <br>
      *     <pre>
      *         headers = {"Accept: ${value}"}
-     *     <pre/>
+     *     </pre>
      *
-     * @return
+     * @return 请求头数组
      */
     String[] headers() default {};
 

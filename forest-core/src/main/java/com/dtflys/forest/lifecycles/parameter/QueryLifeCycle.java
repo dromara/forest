@@ -10,7 +10,7 @@ import com.dtflys.forest.utils.StringUtils;
 import static com.dtflys.forest.mapping.MappingParameter.TARGET_QUERY;
 
 /**
- * @Query注解的生命周期
+ * Forest &#064;Query注解的生命周期
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2020-08-21 1:14
  */

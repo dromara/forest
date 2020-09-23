@@ -8,7 +8,7 @@ import com.dtflys.forest.lifecycles.ParameterAnnotationLifeCycle;
 import com.dtflys.forest.utils.StringUtils;
 
 /**
- * @Header注解的生命周期
+ * Forest &#064;Header注解的生命周期
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2020-08-21 1:31
  */

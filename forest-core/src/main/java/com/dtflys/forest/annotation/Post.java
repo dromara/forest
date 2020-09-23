@@ -55,13 +55,13 @@ public @interface Post {
      * type of response data: <br>
      *     text json xml <br>
      * default value is "auto"
-     * @return
+     * @return 请求响应返回的数据类型
      */
     String dataType() default "auto";
 
     /**
      * whether can use async http request or not
-     * @return
+     * @return 是否异步
      */
     boolean async() default false;
 
@@ -126,7 +126,7 @@ public @interface Post {
      *     variables and parameters <br>
      *     <pre>
      *         headers = {"Accept: ${value}"}
-     *     <pre/>
+     *     </pre>
      *
      * @return
      */

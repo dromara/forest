@@ -3,7 +3,7 @@ package com.dtflys.forest.http;
 
 /**
  * 键值对类型请求体
- * <p>该请求体对象会包装键值对的名称和值，会根据请求的ContentType转换成表单项或JSON中的一个字段<p/>
+ * <p>该请求体对象会包装键值对的名称和值, 会根据请求的ContentType转换成表单项或JSON中的一个字段<p/>
  *
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2020-09-22 17:30

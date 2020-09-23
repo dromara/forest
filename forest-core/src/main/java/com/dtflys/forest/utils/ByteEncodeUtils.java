@@ -7,7 +7,7 @@ import org.mozilla.universalchardet.UniversalDetector;
  * 通过字符串字节数组获得字符串编码名称
  *
  * @author HouKunLin
- * @date 2020/9/3 0003 10:21
+ * @since 2020/9/3 0003 10:21
  * @see <a href="https://blog.csdn.net/qq_31384551/article/details/81627840">参考资料</a>
  */
 public class ByteEncodeUtils {

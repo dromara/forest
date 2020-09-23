@@ -7,7 +7,7 @@ import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.lifecycles.ParameterAnnotationLifeCycle;
 
 /**
- * @DataParam注解的生命周期
+ * Forest &#064;DataParam注解的生命周期
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2020-08-21 0:50
  */

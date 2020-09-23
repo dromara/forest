@@ -3,7 +3,7 @@ package com.dtflys.forest.http;
 /**
  * Forest请求体
  * <p>该类为Forest请求中所有类型请求体项的父类<p/>
- * <p>该类有3个子类：</p>
+ * <p>该类有3个子类: </p>
  * <p>    StringRequestBody    字符串请求体</p>
  * <p>    ObjectRequestBody    对象请求体</p>
  * <p>    NameValueRequestBody 键值对请求体</p>

@@ -37,45 +37,42 @@ import java.lang.annotation.Target;
  * <p>Query参数为 [参数名1]=[参数值1](&[参数名n]=[参数值n])* 的形式</P>
  * <p>[参数名] 由该注解的 value 属性表示</P>
  * <p>[参数值] 由该注解所修饰的参数的值表示</P>
- * <p>
  * <p>该注解有一下几种模式：</p>
  *
  *    （1） 键值对模式: <br><br>
  *
  *          <pre>
- *          void send(@Query("username") String username, @Query("password") String password);
+ *          void send(&#064;Query("username") String username, &#064;Query("password") String password);
  *          </pre>
  *
- *          此模式的@Query注解可以修饰一个或多个参数，每个参数仅作为一个键值对。这些键值对最终会被作为一个URL的Query参数添加到请求的URL参数中<br><br>
+ *          此模式的&#064;Query注解可以修饰一个或多个参数，每个参数仅作为一个键值对。这些键值对最终会被作为一个URL的Query参数添加到请求的URL参数中<br><br>
  *
  *    （2） 对象模式：<br><br>
  *
  *          <pre>
- *          void send(@Query UserInfo userInfo);
+ *          void send(&#064;Query UserInfo userInfo);
  *          </pre>
  *
- *          此模式的@Query注解可以修饰一个或多个自定义对象，但不能设置名称（value属性）以表明它不是一个键值对。被修饰的参数对象会被拆成一个个字段（这个对象类中所有getter方法对应的字段），
+ *          此模式的&#064;Query注解可以修饰一个或多个自定义对象，但不能设置名称（value属性）以表明它不是一个键值对。被修饰的参数对象会被拆成一个个字段（这个对象类中所有getter方法对应的字段），
  *          所有这些字段将像键值对一样被作为一个URL的Query参数添加到请求的URL参数中 <br><br>
  *
  *    （3） Map模式：<br><br>
  *
  *          <pre>
- *          void send(@Query Map headerMap);
+ *          void send(&#064;Query Map headerMap);
  *          </pre>
  *
- *          此模式的@Query注解可以修饰一个或多个Map对象，但不能设置名称（value属性）以表明它不是一个键值对。被修饰的参数对象会被拆成一个个键值对（Map中的所有有值的键值对），
+ *          此模式的&#064;Query注解可以修饰一个或多个Map对象，但不能设置名称（value属性）以表明它不是一个键值对。被修饰的参数对象会被拆成一个个键值对（Map中的所有有值的键值对），
  *          所有这些键值对被作为一个URL的Query参数添加到请求的URL参数中 <br><br>
  *
  *    （4） 字符串模式：<br><br>
  *
  *          <pre>
- *          void send(@Query String query);
+ *          void send(&#064;Query String query);
  *          </pre>
  *
- *          此模式的@Query注解可以修饰一个或多个String类型参数，但不能设置名称（value属性）以表明它不是一个键值对。
+ *          此模式的&#064;Query注解可以修饰一个或多个String类型参数，但不能设置名称（value属性）以表明它不是一个键值对。
  *          被修饰的字符串参数将直接以 [参数值] 的形式添加到URL中的Query参数部分
- *
- * </p>
  *
  * @author gongjun
  * @since 2020-08-03
@@ -90,7 +87,7 @@ public @interface Query {
      * URL Query参数的参数名（可省略）
      * <p>如有参数名，将会以 [参数名]=[参数值] 的形式添加到URL中的Query参数部分（即'?'后的那部分）</p>
      * <p>如没有参数名，将直接以 [参数值] 的形式添加到URL中的Query参数部分，</p>
-     * <p>如 @Query String name，且参数name的值为yyy的话，产生的URL便会是 http://xxx.xxx.xxx/xxx?yyy</p>
+     * <p>如 &#064;Query String name，且参数name的值为yyy的话，产生的URL便会是 http://xxx.xxx.xxx/xxx?yyy</p>
      *
      * @return
      */
