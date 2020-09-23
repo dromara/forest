@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 
 /**
  * URL Query参数注解，该注解只能修饰方法的参数，被修饰的参数会被作为一个URL的Query参数添加到请求的URL中的Query部分（即'?'后的那部分）
- * Query参数将会以 [参数名]=[参数值] 的形式添加到URL中的Query参数部分（即'?'后的那部分）
+ * Query参数为 [参数名]=[参数值] 的形式
  * [参数名] 由该注解的 value 属性表示
  * [参数值] 由该注解所修饰的参数的值表示
  * <p>
