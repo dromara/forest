@@ -9,7 +9,11 @@ import java.lang.annotation.Target;
 import java.lang.annotation.RetentionPolicy;
 
 /**
+ * 接口级别请求配置信息注解
  * The annotation must be on an interface. It allows you to make some configurations shared for all the requests in this interface.
+ * 该注解必须绑定在某一个接口类上。在该注解中配置的参数信息将会被次注解绑定的接口中所有方法的请求所共享，
+ * 它可以覆盖全局级别的请求配置信息，但不能覆盖方法级别的请求参数信息
+ *
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2018-03-30 16:59
  */
