@@ -17,7 +17,6 @@ import static org.mockito.Mockito.mock;
  */
 public class TestExceptions {
 
-
     @Test
     public void testForestNetworkException() {
         try {
