@@ -11,6 +11,12 @@ import org.apache.commons.io.IOUtils;
 import java.io.*;
 import java.lang.reflect.Type;
 
+/**
+ * 默认的二进制数据转换器
+ *
+ * @author gongjun
+ * @since 2020-08-03 20:05
+ */
 public class DefaultBinaryConverter implements ForestConverter<Object> {
 
 
