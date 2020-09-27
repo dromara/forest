@@ -86,7 +86,7 @@ public class ForestMethod<T> implements VariableScope {
     private MappingTemplate userAgentTemplate;
     private long progressStep = -1;
     private ForestConverter decoder = null;
-    private String sslKeyStoreId;
+    private MappingTemplate sslKeyStoreId;
     private MappingTemplate[] dataTemplateArray;
     private MappingTemplate[] headerTemplateArray;
     private MappingParameter[] parameterTemplateArray;
@@ -338,7 +338,7 @@ public class ForestMethod<T> implements VariableScope {
         if (StringUtils.isNotEmpty(metaRequest.getUserAgent())) {
             userAgentTemplate = makeTemplate(metaRequest.getUserAgent());
         }
-        sslKeyStoreId = metaRequest.getKeyStore();
+        sslKeyStoreId = makeTemplate(metaRequest.getKeyStore());
         if (StringUtils.isNotEmpty(metaRequest.getContentEncoding())) {
             encodeTemplate = makeTemplate(metaRequest.getContentEncoding());
         }
@@ -831,11 +831,14 @@ public class ForestMethod<T> implements VariableScope {
 
         request.setMultiparts(multiparts);
         // setup ssl keystore
-        SSLKeyStore sslKeyStore = null;
-        if (StringUtils.isNotEmpty(sslKeyStoreId)) {
-            sslKeyStore = configuration.getKeyStore(sslKeyStoreId);
+        if (sslKeyStoreId != null) {
+            SSLKeyStore sslKeyStore = null;
+            String keyStoreId = sslKeyStoreId.render(args);
+            if (StringUtils.isNotEmpty(keyStoreId)) {
+                sslKeyStore = configuration.getKeyStore(keyStoreId);
+                request.setKeyStore(sslKeyStore);
+            }
         }
-        request.setKeyStore(sslKeyStore);
 
         if (decoder != null) {
             request.setDecoder(decoder);
