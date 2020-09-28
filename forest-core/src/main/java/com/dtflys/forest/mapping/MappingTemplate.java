@@ -7,6 +7,7 @@ import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -372,6 +373,62 @@ public class MappingTemplate {
         }
         return obj.toString();
     }
+
+
+    private static String getFormCollectionItem(Collection collection) {
+        if (collection.isEmpty()) {
+            return null;
+        }
+        StringBuilder builder = new StringBuilder();
+        for (Iterator iterator = collection.iterator(); iterator.hasNext(); ) {
+            Object item = iterator.next();
+            builder.append(item);
+            if (iterator.hasNext()) {
+                builder.append(",");
+            }
+        }
+        return builder.toString();
+    }
+
+
+    private static String getFormedArrayItem(Object array) {
+        StringBuilder builder = new StringBuilder();
+        int len = Array.getLength(array);
+        if (len == 0) {
+            return null;
+        }
+        for (int i = 0; i < len; i++) {
+            Object item = Array.get(array, i);
+            builder.append(item);
+            if (i < len - 1) {
+                builder.append(",");
+            }
+        }
+        return builder.toString();
+    }
+
+
+
+    public static String getFormedValue(ForestJsonConverter jsonConverter, Object obj) {
+        if (obj == null) {
+            return null;
+        }
+        if (obj instanceof Collection) {
+            Collection collection = (Collection) obj;
+            return getFormCollectionItem(collection);
+        }
+        if (obj.getClass().isArray()) {
+            return getFormedArrayItem(obj);
+        }
+        if (obj instanceof Map) {
+            return jsonConverter.encodeToString(obj);
+        }
+        if (obj instanceof Date) {
+            return String.valueOf(((Date) obj).getTime());
+        }
+        return obj.toString();
+    }
+
 
     @Override
     public String toString() {
