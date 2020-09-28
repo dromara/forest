@@ -7,13 +7,21 @@ import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.multipart.ForestMultipart;
+import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import okhttp3.*;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.nio.charset.Charset;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -51,10 +59,12 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
         setBody(builder, body);
     }
 
+
     @Override
     protected void setFormBody(Request.Builder builder, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList) {
         FormBody.Builder bodyBuilder = new FormBody.Builder();
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
+        nameValueList = prepareFromNameValueList(jsonConverter, nameValueList);
         for (int i = 0; i < nameValueList.size(); i++) {
             RequestNameValue nameValue = nameValueList.get(i);
             if (!nameValue.isInBody()) {
@@ -62,7 +72,7 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
             }
             String name = nameValue.getName();
             Object value = nameValue.getValue();
-            bodyBuilder.addEncoded(name, MappingTemplate.getParameterValue(jsonConverter, value));
+            bodyBuilder.addEncoded(name, MappingTemplate.getFormedValue(jsonConverter, value));
         }
 
         FormBody body = bodyBuilder.build();
