@@ -1,12 +1,14 @@
 package com.dtflys.test.http.client;
 
 import com.dtflys.forest.annotation.*;
+import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.model.*;
 import com.dtflys.test.http.model.UserParam;
 import com.dtflys.test.http.model.XmlTestParam;
 import com.dtflys.test.interceptor.PostHeadInterceptor;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -113,6 +115,47 @@ public interface PostClient {
     String complexPost3(@Query("param") String param,
                         @Body("username") String username,
                         @Body("password") String password);
+
+
+    @Request(
+            url = "http://localhost:${port}/form-array",
+            type = "post",
+            headers = {"Accept:text/plain"},
+            contentType = "application/x-www-form-urlencoded"
+    )
+    String postFormList1(@Body("username") String username,
+                         @Body("password") String password,
+                         @Body("idList") List<Integer> idList,
+                         @Body("cause") List<Cause> causes);
+
+
+    @Request(
+            url = "http://localhost:${port}/form-array",
+            type = "post",
+            headers = {"Accept:text/plain"},
+            contentType = "application/x-www-form-urlencoded"
+    )
+    String postFormList2(@Body FormListParam param);
+
+
+    @Request(
+            url = "http://localhost:${port}/form-array",
+            type = "post",
+            headers = {"Accept:text/plain"},
+            contentType = "application/x-www-form-urlencoded"
+    )
+    String postFormArray1(@Body("username") String username,
+                          @Body("password") String password,
+                          @Body("idList") Integer[] idList,
+                          @Body("cause") Cause[] causes);
+
+    @Request(
+            url = "http://localhost:${port}/form-array",
+            type = "post",
+            headers = {"Accept:text/plain"},
+            contentType = "application/x-www-form-urlencoded"
+    )
+    String postFormArray2(@Body FormArrayParam param);
 
     @Request(
             url = "http://localhost:${port}/complex",

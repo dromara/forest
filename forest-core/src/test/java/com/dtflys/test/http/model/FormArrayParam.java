@@ -1,0 +1,41 @@
+package com.dtflys.test.http.model;
+
+import com.alibaba.fastjson.annotation.JSONField;
+
+import java.util.List;
+
+public class FormArrayParam {
+
+    @JSONField(ordinal = 1)
+    private String username;
+
+    @JSONField(ordinal = 2)
+    private String password;
+
+    @JSONField(ordinal = 3)
+    private Integer[] idList;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Integer[] getIdList() {
+        return idList;
+    }
+
+    public void setIdList(Integer[] idList) {
+        this.idList = idList;
+    }
+}
