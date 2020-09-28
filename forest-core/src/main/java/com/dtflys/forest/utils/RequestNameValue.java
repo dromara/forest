@@ -55,4 +55,7 @@ public class RequestNameValue {
         return target == TARGET_HEADER;
     }
 
+    public int getTarget() {
+        return target;
+    }
 }

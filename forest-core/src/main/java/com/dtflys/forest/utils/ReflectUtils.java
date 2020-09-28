@@ -69,6 +69,42 @@ public class ReflectUtils {
         return false;
     }
 
+
+    public static boolean isPrimaryArrayType(Class type) {
+        if (!type.isArray()) {
+            return false;
+        }
+        if (byte[].class.isAssignableFrom(type) || Byte[].class.isAssignableFrom(type)) {
+            return true;
+        }
+        if (int[].class.isAssignableFrom(type) || Integer[].class.isAssignableFrom(type)) {
+            return true;
+        }
+        if (long[].class.isAssignableFrom(type) || Long[].class.isAssignableFrom(type)) {
+            return true;
+        }
+        if (short[].class.isAssignableFrom(type) || Short[].class.isAssignableFrom(type)) {
+            return true;
+        }
+        if (float[].class.isAssignableFrom(type) || Float[].class.isAssignableFrom(type)) {
+            return true;
+        }
+        if (double[].class.isAssignableFrom(type) || Double[].class.isAssignableFrom(type)) {
+            return true;
+        }
+        if (BigDecimal[].class.isAssignableFrom(type)) {
+            return true;
+        }
+        if (BigInteger[].class.isAssignableFrom(type)) {
+            return true;
+        }
+        if (CharSequence[].class.isAssignableFrom(type)) {
+            return true;
+        }
+        return false;
+    }
+
+
     public static Map<String, Object> getAttributesFromAnnotation(Annotation ann) {
         Set<String> excludeMethodNames = new HashSet<>();
         excludeMethodNames.add("equals");
