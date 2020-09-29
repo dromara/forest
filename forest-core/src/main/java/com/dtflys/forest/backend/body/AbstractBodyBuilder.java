@@ -8,17 +8,13 @@ import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.http.NameValueRequestBody;
 import com.dtflys.forest.http.ObjectRequestBody;
 import com.dtflys.forest.http.StringRequestBody;
-import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
-import com.google.common.collect.Lists;
 
 import java.lang.reflect.Array;
-import java.lang.reflect.TypeVariable;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -38,6 +34,12 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
     public final static String TYPE_APPLICATION_JSON = "application/json";
     public final static String TYPE_MULTIPART_FORM_DATA = "multipart/form-data";
 
+    /**
+     * 构建
+     * @param httpRequest
+     * @param request
+     * @param lifeCycleHandler
+     */
     @Override
     public void buildBody(T httpRequest, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         String contentType = request.getContentType();
@@ -176,38 +178,64 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
         }
     }
 
-    protected void prepareFormCollectionItem(List<RequestNameValue> newNameValueList, ForestJsonConverter jsonConverter, String name, Collection collection, int target) {
+    /**
+     * 处理Form表单中的集合项
+     * @param newNameValueList 键值对列表
+     * @param name 表单项目名
+     * @param collection 集合对象
+     * @param target
+     */
+    protected void processFormCollectionItem(List<RequestNameValue> newNameValueList, String name, Collection collection, int target) {
         int index = 0;
         for (Iterator iterator = collection.iterator(); iterator.hasNext(); ) {
             Object item = iterator.next();
             String subName = name + "[" + index + "]";
-            prepareFormItem(newNameValueList, jsonConverter, subName, item, target);
+            processFormItem(newNameValueList, subName, item, target);
             index++;
         }
     }
 
-
-    protected void prepareFormArrayItem(List<RequestNameValue> newNameValueList, ForestJsonConverter jsonConverter, String name, Object array, int target) {
+    /**
+     * 处理Form表单中的数组项
+     * @param newNameValueList 键值对列表
+     * @param name 表单项目名
+     * @param array 数组
+     * @param target 请求目标位置
+     */
+    protected void processFormArrayItem(List<RequestNameValue> newNameValueList, String name, Object array, int target) {
         int len = Array.getLength(array);
         for (int i = 0; i < len; i++) {
             Object item = Array.get(array, i);
             String subName = name + "[" + i + "]";
-            prepareFormItem(newNameValueList, jsonConverter, subName, item, target);
+            processFormItem(newNameValueList, subName, item, target);
         }
     }
 
-    protected void prepareFormMapItem(List<RequestNameValue> newNameValueList, ForestJsonConverter jsonConverter, String name, Map map, int target) {
+    /**
+     * 处理Form表单中的Map项
+     * @param newNameValueList 键值对列表
+     * @param name 表单项目名
+     * @param map Map对象
+     * @param target 请求目标位置
+     */
+    protected void processFormMapItem(List<RequestNameValue> newNameValueList, String name, Map map, int target) {
         for (Iterator<Map.Entry> iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
             Map.Entry entry = iterator.next();
             Object mapKey = entry.getKey();
             Object mapValue = entry.getValue();
-            String subName = name + "." + mapKey;
-            prepareFormItem(newNameValueList, jsonConverter, subName, mapValue, target);
+            String subName = name + "[" + mapKey + "]";
+            processFormItem(newNameValueList, subName, mapValue, target);
         }
     }
 
-
-    protected void prepareFormItem(List<RequestNameValue> newNameValueList, ForestJsonConverter jsonConverter, String name, Object value, int target) {
+    /**
+     * 处理Form表单中的项
+     * @param newNameValueList 键值对列表
+     * @param name 表单项目名
+     * @param value 表单项目值
+     * @param target 请求目标位置
+     */
+    protected void processFormItem(List<RequestNameValue> newNameValueList, String name, Object value, int target) {
         if (StringUtils.isEmpty(name) && value == null) {
             return;
         }
@@ -230,35 +258,40 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
             }
             if (needCollapse) {
                 if (value instanceof Collection) {
-                    prepareFormCollectionItem(newNameValueList, jsonConverter, name, (Collection) value, target);
+                    processFormCollectionItem(newNameValueList, name, (Collection) value, target);
                 } else if (itemClass.isArray()) {
-                    prepareFormArrayItem(newNameValueList, jsonConverter, name, value, target);
+                    processFormArrayItem(newNameValueList, name, value, target);
                 }
             } else if (ReflectUtils.isPrimaryType(itemClass)
                     || ReflectUtils.isPrimaryArrayType(itemClass)
                     || value instanceof Collection) {
                 newNameValueList.add(new RequestNameValue(name, value, target));
             } else if (value instanceof Map) {
-                prepareFormMapItem(newNameValueList, jsonConverter, name, (Map) value, target);
+                processFormMapItem(newNameValueList, name, (Map) value, target);
             } else {
-                Map<String, Object> itemAttrs = jsonConverter.convertObjectToMap(value);
+                Map<String, Object> itemAttrs = ReflectUtils.convertObjectToMap(value);
                 for (Map.Entry<String, Object> entry : itemAttrs.entrySet()) {
                     String subAttrName = entry.getKey();
                     Object subAttrValue = entry.getValue();
                     String subName = name + "." + subAttrName;
-                    prepareFormItem(newNameValueList, jsonConverter, subName, subAttrValue, target);
+                    processFormItem(newNameValueList, subName, subAttrValue, target);
                 }
             }
         }
     }
 
-    protected List<RequestNameValue> prepareFromNameValueList(ForestJsonConverter jsonConverter, List<RequestNameValue> nameValueList) {
+    /**
+     * 处理Form表单中的键值对列表
+     * @param nameValueList 键值对列表
+     * @return 处理过的新键值对列表
+     */
+    protected List<RequestNameValue> processFromNameValueList(List<RequestNameValue> nameValueList) {
         List<RequestNameValue> newNameValueList = new LinkedList<>();
         for (RequestNameValue nameValue : nameValueList) {
             String name = nameValue.getName();
             Object value = nameValue.getValue();
             int target = nameValue.getTarget();
-            prepareFormItem(newNameValueList, jsonConverter, name, value, target);
+            processFormItem(newNameValueList, name, value, target);
         }
         return newNameValueList;
     }

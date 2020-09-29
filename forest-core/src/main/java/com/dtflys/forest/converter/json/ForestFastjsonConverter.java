@@ -1,18 +1,25 @@
 package com.dtflys.forest.converter.json;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.parser.DefaultJSONParser;
+import com.alibaba.fastjson.parser.ParserConfig;
+import com.alibaba.fastjson.parser.deserializer.ObjectDeserializer;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.util.FieldInfo;
 import com.alibaba.fastjson.util.TypeUtils;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -135,6 +142,96 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         }
     }
 
+    private static final Object toJSON(Object javaObject) {
+        return toJSON(javaObject, ParserConfig.getGlobalInstance());
+    }
+
+    private static final Object toJSON(Object javaObject, ParserConfig mapping) {
+        if (javaObject == null) {
+            return null;
+        }
+
+        if (javaObject instanceof JSON) {
+            return (JSON) javaObject;
+        }
+
+        if (javaObject instanceof Map) {
+            Map<Object, Object> map = (Map<Object, Object>) javaObject;
+
+            JSONObject json = new JSONObject(map.size());
+
+            for (Map.Entry<Object, Object> entry : map.entrySet()) {
+                Object key = entry.getKey();
+                String jsonKey = TypeUtils.castToString(key);
+                Object jsonValue = toJSON(entry.getValue());
+                json.put(jsonKey, jsonValue);
+            }
+
+            return json;
+        }
+
+        if (javaObject instanceof Collection) {
+            Collection<Object> collection = (Collection<Object>) javaObject;
+
+            JSONArray array = new JSONArray(collection.size());
+
+            for (Object item : collection) {
+                Object jsonValue = toJSON(item);
+                array.add(jsonValue);
+            }
+
+            return array;
+        }
+
+        Class<?> clazz = javaObject.getClass();
+
+        if (clazz.isEnum()) {
+            return ((Enum<?>) javaObject).name();
+        }
+
+        if (clazz.isArray()) {
+            int len = Array.getLength(javaObject);
+
+            JSONArray array = new JSONArray(len);
+
+            for (int i = 0; i < len; ++i) {
+                Object item = Array.get(javaObject, i);
+                Object jsonValue = toJSON(item);
+                array.add(jsonValue);
+            }
+
+            return array;
+        }
+
+        if (mapping.isPrimitive(clazz)) {
+            return javaObject;
+        }
+
+        try {
+            List<FieldInfo> getters = TypeUtils.computeGetters(clazz, null);
+
+            JSONObject json = new JSONObject(getters.size(), true);
+
+            for (FieldInfo field : getters) {
+                Object value = field.get(javaObject);
+                Object jsonValue = JSON.toJSON(value);
+                if (nameField != null) {
+                    json.put((String) nameField.get(field), jsonValue);
+                } else if (nameMethod != null) {
+                    json.put((String) nameMethod.invoke(field), jsonValue);
+                }
+            }
+
+            return json;
+        } catch (IllegalAccessException e) {
+            throw new JSONException("toJSON error", e);
+        } catch (InvocationTargetException e) {
+            throw new JSONException("toJSON error", e);
+        }
+    }
+
+
+
     @Override
     public Map<String, Object> convertObjectToMap(Object obj) {
         if (obj == null) {
@@ -148,14 +245,14 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         }
         List<FieldInfo> getters = TypeUtils.computeGetters(obj.getClass(), null);
         JSONObject json = new JSONObject(getters.size(), true);
+
         try {
             for (FieldInfo field : getters) {
                 Object value = field.get(obj);
-                Object jsonValue = JSON.toJSON(value);
                 if (nameField != null) {
-                    json.put((String) nameField.get(field), jsonValue);
+                    json.put((String) nameField.get(field), value);
                 } else if (nameMethod != null) {
-                    json.put((String) nameMethod.invoke(field), jsonValue);
+                    json.put((String) nameMethod.invoke(field), value);
                 }
             }
             return json;

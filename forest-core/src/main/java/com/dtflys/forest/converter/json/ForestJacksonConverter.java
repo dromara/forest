@@ -4,6 +4,8 @@ import com.dtflys.forest.exceptions.ForestConvertException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.MapType;
+import com.fasterxml.jackson.databind.util.BeanUtil;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -85,6 +87,8 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         if (obj instanceof CharSequence) {
             return convertToJavaObject(obj.toString(), LinkedHashMap.class);
         }
-        return mapper.convertValue(obj, LinkedHashMap.class);
+
+        JavaType javaType = mapper.getTypeFactory().constructMapType(LinkedHashMap.class, String.class, Object.class);
+        return mapper.convertValue(obj, javaType);
     }
 }

@@ -22,7 +22,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
             if (Map.class.isAssignableFrom(targetType)) {
                 JsonParser jsonParser = new JsonParser();
                 JsonObject jsonObject = jsonParser.parse(source).getAsJsonObject();
-                return (T) toMap(jsonObject);
+                return (T) toMap(jsonObject, false);
             }
             else if (List.class.isAssignableFrom(targetType)) {
                 JsonParser jsonParser = new JsonParser();
@@ -51,18 +51,30 @@ public class ForestGsonConverter implements ForestJsonConverter {
     }
 
 
-    private static Map<String, Object> toMap(JsonObject json){
+    private static Map<String, Object> toMap(JsonObject json, boolean singleLevel){
         Map<String, Object> map = new HashMap<String, Object>();
         Set<Map.Entry<String, JsonElement>> entrySet = json.entrySet();
         for (Iterator<Map.Entry<String, JsonElement>> iter = entrySet.iterator(); iter.hasNext(); ){
             Map.Entry<String, JsonElement> entry = iter.next();
             String key = entry.getKey();
             Object value = entry.getValue();
+            if (singleLevel) {
+                if(value instanceof JsonArray) {
+                    map.put(key, toList((JsonArray) value));
+                }
+                else if (value instanceof JsonPrimitive) {
+                    map.put(key, toObject((JsonPrimitive) value));
+                }
+                else {
+                    map.put(key, value);
+                }
+                continue;
+            }
             if(value instanceof JsonArray) {
                 map.put(key, toList((JsonArray) value));
             }
             else if(value instanceof JsonObject) {
-                map.put(key, toMap((JsonObject) value));
+                map.put(key, toMap((JsonObject) value, singleLevel));
             }
             else if (value instanceof JsonPrimitive) {
                 map.put(key, toObject((JsonPrimitive) value));
@@ -108,7 +120,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
             return toList(jsonPrimitive.getAsJsonArray());
         }
         if (jsonPrimitive.isJsonObject()) {
-            return toMap(jsonPrimitive.getAsJsonObject());
+            return toMap(jsonPrimitive.getAsJsonObject(), false);
         }
         return null;
     }
@@ -121,7 +133,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
                 list.add(toList((JsonArray) value));
             }
             else if (value instanceof JsonObject) {
-                list.add(toMap((JsonObject) value));
+                list.add(toMap((JsonObject) value, false));
             }
             else if (value instanceof JsonPrimitive) {
                 list.add(toObject((JsonPrimitive) value));
@@ -149,7 +161,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
         }
         Gson gson = new Gson();
         JsonElement jsonElement = gson.toJsonTree(obj);
-        return toMap(jsonElement.getAsJsonObject());
+        return toMap(jsonElement.getAsJsonObject(), true);
     }
 
     public String convertToJson(Object obj, Type type) {
