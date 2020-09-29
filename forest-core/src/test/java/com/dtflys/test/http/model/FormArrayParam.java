@@ -15,6 +15,9 @@ public class FormArrayParam {
     @JSONField(ordinal = 3)
     private Integer[] idList;
 
+    @JSONField(ordinal = 4)
+    private Cause[] cause;
+
     public String getUsername() {
         return username;
     }
@@ -37,5 +40,13 @@ public class FormArrayParam {
 
     public void setIdList(Integer[] idList) {
         this.idList = idList;
+    }
+
+    public Cause[] getCause() {
+        return cause;
+    }
+
+    public void setCause(Cause[] cause) {
+        this.cause = cause;
     }
 }

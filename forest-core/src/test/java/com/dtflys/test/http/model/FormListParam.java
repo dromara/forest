@@ -16,7 +16,7 @@ public class FormListParam {
     private List<Integer> idList;
 
     @JSONField(ordinal = 4)
-    private List<Cause> causes;
+    private List<Cause> cause;
 
     public String getUsername() {
         return username;
@@ -42,11 +42,11 @@ public class FormListParam {
         this.idList = idList;
     }
 
-    public List<Cause> getCauses() {
-        return causes;
+    public List<Cause> getCause() {
+        return cause;
     }
 
-    public void setCauses(List<Cause> causes) {
-        this.causes = causes;
+    public void setCause(List<Cause> cause) {
+        this.cause = cause;
     }
 }

@@ -78,7 +78,7 @@ public class TestPost2Client extends BaseClientTest {
         cause2.setId(2);
         cause2.setScore(73);
         List<Cause> causes = Lists.newArrayList(cause1, cause2);
-        param.setCauses(causes);
+        param.setCause(causes);
         String result = postClient.postFormList2(param);
         assertEquals(Post2MockServer.EXPECTED, result);
     }
@@ -100,10 +100,17 @@ public class TestPost2Client extends BaseClientTest {
     @Test
     public void testPostFormArray2() {
         FormArrayParam param = new FormArrayParam();
-        List<Integer> idList = Lists.newArrayList(1, 2, 3);
         param.setUsername("foo");
         param.setPassword("123456");
         param.setIdList(new Integer[] {1, 2, 3});
+        Cause cause1 = new Cause();
+        cause1.setId(1);
+        cause1.setScore(87);
+        Cause cause2 = new Cause();
+        cause2.setId(2);
+        cause2.setScore(73);
+        Cause[] causes = new Cause[] {cause1, cause2};
+        param.setCause(causes);
         String result = postClient.postFormArray2(param);
         assertEquals(Post2MockServer.EXPECTED, result);
     }

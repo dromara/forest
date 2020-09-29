@@ -1,9 +1,14 @@
 package com.dtflys.test.converter;
 
+import com.dtflys.forest.converter.json.ForestFastjsonConverter;
+import com.dtflys.forest.utils.ReflectUtils;
+import com.dtflys.test.http.model.Cause;
+import com.dtflys.test.http.model.FormListParam;
 import com.dtflys.test.model.Coordinate;
 import com.dtflys.test.model.SubCoordinate;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import junit.framework.Assert;
 import com.dtflys.forest.converter.json.ForestJacksonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
@@ -131,6 +136,29 @@ public class TestForestJacksonConverter {
         assertNotNull(map);
         assertEquals("11.11111", map.get("longitude"));
         assertEquals("22.22222", map.get("latitude"));
+    }
+
+    @Test
+    public void testJavaObjectToMap3() {
+        FormListParam param = new FormListParam();
+        List<Integer> idList = Lists.newArrayList(1, 2, 3);
+        param.setUsername("foo");
+        param.setPassword("123456");
+        param.setIdList(idList);
+        Cause cause1 = new Cause();
+        cause1.setId(1);
+        cause1.setScore(87);
+        Cause cause2 = new Cause();
+        cause2.setId(2);
+        cause2.setScore(73);
+        List<Cause> causes = Lists.newArrayList(cause1, cause2);
+        param.setCause(causes);
+
+        Map map = ReflectUtils.convertObjectToMap(param);
+        assertEquals("foo", map.get("username"));
+        assertEquals("123456", map.get("password"));
+        assertEquals(idList, map.get("idList"));
+        assertEquals(causes, map.get("cause"));
     }
 
 
