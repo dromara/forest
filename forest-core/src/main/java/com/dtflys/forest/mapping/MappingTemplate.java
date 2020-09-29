@@ -375,7 +375,7 @@ public class MappingTemplate {
     }
 
 
-    private static String getFormCollectionItem(Collection collection) {
+    private static String getFormCollectionValueString(Collection collection) {
         if (collection.isEmpty()) {
             return null;
         }
@@ -391,7 +391,7 @@ public class MappingTemplate {
     }
 
 
-    private static String getFormedArrayItem(Object array) {
+    private static String getFormArrayValueString(Object array) {
         StringBuilder builder = new StringBuilder();
         int len = Array.getLength(array);
         if (len == 0) {
@@ -409,16 +409,16 @@ public class MappingTemplate {
 
 
 
-    public static String getFormedValue(ForestJsonConverter jsonConverter, Object obj) {
+    public static String getFormValueString(ForestJsonConverter jsonConverter, Object obj) {
         if (obj == null) {
             return null;
         }
         if (obj instanceof Collection) {
             Collection collection = (Collection) obj;
-            return getFormCollectionItem(collection);
+            return getFormCollectionValueString(collection);
         }
         if (obj.getClass().isArray()) {
-            return getFormedArrayItem(obj);
+            return getFormArrayValueString(obj);
         }
         if (obj instanceof Map) {
             return jsonConverter.encodeToString(obj);
