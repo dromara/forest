@@ -11,6 +11,7 @@ import com.dtflys.test.http.model.JsonTestUser;
 import com.dtflys.test.interceptor.ErrorInterceptor;
 import com.dtflys.test.model.TestResult;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 
@@ -130,6 +131,25 @@ public interface GetClient {
             headers = {"Accept:text/plain"}
     )
     String queryObjectGet(@Query JsonTestUser user);
+
+    @Request(
+            url = "http://localhost:${port}/hello/user?username=foo&username=bar&username=user1&username=user2&password=123456",
+            headers = {"Accept:text/plain"}
+    )
+    String repeatableQuery();
+
+    @Request(
+            url = "http://localhost:${port}/hello/user?username=foo&username=bar",
+            headers = {"Accept:text/plain"}
+    )
+    String repeatableQuery(@Query("username") String user1, @Query("username") String user2, @Query("password") String password);
+
+    @Request(
+            url = "http://localhost:${port}/hello/user",
+            headers = {"Accept:text/plain"}
+    )
+    String repeatableQuery(@Query("username") List<String> usernames, @Query("password") String password);
+
 
     @Request(
             url = "http://localhost:${port}/hello/user",
