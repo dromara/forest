@@ -43,7 +43,6 @@ import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 
-import java.io.InputStream;
 import java.util.*;
 
 import static com.dtflys.forest.mapping.MappingParameter.*;
@@ -88,7 +87,7 @@ public class ForestRequest<T> {
     /**
      * URL中的Query参数表
      */
-    private Map<String, Object> query = new LinkedHashMap<>();
+    private ForestQueryMap query = new ForestQueryMap();
 
     /**
      * 请求类型
@@ -279,7 +278,7 @@ public class ForestRequest<T> {
         return this;
     }
 
-    public Map<String, Object> getQueryMap() {
+    public Map<String, Object> getQuery() {
         return query;
     }
 
@@ -289,14 +288,22 @@ public class ForestRequest<T> {
 
     public String getQueryString() {
         StringBuilder builder = new StringBuilder();
-        Iterator<String> iterator = query.keySet().iterator();
+        Iterator<ForestQueryParameter> iterator = query.queryValues().iterator();
+        query.values();
         while (iterator.hasNext()) {
-            String name  = iterator.next();
-            Object value = query.get(name);
-            if (value != null) {
-                builder.append(name);
-                builder.append("=");
-                builder.append(value);
+            ForestQueryParameter query = iterator.next();
+            if (query != null) {
+                String name = query.getName();
+                Object value = query.getValue();
+                if (name != null) {
+                    builder.append(name);
+                    if (value != null) {
+                        builder.append("=");
+                    }
+                }
+                if (value != null) {
+                    builder.append(value);
+                }
             }
             if (iterator.hasNext()) {
                 builder.append("&");
@@ -306,9 +313,37 @@ public class ForestRequest<T> {
     }
 
     public ForestRequest addQuery(String name, Object value) {
-        this.query.put(name, value);
+        this.query.addQuery(name, value);
         return this;
     }
+
+    public ForestRequest addQuery(ForestQueryParameter queryParameter) {
+        this.query.addQuery(queryParameter);
+        return this;
+    }
+
+    public ForestRequest addQuery(Collection<ForestQueryParameter> queryParameters) {
+        for (ForestQueryParameter queryParameter : queryParameters) {
+            addQuery(queryParameter);
+        }
+        return this;
+    }
+
+    public ForestRequest addQueryValues(String name, Collection queryValues) {
+        for (Object queryValue : queryValues) {
+            addQuery(name, queryValue);
+        }
+        return this;
+    }
+
+
+    public ForestRequest addQuery(ForestQueryParameter[] queryParameters) {
+        for (ForestQueryParameter queryParameter : queryParameters) {
+            addQuery(queryParameter);
+        }
+        return this;
+    }
+
 
     public ForestRequestType getType() {
         return type;
@@ -587,7 +622,7 @@ public class ForestRequest<T> {
         return this;
     }
 
-
+    @Deprecated
     public List<RequestNameValue> getQueryNameValueList() {
         List<RequestNameValue> nameValueList = new ArrayList<>();
         for (Iterator<Map.Entry<String, Object>> iterator = query.entrySet().iterator(); iterator.hasNext(); ) {
@@ -598,7 +633,10 @@ public class ForestRequest<T> {
             nameValueList.add(nameValue);
         }
         return nameValueList;
+    }
 
+    public List<ForestQueryParameter> getQueryValues() {
+        return query.queryValues();
     }
 
     public List<RequestNameValue> getDataNameValueList() {

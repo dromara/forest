@@ -1,6 +1,7 @@
 package com.dtflys.forest.backend.url;
 
 import com.dtflys.forest.converter.json.ForestJsonConverter;
+import com.dtflys.forest.http.ForestQueryParameter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.utils.RequestNameValue;
@@ -20,19 +21,16 @@ public class QueryableURLBuilder extends URLBuilder {
     @Override
     public String buildUrl(ForestRequest request) {
         String url = request.getUrl();
-        List<RequestNameValue> data = request.getQueryNameValueList();
+        List<ForestQueryParameter> queryParameters = request.getQueryValues();
         StringBuilder paramBuilder = new StringBuilder();
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
-        for (int i = 0; i < data.size(); i++) {
-            RequestNameValue nameValue = data.get(i);
-            if (!nameValue.isInQuery()) {
-                continue;
-            }
-            String name = nameValue.getName();
+        for (int i = 0; i < queryParameters.size(); i++) {
+            ForestQueryParameter queryParam = queryParameters.get(i);
+            String name = queryParam.getName();
             if (name != null) {
-                paramBuilder.append(nameValue.getName());
+                paramBuilder.append(queryParam.getName());
             }
-            String value = MappingTemplate.getParameterValue(jsonConverter, nameValue.getValue());
+            String value = MappingTemplate.getParameterValue(jsonConverter, queryParam.getValue());
             if (StringUtils.isNotEmpty(value) && request.getCharset() != null) {
                 if (name != null) {
                     paramBuilder.append('=');
@@ -46,7 +44,7 @@ public class QueryableURLBuilder extends URLBuilder {
                     paramBuilder.append(encodedValue);
                 }
             }
-            if (i < data.size() - 1) {
+            if (i < queryParameters.size() - 1) {
                 paramBuilder.append('&');
             }
         }
