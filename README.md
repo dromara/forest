@@ -51,7 +51,7 @@ Forest是一个高层的、极简的轻量级HTTP调用API框架。<br>
 
 * [Demo工程](https://gitee.com/dt_flys/forest-example)
 
-Forest有哪些特性呢？
+Forest有哪些特性？
 -----
 * 以Httpclient和OkHttp为后端框架
 * 通过调用本地方法的方式去发送Http请求, 实现了业务逻辑与Http协议之间的解耦
