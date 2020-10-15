@@ -731,17 +731,21 @@ public class ForestMethod<T> implements VariableScope {
                         || obj.getClass().isArray()
                         || ReflectUtils.isPrimaryType(obj.getClass())) {
                     if (MappingParameter.isQuery(target)) {
-                        if (obj instanceof Collection) {
-                            for (Object subItem : (Collection) obj) {
-                                if (subItem instanceof ForestQueryParameter) {
-                                    request.addQuery((ForestQueryParameter) subItem);
-                                } else {
-                                    request.addQuery(ForestQueryParameter.createSimpleQueryParameter(subItem));
+                        if (parameter.isJsonParam()) {
+                            request.addQuery(parameter.getName(), obj);
+                        } else {
+                            if (obj instanceof Collection) {
+                                for (Object subItem : (Collection) obj) {
+                                    if (subItem instanceof ForestQueryParameter) {
+                                        request.addQuery((ForestQueryParameter) subItem);
+                                    } else {
+                                        request.addQuery(ForestQueryParameter.createSimpleQueryParameter(subItem));
+                                    }
                                 }
-                            }
-                        } else if (obj.getClass().isArray()) {
-                            if (obj instanceof ForestQueryParameter[]) {
-                                request.addQuery((ForestQueryParameter[]) obj);
+                            } else if (obj.getClass().isArray()) {
+                                if (obj instanceof ForestQueryParameter[]) {
+                                    request.addQuery((ForestQueryParameter[]) obj);
+                                }
                             }
                         }
                     } else if (MappingParameter.isBody(target)) {
@@ -787,7 +791,7 @@ public class ForestMethod<T> implements VariableScope {
                     if (MappingParameter.isHeader(target)) {
                         request.addHeader(nameValue);
                     } else if (MappingParameter.isQuery(target)) {
-                        if (obj instanceof Collection) {
+                        if (!parameter.isJsonParam() && obj instanceof Collection) {
                             for (Object subItem : (Collection) obj) {
                                 request.addQuery(parameter.getName(), subItem);
                             }
