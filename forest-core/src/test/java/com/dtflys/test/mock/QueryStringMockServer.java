@@ -4,6 +4,7 @@ import org.apache.http.HttpHeaders;
 import org.mockserver.client.server.MockServerClient;
 import org.mockserver.junit.MockServerRule;
 import org.mockserver.model.Header;
+import org.mockserver.model.Parameter;
 
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
@@ -29,7 +30,7 @@ public class QueryStringMockServer extends MockServerRule {
                         .withPath("/hello/user")
                         .withMethod("GET")
                         .withHeader(new Header(HttpHeaders.ACCEPT, "text/plain"))
-                        .withQueryStringParameter("foo", "")
+                        .withQueryStringParameter(new Parameter("foo"))
         )
                 .respond(
                         response()
