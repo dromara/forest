@@ -120,35 +120,42 @@ public interface GetClient {
     )
     String annObjectGet(@DataObject JsonTestUser user);
 
-    @Request(
+    @Get(
             url = "http://localhost:${port}/hello/user",
             headers = {"Accept:text/plain"}
     )
     String queryObjectGet(@Query Map<String, Object> user);
 
-    @Request(
+    @Get(
             url = "http://localhost:${port}/hello/user",
             headers = {"Accept:text/plain"}
     )
     String queryObjectGet(@Query JsonTestUser user);
 
-    @Request(
+    @Get(
             url = "http://localhost:${port}/hello/user?username=foo&username=bar&username=user1&username=user2&password=123456",
             headers = {"Accept:text/plain"}
     )
     String repeatableQuery();
 
-    @Request(
+    @Get(
             url = "http://localhost:${port}/hello/user?username=foo&username=bar",
             headers = {"Accept:text/plain"}
     )
     String repeatableQuery(@Query("username") String user1, @Query("username") String user2, @Query("password") String password);
 
-    @Request(
+    @Get(
             url = "http://localhost:${port}/hello/user",
             headers = {"Accept:text/plain"}
     )
     String repeatableQuery(@Query("username") List<String> usernames, @Query("password") String password);
+
+
+    @Get(
+            url = "http://localhost:${port}/hello/user",
+            headers = {"Accept:text/plain"}
+    )
+    String jsonQuery(@JSONQuery("ids") List<Integer> idList, @JSONQuery("user") Map<String, String> userInfo);
 
 
     @Request(
