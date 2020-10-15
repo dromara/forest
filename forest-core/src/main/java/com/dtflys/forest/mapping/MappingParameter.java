@@ -69,6 +69,22 @@ public class MappingParameter {
         return target == TARGET_HEADER;
     }
 
+    public static boolean isUnknownTarget(int target) {
+        return target == TARGET_UNKNOWN;
+    }
+
+    public static boolean isHeader(int target) {
+        return target == TARGET_HEADER;
+    }
+
+    public static boolean isBody(int target) {
+        return target == TARGET_BODY;
+    }
+
+    public static boolean isQuery(int target) {
+        return target == TARGET_QUERY;
+    }
+
     public int getTarget() {
         return target;
     }
