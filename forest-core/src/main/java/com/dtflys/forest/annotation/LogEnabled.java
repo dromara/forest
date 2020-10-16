@@ -1,5 +1,6 @@
 package com.dtflys.forest.annotation;
 
+import com.dtflys.forest.lifecycles.logging.LogEnabledLifeCycle;
 import com.dtflys.forest.lifecycles.method.HeadRequestLifeCycle;
 import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.LogHandler;
@@ -16,7 +17,7 @@ import java.lang.annotation.Target;
  * @since 2020-10-13 16:22
  */
 @Documented
-@MethodLifeCycle(HeadRequestLifeCycle.class)
+@MethodLifeCycle(LogEnabledLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface LogEnabled {
@@ -32,12 +33,17 @@ public @interface LogEnabled {
     boolean logRequest() default true;
 
     /**
-     * 是否打印响应日志
+     * 是否打印响应状态日志
      */
-    boolean logResponse() default true;
+    boolean logResponseStatus() default true;
 
     /**
-     * 日志处理器
+     * 是否打印响应内容日志
+     */
+    boolean logResponseContent() default false;
+
+    /**
+     * 日志处理器接口实现类
      */
     Class<? extends LogHandler> logHandler() default DefaultLogHandler.class;
 }

@@ -136,7 +136,7 @@ public class HttpclientForestResponse extends ForestResponse {
     @Override
     public InputStream getInputStream() throws IOException {
         if (bytes == null) {
-            return entity.getContent();
+            bytes = getByteArray();
         }
         return new ByteArrayInputStream(bytes);
     }

@@ -1,59 +1,132 @@
 package com.dtflys.forest.logging;
 
 import com.dtflys.forest.utils.StringUtils;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
+ * 默认日志处理器
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2020-09-14 17:31
  */
 public class DefaultLogHandler implements LogHandler {
 
-    private final static Logger logger = LoggerFactory.getLogger(DefaultLogHandler.class);
+    private ForestLogger logger = new ForestLogger();
 
+    /**
+     * 获取请求头日志内容
+     * @param requestLogMessage 请求日志消息
+     * @return
+     */
     protected String requestLoggingHeaders(RequestLogMessage requestLogMessage) {
-        String headers = "";
-        return headers;
+        StringBuilder builder = new StringBuilder();
+        List<LogHeaderMessage> headers = requestLogMessage.getHeaders();
+        if (headers == null) {
+            return "";
+        }
+        for (int i = 0; i < headers.size(); i++) {
+            LogHeaderMessage headerMessage = headers.get(i);
+            String name = headerMessage.getName();
+            String value = headerMessage.getValue();
+            builder.append("\t\t" + name + ": " + value);
+            if (i < headers.size() - 1) {
+                builder.append("\n");
+            }
+        }
+        return builder.toString();
     }
 
+    /**
+     * 获取请求体日志内容
+     * @param requestLogMessage 请求日志消息
+     * @return
+     */
     protected String requestLoggingBody(RequestLogMessage requestLogMessage) {
-        String body = "";
-        return body;
+        LogBodyMessage logBodyMessage = requestLogMessage.getBody();
+        if (logBodyMessage == null) {
+            return "";
+        }
+        return logBodyMessage.getBodyString();
     }
 
+    /**
+     * 请求日志打印的内容
+     * @param requestLogMessage 请求日志字符串
+     * @return
+     */
     protected String requestLoggingContent(RequestLogMessage requestLogMessage) {
-        String content = "Request: \n\t" + requestLogMessage.getRequestLine();
+        StringBuilder builder = new StringBuilder();
+        builder.append("Request: \n\t");
+        builder.append(requestLogMessage.getRequestLine());
         String headers = requestLoggingHeaders(requestLogMessage);
         if (StringUtils.isNotEmpty(headers)) {
-            content += "\n\tHeaders: \n" + headers;
+            builder.append("\n\tHeaders: \n");
+            builder.append(headers);
         }
         String body = requestLoggingBody(requestLogMessage);
         if (StringUtils.isNotEmpty(body)) {
-            content += "\n\tBody: " + body;
+            builder.append("\n\tBody: ");
+            builder.append(body);
         }
-        return content;
+        return builder.toString();
     }
 
-    protected static void logContent(String content) {
-        logger.info("[Forest] " + content);
+    /**
+     * 请求响应日志打印的内容
+     * @param responseLogMessage 请求响应日志字符串
+     * @return
+     */
+    protected String responseLoggingContent(ResponseLogMessage responseLogMessage) {
+        return "Response: Status = " + responseLogMessage.getStatus() + ", Time = " + responseLogMessage.getTime() + "ms";
+    }
+
+    /**
+     * 打印日志内容
+     * @param content 日志内容字符串
+     */
+    public void logContent(String content) {
+        getLogger().info("[Forest] " + content);
     }
 
 
+    @Override
+    public ForestLogger getLogger() {
+        return logger;
+    }
+
+    @Override
+    public void setLogger(ForestLogger logger) {
+        this.logger = logger;
+    }
+
+    /**
+     * 打印请求日志
+     * @param requestLogMessage 请求日志消息
+     */
     @Override
     public void logRequest(RequestLogMessage requestLogMessage) {
         String content = requestLoggingContent(requestLogMessage);
         logContent(content);
     }
 
+    /**
+     * 打印响应状态日志
+     * @param responseLogMessage 响应日志消息
+     */
     @Override
-    public void logResponse(ResponseLogMessage responseLogMessage) {
+    public void logResponseStatus(ResponseLogMessage responseLogMessage) {
+        String content = responseLoggingContent(responseLogMessage);
+        logContent(content);
+    }
 
+    /**
+     * 打印响应内容日志
+     * @param responseLogMessage 响应日志消息
+     */
+    @Override
+    public void logResponseContent(ResponseLogMessage responseLogMessage) {
+        logContent("Response: Content=" + responseLogMessage.getResponse().getContent());
     }
 }

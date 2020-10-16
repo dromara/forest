@@ -25,6 +25,9 @@ import com.dtflys.forest.interceptor.InterceptorFactory;
 import com.dtflys.forest.lifecycles.BaseAnnotationLifeCycle;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.lifecycles.ParameterAnnotationLifeCycle;
+import com.dtflys.forest.lifecycles.method.RequestLifeCycle;
+import com.dtflys.forest.logging.LogConfiguration;
+import com.dtflys.forest.logging.LogHandler;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingVariable;
@@ -104,7 +107,11 @@ public class ForestMethod<T> implements VariableScope {
     private Type onSuccessClassGenericType = null;
     private Class retryerClass = null;
     private boolean async = false;
-    private boolean logEnable = true;
+    private boolean logEnabled = true;
+    private boolean logRequest = true;
+    private boolean logResponseStatus = true;
+    private boolean logResponseContent = false;
+    private LogConfiguration logConfiguration = null;
 
     public ForestMethod(InterfaceProxyHandler interfaceProxyHandler, ForestConfiguration configuration, Method method) {
         this.interfaceProxyHandler = interfaceProxyHandler;
@@ -113,7 +120,7 @@ public class ForestMethod<T> implements VariableScope {
         this.interceptorFactory = configuration.getInterceptorFactory();
         this.methodNameItems = NameUtils.splitCamelName(method.getName());
         processBaseProperties();
-        processInterfaceMethods();
+        processMethodAnnotations();
     }
 
     @Override
@@ -202,9 +209,12 @@ public class ForestMethod<T> implements VariableScope {
         }
 
         List<Annotation> baseAnnotationList = interfaceProxyHandler.getBaseAnnotations();
+        Map<Annotation, Class> baseAnnMap = new HashMap<>(baseAnnotationList.size());
         for (Annotation annotation : baseAnnotationList) {
-            addMetaRequestAnnotation(annotation);
+            Class interceptorClass = getAnnotationLifeCycleClass(annotation);
+            baseAnnMap.put(annotation, interceptorClass);
         }
+        addMetaRequestAnnotations(baseAnnMap);
     }
 
     private <T extends Interceptor> T addInterceptor(Class<T> interceptorClass) {
@@ -220,11 +230,8 @@ public class ForestMethod<T> implements VariableScope {
         return interceptor;
     }
 
-    /**
-     * 添加元请求注释
-     * @param annotation
-     */
-    private void addMetaRequestAnnotation(Annotation annotation) {
+
+    private Class getAnnotationLifeCycleClass(Annotation annotation) {
         Class<? extends Annotation> annType = annotation.annotationType();
         Class<? extends MethodAnnotationLifeCycle> interceptorClass = null;
         MethodLifeCycle methodLifeCycleAnn = annType.getAnnotation(MethodLifeCycle.class);
@@ -236,8 +243,7 @@ public class ForestMethod<T> implements VariableScope {
                     if (MethodAnnotationLifeCycle.class.isAssignableFrom(baseAnnLifeCycleClass)) {
                         interceptorClass = (Class<? extends MethodAnnotationLifeCycle>) baseAnnLifeCycleClass;
                     } else {
-                        addInterceptor(baseAnnLifeCycleClass);
-                        return;
+                        return baseAnnLifeCycleClass;
                     }
                 }
             }
@@ -249,32 +255,49 @@ public class ForestMethod<T> implements VariableScope {
                     throw new ForestInterceptorDefineException(interceptorClass);
                 }
             }
+        }
 
-            RequestAttributes requestAttributesAnn = annType.getAnnotation(RequestAttributes.class);
-            if (requestAttributesAnn != null) {
-                Map<String, Object> attrTemplates = ReflectUtils.getAttributesFromAnnotation(annotation);
-                for (String key : attrTemplates.keySet()) {
-                    Object value = attrTemplates.get(key);
-                    if (value instanceof CharSequence) {
-                        MappingTemplate template = makeTemplate(value.toString());
-                        attrTemplates.put(key, template);
-                    }
-                }
+        return interceptorClass;
+    }
 
-                InterceptorAttributes attributes = new InterceptorAttributes(interceptorClass, attrTemplates);
-                if (interceptorAttributesList == null) {
-                    interceptorAttributesList = new LinkedList<>();
+    /**
+     * 添加元请求注释表
+     * @param annMap 请求注释表
+     */
+    private void addMetaRequestAnnotations(Map<Annotation, Class> annMap) {
+        for (Map.Entry<Annotation, Class> entry : annMap.entrySet()) {
+            addMetaRequestAnnotation(entry.getKey(), entry.getValue());
+        }
+    }
+
+    /**
+     * 添加元请求注释
+     * @param annotation 注解
+     * @param interceptorClass 拦截器类
+     */
+    private void addMetaRequestAnnotation(Annotation annotation, Class interceptorClass) {
+        Class<? extends Annotation> annType = annotation.annotationType();
+        RequestAttributes requestAttributesAnn = annType.getAnnotation(RequestAttributes.class);
+        if (requestAttributesAnn != null) {
+            Map<String, Object> attrTemplates = ReflectUtils.getAttributesFromAnnotation(annotation);
+            for (String key : attrTemplates.keySet()) {
+                Object value = attrTemplates.get(key);
+                if (value instanceof CharSequence) {
+                    MappingTemplate template = makeTemplate(value.toString());
+                    attrTemplates.put(key, template);
                 }
-                interceptorAttributesList.add(attributes);
             }
-            Interceptor interceptor = addInterceptor(interceptorClass);
-            if (interceptor instanceof MethodAnnotationLifeCycle) {
-                MethodAnnotationLifeCycle lifeCycle = (MethodAnnotationLifeCycle) interceptor;
-                lifeCycle.onMethodInitialized(this, annotation);
-                if (this.metaRequest != null) {
-                    processMetaRequest(this.metaRequest);
-                }
+
+            InterceptorAttributes attributes = new InterceptorAttributes(interceptorClass, attrTemplates);
+            if (interceptorAttributesList == null) {
+                interceptorAttributesList = new LinkedList<>();
             }
+            interceptorAttributesList.add(attributes);
+        }
+        Interceptor interceptor = addInterceptor(interceptorClass);
+        if (interceptor instanceof MethodAnnotationLifeCycle) {
+            MethodAnnotationLifeCycle lifeCycle = (MethodAnnotationLifeCycle) interceptor;
+            lifeCycle.onMethodInitialized(this, annotation);
         }
     }
 
@@ -311,15 +334,38 @@ public class ForestMethod<T> implements VariableScope {
 
 
     /**
-     * 处理接口中定义的方法
+     * 处理方法上的注解列表
      */
-    private void processInterfaceMethods() {
+    private void processMethodAnnotations() {
         Annotation[] annotations = method.getAnnotations();
+        Map<Annotation, Class> requestAnns = new LinkedHashMap();
+        Map<Annotation, Class> methodAnns = new LinkedHashMap<>();
+
+        // 对注解分类
         for (int i = 0; i < annotations.length; i++) {
             Annotation ann = annotations[i];
-            // 添加自定义注解
-            addMetaRequestAnnotation(ann);
+            Class interceptorClass = getAnnotationLifeCycleClass(ann);
+            if (interceptorClass == null) {
+                continue;
+            }
+            if (RequestLifeCycle.class.isAssignableFrom(interceptorClass)) {
+                requestAnns.put(ann, interceptorClass);
+            } else {
+                methodAnns.put(ann, interceptorClass);
+            }
         }
+
+        // 先添加请求类注解
+        addMetaRequestAnnotations(requestAnns);
+
+        // 再添加普通方法类注解
+        addMetaRequestAnnotations(methodAnns);
+
+        // 处理请求元信息
+        if (this.metaRequest != null) {
+            processMetaRequest(this.metaRequest);
+        }
+
         returnClass = method.getReturnType();
     }
 
@@ -360,14 +406,27 @@ public class ForestMethod<T> implements VariableScope {
             retryCount = rtnum;
         }
         maxRetryInterval = metaRequest.getMaxRetryInterval();
-        logEnable = configuration.isLogEnabled();
-        if (!logEnable) {
-            logEnable = metaRequest.isLogEnabled();
+        logEnabled = configuration.isLogEnabled();
+        if (!logEnabled) {
+            logEnabled = metaRequest.isLogEnabled();
+        }
+        logRequest = configuration.isLogRequest();
+        logResponseStatus = configuration.isLogResponseStatus();
+        logResponseContent = configuration.isLogResponseContent();
+
+        LogConfiguration metaLogConfiguration = metaRequest.getLogConfiguration();
+        if (metaLogConfiguration != null) {
+            logEnabled = metaLogConfiguration.isLogEnabled();
+            logRequest = metaLogConfiguration.isLogRequest();
+            logResponseStatus = metaLogConfiguration.isLogResponseStatus();
+            logResponseContent = metaLogConfiguration.isLogResponseContent();
         }
 
-        for (TypeVariable<Method> typeVariable : typeVariables) {
-            System.out.println(typeVariable.getName());
-        }
+        logConfiguration = new LogConfiguration();
+        logConfiguration.setLogEnabled(logEnabled);
+        logConfiguration.setLogRequest(logRequest);
+        logConfiguration.setLogResponseStatus(logResponseStatus);
+        logConfiguration.setLogResponseContent(logResponseContent);
 
         parameterTemplateArray = new MappingParameter[paramTypes.length];
         processParameters(parameters, genericParamTypes, paramAnns);
@@ -657,6 +716,8 @@ public class ForestMethod<T> implements VariableScope {
             throw new ForestRuntimeException(e);
         }
 
+        LogHandler logHandler = configuration.getLogHandler();
+
         // createExecutor and initialize http instance
         ForestRequest<T> request = new ForestRequest(configuration, args);
         request.setProtocol(protocol)
@@ -664,7 +725,8 @@ public class ForestMethod<T> implements VariableScope {
                 .setType(type)
                 .setCharset(charset)
                 .setSslProtocol(sslProtocol)
-                .setLogEnable(logEnable)
+                .setLogConfiguration(logConfiguration)
+                .setLogHandler(logHandler)
                 .setAsync(async);
 
         if (StringUtils.isNotEmpty(userInfo)) {

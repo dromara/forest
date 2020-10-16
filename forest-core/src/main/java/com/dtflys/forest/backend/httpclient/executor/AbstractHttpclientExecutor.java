@@ -2,18 +2,21 @@ package com.dtflys.forest.backend.httpclient.executor;
 
 import com.dtflys.forest.backend.AbstractHttpExecutor;
 import com.dtflys.forest.backend.BodyBuilder;
-import com.dtflys.forest.backend.body.NoneBodyBuilder;
 import com.dtflys.forest.backend.httpclient.HttpclientRequestProvider;
 import com.dtflys.forest.backend.httpclient.body.HttpclientBodyBuilder;
+import com.dtflys.forest.backend.httpclient.logging.HttpclientLogBodyMessage;
 import com.dtflys.forest.backend.url.URLBuilder;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
+import com.dtflys.forest.logging.LogBodyMessage;
+import com.dtflys.forest.logging.LogConfiguration;
+import com.dtflys.forest.logging.LogHandler;
+import com.dtflys.forest.logging.LogHeaderMessage;
+import com.dtflys.forest.logging.RequestLogMessage;
+import com.dtflys.forest.logging.ResponseLogMessage;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
@@ -27,10 +30,6 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.mapping.MappingTemplate;
 
 
-import org.apache.http.entity.mime.FormBodyPart;
-import org.apache.http.entity.mime.MinimalField;
-import org.apache.http.entity.mime.content.ContentBody;
-import org.apache.http.entity.mime.content.StringBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,10 +37,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.net.URI;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -123,129 +119,70 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         log.info("[Forest] " + content);
     }
 
+    private RequestLogMessage getRequestLogMessage(int retryCount, T httpReq) {
+        RequestLogMessage logMessage = new RequestLogMessage();
+        URI uri = httpReq.getURI();
+        logMessage.setUri(uri.toASCIIString());
+        logMessage.setType(httpReq.getMethod());
+        logMessage.setScheme(uri.getScheme());
+        logMessage.setRetryCount(retryCount);
+        setLogHeaders(logMessage, httpReq);
+        setLogBody(logMessage, httpReq);
+        return logMessage;
+    }
+
     public void logRequest(int retryCount, T httpReq) {
-        if (!request.isLogEnable()) {
+        LogConfiguration logConfiguration = request.getLogConfiguration();
+        if (!logConfiguration.isLogEnabled() || !logConfiguration.isLogRequest()) {
             return;
         }
-        String requestLine = getLogContentForRequestLine(retryCount, httpReq);
-        String headers = getLogContentForHeaders(httpReq);
-        String body = getLogContentForBody(httpReq);
-        String content = "Request: \n\t" + requestLine;
-        if (StringUtils.isNotEmpty(headers)) {
-            content += "\n\tHeaders: \n" + headers;
+        RequestLogMessage logMessage = getRequestLogMessage(retryCount, httpReq);
+        LogHandler logHandler = request.getLogHandler();
+        if (logHandler != null) {
+            logHandler.logRequest(logMessage);
         }
-        if (StringUtils.isNotEmpty(body)) {
-            content += "\n\tBody: " + body;
-        }
-        logContent(content);
     }
 
     public void logResponse(long startTime, ForestResponse response) {
-        if (!request.isLogEnable()) {
+        LogConfiguration logConfiguration = request.getLogConfiguration();
+        if (!logConfiguration.isLogEnabled()) {
             return;
         }
         long endTime = System.currentTimeMillis();
-        long time = endTime - startTime;
-        logContent("Response: Status = " + response.getStatusCode() + ", Time = " + time + "ms");
+        ResponseLogMessage logMessage = new ResponseLogMessage(response, startTime, endTime, response.getStatusCode());
+        LogHandler logHandler = request.getLogHandler();
+        if (logHandler != null) {
+            if (logConfiguration.isLogResponseStatus()) {
+                logHandler.logResponseStatus(logMessage);
+            }
+            if (logConfiguration.isLogResponseContent() && logConfiguration.isLogResponseContent()) {
+                logHandler.logResponseContent(logMessage);
+            }
+        }
     }
 
-    protected String getLogContentForRequestLine(int retryCount, T httpReq) {
-        if (retryCount == 0) {
-            return httpReq.getRequestLine().toString();
-        }
-        else {
-            return "[Retry: " + retryCount + "] " + httpReq.getRequestLine().toString();
-        }
-    }
 
-    protected String getLogContentForHeaders(T httpReq) {
-        StringBuffer buffer = new StringBuffer();
+    protected void setLogHeaders(RequestLogMessage logMessage, T httpReq) {
         Header[] headers = httpReq.getAllHeaders();
         for (int i = 0; i < headers.length; i++) {
             Header header = headers[i];
-            buffer.append("\t\t" + header.getName() + ": " + header.getValue());
-            if (i < headers.length - 1) {
-                buffer.append("\n");
-            }
+            String name = header.getName();
+            String value = header.getValue();
+            logMessage.addHeader(new LogHeaderMessage(name, value));
         }
-        return buffer.toString();
     }
 
-    protected String getLogContentForBody(T httpReq) {
+    protected void setLogBody(RequestLogMessage logMessage, T httpReq) {
         if (!(httpReq instanceof HttpEntityEnclosingRequestBase)) {
-            return null;
+            return;
         }
         HttpEntityEnclosingRequestBase entityEnclosingRequest = (HttpEntityEnclosingRequestBase) httpReq;
         HttpEntity entity = entityEnclosingRequest.getEntity();
         if (entity == null) {
-            return null;
+            return;
         }
-        if (entity.getContentType().getValue().startsWith("multipart/")) {
-            Class[] paramTypes = new Class[0];
-            Object[] args = new Object[0];
-            List<FormBodyPart> parts = null;
-            try {
-                Method getMultipartMethod = entity.getClass().getDeclaredMethod("getMultipart", paramTypes);
-                getMultipartMethod.setAccessible(true);
-                Object multipart = getMultipartMethod.invoke(entity, args);
-                if (multipart != null) {
-                    Method getBodyPartsMethod = multipart.getClass().getDeclaredMethod("getBodyParts", paramTypes);
-                    getBodyPartsMethod.setAccessible(true);
-                    parts = (List<FormBodyPart>) getBodyPartsMethod.invoke(multipart, args);
-                }
-            } catch (NoSuchMethodException e) {
-            } catch (IllegalAccessException e) {
-            } catch (InvocationTargetException e) {
-            }
-            Long contentLength = null;
-            try {
-                contentLength = entity.getContentLength();
-            } catch (Throwable th) {
-            }
-
-            if (parts == null) {
-                String result = "[" + entity.getContentType().getValue();
-                if (contentLength != null) {
-                    result += "; length=" + contentLength;
-                }
-                return result + "]";
-            } else {
-                StringBuilder builder = new StringBuilder();
-                builder.append("[")
-                        .append(entity.getContentType().getValue());
-                if (contentLength != null) {
-                    builder.append("; length=").append(contentLength);
-                }
-                builder.append("] parts:");
-                for (FormBodyPart part : parts) {
-                    ContentBody partBody = part.getBody();
-                    MinimalField disposition = part.getHeader().getField("Content-Disposition");
-                    builder.append("\n             -- [")
-                            .append(disposition.getBody());
-                    if (partBody instanceof StringBody) {
-                        Reader reader = ((StringBody) partBody).getReader();
-                        BufferedReader bufferedReader = new BufferedReader(reader);
-                        String value = null;
-                        try {
-                            value = getLogContentFormBufferedReader(bufferedReader);
-                        } catch (IOException e) {
-                        }
-                        builder.append("; value=\"")
-                                .append(value)
-                                .append("\"]");
-                    } else {
-                        Long length = null;
-                        length = partBody.getContentLength();
-                        if (length != null) {
-                            builder.append("; length=").append(length);
-                        }
-                        builder.append("]");
-                    }
-                }
-                return builder.toString();
-            }
-        }
-        return getLogContentForStringBody(entity);
+        LogBodyMessage logBodyMessage = new HttpclientLogBodyMessage(entity);
+        logMessage.setBody(logBodyMessage);
     }
 
 

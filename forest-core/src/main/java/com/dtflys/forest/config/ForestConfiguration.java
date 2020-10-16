@@ -30,6 +30,8 @@ import com.dtflys.forest.converter.binary.DefaultBinaryConverter;
 import com.dtflys.forest.converter.text.DefaultTextConverter;
 import com.dtflys.forest.interceptor.DefaultInterceptorFactory;
 import com.dtflys.forest.interceptor.InterceptorFactory;
+import com.dtflys.forest.logging.DefaultLogHandler;
+import com.dtflys.forest.logging.LogHandler;
 import com.dtflys.forest.proxy.ProxyFactory;
 import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.forest.retryer.Retryer;
@@ -123,9 +125,30 @@ public class ForestConfiguration implements Serializable {
     private String sslProtocol = SSLUtils.TLSv1_2;
 
     /**
-     * 是否允许打印请求日志
+     * 是否允许打印请求/响应日志
      */
     private boolean logEnabled = true;
+
+    /**
+     * 是否允许打印请求/响应日志
+     */
+    private boolean logRequest = true;
+
+
+    /**
+     * 是否允许打印响应状态日志
+     */
+    private boolean logResponseStatus = true;
+
+    /**
+     * 是否允许打印响应内容日志
+     */
+    private boolean logResponseContent = false;
+
+    /**
+     * 日志处理器
+     */
+    private LogHandler logHandler;
 
     /**
      * 是否缓存请求接口实例
@@ -224,6 +247,7 @@ public class ForestConfiguration implements Serializable {
         configuration.setSslProtocol(SSLUtils.TLSv1_2);
         configuration.registerFilter("json", JSONFilter.class);
         configuration.registerFilter("xml", XmlFilter.class);
+        configuration.setLogHandler(new DefaultLogHandler());
         return configuration;
     }
 
@@ -507,7 +531,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 是否允许打印请求日志
-     * @return 如果允许打印请求日志为 {@code true} , 否则为 {@code false}
+     * @return 允许为 {@code true} , 否则为 {@code false}
      */
     public boolean isLogEnabled() {
         return logEnabled;
@@ -515,10 +539,74 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 设置是否允许打印请求日志
-     * @param logEnabled 如果允许打印请求日志为 {@code true} , 否则为 {@code false}
+     * @param logEnabled 允许为 {@code true} , 否则为 {@code false}
      */
     public void setLogEnabled(boolean logEnabled) {
         this.logEnabled = logEnabled;
+    }
+
+    /**
+     * 是否允许打印请求/响应日志
+     * @return 允许为 {@code true}, 否则为 {@code false}
+     */
+    public boolean isLogRequest() {
+        return logRequest;
+    }
+
+    /**
+     * 设置是否允许打印请求/响应日志
+     * @param logRequest 允许为 {@code true} , 否则为 {@code false}
+     */
+    public void setLogRequest(boolean logRequest) {
+        this.logRequest = logRequest;
+    }
+
+    /**
+     * 是否允许打印响应日志
+     * @return 允许为 {@code true}, 否则为 {@code false}
+     */
+    public boolean isLogResponseStatus() {
+        return logResponseStatus;
+    }
+
+    /**
+     * 设置是否允许打印响应日志
+     * @param logResponseStatus 允许为 {@code true}, 否则为 {@code false}
+     */
+    public void setLogResponseStatus(boolean logResponseStatus) {
+        this.logResponseStatus = logResponseStatus;
+    }
+
+    /**
+     * 是否允许打印响应日志
+     * @return 允许为 {@code true}, 否则为 {@code false}
+     */
+    public boolean isLogResponseContent() {
+        return logResponseContent;
+    }
+
+    /**
+     * 设置是否允许打印响应日志
+     * @param logResponseContent 允许为 {@code true}, 否则为 {@code false}
+     */
+    public void setLogResponseContent(boolean logResponseContent) {
+        this.logResponseContent = logResponseContent;
+    }
+
+    /**
+     * 获取日志处理器
+     * @return 日志处理器接口实例
+     */
+    public LogHandler getLogHandler() {
+        return logHandler;
+    }
+
+    /**
+     * 设置日志处理器
+     * @param logHandler 日志处理器接口实例
+     */
+    public void setLogHandler(LogHandler logHandler) {
+        this.logHandler = logHandler;
     }
 
     /**

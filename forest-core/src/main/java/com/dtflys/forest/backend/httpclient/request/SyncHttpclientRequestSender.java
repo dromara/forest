@@ -10,6 +10,9 @@ import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
+import com.dtflys.forest.logging.LogConfiguration;
+import com.dtflys.forest.logging.LogHandler;
+import com.dtflys.forest.logging.ResponseLogMessage;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -18,7 +21,6 @@ import org.apache.http.impl.cookie.BrowserCompatSpec;
 import org.apache.http.params.HttpParams;
 
 import java.io.IOException;
-import java.util.Date;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -59,24 +61,22 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
     };
 
 
-
-    public static void logResponse(ForestRequest request, ForestResponse response) {
-        if (!request.isLogEnable()) {
-            return;
-        }
-        logContent("Response: Status=" + response.getStatusCode());
-        if (response.isSuccess()) {
-            logContent("Response: Content=" + response.getContent());
-        }
-    }
-
     public void logResponse(long startTime, ForestResponse response) {
-        if (!request.isLogEnable()) {
+        LogConfiguration logConfiguration = request.getLogConfiguration();
+        if (!logConfiguration.isLogEnabled()) {
             return;
         }
         long endTime = System.currentTimeMillis();
-        long time = endTime - startTime;
-        logContent("Response: Status = " + response.getStatusCode() + ", Time = " + time + "ms");
+        ResponseLogMessage logMessage = new ResponseLogMessage(response, startTime, endTime, response.getStatusCode());
+        LogHandler logHandler = request.getLogHandler();
+        if (logHandler != null) {
+            if (logConfiguration.isLogResponseStatus()) {
+                logHandler.logResponseStatus(logMessage);
+            }
+            if (logConfiguration.isLogResponseContent() && response.isSuccess()) {
+                logHandler.logResponseContent(logMessage);
+            }
+        }
     }
 
 
@@ -90,7 +90,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             httpResponse = client.execute(httpRequest);
             ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
             response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler);
-            logResponse(request, response);
+            logResponse(startTime, response);
         } catch (IOException e) {
             httpRequest.abort();
             ForestRetryException retryException = new ForestRetryException(

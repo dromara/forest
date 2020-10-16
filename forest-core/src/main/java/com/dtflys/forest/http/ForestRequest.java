@@ -27,6 +27,8 @@ package com.dtflys.forest.http;
 import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
+import com.dtflys.forest.logging.LogConfiguration;
+import com.dtflys.forest.logging.LogHandler;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.retryer.Retryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
@@ -227,9 +229,14 @@ public class ForestRequest<T> {
     private ForestConverter decoder;
 
     /**
-     * 是否打印日志
+     * 请求日志配置信息
      */
-    private boolean logEnable = true;
+    private LogConfiguration logConfiguration;
+
+    /**
+     * 日志处理器
+     */
+    private LogHandler logHandler;
 
     /**
      * SSL KeyStore信息
@@ -853,12 +860,29 @@ public class ForestRequest<T> {
         return this;
     }
 
+    @Deprecated
     public boolean isLogEnable() {
-        return logEnable;
+        if (logConfiguration == null) {
+            return true;
+        }
+        return logConfiguration.isLogEnabled();
     }
 
-    public ForestRequest setLogEnable(boolean logEnable) {
-        this.logEnable = logEnable;
+    public LogConfiguration getLogConfiguration() {
+        return logConfiguration;
+    }
+
+    public ForestRequest setLogConfiguration(LogConfiguration logConfiguration) {
+        this.logConfiguration = logConfiguration;
+        return this;
+    }
+
+    public LogHandler getLogHandler() {
+        return logHandler;
+    }
+
+    public ForestRequest setLogHandler(LogHandler logHandler) {
+        this.logHandler = logHandler;
         return this;
     }
 
