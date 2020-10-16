@@ -6,6 +6,11 @@ forest:
   connect-timeout: 4000
   charset: GBK
   log-enabled: true
+  log-request: false
+  log-response-status: false
+  log-response-content: true
+  log-handler: com.dtflys.forest.springboot.test.logging.TestLogHandler
   retry-count: 0
   filters:
     test: com.dtflys.forest.springboot.test.filter.TestFilter
+

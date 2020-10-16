@@ -2,6 +2,7 @@ package com.dtflys.forest.springboot.test;
 
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.retryer.BackOffRetryer;
 import com.thebeastshop.forest.springboot.annotation.ForestScan;
 import com.dtflys.forest.config.ForestConfiguration;
@@ -41,6 +42,7 @@ public class Test0 {
         assertEquals(Integer.valueOf(5), config0.getRetryCount());
         assertEquals("okhttp3", config0.getBackend().getName());
         assertEquals("SSLv3", config0.getSslProtocol());
+        assertTrue(config0.getLogHandler() instanceof DefaultLogHandler);
         assertEquals("http://www.thebeastshop.com", config0.getVariableValue("baseUrl"));
         assertEquals("xxx", config0.getVariableValue("myName"));
         assertNotNull(config0.getVariableValue("user"));

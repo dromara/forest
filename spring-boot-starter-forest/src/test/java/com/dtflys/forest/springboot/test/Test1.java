@@ -2,6 +2,9 @@ package com.dtflys.forest.springboot.test;
 
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.logging.DefaultLogHandler;
+import com.dtflys.forest.logging.LogConfiguration;
+import com.dtflys.forest.springboot.test.logging.TestLogHandler;
 import com.thebeastshop.forest.springboot.annotation.ForestScan;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.springboot.test.client1.BaiduClient;
@@ -41,6 +44,11 @@ public class Test1 {
         assertTrue(forestConfiguration.isLogEnabled());
         assertEquals("okhttp3", forestConfiguration.getBackend().getName());
         assertEquals("TLSv1.2", forestConfiguration.getSslProtocol());
+        assertTrue(forestConfiguration.isLogEnabled());
+        assertTrue(!forestConfiguration.isLogRequest());
+        assertTrue(!forestConfiguration.isLogResponseStatus());
+        assertTrue(forestConfiguration.isLogResponseContent());
+        assertTrue(forestConfiguration.getLogHandler() instanceof TestLogHandler);
     }
 
     @Test
@@ -56,6 +64,12 @@ public class Test1 {
         long time = sw.getTotalTimeMillis();
         assertTrue(time >= 50);
         assertTrue(time <= 900);
+        LogConfiguration logConfiguration = request.getLogConfiguration();
+        assertTrue(logConfiguration.isLogEnabled());
+        assertTrue(!logConfiguration.isLogRequest());
+        assertTrue(!logConfiguration.isLogResponseStatus());
+        assertTrue(logConfiguration.isLogResponseContent());
+        assertTrue(logConfiguration.getLogHandler() instanceof TestLogHandler);
     }
 
 }
