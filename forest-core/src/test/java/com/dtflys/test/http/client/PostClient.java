@@ -7,6 +7,7 @@ import com.dtflys.test.http.model.*;
 import com.dtflys.test.http.model.UserParam;
 import com.dtflys.test.http.model.XmlTestParam;
 import com.dtflys.test.interceptor.PostHeadInterceptor;
+import sun.rmi.runtime.Log;
 
 import java.io.File;
 import java.util.List;
@@ -258,13 +259,16 @@ public interface PostClient {
             },
             contentType = "application/json"
     )
+    @LogEnabled
     ForestResponse<String> postJson5(@DataParam("username") String username, @DataVariable("token") String token);
 
     @Request(
             url = "http://localhost:${port}/json",
             type = "post",
-            contentType = "application/json"
+            contentType = "application/json",
+            logEnabled = false
     )
+    @LogEnabled
     String postJson5Map(@DataObject Map user);
 
     @Request(
@@ -272,6 +276,7 @@ public interface PostClient {
             type = "post",
             headers = {"Content-Type: application/json"}
     )
+    @LogEnabled(logRequest = false)
     String postJson6(@DataObject JsonTestUser user);
 
     @Request(
@@ -310,12 +315,14 @@ public interface PostClient {
             headers = {"Accept-Encoding: UTF-8"},
             contentType = "application/json"
     )
+    @LogEnabled(logResponseContent = true)
     String postJson11(@Body JsonTestUser user);
 
     @Post(
             url = "http://localhost:${port}/json",
             headers = {"Content-Type: application/json; charset=utf-8"}
     )
+    @LogEnabled(logRequest = false, logResponseContent = true)
     String postJson12(@Body List<JsonTestList> user);
 
     @Post(
@@ -334,6 +341,7 @@ public interface PostClient {
             url = "http://localhost:${port}/json",
             contentType = "application/json"
     )
+    @LogEnabled(false)
     String postJson5Map2(@Body Map user);
 
     @Request(
@@ -342,6 +350,7 @@ public interface PostClient {
             data = "${json(user)}",
             headers = {"Content-Type: application/json; charset=utf-8"}
     )
+    @LogEnabled(logRequest = false, logResponseStatus = false, logResponseContent = true)
     String postJson11(@DataVariable("user") JsonTestUser2 user);
 
     @Request(
