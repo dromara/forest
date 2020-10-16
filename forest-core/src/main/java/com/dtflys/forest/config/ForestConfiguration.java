@@ -31,10 +31,9 @@ import com.dtflys.forest.converter.text.DefaultTextConverter;
 import com.dtflys.forest.interceptor.DefaultInterceptorFactory;
 import com.dtflys.forest.interceptor.InterceptorFactory;
 import com.dtflys.forest.logging.DefaultLogHandler;
-import com.dtflys.forest.logging.LogHandler;
+import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.proxy.ProxyFactory;
 import com.dtflys.forest.retryer.BackOffRetryer;
-import com.dtflys.forest.retryer.Retryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.ssl.SSLUtils;
 import com.dtflys.forest.utils.ForestDataType;
@@ -148,7 +147,7 @@ public class ForestConfiguration implements Serializable {
     /**
      * 日志处理器
      */
-    private LogHandler logHandler;
+    private ForestLogHandler logHandler;
 
     /**
      * 是否缓存请求接口实例
@@ -597,7 +596,7 @@ public class ForestConfiguration implements Serializable {
      * 获取日志处理器
      * @return 日志处理器接口实例
      */
-    public LogHandler getLogHandler() {
+    public ForestLogHandler getLogHandler() {
         return logHandler;
     }
 
@@ -605,7 +604,7 @@ public class ForestConfiguration implements Serializable {
      * 设置日志处理器
      * @param logHandler 日志处理器接口实例
      */
-    public void setLogHandler(LogHandler logHandler) {
+    public void setLogHandler(ForestLogHandler logHandler) {
         this.logHandler = logHandler;
     }
 

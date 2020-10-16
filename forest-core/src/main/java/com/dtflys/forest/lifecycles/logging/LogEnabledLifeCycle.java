@@ -14,11 +14,15 @@ public class LogEnabledLifeCycle implements MethodAnnotationLifeCycle<LogEnabled
         if (metaRequest == null) {
             return;
         }
+        LogConfiguration logConfiguration = metaRequest.getLogConfiguration();
+        if (logConfiguration == null) {
+            logConfiguration = new LogConfiguration();
+            metaRequest.setLogConfiguration(logConfiguration);
+        }
         boolean logEnabled = annotation.value();
         boolean logRequest = annotation.logRequest();
         boolean logResponseStatus = annotation.logResponseStatus();
         boolean logResponseContent = annotation.logResponseContent();
-        LogConfiguration logConfiguration = new LogConfiguration();
         logConfiguration.setLogEnabled(logEnabled);
         logConfiguration.setLogRequest(logRequest);
         logConfiguration.setLogResponseStatus(logResponseStatus);

@@ -1,5 +1,7 @@
 package com.thebeastshop.forest.springboot.properties;
 
+import com.dtflys.forest.logging.DefaultLogHandler;
+import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.forest.ssl.SSLUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -65,9 +67,29 @@ public class ForestConfigurationProperties {
     private long maxRetryInterval = 0;
 
     /**
-     * Enable print log of request
+     * Enable print log of request/response
      */
     private boolean logEnabled = true;
+
+    /**
+     * Enable print log of request
+     */
+    private boolean logRequest = true;
+
+    /**
+     * Enable print log of response status
+     */
+    private boolean logResponseStatus = true;
+
+    /**
+     * Enable print log of response content
+     */
+    private boolean logResponseContent = false;
+
+    /**
+     * Class of log handler
+     */
+    private Class<? extends ForestLogHandler> logHandler = DefaultLogHandler.class;
 
     /**
      * default SSL protocol for https requests
@@ -182,6 +204,38 @@ public class ForestConfigurationProperties {
 
     public void setLogEnabled(boolean logEnabled) {
         this.logEnabled = logEnabled;
+    }
+
+    public boolean isLogRequest() {
+        return logRequest;
+    }
+
+    public void setLogRequest(boolean logRequest) {
+        this.logRequest = logRequest;
+    }
+
+    public boolean isLogResponseStatus() {
+        return logResponseStatus;
+    }
+
+    public void setLogResponseStatus(boolean logResponseStatus) {
+        this.logResponseStatus = logResponseStatus;
+    }
+
+    public boolean isLogResponseContent() {
+        return logResponseContent;
+    }
+
+    public void setLogResponseContent(boolean logResponseContent) {
+        this.logResponseContent = logResponseContent;
+    }
+
+    public Class<? extends ForestLogHandler> getLogHandler() {
+        return logHandler;
+    }
+
+    public void setLogHandler(Class<? extends ForestLogHandler> logHandler) {
+        this.logHandler = logHandler;
     }
 
     public String getSslProtocol() {

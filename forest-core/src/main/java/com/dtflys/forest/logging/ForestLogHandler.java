@@ -7,7 +7,7 @@ package com.dtflys.forest.logging;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2020-09-14 17:31
  */
-public interface LogHandler {
+public interface ForestLogHandler {
 
     /**
      * 获取Forest日志控制对象

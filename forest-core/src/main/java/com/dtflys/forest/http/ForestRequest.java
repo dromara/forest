@@ -28,7 +28,7 @@ import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
 import com.dtflys.forest.logging.LogConfiguration;
-import com.dtflys.forest.logging.LogHandler;
+import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.retryer.Retryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
@@ -236,7 +236,7 @@ public class ForestRequest<T> {
     /**
      * 日志处理器
      */
-    private LogHandler logHandler;
+    private ForestLogHandler logHandler;
 
     /**
      * SSL KeyStore信息
@@ -877,11 +877,11 @@ public class ForestRequest<T> {
         return this;
     }
 
-    public LogHandler getLogHandler() {
+    public ForestLogHandler getLogHandler() {
         return logHandler;
     }
 
-    public ForestRequest setLogHandler(LogHandler logHandler) {
+    public ForestRequest setLogHandler(ForestLogHandler logHandler) {
         this.logHandler = logHandler;
         return this;
     }

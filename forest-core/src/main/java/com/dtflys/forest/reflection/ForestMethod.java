@@ -27,7 +27,7 @@ import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.lifecycles.ParameterAnnotationLifeCycle;
 import com.dtflys.forest.lifecycles.method.RequestLifeCycle;
 import com.dtflys.forest.logging.LogConfiguration;
-import com.dtflys.forest.logging.LogHandler;
+import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingVariable;
@@ -111,6 +111,7 @@ public class ForestMethod<T> implements VariableScope {
     private boolean logRequest = true;
     private boolean logResponseStatus = true;
     private boolean logResponseContent = false;
+    private ForestLogHandler logHandler = null;
     private LogConfiguration logConfiguration = null;
 
     public ForestMethod(InterfaceProxyHandler interfaceProxyHandler, ForestConfiguration configuration, Method method) {
@@ -413,6 +414,7 @@ public class ForestMethod<T> implements VariableScope {
         logRequest = configuration.isLogRequest();
         logResponseStatus = configuration.isLogResponseStatus();
         logResponseContent = configuration.isLogResponseContent();
+        logHandler = configuration.getLogHandler();
 
         LogConfiguration metaLogConfiguration = metaRequest.getLogConfiguration();
         if (metaLogConfiguration != null) {
@@ -420,6 +422,7 @@ public class ForestMethod<T> implements VariableScope {
             logRequest = metaLogConfiguration.isLogRequest();
             logResponseStatus = metaLogConfiguration.isLogResponseStatus();
             logResponseContent = metaLogConfiguration.isLogResponseContent();
+            logHandler = metaLogConfiguration.getLogHandler();
         }
 
         logConfiguration = new LogConfiguration();
@@ -427,6 +430,7 @@ public class ForestMethod<T> implements VariableScope {
         logConfiguration.setLogRequest(logRequest);
         logConfiguration.setLogResponseStatus(logResponseStatus);
         logConfiguration.setLogResponseContent(logResponseContent);
+        logConfiguration.setLogHandler(logHandler);
 
         parameterTemplateArray = new MappingParameter[paramTypes.length];
         processParameters(parameters, genericParamTypes, paramAnns);
@@ -716,7 +720,7 @@ public class ForestMethod<T> implements VariableScope {
             throw new ForestRuntimeException(e);
         }
 
-        LogHandler logHandler = configuration.getLogHandler();
+        ForestLogHandler logHandler = configuration.getLogHandler();
 
         // createExecutor and initialize http instance
         ForestRequest<T> request = new ForestRequest(configuration, args);

@@ -11,7 +11,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
 import com.dtflys.forest.logging.LogConfiguration;
-import com.dtflys.forest.logging.LogHandler;
+import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.ResponseLogMessage;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -68,7 +68,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
         }
         long endTime = System.currentTimeMillis();
         ResponseLogMessage logMessage = new ResponseLogMessage(response, startTime, endTime, response.getStatusCode());
-        LogHandler logHandler = request.getLogHandler();
+        ForestLogHandler logHandler = request.getLogHandler();
         if (logHandler != null) {
             if (logConfiguration.isLogResponseStatus()) {
                 logHandler.logResponseStatus(logMessage);

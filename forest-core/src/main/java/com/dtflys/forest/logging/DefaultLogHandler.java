@@ -1,8 +1,6 @@
 package com.dtflys.forest.logging;
 
 import com.dtflys.forest.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -11,7 +9,7 @@ import java.util.List;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2020-09-14 17:31
  */
-public class DefaultLogHandler implements LogHandler {
+public class DefaultLogHandler implements ForestLogHandler {
 
     private ForestLogger logger = new ForestLogger();
 

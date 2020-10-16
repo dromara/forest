@@ -25,7 +25,7 @@ public class LogConfiguration {
     /**
      * 日志处理器
      */
-    private LogHandler logHandler;
+    private ForestLogHandler logHandler;
 
     /**
      * 是否允许打印请求/响应日志
@@ -79,11 +79,11 @@ public class LogConfiguration {
      * 获取日志处理器
      * @return 日志处理器接口实例
      */
-    public LogHandler getLogHandler() {
+    public ForestLogHandler getLogHandler() {
         return logHandler;
     }
 
-    public void setLogHandler(LogHandler logHandler) {
+    public void setLogHandler(ForestLogHandler logHandler) {
         this.logHandler = logHandler;
     }
 }

@@ -11,7 +11,7 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
 import com.dtflys.forest.logging.LogBodyMessage;
 import com.dtflys.forest.logging.LogConfiguration;
-import com.dtflys.forest.logging.LogHandler;
+import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.LogHeaderMessage;
 import com.dtflys.forest.logging.RequestLogMessage;
 import com.dtflys.forest.logging.ResponseLogMessage;
@@ -137,7 +137,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
             return;
         }
         RequestLogMessage logMessage = getRequestLogMessage(retryCount, httpReq);
-        LogHandler logHandler = request.getLogHandler();
+        ForestLogHandler logHandler = request.getLogHandler();
         if (logHandler != null) {
             logHandler.logRequest(logMessage);
         }
@@ -150,7 +150,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         }
         long endTime = System.currentTimeMillis();
         ResponseLogMessage logMessage = new ResponseLogMessage(response, startTime, endTime, response.getStatusCode());
-        LogHandler logHandler = request.getLogHandler();
+        ForestLogHandler logHandler = request.getLogHandler();
         if (logHandler != null) {
             if (logConfiguration.isLogResponseStatus()) {
                 logHandler.logResponseStatus(logMessage);
