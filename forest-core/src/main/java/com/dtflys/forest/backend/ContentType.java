@@ -34,7 +34,7 @@ public class ContentType {
             String[] expr = chartExpr.split("=");
             if ("charset".equalsIgnoreCase(expr[0].trim())
                     && expr.length > 1) {
-                this.charset = expr[1].trim();
+                this.charset = expr[1].trim().replace("\"", "");
             }
         }
     }
