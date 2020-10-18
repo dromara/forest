@@ -55,7 +55,7 @@ Forest有哪些特性？
 -----
 * 以Httpclient和OkHttp为后端框架
 * 通过调用本地方法的方式去发送Http请求, 实现了业务逻辑与Http协议之间的解耦
-* 相比Feign更轻量，不依赖Spring Cloud和任何注册中心
+* 因为针对第三方接口，所以不需要依赖Spring Cloud和任何注册中心
 * 支持所有请求方法：GET, HEAD, OPTIONS, TRACE, POST, DELETE, PUT, PATCH
 * 支持文件上传和下载
 * 支持灵活的模板表达式
