@@ -32,9 +32,10 @@ public class ContentType {
         if (group.length > 1) {
             String chartExpr = group[1];
             String[] expr = chartExpr.split("=");
-            if ("charset".equalsIgnoreCase(expr[0].trim())
-                    && expr.length > 1) {
-                this.charset = expr[1].trim().replace("\"", "");
+            String charsetLabel = expr[0].trim();
+            if ("charset".equalsIgnoreCase(charsetLabel) && expr.length > 1) {
+                String charsetValue = expr[1].trim();
+                this.charset = charsetValue.replace("\"", "");
             }
         }
     }
