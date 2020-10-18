@@ -90,7 +90,7 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
             return;
         }
         RequestLogMessage requestLogMessage = buildRequestMessage(retryCount, okRequest);
-        request.getLogHandler().logRequest(requestLogMessage);
+        logConfiguration.getLogHandler().logRequest(requestLogMessage);
     }
 
     public void logResponse(long startTime,  ForestResponse response) {
@@ -100,7 +100,7 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
         }
         long endTime = System.currentTimeMillis();
         ResponseLogMessage logMessage = new ResponseLogMessage(response, startTime, endTime, response.getStatusCode());
-        ForestLogHandler logHandler = request.getLogHandler();
+        ForestLogHandler logHandler = logConfiguration.getLogHandler();
         if (logHandler != null) {
             if (logConfiguration.isLogResponseStatus()) {
                 logHandler.logResponseStatus(logMessage);

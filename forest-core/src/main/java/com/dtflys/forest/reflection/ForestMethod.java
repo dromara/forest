@@ -720,7 +720,6 @@ public class ForestMethod<T> implements VariableScope {
             throw new ForestRuntimeException(e);
         }
 
-        ForestLogHandler logHandler = configuration.getLogHandler();
 
         // createExecutor and initialize http instance
         ForestRequest<T> request = new ForestRequest(configuration, args);
@@ -730,7 +729,6 @@ public class ForestMethod<T> implements VariableScope {
                 .setCharset(charset)
                 .setSslProtocol(sslProtocol)
                 .setLogConfiguration(logConfiguration)
-                .setLogHandler(logHandler)
                 .setAsync(async);
 
         if (StringUtils.isNotEmpty(userInfo)) {

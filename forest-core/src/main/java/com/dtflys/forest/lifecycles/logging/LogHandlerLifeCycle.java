@@ -2,6 +2,7 @@ package com.dtflys.forest.lifecycles.logging;
 
 import com.dtflys.forest.annotation.LogEnabled;
 import com.dtflys.forest.annotation.LogHandler;
+import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.logging.ForestLogHandler;
@@ -17,9 +18,14 @@ public class LogHandlerLifeCycle implements MethodAnnotationLifeCycle<LogHandler
         if (metaRequest == null) {
             return;
         }
+        ForestConfiguration configuration = method.getConfiguration();
         LogConfiguration logConfiguration = metaRequest.getLogConfiguration();
         if (logConfiguration == null) {
             logConfiguration = new LogConfiguration();
+            logConfiguration.setLogEnabled(configuration.isLogEnabled());
+            logConfiguration.setLogRequest(configuration.isLogRequest());
+            logConfiguration.setLogResponseStatus(configuration.isLogResponseStatus());
+            logConfiguration.setLogResponseContent(configuration.isLogResponseContent());
             metaRequest.setLogConfiguration(logConfiguration);
         }
         Class<? extends ForestLogHandler> logHandlerClass = annotation.value();
@@ -33,6 +39,8 @@ public class LogHandlerLifeCycle implements MethodAnnotationLifeCycle<LogHandler
         }
         if (logHandler != null) {
             logConfiguration.setLogHandler(logHandler);
+        } else {
+            logConfiguration.setLogHandler(configuration.getLogHandler());
         }
     }
 }

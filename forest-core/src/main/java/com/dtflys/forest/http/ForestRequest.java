@@ -233,10 +233,6 @@ public class ForestRequest<T> {
      */
     private LogConfiguration logConfiguration;
 
-    /**
-     * 日志处理器
-     */
-    private ForestLogHandler logHandler;
 
     /**
      * SSL KeyStore信息
@@ -877,14 +873,6 @@ public class ForestRequest<T> {
         return this;
     }
 
-    public ForestLogHandler getLogHandler() {
-        return logHandler;
-    }
-
-    public ForestRequest setLogHandler(ForestLogHandler logHandler) {
-        this.logHandler = logHandler;
-        return this;
-    }
 
     public SSLKeyStore getKeyStore() {
         return keyStore;

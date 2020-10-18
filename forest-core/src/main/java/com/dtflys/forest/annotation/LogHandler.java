@@ -1,6 +1,6 @@
 package com.dtflys.forest.annotation;
 
-import com.dtflys.forest.lifecycles.logging.LogEnabledLifeCycle;
+import com.dtflys.forest.lifecycles.logging.LogHandlerLifeCycle;
 import com.dtflys.forest.logging.ForestLogHandler;
 
 import java.lang.annotation.Documented;
@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
  * @since 2020-10-13 16:22
  */
 @Documented
-@MethodLifeCycle(LogEnabledLifeCycle.class)
+@MethodLifeCycle(LogHandlerLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface LogHandler {

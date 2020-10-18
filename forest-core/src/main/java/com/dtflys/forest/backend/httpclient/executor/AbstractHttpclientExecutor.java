@@ -137,7 +137,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
             return;
         }
         RequestLogMessage logMessage = getRequestLogMessage(retryCount, httpReq);
-        ForestLogHandler logHandler = request.getLogHandler();
+        ForestLogHandler logHandler = request.getLogConfiguration().getLogHandler();
         if (logHandler != null) {
             logHandler.logRequest(logMessage);
         }
@@ -150,7 +150,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         }
         long endTime = System.currentTimeMillis();
         ResponseLogMessage logMessage = new ResponseLogMessage(response, startTime, endTime, response.getStatusCode());
-        ForestLogHandler logHandler = request.getLogHandler();
+        ForestLogHandler logHandler = logConfiguration.getLogHandler();
         if (logHandler != null) {
             if (logConfiguration.isLogResponseStatus()) {
                 logHandler.logResponseStatus(logMessage);
