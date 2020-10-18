@@ -68,7 +68,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
         }
         long endTime = System.currentTimeMillis();
         ResponseLogMessage logMessage = new ResponseLogMessage(response, startTime, endTime, response.getStatusCode());
-        ForestLogHandler logHandler = request.getLogHandler();
+        ForestLogHandler logHandler = logConfiguration.getLogHandler();
         if (logHandler != null) {
             if (logConfiguration.isLogResponseStatus()) {
                 logHandler.logResponseStatus(logMessage);
