@@ -1,6 +1,8 @@
 package com.dtflys.forest.springboot.test.client2;
 
+import com.dtflys.forest.annotation.LogHandler;
 import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.springboot.test.logging.TestLogHandler;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -12,6 +14,7 @@ public interface GiteeClient {
             url = "https://gitee.com/dt_flys/forest",
             timeout = 80000
     )
+    @LogHandler(TestLogHandler.class)
     String index();
 
 }
