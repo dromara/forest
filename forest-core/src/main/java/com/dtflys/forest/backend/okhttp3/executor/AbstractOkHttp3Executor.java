@@ -2,11 +2,17 @@ package com.dtflys.forest.backend.okhttp3.executor;
 
 import com.dtflys.forest.backend.BodyBuilder;
 import com.dtflys.forest.backend.HttpExecutor;
+import com.dtflys.forest.backend.okhttp3.logging.OkHttp3LogBodyMessage;
 import com.dtflys.forest.backend.url.URLBuilder;
 import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.logging.LogBodyMessage;
+import com.dtflys.forest.logging.LogConfiguration;
+import com.dtflys.forest.logging.ForestLogHandler;
+import com.dtflys.forest.logging.LogHeaderMessage;
 import com.dtflys.forest.logging.RequestLogMessage;
+import com.dtflys.forest.logging.ResponseLogMessage;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.backend.okhttp3.conn.OkHttp3ConnectionManager;
@@ -21,21 +27,15 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import okio.BufferedSink;
-import okio.Okio;
-import okio.Sink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 
@@ -53,157 +53,62 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
 
     private final OkHttp3ResponseHandler okHttp3ResponseHandler;
 
-    protected String getLogContentForRequestLine(int retryCount, Request okRequest) {
+    protected RequestLogMessage buildRequestMessage(int retryCount, Request okRequest) {
+        RequestLogMessage message = new RequestLogMessage();
         HttpUrl url = okRequest.url();
         String scheme = url.scheme().toUpperCase();
         String uri = url.uri().toString();
         String method = okRequest.method();
-        String httpline = method + " " + uri + " " + scheme;
-        if (retryCount == 0) {
-            return httpline;
-        }
-        else {
-            return "[Retry: " + retryCount + "] " + httpline;
-        }
+        message.setUri(uri);
+        message.setType(method);
+        message.setScheme(scheme);
+        message.setRetryCount(retryCount);
+        setLogHeaders(message, okRequest);
+        setLogBody(message, okRequest);
+        return message;
     }
 
-    protected String getLogContentForHeaders(Request okRequest) {
-        StringBuffer buffer = new StringBuffer();
+    protected void setLogHeaders(RequestLogMessage message, Request okRequest) {
         Headers headers = okRequest.headers();
         for (int i = 0; i < headers.size(); i++) {
             String name = headers.name(i);
             String value = headers.value(i);
-            buffer.append("\t\t" + name + ": " + value);
-            if (i < headers.size() - 1) {
-                buffer.append("\n");
-            }
+            message.addHeader(new LogHeaderMessage(name, value));
         }
-        return buffer.toString();
     }
 
-
-    protected String getLogContentForBody(Request okRequest) {
+    protected void setLogBody(RequestLogMessage message, Request okRequest) {
         RequestBody requestBody = okRequest.body();
-        if (requestBody == null) {
-            return null;
-        }
-        if (requestBody instanceof MultipartBody) {
-            MultipartBody multipartBody = (MultipartBody) requestBody;
-            String boundary = multipartBody.boundary();
-            Long contentLength = null;
-            try {
-                contentLength = multipartBody.contentLength();
-            } catch (IOException e) {
-            }
-            StringBuilder builder = new StringBuilder();
-            builder.append("[")
-                    .append("boundary=")
-                    .append(boundary);
-            if (contentLength != null) {
-                builder.append("; length=").append(contentLength);
-            }
-            builder.append("] parts:");
-            List<MultipartBody.Part> parts = multipartBody.parts();
-            for (MultipartBody.Part part : parts) {
-                RequestBody partBody = part.body();
-                List<String> disposition = part.headers().values("Content-Disposition");
-                builder.append("\n             -- [")
-                        .append(disposition.get(0));
-                MediaType mediaType = partBody.contentType();
-                if (mediaType == null) {
-                    builder.append("; value=\"")
-                            .append(getLogContentForStringBody(partBody))
-                            .append("\"]");
-                } else {
-                    Long length = null;
-                    try {
-                        length = partBody.contentLength();
-                    } catch (IOException e) {
-                    }
-                    if (length != null) {
-                        builder.append("; length=").append(length);
-                    }
-                    builder.append("]");
-                }
-            }
-
-            return builder.toString();
-        }
-        return getLogContentForStringBody(requestBody);
+        LogBodyMessage logBodyMessage = new OkHttp3LogBodyMessage(requestBody);
+        message.setBody(logBodyMessage);
     }
 
-    private String getLogContentForStringBody(RequestBody requestBody) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Sink sink = Okio.sink(out);
-        BufferedSink bufferedSink = Okio.buffer(sink);
-        try {
-            requestBody.writeTo(bufferedSink);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                bufferedSink.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        InputStream inputStream = new ByteArrayInputStream(out.toByteArray());
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-        StringBuilder builder = new StringBuilder();
-        String line;
-        String body;
-        try {
-            List<String> lines = new LinkedList<>();
-            while ((line = reader.readLine()) != null) {
-                lines.add(line);
-            }
-            for (int i = 0, len = lines.size(); i < len; i++) {
-                builder.append(lines.get(i));
-                if (i < len - 1) {
-                    builder.append("\\n");
-                }
-            }
-            body = builder.toString();
-            return body;
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return null;
-    }
-
-
-
-    protected static void logContent(String content) {
-        log.info("[Forest] " + content);
-    }
 
     public void logRequest(int retryCount,  Request okRequest) {
-        if (!request.isLogEnable()) {
+        LogConfiguration logConfiguration = request.getLogConfiguration();
+        if (!logConfiguration.isLogEnabled() || !logConfiguration.isLogRequest()) {
             return;
         }
-        RequestLogMessage requestLogMessage = new RequestLogMessage();
-        okRequest.url().uri().toString();
-        String requestLine = getLogContentForRequestLine(retryCount, okRequest);
-        String headers = getLogContentForHeaders(okRequest);
-        String body = getLogContentForBody(okRequest);
-        requestLogMessage.setRequestLine(requestLine);
-        String content = "Request: \n\t" + requestLine;
-        if (StringUtils.isNotEmpty(headers)) {
-            content += "\n\tHeaders: \n" + headers;
-        }
-        if (StringUtils.isNotEmpty(body)) {
-            content += "\n\tBody: " + body;
-        }
-        logContent(content);
+        RequestLogMessage requestLogMessage = buildRequestMessage(retryCount, okRequest);
+        request.getLogHandler().logRequest(requestLogMessage);
     }
 
     public void logResponse(long startTime,  ForestResponse response) {
-        if (!request.isLogEnable()) {
+        LogConfiguration logConfiguration = request.getLogConfiguration();
+        if (!logConfiguration.isLogEnabled()) {
             return;
         }
         long endTime = System.currentTimeMillis();
-        long time = endTime - startTime;
-        logContent("Response: Status = " + response.getStatusCode() + ", Time = " + time + "ms");
+        ResponseLogMessage logMessage = new ResponseLogMessage(response, startTime, endTime, response.getStatusCode());
+        ForestLogHandler logHandler = request.getLogHandler();
+        if (logHandler != null) {
+            if (logConfiguration.isLogResponseStatus()) {
+                logHandler.logResponseStatus(logMessage);
+            }
+            if (logConfiguration.isLogResponseContent() && response.isSuccess()) {
+                logHandler.logResponseContent(logMessage);
+            }
+        }
     }
 
     protected AbstractOkHttp3Executor(ForestRequest request, OkHttp3ConnectionManager connectionManager, OkHttp3ResponseHandler okHttp3ResponseHandler) {

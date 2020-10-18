@@ -4,22 +4,17 @@ import org.apache.http.HttpHeaders;
 import org.mockserver.client.server.MockServerClient;
 import org.mockserver.junit.MockServerRule;
 import org.mockserver.model.Header;
-import org.mockserver.model.Parameter;
 
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
-/**
- * @author gongjun[dt_flys@hotmail.com]
- * @since 2020-09-03 11:43
- */
-public class QueryStringMockServer extends MockServerRule {
+public class RepeatableQueryMockServer extends MockServerRule {
 
     public final static String EXPECTED = "{\"status\": \"ok\"}";
 
-    public final static Integer port = 5032;
+    public final static Integer port = 5102;
 
-    public QueryStringMockServer(Object target) {
+    public RepeatableQueryMockServer(Object target) {
         super(target, port);
     }
 
@@ -30,7 +25,12 @@ public class QueryStringMockServer extends MockServerRule {
                         .withPath("/hello/user")
                         .withMethod("GET")
                         .withHeader(new Header(HttpHeaders.ACCEPT, "text/plain"))
-                        .withQueryStringParameter(new Parameter("foo"))
+                        .withQueryStringParameter("username",  "foo")
+                        .withQueryStringParameter("username",  "bar")
+                        .withQueryStringParameter("username",  "user1")
+                        .withQueryStringParameter("username",  "user2")
+                        .withQueryStringParameter("password",  "123456")
+
         )
                 .respond(
                         response()

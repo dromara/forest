@@ -14,6 +14,11 @@ import org.apache.commons.io.FileUtils;
 import java.io.*;
 import java.lang.reflect.Type;
 
+/**
+ * 文件下载生命周期
+ * @author gongjun[dt_flys@hotmail.com]
+ * @since 2020-08-04 02:29
+ */
 public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile, Object> {
 
     @Override

@@ -112,12 +112,6 @@ public class OkHttp3ForestResponse extends ForestResponse {
         }
     }
 
-    public boolean isText() {
-        if (contentType == null) {
-            return false;
-        }
-        return false;
-    }
 
     @Override
     public boolean isReceivedResponseData() {
@@ -135,7 +129,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
     @Override
     public InputStream getInputStream() throws Exception {
         if (bytes == null) {
-            return body.byteStream();
+            bytes = getByteArray();
         }
         return new ByteArrayInputStream(getByteArray());
     }

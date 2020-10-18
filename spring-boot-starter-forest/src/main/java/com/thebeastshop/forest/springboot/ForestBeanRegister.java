@@ -3,6 +3,7 @@ package com.thebeastshop.forest.springboot;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.interceptor.SpringInterceptorFactory;
+import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.scanner.ClassPathClientScanner;
 import com.dtflys.forest.schema.ForestConfigurationBeanDefinitionParser;
 import com.dtflys.forest.utils.StringUtils;
@@ -20,7 +21,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.ResourceLoader;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcessor {
@@ -49,6 +49,19 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
         if (StringUtils.isBlank(id)) {
             id = "forestConfiguration";
         }
+
+        Class<? extends ForestLogHandler> logHandlerClass = forestConfigurationProperties.getLogHandler();
+        ForestLogHandler logHandler = null;
+        if (logHandlerClass != null) {
+            try {
+                logHandler = logHandlerClass.newInstance();
+            } catch (InstantiationException e) {
+                throw new ForestRuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new ForestRuntimeException(e);
+            }
+        }
+
         beanDefinitionBuilder
                 .addPropertyValue("maxConnections", forestConfigurationProperties.getMaxConnections())
                 .addPropertyValue("maxRouteConnections", forestConfigurationProperties.getMaxRouteConnections())
@@ -59,6 +72,10 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
                 .addPropertyValue("retryCount", forestConfigurationProperties.getRetryCount())
                 .addPropertyValue("maxRetryInterval", forestConfigurationProperties.getMaxRetryInterval())
                 .addPropertyValue("logEnabled", forestConfigurationProperties.isLogEnabled())
+                .addPropertyValue("logRequest", forestConfigurationProperties.isLogRequest())
+                .addPropertyValue("logResponseStatus", forestConfigurationProperties.isLogResponseStatus())
+                .addPropertyValue("logResponseContent", forestConfigurationProperties.isLogResponseContent())
+                .addPropertyValue("logHandler", logHandler)
                 .addPropertyValue("backendName", forestConfigurationProperties.getBackend())
                 .addPropertyValue("interceptors", forestConfigurationProperties.getInterceptors())
                 .addPropertyValue("sslProtocol", forestConfigurationProperties.getSslProtocol())

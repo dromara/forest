@@ -723,7 +723,7 @@ public User {
  * 但可以被方法上定义的属性所覆盖
  */
 @BaseRequest(
-    baseUrl = "http://localhost:8080",     // 默认域名
+    baseURL = "http://localhost:8080",     // 默认域名
     headers = {
         "Accept:text/plain"                // 默认请求头
     },
@@ -735,7 +735,7 @@ public interface MyClient {
     @Get(url = "/hello/user")     
     String send1(@Query("username") String username);
 
-    // 若方法的URL是完整包含http://开头的，那么会以方法的URL中域名为准，不会被接口层级中的baseUrl属性覆盖
+    // 若方法的URL是完整包含http://开头的，那么会以方法的URL中域名为准，不会被接口层级中的baseURL属性覆盖
     @Get(url = "http://www.xxx.com/hello/user")
     String send2(@Query("username") String username);
   
@@ -755,24 +755,24 @@ public interface MyClient {
 
 ```java
 /** 
- * 若全局变量中已定义 baseUrl 和 accept，
+ * 若全局变量中已定义 baseURL 和 accept，
  * 便会将全局变量中的值绑定到 @BaseRequest 的属性中
  */
 @BaseRequest(
-    baseUrl = "${baseUrl}",     // 默认域名
+    baseUrl = "${baseURL}",     // 默认域名
     headers = {
         "Accept:${accept}"      // 默认请求头
     }
 )
 public interface MyClient {
 
-    // 方法的URL的域名将会引用全局变量中定义的 baseUrl
+    // 方法的URL的域名将会引用全局变量中定义的 baseURL
     @Get(url = "/hello/user")     
     String send1(@Query("username") String username);
 
     // @BaseRequest 中的属性亦可以引用方法中的绑定变量名的参数
     @Get(url = "/hello/user")
-    String send2(@DataVariable("baseUrl") String baseUrl);
+    String send2(@DataVariable("baseURL") String baseUrl);
   
 
 }

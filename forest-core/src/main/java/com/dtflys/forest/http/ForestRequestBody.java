@@ -32,6 +32,11 @@ public abstract class ForestRequestBody {
          * 对象请求体类型
          */
         OBJECT,
+
+        /**
+         * 文件类型
+         */
+        MULTIPART,
     }
 
     /**

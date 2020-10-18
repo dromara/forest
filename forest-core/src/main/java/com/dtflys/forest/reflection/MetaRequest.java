@@ -1,5 +1,7 @@
 package com.dtflys.forest.reflection;
 
+import com.dtflys.forest.logging.LogConfiguration;
+
 import java.lang.annotation.Annotation;
 
 public class MetaRequest {
@@ -77,8 +79,14 @@ public class MetaRequest {
      */
     private String userAgent;
 
+    /**
+     * Request Headers
+     */
     private String[] headers;
 
+    /**
+     * 拦截器类数组
+     */
     private Class<?>[] interceptor;
 
     private String[] data;
@@ -93,7 +101,15 @@ public class MetaRequest {
      */
     private String keyStore;
 
+    /**
+     * 是否允许打印请求/响应日志
+     */
     private boolean logEnabled;
+
+    /**
+     * 日志配置信息 (比logEnabled属性优先级更高)
+     */
+    private LogConfiguration logConfiguration;
 
     public MetaRequest(Annotation requestAnnotation) {
         this.requestAnnotation = requestAnnotation;
@@ -268,5 +284,13 @@ public class MetaRequest {
 
     public void setLogEnabled(boolean logEnabled) {
         this.logEnabled = logEnabled;
+    }
+
+    public LogConfiguration getLogConfiguration() {
+        return logConfiguration;
+    }
+
+    public void setLogConfiguration(LogConfiguration logConfiguration) {
+        this.logConfiguration = logConfiguration;
     }
 }

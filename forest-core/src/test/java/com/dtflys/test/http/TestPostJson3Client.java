@@ -4,12 +4,14 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestFastjsonConverter;
+import com.dtflys.forest.logging.ForestLogger;
 import com.dtflys.test.http.client.PostClient;
 import com.dtflys.test.http.model.JsonTestList;
 import com.dtflys.test.http.model.JsonTestUser;
 import com.dtflys.test.mock.PostJson3MockServer;
 import com.dtflys.test.mock.PostJsonMockServer;
 import org.junit.*;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,6 +88,9 @@ public class TestPostJson3Client extends BaseClientTest {
 
     @Test
     public void testJsonPost12() {
+        ForestLogger logger = Mockito.mock(ForestLogger.class);
+        configuration.getLogHandler().setLogger(logger);
+
         JsonTestUser user = new JsonTestUser();
         user.setUsername("foo");
         JsonTestList testList = new JsonTestList();
@@ -96,6 +101,14 @@ public class TestPostJson3Client extends BaseClientTest {
         log.info("response: " + result);
         assertNotNull(result);
         Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
+
+        Mockito.verify(logger, Mockito.never()).info("[Forest] Request: \n" +
+                "\tPOST http://localhost:5016/json HTTP\n" +
+                "\tHeaders: \n" +
+                "\t\tContent-Type: application/json; charset=utf-8\n" +
+                "\tBody: [{\"userList\":[{\"username\":\"foo\"}]}]");
+        Mockito.verify(logger).info("[Forest] Response: Content={\"status\": \"ok\"}");
+
     }
 
 
