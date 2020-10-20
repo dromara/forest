@@ -4,8 +4,10 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestFastjsonConverter;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.logging.ForestLogger;
+import com.dtflys.forest.logging.RequestLogMessage;
 import com.dtflys.test.http.client.PostClient;
 import com.dtflys.test.http.model.JsonTestUser;
 import com.dtflys.test.mock.PostJson2MockServer;
@@ -68,6 +70,11 @@ public class TestPostJson2Client extends BaseClientTest {
         log.info("response: " + result);
         assertNotNull(result);
         Assert.assertEquals(PostJson2MockServer.EXPECTED, result);
+        ForestRequest request = response.getRequest();
+        assertNotNull(result);
+        RequestLogMessage logMessage = request.getRequestLogMessage();
+        assertNotNull(logMessage);
+        assertNotNull(logMessage.getRequest());
         Mockito.verify(logger).info("[Forest] Request: \n" +
                 "\tPOST http://localhost:5015/json HTTP\n" +
                 "\tHeaders: \n" +

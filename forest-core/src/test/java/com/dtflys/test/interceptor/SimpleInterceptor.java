@@ -2,6 +2,7 @@ package com.dtflys.test.interceptor;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.interceptor.Interceptor;
 import org.apache.http.HttpHeaders;
@@ -19,6 +20,7 @@ public class SimpleInterceptor implements Interceptor<String> {
     @Override
     public boolean beforeExecute(ForestRequest request) {
         log.info("invoke Simple beforeExecute");
+        request.setType(ForestRequestType.GET);
         request.addHeader(HttpHeaders.ACCEPT, "text/plain");
         request.addQuery("username", "foo");
         return true;

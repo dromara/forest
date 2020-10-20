@@ -1,15 +1,12 @@
 package com.dtflys.test.http.client;
 
 import com.dtflys.forest.annotation.*;
-import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.model.*;
 import com.dtflys.test.http.model.UserParam;
 import com.dtflys.test.http.model.XmlTestParam;
 import com.dtflys.test.interceptor.PostHeadInterceptor;
-import sun.rmi.runtime.Log;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 

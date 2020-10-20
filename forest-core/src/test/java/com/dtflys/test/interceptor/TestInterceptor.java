@@ -1,6 +1,7 @@
 package com.dtflys.test.interceptor;
 
 import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.forest.logging.ForestLogger;
 import com.dtflys.test.http.BaseClientTest;
 import com.dtflys.test.mock.GetMockServer;
 import com.dtflys.forest.interceptor.DefaultInterceptorFactory;
@@ -12,6 +13,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,9 +57,18 @@ public class TestInterceptor extends BaseClientTest {
 
     @Test
     public void testSimpleInterceptor() {
+        ForestLogger logger = Mockito.mock(ForestLogger.class);
+        configuration.getLogHandler().setLogger(logger);
+
         String result = interceptorClient.simple();
         assertNotNull(result);
         assertEquals("XX: " + GetMockServer.EXPECTED, result);
+
+        Mockito.verify(logger).info("[Forest] Request: \n" +
+                "\t[Type Change]: POST -> GET\n" +
+                "\tGET http://localhost:5002/hello/user?username=foo&username=foo HTTP\n" +
+                "\tHeaders: \n" +
+                "\t\tAccept: text/plain");
     }
 
     @Test

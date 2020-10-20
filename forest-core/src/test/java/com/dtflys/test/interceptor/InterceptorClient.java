@@ -1,5 +1,6 @@
 package com.dtflys.test.interceptor;
 
+import com.dtflys.forest.annotation.Post;
 import com.dtflys.forest.annotation.Request;
 
 
@@ -9,7 +10,7 @@ import com.dtflys.forest.annotation.Request;
  */
 public interface InterceptorClient {
 
-    @Request(
+    @Post(
             url = "http://localhost:${port}/hello/user?username=foo",
             headers = {"Accept:text/plain"},
             interceptor = SimpleInterceptor.class
