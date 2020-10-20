@@ -1,7 +1,9 @@
 package com.dtflys.forest.logging;
 
 import com.dtflys.forest.utils.StringUtils;
+import org.apache.commons.collections.CollectionUtils;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -39,7 +41,7 @@ public class DefaultLogHandler implements ForestLogHandler {
     /**
      * 获取请求体日志内容
      * @param requestLogMessage 请求日志消息
-     * @return
+     * @return 请求体字符串
      */
     protected String requestLoggingBody(RequestLogMessage requestLogMessage) {
         LogBodyMessage logBodyMessage = requestLogMessage.getBody();
@@ -50,6 +52,26 @@ public class DefaultLogHandler implements ForestLogHandler {
     }
 
     /**
+     * 获取请求类型变更历史日志内容
+     * @param requestLogMessage 请求日志消息
+     * @return 日志内容字符串
+     */
+    protected String requestTypeChangeHistory(RequestLogMessage requestLogMessage) {
+        List<String> typeChangeHistory = requestLogMessage.getTypeChangeHistory();
+        if (CollectionUtils.isEmpty(typeChangeHistory)) {
+            return "";
+        }
+        StringBuilder builder = new StringBuilder();
+        builder.append("[Type Change]: ");
+        for (Iterator<String> iterator = typeChangeHistory.iterator(); iterator.hasNext(); ) {
+            String type = iterator.next();
+            builder.append(type).append(" -> ");
+        }
+        builder.append(requestLogMessage.getType()).append("\n\t");
+        return builder.toString();
+    }
+
+    /**
      * 请求日志打印的内容
      * @param requestLogMessage 请求日志字符串
      * @return
@@ -57,6 +79,7 @@ public class DefaultLogHandler implements ForestLogHandler {
     protected String requestLoggingContent(RequestLogMessage requestLogMessage) {
         StringBuilder builder = new StringBuilder();
         builder.append("Request: \n\t");
+        builder.append(requestTypeChangeHistory(requestLogMessage));
         builder.append(requestLogMessage.getRequestLine());
         String headers = requestLoggingHeaders(requestLogMessage);
         if (StringUtils.isNotEmpty(headers)) {

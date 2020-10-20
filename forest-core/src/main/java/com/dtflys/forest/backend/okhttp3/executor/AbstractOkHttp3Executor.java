@@ -90,6 +90,8 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
             return;
         }
         RequestLogMessage requestLogMessage = buildRequestMessage(retryCount, okRequest);
+        requestLogMessage.setRequest(request);
+        request.setRequestLogMessage(requestLogMessage);
         logConfiguration.getLogHandler().logRequest(requestLogMessage);
     }
 

@@ -29,6 +29,7 @@ import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.ForestLogHandler;
+import com.dtflys.forest.logging.RequestLogMessage;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.retryer.Retryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
@@ -95,6 +96,16 @@ public class ForestRequest<T> {
      * 请求类型
      */
     private ForestRequestType type;
+
+    /**
+     * 请求类型变更历史
+     */
+    private List<ForestRequestType> typeChangeHistory;
+
+    /**
+     * 请求日志消息
+     */
+    private RequestLogMessage requestLogMessage;
 
     /**
      * 请求字符集
@@ -353,8 +364,46 @@ public class ForestRequest<T> {
     }
 
     public ForestRequest setType(ForestRequestType type) {
+        if (this.type != null) {
+            if (this.typeChangeHistory == null) {
+                this.typeChangeHistory = new LinkedList<>();
+            }
+            this.typeChangeHistory.add(this.type);
+        }
         this.type = type;
         return this;
+    }
+
+    /**
+     * 获取请求类型变更历史列表
+     * @return 请求类型列表
+     */
+    public List<ForestRequestType> getTypeChangeHistory() {
+        return typeChangeHistory;
+    }
+
+    /**
+     * 获取请求类型变更历史字符串列表
+     * @return 字符串列表
+     */
+    public List<String> getTypeChangeHistoryString() {
+        if (typeChangeHistory == null) {
+            return null;
+        }
+        List<String> results = new LinkedList<>();
+        for (ForestRequestType type : typeChangeHistory) {
+            results.add(type.getName());
+        }
+        return results;
+    }
+
+
+    public RequestLogMessage getRequestLogMessage() {
+        return requestLogMessage;
+    }
+
+    public void setRequestLogMessage(RequestLogMessage requestLogMessage) {
+        this.requestLogMessage = requestLogMessage;
     }
 
     public String getFilename() {
@@ -889,9 +938,9 @@ public class ForestRequest<T> {
      * @param lifeCycleHandler
      */
     public void execute(HttpBackend backend, LifeCycleHandler lifeCycleHandler) {
-        HttpExecutor executor  = backend.createExecutor(this, lifeCycleHandler);
-        if (executor != null) {
-            if (interceptorChain.beforeExecute(this)) {
+        if (interceptorChain.beforeExecute(this)) {
+            HttpExecutor executor  = backend.createExecutor(this, lifeCycleHandler);
+            if (executor != null) {
                 try {
                     executor.execute(lifeCycleHandler);
                 } catch (ForestRuntimeException e) {

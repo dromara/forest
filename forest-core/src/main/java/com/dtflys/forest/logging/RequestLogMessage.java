@@ -65,6 +65,10 @@ public class RequestLogMessage {
         this.type = type;
     }
 
+    public List<String> getTypeChangeHistory() {
+        return request.getTypeChangeHistoryString();
+    }
+
     public String getUri() {
         return uri;
     }

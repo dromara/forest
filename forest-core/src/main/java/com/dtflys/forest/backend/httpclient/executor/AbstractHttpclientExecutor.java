@@ -137,6 +137,9 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
             return;
         }
         RequestLogMessage logMessage = getRequestLogMessage(retryCount, httpReq);
+        logMessage.setRequest(request);
+        request.setRequestLogMessage(logMessage);
+
         ForestLogHandler logHandler = request.getLogConfiguration().getLogHandler();
         if (logHandler != null) {
             logHandler.logRequest(logMessage);
