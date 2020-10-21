@@ -115,36 +115,6 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
     }
 
 
-    protected static void logContent(String content) {
-        log.info("[Forest] " + content);
-    }
-
-    private RequestLogMessage getRequestLogMessage(int retryCount, T httpReq) {
-        RequestLogMessage logMessage = new RequestLogMessage();
-        URI uri = httpReq.getURI();
-        logMessage.setUri(uri.toASCIIString());
-        logMessage.setType(httpReq.getMethod());
-        logMessage.setScheme(uri.getScheme());
-        logMessage.setRetryCount(retryCount);
-        setLogHeaders(logMessage, httpReq);
-        setLogBody(logMessage, httpReq);
-        return logMessage;
-    }
-
-    public void logRequest(int retryCount, T httpReq) {
-        LogConfiguration logConfiguration = request.getLogConfiguration();
-        if (!logConfiguration.isLogEnabled() || !logConfiguration.isLogRequest()) {
-            return;
-        }
-        RequestLogMessage logMessage = getRequestLogMessage(retryCount, httpReq);
-        logMessage.setRequest(request);
-        request.setRequestLogMessage(logMessage);
-
-        ForestLogHandler logHandler = request.getLogConfiguration().getLogHandler();
-        if (logHandler != null) {
-            logHandler.logRequest(logMessage);
-        }
-    }
 
     public void logResponse(long startTime, ForestResponse response) {
         LogConfiguration logConfiguration = request.getLogConfiguration();
@@ -165,60 +135,6 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
     }
 
 
-    protected void setLogHeaders(RequestLogMessage logMessage, T httpReq) {
-        Header[] headers = httpReq.getAllHeaders();
-        for (int i = 0; i < headers.length; i++) {
-            Header header = headers[i];
-            String name = header.getName();
-            String value = header.getValue();
-            logMessage.addHeader(new LogHeaderMessage(name, value));
-        }
-    }
-
-    protected void setLogBody(RequestLogMessage logMessage, T httpReq) {
-        if (!(httpReq instanceof HttpEntityEnclosingRequestBase)) {
-            return;
-        }
-        HttpEntityEnclosingRequestBase entityEnclosingRequest = (HttpEntityEnclosingRequestBase) httpReq;
-        HttpEntity entity = entityEnclosingRequest.getEntity();
-        if (entity == null) {
-            return;
-        }
-        LogBodyMessage logBodyMessage = new HttpclientLogBodyMessage(entity);
-        logMessage.setBody(logBodyMessage);
-    }
-
-
-    private String getLogContentForStringBody(HttpEntity entity) {
-        InputStream in = null;
-        try {
-            in = entity.getContent();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-            return getLogContentFormBufferedReader(reader);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private String getLogContentFormBufferedReader(BufferedReader reader) throws IOException {
-        StringBuilder builder = new StringBuilder();
-        String line;
-        String body;
-        List<String> lines = new LinkedList<>();
-        while ((line = reader.readLine()) != null) {
-            lines.add(line);
-        }
-        for (int i = 0, len = lines.size(); i < len; i++) {
-            builder.append(lines.get(i));
-            if (i < len - 1) {
-                builder.append("\\n");
-            }
-        }
-        body = builder.toString();
-        return body;
-    }
-
     @Override
     public void execute(LifeCycleHandler lifeCycleHandler) {
         prepare(lifeCycleHandler);
@@ -230,13 +146,13 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         Date startDate = new Date();
         long startTime = startDate.getTime();
         try {
-            logRequest(retryCount, httpRequest);
+//            logRequest(retryCount, httpRequest);
             requestSender.sendRequest(request, httpclientResponseHandler, httpRequest, lifeCycleHandler, startTime, 0);
         } catch (IOException e) {
             if (retryCount >= request.getRetryCount()) {
                 httpRequest.abort();
                 ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
-                response = forestResponseFactory.createResponse(request, null, lifeCycleHandler);
+                response = forestResponseFactory.createResponse(request, null, lifeCycleHandler, e);
                 logResponse(startTime, response);
                 lifeCycleHandler.handleSyncWitchException(request, response, e);
 //                throw new ForestRuntimeException(e);

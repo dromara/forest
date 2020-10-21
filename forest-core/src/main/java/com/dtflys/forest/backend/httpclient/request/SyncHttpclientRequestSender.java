@@ -15,6 +15,7 @@ import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.ResponseLogMessage;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.cookie.*;
 import org.apache.http.impl.cookie.BrowserCompatSpec;
@@ -87,9 +88,10 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
         ForestResponse response = null;
         client = getHttpClient();
         try {
+            logRequest(retryCount, (HttpRequestBase) httpRequest);
             httpResponse = client.execute(httpRequest);
             ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
-            response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler);
+            response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, null);
             logResponse(startTime, response);
         } catch (IOException e) {
             httpRequest.abort();
@@ -99,13 +101,14 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
                 request.getRetryer().canRetry(retryException);
             } catch (Throwable throwable) {
                 ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
-                response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler);
+                response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, throwable);
                 logResponse(startTime, response);
                 lifeCycleHandler.handleSyncWitchException(request, response, e);
                 return;
             }
             startTime = System.currentTimeMillis();
             sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, startTime, retryCount + 1);
+            return;
         } finally {
             connectionManager.afterConnect();
         }

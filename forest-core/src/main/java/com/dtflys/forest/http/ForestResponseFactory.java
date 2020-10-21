@@ -8,6 +8,6 @@ import com.dtflys.forest.handler.LifeCycleHandler;
  */
 public interface ForestResponseFactory<R> {
 
-    ForestResponse createResponse(ForestRequest request, R res, LifeCycleHandler lifeCycleHandler);
+    ForestResponse createResponse(ForestRequest request, R res, LifeCycleHandler lifeCycleHandler, Throwable exception);
 
 }

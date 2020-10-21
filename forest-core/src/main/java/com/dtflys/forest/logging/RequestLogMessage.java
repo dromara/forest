@@ -98,13 +98,7 @@ public class RequestLogMessage {
      * @return 请求行字符串
      */
     public String getRequestLine() {
-        String requestLine = getType() + " " + getUri() + " " + getScheme();
-        if (retryCount == 0) {
-            return requestLine;
-        }
-        else {
-            return "[Retry: " + retryCount + "] " + requestLine;
-        }
+        return getType() + " " + getUri() + " " + getScheme();
     }
 
     public List<LogHeaderMessage> getHeaders() {

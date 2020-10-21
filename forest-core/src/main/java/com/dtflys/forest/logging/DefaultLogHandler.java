@@ -1,5 +1,6 @@
 package com.dtflys.forest.logging;
 
+import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.commons.collections.CollectionUtils;
 
@@ -72,13 +73,27 @@ public class DefaultLogHandler implements ForestLogHandler {
     }
 
     /**
+     * 请求失败重试信息
+     * @param requestLogMessage
+     * @return 重试信息字符串
+     */
+    protected String retryContent(RequestLogMessage requestLogMessage) {
+        int retryCount = requestLogMessage.getRetryCount();
+        if (retryCount > 0) {
+            return "[Retry]: " + retryCount + "\n\t";
+        }
+        return "";
+    }
+
+    /**
      * 请求日志打印的内容
      * @param requestLogMessage 请求日志字符串
-     * @return
+     * @return 请求日志字符串
      */
     protected String requestLoggingContent(RequestLogMessage requestLogMessage) {
         StringBuilder builder = new StringBuilder();
         builder.append("Request: \n\t");
+        builder.append(retryContent(requestLogMessage));
         builder.append(requestTypeChangeHistory(requestLogMessage));
         builder.append(requestLogMessage.getRequestLine());
         String headers = requestLoggingHeaders(requestLogMessage);
@@ -100,8 +115,18 @@ public class DefaultLogHandler implements ForestLogHandler {
      * @return
      */
     protected String responseLoggingContent(ResponseLogMessage responseLogMessage) {
-        return "Response: Status = " + responseLogMessage.getStatus() + ", Time = " + responseLogMessage.getTime() + "ms";
+        ForestResponse response = responseLogMessage.getResponse();
+        if (response != null && response.getException() != null) {
+            return "[Network Error]: " + response.getException().getMessage();
+        }
+        int status = responseLogMessage.getStatus();
+        if (status >= 0) {
+            return "Response: Status = " + responseLogMessage.getStatus() + ", Time = " + responseLogMessage.getTime() + "ms";
+        } else {
+            return "[Network Error]: Unknown Network Error!";
+        }
     }
+
 
     /**
      * 打印日志内容
@@ -148,6 +173,8 @@ public class DefaultLogHandler implements ForestLogHandler {
      */
     @Override
     public void logResponseContent(ResponseLogMessage responseLogMessage) {
-        logContent("Response: Content=" + responseLogMessage.getResponse().getContent());
+        if (responseLogMessage.getResponse() != null && responseLogMessage.getResponse().isSuccess()) {
+            logContent("Response: Content=" + responseLogMessage.getResponse().getContent());
+        }
     }
 }

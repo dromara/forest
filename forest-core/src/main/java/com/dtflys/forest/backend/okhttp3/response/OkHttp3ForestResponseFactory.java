@@ -13,8 +13,9 @@ import okhttp3.Response;
 public class OkHttp3ForestResponseFactory implements ForestResponseFactory<Response> {
 
     @Override
-    public ForestResponse createResponse(ForestRequest request, Response res, LifeCycleHandler lifeCycleHandler) {
+    public ForestResponse createResponse(ForestRequest request, Response res, LifeCycleHandler lifeCycleHandler, Throwable exception) {
         ForestResponse response = new OkHttp3ForestResponse(request, res);
+        response.setException(exception);
         return response;
     }
 }

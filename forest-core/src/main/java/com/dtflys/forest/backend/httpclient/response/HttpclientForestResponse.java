@@ -52,7 +52,7 @@ public class HttpclientForestResponse extends ForestResponse {
                 this.content = buildContent();
             }
         } else {
-            this.statusCode = 404;
+            this.statusCode = -1;
         }
     }
 

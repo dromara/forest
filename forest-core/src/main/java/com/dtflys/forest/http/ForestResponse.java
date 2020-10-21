@@ -44,6 +44,7 @@ public abstract class ForestResponse<T> {
     protected volatile String contentEncoding;
     protected volatile long contentLength;
     protected volatile ForestHeaderMap headers = new ForestHeaderMap();
+    protected volatile Throwable exception;
     protected volatile T result;
 
     public ForestResponse(ForestRequest request) {
@@ -68,6 +69,14 @@ public abstract class ForestResponse<T> {
 
     public void setResult(T result) {
         this.result = result;
+    }
+
+    public Throwable getException() {
+        return exception;
+    }
+
+    public void setException(Throwable exception) {
+        this.exception = exception;
     }
 
     public int getStatusCode() {

@@ -35,15 +35,17 @@ public class HttpclientForestResponseFactory implements ForestResponseFactory<Ht
 
 
     @Override
-    public synchronized ForestResponse createResponse(ForestRequest request, HttpResponse httpResponse, LifeCycleHandler lifeCycleHandler) {
+    public synchronized ForestResponse createResponse(ForestRequest request, HttpResponse httpResponse, LifeCycleHandler lifeCycleHandler, Throwable exception) {
         if (resultResponse != null) {
             return resultResponse;
         }
+/*
         if (httpResponse == null) {
             httpResponse = new BasicHttpResponse(
                     new BasicStatusLine(
-                            new ProtocolVersion("1.1", 1, 1), 404, ""));
+                            new ProtocolVersion("1.1", 1, 1), -1, ""));
         }
+*/
         HttpEntity entity = null;
         if (httpResponse != null) {
             entity = httpResponse.getEntity();
@@ -65,6 +67,7 @@ public class HttpclientForestResponseFactory implements ForestResponseFactory<Ht
 //            }
 //        }
         this.resultResponse = response;
+        response.setException(exception);
         return response;
     }
 

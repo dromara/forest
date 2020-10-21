@@ -9,6 +9,7 @@ import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -33,11 +34,11 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
         final CloseableHttpAsyncClient client = connectionManager.getHttpAsyncClient(request);
         client.start();
         final ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
-
+        logRequest(retryCount, (HttpRequestBase) httpRequest);
         final Future<HttpResponse> future = client.execute(httpRequest, new FutureCallback<HttpResponse>() {
             @Override
             public void completed(final HttpResponse httpResponse) {
-                ForestResponse response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler);
+                ForestResponse response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, null);
                 if (response.isError()) {
                     ForestNetworkException networkException =
                             new ForestNetworkException("", response.getStatusCode(), response);
@@ -63,7 +64,7 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
                     } catch (IOException e) {
                     }
                 }
-                ForestResponse response = forestResponseFactory.createResponse(request, null, lifeCycleHandler);
+                ForestResponse response = forestResponseFactory.createResponse(request, null, lifeCycleHandler, ex);
                 ForestRetryException retryException = new ForestRetryException(
                         ex,  request, request.getRetryCount(), retryCount);
                 try {
