@@ -67,7 +67,7 @@ public interface GetClient {
     ForestResponse<String> errorGet4();
 
     @Request(
-            url = "http://localhost:${port}/hello/user?username=foo",
+            url = "http://xxxx:${port}/hello/user?username=foo",
             retryCount = 3,
             maxRetryInterval = 50000,
             headers = {"Accept:text/plain"}

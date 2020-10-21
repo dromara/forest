@@ -30,7 +30,7 @@ public class TestResponseFactory {
         when(statusLine.getStatusCode()).thenReturn(200);
         when(httpResponse.getStatusLine()).thenReturn(statusLine);
         LifeCycleHandler lifeCycleHandler = new NoneLifeCycleHandler();
-        ForestResponse response = responseFactory.createResponse(request, httpResponse, lifeCycleHandler);
+        ForestResponse response = responseFactory.createResponse(request, httpResponse, lifeCycleHandler, null);
         assertNotNull(response);
         assertNull(response.getContent());
     }
