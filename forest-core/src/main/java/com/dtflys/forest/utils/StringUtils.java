@@ -54,6 +54,29 @@ public final class StringUtils {
         return "get" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
     }
 
-
+    /**
+     * 去掉开头空格
+     * @param str
+     * @return
+     */
+    public static String trimBegin(String str) {
+        if (str == null) {
+            return null;
+        }
+        StringBuilder builder = new StringBuilder();
+        int len = str.length();
+        boolean before = true;
+        for (int i = 0; i < len; i++) {
+            char ch = str.charAt(i);
+            if (before) {
+                if (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r') {
+                    continue;
+                }
+            }
+            builder.append(ch);
+            before = false;
+        }
+        return builder.toString();
+    }
 
 }
