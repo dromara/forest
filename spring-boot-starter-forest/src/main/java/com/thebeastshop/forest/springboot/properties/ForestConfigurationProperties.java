@@ -91,6 +91,7 @@ public class ForestConfigurationProperties {
      */
     private Class<? extends ForestLogHandler> logHandler = DefaultLogHandler.class;
 
+
     /**
      * default SSL protocol for https requests
      */
@@ -115,6 +116,10 @@ public class ForestConfigurationProperties {
      * SSL Key Stores
      */
     private List<ForestSSLKeyStoreProperties> sslKeyStores = new ArrayList<>();
+
+    private Map<String, ForestConverterItemProperties> converters = new HashMap<>();
+
+    private Map<String, Class> filters = new HashMap<>();
 
 /*
     public boolean isEnabled() {
@@ -276,5 +281,21 @@ public class ForestConfigurationProperties {
 
     public void setSslKeyStores(List<ForestSSLKeyStoreProperties> sslKeyStores) {
         this.sslKeyStores = sslKeyStores;
+    }
+
+    public Map<String, ForestConverterItemProperties> getConverters() {
+        return converters;
+    }
+
+    public void setConverters(Map<String, ForestConverterItemProperties> converters) {
+        this.converters = converters;
+    }
+
+    public Map<String, Class> getFilters() {
+        return filters;
+    }
+
+    public void setFilters(Map<String, Class> filters) {
+        this.filters = filters;
     }
 }
