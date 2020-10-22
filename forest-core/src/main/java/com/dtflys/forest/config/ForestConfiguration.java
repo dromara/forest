@@ -796,7 +796,7 @@ public class ForestConfiguration implements Serializable {
     public ForestConverter getConverter(ForestDataType dataType) {
         ForestConverter converter = getConverterMap().get(dataType);
         if (converter == null) {
-            throw new ForestRuntimeException("Can not found converter for type " + dataType.name());
+            throw new ForestRuntimeException("Can not found converter for type " + dataType.getName());
         }
         return converter;
     }
