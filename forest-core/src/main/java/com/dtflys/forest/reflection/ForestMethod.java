@@ -606,7 +606,7 @@ public class ForestMethod<T> implements VariableScope {
         MetaRequest baseMetaRequest = interfaceProxyHandler.getBaseMetaRequest();
         String baseUrl = null;
         if (baseUrlTemplate != null) {
-            baseUrl = baseUrlTemplate.render(args);
+            baseUrl = StringUtils.trimBegin(baseUrlTemplate.render(args));
         }
         String renderedUrl = urlTemplate.render(args);
         ForestRequestType type = type(args);
@@ -670,7 +670,7 @@ public class ForestMethod<T> implements VariableScope {
             }
         }
 
-        renderedUrl = URLUtils.getValidURL(baseUrl, renderedUrl);
+        renderedUrl = StringUtils.trimBegin(URLUtils.getValidURL(baseUrl, renderedUrl));
         String query = "";
         String protocol = "";
         String userInfo = null;
@@ -900,7 +900,6 @@ public class ForestMethod<T> implements VariableScope {
             int index = factory.getIndex();
             String name = null;
             String fileName = null;
-            String contentType = request.getContentType();
             if (nameTemplate != null) {
                 name = nameTemplate.render(args);
             }
@@ -1048,7 +1047,7 @@ public class ForestMethod<T> implements VariableScope {
             request.setDataType(ForestDataType.TEXT);
         } else {
             dataType = dataType.toUpperCase();
-            ForestDataType forestDataType = ForestDataType.valueOf(dataType);
+            ForestDataType forestDataType = ForestDataType.findByName(dataType);
             request.setDataType(forestDataType);
         }
 
@@ -1116,7 +1115,7 @@ public class ForestMethod<T> implements VariableScope {
 
 
     private List<RequestNameValue> getNameValueListFromObjectWithJSON(MappingParameter parameter, Object obj, ForestRequestType type) {
-        Map<String, Object> propMap = configuration.getJsonConverter().convertObjectToMap(obj);
+        Map<String, Object> propMap = ReflectUtils.convertObjectToMap(obj);
         List<RequestNameValue> nameValueList = new ArrayList<>();
         for (Map.Entry<String, Object> entry : propMap.entrySet()) {
             String name = entry.getKey();
