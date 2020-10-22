@@ -1,5 +1,6 @@
 package com.dtflys.forest.springboot.test.client1;
 
+import com.dtflys.forest.annotation.LogEnabled;
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.http.ForestResponse;
 
@@ -10,8 +11,9 @@ import com.dtflys.forest.http.ForestResponse;
 public interface BaiduClient {
 
     @Request(
-            url = "http://132.21.17.33:2552/xxx/test"
+            url = "http://132.21.17.33:2552/xxx/test?t=${test($0)}"
     )
-    ForestResponse<String> testTimeout();
+    @LogEnabled(logRequest = true)
+    ForestResponse<String> testTimeout(String text);
 
 }
