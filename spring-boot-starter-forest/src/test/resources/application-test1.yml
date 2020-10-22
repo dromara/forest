@@ -13,4 +13,15 @@ forest:
   retry-count: 0
   filters:
     test: com.dtflys.forest.springboot.test.filter.TestFilter
+  converters:
+    json:
+      type: com.dtflys.forest.converter.json.ForestGsonConverter
+      parameters:
+        dateFormat: yyyy/MM/dd hh:mm:ss
+  variables:
+    baseUrl: http://www.xxxxxx.com
+    user:
+      name: foo
+      password: bar
+
 
