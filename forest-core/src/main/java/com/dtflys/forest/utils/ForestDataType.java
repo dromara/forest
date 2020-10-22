@@ -24,32 +24,113 @@
 
 package com.dtflys.forest.utils;
 
+import com.dtflys.forest.exceptions.ForestRuntimeException;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
+ * 数据类型封装类型
+ *
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-05-30
  */
-public enum ForestDataType {
+public class ForestDataType {
 
-    AUTO("auto"),
+    /**
+     * 数据类型表
+     * <p>所有在Forest中创建的数据类型对象都会放入这个哈希表中<p/>
+     * @since 1.5.0-BETA4
+     */
+    public final static Map<String, ForestDataType> dataTypes = new HashMap<>();
 
-    TEXT("text"),
+    /** 数据类型： 自动类型 */
+    public final static ForestDataType AUTO = ForestDataType.createDataType("auto");
 
-    JSON("json"),
+    /** 数据类型： 文本类型 */
+    public final static ForestDataType TEXT = ForestDataType.createDataType("text");
 
-    XML("xml"),
+    /** 数据类型： JSON类型 */
+    public final static ForestDataType JSON = ForestDataType.createDataType("json");
 
-    BINARY("binary"),
+    /** 数据类型： XML类型 */
+    public final static ForestDataType XML = ForestDataType.createDataType("xml");
 
-    ;
+    /** 数据类型： 二进制类型 */
+    public final static ForestDataType BINARY = ForestDataType.createDataType("binary");
 
+    /** 数据类型名称 */
     private String name;
 
-    ForestDataType(String name) {
+    /**
+     * 创建新的数据类型
+     *
+     * @param name Data type name
+     * @return New instance of {@code com.dtflys.forest.utils.ForestDataType}
+     * @since 1.5.0-BETA4
+     */
+    public static ForestDataType createDataType(String name) {
+        if (StringUtils.isEmpty(name)) {
+            throw new ForestRuntimeException("Data type name cannot be empty!");
+        }
+        name = name.toLowerCase();
+        ForestDataType dataType = new ForestDataType(name);
+        if (dataTypes.containsKey(name)) {
+            throw new ForestRuntimeException("Data type '" + name + "' has already been existed!" );
+        }
+        dataTypes.put(name, dataType);
+        return dataType;
+    }
+
+    /**
+     * 数据类型构造函数
+     * <p>该构造函数为私有方法，外部代码不能直接通过new ForestDataType(name)进行创建数据类型对象<p/>
+     * <p>需要通过静态方法ForestDataType.createDataType或ForestDataType.findOrCreateDataType进行创建<p/>
+     *
+     * @param name Date type name
+     * @since 1.5.0-BETA4
+     */
+    private ForestDataType(String name) {
         this.name = name;
     }
 
+    /**
+     * 获取数据类型名称
+     *
+     * @return Name of this data type
+     */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Find data type object by data type name
+     *
+     * @param name Data type name
+     * @return Instance of {@code com.dtflys.forest.utils.ForestDataType}
+     * @since 1.5.0-BETA4
+     */
+    public static ForestDataType findByName(String name) {
+        return dataTypes.get(name.toLowerCase());
+    }
+
+    /**
+     * Find or create a data type
+     *
+     * @param name Data type name
+     * @return Instance of {@code com.dtflys.forest.utils.ForestDataType}
+     * @since 1.5.0-BETA4
+     */
+    public static ForestDataType findOrCreateDataType(String name) {
+        if (StringUtils.isEmpty(name)) {
+            return null;
+        }
+        name = name.toLowerCase();
+        ForestDataType dataType = dataTypes.get(name);
+        if (dataType == null) {
+            dataType = createDataType(name);
+        }
+        return dataType;
     }
 
 }
