@@ -11,6 +11,19 @@ import java.io.Serializable;
  */
 public class JSONConverterSelector implements Serializable {
 
+    private static JSONConverterSelector instance;
+
+    private ForestJsonConverter cachedJsonConverter;
+
+    public static JSONConverterSelector getInstance() {
+        if (instance != null) {
+            return instance;
+        }
+        instance = new JSONConverterSelector();
+        return instance;
+    }
+
+
     /**
      * check FastJSON
      * @return
@@ -36,21 +49,26 @@ public class JSONConverterSelector implements Serializable {
     }
 
     public ForestJsonConverter select() {
+        if (cachedJsonConverter != null) {
+            return cachedJsonConverter;
+        }
         try {
             checkFastJSONClass();
-            return new ForestFastjsonConverter();
+            cachedJsonConverter = new ForestFastjsonConverter();
+            return cachedJsonConverter;
         } catch (Throwable e) {
         }
         try {
             checkJacsonClass();
-            return new ForestJacksonConverter();
+            cachedJsonConverter = new ForestJacksonConverter();
+            return cachedJsonConverter;
         } catch (Throwable e1) {
         }
         try {
             checkGsonClass();
-            return new ForestGsonConverter();
+            cachedJsonConverter = new ForestGsonConverter();
         } catch (Throwable e) {
         }
-        return null;
+        return cachedJsonConverter;
     }
 }
