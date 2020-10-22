@@ -22,6 +22,7 @@ import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.ResourceLoader;
 
 import java.util.List;
+import java.util.Map;
 
 public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcessor {
 
@@ -99,6 +100,14 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
         beanFactory.registerBeanDefinition(id, beanDefinition);
 
         ForestConfiguration configuration = applicationContext.getBean(id, ForestConfiguration.class);
+
+        Map<String, Class> filters = forestConfigurationProperties.getFilters();
+        for (Map.Entry<String, Class> entry : filters.entrySet()) {
+            String filterName = entry.getKey();
+            Class filterClass = entry.getValue();
+            configuration.registerFilter(filterName, filterClass);
+        }
+
         return configuration;
     }
 
