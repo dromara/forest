@@ -105,7 +105,9 @@ public abstract class ForestResponse<T> {
     }
 
     public boolean isSuccess() {
-        return getStatusCode() >= HttpStatus.OK && getStatusCode() < HttpStatus.MULTIPLE_CHOICES;
+        return getException() == null
+                && getStatusCode() >= HttpStatus.OK
+                && getStatusCode() < HttpStatus.MULTIPLE_CHOICES;
     }
 
 
