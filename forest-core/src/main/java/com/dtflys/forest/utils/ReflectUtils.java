@@ -1,8 +1,7 @@
 package com.dtflys.forest.utils;
 
-import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.forest.converter.json.ForestFastjsonConverter;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
+import com.dtflys.forest.converter.json.JSONConverterSelector;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 
 import java.lang.annotation.Annotation;
@@ -16,7 +15,14 @@ import java.util.Set;
 
 public class ReflectUtils {
 
-    private static ForestJsonConverter FORM_MAP_CONVERTER = new ForestFastjsonConverter();
+    private static ForestJsonConverter FORM_MAP_CONVERTER;
+
+    /**
+     * JSON转换选择器
+     * @since 1.5.1-BETA4
+     */
+    private static JSONConverterSelector jsonConverterSelector = new JSONConverterSelector();
+
 
     /**
      * 从Type获取Class
@@ -175,6 +181,9 @@ public class ReflectUtils {
 
 
     public static Map convertObjectToMap(Object srcObj) {
+        if (FORM_MAP_CONVERTER == null) {
+            FORM_MAP_CONVERTER = jsonConverterSelector.select();
+        }
         return FORM_MAP_CONVERTER.convertObjectToMap(srcObj);
     }
 }
