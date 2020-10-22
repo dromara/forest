@@ -4,6 +4,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.retryer.BackOffRetryer;
+import com.dtflys.forest.springboot.test.moudle.TestUser;
 import com.thebeastshop.forest.springboot.annotation.ForestScan;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.springboot.test.client0.BeastshopClient;
@@ -73,5 +74,14 @@ public class Test0 {
         assertNotNull(result);
     }
 
+
+    @Test
+    public void testBug2() {
+        TestUser user = new TestUser();
+        user.setUsername("foo");
+        user.setPassword("bar");
+        String result = beastshopClient.testBug2(user);
+        assertNotNull(result);
+    }
 
 }

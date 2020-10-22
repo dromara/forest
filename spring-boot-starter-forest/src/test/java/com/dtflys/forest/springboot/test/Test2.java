@@ -14,6 +14,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.annotation.Resource;
+
 import static org.junit.Assert.*;
 
 
@@ -25,10 +27,10 @@ import static org.junit.Assert.*;
 @EnableAutoConfiguration
 public class Test2 {
 
-    @Autowired
+    @Resource
     private GiteeClient giteeClient;
 
-    @Autowired
+    @Resource
     private ForestConfiguration forestConfiguration;
 
     @Test

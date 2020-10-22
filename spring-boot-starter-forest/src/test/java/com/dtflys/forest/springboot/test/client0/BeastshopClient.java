@@ -1,9 +1,13 @@
 package com.dtflys.forest.springboot.test.client0;
 
 
+import com.dtflys.forest.annotation.Body;
 import com.dtflys.forest.annotation.DataParam;
+import com.dtflys.forest.annotation.Post;
+import com.dtflys.forest.annotation.Query;
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.springboot.test.moudle.TestUser;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -26,5 +30,12 @@ public interface BeastshopClient {
             logEnabled = true
     )
     String testBug(@DataParam("num") Integer num);
+
+    @Post(
+            url = "${idServiceUrl}",
+            logEnabled = true
+    )
+    String testBug2(@Query TestUser user);
+
 
 }

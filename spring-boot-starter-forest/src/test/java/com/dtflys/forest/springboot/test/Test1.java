@@ -45,17 +45,18 @@ public class Test1 {
         assertEquals("okhttp3", forestConfiguration.getBackend().getName());
         assertEquals("TLSv1.2", forestConfiguration.getSslProtocol());
         assertTrue(forestConfiguration.isLogEnabled());
-        assertTrue(!forestConfiguration.isLogRequest());
+        assertTrue(forestConfiguration.isLogRequest());
         assertTrue(!forestConfiguration.isLogResponseStatus());
         assertTrue(forestConfiguration.isLogResponseContent());
         assertTrue(forestConfiguration.getLogHandler() instanceof TestLogHandler);
+        assertTrue(forestConfiguration.hasFilter("test"));
     }
 
     @Test
     public void testClient1() {
         StopWatch sw = new StopWatch();
         sw.start();
-        ForestResponse response = baiduClient.testTimeout();
+        ForestResponse response = baiduClient.testTimeout("xxx");
         sw.stop();
         assertNotNull(response);
         ForestRequest request = response.getRequest();
@@ -66,9 +67,9 @@ public class Test1 {
         assertTrue(time <= 900);
         LogConfiguration logConfiguration = request.getLogConfiguration();
         assertTrue(logConfiguration.isLogEnabled());
-        assertTrue(!logConfiguration.isLogRequest());
-        assertTrue(!logConfiguration.isLogResponseStatus());
-        assertTrue(logConfiguration.isLogResponseContent());
+        assertTrue(logConfiguration.isLogRequest());
+        assertTrue(logConfiguration.isLogResponseStatus());
+        assertTrue(!logConfiguration.isLogResponseContent());
         assertTrue(logConfiguration.getLogHandler() instanceof TestLogHandler);
     }
 
