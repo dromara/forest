@@ -130,8 +130,13 @@ public class ContentType {
         return "video".equals(type);
     }
 
+
     public boolean canReadAsString() {
         return isJson() || isXml() || isJavaScript() || isText();
+    }
+
+    public boolean canReadAsBinaryStream() {
+        return !canReadAsString();
     }
 
     @Override
