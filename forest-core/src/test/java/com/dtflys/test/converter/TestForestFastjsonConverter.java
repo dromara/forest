@@ -5,6 +5,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJacksonConverter;
 import com.dtflys.test.http.model.Cause;
 import com.dtflys.test.http.model.FormListParam;
 import com.dtflys.test.model.Coordinate;
@@ -14,6 +15,10 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.google.common.collect.Lists;
 import org.junit.Test;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -217,6 +222,22 @@ public class TestForestFastjsonConverter {
         }
         assertTrue(error);
     }
+
+
+    @Test
+    public void testMapToJSONString() throws ParseException {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("name", "foo");
+        map.put("password", "bar");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Date date = dateFormat.parse("2020-10-10 10:10:10");
+        map.put("createDate", date);
+        ForestFastjsonConverter fastjsonConverter = new ForestFastjsonConverter();
+        fastjsonConverter.setDateFormat("yyyy/MM/dd hh:mm:ss");
+        String jsonStr = fastjsonConverter.encodeToString(map);
+        assertEquals("{\"name\":\"foo\",\"password\":\"bar\",\"createDate\":\"2020/10/10 10:10:10\"}", jsonStr);
+    }
+
 
     @Test
     public void testJavaObjectToMap() {

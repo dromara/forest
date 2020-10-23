@@ -120,5 +120,17 @@ public class TestErrorClient extends BaseClientTest {
         assertEquals(1000 + 2000 + 4000, retryer.getWaitedTime());
     }
 
+    @Test
+    public void testErrorGetWithRetry2() {
+        boolean hasThrow = false;
+        try {
+            getClient.errorGetWithRetry();
+        } catch (Throwable th) {
+            hasThrow = true;
+            th.printStackTrace();
+        }
+        assertTrue(hasThrow);
+    }
+
 
 }

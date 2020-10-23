@@ -1,5 +1,6 @@
 package com.dtflys.test.converter;
 
+import com.dtflys.forest.converter.json.ForestFastjsonConverter;
 import com.dtflys.forest.converter.json.ForestJacksonConverter;
 import com.dtflys.test.http.model.Cause;
 import com.dtflys.test.http.model.FormListParam;
@@ -12,6 +13,11 @@ import com.dtflys.forest.converter.json.ForestGsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import org.junit.Test;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -134,6 +140,21 @@ public class TestGsonConverter {
         }
         assertTrue(error);
     }
+
+    @Test
+    public void testMapToJSONString() throws ParseException {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("name", "foo");
+        map.put("password", "bar");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Date date = dateFormat.parse("2020-10-10 10:10:10");
+        map.put("createDate", date);
+        ForestGsonConverter forestGsonConverter = new ForestGsonConverter();
+        forestGsonConverter.setDateFormat("yyyy/MM/dd hh:mm:ss");
+        String jsonStr = forestGsonConverter.encodeToString(map);
+        assertEquals("{\"name\":\"foo\",\"password\":\"bar\",\"createDate\":\"2020/10/10 10:10:10\"}", jsonStr);
+    }
+
 
     @Test
     public void testJavaObjectToMap() {
