@@ -2229,8 +2229,123 @@ forestConfiguration.getConverterMap().put(ForestDataType.XML, new MyXmlConverter
 
 ```
 
+# 十三. 自定义注解
 
-# 十三. 联系作者
+Forest提供了很多内置的注解，比如 `@Request`, `@Get`, `FileDownload` 等等。Forest对于请求接口的构建也是基于这些注解来工作的，
+那么总有一些需求是光靠这些内置注解是满足不了的，比如公司内部定义的加签加密方式，自定义数据转换类型等等。当然，您也可以通过[拦截器](###_十一-拦截器)来做，但每个接口类或者每个方法上加上一长串类名总觉得不那么优雅，而且无法通过方法动态传入参数。
+为了克服拦截器的这些缺点，自定义注解就应运而生了，以便于您可以简单优雅得解决上述各种需求，而且极大得扩展了Forest的能力。
+
+自定义注解在技术结构上基于拦截器，本质上就是把拦截器封装成了一个个注解，所以如果还不知道拦截器是啥的话，请先看[拦截器](###_十一-拦截器)。
+Forest中的所有内置注解也都是通过这样方式工作的。
+
+## 13.1 定义一个注解
+
+```java
+/**
+ * 用Forest自定义注解实现一个自定义的签名加密注解
+ * 凡用此接口修饰的方法或接口，其对应的所有请求都会执行自定义的签名加密过程
+ * 而自定义的签名加密过程，由这里的@MethodLifeCycle注解指定的生命周期类进行处理
+ * 可以将此注解用在接口类和方法上
+ */
+@Documented
+/** 重点： @MethodLifeCycle注解指定该注解的生命周期类*/
+@MethodLifeCycle(MyAuthLifeCycle.class)
+@RequestAttributes
+@Retention(RetentionPolicy.RUNTIME)
+/** 指定该注解可用于类上或方法上 */
+@Target({ElementType.TYPE, ElementType.METHOD})
+public @interface MyAuth {
+
+    /** 
+     * 自定义注解的属性：用户名
+     * 所有自定注解的属性可以在生命周期类中被获取到
+     */
+    String username();
+
+    /** 
+     * 自定义注解的属性：密码
+     * 所有自定注解的属性可以在生命周期类中被获取到
+     */
+    String password();
+}
+```
+
+上面的代码定义了一个名叫 `@MyAuth` 的注解，在这个注解有又有一个叫 `@MethodLifeCycle` 的注解，这个注解的`value`参数指定了该注解所绑定的接口或方法的对应请求，所要执行的生命周期类。
+
+## 13.2 生命周期类
+
+生命周期类，就如其名字所暗示的一样，它包括了一个请求从方法调用、创建请求、执行完成、成功、失败等生命周期中各个环节所要经历的整个过程。
+
+当然，您也可以理解为另一种拦截器，事实上三种生命周期接口`BaseAnnotationLifeCycle`、`MethodAnnotationLifeCycle` 和 `ParameterAnnotationLifeCycle` 都继承自 `Interceptor` 接口。
+
+好了，来看下为我们 `@MyAuth` 注解写的生命周期类
+
+```java
+
+/**
+ *  MyAuthLifeCycle 为自定义的 @MyAuth 注解的生命周期类
+ * 因为 @MyAuth 是针对每个请求方法的，所以它实现自 MethodAnnotationLifeCycle 接口
+ * MethodAnnotationLifeCycle 接口带有泛型参数
+ * 第一个泛型参数是该生命周期类绑定的注解类型
+ * 第二个泛型参数为请求方法返回的数据类型，为了尽可能适应多的不同方法的返回类型，这里使用 Object
+ */
+public class MyAuthLifeCycle implements MethodAnnotationLifeCycle<MyAuth, Object> {
+
+ 
+    /**
+     * 当方法调用时调用此方法，此时还没有执行请求发送
+     * 次方法可以获得请求对应的方法调用信息，以及动态传入的方法调用参数列表
+     */
+    @Override
+    public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
+        System.out.println("Invoke Method '" + method.getMethodName() + "' Arguments: " + args);
+    }
+
+    /**
+     * 发送请求前执行此方法，同拦截器中的一样
+     */
+    @Override
+    public boolean beforeExecute(ForestRequest request) {
+        // 通过getAttribute方法获取自定义注解中的属性值
+        // getAttribute第一个参数为request对象，第二个参数为自定义注解中的属性名
+        String username = (String) getAttribute(request, "username");
+        String password = (String) getAttribute(request, "password");
+        // 使用Base64进行加密
+        String basic = "MyAuth " + Base64Utils.encode("{" + username + ":" + password + "}");
+        // 调用addHeader方法将加密结构加到请求头MyAuthorization中
+        request.addHeader("MyAuthorization", basic);
+        return true;
+    }
+
+    /**
+     * 此方法在请求方法初始化的时候被调用
+     */
+    @Override
+    public void onMethodInitialized(ForestMethod method, BasicAuth annotation) {
+        System.out.println("Method '" + method.getMethodName() + "' Initialized, Arguments: " + args);
+    }
+}
+
+```
+
+OK, 定义部分基本完成了。就让我们来使用刚刚定义好的 `@MyAuth` 注解吧
+
+```java
+/**
+ * 在请求接口上加上自定义的 @MyAuth 注解
+ * 注解的参数可以是字符串模板，通过方法调用的时候动态传入
+ * 也可以是写死的字符串
+ */
+@Get(
+        url = "http://localhost:${port}/hello/user?username=${username}",
+        headers = {"Accept:text/plain"}
+)
+@MyAuth(username = "${username}", password = "bar")
+String send(@DataVariable("username") String username);
+
+```
+
+# 十四. 联系作者
 
 您如有问题可以扫码加入微信的技术交流群
 
@@ -2239,7 +2354,7 @@ forestConfiguration.getConverterMap().put(ForestDataType.XML, new MyXmlConverter
 ![avatar](https://dt_flys.gitee.io/forest/media/wx_gzh.jpg)
 
 
-# 十四. 项目协议
+# 十五. 项目协议
 
 The MIT License (MIT)
 
