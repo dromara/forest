@@ -11,12 +11,16 @@
 <a href="https://travis-ci.org/github/mySingleLive/forest">
     <img src="https://api.travis-ci.org/mySingleLive/forest.svg?branch=master&status=passed" alt="Build">
 </a>
+<!--
 <a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.5.0-BETA4/jar">
     <img src="https://img.shields.io/badge/maven%20central-1.5.0-BETA4-brightgreen.svg" alt="Maven Central">
 </a>
+-->
+<!--
 <a href="https://gitee.com/dt_flys/forest/releases/v1.5.0-BETA4">
     <img src="https://img.shields.io/badge/release-v1.5.0-BETA4-blue" alt="Release">
 </a>
+-->
 <a href="https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html">
     <img src="https://img.shields.io/badge/JDK-1.8+-yellow" alt="JDK">
 </a>
