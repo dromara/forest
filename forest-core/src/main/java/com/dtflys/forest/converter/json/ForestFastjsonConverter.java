@@ -1,3 +1,27 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2016 Jun Gong
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.dtflys.forest.converter.json;
 
 import com.alibaba.fastjson.JSON;
@@ -5,14 +29,13 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.alibaba.fastjson.parser.DefaultJSONParser;
 import com.alibaba.fastjson.parser.ParserConfig;
-import com.alibaba.fastjson.parser.deserializer.ObjectDeserializer;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.util.FieldInfo;
 import com.alibaba.fastjson.util.TypeUtils;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.utils.StringUtils;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -38,6 +61,9 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
     private String serializerFeatureName = "DisableCircularReferenceDetect";
 
     private SerializerFeature serializerFeature;
+
+    /** 日期格式 */
+    private String dateFormat;
 
     private static Field nameField;
 
@@ -127,23 +153,36 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
 
     }
 
+
+    private String parseToString(Object obj) {
+        if (serializerFeature == null) {
+            if (dateFormat != null) {
+                return JSON.toJSONString(obj, SerializerFeature.WriteDateUseDateFormat);
+            }
+            return JSON.toJSONString(obj);
+        }
+        if (dateFormat != null) {
+            return JSON.toJSONString(obj, SerializerFeature.WriteDateUseDateFormat, serializerFeature);
+        }
+        return JSON.toJSONString(obj, serializerFeature);
+
+    }
+
     @Override
     public String encodeToString(Object obj) {
         if (obj instanceof CharSequence) {
             obj.toString();
         }
         try {
-            if (serializerFeature == null) {
-                return JSON.toJSONString(obj);
-            }
-            return JSON.toJSONString(obj, serializerFeature);
+            return parseToString(obj);
         } catch (Throwable th) {
             throw new ForestRuntimeException(th);
         }
     }
 
     private static final Object toJSON(Object javaObject) {
-        return toJSON(javaObject, ParserConfig.getGlobalInstance());
+        ParserConfig parserConfig = ParserConfig.getGlobalInstance();
+        return toJSON(javaObject, parserConfig);
     }
 
     private static final Object toJSON(Object javaObject, ParserConfig mapping) {
@@ -261,6 +300,19 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         } catch (InvocationTargetException e) {
             return defaultJsonMap(obj);
         }
+    }
+
+    @Override
+    public void setDateFormat(String format) {
+        this.dateFormat = format;
+        if (StringUtils.isNotBlank(format)) {
+            JSON.DEFFAULT_DATE_FORMAT = format;
+        }
+    }
+
+    @Override
+    public String getDateFormat() {
+        return this.dateFormat;
     }
 
     public Map<String, Object> defaultJsonMap(Object obj) {

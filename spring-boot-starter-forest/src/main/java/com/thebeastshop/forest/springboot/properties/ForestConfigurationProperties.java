@@ -117,7 +117,7 @@ public class ForestConfigurationProperties {
      */
     private List<ForestSSLKeyStoreProperties> sslKeyStores = new ArrayList<>();
 
-    private Map<String, ForestConverterItemProperties> converters = new HashMap<>();
+    private ForestConvertProperties converters;
 
     private Map<String, Class> filters = new HashMap<>();
 
@@ -283,11 +283,11 @@ public class ForestConfigurationProperties {
         this.sslKeyStores = sslKeyStores;
     }
 
-    public Map<String, ForestConverterItemProperties> getConverters() {
+    public ForestConvertProperties getConverters() {
         return converters;
     }
 
-    public void setConverters(Map<String, ForestConverterItemProperties> converters) {
+    public void setConverters(ForestConvertProperties converters) {
         this.converters = converters;
     }
 

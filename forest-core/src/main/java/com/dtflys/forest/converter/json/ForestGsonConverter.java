@@ -1,6 +1,31 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2016 Jun Gong
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.dtflys.forest.converter.json;
 
 import com.dtflys.forest.exceptions.ForestConvertException;
+import com.dtflys.forest.utils.StringUtils;
 import com.google.gson.*;
 
 import java.lang.reflect.ParameterizedType;
@@ -16,6 +41,19 @@ import java.util.*;
  */
 public class ForestGsonConverter implements ForestJsonConverter {
 
+    /** 日期格式 */
+    private String dateFormat;
+
+    @Override
+    public String getDateFormat() {
+        return dateFormat;
+    }
+
+    @Override
+    public void setDateFormat(String dateFormat) {
+        this.dateFormat = dateFormat;
+    }
+
     @Override
     public <T> T convertToJavaObject(String source, Class<T> targetType) {
         try {
@@ -29,7 +67,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
                 JsonArray jsonArray = jsonParser.parse(source).getAsJsonArray();
                 return (T) toList(jsonArray);
             }
-            Gson gson = new Gson();
+            Gson gson = createGson();
             return (T) gson.fromJson(source, targetType);
         } catch (Throwable th) {
             throw new ForestConvertException("json", th);
@@ -41,7 +79,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
         try {
             if (targetType instanceof ParameterizedType
                     || targetType.getClass().getName().startsWith("com.google.gson")) {
-                Gson gson = new Gson();
+                Gson gson = createGson();
                 return gson.fromJson(source, targetType);
             }
             return convertToJavaObject(source, (Class<? extends T>) targetType);
@@ -145,9 +183,21 @@ public class ForestGsonConverter implements ForestJsonConverter {
         return list;
     }
 
+    /**
+     * 创建GSON对象
+     * @return New instance of {@code com.google.gson.Gson}
+     */
+    private Gson createGson() {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        if (StringUtils.isNotBlank(dateFormat)) {
+            gsonBuilder.setDateFormat(dateFormat);
+        }
+        return gsonBuilder.create();
+    }
+
     @Override
     public String encodeToString(Object obj) {
-        Gson gson = new Gson();
+        Gson gson = createGson();
         return gson.toJson(obj);
     }
 
@@ -159,13 +209,15 @@ public class ForestGsonConverter implements ForestJsonConverter {
         if (obj instanceof CharSequence) {
             return convertToJavaObject(obj.toString(), LinkedHashMap.class);
         }
-        Gson gson = new Gson();
+        Gson gson = createGson();
         JsonElement jsonElement = gson.toJsonTree(obj);
         return toMap(jsonElement.getAsJsonObject(), true);
     }
 
+
+
     public String convertToJson(Object obj, Type type) {
-        Gson gson = new Gson();
+        Gson gson = createGson();
         return gson.toJson(obj, type);
     }
 

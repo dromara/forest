@@ -1,14 +1,18 @@
 package com.thebeastshop.forest.springboot;
 
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.interceptor.SpringInterceptorFactory;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.scanner.ClassPathClientScanner;
 import com.dtflys.forest.schema.ForestConfigurationBeanDefinitionParser;
+import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 import com.thebeastshop.forest.springboot.annotation.ForestScannerRegister;
 import com.thebeastshop.forest.springboot.properties.ForestConfigurationProperties;
+import com.thebeastshop.forest.springboot.properties.ForestConvertProperties;
+import com.thebeastshop.forest.springboot.properties.ForestConverterItemProperties;
 import com.thebeastshop.forest.springboot.properties.ForestSSLKeyStoreProperties;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -17,10 +21,14 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.ManagedMap;
+import org.springframework.cglib.core.ReflectUtils;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.ResourceLoader;
 
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
@@ -108,7 +116,50 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
             configuration.registerFilter(filterName, filterClass);
         }
 
+        ForestConvertProperties convertProperties = forestConfigurationProperties.getConverters();
+        if (convertProperties != null) {
+            registerConverter(configuration, ForestDataType.TEXT, convertProperties.getText());
+            registerConverter(configuration, ForestDataType.JSON, convertProperties.getJson());
+            registerConverter(configuration, ForestDataType.XML, convertProperties.getXml());
+            registerConverter(configuration, ForestDataType.BINARY, convertProperties.getBinary());
+        }
+
         return configuration;
+    }
+
+    private void registerConverter(ForestConfiguration configuration, ForestDataType dataType, ForestConverterItemProperties converterItemProperties) {
+        if (converterItemProperties == null) {
+            return;
+        }
+        Class type = converterItemProperties.getType();
+        if (type != null) {
+            ForestConverter converter = null;
+            try {
+                converter = (ForestConverter) type.newInstance();
+
+                Map<String, Object> parameters = converterItemProperties.getParameters();
+                PropertyDescriptor[] descriptors = ReflectUtils.getBeanSetters(type);
+                for (PropertyDescriptor descriptor : descriptors) {
+                    String name = descriptor.getName();
+                    Object value = parameters.get(name);
+                    Method method = descriptor.getWriteMethod();
+                    if (method != null) {
+                        try {
+                            method.invoke(converter, value);
+                        } catch (IllegalAccessException e) {
+                            throw new ForestRuntimeException("An error occurred during setting the property " + type.getName() + "." + name, e);
+                        } catch (InvocationTargetException e) {
+                            throw new ForestRuntimeException("An error occurred during setting the property " + type.getName() + "." + name, e);
+                        }
+                    }
+                }
+                configuration.getConverterMap().put(dataType, converter);
+            } catch (InstantiationException e) {
+                throw new ForestRuntimeException("[Forest] Convert type '" + type.getName() + "' cannot be initialized!", e);
+            } catch (IllegalAccessException e) {
+                throw new ForestRuntimeException("[Forest] Convert type '" + type.getName() + "' cannot be initialized!", e);
+            }
+        }
     }
 
     public BeanDefinition registerInterceptorFactoryBean() {
