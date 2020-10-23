@@ -131,7 +131,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
         if (bytes == null) {
             bytes = getByteArray();
         }
-        return new ByteArrayInputStream(getByteArray());
+        return new ByteArrayInputStream(bytes);
     }
 
 }

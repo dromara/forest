@@ -1,5 +1,6 @@
 package com.dtflys.forest.handler;
 
+import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestHandlerException;
 import com.dtflys.forest.http.ForestRequest;
@@ -91,15 +92,21 @@ public class ResultHandler {
                 if (InputStream.class.isAssignableFrom(resultClass)) {
                     return response.getInputStream();
                 }
-
+                ContentType contentType = response.getContentType();
                 if (request.getDecoder() != null) {
-                    return request.getDecoder().convertToJavaObject(responseText, resultType);
+                    if (contentType != null && contentType.canReadAsString()) {
+                        return request.getDecoder().convertToJavaObject(responseText, resultType);
+                    } else {
+                        return request.getDecoder().convertToJavaObject(response.getByteArray(), resultType);
+                    }
                 }
 
                 ForestDataType dataType = request.getDataType();
                 ForestConverter converter = request.getConfiguration().getConverter(dataType);
-                return converter.convertToJavaObject(responseText, resultType);
-
+                if (contentType != null && contentType.canReadAsString()) {
+                    return converter.convertToJavaObject(responseText, resultType);
+                }
+                return converter.convertToJavaObject(response.getByteArray(), resultType);
             } catch (Exception e) {
                 throw new ForestHandlerException(e, request, response);
             }
