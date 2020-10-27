@@ -49,6 +49,11 @@ public class RequestLogMessage {
      */
     private LogBodyMessage body;
 
+    /**
+     * 请求代理信息
+     */
+    private RequestProxyLogMessage proxy;
+
     public ForestRequest getRequest() {
         return request;
     }
@@ -122,5 +127,13 @@ public class RequestLogMessage {
 
     public void setBody(LogBodyMessage body) {
         this.body = body;
+    }
+
+    public RequestProxyLogMessage getProxy() {
+        return proxy;
+    }
+
+    public void setProxy(RequestProxyLogMessage proxy) {
+        this.proxy = proxy;
     }
 }
