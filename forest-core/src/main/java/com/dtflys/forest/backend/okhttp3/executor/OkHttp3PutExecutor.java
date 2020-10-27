@@ -4,7 +4,6 @@ import com.dtflys.forest.backend.BodyBuilder;
 import com.dtflys.forest.backend.okhttp3.body.OkHttp3PutBodyBuilder;
 import com.dtflys.forest.backend.okhttp3.conn.OkHttp3ConnectionManager;
 import com.dtflys.forest.backend.okhttp3.response.OkHttp3ResponseHandler;
-import com.dtflys.forest.backend.url.SimpleURLBuilder;
 import com.dtflys.forest.backend.url.URLBuilder;
 import com.dtflys.forest.http.ForestRequest;
 import okhttp3.Request;
