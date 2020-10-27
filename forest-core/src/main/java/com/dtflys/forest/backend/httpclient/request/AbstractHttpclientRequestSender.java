@@ -2,16 +2,19 @@ package com.dtflys.forest.backend.httpclient.request;
 
 import com.dtflys.forest.backend.httpclient.conn.HttpclientConnectionManager;
 import com.dtflys.forest.backend.httpclient.logging.HttpclientLogBodyMessage;
+import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.LogBodyMessage;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.LogHeaderMessage;
 import com.dtflys.forest.logging.RequestLogMessage;
+import com.dtflys.forest.logging.RequestProxyLogMessage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.slf4j.Logger;
@@ -69,6 +72,12 @@ public abstract class AbstractHttpclientRequestSender implements HttpclientReque
         logMessage.setRetryCount(retryCount);
         setLogHeaders(logMessage, httpReq);
         setLogBody(logMessage, httpReq);
+        ForestProxy proxy = request.getProxy();
+        if (proxy != null) {
+            RequestProxyLogMessage proxyLogMessage = new RequestProxyLogMessage();
+            proxyLogMessage.setHost(proxy.getHost());
+            proxyLogMessage.setPort(proxy.getPort() + "");
+        }
         return logMessage;
     }
 

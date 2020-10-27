@@ -5,6 +5,7 @@ import com.dtflys.forest.backend.okhttp3.response.OkHttpResponseBody;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.LifeCycleHandler;
+import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.ssl.ForestX509TrustManager;
 import com.dtflys.forest.ssl.SSLKeyStore;
@@ -22,6 +23,8 @@ import okhttp3.TlsVersion;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.security.KeyStore;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
@@ -74,6 +77,13 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
                 .connectionPool(pool)
                 .connectTimeout(timeout, TimeUnit.MILLISECONDS)
                 .readTimeout(timeout, TimeUnit.MILLISECONDS);
+
+        // set proxy
+        ForestProxy proxy = request.getProxy();
+        if (proxy != null) {
+            Proxy okProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxy.getHost(), proxy.getPort()));
+            builder.proxy(okProxy);
+        }
 
         if ("https".equals(request.getProtocol())) {
             String protocol = request.getSslProtocol();

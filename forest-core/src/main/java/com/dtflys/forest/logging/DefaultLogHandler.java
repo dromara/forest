@@ -1,8 +1,9 @@
 package com.dtflys.forest.logging;
 
+import com.dtflys.forest.http.ForestProxy;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.StringUtils;
-import org.apache.commons.collections.CollectionUtils;
 
 import java.util.Iterator;
 import java.util.List;
@@ -59,7 +60,7 @@ public class DefaultLogHandler implements ForestLogHandler {
      */
     protected String requestTypeChangeHistory(RequestLogMessage requestLogMessage) {
         List<String> typeChangeHistory = requestLogMessage.getTypeChangeHistory();
-        if (CollectionUtils.isEmpty(typeChangeHistory)) {
+        if (typeChangeHistory == null || typeChangeHistory.size() == 0) {
             return "";
         }
         StringBuilder builder = new StringBuilder();
@@ -86,6 +87,19 @@ public class DefaultLogHandler implements ForestLogHandler {
     }
 
     /**
+     *
+     * @param requestLogMessage
+     * @return
+     */
+    protected String proxyContent(RequestLogMessage requestLogMessage) {
+        RequestProxyLogMessage proxyLogMessage = requestLogMessage.getProxy();
+        if (proxyLogMessage != null) {
+            return "[Proxy]: host: " + proxyLogMessage.getHost() + ", port: " + proxyLogMessage.getPort() + "\n\t";
+        }
+        return "";
+    }
+
+    /**
      * 请求日志打印的内容
      * @param requestLogMessage 请求日志字符串
      * @return 请求日志字符串
@@ -94,6 +108,7 @@ public class DefaultLogHandler implements ForestLogHandler {
         StringBuilder builder = new StringBuilder();
         builder.append("Request: \n\t");
         builder.append(retryContent(requestLogMessage));
+        builder.append(proxyContent(requestLogMessage));
         builder.append(requestTypeChangeHistory(requestLogMessage));
         builder.append(requestLogMessage.getRequestLine());
         String headers = requestLoggingHeaders(requestLogMessage);

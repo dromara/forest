@@ -5,6 +5,7 @@ import com.dtflys.forest.backend.HttpExecutor;
 import com.dtflys.forest.backend.okhttp3.logging.OkHttp3LogBodyMessage;
 import com.dtflys.forest.backend.url.URLBuilder;
 import com.dtflys.forest.exceptions.ForestRetryException;
+import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.logging.LogBodyMessage;
@@ -12,6 +13,7 @@ import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.LogHeaderMessage;
 import com.dtflys.forest.logging.RequestLogMessage;
+import com.dtflys.forest.logging.RequestProxyLogMessage;
 import com.dtflys.forest.logging.ResponseLogMessage;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
@@ -35,6 +37,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.SocketAddress;
 import java.util.Date;
 import java.util.List;
 
@@ -65,6 +70,7 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
         message.setRetryCount(retryCount);
         setLogHeaders(message, okRequest);
         setLogBody(message, okRequest);
+
         return message;
     }
 
@@ -84,7 +90,7 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
     }
 
 
-    public void logRequest(int retryCount,  Request okRequest) {
+    public void logRequest(int retryCount,  Request okRequest, OkHttpClient okHttpClient) {
         LogConfiguration logConfiguration = request.getLogConfiguration();
         if (!logConfiguration.isLogEnabled() || !logConfiguration.isLogRequest()) {
             return;
@@ -92,6 +98,16 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
         RequestLogMessage requestLogMessage = buildRequestMessage(retryCount, okRequest);
         requestLogMessage.setRequest(request);
         requestLogMessage.setRetryCount(retryCount);
+        Proxy proxy = okHttpClient.proxy();
+        if (proxy != null) {
+            RequestProxyLogMessage proxyLogMessage = new RequestProxyLogMessage();
+            SocketAddress address = proxy.address();
+            if (address instanceof InetSocketAddress) {
+                InetSocketAddress inetSocketAddress = (InetSocketAddress) address;
+                proxyLogMessage.setHost(inetSocketAddress.getHostString());
+                proxyLogMessage.setPort(inetSocketAddress.getPort() + "");
+            }
+        }
         request.setRequestLogMessage(requestLogMessage);
         logConfiguration.getLogHandler().logRequest(requestLogMessage);
     }
@@ -166,10 +182,11 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
         prepareHeaders(builder);
         prepareBody(builder, lifeCycleHandler);
 
+
         final Request okRequest = builder.build();
         Call call = okHttpClient.newCall(okRequest);
         final OkHttp3ForestResponseFactory factory = new OkHttp3ForestResponseFactory();
-        logRequest(retryCount, okRequest);
+        logRequest(retryCount, okRequest, okHttpClient);
         Date startDate = new Date();
         long startTime = startDate.getTime();
         if (request.isAsync()) {
