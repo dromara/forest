@@ -1,5 +1,6 @@
 package com.dtflys.forest.utils;
 
+import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.converter.json.JSONConverterSelector;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
@@ -180,7 +181,10 @@ public class ReflectUtils {
     }
 
 
-    public static Map convertObjectToMap(Object srcObj) {
+    public static Map convertObjectToMap(Object srcObj, ForestConfiguration configuration) {
+        if (configuration != null) {
+            return configuration.getJsonConverter().convertObjectToMap(srcObj);
+        }
         if (FORM_MAP_CONVERTER == null) {
             FORM_MAP_CONVERTER = jsonConverterSelector.select();
         }
