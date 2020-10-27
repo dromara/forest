@@ -4,22 +4,15 @@ import com.dtflys.forest.backend.AbstractHttpExecutor;
 import com.dtflys.forest.backend.BodyBuilder;
 import com.dtflys.forest.backend.httpclient.HttpclientRequestProvider;
 import com.dtflys.forest.backend.httpclient.body.HttpclientBodyBuilder;
-import com.dtflys.forest.backend.httpclient.logging.HttpclientLogBodyMessage;
 import com.dtflys.forest.backend.url.URLBuilder;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
-import com.dtflys.forest.logging.LogBodyMessage;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.ForestLogHandler;
-import com.dtflys.forest.logging.LogHeaderMessage;
-import com.dtflys.forest.logging.RequestLogMessage;
 import com.dtflys.forest.logging.ResponseLogMessage;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpRequestBase;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.backend.httpclient.request.HttpclientRequestSender;
@@ -33,13 +26,8 @@ import com.dtflys.forest.mapping.MappingTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
