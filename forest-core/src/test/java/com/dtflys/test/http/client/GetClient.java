@@ -8,6 +8,7 @@ import com.dtflys.forest.annotation.DataVariable;
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.model.JsonTestUser;
+import com.dtflys.test.interceptor.AddQueryInterceptor;
 import com.dtflys.test.interceptor.ErrorInterceptor;
 import com.dtflys.test.model.TestResult;
 
@@ -38,6 +39,40 @@ public interface GetClient {
     )
     String simpleGet3();
 
+    @Request(
+            url = "http://localhost:${port}/hello/user?username=foo",
+            headers = {"Accept:text/plain"}
+    )
+    String simpleGetMultiQuery(@Query("password") String password);
+
+
+    @Request(
+            url = "http://localhost:${port}/hello/user",
+            headers = {"Accept:text/plain"}
+    )
+    String simpleGetMultiQuery2(@Query("username") String username, @Query("password") String password);
+
+    @Request(
+            url = "http://localhost:${port}/hello/user",
+            headers = {"Accept:text/plain"},
+            interceptor = AddQueryInterceptor.class
+    )
+    String simpleGetMultiQuery3();
+
+    @Request(
+            url = "http://localhost:${port}/hello/user?username=foo",
+            headers = {"Accept:text/plain"},
+            interceptor = AddQueryInterceptor.class
+    )
+    ForestResponse<String> simpleGetMultiQuery4();
+
+
+    @Request(
+            url = "http://localhost:${port}/hello/user",
+            headers = {"Accept:text/plain"},
+            interceptor = AddQueryInterceptor.class
+    )
+    ForestResponse<String> simpleGetMultiQuery5(@Query("username") String username);
 
 
     @Request(
