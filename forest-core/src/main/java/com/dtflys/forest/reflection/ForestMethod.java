@@ -670,70 +670,16 @@ public class ForestMethod<T> implements VariableScope {
             }
         }
 
-        renderedUrl = StringUtils.trimBegin(URLUtils.getValidURL(baseUrl, renderedUrl));
-        String query = "";
-        String protocol = "";
-        String userInfo = null;
-        try {
-            URL u = new URL(renderedUrl);
-            query = u.getQuery();
-            userInfo = u.getUserInfo();
-            if (StringUtils.isNotEmpty(query)) {
-                String[] params = query.split("&");
-                for (int i = 0; i < params.length; i++) {
-                    String p = params[i];
-                    String[] nameValue = p.split("=", 2);
-                    String name = nameValue[0];
-                    RequestNameValue requestNameValue = new RequestNameValue(name, TARGET_QUERY);
-                    nameValueList.add(requestNameValue);
-                    if (nameValue.length > 1) {
-                        StringBuilder valueBuilder = new StringBuilder();
-                        valueBuilder.append(nameValue[1]);
-                        if (nameValue.length > 2) {
-                            for (int j = 2; j < nameValue.length; j++) {
-                                valueBuilder.append("=");
-                                valueBuilder.append(nameValue[j]);
-                            }
-                        }
-                        String value = valueBuilder.toString();
-                        requestNameValue.setValue(value);
-                    }
-                }
-            }
-            protocol = u.getProtocol();
-            int port = u.getPort();
-            StringBuilder urlBuilder = new StringBuilder();
-            urlBuilder.append(protocol).append("://");
-            if (userInfo != null) {
-                urlBuilder.append(userInfo).append('@');
-            }
-            urlBuilder.append(u.getHost());
-            if (port != 80 && port > -1) {
-                urlBuilder.append(':').append(port);
-            }
-            String path = u.getPath();
-            if (StringUtils.isNotEmpty(path)) {
-                urlBuilder.append(path);
-            }
-            newUrl = urlBuilder.toString();
-        } catch (MalformedURLException e) {
-            throw new ForestRuntimeException(e);
-        }
-
+        renderedUrl = URLUtils.getValidURL(baseUrl, renderedUrl);
 
         // createExecutor and initialize http instance
         ForestRequest<T> request = new ForestRequest(configuration, args);
-        request.setProtocol(protocol)
-                .setUrl(newUrl)
+        request.setUrl(renderedUrl)
                 .setType(type)
                 .setCharset(charset)
                 .setSslProtocol(sslProtocol)
                 .setLogConfiguration(logConfiguration)
                 .setAsync(async);
-
-        if (StringUtils.isNotEmpty(userInfo)) {
-            request.setUserInfo(userInfo);
-        }
 
         if (StringUtils.isNotEmpty(renderedContentType)) {
             request.setContentType(renderedContentType);
@@ -833,7 +779,7 @@ public class ForestMethod<T> implements VariableScope {
                 }
                 else {
                     try {
-                        List<RequestNameValue> list = getNameValueListFromObjectWithJSON(parameter, obj, type);
+                        List<RequestNameValue> list = getNameValueListFromObjectWithJSON(parameter, configuration, obj, type);
                         for (RequestNameValue nameValue : list) {
                             if (nameValue.isInHeader()) {
                                 request.addHeader(nameValue);
@@ -1114,8 +1060,8 @@ public class ForestMethod<T> implements VariableScope {
     }
 
 
-    private List<RequestNameValue> getNameValueListFromObjectWithJSON(MappingParameter parameter, Object obj, ForestRequestType type) {
-        Map<String, Object> propMap = ReflectUtils.convertObjectToMap(obj);
+    private List<RequestNameValue> getNameValueListFromObjectWithJSON(MappingParameter parameter, ForestConfiguration configuration, Object obj, ForestRequestType type) {
+        Map<String, Object> propMap = ReflectUtils.convertObjectToMap(obj, configuration);
         List<RequestNameValue> nameValueList = new ArrayList<>();
         for (Map.Entry<String, Object> entry : propMap.entrySet()) {
             String name = entry.getKey();

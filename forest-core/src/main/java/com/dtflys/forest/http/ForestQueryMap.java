@@ -180,6 +180,19 @@ public class ForestQueryMap implements Map<String, Object> {
         queries.clear();
     }
 
+    /**
+     * 清除所有源自URL的Query参数
+     */
+    public void clearQueriesFromUrl() {
+        int len = queries.size();
+        for (int i = len - 1; i >=0; i--) {
+            ForestQueryParameter query = queries.get(i);
+            if (query.isFromUrl()) {
+                queries.remove(i);
+            }
+        }
+    }
+
     @Override
     public Set<String> keySet() {
         Set<String> set = new HashSet<>();

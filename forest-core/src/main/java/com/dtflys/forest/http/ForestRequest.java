@@ -45,7 +45,10 @@ import com.dtflys.forest.interceptor.InterceptorChain;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
+import com.dtflys.forest.utils.URLUtils;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 
 import static com.dtflys.forest.mapping.MappingParameter.*;
@@ -251,6 +254,11 @@ public class ForestRequest<T> {
      */
     private SSLKeyStore keyStore;
 
+    /**
+     * 正向代理
+     */
+    private ForestProxy proxy;
+
     public ForestRequest(ForestConfiguration configuration, Object[] arguments) {
         this.configuration = configuration;
         this.arguments = arguments;
@@ -278,8 +286,84 @@ public class ForestRequest<T> {
         return url;
     }
 
+    /**
+     * 设置请求的url地址
+     * <p>每次设置请求的url地址时，都会解析传入的url参数字符串，</p>
+     * <p>然后从url中解析出Query参数，并将其替换调用原来的Query参数，或新增成新的Query参数</p>
+     *
+     * @param url url地址字符串
+     * @return {@link ForestRequest}对象实例
+     */
     public ForestRequest setUrl(String url) {
-        this.url = url;
+        if (StringUtils.isBlank(url)) {
+            throw new ForestRuntimeException("[Forest] Request url cannot be empty!");
+        }
+        String newUrl = null;
+        String srcUrl = StringUtils.trimBegin(url);
+        String query = "";
+        String protocol = "";
+        String userInfo = null;
+
+        if (!this.query.isEmpty()) {
+            this.query.clearQueriesFromUrl();
+        }
+
+        try {
+            URL u = new URL(srcUrl);
+            query = u.getQuery();
+            userInfo = u.getUserInfo();
+            if (StringUtils.isNotEmpty(query)) {
+                String[] params = query.split("&");
+                for (int i = 0; i < params.length; i++) {
+                    String p = params[i];
+                    String[] nameValue = p.split("=", 2);
+                    String name = nameValue[0];
+                    RequestNameValue requestNameValue = new RequestNameValue(name, TARGET_QUERY);
+                    if (nameValue.length > 1) {
+                        StringBuilder valueBuilder = new StringBuilder();
+                        valueBuilder.append(nameValue[1]);
+                        if (nameValue.length > 2) {
+                            for (int j = 2; j < nameValue.length; j++) {
+                                valueBuilder.append("=");
+                                valueBuilder.append(nameValue[j]);
+                            }
+                        }
+                        String value = valueBuilder.toString();
+                        requestNameValue.setValue(value);
+                    }
+
+                    addQuery(new ForestQueryParameter(
+                            requestNameValue.getName(), requestNameValue.getValue(), true));
+                }
+            }
+
+            protocol = u.getProtocol();
+            int port = u.getPort();
+            StringBuilder urlBuilder = new StringBuilder();
+            urlBuilder.append(protocol).append("://");
+            if (userInfo != null) {
+                urlBuilder.append(userInfo).append('@');
+            }
+            urlBuilder.append(u.getHost());
+            if (port != 80 && port > -1) {
+                urlBuilder.append(':').append(port);
+            }
+            String path = u.getPath();
+            if (StringUtils.isNotEmpty(path)) {
+                urlBuilder.append(path);
+            }
+            newUrl = urlBuilder.toString();
+        } catch (MalformedURLException e) {
+            throw new ForestRuntimeException(e);
+        }
+
+        this.url = newUrl;
+        if (StringUtils.isNotEmpty(protocol)) {
+            this.protocol = protocol;
+        }
+        if (StringUtils.isNotEmpty(userInfo)) {
+            this.userInfo = userInfo;
+        }
         return this;
     }
 
@@ -292,7 +376,11 @@ public class ForestRequest<T> {
         return this;
     }
 
-    public Map<String, Object> getQuery() {
+    /**
+     * 获取请求的Query参数表
+     * @return Query参数表
+     */
+    public ForestQueryMap getQuery() {
         return query;
     }
 
@@ -326,16 +414,32 @@ public class ForestRequest<T> {
         return builder.toString();
     }
 
+    /**
+     * 添加请求中的Query参数
+     * @param name Query参数名
+     * @param value Query参数值
+     * @return {@link ForestRequest}对象实例
+     */
     public ForestRequest addQuery(String name, Object value) {
         this.query.addQuery(name, value);
         return this;
     }
 
+    /**
+     * 添加请求中的Query参数
+     * @param queryParameter Query参数，{@link ForestQueryParameter}对象实例
+     * @return {@link ForestRequest}对象实例
+     */
     public ForestRequest addQuery(ForestQueryParameter queryParameter) {
         this.query.addQuery(queryParameter);
         return this;
     }
 
+    /**
+     * 批量添加请求中的Query参数
+     * @param queryParameters Query参数集合，{@link ForestQueryParameter}对象实例集合
+     * @return {@link ForestRequest}对象实例
+     */
     public ForestRequest addQuery(Collection<ForestQueryParameter> queryParameters) {
         for (ForestQueryParameter queryParameter : queryParameters) {
             addQuery(queryParameter);
@@ -343,6 +447,12 @@ public class ForestRequest<T> {
         return this;
     }
 
+    /**
+     * 批量添加请求中的同名Query参数
+     * @param name Query参数名
+     * @param queryValues Query参数值集合
+     * @return {@link ForestRequest}对象实例
+     */
     public ForestRequest addQueryValues(String name, Collection queryValues) {
         for (Object queryValue : queryValues) {
             addQuery(name, queryValue);
@@ -350,13 +460,87 @@ public class ForestRequest<T> {
         return this;
     }
 
-
+    /**
+     * 批量添加请求中的Query参数
+     * @param queryParameters Query参数数组，{@link ForestQueryParameter}对象实例数组
+     * @return {@link ForestRequest}对象实例
+     */
     public ForestRequest addQuery(ForestQueryParameter[] queryParameters) {
         for (ForestQueryParameter queryParameter : queryParameters) {
             addQuery(queryParameter);
         }
         return this;
     }
+
+    /**
+     * 替换请求中的Query参数值
+     * @param queryParameter Query参数，{@link ForestQueryParameter}对象实例
+     * @return {@link ForestRequest}对象实例
+     */
+    public ForestRequest replaceQuery(ForestQueryParameter queryParameter) {
+        List<ForestQueryParameter> queryParameters = this.query.getQueries(queryParameter.getName());
+        for (ForestQueryParameter parameter : queryParameters) {
+            parameter.setValue(queryParameter.getValue());
+        }
+        return this;
+    }
+
+
+    /**
+     * 替换请求中的Query参数值
+     * @param name Query参数名
+     * @param value Query参数值
+     * @return {@link ForestRequest}对象实例
+     */
+    public ForestRequest replaceQuery(String name, Object value) {
+        List<ForestQueryParameter> queryParameters = this.query.getQueries(name);
+        for (ForestQueryParameter parameter : queryParameters) {
+            parameter.setValue(value);
+        }
+        return this;
+    }
+
+    /**
+     * 替换或添加请求中的Query参数
+     * <p>当请求中不存在与该方法调用时传递过来{@link ForestQueryParameter}对象中同名的Query参数时，会将{@link ForestQueryParameter}对象添加成新的Query参数到请求中，</p>
+     * <p>若请求中已存在同名Query参数名时，则会替换请求中的所有同名的Query参数值</p>
+     *
+     * @param queryParameter Query参数，{@link ForestQueryParameter}对象实例
+     * @return {@link ForestRequest}对象实例
+     */
+    public ForestRequest replaceOrAddQuery(ForestQueryParameter queryParameter) {
+        List<ForestQueryParameter> queryParameters = this.query.getQueries(queryParameter.getName());
+        if (queryParameters.isEmpty()) {
+            addQuery(queryParameter);
+        } else {
+            for (ForestQueryParameter parameter : queryParameters) {
+                parameter.setValue(queryParameter.getValue());
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 替换或添加请求中的Query参数
+     * <p>当请求中不存在与该方法调用时传递过来{@code name}参数同名的Query参数时，会将{@code name}参数和{@code value}参数添加成新的Query参数到请求中，</p>
+     * <p>若请求中已存在同名Query参数名时，则会替换请求中的所有同名的Query参数值</p>
+     *
+     * @param name Query参数名
+     * @param value Query参数值
+     * @return
+     */
+    public ForestRequest replaceOrAddQuery(String name, String value) {
+        List<ForestQueryParameter> queryParameters = this.query.getQueries(name);
+        if (queryParameters.isEmpty()) {
+            addQuery(name, value);
+        } else {
+            for (ForestQueryParameter parameter : queryParameters) {
+                parameter.setValue(value);
+            }
+        }
+        return this;
+    }
+
 
 
     public ForestRequestType getType() {
@@ -929,6 +1113,15 @@ public class ForestRequest<T> {
 
     public ForestRequest setKeyStore(SSLKeyStore keyStore) {
         this.keyStore = keyStore;
+        return this;
+    }
+
+    public ForestProxy getProxy() {
+        return proxy;
+    }
+
+    public ForestRequest setProxy(ForestProxy proxy) {
+        this.proxy = proxy;
         return this;
     }
 
