@@ -55,7 +55,7 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
     protected void setFormBody(Request.Builder builder, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList) {
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         FormBody.Builder bodyBuilder = new FormBody.Builder();
-        nameValueList = processFromNameValueList(nameValueList);
+        nameValueList = processFromNameValueList(nameValueList, request.getConfiguration());
         for (int i = 0; i < nameValueList.size(); i++) {
             RequestNameValue nameValue = nameValueList.get(i);
             if (!nameValue.isInBody()) {
