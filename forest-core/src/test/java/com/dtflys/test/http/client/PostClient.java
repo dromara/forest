@@ -37,6 +37,14 @@ public interface PostClient {
     )
     String simplePost(@Header("Accept") String accept);
 
+    @Request(
+            url = "http://localhost:${port}/hello",
+            type = "post",
+            data = "username=foo&password=123456"
+    )
+    @HTTPProxy(host = "127.0.0.1", port = "10801")
+    String simplePostWithProxy(@Header("Accept") String accept);
+
     @Post(
             url = "http://localhost:${port}/hello",
             data = "username=foo&password=123456",
