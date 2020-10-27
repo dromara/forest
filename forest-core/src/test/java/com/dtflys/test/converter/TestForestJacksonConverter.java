@@ -1,5 +1,6 @@
 package com.dtflys.test.converter;
 
+import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestFastjsonConverter;
 import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.test.http.model.Cause;
@@ -173,7 +174,7 @@ public class TestForestJacksonConverter {
         List<Cause> causes = Lists.newArrayList(cause1, cause2);
         param.setCause(causes);
 
-        Map map = ReflectUtils.convertObjectToMap(param);
+        Map map = ReflectUtils.convertObjectToMap(param, ForestConfiguration.configuration());
         assertEquals("foo", map.get("username"));
         assertEquals("123456", map.get("password"));
         assertEquals(idList, map.get("idList"));
