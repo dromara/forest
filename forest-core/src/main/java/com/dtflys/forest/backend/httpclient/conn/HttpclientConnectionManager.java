@@ -5,8 +5,10 @@ import com.dtflys.forest.backend.HttpConnectionConstants;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.exceptions.ForestUnsupportException;
+import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
 import org.apache.http.Consts;
+import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthSchemeProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.AuthSchemes;
@@ -31,6 +33,7 @@ import org.apache.http.nio.reactor.ConnectingIOReactor;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 
+import java.lang.reflect.Proxy;
 import java.nio.charset.CodingErrorAction;
 import java.security.*;
 
@@ -150,6 +153,12 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
         // 在提交请求之前 测试连接是否可用
         configBuilder.setStaleConnectionCheckEnabled(true);
         RequestConfig requestConfig = configBuilder.build();
+
+        ForestProxy proxy = request.getProxy();
+        if (proxy != null) {
+            HttpHost httpHost = new HttpHost(proxy.getHost(), proxy.getPort());
+            configBuilder.setProxy(httpHost);
+        }
 
         return builder
                 .setDefaultRequestConfig(requestConfig)
