@@ -244,8 +244,8 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
         if (StringUtils.isEmpty(name) && value == null) {
             return;
         }
-        Class itemClass = value.getClass();
         if (value != null) {
+            Class itemClass = value.getClass();
             boolean needCollapse = false;
             if (value instanceof Collection) {
                 Collection collection = (Collection) value;
