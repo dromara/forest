@@ -26,6 +26,7 @@ import com.dtflys.forest.lifecycles.BaseAnnotationLifeCycle;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.lifecycles.ParameterAnnotationLifeCycle;
 import com.dtflys.forest.lifecycles.method.RequestLifeCycle;
+import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.mapping.MappingParameter;
@@ -111,7 +112,7 @@ public class ForestMethod<T> implements VariableScope {
     private boolean logRequest = true;
     private boolean logResponseStatus = true;
     private boolean logResponseContent = false;
-    private ForestLogHandler logHandler = null;
+    private ForestLogHandler logHandler = new DefaultLogHandler();
     private LogConfiguration logConfiguration = null;
 
     public ForestMethod(InterfaceProxyHandler interfaceProxyHandler, ForestConfiguration configuration, Method method) {
