@@ -12,7 +12,7 @@
     <img src="https://api.travis-ci.org/mySingleLive/forest.svg?branch=master&status=passed" alt="Build">
 </a>
 <!--
-<a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.5.0-BETA5/jar">
+<a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.5.0-BETA7/jar">
     <img src="https://img.shields.io/badge/maven%20central-1.5.0-BETA5-brightgreen.svg" alt="Maven Central">
 </a>
 -->
