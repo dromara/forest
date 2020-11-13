@@ -2,7 +2,7 @@
 
 <p align="center">
 <a href="http://dt_flys.gitee.io/forest-website">
-    <img width="300" src="http://localhost:3000/forest-website/img/logo-main.svg" alt="logo">
+    <img width="300" src="http://localhost:3000/forest-website/img/logo3.png" alt="logo">
 </a>
 </p>
 
