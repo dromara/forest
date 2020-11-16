@@ -60,12 +60,12 @@ Forest 1.0.x 和 Forest 1.1.x 基于 JDK 1.7, Forest 1.2.x及以上版本基于 
 </dependency>
 ```
 
-最新版本为<font color=red>1.5.0-BETA5</font>
+最新版本为<font color=red>1.5.0-http://dt_flys.gitee.io/forest-website/</font>
 
 如果您用的是Gradle:
 
 ```gradle
-compile group: 'com.dtflys.forest', name: 'spring-boot-starter-forest', version: '1.5.0-BETA5'
+compile group: 'com.dtflys.forest', name: 'spring-boot-starter-forest', version: '1.5.0-BETA7'
 ```
 
 ## 2.2 在非 Spring Boot 项目中安装
