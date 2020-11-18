@@ -12,13 +12,13 @@
     <img src="https://api.travis-ci.org/mySingleLive/forest.svg?branch=master&status=passed" alt="Build">
 </a>
 <!--
-<a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.5.0-BETA7/jar">
-    <img src="https://img.shields.io/badge/maven%20central-1.5.0-BETA7-brightgreen.svg" alt="Maven Central">
+<a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.5.0-BETA8/jar">
+    <img src="https://img.shields.io/badge/maven%20central-1.5.0-BETA8-brightgreen.svg" alt="Maven Central">
 </a>
 -->
 <!--
-<a href="https://gitee.com/dt_flys/forest/releases/v1.5.0-BETA7">
-    <img src="https://img.shields.io/badge/release-v1.5.0-BETA7-blue" alt="Release">
+<a href="https://gitee.com/dt_flys/forest/releases/v1.5.0-BETA8">
+    <img src="https://img.shields.io/badge/release-v1.5.0-BETA8-blue" alt="Release">
 </a>
 -->
 <a href="https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html">
@@ -91,7 +91,7 @@ Forest有哪些特性？
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>spring-boot-starter-forest</artifactId>
-    <version>1.5.0-BETA7</version>
+    <version>1.5.0-BETA8</version>
 </dependency>
 ```
 
