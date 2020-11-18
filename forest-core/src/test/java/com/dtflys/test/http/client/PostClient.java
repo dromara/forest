@@ -243,6 +243,8 @@ public interface PostClient {
     )
     String postJsonObj3(@DataVariable("user") JsonTestUser3 user);
 
+
+
     @Post(
             url = "http://localhost:${port}/json",
             headers = {"Content-Type: application/json; charset=utf-8"}

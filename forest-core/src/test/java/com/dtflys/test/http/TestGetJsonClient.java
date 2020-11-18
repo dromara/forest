@@ -121,6 +121,19 @@ public class TestGetJsonClient extends BaseClientTest {
     }
 
     @Test
+    public void testJsonPostObj4() {
+        JsonTestUser3 user = new JsonTestUser3();
+        user.setUsername("foo");
+        user.setPassword("123456&&++===");
+        user.setCnName("中文名");
+        String result = postClient.postJsonObj4(user);
+        log.info("response: " + result);
+        assertNotNull(result);
+        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
+    }
+
+
+    @Test
     public void testPostBodyString1() {
         String result = postClient.postBodyString1("{\"username\":\"foo\",\"password\":\"123456&&++===\",\"cn_name\":\"中文名\"}");
         log.info("response: " + result);
