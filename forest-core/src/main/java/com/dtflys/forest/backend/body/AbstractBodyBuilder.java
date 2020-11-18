@@ -1,6 +1,7 @@
 package com.dtflys.forest.backend.body;
 
 import com.dtflys.forest.backend.BodyBuilder;
+import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.handler.LifeCycleHandler;
@@ -31,10 +32,6 @@ import java.util.Map;
  */
 public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
 
-    public final static String TYPE_APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
-    public final static String TYPE_APPLICATION_JSON = "application/json";
-    public final static String TYPE_MULTIPART_FORM_DATA = "multipart/form-data";
-
     /**
      * 构建
      * @param httpRequest
@@ -54,7 +51,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
         }
 
         if (StringUtils.isEmpty(contentType)) {
-            contentType = TYPE_APPLICATION_X_WWW_FORM_URLENCODED;
+            contentType = ContentType.APPLICATION_X_WWW_FORM_URLENCODED;
         }
 
         String[] typeGroup = contentType.split(";[ ]*charset=");
@@ -71,14 +68,14 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
         }
 
         if (StringUtils.isEmpty(mineType)) {
-            mineType = TYPE_APPLICATION_X_WWW_FORM_URLENCODED;
+            mineType = ContentType.APPLICATION_X_WWW_FORM_URLENCODED;
         }
         List<RequestNameValue> nameValueList = request.getDataNameValueList();
 
-        if (mineType.equals(TYPE_APPLICATION_X_WWW_FORM_URLENCODED) && !nameValueList.isEmpty()) {
+        if (mineType.equals(ContentType.APPLICATION_X_WWW_FORM_URLENCODED) && !nameValueList.isEmpty()) {
             setFormBody(httpRequest, request, charset, contentType, nameValueList);
         }
-        else if (mineType.equals(TYPE_APPLICATION_JSON)) {
+        else if (mineType.equals(ContentType.APPLICATION_JSON)) {
             ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
             List<ForestRequestBody> srcBodyList = request.getBody();
             List<ForestRequestBody> bodyList = new LinkedList(srcBodyList);

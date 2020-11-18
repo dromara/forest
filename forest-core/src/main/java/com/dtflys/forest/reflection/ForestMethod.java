@@ -4,6 +4,7 @@ import com.dtflys.forest.annotation.BaseLifeCycle;
 import com.dtflys.forest.annotation.MethodLifeCycle;
 import com.dtflys.forest.annotation.ParamLifeCycle;
 import com.dtflys.forest.annotation.RequestAttributes;
+import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.callback.OnSuccess;
@@ -46,12 +47,8 @@ import com.dtflys.forest.utils.URLUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.*;
 
-import static com.dtflys.forest.backend.body.AbstractBodyBuilder.TYPE_APPLICATION_X_WWW_FORM_URLENCODED;
-import static com.dtflys.forest.backend.body.AbstractBodyBuilder.TYPE_MULTIPART_FORM_DATA;
 import static com.dtflys.forest.mapping.MappingParameter.*;
 
 /**
@@ -837,7 +834,7 @@ public class ForestMethod<T> implements VariableScope {
         List<ForestMultipart> multiparts = new ArrayList<>(multipartFactories.size());
 
         if (!multipartFactories.isEmpty() && request.getContentType() == null) {
-            request.setContentType(TYPE_MULTIPART_FORM_DATA);
+            request.setContentType(ContentType.MULTIPART_FORM_DATA);
         }
 
         for (int i = 0; i < multipartFactories.size(); i++) {
@@ -857,7 +854,7 @@ public class ForestMethod<T> implements VariableScope {
             if (data == null) {
                 continue;
             }
-            ForestMultipart multipart = factory.create(name, fileName, data, TYPE_MULTIPART_FORM_DATA);
+            ForestMultipart multipart = factory.create(name, fileName, data, ContentType.MULTIPART_FORM_DATA);
             multiparts.add(multipart);
         }
 
@@ -900,7 +897,7 @@ public class ForestMethod<T> implements VariableScope {
 
         List<RequestNameValue> dataNameValueList = new ArrayList<>();
         renderedContentType = request.getContentType();
-        if (renderedContentType == null || renderedContentType.equalsIgnoreCase(TYPE_APPLICATION_X_WWW_FORM_URLENCODED)) {
+        if (renderedContentType == null || renderedContentType.equalsIgnoreCase(ContentType.APPLICATION_JSON)) {
             for (int i = 0; i < dataTemplateArray.length; i++) {
                 MappingTemplate dataTemplate = dataTemplateArray[i];
                 String data = dataTemplate.render(args);

@@ -8,6 +8,11 @@ import com.dtflys.forest.utils.StringUtils;
  */
 public class ContentType {
 
+    public final static String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
+    public final static String APPLICATION_JSON = "application/json";
+    public final static String APPLICATION_XML = "application/xml";
+    public final static String MULTIPART_FORM_DATA = "multipart/form-data";
+
     private final String type;
 
     private final String subType;
