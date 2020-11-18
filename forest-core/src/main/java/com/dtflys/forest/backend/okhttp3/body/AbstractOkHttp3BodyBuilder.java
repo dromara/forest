@@ -37,6 +37,9 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
             }
         }
         if (contentType != null) {
+            if (mediaType == null) {
+                throw new ForestRuntimeException("[Forest] '" + contentType + "' is not a valid content type");
+            }
             Charset mtcs = mediaType.charset();
             if (mtcs == null) {
                 if (StringUtils.isNotEmpty(charset) && mergeCharset) {
