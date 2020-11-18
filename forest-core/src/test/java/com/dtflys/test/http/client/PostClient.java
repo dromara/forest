@@ -269,6 +269,31 @@ public interface PostClient {
     @LogEnabled
     ForestResponse<String> postJson5(@DataParam("username") String username, @DataVariable("token") String token);
 
+
+    @Post(url = "http://localhost:${port}/json")
+    String postJsonBodyMap(@JSONBody Map user);
+
+    @Post(
+            url = "http://localhost:${port}/json",
+            contentType = "application/json"
+    )
+    String postJsonBodyMap2(@JSONBody Map user);
+
+    @Post(
+            url = "http://localhost:${port}/json",
+            contentType = "${1}"
+    )
+    String postJsonBodyMapError(@JSONBody Map user, String contentType);
+
+    @Post(url = "http://localhost:${port}/json")
+    String postJsonBodyObj(@JSONBody JsonTestUser user);
+
+    @Post(url = "http://localhost:${port}/json")
+    String postJsonBodyField(@JSONBody("username") String username);
+
+    @Post(url = "http://localhost:${port}/json")
+    String postJsonBodyString(@JSONBody String body);
+
     @Request(
             url = "http://localhost:${port}/json",
             type = "post",
