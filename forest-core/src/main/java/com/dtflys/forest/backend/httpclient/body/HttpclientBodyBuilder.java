@@ -8,6 +8,7 @@ import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
+import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -17,6 +18,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.AbstractContentBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.io.UnsupportedEncodingException;
@@ -89,6 +91,11 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
         entityBuilder.setCharset(httpCharset);
         entityBuilder.setMode(HttpMultipartMode.RFC6532);
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
+        Charset itemCharset = Consts.UTF_8;
+        if (StringUtils.isNotEmpty(charset)) {
+            itemCharset = Charset.forName(charset);
+        }
+        ContentType itemContentType = ContentType.create("text/plain", itemCharset);
         for (int i = 0; i < nameValueList.size(); i++) {
             RequestNameValue nameValue = nameValueList.get(i);
             if (!nameValue.isInBody()) {
@@ -96,9 +103,9 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
             }
             String name = nameValue.getName();
             Object value = nameValue.getValue();
-            entityBuilder.addTextBody(name, MappingTemplate.getParameterValue(jsonConverter, value));
+            String text = MappingTemplate.getParameterValue(jsonConverter, value);
+            entityBuilder.addTextBody(name, text, itemContentType);
         }
-        long contentLength = 0;
         for (int i = 0; i < multiparts.size(); i++) {
             ForestMultipart multipart = multiparts.get(i);
             String name = multipart.getName();
@@ -107,12 +114,9 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
             AbstractContentBody contentBody = null;
             if (multipart.isFile()) {
                 contentBody = new HttpclientMultipartFileBody(request, multipart.getFile(), ctype, fileName, lifeCycleHandler);
-//                entityBuilder.addBinaryBody(name, multipart.getFile(), ctype, fileName);
             } else {
                 contentBody = new HttpclientMultipartCommonBody(request, multipart, ctype, fileName, lifeCycleHandler);
-//                entityBuilder.addBinaryBody(name, multipart.getInputStream(), ctype, fileName);
             }
-            contentLength += contentBody.getContentLength();
             entityBuilder.addPart(name, contentBody);
         }
         if (httpReq.getFirstHeader("Content-Type") != null) {
