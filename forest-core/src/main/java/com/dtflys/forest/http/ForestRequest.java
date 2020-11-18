@@ -28,9 +28,9 @@ import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
 import com.dtflys.forest.logging.LogConfiguration;
-import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.RequestLogMessage;
 import com.dtflys.forest.multipart.ForestMultipart;
+import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.retryer.Retryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.callback.OnError;
@@ -45,7 +45,6 @@ import com.dtflys.forest.interceptor.InterceptorChain;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
-import com.dtflys.forest.utils.URLUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -71,6 +70,11 @@ public class ForestRequest<T> {
      * Forest配置信息对象
      */
     private final ForestConfiguration configuration;
+
+    /**
+     * Forest方法
+     */
+    private final ForestMethod method;
 
     /**
      * HTTP协议
@@ -259,13 +263,22 @@ public class ForestRequest<T> {
      */
     private ForestProxy proxy;
 
-    public ForestRequest(ForestConfiguration configuration, Object[] arguments) {
+    public ForestRequest(ForestConfiguration configuration, ForestMethod method, Object[] arguments) {
         this.configuration = configuration;
+        this.method = method;
         this.arguments = arguments;
     }
 
+    public ForestRequest(ForestConfiguration configuration, ForestMethod method) {
+        this(configuration, method, new Object[0]);
+    }
+
     public ForestRequest(ForestConfiguration configuration) {
-        this(configuration, new Object[0]);
+        this(configuration, null, new Object[0]);
+    }
+
+    public ForestRequest(ForestConfiguration configuration, Object[] arguments) {
+        this(configuration, null, arguments);
     }
 
 
@@ -374,6 +387,14 @@ public class ForestRequest<T> {
     public ForestRequest setUserInfo(String userInfo) {
         this.userInfo = userInfo;
         return this;
+    }
+
+    /**
+     * 获取请求对应的Forest方法
+     * @return Forest方法对象
+     */
+    public ForestMethod getMethod() {
+        return method;
     }
 
     /**

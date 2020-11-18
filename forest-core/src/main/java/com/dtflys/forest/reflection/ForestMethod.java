@@ -671,7 +671,7 @@ public class ForestMethod<T> implements VariableScope {
         renderedUrl = URLUtils.getValidURL(baseUrl, renderedUrl);
 
         // createExecutor and initialize http instance
-        ForestRequest<T> request = new ForestRequest(configuration, args);
+        ForestRequest<T> request = new ForestRequest(configuration, this, args);
         request.setUrl(renderedUrl)
                 .setType(type)
                 .setCharset(charset)
