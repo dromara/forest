@@ -12,23 +12,10 @@ import com.dtflys.forest.utils.StringUtils;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2020-08-21 1:25
  */
-public class BodyLifeCycle implements ParameterAnnotationLifeCycle<Body, Object> {
+public class BodyLifeCycle extends AbstractBodyLifeCycle<Body> {
 
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, Body annotation) {
-        String name = annotation.value();
-        String filterName = annotation.filter();
-        if (StringUtils.isNotEmpty(name)) {
-            parameter.setName(name);
-            MappingVariable variable = new MappingVariable(name, parameter.getType());
-            variable.setIndex(parameter.getIndex());
-            method.addVariable(name, variable);
-            parameter.setObjectProperties(false);
-        } else {
-            parameter.setObjectProperties(true);
-        }
-        method.processParameterFilter(parameter, filterName);
-        parameter.setTarget(MappingParameter.TARGET_BODY);
-        method.addNamedParameter(parameter);
+        super.onParameterInitialized(method, parameter, annotation);
     }
 }
