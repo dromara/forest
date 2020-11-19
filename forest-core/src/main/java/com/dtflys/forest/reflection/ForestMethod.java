@@ -371,9 +371,11 @@ public class ForestMethod<T> implements VariableScope {
     private void processMetaRequest(MetaRequest metaRequest) {
         Class[] paramTypes = method.getParameterTypes();
         Type[] genericParamTypes = method.getGenericParameterTypes();
-        TypeVariable<Method>[] typeVariables = method.getTypeParameters();
         Annotation[][] paramAnns = method.getParameterAnnotations();
         Parameter[] parameters = method.getParameters();
+
+        parameterTemplateArray = new MappingParameter[paramTypes.length];
+        processParameters(parameters, genericParamTypes, paramAnns);
 
         urlTemplate = makeTemplate(metaRequest.getUrl());
         typeTemplate = makeTemplate(metaRequest.getType());
@@ -430,8 +432,6 @@ public class ForestMethod<T> implements VariableScope {
         logConfiguration.setLogResponseContent(logResponseContent);
         logConfiguration.setLogHandler(logHandler);
 
-        parameterTemplateArray = new MappingParameter[paramTypes.length];
-        processParameters(parameters, genericParamTypes, paramAnns);
 
         dataTemplateArray = new MappingTemplate[dataArray.length];
         for (int j = 0; j < dataArray.length; j++) {

@@ -18,21 +18,11 @@ import java.lang.reflect.Parameter;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.5.0-BETA9
  */
-public class JSONBodyLifeCycle implements ParameterAnnotationLifeCycle<JSONBody, Object> {
+public class JSONBodyLifeCycle extends AbstractBodyLifeCycle<JSONBody> {
 
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, JSONBody annotation) {
-        String name = annotation.value();
-        String filterName = annotation.filter();
-        if (StringUtils.isNotEmpty(name)) {
-            parameter.setName(name);
-            MappingVariable variable = new MappingVariable(name, parameter.getType());
-            variable.setIndex(parameter.getIndex());
-            method.addVariable(name, variable);
-            parameter.setObjectProperties(false);
-        } else {
-            parameter.setObjectProperties(true);
-        }
+        super.onParameterInitialized(method, parameter, annotation);
         MetaRequest metaRequest = method.getMetaRequest();
 
         String methodName = methodName(method);
@@ -49,10 +39,9 @@ public class JSONBodyLifeCycle implements ParameterAnnotationLifeCycle<JSONBody,
                     methodName + "' has already been set value '" + contentType +
                     "', not 'application/json'. Hence the annotation @JSONBody cannot be bind on a parameter in this method.");
         }
-        metaRequest.setContentType(ContentType.APPLICATION_JSON);
-        method.processParameterFilter(parameter, filterName);
-        parameter.setTarget(MappingParameter.TARGET_BODY);
-        method.addNamedParameter(parameter);
+        if (StringUtils.isBlank(contentType)) {
+            metaRequest.setContentType(ContentType.APPLICATION_JSON);
+        }
     }
 
     private static String methodName(ForestMethod method) {
