@@ -50,8 +50,11 @@ Forest是一个高层的、极简的轻量级HTTP调用API框架。<br>
 文档和示例：
 -------------------------------------
 * [项目主页](http://forest.dtflyx.com/) 
-* [中文文档](http://forest.dtflyx.com//docs/) 
+
+* [中文文档](http://forest.dtflyx.com/docs/) 
+
 * [JavaDoc](https://apidoc.gitee.com/dt_flys/forest/)
+
 * [Demo工程](https://gitee.com/dt_flys/forest-example)
 
 Forest有哪些特性？
