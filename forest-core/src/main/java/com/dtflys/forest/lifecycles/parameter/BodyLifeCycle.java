@@ -14,8 +14,4 @@ import com.dtflys.forest.utils.StringUtils;
  */
 public class BodyLifeCycle extends AbstractBodyLifeCycle<Body> {
 
-    @Override
-    public void onParameterInitialized(ForestMethod method, MappingParameter parameter, Body annotation) {
-        super.onParameterInitialized(method, parameter, annotation);
-    }
 }
