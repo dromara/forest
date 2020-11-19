@@ -61,7 +61,7 @@ import static com.dtflys.forest.mapping.MappingParameter.*;
 public class ForestRequest<T> {
 
     /**
-     * 默认上传/下载进度监听的步长
+ * 默认上传/下载进度监听的步长
      * 每上传/下载一定的比特数，执行一次监听回调函数
      */
     private final static long DEFAULT_PROGRESS_STEP = 1024 * 10;
@@ -201,7 +201,7 @@ public class ForestRequest<T> {
     private OnError onError;
 
     /**
-     * 回调函数：上传/下载进度监听时调用
+     * 进度回调函数：上传/下载进度监听时调用
      * 每上传/下载传输 ${progressStep} 个比特数时，执行一次监听回调函数
      */
     private OnProgress onProgress;
@@ -921,27 +921,61 @@ public class ForestRequest<T> {
         return nameValueList;
     }
 
-
+    /**
+     * 根据参数下标获取该请求对应方法的参数值
+     *
+     * @param index 对应方法的参数下标
+     * @return 参数值
+     */
     public Object getArgument(int index) {
         return arguments[index];
     }
 
+    /**
+     * 获取该请求对应方法的所有参数值
+     *
+     * @return 参数值列表
+     */
     public Object[] getArguments() {
         return arguments;
     }
 
+    /**
+     * 获取该请求的所有请求头信息
+     *
+     * @return 请求头表，{@link ForestHeaderMap}类实例
+     */
     public ForestHeaderMap getHeaders() {
         return headers;
     }
 
+    /**
+     * 根据请求头名称获取该请求的请求头信息
+     *
+     * @param name 请求头名称
+     * @return 请求头，{@link ForestHeader}类实例
+     */
     public ForestHeader getHeader(String name) {
         return headers.getHeader(name);
     }
 
+    /**
+     * 根据请求头名称获取该请求的请求头的值
+     *
+     * @param name 请求头名称
+     * @return 请求头的值
+     */
     public String getHeaderValue(String name) {
         return headers.getValue(name);
     }
 
+    /**
+     * 添加请求头到该请求中
+     *
+     * @param name 请求头名称
+     * @param value 请求头的值
+     * @return {@link ForestRequest}类实例
+     */
     public ForestRequest addHeader(String name, Object value) {
         if (StringUtils.isEmpty(name)) {
             return this;
@@ -950,12 +984,23 @@ public class ForestRequest<T> {
         return this;
     }
 
+    /**
+     * 添加请求头到该请求中
+     *
+     * @param nameValue 请求头键值对，{@link RequestNameValue}类实例
+     * @return {@link ForestRequest}类实例
+     */
     public ForestRequest addHeader(RequestNameValue nameValue) {
         this.addHeader(nameValue.getName(), nameValue.getValue());
         return this;
     }
 
-
+    /**
+     * 批量添加请求头到该请求中
+     *
+     * @param nameValues 请求头键值对列表
+     * @return {@link ForestRequest}类实例
+     */
     public ForestRequest addHeaders(List<RequestNameValue> nameValues) {
         for (RequestNameValue nameValue : nameValues) {
             this.addHeader(nameValue.getName(), nameValue.getValue());
@@ -972,71 +1017,145 @@ public class ForestRequest<T> {
         return this;
     }
 
-    private void putMapAddList(Map<String, Object> map, List<RequestNameValue> source) {
-        for (int i = 0; i < source.size(); i++) {
-            RequestNameValue nameValue = source.get(i);
-            if (nameValue.isInQuery()) {
-                addQuery(nameValue.getName(), nameValue.getValue());
-            } else if (nameValue.isInBody()) {
-                map.put(nameValue.getName(), nameValue.getValue());
-            }
-        }
-    }
-
-
+    /**
+     * 获取OnSuccess回调函数，该回调函数在请求成功时被调用
+     *
+     * @return {@link OnSuccess}接口实例
+     */
     public OnSuccess getOnSuccess() {
         return onSuccess;
     }
 
+    /**
+     * 设置OnSuccess回调函数，该回调函数在请求成功时被调用
+     *
+     * @param onSuccess {@link OnSuccess}接口实例
+     * @return {@link ForestRequest}类实例
+     */
     public ForestRequest setOnSuccess(OnSuccess onSuccess) {
         this.onSuccess = onSuccess;
         return this;
     }
 
+    /**
+     * 获取OnError回调函数，该回调函数在请求失败时被调用
+     *
+     * @return {@link OnError}接口实例
+     */
     public OnError getOnError() {
         return onError;
     }
 
+    /**
+     * 设置OnError回调函数，该回调函数在请求成功时被调用
+     *
+     * @param onError {@link OnError}接口实例
+     * @return {@link ForestRequest}类实例
+     */
     public ForestRequest setOnError(OnError onError) {
         this.onError = onError;
         return this;
     }
 
+    /**
+     * 该请求是否下载文件
+     *
+     * @return {@code true}: 下载文件，{@code false}: 不下载文件
+     */
     public boolean isDownloadFile() {
         return isDownloadFile;
     }
 
-    public void setDownloadFile(boolean downloadFile) {
+    /**
+     * 设置该请求是否下载文件
+     *
+     * @param downloadFile {@code true}: 下载文件，{@code false}: 不下载文件
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest setDownloadFile(boolean downloadFile) {
         isDownloadFile = downloadFile;
+        return this;
     }
 
+    /**
+     * 获取上传/下载进度监听的步长
+     * <p>每上传/下载一定的比特数，执行一次监听回调函数</p>
+     *
+     * @return 进度监听的步长，{@code long}类型数值
+     */
     public long getProgressStep() {
         return progressStep;
     }
 
+    /**
+     * 设置获取上传/下载进度监听的步长
+     * <p>每上传/下载一定的比特数，执行一次监听回调函数</p>
+     *
+     * @param progressStep 进度监听的步长，{@code long}类型数值
+     * @return {@link ForestRequest}类实例
+     */
     public ForestRequest setProgressStep(long progressStep) {
         this.progressStep = progressStep;
         return this;
     }
 
+    /**
+     * 获取进度回调函数：上传/下载进度监听时调用
+     * <p>每上传/下载传输 ${progressStep} 个比特数时，执行一次监听回调函数</p>
+     *
+     * @return 进度回调函数，{@link OnProgress}接口实例
+     */
     public OnProgress getOnProgress() {
         return onProgress;
     }
 
+    /**
+     * 设置进度回调函数：上传/下载进度监听时调用
+     * <p>每上传/下载传输 ${progressStep} 个比特数时，执行一次监听回调函数</p>
+     *
+     * @param onProgress 进度回调函数，{@link OnProgress}接口实例
+     * @return {@link ForestRequest}类实例
+     */
     public ForestRequest setOnProgress(OnProgress onProgress) {
         this.onProgress = onProgress;
         return this;
     }
 
+    /**
+     * 添加拦截器到该请求中
+     * <p>拦截器在请求的初始化、发送请求前、发送成功、发送失败等生命周期中都会被调用</p>
+     *
+     * @param interceptor 拦截器，{@link Interceptor}接口实例
+     * @return {@link ForestRequest}类实例
+     */
     public ForestRequest<T> addInterceptor(Interceptor interceptor) {
         interceptorChain.addInterceptor(interceptor);
         return this;
     }
 
+    /**
+     * 获取拦截器链对象
+     *
+     * @return 拦截器链对象，{@link InterceptorChain}类实例
+     */
     public InterceptorChain getInterceptorChain() {
         return interceptorChain;
     }
 
+    /**
+     * 添加拦截器属性到该请求
+     * <p>被添加的属性会被对应的请求所绑定，同时也会绑定到拦截器类，并且按不同的拦截器进行隔离。</p>
+     * <p>而且这些属性值不能通过网络请求传递到远端服务器。</p>
+     * <p>
+     *     拦截器属性有两个特性：<br></br>
+     *     1. 按请求隔离： 如有请求A和请求B，都有一个名为attr1的拦截器属性，但它们是两个互不影响的独立的属性。<br></br>
+     *     2. 按拦截器隔离：如果有拦截器T1和拦截器T2，同一个请求分别对着两个拦截器绑定了一个属性，都名为 attr1。但它们也是两个独立的互不干涉的属性。<br></br>
+     *     也就是说，在拦截器T1中访问的attr1属性和在拦截器T2中访问的attr1属性是不同的。
+     * </p>
+     * @param interceptorClass 要绑定的拦截器类
+     * @param attributes 拦截器属性，{@link InterceptorAttributes}类实例
+     * @return {@link ForestRequest}类实例
+     */
     public ForestRequest addInterceptorAttributes(Class interceptorClass, InterceptorAttributes attributes) {
         InterceptorAttributes oldAttributes = interceptorAttributes.get(interceptorClass);
         if (oldAttributes != null) {
@@ -1053,6 +1172,22 @@ public class ForestRequest<T> {
         return this;
     }
 
+    /**
+     * 添加拦截器属性到该请求
+     * <p>被添加的属性会被对应的请求所绑定，同时也会绑定到拦截器类，并且按不同的拦截器进行隔离。</p>
+     * <p>而且这些属性值不能通过网络请求传递到远端服务器。</p>
+     * <p>
+     *     拦截器属性有两个特性：<br></br>
+     *     1. 按请求隔离： 如有请求A和请求B，都有一个名为attr1的拦截器属性，但它们是两个互不影响的独立的属性。<br></br>
+     *     2. 按拦截器隔离：如果有拦截器T1和拦截器T2，同一个请求分别对着两个拦截器绑定了一个属性，都名为 attr1。但它们也是两个独立的互不干涉的属性。<br></br>
+     *     也就是说，在拦截器T1中访问的attr1属性和在拦截器T2中访问的attr1属性是不同的。
+     * </p>
+     *
+     * @param interceptorClass 要绑定的拦截器类
+     * @param attributeName 拦截器属性名
+     * @param attributeValue 拦截器属性值
+     * @return {@link ForestRequest}类实例
+     */
     public ForestRequest addInterceptorAttribute(Class interceptorClass, String attributeName, Object attributeValue) {
         InterceptorAttributes attributes = getInterceptorAttributes(interceptorClass);
         if (attributes == null) {
@@ -1063,17 +1198,50 @@ public class ForestRequest<T> {
         return this;
     }
 
-
+    /**
+     * 获取拦截器属性表
+     * <p>
+     *     拦截器属性有两个特性：<br></br>
+     *     1. 按请求隔离： 如有请求A和请求B，都有一个名为attr1的拦截器属性，但它们是两个互不影响的独立的属性。<br></br>
+     *     2. 按拦截器隔离：如果有拦截器T1和拦截器T2，同一个请求分别对着两个拦截器绑定了一个属性，都名为 attr1。但它们也是两个独立的互不干涉的属性。<br></br>
+     *     也就是说，在拦截器T1中访问的attr1属性和在拦截器T2中访问的attr1属性是不同的。
+     * </p>
+     *
+     * @return {@link Map}映射，Key: 拦截器类，Value: 拦截器属性集合对象，{@link InterceptorAttributes}类实例
+     */
     public Map<Class, InterceptorAttributes> getInterceptorAttributes() {
         return interceptorAttributes;
     }
 
-
+    /**
+     * 根据拦截器类获取拦截器属性集合对象
+     * <p>
+     *     拦截器属性有两个特性：<br></br>
+     *     1. 按请求隔离： 如有请求A和请求B，都有一个名为attr1的拦截器属性，但它们是两个互不影响的独立的属性。<br></br>
+     *     2. 按拦截器隔离：如果有拦截器T1和拦截器T2，同一个请求分别对着两个拦截器绑定了一个属性，都名为 attr1。但它们也是两个独立的互不干涉的属性。<br></br>
+     *     也就是说，在拦截器T1中访问的attr1属性和在拦截器T2中访问的attr1属性是不同的。
+     * </p>
+     *
+     * @param interceptorClass 拦截器类
+     * @return 拦截器属性集合对象，{@link InterceptorAttributes}类实例
+     */
     public InterceptorAttributes getInterceptorAttributes(Class interceptorClass) {
         return interceptorAttributes.get(interceptorClass);
     }
 
-
+    /**
+     * 根据拦截器类和拦截器属性名获取拦截器属性值
+     * <p>
+     *     拦截器属性有两个特性：<br></br>
+     *     1. 按请求隔离： 如有请求A和请求B，都有一个名为attr1的拦截器属性，但它们是两个互不影响的独立的属性。<br></br>
+     *     2. 按拦截器隔离：如果有拦截器T1和拦截器T2，同一个请求分别对着两个拦截器绑定了一个属性，都名为 attr1。但它们也是两个独立的互不干涉的属性。<br></br>
+     *     也就是说，在拦截器T1中访问的attr1属性和在拦截器T2中访问的attr1属性是不同的。
+     * </p>
+     *
+     * @param interceptorClass 拦截器类
+     * @param attributeName 拦截器属性名
+     * @return 拦截器属性值
+     */
     public Object getInterceptorAttribute(Class interceptorClass, String attributeName) {
         InterceptorAttributes attributes = interceptorAttributes.get(interceptorClass);
         if (attributes == null) {
@@ -1082,34 +1250,74 @@ public class ForestRequest<T> {
         return attributes.getAttribute(attributeName);
     }
 
-
+    /**
+     * 获取Forest请求重试器
+     *
+     * @return Forest请求重试器，{@link Retryer}接口实例
+     */
     public Retryer getRetryer() {
         return retryer;
     }
 
+    /**
+     * 设置Forest请求重试器
+     *
+     * @param retryer Forest请求重试器，{@link Retryer}接口实例
+     * @return {@link ForestRequest}类实例
+     */
     public ForestRequest setRetryer(Retryer retryer) {
         this.retryer = retryer;
         return this;
     }
 
+    /**
+     * 添加附件到请求中
+     * <p>Attachment 是和请求绑定的附件属性值，这些值不能通过网络请求传递到远端服务器。</p>
+     * <p>不同请求的附件相互独立，即使名称相同，也互不影响。</p>
+     *
+     * @param name 附件名
+     * @param value 附件值
+     * @return {@link ForestRequest}类实例
+     */
     public ForestRequest addAttachment(String name, Object value) {
         attachments.put(name, value);
         return this;
     }
 
+    /**
+     * 根据名称获取该请求中的附件
+     * <p>Attachment 是和请求绑定的附件属性值，这些值不能通过网络请求传递到远端服务器。</p>
+     * <p>不同请求的附件相互独立，即使名称相同，也互不影响。</p>
+     *
+     * @param name 附件名
+     * @return 附件值
+     */
     public Object getAttachment(String name) {
         return attachments.get(name);
     }
 
+    /**
+     * 获取反序列化器
+     * @return 反序列化器，{@link ForestConverter}接口实例
+     */
     public ForestConverter getDecoder() {
         return decoder;
     }
 
+    /**
+     * 设置反序列化器
+     * @param decoder 反序列化器，{@link ForestConverter}接口实例
+     * @return {@link ForestRequest}类实例
+     */
     public ForestRequest setDecoder(ForestConverter decoder) {
         this.decoder = decoder;
         return this;
     }
 
+    /**
+     * 是否允许打印请求/响应日志
+     * @return {@code true}：允许，{@code false}：不允许
+     */
     @Deprecated
     public boolean isLogEnable() {
         if (logConfiguration == null) {
@@ -1118,6 +1326,10 @@ public class ForestRequest<T> {
         return logConfiguration.isLogEnabled();
     }
 
+    /**
+     * 获取请求日志配置信息
+     * @return 请求日志配置信息，{@link LogConfiguration}类实例
+     */
     public LogConfiguration getLogConfiguration() {
         return logConfiguration;
     }
