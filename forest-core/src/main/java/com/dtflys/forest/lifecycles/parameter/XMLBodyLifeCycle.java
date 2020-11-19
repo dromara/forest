@@ -3,6 +3,7 @@ package com.dtflys.forest.lifecycles.parameter;
 import com.dtflys.forest.annotation.XMLBody;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.lifecycles.ParameterAnnotationLifeCycle;
 import com.dtflys.forest.mapping.MappingParameter;
@@ -16,41 +17,30 @@ import com.dtflys.forest.utils.StringUtils;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.5.0-BETA9
  */
-public class XMLBodyLifeCycle implements ParameterAnnotationLifeCycle<XMLBody, Object> {
+public class XMLBodyLifeCycle extends AbstractBodyLifeCycle<XMLBody> {
 
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, XMLBody annotation) {
-        String name = annotation.value();
-        String filterName = annotation.filter();
-        if (StringUtils.isNotEmpty(name)) {
-            parameter.setName(name);
-            MappingVariable variable = new MappingVariable(name, parameter.getType());
-            variable.setIndex(parameter.getIndex());
-            method.addVariable(name, variable);
-            parameter.setObjectProperties(false);
-        } else {
-            parameter.setObjectProperties(true);
-        }
+        super.onParameterInitialized(method, parameter, annotation);
         MetaRequest metaRequest = method.getMetaRequest();
-
         String methodName = methodName(method);
-
         if (metaRequest == null) {
             throw new ForestRuntimeException("[Forest] method '" + methodName +
-                    "' has not bind a Forest request annotation. Hence the annotation @JSONBody cannot be bind on a parameter in this method.");
+                    "' has not bind a Forest request annotation. Hence the annotation @XMLBody cannot be bind on a parameter in this method.");
         }
         String contentType = metaRequest.getContentType();
         if (StringUtils.isNotEmpty(contentType) &&
-                !ContentType.APPLICATION_JSON.equals(contentType) &&
+                !ContentType.APPLICATION_XML.equals(contentType) &&
                 contentType.indexOf("$") < 0) {
             throw new ForestRuntimeException("[Forest] the Content-Type of request binding on method '" +
                     methodName + "' has already been set value '" + contentType +
-                    "', not 'application/json'. Hence the annotation @JSONBody cannot be bind on a parameter in this method.");
+                    "', not 'application/xml'. Hence the annotation @XMLBody cannot be bind on a parameter in this method.");
         }
-        metaRequest.setContentType(ContentType.APPLICATION_XML);
-        method.processParameterFilter(parameter, filterName);
-        parameter.setTarget(MappingParameter.TARGET_BODY);
-        method.addNamedParameter(parameter);
+        Filter filter = method.getConfiguration().newFilterInstance("xml");
+        parameter.addFilter(filter);
+        if (StringUtils.isBlank(contentType)) {
+            metaRequest.setContentType(ContentType.APPLICATION_XML);
+        }
     }
 
     private static String methodName(ForestMethod method) {
@@ -61,14 +51,14 @@ public class XMLBodyLifeCycle implements ParameterAnnotationLifeCycle<XMLBody, O
     public boolean beforeExecute(ForestRequest request) {
         String contentType = request.getContentType();
         if (StringUtils.isBlank(contentType)) {
-            request.setContentType(ContentType.APPLICATION_JSON);
+            request.setContentType(ContentType.APPLICATION_XML);
         }
 
-        if (contentType.indexOf(ContentType.APPLICATION_JSON) < 0) {
+        if (contentType.indexOf(ContentType.APPLICATION_XML) < 0) {
             String methodName = methodName(request.getMethod());
             throw new ForestRuntimeException("[Forest] the Content-Type of request binding on method '" +
                     methodName + "' has already been set value '" + contentType +
-                    "', not 'application/json'. Hence the annotation @JSONBody cannot be bind on a parameter in this method.");
+                    "', not 'application/xml'. Hence the annotation @XMLBody cannot be bind on a parameter in this method.");
         }
         return true;
     }

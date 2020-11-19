@@ -1,6 +1,7 @@
 package com.dtflys.forest.annotation;
 
 import com.dtflys.forest.lifecycles.parameter.JSONBodyLifeCycle;
+import com.dtflys.forest.lifecycles.parameter.XMLBodyLifeCycle;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -54,7 +55,7 @@ import java.lang.annotation.Target;
  * @since 2020-08-10 16:51
  */
 @Documented
-@ParamLifeCycle(JSONBodyLifeCycle.class)
+@ParamLifeCycle(XMLBodyLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface XMLBody {
