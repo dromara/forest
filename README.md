@@ -1,7 +1,7 @@
 
 
 <p align="center">
-<a href="http://dt_flys.gitee.io/forest-website">
+<a href="http://forest.dtflyx.com">
     <img width="300" src="site/media/logo3.png" alt="logo">
 </a>
 </p>
@@ -12,13 +12,13 @@
     <img src="https://api.travis-ci.org/mySingleLive/forest.svg?branch=master&status=passed" alt="Build">
 </a>
 <!--
-<a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.5.0-BETA7/jar">
-    <img src="https://img.shields.io/badge/maven%20central-1.5.0-BETA7-brightgreen.svg" alt="Maven Central">
+<a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.5.0-BETA8/jar">
+    <img src="https://img.shields.io/badge/maven%20central-1.5.0-BETA8-brightgreen.svg" alt="Maven Central">
 </a>
 -->
 <!--
-<a href="https://gitee.com/dt_flys/forest/releases/v1.5.0-BETA7">
-    <img src="https://img.shields.io/badge/release-v1.5.0-BETA7-blue" alt="Release">
+<a href="https://gitee.com/dt_flys/forest/releases/v1.5.0-BETA8">
+    <img src="https://img.shields.io/badge/release-v1.5.0-BETA8-blue" alt="Release">
 </a>
 -->
 <a href="https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html">
@@ -30,7 +30,7 @@
 <a href="https://opensource.org/licenses/mit-license.php">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
 </a>
-<a href="http://dt_flys.gitee.io/forest-website">
+<a href="http://forest.dtflyx.com/">
     <img src="https://img.shields.io/badge/document-1.x-e96.svg" alt="Documentation">
 </a>
 <a href="https://gitee.com/dt_flys/forest#%E8%81%94%E7%B3%BB%E4%BD%9C%E8%80%85">
@@ -49,9 +49,9 @@ Forest是一个高层的、极简的轻量级HTTP调用API框架。<br>
 
 文档和示例：
 -------------------------------------
-* [项目主页](http://dt_flys.gitee.io/forest-website) 
+* [项目主页](http://forest.dtflyx.com/) 
 
-* [中文文档](http://dt_flys.gitee.io/forest-website/docs/) 
+* [中文文档](http://forest.dtflyx.com//docs/) 
 
 * [JavaDoc](https://apidoc.gitee.com/dt_flys/forest/)
 
@@ -91,7 +91,7 @@ Forest有哪些特性？
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>spring-boot-starter-forest</artifactId>
-    <version>1.5.0-BETA7</version>
+    <version>1.5.0-BETA8</version>
 </dependency>
 ```
 
@@ -201,7 +201,7 @@ File file = myClient.downloadFile("D:\\TestDownload", progress -> {
 
 
 
-#### 详细文档请看：[http://dt_flys.gitee.io/forest-website](http://dt_flys.gitee.io/forest-website)
+#### 详细文档请看：[http://forest.dtflyx.com](http://forest.dtflyx.com)
 
 ### 联系作者:<br>
 
