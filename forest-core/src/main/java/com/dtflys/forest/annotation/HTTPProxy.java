@@ -1,6 +1,5 @@
 package com.dtflys.forest.annotation;
 
-import com.dtflys.forest.lifecycles.authorization.BasicAuthLifeCycle;
 import com.dtflys.forest.lifecycles.proxy.HTTPProxyLifeCycle;
 
 import java.lang.annotation.Documented;
