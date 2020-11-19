@@ -1,7 +1,7 @@
 
 
 <p align="center">
-<a href="http://dt_flys.gitee.io/forest-website">
+<a href="http://forest.dtflyx.com/">
     <img width="300" src="site/media/logo3.png" alt="logo">
 </a>
 </p>
@@ -30,7 +30,7 @@
 <a href="https://opensource.org/licenses/mit-license.php">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
 </a>
-<a href="http://dt_flys.gitee.io/forest-website">
+<a href="http://forest.dtflyx.com/">
     <img src="https://img.shields.io/badge/document-1.x-e96.svg" alt="Documentation">
 </a>
 <a href="https://gitee.com/dt_flys/forest#%E8%81%94%E7%B3%BB%E4%BD%9C%E8%80%85">
@@ -49,9 +49,9 @@ Forest是一个高层的、极简的轻量级HTTP调用API框架。<br>
 
 文档和示例：
 -------------------------------------
-* [项目主页](http://dt_flys.gitee.io/forest-website) 
+* [项目主页](http://forest.dtflyx.com/) 
 
-* [中文文档](http://dt_flys.gitee.io/forest-website/docs/) 
+* [中文文档](http://forest.dtflyx.com/docs/) 
 
 * [JavaDoc](https://apidoc.gitee.com/dt_flys/forest/)
 
@@ -201,7 +201,7 @@ File file = myClient.downloadFile("D:\\TestDownload", progress -> {
 
 
 
-#### 详细文档请看：[http://dt_flys.gitee.io/forest-website](http://dt_flys.gitee.io/forest-website)
+#### 详细文档请看：[http://forest.dtflyx.com/](http://forest.dtflyx.com/)
 
 ### 联系作者:<br>
 
