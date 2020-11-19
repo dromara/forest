@@ -10,6 +10,13 @@ import com.dtflys.forest.utils.StringUtils;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
+/**
+ * 抽象请求体生命周期处理类
+ *
+ * @param <A> 参数注解类型
+ * @author gongjun[dt_flys@hotmail.com]
+ * @since 1.5.0-BETA9
+ */
 public abstract class AbstractBodyLifeCycle<A extends Annotation> implements ParameterAnnotationLifeCycle<A, Object> {
 
     @Override
