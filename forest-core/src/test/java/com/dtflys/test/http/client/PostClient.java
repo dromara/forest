@@ -422,4 +422,10 @@ public interface PostClient {
     @Post(url = "http://localhost:${port}/xml")
     String postXmlBody(@XMLBody XmlTestParam testParam);
 
+
+    @Post(url = "http://localhost:${port}/xml")
+    String postXmlBodyString(@XMLBody String xml);
+
+
+
 }

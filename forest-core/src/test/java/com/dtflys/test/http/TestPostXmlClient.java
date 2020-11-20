@@ -15,6 +15,9 @@ import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -93,6 +96,18 @@ public class TestPostXmlClient extends BaseClientTest {
         testParam.setA(1);
         testParam.setB(2);
         String result = postClient.postXmlBody(testParam);
+        log.info("response: " + result);
+        assertNotNull(result);
+        Assert.assertEquals(PostMockServer.EXPECTED, result);
+    }
+
+    @Test
+    public void testXmlBodyStringPost() {
+        String result = postClient.postXmlBodyString("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+                "<misc>\n" +
+                "    <a>1</a>\n" +
+                "    <b>2</b>\n" +
+                "</misc>\n");
         log.info("response: " + result);
         assertNotNull(result);
         Assert.assertEquals(PostMockServer.EXPECTED, result);
