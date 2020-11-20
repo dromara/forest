@@ -851,11 +851,7 @@ public class ForestMethod<T> implements VariableScope {
                 fileName = fileNameTemplate.render(args);
             }
             Object data = args[index];
-            if (data == null) {
-                continue;
-            }
-            ForestMultipart multipart = factory.create(name, fileName, data, ContentType.MULTIPART_FORM_DATA);
-            multiparts.add(multipart);
+            factory.addMultipart(name, fileName, data, ContentType.MULTIPART_FORM_DATA, multiparts);
         }
 
 
