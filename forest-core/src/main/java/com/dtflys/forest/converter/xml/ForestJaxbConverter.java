@@ -10,7 +10,10 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.lang.reflect.MalformedParameterizedTypeException;
 import java.lang.reflect.Type;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 基于JAXB实现的XML转换器
@@ -21,6 +24,15 @@ public class ForestJaxbConverter implements ForestXmlConverter {
 
     @Override
     public String encodeToString(Object obj) {
+        if (obj == null) {
+            return null;
+        }
+        if (obj instanceof CharSequence) {
+            return obj.toString();
+        }
+        if (obj instanceof Map || obj instanceof List) {
+            throw new ForestRuntimeException("[Forest] JAXB XML converter dose not support translating instance of java.util.Map or java.util.List");
+        }
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(obj.getClass());
             StringWriter writer = new StringWriter();
@@ -55,7 +67,6 @@ public class ForestJaxbConverter implements ForestXmlConverter {
     public Marshaller createMarshaller(JAXBContext jaxbContext, String encoding) {
         try {
             Marshaller marshaller = jaxbContext.createMarshaller();
-
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
             if (StringUtils.isNotEmpty(encoding)) {
