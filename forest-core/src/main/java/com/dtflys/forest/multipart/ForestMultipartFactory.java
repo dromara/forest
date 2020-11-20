@@ -1,6 +1,5 @@
 package com.dtflys.forest.multipart;
 
-import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.utils.StringUtils;
@@ -8,9 +7,7 @@ import com.dtflys.forest.utils.StringUtils;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Array;
-import java.lang.reflect.Constructor;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
