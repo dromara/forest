@@ -1,6 +1,5 @@
 package com.dtflys.forest.annotation;
 
-import com.dtflys.forest.lifecycles.parameter.JSONBodyLifeCycle;
 import com.dtflys.forest.lifecycles.parameter.XMLBodyLifeCycle;
 
 import java.lang.annotation.Documented;
@@ -35,7 +34,7 @@ import java.lang.annotation.Target;
  *          被修饰的字符串参数将直接以文本形式添加到请求体中。
  *
  * @author gongjun
- * @since 2020-08-10 16:51
+ * @since 1.5.0-BETA9
  */
 @Documented
 @ParamLifeCycle(XMLBodyLifeCycle.class)
