@@ -1,11 +1,11 @@
 package com.dtflys.test.http.client;
 
 import com.dtflys.forest.annotation.GetRequest;
-import com.dtflys.forest.annotation.OAuth2;
+import com.dtflys.forest.extensions.OAuth2;
 
 /**
  * @author HouKunLin
- * @date 2020-11-23 23:25:54
+ * @since 1.5.0-BETA9
  */
 public interface OAuth2Client {
     @OAuth2(

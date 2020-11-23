@@ -1,6 +1,6 @@
 package com.dtflys.forest.lifecycles.authorization;
 
-import com.dtflys.forest.annotation.OAuth2;
+import com.dtflys.forest.extensions.OAuth2;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
@@ -18,7 +18,7 @@ import java.util.Map;
  * OAuth2 注解的生命周期.
  *
  * @author HouKunLin
- * @date 2020-11-23 22:43:51
+ * @since 1.5.0-BETA9
  */
 public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object> {
     private final byte[] lock = new byte[0];
