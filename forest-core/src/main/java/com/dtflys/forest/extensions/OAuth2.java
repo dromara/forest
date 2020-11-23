@@ -1,5 +1,7 @@
-package com.dtflys.forest.annotation;
+package com.dtflys.forest.extensions;
 
+import com.dtflys.forest.annotation.MethodLifeCycle;
+import com.dtflys.forest.annotation.RequestAttributes;
 import com.dtflys.forest.lifecycles.authorization.OAuth2LifeCycle;
 import com.dtflys.forest.utils.StringUtils;
 
@@ -10,7 +12,7 @@ import java.lang.annotation.*;
  * OAuth2 请求。自动获取Token、刷新Token，目前只支持 PASSWORD、CLIENT_CREDENTIALS 这样的无回调、无交互的类型。
  *
  * @author HouKunLin
- * @date 2020-11-23 22:43:55
+ * @since 1.5.0-BETA9
  */
 @Documented
 @MethodLifeCycle(OAuth2LifeCycle.class)
@@ -20,40 +22,30 @@ import java.lang.annotation.*;
 public @interface OAuth2 {
     /**
      * 请求Token的URL地址
-     *
-     * @return
      */
     @Nonnull
     String tokenUri();
 
     /**
      * 客户端ID
-     *
-     * @return
      */
     @Nonnull
     String clientId();
 
     /**
      * 客户端Secret
-     *
-     * @return
      */
     @Nonnull
     String clientSecret();
 
     /**
      * 类型
-     *
-     * @return
      */
     @Nonnull
     GrantType grantType();
 
     /**
      * 范围
-     *
-     * @return
      */
     String scope() default "";
 
@@ -61,72 +53,60 @@ public @interface OAuth2 {
      * 在 expires_in 剩余多少秒进行刷新。默认：600秒5分钟。
      * 不会主动触发刷新，只有在Token有效期最后5分钟内有请求的时候才会触发刷新。
      * 假如刷新失败将一直使用旧的Token，直到最后旧的Token失效时才会重新获取Token
-     *
-     * @return
      */
     int refreshAtExpiresBefore() default 600;
 
     /**
      * 用户名
-     *
-     * @return
      */
     String username() default "";
 
     /**
      * 密码
-     *
-     * @return
      */
     String password() default "";
 
     /**
      * 其他的登录参数（在Get内容中）。例如：
+     * <pre>
      * {
      * "params1:值1",
      * "params2:值2",
      * "other-info:其他参数值"
      * }
-     *
-     * @return
+     * </pre>
      */
     String[] params() default {};
 
     /**
      * 其他的登录参数（在Post内容中）。例如：
+     * <pre>
      * {
      * "params1:值1",
      * "params2:值2",
      * "other-info:其他参数值"
      * }
-     *
-     * @return
+     * </pre>
      */
     String[] body() default {};
 
     /**
      * Token 信息位置。默认通过Header传输
-     *
-     * @return
      */
     @Nonnull
     TokenAt tokenAt() default TokenAt.HEADER;
 
     /**
      * 传输 Token 的参数名，会强制覆盖 tokenAt 的设置。例如：
-     * Token在Header的时候默认为 Authorization
-     * Token在Body的时候默认为 access_token
-     *
-     * @return
+     * <p>Token在Header的时候默认为 Authorization</p>
+     * <p>Token在Body的时候默认为 access_token</p>
      */
     String tokenVariable() default "";
 
     /**
      * Token 前缀，会强制覆盖 tokenAt 的设置。例如：
-     * Token在Header的时候默认为 Bearer 前缀
-     * Token在Body的时候需默认该项设置为空字符串
-     *
-     * @return
+     * <p>Token在Header的时候默认为 Bearer 前缀 </p>
+     * <p>Token在Body的时候需默认该项设置为空字符串</p>
      */
     String tokenPrefix() default "";
 
@@ -188,7 +168,6 @@ public @interface OAuth2 {
          * 获取变量名
          *
          * @param defaultTokenVariable 默认的变量名，这个参数传入的应该为 @OAuth2.tokenVariable 的值
-         * @return
          */
         public String getTokenVariable(String defaultTokenVariable) {
             if (StringUtils.isBlank(defaultTokenVariable)) {
@@ -203,7 +182,6 @@ public @interface OAuth2 {
          *
          * @param defaultPrefix 默认的前缀，这个参数传入的应该为 @OAuth2.tokenPrefix 的值
          * @param token         实际的 Token 值
-         * @return
          */
         public String getTokenValue(String defaultPrefix, String token) {
             // 优先使用 @OAuth2.tokenPrefix 值
