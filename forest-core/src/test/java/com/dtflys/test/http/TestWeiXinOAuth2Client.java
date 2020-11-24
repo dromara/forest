@@ -16,9 +16,8 @@ import static junit.framework.TestCase.assertNotNull;
 
 /**
  * @author HouKunLin
- * @date 2020/11/23 0023 21:36
  */
-public class TestWeiXinOAuth2Client extends BaseClientTest {
+public class TestWeiXinOAuth2Client /*extends BaseClientTest*/ {
     private final static Logger log = LoggerFactory.getLogger(TestWeiXinOAuth2Client.class);
 
     private static ForestConfiguration configuration;
@@ -26,30 +25,30 @@ public class TestWeiXinOAuth2Client extends BaseClientTest {
     private static WeiXinOAuth2Client weiXinOAuth2Client;
 
     public TestWeiXinOAuth2Client(HttpBackend backend) {
-        super(backend, configuration);
+//        super(backend, configuration);
         weiXinOAuth2Client = configuration.createInstance(WeiXinOAuth2Client.class);
     }
 
-    @BeforeClass
+//    @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
     }
 
-    @Test
+//    @Test
     public void testListMenu() {
         Map<String, Object> result = weiXinOAuth2Client.listMenu();
         System.out.println(JSON.toJSONString(result));
         assertNotNull(result);
     }
 
-    @Test
+//    @Test
     public void testListCustomMenu() {
         Map<String, Object> result = weiXinOAuth2Client.listCustomMenu();
         System.out.println(JSON.toJSONString(result));
         assertNotNull(result);
     }
 
-    @Test
+//    @Test
     public void testGetCurrentAutoreplyInfo() {
         Map<String, Object> result = weiXinOAuth2Client.getCurrentAutoreplyInfo();
         System.out.println(JSON.toJSONString(result));
