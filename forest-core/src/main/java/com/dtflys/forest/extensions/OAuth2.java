@@ -88,20 +88,20 @@ public @interface OAuth2 {
      * 其他的登录参数（在Get内容中）。例如：
      * <pre>
      * {
-     * "params1:值1",
-     * "params2:值2",
+     * "名称1:值1",
+     * "名称2:值2",
      * "other-info:其他参数值"
      * }
      * </pre>
      */
-    String[] params() default {};
+    String[] query() default {};
 
     /**
      * 其他的登录参数（在Post内容中）。例如：
      * <pre>
      * {
-     * "params1:值1",
-     * "params2:值2",
+     * "名称1:值1",
+     * "名称2:值2",
      * "other-info:其他参数值"
      * }
      * </pre>
