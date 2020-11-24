@@ -201,12 +201,12 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
      */
     private TokenCache executeRequestToken(ForestRequest request, String clientId, Map<String, Object> body) {
         // 加入扩展参数
-        String[] bodyParams = (String[]) getAttribute(request, "body");
-        body.putAll(kv2map(bodyParams));
+        String[] bodyItems = (String[]) getAttribute(request, "body");
+        body.putAll(kv2map(bodyItems));
 
-        Map<String, Object> params = kv2map((String[]) getAttribute(request, "params"));
+        Map<String, Object> queryItems = kv2map((String[]) getAttribute(request, "query"));
 
-        OAuth2Token token = oAuth2Client.token(getAttributeAsString(request, "tokenUri"), params, body);
+        OAuth2Token token = oAuth2Client.token(getAttributeAsString(request, "tokenUri"), queryItems, body);
         return new TokenCache(clientId, token);
     }
 
