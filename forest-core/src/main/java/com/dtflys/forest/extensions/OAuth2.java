@@ -27,6 +27,18 @@ public @interface OAuth2 {
     String tokenUri();
 
     /**
+     * 设置缓存ID，为了确保缓存唯一（防止被其他同类型请求的缓存Token覆盖）建议设置此值。
+     * 虽然系统已经预设了一部分缓存key内容，但是也无法保证缓存不被其他配置覆盖，因此可能需要您手动设置该值。
+     * 默认使用：tokenUri/clientId/grantType/scope/username 组成一个KEY。
+     * 假如设置了 cacheId 将会直接把 cacheId 作为缓冲 KEY。
+     * 该参数在我引入了适配微信公众号开发请求 access_token 时发现可能需要这样设置，因为微信公众号传入的是 appid 而不是 clientId，
+     * 因此可能会有人把 clientId 设置为空字符串，此时假如系统中管理了两个公众号的接口请求，就可能引起缓存 Token 错乱、被覆盖的可能性。
+     *
+     * @see OAuth2LifeCycle#getCacheId(com.dtflys.forest.http.ForestRequest)
+     */
+    String cacheId() default "";
+
+    /**
      * 客户端ID
      */
     @Nonnull

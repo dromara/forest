@@ -63,6 +63,10 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
      * @return 缓存ID
      */
     private String getCacheId(ForestRequest request) {
+        String cacheId = getAttributeAsString(request, "cacheId");
+        if (StringUtils.isNotBlank(cacheId)) {
+            return cacheId;
+        }
         // tokenUri/clientId/grantType/scope/username 任何一个变动都可能是不同的帐号权限
         String tokenUri = getAttributeAsString(request, "tokenUri");
         String clientId = getAttributeAsString(request, "clientId");
