@@ -35,7 +35,18 @@ public class TestOAuth2Client extends BaseClientTest {
     }
 
     @Test
+    public void testPasswordTokenAtURL() {
+        System.out.println(oAuth2Client.testPasswordTokenAtURL());
+    }
+
+    @Test
     public void testClientCredentials() {
         System.out.println(oAuth2Client.testClientCredentials());
     }
+
+    @Test
+    public void testClientCredentialsTokenAtURL() {
+        System.out.println(oAuth2Client.testClientCredentialsTokenAtURL());
+    }
+
 }
