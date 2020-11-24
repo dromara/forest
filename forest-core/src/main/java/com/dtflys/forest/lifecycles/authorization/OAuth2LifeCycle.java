@@ -220,7 +220,7 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
         Map<String, Object> map = new HashMap<>();
         for (String value : values) {
             int indexOf = value.indexOf(":");
-            map.put(value.substring(0, indexOf), value.substring(indexOf + 1));
+            map.put(value.substring(0, indexOf), StringUtils.trimBegin(value.substring(indexOf + 1)));
         }
         return map;
     }
