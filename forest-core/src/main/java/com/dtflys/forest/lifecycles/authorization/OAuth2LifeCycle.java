@@ -1,7 +1,7 @@
 package com.dtflys.forest.lifecycles.authorization;
 
-import com.dtflys.forest.extensions.OAuth2;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.extensions.OAuth2;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.reflection.ForestMethod;
@@ -236,7 +236,8 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
         body.put("scope", getAttributeAsString(request, "scope"));
 
         OAuth2.GrantType grantType = (OAuth2.GrantType) getAttribute(request, "grantType");
-        body.put("grant_type", grantType.getValue());
+        String grantTypeValue = grantType.getValue(getAttributeAsString(request, "grantTypeValue"));
+        body.put("grant_type", grantTypeValue);
 
         if (fillAccount && grantType == OAuth2.GrantType.PASSWORD) {
             body.put("username", getAttributeAsString(request, "username"));

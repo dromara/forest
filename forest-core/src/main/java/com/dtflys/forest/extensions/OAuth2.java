@@ -39,10 +39,17 @@ public @interface OAuth2 {
     String clientSecret();
 
     /**
-     * 类型
+     * grantType 类型
      */
     @Nonnull
-    GrantType grantType();
+    GrantType grantType() default GrantType.CLIENT_CREDENTIALS;
+
+    /**
+     * 强制设置 grantType 值，该值将会覆盖 grantType 的设置。
+     * 由于一些特殊的情况，grantType 的值跟 GrantType 中预设的不一致，可以通过设置该参数来强制覆盖 GrantType 的参数值。
+     * 例如微信公众号开发的 grant_type = client_credential ，而预设中的是 CLIENT_CREDENTIALS("client_credentials") 两者不一致导致的请求失败
+     */
+    String grantTypeValue() default "";
 
     /**
      * 范围
@@ -128,8 +135,18 @@ public @interface OAuth2 {
             this.value = value;
         }
 
-        public String getValue() {
-            return value;
+        /**
+         * 获取 GrantType 的实际请求参数值
+         *
+         * @param defaultValue 默认的一个参数值，这个参数传入的应该为 @OAuth2.grantTypeValue 的值
+         * @return GrantType 实际请求值
+         */
+        public String getValue(String defaultValue) {
+            if (StringUtils.isBlank(defaultValue)) {
+                // 当 @OAuth2.grantTypeValue 未设置值时，使用 @OAuth2.grantType 默认值
+                return value;
+            }
+            return defaultValue;
         }
     }
 
