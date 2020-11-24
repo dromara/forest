@@ -206,7 +206,7 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
 
         Map<String, Object> params = kv2map((String[]) getAttribute(request, "params"));
 
-        Map<String, Object> token = oAuth2Client.token(getAttributeAsString(request, "tokenUri"), params, body);
+        OAuth2Token token = oAuth2Client.token(getAttributeAsString(request, "tokenUri"), params, body);
         return new TokenCache(clientId, token);
     }
 
@@ -274,21 +274,30 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
          * @param clientId 客户端ID
          * @param token    请求服务器端返回的 Token 结果
          */
-        public TokenCache(String clientId, Map<String, Object> token) {
-            for (String errorKey : ERROR_KEYS) {
-                Object errorValue = token.get(errorKey);
-                if (errorValue != null) {
-                    // 通常可能不会执行到这里，因为一旦 OAuth2 获取失败会返回一个 HTTP CODE 400 ，这个 HTTP CODE 会直接被程序抛出异常
-                    // 但是也有一些 OAuth2 服务器它们会返回 HTTP CODE 200 然后程序走到这里，例如微信公众号开发的服务器就会执行到这里
-                    throw new ForestRuntimeException("OAuth2 request Token failure, response has '" + errorKey + "'='" + errorValue + "', response: " + token);
-                }
+        public TokenCache(String clientId, OAuth2Token token) {
+            Object error = token.getError();
+            if (error != null) {
+                // 通常可能不会执行到这里，因为一旦 OAuth2 获取失败会返回一个 HTTP CODE 400 ，这个 HTTP CODE 会直接被程序抛出异常
+                // 但是也有一些 OAuth2 服务器它们会返回 HTTP CODE 200 然后程序走到这里，例如微信公众号开发的服务器就会执行到这里
+                throw new ForestRuntimeException("OAuth2 request Token failure, response has 'error'='" + error + "', response: " + token);
             }
+            Object errorcode = token.getErrcode();
+            if (errorcode != null) {
+                // 通常可能不会执行到这里，因为一旦 OAuth2 获取失败会返回一个 HTTP CODE 400 ，这个 HTTP CODE 会直接被程序抛出异常
+                // 但是也有一些 OAuth2 服务器它们会返回 HTTP CODE 200 然后程序走到这里，例如微信公众号开发的服务器就会执行到这里
+                throw new ForestRuntimeException("OAuth2 request Token failure, response has 'errorcode'='" + errorcode + "', response: " + token);
+            }
+
             this.clientId = clientId;
-            this.accessToken = (String) token.get("access_token");
-            this.refreshToken = (String) token.get("refresh_token");
-            this.tokenType = (String) token.get("token_type");
+            this.accessToken = token.getAccess_token();
+            this.refreshToken = token.getRefresh_token();
+            this.tokenType = token.getToken_type();
+            Long expires = token.getExpires_in();
+            if (expires == null) {
+                expires = 0L;
+            }
             // 设置 Token 到期时间：当前时间 + Token有效期
-            this.expiresAt = LocalDateTime.now().plusSeconds((int) token.get("expires_in"));
+            this.expiresAt = LocalDateTime.now().plusSeconds(expires);
         }
 
         /**

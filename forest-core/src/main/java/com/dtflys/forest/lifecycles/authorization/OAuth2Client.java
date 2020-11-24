@@ -2,6 +2,7 @@ package com.dtflys.forest.lifecycles.authorization;
 
 import com.dtflys.forest.annotation.Body;
 import com.dtflys.forest.annotation.DataVariable;
+import com.dtflys.forest.annotation.LogEnabled;
 import com.dtflys.forest.annotation.PostRequest;
 import com.dtflys.forest.annotation.Query;
 
@@ -20,8 +21,8 @@ public interface OAuth2Client {
      * @param tokenUri 获取 Token 的地址
      * @param params   GET 参数
      * @param body     POST 参数
-     * @return 返回json信息 map
+     * @return 返回json信息 {@link OAuth2Token}类实例
      */
     @PostRequest(url = "${tokenUri}")
-    Map<String, Object> token(@DataVariable("tokenUri") String tokenUri, @Query Map<String, Object> params, @Body Map<String, Object> body);
+    OAuth2Token token(@DataVariable("tokenUri") String tokenUri, @Query Map<String, Object> params, @Body Map<String, Object> body);
 }
