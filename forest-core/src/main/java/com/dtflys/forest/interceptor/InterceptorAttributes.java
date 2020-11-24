@@ -31,6 +31,14 @@ public class InterceptorAttributes {
             Object value = entry.getValue();
             if (value instanceof MappingTemplate) {
                 value = ((MappingTemplate) value).render(args);
+            } else if (value instanceof MappingTemplate[]) {
+                MappingTemplate[] templates = (MappingTemplate[]) value;
+                int len = templates.length;
+                String[] strArray = new String[len];
+                for (int i = 0; i < len; i++) {
+                    strArray[i] = templates[i].render(args);
+                }
+                value = strArray;
             }
             attributes.put(name, value);
         }
