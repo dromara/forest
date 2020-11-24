@@ -12,17 +12,19 @@ import java.util.Map;
  * OAuth2 请求
  *
  * @author HouKunLin
- * @date 2020 /11/23 0023 15:38
+ * @since 1.5.0-BETA9
  */
 public interface OAuth2Client {
     /**
      * 获取 Token
      *
      * @param tokenUri 获取 Token 的地址
-     * @param params   GET 参数
+     * @param query    GET 参数
      * @param body     POST 参数
      * @return 返回json信息 {@link OAuth2Token}类实例
      */
     @PostRequest(url = "${tokenUri}")
-    OAuth2Token token(@DataVariable("tokenUri") String tokenUri, @Query Map<String, Object> params, @Body Map<String, Object> body);
+    OAuth2Token token(@DataVariable("tokenUri") String tokenUri,
+                      @Query Map<String, Object> query,
+                      @Body Map<String, Object> body);
 }
