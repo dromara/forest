@@ -49,7 +49,7 @@ public class TestOAuth2Client extends BaseClientTest {
 
     @Test
     public void testPasswordTokenAtURL() {
-        String result = oAuth2Client.testPasswordTokenAtURL();
+        String result = oAuth2Client.testPasswordTokenAtURL("root", "123456");
         assertNotNull(result);
         assertEquals(OAuth2MockServer.EXPECTED, result);
     }

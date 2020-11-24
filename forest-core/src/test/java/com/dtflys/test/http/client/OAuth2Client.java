@@ -32,12 +32,14 @@ public interface OAuth2Client {
             clientSecret = "123456",
             grantType = OAuth2.GrantType.PASSWORD,
             scope = "any",
-            username = "root",
-            password = "123456",
+            body = {
+                    "username: ${0}",
+                    "password: ${1}"
+            },
             tokenAt = OAuth2.TokenAt.URL
     )
     @GetRequest(url = "http://localhost:${port}/auth/test/password_at_url")
-    String testPasswordTokenAtURL();
+    String testPasswordTokenAtURL(String username, String password);
 
     /**
      * 测试使用 CLIENT_CREDENTIALS 模式调用接口
