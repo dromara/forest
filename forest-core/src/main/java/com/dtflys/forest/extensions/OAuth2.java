@@ -2,6 +2,7 @@ package com.dtflys.forest.extensions;
 
 import com.dtflys.forest.annotation.MethodLifeCycle;
 import com.dtflys.forest.annotation.RequestAttributes;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.lifecycles.authorization.OAuth2LifeCycle;
 import com.dtflys.forest.utils.StringUtils;
 
@@ -33,8 +34,6 @@ public @interface OAuth2 {
      * 假如设置了 cacheId 将会直接把 cacheId 作为缓冲 KEY。
      * 该参数在我引入了适配微信公众号开发请求 access_token 时发现可能需要这样设置，因为微信公众号传入的是 appid 而不是 clientId，
      * 因此可能会有人把 clientId 设置为空字符串，此时假如系统中管理了两个公众号的接口请求，就可能引起缓存 Token 错乱、被覆盖的可能性。
-     *
-     * @see OAuth2LifeCycle#getCacheId(com.dtflys.forest.http.ForestRequest)
      */
     String cacheId() default "";
 
