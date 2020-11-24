@@ -1,12 +1,18 @@
 package com.dtflys.test.http;
 
+import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.test.http.client.WeiXinOAuth2Client;
+import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+
+import static junit.framework.TestCase.assertNotNull;
 
 /**
  * @author HouKunLin
@@ -31,16 +37,22 @@ public class TestWeiXinOAuth2Client extends BaseClientTest {
 
     @Test
     public void testListMenu() {
-        System.out.println(weiXinOAuth2Client.listMenu());
+        Map<String, Object> result = weiXinOAuth2Client.listMenu();
+        System.out.println(JSON.toJSONString(result));
+        assertNotNull(result);
     }
 
     @Test
     public void testListCustomMenu() {
-        System.out.println(weiXinOAuth2Client.listCustomMenu());
+        Map<String, Object> result = weiXinOAuth2Client.listCustomMenu();
+        System.out.println(JSON.toJSONString(result));
+        assertNotNull(result);
     }
 
     @Test
     public void testGetCurrentAutoreplyInfo() {
-        System.out.println(weiXinOAuth2Client.getCurrentAutoreplyInfo());
+        Map<String, Object> result = weiXinOAuth2Client.getCurrentAutoreplyInfo();
+        System.out.println(JSON.toJSONString(result));
+        assertNotNull(result);
     }
 }

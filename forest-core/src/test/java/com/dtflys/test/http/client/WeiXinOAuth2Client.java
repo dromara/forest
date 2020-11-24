@@ -13,14 +13,14 @@ import java.util.Map;
  */
 @OAuth2(
         tokenUri = "https://api.weixin.qq.com/cgi-bin/token",
-        clientId = "",
-        clientSecret = "",
+        clientId = "x",
+        clientSecret = "yyy",
         grantType = OAuth2.GrantType.CLIENT_CREDENTIALS,
         grantTypeValue = "client_credential",
         body = {
                 // 请在这里填写 微信公众号 AppID 和 Secret
-                "appid:",
-                "secret:"
+                "appid: wx5e6e468c3afc28ed",
+                "secret: 57bf25691d7bbe364c54a321e8cb75df"
         },
         tokenAt = OAuth2.TokenAt.URL
 )

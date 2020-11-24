@@ -3,17 +3,22 @@ package com.dtflys.test.http;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.test.http.client.OAuth2Client;
+import com.dtflys.test.mock.OAuth2MockServer;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author HouKunLin
- * @date 2020/11/23 0023 21:36
  */
 public class TestOAuth2Client extends BaseClientTest {
-    private final static Logger log = LoggerFactory.getLogger(TestOAuth2Client.class);
+
+    @Rule
+    public OAuth2MockServer server = new OAuth2MockServer(this);
 
     private static ForestConfiguration configuration;
 
@@ -27,26 +32,41 @@ public class TestOAuth2Client extends BaseClientTest {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
+        configuration.setVariableValue("port", OAuth2MockServer.port);
+    }
+
+    @Before
+    public void prepareMockServer() {
+        server.initServer();
     }
 
     @Test
     public void testPassword() {
-        System.out.println(oAuth2Client.testPassword());
+        String result = oAuth2Client.testPassword();
+        assertNotNull(result);
+        assertEquals(OAuth2MockServer.EXPECTED, result);
     }
 
     @Test
     public void testPasswordTokenAtURL() {
-        System.out.println(oAuth2Client.testPasswordTokenAtURL());
+        String result = oAuth2Client.testPasswordTokenAtURL();
+        assertNotNull(result);
+        assertEquals(OAuth2MockServer.EXPECTED, result);
     }
 
     @Test
     public void testClientCredentials() {
-        System.out.println(oAuth2Client.testClientCredentials());
+        String result = oAuth2Client.testClientCredentials();
+        assertNotNull(result);
+        assertEquals(OAuth2MockServer.EXPECTED, result);
     }
 
     @Test
     public void testClientCredentialsTokenAtURL() {
-        System.out.println(oAuth2Client.testClientCredentialsTokenAtURL());
+        String result = oAuth2Client.testClientCredentialsTokenAtURL();
+        assertNotNull(result);
+        assertEquals(OAuth2MockServer.EXPECTED, result);
+
     }
 
 }
