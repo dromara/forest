@@ -284,6 +284,16 @@ public class ForestMethod<T> implements VariableScope {
                 if (value instanceof CharSequence) {
                     MappingTemplate template = makeTemplate(value.toString());
                     attrTemplates.put(key, template);
+                } else if (String[].class.isAssignableFrom(value.getClass())) {
+                    String[] stringArray = (String[]) value;
+                    int len = stringArray.length;
+                    MappingTemplate[] templates = new MappingTemplate[stringArray.length];
+                    for (int i = 0; i < len; i++) {
+                        String item = stringArray[i];
+                        MappingTemplate template = makeTemplate(item);
+                        templates[i] = template;
+                    }
+                    attrTemplates.put(key, templates);
                 }
             }
 
