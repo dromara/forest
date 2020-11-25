@@ -19,7 +19,7 @@ public class OAuth2MockServer extends MockServerRule {
 
     public final static String TOKEN_JSON = "{" +
             "\"access_token\": \"" + TOKEN + "\"," +
-            "\"expires_in\": \"10\"" +
+            "\"expires_in\": \"1\"" +
             "}";
 
 

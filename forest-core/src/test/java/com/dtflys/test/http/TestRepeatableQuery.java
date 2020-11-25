@@ -73,4 +73,12 @@ public class TestRepeatableQuery extends BaseClientTest {
         assertEquals(RepeatableQueryMockServer.EXPECTED, result);
     }
 
+    @Test
+    public void testArrayQuery() {
+        List<String> usernames = Lists.newArrayList("foo", "bar", "user1", "user2");
+        String result = getClient.arrayQuery(usernames, "123456");
+        assertNotNull(result);
+        assertEquals(RepeatableQueryMockServer.EXPECTED, result);
+    }
+
 }
