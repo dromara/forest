@@ -33,6 +33,7 @@ import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingVariable;
+import com.dtflys.forest.mapping.SubVariableScope;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.multipart.ForestMultipartFactory;
 import com.dtflys.forest.proxy.InterfaceProxyHandler;
@@ -701,7 +702,6 @@ public class ForestMethod<T> implements VariableScope {
             request.setUserAgent(renderedUserAgent);
         }
 
-
         for (int i = 0; i < namedParameters.size(); i++) {
             MappingParameter parameter = namedParameters.get(i);
             if (parameter.isObjectProperties()) {
@@ -745,15 +745,15 @@ public class ForestMethod<T> implements VariableScope {
                         request.addBody(new StringRequestBody(obj.toString()));
                     }
                 }
-                else if (obj instanceof Collection
+                else if (obj instanceof Iterable
                         || obj.getClass().isArray()
                         || ReflectUtils.isPrimaryType(obj.getClass())) {
                     if (MappingParameter.isQuery(target)) {
                         if (parameter.isJsonParam()) {
                             request.addQuery(parameter.getName(), obj);
                         } else {
-                            if (obj instanceof Collection) {
-                                for (Object subItem : (Collection) obj) {
+                            if (obj instanceof Iterable) {
+                                for (Object subItem : (Iterable) obj) {
                                     if (subItem instanceof ForestQueryParameter) {
                                         request.addQuery((ForestQueryParameter) subItem);
                                     } else {
@@ -809,9 +809,15 @@ public class ForestMethod<T> implements VariableScope {
                     if (MappingParameter.isHeader(target)) {
                         request.addHeader(nameValue);
                     } else if (MappingParameter.isQuery(target)) {
-                        if (!parameter.isJsonParam() && obj instanceof Collection) {
-                            for (Object subItem : (Collection) obj) {
-                                request.addQuery(parameter.getName(), subItem);
+                        if (!parameter.isJsonParam() && obj instanceof Iterable) {
+                            int index = 0;
+                            for (Object subItem : (Iterable) obj) {
+                                SubVariableScope scope = new SubVariableScope(this);
+                                scope.addVariableValue("_it", subItem);
+                                scope.addVariableValue("_index", index++);
+                                MappingTemplate template = new MappingTemplate(parameter.getName(), scope);
+                                String name = template.render(args);
+                                request.addQuery(name, subItem);
                             }
                         } else {
                             request.addQuery(parameter.getName(), obj);
