@@ -1,5 +1,6 @@
 package com.dtflys.forest.utils;
 
+import com.dtflys.forest.annotation.AliasFor;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.converter.json.JSONConverterSelector;
@@ -23,6 +24,24 @@ public class ReflectUtils {
      * @since 1.5.1-BETA4
      */
     private static JSONConverterSelector jsonConverterSelector = new JSONConverterSelector();
+
+    /**
+     * 被排除调注解方法名集合
+     */
+    private static Set<String> excludedAnntotationMethodNames = new HashSet<>();
+    static {
+        excludedAnntotationMethodNames.add("equals");
+        excludedAnntotationMethodNames.add("getClass");
+        excludedAnntotationMethodNames.add("annotationType");
+        excludedAnntotationMethodNames.add("notify");
+        excludedAnntotationMethodNames.add("notifyAll");
+        excludedAnntotationMethodNames.add("wait");
+        excludedAnntotationMethodNames.add("hashCode");
+        excludedAnntotationMethodNames.add("toString");
+        excludedAnntotationMethodNames.add("newProxyInstance");
+        excludedAnntotationMethodNames.add("newProxyClass");
+        excludedAnntotationMethodNames.add("getInvocationHandler");
+    }
 
 
     /**
@@ -117,41 +136,50 @@ public class ReflectUtils {
 
 
     public static Map<String, Object> getAttributesFromAnnotation(Annotation ann) {
-        Set<String> excludeMethodNames = new HashSet<>();
-        excludeMethodNames.add("equals");
-        excludeMethodNames.add("getClass");
-        excludeMethodNames.add("annotationType");
-        excludeMethodNames.add("notify");
-        excludeMethodNames.add("notifyAll");
-        excludeMethodNames.add("wait");
-        excludeMethodNames.add("hashCode");
-        excludeMethodNames.add("toString");
-        excludeMethodNames.add("newProxyInstance");
-        excludeMethodNames.add("newProxyClass");
-        excludeMethodNames.add("getInvocationHandler");
-
         Map<String, Object> results = new HashMap<>();
-        Class clazz = ann.getClass();
+        Class clazz = ann.annotationType();
         Method[] methods = clazz.getMethods();
         Object[] args = new Object[0];
         for (Method method : methods) {
             String name = method.getName();
-            if (excludeMethodNames.contains(name)) {
+            if (excludedAnntotationMethodNames.contains(name)) {
                 continue;
             }
             if (method.getParameters().length > 0) {
                 continue;
             }
+            Object value = invokeAnnotationMethod(ann, clazz, name, args);
+            if (value == null ||
+                    (value instanceof CharSequence && StringUtils.isEmpty(String.valueOf(value)))) {
+                AliasFor aliasFor = method.getAnnotation(AliasFor.class);
+                if (aliasFor != null) {
+                    String aliasName = aliasFor.value();
+                    value = invokeAnnotationMethod(ann, clazz, aliasName, args);
+                }
+            }
+            results.put(name, value);
+        }
+        return results;
+    }
+
+
+    private static Object invokeAnnotationMethod(Annotation ann, Class clazz, String name, Object[] args) {
+        Method method = null;
+        try {
+            method = clazz.getMethod(name, new Class[0]);
+        } catch (NoSuchMethodException e) {
+            throw new ForestRuntimeException(e);
+        }
+        if (method != null) {
             try {
-                Object value = method.invoke(ann, args);
-                results.put(name, value);
+                return method.invoke(ann, args);
             } catch (IllegalAccessException e) {
                 throw new ForestRuntimeException(e);
             } catch (InvocationTargetException e) {
                 throw new ForestRuntimeException(e);
             }
         }
-        return results;
+        return null;
     }
 
 

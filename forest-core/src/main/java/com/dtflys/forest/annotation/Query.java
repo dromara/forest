@@ -84,16 +84,27 @@ import java.lang.annotation.Target;
 public @interface Query {
 
     /**
-     * URL Query参数的参数名（可省略）
+     * URL Query参数的参数名（可省略）[同name]
      * <p>如有参数名，将会以 [参数名]=[参数值] 的形式添加到URL中的Query参数部分（即'?'后的那部分）</p>
      * <p>如没有参数名，将直接以 [参数值] 的形式添加到URL中的Query参数部分，</p>
      * <p>如 &#064;Query String name，且参数name的值为yyy的话，产生的URL便会是 http://xxx.xxx.xxx/xxx?yyy</p>
      */
+    @AliasFor("name")
     String value() default "";
+
+    /**
+     * URL Query参数的参数名（可省略）[同value]
+     * <p>如有参数名，将会以 [参数名]=[参数值] 的形式添加到URL中的Query参数部分（即'?'后的那部分）</p>
+     * <p>如没有参数名，将直接以 [参数值] 的形式添加到URL中的Query参数部分，</p>
+     * <p>如 &#064;Query String name，且参数name的值为yyy的话，产生的URL便会是 http://xxx.xxx.xxx/xxx?yyy</p>
+     */
+    @AliasFor("value")
+    String name() default "";
 
     /**
      * The filters will do some processing for the query value before sending request.
      */
     String filter() default "";
+
 
 }

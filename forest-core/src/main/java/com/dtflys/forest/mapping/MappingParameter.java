@@ -31,9 +31,9 @@ public class MappingParameter {
     protected String name;
 
     /**
-     * 参数名称模板
+     *
      */
-    protected MappingTemplate nameTemplate;
+    protected MappingTemplate toTemplate;
 
     /**
      * 参数绑定的目标位置
