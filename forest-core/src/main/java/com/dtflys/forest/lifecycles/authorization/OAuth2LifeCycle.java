@@ -254,10 +254,6 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
      * 缓存 Token 信息的对象.
      */
     public static class TokenCache {
-        /**
-         * 错误代码的KEY，通常在标准 OAuth2 情况下是 error，但是发现在微信公众号的返回是 errcode
-         */
-        private final static String[] ERROR_KEYS = new String[]{"error", "errcode"};
         private final String clientId;
         private final String accessToken;
         private final String refreshToken;
@@ -275,17 +271,10 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
          * @param token    请求服务器端返回的 Token 结果
          */
         public TokenCache(String clientId, OAuth2Token token) {
-            Object error = token.getError();
-            if (error != null) {
+            if (token.hasError()) {
                 // 通常可能不会执行到这里，因为一旦 OAuth2 获取失败会返回一个 HTTP CODE 400 ，这个 HTTP CODE 会直接被程序抛出异常
                 // 但是也有一些 OAuth2 服务器它们会返回 HTTP CODE 200 然后程序走到这里，例如微信公众号开发的服务器就会执行到这里
-                throw new ForestRuntimeException("OAuth2 request Token failure, response has 'error'='" + error + "', response: " + token);
-            }
-            Object errorcode = token.getErrcode();
-            if (errorcode != null) {
-                // 通常可能不会执行到这里，因为一旦 OAuth2 获取失败会返回一个 HTTP CODE 400 ，这个 HTTP CODE 会直接被程序抛出异常
-                // 但是也有一些 OAuth2 服务器它们会返回 HTTP CODE 200 然后程序走到这里，例如微信公众号开发的服务器就会执行到这里
-                throw new ForestRuntimeException("OAuth2 request Token failure, response has 'errorcode'='" + errorcode + "', response: " + token);
+                throw new ForestRuntimeException("OAuth2 request Token failure, response: " + token.getErrorMessage());
             }
 
             this.clientId = clientId;
