@@ -10,6 +10,7 @@ import java.io.InputStream;
 /**
  * Forest对上传下载的文件、流、二进制数值等内容的封装抽象类
  * 提供针对用于上传下载等用途资源的公共接口
+ *
  * @param <T> 文件数据类型, 可以有 {@link File}, {@link InputStream}, {@link String} 以及 {@code byte[]} 这几种基本类型
  * @author gongjun [dt_flys@hotmail.com]
  * @since 2020-08-02 15:01

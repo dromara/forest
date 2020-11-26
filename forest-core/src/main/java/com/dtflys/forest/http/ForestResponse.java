@@ -31,8 +31,10 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
+ * Forest请求响应类
+ *
  * @author gongjun[dt_flys@hotmail.com]
- * @since 2016-03-25 16:33
+ * @since 1.1.0
  */
 public abstract class ForestResponse<T> {
 
