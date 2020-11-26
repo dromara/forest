@@ -4,7 +4,12 @@ import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 
 import java.net.URI;
 
-public abstract class HttpWithBodyEntity extends HttpEntityEnclosingRequestBase {
+/**
+ * HttpClient请求体抽象基类
+ * @author gongjun[dt_flys@hotmail.com]
+ * @since 1.4.0
+ */
+public abstract class AbstractHttpWithBodyEntity extends HttpEntityEnclosingRequestBase {
 
     private final String httpMethod;
 
@@ -14,18 +19,18 @@ public abstract class HttpWithBodyEntity extends HttpEntityEnclosingRequestBase 
         return httpMethod;
     }
 
-    public HttpWithBodyEntity(String httpMethod) {
+    public AbstractHttpWithBodyEntity(String httpMethod) {
         super();
         this.httpMethod = httpMethod;
     }
 
-    public HttpWithBodyEntity(final URI uri, String httpMethod) {
+    public AbstractHttpWithBodyEntity(final URI uri, String httpMethod) {
         super();
         this.httpMethod = httpMethod;
         setURI(uri);
     }
 
-    public HttpWithBodyEntity(final String uri, String httpMethod) {
+    public AbstractHttpWithBodyEntity(final String uri, String httpMethod) {
         super();
         this.httpMethod = httpMethod;
         setURI(URI.create(uri));
