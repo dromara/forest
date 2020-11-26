@@ -28,6 +28,7 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 数据类型封装类型
@@ -42,7 +43,7 @@ public class ForestDataType {
      * <p>所有在Forest中创建的数据类型对象都会放入这个哈希表中<p/>
      * @since 1.5.0-BETA4
      */
-    public final static Map<String, ForestDataType> dataTypes = new HashMap<>();
+    public final static Map<String, ForestDataType> DATA_TYPES = new HashMap<>();
 
     /** 数据类型： 自动类型 */
     public final static ForestDataType AUTO = ForestDataType.createDataType("auto");
@@ -75,10 +76,10 @@ public class ForestDataType {
         }
         name = name.toLowerCase();
         ForestDataType dataType = new ForestDataType(name);
-        if (dataTypes.containsKey(name)) {
+        if (DATA_TYPES.containsKey(name)) {
             throw new ForestRuntimeException("Data type '" + name + "' has already been existed!" );
         }
-        dataTypes.put(name, dataType);
+        DATA_TYPES.put(name, dataType);
         return dataType;
     }
 
@@ -111,7 +112,7 @@ public class ForestDataType {
      * @since 1.5.0-BETA4
      */
     public static ForestDataType findByName(String name) {
-        return dataTypes.get(name.toLowerCase());
+        return DATA_TYPES.get(name.toLowerCase());
     }
 
     /**
@@ -126,11 +127,36 @@ public class ForestDataType {
             return null;
         }
         name = name.toLowerCase();
-        ForestDataType dataType = dataTypes.get(name);
+        ForestDataType dataType = DATA_TYPES.get(name);
         if (dataType == null) {
             dataType = createDataType(name);
         }
         return dataType;
     }
 
+    /**
+     * 重载equals方法
+     * @param o 相比较的对象
+     * @return {@code true}：相同对象; {@code false}：不同对象
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ForestDataType)) {
+            return false;
+        }
+        ForestDataType that = (ForestDataType) o;
+        return Objects.equals(getName(), that.getName());
+    }
+
+    /**
+     * 重载HashCode
+     * @return 哈希值
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName());
+    }
 }

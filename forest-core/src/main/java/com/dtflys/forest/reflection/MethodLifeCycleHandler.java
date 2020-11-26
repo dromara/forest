@@ -12,7 +12,6 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.retryer.Retryer;
 import com.dtflys.forest.utils.ForestProgress;
 import com.dtflys.forest.utils.ReflectUtils;
-import com.twitter.finagle.http.path.$colon$amp;
 
 import java.lang.reflect.Type;
 
@@ -29,7 +28,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
 
     private final Type onSuccessClassGenericType;
 
-    private static final ResultHandler resultHandler = new ResultHandler();
+    private static final ResultHandler RESULT_HANDLER = new ResultHandler();
 
     private volatile T resultData;
 
@@ -93,7 +92,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
 
     @Override
     public synchronized Object handleResultType(ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
-        Object resultData = resultHandler.getResult(request, response, resultType, resultClass);
+        Object resultData = RESULT_HANDLER.getResult(request, response, resultType, resultClass);
         if (!(resultData instanceof ForestResponse)) {
             response.setResult(resultData);
         }
@@ -108,7 +107,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
         request.getInterceptorChain().onSuccess(resultData, request, response);
         OnSuccess onSuccess = request.getOnSuccess();
         if (onSuccess != null) {
-            resultData = resultHandler.getResult(request, response, onSuccessClassGenericType, ReflectUtils.getClassByType(onSuccessClassGenericType));
+            resultData = RESULT_HANDLER.getResult(request, response, onSuccessClassGenericType, ReflectUtils.getClassByType(onSuccessClassGenericType));
             onSuccess.onSuccess(resultData, request, response);
         }
         resultData = response.getResult();

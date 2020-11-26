@@ -25,7 +25,7 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
     public static final X509HostnameVerifier BROWSER_COMPATIBLE_HOSTNAME_VERIFIER = new BrowserCompatHostnameVerifier();
 
 //    private final SSLSocketFactory socketfactory;
-    private final static ThreadLocal<ForestRequest> requestLocal = new ThreadLocal<>();
+    private final static ThreadLocal<ForestRequest> REQUEST_LOCAL = new ThreadLocal<>();
     private final X509HostnameVerifier hostnameVerifier;
 
     public static org.apache.http.conn.ssl.SSLConnectionSocketFactory getSocketFactory() throws SSLInitializationException {
@@ -91,21 +91,21 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
 
 
     private ForestRequest getCurrentRequest() {
-        ForestRequest request = requestLocal.get();
-        System.out.println("getCurrentRequest[" + Thread.currentThread().getName() + "][" + requestLocal.hashCode() + "]: " + request);
+        ForestRequest request = REQUEST_LOCAL.get();
+        System.out.println("getCurrentRequest[" + Thread.currentThread().getName() + "][" + REQUEST_LOCAL.hashCode() + "]: " + request);
         return request;
     }
 
 
     public void setCurrentRequest(ForestRequest request) {
-        System.out.println("setCurrentRequest[" + Thread.currentThread().getName() + "][" + requestLocal.hashCode() + "]: " + request);
-        requestLocal.set(request);
+        System.out.println("setCurrentRequest[" + Thread.currentThread().getName() + "][" + REQUEST_LOCAL.hashCode() + "]: " + request);
+        REQUEST_LOCAL.set(request);
     }
 
 
     public ForestRequest removeCurrentRequest() {
-        ForestRequest request = requestLocal.get();
-        requestLocal.remove();
+        ForestRequest request = REQUEST_LOCAL.get();
+        REQUEST_LOCAL.remove();
         return request;
     }
 
