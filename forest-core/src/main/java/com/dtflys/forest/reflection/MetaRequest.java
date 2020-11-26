@@ -10,14 +10,12 @@ public class MetaRequest {
 
     /**
      * target http url
-     * @return
      */
     private String url;
 
     /**
      * http method type: <br>
      *     GET POST PUT HEAD OPTIONS DELETE PATCH TRACE
-     * @return
      */
     private String type;
 
@@ -25,13 +23,11 @@ public class MetaRequest {
      * type of response data: <br>
      *     text json xml <br>
      * default value is "auto"
-     * @return
      */
     private String dataType;
 
     /**
      * whether can use async http request or not
-     * @return
      */
     private boolean async;
 
@@ -44,13 +40,11 @@ public class MetaRequest {
 
     /**
      * Class of retryer
-     * @return
      */
     private Class retryer;
 
     /**
      * max count to retry
-     * @return
      */
     private int retryCount;
 
@@ -58,19 +52,16 @@ public class MetaRequest {
 
     /**
      * Content Type
-     * @return
      */
     private String contentType;
 
     /**
      * Content Encoding
-     * @return
      */
     private String contentEncoding;
 
     /**
      * Charset, Default is UTF-8
-     * @return
      */
     private String charset;
 
@@ -97,7 +88,6 @@ public class MetaRequest {
 
     /**
      * KeyStore Id
-     * @return
      */
     private String keyStore;
 

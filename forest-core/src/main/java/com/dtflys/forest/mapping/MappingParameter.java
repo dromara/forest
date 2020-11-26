@@ -6,7 +6,10 @@ import com.dtflys.forest.filter.FilterChain;
 import java.util.Iterator;
 
 /**
- * Created by Administrator on 2016/5/17.
+ * 字符串模板解析类 方法参数
+ *
+ * @author gongjun[dt_flys@hotmail.com]
+ * @since 1.0.0
  */
 public class MappingParameter {
 
@@ -31,9 +34,9 @@ public class MappingParameter {
     protected String name;
 
     /**
-     *
+     * 映射操作
      */
-    protected MappingTemplate toTemplate;
+    protected String map;
 
     /**
      * 参数绑定的目标位置
@@ -76,6 +79,14 @@ public class MappingParameter {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getMap() {
+        return map;
+    }
+
+    public void setMap(String map) {
+        this.map = map;
     }
 
     public boolean isUnknownTarget() {

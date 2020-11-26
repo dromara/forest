@@ -56,8 +56,8 @@ public final class StringUtils {
 
     /**
      * 去掉开头空格
-     * @param str
-     * @return
+     * @param str 源字符串
+     * @return 去掉开头空格后的字符串
      */
     public static String trimBegin(String str) {
         if (str == null) {

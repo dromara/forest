@@ -41,11 +41,19 @@ public interface ForestJsonConverter extends ForestConverter<String>, ForestEnco
      * 将源对象转换为Map对象
      *
      * @param obj  源对象
-     * @return
+     * @return 转换后的Map对象
      */
     Map<String, Object> convertObjectToMap(Object obj);
 
+    /**
+     * 设置日期格式
+     * @param format 日期格式化模板字符
+     */
     void setDateFormat(String format);
 
+    /**
+     * 获取日期格式
+     * @return 日期格式化模板字符
+     */
     String getDateFormat();
 }

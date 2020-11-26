@@ -33,10 +33,10 @@ import java.util.Map;
 public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
 
     /**
-     * 构建
-     * @param httpRequest
-     * @param request
-     * @param lifeCycleHandler
+     * 构建请求体
+     * @param httpRequest 后端http请求对象
+     * @param request Forest请求对象
+     * @param lifeCycleHandler 生命周期处理器
      */
     @Override
     public void buildBody(T httpRequest, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
@@ -182,7 +182,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
      * @param configuration Forest配置
      * @param name 表单项目名
      * @param collection 集合对象
-     * @param target
+     * @param target 请求目标位置
      */
     protected void processFormCollectionItem(List<RequestNameValue> newNameValueList, ForestConfiguration configuration, String name, Collection collection, int target) {
         int index = 0;

@@ -412,7 +412,6 @@ public class ForestRequest<T> {
     public String getQueryString() {
         StringBuilder builder = new StringBuilder();
         Iterator<ForestQueryParameter> iterator = query.queryValues().iterator();
-        query.values();
         while (iterator.hasNext()) {
             ForestQueryParameter query = iterator.next();
             if (query != null) {
@@ -548,7 +547,7 @@ public class ForestRequest<T> {
      *
      * @param name Query参数名
      * @param value Query参数值
-     * @return
+     * @return {@link ForestRequest}类实例
      */
     public ForestRequest replaceOrAddQuery(String name, String value) {
         List<ForestQueryParameter> queryParameters = this.query.getQueries(name);
@@ -738,7 +737,6 @@ public class ForestRequest<T> {
 
     /**
      * 旧的获取Body数据的方法，已不建议使用
-     * @return
      */
     @Deprecated
     public Map<String, Object> getData() {
@@ -747,8 +745,8 @@ public class ForestRequest<T> {
 
     /**
      * 添加Body数据
-     * @param body
-     * @return
+     * @param body Forest请求体，{@link ForestRequestBody}类实例
+     * @return {@link ForestRequest}类实例
      */
     public ForestRequest addBody(ForestRequestBody body) {
         this.bodyItems.add(body);
@@ -759,7 +757,7 @@ public class ForestRequest<T> {
     /**
      * 添加字符串Body数据
      * @param stringBody 请求体字符串内容
-     * @return
+     * @return {@link ForestRequest}类实例
      */
     public ForestRequest addBody(String stringBody) {
         return addBody(new StringRequestBody(stringBody));
@@ -769,7 +767,7 @@ public class ForestRequest<T> {
      * 添加键值对类型Body数据
      * @param name 字段名
      * @param value 字段值
-     * @return
+     * @return {@link ForestRequest}类实例
      */
     public ForestRequest addBody(String name, Object value) {
         return addBody(new NameValueRequestBody(name, value));
@@ -778,7 +776,7 @@ public class ForestRequest<T> {
     /**
      * 添加键值对类型Body数据
      * @param nameValue 请求键值对对象
-     * @return
+     * @return {@link ForestRequest}类实例
      */
     @Deprecated
     public ForestRequest addBody(RequestNameValue nameValue) {
@@ -788,7 +786,7 @@ public class ForestRequest<T> {
     /**
      * 批量添加键值对类型Body数据
      * @param nameValueList 请求键值对对象列表
-     * @return
+     * @return {@link ForestRequest}类实例
      */
     @Deprecated
     public ForestRequest addBody(List<RequestNameValue> nameValueList) {
@@ -800,9 +798,9 @@ public class ForestRequest<T> {
 
     /**
      * 添加键值对类型Body数据, 已不再建议使用
-     * @param name
-     * @param value
-     * @return
+     * @param name 键值对名称
+     * @param value 键值对的值
+     * @return {@link ForestRequest}类实例
      */
     @Deprecated
     public ForestRequest addData(String name, Object value) {
@@ -812,7 +810,7 @@ public class ForestRequest<T> {
     /**
      * 添加键值对类型Body数据, 已不再建议使用
      * @param nameValue 请求键值对对象
-     * @return
+     * @return {@link ForestRequest}类实例
      */
     @Deprecated
     public ForestRequest addData(RequestNameValue nameValue) {
@@ -822,7 +820,7 @@ public class ForestRequest<T> {
     /**
      * 批量添加键值对类型Body数据, 已不再建议使用
      * @param data 请求键值对对象列表
-     * @return
+     * @return {@link ForestRequest}类实例
      */
     @Deprecated
     public ForestRequest addData(List<RequestNameValue> data) {
@@ -832,7 +830,7 @@ public class ForestRequest<T> {
     /**
      * 添加键值对
      * @param nameValue 键值对对象
-     * @return
+     * @return {@link ForestRequest}类实例
      */
     public ForestRequest addNameValue(RequestNameValue nameValue) {
         if (nameValue.isInHeader()) {
@@ -848,7 +846,7 @@ public class ForestRequest<T> {
     /**
      * 添加键值对列表
      * @param nameValueList 键值对列表
-     * @return
+     * @return {@link ForestRequest}类实例
      */
     public ForestRequest addNameValue(List<RequestNameValue> nameValueList) {
         for (RequestNameValue nameValue : nameValueList) {
@@ -860,7 +858,7 @@ public class ForestRequest<T> {
     /**
      * 替换Body数据，原有的Body数据将被清空
      * @param body 请求体对象
-     * @return
+     * @return {@link ForestRequest}类实例
      */
     public ForestRequest replaceBody(ForestRequestBody body) {
         this.bodyItems.clear();
@@ -871,7 +869,7 @@ public class ForestRequest<T> {
     /**
      * 替换Body为新的字符串数据，原有的Body数据将被清空
      * @param stringbody 字符串请求体
-     * @return
+     * @return {@link ForestRequest}类实例
      */
     public ForestRequest replaceBody(String stringbody) {
         this.bodyItems.clear();
@@ -1359,9 +1357,9 @@ public class ForestRequest<T> {
     }
 
     /**
-     * Execute request
-     * @param backend
-     * @param lifeCycleHandler
+     * 执行请求发送过程
+     * @param backend HTTP后端，{@link HttpBackend}接口实例
+     * @param lifeCycleHandler 生命周期处理器，{@link LifeCycleHandler}接口实例
      */
     public void execute(HttpBackend backend, LifeCycleHandler lifeCycleHandler) {
         if (interceptorChain.beforeExecute(this)) {

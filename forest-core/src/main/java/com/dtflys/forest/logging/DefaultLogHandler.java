@@ -20,7 +20,7 @@ public class DefaultLogHandler implements ForestLogHandler {
     /**
      * 获取请求头日志内容
      * @param requestLogMessage 请求日志消息
-     * @return
+     * @return 请求头日志内容
      */
     protected String requestLoggingHeaders(RequestLogMessage requestLogMessage) {
         StringBuilder builder = new StringBuilder();
@@ -75,7 +75,7 @@ public class DefaultLogHandler implements ForestLogHandler {
 
     /**
      * 请求失败重试信息
-     * @param requestLogMessage
+     * @param requestLogMessage 请求日志消息，{@link RequestLogMessage}类实例
      * @return 重试信息字符串
      */
     protected String retryContent(RequestLogMessage requestLogMessage) {
@@ -87,9 +87,9 @@ public class DefaultLogHandler implements ForestLogHandler {
     }
 
     /**
-     *
-     * @param requestLogMessage
-     * @return
+     * 正向代理信息
+     * @param requestLogMessage 请求日志消息，{@link RequestLogMessage}类实例
+     * @return 正向代理日志字符串
      */
     protected String proxyContent(RequestLogMessage requestLogMessage) {
         RequestProxyLogMessage proxyLogMessage = requestLogMessage.getProxy();
@@ -127,7 +127,7 @@ public class DefaultLogHandler implements ForestLogHandler {
     /**
      * 请求响应日志打印的内容
      * @param responseLogMessage 请求响应日志字符串
-     * @return
+     * @return 请求响应日志字符串
      */
     protected String responseLoggingContent(ResponseLogMessage responseLogMessage) {
         ForestResponse response = responseLogMessage.getResponse();

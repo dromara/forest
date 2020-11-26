@@ -47,7 +47,6 @@ public @interface Trace {
 
     /**
      * target http url
-     * @return
      */
     String url();
 

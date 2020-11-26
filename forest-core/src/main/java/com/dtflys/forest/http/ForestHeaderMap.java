@@ -23,16 +23,16 @@ public class ForestHeaderMap {
 
     /**
      * 获取本请求头集合的大小
-     * @return
+     * @return 本请求头集合的大小
      */
     public int size() {
         return headers.size();
     }
 
     /**
-     * 根据请求头名称获取请求体的值
+     * 根据请求头名称获取请求头的值
      * @param name 请求头名称
-     * @return
+     * @return 请求头的值
      */
     public String getValue(String name) {
         ForestHeader header = getHeader(name);
@@ -43,9 +43,9 @@ public class ForestHeaderMap {
     }
 
     /**
-     * 根据请求头名称获取请求体的值列表
+     * 根据请求头名称获取请求头的值列表
      * @param name 请求头名称
-     * @return
+     * @return 请求头的值列表
      */
     public List<String> getValues(String name) {
         List<String> results = new ArrayList<>(2);
@@ -60,7 +60,7 @@ public class ForestHeaderMap {
     /**
      * 根据请求头名称获取请求头对象
      * @param name 请求头名称
-     * @return
+     * @return 请求头对象，{@link ForestHeader}类实例
      */
     public ForestHeader getHeader(String name) {
         for (ForestHeader header : headers) {
@@ -74,7 +74,7 @@ public class ForestHeaderMap {
     /**
      * 根据请求头名称获取请求头对象列表
      * @param name 请求头名称
-     * @return
+     * @return 请求头对象列表，列表项为{@link ForestHeader}类实例
      */
     public List<ForestHeader> getHeaders(String name) {
         List<ForestHeader> results = new ArrayList<>(2);
@@ -88,7 +88,7 @@ public class ForestHeaderMap {
 
     /**
      * 获取所有请求头的名称列表
-     * @return
+     * @return 所有请求头的名称列表
      */
     public List<String> names() {
         List<String> results = new ArrayList<>(headers.size());
@@ -100,7 +100,7 @@ public class ForestHeaderMap {
 
     /**
      * 获取所有请求头的值
-     * @return
+     * @return 所有请求头的值列表
      */
     public List<String> getValues() {
         List<String> results = new ArrayList<>(headers.size());
@@ -144,7 +144,7 @@ public class ForestHeaderMap {
 
     /**
      * 获取本请求头集合的迭代器对象
-     * @return
+     * @return 本请求头集合的迭代器对象，{@link Iterator<ForestHeader>}实例
      */
     public Iterator<ForestHeader> headerIterator() {
         return headers.iterator();
@@ -152,7 +152,7 @@ public class ForestHeaderMap {
 
     /**
      * 根据请求头的名称删除请求头
-     * @param name
+     * @param name 请求头名称
      */
     public void remove(String name) {
         ForestHeader header = getHeader(name);

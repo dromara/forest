@@ -46,8 +46,8 @@ public class ReflectUtils {
 
     /**
      * 从Type获取Class
-     * @param genericType
-     * @return
+     * @param genericType Java Type类型，{@link Type}接口实例
+     * @return  Java类，{@link Class}类实例
      */
     public static Class getClassByType(Type genericType) {
         if (genericType instanceof ParameterizedType) {
@@ -68,6 +68,11 @@ public class ReflectUtils {
         }
     }
 
+    /**
+     * 是否是Java基本类型
+     * @param type Java类，{@link Class}类实例
+     * @return {@code true}：是基本类型，{@code false}：不是基本类型
+     */
     public static boolean isPrimaryType(Class type) {
         if (byte.class.isAssignableFrom(type) || Byte.class.isAssignableFrom(type)) {
             return true;
@@ -99,7 +104,11 @@ public class ReflectUtils {
         return false;
     }
 
-
+    /**
+     * 是否为基本数组类型
+     * @param type Java类，{@link Class}类实例
+     * @return {@code true}：是基本数组类型，{@code false}：不是基本数组类型
+     */
     public static boolean isPrimaryArrayType(Class type) {
         if (!type.isArray()) {
             return false;
@@ -135,6 +144,11 @@ public class ReflectUtils {
     }
 
 
+    /**
+     * 从注解对象中获取所有属性
+     * @param ann 注解对象，{@link Annotation}接口实例
+     * @return 注解对象中有属性 {@link Map}表对象，Key：属性名 Value：属性值
+     */
     public static Map<String, Object> getAttributesFromAnnotation(Annotation ann) {
         Map<String, Object> results = new HashMap<>();
         Class clazz = ann.annotationType();

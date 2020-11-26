@@ -323,8 +323,8 @@ public class ForestMethod<T> implements VariableScope {
     }
 
     /**
-     * 获取Java原生方法
-     * @return
+     * 获取Forest方法对应的Java原生方法
+     * @return Java原生方法，{@link java.lang.reflect.Method}类实例
      */
     public Method getMethod() {
         return method;
@@ -332,12 +332,16 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 获取方法名
-     * @return
+     * @return 方法名字符串
      */
     public String getMethodName() {
         return method.getName();
     }
 
+    /**
+     * 获取元请求信息
+     * @return 元请求对象，{@link MetaRequest}类实例
+     */
     public MetaRequest getMetaRequest() {
         return metaRequest;
     }
@@ -481,9 +485,9 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 处理参数列表
-     * @param parameters
-     * @param genericParamTypes
-     * @param paramAnns
+     * @param parameters 参数数组，{@link Parameter}类数组实例
+     * @param genericParamTypes 参数类型数组
+     * @param paramAnns 参数注解的二维数组
      */
     private void processParameters(Parameter[] parameters, Type[] genericParamTypes, Annotation[][] paramAnns) {
         for (int i = 0; i < parameters.length; i++) {
@@ -509,8 +513,8 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 处理参数的注解
-     * @param parameter
-     * @param anns
+     * @param parameter 方法参数-字符串模板解析对象，{@link MappingParameter}类实例
+     * @param anns 方法参数注解的二维数组
      */
     private void processParameterAnnotation(MappingParameter parameter, Annotation[] anns) {
         for (int i = 0; i < anns.length; i++) {
@@ -530,7 +534,7 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 添加命名参数
-     * @param parameter
+     * @param parameter 方法参数-字符串模板解析对象，{@link MappingParameter}类实例
      */
     public void addNamedParameter(MappingParameter parameter) {
         namedParameters.add(parameter);
@@ -538,16 +542,16 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 添加变量
-     * @param name
-     * @param variable
+     * @param name 变量名
+     * @param variable 变量对象，{@link MappingVariable}类实例
      */
     public void addVariable(String name, MappingVariable variable) {
         variables.put(name, variable);
     }
 
     /**
-     * 添加Mutlipart工厂
-     * @param multipartFactory
+     * 添加Forest文件上传用的Mutlipart工厂
+     * @param multipartFactory Forest文件上传用的Mutlipart工厂，{@link ForestMultipartFactory}类实例
      */
     public void addMultipartFactory(ForestMultipartFactory multipartFactory) {
         multipartFactories.add(multipartFactory);
@@ -555,8 +559,8 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 处理参数的过滤器
-     * @param parameter
-     * @param filterName
+     * @param parameter 方法参数-字符串模板解析对象，{@link MappingParameter}类实例
+     * @param filterName 过滤器名称
      */
     public void processParameterFilter(MappingParameter parameter, String filterName) {
         if (StringUtils.isNotEmpty(filterName)) {
@@ -568,6 +572,11 @@ public class ForestMethod<T> implements VariableScope {
         }
     }
 
+    /**
+     * 给请求设置重试策略
+     * @param retryerClass 重试策略类型
+     * @param request Forest请求对象，{@link ForestRequest}类实例
+     */
     private void setRetryerToRequest(Class retryerClass, ForestRequest request) {
         try {
             Constructor constructor = retryerClass.getConstructor(ForestRequest.class);
@@ -586,8 +595,8 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 获得最终的请求类型
-     * @param args
-     * @return
+     * @param args 调用本对象对应方法时传入的参数数组
+     * @return 请求类型，{@link ForestRequestType}枚举实例
      */
     private ForestRequestType type(Object[] args) {
         String renderedType = typeTemplate.render(args);
@@ -608,8 +617,8 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 创建请求
-     * @param args
-     * @return
+     * @param args 调用本对象对应方法时传入的参数数组
+     * @return Forest请求对象，{@link ForestRequest}类实例
      */
     private ForestRequest makeRequest(Object[] args) {
         MetaRequest baseMetaRequest = interfaceProxyHandler.getBaseMetaRequest();
@@ -1035,41 +1044,6 @@ public class ForestMethod<T> implements VariableScope {
     }
 
 
-    /**
-     * 从对象中获取键值对列表
-     * @param obj
-     * @return
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
-     */
-    private List<RequestNameValue> getNameValueListFromObject(Object obj, ForestRequestType type) throws InvocationTargetException, IllegalAccessException {
-        Class clazz = obj.getClass();
-        if (clazz.equals(Object.class)) {
-            return new ArrayList<>();
-        }
-
-        Method[] methods = clazz.getDeclaredMethods();
-        List<RequestNameValue> nameValueList = new ArrayList<>();
-        for (int i = 0; i < methods.length; i++) {
-            Method mtd = methods[i];
-            String getterName = StringUtils.getGetterName(mtd);
-            if (getterName == null) {
-                continue;
-            }
-            Method getter = mtd;
-            Object value = getter.invoke(obj);
-            if (value != null) {
-                RequestNameValue nameValue = new RequestNameValue(
-                        getterName ,value,
-                        type.getDefaultParamTarget());
-                nameValueList.add(nameValue);
-            }
-
-        }
-        return nameValueList;
-    }
-
-
     private List<RequestNameValue> getNameValueListFromObjectWithJSON(MappingParameter parameter, ForestConfiguration configuration, Object obj, ForestRequestType type) {
         Map<String, Object> propMap = ReflectUtils.convertObjectToMap(obj, configuration);
         List<RequestNameValue> nameValueList = new ArrayList<>();
@@ -1087,8 +1061,8 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 调用方法
-     * @param args
-     * @return
+     * @param args 调用本对象对应方法时传入的参数数组
+     * @return 调用本对象对应方法结束后返回的值，任意类型的对象实例
      */
     public Object invoke(Object[] args) {
         ForestRequest request = makeRequest(args);
@@ -1102,9 +1076,9 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 获取泛型类型
-     * @param genType
-     * @param index
-     * @return
+     * @param genType 带泛型参数的类型，{@link Type}接口实例
+     * @param index 泛型参数下标
+     * @return 泛型参数中的类型，{@link Type}接口实例
      */
     private static Type getGenericClassOrType(Type genType, final int index) {
 
@@ -1125,7 +1099,10 @@ public class ForestMethod<T> implements VariableScope {
         return params[index];
     }
 
-
+    /**
+     * 获取方法返回值类型
+     * @return 方法返回值类型，{@link Type}接口实例
+     */
     public Type getReturnType() {
         Type type = method.getGenericReturnType();
         return type;

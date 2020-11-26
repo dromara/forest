@@ -853,7 +853,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 设置全局JSON数据转换器的选择器
-     * @param jsonConverterSelector
+     * @param jsonConverterSelector JSON转换器选择策略对象，{@link JSONConverterSelector}类实例
      * @return 当前ForestConfiguration实例
      */
     private ForestConfiguration setJsonConverterSelector(JSONConverterSelector jsonConverterSelector) {

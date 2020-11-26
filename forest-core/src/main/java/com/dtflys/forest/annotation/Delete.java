@@ -103,7 +103,6 @@ public @interface Delete {
 
     /**
      * Charset, Default is UTF-8
-     * @return
      */
     String charset() default "";
 
@@ -137,7 +136,6 @@ public @interface Delete {
 
     /**
      * KeyStore Id
-     * @return
      */
     String keyStore() default "";
 
