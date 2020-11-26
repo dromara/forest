@@ -33,6 +33,8 @@ public class ProgressUtils {
             case 3:
                 barBuilder.append(" ");
                 break;
+            default:
+                break;
         }
         barBuilder.append(percentage);
         barBuilder.append("\u001b[34m");

@@ -95,7 +95,7 @@ public class ForestConfigurationProperties {
     /**
      * default SSL protocol for https requests
      */
-    private String sslProtocol = SSLUtils.TLSv1_2;
+    private String sslProtocol = SSLUtils.TLS_1_2;
 
     /**
      * backend of forest: httpclient, okhttp3

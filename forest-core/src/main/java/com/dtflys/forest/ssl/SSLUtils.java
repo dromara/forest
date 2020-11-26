@@ -18,12 +18,12 @@ import java.security.cert.X509Certificate;
 public class SSLUtils {
 
 //    public final static String DEFAULT_PROTOCOL = "SSLv3"; // 已弃用
-    public final static String SSLv2 = "SSLv2";
-    public final static String SSLv3 = "SSLv3";
-    public final static String TLSv1_0 = "TLSv1.0";
-    public final static String TLSv1_1 = "TLSv1.1";
-    public final static String TLSv1_2 = "TLSv1.2";
-    public final static String TLSv1_3 = "TLSv1.3";
+    public final static String SSL_2 = "SSLv2";
+    public final static String SSL_3 = "SSLv3";
+    public final static String TLS_1_0 = "TLSv1.0";
+    public final static String TLS_1_1 = "TLSv1.1";
+    public final static String TLS_1_2 = "TLSv1.2";
+    public final static String TLS_1_3 = "TLSv1.3";
 
     /**
      * 自定义SSL证书

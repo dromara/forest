@@ -49,7 +49,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
 //        }
     }
 
-    private final static CookieSpecFactory defaultCookieSF = new CookieSpecFactory() {
+    private final static CookieSpecFactory DEFAULT_COOKIE_SF = new CookieSpecFactory() {
         @Override
         public CookieSpec newInstance(HttpParams params) {
             return new BrowserCompatSpec() {
