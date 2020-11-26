@@ -13,7 +13,7 @@ import java.util.List;
 public class MappingFilterInvoke extends MappingInvoke {
 
     public MappingFilterInvoke(VariableScope variableScope, MappingIdentity name, List<MappingExpr> argList) {
-        super(Token.FINVOKE, variableScope, null, name, argList);
+        super(Token.FILTER_INVOKE, variableScope, null, name, argList);
     }
 
     @Override
