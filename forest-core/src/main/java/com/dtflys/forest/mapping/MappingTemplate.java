@@ -41,6 +41,14 @@ public class MappingTemplate {
         }
     }
 
+    public VariableScope getVariableScope() {
+        return variableScope;
+    }
+
+    public void setVariableScope(VariableScope variableScope) {
+        this.variableScope = variableScope;
+    }
+
     private void match(char except) {
         if (isEnd()) {
             throw new ForestRuntimeException("Template Expression Parse Error:\n Not found '" + except + "', column " + readIndex + " at \"" + template + "\"");
