@@ -40,7 +40,8 @@ public class ForestDataType {
 
     /**
      * 数据类型表
-     * <p>所有在Forest中创建的数据类型对象都会放入这个哈希表中<p/>
+     * <p>所有在Forest中创建的数据类型对象都会放入这个哈希表中</p>
+     *
      * @since 1.5.0-BETA4
      */
     public final static Map<String, ForestDataType> DATA_TYPES = new HashMap<>();
@@ -85,8 +86,8 @@ public class ForestDataType {
 
     /**
      * 数据类型构造函数
-     * <p>该构造函数为私有方法，外部代码不能直接通过new ForestDataType(name)进行创建数据类型对象<p/>
-     * <p>需要通过静态方法ForestDataType.createDataType或ForestDataType.findOrCreateDataType进行创建<p/>
+     * <p>该构造函数为私有方法，外部代码不能直接通过new ForestDataType(name)进行创建数据类型对象</p>
+     * <p>需要通过静态方法ForestDataType.createDataType或ForestDataType.findOrCreateDataType进行创建</p>
      *
      * @param name Date type name
      * @since 1.5.0-BETA4

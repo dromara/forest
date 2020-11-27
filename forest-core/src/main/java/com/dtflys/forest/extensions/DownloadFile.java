@@ -20,9 +20,17 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 public @interface DownloadFile {
 
-    /** The directory path of file you want to save */
+    /**
+     * 目录地址，即文件下载的目标目录的地址
+     *
+     * @return 目录地址
+     */
     String dir();
 
-    /** The file name you want to save */
+    /**
+     * 文件名，即文件下载完成后保存的文件名
+     *
+     * @return 文件名
+     */
     String filename() default "";
 }
