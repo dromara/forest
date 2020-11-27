@@ -91,7 +91,7 @@ public class TestForestConfiguration {
         assertEquals(Integer.valueOf(222), configuration.getMaxRouteConnections());
         configuration.setTimeout(12000);
         assertEquals(Integer.valueOf(12000), configuration.getTimeout());
-        configuration.setSslProtocol(SSLUtils.SSLv3);
+        configuration.setSslProtocol(SSLUtils.SSL_3);
         configuration.setConnectTimeout(2000);
     }
 
