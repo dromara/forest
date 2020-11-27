@@ -5,6 +5,8 @@ import org.mockserver.client.server.MockServerClient;
 import org.mockserver.junit.MockServerRule;
 import org.mockserver.model.Header;
 
+import java.nio.charset.Charset;
+
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
@@ -14,7 +16,7 @@ import static org.mockserver.model.HttpResponse.response;
  */
 public class PostJsonMockServer extends MockServerRule {
 
-    public final static String EXPECTED = "{\"status\": \"ok\"}";
+    public final static String EXPECTED = "{\"status\": \"ok\", \"msg\": \"中文\"}";
 
     public final static Integer port = 5007;
 
@@ -33,7 +35,8 @@ public class PostJsonMockServer extends MockServerRule {
         ).respond(
                 response()
                         .withStatusCode(200)
-                        .withBody(EXPECTED)
+                        .withHeader("Content-Encoding", "default")
+                        .withBody(EXPECTED, Charset.forName("UTF-8"))
         );
     }
 
