@@ -144,7 +144,8 @@ public class ForestHeaderMap {
 
     /**
      * 获取本请求头集合的迭代器对象
-     * @return 本请求头集合的迭代器对象，{@link Iterator<ForestHeader>}实例
+     *
+     * @return 本请求头集合的迭代器对象
      */
     public Iterator<ForestHeader> headerIterator() {
         return headers.iterator();
@@ -152,6 +153,7 @@ public class ForestHeaderMap {
 
     /**
      * 根据请求头的名称删除请求头
+     *
      * @param name 请求头名称
      */
     public void remove(String name) {
