@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * 请求日志消息
- * <p>封装了请求日志打印所需的所有信息<p/>
+ * <p>封装了请求日志打印所需的所有信息</p>
  *
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2020-09-14 17:31
