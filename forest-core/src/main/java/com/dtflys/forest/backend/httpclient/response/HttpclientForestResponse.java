@@ -6,6 +6,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.ByteEncodeUtils;
 import com.dtflys.forest.utils.StringUtils;
+import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HeaderIterator;
@@ -16,6 +17,7 @@ import org.apache.http.util.EntityUtils;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -44,10 +46,9 @@ public class HttpclientForestResponse extends ForestResponse {
                 }
                 this.contentLength = entity.getContentLength();
                 Header encoding = entity.getContentEncoding();
-                if (encoding != null) {
+                this.contentEncoding = contentType.getCharset();
+                if (StringUtils.isEmpty(contentEncoding)) {
                     this.contentEncoding = encoding.getValue();
-                } else if (contentType != null) {
-                    this.contentEncoding = contentType.getCharset();
                 }
                 this.content = buildContent();
             }
