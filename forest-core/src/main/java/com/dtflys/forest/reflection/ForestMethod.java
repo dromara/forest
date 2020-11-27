@@ -820,11 +820,13 @@ public class ForestMethod<T> implements VariableScope {
                     } else if (MappingParameter.isQuery(target)) {
                         if (!parameter.isJsonParam() && obj instanceof Iterable) {
                             int index = 0;
+                            MappingTemplate template = makeTemplate(parameter.getName());
+                            VariableScope parentScope = template.getVariableScope();
                             for (Object subItem : (Iterable) obj) {
-                                SubVariableScope scope = new SubVariableScope(this);
+                                SubVariableScope scope = new SubVariableScope(parentScope);
                                 scope.addVariableValue("_it", subItem);
                                 scope.addVariableValue("_index", index++);
-                                MappingTemplate template = new MappingTemplate(parameter.getName(), scope);
+                                template.setVariableScope(scope);
                                 String name = template.render(args);
                                 request.addQuery(name, subItem);
                             }
@@ -867,16 +869,8 @@ public class ForestMethod<T> implements VariableScope {
             MappingTemplate nameTemplate = factory.getNameTemplate();
             MappingTemplate fileNameTemplate = factory.getFileNameTemplate();
             int index = factory.getIndex();
-            String name = null;
-            String fileName = null;
-            if (nameTemplate != null) {
-                name = nameTemplate.render(args);
-            }
-            if (fileNameTemplate != null) {
-                fileName = fileNameTemplate.render(args);
-            }
             Object data = args[index];
-            factory.addMultipart(name, fileName, data, ContentType.MULTIPART_FORM_DATA, multiparts);
+            factory.addMultipart(nameTemplate, fileNameTemplate, data, ContentType.MULTIPART_FORM_DATA, multiparts, args);
         }
 
 
