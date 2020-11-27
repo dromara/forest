@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
  * <p>同时，请求的 Content-Type 自动被设置为 application/xml</p>
  * <p>该注解有一下几种模式：</p>
  *
- *    （1） 对象模式：<br/><br/>
+ *    （1） 对象模式：<br>
  *
  *          <pre class="code">
  *          void send(&#064;XMLBody UserInfo userInfo);
@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
  *          此模式的&#064;XMLBody注解可以修饰一个或多个自定义对象，但不能设置名称（value属性）以表明它不是一个键值对。被修饰的参数对象会被拆成一个个字段（这个对象的类中所有getter方法对应的字段），
  *          所有这些字段将像键值对一样被合并成一个XML对象。<br><br>
  *
- *    （2） 字符串模式：<br/><br/>
+ *    （2） 字符串模式：<br>
  *
  *          <pre class="code">
  *          void send(&#064;XMLBody String body);

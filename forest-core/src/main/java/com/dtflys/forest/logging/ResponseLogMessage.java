@@ -4,7 +4,7 @@ import com.dtflys.forest.http.ForestResponse;
 
 /**
  * 请求响应日志消息
- * <p>封装了请求响应日志打印所需的所有信息<p/>
+ * <p>封装了请求响应日志打印所需的所有信息</p>
  *
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2020-09-14 17:31
