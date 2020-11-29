@@ -6,6 +6,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.ByteEncodeUtils;
 import com.dtflys.forest.utils.StringUtils;
+import com.sun.istack.internal.NotNull;
 import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.Response;
@@ -85,19 +86,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
             if (bytes == null) {
                 return null;
             }
-            String encode = null;
-            if (StringUtils.isNotEmpty(contentEncoding)) {
-                // 默认从Content-Encoding获取字符编码
-                encode = contentEncoding;
-            } else {
-                // Content-Encoding为空的情况下，自动判断字符编码
-                encode = ByteEncodeUtils.getCharsetName(bytes);
-            }
-            if (encode.toUpperCase().startsWith("GB")) {
-                // 返回的GB中文编码会有多种编码类型，这里统一使用GBK编码
-                encode = "GBK";
-            }
-            return IOUtils.toString(bytes, encode);
+            return byteToString(bytes);
         } catch (IOException e) {
             throw new ForestRuntimeException(e);
         }

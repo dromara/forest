@@ -108,19 +108,7 @@ public class HttpclientForestResponse extends ForestResponse {
                 return null;
             }
             bytes = IOUtils.toByteArray(inputStream);
-            String encode = null;
-            if (StringUtils.isNotEmpty(contentEncoding)) {
-                // 默认从Content-Encoding获取字符编码
-                encode = contentEncoding;
-            } else {
-                // Content-Encoding为空的情况下，自动判断字符编码
-                encode = ByteEncodeUtils.getCharsetName(bytes);
-            }
-            if (encode.toUpperCase().startsWith("GB")) {
-                // 返回的GB中文编码会有多种编码类型，这里统一使用GBK编码
-                encode = "GBK";
-            }
-            return IOUtils.toString(bytes, encode);
+            return byteToString(bytes);
         } catch (IOException e) {
             throw new ForestRuntimeException(e);
         }
