@@ -31,7 +31,6 @@ public class OkHttp3ForestResponse extends ForestResponse {
     public OkHttp3ForestResponse(ForestRequest request, Response okResponse) {
         super(request);
         this.okResponse = okResponse;
-        // TODO 根据 IDEA SonarLint 插件提示，该方法复杂度过高，计划优化构造方法的代码，减少代码行数，提取部分代码到单独的方法中
         if (okResponse == null) {
             this.body = null;
             this.statusCode = 404;
@@ -39,24 +38,11 @@ public class OkHttp3ForestResponse extends ForestResponse {
         }
         this.body = okResponse.body();
         this.statusCode = okResponse.code();
-        String respEncodingFromHeader = okResponse.header("Content-Encoding");
         setupHeaders();
         if (body == null) {
             return;
         }
-        MediaType mediaType = body.contentType();
-        if (mediaType != null) {
-            String type = mediaType.type();
-            String subType = mediaType.subtype();
-            this.contentType = new ContentType(type, subType);
-            Charset charset = mediaType.charset();
-            if (charset != null) {
-                this.contentEncoding = charset.name();
-            }
-        }
-        if (StringUtils.isEmpty(this.contentEncoding)) {
-            this.contentEncoding = respEncodingFromHeader;
-        }
+        setupContentTypeAndEncoding();
         if (contentType == null || contentType.isEmpty()) {
             this.content = readContentAsString();
         } else if (!request.isDownloadFile() && contentType.canReadAsString()) {
@@ -97,6 +83,21 @@ public class OkHttp3ForestResponse extends ForestResponse {
         }
     }
 
+    private void setupContentTypeAndEncoding() {
+        MediaType mediaType = body.contentType();
+        if (mediaType != null) {
+            String type = mediaType.type();
+            String subType = mediaType.subtype();
+            this.contentType = new ContentType(type, subType);
+            Charset charset = mediaType.charset();
+            if (charset != null) {
+                this.contentEncoding = charset.name();
+            }
+        }
+        if (StringUtils.isEmpty(this.contentEncoding)) {
+            this.contentEncoding = okResponse.header("Content-Encoding");
+        }
+    }
 
     @Override
     public boolean isReceivedResponseData() {
