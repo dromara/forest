@@ -72,7 +72,7 @@ public class TestPostJson6Client extends BaseClientTest {
         String result = postClient.postJsonObjWithList1(obj);
         log.info("response: " + result);
         assertNotNull(result);
-        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
+        Assert.assertEquals(PostJson6MockServer.EXPECTED, result);
     }
 
     @Test
@@ -81,7 +81,7 @@ public class TestPostJson6Client extends BaseClientTest {
         String result = postClient.postJsonObjWithList2("test", data);
         log.info("response: " + result);
         assertNotNull(result);
-        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
+        Assert.assertEquals(PostJson6MockServer.EXPECTED, result);
     }
 
 

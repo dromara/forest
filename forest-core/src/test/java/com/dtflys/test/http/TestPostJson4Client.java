@@ -64,7 +64,7 @@ public class TestPostJson4Client extends BaseClientTest {
         String result = postClient.postJson9(testList);
         log.info("response: " + result);
         assertNotNull(result);
-        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
+        Assert.assertEquals(PostJson4MockServer.EXPECTED, result);
     }
 
 
@@ -77,7 +77,7 @@ public class TestPostJson4Client extends BaseClientTest {
         String result = postClient.postJson10(testList);
         log.info("response: " + result);
         assertNotNull(result);
-        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
+        Assert.assertEquals(PostJson4MockServer.EXPECTED, result);
     }
 
 
