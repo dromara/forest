@@ -14,6 +14,7 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -42,11 +43,15 @@ public class HttpclientForestResponse extends ForestResponse {
                 }
                 this.contentLength = entity.getContentLength();
                 Header encoding = entity.getContentEncoding();
-                this.contentEncoding = contentType.getCharset();
-                if (StringUtils.isEmpty(contentEncoding)) {
+                if (contentType != null) {
+                    this.contentEncoding = this.contentType.getCharset();
+                } else if (encoding != null) {
                     this.contentEncoding = encoding.getValue();
-                }
-                this.content = buildContent();
+                    Charset charset = Charset.forName(this.contentEncoding);
+                    if (charset == null || !charset.name().equals(this.contentEncoding)) {
+                        this.contentEncoding = null;
+                    }
+                } this.content = buildContent();
             }
         } else {
             this.statusCode = -1;
