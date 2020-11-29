@@ -31,6 +31,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
     public OkHttp3ForestResponse(ForestRequest request, Response okResponse) {
         super(request);
         this.okResponse = okResponse;
+        // TODO 根据 IDEA SonarLint 插件提示，该方法复杂度过高，计划优化构造方法的代码，减少代码行数，提取部分代码到单独的方法中
         if (okResponse != null) {
             this.body = okResponse.body();
             this.statusCode = okResponse.code();
