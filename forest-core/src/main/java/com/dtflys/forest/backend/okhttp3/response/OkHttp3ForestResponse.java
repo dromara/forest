@@ -4,18 +4,13 @@ import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.utils.ByteEncodeUtils;
 import com.dtflys.forest.utils.StringUtils;
-import com.sun.istack.internal.NotNull;
 import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import org.apache.commons.io.IOUtils;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.Charset;
 
 /**
@@ -32,7 +27,6 @@ public class OkHttp3ForestResponse extends ForestResponse {
      * 内容字节数组
      */
     private byte[] bytes;
-
 
     public OkHttp3ForestResponse(ForestRequest request, Response okResponse) {
         super(request);
