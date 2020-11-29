@@ -31,6 +31,7 @@ import com.dtflys.forest.utils.StringUtils;
 import com.sun.istack.internal.NotNull;
 import org.apache.commons.io.IOUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -126,7 +127,9 @@ public abstract class ForestResponse<T> {
 
     public abstract byte[] getByteArray() throws Exception;
 
-    public abstract InputStream getInputStream() throws Exception;
+    public InputStream getInputStream() throws Exception {
+        return new ByteArrayInputStream(getByteArray());
+    }
 
     public ForestHeader getHeader(String name) {
         return headers.getHeader(name);

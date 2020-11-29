@@ -115,12 +115,4 @@ public class OkHttp3ForestResponse extends ForestResponse {
         return bytes;
     }
 
-    @Override
-    public InputStream getInputStream() throws Exception {
-        if (bytes == null) {
-            bytes = getByteArray();
-        }
-        return new ByteArrayInputStream(bytes);
-    }
-
 }

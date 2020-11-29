@@ -122,11 +122,4 @@ public class HttpclientForestResponse extends ForestResponse {
         return bytes;
     }
 
-    @Override
-    public InputStream getInputStream() throws IOException {
-        if (bytes == null) {
-            bytes = getByteArray();
-        }
-        return new ByteArrayInputStream(bytes);
-    }
 }
