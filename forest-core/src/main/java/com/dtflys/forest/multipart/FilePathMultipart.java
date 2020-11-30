@@ -64,6 +64,15 @@ public class FilePathMultipart extends ForestMultipart<String> {
         return true;
     }
 
+    /**
+     * 获取文件实际路径
+     *
+     * @return 文件实际路径
+     */
+    public String getFilePath() {
+        return filePath;
+    }
+
     @Override
     public File getFile() {
         if (file != null) {

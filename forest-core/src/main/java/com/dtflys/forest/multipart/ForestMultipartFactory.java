@@ -10,6 +10,7 @@ import com.twitter.util.Var;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Array;
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -21,6 +22,7 @@ public class ForestMultipartFactory<T> {
     private static Map<Class, Class> multipartTypeMap = new LinkedHashMap<>();
 
     private final Class<T> paramType;
+
 
     protected ForestMultipartFactory(Class<T> paramType,
                                      int index,
@@ -42,7 +44,10 @@ public class ForestMultipartFactory<T> {
             int index,
             MappingTemplate nameTemplate,
             MappingTemplate fileNameTemplate) {
-        if (multipartTypeMap.containsKey(paramType)) {
+        if (multipartTypeMap.containsKey(paramType) ||
+            Map.class.isAssignableFrom(paramType) ||
+            Iterable.class.isAssignableFrom(paramType) ||
+            paramType.isArray()) {
             return new ForestMultipartFactory<>(paramType, index, nameTemplate, fileNameTemplate);
         }
         for (Class<P> pType : multipartTypeMap.keySet()) {
@@ -80,6 +85,10 @@ public class ForestMultipartFactory<T> {
     }
 
     public <M extends ForestMultipart<T>> M create(String name, String fileName, T data, String contentType) {
+        return create(paramType, name, fileName, data, contentType);
+    }
+
+    public <M extends ForestMultipart<T>> M create(Class<T> pType, String name, String fileName, T data, String contentType) {
         if (data instanceof ForestMultipart) {
             ForestMultipart multipart = (ForestMultipart) data;
             if (StringUtils.isEmpty(multipart.getName()) && StringUtils.isNotEmpty(name)) {
@@ -90,7 +99,10 @@ public class ForestMultipartFactory<T> {
             }
             return (M) multipart;
         }
-        Class<M> multipartType = multipartTypeMap.get(paramType);
+        if (pType == null) {
+            pType = paramType;
+        }
+        Class<M> multipartType = multipartTypeMap.get(pType);
         try {
             M multipart = multipartType.newInstance();
             multipart.setName(name);
@@ -114,7 +126,7 @@ public class ForestMultipartFactory<T> {
         if (data instanceof Iterable) {
             Iterable dataCollection = (Iterable) data;
             Iterator iterator = dataCollection.iterator();
-            if (iterator.hasNext()) {
+            if (!iterator.hasNext()) {
                 return;
             }
             int i = 0;
@@ -126,7 +138,7 @@ public class ForestMultipartFactory<T> {
                 fileNameTemplate.setVariableScope(scope);
                 String name = nameTemplate.render(args);
                 String fileName = fileNameTemplate.render(args);
-                ForestMultipart multipart = create(name, fileName, (T) item, contentType);
+                ForestMultipart multipart = create((Class<T>) item.getClass(), name, fileName, (T) item, contentType);
                 multiparts.add(multipart);
             }
         } else if (data.getClass().isArray()) {
@@ -156,22 +168,23 @@ public class ForestMultipartFactory<T> {
                 fileNameTemplate.setVariableScope(scope);
                 String name = nameTemplate.render(args);
                 String fileName = fileNameTemplate.render(args);
-                ForestMultipart multipart = create(name, fileName, (T) item, contentType);
+                ForestMultipart multipart = create((Class<T>) item.getClass(), name, fileName, (T) item, contentType);
                 multiparts.add(multipart);
             }
         } else if (data instanceof Map) {
             Map map = (Map) data;
             int i = 0;
             for (Object key : map.keySet()) {
-                String itemName = String.valueOf(key);
                 Object item = map.get(key);
                 SubVariableScope scope = new SubVariableScope(parentScope);
                 scope.addVariableValue("_it", item);
                 scope.addVariableValue("_key", key);
                 scope.addVariableValue("_index", i++);
                 fileNameTemplate.setVariableScope(scope);
+                nameTemplate.setVariableScope(scope);
+                String itemName = nameTemplate.render(args);
                 String fileName = fileNameTemplate.render(args);
-                ForestMultipart multipart = create(itemName, fileName, (T) item, contentType);
+                ForestMultipart multipart = create((Class<T>) item.getClass(), itemName, fileName, (T) item, contentType);
                 multiparts.add(multipart);
             }
         } else {
