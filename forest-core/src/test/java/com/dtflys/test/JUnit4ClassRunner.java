@@ -30,7 +30,7 @@ public class JUnit4ClassRunner extends BlockJUnit4ClassRunner {
     /**
      * Creates a BlockJUnit4ClassRunner to run {@code klass}
      *
-     * @param klass
+     * @param klass Java类
      * @throws InitializationError if the misc class is malformed.
      */
     public JUnit4ClassRunner(Class<?> klass) throws InitializationError {
