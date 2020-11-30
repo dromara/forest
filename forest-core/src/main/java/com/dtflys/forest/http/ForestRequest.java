@@ -31,6 +31,7 @@ import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.RequestLogMessage;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.reflection.ForestMethod;
+import com.dtflys.forest.reflection.MethodLifeCycleHandler;
 import com.dtflys.forest.retryer.Retryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.callback.OnError;
@@ -75,6 +76,16 @@ public class ForestRequest<T> {
      * Forest方法
      */
     private final ForestMethod method;
+
+    /**
+     * HTTP后端
+     */
+    private HttpBackend backend;
+
+    /**
+     * 生命周期处理器
+     */
+    private LifeCycleHandler lifeCycleHandler;
 
     /**
      * HTTP协议
@@ -281,20 +292,36 @@ public class ForestRequest<T> {
         this(configuration, null, arguments);
     }
 
-
+    /**
+     * 获取该请求的配置对象
+     * @return 配置对象
+     */
     public ForestConfiguration getConfiguration() {
         return configuration;
     }
 
+    /**
+     * 获取请求协议
+     * @return 请求协议
+     */
     public String getProtocol() {
         return protocol;
     }
 
+    /**
+     * 设置请求协议
+     * @param protocol 请求协议
+     * @return {@link ForestRequest}对象实例
+     */
     public ForestRequest setProtocol(String protocol) {
         this.protocol = protocol;
         return this;
     }
 
+    /**
+     * 获取请求URL
+     * @return URL字符串
+     */
     public String getUrl() {
         return url;
     }
@@ -398,6 +425,42 @@ public class ForestRequest<T> {
     }
 
     /**
+     * 获取HTTP后端对象
+     * @return HTTP后端对象，{@link HttpBackend}接口实例
+     */
+    public HttpBackend getBackend() {
+        return backend;
+    }
+
+    /**
+     * 设置HTTP后端对象
+     * @param backend HTTP后端对象，{@link HttpBackend}接口实例
+     * @return {@link ForestRequest}对象实例
+     */
+    public ForestRequest setBackend(HttpBackend backend) {
+        this.backend = backend;
+        return this;
+    }
+
+    /**
+     * 获取生命周期处理器
+     * @return 生命周期处理器，{@link LifeCycleHandler}接口实例
+     */
+    public LifeCycleHandler getLifeCycleHandler() {
+        return lifeCycleHandler;
+    }
+
+    /**
+     * 设置生命周期处理器
+     * @param lifeCycleHandler 生命周期处理器，{@link LifeCycleHandler}接口实例
+     * @return {@link ForestRequest}对象实例
+     */
+    public ForestRequest setLifeCycleHandler(LifeCycleHandler lifeCycleHandler) {
+        this.lifeCycleHandler = lifeCycleHandler;
+        return this;
+    }
+
+    /**
      * 获取请求的Query参数表
      * @return Query参数表
      */
@@ -405,10 +468,19 @@ public class ForestRequest<T> {
         return query;
     }
 
+    /**
+     * 根据名称获取请求的Query参数值
+     * @param name Query参数名称
+     * @return Query参数值
+     */
     public Object getQuery(String name) {
         return query.get(name);
     }
 
+    /**
+     * 动态获取请求的URL Query参数字符串
+     * @return
+     */
     public String getQueryString() {
         StringBuilder builder = new StringBuilder();
         Iterator<ForestQueryParameter> iterator = query.queryValues().iterator();
@@ -1361,7 +1433,7 @@ public class ForestRequest<T> {
      * @param backend HTTP后端，{@link HttpBackend}接口实例
      * @param lifeCycleHandler 生命周期处理器，{@link LifeCycleHandler}接口实例
      */
-    public void execute(HttpBackend backend, LifeCycleHandler lifeCycleHandler) {
+    public Object execute(HttpBackend backend, LifeCycleHandler lifeCycleHandler) {
         if (interceptorChain.beforeExecute(this)) {
             HttpExecutor executor  = backend.createExecutor(this, lifeCycleHandler);
             if (executor != null) {
@@ -1374,6 +1446,17 @@ public class ForestRequest<T> {
                 }
             }
         }
+        if (lifeCycleHandler instanceof MethodLifeCycleHandler) {
+            return ((MethodLifeCycleHandler<?>) lifeCycleHandler).getResultData();
+        }
+        return null;
+    }
+
+    /**
+     * 执行请求发送过程
+     */
+    public Object execute() {
+        return execute(getBackend(), getLifeCycleHandler());
     }
 
 }
