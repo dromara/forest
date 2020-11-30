@@ -29,6 +29,16 @@ public class MappingInvoke extends MappingDot {
     }
 
     @Override
+    public void setVariableScope(VariableScope variableScope) {
+        super.setVariableScope(variableScope);
+        if (argList != null) {
+            for (MappingExpr arg : argList) {
+                arg.setVariableScope(variableScope);
+            }
+        }
+    }
+
+    @Override
     public Object render(Object[] args) {
         Object obj = left.render(args);
         String methodName = right.getName();

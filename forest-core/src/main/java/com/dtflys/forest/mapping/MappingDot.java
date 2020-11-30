@@ -52,7 +52,16 @@ public class MappingDot extends MappingExpr {
         return method;
     }
 
-
+    @Override
+    public void setVariableScope(VariableScope variableScope) {
+        super.setVariableScope(variableScope);
+        if (left != null) {
+            left.setVariableScope(variableScope);
+        }
+        if (right != null) {
+            right.setVariableScope(variableScope);
+        }
+    }
 
     @Override
     public Object render(Object[] args) {

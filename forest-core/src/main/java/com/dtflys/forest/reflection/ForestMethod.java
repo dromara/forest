@@ -65,6 +65,7 @@ public class ForestMethod<T> implements VariableScope {
     private final Method method;
     private String[] methodNameItems;
     private Class returnClass;
+    private Type returnType;
     private MetaRequest metaRequest;
     private MappingTemplate baseUrlTemplate;
     private MappingTemplate urlTemplate;
@@ -1062,9 +1063,27 @@ public class ForestMethod<T> implements VariableScope {
         ForestRequest request = makeRequest(args);
         MethodLifeCycleHandler<T> lifeCycleHandler = new MethodLifeCycleHandler<>(
                 this, onSuccessClassGenericType);
+        request.setBackend(configuration.getBackend())
+                .setLifeCycleHandler(lifeCycleHandler);
         lifeCycleHandler.handleInvokeMethod(request, this, args);
-        request.execute(configuration.getBackend(), lifeCycleHandler);
-        return lifeCycleHandler.getResultData();
+        // 如果返回类型为ForestRequest，直接返回请求对象
+        if (ForestRequest.class.isAssignableFrom(returnClass)) {
+            Type retType = getReturnType();
+            if (retType instanceof ParameterizedType) {
+                ParameterizedType parameterizedType = (ParameterizedType) retType;
+                Type[] genTypes = parameterizedType.getActualTypeArguments();
+                if (genTypes.length > 0) {
+                    Type targetType = genTypes[0];
+                    returnClass = ReflectUtils.getClassByType(targetType);
+                    returnType = targetType;
+                } else {
+                    returnClass = String.class;
+                    returnType = String.class;
+                }
+            }
+            return request;
+        }
+        return request.execute();
     }
 
 
@@ -1098,6 +1117,9 @@ public class ForestMethod<T> implements VariableScope {
      * @return 方法返回值类型，{@link Type}接口实例
      */
     public Type getReturnType() {
+        if (returnType != null) {
+            return returnType;
+        }
         Type type = method.getGenericReturnType();
         return type;
     }

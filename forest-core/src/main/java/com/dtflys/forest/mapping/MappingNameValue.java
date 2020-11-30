@@ -25,4 +25,5 @@ public class MappingNameValue {
     public void setValue(MappingTemplate value) {
         this.value = value;
     }
+
 }

@@ -47,6 +47,11 @@ public class MappingTemplate {
 
     public void setVariableScope(VariableScope variableScope) {
         this.variableScope = variableScope;
+        int len = exprList.size();
+        for (int i = 0; i < len; i++) {
+            MappingExpr expr = exprList.get(i);
+            expr.setVariableScope(variableScope);
+        }
     }
 
     private void match(char except) {
