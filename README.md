@@ -192,6 +192,22 @@ Map result = myClient.upload("D:\\TestUpload\\xxx.jpg", progress -> {
 });
 ```
 
+## 多文件批量上传
+
+```java
+/**
+ * 上传Map包装的文件列表，其中 ${_key} 代表Map中每一次迭代中的键值
+ */
+@PostRequest(url = "/upload")
+ForestRequest<Map> uploadByteArrayMap(@DataFile(value = "file", fileName = "${_key}") Map<String, byte[]> byteArrayMap);
+
+/**
+ * 上传List包装的文件列表，其中 ${_index} 代表每次迭代List的循环计数（从零开始计）
+ */
+@PostRequest(url = "/upload")
+ForestRequest<Map> uploadByteArrayList(@DataFile(value = "file", fileName = "test-img-${_index}.jpg") List<byte[]> byteArrayList);
+```
+
 ## 文件下载
 
 下载文件也是同样的简单
