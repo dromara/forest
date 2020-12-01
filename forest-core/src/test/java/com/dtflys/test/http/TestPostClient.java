@@ -6,12 +6,15 @@ import com.dtflys.test.mock.PostMockServer;
 import com.dtflys.test.http.client.PostClient;
 import com.dtflys.test.http.model.UserParam;
 import com.dtflys.test.mock.PutMockServer;
+import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -122,6 +125,15 @@ public class TestPostClient extends BaseClientTest {
     @Test
     public void testAnnParamPost() {
         String result = postClient.annParamPost("foo", "123456");
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(PutMockServer.EXPECTED, result);
+    }
+
+    @Test
+    public void testListBodyPost() {
+        List<String> list = Lists.newArrayList("xx", "yy", "zz");
+        String result = postClient.listBodyPost(list);
         log.info("response: " + result);
         assertNotNull(result);
         assertEquals(PutMockServer.EXPECTED, result);

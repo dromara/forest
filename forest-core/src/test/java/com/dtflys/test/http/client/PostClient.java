@@ -85,6 +85,13 @@ public interface PostClient {
     )
     String varParamPost(@DataVariable("username") String username, @DataVariable("password") String password);
 
+    @Post(
+            url = "http://localhost:${port}/hello-list",
+            headers = {"Accept:text/plain"},
+            contentType = "application/x-www-form-urlencoded"
+    )
+    String listBodyPost(@Body("item_${_index}") List<String> list);
+
 
     @Request(
             url = "http://localhost:${port}/hello",
