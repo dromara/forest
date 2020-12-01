@@ -248,7 +248,7 @@ String send(@DataVariable("username") String username);
 
 ```java
 @OAuth2(
-        tokenUri = "http://localhost:${port}/auth/oauth/token",
+        tokenUri = "/auth/oauth/token",
         clientId = "password",
         clientSecret = "xxxxx-yyyyy-zzzzz",
         grantType = OAuth2.GrantType.PASSWORD,
@@ -256,7 +256,7 @@ String send(@DataVariable("username") String username);
         username = "root",
         password = "xxxxxx"
 )
-@Get(url = "/auth/test/data")
+@Get(url = "/test/data")
 String getData();
 ```
 
