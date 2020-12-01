@@ -134,7 +134,6 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         Date startDate = new Date();
         long startTime = startDate.getTime();
         try {
-//            logRequest(retryCount, httpRequest);
             requestSender.sendRequest(request, httpclientResponseHandler, httpRequest, lifeCycleHandler, startTime, 0);
         } catch (IOException e) {
             if (retryCount >= request.getRetryCount()) {
@@ -143,11 +142,9 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
                 response = forestResponseFactory.createResponse(request, null, lifeCycleHandler, e);
                 logResponse(startTime, response);
                 lifeCycleHandler.handleSyncWitchException(request, response, e);
-//                throw new ForestRuntimeException(e);
                 return;
             }
             log.error(e.getMessage());
-//            execute(retryCount + 1, lifeCycleHandler);
         } catch (ForestRuntimeException e) {
             httpRequest.abort();
             throw e;

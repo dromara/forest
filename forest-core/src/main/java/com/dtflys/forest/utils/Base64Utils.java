@@ -1,5 +1,6 @@
 package com.dtflys.forest.utils;
 
+import org.apache.xerces.impl.dv.util.Base64;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
@@ -15,29 +16,19 @@ import java.io.IOException;
 public class Base64Utils {
 
 	public static String simpleEncode(byte[] data) {
-		return new BASE64Encoder().encode(data);
+		return Base64.encode(data);
 	}
 
 	public static byte[] simpleDecode(String str) {
-		try {
-			return new BASE64Decoder().decodeBuffer(str);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
+		return Base64.decode(str);
 	}
 
     public static String encode(String str){
-    	return new BASE64Encoder().encode(str.getBytes());
+		return Base64.encode(str.getBytes());
     }
 
     public static String decode(String str){
-    	try {
-			return new String(new BASE64Decoder().decodeBuffer(str));
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
+		return new String(Base64.decode(str));
     }
 
 }

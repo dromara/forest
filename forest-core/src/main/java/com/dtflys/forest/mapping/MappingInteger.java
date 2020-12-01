@@ -17,6 +17,11 @@ public class MappingInteger extends MappingExpr {
         return number;
     }
 
+    @Override
+    public boolean isIterateVariable() {
+        return false;
+    }
+
     public int getNumber() {
         return number;
     }

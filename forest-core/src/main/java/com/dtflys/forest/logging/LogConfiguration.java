@@ -1,5 +1,11 @@
 package com.dtflys.forest.logging;
 
+/**
+ * 请求日志配置信息
+ *
+ * @author gongjun[dt_flys@hotmail.com]
+ * @since 1.5.0-BETA5
+ */
 public class LogConfiguration {
 
     /**

@@ -22,9 +22,17 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE, ElementType.METHOD})
 public @interface BasicAuth {
 
-    /** Basic auth username */
+    /**
+     * Basic Auth 验证的用户名
+     *
+     * @return 用户名
+     */
     String username();
 
-    /** Basic auth password */
+    /**
+     * Basic Auth 验证的密码
+     *
+     * @return 密码
+     */
     String password();
 }

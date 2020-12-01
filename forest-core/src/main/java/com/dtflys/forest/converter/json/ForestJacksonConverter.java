@@ -58,7 +58,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
 
     /**
      * 获取Jackson的Mapper对象
-     * @return
+     * @return Jackson的Mapper对象，{@link ObjectMapper}类实例
      */
     public ObjectMapper getMapper() {
         return mapper;

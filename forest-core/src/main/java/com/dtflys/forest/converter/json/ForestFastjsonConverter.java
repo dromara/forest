@@ -83,7 +83,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
 
     /**
      * 获取FastJson的序列化特性名
-     * @return
+     * @return FastJson的序列化特性名字符串
      */
     public String getSerializerFeatureName() {
         return serializerFeatureName;
@@ -91,7 +91,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
 
     /**
      * 设置FastJson的序列化特性名
-     * @param serializerFeatureName
+     * @param serializerFeatureName FastJson的序列化特性名字符串
      */
     public void setSerializerFeatureName(String serializerFeatureName) {
         this.serializerFeatureName = serializerFeatureName;
@@ -101,7 +101,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
 
     /**
      * 获取FastJson的序列化特性对象
-     * @return
+     * @return FastJson的序列化特性对象，{@link SerializerFeature}枚举实例
      */
     public SerializerFeature getSerializerFeature() {
         return serializerFeature;
@@ -113,7 +113,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
 
     /**
      * 设置FastJson的序列化特性对象
-     * @param serializerFeature
+     * @param serializerFeature FastJson的序列化特性对象，{@link SerializerFeature}枚举实例
      */
     public void setSerializerFeature(SerializerFeature serializerFeature) {
         this.serializerFeature = serializerFeature;

@@ -20,6 +20,7 @@ public class RepeatableQueryMockServer extends MockServerRule {
 
     public void initServer() {
         MockServerClient mockClient = new MockServerClient("localhost", port);
+
         mockClient.when(
                 request()
                         .withPath("/hello/user")
@@ -32,11 +33,28 @@ public class RepeatableQueryMockServer extends MockServerRule {
                         .withQueryStringParameter("password",  "123456")
 
         )
-                .respond(
-                        response()
-                                .withStatusCode(200)
-                                .withBody(EXPECTED)
-                );
+        .respond(
+                response()
+                        .withStatusCode(200)
+                        .withBody(EXPECTED)
+        );
+
+        mockClient.when(
+                request()
+                        .withPath("/hello/user/array")
+                        .withMethod("GET")
+                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plain"))
+                        .withQueryStringParameter("username_0",  "foo")
+                        .withQueryStringParameter("username_1",  "bar")
+                        .withQueryStringParameter("username_2",  "user1")
+                        .withQueryStringParameter("username_3",  "user2")
+                        .withQueryStringParameter("password",  "123456")
+        )
+        .respond(
+                response()
+                        .withStatusCode(200)
+                        .withBody(EXPECTED)
+        );
 
     }
 

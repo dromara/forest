@@ -1,7 +1,6 @@
 package com.dtflys.forest.backend.okhttp3.executor;
 
 import com.dtflys.forest.backend.BodyBuilder;
-import com.dtflys.forest.backend.body.NoneBodyBuilder;
 import com.dtflys.forest.backend.okhttp3.body.OkHttp3GetBodyBuilder;
 import com.dtflys.forest.backend.okhttp3.conn.OkHttp3ConnectionManager;
 import com.dtflys.forest.backend.okhttp3.response.OkHttp3ResponseHandler;
@@ -15,7 +14,7 @@ import okhttp3.*;
  */
 public class OkHttp3GetExecutor extends AbstractOkHttp3Executor {
 
-    private static final BodyBuilder bodyBuilder = new OkHttp3GetBodyBuilder();
+    private static final BodyBuilder BODY_BUILDER = new OkHttp3GetBodyBuilder();
 
     public OkHttp3GetExecutor(OkHttp3ConnectionManager connectionManager, OkHttp3ResponseHandler okHttp3ResponseHandler, ForestRequest request) {
         super(request, connectionManager, okHttp3ResponseHandler);
@@ -23,7 +22,7 @@ public class OkHttp3GetExecutor extends AbstractOkHttp3Executor {
 
     @Override
     protected BodyBuilder<Request.Builder> getBodyBuilder() {
-        return bodyBuilder;
+        return BODY_BUILDER;
     }
 
     @Override

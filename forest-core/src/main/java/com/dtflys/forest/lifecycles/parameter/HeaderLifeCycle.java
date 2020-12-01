@@ -5,7 +5,10 @@ import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.lifecycles.ParameterAnnotationLifeCycle;
+import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
+
+import java.util.Map;
 
 /**
  * Forest &#064;Header注解的生命周期
@@ -16,7 +19,8 @@ public class HeaderLifeCycle implements ParameterAnnotationLifeCycle<Header, Obj
 
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, Header annotation) {
-        String name = annotation.value();
+        Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(annotation);
+        String name = (String) attrs.get("name");
         if (StringUtils.isNotEmpty(name)) {
             parameter.setName(name);
             MappingVariable variable = new MappingVariable(name, parameter.getType());

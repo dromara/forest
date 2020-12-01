@@ -14,7 +14,7 @@ import okhttp3.Request;
  */
 public class OkHttp3PostExecutor extends AbstractOkHttp3Executor {
 
-    private static final BodyBuilder bodyBuilder = new OkHttp3PostBodyBuilder();
+    private static final BodyBuilder BODY_BUILDER = new OkHttp3PostBodyBuilder();
 
     public OkHttp3PostExecutor(OkHttp3ConnectionManager connectionManager, OkHttp3ResponseHandler okHttp3ResponseHandler, ForestRequest request) {
         super(request, connectionManager, okHttp3ResponseHandler);
@@ -22,7 +22,7 @@ public class OkHttp3PostExecutor extends AbstractOkHttp3Executor {
 
     @Override
     protected BodyBuilder<Request.Builder> getBodyBuilder() {
-        return bodyBuilder;
+        return BODY_BUILDER;
     }
 
     @Override

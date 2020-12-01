@@ -41,6 +41,19 @@ public class MappingTemplate {
         }
     }
 
+    public VariableScope getVariableScope() {
+        return variableScope;
+    }
+
+    public void setVariableScope(VariableScope variableScope) {
+        this.variableScope = variableScope;
+        int len = exprList.size();
+        for (int i = 0; i < len; i++) {
+            MappingExpr expr = exprList.get(i);
+            expr.setVariableScope(variableScope);
+        }
+    }
+
     private void match(char except) {
         if (isEnd()) {
             throw new ForestRuntimeException("Template Expression Parse Error:\n Not found '" + except + "', column " + readIndex + " at \"" + template + "\"");
@@ -113,6 +126,15 @@ public class MappingTemplate {
             MappingString str = new MappingString(buffer.toString());
             exprList.add(str);
         }
+    }
+
+    public boolean hasIterateVariable() {
+        for (MappingExpr expr : exprList) {
+            if (expr.isIterateVariable()) {
+                return true;
+            }
+        }
+        return false;
     }
 
 

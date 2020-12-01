@@ -18,17 +18,17 @@ import java.security.cert.X509Certificate;
 public class SSLUtils {
 
 //    public final static String DEFAULT_PROTOCOL = "SSLv3"; // 已弃用
-    public final static String SSLv2 = "SSLv2";
-    public final static String SSLv3 = "SSLv3";
-    public final static String TLSv1_0 = "TLSv1.0";
-    public final static String TLSv1_1 = "TLSv1.1";
-    public final static String TLSv1_2 = "TLSv1.2";
-    public final static String TLSv1_3 = "TLSv1.3";
+    public final static String SSL_2 = "SSLv2";
+    public final static String SSL_3 = "SSLv3";
+    public final static String TLS_1_0 = "TLSv1.0";
+    public final static String TLS_1_1 = "TLSv1.1";
+    public final static String TLS_1_2 = "TLSv1.2";
+    public final static String TLS_1_3 = "TLSv1.3";
 
     /**
      * 自定义SSL证书
-     * @param request
-     * @return
+     * @param request Forest请求对象，{@link ForestRequest}类实例
+     * @return SSL上下文，{@link SSLContext}类实例
      */
     public static SSLContext customSSL(ForestRequest request) {
         SSLContext sslContext = null;
@@ -85,9 +85,10 @@ public class SSLUtils {
 
     /**
      * 默认的单向验证HTTPS请求绕过SSL验证，使用默认SSL协议
-     * @return
-     * @throws NoSuchAlgorithmException
-     * @throws KeyManagementException
+     *
+     * @return SSL上下文，{@link SSLContext}类实例
+     * @throws NoSuchAlgorithmException 没有对应加密算法异常
+     * @throws KeyManagementException Key管理异常
      */
     public static SSLContext createIgnoreVerifySSL(String sslProtocol) throws NoSuchAlgorithmException, KeyManagementException {
         SSLContext sc = SSLContext.getInstance(sslProtocol);
@@ -100,8 +101,8 @@ public class SSLUtils {
 
     /**
      * 获取SSL上下文
-     * @param request
-     * @return
+     * @param request Forest请求对象，{@link ForestRequest}类实例
+     * @return SSL上下文，{@link SSLContext}类实例
      */
     public static SSLContext getSSLContext(ForestRequest request, String protocol) throws KeyManagementException, NoSuchAlgorithmException {
         if (request.getKeyStore() == null) {

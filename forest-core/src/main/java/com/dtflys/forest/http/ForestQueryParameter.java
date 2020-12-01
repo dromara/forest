@@ -20,7 +20,7 @@ public class ForestQueryParameter {
 
     /**
      * 是否源自URL
-     * <p>源自URL的Query参数在每次调用{@link ForestRequest#setUrl(String)}时都会被清理掉<p/>
+     * <p>源自URL的Query参数在每次调用{@link ForestRequest#setUrl(String)}时都会被清理掉</p>
      */
     private final boolean fromUrl;
 

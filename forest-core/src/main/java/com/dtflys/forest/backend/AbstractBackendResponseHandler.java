@@ -13,16 +13,18 @@ import java.util.concurrent.Future;
 
 
 /**
+ * 后端请求响应处理器抽象基类
+ *
  * @author gongjun[jun.gong@thebeastshop.com]
- * @since 2017-05-19 15:46
+ * @since 1.3.0
  */
-public abstract class BackendResponseHandler<R> {
+public abstract class AbstractBackendResponseHandler<R> {
 
     protected final ForestRequest request;
 
     protected final LifeCycleHandler lifeCycleHandler;
 
-    public BackendResponseHandler(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
+    public AbstractBackendResponseHandler(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         this.request = request;
         this.lifeCycleHandler = lifeCycleHandler;
     }

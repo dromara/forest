@@ -50,7 +50,7 @@ public abstract class ForestRequestBody {
 
     /**
      * 获取请求体类型
-     * @return
+     * @return 请求体类型，{@link BodyType}枚举实例
      */
     public BodyType getType() {
         return type;

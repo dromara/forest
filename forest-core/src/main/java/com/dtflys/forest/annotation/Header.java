@@ -72,10 +72,16 @@ import java.lang.annotation.Target;
 public @interface Header {
 
     /**
-     * Request header name
-     * @return
+     * 请求头名（可省略）[同value]
      */
+    @AliasFor("name")
     String value() default "";
+
+    /**
+     * 请求头名（可省略）[同name]
+     */
+    @AliasFor("value")
+    String name() default "";
 
 
 }

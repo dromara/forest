@@ -22,6 +22,11 @@ public class MappingString extends MappingExpr {
     }
 
     @Override
+    public boolean isIterateVariable() {
+        return false;
+    }
+
+    @Override
     public String toString() {
         return text.toString();
     }

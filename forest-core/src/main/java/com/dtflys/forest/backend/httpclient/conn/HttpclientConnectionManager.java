@@ -183,11 +183,11 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
     }
 
 
-    /**
-     * 自定义SSL证书
-     * @param request
-     * @return
-     */
+//    /**
+//     * 自定义SSL证书
+//     * @param request
+//     * @return
+//     */
 /*
     private static SSLContext customSSL(ForestRequest request) {
         SSLContext sslContext = null;
@@ -220,13 +220,13 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
     }
 */
 
-    /**
-     * 绕过SSL验证
-     *
-     * @return
-     * @throws NoSuchAlgorithmException
-     * @throws KeyManagementException
-     */
+//    /**
+//     * 绕过SSL验证
+//     *
+//     * @return
+//     * @throws NoSuchAlgorithmException
+//     * @throws KeyManagementException
+//     */
 /*
     private static SSLContext createIgnoreVerifySSL() throws NoSuchAlgorithmException, KeyManagementException {
         SSLContext sc = SSLContext.getInstance("SSLv3");
@@ -253,11 +253,11 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
     }
 */
 
-    /**
-     * 获取SSL上下文
-     * @param request
-     * @return
-     */
+//    /**
+//     * 获取SSL上下文
+//     * @param request
+//     * @return
+//     */
 /*
     private static SSLContext getSSLContext(ForestRequest request) throws KeyManagementException, NoSuchAlgorithmException {
         if (request.getKeyStore() == null) {

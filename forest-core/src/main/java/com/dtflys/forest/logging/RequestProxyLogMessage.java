@@ -2,7 +2,7 @@ package com.dtflys.forest.logging;
 
 /**
  * 请求正向代理日志消息
- * <p>封装了请求正向代理日志打印所需的所有信息<p/>
+ * <p>封装了请求正向代理日志打印所需的所有信息</p>
  *
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 1.5.0-BETA5

@@ -1,5 +1,6 @@
 package com.dtflys.forest.utils;
 
+import com.dtflys.forest.annotation.AliasFor;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.converter.json.JSONConverterSelector;
@@ -24,11 +25,29 @@ public class ReflectUtils {
      */
     private static JSONConverterSelector jsonConverterSelector = new JSONConverterSelector();
 
+    /**
+     * 被排除调注解方法名集合
+     */
+    private static Set<String> excludedAnntotationMethodNames = new HashSet<>();
+    static {
+        excludedAnntotationMethodNames.add("equals");
+        excludedAnntotationMethodNames.add("getClass");
+        excludedAnntotationMethodNames.add("annotationType");
+        excludedAnntotationMethodNames.add("notify");
+        excludedAnntotationMethodNames.add("notifyAll");
+        excludedAnntotationMethodNames.add("wait");
+        excludedAnntotationMethodNames.add("hashCode");
+        excludedAnntotationMethodNames.add("toString");
+        excludedAnntotationMethodNames.add("newProxyInstance");
+        excludedAnntotationMethodNames.add("newProxyClass");
+        excludedAnntotationMethodNames.add("getInvocationHandler");
+    }
+
 
     /**
      * 从Type获取Class
-     * @param genericType
-     * @return
+     * @param genericType Java Type类型，{@link Type}接口实例
+     * @return  Java类，{@link Class}类实例
      */
     public static Class getClassByType(Type genericType) {
         if (genericType instanceof ParameterizedType) {
@@ -49,6 +68,11 @@ public class ReflectUtils {
         }
     }
 
+    /**
+     * 是否是Java基本类型
+     * @param type Java类，{@link Class}类实例
+     * @return {@code true}：是基本类型，{@code false}：不是基本类型
+     */
     public static boolean isPrimaryType(Class type) {
         if (byte.class.isAssignableFrom(type) || Byte.class.isAssignableFrom(type)) {
             return true;
@@ -80,7 +104,11 @@ public class ReflectUtils {
         return false;
     }
 
-
+    /**
+     * 是否为基本数组类型
+     * @param type Java类，{@link Class}类实例
+     * @return {@code true}：是基本数组类型，{@code false}：不是基本数组类型
+     */
     public static boolean isPrimaryArrayType(Class type) {
         if (!type.isArray()) {
             return false;
@@ -116,42 +144,56 @@ public class ReflectUtils {
     }
 
 
+    /**
+     * 从注解对象中获取所有属性
+     * @param ann 注解对象，{@link Annotation}接口实例
+     * @return 注解对象中有属性 {@link Map}表对象，Key：属性名 Value：属性值
+     */
     public static Map<String, Object> getAttributesFromAnnotation(Annotation ann) {
-        Set<String> excludeMethodNames = new HashSet<>();
-        excludeMethodNames.add("equals");
-        excludeMethodNames.add("getClass");
-        excludeMethodNames.add("annotationType");
-        excludeMethodNames.add("notify");
-        excludeMethodNames.add("notifyAll");
-        excludeMethodNames.add("wait");
-        excludeMethodNames.add("hashCode");
-        excludeMethodNames.add("toString");
-        excludeMethodNames.add("newProxyInstance");
-        excludeMethodNames.add("newProxyClass");
-        excludeMethodNames.add("getInvocationHandler");
-
         Map<String, Object> results = new HashMap<>();
-        Class clazz = ann.getClass();
+        Class clazz = ann.annotationType();
         Method[] methods = clazz.getMethods();
         Object[] args = new Object[0];
         for (Method method : methods) {
             String name = method.getName();
-            if (excludeMethodNames.contains(name)) {
+            if (excludedAnntotationMethodNames.contains(name)) {
                 continue;
             }
             if (method.getParameters().length > 0) {
                 continue;
             }
+            Object value = invokeAnnotationMethod(ann, clazz, name, args);
+            if (value == null ||
+                    (value instanceof CharSequence && StringUtils.isEmpty(String.valueOf(value)))) {
+                AliasFor aliasFor = method.getAnnotation(AliasFor.class);
+                if (aliasFor != null) {
+                    String aliasName = aliasFor.value();
+                    value = invokeAnnotationMethod(ann, clazz, aliasName, args);
+                }
+            }
+            results.put(name, value);
+        }
+        return results;
+    }
+
+
+    private static Object invokeAnnotationMethod(Annotation ann, Class clazz, String name, Object[] args) {
+        Method method = null;
+        try {
+            method = clazz.getMethod(name, new Class[0]);
+        } catch (NoSuchMethodException e) {
+            throw new ForestRuntimeException(e);
+        }
+        if (method != null) {
             try {
-                Object value = method.invoke(ann, args);
-                results.put(name, value);
+                return method.invoke(ann, args);
             } catch (IllegalAccessException e) {
                 throw new ForestRuntimeException(e);
             } catch (InvocationTargetException e) {
                 throw new ForestRuntimeException(e);
             }
         }
-        return results;
+        return null;
     }
 
 

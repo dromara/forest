@@ -19,4 +19,10 @@ public abstract class MappingExpr {
     public Object render(Object[] args) {
         return null;
     }
+
+    public void setVariableScope(VariableScope variableScope) {
+        this.variableScope = variableScope;
+    }
+
+    public abstract boolean isIterateVariable();
 }

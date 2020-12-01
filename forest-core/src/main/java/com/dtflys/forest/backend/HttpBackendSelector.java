@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class HttpBackendSelector {
 
-    private final static Map<String, HttpBackendCreator> backendMap = new HashMap<>();
+    private final static Map<String, HttpBackendCreator> BACKEND_MAP = new HashMap<>();
 
     private final static String HTTPCLIENT_BACKEND_NAME = "httpclient";
     private final static String OKHTTP3_BACKEND_NAME = "okhttp3";
@@ -28,14 +28,14 @@ public class HttpBackendSelector {
     private final static HttpBackendCreator OKHTTP3_BACKEND_CREATOR = new HttpBackendCreator(OKHTTP3_BACKEND_CLASS_NAME);
 
     static {
-        backendMap.put(HTTPCLIENT_BACKEND_NAME, HTTPCLIENT_BACKEND_CREATOR);
-        backendMap.put(OKHTTP3_BACKEND_NAME, OKHTTP3_BACKEND_CREATOR);
+        BACKEND_MAP.put(HTTPCLIENT_BACKEND_NAME, HTTPCLIENT_BACKEND_CREATOR);
+        BACKEND_MAP.put(OKHTTP3_BACKEND_NAME, OKHTTP3_BACKEND_CREATOR);
     }
 
     public HttpBackend select(ForestConfiguration configuration) {
         String name = configuration.getBackendName();
         if (StringUtils.isNotEmpty(name)) {
-            HttpBackendCreator backendCreator = backendMap.get(name);
+            HttpBackendCreator backendCreator = BACKEND_MAP.get(name);
             if (backendCreator == null) {
                 throw new ForestRuntimeException("Http setBackend \"" + name + "\" can not be found.");
             }

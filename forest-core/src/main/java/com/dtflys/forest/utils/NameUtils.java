@@ -11,8 +11,8 @@ public class NameUtils {
 
     /**
      * 按驼峰命名法的规则将字符串分割
-     * @param name
-     * @return
+     * @param name 源字符串
+     * @return 分割后的字符串数组
      */
     public static String[] splitCamelName(String name) {
         int len = name.length();

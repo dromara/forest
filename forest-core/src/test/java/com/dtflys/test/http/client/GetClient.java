@@ -196,6 +196,14 @@ public interface GetClient {
 
 
     @Get(
+            url = "http://localhost:${port}/hello/user/array",
+            headers = {"Accept:text/plain"}
+    )
+    String arrayQuery(@Query(name = "username_${_index}") List<String> usernames, @Query("password") String password);
+
+
+
+    @Get(
             url = "http://localhost:${port}/hello/user",
             headers = {"Accept:text/plain"}
     )

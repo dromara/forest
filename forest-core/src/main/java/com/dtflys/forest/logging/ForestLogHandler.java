@@ -11,13 +11,13 @@ public interface ForestLogHandler {
 
     /**
      * 获取Forest日志控制对象
-     * @return
+     * @return Forest日志控制对象，{@link ForestLogger}类实例
      */
     ForestLogger getLogger();
 
     /**
      * 设置Forest日志控制对象
-     * @param logger
+     * @param logger Forest日志控制对象，{@link ForestLogger}类实例
      */
     void setLogger(ForestLogger logger);
 

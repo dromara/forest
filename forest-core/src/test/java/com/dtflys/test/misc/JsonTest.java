@@ -19,7 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author: Gongjun
+ * JSON单元测试
+ * @author gongjun
  */
 public class JsonTest extends TestCase {
 

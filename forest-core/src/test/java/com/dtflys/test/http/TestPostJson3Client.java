@@ -68,7 +68,7 @@ public class TestPostJson3Client extends BaseClientTest {
         String result = postClient.postJson7(list);
         log.info("response: " + result);
         assertNotNull(result);
-        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
+        Assert.assertEquals(PostJson3MockServer.EXPECTED, result);
     }
 
 
@@ -83,7 +83,7 @@ public class TestPostJson3Client extends BaseClientTest {
         String result = postClient.postJson8(list);
         log.info("response: " + result);
         assertNotNull(result);
-        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
+        Assert.assertEquals(PostJson3MockServer.EXPECTED, result);
     }
 
     @Test
@@ -100,7 +100,7 @@ public class TestPostJson3Client extends BaseClientTest {
         String result = postClient.postJson12(list);
         log.info("response: " + result);
         assertNotNull(result);
-        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
+        Assert.assertEquals(PostJson3MockServer.EXPECTED, result);
 
         Mockito.verify(logger, Mockito.never()).info("[Forest] Request: \n" +
                 "\tPOST http://localhost:5016/json HTTP\n" +

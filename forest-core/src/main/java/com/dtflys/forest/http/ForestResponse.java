@@ -26,13 +26,21 @@ package com.dtflys.forest.http;
 
 
 import com.dtflys.forest.backend.ContentType;
+import com.dtflys.forest.utils.ByteEncodeUtils;
+import com.dtflys.forest.utils.StringUtils;
+import org.apache.commons.io.IOUtils;
 
+import javax.annotation.Nonnull;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
 /**
+ * Forest请求响应类
+ *
  * @author gongjun[dt_flys@hotmail.com]
- * @since 2016-03-25 16:33
+ * @since 1.1.0
  */
 public abstract class ForestResponse<T> {
 
@@ -55,12 +63,12 @@ public abstract class ForestResponse<T> {
         return request;
     }
 
-    public synchronized void setContent(String content) {
-        this.content = content;
-    }
-
     public String getContent() {
         return content;
+    }
+
+    public synchronized void setContent(String content) {
+        this.content = content;
     }
 
     public T getResult() {
@@ -119,7 +127,9 @@ public abstract class ForestResponse<T> {
 
     public abstract byte[] getByteArray() throws Exception;
 
-    public abstract InputStream getInputStream() throws Exception;
+    public InputStream getInputStream() throws Exception {
+        return new ByteArrayInputStream(getByteArray());
+    }
 
     public ForestHeader getHeader(String name) {
         return headers.getHeader(name);
@@ -139,5 +149,29 @@ public abstract class ForestResponse<T> {
 
     public ForestHeaderMap getHeaders() {
         return headers;
+    }
+
+    /**
+     * 把字节数组转换成字符串（自动根据字符串编码转换）
+     *
+     * @param bytes 字节数组
+     * @return 字符串
+     * @throws IOException 字符串处理异常
+     */
+    @Nonnull
+    protected String byteToString(byte[] bytes) throws IOException {
+        String encode;
+        if (StringUtils.isNotEmpty(contentEncoding)) {
+            // 默认从Content-Encoding获取字符编码
+            encode = contentEncoding;
+        } else {
+            // Content-Encoding为空的情况下，自动判断字符编码
+            encode = ByteEncodeUtils.getCharsetName(bytes);
+        }
+        if (encode.toUpperCase().startsWith("GB")) {
+            // 返回的GB中文编码会有多种编码类型，这里统一使用GBK编码
+            encode = "GBK";
+        }
+        return IOUtils.toString(bytes, encode);
     }
 }

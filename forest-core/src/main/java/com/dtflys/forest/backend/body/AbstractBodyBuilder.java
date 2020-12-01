@@ -1,6 +1,7 @@
 package com.dtflys.forest.backend.body;
 
 import com.dtflys.forest.backend.BodyBuilder;
+import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.handler.LifeCycleHandler;
@@ -31,15 +32,11 @@ import java.util.Map;
  */
 public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
 
-    public final static String TYPE_APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
-    public final static String TYPE_APPLICATION_JSON = "application/json";
-    public final static String TYPE_MULTIPART_FORM_DATA = "multipart/form-data";
-
     /**
-     * 构建
-     * @param httpRequest
-     * @param request
-     * @param lifeCycleHandler
+     * 构建请求体
+     * @param httpRequest 后端http请求对象
+     * @param request Forest请求对象
+     * @param lifeCycleHandler 生命周期处理器
      */
     @Override
     public void buildBody(T httpRequest, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
@@ -54,7 +51,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
         }
 
         if (StringUtils.isEmpty(contentType)) {
-            contentType = TYPE_APPLICATION_X_WWW_FORM_URLENCODED;
+            contentType = ContentType.APPLICATION_X_WWW_FORM_URLENCODED;
         }
 
         String[] typeGroup = contentType.split(";[ ]*charset=");
@@ -71,14 +68,14 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
         }
 
         if (StringUtils.isEmpty(mineType)) {
-            mineType = TYPE_APPLICATION_X_WWW_FORM_URLENCODED;
+            mineType = ContentType.APPLICATION_X_WWW_FORM_URLENCODED;
         }
         List<RequestNameValue> nameValueList = request.getDataNameValueList();
 
-        if (mineType.equals(TYPE_APPLICATION_X_WWW_FORM_URLENCODED) && !nameValueList.isEmpty()) {
+        if (mineType.equals(ContentType.APPLICATION_X_WWW_FORM_URLENCODED) && !nameValueList.isEmpty()) {
             setFormBody(httpRequest, request, charset, contentType, nameValueList);
         }
-        else if (mineType.equals(TYPE_APPLICATION_JSON)) {
+        else if (mineType.equals(ContentType.APPLICATION_JSON)) {
             ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
             List<ForestRequestBody> srcBodyList = request.getBody();
             List<ForestRequestBody> bodyList = new LinkedList(srcBodyList);
@@ -185,7 +182,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
      * @param configuration Forest配置
      * @param name 表单项目名
      * @param collection 集合对象
-     * @param target
+     * @param target 请求目标位置
      */
     protected void processFormCollectionItem(List<RequestNameValue> newNameValueList, ForestConfiguration configuration, String name, Collection collection, int target) {
         int index = 0;

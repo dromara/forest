@@ -52,7 +52,28 @@ public class MappingDot extends MappingExpr {
         return method;
     }
 
+    @Override
+    public void setVariableScope(VariableScope variableScope) {
+        super.setVariableScope(variableScope);
+        if (left != null) {
+            left.setVariableScope(variableScope);
+        }
+        if (right != null) {
+            right.setVariableScope(variableScope);
+        }
+    }
 
+    @Override
+    public boolean isIterateVariable() {
+        boolean ret = false;
+        if (left != null) {
+            ret = left.isIterateVariable();
+        }
+        if (right != null) {
+            ret = ret || right.isIterateVariable();
+        }
+        return ret;
+    }
 
     @Override
     public Object render(Object[] args) {
@@ -77,6 +98,8 @@ public class MappingDot extends MappingExpr {
             throw new ForestRuntimeException(e);
         }
     }
+
+
 
     @Override
     public String toString() {

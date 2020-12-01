@@ -21,7 +21,10 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -99,7 +102,6 @@ public class TestPostJson2Client extends BaseClientTest {
                 "\tHeaders: \n" +
                 "\t\tContent-Type: application/json\n" +
                 "\tBody: {\"username\":\"foo\"}");
-
     }
 
     @Test
@@ -155,6 +157,86 @@ public class TestPostJson2Client extends BaseClientTest {
                 "\t\tContent-Type: application/json\n" +
                 "\tBody: {\"username\":\"foo\"}");
         Mockito.verify(logger).info("[Forest] Response: Content=成功访问");
+    }
+
+    @Test
+    public void testJsonPostBodyMap() {
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("username", "foo");
+        String result = postClient.postJsonBodyMap(userMap);
+        log.info("response: " + result);
+        assertNotNull(result);
+        Assert.assertEquals(PostJson2MockServer.EXPECTED, result);
+    }
+
+    @Test
+    public void testJsonPostBodyMap2() {
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("username", "foo");
+        String result = postClient.postJsonBodyMap2(userMap);
+        log.info("response: " + result);
+        assertNotNull(result);
+        Assert.assertEquals(PostJson2MockServer.EXPECTED, result);
+    }
+
+
+    @Test
+    public void testJsonPostBodyObj() {
+        JsonTestUser user = new JsonTestUser();
+        user.setUsername("foo");
+        String result = postClient.postJsonBodyObj(user);
+        log.info("response: " + result);
+        assertNotNull(result);
+        Assert.assertEquals(PostJson2MockServer.EXPECTED, result);
+    }
+
+    @Test
+    public void testJsonPostBodyField() {
+        String result = postClient.postJsonBodyField("foo");
+        log.info("response: " + result);
+        assertNotNull(result);
+        Assert.assertEquals(PostJson2MockServer.EXPECTED, result);
+    }
+
+    @Test
+    public void testJsonPostBodyString() {
+        String result = postClient.postJsonBodyString("{\"username\":\"foo\"}");
+        log.info("response: " + result);
+        assertNotNull(result);
+        Assert.assertEquals(PostJson2MockServer.EXPECTED, result);
+    }
+
+
+
+    @Test
+    public void testJsonPostBodyMapError() {
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("username", "foo");
+        String result = null;
+        boolean error = false;
+        try {
+            result = postClient.postJsonBodyMapError(userMap, "application/xml");
+        } catch (Throwable th) {
+            error = true;
+        }
+        assertNull(result);
+        assertTrue(error);
+    }
+
+
+    @Test
+    public void testJsonPostBodyMapError2() {
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("username", "foo");
+        String result = null;
+        boolean error = false;
+        try {
+            result = postClient.postJsonBodyMapError(userMap, "application/json");
+        } catch (Throwable th) {
+            error = true;
+        }
+        assertNotNull(result);
+        assertFalse(error);
     }
 
 

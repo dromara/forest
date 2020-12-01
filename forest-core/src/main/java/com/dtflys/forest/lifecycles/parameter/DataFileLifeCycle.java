@@ -7,9 +7,6 @@ import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.multipart.ForestMultipartFactory;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.lifecycles.ParameterAnnotationLifeCycle;
-import com.dtflys.forest.utils.StringUtils;
-
-import static com.dtflys.forest.backend.body.AbstractBodyBuilder.TYPE_MULTIPART_FORM_DATA;
 
 /**
  * Forest &#064;DataFile注解的生命周期

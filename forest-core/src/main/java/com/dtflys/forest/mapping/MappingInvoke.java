@@ -29,6 +29,16 @@ public class MappingInvoke extends MappingDot {
     }
 
     @Override
+    public void setVariableScope(VariableScope variableScope) {
+        super.setVariableScope(variableScope);
+        if (argList != null) {
+            for (MappingExpr arg : argList) {
+                arg.setVariableScope(variableScope);
+            }
+        }
+    }
+
+    @Override
     public Object render(Object[] args) {
         Object obj = left.render(args);
         String methodName = right.getName();
@@ -55,6 +65,20 @@ public class MappingInvoke extends MappingDot {
             throw new ForestRuntimeException(e);
         }
 
+    }
+
+    @Override
+    public boolean isIterateVariable() {
+        boolean ret = super.isIterateVariable();
+        if (ret) {
+            return true;
+        }
+        for (MappingExpr argExpr : argList) {
+            if (argExpr.isIterateVariable()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

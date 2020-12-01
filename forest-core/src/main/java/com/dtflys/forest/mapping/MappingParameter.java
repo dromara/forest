@@ -3,8 +3,13 @@ package com.dtflys.forest.mapping;
 import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.filter.FilterChain;
 
+import java.util.Iterator;
+
 /**
- * Created by Administrator on 2016/5/17.
+ * 字符串模板解析类 方法参数
+ *
+ * @author gongjun[dt_flys@hotmail.com]
+ * @since 1.0.0
  */
 public class MappingParameter {
 
@@ -13,16 +18,39 @@ public class MappingParameter {
     public final static int TARGET_BODY = 2;
     public final static int TARGET_HEADER = 3;
 
+    /**
+     * 参数类型
+     */
     protected final Class type;
 
+    /**
+     * 参数下标
+     */
     protected Integer index;
 
+    /**
+     * 参数名称
+     */
     protected String name;
 
+    /**
+     * 映射操作
+     */
+    protected String map;
+
+    /**
+     * 参数绑定的目标位置
+     */
     protected int target = TARGET_UNKNOWN;
 
+    /**
+     * 是否为对象属性
+     */
     private boolean objectProperties = false;
 
+    /**
+     * 是否为JSON参数
+     */
     private boolean isJsonParam = false;
 
     private String jsonParamName;
@@ -51,6 +79,14 @@ public class MappingParameter {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getMap() {
+        return map;
+    }
+
+    public void setMap(String map) {
+        this.map = map;
     }
 
     public boolean isUnknownTarget() {

@@ -65,7 +65,7 @@ public class TestPostJson5Client extends BaseClientTest {
         String result = postClient.postJson11(user);
         log.info("response: " + result);
         assertNotNull(result);
-        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
+        Assert.assertEquals(PostJson5MockServer.EXPECTED, result);
         Mockito.verify(logger).info("[Forest] Response: Content={\"status\": \"ok\"}");
     }
 

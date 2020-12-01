@@ -120,6 +120,7 @@ public class TestGetJsonClient extends BaseClientTest {
         Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
     }
 
+
     @Test
     public void testPostBodyString1() {
         String result = postClient.postBodyString1("{\"username\":\"foo\",\"password\":\"123456&&++===\",\"cn_name\":\"中文名\"}");

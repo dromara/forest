@@ -206,12 +206,6 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
                         return;
                     }
                     execute(lifeCycleHandler, retryCount + 1);
-/*
-                    future.failed(e);
-                    ForestResponse response = factory.createResponse(request, null, lifeCycleHandler);
-                    logResponse(startTime, response);
-                    lifeCycleHandler.handleError(request, response, e);
-*/
                 }
 
                 @Override

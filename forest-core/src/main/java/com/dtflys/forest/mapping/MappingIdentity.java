@@ -23,6 +23,11 @@ public class MappingIdentity extends MappingExpr {
     }
 
     @Override
+    public boolean isIterateVariable() {
+        return false;
+    }
+
+    @Override
     public String toString() {
         return "[ID: " + name + "]";
     }

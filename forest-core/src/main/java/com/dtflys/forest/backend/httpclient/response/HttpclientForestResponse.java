@@ -4,7 +4,6 @@ import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.utils.ByteEncodeUtils;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
@@ -13,9 +12,9 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -44,12 +43,15 @@ public class HttpclientForestResponse extends ForestResponse {
                 }
                 this.contentLength = entity.getContentLength();
                 Header encoding = entity.getContentEncoding();
-                if (encoding != null) {
+                if (contentType != null) {
+                    this.contentEncoding = this.contentType.getCharset();
+                } else if (encoding != null) {
                     this.contentEncoding = encoding.getValue();
-                } else if (contentType != null) {
-                    this.contentEncoding = contentType.getCharset();
-                }
-                this.content = buildContent();
+                    Charset charset = Charset.forName(this.contentEncoding);
+                    if (charset == null || !charset.name().equals(this.contentEncoding)) {
+                        this.contentEncoding = null;
+                    }
+                } this.content = buildContent();
             }
         } else {
             this.statusCode = -1;
@@ -107,19 +109,7 @@ public class HttpclientForestResponse extends ForestResponse {
                 return null;
             }
             bytes = IOUtils.toByteArray(inputStream);
-            String encode = null;
-            if (StringUtils.isNotEmpty(contentEncoding)) {
-                // 默认从Content-Encoding获取字符编码
-                encode = contentEncoding;
-            } else {
-                // Content-Encoding为空的情况下，自动判断字符编码
-                encode = ByteEncodeUtils.getCharsetName(bytes);
-            }
-            if (encode.toUpperCase().startsWith("GB")) {
-                // 返回的GB中文编码会有多种编码类型，这里统一使用GBK编码
-                encode = "GBK";
-            }
-            return IOUtils.toString(bytes, encode);
+            return byteToString(bytes);
         } catch (IOException e) {
             throw new ForestRuntimeException(e);
         }
@@ -133,11 +123,4 @@ public class HttpclientForestResponse extends ForestResponse {
         return bytes;
     }
 
-    @Override
-    public InputStream getInputStream() throws IOException {
-        if (bytes == null) {
-            bytes = getByteArray();
-        }
-        return new ByteArrayInputStream(bytes);
-    }
 }

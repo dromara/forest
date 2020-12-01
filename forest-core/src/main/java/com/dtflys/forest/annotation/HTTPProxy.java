@@ -1,6 +1,5 @@
 package com.dtflys.forest.annotation;
 
-import com.dtflys.forest.lifecycles.authorization.BasicAuthLifeCycle;
 import com.dtflys.forest.lifecycles.proxy.HTTPProxyLifeCycle;
 
 import java.lang.annotation.Documented;
@@ -10,7 +9,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *
+ * HTTP正向代理注解
  * @author gongjun [dt_flys@hotmail.com]
  * @since 1.5.0-BETA5
  */

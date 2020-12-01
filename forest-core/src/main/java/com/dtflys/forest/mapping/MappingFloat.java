@@ -18,6 +18,11 @@ public class MappingFloat extends MappingExpr {
         return number;
     }
 
+    @Override
+    public boolean isIterateVariable() {
+        return false;
+    }
+
     public float getNumber() {
         return number;
     }

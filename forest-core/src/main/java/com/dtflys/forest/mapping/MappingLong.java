@@ -18,6 +18,11 @@ public class MappingLong extends MappingExpr {
         return number;
     }
 
+    @Override
+    public boolean isIterateVariable() {
+        return false;
+    }
+
     public long getNumber() {
         return number;
     }

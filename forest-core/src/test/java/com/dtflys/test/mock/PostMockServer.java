@@ -35,6 +35,20 @@ public class PostMockServer extends MockServerRule {
                         .withStatusCode(200)
                         .withBody(EXPECTED)
         );
+
+        mockClient.when(
+                request()
+                        .withPath("/hello-list")
+                        .withMethod("POST")
+                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plain"))
+                        .withBody("item_0=xx&item_1=yy&item_2=zz")
+        ).respond(
+                response()
+                        .withStatusCode(200)
+                        .withBody(EXPECTED)
+        );
+
+
     }
 
 }

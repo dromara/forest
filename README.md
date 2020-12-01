@@ -1,7 +1,7 @@
 
 
 <p align="center">
-<a href="http://forest.dtflyx.com">
+<a href="http://forest.dtflyx.com/">
     <img width="300" src="site/media/logo3.png" alt="logo">
 </a>
 </p>
@@ -12,13 +12,13 @@
     <img src="https://api.travis-ci.org/mySingleLive/forest.svg?branch=master&status=passed" alt="Build">
 </a>
 <!--
-<a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.5.0-BETA8/jar">
-    <img src="https://img.shields.io/badge/maven%20central-1.5.0-BETA8-brightgreen.svg" alt="Maven Central">
+<a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.5.0-BETA9/jar">
+    <img src="https://img.shields.io/badge/maven%20central-1.5.0-BETA9-brightgreen.svg" alt="Maven Central">
 </a>
 -->
 <!--
-<a href="https://gitee.com/dt_flys/forest/releases/v1.5.0-BETA8">
-    <img src="https://img.shields.io/badge/release-v1.5.0-BETA8-blue" alt="Release">
+<a href="https://gitee.com/dt_flys/forest/releases/v1.5.0-BETA9">
+    <img src="https://img.shields.io/badge/release-v1.5.0-BETA9-blue" alt="Release">
 </a>
 -->
 <a href="https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html">
@@ -67,6 +67,7 @@ Forest有哪些特性？
 * 支持灵活的模板表达式
 * 支持拦截器处理请求的各个生命周期
 * 支持自定义注解
+* 支持OAuth2验证
 * 支持过滤器来过滤传入的数据
 * 基于注解、配置化的方式定义Http请求
 * 支持Spring和Springboot集成
@@ -91,7 +92,7 @@ Forest有哪些特性？
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>spring-boot-starter-forest</artifactId>
-    <version>1.5.0-BETA8</version>
+    <version>1.5.0-BETA9</version>
 </dependency>
 ```
 
@@ -149,6 +150,26 @@ Map result = amapClient.getLocation("121.475078", "31.223577");
 System.out.println(result);
 ```
 
+## 发送JSON数据
+
+```java
+@Post(url = "/register")
+String registerUser(@JSONBody MyUser user);
+
+@Post(url = "/test/json")
+String postJsonMap(@JSONBody Map mapObj);
+```
+
+## 发送XML数据
+
+```java
+@Post(url = "/message")
+String sendXmlMessage(@XMLBody MyMessage message);
+
+@Post(url = "/test/xml")
+String postXmlBodyString(@XMLBody String xml);
+```
+
 ## 文件上传
 
 ```java
@@ -169,6 +190,22 @@ Map result = myClient.upload("D:\\TestUpload\\xxx.jpg", progress -> {
         System.out.println("--------   Upload Completed!   --------");
     }
 });
+```
+
+## 多文件批量上传
+
+```java
+/**
+ * 上传Map包装的文件列表，其中 ${_key} 代表Map中每一次迭代中的键值
+ */
+@Post(url = "/upload")
+ForestRequest<Map> uploadByteArrayMap(@DataFile(value = "file", fileName = "${_key}") Map<String, byte[]> byteArrayMap);
+
+/**
+ * 上传List包装的文件列表，其中 ${_index} 代表每次迭代List的循环计数（从零开始计）
+ */
+@Post(url = "/upload")
+ForestRequest<Map> uploadByteArrayList(@DataFile(value = "file", fileName = "test-img-${_index}.jpg") List<byte[]> byteArrayList);
 ```
 
 ## 文件下载
@@ -199,11 +236,130 @@ File file = myClient.downloadFile("D:\\TestDownload", progress -> {
 });
 ```
 
+## 基本签名验证
 
+```java
+@Post(url = "/hello/user?username=${username}")
+@BasicAuth(username = "${username}", password = "bar")
+String send(@DataVariable("username") String username);
+```
 
-#### 详细文档请看：[http://forest.dtflyx.com](http://forest.dtflyx.com)
+## OAuth 2.0
 
-### 联系作者:<br>
+```java
+@OAuth2(
+        tokenUri = "/auth/oauth/token",
+        clientId = "password",
+        clientSecret = "xxxxx-yyyyy-zzzzz",
+        grantType = OAuth2.GrantType.PASSWORD,
+        scope = "any",
+        username = "root",
+        password = "xxxxxx"
+)
+@Get(url = "/test/data")
+String getData();
+```
+
+## 自定义注解
+
+Forest运行您根据需要自行定义注解，不但让您可以简单优雅得解决各种需求，而且极大得扩展了Forest的能力。
+
+### 定义一个注解
+
+```java
+/**
+ * 用Forest自定义注解实现一个自定义的签名加密注解
+ * 凡用此接口修饰的方法或接口，其对应的所有请求都会执行自定义的签名加密过程
+ * 而自定义的签名加密过程，由这里的@MethodLifeCycle注解指定的生命周期类进行处理
+ * 可以将此注解用在接口类和方法上
+ */
+@Documented
+/** 重点： @MethodLifeCycle注解指定该注解的生命周期类*/
+@MethodLifeCycle(MyAuthLifeCycle.class)
+@RequestAttributes
+@Retention(RetentionPolicy.RUNTIME)
+/** 指定该注解可用于类上或方法上 */
+@Target({ElementType.TYPE, ElementType.METHOD})
+public @interface MyAuth {
+
+    /** 
+     * 自定义注解的属性：用户名
+     * 所有自定注解的属性可以在生命周期类中被获取到
+     */
+    String username();
+
+    /** 
+     * 自定义注解的属性：密码
+     * 所有自定注解的属性可以在生命周期类中被获取到
+     */
+    String password();
+}
+```
+
+### 定义注解生命周期类
+
+```java
+/**
+ *  MyAuthLifeCycle 为自定义的 @MyAuth 注解的生命周期类
+ * 因为 @MyAuth 是针对每个请求方法的，所以它实现自 MethodAnnotationLifeCycle 接口
+ * MethodAnnotationLifeCycle 接口带有泛型参数
+ * 第一个泛型参数是该生命周期类绑定的注解类型
+ * 第二个泛型参数为请求方法返回的数据类型，为了尽可能适应多的不同方法的返回类型，这里使用 Object
+ */
+public class MyAuthLifeCycle implements MethodAnnotationLifeCycle<MyAuth, Object> {
+
+ 
+    /**
+     * 当方法调用时调用此方法，此时还没有执行请求发送
+     * 次方法可以获得请求对应的方法调用信息，以及动态传入的方法调用参数列表
+     */
+    @Override
+    public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
+        System.out.println("Invoke Method '" + method.getMethodName() + "' Arguments: " + args);
+    }
+
+    /**
+     * 发送请求前执行此方法，同拦截器中的一样
+     */
+    @Override
+    public boolean beforeExecute(ForestRequest request) {
+        // 通过getAttribute方法获取自定义注解中的属性值
+        // getAttribute第一个参数为request对象，第二个参数为自定义注解中的属性名
+        String username = (String) getAttribute(request, "username");
+        String password = (String) getAttribute(request, "password");
+        // 使用Base64进行加密
+        String basic = "MyAuth " + Base64Utils.encode("{" + username + ":" + password + "}");
+        // 调用addHeader方法将加密结构加到请求头MyAuthorization中
+        request.addHeader("MyAuthorization", basic);
+        return true;
+    }
+
+    /**
+     * 此方法在请求方法初始化的时候被调用
+     */
+    @Override
+    public void onMethodInitialized(ForestMethod method, BasicAuth annotation) {
+        System.out.println("Method '" + method.getMethodName() + "' Initialized, Arguments: " + args);
+    }
+}
+```
+
+### 使用自定义的注解
+
+```java
+/**
+ * 在请求接口上加上自定义的 @MyAuth 注解
+ * 注解的参数可以是字符串模板，通过方法调用的时候动态传入
+ * 也可以是写死的字符串
+ */
+@Get(url = "/hello/user?username=${username}")
+@MyAuth(username = "${username}", password = "bar")
+String send(@DataVariable("username") String username);
+```
+
+## 详细文档请看：[http://forest.dtflyx.com/](http://forest.dtflyx.com/)
+
+## 联系作者:<br>
 
 亲，进群前记得先star一下哦~
 

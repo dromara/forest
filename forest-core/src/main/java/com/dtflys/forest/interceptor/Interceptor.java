@@ -13,6 +13,9 @@ import scala.Int;
 import java.util.Map;
 
 /**
+ * Forest拦截器接口
+ * <p>拦截器在请求的初始化、发送请求前、发送成功、发送失败等生命周期中都会被调用</p>
+ *
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-06-26
  */

@@ -49,29 +49,35 @@ public class JSONConverterSelector implements Serializable {
 
 
     /**
-     * check FastJSON
-     * @return
+     * 检测FastJSON相关类型
+     * @return FastJSON相关类型
      */
     public Class checkFastJSONClass() throws Throwable {
         return Class.forName("com.alibaba.fastjson.JSON");
     }
 
     /**
-     * check Jaskon
-     * @return
+     * 检测Jaskon相关类型
+     * @return Jaskon相关类型
      */
     public Class checkJacsonClass() throws Throwable {
         return Class.forName("com.fasterxml.jackson.databind.ObjectMapper");
     }
 
     /**
-     * check Gson
-     * @return
+     * 检测Gson相关类型
+     * @return Gson相关类型
      */
     public Class checkGsonClass() throws Throwable {
         return Class.forName("com.google.gson.JsonParser");
     }
 
+    /**
+     * 选择Forest的JSON转换器
+     * <p>从FastJson、Jackson以及Gson中动态选择一个可用的JSON转换器</p>
+     *
+     * @return Forest的JSON转换器，{@link ForestJsonConverter}接口实例
+     */
     public ForestJsonConverter select() {
         if (cachedJsonConverter != null) {
             return cachedJsonConverter;

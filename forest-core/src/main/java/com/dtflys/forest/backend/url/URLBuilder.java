@@ -10,18 +10,18 @@ import com.dtflys.forest.http.ForestRequest;
  */
 public abstract class URLBuilder {
 
-    private final static URLBuilder simpleInstance = new SimpleURLBuilder();
+    private final static URLBuilder SIMPLE_URL_BUILDER = new SimpleURLBuilder();
 
-    private final static URLBuilder queryableInstance = new QueryableURLBuilder();
+    private final static URLBuilder QUERYABLE_URL_BUILDER = new QueryableURLBuilder();
 
     public abstract String buildUrl(ForestRequest request);
 
     public static URLBuilder getSimpleURLBuilder() {
-        return simpleInstance;
+        return SIMPLE_URL_BUILDER;
     }
 
     public static URLBuilder getQueryableURLBuilder() {
-        return queryableInstance;
+        return QUERYABLE_URL_BUILDER;
     }
 
 }
