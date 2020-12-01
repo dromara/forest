@@ -149,6 +149,27 @@ Map result = amapClient.getLocation("121.475078", "31.223577");
 System.out.println(result);
 ```
 
+## 发送JSON数据
+
+```java
+@Post(url = "http://localhost:8080/register")
+String registerUser(@JSONBody MyUser user);
+
+@Post(url = "http://localhost:8080/test/json")
+String postJsonMap(@JSONBody Map mapObj);
+```
+
+## 发送XML数据
+
+```java
+@Post(url = "http://localhost:8080/message")
+String sendXmlMessage(@XMLBody MyMessage message);
+
+@Post(url = "http://localhost:8080/test/xml")
+String postXmlBodyString(@XMLBody String xml);
+```
+
+
 ## 文件上传
 
 ```java
