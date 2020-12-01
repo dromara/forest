@@ -296,7 +296,7 @@ public @interface MyAuth {
 }
 ```
 
-### 定义生命周期类
+### 定义注解生命周期类
 
 ```java
 /**
