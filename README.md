@@ -153,19 +153,38 @@ System.out.println(result);
 ## 发送JSON数据
 
 ```java
+/**
+ * 将对象参数解析为JSON字符串，并放在请求的Body进行传输
+ */
 @Post(url = "/register")
 String registerUser(@JSONBody MyUser user);
 
+/**
+ * 将Map类型参数解析为JSON字符串，并放在请求的Body进行传输
+ */
 @Post(url = "/test/json")
 String postJsonMap(@JSONBody Map mapObj);
+
+/**
+ * 直接传入一个JSON字符串，并放在请求的Body进行传输
+ */
+@Post(url = "/test/json")
+String postJsonText(@JSONBody String jsonText);
 ```
 
 ## 发送XML数据
 
 ```java
+/**
+ * 将一个通过JAXB注解修饰过的类型对象解析为XML字符串
+ * 并放在请求的Body进行传输
+ */
 @Post(url = "/message")
 String sendXmlMessage(@XMLBody MyMessage message);
 
+/**
+ * 直接传入一个XML字符串，并放在请求的Body进行传输
+ */
 @Post(url = "/test/xml")
 String postXmlBodyString(@XMLBody String xml);
 ```
@@ -262,7 +281,7 @@ String getData();
 
 ## 自定义注解
 
-Forest运行您根据需要自行定义注解，不但让您可以简单优雅得解决各种需求，而且极大得扩展了Forest的能力。
+Forest允许您根据需要自行定义注解，不但让您可以简单优雅得解决各种需求，而且极大得扩展了Forest的能力。
 
 ### 定义一个注解
 
