@@ -352,10 +352,7 @@ public class MyAuthLifeCycle implements MethodAnnotationLifeCycle<MyAuth, Object
  * 注解的参数可以是字符串模板，通过方法调用的时候动态传入
  * 也可以是写死的字符串
  */
-@Get(
-        url = "http://localhost:${port}/hello/user?username=${username}",
-        headers = {"Accept:text/plain"}
-)
+@Get(url = "/hello/user?username=${username}")
 @MyAuth(username = "${username}", password = "bar")
 String send(@DataVariable("username") String username);
 ```
