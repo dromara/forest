@@ -236,7 +236,7 @@ File file = myClient.downloadFile("D:\\TestDownload", progress -> {
 });
 ```
 
-## 基本验签
+## 基本签名验证
 
 ```java
 @Post(url = "/hello/user?username=${username}")
