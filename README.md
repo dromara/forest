@@ -67,6 +67,7 @@ Forest有哪些特性？
 * 支持灵活的模板表达式
 * 支持拦截器处理请求的各个生命周期
 * 支持自定义注解
+* 支持OAuth2验证
 * 支持过滤器来过滤传入的数据
 * 基于注解、配置化的方式定义Http请求
 * 支持Spring和Springboot集成
@@ -169,7 +170,6 @@ String sendXmlMessage(@XMLBody MyMessage message);
 String postXmlBodyString(@XMLBody String xml);
 ```
 
-
 ## 文件上传
 
 ```java
@@ -236,6 +236,29 @@ File file = myClient.downloadFile("D:\\TestDownload", progress -> {
 });
 ```
 
+## 基本验签
+
+```java
+@Post(url = "/hello/user?username=${username}")
+@BasicAuth(username = "${username}", password = "bar")
+String send(@DataVariable("username") String username);
+```
+
+## OAuth 2.0
+
+```java
+@OAuth2(
+        tokenUri = "http://localhost:${port}/auth/oauth/token",
+        clientId = "password",
+        clientSecret = "xxxxx-yyyyy-zzzzz",
+        grantType = OAuth2.GrantType.PASSWORD,
+        scope = "any",
+        username = "root",
+        password = "xxxxxx"
+)
+@Get(url = "/auth/test/data")
+String getData();
+```
 
 
 #### 详细文档请看：[http://forest.dtflyx.com/](http://forest.dtflyx.com/)
