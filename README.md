@@ -152,20 +152,20 @@ System.out.println(result);
 ## 发送JSON数据
 
 ```java
-@Post(url = "http://localhost:8080/register")
+@Post(url = "/register")
 String registerUser(@JSONBody MyUser user);
 
-@Post(url = "http://localhost:8080/test/json")
+@Post(url = "/test/json")
 String postJsonMap(@JSONBody Map mapObj);
 ```
 
 ## 发送XML数据
 
 ```java
-@Post(url = "http://localhost:8080/message")
+@Post(url = "/message")
 String sendXmlMessage(@XMLBody MyMessage message);
 
-@Post(url = "http://localhost:8080/test/xml")
+@Post(url = "/test/xml")
 String postXmlBodyString(@XMLBody String xml);
 ```
 
