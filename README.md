@@ -153,19 +153,38 @@ System.out.println(result);
 ## 发送JSON数据
 
 ```java
+/**
+ * 将对象参数解析为JSON字符串，并放在请求的Body进行传输
+ */
 @Post(url = "/register")
 String registerUser(@JSONBody MyUser user);
 
+/**
+ * 将Map类型参数解析为JSON字符串，并放在请求的Body进行传输
+ */
 @Post(url = "/test/json")
 String postJsonMap(@JSONBody Map mapObj);
+
+/**
+ * 直接传入一个JSON字符串，并放在请求的Body进行传输
+ */
+@Post(url = "/test/json")
+String postJsonText(@JSONBody String jsonText);
 ```
 
 ## 发送XML数据
 
 ```java
+/**
+ * 将一个通过JAXB注解修饰过的类型对象解析为XML字符串
+ * 并放在请求的Body进行传输
+ */
 @Post(url = "/message")
 String sendXmlMessage(@XMLBody MyMessage message);
 
+/**
+ * 直接传入一个XML字符串，并放在请求的Body进行传输
+ */
 @Post(url = "/test/xml")
 String postXmlBodyString(@XMLBody String xml);
 ```
