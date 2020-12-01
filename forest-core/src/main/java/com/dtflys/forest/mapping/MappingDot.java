@@ -64,6 +64,18 @@ public class MappingDot extends MappingExpr {
     }
 
     @Override
+    public boolean isIterateVariable() {
+        boolean ret = false;
+        if (left != null) {
+            ret = left.isIterateVariable();
+        }
+        if (right != null) {
+            ret = ret || right.isIterateVariable();
+        }
+        return ret;
+    }
+
+    @Override
     public Object render(Object[] args) {
         Object obj = left.render(args);
         if (obj == null) {
@@ -86,6 +98,8 @@ public class MappingDot extends MappingExpr {
             throw new ForestRuntimeException(e);
         }
     }
+
+
 
     @Override
     public String toString() {

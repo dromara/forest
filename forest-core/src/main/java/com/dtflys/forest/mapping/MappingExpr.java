@@ -23,4 +23,6 @@ public abstract class MappingExpr {
     public void setVariableScope(VariableScope variableScope) {
         this.variableScope = variableScope;
     }
+
+    public abstract boolean isIterateVariable();
 }

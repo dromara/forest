@@ -18,6 +18,11 @@ public class MappingDouble extends MappingExpr {
         return number;
     }
 
+    @Override
+    public boolean isIterateVariable() {
+        return false;
+    }
+
     public double getNumber() {
         return number;
     }

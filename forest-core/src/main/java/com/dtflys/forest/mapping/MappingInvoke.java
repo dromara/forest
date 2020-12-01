@@ -68,6 +68,20 @@ public class MappingInvoke extends MappingDot {
     }
 
     @Override
+    public boolean isIterateVariable() {
+        boolean ret = super.isIterateVariable();
+        if (ret) {
+            return true;
+        }
+        for (MappingExpr argExpr : argList) {
+            if (argExpr.isIterateVariable()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public String toString() {
         return "[Invoke: " + left.toString() + "." + right + " ()]";
     }

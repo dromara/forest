@@ -835,7 +835,22 @@ public class ForestMethod<T> implements VariableScope {
                             request.addQuery(parameter.getName(), obj);
                         }
                     } else {
-                        nameValueList.add(nameValue);
+                        MappingTemplate template = makeTemplate(nameValue.getName());
+                        if (obj instanceof Iterable && template.hasIterateVariable()) {
+                            int index = 0;
+                            VariableScope parentScope = template.getVariableScope();
+                            for (Object subItem : (Iterable) obj) {
+                                SubVariableScope scope = new SubVariableScope(parentScope);
+                                template.setVariableScope(scope);
+                                scope.addVariableValue("_it", subItem);
+                                scope.addVariableValue("_index", index++);
+                                template.setVariableScope(scope);
+                                String name = template.render(args);
+                                nameValueList.add(new RequestNameValue(name, subItem, target));
+                            }
+                        } else {
+                            nameValueList.add(nameValue);
+                        }
                     }
                 }
             }

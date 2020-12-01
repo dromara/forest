@@ -17,6 +17,11 @@ public class MappingIndex extends MappingExpr {
         return args[index];
     }
 
+    @Override
+    public boolean isIterateVariable() {
+        return false;
+    }
+
     public Integer getIndex() {
         return index;
     }

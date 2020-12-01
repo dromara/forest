@@ -128,6 +128,15 @@ public class MappingTemplate {
         }
     }
 
+    public boolean hasIterateVariable() {
+        for (MappingExpr expr : exprList) {
+            if (expr.isIterateVariable()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     private void syntaxErrorWatch1(char ch) {
         throw new ForestRuntimeException("Template Expression Parse Error:\n Character '" + ch +
