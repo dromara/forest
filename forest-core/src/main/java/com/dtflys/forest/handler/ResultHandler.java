@@ -65,9 +65,6 @@ public class ResultHandler {
                         }
                     }
                 }
-                if (boolean.class.isAssignableFrom(resultClass) || Boolean.class.isAssignableFrom(resultClass)) {
-                    return response.isSuccess();
-                }
                 if (resultClass.isArray()) {
                     if (byte[].class.isAssignableFrom(resultClass)) {
                         return response.getByteArray();
