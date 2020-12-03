@@ -33,6 +33,7 @@ import com.alibaba.fastjson.parser.ParserConfig;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.util.FieldInfo;
 import com.alibaba.fastjson.util.TypeUtils;
+import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.StringUtils;
@@ -303,11 +304,12 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
     }
 
     @Override
-    public void setDateFormat(String format) {
+    public ForestConverter setDateFormat(String format) {
         this.dateFormat = format;
         if (StringUtils.isNotBlank(format)) {
             JSON.DEFFAULT_DATE_FORMAT = format;
         }
+        return this;
     }
 
     @Override

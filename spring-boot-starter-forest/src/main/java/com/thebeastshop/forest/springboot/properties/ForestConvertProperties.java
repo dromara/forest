@@ -1,5 +1,7 @@
 package com.thebeastshop.forest.springboot.properties;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
 public class ForestConvertProperties {
 
     private ForestConverterItemProperties text;
