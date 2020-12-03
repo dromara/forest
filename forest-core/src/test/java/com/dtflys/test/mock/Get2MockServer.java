@@ -38,6 +38,30 @@ public class Get2MockServer extends MockServerRule {
                         .withBody(EXPECTED)
         );
 
+        mockClient.when(
+                request()
+                        .withPath("/boolean/true")
+                        .withMethod("GET")
+        )
+                .respond(
+                        response()
+                                .withStatusCode(200)
+                                .withBody("true")
+                );
+
+
+
+        mockClient.when(
+                request()
+                        .withPath("/boolean/false")
+                        .withMethod("GET")
+        )
+                .respond(
+                        response()
+                                .withStatusCode(200)
+                                .withBody("false")
+                );
+
     }
 
 }

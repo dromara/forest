@@ -45,6 +45,12 @@ public interface GetClient {
     )
     String simpleGetMultiQuery(@Query("password") String password);
 
+    @Get(url = "http://localhost:${port}/boolean/true")
+    Boolean getBooleanResultTrue();
+
+    @Get(url = "http://localhost:${port}/boolean/false")
+    Boolean getBooleanResultFlase();
+
 
     @Request(
             url = "http://localhost:${port}/hello/user",
