@@ -44,11 +44,27 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
                     } catch (Throwable th) {
                         result = tryConvert(source, targetType, ForestDataType.TEXT);
                     }
+                } else if ("true".equalsIgnoreCase(trimmedStr)) {
+                    if (boolean.class.isAssignableFrom(targetType) || Boolean.class.isAssignableFrom(targetType)) {
+                        result = (T) Boolean.TRUE;
+                    } else  {
+                        result = tryConvert(trimmedStr, targetType, ForestDataType.TEXT);
+                    }
+                } else if ("false".equalsIgnoreCase(trimmedStr)) {
+                    if (boolean.class.isAssignableFrom(targetType) || Boolean.class.isAssignableFrom(targetType)) {
+                        result = (T) Boolean.FALSE;
+                    } else {
+                        result = tryConvert(trimmedStr, targetType, ForestDataType.TEXT);
+                    }
                 } else {
                     result = tryConvert(source, targetType, ForestDataType.TEXT);
                 }
             } catch (Throwable th) {
-                throw new ForestConvertException("auto", th);
+                try {
+                    result = tryConvert(trimmedStr, targetType, ForestDataType.TEXT);
+                } catch (Throwable th2) {
+                    throw new ForestConvertException("auto", th2);
+                }
             }
         }
         return result;
@@ -90,11 +106,27 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
                     } catch (Throwable th) {
                         result = tryConvert(source, targetType, ForestDataType.TEXT);
                     }
+                }  else if ("true".equalsIgnoreCase(trimmedStr)) {
+                    if (boolean.class.isAssignableFrom(clazz) || Boolean.class.isAssignableFrom(clazz)) {
+                        result = (T) Boolean.TRUE;
+                    } else {
+                        result = tryConvert(trimmedStr, targetType, ForestDataType.TEXT);
+                    }
+                } else if ("false".equalsIgnoreCase(trimmedStr)) {
+                    if (boolean.class.isAssignableFrom(clazz) || Boolean.class.isAssignableFrom(clazz)) {
+                        result = (T) Boolean.FALSE;
+                    } else {
+                        result = tryConvert(trimmedStr, targetType, ForestDataType.TEXT);
+                    }
                 } else {
                     result = tryConvert(source, targetType, ForestDataType.TEXT);
                 }
             } catch (Throwable th) {
-                result = tryConvert(source, targetType, ForestDataType.TEXT);
+                try {
+                    result = tryConvert(trimmedStr, targetType, ForestDataType.TEXT);
+                } catch (Throwable th2) {
+                    throw new ForestConvertException("auto", th2);
+                }
             }
         }
         return result;
