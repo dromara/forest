@@ -37,7 +37,7 @@ import java.lang.annotation.Target;
  * 也就会自动执行组装请求、发送请求、接受请求响应信息等任务。
  *
  * @author gongjun[dt_flys@hotmail.com]
- * @since 2020-08-13 23:41
+ * @since 1.4.0
  */
 @Documented
 @MethodLifeCycle(PostRequestLifeCycle.class)
@@ -46,9 +46,16 @@ import java.lang.annotation.Target;
 public @interface Post {
 
     /**
-     * target http url
+     * 目标请求URL [同url属性]
      */
-    String url();
+    @AliasFor("url")
+    String value() default "";
+
+    /**
+     * 目标请求URL [同value属性]
+     */
+    @AliasFor("value")
+    String url() default "";
 
     /**
      * type of response data: <br>

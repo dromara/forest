@@ -117,7 +117,7 @@ public class ForestConfigurationProperties {
      */
     private List<ForestSSLKeyStoreProperties> sslKeyStores = new ArrayList<>();
 
-    private ForestConvertProperties converters;
+    private ForestConvertProperties converters = new ForestConvertProperties();
 
     private Map<String, Class> filters = new HashMap<>();
 
