@@ -29,7 +29,7 @@ import static junit.framework.Assert.assertTrue;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-18 13:53
  */
-public class TestGsonConverter {
+public class TestGsonConverter extends JSONConverter {
 
     @Test
     public void testConvertToJson() {
@@ -174,6 +174,26 @@ public class TestGsonConverter {
         assertNotNull(map);
         assertEquals("11.11111", map.get("longitude"));
         assertEquals("22.22222", map.get("latitude"));
+    }
+
+
+    @Test
+    public void testDate() throws ParseException {
+        ForestGsonConverter gsonConverter = new ForestGsonConverter();
+        String json = "{\"name\":\"foo\",\"date\":\"2020-10-10 10:12:00\"}";
+        gsonConverter.setDateFormat("yyyy-MM-dd hh:mm:ss");
+        TestJsonObj testJsonObj = gsonConverter.convertToJavaObject(json, TestJsonObj.class);
+        assertNotNull(testJsonObj);
+        assertEquals("foo", testJsonObj.getName());
+        assertDateEquals("2020-10-10 10:12:00", testJsonObj.getDate(), "yyyy-MM-dd hh:mm:ss");
+
+        json = "{\"name\":\"foo\",\"date\":\"2020/10/10 10:12:00\"}";
+        gsonConverter.setDateFormat("yyyy/MM/dd hh:mm:ss");
+        testJsonObj = gsonConverter.convertToJavaObject(json, TestJsonObj.class);
+        assertNotNull(testJsonObj);
+        assertEquals("foo", testJsonObj.getName());
+        assertDateEquals("2020-10-10 10:12:00", testJsonObj.getDate(), "yyyy-MM-dd hh:mm:ss");
+
     }
 
 

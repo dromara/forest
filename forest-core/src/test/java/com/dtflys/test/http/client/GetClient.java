@@ -49,7 +49,13 @@ public interface GetClient {
     Boolean getBooleanResultTrue();
 
     @Get(url = "http://localhost:${port}/boolean/false")
-    Boolean getBooleanResultFlase();
+    Boolean getBooleanResultFalse();
+
+    @Get("http://localhost:${port}/boolean/true")
+    Boolean getBooleanResultTrue2();
+
+    @Get("http://localhost:${port}/boolean/false")
+    Boolean getBooleanResultFalse2();
 
 
     @Request(

@@ -277,8 +277,9 @@ public interface PostClient {
     ForestResponse<String> postJson5(@DataParam("username") String username, @DataVariable("token") String token);
 
 
-    @Post(url = "http://localhost:${port}/json")
+    @Post("http://localhost:${port}/json")
     String postJsonBodyMap(@JSONBody Map user);
+
 
     @Post(
             url = "http://localhost:${port}/json",
