@@ -6,7 +6,7 @@ import com.dtflys.forest.utils.ForestProgress;
  * 回调函数: 文件上传或下载监听传输进度时调用
  *
  * @author gongjun
- * @since 2020-07-26
+ * @since 1.4.0
  */
 public interface OnProgress {
 
