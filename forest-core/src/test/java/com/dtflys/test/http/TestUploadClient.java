@@ -425,4 +425,22 @@ public class TestUploadClient extends BaseClientTest {
         }
     }
 
+    @Test
+    public void testUploadFileWithJSON() {
+        String path = this.getClass().getResource("/test-img.jpg").getPath();
+        if (path.startsWith("/") && isWindows()) {
+            path = path.substring(1);
+        }
+        File file = new File(path);
+        ForestRequest<Map> request = uploadClient.upload(file, progress -> {});
+        assertNotNull(request);
+        List<ForestMultipart> multipartList = request.getMultiparts();
+        assertEquals(1, multipartList.size());
+        ForestMultipart multipart = multipartList.get(0);
+        assertTrue(Map.class.isAssignableFrom(request.getMethod().getReturnClass()));
+        assertTrue(multipart instanceof FileMultipart);
+        assertEquals("file", multipart.getName());
+        assertEquals("test-img.jpg", multipart.getOriginalFileName());
+    }
+
 }
