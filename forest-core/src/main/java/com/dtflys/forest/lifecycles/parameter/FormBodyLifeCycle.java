@@ -11,8 +11,9 @@ import com.dtflys.forest.utils.StringUtils;
 
 /**
  * Forest &#064;FormBody注解的生命周期
+ *
  * @author gongjun[dt_flys@hotmail.com]
- * @since 1.5.0-BETA9
+ * @since 1.5.0-RC1
  */
 public class FormBodyLifeCycle extends AbstractBodyLifeCycle<FormBody> {
 
@@ -30,6 +31,7 @@ public class FormBodyLifeCycle extends AbstractBodyLifeCycle<FormBody> {
         String contentType = metaRequest.getContentType();
         if (StringUtils.isNotEmpty(contentType) &&
                 !ContentType.APPLICATION_X_WWW_FORM_URLENCODED.equals(contentType) &&
+                !ContentType.MULTIPART_FORM_DATA.equals(contentType) &&
                 contentType.indexOf("$") < 0) {
             throw new ForestRuntimeException("[Forest] the Content-Type of request binding on method '" +
                     methodName + "' has already been set value '" + contentType +
