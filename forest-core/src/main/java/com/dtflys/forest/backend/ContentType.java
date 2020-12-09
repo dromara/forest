@@ -137,7 +137,8 @@ public class ContentType {
 
 
     public boolean canReadAsString() {
-        return isJson() || isXml() || isJavaScript() || isText();
+        return (isApplication() || isJson() || isXml() || isJavaScript() || isText()) &&
+                !(isAudio() || isImage() || isMultipart() || isVideo() || isOctetStream() || isPdf() || isZip());
     }
 
     public boolean canReadAsBinaryStream() {
