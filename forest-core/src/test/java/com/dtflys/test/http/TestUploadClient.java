@@ -3,6 +3,8 @@ package com.dtflys.test.http;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestRequestBody;
+import com.dtflys.forest.http.NameValueRequestBody;
 import com.dtflys.forest.multipart.ByteArrayMultipart;
 import com.dtflys.forest.multipart.FileMultipart;
 import com.dtflys.forest.multipart.FilePathMultipart;
@@ -13,7 +15,6 @@ import com.dtflys.test.mock.TraceMockServer;
 import org.apache.commons.io.IOUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +41,7 @@ public class TestUploadClient extends BaseClientTest {
     private static ForestConfiguration configuration;
 
     private UploadClient uploadClient;
+
 
     @BeforeClass
     public static void prepareClient() {
@@ -423,6 +425,33 @@ public class TestUploadClient extends BaseClientTest {
             assertEquals(key, multipart.getOriginalFileName());
             i++;
         }
+    }
+
+    @Test
+    public void testMixtureUploadImage() throws IOException {
+        String path = this.getClass().getResource("/test-img.jpg").getPath();
+        if (path.startsWith("/") && isWindows()) {
+            path = path.substring(1);
+        }
+        File file = new File(path);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("a", 1);
+        map.put("b", 2);
+        ForestRequest request = uploadClient.imageUpload("img1.jpg", file, map);
+        assertNotNull(request);
+        List<ForestMultipart> multipartList = request.getMultiparts();
+        assertEquals(1, multipartList.size());
+        ForestMultipart multipart = multipartList.get(0);
+        assertTrue(Map.class.isAssignableFrom(request.getMethod().getReturnClass()));
+        assertTrue(multipart instanceof FileMultipart);
+        assertEquals("file", multipart.getName());
+        assertEquals("img1.jpg", multipart.getOriginalFileName());
+        List<ForestRequestBody> bodyList = request.getBody();
+        assertTrue(bodyList.size() == 1);
+        ForestRequestBody body = bodyList.get(0);
+        assertTrue(body instanceof NameValueRequestBody);
+        assertEquals("meta", ((NameValueRequestBody) body).getName());
     }
 
 }
