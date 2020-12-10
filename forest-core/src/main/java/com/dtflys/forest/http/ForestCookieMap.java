@@ -1,5 +1,7 @@
 package com.dtflys.forest.http;
 
+import okhttp3.Cookie;
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,10 +24,11 @@ public class ForestCookieMap {
         return cookies.size();
     }
 
+
     public List<ForestCookie> getCookies(String domain) {
         List<ForestCookie> list = new LinkedList<>();
         for (ForestCookie cookie : cookies) {
-            if (cookie.getDomain().equals(domain)) {
+            if (cookie.matchDomain(domain)) {
                 list.add(cookie);
             }
         }
@@ -35,8 +38,8 @@ public class ForestCookieMap {
     public List<ForestCookie> getCookies(String domain, String path) {
         List<ForestCookie> list = new LinkedList<>();
         for (ForestCookie cookie : cookies) {
-            if (cookie.getDomain().equals(domain) &&
-                cookie.getPath().equals(path)) {
+            if (cookie.matchDomain(domain) &&
+                cookie.matchPath(path)) {
                 list.add(cookie);
             }
         }
@@ -46,8 +49,8 @@ public class ForestCookieMap {
     public List<ForestCookie> getCookies(String domain, String path, String name) {
         List<ForestCookie> list = new LinkedList<>();
         for (ForestCookie cookie : cookies) {
-            if (cookie.getDomain().equals(domain) &&
-                    cookie.getPath().equals(path) &&
+            if (cookie.matchDomain(domain) &&
+                    cookie.matchPath(path) &&
                     cookie.getName().equals(name)) {
                 list.add(cookie);
             }

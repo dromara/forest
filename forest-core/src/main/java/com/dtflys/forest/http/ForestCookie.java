@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.time.Duration;
 import java.util.Date;
 
+import static okhttp3.internal.Util.verifyAsIpAddress;
+
 /**
  * Forest Cookie
  *
@@ -100,5 +102,33 @@ public class ForestCookie implements Serializable {
     public boolean isHostOnly() {
         return hostOnly;
     }
+
+    public boolean matchDomain(String domain) {
+        if (this.domain.equals(domain)) {
+            return true;
+        }
+
+        if (this.domain.endsWith(domain)
+                && this.domain.charAt(this.domain.length() - domain.length() - 1) == '.'
+                && !verifyAsIpAddress(this.domain)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean matchPath(String path) {
+        if (this.path.equals(path)) {
+            return true;
+        }
+        if (this.path.startsWith(path)) {
+            if (path.endsWith("/")) {
+                return true;
+            }
+            return this.path.charAt(path.length()) == '/';
+        }
+        return false;
+    }
+
 
 }
