@@ -90,7 +90,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
                 }
             }
         }
-        if (StringUtils.isNotEmpty(contentType) && !contentType.startsWith("multipart/form-data")) {
+        if (StringUtils.isNotEmpty(contentType)) {
             httpRequest.setHeader("Content-Type", contentType);
         }
         if (StringUtils.isNotEmpty(contentEncoding)) {

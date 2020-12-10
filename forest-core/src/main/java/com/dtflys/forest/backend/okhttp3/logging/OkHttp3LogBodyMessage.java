@@ -1,5 +1,6 @@
 package com.dtflys.forest.backend.okhttp3.logging;
 
+import com.dtflys.forest.backend.httpclient.body.HttpclientMultipartFileBody;
 import com.dtflys.forest.logging.LogBodyMessage;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -100,6 +101,9 @@ public class OkHttp3LogBodyMessage implements LogBodyMessage {
                         .append(disposition.get(0));
                 MediaType mediaType = partBody.contentType();
                 if (mediaType == null) {
+                    builder.append("; content-type=\"")
+                            .append(partBody.contentType())
+                            .append("\"");
                     builder.append("; value=\"")
                             .append(getLogContentForStringBody(partBody))
                             .append("\"]");
@@ -112,6 +116,9 @@ public class OkHttp3LogBodyMessage implements LogBodyMessage {
                     if (length != null) {
                         builder.append("; length=").append(length);
                     }
+                    builder.append("; content-type=\"")
+                            .append(partBody.contentType())
+                            .append("\"");
                     builder.append("]");
                 }
             }

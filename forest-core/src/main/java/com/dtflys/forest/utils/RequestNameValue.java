@@ -17,6 +17,11 @@ public class RequestNameValue {
     private final int target;
 
     /**
+     * 子项Content-Type
+     */
+    private String partContentType;
+
+    /**
      * 请求对象中键值对数据的封装
      *
      * @param name 键值字符串
@@ -27,11 +32,26 @@ public class RequestNameValue {
         this.target = target;
     }
 
+    public RequestNameValue(String name, int target, String partContentType) {
+        this.name = name;
+        this.target = target;
+        this.partContentType = partContentType;
+    }
+
+
     public RequestNameValue(String name, Object value, int target) {
         this.name = name;
         this.value = value;
         this.target = target;
     }
+
+    public RequestNameValue(String name, Object value, int target, String partContentType) {
+        this.name = name;
+        this.value = value;
+        this.target = target;
+        this.partContentType = partContentType;
+    }
+
 
 
     public String getName() {
@@ -64,5 +84,13 @@ public class RequestNameValue {
 
     public int getTarget() {
         return target;
+    }
+
+    public String getPartContentType() {
+        return partContentType;
+    }
+
+    public void setPartContentType(String partContentType) {
+        this.partContentType = partContentType;
     }
 }

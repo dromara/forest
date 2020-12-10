@@ -107,6 +107,20 @@ public class ContentType {
         return "ogg".equals(subType);
     }
 
+    public boolean isStream() {
+        if (subType == null) {
+            return false;
+        }
+        return subType.endsWith("stream") || subType.startsWith("stream");
+    }
+
+    public boolean isTorrent() {
+        if (subType == null) {
+            return false;
+        }
+        return subType.endsWith("torrent");
+    }
+
     public boolean isPdf() {
         if (subType == null) {
             return false;
@@ -141,7 +155,7 @@ public class ContentType {
     }
 
     public boolean canReadAsBinaryStream() {
-        return !canReadAsString();
+        return isAudio() || isImage() || isMultipart() || isVideo() || isStream() || isPdf() || isZip();
     }
 
     @Override
