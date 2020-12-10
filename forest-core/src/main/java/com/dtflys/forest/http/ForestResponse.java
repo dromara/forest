@@ -26,6 +26,7 @@ package com.dtflys.forest.http;
 
 
 import com.dtflys.forest.backend.ContentType;
+import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.ByteEncodeUtils;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.commons.io.IOUtils;
@@ -64,7 +65,20 @@ public abstract class ForestResponse<T> {
     }
 
     public String getContent() {
+        if (content != null) {
+            return content;
+        }
+        content = readAsString();
         return content;
+    }
+
+    public String readAsString() {
+        try {
+            byte[] bytes = getByteArray();
+            return byteToString(bytes);
+        } catch (Exception e) {
+            throw new ForestRuntimeException(e);
+        }
     }
 
     public synchronized void setContent(String content) {

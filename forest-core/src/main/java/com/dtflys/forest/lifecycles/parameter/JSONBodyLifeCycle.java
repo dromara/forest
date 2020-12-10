@@ -34,6 +34,7 @@ public class JSONBodyLifeCycle extends AbstractBodyLifeCycle<JSONBody> {
         String contentType = metaRequest.getContentType();
         if (StringUtils.isNotEmpty(contentType) &&
                 !ContentType.APPLICATION_JSON.equals(contentType) &&
+                !ContentType.MULTIPART_FORM_DATA.equals(contentType) &&
                 contentType.indexOf("$") < 0) {
             throw new ForestRuntimeException("[Forest] the Content-Type of request binding on method '" +
                     methodName + "' has already been set value '" + contentType +
@@ -55,7 +56,8 @@ public class JSONBodyLifeCycle extends AbstractBodyLifeCycle<JSONBody> {
             request.setContentType(ContentType.APPLICATION_JSON);
         }
 
-        if (contentType.indexOf(ContentType.APPLICATION_JSON) < 0) {
+        if (contentType.indexOf(ContentType.APPLICATION_JSON) < 0 &&
+                contentType.indexOf(ContentType.MULTIPART_FORM_DATA) < 0) {
             String methodName = methodName(request.getMethod());
             throw new ForestRuntimeException("[Forest] the Content-Type of request binding on method '" +
                     methodName + "' has already been set value '" + contentType +

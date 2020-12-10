@@ -1,5 +1,6 @@
 package com.dtflys.forest.backend.httpclient.logging;
 
+import com.dtflys.forest.backend.httpclient.body.HttpclientMultipartFileBody;
 import com.dtflys.forest.logging.LogBodyMessage;
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.mime.FormBodyPart;
@@ -117,6 +118,9 @@ public class HttpclientLogBodyMessage implements LogBodyMessage {
                             value = getLogContentFormBufferedReader(bufferedReader);
                         } catch (IOException e) {
                         }
+                        builder.append("; content-type=\"")
+                                .append(((StringBody) partBody).getContentType())
+                                .append("\"");
                         builder.append("; value=\"")
                                 .append(value)
                                 .append("\"]");
@@ -125,6 +129,11 @@ public class HttpclientLogBodyMessage implements LogBodyMessage {
                         length = partBody.getContentLength();
                         if (length != null) {
                             builder.append("; length=").append(length);
+                        }
+                        if (partBody instanceof HttpclientMultipartFileBody) {
+                            builder.append("; content-type=\"")
+                                    .append(((HttpclientMultipartFileBody) partBody).getContentType())
+                                    .append("\"");
                         }
                         builder.append("]");
                     }

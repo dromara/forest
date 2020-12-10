@@ -85,7 +85,7 @@ public class HttpclientForestResponse extends ForestResponse {
                 content = readContentAsString();
             } else if (!request.isDownloadFile() && contentType.canReadAsString()) {
                 content = readContentAsString();
-            } else {
+            } else if (contentType.canReadAsBinaryStream()) {
                 StringBuilder builder = new StringBuilder();
                 builder.append("[content-type: ")
                         .append(contentType);

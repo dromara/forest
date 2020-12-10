@@ -20,11 +20,24 @@ public class NameValueRequestBody extends ForestRequestBody {
      */
     private Object value;
 
+    /**
+     * 请求体项Content-Type
+     */
+    private String contentType;
+
     public NameValueRequestBody(String name, Object value) {
         super(BodyType.NAME_VALUE);
         this.name = name;
         this.value = value;
     }
+
+    public NameValueRequestBody(String name, String contentType, Object value) {
+        super(BodyType.NAME_VALUE);
+        this.name = name;
+        this.contentType = contentType;
+        this.value = value;
+    }
+
 
     public String getName() {
         return name;
@@ -40,6 +53,14 @@ public class NameValueRequestBody extends ForestRequestBody {
 
     public void setValue(Object value) {
         this.value = value;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
 
     public String toFormString() {

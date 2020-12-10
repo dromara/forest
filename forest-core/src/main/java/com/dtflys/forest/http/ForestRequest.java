@@ -847,6 +847,17 @@ public class ForestRequest<T> {
 
     /**
      * 添加键值对类型Body数据
+     * @param name 字段名
+     * @param contentType 该请求体项的Content-Type
+     * @param value 字段值
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest addBody(String name, String contentType, Object value) {
+        return addBody(new NameValueRequestBody(name, contentType, value));
+    }
+
+    /**
+     * 添加键值对类型Body数据
      * @param nameValue 请求键值对对象
      * @return {@link ForestRequest}类实例
      */
@@ -910,7 +921,7 @@ public class ForestRequest<T> {
         } else if (nameValue.isInQuery()) {
             this.addQuery(nameValue.getName(), nameValue.getValue());
         } else if (nameValue.isInBody()) {
-            this.addBody(nameValue.getName(), nameValue.getValue());
+            this.addBody(nameValue.getName(), nameValue.getPartContentType(), nameValue.getValue());
         }
         return this;
     }
@@ -973,7 +984,7 @@ public class ForestRequest<T> {
                 NameValueRequestBody nameValueRequestBody = (NameValueRequestBody) item;
                 String name = nameValueRequestBody.getName();
                 Object value = nameValueRequestBody.getValue();
-                RequestNameValue nameValue = new RequestNameValue(name, value, TARGET_BODY);
+                RequestNameValue nameValue = new RequestNameValue(name, value, TARGET_BODY, nameValueRequestBody.getContentType());
                 nameValueList.add(nameValue);
             }
         }

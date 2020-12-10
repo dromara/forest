@@ -161,7 +161,7 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
                 }
             }
         }
-        if (StringUtils.isNotEmpty(contentType) && !contentType.startsWith("multipart/form-data")) {
+        if (StringUtils.isNotEmpty(contentType)) {
             builder.addHeader("Content-Type", contentType);
         }
         if (StringUtils.isNotEmpty(contentEncoding)) {

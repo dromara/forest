@@ -8,6 +8,7 @@ import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
+import okhttp3.MediaType;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -22,6 +23,7 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.util.*;
 
@@ -95,7 +97,7 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
         if (StringUtils.isNotEmpty(charset)) {
             itemCharset = Charset.forName(charset);
         }
-        ContentType itemContentType = ContentType.create("text/plain", itemCharset);
+
         for (int i = 0; i < nameValueList.size(); i++) {
             RequestNameValue nameValue = nameValueList.get(i);
             if (!nameValue.isInBody()) {
@@ -104,13 +106,33 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
             String name = nameValue.getName();
             Object value = nameValue.getValue();
             String text = MappingTemplate.getParameterValue(jsonConverter, value);
+            String partContentType = nameValue.getPartContentType();
+            if (StringUtils.isEmpty(partContentType)) {
+                partContentType = "text/plain";
+            }
+            ContentType itemContentType = ContentType.create(partContentType, itemCharset);
             entityBuilder.addTextBody(name, text, itemContentType);
         }
         for (int i = 0; i < multiparts.size(); i++) {
             ForestMultipart multipart = multiparts.get(i);
             String name = multipart.getName();
             String fileName = multipart.getOriginalFileName();
-            ContentType ctype = ContentType.create(multipart.getContentType(), httpCharset);
+            String partContentType = multipart.getContentType();
+
+            ContentType ctype = null;
+
+            if (StringUtils.isNotEmpty(partContentType)) {
+                ctype = ContentType.create(partContentType, httpCharset);
+            }
+            if (ctype == null) {
+                String mimeType = URLConnection.guessContentTypeFromName(fileName);
+                if (mimeType == null) {
+                    // guess this is a video uploading
+                    ctype = ContentType.create(com.dtflys.forest.backend.ContentType.MULTIPART_FORM_DATA, httpCharset);
+                } else {
+                    ctype = ContentType.create(mimeType);
+                }
+            }
             AbstractContentBody contentBody = null;
             if (multipart.isFile()) {
                 contentBody = new HttpclientMultipartFileBody(request, multipart.getFile(), ctype, fileName, lifeCycleHandler);
@@ -119,9 +141,10 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
             }
             entityBuilder.addPart(name, contentBody);
         }
-        if (httpReq.getFirstHeader("Content-Type") != null) {
-            httpReq.removeHeaders("Content-Type");
-        }
+//        if (httpReq.getFirstHeader("Content-Type") != null) {
+//            httpReq.removeHeaders("Content-Type");
+//        }
+//        httpReq.addHeader("Content-Type", com.dtflys.forest.backend.ContentType.MULTIPART_FORM_DATA);
         HttpEntity entity = entityBuilder.build();
         httpReq.setEntity(entity);
     }
