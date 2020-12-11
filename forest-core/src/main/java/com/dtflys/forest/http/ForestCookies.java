@@ -1,22 +1,21 @@
 package com.dtflys.forest.http;
 
-import okhttp3.Cookie;
-
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Forest Cookie Map集合
+ * Forest Cookie 集合
  *
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.5.0-RC1
  */
-public class ForestCookieMap {
+public class ForestCookies implements Iterable<ForestCookie> {
 
     private List<ForestCookie> cookies;
 
-    public ForestCookieMap() {
+    public ForestCookies() {
         this.cookies = new LinkedList<>();
     }
 
@@ -63,14 +62,6 @@ public class ForestCookieMap {
         this.cookies.add(cookie);
     }
 
-    public void setCookie(ForestCookie cookie) {
-        for (ForestCookie item : cookies) {
-            if (item.getName().equalsIgnoreCase(cookie.getName())) {
-
-            }
-        }
-    }
-
     public List<String> domains() {
         List<String> results = new LinkedList<>();
         for (ForestCookie cookie : cookies) {
@@ -101,6 +92,9 @@ public class ForestCookieMap {
         return this.cookies;
     }
 
-
+    @Override
+    public Iterator<ForestCookie> iterator() {
+        return this.cookies.iterator();
+    }
 
 }

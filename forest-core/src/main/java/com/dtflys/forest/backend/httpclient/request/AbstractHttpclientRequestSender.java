@@ -2,6 +2,8 @@ package com.dtflys.forest.backend.httpclient.request;
 
 import com.dtflys.forest.backend.httpclient.conn.HttpclientConnectionManager;
 import com.dtflys.forest.backend.httpclient.logging.HttpclientLogBodyMessage;
+import com.dtflys.forest.http.ForestCookie;
+import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.logging.ForestLogHandler;
@@ -15,8 +17,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.cookie.Cookie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,6 +101,14 @@ public abstract class AbstractHttpclientRequestSender implements HttpclientReque
         }
     }
 
+    protected ForestCookies getCookiesFromHttpCookieStore(CookieStore cookieStore) {
+        ForestCookies cookies = new ForestCookies();
+        for (Cookie httpCookie : cookieStore.getCookies()) {
+            ForestCookie cookie = ForestCookie.createFromHttpclientCookie(httpCookie);
+            cookies.addCookie(cookie);
+        }
+        return cookies;
+    }
 
     protected static void logContent(String content) {
         log.info("[Forest] " + content);

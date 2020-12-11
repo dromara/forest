@@ -1,12 +1,15 @@
 package com.dtflys.forest.reflection;
 
+import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
+import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.exceptions.ForestNetworkException;
 import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.handler.ResultHandler;
+import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.retryer.Retryer;
@@ -153,10 +156,28 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
 
     @Override
     public void handleProgress(ForestRequest request, ForestProgress progress) {
-//        request.getInterceptorChain().onProgress(progress);
+        request.getInterceptorChain().onProgress(progress);
         OnProgress onProgress = request.getOnProgress();
         if (onProgress != null) {
             onProgress.onProgress(progress);
+        }
+    }
+
+    @Override
+    public void handleLoadCookie(ForestRequest request, ForestCookies cookies) {
+        request.getInterceptorChain().onLoadCookie(request, cookies);
+        OnLoadCookie onLoadCookie = request.getOnLoadCookie();
+        if (onLoadCookie != null) {
+            onLoadCookie.onLoadCookie(request, cookies);
+        }
+    }
+
+    @Override
+    public void handleSaveCookie(ForestRequest request, ForestCookies cookies) {
+        request.getInterceptorChain().onSaveCookie(request, cookies);
+        OnSaveCookie onSaveCookie = request.getOnSaveCookie();
+        if (onSaveCookie != null) {
+            onSaveCookie.onSaveCookie(request, cookies);
         }
     }
 

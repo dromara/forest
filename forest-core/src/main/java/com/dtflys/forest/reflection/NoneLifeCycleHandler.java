@@ -2,6 +2,7 @@ package com.dtflys.forest.reflection;
 
 import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.handler.LifeCycleHandler;
+import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.retryer.Retryer;
@@ -61,6 +62,16 @@ public class NoneLifeCycleHandler implements LifeCycleHandler {
 
     @Override
     public void handleProgress(ForestRequest request, ForestProgress progress) {
+
+    }
+
+    @Override
+    public void handleLoadCookie(ForestRequest request, ForestCookies cookies) {
+
+    }
+
+    @Override
+    public void handleSaveCookie(ForestRequest request, ForestCookies cookies) {
 
     }
 

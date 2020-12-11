@@ -5,6 +5,8 @@ import com.dtflys.forest.backend.BodyBuilder;
 import com.dtflys.forest.backend.httpclient.HttpclientRequestProvider;
 import com.dtflys.forest.backend.httpclient.body.HttpclientBodyBuilder;
 import com.dtflys.forest.backend.url.URLBuilder;
+import com.dtflys.forest.http.ForestCookie;
+import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
@@ -13,6 +15,7 @@ import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.ResponseLogMessage;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.HttpRequestBase;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.backend.httpclient.request.HttpclientRequestSender;
@@ -23,6 +26,9 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.mapping.MappingTemplate;
 
 
+import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.cookie.BasicClientCookie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +48,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
     protected final String typeName;
     protected T httpRequest;
     protected BodyBuilder<T> bodyBuilder;
+    protected CookieStore cookieStore;
 
 
     protected T buildRequest() {
@@ -66,6 +73,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
     protected void prepare(LifeCycleHandler lifeCycleHandler) {
         httpRequest = buildRequest();
         prepareBodyBuilder();
+        prepareCookies(lifeCycleHandler);
         prepareHeaders();
         prepareBody(lifeCycleHandler);
     }
@@ -95,6 +103,25 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         }
         if (StringUtils.isNotEmpty(contentEncoding)) {
             httpRequest.setHeader("Content-Encoding", contentEncoding);
+        }
+
+    }
+
+
+    public void prepareCookies(LifeCycleHandler lifeCycleHandler) {
+        cookieStore = new BasicCookieStore();
+        ForestCookies cookies = new ForestCookies();
+        lifeCycleHandler.handleLoadCookie(request, cookies);
+        for (ForestCookie cookie : cookies) {
+            BasicClientCookie httpCookie = new BasicClientCookie(
+                    cookie.getName(),
+                    cookie.getValue()
+            );
+            httpCookie.setDomain(cookie.getDomain());
+            httpCookie.setPath(cookie.getPath());
+            httpCookie.setSecure(cookie.isSecure());
+            httpCookie.setExpiryDate(new Date(cookie.getExpiresTime()));
+            cookieStore.addCookie(httpCookie);
         }
     }
 
@@ -134,7 +161,13 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         Date startDate = new Date();
         long startTime = startDate.getTime();
         try {
-            requestSender.sendRequest(request, httpclientResponseHandler, httpRequest, lifeCycleHandler, startTime, 0);
+            requestSender.sendRequest(
+                    request,
+                    httpclientResponseHandler,
+                    httpRequest,
+                    lifeCycleHandler,
+                    cookieStore,
+                    startTime, 0);
         } catch (IOException e) {
             if (retryCount >= request.getRetryCount()) {
                 httpRequest.abort();

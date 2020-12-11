@@ -24,7 +24,9 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
+import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
 import com.dtflys.forest.logging.LogConfiguration;
@@ -217,6 +219,15 @@ public class ForestRequest<T> {
      */
     private OnProgress onProgress;
 
+    /**
+     * 回调函数: 加载Cookie时调用
+     */
+    private OnLoadCookie onLoadCookie;
+
+    /**
+     * 回调函数: 需要保存Cookie时调用
+     */
+    private OnSaveCookie onSaveCookie;
 
     /**
      * 是否下载文件
@@ -1199,6 +1210,46 @@ public class ForestRequest<T> {
      */
     public ForestRequest setOnProgress(OnProgress onProgress) {
         this.onProgress = onProgress;
+        return this;
+    }
+
+    /**
+     * 获取回调函数: 加载Cookie时调用
+     *
+     * @return {@link OnLoadCookie}接口实例
+     */
+    public OnLoadCookie getOnLoadCookie() {
+        return onLoadCookie;
+    }
+
+    /**
+     * 设置回调函数: 加载Cookie时调用
+     *
+     * @param onLoadCookie {@link OnLoadCookie}接口实例
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest setOnLoadCookie(OnLoadCookie onLoadCookie) {
+        this.onLoadCookie = onLoadCookie;
+        return this;
+    }
+
+    /**
+     * 获取回调函数: 需要保存Cookie时调用
+     *
+     * @return {@link OnSaveCookie}接口实例
+     */
+    public OnSaveCookie getOnSaveCookie() {
+        return onSaveCookie;
+    }
+
+    /**
+     * 设置回调函数: 需要保存Cookie时调用
+     *
+     * @param onSaveCookie {@link OnSaveCookie}接口实例
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest setOnSaveCookie(OnSaveCookie onSaveCookie) {
+        this.onSaveCookie = onSaveCookie;
         return this;
     }
 

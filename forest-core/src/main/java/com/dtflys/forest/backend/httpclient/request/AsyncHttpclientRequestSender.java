@@ -6,9 +6,11 @@ import com.dtflys.forest.backend.httpclient.response.HttpclientResponseHandler;
 import com.dtflys.forest.exceptions.ForestNetworkException;
 import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.handler.LifeCycleHandler;
+import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.HttpResponse;
@@ -30,7 +32,10 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
     }
 
     @Override
-    public void sendRequest(final ForestRequest request, final HttpclientResponseHandler responseHandler, final HttpUriRequest httpRequest, LifeCycleHandler lifeCycleHandler, long startTime, int retryCount)  {
+    public void sendRequest(
+            final ForestRequest request, final HttpclientResponseHandler responseHandler,
+            final HttpUriRequest httpRequest, LifeCycleHandler lifeCycleHandler,
+            CookieStore cookieStore, long startTime, int retryCount)  {
         final CloseableHttpAsyncClient client = connectionManager.getHttpAsyncClient(request);
         client.start();
         final ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
@@ -50,9 +55,11 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
                         responseHandler.handleError(response);
                         return;
                     }
-                    sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, startTime, retryCount + 1);
+                    sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, cookieStore, startTime, retryCount + 1);
                     return;
                 }
+                ForestCookies cookies = getCookiesFromHttpCookieStore(cookieStore);
+                lifeCycleHandler.handleSaveCookie(request, cookies);
                 responseHandler.handleSuccess(response);
             }
 
@@ -73,7 +80,7 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
                     responseHandler.handleError(response, ex);
                     return;
                 }
-                sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, startTime, retryCount + 1);
+                sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, cookieStore, startTime, retryCount + 1);
             }
 
             @Override

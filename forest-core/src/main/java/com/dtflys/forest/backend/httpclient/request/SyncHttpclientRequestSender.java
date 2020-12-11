@@ -14,6 +14,7 @@ import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.ResponseLogMessage;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -82,7 +83,10 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
 
 
     @Override
-    public void sendRequest(ForestRequest request, HttpclientResponseHandler responseHandler, HttpUriRequest httpRequest, LifeCycleHandler lifeCycleHandler, long startTime, int retryCount)
+    public void sendRequest(
+            ForestRequest request, HttpclientResponseHandler responseHandler,
+            HttpUriRequest httpRequest, LifeCycleHandler lifeCycleHandler,
+            CookieStore cookieStore, long startTime, int retryCount)
             throws IOException {
         HttpResponse httpResponse = null;
         ForestResponse response = null;
@@ -107,7 +111,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
                 return;
             }
             startTime = System.currentTimeMillis();
-            sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, startTime, retryCount + 1);
+            sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, cookieStore, startTime, retryCount + 1);
             return;
         } finally {
             connectionManager.afterConnect();
@@ -124,11 +128,12 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
                 responseHandler.handleSync(httpResponse, response);
                 return;
             }
-            sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, startTime, retryCount + 1);
+            sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, cookieStore, startTime, retryCount + 1);
             return;
         }
 
         try {
+            lifeCycleHandler.handleSaveCookie(request, getCookiesFromHttpCookieStore(cookieStore));
             responseHandler.handleSync(httpResponse, response);
         } catch (Exception ex) {
             if (ex instanceof ForestRuntimeException) {
