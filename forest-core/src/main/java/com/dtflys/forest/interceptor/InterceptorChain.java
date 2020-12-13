@@ -1,6 +1,7 @@
 package com.dtflys.forest.interceptor;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.reflection.ForestMethod;
@@ -76,6 +77,24 @@ public class InterceptorChain implements Interceptor {
         for (; iter.hasNext(); ) {
             Interceptor item = iter.next();
             item.onProgress(progress);
+        }
+    }
+
+    @Override
+    public void onLoadCookie(ForestRequest request, ForestCookies cookies) {
+        Iterator<Interceptor> iter = interceptors.iterator();
+        for (; iter.hasNext(); ) {
+            Interceptor item = iter.next();
+            item.onLoadCookie(request, cookies);
+        }
+    }
+
+    @Override
+    public void onSaveCookie(ForestRequest request, ForestCookies cookies) {
+        Iterator<Interceptor> iter = interceptors.iterator();
+        for (; iter.hasNext(); ) {
+            Interceptor item = iter.next();
+            item.onSaveCookie(request, cookies);
         }
     }
 

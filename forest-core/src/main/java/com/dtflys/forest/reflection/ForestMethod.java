@@ -6,7 +6,9 @@ import com.dtflys.forest.annotation.ParamLifeCycle;
 import com.dtflys.forest.annotation.RequestAttributes;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.callback.OnError;
+import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
+import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.VariableScope;
@@ -100,6 +102,8 @@ public class ForestMethod<T> implements VariableScope {
     private MappingParameter onSuccessParameter = null;
     private MappingParameter onErrorParameter = null;
     private MappingParameter onProgressParameter = null;
+    private MappingParameter onLoadCookieParameter = null;
+    private MappingParameter onSaveCookieParameter = null;
     private List<Interceptor> globalInterceptorList;
     private List<Interceptor> baseInterceptorList;
     private List<Interceptor> interceptorList;
@@ -507,6 +511,10 @@ public class ForestMethod<T> implements VariableScope {
                 onErrorParameter = parameter;
             } else if (OnProgress.class.isAssignableFrom(paramType)) {
                 onProgressParameter = parameter;
+            } else if (OnSaveCookie.class.isAssignableFrom(paramType)) {
+                onSaveCookieParameter = parameter;
+            } else if (OnLoadCookie.class.isAssignableFrom(paramType)) {
+                onLoadCookieParameter = parameter;
             }
             processParameterAnnotation(parameter, anns);
         }
@@ -1014,6 +1022,16 @@ public class ForestMethod<T> implements VariableScope {
         if (onProgressParameter != null) {
             OnProgress onProgressCallback = (OnProgress) args[onProgressParameter.getIndex()];
             request.setOnProgress(onProgressCallback);
+        }
+
+        if (onSaveCookieParameter != null) {
+            OnSaveCookie onSaveCookieCallback = (OnSaveCookie) args[onSaveCookieParameter.getIndex()];
+            request.setOnSaveCookie(onSaveCookieCallback);
+        }
+
+        if (onLoadCookieParameter != null) {
+            OnLoadCookie onLoadCookieCallback = (OnLoadCookie) args[onLoadCookieParameter.getIndex()];
+            request.setOnLoadCookie(onLoadCookieCallback);
         }
 
         String dataType = dataTypeTemplate.render(args);

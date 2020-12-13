@@ -50,6 +50,8 @@ import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 
@@ -335,6 +337,18 @@ public class ForestRequest<T> {
      */
     public String getUrl() {
         return url;
+    }
+
+    /**
+     * 获取请求URI
+     * @return {@link URI}类实例
+     */
+    public URI getURI() {
+        try {
+            return new URI(url);
+        } catch (URISyntaxException e) {
+            throw new ForestRuntimeException(e);
+        }
     }
 
     /**

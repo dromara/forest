@@ -157,12 +157,16 @@ public class ForestCookie implements Serializable {
     public static ForestCookie createFromHttpclientCookie(org.apache.http.cookie.Cookie httpCookie) {
         long currentTime = System.currentTimeMillis();
         Date expiresDate = httpCookie.getExpiryDate();
-        long expiresAt = expiresDate.getTime();
         long maxAge;
-        if (expiresAt > currentTime) {
-            maxAge = expiresAt - currentTime;
+        if (expiresDate != null) {
+            long expiresAt = expiresDate.getTime();
+            if (expiresAt > currentTime) {
+                maxAge = expiresAt - currentTime;
+            } else {
+                maxAge = 0L;
+            }
         } else {
-            maxAge = 0L;
+            maxAge = Long.MAX_VALUE;
         }
         Date createTime = new Date(currentTime);
         Duration maxAgeDuration = Duration.ofMillis(maxAge);
@@ -174,8 +178,8 @@ public class ForestCookie implements Serializable {
                 httpCookie.getDomain(),
                 httpCookie.getPath(),
                 httpCookie.isSecure(),
-                true,
                 false,
+                true,
                 false);
     }
 
@@ -212,6 +216,10 @@ public class ForestCookie implements Serializable {
     }
 
     public long getExpiresTime() {
+        long maxAgeMilis = maxAge.toMillis();
+        if (maxAgeMilis == Long.MAX_VALUE) {
+            return Long.MAX_VALUE;
+        }
         long expiresTime = createTime.getTime() + maxAge.toMillis();
         return expiresTime;
     }

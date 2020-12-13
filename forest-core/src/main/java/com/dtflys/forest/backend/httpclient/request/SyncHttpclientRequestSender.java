@@ -36,8 +36,8 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
         super(connectionManager, request);
     }
 
-    protected HttpClient getHttpClient() {
-        HttpClient client = connectionManager.getHttpClient(request);
+    protected HttpClient getHttpClient(CookieStore cookieStore) {
+        HttpClient client = connectionManager.getHttpClient(request, cookieStore);
         setupHttpClient(client);
         return client;
     }
@@ -90,7 +90,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             throws IOException {
         HttpResponse httpResponse = null;
         ForestResponse response = null;
-        client = getHttpClient();
+        client = getHttpClient(cookieStore);
         try {
             logRequest(retryCount, (HttpRequestBase) httpRequest);
             httpResponse = client.execute(httpRequest);

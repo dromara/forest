@@ -59,7 +59,18 @@ public class ForestCookies implements Iterable<ForestCookie> {
 
 
     public void addCookie(ForestCookie cookie) {
-        this.cookies.add(cookie);
+        if (cookie != null) {
+            this.cookies.add(cookie);
+        }
+    }
+
+    public void addAllCookies(List<ForestCookie> cookies) {
+        if (cookies == null) {
+            return;
+        }
+        for (ForestCookie cookie : cookies) {
+            this.addCookie(cookie);
+        }
     }
 
     public List<String> domains() {

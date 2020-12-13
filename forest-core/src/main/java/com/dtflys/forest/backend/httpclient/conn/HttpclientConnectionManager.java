@@ -10,6 +10,7 @@ import com.dtflys.forest.http.ForestRequest;
 import org.apache.http.Consts;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthSchemeProvider;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.config.CookieSpecs;
@@ -120,7 +121,7 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
         }
     }
 
-    public HttpClient getHttpClient(ForestRequest request) {
+    public HttpClient getHttpClient(ForestRequest request, CookieStore cookieStore) {
         sslConnectFactory.setCurrentRequest(request);
         HttpClientBuilder builder = HttpClients.custom();
         builder.setConnectionManager(tsConnectionManager);
@@ -158,6 +159,9 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
         if (proxy != null) {
             HttpHost httpHost = new HttpHost(proxy.getHost(), proxy.getPort());
             configBuilder.setProxy(httpHost);
+        }
+        if (cookieStore != null) {
+            builder.setDefaultCookieStore(cookieStore);
         }
 
         return builder
