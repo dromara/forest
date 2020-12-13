@@ -118,7 +118,11 @@ public class HttpclientForestResponse extends ForestResponse {
     @Override
     public byte[] getByteArray() throws IOException {
         if (bytes == null) {
-            bytes = EntityUtils.toByteArray(entity);
+            if (entity == null) {
+                return null;
+            } else {
+                bytes = EntityUtils.toByteArray(entity);
+            }
         }
         return bytes;
     }

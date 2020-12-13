@@ -75,6 +75,9 @@ public abstract class ForestResponse<T> {
     public String readAsString() {
         try {
             byte[] bytes = getByteArray();
+            if (bytes == null) {
+                return null;
+            }
             return byteToString(bytes);
         } catch (Exception e) {
             throw new ForestRuntimeException(e);

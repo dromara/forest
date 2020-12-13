@@ -107,7 +107,11 @@ public class OkHttp3ForestResponse extends ForestResponse {
     @Override
     public byte[] getByteArray() throws Exception {
         if (bytes == null) {
-            bytes = body.bytes();
+            if (body == null) {
+                return null;
+            } else {
+                bytes = body.bytes();
+            }
         }
         return bytes;
     }
