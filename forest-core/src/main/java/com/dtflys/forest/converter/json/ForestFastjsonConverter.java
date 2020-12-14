@@ -157,15 +157,9 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
 
     private String parseToString(Object obj) {
         if (serializerFeature == null) {
-            if (dateFormat != null) {
-                return JSON.toJSONString(obj, SerializerFeature.WriteDateUseDateFormat);
-            }
-            return JSON.toJSONString(obj);
+            return JSON.toJSONString(obj, SerializerFeature.WriteDateUseDateFormat);
         }
-        if (dateFormat != null) {
-            return JSON.toJSONString(obj, SerializerFeature.WriteDateUseDateFormat, serializerFeature);
-        }
-        return JSON.toJSONString(obj, serializerFeature);
+        return JSON.toJSONString(obj, SerializerFeature.WriteDateUseDateFormat, serializerFeature);
 
     }
 
