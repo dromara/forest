@@ -400,6 +400,12 @@ public interface PostClient {
     )
     String postJson12(@DataObject JsonTestUser2 user);
 
+    @Post(
+            url = "http://localhost:${port}/json-date",
+            headers = {"Content-Type: application/json"}
+    )
+    String postJsonDate(@Body JsonTestDate jsonTestDate);
+
 
     @Request(
             url = "http://localhost:${port}/xml",

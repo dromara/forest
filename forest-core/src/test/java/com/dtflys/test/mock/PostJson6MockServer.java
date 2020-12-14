@@ -35,6 +35,20 @@ public class PostJson6MockServer extends MockServerRule {
                         .withStatusCode(200)
                         .withBody(EXPECTED)
         );
+
+
+        mockClient.when(
+                request()
+                        .withPath("/json-date")
+                        .withMethod("POST")
+                        .withHeader(new Header(HttpHeaders.CONTENT_TYPE, "application/json"))
+                        .withBody("{\"createTime\":\"2020-10-11 10:12:00\"}")
+        ).respond(
+                response()
+                        .withStatusCode(200)
+                        .withBody(EXPECTED)
+        );
+
     }
 
 }
