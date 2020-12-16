@@ -376,6 +376,15 @@ public class MyAuthLifeCycle implements MethodAnnotationLifeCycle<MyAuth, Object
 String send(@DataVariable("username") String username);
 ```
 
+## 主要贡献者
+
+|     | ID     | 主页 |
+|------| :------ | :--------------  |
+|<a href="https://gitee.com/dt_flys"><img src="https://portrait.gitee.com/uploads/avatars/user/405/1216742_dt_flys_1594991700.png!avatar100" height="30"/></a>|  公子骏 | [https://gitee.com/dt_flys](https://gitee.com/dt_flys) |
+|<a href="https://gitee.com/houkunlin"><img src="https://portrait.gitee.com/uploads/avatars/user/129/389082_houkunlin_1578922331.jpg!avatar100" height="30"/></a>| 侯坤林 | [https://gitee.com/houkunlin](https://gitee.com/houkunlin) |
+|<a href="https://gitee.com/fangzhengjin"><img src="https://portrait.gitee.com/uploads/avatars/user/304/913503_fangzhengjin_1578935731.png!avatar100" height="30"/></a>| fangzhengjin  | [https://gitee.com/fangzhengjin](https://gitee.com/fangzhengjin) |
+|<a href="https://gitee.com/bryan31"><img src="https://portrait.gitee.com/uploads/avatars/user/367/1102362_bryan31_1578940308.png!avatar100" height="30"/></a>| bryan31 | [https://gitee.com/bryan31](https://gitee.com/bryan31) |
+
 ## 详细文档请看：[http://forest.dtflyx.com/](http://forest.dtflyx.com/)
 
 ## 联系作者:<br>
