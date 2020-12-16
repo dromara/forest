@@ -387,7 +387,7 @@ String send(@DataVariable("username") String username);
 |<a href="https://gitee.com/fangzhengjin"><img src="https://portrait.gitee.com/uploads/avatars/user/304/913503_fangzhengjin_1578935731.png!avatar100" height="30"/></a>| fangzhengjin  | [https://gitee.com/fangzhengjin](https://gitee.com/fangzhengjin) |
 |<a href="https://gitee.com/bryan31"><img src="https://portrait.gitee.com/uploads/avatars/user/367/1102362_bryan31_1578940308.png!avatar100" height="30"/></a>| bryan31 | [https://gitee.com/bryan31](https://gitee.com/bryan31) |
 
-## 联系作者:<br>
+## 联系作者
 
 亲，进群前记得先star一下哦~
 
