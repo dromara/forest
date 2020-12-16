@@ -4,7 +4,6 @@ import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.client.GetClient;
-import com.dtflys.test.http.model.JsonTestUser;
 import com.dtflys.test.mock.Get2MockServer;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -13,11 +12,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -105,6 +101,34 @@ public class TestGet2Client extends BaseClientTest {
                 response.getRequest().getUrl() + "?" + response.getRequest().getQueryString());
         assertNotNull(result);
         assertEquals(Get2MockServer.EXPECTED, result);
+    }
+
+
+    @Test
+    public void testGetBooleanResultTrue() {
+        Boolean ret = getClient.getBooleanResultTrue();
+        assertTrue(ret);
+    }
+
+
+    @Test
+    public void testGetBooleanResultFalse() {
+        Boolean ret = getClient.getBooleanResultFalse();
+        assertFalse(ret);
+    }
+
+
+    @Test
+    public void testGetBooleanResultTrue2() {
+        Boolean ret = getClient.getBooleanResultTrue2();
+        assertTrue(ret);
+    }
+
+
+    @Test
+    public void testGetBooleanResultFalse2() {
+        Boolean ret = getClient.getBooleanResultFalse2();
+        assertFalse(ret);
     }
 
 

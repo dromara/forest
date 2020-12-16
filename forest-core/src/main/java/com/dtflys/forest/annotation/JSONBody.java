@@ -1,5 +1,6 @@
 package com.dtflys.forest.annotation;
 
+import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.lifecycles.parameter.BodyLifeCycle;
 import com.dtflys.forest.lifecycles.parameter.JSONBodyLifeCycle;
 
@@ -81,4 +82,10 @@ public @interface JSONBody {
      * The filters will do some processing for the query value before sending request.
      */
     String filter() default "";
+
+    /**
+     * 子项Content-Type
+     */
+    String partContentType() default ContentType.APPLICATION_JSON;
+
 }

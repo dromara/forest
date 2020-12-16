@@ -24,6 +24,7 @@ public abstract class AbstractBodyLifeCycle<A extends Annotation> implements Par
         Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(annotation);
         String name = (String) attrs.get("name");
         String filterName = (String) attrs.get("filter");
+        String partContentType = (String) attrs.get("partContentType");
         if (StringUtils.isNotEmpty(name)) {
             parameter.setName(name);
             MappingVariable variable = new MappingVariable(name, parameter.getType());
@@ -32,6 +33,9 @@ public abstract class AbstractBodyLifeCycle<A extends Annotation> implements Par
             parameter.setObjectProperties(false);
         } else {
             parameter.setObjectProperties(true);
+        }
+        if (StringUtils.isNotBlank(partContentType)) {
+            parameter.setPartContentType(partContentType.trim());
         }
         method.processParameterFilter(parameter, filterName);
         parameter.setTarget(MappingParameter.TARGET_BODY);

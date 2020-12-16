@@ -53,6 +53,11 @@ public class MappingParameter {
      */
     private boolean isJsonParam = false;
 
+    /**
+     * 子项Content-Type
+     */
+    private String partContentType;
+
     private String jsonParamName;
 
     private FilterChain filterChain = new FilterChain();
@@ -143,6 +148,14 @@ public class MappingParameter {
 
     public void setJsonParam(boolean jsonParam) {
         isJsonParam = jsonParam;
+    }
+
+    public String getPartContentType() {
+        return partContentType;
+    }
+
+    public void setPartContentType(String partContentType) {
+        this.partContentType = partContentType;
     }
 
     public String getJsonParamName() {

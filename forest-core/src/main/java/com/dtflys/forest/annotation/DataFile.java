@@ -106,8 +106,14 @@ public @interface DataFile {
      */
     String value();
 
+
     /**
      * 要上传的文件的目标文件名（可省略）
      */
     String fileName() default "";
+
+    /**
+     * 子项Content-Type
+     */
+    String partContentType() default "";
 }

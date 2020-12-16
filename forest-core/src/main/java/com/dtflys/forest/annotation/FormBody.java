@@ -1,5 +1,6 @@
 package com.dtflys.forest.annotation;
 
+import com.dtflys.forest.lifecycles.parameter.FormBodyLifeCycle;
 import com.dtflys.forest.lifecycles.parameter.JSONBodyLifeCycle;
 
 import java.lang.annotation.Documented;
@@ -54,7 +55,7 @@ import java.lang.annotation.Target;
  * @since 1.5.0-BETA9
  */
 @Documented
-@ParamLifeCycle(JSONBodyLifeCycle.class)
+@ParamLifeCycle(FormBodyLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface FormBody {

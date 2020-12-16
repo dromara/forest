@@ -1,9 +1,12 @@
 package com.dtflys.forest.interceptor;
 
 import com.dtflys.forest.callback.OnError;
+import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
+import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.reflection.ForestMethod;
@@ -19,7 +22,7 @@ import java.util.Map;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-06-26
  */
-public interface Interceptor<T> extends OnSuccess<T>, OnError, OnProgress {
+public interface Interceptor<T> extends OnSuccess<T>, OnError, OnProgress, OnLoadCookie, OnSaveCookie {
 
 
     default void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
@@ -34,6 +37,14 @@ public interface Interceptor<T> extends OnSuccess<T>, OnError, OnProgress {
 
     @Override
     default void onProgress(ForestProgress progress) {
+    }
+
+    @Override
+    default void onLoadCookie(ForestRequest request, ForestCookies cookies) {
+    }
+
+    @Override
+    default void onSaveCookie(ForestRequest request, ForestCookies cookies) {
     }
 
     default InterceptorAttributes getAttributes(ForestRequest request) {

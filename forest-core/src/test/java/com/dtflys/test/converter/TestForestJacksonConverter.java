@@ -32,7 +32,7 @@ import static junit.framework.Assert.assertTrue;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2017-05-08 23:26
  */
-public class TestForestJacksonConverter {
+public class TestForestJacksonConverter extends JSONConverter {
 
     private ObjectMapper mapper = new ObjectMapper();
     {
@@ -179,6 +179,25 @@ public class TestForestJacksonConverter {
         assertEquals("123456", map.get("password"));
         assertEquals(idList, map.get("idList"));
         assertEquals(causes, map.get("cause"));
+    }
+
+
+    @Test
+    public void testDate() throws ParseException {
+        ForestJacksonConverter forestJacksonConverter = new ForestJacksonConverter();
+        String json = "{\"name\":\"foo\",\"date\":\"2020-10-10 10:12:00\"}";
+        forestJacksonConverter.setDateFormat("yyyy-MM-dd hh:mm:ss");
+        TestJsonObj testJsonObj = forestJacksonConverter.convertToJavaObject(json, TestJsonObj.class);
+        assertNotNull(testJsonObj);
+        assertEquals("foo", testJsonObj.getName());
+        assertDateEquals("2020-10-10 10:12:00", testJsonObj.getDate(), "yyyy-MM-dd hh:mm:ss");
+
+        json = "{\"name\":\"foo\",\"date\":\"2020/10/10 10:12:00\"}";
+        forestJacksonConverter.setDateFormat("yyyy/MM/dd hh:mm:ss");
+        testJsonObj = forestJacksonConverter.convertToJavaObject(json, TestJsonObj.class);
+        assertNotNull(testJsonObj);
+        assertEquals("foo", testJsonObj.getName());
+        assertDateEquals("2020-10-10 10:12:00", testJsonObj.getDate(), "yyyy-MM-dd hh:mm:ss");
     }
 
 

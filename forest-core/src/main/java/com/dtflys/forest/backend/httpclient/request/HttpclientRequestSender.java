@@ -3,6 +3,7 @@ package com.dtflys.forest.backend.httpclient.request;
 import com.dtflys.forest.backend.httpclient.response.HttpclientResponseHandler;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import java.io.IOException;
@@ -13,6 +14,6 @@ import java.io.IOException;
  */
 public interface HttpclientRequestSender {
 
-    void sendRequest(ForestRequest request, HttpclientResponseHandler responseHandler, HttpUriRequest httpRequest, LifeCycleHandler lifeCycleHandler, long startTime, int retryCount) throws IOException;
+    void sendRequest(ForestRequest request, HttpclientResponseHandler responseHandler, HttpUriRequest httpRequest, LifeCycleHandler lifeCycleHandler, CookieStore cookieStore, long startTime, int retryCount) throws IOException;
 
 }

@@ -47,7 +47,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
             this.content = readContentAsString();
         } else if (!request.isDownloadFile() && contentType.canReadAsString()) {
             this.content = readContentAsString();
-        } else {
+        } else if (contentType.canReadAsBinaryStream()) {
             StringBuilder builder = new StringBuilder();
             builder.append("[content-type: ")
                     .append(contentType.toString());
@@ -107,7 +107,11 @@ public class OkHttp3ForestResponse extends ForestResponse {
     @Override
     public byte[] getByteArray() throws Exception {
         if (bytes == null) {
-            bytes = body.bytes();
+            if (body == null) {
+                return null;
+            } else {
+                bytes = body.bytes();
+            }
         }
         return bytes;
     }

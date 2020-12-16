@@ -6,7 +6,9 @@ import com.dtflys.forest.annotation.ParamLifeCycle;
 import com.dtflys.forest.annotation.RequestAttributes;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.callback.OnError;
+import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
+import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.VariableScope;
@@ -100,6 +102,8 @@ public class ForestMethod<T> implements VariableScope {
     private MappingParameter onSuccessParameter = null;
     private MappingParameter onErrorParameter = null;
     private MappingParameter onProgressParameter = null;
+    private MappingParameter onLoadCookieParameter = null;
+    private MappingParameter onSaveCookieParameter = null;
     private List<Interceptor> globalInterceptorList;
     private List<Interceptor> baseInterceptorList;
     private List<Interceptor> interceptorList;
@@ -507,6 +511,10 @@ public class ForestMethod<T> implements VariableScope {
                 onErrorParameter = parameter;
             } else if (OnProgress.class.isAssignableFrom(paramType)) {
                 onProgressParameter = parameter;
+            } else if (OnSaveCookie.class.isAssignableFrom(paramType)) {
+                onSaveCookieParameter = parameter;
+            } else if (OnLoadCookie.class.isAssignableFrom(paramType)) {
+                onLoadCookieParameter = parameter;
             }
             processParameterAnnotation(parameter, anns);
         }
@@ -727,7 +735,7 @@ public class ForestMethod<T> implements VariableScope {
                     if (MappingParameter.isHeader(target)) {
                         request.addHeader(new RequestNameValue(parameter.getJsonParamName(), json, target));
                     } else {
-                        nameValueList.add(new RequestNameValue(parameter.getJsonParamName(), json, target));
+                        nameValueList.add(new RequestNameValue(parameter.getJsonParamName(), json, target, parameter.getPartContentType()));
                     }
                 }
                 else if (!parameter.getFilterChain().isEmpty()) {
@@ -744,7 +752,7 @@ public class ForestMethod<T> implements VariableScope {
                                 request.addBody(new ObjectRequestBody(obj));
                             }
                         } else {
-                            nameValueList.add(new RequestNameValue(obj.toString(), target));
+                            nameValueList.add(new RequestNameValue(obj.toString(), target, parameter.getPartContentType()));
                         }
                     }
                 }
@@ -788,7 +796,7 @@ public class ForestMethod<T> implements VariableScope {
                             if (MappingParameter.isHeader(target)) {
                                 request.addHeader(new RequestNameValue(String.valueOf(key), value, target));
                             } else if (MappingParameter.isBody(target)) {
-                                request.addBody(String.valueOf(key), value);
+                                request.addBody(String.valueOf(key), parameter.getPartContentType(), value);
                             } else if (MappingParameter.isQuery(target)) {
                                 request.addQuery(String.valueOf(key), value);
                             }
@@ -812,7 +820,7 @@ public class ForestMethod<T> implements VariableScope {
             }
             else if (parameter.getIndex() != null) {
                 int target = parameter.isUnknownTarget() ? type.getDefaultParamTarget() : parameter.getTarget();
-                RequestNameValue nameValue = new RequestNameValue(parameter.getName(), target);
+                RequestNameValue nameValue = new RequestNameValue(parameter.getName(), target, parameter.getPartContentType());
                 Object obj = args[parameter.getIndex()];
                 if (obj != null) {
                     nameValue.setValue(obj);
@@ -846,7 +854,7 @@ public class ForestMethod<T> implements VariableScope {
                                 scope.addVariableValue("_index", index++);
                                 template.setVariableScope(scope);
                                 String name = template.render(args);
-                                nameValueList.add(new RequestNameValue(name, subItem, target));
+                                nameValueList.add(new RequestNameValue(name, subItem, target, parameter.getPartContentType()));
                             }
                         } else {
                             nameValueList.add(nameValue);
@@ -886,9 +894,8 @@ public class ForestMethod<T> implements VariableScope {
             MappingTemplate fileNameTemplate = factory.getFileNameTemplate();
             int index = factory.getIndex();
             Object data = args[index];
-            factory.addMultipart(nameTemplate, fileNameTemplate, data, ContentType.MULTIPART_FORM_DATA, multiparts, args);
+            factory.addMultipart(nameTemplate, fileNameTemplate, data, multiparts, args);
         }
-
 
         request.setMultiparts(multiparts);
         // setup ssl keystore
@@ -1017,6 +1024,16 @@ public class ForestMethod<T> implements VariableScope {
             request.setOnProgress(onProgressCallback);
         }
 
+        if (onSaveCookieParameter != null) {
+            OnSaveCookie onSaveCookieCallback = (OnSaveCookie) args[onSaveCookieParameter.getIndex()];
+            request.setOnSaveCookie(onSaveCookieCallback);
+        }
+
+        if (onLoadCookieParameter != null) {
+            OnLoadCookie onLoadCookieCallback = (OnLoadCookie) args[onLoadCookieParameter.getIndex()];
+            request.setOnLoadCookie(onLoadCookieCallback);
+        }
+
         String dataType = dataTypeTemplate.render(args);
         if (StringUtils.isEmpty(dataType)) {
             request.setDataType(ForestDataType.TEXT);
@@ -1062,7 +1079,8 @@ public class ForestMethod<T> implements VariableScope {
             Object value = entry.getValue();
             if (value != null) {
                 RequestNameValue nameValue = new RequestNameValue(name ,value,
-                        parameter.isUnknownTarget() ? type.getDefaultParamTarget() : parameter.getTarget());
+                        parameter.isUnknownTarget() ? type.getDefaultParamTarget() : parameter.getTarget(),
+                        parameter.getPartContentType());
                 nameValueList.add(nameValue);
             }
         }

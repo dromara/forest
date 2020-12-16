@@ -10,6 +10,7 @@ import com.dtflys.forest.http.ForestRequest;
 import org.apache.http.Consts;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthSchemeProvider;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.config.CookieSpecs;
@@ -120,7 +121,7 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
         }
     }
 
-    public HttpClient getHttpClient(ForestRequest request) {
+    public HttpClient getHttpClient(ForestRequest request, CookieStore cookieStore) {
         sslConnectFactory.setCurrentRequest(request);
         HttpClientBuilder builder = HttpClients.custom();
         builder.setConnectionManager(tsConnectionManager);
@@ -159,6 +160,9 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
             HttpHost httpHost = new HttpHost(proxy.getHost(), proxy.getPort());
             configBuilder.setProxy(httpHost);
         }
+        if (cookieStore != null) {
+            builder.setDefaultCookieStore(cookieStore);
+        }
 
         return builder
                 .setDefaultRequestConfig(requestConfig)
@@ -181,91 +185,6 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
     public void afterConnect() {
         sslConnectFactory.removeCurrentRequest();
     }
-
-
-//    /**
-//     * 自定义SSL证书
-//     * @param request
-//     * @return
-//     */
-/*
-    private static SSLContext customSSL(ForestRequest request) {
-        SSLContext sslContext = null;
-        SSLKeyStore keyStore = request.getKeyStore();
-        final KeyStore trustStore = keyStore.getTrustStore();
-        String keystorePass = keyStore.getKeystorePass();
-        if (trustStore != null) {
-            try {
-                SSLContextBuilder scBuilder = SSLContexts.custom();
-                if (keystorePass != null) {
-                    sslContext = scBuilder
-                            .loadKeyMaterial(trustStore, keystorePass.toCharArray())
-                            .build();
-                } else {
-                    sslContext = scBuilder
-                            .loadTrustMaterial(trustStore, new TrustSelfSignedStrategy())
-                            .build();
-                }
-            } catch (NoSuchAlgorithmException e) {
-                throw new ForestRuntimeException(e);
-            } catch (KeyManagementException e) {
-                throw new ForestRuntimeException(e);
-            } catch (KeyStoreException e) {
-                throw new ForestRuntimeException(e);
-            } catch (UnrecoverableKeyException e) {
-                throw new ForestRuntimeException(e);
-            }
-        }
-        return sslContext;
-    }
-*/
-
-//    /**
-//     * 绕过SSL验证
-//     *
-//     * @return
-//     * @throws NoSuchAlgorithmException
-//     * @throws KeyManagementException
-//     */
-/*
-    private static SSLContext createIgnoreVerifySSL() throws NoSuchAlgorithmException, KeyManagementException {
-        SSLContext sc = SSLContext.getInstance("SSLv3");
-        X509TrustManager trustManager = new X509TrustManager() {
-            @Override
-            public void checkClientTrusted(
-                    java.security.cert.X509Certificate[] paramArrayOfX509Certificate,
-                    String paramString) throws CertificateException {
-            }
-
-            @Override
-            public void checkServerTrusted(
-                    java.security.cert.X509Certificate[] paramArrayOfX509Certificate,
-                    String paramString) throws CertificateException {
-            }
-
-            @Override
-            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                return null;
-            }
-        };
-        sc.init(null, new TrustManager[] { trustManager }, null);
-        return sc;
-    }
-*/
-
-//    /**
-//     * 获取SSL上下文
-//     * @param request
-//     * @return
-//     */
-/*
-    private static SSLContext getSSLContext(ForestRequest request) throws KeyManagementException, NoSuchAlgorithmException {
-        if (request.getKeyStore() == null) {
-            return createIgnoreVerifySSL();
-        }
-        return customSSL(request);
-    }
-*/
 
 
 

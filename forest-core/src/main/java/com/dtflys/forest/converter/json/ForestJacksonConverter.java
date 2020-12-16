@@ -24,6 +24,7 @@
 
 package com.dtflys.forest.converter.json;
 
+import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.utils.StringUtils;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -70,12 +71,13 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     }
 
     @Override
-    public void setDateFormat(String dateFormat) {
+    public ForestConverter setDateFormat(String dateFormat) {
         this.dateFormat = dateFormat;
         if (StringUtils.isNotBlank(dateFormat)) {
             DateFormat format = new SimpleDateFormat(dateFormat);
             mapper.setDateFormat(format);
         }
+        return this;
     }
 
     @Override

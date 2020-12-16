@@ -5,6 +5,8 @@ import com.dtflys.forest.backend.okhttp3.response.OkHttpResponseBody;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.LifeCycleHandler;
+import com.dtflys.forest.http.ForestCookie;
+import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.ssl.ForestX509TrustManager;
@@ -16,6 +18,9 @@ import com.dtflys.forest.utils.StringUtils;
 import okhttp3.CipherSuite;
 import okhttp3.ConnectionPool;
 import okhttp3.ConnectionSpec;
+import okhttp3.Cookie;
+import okhttp3.CookieJar;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import okhttp3.TlsVersion;
@@ -26,7 +31,11 @@ import javax.net.ssl.X509TrustManager;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.security.KeyStore;
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -76,7 +85,50 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .connectionPool(pool)
                 .connectTimeout(timeout, TimeUnit.MILLISECONDS)
-                .readTimeout(timeout, TimeUnit.MILLISECONDS);
+                .readTimeout(timeout, TimeUnit.MILLISECONDS)
+                .cookieJar(new CookieJar() {
+                    @Override
+                    public void saveFromResponse(HttpUrl url, List<Cookie> okCookies) {
+                        ForestCookies cookies = new ForestCookies();
+                        for (Cookie okCookie: okCookies) {
+                            ForestCookie cookie = ForestCookie.createFromOkHttpCookie(okCookie);
+                            cookies.addCookie(cookie);
+                        }
+                        lifeCycleHandler.handleSaveCookie(request, cookies);
+                    }
+
+                    @Override
+                    public List<Cookie> loadForRequest(HttpUrl url) {
+                        ForestCookies cookies = new ForestCookies();
+                        lifeCycleHandler.handleLoadCookie(request, cookies);
+                        List<ForestCookie> forestCookies = cookies.allCookies();
+                        List<Cookie> okCookies = new ArrayList<>(forestCookies.size());
+                        for (ForestCookie cookie : forestCookies) {
+                            Duration maxAge = cookie.getMaxAge();
+                            Date createTime = cookie.getCreateTime();
+                            long expiresAt = createTime.getTime() + maxAge.toMillis();
+                            Cookie.Builder cookeBuilder = new Cookie.Builder();
+                            cookeBuilder.name(cookie.getName())
+                                .value(cookie.getValue())
+                                .expiresAt(expiresAt)
+                                .path(cookie.getPath());
+                            if (cookie.isHostOnly()) {
+                                cookeBuilder.hostOnlyDomain(cookie.getDomain());
+                            } else {
+                                cookeBuilder.domain(cookie.getDomain());
+                            }
+                            if (cookie.isHttpOnly()) {
+                                cookeBuilder.httpOnly();
+                            }
+                            if (cookie.isSecure()) {
+                                cookeBuilder.secure();
+                            }
+                            Cookie okCookie = cookeBuilder.build();
+                            okCookies.add(okCookie);
+                        }
+                        return okCookies;
+                    }
+                });
 
         // set proxy
         ForestProxy proxy = request.getProxy();

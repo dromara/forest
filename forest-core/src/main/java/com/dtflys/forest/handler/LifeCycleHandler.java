@@ -1,6 +1,7 @@
 package com.dtflys.forest.handler;
 
 import com.dtflys.forest.exceptions.ForestRetryException;
+import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.reflection.ForestMethod;
@@ -36,6 +37,10 @@ public interface LifeCycleHandler {
     void handleTry(ForestRetryException ex, Retryer retryer) throws Throwable;
 
     void handleProgress(ForestRequest request, ForestProgress progress);
+
+    void handleLoadCookie(ForestRequest request, ForestCookies cookies);
+
+    void handleSaveCookie(ForestRequest request, ForestCookies cookies);
 
     Object handleResult(Object resultData);
 

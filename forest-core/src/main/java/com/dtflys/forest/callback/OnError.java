@@ -34,7 +34,7 @@ import com.dtflys.forest.http.ForestResponse;
  * 回调函数: 请求失败后调用
  *
  * @author gongjun
- * @since 2016-05-26
+ * @since 1.0.0
  */
 public interface OnError {
 

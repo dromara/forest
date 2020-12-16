@@ -9,8 +9,11 @@ import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
+import com.twitter.util.Throw;
 import okhttp3.*;
+import org.apache.http.entity.ContentType;
 
+import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.util.List;
 
@@ -83,8 +86,8 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
         MultipartBody.Builder bodyBuilder = new MultipartBody.Builder();
         MediaType mediaType = MediaType.parse(contentType);
         bodyBuilder.setType(mediaType);
-
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
+        Charset ch = Charset.forName(charset);
         for (int i = 0; i < nameValueList.size(); i++) {
             RequestNameValue nameValue = nameValueList.get(i);
             if (!nameValue.isInBody()) {
@@ -92,10 +95,20 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
             }
             String name = nameValue.getName();
             Object value = nameValue.getValue();
-            bodyBuilder.addFormDataPart(name, MappingTemplate.getParameterValue(jsonConverter, value));
+            String partContentType = nameValue.getPartContentType();
+            if (StringUtils.isEmpty(partContentType)) {
+                partContentType = "text/plain";
+            }
+            MediaType partMediaType = MediaType.parse(partContentType);
+            if (partMediaType.charset() == null) {
+                partMediaType.charset(ch);
+            }
+            RequestBody requestBody = RequestBody.create(partMediaType, MappingTemplate.getParameterValue(jsonConverter, value));
+            MultipartBody.Part part = MultipartBody.Part.createFormData(name, null, requestBody);
+            bodyBuilder.addPart(part);
         }
         for (ForestMultipart multipart : multiparts) {
-            RequestBody fileBody = createFileBody(request, multipart, lifeCycleHandler);
+            RequestBody fileBody = createFileBody(request, multipart, ch, lifeCycleHandler);
             bodyBuilder.addFormDataPart(multipart.getName(), multipart.getOriginalFileName(), fileBody);
         }
 
@@ -103,9 +116,27 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
         setBody(builder, body);
     }
 
-    private RequestBody createFileBody(ForestRequest request, ForestMultipart multipart, LifeCycleHandler lifeCycleHandler) {
-        MediaType fileMediaType = MediaType.parse(multipart.getContentType());
+    private RequestBody createFileBody(ForestRequest request, ForestMultipart multipart, Charset charset, LifeCycleHandler lifeCycleHandler) {
         RequestBody wrappedBody, requestBody;
+        String partContentType = multipart.getContentType();
+        MediaType fileMediaType = null;
+        if (StringUtils.isNotEmpty(partContentType)) {
+            fileMediaType = MediaType.parse(partContentType);
+        }
+
+        if (fileMediaType == null) {
+            String mimeType = URLConnection.guessContentTypeFromName(multipart.getOriginalFileName());
+            if (mimeType == null) {
+                // guess this is a video uploading
+                fileMediaType = MediaType.parse(com.dtflys.forest.backend.ContentType.MULTIPART_FORM_DATA);
+            } else {
+                fileMediaType = MediaType.parse(mimeType);
+            }
+        }
+
+        if (fileMediaType.charset() == null) {
+            fileMediaType.charset(charset);
+        }
         if (multipart.isFile()) {
             requestBody = RequestBody.create(fileMediaType, multipart.getFile());
         } else {

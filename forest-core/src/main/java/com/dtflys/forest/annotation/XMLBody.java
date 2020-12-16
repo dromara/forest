@@ -1,5 +1,6 @@
 package com.dtflys.forest.annotation;
 
+import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.lifecycles.parameter.XMLBodyLifeCycle;
 
 import java.lang.annotation.Documented;
@@ -46,4 +47,10 @@ public @interface XMLBody {
      * The filters will do some processing for the query value before sending request.
      */
     String filter() default "";
+
+    /**
+     * 子项Content-Type
+     */
+    String partContentType() default ContentType.APPLICATION_XML;
+
 }

@@ -1,17 +1,15 @@
 package com.dtflys.forest.multipart;
 
+import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.SubVariableScope;
 import com.dtflys.forest.utils.StringUtils;
-import com.twitter.util.Var;
 
 import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Array;
-import java.lang.reflect.Type;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -23,12 +21,14 @@ public class ForestMultipartFactory<T> {
 
     private final Class<T> paramType;
 
+    private final String partContentType;
 
     protected ForestMultipartFactory(Class<T> paramType,
-                                     int index,
+                                     String partContentType, int index,
                                      MappingTemplate nameTemplate,
                                      MappingTemplate fileNameTemplate) {
         this.paramType = paramType;
+        this.partContentType = partContentType;
         this.index = index;
         this.nameTemplate = nameTemplate;
         this.fileNameTemplate = fileNameTemplate;
@@ -43,16 +43,17 @@ public class ForestMultipartFactory<T> {
             Class<P> paramType,
             int index,
             MappingTemplate nameTemplate,
-            MappingTemplate fileNameTemplate) {
+            MappingTemplate fileNameTemplate,
+            String partContentType) {
         if (multipartTypeMap.containsKey(paramType) ||
             Map.class.isAssignableFrom(paramType) ||
             Iterable.class.isAssignableFrom(paramType) ||
             paramType.isArray()) {
-            return new ForestMultipartFactory<>(paramType, index, nameTemplate, fileNameTemplate);
+            return new ForestMultipartFactory<>(paramType, partContentType, index, nameTemplate, fileNameTemplate);
         }
         for (Class<P> pType : multipartTypeMap.keySet()) {
             if (pType.isAssignableFrom(paramType)) {
-                return new ForestMultipartFactory<>(paramType, index, nameTemplate, fileNameTemplate);
+                return new ForestMultipartFactory<>(paramType, partContentType, index, nameTemplate, fileNameTemplate);
             }
         }
         throw new ForestRuntimeException("[Forest] Can not wrap parameter type \"" + paramType.getName() + "\" in ForestMultipart");
@@ -117,11 +118,11 @@ public class ForestMultipartFactory<T> {
         }
     }
 
-
-    public void addMultipart(MappingTemplate nameTemplate, MappingTemplate fileNameTemplate, Object data, String contentType, List<ForestMultipart> multiparts, Object[] args) {
+    public void addMultipart(MappingTemplate nameTemplate, MappingTemplate fileNameTemplate, Object data, List<ForestMultipart> multiparts, Object[] args) {
         if (data == null) {
             return;
         }
+        String contentType = partContentType;
         VariableScope parentScope = nameTemplate.getVariableScope();
         if (data instanceof Iterable) {
             Iterable dataCollection = (Iterable) data;

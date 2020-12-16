@@ -13,6 +13,7 @@ import com.dtflys.test.model.SubCoordinate;
 import com.dtflys.forest.converter.json.ForestFastjsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.google.common.collect.Lists;
+import freemarker.template.SimpleDate;
 import org.junit.Test;
 
 import java.text.DateFormat;
@@ -32,8 +33,7 @@ import static junit.framework.Assert.assertTrue;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2017-05-08 23:13
  */
-public class TestForestFastjsonConverter {
-
+public class TestForestFastjsonConverter extends JSONConverter {
 
     @Test
     public void testSerializerFeature() {
@@ -170,11 +170,13 @@ public class TestForestFastjsonConverter {
     }
 
 
+
     @Test
-    public void testConvertToJava() {
+    public void testConvertToJava() throws ParseException {
         String jsonText = "{\"a\":1, \"b\":2}";
         ForestFastjsonConverter forestFastjsonConverter = new ForestFastjsonConverter();
         Map result = forestFastjsonConverter.convertToJavaObject(jsonText, Map.class);
+
         assertNotNull(result);
         assertEquals(1, result.get("a"));
         assertEquals(2, result.get("b"));
@@ -290,5 +292,21 @@ public class TestForestFastjsonConverter {
         ForestFastjsonConverter forestFastjsonConverter = new ForestFastjsonConverter();
         Map map = forestFastjsonConverter.convertToJavaObject(json, HashMap.class);
         System.out.println(map);
+    }
+
+    @Test
+    public void testDate() throws ParseException {
+        String json = "{\"name\":\"foo\",\"date\":\"2020-10-10 10:12:00\"}";
+        ForestFastjsonConverter forestFastjsonConverter = new ForestFastjsonConverter();
+        TestJsonObj testJsonObj = forestFastjsonConverter.convertToJavaObject(json, TestJsonObj.class);
+        assertNotNull(testJsonObj);
+        assertEquals("foo", testJsonObj.getName());
+        assertDateEquals("2020-10-10 10:12:00", testJsonObj.getDate(), "yyyy-MM-dd hh:mm:ss");
+
+        json = "{\"name\":\"foo\",\"date\":\"2020/10/10 10:12:00\"}";
+        testJsonObj = forestFastjsonConverter.convertToJavaObject(json, TestJsonObj.class);
+        assertNotNull(testJsonObj);
+        assertEquals("foo", testJsonObj.getName());
+        assertDateEquals("2020-10-10 10:12:00", testJsonObj.getDate(), "yyyy-MM-dd hh:mm:ss");
     }
 }

@@ -1,7 +1,7 @@
 package com.dtflys.test.http.client;
 
-import com.dtflys.forest.annotation.Body;
 import com.dtflys.forest.annotation.DataFile;
+import com.dtflys.forest.annotation.JSONBody;
 import com.dtflys.forest.annotation.Post;
 import com.dtflys.forest.annotation.PostRequest;
 import com.dtflys.forest.annotation.Request;
@@ -65,5 +65,8 @@ public interface UploadClient {
     @PostRequest(url = "/upload")
     ForestRequest<Map> uploadByteArrayArray(@DataFile(value = "file", fileName = "test-img-${_index}.jpg") byte[][] byteArrayArray);
 
+    // mixture
+    @PostRequest(url = "/upload")
+    ForestRequest<Map> imageUpload(String fileName, @DataFile(value = "file", fileName = "${0}") File file, @JSONBody("meta") Map map);
 
 }

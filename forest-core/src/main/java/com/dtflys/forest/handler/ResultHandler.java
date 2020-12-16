@@ -7,6 +7,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
+import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.InputStream;
@@ -65,9 +66,6 @@ public class ResultHandler {
                         }
                     }
                 }
-                if (boolean.class.isAssignableFrom(resultClass) || Boolean.class.isAssignableFrom(resultClass)) {
-                    return response.isSuccess();
-                }
                 if (resultClass.isArray()) {
                     if (byte[].class.isAssignableFrom(resultClass)) {
                         return response.getByteArray();
@@ -81,6 +79,9 @@ public class ResultHandler {
                 String responseText = null;
                 if (result != null && CharSequence.class.isAssignableFrom(result.getClass())) {
                     responseText = result.toString();
+                }
+                else if (CharSequence.class.isAssignableFrom(resultClass)) {
+                    responseText = response.readAsString();
                 }
                 else {
                     responseText = response.getContent();

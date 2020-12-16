@@ -38,7 +38,7 @@ import java.lang.annotation.Target;
  * 也就会自动执行组装请求、发送请求、接受请求响应信息等任务。
  *
  * @author gongjun[dt_flys@hotmail.com]
- * @since 2016-05-12
+ * @since 1.0.0
  */
 @Documented
 @MethodLifeCycle(RequestLifeCycle.class)
@@ -47,20 +47,27 @@ import java.lang.annotation.Target;
 public @interface Request {
 
     /**
-     * target http url
+     * 目标请求URL [同url属性]
      */
-    String url();
+    @AliasFor("url")
+    String value() default "";
 
     /**
-     * http method type: <br>
+     * 目标请求URL [同value属性]
+     */
+    @AliasFor("value")
+    String url() default "";
+
+    /**
+     * HTTP Method: <br>
      * GET POST PUT HEAD OPTIONS DELETE PATCH TRACE
      */
     String type() default "";
 
     /**
-     * type of response data: <br>
+     * 请求响应后接受的数据类型: <br>
      *     text json xml <br>
-     * default value is "auto"
+     *     default value is "auto"
      */
     String dataType() default "auto";
 
@@ -69,6 +76,9 @@ public @interface Request {
      */
     boolean async() default false;
 
+    /**
+     * 请求超时时间 (单位毫秒)
+     */
     int timeout() default -1;
 
     /**
@@ -128,12 +138,25 @@ public @interface Request {
      */
     String[] headers() default {};
 
+    /**
+     * 拦截器类列表
+     */
     Class<?>[] interceptor() default {};
 
+    /**
+     * 请求数据项列表
+     */
     String[] data() default {};
 
+    /**
+     * 请求进度步长 (单位：比特)<br>
+     * 适用于文件上传/下载
+     */
     long progressStep() default -1L;
 
+    /**
+     * 数据反序列化器类
+     */
     Class<?> decoder() default Object.class;
 
     /**
@@ -141,5 +164,8 @@ public @interface Request {
      */
     String keyStore() default "";
 
+    /**
+     * 请求日志开关
+     */
     boolean logEnabled() default false;
 }

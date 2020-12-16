@@ -107,4 +107,9 @@ public @interface Body {
      */
     String filter() default "";
 
+    /**
+     * 子项Content-Type
+     */
+    String partContentType() default "";
+
 }
