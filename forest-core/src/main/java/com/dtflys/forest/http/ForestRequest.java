@@ -1485,23 +1485,73 @@ public class ForestRequest<T> {
         return this;
     }
 
-
+    /**
+     * 获取SSL KeyStore信息
+     * <p>在双向HTTPS请求中使用的验证信息</p>
+     *
+     * @return SSL KeyStore信息，{@link SSLKeyStore}类实例
+     */
     public SSLKeyStore getKeyStore() {
         return keyStore;
     }
 
+    /**
+     * 设置SSL KeyStore信息
+     * <p>在双向HTTPS请求中使用的验证信息</p>
+     *
+     * @param keyStore SSL KeyStore信息，{@link SSLKeyStore}类实例
+     * @return {@link ForestRequest}类实例
+     */
     public ForestRequest setKeyStore(SSLKeyStore keyStore) {
         this.keyStore = keyStore;
         return this;
     }
 
+    /**
+     * 获取正向代理
+     *
+     * @return 正向代理，{@link ForestProxy}类实例
+     */
     public ForestProxy getProxy() {
         return proxy;
     }
 
+    /**
+     * 设置正向代理
+     *
+     * @param proxy 正向代理，{@link ForestProxy}类实例
+     * @return {@link ForestRequest}类实例
+     */
     public ForestRequest setProxy(ForestProxy proxy) {
         this.proxy = proxy;
         return this;
+    }
+
+    /**
+     * 设置该请求对应的方法返回值
+     *
+     * @param result 方法返回值
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest methodReturn(T result) {
+        if (this.lifeCycleHandler != null) {
+            this.lifeCycleHandler.handleResult(result);
+        }
+        return this;
+    }
+
+    /**
+     * 获取该请求对应的方法返回值
+     *
+     * @return 方法返回值
+     */
+    public Object getMethodReturnValue() {
+        if (this.lifeCycleHandler != null) {
+            if (this.lifeCycleHandler instanceof MethodLifeCycleHandler) {
+                return ((MethodLifeCycleHandler) lifeCycleHandler).getResultData();
+            }
+        }
+        return null;
     }
 
     /**
@@ -1522,10 +1572,7 @@ public class ForestRequest<T> {
                 }
             }
         }
-        if (lifeCycleHandler instanceof MethodLifeCycleHandler) {
-            return ((MethodLifeCycleHandler<?>) lifeCycleHandler).getResultData();
-        }
-        return null;
+        return getMethodReturnValue();
     }
 
     /**
