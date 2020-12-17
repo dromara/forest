@@ -4,14 +4,10 @@ import com.dtflys.forest.annotation.JSONBody;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.lifecycles.ParameterAnnotationLifeCycle;
 import com.dtflys.forest.mapping.MappingParameter;
-import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MetaRequest;
 import com.dtflys.forest.utils.StringUtils;
-
-import java.lang.reflect.Parameter;
 
 /**
  * Forest &#064;JSONBody注解的生命周期
@@ -65,4 +61,5 @@ public class JSONBodyLifeCycle extends AbstractBodyLifeCycle<JSONBody> {
         }
         return true;
     }
+
 }
