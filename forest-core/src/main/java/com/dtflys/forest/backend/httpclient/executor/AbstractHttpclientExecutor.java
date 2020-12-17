@@ -26,7 +26,6 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.mapping.MappingTemplate;
 
 
-import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.slf4j.Logger;
@@ -174,7 +173,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
                 ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
                 response = forestResponseFactory.createResponse(request, null, lifeCycleHandler, e);
                 logResponse(startTime, response);
-                lifeCycleHandler.handleSyncWitchException(request, response, e);
+                lifeCycleHandler.handleSyncWithException(request, response, e);
                 return;
             }
             log.error(e.getMessage());

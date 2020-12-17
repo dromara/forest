@@ -21,7 +21,7 @@ public class NoneLifeCycleHandler implements LifeCycleHandler {
     }
 
     @Override
-    public Object handleSyncWitchException(ForestRequest request, ForestResponse response, Exception ex) {
+    public Object handleSyncWithException(ForestRequest request, ForestResponse response, Exception ex) {
         return null;
     }
 

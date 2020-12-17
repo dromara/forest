@@ -5,7 +5,6 @@ import com.dtflys.forest.backend.HttpExecutor;
 import com.dtflys.forest.backend.okhttp3.logging.OkHttp3LogBodyMessage;
 import com.dtflys.forest.backend.url.URLBuilder;
 import com.dtflys.forest.exceptions.ForestRetryException;
-import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.logging.LogBodyMessage;
@@ -240,7 +239,7 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
                 } catch (Throwable throwable) {
                     ForestResponse response = factory.createResponse(request, null, lifeCycleHandler, e);
                     logResponse(startTime, response);
-                    lifeCycleHandler.handleSyncWitchException(request, response, e);
+                    lifeCycleHandler.handleSyncWithException(request, response, e);
                     return;
                 }
                 execute(lifeCycleHandler, retryCount + 1);

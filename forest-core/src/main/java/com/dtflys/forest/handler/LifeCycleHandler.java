@@ -20,7 +20,7 @@ public interface LifeCycleHandler {
 
     Object handleSync(ForestRequest request, ForestResponse response);
 
-    Object handleSyncWitchException(ForestRequest request, ForestResponse response, Exception ex);
+    Object handleSyncWithException(ForestRequest request, ForestResponse response, Exception ex);
 
     Object handleResultType(ForestRequest request, ForestResponse response);
 

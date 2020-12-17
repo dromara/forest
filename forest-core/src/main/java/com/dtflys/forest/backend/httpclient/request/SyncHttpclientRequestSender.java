@@ -107,7 +107,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
                 ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
                 response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, throwable);
                 logResponse(startTime, response);
-                lifeCycleHandler.handleSyncWitchException(request, response, e);
+                lifeCycleHandler.handleSyncWithException(request, response, e);
                 return;
             }
             startTime = System.currentTimeMillis();
