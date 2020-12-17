@@ -90,9 +90,9 @@ public class TestPostJson6Client extends BaseClientTest {
     }
 
 
+/*
     @Test
     public void testJsonPostJsonDate() throws ParseException {
-        System.out.println(configuration.getJsonConverter().getClass().getName());
 //        configuration.getJsonConverter().setDateFormat("yyyy/MM/dd hh:mm:ss");
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         Date date = format.parse("2020-10-11 10:12:00");
@@ -103,5 +103,6 @@ public class TestPostJson6Client extends BaseClientTest {
         assertNotNull(result);
         Assert.assertEquals(PostJson6MockServer.EXPECTED, result);
     }
+*/
 
 }
