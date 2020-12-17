@@ -156,7 +156,6 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
                     .sslSocketFactory(sslSocketFactory, getX509TrustManager(request))
                     .hostnameVerifier(TrustAllHostnameVerifier.DEFAULT);
         }
-
         // add default interceptor
         builder.addNetworkInterceptor(chain -> {
             Response response = chain.proceed(chain.request());
