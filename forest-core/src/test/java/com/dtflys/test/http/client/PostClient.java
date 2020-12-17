@@ -6,6 +6,7 @@ import com.dtflys.test.http.model.*;
 import com.dtflys.test.http.model.UserParam;
 import com.dtflys.test.http.model.XmlTestParam;
 import com.dtflys.test.interceptor.PostHeadInterceptor;
+import com.dtflys.test.interceptor.XmlResponseInterceptor;
 
 import java.util.List;
 import java.util.Map;
@@ -440,6 +441,8 @@ public interface PostClient {
     @Post(url = "http://localhost:${port}/xml")
     String postXmlBodyString(@XMLBody String xml);
 
+    @Post(url = "http://localhost:${port}/xml-response", interceptor = XmlResponseInterceptor.class)
+    XmlTestParam postAndGetXmlResponse(@XMLBody XmlTestParam testParam);
 
 
 }

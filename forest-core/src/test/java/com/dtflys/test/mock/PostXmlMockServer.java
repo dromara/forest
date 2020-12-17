@@ -36,6 +36,27 @@ public class PostXmlMockServer extends MockServerRule {
                         .withStatusCode(200)
                         .withBody(EXPECTED)
         );
+
+
+        mockClient.when(
+                request()
+                        .withPath("/xml-response")
+                        .withMethod("POST")
+                        .withBody("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+                                "<misc>\n" +
+                                "    <a>1</a>\n" +
+                                "    <b>2</b>\n" +
+                                "</misc>\n")
+        ).respond(
+                response()
+                        .withStatusCode(200)
+                        .withBody("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+                                "<misc>\n" +
+                                "    <a>3</a>\n" +
+                                "    <b>4</b>\n" +
+                                "</misc>\n")
+        );
+
     }
 
 }

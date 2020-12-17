@@ -113,4 +113,16 @@ public class TestPostXmlClient extends BaseClientTest {
         Assert.assertEquals(PostMockServer.EXPECTED, result);
     }
 
+
+    @Test
+    public void testPostAndGetXmlResponse() {
+        XmlTestParam testParam = new XmlTestParam();
+        testParam.setA(1);
+        testParam.setB(2);
+        XmlTestParam result = postClient.postAndGetXmlResponse(testParam);
+        log.info("response: " + result);
+        assertEquals(Integer.valueOf(10), result.getA());
+        assertEquals(Integer.valueOf(20), result.getB());
+    }
+
 }
