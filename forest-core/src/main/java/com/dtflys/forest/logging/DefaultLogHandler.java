@@ -188,8 +188,8 @@ public class DefaultLogHandler implements ForestLogHandler {
      */
     @Override
     public void logResponseContent(ResponseLogMessage responseLogMessage) {
-        if (responseLogMessage.getResponse() != null && responseLogMessage.getResponse().isSuccess()) {
-            logContent("Response: Content=" + responseLogMessage.getResponse().getContent());
+        if (responseLogMessage.getResponse() != null) {
+            logContent("Response Content:\n\t" + responseLogMessage.getResponse().getContent());
         }
     }
 }
