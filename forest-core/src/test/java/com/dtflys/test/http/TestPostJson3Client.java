@@ -107,7 +107,7 @@ public class TestPostJson3Client extends BaseClientTest {
                 "\tHeaders: \n" +
                 "\t\tContent-Type: application/json; charset=utf-8\n" +
                 "\tBody: [{\"userList\":[{\"username\":\"foo\"}]}]");
-        Mockito.verify(logger).info("[Forest] Response: Content={\"status\": \"ok\"}");
+        Mockito.verify(logger).info("[Forest] Response Content:\n\t{\"status\": \"ok\"}");
 
     }
 

@@ -156,7 +156,7 @@ public class TestPostJson2Client extends BaseClientTest {
                 "\t\tAccept-Encoding: UTF-8\n" +
                 "\t\tContent-Type: application/json\n" +
                 "\tBody: {\"username\":\"foo\"}");
-        Mockito.verify(logger).info("[Forest] Response: Content=成功访问");
+        Mockito.verify(logger).info("[Forest] Response Content:\n\t成功访问");
     }
 
     @Test
