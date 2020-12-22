@@ -764,8 +764,9 @@ public class ForestMethod<T> implements VariableScope {
                     }
                 }
                 else if (obj instanceof Iterable
-                        || obj.getClass().isArray()
-                        || ReflectUtils.isPrimaryType(obj.getClass())) {
+                        || (obj != null 
+                        && (obj.getClass().isArray()
+                        || ReflectUtils.isPrimaryType(obj.getClass())))) {
                     if (MappingParameter.isQuery(target)) {
                         if (parameter.isJsonParam()) {
                             request.addQuery(parameter.getName(), obj);
