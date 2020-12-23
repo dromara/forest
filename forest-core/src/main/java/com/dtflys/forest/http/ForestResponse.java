@@ -113,7 +113,7 @@ public abstract class ForestResponse<T> {
      * {@link ForestResponse#getContent()}不会读取二进制形式数据内容，
      * 而{@link ForestResponse#readAsString()}会将二进制数据转换成字符串读取
      *
-     * @return
+     * @return 响应内容文本字符串
      */
     public String getContent() {
         if (content != null) {
@@ -191,8 +191,8 @@ public abstract class ForestResponse<T> {
 
     /**
      * 设置请求响应的状态码
+     *
      * @param statusCode 请求响应的状态码
-     * @return
      */
     public void setStatusCode(Integer statusCode) {
         this.statusCode = statusCode;
