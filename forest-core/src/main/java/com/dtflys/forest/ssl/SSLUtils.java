@@ -86,6 +86,7 @@ public class SSLUtils {
     /**
      * 默认的单向验证HTTPS请求绕过SSL验证，使用默认SSL协议
      *
+     * @param sslProtocol SSL协议名称
      * @return SSL上下文，{@link SSLContext}类实例
      * @throws NoSuchAlgorithmException 没有对应加密算法异常
      * @throws KeyManagementException Key管理异常
@@ -102,6 +103,7 @@ public class SSLUtils {
     /**
      * 获取SSL上下文
      * @param request Forest请求对象，{@link ForestRequest}类实例
+     * @param protocol 协议名称
      * @return SSL上下文，{@link SSLContext}类实例
      */
     public static SSLContext getSSLContext(ForestRequest request, String protocol) throws KeyManagementException, NoSuchAlgorithmException {
