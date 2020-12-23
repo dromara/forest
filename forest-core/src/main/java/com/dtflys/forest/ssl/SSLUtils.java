@@ -106,6 +106,17 @@ public class SSLUtils {
      * @param protocol 协议名称
      * @return SSL上下文，{@link SSLContext}类实例
      */
+
+
+    /**
+     * 获取SSL上下文
+     *
+     * @param request Forest请求对象，{@link ForestRequest}类实例
+     * @param protocol 协议名称
+     * @return SSL上下文，{@link SSLContext}类实例
+     * @throws KeyManagementException Key管理异常
+     * @throws NoSuchAlgorithmException 找不到对应加密算法的异常
+     */
     public static SSLContext getSSLContext(ForestRequest request, String protocol) throws KeyManagementException, NoSuchAlgorithmException {
         if (request.getKeyStore() == null) {
             return SSLUtils.createIgnoreVerifySSL(protocol);
