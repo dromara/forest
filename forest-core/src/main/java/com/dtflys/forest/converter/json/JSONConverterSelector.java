@@ -50,7 +50,9 @@ public class JSONConverterSelector implements Serializable {
 
     /**
      * 检测FastJSON相关类型
+     *
      * @return FastJSON相关类型
+     * @throws Throwable 找不到类型时抛出的异常
      */
     public Class checkFastJSONClass() throws Throwable {
         return Class.forName("com.alibaba.fastjson.JSON");
@@ -58,7 +60,9 @@ public class JSONConverterSelector implements Serializable {
 
     /**
      * 检测Jaskon相关类型
+     *
      * @return Jaskon相关类型
+     * @throws Throwable 找不到类型时抛出的异常
      */
     public Class checkJacsonClass() throws Throwable {
         return Class.forName("com.fasterxml.jackson.databind.ObjectMapper");
@@ -66,7 +70,9 @@ public class JSONConverterSelector implements Serializable {
 
     /**
      * 检测Gson相关类型
+     *
      * @return Gson相关类型
+     * @throws Throwable 找不到类型时抛出的异常
      */
     public Class checkGsonClass() throws Throwable {
         return Class.forName("com.google.gson.JsonParser");
