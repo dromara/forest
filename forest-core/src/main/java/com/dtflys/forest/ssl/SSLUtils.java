@@ -99,15 +99,6 @@ public class SSLUtils {
     }
 
 
-
-    /**
-     * 获取SSL上下文
-     * @param request Forest请求对象，{@link ForestRequest}类实例
-     * @param protocol 协议名称
-     * @return SSL上下文，{@link SSLContext}类实例
-     */
-
-
     /**
      * 获取SSL上下文
      *
