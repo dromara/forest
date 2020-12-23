@@ -247,6 +247,7 @@ public abstract class ForestResponse<T> {
 
     /**
      * 网络请求是否失败
+     *
      * @return {@code true}: 失败
      */
     public boolean isError() {
