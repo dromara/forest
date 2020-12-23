@@ -31,7 +31,6 @@ import com.dtflys.forest.utils.ByteEncodeUtils;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.commons.io.IOUtils;
 
-import javax.annotation.Nonnull;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -175,7 +174,6 @@ public abstract class ForestResponse<T> {
      * @return 字符串
      * @throws IOException 字符串处理异常
      */
-    @Nonnull
     protected String byteToString(byte[] bytes) throws IOException {
         String encode;
         if (StringUtils.isNotEmpty(contentEncoding)) {
