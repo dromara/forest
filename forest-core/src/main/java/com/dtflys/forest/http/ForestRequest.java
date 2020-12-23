@@ -504,7 +504,8 @@ public class ForestRequest<T> {
 
     /**
      * 动态获取请求的URL Query参数字符串
-     * @return
+     *
+     * @return Query参数字符串
      */
     public String getQueryString() {
         StringBuilder builder = new StringBuilder();
@@ -833,7 +834,8 @@ public class ForestRequest<T> {
     }
 
     /**
-     * 旧的获取Body数据的方法，已不建议使用
+     * 旧的获取Body数据的方法 [已不建议使用]
+     * @return 请求中的数据，{@link Map}对象实例
      */
     @Deprecated
     public Map<String, Object> getData() {
