@@ -1558,8 +1558,10 @@ public class ForestRequest<T> {
 
     /**
      * 执行请求发送过程
+     *
      * @param backend HTTP后端，{@link HttpBackend}接口实例
      * @param lifeCycleHandler 生命周期处理器，{@link LifeCycleHandler}接口实例
+     * @return 接受到请求响应后，其响应内容反序列化成对象的结果
      */
     public Object execute(HttpBackend backend, LifeCycleHandler lifeCycleHandler) {
         if (interceptorChain.beforeExecute(this)) {
@@ -1579,6 +1581,8 @@ public class ForestRequest<T> {
 
     /**
      * 执行请求发送过程
+     *
+     * @return 接受到请求响应后，其响应内容反序列化成对象的结果
      */
     public Object execute() {
         return execute(getBackend(), getLifeCycleHandler());
