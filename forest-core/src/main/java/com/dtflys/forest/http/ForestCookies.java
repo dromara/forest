@@ -19,6 +19,11 @@ public class ForestCookies implements Iterable<ForestCookie> {
         this.cookies = new LinkedList<>();
     }
 
+    /**
+     * 获取Cookie集合大小
+     *
+     * @return 集合大小
+     */
     public int size() {
         return cookies.size();
     }
