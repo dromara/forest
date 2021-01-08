@@ -16,6 +16,8 @@ public class RequestNameValue {
 
     private final int target;
 
+    private String defaultValue;
+
     /**
      * 子项Content-Type
      */
@@ -58,16 +60,27 @@ public class RequestNameValue {
         return name;
     }
 
-    public void setName(String name) {
+    public RequestNameValue setName(String name) {
         this.name = name;
+        return this;
     }
 
     public Object getValue() {
         return value;
     }
 
-    public void setValue(Object value) {
+    public RequestNameValue setValue(Object value) {
         this.value = value;
+        return this;
+    }
+
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public RequestNameValue setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+        return this;
     }
 
     public boolean isInQuery() {
@@ -90,7 +103,8 @@ public class RequestNameValue {
         return partContentType;
     }
 
-    public void setPartContentType(String partContentType) {
+    public RequestNameValue setPartContentType(String partContentType) {
         this.partContentType = partContentType;
+        return this;
     }
 }
