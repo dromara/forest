@@ -52,7 +52,6 @@ public class OkHttpResponseBody extends ResponseBody {
 
     @Override
     public void close() {
-        System.out.println("[Forest Debug] Response Body Close!");
         super.close();
     }
 
