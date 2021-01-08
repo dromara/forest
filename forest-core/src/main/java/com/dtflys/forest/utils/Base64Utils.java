@@ -1,11 +1,7 @@
 package com.dtflys.forest.utils;
 
-import org.apache.xerces.impl.dv.util.Base64;
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
-import java.io.IOException;
-
+import java.util.Base64;
 
 /**
  * Base64字符串与字节码转换工具
@@ -15,20 +11,16 @@ import java.io.IOException;
 
 public class Base64Utils {
 
-	public static String simpleEncode(byte[] data) {
-		return Base64.encode(data);
-	}
+	private final static Base64.Decoder DECODER = Base64.getDecoder();
+	private final static Base64.Encoder ENCODER = Base64.getEncoder();
 
-	public static byte[] simpleDecode(String str) {
-		return Base64.decode(str);
-	}
 
-    public static String encode(String str){
-		return Base64.encode(str.getBytes());
+    public static String encode(String str) {
+		return ENCODER.encodeToString(str.getBytes());
     }
 
-    public static String decode(String str){
-		return new String(Base64.decode(str));
+    public static byte[] decode(String str) {
+		return DECODER.decode(str);
     }
 
 }
