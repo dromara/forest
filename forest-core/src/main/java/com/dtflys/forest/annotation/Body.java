@@ -112,4 +112,9 @@ public @interface Body {
      */
     String partContentType() default "";
 
+    /**
+     * 默认值
+     */
+    String defaultValue() default "";
+
 }

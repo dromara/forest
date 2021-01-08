@@ -47,4 +47,9 @@ public @interface JSONQuery {
      */
     String filter() default "";
 
+    /**
+     * 默认值
+     */
+    String defaultValue() default "";
+
 }

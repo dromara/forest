@@ -81,4 +81,9 @@ public @interface FormBody {
      */
     String filter() default "";
 
+    /**
+     * 默认值
+     */
+    String defaultValue() default "";
+
 }

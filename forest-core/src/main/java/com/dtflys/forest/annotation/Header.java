@@ -83,5 +83,9 @@ public @interface Header {
     @AliasFor("value")
     String name() default "";
 
+    /**
+     * 默认值
+     */
+    String defaultValue() default "";
 
 }

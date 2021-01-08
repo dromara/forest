@@ -58,6 +58,11 @@ public class MappingParameter {
      */
     private String partContentType;
 
+    /**
+     * 默认值
+     */
+    private String defaultValue;
+
     private String jsonParamName;
 
     private FilterChain filterChain = new FilterChain();
@@ -156,6 +161,14 @@ public class MappingParameter {
 
     public void setPartContentType(String partContentType) {
         this.partContentType = partContentType;
+    }
+
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
     }
 
     public String getJsonParamName() {
