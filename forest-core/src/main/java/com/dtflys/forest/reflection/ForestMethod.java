@@ -635,6 +635,9 @@ public class ForestMethod<T> implements VariableScope {
         if (baseUrlTemplate != null) {
             baseUrl = StringUtils.trimBegin(baseUrlTemplate.render(args));
         }
+        if (urlTemplate == null) {
+            throw new ForestRuntimeException("request URL is empty");
+        }
         String renderedUrl = urlTemplate.render(args);
         ForestRequestType type = type(args);
         String baseContentEncoding = null;
@@ -733,9 +736,11 @@ public class ForestMethod<T> implements VariableScope {
                         json = jsonConverter.encodeToString(obj);
                     }
                     if (MappingParameter.isHeader(target)) {
-                        request.addHeader(new RequestNameValue(parameter.getJsonParamName(), json, target));
+                        request.addHeader(new RequestNameValue(parameter.getJsonParamName(), json, target)
+                                .setDefaultValue(parameter.getDefaultValue()));
                     } else {
-                        nameValueList.add(new RequestNameValue(parameter.getJsonParamName(), json, target, parameter.getPartContentType()));
+                        nameValueList.add(new RequestNameValue(parameter.getJsonParamName(), json, target, parameter.getPartContentType())
+                                .setDefaultValue(parameter.getDefaultValue()));
                     }
                 }
                 else if (!parameter.getFilterChain().isEmpty()) {
@@ -747,20 +752,25 @@ public class ForestMethod<T> implements VariableScope {
                             request.addQuery(obj.toString(), null);
                         } else if (MappingParameter.isBody(target)) {
                             if (obj instanceof CharSequence) {
-                                request.addBody(new StringRequestBody(obj.toString()));
+                                request.addBody(new StringRequestBody(obj.toString())
+                                        .setDefaultValue(parameter.getDefaultValue()));
                             } else {
-                                request.addBody(new ObjectRequestBody(obj));
+                                request.addBody(new ObjectRequestBody(obj)
+                                        .setDefaultValue(parameter.getDefaultValue()));
                             }
                         } else {
-                            nameValueList.add(new RequestNameValue(obj.toString(), target, parameter.getPartContentType()));
+                            nameValueList.add(new RequestNameValue(obj.toString(), target, parameter.getPartContentType())
+                                    .setDefaultValue(parameter.getDefaultValue()));
                         }
                     }
                 }
                 else if (obj instanceof CharSequence) {
                     if (MappingParameter.isQuery(target)) {
-                        request.addQuery(ForestQueryParameter.createSimpleQueryParameter(obj));
+                        request.addQuery(ForestQueryParameter.createSimpleQueryParameter(obj)
+                                .setDefaultValue(parameter.getDefaultValue()));
                     } else if (MappingParameter.isBody(target)) {
-                        request.addBody(new StringRequestBody(obj.toString()));
+                        request.addBody(new StringRequestBody(obj.toString())
+                                .setDefaultValue(parameter.getDefaultValue()));
                     }
                 }
                 else if (obj instanceof Iterable
