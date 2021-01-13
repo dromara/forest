@@ -65,6 +65,12 @@ public class TestHeadClient extends BaseClientTest {
     }
 
     @Test
+    public void testHeadHelloUser2WithDefaultHeaders() {
+        headClient.headHelloUserWithDefaultHeaders(null, null);
+    }
+
+
+    @Test
     public void testHeadHelloUser3() {
         accessTokenLocal.set("11111111");
         Map<String, Object> headers = new HashMap<>();

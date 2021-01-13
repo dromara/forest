@@ -728,6 +728,9 @@ public class ForestMethod<T> implements VariableScope {
             if (parameter.isObjectProperties()) {
                 int target = parameter.isUnknownTarget() ? type.getDefaultParamTarget() : parameter.getTarget();
                 Object obj = args[parameter.getIndex()];
+                if (obj == null && StringUtils.isNotEmpty(parameter.getDefaultValue())) {
+                    obj = parameter.getConvertedDefaultValue(configuration.getJsonConverter());
+                }
                 if (parameter.isJsonParam()) {
                     String  json = "";
                     if (obj != null) {
@@ -745,6 +748,9 @@ public class ForestMethod<T> implements VariableScope {
                 }
                 else if (!parameter.getFilterChain().isEmpty()) {
                     obj = parameter.getFilterChain().doFilter(configuration, obj);
+                    if (obj == null && StringUtils.isNotEmpty(parameter.getDefaultValue())) {
+                        obj = parameter.getDefaultValue();
+                    }
                     if (obj != null) {
                         if (MappingParameter.isHeader(target)) {
                             request.addHeader(new RequestNameValue(null, obj, target));
@@ -830,8 +836,12 @@ public class ForestMethod<T> implements VariableScope {
             }
             else if (parameter.getIndex() != null) {
                 int target = parameter.isUnknownTarget() ? type.getDefaultParamTarget() : parameter.getTarget();
-                RequestNameValue nameValue = new RequestNameValue(parameter.getName(), target, parameter.getPartContentType());
+                RequestNameValue nameValue = new RequestNameValue(parameter.getName(), target, parameter.getPartContentType())
+                        .setDefaultValue(parameter.getDefaultValue());
                 Object obj = args[parameter.getIndex()];
+                if (obj == null && StringUtils.isNotEmpty(nameValue.getDefaultValue())) {
+                    obj = parameter.getConvertedDefaultValue(configuration.getJsonConverter());
+                }
                 if (obj != null) {
                     nameValue.setValue(obj);
                     if (MappingParameter.isHeader(target)) {
@@ -864,7 +874,9 @@ public class ForestMethod<T> implements VariableScope {
                                 scope.addVariableValue("_index", index++);
                                 template.setVariableScope(scope);
                                 String name = template.render(args);
-                                nameValueList.add(new RequestNameValue(name, subItem, target, parameter.getPartContentType()));
+                                nameValueList.add(
+                                        new RequestNameValue(name, subItem, target, parameter.getPartContentType())
+                                        .setDefaultValue(parameter.getDefaultValue()));
                             }
                         } else {
                             nameValueList.add(nameValue);

@@ -96,6 +96,15 @@ public class TestGetClient extends BaseClientTest {
         assertEquals(GetMockServer.EXPECTED, result);
     }
 
+    @Test
+    public void testTextParamGetWithDefaultValue() {
+        String result = getClient.textParamGetWithDefaultUsername(null);
+        log.info("response: " + result);
+        assertNotNull(result);
+        assertEquals(GetMockServer.EXPECTED, result);
+    }
+
+
 
     @Test
     public void testTextParamInPathGet() {

@@ -5,12 +5,7 @@ import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestFastjsonConverter;
 import com.dtflys.test.http.client.PostClient;
-import com.dtflys.test.http.model.JsonTestDate;
-import com.dtflys.test.http.model.JsonTestList;
-import com.dtflys.test.http.model.JsonTestUser;
-import com.dtflys.test.mock.PostJson3MockServer;
 import com.dtflys.test.mock.PostJson6MockServer;
-import com.dtflys.test.mock.PostJsonMockServer;
 import com.google.common.collect.Lists;
 import org.junit.Assert;
 import org.junit.Before;
@@ -20,12 +15,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,6 +73,14 @@ public class TestPostJson6Client extends BaseClientTest {
     public void testJsonPostObjWithList2() {
         List<String> data = Lists.newArrayList("A", "B", "C");
         String result = postClient.postJsonObjWithList2("test", data);
+        log.info("response: " + result);
+        assertNotNull(result);
+        Assert.assertEquals(PostJson6MockServer.EXPECTED, result);
+    }
+
+    @Test
+    public void testJsonPostObjWithList2AndDefaultBody() {
+        String result = postClient.postJsonObjWithList2AndDefaultBody(null, null);
         log.info("response: " + result);
         assertNotNull(result);
         Assert.assertEquals(PostJson6MockServer.EXPECTED, result);

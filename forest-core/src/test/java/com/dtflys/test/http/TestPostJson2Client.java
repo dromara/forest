@@ -170,6 +170,15 @@ public class TestPostJson2Client extends BaseClientTest {
     }
 
     @Test
+    public void testJsonPostBodyMapWithDefaultBody() {
+        String result = postClient.postJsonBodyMapWithDefaultBody(null);
+        log.info("response: " + result);
+        assertNotNull(result);
+        Assert.assertEquals(PostJson2MockServer.EXPECTED, result);
+    }
+
+
+    @Test
     public void testJsonPostBodyMap2() {
         Map<String, Object> userMap = new HashMap<>();
         userMap.put("username", "foo");

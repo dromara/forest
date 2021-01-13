@@ -1,7 +1,10 @@
 package com.dtflys.forest.mapping;
 
+import com.dtflys.forest.converter.ForestConverter;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.filter.FilterChain;
+import com.dtflys.forest.utils.StringUtils;
 
 import java.util.Iterator;
 
@@ -134,6 +137,22 @@ public class MappingParameter {
     public int getTarget() {
         return target;
     }
+
+    /**
+     * 获取已根据类型已转换的默认值
+     * @param converter 转换器，{@link ForestConverter}接口实例
+     * @return
+     */
+    public Object getConvertedDefaultValue(ForestConverter converter) {
+        if (StringUtils.isEmpty(defaultValue)) {
+            return null;
+        }
+        if (CharSequence.class.isAssignableFrom(this.type) && defaultValue instanceof CharSequence) {
+            return defaultValue;
+        }
+        return converter.convertToJavaObject(defaultValue, this.type);
+    }
+
 
     public void setTarget(int target) {
         this.target = target;

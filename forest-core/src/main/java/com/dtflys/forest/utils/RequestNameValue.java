@@ -1,5 +1,7 @@
 package com.dtflys.forest.utils;
 
+import com.dtflys.forest.converter.json.ForestJsonConverter;
+
 import static com.dtflys.forest.mapping.MappingParameter.*;
 
 /**
@@ -82,6 +84,7 @@ public class RequestNameValue {
         this.defaultValue = defaultValue;
         return this;
     }
+
 
     public boolean isInQuery() {
         return target == TARGET_QUERY;

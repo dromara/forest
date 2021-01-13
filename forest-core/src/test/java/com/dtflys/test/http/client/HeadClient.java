@@ -35,6 +35,18 @@ public interface HeadClient {
     void headHelloUser(@Header("Accept") String accept, @Header("accessToken") String accessToken);
 
     @HeadRequest(
+            url = "http://localhost:${port}/hello/user?username=foo",
+            headers = {
+                    "test: testquery:dsds",
+                    "test2: testquery2: dsds"
+            }
+    )
+    void headHelloUserWithDefaultHeaders(
+            @Header(name = "Accept", defaultValue = "text/plain") String accept,
+            @Header(name = "accessToken", defaultValue = "11111111") String accessToken);
+
+
+    @HeadRequest(
             url = "http://localhost:${port}/hello/user"
     )
     void headHelloUser(@Header Map<String, Object> headers, @Query("username") String username);

@@ -38,7 +38,7 @@ public abstract class AbstractBodyLifeCycle<A extends Annotation> implements Par
         if (StringUtils.isNotBlank(partContentType)) {
             parameter.setPartContentType(partContentType.trim());
         }
-        if (StringUtils.isNotEmpty(name)) {
+        if (StringUtils.isNotEmpty(defaultValue)) {
             parameter.setDefaultValue(defaultValue);
         }
         method.processParameterFilter(parameter, filterName);

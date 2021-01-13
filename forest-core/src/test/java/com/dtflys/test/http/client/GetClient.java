@@ -130,7 +130,6 @@ public interface GetClient {
     String errorGetWithRetry();
 
 
-
     @Request(
             url = "http://localhost:${port}/hello/user",
             dataType = "json",
@@ -146,6 +145,12 @@ public interface GetClient {
             data = "username=${$0.toString()}"
     )
     String textParamGet(String username);
+
+    @Request(
+            url = "http://localhost:${port}/hello/user",
+            headers = {"Accept:text/plain"}
+    )
+    String textParamGetWithDefaultUsername(@Query(name = "username", defaultValue = "foo") String username);
 
 
     @Request(
