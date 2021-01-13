@@ -20,8 +20,14 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.METHOD})
 public @interface HTTPProxy {
 
+    /**
+     * 代理服务主机地址
+     */
     String host();
 
+    /**
+     * 代理服务端口号
+     */
     String port() default "80";
 
 }
