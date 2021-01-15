@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:forest="http://www.dtflys.com/schema/forest"
+       xmlns:forest="http://forest.dtflyx.com/schema/forest"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://www.dtflys.com/schema/forest
-       http://www.dtflys.com/schema/forest/forest-spring.xsd">
+       http://forest.dtflyx.com/schema/forest
+       http://forest.dtflyx.com/schema/forest/forest-spring.xsd">
 
-<forest:configuration
+    <forest:configuration
             id="forestConfiguration"
             timeout="30000"
             retryCount="3"

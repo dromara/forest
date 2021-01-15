@@ -1,6 +1,11 @@
 package com.dtflys.spring.test;
 
+import com.dtflys.forest.converter.json.ForestGsonConverter;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
+import com.dtflys.forest.retryer.BackOffRetryer;
+import com.dtflys.forest.retryer.NoneRetryer;
 import com.dtflys.forest.ssl.SSLUtils;
+import com.dtflys.spring.test.logging.TestLogHandler;
 import junit.framework.TestCase;
 import com.dtflys.forest.config.ForestConfiguration;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -29,6 +34,16 @@ public class ConfigurationTest extends TestCase {
         assertEquals(forestConfiguration.getVariableValue("x"), "0");
         assertEquals(forestConfiguration.getVariableValue("y"), "1");
         assertEquals(forestConfiguration.getBackend().getName(), "httpclient");
+        assertEquals("GBK", forestConfiguration.getCharset());
+        assertEquals(Boolean.TRUE, Boolean.valueOf(forestConfiguration.isLogEnabled()));
+        assertEquals(Boolean.FALSE, Boolean.valueOf(forestConfiguration.isLogResponseStatus()));
+        assertEquals(Boolean.TRUE, Boolean.valueOf(forestConfiguration.isLogResponseContent()));
+        assertEquals(NoneRetryer.class, forestConfiguration.getRetryer());
+        assertTrue(forestConfiguration.getLogHandler() instanceof TestLogHandler);
+        ForestJsonConverter jsonConverter = forestConfiguration.getJsonConverter();
+        assertNotNull(jsonConverter);
+        assertTrue(jsonConverter instanceof ForestGsonConverter);
+        assertEquals("yyyy/MM/dd hh:mm:ss", jsonConverter.getDateFormat());
     }
 
 }

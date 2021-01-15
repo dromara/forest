@@ -1,10 +1,12 @@
 package com.dtflys.forest.schema;
 
+import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.ssl.SpringSSLKeyStore;
 import com.dtflys.forest.utils.ClientFactoryBeanUtils;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.ssl.SSLKeyStore;
+import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +74,22 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
                     if ("backend".equals(attributeName)) {
                         beanDefinition.getPropertyValues().addPropertyValue("backendName", attributeValue);
                     }
+                    else if ("logHandler".equals(attributeName)) {
+                        try {
+                            Class clazz = Class.forName(attributeValue);
+                            if (!ForestLogHandler.class.isAssignableFrom(clazz)) {
+                                throw new ForestRuntimeException("property 'logHandler' must be a class extending from com.dtflys.forest.logging.ForestLogHandler");
+                            }
+                            ForestLogHandler handler = (ForestLogHandler) clazz.newInstance();
+                            beanDefinition.getPropertyValues().addPropertyValue("logHandler", handler);
+                        } catch (ClassNotFoundException e) {
+                            throw new ForestRuntimeException(e);
+                        } catch (IllegalAccessException e) {
+                            throw new ForestRuntimeException(e);
+                        } catch (InstantiationException e) {
+                            throw new ForestRuntimeException(e);
+                        }
+                    }
                     else {
                         beanDefinition.getPropertyValues().addPropertyValue(attributeName, attributeValue);
                     }
@@ -90,6 +108,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         if (nodesLength > 0) {
             ManagedMap<String, Object> varMap = new ManagedMap<String, Object>();
             ManagedMap<String, BeanDefinition> sslKeyStoreMap = new ManagedMap<>();
+            ManagedMap<ForestDataType, BeanDefinition> converterMap = new ManagedMap<>();
             for (int i = 0; i < nodesLength; i++) {
                 Node node = nodeList.item(i);
                 if (node instanceof Element) {
@@ -97,14 +116,16 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
                     String elemName = elem.getLocalName();
                     if (elemName.equals("var")) {
                         parseVariable(elem, varMap);
-                    }
-                    else if (elemName.equals("ssl-keystore")) {
+                    } else if (elemName.equals("ssl-keystore")) {
                         parseSSLKeyStore(elem, sslKeyStoreMap);
+                    } else if (elemName.equals("converter")) {
+                        parseConverter(elem, converterMap);
                     }
                 }
             }
             beanDefinition.getPropertyValues().addPropertyValue("variables", varMap);
             beanDefinition.getPropertyValues().addPropertyValue("sslKeyStores", sslKeyStoreMap);
+            beanDefinition.getPropertyValues().addPropertyValue("converterMap", converterMap);
         }
     }
 
@@ -141,11 +162,11 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
 
     public static BeanDefinition createSSLKeyStoreBean(String id,
                                                        String keystoreType,
-                                                        String filePath,
-                                                        String keystorePass,
-                                                        String certPass,
-                                                        String protocolsStr,
-                                                        String cipherSuitesStr) {
+                                                       String filePath,
+                                                       String keystorePass,
+                                                       String certPass,
+                                                       String protocolsStr,
+                                                       String cipherSuitesStr) {
         BeanDefinition beanDefinition = new GenericBeanDefinition();
         beanDefinition.setBeanClassName(sslKeyStoreBeanClass.getName());
         ConstructorArgumentValues beanDefValues = beanDefinition.getConstructorArgumentValues();
@@ -170,6 +191,39 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
             }
             beanDefinition.getPropertyValues().add("cipherSuites", cipherSuites);
         }
+        return beanDefinition;
+    }
+
+    private static void parseConverter(Element elem, ManagedMap<ForestDataType, BeanDefinition> converterMap) {
+        String dataTypeName = elem.getAttribute("dataType");
+        ForestDataType dataType = ForestDataType.findOrCreateDataType(dataTypeName);
+        if (dataType == null) {
+            throw new ForestRuntimeException("Cannot find data type named '" + dataTypeName + "'");
+        }
+        String className = elem.getAttribute("class");
+        BeanDefinition definition = createConverterBean(className);
+        NodeList nodeList = elem.getChildNodes();
+        int nodeLength = nodeList.getLength();
+        if (nodeLength > 0) {
+            for (int i = 0; i < nodeLength; i++) {
+                Node node = nodeList.item(i);
+                if (node instanceof Element) {
+                    Element childElem = (Element) node;
+                    String childElemName = childElem.getLocalName();
+                    if (childElemName.equals("parameter")) {
+                        String paramName = childElem.getAttribute("name");
+                        String paramValue = childElem.getAttribute("value");
+                        definition.getPropertyValues().addPropertyValue(paramName, paramValue);
+                    }
+                }
+            }
+        }
+        converterMap.put(dataType, definition);
+    }
+
+    public static BeanDefinition createConverterBean(String className) {
+        BeanDefinition beanDefinition = new GenericBeanDefinition();
+        beanDefinition.setBeanClassName(className);
         return beanDefinition;
     }
 }
