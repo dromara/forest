@@ -120,6 +120,7 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
         RequestConfig.Builder configBuilder = RequestConfig.custom();
         // 设置连接超时
         configBuilder.setConnectTimeout(request.getTimeout());
+
         // 设置读取超时
 
         Integer timeout = request.getTimeout();
@@ -131,6 +132,8 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
         configBuilder.setConnectionRequestTimeout(HttpConnectionConstants.DEFAULT_READ_TIMEOUT);
         // 在提交请求之前 测试连接是否可用
         configBuilder.setStaleConnectionCheckEnabled(true);
+        // 设置Cookie策略
+        configBuilder.setCookieSpec(CookieSpecs.STANDARD);
         RequestConfig requestConfig = configBuilder.build();
 
         ForestProxy proxy = request.getProxy();
