@@ -9,7 +9,7 @@
 
 <p align="center">
 <a href="https://travis-ci.org/github/mySingleLive/forest">
-    <img src="https://api.travis-ci.org/mySingleLive/forest.svg?branch=master&status=passed" alt="Build">
+    <img src="https://gitee.com/dt_flys/forest/badge/star.svg" alt="Gitee">
 </a>
 <!--
 <a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.5.0-RC2/jar">
