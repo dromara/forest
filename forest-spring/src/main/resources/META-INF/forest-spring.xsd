@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.dtflys.com/schema/forest"
+<xsd:schema xmlns="http://forest.dtflyx.com/schema/forest"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            targetNamespace="http://www.dtflys.com/schema/forest"
+            targetNamespace="http://forest.dtflyx.com/schema/forest"
             elementFormDefault="qualified" attributeFormDefault="unqualified">
 
     <xsd:annotation>
@@ -12,7 +12,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 <![CDATA[
-                    The configuration for the forest definition.
+                    Forest的全局配置
                 ]]>
             </xsd:documentation>
         </xsd:annotation>
@@ -22,7 +22,27 @@
         <xsd:annotation>
             <xsd:documentation>
                 <![CDATA[
-                    The SSL KeyStore for the forest definition.
+                    SSL KeyStore配置
+                ]]>
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="converter" type="converterType">
+        <xsd:annotation>
+            <xsd:documentation>
+                <![CDATA[
+                    Forest数据转换器配置
+                ]]>
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="parameter" type="converterParameterType">
+        <xsd:annotation>
+            <xsd:documentation>
+                <![CDATA[
+                    Forest数据转换器参数配置
                 ]]>
             </xsd:documentation>
         </xsd:annotation>
@@ -33,7 +53,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 <![CDATA[
-                    The global variable definitions.
+                    Forest全局变量定义
                 ]]>
             </xsd:documentation>
         </xsd:annotation>
@@ -50,6 +70,7 @@
         <xsd:sequence>
             <xsd:element ref="var" minOccurs="0" maxOccurs="unbounded"/>
             <xsd:element ref="ssl-keystore" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element ref="converter" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
         <xsd:attribute name="id" type="xsd:ID" use="optional">
         </xsd:attribute>
@@ -57,7 +78,7 @@
             <xsd:annotation>
                 <xsd:documentation>
                     <![CDATA[
-                           Supported http backends: <br/>
+                           HTTP后端: <br/>
                            1. httpclient -> Using Httpclient framework. <br/>
                            2. okhttp3 -> Using OkHttp3 framework.
                         ]]>
@@ -68,7 +89,7 @@
             <xsd:annotation>
                 <xsd:documentation>
                     <![CDATA[
-                           Timeout in milliseconds.
+                           全局的请求超时时间，单位为毫秒
                         ]]>
                 </xsd:documentation>
             </xsd:annotation>
@@ -86,16 +107,26 @@
             <xsd:annotation>
                 <xsd:documentation>
                     <![CDATA[
-                           Maximum number of connections allowed per route.
+                           设置全局的最大请求路径连接数
                         ]]>
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="charset" type="xsd:string" use="optional" default="UTF-8">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           全局的请求数据字符集
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+
         <xsd:attribute name="connectTimeout" type="xsd:string" use="optional">
             <xsd:annotation>
                 <xsd:documentation>
                     <![CDATA[
-                           Connect timeout in milliseconds.
+                            局的请求连接超时时间，单位为毫秒
                         ]]>
                 </xsd:documentation>
             </xsd:annotation>
@@ -104,7 +135,17 @@
             <xsd:annotation>
                 <xsd:documentation>
                     <![CDATA[
-                           Maximum number of retry times.
+                           全局的最大请求失败重试次数
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="retryer" type="xsd:token" use="optional"
+                       default="com.dtflys.forest.retryer.BackOffRetryer">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           获取全局的请求失败重试策略类
                         ]]>
                 </xsd:documentation>
             </xsd:annotation>
@@ -113,7 +154,62 @@
             <xsd:annotation>
                 <xsd:documentation>
                     <![CDATA[
-                           Default ssl protocol for https requests.
+                           全局的单向HTTPS请求的SSL协议，默认为 TLSv1.2
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="logEnabled" type="xsd:boolean" use="optional" default="true">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           是否允许打印请求/响应日志
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="logRequest" type="xsd:boolean" use="optional" default="true">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           是否允许打印请求/响应日志
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="logResponseStatus" type="xsd:boolean" use="optional" default="true">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           是否允许打印响应内容日志
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="logResponseContent" type="xsd:boolean" use="optional" default="false">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           是否允许打印响应内容日志
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="logHandler" type="xsd:token" use="optional"
+                       default="com.dtflys.forest.logging.DefaultLogHandler">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           是否允许打印响应内容日志
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="clientCacheEnabled" type="xsd:boolean" use="optional" default="true">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           是否缓存请求接口实例
                         ]]>
                 </xsd:documentation>
             </xsd:annotation>
@@ -124,43 +220,174 @@
 
     <xsd:complexType name="variableType" mixed="true">
         <xsd:attribute name="name" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           变量名
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="value" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           变量值
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
         </xsd:attribute>
     </xsd:complexType>
 
     <xsd:complexType name="scanType">
         <xsd:attribute name="configuration" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           Forest全局配置ID
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="base-package" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           Forest客户端接口扫描包路径
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
         </xsd:attribute>
     </xsd:complexType>
 
     <xsd:complexType name="clientType">
         <xsd:attribute name="id" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           Forest客户端ID
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="configuration" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           Forest全局配置ID
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="class" type="xsd:string" use="required">
+        <xsd:attribute name="class" type="xsd:token" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           Forest客户端接口类
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
         </xsd:attribute>
     </xsd:complexType>
 
     <xsd:complexType name="sslKeystoreType" mixed="true">
         <xsd:attribute name="id" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           SSL Keystore ID
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="type" type="xsd:string" use="optional" default="jks">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           SSL Keystore类型
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="protocols" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           SSL协议
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="cipher-suites" type="xsd:string" use="optional">
         </xsd:attribute>
         <xsd:attribute name="file" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           SSL证书文件
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="keystorePass" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           KeyStore密码
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="certPass" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           Cert密码
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
         </xsd:attribute>
     </xsd:complexType>
 
+
+    <xsd:complexType name="converterType" mixed="true">
+        <xsd:sequence>
+            <xsd:element ref="parameter" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+
+        <xsd:attribute name="dataType" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           数据转换类型，包含以下几种：auto, text, json, xml, binary
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="class" type="xsd:token" use="required">
+        </xsd:attribute>
+    </xsd:complexType>
+
+
+    <xsd:complexType name="converterParameterType" mixed="true">
+        <xsd:attribute name="name" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           参数名
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="value" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           参数值
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
 
 </xsd:schema>

@@ -53,15 +53,6 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
     private final ForestSSLConnectionFactory sslConnectFactory = new ForestSSLConnectionFactory();
 
     public HttpclientConnectionManager() {
-//        synchronized (HttpclientConnectionManager.class) {
-//            if (tsConnectionManager == null) {
-//                try {
-//                    init();
-//                } catch (IOReactorException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
     }
 
     @Override
@@ -125,23 +116,11 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
         sslConnectFactory.setCurrentRequest(request);
         HttpClientBuilder builder = HttpClients.custom();
         builder.setConnectionManager(tsConnectionManager);
-        /*if ("https".equals(request.getProtocol())) {
-            try {
-                SSLContext sslContext = getSSLContext(request);
-                SSLConnectionSocketFactory sslsf = getSSLConnectionSocketFactory(sslContext);
-                builder.setSSLSocketFactory(sslsf);
-            } catch (KeyManagementException e) {
-                throw new ForestRuntimeException(e);
-            } catch (NoSuchAlgorithmException e) {
-                throw new ForestRuntimeException(e);
-            }
-        } else {
-            builder.setConnectionManager(tsConnectionManager);
-        }*/
 
         RequestConfig.Builder configBuilder = RequestConfig.custom();
         // 设置连接超时
         configBuilder.setConnectTimeout(request.getTimeout());
+
         // 设置读取超时
 
         Integer timeout = request.getTimeout();
@@ -153,6 +132,8 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
         configBuilder.setConnectionRequestTimeout(HttpConnectionConstants.DEFAULT_READ_TIMEOUT);
         // 在提交请求之前 测试连接是否可用
         configBuilder.setStaleConnectionCheckEnabled(true);
+        // 设置Cookie策略
+        configBuilder.setCookieSpec(CookieSpecs.STANDARD);
         RequestConfig requestConfig = configBuilder.build();
 
         ForestProxy proxy = request.getProxy();
@@ -170,17 +151,6 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
     }
 
 
-/*
-    private static SSLConnectionSocketFactory getSSLConnectionSocketFactory(SSLContext sslContext) {
-        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
-                sslContext,
-                new String[] { "TLSv1" },
-                null,
-                SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
-        return sslsf;
-    }
-*/
-
 
     public void afterConnect() {
         sslConnectFactory.removeCurrentRequest();
@@ -194,17 +164,6 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
         }
 
         HttpAsyncClientBuilder builder = HttpAsyncClients.custom();
-/*
-        if ("https".equals(request.getProtocol())) {
-            try {
-                builder.setSSLContext(getSSLContext(request));
-            } catch (KeyManagementException e) {
-                throw new ForestRuntimeException(e);
-            } catch (NoSuchAlgorithmException e) {
-                throw new ForestRuntimeException(e);
-            }
-        }
-*/
 
         Integer timeout = request.getTimeout();
         if (timeout == null) {

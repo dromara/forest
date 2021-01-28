@@ -9,6 +9,7 @@ import com.dtflys.forest.http.ForestCookie;
 import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.ssl.ForestX509TrustManager;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.ssl.SSLUtils;
@@ -28,6 +29,7 @@ import okhttp3.TlsVersion;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
+import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.security.KeyStore;
@@ -36,6 +38,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -48,6 +52,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
      * connection pool
      */
     private ConnectionPool pool;
+
 
     public OkHttp3ConnectionManager() {
     }
@@ -77,6 +82,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
     }
 
     public OkHttpClient getClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
+
         Integer timeout = request.getTimeout();
         if (timeout == null) {
             timeout = request.getConfiguration().getTimeout();
@@ -107,23 +113,23 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
                             Duration maxAge = cookie.getMaxAge();
                             Date createTime = cookie.getCreateTime();
                             long expiresAt = createTime.getTime() + maxAge.toMillis();
-                            Cookie.Builder cookeBuilder = new Cookie.Builder();
-                            cookeBuilder.name(cookie.getName())
+                            Cookie.Builder cookieBuilder = new Cookie.Builder();
+                            cookieBuilder.name(cookie.getName())
                                 .value(cookie.getValue())
                                 .expiresAt(expiresAt)
                                 .path(cookie.getPath());
                             if (cookie.isHostOnly()) {
-                                cookeBuilder.hostOnlyDomain(cookie.getDomain());
+                                cookieBuilder.hostOnlyDomain(cookie.getDomain());
                             } else {
-                                cookeBuilder.domain(cookie.getDomain());
+                                cookieBuilder.domain(cookie.getDomain());
                             }
                             if (cookie.isHttpOnly()) {
-                                cookeBuilder.httpOnly();
+                                cookieBuilder.httpOnly();
                             }
                             if (cookie.isSecure()) {
-                                cookeBuilder.secure();
+                                cookieBuilder.secure();
                             }
-                            Cookie okCookie = cookeBuilder.build();
+                            Cookie okCookie = cookieBuilder.build();
                             okCookies.add(okCookie);
                         }
                         return okCookies;

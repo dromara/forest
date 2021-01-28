@@ -263,6 +263,13 @@ public interface PostClient {
             url = "http://localhost:${port}/json",
             headers = {"Content-Type: application/json; charset=utf-8"}
     )
+    String postBodyString1WithDefaultBody(
+            @Body(defaultValue = "{\"username\":\"foo\",\"password\":\"123456&&++===\",\"cn_name\":\"中文名\"}") String body);
+
+    @Post(
+            url = "http://localhost:${port}/json",
+            headers = {"Content-Type: application/json; charset=utf-8"}
+    )
     String postBodyString2(@Body("") String body);
 
     @Request(
@@ -280,6 +287,10 @@ public interface PostClient {
 
     @Post("http://localhost:${port}/json")
     String postJsonBodyMap(@JSONBody Map user);
+
+    @Post("http://localhost:${port}/json")
+    String postJsonBodyMapWithDefaultBody(
+            @JSONBody(defaultValue = "{\"username\":\"foo\"}") Map user);
 
 
     @Post(
@@ -350,6 +361,14 @@ public interface PostClient {
     )
     String postJson10(JsonTestList user);
 
+    @Request(
+            url = "http://localhost:${port}/json",
+            type = "post",
+            headers = {"Content-Type: application/json; charset=utf-8"}
+    )
+    String postJson10WithDefaultBody(
+            @Body(defaultValue = "{\"userList\":[{\"username\":\"foo\"}]}") JsonTestList user);
+
 
     @Post(
             url = "http://localhost:${port}/json",
@@ -377,6 +396,14 @@ public interface PostClient {
             headers = {"Content-Type: application/json; charset=utf-8"}
     )
     String postJsonObjWithList2(@Body("name") String name, @Body("data") List<String> data);
+
+    @Post(
+            url = "http://localhost:${port}/json",
+            headers = {"Content-Type: application/json; charset=utf-8"}
+    )
+    String postJsonObjWithList2AndDefaultBody(
+            @Body(name = "name", defaultValue = "test") String name,
+            @Body(name = "data", defaultValue = "[\"A\",\"B\",\"C\"]") List<String> data);
 
     @Post(
             url = "http://localhost:${port}/json",

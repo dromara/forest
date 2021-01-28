@@ -6,12 +6,12 @@
 
     <groupId>com.dtflys.forest</groupId>
     <artifactId>spring-boot-starter-forest</artifactId>
-    <version>1.5.0-RC1</version>
+    <version>1.5.0-RC2.1</version>
 
     <parent>
         <groupId>com.dtflys.forest</groupId>
         <artifactId>forest</artifactId>
-        <version>1.5.0-RC1</version>
+        <version>1.5.0-RC2.1</version>
     </parent>
 
     <properties>
@@ -72,14 +72,6 @@
             <artifactId>jackson-databind</artifactId>
             <version>2.9.10</version>
         </dependency>
-
-<!--
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>1.2.48</version>
-        </dependency>
--->
 
     </dependencies>
 

@@ -19,12 +19,10 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.Args;
 import org.apache.http.util.TextUtils;
 
-//@ThreadSafe
 public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactory {
 
     public static final X509HostnameVerifier BROWSER_COMPATIBLE_HOSTNAME_VERIFIER = new BrowserCompatHostnameVerifier();
 
-//    private final SSLSocketFactory socketfactory;
     private final static ThreadLocal<ForestRequest> REQUEST_LOCAL = new ThreadLocal<>();
     private final X509HostnameVerifier hostnameVerifier;
 
@@ -59,7 +57,6 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
 
     @Override
     public Socket connectSocket(int connectTimeout, Socket socket, HttpHost host, InetSocketAddress remoteAddress, InetSocketAddress localAddress, HttpContext context) throws IOException {
-        System.out.println("current request: " + getCurrentRequest());
         Args.notNull(host, "HTTP host");
         Args.notNull(remoteAddress, "Remote address");
         Socket sock = socket != null?socket:this.createSocket(context);
@@ -92,13 +89,11 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
 
     private ForestRequest getCurrentRequest() {
         ForestRequest request = REQUEST_LOCAL.get();
-        System.out.println("getCurrentRequest[" + Thread.currentThread().getName() + "][" + REQUEST_LOCAL.hashCode() + "]: " + request);
         return request;
     }
 
 
     public void setCurrentRequest(ForestRequest request) {
-        System.out.println("setCurrentRequest[" + Thread.currentThread().getName() + "][" + REQUEST_LOCAL.hashCode() + "]: " + request);
         REQUEST_LOCAL.set(request);
     }
 
@@ -136,11 +131,6 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
         return sslsock;
     }
 
-/*
-    X509HostnameVerifier getHostnameVerifier() {
-        return this.hostnameVerifier;
-    }
-*/
 
     private void verifyHostname(SSLSocket sslsock, String hostname) throws IOException {
         try {

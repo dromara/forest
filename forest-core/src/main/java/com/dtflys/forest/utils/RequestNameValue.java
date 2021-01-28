@@ -1,5 +1,7 @@
 package com.dtflys.forest.utils;
 
+import com.dtflys.forest.converter.json.ForestJsonConverter;
+
 import static com.dtflys.forest.mapping.MappingParameter.*;
 
 /**
@@ -15,6 +17,8 @@ public class RequestNameValue {
     private Object value;
 
     private final int target;
+
+    private String defaultValue;
 
     /**
      * 子项Content-Type
@@ -58,17 +62,29 @@ public class RequestNameValue {
         return name;
     }
 
-    public void setName(String name) {
+    public RequestNameValue setName(String name) {
         this.name = name;
+        return this;
     }
 
     public Object getValue() {
         return value;
     }
 
-    public void setValue(Object value) {
+    public RequestNameValue setValue(Object value) {
         this.value = value;
+        return this;
     }
+
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public RequestNameValue setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+        return this;
+    }
+
 
     public boolean isInQuery() {
         return target == TARGET_QUERY;
@@ -90,7 +106,8 @@ public class RequestNameValue {
         return partContentType;
     }
 
-    public void setPartContentType(String partContentType) {
+    public RequestNameValue setPartContentType(String partContentType) {
         this.partContentType = partContentType;
+        return this;
     }
 }

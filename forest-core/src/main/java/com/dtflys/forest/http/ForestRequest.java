@@ -504,7 +504,8 @@ public class ForestRequest<T> {
 
     /**
      * 动态获取请求的URL Query参数字符串
-     * @return
+     *
+     * @return Query参数字符串
      */
     public String getQueryString() {
         StringBuilder builder = new StringBuilder();
@@ -833,7 +834,8 @@ public class ForestRequest<T> {
     }
 
     /**
-     * 旧的获取Body数据的方法，已不建议使用
+     * 旧的获取Body数据的方法 [已不建议使用]
+     * @return 请求中的数据，{@link Map}对象实例
      */
     @Deprecated
     public Map<String, Object> getData() {
@@ -1556,8 +1558,10 @@ public class ForestRequest<T> {
 
     /**
      * 执行请求发送过程
+     *
      * @param backend HTTP后端，{@link HttpBackend}接口实例
      * @param lifeCycleHandler 生命周期处理器，{@link LifeCycleHandler}接口实例
+     * @return 接受到请求响应后，其响应内容反序列化成对象的结果
      */
     public Object execute(HttpBackend backend, LifeCycleHandler lifeCycleHandler) {
         if (interceptorChain.beforeExecute(this)) {
@@ -1577,6 +1581,8 @@ public class ForestRequest<T> {
 
     /**
      * 执行请求发送过程
+     *
+     * @return 接受到请求响应后，其响应内容反序列化成对象的结果
      */
     public Object execute() {
         return execute(getBackend(), getLifeCycleHandler());

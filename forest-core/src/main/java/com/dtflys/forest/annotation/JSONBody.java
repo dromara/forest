@@ -88,4 +88,9 @@ public @interface JSONBody {
      */
     String partContentType() default ContentType.APPLICATION_JSON;
 
+    /**
+     * 默认值
+     */
+    String defaultValue() default "";
+
 }

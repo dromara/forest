@@ -20,6 +20,7 @@ public class HeaderLifeCycle implements ParameterAnnotationLifeCycle<Header, Obj
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, Header annotation) {
         Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(annotation);
+        String defaultValue = (String) attrs.get("defaultValue");
         String name = (String) attrs.get("name");
         if (StringUtils.isNotEmpty(name)) {
             parameter.setName(name);
@@ -29,6 +30,9 @@ public class HeaderLifeCycle implements ParameterAnnotationLifeCycle<Header, Obj
             parameter.setObjectProperties(false);
         } else {
             parameter.setObjectProperties(true);
+        }
+        if (StringUtils.isNotEmpty(defaultValue)) {
+            parameter.setDefaultValue(defaultValue);
         }
         parameter.setTarget(MappingParameter.TARGET_HEADER);
         method.addNamedParameter(parameter);

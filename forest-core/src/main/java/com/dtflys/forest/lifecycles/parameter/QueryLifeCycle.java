@@ -24,6 +24,7 @@ public class QueryLifeCycle implements ParameterAnnotationLifeCycle<Query, Objec
         Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(annotation);
         String name = (String) attrs.get("name");
         String filterName = (String) attrs.get("filter");
+        String defaultValue = (String) attrs.get("defaultValue");
         if (StringUtils.isNotEmpty(name)) {
             parameter.setName(name);
             MappingVariable variable = new MappingVariable(name, parameter.getType());
@@ -36,6 +37,9 @@ public class QueryLifeCycle implements ParameterAnnotationLifeCycle<Query, Objec
             parameter.setObjectProperties(false);
         } else {
             parameter.setObjectProperties(true);
+        }
+        if (StringUtils.isNotEmpty(defaultValue)) {
+            parameter.setDefaultValue(defaultValue);
         }
         method.processParameterFilter(parameter, filterName);
         parameter.setTarget(TARGET_QUERY);

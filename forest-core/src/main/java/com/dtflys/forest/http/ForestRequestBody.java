@@ -44,6 +44,11 @@ public abstract class ForestRequestBody {
      */
     protected final BodyType type;
 
+    /**
+     * 默认值
+     */
+    private String defaultValue;
+
     public ForestRequestBody(BodyType type) {
         this.type = type;
     }
@@ -56,4 +61,12 @@ public abstract class ForestRequestBody {
         return type;
     }
 
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public ForestRequestBody setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+        return this;
+    }
 }

@@ -1,25 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:forest="http://www.dtflys.com/schema/forest"
+       xmlns:forest="http://forest.dtflyx.com/schema/forest"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://www.dtflys.com/schema/forest
-       http://www.dtflys.com/schema/forest/forest-spring.xsd">
+       http://forest.dtflyx.com/schema/forest
+       http://forest.dtflyx.com/schema/forest/forest-spring.xsd">
 
-<forest:configuration
+
+    <forest:configuration
             id="forestConfiguration"
             backend="httpclient"
             timeout="30000"
             retryCount="3"
+            retryer="com.dtflys.forest.retryer.NoneRetryer"
+            charset="GBK"
             sslProtocol="SSLv3"
             connectTimeout="10000"
             maxConnections="500"
-            maxRouteConnections="500">
+            maxRouteConnections="500"
+            logEnabled="true"
+            logHandler="com.dtflys.spring.test.logging.TestLogHandler"
+            logRequest="false"
+            logResponseStatus="false"
+            logResponseContent="true">
 
         <forest:var name="baseUrl" value="http://www.thebeastshop.com"/>
         <forest:var name="x" value="0"/>
         <forest:var name="y" value="1"/>
+
+        <forest:ssl-keystore id="keystore1" file="test.keystore" keystorePass="123456" certPass="123456"/>
+
+        <forest:converter dataType="json" class="com.dtflys.forest.converter.json.ForestGsonConverter">
+            <forest:parameter name="dateFormat" value="yyyy/MM/dd hh:mm:ss"/>
+        </forest:converter>
+
+        <forest:converter dataType="xml" class="com.dtflys.forest.converter.xml.ForestJaxbConverter">
+        </forest:converter>
 
     </forest:configuration>
 

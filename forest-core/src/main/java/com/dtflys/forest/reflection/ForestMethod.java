@@ -635,6 +635,9 @@ public class ForestMethod<T> implements VariableScope {
         if (baseUrlTemplate != null) {
             baseUrl = StringUtils.trimBegin(baseUrlTemplate.render(args));
         }
+        if (urlTemplate == null) {
+            throw new ForestRuntimeException("request URL is empty");
+        }
         String renderedUrl = urlTemplate.render(args);
         ForestRequestType type = type(args);
         String baseContentEncoding = null;
@@ -725,6 +728,9 @@ public class ForestMethod<T> implements VariableScope {
             if (parameter.isObjectProperties()) {
                 int target = parameter.isUnknownTarget() ? type.getDefaultParamTarget() : parameter.getTarget();
                 Object obj = args[parameter.getIndex()];
+                if (obj == null && StringUtils.isNotEmpty(parameter.getDefaultValue())) {
+                    obj = parameter.getConvertedDefaultValue(configuration.getJsonConverter());
+                }
                 if (parameter.isJsonParam()) {
                     String  json = "";
                     if (obj != null) {
@@ -733,13 +739,18 @@ public class ForestMethod<T> implements VariableScope {
                         json = jsonConverter.encodeToString(obj);
                     }
                     if (MappingParameter.isHeader(target)) {
-                        request.addHeader(new RequestNameValue(parameter.getJsonParamName(), json, target));
+                        request.addHeader(new RequestNameValue(parameter.getJsonParamName(), json, target)
+                                .setDefaultValue(parameter.getDefaultValue()));
                     } else {
-                        nameValueList.add(new RequestNameValue(parameter.getJsonParamName(), json, target, parameter.getPartContentType()));
+                        nameValueList.add(new RequestNameValue(parameter.getJsonParamName(), json, target, parameter.getPartContentType())
+                                .setDefaultValue(parameter.getDefaultValue()));
                     }
                 }
                 else if (!parameter.getFilterChain().isEmpty()) {
                     obj = parameter.getFilterChain().doFilter(configuration, obj);
+                    if (obj == null && StringUtils.isNotEmpty(parameter.getDefaultValue())) {
+                        obj = parameter.getDefaultValue();
+                    }
                     if (obj != null) {
                         if (MappingParameter.isHeader(target)) {
                             request.addHeader(new RequestNameValue(null, obj, target));
@@ -747,20 +758,25 @@ public class ForestMethod<T> implements VariableScope {
                             request.addQuery(obj.toString(), null);
                         } else if (MappingParameter.isBody(target)) {
                             if (obj instanceof CharSequence) {
-                                request.addBody(new StringRequestBody(obj.toString()));
+                                request.addBody(new StringRequestBody(obj.toString())
+                                        .setDefaultValue(parameter.getDefaultValue()));
                             } else {
-                                request.addBody(new ObjectRequestBody(obj));
+                                request.addBody(new ObjectRequestBody(obj)
+                                        .setDefaultValue(parameter.getDefaultValue()));
                             }
                         } else {
-                            nameValueList.add(new RequestNameValue(obj.toString(), target, parameter.getPartContentType()));
+                            nameValueList.add(new RequestNameValue(obj.toString(), target, parameter.getPartContentType())
+                                    .setDefaultValue(parameter.getDefaultValue()));
                         }
                     }
                 }
                 else if (obj instanceof CharSequence) {
                     if (MappingParameter.isQuery(target)) {
-                        request.addQuery(ForestQueryParameter.createSimpleQueryParameter(obj));
+                        request.addQuery(ForestQueryParameter.createSimpleQueryParameter(obj)
+                                .setDefaultValue(parameter.getDefaultValue()));
                     } else if (MappingParameter.isBody(target)) {
-                        request.addBody(new StringRequestBody(obj.toString()));
+                        request.addBody(new StringRequestBody(obj.toString())
+                                .setDefaultValue(parameter.getDefaultValue()));
                     }
                 }
                 else if (obj instanceof Iterable
@@ -821,8 +837,12 @@ public class ForestMethod<T> implements VariableScope {
             }
             else if (parameter.getIndex() != null) {
                 int target = parameter.isUnknownTarget() ? type.getDefaultParamTarget() : parameter.getTarget();
-                RequestNameValue nameValue = new RequestNameValue(parameter.getName(), target, parameter.getPartContentType());
+                RequestNameValue nameValue = new RequestNameValue(parameter.getName(), target, parameter.getPartContentType())
+                        .setDefaultValue(parameter.getDefaultValue());
                 Object obj = args[parameter.getIndex()];
+                if (obj == null && StringUtils.isNotEmpty(nameValue.getDefaultValue())) {
+                    obj = parameter.getConvertedDefaultValue(configuration.getJsonConverter());
+                }
                 if (obj != null) {
                     nameValue.setValue(obj);
                     if (MappingParameter.isHeader(target)) {
@@ -855,7 +875,9 @@ public class ForestMethod<T> implements VariableScope {
                                 scope.addVariableValue("_index", index++);
                                 template.setVariableScope(scope);
                                 String name = template.render(args);
-                                nameValueList.add(new RequestNameValue(name, subItem, target, parameter.getPartContentType()));
+                                nameValueList.add(
+                                        new RequestNameValue(name, subItem, target, parameter.getPartContentType())
+                                        .setDefaultValue(parameter.getDefaultValue()));
                             }
                         } else {
                             nameValueList.add(nameValue);

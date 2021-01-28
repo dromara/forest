@@ -80,5 +80,13 @@ public class TestPostJson4Client extends BaseClientTest {
         Assert.assertEquals(PostJson4MockServer.EXPECTED, result);
     }
 
+    @Test
+    public void testJsonPost8WithDefaultBody() {
+        String result = postClient.postJson10WithDefaultBody(null);
+        log.info("response: " + result);
+        assertNotNull(result);
+        Assert.assertEquals(PostJson4MockServer.EXPECTED, result);
+    }
+
 
 }

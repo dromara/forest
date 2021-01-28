@@ -19,6 +19,11 @@ public class ForestQueryParameter {
     private Object value;
 
     /**
+     * 默认值
+     */
+    private String defaultValue;
+
+    /**
      * 是否源自URL
      * <p>源自URL的Query参数在每次调用{@link ForestRequest#setUrl(String)}时都会被清理掉</p>
      */
@@ -52,8 +57,9 @@ public class ForestQueryParameter {
         return value;
     }
 
-    public void setValue(Object value) {
+    public ForestQueryParameter setValue(Object value) {
         this.value = value;
+        return this;
     }
 
     /**
@@ -65,5 +71,14 @@ public class ForestQueryParameter {
      */
     public boolean isFromUrl() {
         return fromUrl;
+    }
+
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public ForestQueryParameter setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+        return this;
     }
 }

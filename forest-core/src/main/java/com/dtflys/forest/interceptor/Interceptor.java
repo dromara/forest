@@ -36,6 +36,14 @@ public interface Interceptor<T> extends OnSuccess<T>, OnError, OnProgress, OnLoa
     }
 
     @Override
+    default void onSuccess(T data, ForestRequest request, ForestResponse response) {
+    }
+
+    @Override
+    default void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
+    }
+
+    @Override
     default void onProgress(ForestProgress progress) {
     }
 

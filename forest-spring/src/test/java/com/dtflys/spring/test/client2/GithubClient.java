@@ -1,6 +1,7 @@
 package com.dtflys.spring.test.client2;
 
 import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.backend.ContentType;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -10,7 +11,8 @@ public interface GithubClient {
 
     @Request(
             url = "https://www.github.com",
-            timeout = 80000
+            timeout = 80000,
+            contentType = ContentType.APPLICATION_JSON
     )
     String index();
 
