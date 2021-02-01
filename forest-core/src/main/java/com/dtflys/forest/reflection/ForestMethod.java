@@ -50,6 +50,7 @@ import com.dtflys.forest.utils.URLUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
+import java.net.URL;
 import java.util.*;
 
 import static com.dtflys.forest.mapping.MappingParameter.*;
@@ -700,7 +701,9 @@ public class ForestMethod<T> implements VariableScope {
             }
         }
 
+
         renderedUrl = URLUtils.getValidURL(baseUrl, renderedUrl);
+
 
         // createExecutor and initialize http instance
         ForestRequest<T> request = new ForestRequest(configuration, this, args);

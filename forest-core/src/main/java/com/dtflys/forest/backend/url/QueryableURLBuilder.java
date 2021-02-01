@@ -48,11 +48,16 @@ public class QueryableURLBuilder extends URLBuilder {
                 paramBuilder.append('&');
             }
         }
+        StringBuilder urlBuilder = new StringBuilder(url);
         String query = paramBuilder.toString();
         if (StringUtils.isNotEmpty(query)) {
-            return url + "?" + query;
+            urlBuilder.append("?").append(query);
         }
-        return url;
+        String ref = request.getRef();
+        if (StringUtils.isNotEmpty(ref)) {
+            urlBuilder.append("#").append(ref);
+        }
+        return urlBuilder.toString();
     }
 
 }

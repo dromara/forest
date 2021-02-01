@@ -1,7 +1,5 @@
 package com.dtflys.forest.logging;
 
-import com.dtflys.forest.http.ForestProxy;
-import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.StringUtils;
 
@@ -188,8 +186,11 @@ public class DefaultLogHandler implements ForestLogHandler {
      */
     @Override
     public void logResponseContent(ResponseLogMessage responseLogMessage) {
-        if (responseLogMessage.getResponse() != null && responseLogMessage.getResponse().isSuccess()) {
-            logContent("Response: Content=" + responseLogMessage.getResponse().getContent());
+        if (responseLogMessage.getResponse() != null) {
+            String content = responseLogMessage.getResponse().getContent();
+            if (StringUtils.isNotEmpty(content)) {
+                logContent("Response Content:\n\t" + content);
+            }
         }
     }
 }

@@ -375,14 +375,14 @@ public interface PostClient {
             headers = {"Accept-Encoding: UTF-8"},
             contentType = "application/json"
     )
-    @LogEnabled(logResponseContent = true)
+    @LogEnabled(logResponseStatus = false, logResponseContent = true)
     String postJson11(@Body JsonTestUser user);
 
     @Post(
             url = "http://localhost:${port}/json",
             headers = {"Content-Type: application/json; charset=utf-8"}
     )
-    @LogEnabled(logRequest = false, logResponseContent = true)
+    @LogEnabled(logRequest = false, logResponseStatus = false, logResponseContent = true)
     String postJson12(@Body List<JsonTestList> user);
 
     @Post(
