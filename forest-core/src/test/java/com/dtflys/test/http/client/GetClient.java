@@ -116,15 +116,17 @@ public interface GetClient {
     @Request(
             url = "http://xxxx:${port}/hello/user?username=foo",
             retryCount = 3,
-            maxRetryInterval = 50000,
+            maxRetryInterval = 5000,
+            timeout = 5,
             headers = {"Accept:text/plain"}
     )
     String errorGetWithRetry(OnError onError);
 
     @Request(
             url = "http://xxxx:${port}/hello/user?username=foo",
-            retryCount = 3,
-            maxRetryInterval = 50000,
+            retryCount = 5,
+            maxRetryInterval = 5000,
+            timeout = 1,
             headers = {"Accept:text/plain"}
     )
     String errorGetWithRetry();

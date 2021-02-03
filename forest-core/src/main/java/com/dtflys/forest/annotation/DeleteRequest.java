@@ -86,7 +86,7 @@ public @interface DeleteRequest {
     /**
      * max count to retry
      */
-    int retryCount() default 0;
+    int retryCount() default -1;
 
     int maxRetryInterval() default -1;
 

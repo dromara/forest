@@ -46,7 +46,7 @@ public class MetaRequest {
     /**
      * max count to retry
      */
-    private int retryCount;
+    private Integer retryCount;
 
     private long maxRetryInterval;
 
@@ -172,12 +172,16 @@ public class MetaRequest {
         this.retryer = retryer;
     }
 
-    public int getRetryCount() {
+    public Integer getRetryCount() {
         return retryCount;
     }
 
-    public void setRetryCount(int retryCount) {
-        this.retryCount = retryCount;
+    public void setRetryCount(Integer retryCount) {
+        if (retryCount >= 0) {
+            this.retryCount = retryCount;
+        } else {
+            this.retryCount = null;
+        }
     }
 
     public long getMaxRetryInterval() {

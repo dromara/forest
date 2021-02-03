@@ -423,8 +423,8 @@ public class ForestMethod<T> implements VariableScope {
         if (tout > 0) {
             timeout = tout;
         }
-        int rtnum = metaRequest.getRetryCount();
-        if (rtnum > 0) {
+        Integer rtnum = metaRequest.getRetryCount();
+        if (rtnum != null && rtnum >= 0) {
             retryCount = rtnum;
         }
         maxRetryInterval = metaRequest.getMaxRetryInterval();

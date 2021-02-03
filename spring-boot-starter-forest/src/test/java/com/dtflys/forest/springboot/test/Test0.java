@@ -1,8 +1,10 @@
 package com.dtflys.forest.springboot.test;
 
+import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.logging.DefaultLogHandler;
+import com.dtflys.forest.logging.ForestLogger;
 import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.forest.springboot.test.moudle.TestUser;
 import com.thebeastshop.forest.springboot.annotation.ForestScan;
@@ -10,6 +12,7 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.springboot.test.client0.BeastshopClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,6 +21,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
@@ -82,6 +87,33 @@ public class Test0 {
         user.setPassword("bar");
         String result = beastshopClient.testBug2(user);
         assertNotNull(result);
+    }
+
+
+    @Test
+    public void testRetry() {
+        ForestLogger logger = Mockito.mock(ForestLogger.class);
+        config0.getLogHandler().setLogger(logger);
+        try {
+            beastshopClient.testRetry();
+        } catch (ForestRuntimeException e) {
+        }
+        Mockito.verify(logger).info("[Forest] Request: \n" +
+                "\t[Retry]: 1\n" +
+                "\tGET http://www.thebeastshop.com/autopage/shops.htm HTTP");
+        Mockito.verify(logger).info("[Forest] Request: \n" +
+                "\t[Retry]: 2\n" +
+                "\tGET http://www.thebeastshop.com/autopage/shops.htm HTTP");
+        Mockito.verify(logger).info("[Forest] Request: \n" +
+                "\t[Retry]: 3\n" +
+                "\tGET http://www.thebeastshop.com/autopage/shops.htm HTTP");
+        Mockito.verify(logger).info("[Forest] Request: \n" +
+                "\t[Retry]: 4\n" +
+                "\tGET http://www.thebeastshop.com/autopage/shops.htm HTTP");
+        Mockito.verify(logger).info("[Forest] Request: \n" +
+                "\t[Retry]: 5\n" +
+                "\tGET http://www.thebeastshop.com/autopage/shops.htm HTTP");
+        Mockito.verify(logger).info("[Forest] [Network Error]: connect timed out");
     }
 
 }

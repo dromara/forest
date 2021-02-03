@@ -116,7 +116,7 @@ public class TestErrorClient extends BaseClientTest {
         BackOffRetryer retryer = retryerAtomicReference.get();
         assertNotNull(retryer);
         assertEquals(3, retryer.getMaxRetryCount());
-        assertEquals(50000, retryer.getMaxRetryInterval());
+        assertEquals(5000, retryer.getMaxRetryInterval());
         assertEquals(1000 + 2000 + 4000, retryer.getWaitedTime());
     }
 
