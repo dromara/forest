@@ -8,6 +8,8 @@ import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.backend.httpclient.HttpclientBackend;
 import com.dtflys.forest.backend.okhttp3.OkHttp3Backend;
 import com.dtflys.forest.config.ForestConfiguration;
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -39,6 +41,15 @@ public abstract class BaseClientTest {
                 new HttpBackend[][] {
                         {new HttpclientBackend()},
                         {new OkHttp3Backend()}});
+    }
+
+    @After
+    public void afterRequests() {
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 }
