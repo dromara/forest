@@ -11,6 +11,8 @@ public class ForestProxy {
 
     private final int port;
 
+    private ForestHeaderMap headers;
+
     public ForestProxy(String ip, int port) {
         this.host = ip;
         this.port = port;
@@ -23,6 +25,14 @@ public class ForestProxy {
 
     public int getPort() {
         return port;
+    }
+
+    public ForestHeaderMap getHeaders() {
+        return headers;
+    }
+
+    public void setHeaders(ForestHeaderMap headers) {
+        this.headers = headers;
     }
 }
 
