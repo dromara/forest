@@ -78,11 +78,11 @@ public class ForestMultipartFactory<T> {
     }
 
     public MappingTemplate getNameTemplate() {
-        return nameTemplate;
+        return nameTemplate.clone();
     }
 
     public MappingTemplate getFileNameTemplate() {
-        return fileNameTemplate;
+        return fileNameTemplate.clone();
     }
 
     public <M extends ForestMultipart<T>> M create(String name, String fileName, T data, String contentType) {

@@ -7,10 +7,14 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.exceptions.ForestUnsupportException;
 import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.utils.StringUtils;
 import org.apache.http.Consts;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthSchemeProvider;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CookieStore;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.config.CookieSpecs;
@@ -22,8 +26,10 @@ import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.impl.auth.*;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
@@ -140,14 +146,26 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
         if (proxy != null) {
             HttpHost httpHost = new HttpHost(proxy.getHost(), proxy.getPort());
             configBuilder.setProxy(httpHost);
+            CredentialsProvider provider = new BasicCredentialsProvider();
+            if (StringUtils.isNotEmpty(proxy.getUsername()) &&
+                    StringUtils.isNotEmpty(proxy.getPassword())) {
+                provider.setCredentials(
+                        new AuthScope(httpHost),
+                        new UsernamePasswordCredentials(
+                                proxy.getUsername(),
+                                proxy.getUsername()));
+            }
         }
         if (cookieStore != null) {
             builder.setDefaultCookieStore(cookieStore);
         }
 
-        return builder
+
+        HttpClient httpClient = builder
                 .setDefaultRequestConfig(requestConfig)
                 .build();
+
+        return httpClient;
     }
 
 

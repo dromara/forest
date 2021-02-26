@@ -7,6 +7,8 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestCookie;
 import com.dtflys.forest.http.ForestCookies;
+import com.dtflys.forest.http.ForestHeader;
+import com.dtflys.forest.http.ForestHeaderMap;
 import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.reflection.ForestMethod;
@@ -16,19 +18,25 @@ import com.dtflys.forest.ssl.SSLUtils;
 import com.dtflys.forest.ssl.TrustAllHostnameVerifier;
 import com.dtflys.forest.ssl.TrustAllManager;
 import com.dtflys.forest.utils.StringUtils;
+import okhttp3.Authenticator;
 import okhttp3.CipherSuite;
 import okhttp3.ConnectionPool;
 import okhttp3.ConnectionSpec;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
+import okhttp3.Credentials;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.Route;
 import okhttp3.TlsVersion;
 
+import javax.annotation.Nullable;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -37,6 +45,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -141,6 +150,20 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
         if (proxy != null) {
             Proxy okProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxy.getHost(), proxy.getPort()));
             builder.proxy(okProxy);
+            if (StringUtils.isNotEmpty(proxy.getUsername())) {
+                builder.proxyAuthenticator(new Authenticator() {
+                    @Nullable
+                    @Override
+                    public Request authenticate(@Nullable Route route, Response response) {
+                        Request.Builder proxyBuilder = response.request().newBuilder();
+                        String credential = Credentials.basic(
+                                proxy.getUsername(),
+                                proxy.getPassword());
+                        proxyBuilder.addHeader("Proxy-Authorization", credential);
+                        return proxyBuilder.build();
+                    }
+                });
+            }
         }
 
         if ("https".equals(request.getProtocol())) {

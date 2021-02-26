@@ -69,7 +69,6 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
         message.setRetryCount(retryCount);
         setLogHeaders(message, okRequest);
         setLogBody(message, okRequest);
-
         return message;
     }
 

@@ -422,9 +422,12 @@ public class ForestRequest<T> {
                 urlBuilder.append(userInfo).append('@');
             }
             urlBuilder.append(u.getHost());
-            if (port != 80 && port > -1) {
+            if (port != 80 && port != 443 && port > -1 ||
+                    port == 80 && !protocol.equals("http") ||
+                    port == 443 && !protocol.equals("https")) {
                 urlBuilder.append(':').append(port);
             }
+
             String path = u.getPath();
             if (StringUtils.isNotEmpty(path)) {
                 urlBuilder.append(path);

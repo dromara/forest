@@ -875,7 +875,6 @@ public class ForestMethod<T> implements VariableScope {
                                 template.setVariableScope(scope);
                                 scope.addVariableValue("_it", subItem);
                                 scope.addVariableValue("_index", index++);
-                                template.setVariableScope(scope);
                                 String name = template.render(args);
                                 nameValueList.add(
                                         new RequestNameValue(name, subItem, target, parameter.getPartContentType())

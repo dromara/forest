@@ -32,8 +32,13 @@ public @interface HTTPProxy {
     String port() default "80";
 
     /**
-     * 发送到HTTP代理服务器请求的请求头列表
+     * 代理用户名
      */
-    String[] headers() default {};
+    String username() default "";
+
+    /**
+     * 代理密码
+     */
+    String password() default "";
 
 }

@@ -451,6 +451,13 @@ public class MappingTemplate {
         return obj.toString();
     }
 
+    @Override
+    public MappingTemplate clone() {
+        MappingTemplate template = new MappingTemplate(this.template, this.variableScope);
+        template.exprList = this.exprList;
+        return template;
+    }
+
 
     @Override
     public String toString() {

@@ -70,7 +70,7 @@ public class TestPostClient extends BaseClientTest {
     @Test
     public void testSimplePostWithProxy() {
         try {
-            String result = postClient.simplePostWithProxy("text/plain");
+            String result = postClient.simplePostWithProxy("text/plain", "xxxyyy");
             log.info("response: " + result);
             assertNotNull(result);
             assertEquals(PostMockServer.EXPECTED, result);
