@@ -47,7 +47,7 @@ public interface PostClient {
             host = "127.0.0.1",
             port = "10801",
             username = "foo",
-            password = "bar"
+            password = "${1}"
     )
     String simplePostWithProxy(@Header("Accept") String accept, String authorization);
 

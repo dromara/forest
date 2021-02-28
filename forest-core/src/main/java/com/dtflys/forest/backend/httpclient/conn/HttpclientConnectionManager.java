@@ -142,19 +142,21 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
         configBuilder.setCookieSpec(CookieSpecs.STANDARD);
         RequestConfig requestConfig = configBuilder.build();
 
-        ForestProxy proxy = request.getProxy();
-        if (proxy != null) {
-            HttpHost httpHost = new HttpHost(proxy.getHost(), proxy.getPort());
-            configBuilder.setProxy(httpHost);
-            CredentialsProvider provider = new BasicCredentialsProvider();
-            if (StringUtils.isNotEmpty(proxy.getUsername()) &&
-                    StringUtils.isNotEmpty(proxy.getPassword())) {
+        ForestProxy forestProxy = request.getProxy();
+        if (forestProxy != null) {
+            HttpHost proxy = new HttpHost(forestProxy.getHost(), forestProxy.getPort());
+            if (StringUtils.isNotEmpty(forestProxy.getUsername()) &&
+                    StringUtils.isNotEmpty(forestProxy.getPassword())) {
+                CredentialsProvider provider = new BasicCredentialsProvider();
                 provider.setCredentials(
-                        new AuthScope(httpHost),
+                        new AuthScope(proxy),
                         new UsernamePasswordCredentials(
-                                proxy.getUsername(),
-                                proxy.getUsername()));
+                                forestProxy.getUsername(),
+                                forestProxy.getPassword()));
+                builder.setDefaultCredentialsProvider(provider);
             }
+            configBuilder.setProxy(proxy);
+
         }
         if (cookieStore != null) {
             builder.setDefaultCookieStore(cookieStore);
