@@ -395,6 +395,10 @@ String send(@DataVariable("username") String username);
 
 ![avatar](https://dt_flys.gitee.io/forest/media/wx_gzh.jpg)
 
+
+## Gitee上的Star趋势图
+[![Giteye chart](https://chart.giteye.net/gitee/dt_flys/forest/GXX5Z8C3.png)](https://giteye.net/chart/GXX5Z8C3)
+
 参与贡献
 -----------------------------------
 
