@@ -12,6 +12,7 @@ import okhttp3.ResponseBody;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Date;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -28,8 +29,8 @@ public class OkHttp3ForestResponse extends ForestResponse {
      */
     private byte[] bytes;
 
-    public OkHttp3ForestResponse(ForestRequest request, Response okResponse) {
-        super(request);
+    public OkHttp3ForestResponse(ForestRequest request, Response okResponse, Date requestTime, Date responseTime) {
+        super(request, requestTime, responseTime);
         this.okResponse = okResponse;
         if (okResponse == null) {
             this.body = null;

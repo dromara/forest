@@ -28,7 +28,6 @@ public class BaseInterceptor implements Interceptor {
     public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
         log.info("invoke Base onSuccess, data: " + data);
         response.setResult("Base: " + data);
-        throw new RuntimeException("xxxx");
     }
 
     @Override

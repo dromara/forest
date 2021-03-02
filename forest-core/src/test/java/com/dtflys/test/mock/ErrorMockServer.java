@@ -33,7 +33,7 @@ public class ErrorMockServer extends MockServerRule {
         )
         .respond(
                 response()
-                        .withStatusCode(400)
+                        .withStatusCode(500)
                         .withBody(EXPECTED)
         );
 

@@ -34,6 +34,7 @@ import org.apache.commons.io.IOUtils;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -48,6 +49,21 @@ public abstract class ForestResponse<T> {
      * 请求对象
      */
     protected ForestRequest request;
+
+    /**
+     * 请求开始时间
+     */
+    protected Date requestTime;
+
+    /**
+     * 响应接受时间
+     */
+    protected Date responseTime;
+
+    /**
+     * 是否已经打印过响应日志
+     */
+    protected volatile boolean logged = false;
 
     /**
      * 网络状态码
@@ -94,9 +110,13 @@ public abstract class ForestResponse<T> {
      */
     protected volatile T result;
 
-    public ForestResponse(ForestRequest request) {
+
+    public ForestResponse(ForestRequest request, Date requestTime, Date responseTime) {
         this.request = request;
+        this.requestTime = requestTime;
+        this.responseTime = responseTime;
     }
+
 
     /**
      * 获取该响应对象对应的请求对象
@@ -105,6 +125,50 @@ public abstract class ForestResponse<T> {
      */
     public ForestRequest getRequest() {
         return request;
+    }
+
+    /**
+     * 获取请求开始时间
+     *
+     * @return 请求开始时间, {@link Date}对象实例
+     */
+    public Date getRequestTime() {
+        return requestTime;
+    }
+
+    /**
+     * 获取响应接受时间
+     *
+     * @return 响应接受时间, {@link Date}对象实例
+     */
+    public Date getResponseTime() {
+        return responseTime;
+    }
+
+    /**
+     * 获取网络请求的耗时（以毫秒为单位）
+     *
+     * @return 从请求开始到接受到响应的整个耗费的时间, 单位：毫秒
+     */
+    public long getTimeAsMillisecond() {
+        return responseTime.getTime() - requestTime.getTime();
+    }
+
+    /**
+     * 该响应是否已打过日志
+     *
+     * @return {@code true}: 已打印过， {@code false}: 没打印过
+     */
+    public boolean isLogged() {
+        return logged;
+    }
+
+    /**
+     * 设置该响应是否已打过日志
+     * @param logged {@code true}: 已打印过， {@code false}: 没打印过
+     */
+    public void setLogged(boolean logged) {
+        this.logged = logged;
     }
 
     /**

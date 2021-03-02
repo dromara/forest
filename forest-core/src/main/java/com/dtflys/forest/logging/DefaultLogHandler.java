@@ -130,13 +130,13 @@ public class DefaultLogHandler implements ForestLogHandler {
     protected String responseLoggingContent(ResponseLogMessage responseLogMessage) {
         ForestResponse response = responseLogMessage.getResponse();
         if (response != null && response.getException() != null) {
-            return "[Network Error]: " + response.getException().getMessage();
+            return "Response: [Network Error]: " + response.getException().getMessage();
         }
         int status = responseLogMessage.getStatus();
         if (status >= 0) {
             return "Response: Status = " + responseLogMessage.getStatus() + ", Time = " + responseLogMessage.getTime() + "ms";
         } else {
-            return "[Network Error]: Unknown Network Error!";
+            return "Response: [Network Error]: Unknown Network Error!";
         }
     }
 

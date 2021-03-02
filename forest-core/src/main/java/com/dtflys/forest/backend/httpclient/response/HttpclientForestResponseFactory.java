@@ -13,6 +13,7 @@ import org.apache.http.message.BasicStatusLine;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -35,7 +36,7 @@ public class HttpclientForestResponseFactory implements ForestResponseFactory<Ht
 
 
     @Override
-    public synchronized ForestResponse createResponse(ForestRequest request, HttpResponse httpResponse, LifeCycleHandler lifeCycleHandler, Throwable exception) {
+    public synchronized ForestResponse createResponse(ForestRequest request, HttpResponse httpResponse, LifeCycleHandler lifeCycleHandler, Throwable exception, Date requestTime) {
         if (resultResponse != null) {
             return resultResponse;
         }
@@ -53,7 +54,7 @@ public class HttpclientForestResponseFactory implements ForestResponseFactory<Ht
                 entity = new HttpclientEntity(request, entity, lifeCycleHandler);
             }
         }
-        HttpclientForestResponse response = new HttpclientForestResponse(request, httpResponse, entity);
+        HttpclientForestResponse response = new HttpclientForestResponse(request, httpResponse, entity, requestTime, new Date());
 //        int statusCode = httpResponse.getStatusLine().getStatusCode();
 //        response.setStatusCode(statusCode);
 //        httpResponse.getAllHeaders();

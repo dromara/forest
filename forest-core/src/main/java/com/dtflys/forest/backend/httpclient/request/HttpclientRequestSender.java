@@ -7,6 +7,7 @@ import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import java.io.IOException;
+import java.util.Date;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -14,6 +15,12 @@ import java.io.IOException;
  */
 public interface HttpclientRequestSender {
 
-    void sendRequest(ForestRequest request, HttpclientResponseHandler responseHandler, HttpUriRequest httpRequest, LifeCycleHandler lifeCycleHandler, CookieStore cookieStore, long startTime, int retryCount) throws IOException;
+    void sendRequest(ForestRequest request,
+                     HttpclientResponseHandler responseHandler,
+                     HttpUriRequest httpRequest,
+                     LifeCycleHandler lifeCycleHandler,
+                     CookieStore cookieStore,
+                     Date startDate,
+                     int retryCount) throws IOException;
 
 }

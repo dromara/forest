@@ -91,6 +91,7 @@ public interface GetClient {
             url = "http://localhost:${port}/hello/user?username=foo",
             headers = {"Accept:text/plain"}
     )
+    @LogEnabled(logResponseContent = true)
     String errorGet(OnError onError);
 
     @Request(

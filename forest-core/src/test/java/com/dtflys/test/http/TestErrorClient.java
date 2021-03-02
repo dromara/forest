@@ -91,7 +91,7 @@ public class TestErrorClient extends BaseClientTest {
             int status = ex.getStatusCode(); // 获取请求响应状态码
             ForestResponse<Map> response = ex.getResponse(); // 获取Response对象
             String content = response.getContent(); // 获取未经序列化的请求响应内容
-            assertEquals(400, status);
+            assertEquals(500, status);
             assertNotNull(response);
             assertEquals(ErrorMockServer.EXPECTED, content);
         }

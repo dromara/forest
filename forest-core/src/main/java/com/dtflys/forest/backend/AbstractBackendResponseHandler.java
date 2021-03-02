@@ -9,6 +9,7 @@ import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.utils.ReflectUtils;
 
 import java.lang.reflect.Type;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -62,6 +63,7 @@ public abstract class AbstractBackendResponseHandler<R> {
 
     public abstract void handleFuture(
                      final Future<R> httpResponseFuture,
+                     Date requestTime,
                      ForestResponseFactory forestResponseFactory);
 
 
