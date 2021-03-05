@@ -35,13 +35,17 @@ public class QueryableURLBuilder extends URLBuilder {
                 if (name != null) {
                     paramBuilder.append('=');
                 }
-                String encodedValue = null;
-                try {
-                    encodedValue = URLEncoder.encode(value, request.getCharset());
-                } catch (UnsupportedEncodingException e) {
-                }
-                if (encodedValue != null) {
-                    paramBuilder.append(encodedValue);
+                if (queryParam.isUrlencoded()) {
+                    String encodedValue = null;
+                    try {
+                        encodedValue = URLEncoder.encode(value, request.getCharset());
+                    } catch (UnsupportedEncodingException e) {
+                    }
+                    if (encodedValue != null) {
+                        paramBuilder.append(encodedValue);
+                    }
+                } else {
+                    paramBuilder.append(value);
                 }
             }
             if (i < queryParameters.size() - 1) {

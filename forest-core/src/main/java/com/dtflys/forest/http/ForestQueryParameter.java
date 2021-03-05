@@ -19,6 +19,11 @@ public class ForestQueryParameter {
     private Object value;
 
     /**
+     * 是否做URLEncode
+     */
+    private boolean urlencoded = true;
+
+    /**
      * 默认值
      */
     private String defaultValue;
@@ -41,6 +46,9 @@ public class ForestQueryParameter {
         this.name = name;
         this.value = value;
         this.fromUrl = fromUrl;
+        if (fromUrl) {
+            this.urlencoded = false;
+        }
     }
 
 
@@ -60,6 +68,14 @@ public class ForestQueryParameter {
     public ForestQueryParameter setValue(Object value) {
         this.value = value;
         return this;
+    }
+
+    public boolean isUrlencoded() {
+        return urlencoded;
+    }
+
+    public void setUrlencoded(boolean urlencoded) {
+        this.urlencoded = urlencoded;
     }
 
     /**
