@@ -399,6 +399,12 @@ String send(@DataVariable("username") String username);
 ## Gitee上的Star趋势图
 [![Giteye chart](https://chart.giteye.net/gitee/dt_flys/forest/GXX5Z8C3.png)](https://giteye.net/chart/GXX5Z8C3)
 
+
+## 贡献者列表
+[![Giteye chart](https://chart.giteye.net/gitee/dt_flys/forest/2E26F7V4.png)](https://giteye.net/chart/2E26F7V4)
+
+正因为有他们的贡献，Forest才得以走下去
+
 参与贡献
 -----------------------------------
 
