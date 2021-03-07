@@ -28,7 +28,7 @@ public class ForestScannerRegister implements ImportBeanDefinitionRegistrar, Res
 
     private ResourceLoader resourceLoader;
 
-    public static List<String> basePackages;
+    public static List<String> basePackages = new ArrayList<>();
 
     public static String configurationId;
 
@@ -42,7 +42,6 @@ public class ForestScannerRegister implements ImportBeanDefinitionRegistrar, Res
         AnnotationAttributes annoAttrs = AnnotationAttributes.fromMap(importingClassMetadata.getAnnotationAttributes(ForestScan.class.getName()));
 
 
-        List<String> basePackages = new ArrayList<>();
         for (String pkg : annoAttrs.getStringArray("value")) {
             if (StringUtils.hasText(pkg)) {
                 basePackages.add(pkg);
@@ -58,8 +57,6 @@ public class ForestScannerRegister implements ImportBeanDefinitionRegistrar, Res
         for (Class<?> clazz : annoAttrs.getClassArray("basePackageClasses")) {
             basePackages.add(ClassUtils.getPackageName(clazz));
         }
-
-        ForestScannerRegister.basePackages = basePackages;
 
         configurationId = annoAttrs.getString("configuration");
 
