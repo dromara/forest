@@ -380,6 +380,7 @@ String send(@DataVariable("username") String username);
 
 ## 贡献者列表
 [![Giteye chart](https://chart.giteye.net/gitee/dt_flys/forest/2E26F7V4.png)](https://giteye.net/chart/2E26F7V4)
+正因为有他们的贡献，Forest才得以走下去
 
 ## 联系作者
 
@@ -395,7 +396,6 @@ String send(@DataVariable("username") String username);
 
 
 
-正因为有他们的贡献，Forest才得以走下去
 
 参与贡献
 -----------------------------------
