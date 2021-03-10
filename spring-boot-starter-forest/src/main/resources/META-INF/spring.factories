@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.thebeastshop.forest.springboot.ForestAutoConfiguration
+  com.dtflys.forest.springboot.ForestAutoConfiguration

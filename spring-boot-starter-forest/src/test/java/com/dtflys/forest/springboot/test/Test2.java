@@ -1,13 +1,12 @@
 package com.dtflys.forest.springboot.test;
 
-import com.thebeastshop.forest.springboot.annotation.ForestScan;
+import com.dtflys.forest.springboot.annotation.ForestScan;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.interceptor.SpringInterceptorFactory;
 import com.dtflys.forest.springboot.test.client2.GiteeClient;
 import com.dtflys.forest.springboot.test.interceptor.GlobalInterceptor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
@@ -48,10 +47,18 @@ public class Test2 {
     }
 
     @Test
-    public void testClient2() {
+    public void testClient1() {
         String result = giteeClient.index();
         assertNotNull(result);
         assertTrue(result.startsWith("Global: "));
     }
+
+    @Test
+    public void testClient2() {
+        String result = giteeClient.index2();
+        assertNotNull(result);
+        assertTrue(result.startsWith("Global: "));
+    }
+
 
 }

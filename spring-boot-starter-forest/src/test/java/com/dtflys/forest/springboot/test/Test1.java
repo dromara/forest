@@ -2,10 +2,9 @@ package com.dtflys.forest.springboot.test;
 
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.LogConfiguration;
+import com.dtflys.forest.springboot.annotation.ForestScan;
 import com.dtflys.forest.springboot.test.logging.TestLogHandler;
-import com.thebeastshop.forest.springboot.annotation.ForestScan;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.springboot.test.client1.BaiduClient;
 import org.junit.Test;

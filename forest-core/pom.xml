@@ -159,6 +159,14 @@
             </exclusions>
         </dependency>
 
+        <!-- QLExpress -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>QLExpress</artifactId>
+            <version>3.2.0</version>
+        </dependency>
+
+
         <!-- log4j2 -->
         <dependency>
             <groupId>org.slf4j</groupId>
