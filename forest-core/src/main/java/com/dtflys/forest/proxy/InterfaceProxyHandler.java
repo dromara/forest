@@ -9,6 +9,8 @@ import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorFactory;
 import com.dtflys.forest.lifecycles.BaseAnnotationLifeCycle;
+import com.dtflys.forest.logging.ForestLogHandler;
+import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.reflection.ForestMethod;
@@ -44,6 +46,9 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
     private InterceptorFactory interceptorFactory;
 
     private String baseURL;
+
+    private LogConfiguration baseLogConfiguration;
+
 
     private List<Annotation> baseAnnotations = new LinkedList<>();
 
@@ -143,5 +148,13 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
     @Override
     public ForestConfiguration getConfiguration() {
         return configuration;
+    }
+
+    public LogConfiguration getBaseLogConfiguration() {
+        return baseLogConfiguration;
+    }
+
+    public void setBaseLogConfiguration(LogConfiguration baseLogConfiguration) {
+        this.baseLogConfiguration = baseLogConfiguration;
     }
 }
