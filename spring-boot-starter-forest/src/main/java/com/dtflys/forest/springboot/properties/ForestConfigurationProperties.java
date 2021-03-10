@@ -1,4 +1,4 @@
-package com.thebeastshop.forest.springboot.properties;
+package com.dtflys.forest.springboot.properties;
 
 import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.ForestLogHandler;

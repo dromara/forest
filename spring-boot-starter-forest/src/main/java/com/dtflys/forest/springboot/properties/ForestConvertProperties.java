@@ -1,6 +1,4 @@
-package com.thebeastshop.forest.springboot.properties;
-
-import org.springframework.boot.context.properties.ConfigurationProperties;
+package com.dtflys.forest.springboot.properties;
 
 public class ForestConvertProperties {
 

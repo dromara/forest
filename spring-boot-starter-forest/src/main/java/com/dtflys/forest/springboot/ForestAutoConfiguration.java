@@ -1,6 +1,6 @@
-package com.thebeastshop.forest.springboot;
+package com.dtflys.forest.springboot;
 
-import com.thebeastshop.forest.springboot.properties.ForestConfigurationProperties;
+import com.dtflys.forest.springboot.properties.ForestConfigurationProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -9,7 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ComponentScan("com.thebeastshop.forest.springboot.properties")
+@ComponentScan("com.dtflys.forest.springboot.properties")
 @EnableConfigurationProperties({ForestConfigurationProperties.class})
 public class ForestAutoConfiguration {
 

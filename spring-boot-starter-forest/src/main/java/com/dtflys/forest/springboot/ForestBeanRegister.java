@@ -1,4 +1,4 @@
-package com.thebeastshop.forest.springboot;
+package com.dtflys.forest.springboot;
 
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ForestConverter;
@@ -7,13 +7,13 @@ import com.dtflys.forest.interceptor.SpringInterceptorFactory;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.scanner.ClassPathClientScanner;
 import com.dtflys.forest.schema.ForestConfigurationBeanDefinitionParser;
+import com.dtflys.forest.springboot.annotation.ForestScannerRegister;
+import com.dtflys.forest.springboot.properties.ForestConverterItemProperties;
+import com.dtflys.forest.springboot.properties.ForestSSLKeyStoreProperties;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
-import com.thebeastshop.forest.springboot.annotation.ForestScannerRegister;
-import com.thebeastshop.forest.springboot.properties.ForestConfigurationProperties;
-import com.thebeastshop.forest.springboot.properties.ForestConvertProperties;
-import com.thebeastshop.forest.springboot.properties.ForestConverterItemProperties;
-import com.thebeastshop.forest.springboot.properties.ForestSSLKeyStoreProperties;
+import com.dtflys.forest.springboot.properties.ForestConfigurationProperties;
+import com.dtflys.forest.springboot.properties.ForestConvertProperties;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
