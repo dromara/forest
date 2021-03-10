@@ -65,11 +65,18 @@ public class ContentType {
         return "application".equals(type);
     }
 
+    public boolean isFormUrlEncoded() {
+        if (subType == null) {
+            return false;
+        }
+        return isApplication() && subType.equals(APPLICATION_X_WWW_FORM_URLENCODED);
+    }
+
     public boolean isJson() {
         if (subType == null) {
             return false;
         }
-        return "json".equals(subType);
+        return subType.contains("json");
     }
 
     public boolean isXml() {
@@ -83,7 +90,7 @@ public class ContentType {
         if (subType == null) {
             return false;
         }
-        return "zip".equals(subType);
+        return subType.contains("zip");
     }
 
     public boolean isJavaScript() {

@@ -72,10 +72,13 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
         }
         List<RequestNameValue> nameValueList = request.getDataNameValueList();
 
-        if (mineType.equals(ContentType.APPLICATION_X_WWW_FORM_URLENCODED) && !nameValueList.isEmpty()) {
+        ContentType mineContentType = new ContentType(mineType);
+
+
+        if (mineContentType.isFormUrlEncoded() && !nameValueList.isEmpty()) {
             setFormBody(httpRequest, request, charset, contentType, nameValueList);
         }
-        else if (mineType.equals(ContentType.APPLICATION_JSON)) {
+        else if (mineContentType.isJson()) {
             ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
             List<ForestRequestBody> srcBodyList = request.getBody();
             List<ForestRequestBody> bodyList = new LinkedList(srcBodyList);
@@ -155,7 +158,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                 setStringBody(httpRequest, "", charset, contentType, mergeCharset);
             }
         }
-        else if (mineType.startsWith("multipart/")) {
+        else if (mineContentType.isMultipart()) {
             List<ForestMultipart> multiparts = request.getMultiparts();
             setFileBody(httpRequest, request, charset, contentType, nameValueList, multiparts, lifeCycleHandler);
         }
