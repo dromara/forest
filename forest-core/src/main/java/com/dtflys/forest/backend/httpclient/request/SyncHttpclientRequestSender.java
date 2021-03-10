@@ -89,7 +89,6 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             HttpUriRequest httpRequest, LifeCycleHandler lifeCycleHandler,
             CookieStore cookieStore, Date startDate, int retryCount)
             throws IOException {
-        long startTime = startDate.getTime();
         HttpResponse httpResponse = null;
         ForestResponse response = null;
         client = getHttpClient(cookieStore);
@@ -111,7 +110,6 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             }
             response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, null, startDate);
             logResponse(response);
-            startTime = System.currentTimeMillis();
             sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, cookieStore, startDate, retryCount + 1);
             return;
         } finally {

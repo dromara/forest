@@ -10,7 +10,7 @@ public class TestLogHandler extends DefaultLogHandler {
 
     @Override
     public void logContent(String content) {
-        super.logContent("[Test] " + content);
+        super.logContent("[Test1] " + content);
     }
 
     /**

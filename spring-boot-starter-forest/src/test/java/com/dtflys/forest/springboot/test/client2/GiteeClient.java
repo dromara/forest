@@ -1,7 +1,10 @@
 package com.dtflys.forest.springboot.test.client2;
 
+import com.dtflys.forest.annotation.LogEnabled;
 import com.dtflys.forest.annotation.LogHandler;
 import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.callback.OnSuccess;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.springboot.test.logging.TestLogHandler;
 import com.dtflys.forest.springboot.test.logging.TestLogHandler2;
 
@@ -17,13 +20,15 @@ public interface GiteeClient {
             timeout = 80000
     )
     @LogHandler(TestLogHandler.class)
-    String index();
+    @LogEnabled(logResponseStatus = false)
+    ForestRequest<String> index();
 
     @Request(
-            url = "https://gitee.com/dt_flys/forest",
+            url = "https://gitee.com/dt_flys",
             timeout = 80000
     )
-    String index2();
+    @LogEnabled(logResponseStatus = false)
+    ForestRequest<String> index2();
 
 
 }

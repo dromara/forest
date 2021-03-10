@@ -12,6 +12,8 @@ public class ContentType {
     public final static String APPLICATION_JSON = "application/json";
     public final static String APPLICATION_XML = "application/xml";
     public final static String MULTIPART_FORM_DATA = "multipart/form-data";
+    public final static String X_WWW_FORM_URLENCODED = "x-www-form-urlencoded";
+
 
     private final String type;
 
@@ -69,7 +71,7 @@ public class ContentType {
         if (subType == null) {
             return false;
         }
-        return isApplication() && subType.equals(APPLICATION_X_WWW_FORM_URLENCODED);
+        return isApplication() && subType.equals(X_WWW_FORM_URLENCODED);
     }
 
     public boolean isJson() {

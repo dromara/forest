@@ -29,7 +29,7 @@ public class LogEnabledLifeCycle implements MethodAnnotationLifeCycle<LogEnabled
         logConfiguration.setLogRequest(logRequest);
         logConfiguration.setLogResponseStatus(logResponseStatus);
         logConfiguration.setLogResponseContent(logResponseContent);
-        logConfiguration.setLogHandler(configuration.getLogHandler());
+        logConfiguration.setLogHandler(null);
         metaRequest.setLogConfiguration(logConfiguration);
     }
 }

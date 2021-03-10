@@ -112,6 +112,9 @@ public class ForestMethod<T> implements VariableScope {
     private Type onSuccessClassGenericType = null;
     private Class retryerClass = null;
     private boolean async = false;
+
+    private LogConfiguration baseLogConfiguration = null;
+
     private boolean logEnabled = true;
     private boolean logRequest = true;
     private boolean logResponseStatus = true;
@@ -182,6 +185,9 @@ public class ForestMethod<T> implements VariableScope {
         if (StringUtils.isNotBlank(baseSslProtocol)) {
             baseSslProtocolTemplate = makeTemplate(baseSslProtocol);
         }
+
+        baseLogConfiguration = interfaceProxyHandler.getBaseLogConfiguration();
+
         baseTimeout = baseMetaRequest.getTimeout();
         baseRetryerClass = baseMetaRequest.getRetryer();
         baseRetryCount = baseMetaRequest.getRetryCount();
@@ -435,16 +441,25 @@ public class ForestMethod<T> implements VariableScope {
         logRequest = configuration.isLogRequest();
         logResponseStatus = configuration.isLogResponseStatus();
         logResponseContent = configuration.isLogResponseContent();
-        logHandler = configuration.getLogHandler();
 
         LogConfiguration metaLogConfiguration = metaRequest.getLogConfiguration();
+        if (metaLogConfiguration == null && baseLogConfiguration != null) {
+            metaLogConfiguration = baseLogConfiguration;
+        }
         if (metaLogConfiguration != null) {
             logEnabled = metaLogConfiguration.isLogEnabled();
             logRequest = metaLogConfiguration.isLogRequest();
             logResponseStatus = metaLogConfiguration.isLogResponseStatus();
             logResponseContent = metaLogConfiguration.isLogResponseContent();
             logHandler = metaLogConfiguration.getLogHandler();
+            if (logHandler == null && baseLogConfiguration != null) {
+                logHandler = baseLogConfiguration.getLogHandler();
+            }
         }
+        if (logHandler == null && configuration.getLogHandler() != null) {
+            logHandler = configuration.getLogHandler();
+        }
+
 
         logConfiguration = new LogConfiguration();
         logConfiguration.setLogEnabled(logEnabled);

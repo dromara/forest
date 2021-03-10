@@ -1,5 +1,9 @@
 package com.dtflys.forest.springboot.test;
 
+import com.dtflys.forest.callback.OnSuccess;
+import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.logging.ForestLogger;
 import com.dtflys.forest.springboot.annotation.ForestScan;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.interceptor.SpringInterceptorFactory;
@@ -7,6 +11,7 @@ import com.dtflys.forest.springboot.test.client2.GiteeClient;
 import com.dtflys.forest.springboot.test.interceptor.GlobalInterceptor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
@@ -48,16 +53,28 @@ public class Test2 {
 
     @Test
     public void testClient1() {
-        String result = giteeClient.index();
-        assertNotNull(result);
+        ForestLogger logger = Mockito.mock(ForestLogger.class);
+        ForestRequest<String> request = giteeClient.index();
+        assertNotNull(request);
+        request.getLogConfiguration().getLogHandler().setLogger(logger);
+        String result = (String) request.execute();
         assertTrue(result.startsWith("Global: "));
+        Mockito.verify(logger).info("[Test1] 请求: \n" +
+                "\tGET https://gitee.com/dt_flys/forest HTTPS");
+
     }
 
     @Test
     public void testClient2() {
-        String result = giteeClient.index2();
-        assertNotNull(result);
+        ForestLogger logger = Mockito.mock(ForestLogger.class);
+        ForestRequest<String> request = giteeClient.index2();
+        assertNotNull(request);
+        request.getLogConfiguration().getLogHandler().setLogger(logger);
+        String result = (String) request.execute();
         assertTrue(result.startsWith("Global: "));
+        Mockito.verify(logger).info("[Test2] 请求: \n" +
+                "\tGET https://gitee.com/dt_flys HTTPS");
+
     }
 
 

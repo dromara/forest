@@ -113,7 +113,8 @@ public class Test0 {
         Mockito.verify(logger).info("[Forest] Request: \n" +
                 "\t[Retry]: 5\n" +
                 "\tGET http://www.thebeastshop.com/autopage/shops.htm HTTP");
-        Mockito.verify(logger).info("[Forest] [Network Error]: connect timed out");
+//        Mockito.verify(logger).info("[Forest] [Network Error]: connect timed out");
+
     }
 
 }

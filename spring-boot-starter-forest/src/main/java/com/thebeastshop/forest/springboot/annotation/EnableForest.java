@@ -1,6 +1,6 @@
 package com.thebeastshop.forest.springboot.annotation;
 
-import com.thebeastshop.forest.springboot.ForestAutoConfiguration;
+import com.dtflys.forest.springboot.ForestAutoConfiguration;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.Documented;
