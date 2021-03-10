@@ -1,4 +1,4 @@
-package com.thebeastshop.forest.springboot.annotation;
+package com.dtflys.forest.springboot.annotation;
 
 import org.springframework.context.annotation.Import;
 

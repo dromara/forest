@@ -1,14 +1,7 @@
-package com.thebeastshop.forest.springboot.annotation;
+package com.dtflys.forest.springboot.annotation;
 
-import com.dtflys.forest.scanner.ClassPathClientScanner;
-import com.thebeastshop.forest.springboot.ForestAutoConfiguration;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.ResourceLoaderAware;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.io.ResourceLoader;

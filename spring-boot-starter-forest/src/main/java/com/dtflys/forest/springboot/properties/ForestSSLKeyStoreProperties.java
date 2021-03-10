@@ -1,4 +1,4 @@
-package com.thebeastshop.forest.springboot.properties;
+package com.dtflys.forest.springboot.properties;
 
 import java.security.KeyStore;
 
