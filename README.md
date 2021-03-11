@@ -9,7 +9,7 @@
 
 <p align="center">
 <a href="https://gitee.com/dromara/forest">
-    <img src="https://gitee.com/dromara/forest/badge/star.svg" alt="Gitee">
+    <img src="https://gitee.com/dromara/forest/badge/star.svg" alt="Gitee Stars">
 </a>
 <!--
 <a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.5.0-RC4/jar">
