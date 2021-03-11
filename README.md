@@ -8,8 +8,8 @@
 
 
 <p align="center">
-<a href="https://gitee.com/dt_flys/forest">
-    <img src="https://gitee.com/dt_flys/forest/badge/star.svg" alt="Gitee">
+<a href="https://gitee.com/dromara/forest">
+    <img src="https://gitee.com/dromara/forest/badge/star.svg" alt="Gitee">
 </a>
 <!--
 <a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.5.0-RC4/jar">
@@ -17,7 +17,7 @@
 </a>
 -->
 <!--
-<a href="https://gitee.com/dt_flys/forest/releases/v1.5.0-RC4">
+<a href="https://gitee.com/dromara/forest/releases/v1.5.0-RC4">
     <img src="https://img.shields.io/badge/release-v1.5.0-RC4-blue" alt="Release">
 </a>
 -->
@@ -33,7 +33,7 @@
 <a href="http://forest.dtflyx.com/">
     <img src="https://img.shields.io/badge/document-1.x-e96.svg" alt="Documentation">
 </a>
-<a href="https://gitee.com/dt_flys/forest#%E8%81%94%E7%B3%BB%E4%BD%9C%E8%80%85">
+<a href="https://gitee.com/dromara/forest#%E8%81%94%E7%B3%BB%E4%BD%9C%E8%80%85">
     <img src="https://img.shields.io/badge/author-%E5%85%AC%E5%AD%90%E9%AA%8F-7af" alt="Author">
 </a>
 </p>
@@ -53,7 +53,7 @@ Forest是一个高层的、极简的轻量级HTTP调用API框架。<br>
 
 * [中文文档](http://forest.dtflyx.com/docs/) 
 
-* [JavaDoc](https://apidoc.gitee.com/dt_flys/forest/)
+* [JavaDoc](https://apidoc.gitee.com/dromara/forest/)
 
 * [Demo工程](https://gitee.com/dt_flys/forest-example)
 
