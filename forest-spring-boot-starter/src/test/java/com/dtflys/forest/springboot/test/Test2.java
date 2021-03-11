@@ -59,7 +59,7 @@ public class Test2 {
         request.getLogConfiguration().getLogHandler().setLogger(logger);
         String result = (String) request.execute();
         assertTrue(result.startsWith("Global: "));
-        Mockito.verify(logger).info("[Test1] 请求: \n" +
+        Mockito.verify(logger).info("[Forest] [Test1] 请求: \n" +
                 "\tGET https://gitee.com/dt_flys/forest HTTPS");
 
     }
@@ -72,9 +72,8 @@ public class Test2 {
         request.getLogConfiguration().getLogHandler().setLogger(logger);
         String result = (String) request.execute();
         assertTrue(result.startsWith("Global: "));
-        Mockito.verify(logger).info("[Test2] 请求: \n" +
+        Mockito.verify(logger).info("[Forest] [Test2] 请求: \n" +
                 "\tGET https://gitee.com/dt_flys HTTPS");
-
     }
 
 
