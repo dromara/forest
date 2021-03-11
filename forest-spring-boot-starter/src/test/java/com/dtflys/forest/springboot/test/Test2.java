@@ -60,7 +60,7 @@ public class Test2 {
         String result = (String) request.execute();
         assertTrue(result.startsWith("Global: "));
         Mockito.verify(logger).info("[Forest] [Test1] 请求: \n" +
-                "\tGET https://gitee.com/dt_flys/forest HTTPS");
+                "\tGET https://gitee.com/dromara/forest HTTPS");
 
     }
 

@@ -17,7 +17,7 @@ import com.dtflys.forest.springboot.test.logging.TestLogHandler2;
 public interface GiteeClient {
 
     @Request(
-            url = "https://gitee.com/dt_flys/forest",
+            url = "https://gitee.com/dromara/forest",
             timeout = 80000
     )
     @LogHandler(TestLogHandler.class)
