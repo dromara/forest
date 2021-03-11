@@ -387,7 +387,7 @@ String send(@DataVariable("username") String username);
 
 扫描二维码关注公众号，点击菜单中的 `进群` 按钮即可进群
 
-![avatar](https://dt_flys.gitee.io/forest/media/wx_gzh.jpg)
+![avatar](http://forest.dtflyx.com/img/wx_qrcode.jpg)
 
 
 ## Gitee上的Star趋势图
