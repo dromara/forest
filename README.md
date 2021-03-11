@@ -91,8 +91,8 @@ Forest有哪些特性？
 ```xml
 <dependency>
     <groupId>com.dtflys.forest</groupId>
-    <artifactId>spring-boot-starter-forest</artifactId>
-    <version>1.5.0-RC4</version>
+    <artifactId>forest-spring-boot-starter</artifactId>
+    <version>1.5.0-RC6</version>
 </dependency>
 ```
 
