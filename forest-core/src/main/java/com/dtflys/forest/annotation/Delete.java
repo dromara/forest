@@ -88,7 +88,7 @@ public @interface Delete {
      * max count to retry
      * @return 请求最大重试次数
      */
-    int retryCount() default 0;
+    int retryCount() default -1;
 
     int maxRetryInterval() default -1;
 

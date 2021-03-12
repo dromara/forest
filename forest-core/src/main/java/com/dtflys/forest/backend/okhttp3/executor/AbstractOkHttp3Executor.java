@@ -69,7 +69,6 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
         message.setRetryCount(retryCount);
         setLogHeaders(message, okRequest);
         setLogBody(message, okRequest);
-
         return message;
     }
 
@@ -111,19 +110,19 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
         logConfiguration.getLogHandler().logRequest(requestLogMessage);
     }
 
-    public void logResponse(long startTime,  ForestResponse response) {
+    public void logResponse(ForestResponse response) {
         LogConfiguration logConfiguration = request.getLogConfiguration();
-        if (!logConfiguration.isLogEnabled()) {
+        if (!logConfiguration.isLogEnabled() || response.isLogged()) {
             return;
         }
-        long endTime = System.currentTimeMillis();
-        ResponseLogMessage logMessage = new ResponseLogMessage(response, startTime, endTime, response.getStatusCode());
+        response.setLogged(true);
+        ResponseLogMessage logMessage = new ResponseLogMessage(response, response.getStatusCode());
         ForestLogHandler logHandler = logConfiguration.getLogHandler();
         if (logHandler != null) {
             if (logConfiguration.isLogResponseStatus()) {
                 logHandler.logResponseStatus(logMessage);
             }
-            if (logConfiguration.isLogResponseContent() && response.isSuccess()) {
+            if (logConfiguration.isLogResponseContent()) {
                 logHandler.logResponseContent(logMessage);
             }
         }
@@ -199,8 +198,8 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
                         request.getRetryer().canRetry(retryException);
                     } catch (Throwable throwable) {
                         future.failed(e);
-                        ForestResponse response = factory.createResponse(request, null, lifeCycleHandler, throwable);
-                        logResponse(startTime, response);
+                        ForestResponse response = factory.createResponse(request, null, lifeCycleHandler, throwable, startDate);
+                        logResponse(response);
                         lifeCycleHandler.handleError(request, response, e);
                         return;
                     }
@@ -209,8 +208,8 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
 
                 @Override
                 public void onResponse(Call call, Response okResponse) throws IOException {
-                    ForestResponse response = factory.createResponse(request, okResponse, lifeCycleHandler, null);
-                    logResponse(startTime, response);
+                    ForestResponse response = factory.createResponse(request, okResponse, lifeCycleHandler, null, startDate);
+                    logResponse(response);
                     Object result = null;
                     if (response.isSuccess()) {
                         if (request.getOnSuccess() != null) {
@@ -225,10 +224,11 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
                     }
                 }
             });
-            okHttp3ResponseHandler.handleFuture(future, factory);
+            okHttp3ResponseHandler.handleFuture(future, startDate, factory);
         }
         else {
             Response okResponse = null;
+            ForestResponse response = null;
             try {
                 okResponse = call.execute();
             } catch (IOException e) {
@@ -237,16 +237,22 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
                 try {
                     request.getRetryer().canRetry(retryException);
                 } catch (Throwable throwable) {
-                    ForestResponse response = factory.createResponse(request, null, lifeCycleHandler, e);
-                    logResponse(startTime, response);
+                    response = factory.createResponse(request, null, lifeCycleHandler, e, startDate);
+                    logResponse(response);
                     lifeCycleHandler.handleSyncWithException(request, response, e);
                     return;
                 }
+                response = factory.createResponse(request, null, lifeCycleHandler, e, startDate);
+                logResponse(response);
                 execute(lifeCycleHandler, retryCount + 1);
                 return;
+            } finally {
+                if (response == null) {
+                    response = factory.createResponse(request, okResponse, lifeCycleHandler, null, startDate);
+                }
+                logResponse(response);
             }
-            ForestResponse response = factory.createResponse(request, okResponse, lifeCycleHandler, null);
-            logResponse(startTime, response);
+
             if (response.isError()) {
                 retryOrDoError(response, okResponse, null, lifeCycleHandler, retryCount, startTime);
                 return;
@@ -270,7 +276,7 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
             if (future != null) {
                 future.failed(new ForestNetworkException(okResponse.message(), okResponse.code(), response));
             }
-            logResponse(startTime, response);
+            logResponse(response);
             okHttp3ResponseHandler.handleSync(okResponse, response);
             return;
         }

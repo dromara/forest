@@ -9,6 +9,7 @@ import org.apache.http.HttpResponse;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Date;
 import java.util.concurrent.Future;
 
 
@@ -32,6 +33,7 @@ public class HttpclientResponseHandler extends AbstractBackendResponseHandler<Ht
     @Override
     public void handleFuture(
             final Future httpResponseFuture,
+            Date requestTime,
             ForestResponseFactory forestResponseFactory) {
         Type returnType = lifeCycleHandler.getReturnType();
         Type paramType;
@@ -53,13 +55,13 @@ public class HttpclientResponseHandler extends AbstractBackendResponseHandler<Ht
             }
             paramClass = Object.class;
         }
-        handleFutureResult(httpResponseFuture, paramClass, forestResponseFactory);
+        handleFutureResult(httpResponseFuture, requestTime, paramClass, forestResponseFactory);
     }
 
 
-    protected void handleFutureResult(Future httpResponseFuture, Class innerType, ForestResponseFactory forestResponseFactory) {
+    protected void handleFutureResult(Future httpResponseFuture, Date requestTime, Class innerType, ForestResponseFactory forestResponseFactory) {
         HttpclientForestFuture<HttpResponse, HttpResponse> future = new HttpclientForestFuture<>(
-                request, innerType, lifeCycleHandler, httpResponseFuture, forestResponseFactory);
+                request, requestTime, innerType, lifeCycleHandler, httpResponseFuture, forestResponseFactory);
         lifeCycleHandler.handleResult(future);
     }
 

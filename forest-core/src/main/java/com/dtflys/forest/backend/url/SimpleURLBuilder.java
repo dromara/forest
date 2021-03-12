@@ -16,10 +16,15 @@ public class SimpleURLBuilder extends URLBuilder {
     public String buildUrl(ForestRequest request) {
         String url = request.getUrl();
         String queryString = request.getQueryString();
+        StringBuilder urlBuilder = new StringBuilder(url);
         if (StringUtils.isNotBlank(queryString)) {
-            url += "?" + queryString;
+            urlBuilder.append("?").append(queryString);
         }
-        return url;
+        String ref = request.getRef();
+        if (StringUtils.isNotEmpty(ref)) {
+            urlBuilder.append("#").append(ref);
+        }
+        return urlBuilder.toString();
     }
 
 }

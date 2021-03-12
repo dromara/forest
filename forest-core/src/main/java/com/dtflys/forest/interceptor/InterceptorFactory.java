@@ -1,5 +1,10 @@
 package com.dtflys.forest.interceptor;
 
+/**
+ * 拦截器工厂
+ *
+ * @author gongjun[jun.gong@thebeastshop.com]
+ */
 public interface InterceptorFactory {
 
     InterceptorChain getInterceptorChain();

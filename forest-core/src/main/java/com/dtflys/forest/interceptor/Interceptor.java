@@ -11,9 +11,6 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.ForestProgress;
-import scala.Int;
-
-import java.util.Map;
 
 /**
  * Forest拦截器接口

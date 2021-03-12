@@ -15,6 +15,7 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.Date;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -29,8 +30,8 @@ public class HttpclientForestResponse extends ForestResponse {
     private byte[] bytes;
 
 
-    public HttpclientForestResponse(ForestRequest request, HttpResponse httpResponse, HttpEntity entity) {
-        super(request);
+    public HttpclientForestResponse(ForestRequest request, HttpResponse httpResponse, HttpEntity entity, Date requestTime, Date responseTime) {
+        super(request, requestTime, responseTime);
         this.httpResponse = httpResponse;
         this.entity = entity;
         if (httpResponse != null) {

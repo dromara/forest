@@ -130,13 +130,13 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
 
 
 
-    public void logResponse(long startTime, ForestResponse response) {
+    public void logResponse(ForestResponse response) {
         LogConfiguration logConfiguration = request.getLogConfiguration();
-        if (!logConfiguration.isLogEnabled()) {
+        if (!logConfiguration.isLogEnabled() || response.isLogged()) {
             return;
         }
-        long endTime = System.currentTimeMillis();
-        ResponseLogMessage logMessage = new ResponseLogMessage(response, startTime, endTime, response.getStatusCode());
+        response.setLogged(true);
+        ResponseLogMessage logMessage = new ResponseLogMessage(response, response.getStatusCode());
         ForestLogHandler logHandler = logConfiguration.getLogHandler();
         if (logHandler != null) {
             if (logConfiguration.isLogResponseStatus()) {
@@ -158,7 +158,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
 
     public void execute(int retryCount, LifeCycleHandler lifeCycleHandler) {
         Date startDate = new Date();
-        long startTime = startDate.getTime();
+        ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
         try {
             requestSender.sendRequest(
                     request,
@@ -166,13 +166,11 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
                     httpRequest,
                     lifeCycleHandler,
                     cookieStore,
-                    startTime, 0);
+                    startDate, 0);
         } catch (IOException e) {
             if (retryCount >= request.getRetryCount()) {
                 httpRequest.abort();
-                ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
-                response = forestResponseFactory.createResponse(request, null, lifeCycleHandler, e);
-                logResponse(startTime, response);
+                response = forestResponseFactory.createResponse(request, null, lifeCycleHandler, e, startDate);
                 lifeCycleHandler.handleSyncWithException(request, response, e);
                 return;
             }

@@ -7,6 +7,7 @@ import com.dtflys.forest.http.ForestResponseFactory;
 import okhttp3.Response;
 import com.dtflys.forest.handler.LifeCycleHandler;
 
+import java.util.Date;
 import java.util.concurrent.Future;
 
 
@@ -29,7 +30,7 @@ public class OkHttp3ResponseHandler extends AbstractBackendResponseHandler<Objec
     }
 
     @Override
-    public void handleFuture(Future<Object> httpResponseFuture, ForestResponseFactory forestResponseFactory) {
+    public void handleFuture(Future<Object> httpResponseFuture, Date requestTime, ForestResponseFactory forestResponseFactory) {
         lifeCycleHandler.handleResult(httpResponseFuture);
     }
 

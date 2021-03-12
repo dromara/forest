@@ -128,6 +128,12 @@ public class ForestCookie implements Serializable {
         return false;
     }
 
+    /**
+     * 是否匹配域名
+     *
+     * @param domain 域名
+     * @return  {@code true}: 匹配, {@code false}: 不匹配
+     */
     public boolean matchDomain(String domain) {
         return matchDomain(this.domain, domain);
     }
@@ -152,6 +158,17 @@ public class ForestCookie implements Serializable {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    /**
+     * 判断Cookie是否过期
+     *
+     * @param date 当前日期
+     * @return {@code true}: 已过期, {@code false}: 未过期
+     */
+    public boolean isExpired(Date date) {
+        long expiredTime = getExpiresTime();
+        return expiredTime <= date.getTime();
     }
 
     public static ForestCookie createFromHttpclientCookie(org.apache.http.cookie.Cookie httpCookie) {
@@ -243,9 +260,6 @@ public class ForestCookie implements Serializable {
 
         if (!hostOnly) {
             result.append("; domain=");
-//            if (forObsoleteRfc2965) {
-//                result.append(".");
-//            }
             result.append(domain);
         }
 

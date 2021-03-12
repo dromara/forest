@@ -5,6 +5,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
 
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -16,17 +17,20 @@ import java.util.concurrent.TimeoutException;
  */
 public class HttpclientForestFuture<T, R> implements Future<T> {
     private final ForestRequest request;
+    private final Date requestTime;
     private final Class<T> innerType;
     private final LifeCycleHandler lifeCycleHandler;
     private final Future<R> httpResponseFuture;
     private final ForestResponseFactory forestResponseFactory;
 
     public HttpclientForestFuture(ForestRequest request,
+                                  Date requestTime,
                                   Class<T> innerType,
                                   LifeCycleHandler lifeCycleHandler,
                                   Future<R> httpResponseFuture,
                                   ForestResponseFactory forestResponseFactory) {
         this.request = request;
+        this.requestTime = requestTime;
         this.innerType = innerType;
         this.lifeCycleHandler = lifeCycleHandler;
         this.httpResponseFuture = httpResponseFuture;
@@ -43,6 +47,10 @@ public class HttpclientForestFuture<T, R> implements Future<T> {
         return httpResponseFuture.isCancelled();
     }
 
+    public Date getRequestTime() {
+        return requestTime;
+    }
+
     @Override
     public boolean isDone() {
         return httpResponseFuture.isDone();
@@ -52,7 +60,7 @@ public class HttpclientForestFuture<T, R> implements Future<T> {
         if (httpResponse != null && innerType.isAssignableFrom(httpResponse.getClass())) {
             return (T) httpResponse;
         }
-        ForestResponse response = forestResponseFactory.createResponse(request, httpResponse, this.lifeCycleHandler, null);
+        ForestResponse response = forestResponseFactory.createResponse(request, httpResponse, this.lifeCycleHandler, null, requestTime);
         Object ret = lifeCycleHandler.handleResultType(request, response, innerType, innerType);
         return (T) ret;
     }

@@ -7,10 +7,14 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.exceptions.ForestUnsupportException;
 import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.utils.StringUtils;
 import org.apache.http.Consts;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthSchemeProvider;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CookieStore;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.config.CookieSpecs;
@@ -22,8 +26,10 @@ import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.impl.auth.*;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
@@ -136,18 +142,32 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
         configBuilder.setCookieSpec(CookieSpecs.STANDARD);
         RequestConfig requestConfig = configBuilder.build();
 
-        ForestProxy proxy = request.getProxy();
-        if (proxy != null) {
-            HttpHost httpHost = new HttpHost(proxy.getHost(), proxy.getPort());
-            configBuilder.setProxy(httpHost);
+        ForestProxy forestProxy = request.getProxy();
+        if (forestProxy != null) {
+            HttpHost proxy = new HttpHost(forestProxy.getHost(), forestProxy.getPort());
+            if (StringUtils.isNotEmpty(forestProxy.getUsername()) &&
+                    StringUtils.isNotEmpty(forestProxy.getPassword())) {
+                CredentialsProvider provider = new BasicCredentialsProvider();
+                provider.setCredentials(
+                        new AuthScope(proxy),
+                        new UsernamePasswordCredentials(
+                                forestProxy.getUsername(),
+                                forestProxy.getPassword()));
+                builder.setDefaultCredentialsProvider(provider);
+            }
+            configBuilder.setProxy(proxy);
+
         }
         if (cookieStore != null) {
             builder.setDefaultCookieStore(cookieStore);
         }
 
-        return builder
+
+        HttpClient httpClient = builder
                 .setDefaultRequestConfig(requestConfig)
                 .build();
+
+        return httpClient;
     }
 
 

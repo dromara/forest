@@ -50,6 +50,7 @@ import com.dtflys.forest.utils.URLUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
+import java.net.URL;
 import java.util.*;
 
 import static com.dtflys.forest.mapping.MappingParameter.*;
@@ -111,11 +112,14 @@ public class ForestMethod<T> implements VariableScope {
     private Type onSuccessClassGenericType = null;
     private Class retryerClass = null;
     private boolean async = false;
+
+    private LogConfiguration baseLogConfiguration = null;
+
     private boolean logEnabled = true;
     private boolean logRequest = true;
     private boolean logResponseStatus = true;
     private boolean logResponseContent = false;
-    private ForestLogHandler logHandler = new DefaultLogHandler();
+    private ForestLogHandler logHandler = null;
     private LogConfiguration logConfiguration = null;
 
     public ForestMethod(InterfaceProxyHandler interfaceProxyHandler, ForestConfiguration configuration, Method method) {
@@ -181,6 +185,9 @@ public class ForestMethod<T> implements VariableScope {
         if (StringUtils.isNotBlank(baseSslProtocol)) {
             baseSslProtocolTemplate = makeTemplate(baseSslProtocol);
         }
+
+        baseLogConfiguration = interfaceProxyHandler.getBaseLogConfiguration();
+
         baseTimeout = baseMetaRequest.getTimeout();
         baseRetryerClass = baseMetaRequest.getRetryer();
         baseRetryCount = baseMetaRequest.getRetryCount();
@@ -422,8 +429,8 @@ public class ForestMethod<T> implements VariableScope {
         if (tout > 0) {
             timeout = tout;
         }
-        int rtnum = metaRequest.getRetryCount();
-        if (rtnum > 0) {
+        Integer rtnum = metaRequest.getRetryCount();
+        if (rtnum != null && rtnum >= 0) {
             retryCount = rtnum;
         }
         maxRetryInterval = metaRequest.getMaxRetryInterval();
@@ -434,15 +441,26 @@ public class ForestMethod<T> implements VariableScope {
         logRequest = configuration.isLogRequest();
         logResponseStatus = configuration.isLogResponseStatus();
         logResponseContent = configuration.isLogResponseContent();
-        logHandler = configuration.getLogHandler();
 
         LogConfiguration metaLogConfiguration = metaRequest.getLogConfiguration();
+        if (metaLogConfiguration == null && baseLogConfiguration != null) {
+            metaLogConfiguration = baseLogConfiguration;
+        }
         if (metaLogConfiguration != null) {
             logEnabled = metaLogConfiguration.isLogEnabled();
             logRequest = metaLogConfiguration.isLogRequest();
             logResponseStatus = metaLogConfiguration.isLogResponseStatus();
             logResponseContent = metaLogConfiguration.isLogResponseContent();
             logHandler = metaLogConfiguration.getLogHandler();
+            if (logHandler == null && baseLogConfiguration != null) {
+                logHandler = baseLogConfiguration.getLogHandler();
+            }
+        }
+        if (logHandler == null && configuration.getLogHandler() != null) {
+            logHandler = configuration.getLogHandler();
+        }
+        if (logHandler == null) {
+            logHandler = new DefaultLogHandler();
         }
 
         logConfiguration = new LogConfiguration();
@@ -700,7 +718,9 @@ public class ForestMethod<T> implements VariableScope {
             }
         }
 
+
         renderedUrl = URLUtils.getValidURL(baseUrl, renderedUrl);
+
 
         // createExecutor and initialize http instance
         ForestRequest<T> request = new ForestRequest(configuration, this, args);
@@ -873,7 +893,6 @@ public class ForestMethod<T> implements VariableScope {
                                 template.setVariableScope(scope);
                                 scope.addVariableValue("_it", subItem);
                                 scope.addVariableValue("_index", index++);
-                                template.setVariableScope(scope);
                                 String name = template.render(args);
                                 nameValueList.add(
                                         new RequestNameValue(name, subItem, target, parameter.getPartContentType())

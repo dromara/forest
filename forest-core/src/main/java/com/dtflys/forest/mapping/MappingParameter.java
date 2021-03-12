@@ -4,6 +4,7 @@ import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.filter.FilterChain;
+import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.util.Iterator;
@@ -67,6 +68,7 @@ public class MappingParameter {
     private String defaultValue;
 
     private String jsonParamName;
+
 
     private FilterChain filterChain = new FilterChain();
 

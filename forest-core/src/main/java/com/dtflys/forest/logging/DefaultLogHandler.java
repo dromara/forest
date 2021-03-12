@@ -1,7 +1,5 @@
 package com.dtflys.forest.logging;
 
-import com.dtflys.forest.http.ForestProxy;
-import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.StringUtils;
 
@@ -132,13 +130,13 @@ public class DefaultLogHandler implements ForestLogHandler {
     protected String responseLoggingContent(ResponseLogMessage responseLogMessage) {
         ForestResponse response = responseLogMessage.getResponse();
         if (response != null && response.getException() != null) {
-            return "[Network Error]: " + response.getException().getMessage();
+            return "Response: [Network Error]: " + response.getException().getMessage();
         }
         int status = responseLogMessage.getStatus();
         if (status >= 0) {
             return "Response: Status = " + responseLogMessage.getStatus() + ", Time = " + responseLogMessage.getTime() + "ms";
         } else {
-            return "[Network Error]: Unknown Network Error!";
+            return "Response: [Network Error]: Unknown Network Error!";
         }
     }
 
@@ -189,7 +187,10 @@ public class DefaultLogHandler implements ForestLogHandler {
     @Override
     public void logResponseContent(ResponseLogMessage responseLogMessage) {
         if (responseLogMessage.getResponse() != null) {
-            logContent("Response Content:\n\t" + responseLogMessage.getResponse().getContent());
+            String content = responseLogMessage.getResponse().getContent();
+            if (StringUtils.isNotEmpty(content)) {
+                logContent("Response Content:\n\t" + content);
+            }
         }
     }
 }

@@ -6,6 +6,8 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
 import okhttp3.Response;
 
+import java.util.Date;
+
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2018-02-27 15:20
@@ -13,8 +15,8 @@ import okhttp3.Response;
 public class OkHttp3ForestResponseFactory implements ForestResponseFactory<Response> {
 
     @Override
-    public ForestResponse createResponse(ForestRequest request, Response res, LifeCycleHandler lifeCycleHandler, Throwable exception) {
-        ForestResponse response = new OkHttp3ForestResponse(request, res);
+    public ForestResponse createResponse(ForestRequest request, Response res, LifeCycleHandler lifeCycleHandler, Throwable exception, Date requestTime) {
+        ForestResponse response = new OkHttp3ForestResponse(request, res, requestTime, new Date());
         response.setException(exception);
         return response;
     }

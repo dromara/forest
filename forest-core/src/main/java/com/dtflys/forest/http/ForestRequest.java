@@ -49,10 +49,12 @@ import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.*;
 
 import static com.dtflys.forest.mapping.MappingParameter.*;
@@ -108,6 +110,11 @@ public class ForestRequest<T> {
      * 其中，xxx为用户名，yyy为用户密码
      */
     private String userInfo;
+
+    /**
+     * URL井号(#)后面的字符串
+     */
+    private String ref;
 
     /**
      * URL中的Query参数表
@@ -368,6 +375,7 @@ public class ForestRequest<T> {
         String query = "";
         String protocol = "";
         String userInfo = null;
+        String ref = null;
 
         if (!this.query.isEmpty()) {
             this.query.clearQueriesFromUrl();
@@ -403,6 +411,10 @@ public class ForestRequest<T> {
             }
 
             protocol = u.getProtocol();
+            ref = u.getRef();
+            if (StringUtils.isNotEmpty(ref)) {
+                ref = URLEncoder.encode(ref, "UTF-8");
+            }
             int port = u.getPort();
             StringBuilder urlBuilder = new StringBuilder();
             urlBuilder.append(protocol).append("://");
@@ -410,15 +422,20 @@ public class ForestRequest<T> {
                 urlBuilder.append(userInfo).append('@');
             }
             urlBuilder.append(u.getHost());
-            if (port != 80 && port > -1) {
+            if (port != 80 && port != 443 && port > -1 ||
+                    port == 80 && !protocol.equals("http") ||
+                    port == 443 && !protocol.equals("https")) {
                 urlBuilder.append(':').append(port);
             }
+
             String path = u.getPath();
             if (StringUtils.isNotEmpty(path)) {
                 urlBuilder.append(path);
             }
             newUrl = urlBuilder.toString();
         } catch (MalformedURLException e) {
+            throw new ForestRuntimeException(e);
+        } catch (UnsupportedEncodingException e) {
             throw new ForestRuntimeException(e);
         }
 
@@ -429,6 +446,9 @@ public class ForestRequest<T> {
         if (StringUtils.isNotEmpty(userInfo)) {
             this.userInfo = userInfo;
         }
+        if (StringUtils.isNotEmpty(ref)) {
+            this.ref = ref;
+        }
         return this;
     }
 
@@ -438,6 +458,23 @@ public class ForestRequest<T> {
 
     public ForestRequest setUserInfo(String userInfo) {
         this.userInfo = userInfo;
+        return this;
+    }
+
+    /**
+     * 获取URL井号(#)后面的字符串
+     * @return
+     */
+    public String getRef() {
+        return ref;
+    }
+
+    /**
+     * 设置URL井号(#)后面的字符串
+     * @param ref
+     */
+    public ForestRequest setRef(String ref) {
+        this.ref = ref;
         return this;
     }
 

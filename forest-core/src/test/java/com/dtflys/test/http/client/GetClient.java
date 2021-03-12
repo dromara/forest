@@ -11,6 +11,7 @@ import com.dtflys.test.http.model.JsonTestUser;
 import com.dtflys.test.interceptor.AddQueryInterceptor;
 import com.dtflys.test.interceptor.ErrorInterceptor;
 import com.dtflys.test.model.TestResult;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.List;
 import java.util.Map;
@@ -91,6 +92,7 @@ public interface GetClient {
             url = "http://localhost:${port}/hello/user?username=foo",
             headers = {"Accept:text/plain"}
     )
+    @LogEnabled(logResponseContent = true)
     String errorGet(OnError onError);
 
     @Request(
@@ -116,15 +118,17 @@ public interface GetClient {
     @Request(
             url = "http://xxxx:${port}/hello/user?username=foo",
             retryCount = 3,
-            maxRetryInterval = 50000,
+            maxRetryInterval = 5000,
+            timeout = 5,
             headers = {"Accept:text/plain"}
     )
     String errorGetWithRetry(OnError onError);
 
     @Request(
             url = "http://xxxx:${port}/hello/user?username=foo",
-            retryCount = 3,
-            maxRetryInterval = 50000,
+            retryCount = 5,
+            maxRetryInterval = 5000,
+            timeout = 1,
             headers = {"Accept:text/plain"}
     )
     String errorGetWithRetry();
@@ -137,6 +141,14 @@ public interface GetClient {
             data = "username=foo"
     )
     Map jsonMapGet();
+
+    @Request(
+            url = "http://localhost:${port}/hello/user",
+            dataType = "json",
+            headers = {"Accept:text/plain"},
+            data = "username=foo"
+    )
+    JsonNode jsonMapGet2();
 
 
     @Request(
@@ -303,5 +315,6 @@ public interface GetClient {
             timeout = 100
     )
     ForestResponse<String> getUrlWithAt();
+
 
 }

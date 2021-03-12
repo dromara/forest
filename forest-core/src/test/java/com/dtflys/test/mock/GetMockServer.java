@@ -34,6 +34,10 @@ public class GetMockServer extends MockServerRule {
         .respond(
                 response()
                         .withStatusCode(200)
+                        .withHeaders(
+                                new Header("Content-Type", "application/vnd.kafka.v2+json"),
+                                new Header("Vary", "Accept-Encoding, User-Agent")
+                        )
                         .withBody(EXPECTED)
         );
 

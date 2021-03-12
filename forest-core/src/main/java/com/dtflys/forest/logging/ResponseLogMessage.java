@@ -31,10 +31,10 @@ public class ResponseLogMessage {
      */
     private final int status;
 
-    public ResponseLogMessage(ForestResponse response, long requestTime, long responseTime, int status) {
+    public ResponseLogMessage(ForestResponse response, int status) {
         this.response = response;
-        this.requestTime = requestTime;
-        this.responseTime = responseTime;
+        this.requestTime = response.getRequestTime().getTime();
+        this.responseTime = response.getResponseTime().getTime();
         this.status = status;
     }
 

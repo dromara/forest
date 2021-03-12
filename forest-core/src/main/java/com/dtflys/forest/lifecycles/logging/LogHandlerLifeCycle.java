@@ -1,6 +1,5 @@
 package com.dtflys.forest.lifecycles.logging;
 
-import com.dtflys.forest.annotation.LogEnabled;
 import com.dtflys.forest.annotation.LogHandler;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
@@ -11,6 +10,7 @@ import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MetaRequest;
 
 public class LogHandlerLifeCycle implements MethodAnnotationLifeCycle<LogHandler, Object> {
+
 
     @Override
     public void onMethodInitialized(ForestMethod method, LogHandler annotation) {
@@ -43,4 +43,5 @@ public class LogHandlerLifeCycle implements MethodAnnotationLifeCycle<LogHandler
             logConfiguration.setLogHandler(configuration.getLogHandler());
         }
     }
+
 }

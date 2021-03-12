@@ -111,4 +111,9 @@ public @interface Query {
      */
     String defaultValue() default "";
 
+    /**
+     * URL Encoded
+     */
+    boolean urlencoded() default true;
+
 }

@@ -10,6 +10,7 @@ import java.lang.annotation.Target;
 
 /**
  * HTTP正向代理注解
+ *
  * @author gongjun [dt_flys@hotmail.com]
  * @since 1.5.0-BETA5
  */
@@ -29,5 +30,15 @@ public @interface HTTPProxy {
      * 代理服务端口号
      */
     String port() default "80";
+
+    /**
+     * 代理用户名
+     */
+    String username() default "";
+
+    /**
+     * 代理密码
+     */
+    String password() default "";
 
 }

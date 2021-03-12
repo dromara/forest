@@ -23,6 +23,7 @@ import org.apache.http.impl.cookie.BrowserCompatSpec;
 import org.apache.http.params.HttpParams;
 
 import java.io.IOException;
+import java.util.Date;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -63,19 +64,19 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
     };
 
 
-    public void logResponse(long startTime, ForestResponse response) {
+    public void logResponse(ForestResponse response) {
         LogConfiguration logConfiguration = request.getLogConfiguration();
-        if (!logConfiguration.isLogEnabled()) {
+        if (!logConfiguration.isLogEnabled() || response.isLogged()) {
             return;
         }
-        long endTime = System.currentTimeMillis();
-        ResponseLogMessage logMessage = new ResponseLogMessage(response, startTime, endTime, response.getStatusCode());
+        response.setLogged(true);
+        ResponseLogMessage logMessage = new ResponseLogMessage(response, response.getStatusCode());
         ForestLogHandler logHandler = logConfiguration.getLogHandler();
         if (logHandler != null) {
             if (logConfiguration.isLogResponseStatus()) {
                 logHandler.logResponseStatus(logMessage);
             }
-            if (logConfiguration.isLogResponseContent() && response.isSuccess()) {
+            if (logConfiguration.isLogResponseContent()) {
                 logHandler.logResponseContent(logMessage);
             }
         }
@@ -86,17 +87,16 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
     public void sendRequest(
             ForestRequest request, HttpclientResponseHandler responseHandler,
             HttpUriRequest httpRequest, LifeCycleHandler lifeCycleHandler,
-            CookieStore cookieStore, long startTime, int retryCount)
+            CookieStore cookieStore, Date startDate, int retryCount)
             throws IOException {
         HttpResponse httpResponse = null;
         ForestResponse response = null;
         client = getHttpClient(cookieStore);
+        ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
         try {
             logRequest(retryCount, (HttpRequestBase) httpRequest);
             httpResponse = client.execute(httpRequest);
-            ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
-            response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, null);
-            logResponse(startTime, response);
+            response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, null, startDate);
         } catch (IOException e) {
             httpRequest.abort();
             ForestRetryException retryException = new ForestRetryException(
@@ -104,19 +104,21 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             try {
                 request.getRetryer().canRetry(retryException);
             } catch (Throwable throwable) {
-                ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
-                response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, throwable);
-                logResponse(startTime, response);
+                response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, throwable, startDate);
                 lifeCycleHandler.handleSyncWithException(request, response, e);
                 return;
             }
-            startTime = System.currentTimeMillis();
-            sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, cookieStore, startTime, retryCount + 1);
+            response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, null, startDate);
+            logResponse(response);
+            sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, cookieStore, startDate, retryCount + 1);
             return;
         } finally {
             connectionManager.afterConnect();
+            if (response == null) {
+                response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, null, startDate);
+            }
+            logResponse(response);
         }
-
         if (response.isError()) {
             ForestNetworkException networkException =
                     new ForestNetworkException("", response.getStatusCode(), response);
@@ -128,7 +130,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
                 responseHandler.handleSync(httpResponse, response);
                 return;
             }
-            sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, cookieStore, startTime, retryCount + 1);
+            sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, cookieStore, startDate, retryCount + 1);
             return;
         }
 

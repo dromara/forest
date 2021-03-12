@@ -10,6 +10,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.junit.Test;
 
+import java.util.Date;
+
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
 import static org.mockito.Mockito.mock;
@@ -24,13 +26,14 @@ public class TestResponseFactory {
     @Test
     public void  testHttpclientForestResponseFactory() {
         ForestRequest request = new ForestRequest(ForestConfiguration.configuration());
+        Date requestTime = new Date();
         HttpclientForestResponseFactory responseFactory = new HttpclientForestResponseFactory();
         HttpResponse httpResponse = mock(HttpResponse.class);
         StatusLine statusLine = mock(StatusLine.class);
         when(statusLine.getStatusCode()).thenReturn(200);
         when(httpResponse.getStatusLine()).thenReturn(statusLine);
         LifeCycleHandler lifeCycleHandler = new NoneLifeCycleHandler();
-        ForestResponse response = responseFactory.createResponse(request, httpResponse, lifeCycleHandler, null);
+        ForestResponse response = responseFactory.createResponse(request, httpResponse, lifeCycleHandler, null, requestTime);
         assertNotNull(response);
         assertNull(response.getContent());
     }

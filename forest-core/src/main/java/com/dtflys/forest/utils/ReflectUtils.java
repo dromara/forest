@@ -77,6 +77,9 @@ public class ReflectUtils {
         if (byte.class.isAssignableFrom(type) || Byte.class.isAssignableFrom(type)) {
             return true;
         }
+        if (boolean.class.isAssignableFrom(type) || Boolean.class.isAssignableFrom(type)) {
+            return true;
+        }
         if (int.class.isAssignableFrom(type) || Integer.class.isAssignableFrom(type)) {
             return true;
         }
@@ -114,6 +117,9 @@ public class ReflectUtils {
             return false;
         }
         if (byte[].class.isAssignableFrom(type) || Byte[].class.isAssignableFrom(type)) {
+            return true;
+        }
+        if (boolean[].class.isAssignableFrom(type) || Boolean[].class.isAssignableFrom(type)) {
             return true;
         }
         if (int[].class.isAssignableFrom(type) || Integer[].class.isAssignableFrom(type)) {

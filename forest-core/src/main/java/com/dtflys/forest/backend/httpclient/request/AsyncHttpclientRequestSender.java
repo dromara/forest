@@ -18,6 +18,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.concurrent.*;
 
 /**
@@ -35,7 +36,7 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
     public void sendRequest(
             final ForestRequest request, final HttpclientResponseHandler responseHandler,
             final HttpUriRequest httpRequest, LifeCycleHandler lifeCycleHandler,
-            CookieStore cookieStore, long startTime, int retryCount)  {
+            CookieStore cookieStore, Date startDate, int retryCount)  {
         final CloseableHttpAsyncClient client = connectionManager.getHttpAsyncClient(request);
         client.start();
         final ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
@@ -43,7 +44,7 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
         final Future<HttpResponse> future = client.execute(httpRequest, new FutureCallback<HttpResponse>() {
             @Override
             public void completed(final HttpResponse httpResponse) {
-                ForestResponse response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, null);
+                ForestResponse response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, null, startDate);
                 if (response.isError()) {
                     ForestNetworkException networkException =
                             new ForestNetworkException("", response.getStatusCode(), response);
@@ -55,7 +56,7 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
                         responseHandler.handleError(response);
                         return;
                     }
-                    sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, cookieStore, startTime, retryCount + 1);
+                    sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, cookieStore, startDate, retryCount + 1);
                     return;
                 }
                 ForestCookies cookies = getCookiesFromHttpCookieStore(cookieStore);
@@ -71,7 +72,7 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
                     } catch (IOException e) {
                     }
                 }
-                ForestResponse response = forestResponseFactory.createResponse(request, null, lifeCycleHandler, ex);
+                ForestResponse response = forestResponseFactory.createResponse(request, null, lifeCycleHandler, ex, startDate);
                 ForestRetryException retryException = new ForestRetryException(
                         ex,  request, request.getRetryCount(), retryCount);
                 try {
@@ -80,7 +81,7 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
                     responseHandler.handleError(response, ex);
                     return;
                 }
-                sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, cookieStore, startTime, retryCount + 1);
+                sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, cookieStore, startDate, retryCount + 1);
             }
 
             @Override
@@ -93,6 +94,6 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
                 }
             }
         });
-        responseHandler.handleFuture(future, forestResponseFactory);
+        responseHandler.handleFuture(future, startDate, forestResponseFactory);
     }
 }
