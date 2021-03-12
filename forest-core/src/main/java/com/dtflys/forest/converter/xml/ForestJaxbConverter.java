@@ -2,6 +2,7 @@ package com.dtflys.forest.converter.xml;
 
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
 
 import javax.xml.bind.JAXBContext;
@@ -60,7 +61,8 @@ public class ForestJaxbConverter implements ForestXmlConverter {
 
     @Override
     public <T> T convertToJavaObject(String source, Type targetType) {
-        return convertToJavaObject(source, (Class<? extends T>) targetType);
+        Class clazz = ReflectUtils.getClassByType(targetType);
+        return (T) convertToJavaObject(source, clazz);
     }
 
 
