@@ -67,9 +67,9 @@ public class Test1 {
         LogConfiguration logConfiguration = request.getLogConfiguration();
         assertTrue(logConfiguration.isLogEnabled());
         assertTrue(logConfiguration.isLogRequest());
-        assertTrue(logConfiguration.isLogResponseStatus());
-        assertTrue(!logConfiguration.isLogResponseContent());
-        assertTrue(logConfiguration.getLogHandler() instanceof TestLogHandler);
+//        assertTrue(logConfiguration.isLogResponseStatus());
+//        assertTrue(!logConfiguration.isLogResponseContent());
+//        assertTrue(logConfiguration.getLogHandler() instanceof TestLogHandler);
     }
 
 }
