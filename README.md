@@ -12,13 +12,13 @@
     <img src="https://gitee.com/dromara/forest/badge/star.svg" alt="Gitee Stars">
 </a>
 <!--
-<a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.5.0-RC4/jar">
-    <img src="https://img.shields.io/badge/maven%20central-1.5.0-RC4-brightgreen.svg" alt="Maven Central">
+<a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.5.0-RC7/jar">
+    <img src="https://img.shields.io/badge/maven%20central-1.5.0-RC7-brightgreen.svg" alt="Maven Central">
 </a>
 -->
 <!--
-<a href="https://gitee.com/dromara/forest/releases/v1.5.0-RC6">
-    <img src="https://img.shields.io/badge/release-v1.5.0-RC6-blue" alt="Release">
+<a href="https://gitee.com/dromara/forest/releases/v1.5.0-RC7">
+    <img src="https://img.shields.io/badge/release-v1.5.0-RC7-blue" alt="Release">
 </a>
 -->
 <a href="https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html">
@@ -92,7 +92,7 @@ Forest有哪些特性？
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-spring-boot-starter</artifactId>
-    <version>1.5.0-RC6</version>
+    <version>1.5.0-RC7</version>
 </dependency>
 ```
 
