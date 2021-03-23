@@ -14,35 +14,40 @@
 package com.dtflys.test.proxy;
 
 import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.forest.proxy.InterfaceProxyHandler;
-import com.dtflys.forest.proxy.ProxyFactory;
-import com.dtflys.test.http.client.GetClient;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
 
 /**
  * @author caihongming
- * @version v1.0
  * @since 2021-03-23
  **/
 public class TestDefaultMethod {
 
   private static ForestConfiguration configuration = ForestConfiguration.configuration();
 
-  private TestDefault test = configuration.createInstance(TestDefault.class);
+  private TestDefaultClient testDefaultClient = configuration.createInstance(TestDefaultClient.class);
 
   @Test
   public void testGetProxyFactory() {
-    String testStr = test.test();
-    System.out.println(testStr);
-    assertEquals("test", testStr);
+    assertEquals("test", testDefaultClient.test());
+    assertEquals("test2", testDefaultClient.test2());
+    assertEquals("test3: xxx", testDefaultClient.test3("xxx"));
   }
 
-  public interface TestDefault {
+  public interface TestDefaultClient {
 
     default String test() {
       return "test";
     }
+
+    default String test2() {
+      return "test2";
+    }
+
+    default String test3(String msg) {
+      return "test3: " + msg;
+    }
+
   }
 }
