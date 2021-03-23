@@ -19,6 +19,8 @@ import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -102,6 +104,9 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         Method[] methods = interfaceClass.getDeclaredMethods();
         for (int i = 0; i < methods.length; i++) {
             Method method = methods[i];
+            if(method.isDefault()){
+                continue;
+            }
             ForestMethod forestMethod = new ForestMethod(this, configuration, method);
             forestMethodMap.put(method, forestMethod);
         }
@@ -110,6 +115,9 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         String methodName = method.getName();
+        if(method.isDefault()){
+          return invokeDefaultMethod(proxy, method, args);
+        }
         if ("toString".equals(methodName) && (args == null || args.length == 0)) {
             return "{Forest Proxy Object of " + interfaceClass.getName() + "}";
         }
@@ -125,6 +133,18 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         ForestMethod forestMethod = forestMethodMap.get(method);
         return forestMethod.invoke(args);
     }
+
+  private Object invokeDefaultMethod(Object proxy, Method method, Object[] args)
+          throws Throwable {
+    final Constructor<MethodHandles.Lookup> constructor = MethodHandles.Lookup.class
+            .getDeclaredConstructor(Class.class, int.class);
+    if (!constructor.isAccessible()) {
+      constructor.setAccessible(true);
+    }
+    final Class<?> declaringClass = method.getDeclaringClass();
+    return constructor.newInstance(declaringClass, MethodHandles.Lookup.PRIVATE)
+            .unreflectSpecial(method, declaringClass).bindTo(proxy).invokeWithArguments(args);
+  }
 
     public MetaRequest getBaseMetaRequest() {
         return baseMetaRequest;

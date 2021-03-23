@@ -825,46 +825,91 @@ public class ForestRequest<T> {
         return this;
     }
 
+    /**
+     * 获取请求头 Content-Type 的值
+     * @return 请求头 Content-Type 的值
+     */
     public String getContentType() {
         return headers.getValue("Content-Type");
     }
 
+    /**
+     * 设置请求头 Content-Type 的值
+     * @param contentType 请求头 Content-Type 的值
+     * @return {@link ForestRequest}类实例
+     */
     public ForestRequest setContentType(String contentType) {
         addHeader("Content-Type", contentType);
         return this;
     }
 
+    /**
+     * 获取请求超时时间，时间单位为毫秒
+     * @return 请求超时时间
+     */
     public int getTimeout() {
         return timeout;
     }
 
+    /**
+     * 设置请求超时时间，时间单位为毫秒
+     * @param timeout 请求超时时间
+     * @return {@link ForestRequest}类实例
+     */
     public ForestRequest setTimeout(int timeout) {
         this.timeout = timeout;
         return this;
     }
 
+    /**
+     * 获取SSL协议
+     * @return SSL协议字符串
+     */
     public String getSslProtocol() {
         return sslProtocol;
     }
 
+    /**
+     * 设置SSL协议
+     * @param sslProtocol SSL协议字符串
+     * @return {@link ForestRequest}类实例
+     */
     public ForestRequest setSslProtocol(String sslProtocol) {
         this.sslProtocol = sslProtocol;
         return this;
     }
 
+    /**
+     * 获取请求失败后的重试次数
+     * @return 重试次数
+     */
     public int getRetryCount() {
         return retryCount;
     }
 
+    /**
+     * 设置请求失败后的重试次数
+     * @param retryCount 重试次数
+     * @return {@link ForestRequest}类实例
+     */
     public ForestRequest setRetryCount(int retryCount) {
         this.retryCount = retryCount;
         return this;
     }
 
+    /**
+     * 获取最大请重试的时间间隔，时间单位为毫秒
+     * @return 最大请重试的时间间隔
+     */
     public long getMaxRetryInterval() {
         return maxRetryInterval;
     }
 
+    /**
+     * 设置最大请重试的时间间隔，时间单位为毫秒
+     * @param maxRetryInterval 最大请重试的时间间隔
+     * @return {@link ForestRequest}类实例
+     */
     public ForestRequest setMaxRetryInterval(long maxRetryInterval) {
         this.maxRetryInterval = maxRetryInterval;
         return this;
