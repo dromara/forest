@@ -11,9 +11,9 @@ public class ContentType {
     public final static String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
     public final static String APPLICATION_JSON = "application/json";
     public final static String APPLICATION_XML = "application/xml";
+    public final static String APPLICATION_OCTET_STREAM = "application/octet-stream";
     public final static String MULTIPART_FORM_DATA = "multipart/form-data";
     public final static String X_WWW_FORM_URLENCODED = "x-www-form-urlencoded";
-
 
     private final String type;
 
@@ -100,6 +100,10 @@ public class ContentType {
             return false;
         }
         return "javascript".equals(subType);
+    }
+
+    public boolean isBinary() {
+        return isMultipart() || isOctetStream();
     }
 
     public boolean isOctetStream() {
