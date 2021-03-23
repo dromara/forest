@@ -11,7 +11,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.lang.reflect.MalformedParameterizedTypeException;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
