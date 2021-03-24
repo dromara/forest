@@ -69,4 +69,6 @@ public abstract class ForestRequestBody {
         this.defaultValue = defaultValue;
         return this;
     }
+
+    public abstract byte[] getByteArray();
 }

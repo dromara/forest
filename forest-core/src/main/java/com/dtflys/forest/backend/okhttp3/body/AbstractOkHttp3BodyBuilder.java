@@ -85,7 +85,9 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
                                LifeCycleHandler lifeCycleHandler) {
         MultipartBody.Builder bodyBuilder = new MultipartBody.Builder();
         MediaType mediaType = MediaType.parse(contentType);
-        bodyBuilder.setType(mediaType);
+        if ("multipart".equals(mediaType.type())) {
+            bodyBuilder.setType(mediaType);
+        }
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         Charset ch = Charset.forName(charset);
         for (int i = 0; i < nameValueList.size(); i++) {
@@ -146,5 +148,6 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
         wrappedBody = new OkHttpMultipartBody(request, requestBody, lifeCycleHandler);
         return wrappedBody;
     }
+
 
 }

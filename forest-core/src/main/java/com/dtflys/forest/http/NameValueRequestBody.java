@@ -80,4 +80,9 @@ public class NameValueRequestBody extends ForestRequestBody {
     public String toString() {
         return toFormString();
     }
+
+    @Override
+    public byte[] getByteArray() {
+        return new byte[0];
+    }
 }

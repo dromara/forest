@@ -11,6 +11,7 @@ public class ContentType {
     public final static String APPLICATION_X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
     public final static String APPLICATION_JSON = "application/json";
     public final static String APPLICATION_XML = "application/xml";
+    public final static String APPLICATION_OCTET_STREAM = "application/octet-stream";
     public final static String MULTIPART_FORM_DATA = "multipart/form-data";
     public final static String X_WWW_FORM_URLENCODED = "x-www-form-urlencoded";
 
@@ -120,7 +121,11 @@ public class ContentType {
         if (subType == null) {
             return false;
         }
-        return subType.endsWith("stream") || subType.startsWith("stream");
+        return subType.contains("stream");
+    }
+
+    public boolean isBinary() {
+        return isStream() || isImage() || isZip();
     }
 
     public boolean isTorrent() {

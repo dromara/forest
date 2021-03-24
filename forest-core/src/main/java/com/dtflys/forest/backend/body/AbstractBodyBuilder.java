@@ -158,7 +158,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                 setStringBody(httpRequest, "", charset, contentType, mergeCharset);
             }
         }
-        else if (mineContentType.isMultipart()) {
+        else if (mineContentType.isMultipart() || mineContentType.isBinary()) {
             List<ForestMultipart> multiparts = request.getMultiparts();
             setFileBody(httpRequest, request, charset, contentType, nameValueList, multiparts, lifeCycleHandler);
         }
@@ -172,10 +172,12 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
 //            }
             StringBuilder builder = new StringBuilder();
             List bodyList = request.getBody();
-            for (Object bodyItem : bodyList) {
-                builder.append(bodyItem.toString());
+            if (!bodyList.isEmpty()) {
+                for (Object bodyItem : bodyList) {
+                    builder.append(bodyItem.toString());
+                }
+                setStringBody(httpRequest, builder.toString(), charset, contentType, mergeCharset);
             }
-            setStringBody(httpRequest, builder.toString(), charset, contentType, mergeCharset);
         }
     }
 
@@ -332,5 +334,18 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
      * @param lifeCycleHandler 生命周期处理器
      */
     protected abstract void setFileBody(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList,  List<ForestMultipart> multiparts, LifeCycleHandler lifeCycleHandler);
+
+    /**
+     * 设置二进制请求体
+     * @param httpReq 后端请求对象
+     * @param request Forest请求对象
+     * @param charset 字符集
+     * @param contentType 数据类型
+     * @param nameValueList 键值对列表
+     * @param byteArray 字节数组
+     * @param lifeCycleHandler 生命周期处理器
+     */
+//    protected abstract void setBinaryBody(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList,  byte[] byteArray, LifeCycleHandler lifeCycleHandler);
+
 
 }

@@ -28,4 +28,9 @@ public class StringRequestBody extends ForestRequestBody {
     public String toString() {
         return content;
     }
+
+    @Override
+    public byte[] getByteArray() {
+        return content.getBytes();
+    }
 }
