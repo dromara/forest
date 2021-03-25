@@ -31,6 +31,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.Route;
 import okhttp3.TlsVersion;
+import okhttp3.internal.connection.RealConnection;
 
 import javax.annotation.Nullable;
 import javax.net.ssl.SSLSocketFactory;
@@ -117,6 +118,9 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
                         ForestCookies cookies = new ForestCookies();
                         lifeCycleHandler.handleLoadCookie(request, cookies);
                         List<ForestCookie> forestCookies = cookies.allCookies();
+                        if (forestCookies.isEmpty()) {
+                            return new ArrayList<>(0);
+                        }
                         List<Cookie> okCookies = new ArrayList<>(forestCookies.size());
                         for (ForestCookie cookie : forestCookies) {
                             Duration maxAge = cookie.getMaxAge();
@@ -198,6 +202,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
 
     @Override
     public void init(ForestConfiguration configuration) {
+        int maxConnections = configuration.getMaxConnections();
         pool = new ConnectionPool();
     }
 }

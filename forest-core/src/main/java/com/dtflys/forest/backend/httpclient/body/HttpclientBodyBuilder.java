@@ -5,6 +5,7 @@ import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.mapping.MappingTemplate;
+import com.dtflys.forest.multipart.ByteArrayMultipart;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
@@ -14,7 +15,9 @@ import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
+import org.apache.http.entity.FileEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
@@ -149,5 +152,22 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
         httpReq.setEntity(entity);
     }
 
+
+    @Override
+    protected void setBinaryBody(T httpReq,
+                                 ForestRequest request,
+                                 String charset,
+                                 String contentType,
+                                 List<RequestNameValue> nameValueList,
+                                 byte[] bytes,
+                                 LifeCycleHandler lifeCycleHandler) {
+
+        if (StringUtils.isBlank(contentType)) {
+            contentType = ContentType.APPLICATION_OCTET_STREAM.toString();
+        }
+        ContentType ctype = ContentType.create(contentType, charset);
+        HttpEntity entity = new ByteArrayEntity(bytes, ctype);
+        httpReq.setEntity(entity);
+    }
 
 }

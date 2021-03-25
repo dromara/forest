@@ -1,5 +1,9 @@
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.http.body.NameValueRequestBody;
+import com.dtflys.forest.http.body.ObjectRequestBody;
+import com.dtflys.forest.http.body.StringRequestBody;
+
 /**
  * Forest请求体
  * <p>该类为Forest请求中所有类型请求体项的父类</p>
@@ -32,6 +36,21 @@ public abstract class ForestRequestBody {
          * 对象请求体类型
          */
         OBJECT,
+
+        /**
+         * 字节数组请求体类型
+         */
+        BYTE_ARRAY,
+
+        /**
+         * 文件请求体类型
+         */
+        FILE,
+
+        /**
+         * 流请求体类型
+         */
+        INPUT_STREAM,
 
         /**
          * 文件类型

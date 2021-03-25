@@ -28,6 +28,11 @@ import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.converter.ForestConverter;
+import com.dtflys.forest.http.body.ByteArrayRequestBody;
+import com.dtflys.forest.http.body.FileRequestBody;
+import com.dtflys.forest.http.body.InputStreamRequestBody;
+import com.dtflys.forest.http.body.NameValueRequestBody;
+import com.dtflys.forest.http.body.StringRequestBody;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.RequestLogMessage;
@@ -49,6 +54,8 @@ import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 
+import java.io.File;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -942,6 +949,33 @@ public class ForestRequest<T> {
      */
     public ForestRequest addBody(String stringBody) {
         return addBody(new StringRequestBody(stringBody));
+    }
+
+    /**
+     * 添加字节数组Body数据
+     * @param byteArrayBody 请求体字节数组内容
+     * @return
+     */
+    public ForestRequest addBody(byte[] byteArrayBody) {
+        return addBody(new ByteArrayRequestBody(byteArrayBody));
+    }
+
+    /**
+     * 添加文件Body数据
+     * @param fileBody 请求体文件内容
+     * @return
+     */
+    public ForestRequest addBody(File fileBody) {
+        return addBody(new FileRequestBody(fileBody));
+    }
+
+    /**
+     * 添加输入流Body数据
+     * @param inputStreamBody 请求体输入流内容
+     * @return
+     */
+    public ForestRequest addBody(InputStream inputStreamBody) {
+        return addBody(new InputStreamRequestBody(inputStreamBody));
     }
 
     /**

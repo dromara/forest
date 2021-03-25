@@ -19,9 +19,12 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.http.ForestQueryParameter;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.http.ForestRequestType;
-import com.dtflys.forest.http.ObjectRequestBody;
-import com.dtflys.forest.http.StringRequestBody;
+import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.http.body.ObjectRequestBody;
+import com.dtflys.forest.http.body.RequestBodyBuilder;
+import com.dtflys.forest.http.body.StringRequestBody;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
 import com.dtflys.forest.interceptor.InterceptorFactory;
@@ -50,7 +53,6 @@ import com.dtflys.forest.utils.URLUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
-import java.net.URL;
 import java.util.*;
 
 import static com.dtflys.forest.mapping.MappingParameter.*;
@@ -777,13 +779,12 @@ public class ForestMethod<T> implements VariableScope {
                         } else if (MappingParameter.isQuery(target)) {
                             request.addQuery(obj.toString(), null);
                         } else if (MappingParameter.isBody(target)) {
-                            if (obj instanceof CharSequence) {
-                                request.addBody(new StringRequestBody(obj.toString())
-                                        .setDefaultValue(parameter.getDefaultValue()));
-                            } else {
-                                request.addBody(new ObjectRequestBody(obj)
-                                        .setDefaultValue(parameter.getDefaultValue()));
-                            }
+                            ForestRequestBody body = RequestBodyBuilder
+                                    .type(obj.getClass())
+                                    .setData(obj)
+                                    .setDefaultValue(parameter.getDefaultValue())
+                                    .build();
+                            request.addBody(body);
                         } else {
                             nameValueList.add(new RequestNameValue(obj.toString(), target, parameter.getPartContentType())
                                     .setDefaultValue(parameter.getDefaultValue()));
@@ -800,7 +801,7 @@ public class ForestMethod<T> implements VariableScope {
                     }
                 }
                 else if (obj instanceof Iterable
-                        || (obj != null 
+                        || (obj != null
                         && (obj.getClass().isArray()
                         || ReflectUtils.isPrimaryType(obj.getClass())))) {
                     if (MappingParameter.isQuery(target)) {
@@ -822,7 +823,11 @@ public class ForestMethod<T> implements VariableScope {
                             }
                         }
                     } else if (MappingParameter.isBody(target)) {
-                        request.addBody(new ObjectRequestBody(obj));
+                        ForestRequestBody body = RequestBodyBuilder
+                                .type(obj.getClass())
+                                .setData(obj)
+                                .build();
+                        request.addBody(body);
                     }
                 }
                 else if (obj instanceof Map) {
@@ -1199,5 +1204,24 @@ public class ForestMethod<T> implements VariableScope {
         return type;
     }
 
-
+    /**
+     * 获取请求结果类型
+     * @return 请求结果类型，{@link Type}接口实例
+     */
+    public Type getResultType() {
+        Type type = getReturnType();
+        if (type == null) {
+            return Void.class;
+        }
+        Class clazz = ReflectUtils.getClassByType(type);
+        if (ForestResponse.class.isAssignableFrom(clazz)) {
+            if (type instanceof ParameterizedType) {
+                Type[] types = ((ParameterizedType) type).getActualTypeArguments();
+                if (types.length > 0) {
+                    return types[0];
+                }
+            }
+        }
+        return type;
+    }
 }

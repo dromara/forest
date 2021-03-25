@@ -1,4 +1,6 @@
-package com.dtflys.forest.http;
+package com.dtflys.forest.http.body;
+
+import com.dtflys.forest.http.ForestRequestBody;
 
 /**
  * 字符串类型请求体

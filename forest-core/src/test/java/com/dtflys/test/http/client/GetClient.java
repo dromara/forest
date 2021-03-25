@@ -10,6 +10,7 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.model.JsonTestUser;
 import com.dtflys.test.interceptor.AddQueryInterceptor;
 import com.dtflys.test.interceptor.ErrorInterceptor;
+import com.dtflys.test.model.Result;
 import com.dtflys.test.model.TestResult;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -88,16 +89,13 @@ public interface GetClient {
     ForestResponse<String> simpleGetMultiQuery5(@Query("username") String username);
 
 
-    @Request(
-            url = "http://localhost:${port}/hello/user?username=foo",
-            headers = {"Accept:text/plain"}
+    @Post(
+            url = "http://yhkys.market.alicloudapi.com/communication/18871"
     )
-    @LogEnabled(logResponseContent = true)
-    String errorGet(OnError onError);
+    Result<String> errorPost(OnError onError);
 
-    @Request(
-            url = "http://localhost:${port}/hello/user?username=foo",
-            headers = {"Accept:text/plain"}
+    @Post(
+            url = "http://yhkys.market.alicloudapi.com/communication/18871"
     )
     ForestResponse<String> errorGet2();
 

@@ -2,12 +2,17 @@ package com.dtflys.test.http;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.ProgressUtils;
 import com.dtflys.test.http.client.DownloadClient;
 import com.dtflys.test.http.client.GetClient;
+import com.dtflys.test.mock.DownloadMockServer;
+import com.dtflys.test.mock.ErrorMockServer;
 import com.dtflys.test.mock.GetMockServer;
 import com.twitter.finagle.http.path.Path;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.File;
@@ -20,6 +25,9 @@ import static junit.framework.Assert.*;
  */
 public class TestDownloadClient extends BaseClientTest {
 
+    @Rule
+    public DownloadMockServer server = new DownloadMockServer(this);
+
     private static ForestConfiguration configuration;
 
     private DownloadClient downloadClient;
@@ -27,8 +35,13 @@ public class TestDownloadClient extends BaseClientTest {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
+        configuration.setVariableValue("port", DownloadMockServer.port);
     }
 
+    @Before
+    public void prepareMockServer() {
+        server.initServer();
+    }
 
     public TestDownloadClient(HttpBackend backend) {
         super(backend, configuration);
@@ -51,12 +64,14 @@ public class TestDownloadClient extends BaseClientTest {
     @Test
     public void testDownloadFile() {
         String dir = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "TestDownload";
-        File file = downloadClient.downloadFile(dir, progress -> {
+        ForestResponse<File> response = downloadClient.downloadFile(dir, progress -> {
             System.out.println("------------------------------------------");
             System.out.println("total bytes: " + progress.getTotalBytes());
             System.out.println("current bytes: " + progress.getCurrentBytes());
             System.out.println("progress: " + Math.round(progress.getRate() * 100) + "%");
         });
+        assertNotNull(response);
+        File file = response.getResult();
         assertNotNull(file);
         assertTrue(file.exists());
     }
@@ -75,5 +90,16 @@ public class TestDownloadClient extends BaseClientTest {
         });
         assertNotNull(bytes);
     }
+
+
+    @Test
+    public void testDownloadImageFile() {
+        String dir = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "TestDownload";
+        File file = downloadClient.downloadImageFile(dir);
+        assertNotNull(file);
+        assertTrue(file.exists());
+        assertEquals(dir + File.separator + "test-xxx.jpg", file.getAbsolutePath());
+    }
+
 
 }

@@ -49,8 +49,9 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
     @Override
     public Object handleSyncWithException(ForestRequest request, ForestResponse response, Exception ex) {
         try {
-            Object resultData = handleResultType(request, response, returnType, returnClass);
+            Object resultData = null;
             if (response.isSuccess()) {
+                resultData = handleResultType(request, response, returnType, returnClass);
                 resultData = handleSuccess(resultData, request, response);
             } else {
                 if (ex != null) {

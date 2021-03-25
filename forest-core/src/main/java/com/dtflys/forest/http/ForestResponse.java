@@ -76,11 +76,6 @@ public abstract class ForestResponse<T> {
     protected volatile String content;
 
     /**
-     * 文件名
-     */
-    protected volatile String filename;
-
-    /**
      * 响应内容的数据类型
      */
     protected volatile ContentType contentType;
@@ -169,6 +164,27 @@ public abstract class ForestResponse<T> {
      */
     public void setLogged(boolean logged) {
         this.logged = logged;
+    }
+
+    /**
+     * 获取下载文件名
+     * @return 文件名
+     */
+    public String getFilename() {
+        ForestHeader header = getHeader("Content-Disposition");
+        if (header != null) {
+            String dispositionValue = header.getValue();
+            if (StringUtils.isNotEmpty(dispositionValue)) {
+                String[] disGroup = dispositionValue.split(";");
+                for (int i = disGroup.length - 1; i >= 0 ; i--) {
+                    String disStr = disGroup[i];
+                    if (disStr.startsWith("filename=")) {
+                        return disStr.substring("filename=".length());
+                    }
+                }
+            }
+        }
+        return request.getFilename();
     }
 
     /**

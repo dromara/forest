@@ -1,5 +1,6 @@
 package com.dtflys.forest.backend.okhttp3.body;
 
+import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.body.AbstractBodyBuilder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
@@ -9,9 +10,7 @@ import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
-import com.twitter.util.Throw;
 import okhttp3.*;
-import org.apache.http.entity.ContentType;
 
 import java.net.URLConnection;
 import java.nio.charset.Charset;
@@ -149,5 +148,20 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
         return wrappedBody;
     }
 
-
+    @Override
+    protected void setBinaryBody(
+            Request.Builder builder,
+            ForestRequest request,
+            String charset,
+            String contentType,
+            List<RequestNameValue> nameValueList,
+            byte[] bytes,
+            LifeCycleHandler lifeCycleHandler) {
+        if (StringUtils.isBlank(contentType)) {
+            contentType = ContentType.APPLICATION_OCTET_STREAM;
+        }
+        MediaType mediaType = MediaType.parse(contentType);
+        RequestBody body = RequestBody.create(mediaType, bytes);
+        setBody(builder, body);
+    }
 }
