@@ -28,7 +28,7 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
 
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
-        Type resultType = method.getReturnType();
+        Type resultType = method.getResultType();
         addAttribute(request, "resultType", resultType);
         request.setDownloadFile(true);
     }
@@ -40,7 +40,7 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
         Type resultType = getAttribute(request, "resultType", Type.class);
 
         if (StringUtils.isBlank(filename)) {
-            filename = request.getFilename();
+            filename = response.getFilename();
         }
 
         File dir = new File(dirPath);
