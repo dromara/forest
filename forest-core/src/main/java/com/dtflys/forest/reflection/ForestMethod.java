@@ -22,7 +22,6 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.http.body.ObjectRequestBody;
 import com.dtflys.forest.http.body.RequestBodyBuilder;
 import com.dtflys.forest.http.body.StringRequestBody;
 import com.dtflys.forest.interceptor.Interceptor;
@@ -141,9 +140,13 @@ public class ForestMethod<T> implements VariableScope {
 
 
     @Override
+    public boolean isVariableDefined(String name) {
+        return configuration.isVariableDefined(name);
+    }
+
+    @Override
     public Object getVariableValue(String name) {
-        Object value = configuration.getVariableValue(name);
-        return value;
+        return configuration.getVariableValue(name);
     }
 
     public MappingTemplate makeTemplate(String text) {
@@ -800,6 +803,21 @@ public class ForestMethod<T> implements VariableScope {
                                 .setDefaultValue(parameter.getDefaultValue()));
                     }
                 }
+                else if (obj instanceof Map) {
+                    Map map = (Map) obj;
+                    for (Object key : map.keySet()) {
+                        if (key instanceof CharSequence) {
+                            Object value = map.get(key);
+                            if (MappingParameter.isHeader(target)) {
+                                request.addHeader(new RequestNameValue(String.valueOf(key), value, target));
+                            } else if (MappingParameter.isBody(target)) {
+                                request.addBody(String.valueOf(key), parameter.getPartContentType(), value);
+                            } else if (MappingParameter.isQuery(target)) {
+                                request.addQuery(String.valueOf(key), value);
+                            }
+                        }
+                    }
+                }
                 else if (obj instanceof Iterable
                         || (obj != null
                         && (obj.getClass().isArray()
@@ -830,22 +848,13 @@ public class ForestMethod<T> implements VariableScope {
                         request.addBody(body);
                     }
                 }
-                else if (obj instanceof Map) {
-                    Map map = (Map) obj;
-                    for (Object key : map.keySet()) {
-                        if (key instanceof CharSequence) {
-                            Object value = map.get(key);
-                            if (MappingParameter.isHeader(target)) {
-                                request.addHeader(new RequestNameValue(String.valueOf(key), value, target));
-                            } else if (MappingParameter.isBody(target)) {
-                                request.addBody(String.valueOf(key), parameter.getPartContentType(), value);
-                            } else if (MappingParameter.isQuery(target)) {
-                                request.addQuery(String.valueOf(key), value);
-                            }
-                        }
-                    }
-                }
-                else {
+                else if (MappingParameter.isBody(target)) {
+                    ForestRequestBody body = RequestBodyBuilder
+                            .type(obj.getClass())
+                            .setData(obj)
+                            .build();
+                    request.addBody(body);
+                } else {
                     try {
                         List<RequestNameValue> list = getNameValueListFromObjectWithJSON(parameter, configuration, obj, type);
                         for (RequestNameValue nameValue : list) {
