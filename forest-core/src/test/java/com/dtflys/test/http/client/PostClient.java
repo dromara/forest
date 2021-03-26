@@ -135,6 +135,14 @@ public interface PostClient {
                         @Body("username") String username,
                         @Body("password") String password);
 
+    @Post(
+            url = "http://localhost:${port}/complex",
+            headers = {"Accept:text/plain"},
+            contentType = "application/x-www-form-urlencoded"
+    )
+    String complexPost3Map(@Query("param") String param, @Body Map map);
+
+
 
     @Request(
             url = "http://localhost:${port}/form-array",
