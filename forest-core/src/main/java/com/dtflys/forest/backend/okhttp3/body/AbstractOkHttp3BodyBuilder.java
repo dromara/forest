@@ -6,6 +6,8 @@ import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestRequestBody;
+import com.dtflys.forest.http.body.SupportFormUrlEncoded;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.RequestNameValue;
@@ -14,6 +16,7 @@ import okhttp3.*;
 
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -57,9 +60,15 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
 
 
     @Override
-    protected void setFormBody(Request.Builder builder, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList) {
+    protected void setFormBody(Request.Builder builder, ForestRequest request, String charset, String contentType, List<ForestRequestBody> bodyItems) {
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         FormBody.Builder bodyBuilder = new FormBody.Builder();
+        List<RequestNameValue> nameValueList = new LinkedList<>();
+        for (ForestRequestBody bodyItem : bodyItems) {
+            if (bodyItem instanceof SupportFormUrlEncoded) {
+                nameValueList.addAll(((SupportFormUrlEncoded) bodyItem).getNameValueList(request.getConfiguration()));
+            }
+        }
         nameValueList = processFromNameValueList(nameValueList, request.getConfiguration());
         for (int i = 0; i < nameValueList.size(); i++) {
             RequestNameValue nameValue = nameValueList.get(i);

@@ -20,6 +20,15 @@ public abstract class RequestBodyBuilder<T, B extends ForestRequestBody, D exten
         bodyBuilderMap.put(clazz, bodyBuilder);
     }
 
+    public static boolean canBuild(Class clazz) {
+        RequestBodyBuilder builder = type(clazz);
+        return builder != null;
+    }
+
+    public static boolean canBuild(Object obj) {
+        return canBuild(obj.getClass());
+    }
+
     public static RequestBodyBuilder type(Class clazz) {
         if (clazz == null) {
             return null;

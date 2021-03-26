@@ -1,7 +1,13 @@
 package com.dtflys.forest.http.body;
 
 
+import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequestBody;
+import com.dtflys.forest.mapping.MappingParameter;
+import com.dtflys.forest.utils.RequestNameValue;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 键值对类型请求体
@@ -10,7 +16,7 @@ import com.dtflys.forest.http.ForestRequestBody;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2020-09-22 17:30
  */
-public class NameValueRequestBody extends ForestRequestBody {
+public class NameValueRequestBody extends ForestRequestBody implements SupportFormUrlEncoded {
 
     /**
      * 键值对名称
@@ -28,13 +34,11 @@ public class NameValueRequestBody extends ForestRequestBody {
     private String contentType;
 
     public NameValueRequestBody(String name, Object value) {
-        super(BodyType.NAME_VALUE);
         this.name = name;
         this.value = value;
     }
 
     public NameValueRequestBody(String name, String contentType, Object value) {
-        super(BodyType.NAME_VALUE);
         this.name = name;
         this.contentType = contentType;
         this.value = value;
@@ -86,5 +90,12 @@ public class NameValueRequestBody extends ForestRequestBody {
     @Override
     public byte[] getByteArray() {
         return new byte[0];
+    }
+
+    @Override
+    public List<RequestNameValue> getNameValueList(ForestConfiguration configuration) {
+        List<RequestNameValue> nameValueList = new ArrayList<>(1);
+        nameValueList.add(new RequestNameValue(name, value, MappingParameter.TARGET_BODY));
+        return nameValueList;
     }
 }

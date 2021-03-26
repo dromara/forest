@@ -75,8 +75,8 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
         ContentType mineContentType = new ContentType(mineType);
 
 
-        if (mineContentType.isFormUrlEncoded() && !nameValueList.isEmpty()) {
-            setFormBody(httpRequest, request, charset, contentType, nameValueList);
+        if (mineContentType.isFormUrlEncoded()) {
+            setFormBody(httpRequest, request, charset, contentType, request.getBody());
         }
         else if (mineContentType.isJson()) {
             ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
@@ -164,8 +164,14 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
         }
         else if (mineContentType.isBinary()) {
             List<ForestRequestBody> bodyList = request.getBody();
+            List<ForestMultipart> multiparts = request.getMultiparts();
             List<byte[]> byteList = new LinkedList<>();
             int size = 0;
+            for (ForestMultipart multipart : multiparts) {
+                byte[] byteArray = multipart.getBytes();
+                byteList.add(byteArray);
+                size += byteArray.length;
+            }
             for (ForestRequestBody body : bodyList) {
                 byte[] byteArray = body.getByteArray();
                 byteList.add(byteArray);
@@ -340,7 +346,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
      * @param contentType 数据类型
      * @param nameValueList 键值对列表
      */
-    protected abstract void setFormBody(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList);
+    protected abstract void setFormBody(T httpReq, ForestRequest request, String charset, String contentType, List<ForestRequestBody> bodyItems);
 
     /**
      * 设置文件请求体

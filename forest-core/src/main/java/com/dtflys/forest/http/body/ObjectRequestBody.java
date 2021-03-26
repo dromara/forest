@@ -1,7 +1,11 @@
 package com.dtflys.forest.http.body;
 
+import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequestBody;
+import com.dtflys.forest.mapping.MappingParameter;
+import com.dtflys.forest.utils.RequestNameValue;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -9,6 +13,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 对象类型请求体
@@ -17,12 +24,11 @@ import java.io.Reader;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2020-09-22 17:30
  */
-public class ObjectRequestBody extends ForestRequestBody {
+public class ObjectRequestBody extends ForestRequestBody implements SupportFormUrlEncoded {
 
     private Object object;
 
     public ObjectRequestBody(Object object) {
-        super(ForestRequestBody.BodyType.OBJECT);
         this.object = object;
     }
 
@@ -58,5 +64,16 @@ public class ObjectRequestBody extends ForestRequestBody {
             throw new ForestRuntimeException(e);
         }
         return toString().getBytes();
+    }
+
+    @Override
+    public List<RequestNameValue> getNameValueList(ForestConfiguration configuration) {
+        List<RequestNameValue> nameValueList = new LinkedList<>();
+        ForestJsonConverter jsonConverter = configuration.getJsonConverter();
+        Map<String, Object> map = jsonConverter.convertObjectToMap(object);
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            nameValueList.add(new RequestNameValue(entry.getKey(), entry.getValue(), MappingParameter.TARGET_BODY));
+        }
+        return nameValueList;
     }
 }
