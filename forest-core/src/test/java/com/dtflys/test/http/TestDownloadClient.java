@@ -78,8 +78,7 @@ public class TestDownloadClient extends BaseClientTest {
 
     @Test
     public void testDownloadFileToBytes() {
-        String dir = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "TestDownload";
-        byte[] bytes = downloadClient.downloadFileToBytes(dir, progress -> {
+        byte[] bytes = downloadClient.downloadFileToBytes(progress -> {
             System.out.println("------------------------------------------");
             System.out.println("total bytes: " + progress.getTotalBytes());
             System.out.println("current bytes: " + progress.getCurrentBytes());
@@ -98,7 +97,7 @@ public class TestDownloadClient extends BaseClientTest {
         File file = downloadClient.downloadImageFile(dir);
         assertNotNull(file);
         assertTrue(file.exists());
-        assertEquals(dir + File.separator + "test-xxx.jpg", file.getAbsolutePath());
+        assertEquals("test-xxx.jpg", file.getName());
     }
 
 
