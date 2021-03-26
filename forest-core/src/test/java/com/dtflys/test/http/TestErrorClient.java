@@ -58,7 +58,7 @@ public class TestErrorClient extends BaseClientTest {
     @Test
     public void testErrorGet() {
         AtomicReference<String> content = new AtomicReference<>(null);
-        Result<String> result = getClient.errorPost((ex, request, response) -> {
+        String result = getClient.errorGet((ex, request, response) -> {
             content.set(response.getContent());
             response.setResult("onError=true");
         });
