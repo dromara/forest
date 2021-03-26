@@ -89,13 +89,16 @@ public interface GetClient {
     ForestResponse<String> simpleGetMultiQuery5(@Query("username") String username);
 
 
-    @Post(
-            url = "http://yhkys.market.alicloudapi.com/communication/18871"
+    @Request(
+            url = "http://localhost:${port}/hello/user?username=foo",
+            headers = {"Accept:text/plain"}
     )
-    Result<String> errorPost(OnError onError);
+    @LogEnabled(logResponseContent = true)
+    String errorGet(OnError onError);
 
-    @Post(
-            url = "http://yhkys.market.alicloudapi.com/communication/18871"
+    @Request(
+            url = "http://localhost:${port}/hello/user?username=foo",
+            headers = {"Accept:text/plain"}
     )
     ForestResponse<String> errorGet2();
 
@@ -241,7 +244,7 @@ public interface GetClient {
             url = "http://localhost:${port}/hello/user",
             headers = {"Accept:text/plain"}
     )
-    String annObjectGet(@DataObject Map<String, Object> user);
+    String annObjectGet(@Query Map<String, Object> user);
 
 
 
