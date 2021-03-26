@@ -13,7 +13,6 @@ import org.junit.Test;
 import java.io.File;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
 
 public class BinaryClientTest extends BaseClientTest {
 
@@ -54,6 +53,28 @@ public class BinaryClientTest extends BaseClientTest {
         File file = new File(path);
         byte[] byteArray = FileUtil.readBytes(file);
         String result = binaryClient.uploadOctetStreamWithByteArray(byteArray, "test-xxx.jpg");
+        assertEquals(BinaryMockServer.EXPECTED, result);
+    }
+
+    @Test
+    public void testUploadFile() {
+        String path = this.getClass().getResource("/test-img.jpg").getPath();
+        if (path.startsWith("/") && isWindows()) {
+            path = path.substring(1);
+        }
+        File file = new File(path);
+        String result = binaryClient.uploadOctetStreamWithFile(file, "test-xxx.jpg");
+        assertEquals(BinaryMockServer.EXPECTED, result);
+    }
+
+    @Test
+    public void testUploadDataFile() {
+        String path = this.getClass().getResource("/test-img.jpg").getPath();
+        if (path.startsWith("/") && isWindows()) {
+            path = path.substring(1);
+        }
+        File file = new File(path);
+        String result = binaryClient.uploadOctetStreamWithDataFile(file, "test-xxx.jpg");
         assertEquals(BinaryMockServer.EXPECTED, result);
     }
 
