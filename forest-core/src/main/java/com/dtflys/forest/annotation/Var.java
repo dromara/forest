@@ -1,7 +1,6 @@
 package com.dtflys.forest.annotation;
 
-import com.dtflys.forest.lifecycles.parameter.DataVariableLifeCycle;
-import com.dtflys.forest.lifecycles.parameter.VarLifeCycle;
+import com.dtflys.forest.lifecycles.parameter.VariableLifeCycle;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -27,7 +26,7 @@ import java.lang.annotation.Target;
  * @since 2016-05-24
  */
 @Documented
-@ParamLifeCycle(VarLifeCycle.class)
+@ParamLifeCycle(VariableLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = ElementType.PARAMETER)
 public @interface Var {
@@ -35,7 +34,8 @@ public @interface Var {
     /**
      * The name of the variable. The variable name can be referenced in some places (ex. request URL, Body, Headers)
      */
-    String value() default "";
+    String value();
+
 
     /**
      * The filters will do some processing for the variable value before sending request.
