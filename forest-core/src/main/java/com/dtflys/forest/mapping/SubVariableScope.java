@@ -22,6 +22,15 @@ public class SubVariableScope implements VariableScope {
     }
 
     @Override
+    public boolean isVariableDefined(String name) {
+        boolean isDefined = variables.containsKey(name);
+        if (!isDefined) {
+            return parent.isVariableDefined(name);
+        }
+        return true;
+    }
+
+    @Override
     public Object getVariableValue(String name) {
         Object value = variables.get(name);
         if (value == null) {

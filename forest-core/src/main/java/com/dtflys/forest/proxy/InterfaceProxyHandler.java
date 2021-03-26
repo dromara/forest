@@ -131,6 +131,11 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
     }
 
     @Override
+    public boolean isVariableDefined(String name) {
+        return configuration.isVariableDefined(name);
+    }
+
+    @Override
     public Object getVariableValue(String name) {
         return configuration.getVariableValue(name);
     }

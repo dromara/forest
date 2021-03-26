@@ -1,6 +1,7 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
+import com.dtflys.forest.exceptions.ForestVariableUndefined;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.util.HashSet;
@@ -34,6 +35,9 @@ public class MappingReference extends MappingExpr {
         MappingVariable variable = variableScope.getVariable(name);
         if (variable != null) {
             return args[variable.getIndex()];
+        }
+        if (!variableScope.isVariableDefined(name)) {
+            throw new ForestVariableUndefined(name);
         }
         return variableScope.getVariableValue(name);
     }
