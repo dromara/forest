@@ -761,6 +761,15 @@ public class ForestConfiguration implements Serializable {
     }
 
     /**
+     * 判断变量是否已定义
+     * @param name 变量名
+     * @return {@code true}: 已定义, {@code false}: 未定义
+     */
+    public boolean isVariableDefined(String name) {
+        return getVariables().containsKey(name);
+    }
+
+    /**
      * 获取全局SSL的Key Store表
      * @return SSL的Key Store表
      */
