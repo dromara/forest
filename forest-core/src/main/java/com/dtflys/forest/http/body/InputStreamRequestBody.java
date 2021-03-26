@@ -12,7 +12,6 @@ public class InputStreamRequestBody extends ForestRequestBody {
     private InputStream inputStream;
 
     public InputStreamRequestBody(InputStream inputStream) {
-        super(BodyType.INPUT_STREAM);
         this.inputStream = inputStream;
     }
 

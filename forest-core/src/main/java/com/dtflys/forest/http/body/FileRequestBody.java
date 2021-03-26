@@ -12,7 +12,6 @@ public class FileRequestBody extends ForestRequestBody {
     private File file;
 
     public FileRequestBody(File file) {
-        super(BodyType.FILE);
         this.file = file;
     }
 

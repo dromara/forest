@@ -25,27 +25,27 @@ public abstract class ForestRequestBody {
         /**
          * 字符串请求体类型
          */
-        STRING,
+        TEXT,
 
         /**
          * 键值对请求体类型
          */
-        NAME_VALUE,
+        FORM_URL_ENCODED,
 
         /**
-         * 对象请求体类型
+         * JSON格式
          */
-        OBJECT,
+        JSON,
 
         /**
-         * 字节数组请求体类型
+         * XML格式
          */
-        BYTE_ARRAY,
+        XML,
 
         /**
          * 文件请求体类型
          */
-        FILE,
+        BINARY,
 
         /**
          * 流请求体类型
@@ -59,26 +59,11 @@ public abstract class ForestRequestBody {
     }
 
     /**
-     * 请求体类型
-     */
-    protected final BodyType type;
-
-    /**
      * 默认值
      */
     private String defaultValue;
 
-    public ForestRequestBody(BodyType type) {
-        this.type = type;
-    }
 
-    /**
-     * 获取请求体类型
-     * @return 请求体类型，{@link BodyType}枚举实例
-     */
-    public BodyType getType() {
-        return type;
-    }
 
     public String getDefaultValue() {
         return defaultValue;
