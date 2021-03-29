@@ -344,7 +344,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
      * @param request Forest请求对象
      * @param charset 字符集
      * @param contentType 数据类型
-     * @param nameValueList 键值对列表
+     * @param bodyItems 键值对列表
      */
     protected abstract void setFormBody(T httpReq, ForestRequest request, String charset, String contentType, List<ForestRequestBody> bodyItems);
 
