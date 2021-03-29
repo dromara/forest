@@ -19,7 +19,7 @@ public interface BinaryClient {
     String uploadOctetStreamWithByteArray(@Body byte[] body, @Var("filename") String filename);
 
     @Post(
-            url = "http://localhost:${port}/upload-octet-stream/${file.name}",
+            url = "http://localhost:${port}/upload-octet-stream/${filename}",
             contentType = ContentType.APPLICATION_OCTET_STREAM
     )
     @LogEnabled(logResponseContent = true)

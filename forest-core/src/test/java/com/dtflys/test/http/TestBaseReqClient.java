@@ -56,7 +56,7 @@ public class TestBaseReqClient extends BaseClientTest {
             String userAgent = response.getRequest().getHeaderValue("User-Agent");
             assertNotNull(userAgent);
             assertEquals(BaseUrlMockServer.USER_AGENT, userAgent);
-        });
+        }, "UTF-8");
         assertEquals(GetMockServer.EXPECTED, result);
     }
 
@@ -66,7 +66,7 @@ public class TestBaseReqClient extends BaseClientTest {
             String userAgent = response.getRequest().getHeaderValue("User-Agent");
             assertNotNull(userAgent);
             assertEquals(BaseUrlMockServer.USER_AGENT, userAgent);
-        });
+        }, "UTF-8");
         assertEquals(GetMockServer.EXPECTED, result);
     }
 
