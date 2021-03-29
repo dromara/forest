@@ -124,7 +124,11 @@ public class ContentType {
         if (subType == null) {
             return false;
         }
-        return subType.endsWith("stream") || subType.startsWith("stream");
+        return subType.contains("stream");
+    }
+
+    public boolean isBinary() {
+        return isStream() || isImage() || isZip();
     }
 
     public boolean isTorrent() {

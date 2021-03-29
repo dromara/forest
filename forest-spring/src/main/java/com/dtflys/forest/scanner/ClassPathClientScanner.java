@@ -1,6 +1,10 @@
 package com.dtflys.forest.scanner;
 
 import com.dtflys.forest.file.SpringResource;
+import com.dtflys.forest.http.ForestRequestBody;
+import com.dtflys.forest.http.body.MultipartRequestBodyBuilder;
+import com.dtflys.forest.http.body.RequestBodyBuilder;
+import com.dtflys.forest.http.body.ResourceRequestBodyBuilder;
 import com.dtflys.forest.multipart.ForestMultipartFactory;
 import com.dtflys.forest.utils.ClientFactoryBeanUtils;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
@@ -39,14 +43,16 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
      */
     public void registerMultipartTypes() {
         ForestMultipartFactory.registerFactory(Resource.class, SpringResource.class);
+        RequestBodyBuilder.registerBodyBuilder(Resource.class, new ResourceRequestBodyBuilder());
         try {
             Class multipartFileClass = Class.forName("org.springframework.web.multipart.MultipartFile");
             Class springMultipartFileClass = Class.forName("com.dtflys.forest.file.SpringMultipartFile");
             ForestMultipartFactory.registerFactory(multipartFileClass, springMultipartFileClass);
+            RequestBodyBuilder.registerBodyBuilder(multipartFileClass, new MultipartRequestBodyBuilder());
         } catch (ClassNotFoundException e) {
         }
-
     }
+
 
     /**
      * 注册过滤器

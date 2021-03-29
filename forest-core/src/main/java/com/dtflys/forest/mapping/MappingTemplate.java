@@ -2,6 +2,7 @@ package com.dtflys.forest.mapping;
 
 
 import com.dtflys.forest.config.VariableScope;
+import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
@@ -355,32 +356,34 @@ public class MappingTemplate {
 
 
     public String render(Object[] args) {
-        ForestJsonConverter jsonConverter = variableScope.getConfiguration().getJsonConverter();
-        int len = exprList.size();
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < len; i++) {
-            MappingExpr expr = exprList.get(i);
-            Object val = null;
-            if (expr instanceof MappingString) {
-                builder.append(((MappingString) expr).getText());
-            }
-            else if (expr instanceof MappingIndex) {
-                try {
-                    val = args[((MappingIndex) expr).getIndex()];
-                } catch (Exception ex) {
+        try {
+            ForestJsonConverter jsonConverter = variableScope.getConfiguration().getJsonConverter();
+            int len = exprList.size();
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < len; i++) {
+                MappingExpr expr = exprList.get(i);
+                Object val = null;
+                if (expr instanceof MappingString) {
+                    builder.append(((MappingString) expr).getText());
+                } else if (expr instanceof MappingIndex) {
+                    try {
+                        val = args[((MappingIndex) expr).getIndex()];
+                    } catch (Exception ex) {
+                    }
+                    if (val != null) {
+                        builder.append(getParameterValue(jsonConverter, val));
+                    }
+                } else {
+                    val = expr.render(args);
+                    if (val != null) {
+                        builder.append(getParameterValue(jsonConverter, val));
+                    }
                 }
-                if (val != null) {
-                    builder.append(getParameterValue(jsonConverter, val));
-                }
             }
-            else {
-                val = expr.render(args);
-                if (val != null) {
-                    builder.append(getParameterValue(jsonConverter, val));
-                }
-            }
+            return builder.toString();
+        } catch (ForestVariableUndefinedException ex) {
+            throw new ForestVariableUndefinedException(ex.getVariableName(), template);
         }
-        return builder.toString();
     }
 
     public static String getParameterValue(ForestJsonConverter jsonConverter, Object obj) {

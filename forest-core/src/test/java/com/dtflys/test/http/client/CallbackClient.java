@@ -1,10 +1,7 @@
 package com.dtflys.test.http.client;
 
-import com.dtflys.forest.annotation.DataVariable;
 import com.dtflys.forest.annotation.Request;
-import com.dtflys.forest.callback.OnSuccess;
-import com.dtflys.forest.annotation.DataVariable;
-import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.annotation.Var;
 import com.dtflys.forest.callback.OnSuccess;
 
 import java.util.Map;
@@ -20,7 +17,7 @@ public interface CallbackClient {
             headers = {"Accept:text/plain"},
             data = "username=${username}"
     )
-    String getOnSuccess(@DataVariable("username") String username, OnSuccess<String> onSuccess);
+    String getOnSuccess(@Var("username") String username, OnSuccess<String> onSuccess);
 
 
     @Request(
@@ -29,7 +26,7 @@ public interface CallbackClient {
             data = "username=${username}",
             dataType = "json"
     )
-    String getOnSuccessMap(@DataVariable("username") String username, OnSuccess<Map> onSuccess);
+    String getOnSuccessMap(@Var("username") String username, OnSuccess<Map> onSuccess);
 
 
 }

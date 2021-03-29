@@ -4,22 +4,23 @@ import com.dtflys.forest.backend.body.AbstractBodyBuilder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestRequestBody;
+import com.dtflys.forest.http.body.SupportFormUrlEncoded;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
-import okhttp3.MediaType;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.AbstractContentBody;
-import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.io.UnsupportedEncodingException;
@@ -53,9 +54,15 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
 
 
     @Override
-    protected void setFormBody(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList) {
-        List<NameValuePair> nameValuePairs = new ArrayList<>(nameValueList.size());
+    protected void setFormBody(T httpReq, ForestRequest request, String charset, String contentType, List<ForestRequestBody> bodyItems) {
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
+        List<RequestNameValue> nameValueList = new LinkedList<>();
+        for (ForestRequestBody bodyItem : bodyItems) {
+            if (bodyItem instanceof SupportFormUrlEncoded) {
+                nameValueList.addAll(((SupportFormUrlEncoded) bodyItem).getNameValueList(request.getConfiguration()));
+            }
+        }
+        List<NameValuePair> nameValuePairs = new ArrayList<>(nameValueList.size());
         nameValueList = processFromNameValueList(nameValueList, request.getConfiguration());
         for (int i = 0; i < nameValueList.size(); i++) {
             RequestNameValue nameValue = nameValueList.get(i);
@@ -149,5 +156,22 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
         httpReq.setEntity(entity);
     }
 
+
+    @Override
+    protected void setBinaryBody(T httpReq,
+                                 ForestRequest request,
+                                 String charset,
+                                 String contentType,
+                                 List<RequestNameValue> nameValueList,
+                                 byte[] bytes,
+                                 LifeCycleHandler lifeCycleHandler) {
+
+        if (StringUtils.isBlank(contentType)) {
+            contentType = ContentType.APPLICATION_OCTET_STREAM.toString();
+        }
+        ContentType ctype = ContentType.create(contentType, charset);
+        HttpEntity entity = new ByteArrayEntity(bytes, ctype);
+        httpReq.setEntity(entity);
+    }
 
 }

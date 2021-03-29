@@ -28,6 +28,7 @@ package com.dtflys.forest.config;
 import com.dtflys.forest.converter.auto.DefaultAutoConverter;
 import com.dtflys.forest.converter.binary.DefaultBinaryConverter;
 import com.dtflys.forest.converter.text.DefaultTextConverter;
+import com.dtflys.forest.http.body.RequestBodyBuilder;
 import com.dtflys.forest.interceptor.DefaultInterceptorFactory;
 import com.dtflys.forest.interceptor.InterceptorFactory;
 import com.dtflys.forest.logging.DefaultLogHandler;
@@ -52,6 +53,8 @@ import com.dtflys.forest.filter.XmlFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.*;
 
@@ -247,6 +250,12 @@ public class ForestConfiguration implements Serializable {
         configuration.registerFilter("json", JSONFilter.class);
         configuration.registerFilter("xml", XmlFilter.class);
         configuration.setLogHandler(new DefaultLogHandler());
+        RequestBodyBuilder.registerBodyBuilder(CharSequence.class, new RequestBodyBuilder.StringRequestBodyBuilder());
+        RequestBodyBuilder.registerBodyBuilder(String.class, new RequestBodyBuilder.StringRequestBodyBuilder());
+        RequestBodyBuilder.registerBodyBuilder(File.class, new RequestBodyBuilder.FileRequestBodyBuilder());
+        RequestBodyBuilder.registerBodyBuilder(byte[].class, new RequestBodyBuilder.ByteArrayRequestBodyBuilder());
+        RequestBodyBuilder.registerBodyBuilder(InputStream.class, new RequestBodyBuilder.InputStreamBodyBuilder());
+        RequestBodyBuilder.registerBodyBuilder(Object.class, new RequestBodyBuilder.ObjectRequestBodyBuilder());
         return configuration;
     }
 
@@ -749,6 +758,15 @@ public class ForestConfiguration implements Serializable {
      */
     public Object getVariableValue(String name) {
         return getVariables().get(name);
+    }
+
+    /**
+     * 判断变量是否已定义
+     * @param name 变量名
+     * @return {@code true}: 已定义, {@code false}: 未定义
+     */
+    public boolean isVariableDefined(String name) {
+        return getVariables().containsKey(name);
     }
 
     /**

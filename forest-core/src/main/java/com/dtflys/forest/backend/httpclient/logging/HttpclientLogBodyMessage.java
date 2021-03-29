@@ -1,13 +1,16 @@
 package com.dtflys.forest.backend.httpclient.logging;
 
+import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.httpclient.body.HttpclientMultipartFileBody;
 import com.dtflys.forest.logging.LogBodyMessage;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.mime.FormBodyPart;
 import org.apache.http.entity.mime.MinimalField;
 import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.StringBody;
 
+import javax.xml.bind.helpers.AbstractUnmarshallerImpl;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -68,7 +71,9 @@ public class HttpclientLogBodyMessage implements LogBodyMessage {
         if (entity == null) {
             return null;
         }
-        if (entity.getContentType().getValue().startsWith("multipart/")) {
+        Header contentTypeHeader = entity.getContentType();
+        ContentType contentType = new ContentType(contentTypeHeader.getValue());
+        if (contentType.isMultipart()) {
             Class[] paramTypes = new Class[0];
             Object[] args = new Object[0];
             List<FormBodyPart> parts = null;
@@ -140,6 +145,8 @@ public class HttpclientLogBodyMessage implements LogBodyMessage {
                 }
                 return builder.toString();
             }
+        } else if (contentType.isBinary()) {
+            return "[Binary length=" + entity.getContentLength() + "]";
         }
         return getLogContentForStringBody(entity);
     }

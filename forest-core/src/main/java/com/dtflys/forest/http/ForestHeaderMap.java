@@ -9,7 +9,7 @@ import java.util.*;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2020-08-11 12:45
  */
-public class ForestHeaderMap {
+public class ForestHeaderMap implements Map<String, String> {
 
     private final List<ForestHeader> headers;
 
@@ -25,8 +25,159 @@ public class ForestHeaderMap {
      * 获取本请求头集合的大小
      * @return 本请求头集合的大小
      */
+    @Override
     public int size() {
         return headers.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return size() == 0;
+    }
+
+    @Override
+    public boolean containsKey(Object key) {
+        if (key == null) {
+            return false;
+        }
+        String name = key.toString();
+        for (ForestHeader header : headers) {
+            if (header.getName().equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean containsValue(Object value) {
+        for (ForestHeader header : headers) {
+            Object headerVal = header.getValue();
+            if (headerVal == null) {
+                if (value == null) {
+                    return true;
+                }
+                continue;
+            }
+            if (headerVal.equals(value)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public String get(Object key) {
+        if (key == null) {
+            return null;
+        }
+        String name = key.toString();
+        ForestHeader header = getHeader(name);
+        if (header == null) {
+            return null;
+        }
+        return header.getValue();
+    }
+
+
+    @Override
+    public String put(String key, String value) {
+        ForestHeader header = getHeader(key);
+        if (header != null) {
+            header.setValue(value);
+        } else {
+            ForestHeader newHeader = new ForestHeader(key, value);
+            addHeader(newHeader);
+        }
+        return value;
+    }
+
+    /**
+     * 根据请求头的名称删除请求头
+     *
+     * @param key 请求头名称
+     * @return 被删除的请求头的值
+     */
+    @Override
+    public String remove(Object key) {
+        if (key == null) {
+            return null;
+        }
+        String name = key.toString();
+        for (int i = headers.size() - 1; i >= 0; i--) {
+            ForestHeader header = headers.get(i);
+            if (header.getName().equalsIgnoreCase(name)) {
+                ForestHeader removedHeader = headers.remove(i);
+                return removedHeader.getValue();
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void putAll(Map<? extends String, ? extends String> m) {
+        if (m == null) {
+            return;
+        }
+        for (Entry<? extends String, ? extends String> entry : m.entrySet()) {
+            String name = entry.getKey();
+            String value = entry.getValue();
+            put(name, value);
+        }
+    }
+
+    @Override
+    public void clear() {
+        headers.clear();
+    }
+
+    @Override
+    public Set<String> keySet() {
+        Set<String> set = new HashSet<>();
+        for (ForestHeader header : headers) {
+            set.add(header.getName());
+        }
+        return set;
+    }
+
+    @Override
+    public Collection<String> values() {
+        List<String> list = new ArrayList<>();
+        for (ForestHeader header : headers) {
+            String val = header.getValue();
+            if (val != null) {
+                list.add(val);
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public Set<Entry<String, String>> entrySet() {
+        Set<Entry<String, String>> set = new HashSet<>();
+        for (ForestHeader header : headers) {
+            Entry<String, String> entry = new Entry<String, String>() {
+
+                @Override
+                public String getKey() {
+                    return header.getName();
+                }
+
+                @Override
+                public String getValue() {
+                    return header.getValue();
+                }
+
+                @Override
+                public String setValue(String value) {
+                    String oldValue = header.getValue();
+                    header.setValue(value);
+                    return oldValue;
+                }
+            };
+            set.add(entry);
+        }
+        return set;
     }
 
     /**
@@ -149,18 +300,6 @@ public class ForestHeaderMap {
      */
     public Iterator<ForestHeader> headerIterator() {
         return headers.iterator();
-    }
-
-    /**
-     * 根据请求头的名称删除请求头
-     *
-     * @param name 请求头名称
-     */
-    public void remove(String name) {
-        ForestHeader header = getHeader(name);
-        if (header != null) {
-            headers.remove(header);
-        }
     }
 
 }

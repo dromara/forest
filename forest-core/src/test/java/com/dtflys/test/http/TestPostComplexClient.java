@@ -14,6 +14,10 @@ import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -73,6 +77,18 @@ public class TestPostComplexClient extends BaseClientTest {
         assertNotNull(result);
         Assert.assertEquals(PostMockServer.EXPECTED, result);
     }
+
+    @Test
+    public void testComplexPost3Map() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("username", "foo");
+        map.put("password", "123456");
+        String result = postClient.complexPost3Map("1", map);
+        log.info("response: " + result);
+        assertNotNull(result);
+        Assert.assertEquals(PostMockServer.EXPECTED, result);
+    }
+
 
     @Test
     public void testComplexPost4() {

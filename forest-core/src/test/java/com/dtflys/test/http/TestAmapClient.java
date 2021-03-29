@@ -53,13 +53,16 @@ public class TestAmapClient {
         System.out.println(JSON.toJSONString(result));
     }
 
+/*
     @Test
     public void testGetLocation4() {
         Result<AmapLocation<AmapCross>> result = amapClient.getLocationWithJavaObject2(new Coordinate("121.475078", "31.223577"));
         assertNotNull(result);
         System.out.println(JSON.toJSONString(result));
     }
+*/
 
+/*
     @Test
     public void testGetLocation5() {
         ForestResponse<Result<AmapLocation<AmapLocation.AmapCross>>> response =
@@ -77,6 +80,7 @@ public class TestAmapClient {
         assertTrue(crossList.get(0) instanceof AmapLocation.AmapCross);
         System.out.println(JSON.toJSONString(result));
     }
+*/
 
     @Test
     public void testGetLocation6() {

@@ -24,7 +24,7 @@
 
 package com.dtflys.forest.annotation;
 
-import com.dtflys.forest.lifecycles.parameter.DataVariableLifeCycle;
+import com.dtflys.forest.lifecycles.parameter.VariableLifeCycle;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -34,6 +34,7 @@ import java.lang.annotation.Target;
 
 /**
  * 变量定义注解
+ * 不再建议使用此注解，变量定义请使用 <code>com.dtflys.forest.annotation.Var</code>
  * <p>该注解只能修饰方法参数，被修饰的参数表示为一个可被模板字符串引用的变量，不会直接通过请求传输到服务端。</p>
  * 通过该注解定义变量的方式如下：<br><br>
  *
@@ -50,7 +51,7 @@ import java.lang.annotation.Target;
  * @since 2016-05-24
  */
 @Documented
-@ParamLifeCycle(DataVariableLifeCycle.class)
+@ParamLifeCycle(VariableLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = ElementType.PARAMETER)
 public @interface DataVariable {

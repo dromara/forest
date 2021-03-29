@@ -3,6 +3,7 @@ package com.dtflys.test.interceptor;
 import com.dtflys.forest.annotation.BaseRequest;
 import com.dtflys.forest.annotation.DataVariable;
 import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.annotation.Var;
 import com.dtflys.forest.extensions.BasicAuth;
 
 /**
@@ -17,13 +18,13 @@ public interface BaseAuthClient {
             url = "/hello/user?username=${username}",
             headers = {"Accept:text/plain"}
     )
-    String send(@DataVariable("username") String username);
+    String send(@Var("username") String username);
 
     @Request(
             url = "/hello/user?username=foo",
             headers = {"Accept:text/plain"}
     )
-    String send2(@DataVariable("username") String username);
+    String send2(@Var("username") String username);
 
 
 }

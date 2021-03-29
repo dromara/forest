@@ -7,7 +7,6 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
-import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.InputStream;

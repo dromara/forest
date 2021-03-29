@@ -54,6 +54,7 @@ public class TestBaseAuthClient extends BaseClientTest {
         result = baseAuthClient.send2("foo");
         assertNotNull(result);
         assertEquals(BasicAuthGetMockServer.EXPECTED, result);
+
     }
 
 }

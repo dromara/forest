@@ -10,6 +10,7 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.model.JsonTestUser;
 import com.dtflys.test.interceptor.AddQueryInterceptor;
 import com.dtflys.test.interceptor.ErrorInterceptor;
+import com.dtflys.test.model.Result;
 import com.dtflys.test.model.TestResult;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -243,7 +244,7 @@ public interface GetClient {
             url = "http://localhost:${port}/hello/user",
             headers = {"Accept:text/plain"}
     )
-    String annObjectGet(@DataObject Map<String, Object> user);
+    String annObjectGet(@Query Map<String, Object> user);
 
 
 
