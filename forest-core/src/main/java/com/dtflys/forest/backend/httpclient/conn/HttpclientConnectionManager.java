@@ -140,7 +140,6 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
         configBuilder.setStaleConnectionCheckEnabled(true);
         // 设置Cookie策略
         configBuilder.setCookieSpec(CookieSpecs.STANDARD);
-        RequestConfig requestConfig = configBuilder.build();
 
         ForestProxy forestProxy = request.getProxy();
         if (forestProxy != null) {
@@ -163,6 +162,7 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
         }
 
 
+        RequestConfig requestConfig = configBuilder.build();
         HttpClient httpClient = builder
                 .setDefaultRequestConfig(requestConfig)
                 .build();
