@@ -102,9 +102,6 @@ public class ContentType {
         return "javascript".equals(subType);
     }
 
-    public boolean isBinary() {
-        return isMultipart() || isOctetStream();
-    }
 
     public boolean isOctetStream() {
         if (subType == null) {
@@ -128,7 +125,7 @@ public class ContentType {
     }
 
     public boolean isBinary() {
-        return isStream() || isImage() || isZip();
+        return isMultipart() || isStream() || isImage() || isZip();
     }
 
     public boolean isTorrent() {
