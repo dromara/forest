@@ -1,2 +1,5 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.dtflys.forest.springboot.ForestAutoConfiguration
+# ConverterBeanListener
+org.springframework.context.ApplicationListener=\
+  com.dtflys.forest.listener.ConverterBeanListener

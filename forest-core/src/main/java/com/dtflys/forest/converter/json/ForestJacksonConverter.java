@@ -26,6 +26,7 @@ package com.dtflys.forest.converter.json;
 
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestConvertException;
+import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
@@ -136,5 +137,10 @@ public class ForestJacksonConverter implements ForestJsonConverter {
 
         JavaType javaType = mapper.getTypeFactory().constructMapType(LinkedHashMap.class, String.class, Object.class);
         return mapper.convertValue(obj, javaType);
+    }
+
+    @Override
+    public ForestDataType getDateType() {
+        return ForestDataType.JSON;
     }
 }

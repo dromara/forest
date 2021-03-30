@@ -36,6 +36,7 @@ import com.alibaba.fastjson.util.TypeUtils;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.lang.reflect.Array;
@@ -316,4 +317,8 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         return (Map<String, Object>) jsonObj;
     }
 
+    @Override
+    public ForestDataType getDateType() {
+        return ForestDataType.JSON;
+    }
 }

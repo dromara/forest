@@ -26,6 +26,7 @@ package com.dtflys.forest.converter.json;
 
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestConvertException;
+import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 import com.google.gson.*;
 
@@ -89,7 +90,6 @@ public class ForestGsonConverter implements ForestJsonConverter {
             throw new ForestConvertException("json", ex);
         }
     }
-
 
     private static Map<String, Object> toMap(JsonObject json, boolean singleLevel){
         Map<String, Object> map = new HashMap<String, Object>();
@@ -221,6 +221,11 @@ public class ForestGsonConverter implements ForestJsonConverter {
     public String convertToJson(Object obj, Type type) {
         Gson gson = createGson();
         return gson.toJson(obj, type);
+    }
+
+    @Override
+    public ForestDataType getDateType() {
+        return ForestDataType.JSON;
     }
 
 }
