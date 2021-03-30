@@ -132,4 +132,9 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
         return result;
     }
 
+    @Override
+    public ForestDataType getDateType() {
+        return ForestDataType.AUTO;
+    }
+
 }

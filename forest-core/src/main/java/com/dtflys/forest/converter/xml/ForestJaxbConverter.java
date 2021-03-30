@@ -2,6 +2,7 @@ package com.dtflys.forest.converter.xml;
 
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
 
@@ -87,7 +88,9 @@ public class ForestJaxbConverter implements ForestXmlConverter {
         }
     }
 
-
-
+    @Override
+    public ForestDataType getDateType() {
+        return ForestDataType.XML;
+    }
 
 }
