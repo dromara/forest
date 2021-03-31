@@ -7,14 +7,13 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * @author caihongming
- * @version v1.0
  * @since 2021-03-30
  **/
 @Configuration
-public class Config {
+public class ConverterTestConfiguration {
 
     @Bean
-    public ForestConverter forestGsonConverter(){
+    public ForestConverter forestGsonConverter() {
         return new ForestGsonConverter();
     }
 }

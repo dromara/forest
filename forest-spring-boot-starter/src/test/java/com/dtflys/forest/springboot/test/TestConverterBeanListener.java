@@ -3,7 +3,7 @@ package com.dtflys.forest.springboot.test;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.json.ForestGsonConverter;
-import com.dtflys.forest.springboot.test.converter.Config;
+import com.dtflys.forest.springboot.test.converter.ConverterTestConfiguration;
 import com.dtflys.forest.utils.ForestDataType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,13 +19,12 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * @author caihongming
- * @version v1.0
  * @since 2021-03-30
  **/
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestConverterBeanListener.class)
-@ComponentScan(basePackageClasses = Config.class)
-@EnableAutoConfiguration(exclude = GsonAutoConfiguration.class)
+@ComponentScan(basePackageClasses = ConverterTestConfiguration.class)
+@EnableAutoConfiguration
 public class TestConverterBeanListener {
 
     @Resource
