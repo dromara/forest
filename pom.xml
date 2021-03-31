@@ -36,7 +36,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<spring-boot.version>1.5.1.RELEASE</spring-boot.version>
+		<spring-boot.version>2.2.5.RELEASE</spring-boot.version>
 		<slf4j.version>1.7.10</slf4j.version>
 		<log4j.version>2.4.1</log4j.version>
 		<okhttp.version>3.14.9</okhttp.version>

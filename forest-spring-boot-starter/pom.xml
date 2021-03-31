@@ -14,9 +14,6 @@
         <version>1.5.1-BETA</version>
     </parent>
 
-    <properties>
-        <springboot.version>2.2.5.RELEASE</springboot.version>
-    </properties>
 
     <dependencyManagement>
         <dependencies>
@@ -24,7 +21,7 @@
                 <!-- Import dependency management from Spring Boot -->
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>${springboot.version}</version>
+                <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
