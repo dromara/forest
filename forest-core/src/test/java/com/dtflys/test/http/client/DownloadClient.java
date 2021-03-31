@@ -19,7 +19,7 @@ public interface DownloadClient {
     File downloadImage(@Var("dir") String dir, @Var("filename") String filename, OnProgress onProgress);
 
 
-    @Get("http://forspeed.onlinedown.net/down/QQliveSetup_20_731.exe")
+    @Get(value = "http://forspeed.onlinedown.net/down/QQliveSetup_20_731.exe", progressStep = 100)
     @DownloadFile(dir = "${dir}")
     ForestResponse<File> downloadFile(@Var("dir") String dir, OnProgress onProgress);
 
