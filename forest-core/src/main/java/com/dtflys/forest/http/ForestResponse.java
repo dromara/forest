@@ -177,7 +177,11 @@ public abstract class ForestResponse<T> {
             if (StringUtils.isNotEmpty(dispositionValue)) {
                 String[] disGroup = dispositionValue.split(";");
                 for (int i = disGroup.length - 1; i >= 0 ; i--) {
-                    String disStr = disGroup[i];
+                    /**
+                     * content-disposition: attachment; filename="50db602db30cf6df60698510003d2415.jpg"
+                     * need replace trim
+                     */
+                    String disStr = StringUtils.trimBegin(disGroup[i]);
                     if (disStr.startsWith("filename=")) {
                         return disStr.substring("filename=".length());
                     }
