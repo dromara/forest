@@ -7,6 +7,7 @@ import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.ForestLogger;
 import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.forest.springboot.annotation.ForestScan;
+import com.dtflys.forest.springboot.test.client0.DisturbInterface;
 import com.dtflys.forest.springboot.test.moudle.TestUser;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.springboot.test.client0.BeastshopClient;
@@ -38,11 +39,20 @@ public class Test0 {
     @Resource
     private BeastshopClient beastshopClient;
 
+    @Autowired(required = false)
+    private DisturbInterface disturbInterface;
+
+
     @Autowired
     private TestServiceImpl testService;
 
     @Resource(name = "config0")
     private ForestConfiguration config0;
+
+    @Test
+    public void testScanFilter() {
+        assertNull(disturbInterface);
+    }
 
     @Test
     public void testConfiguration() {

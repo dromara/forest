@@ -1,7 +1,6 @@
 package com.dtflys.forest.springboot.test.client0;
 
 
-import com.dtflys.forest.annotation.Body;
 import com.dtflys.forest.annotation.DataParam;
 import com.dtflys.forest.annotation.Post;
 import com.dtflys.forest.annotation.Query;
