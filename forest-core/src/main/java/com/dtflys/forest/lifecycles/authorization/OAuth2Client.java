@@ -24,7 +24,7 @@ public interface OAuth2Client {
      * @return 返回json信息 {@link OAuth2Token}类实例
      */
     @PostRequest(url = "${tokenUri}")
-    ForestResponse token(@DataVariable("tokenUri") String tokenUri,
+    ForestResponse<String> token(@DataVariable("tokenUri") String tokenUri,
                  @Query Map<String, Object> query,
                  @Body Map<String, Object> body);
 }

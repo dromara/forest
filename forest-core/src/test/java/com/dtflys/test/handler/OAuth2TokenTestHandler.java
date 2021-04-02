@@ -15,7 +15,7 @@ import java.util.Map;
 public class OAuth2TokenTestHandler implements OAuth2DefinitionHandler {
 
     @Override
-    public OAuth2Token getOAuth2Token(ForestResponse response, Map map) {
+    public OAuth2Token getOAuth2Token(ForestResponse<String> response, Map map) {
         OAuth2Token oAuth2Token = new OAuth2Token();
         oAuth2Token.setAccess_token((String) map.get("token"));
         return oAuth2Token;

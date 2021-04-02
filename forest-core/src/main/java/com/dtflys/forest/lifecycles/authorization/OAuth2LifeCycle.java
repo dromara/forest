@@ -210,13 +210,12 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
 
         Map<String, Object> queryItems = kv2map((String[]) getAttribute(request, "query"));
         Class<? extends OAuth2DefinitionHandler> handlerClass = request.getMethod().getMethod().getAnnotation(OAuth2.class).OAuth2TokenHandler();
-        ForestResponse response = oAuth2Client.token(getAttributeAsString(request, "tokenUri"), queryItems, body);
+        ForestResponse<String> response = oAuth2Client.token(getAttributeAsString(request, "tokenUri"), queryItems, body);
         OAuth2Token token;
         try {
             OAuth2DefinitionHandler handler = handlerClass.newInstance();
             ForestConfiguration configuration = request.getConfiguration();
-            Map map = (Map) configuration.getConverter(ForestDataType.AUTO)
-                    .convertToJavaObject(response.getContent(), Map.class);
+            Map map = (Map) configuration.getConverter(ForestDataType.AUTO).convertToJavaObject(response.getContent(), Map.class);
             token = handler.getOAuth2Token(response, map);
         } catch (InstantiationException | IllegalAccessException e) {
             throw new ForestRuntimeException("OAuth2 request OAuth2DefinitionHandler error" + e.getMessage());
