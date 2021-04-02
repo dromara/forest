@@ -28,12 +28,11 @@ public class GetTokenMockServer extends MockServerRule {
                 request()
                         .withPath("/token")
                         .withMethod("GET")
-                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plain"))
         )
         .respond(
                 response()
                         .withStatusCode(200)
-                        .withBody(EXPECTED)
+                        .withBody(EXPECTED.getBytes())
         );
 
     }
