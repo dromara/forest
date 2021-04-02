@@ -1,14 +1,15 @@
 package com.dtflys.forest.lifecycles.authorization;
 
-import com.dtflys.forest.converter.json.ForestJsonConverter;
+import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.extensions.OAuth2;
 import com.dtflys.forest.handler.OAuth2DefinitionHandler;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.reflection.ForestMethod;
+import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
-import org.omg.CORBA.DefinitionKind;
 
 import javax.annotation.Nonnull;
 import java.time.Duration;
@@ -208,14 +209,15 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
         body.putAll(kv2map(bodyItems));
 
         Map<String, Object> queryItems = kv2map((String[]) getAttribute(request, "query"));
-        Class<? extends OAuth2DefinitionHandler> aClass = request.getMethod().getMethod().getAnnotation(OAuth2.class).OAuth2TokenHandler();
-        Object tokenInfo = oAuth2Client.token(getAttributeAsString(request, "tokenUri"), queryItems, body);
+        Class<? extends OAuth2DefinitionHandler> handlerClass = request.getMethod().getMethod().getAnnotation(OAuth2.class).OAuth2TokenHandler();
+        ForestResponse response = oAuth2Client.token(getAttributeAsString(request, "tokenUri"), queryItems, body);
         OAuth2Token token;
         try {
-            OAuth2DefinitionHandler handler = aClass.newInstance();
-            ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
-            Object o = jsonConverter.convertToJavaObject(jsonConverter.encodeToString(tokenInfo), handler.supportJavaTypeKey());
-            token = handler.handle(o);
+            OAuth2DefinitionHandler handler = handlerClass.newInstance();
+            ForestConfiguration configuration = request.getConfiguration();
+            Map map = (Map) configuration.getConverter(ForestDataType.AUTO)
+                    .convertToJavaObject(response.getContent(), Map.class);
+            token = handler.getOAuth2Token(request, response, map);
         } catch (InstantiationException | IllegalAccessException e) {
             throw new ForestRuntimeException("OAuth2 request OAuth2DefinitionHandler error" + e.getMessage());
         }

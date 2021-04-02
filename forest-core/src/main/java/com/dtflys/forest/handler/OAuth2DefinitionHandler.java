@@ -1,6 +1,10 @@
 package com.dtflys.forest.handler;
 
+import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.lifecycles.authorization.OAuth2Token;
+
+import java.util.Map;
 
 /**
  * 自定义OAuth2响应
@@ -8,20 +12,15 @@ import com.dtflys.forest.lifecycles.authorization.OAuth2Token;
  * @author YAKAX
  * @since 2021-04-02 18:22
  **/
-public interface OAuth2DefinitionHandler<T> {
+public interface OAuth2DefinitionHandler {
 
     /**
      * 处理认证响应实体
      *
-     * @param object 实体
-     * @return forest 认证实体
+     * @param response forest请求返回包装信息
+     * @param request  forest请求信息
+     * @param map      用户OAUTH2返回信息 map
+     * @return token对象
      */
-    OAuth2Token handle(T object);
-
-    /**
-     * 返回类型
-     *
-     * @return class
-     */
-    Class supportJavaTypeKey();
+    OAuth2Token getOAuth2Token(ForestRequest request, ForestResponse response, Map map);
 }
