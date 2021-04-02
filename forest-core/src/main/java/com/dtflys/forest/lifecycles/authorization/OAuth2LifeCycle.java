@@ -217,7 +217,7 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
             ForestConfiguration configuration = request.getConfiguration();
             Map map = (Map) configuration.getConverter(ForestDataType.AUTO)
                     .convertToJavaObject(response.getContent(), Map.class);
-            token = handler.getOAuth2Token(request, response, map);
+            token = handler.getOAuth2Token(response, map);
         } catch (InstantiationException | IllegalAccessException e) {
             throw new ForestRuntimeException("OAuth2 request OAuth2DefinitionHandler error" + e.getMessage());
         }
