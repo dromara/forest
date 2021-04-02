@@ -17,4 +17,11 @@ public interface OAuth2DefinitionHandler<T> {
      * @return forest 认证实体
      */
     OAuth2Token handle(T object);
+
+    /**
+     * 返回类型
+     *
+     * @return class
+     */
+    Class supportJavaTypeKey();
 }

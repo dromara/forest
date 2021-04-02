@@ -17,5 +17,10 @@ public class OAuth2TokenTestHandler implements OAuth2DefinitionHandler<Definitio
         return token;
     }
 
+    @Override
+    public Class supportJavaTypeKey() {
+        return DefinitionInfo.class;
+    }
+
 
 }
