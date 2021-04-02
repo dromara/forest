@@ -1,6 +1,5 @@
 package com.dtflys.forest.handler;
 
-import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.lifecycles.authorization.OAuth2Token;
 
@@ -18,9 +17,8 @@ public interface OAuth2DefinitionHandler {
      * 处理认证响应实体
      *
      * @param response forest请求返回包装信息
-     * @param request  forest请求信息
      * @param map      用户OAUTH2返回信息 map
      * @return token对象
      */
-    OAuth2Token getOAuth2Token(ForestRequest request, ForestResponse response, Map map);
+    OAuth2Token getOAuth2Token(ForestResponse response, Map map);
 }
