@@ -20,5 +20,5 @@ public interface OAuth2DefinitionHandler {
      * @param map      用户OAUTH2返回信息 map
      * @return token对象
      */
-    OAuth2Token getOAuth2Token(ForestResponse response, Map map);
+    OAuth2Token getOAuth2Token(ForestResponse<String> response, Map map);
 }

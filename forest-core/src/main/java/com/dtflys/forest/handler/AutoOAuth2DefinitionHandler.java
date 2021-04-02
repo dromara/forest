@@ -17,7 +17,7 @@ import java.util.Map;
 public class AutoOAuth2DefinitionHandler implements OAuth2DefinitionHandler {
 
     @Override
-    public OAuth2Token getOAuth2Token(ForestResponse response, Map map) {
+    public OAuth2Token getOAuth2Token(ForestResponse<String> response, Map map) {
         ForestConverter converter = response.getRequest().getConfiguration().getConverter(ForestDataType.AUTO);
         return (OAuth2Token) converter.convertToJavaObject(response.getContent(), OAuth2Token.class);
     }
