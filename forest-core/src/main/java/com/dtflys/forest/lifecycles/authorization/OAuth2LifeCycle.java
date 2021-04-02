@@ -2,6 +2,7 @@ package com.dtflys.forest.lifecycles.authorization;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.extensions.OAuth2;
+import com.dtflys.forest.handler.OAuth2DefinitionHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.reflection.ForestMethod;
@@ -205,8 +206,18 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
         body.putAll(kv2map(bodyItems));
 
         Map<String, Object> queryItems = kv2map((String[]) getAttribute(request, "query"));
-
-        OAuth2Token token = oAuth2Client.token(getAttributeAsString(request, "tokenUri"), queryItems, body);
+        Class<? extends OAuth2DefinitionHandler> aClass = request.getMethod().getMethod().getAnnotation(OAuth2.class).OAuth2TokenHandler();
+        Object tokenInfo = oAuth2Client.token(getAttributeAsString(request, "tokenUri"), queryItems, body);
+        OAuth2Token token;
+        try {
+            OAuth2DefinitionHandler handler = aClass.newInstance();
+            token = handler.handle(tokenInfo);
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new ForestRuntimeException("OAuth2 request OAuth2DefinitionHandler error" + e.getMessage());
+        }
+        if (token == null) {
+            throw new ForestRuntimeException("OAuth2 request OAuth2Token is empty");
+        }
         return new TokenCache(clientId, token);
     }
 
