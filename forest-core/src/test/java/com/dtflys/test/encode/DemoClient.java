@@ -12,7 +12,7 @@ import com.dtflys.forest.http.ForestResponse;
         baseURL = "${baseUrl}",
         headers = {"Accept: */*"
                 , "Content-Type: application/json; charset=UTF-8"
-                , "Accept-Language: zh-CN,zh;q=0.8"
+                , "Accept-Language: zh-CN,zh;q=0.8", "Accept-Encoding: gzip, deflate"
                 , "Cache-Control: no-cache"}
 )
 public interface DemoClient {

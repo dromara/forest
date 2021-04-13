@@ -41,13 +41,16 @@ public class OkHttp3ForestResponse extends ForestResponse {
             return;
         }
         String contentEncoding = okResponse.headers().get("Content-Encoding");
-        //this is used to decompress gzipped responses
-        if (contentEncoding != null && contentEncoding.equals("gzip")) {
-            GzipSource responseBody = new GzipSource(okResponse.body().source());
-            Headers strippedHeaders = okResponse.headers().newBuilder().build();
-            okResponse = okResponse.newBuilder().headers(strippedHeaders)
-                    .body(new RealResponseBody(okResponse.body().contentType().toString(), -1L, Okio.buffer(responseBody)))
-                    .build();
+        // 如果手动添加Accept-Encoding = gzip。则需要手动处理gzip
+        if ("gzip".equals(contentEncoding)) {
+            if(okResponse.body() != null){
+                String contentType = okResponse.header("Content-Type");
+                GzipSource responseBody = new GzipSource(okResponse.body().source());
+                Headers strippedHeaders = okResponse.headers().newBuilder().build();
+                okResponse = okResponse.newBuilder().headers(strippedHeaders)
+                        .body(new RealResponseBody(contentType, -1L, Okio.buffer(responseBody)))
+                        .build();
+            }
         }
         this.body = okResponse.body();
         this.statusCode = okResponse.code();
