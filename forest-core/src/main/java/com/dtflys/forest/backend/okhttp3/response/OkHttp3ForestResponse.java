@@ -9,6 +9,9 @@ import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okhttp3.internal.http.RealResponseBody;
+import okio.GzipSource;
+import okio.Okio;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -36,6 +39,15 @@ public class OkHttp3ForestResponse extends ForestResponse {
             this.body = null;
             this.statusCode = 404;
             return;
+        }
+        String contentEncoding = okResponse.headers().get("Content-Encoding");
+        //this is used to decompress gzipped responses
+        if (contentEncoding != null && contentEncoding.equals("gzip")) {
+            GzipSource responseBody = new GzipSource(okResponse.body().source());
+            Headers strippedHeaders = okResponse.headers().newBuilder().build();
+            okResponse = okResponse.newBuilder().headers(strippedHeaders)
+                    .body(new RealResponseBody(okResponse.body().contentType().toString(), -1L, Okio.buffer(responseBody)))
+                    .build();
         }
         this.body = okResponse.body();
         this.statusCode = okResponse.code();
