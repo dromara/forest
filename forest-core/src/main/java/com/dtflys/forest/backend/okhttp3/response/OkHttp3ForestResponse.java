@@ -37,7 +37,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
         this.okResponse = okResponse;
         if (okResponse == null) {
             this.body = null;
-            this.statusCode = 404;
+            this.statusCode = null;
             return;
         }
         String contentEncoding = okResponse.headers().get("Content-Encoding");
