@@ -91,7 +91,6 @@ public class TestSSLClient extends BaseClientTest {
     }
 
 
-/*
     @Test
     public void truestAllGet() {
         sslClient.truestAllGet();
@@ -100,7 +99,6 @@ public class TestSSLClient extends BaseClientTest {
         assertNotNull(result);
         assertEquals(EXPECTED, result);
     }
-*/
 
     @Test
     public void truestSSLGet() {
