@@ -270,6 +270,9 @@ public abstract class ForestResponse<T> {
      * @return 请求响应的状态码
      */
     public int getStatusCode() {
+        if (statusCode == null) {
+            return -1;
+        }
         return statusCode;
     }
 
