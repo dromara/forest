@@ -29,14 +29,14 @@ public class Get2MockServer extends MockServerRule {
                         .withPath("/hello/user")
                         .withMethod("GET")
                         .withHeader(new Header(HttpHeaders.ACCEPT, "text/plain"))
-                        .withQueryStringParameter("username",  "foo")
-                        .withQueryStringParameter("password",  "bar")
+                        .withQueryStringParameter("username", "foo")
+                        .withQueryStringParameter("password", "bar")
         )
-        .respond(
-                response()
-                        .withStatusCode(200)
-                        .withBody(EXPECTED)
-        );
+                .respond(
+                        response()
+                                .withStatusCode(200)
+                                .withBody(EXPECTED)
+                );
 
         mockClient.when(
                 request()
@@ -50,7 +50,6 @@ public class Get2MockServer extends MockServerRule {
                 );
 
 
-
         mockClient.when(
                 request()
                         .withPath("/boolean/false")
@@ -60,6 +59,18 @@ public class Get2MockServer extends MockServerRule {
                         response()
                                 .withStatusCode(200)
                                 .withBody("false")
+                );
+
+        mockClient.when(
+                request()
+                        .withPath("/gzip")
+                        .withMethod("GET")
+        )
+                .respond(
+                        response()
+                                .withHeader(new Header(HttpHeaders.CONTENT_TYPE, "application/json; charset=utf-8"))
+                                .withStatusCode(200)
+                                .withBody("测试gzip数据")
                 );
 
     }
