@@ -75,7 +75,7 @@ import static com.dtflys.forest.mapping.MappingParameter.*;
 public class ForestRequest<T> {
 
     /**
- * 默认上传/下载进度监听的步长
+     * 默认上传/下载进度监听的步长
      * 每上传/下载一定的比特数，执行一次监听回调函数
      */
     private final static long DEFAULT_PROGRESS_STEP = 1024 * 10;
@@ -168,6 +168,11 @@ public class ForestRequest<T> {
      * 请求超时时间
      */
     private int timeout = 3000;
+
+    /**
+     * 是否开启解压GZIP响应内容
+     */
+    private boolean decompressResponseGzipEnabled = false;
 
     /**
      * SSL协议
@@ -865,6 +870,24 @@ public class ForestRequest<T> {
      */
     public ForestRequest setTimeout(int timeout) {
         this.timeout = timeout;
+        return this;
+    }
+
+    /**
+     * 是否开启解压GZIP响应内容
+     * @return {@code true}为开启，否则不开启
+     */
+    public boolean isDecompressResponseGzipEnabled() {
+        return decompressResponseGzipEnabled;
+    }
+
+    /**
+     * 设置是否开启解压GZIP响应内容
+     * @param decompressResponseGzipEnabled {@code true}为开启，否则不开启
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest setDecompressResponseGzipEnabled(boolean decompressResponseGzipEnabled) {
+        this.decompressResponseGzipEnabled = decompressResponseGzipEnabled;
         return this;
     }
 

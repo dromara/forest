@@ -4,6 +4,7 @@ import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.utils.GzipUtils;
 import com.dtflys.forest.utils.StringUtils;
 import okhttp3.Headers;
 import okhttp3.MediaType;
@@ -40,17 +41,11 @@ public class OkHttp3ForestResponse extends ForestResponse {
             this.statusCode = null;
             return;
         }
-        String contentEncoding = okResponse.headers().get("Content-Encoding");
+        contentEncoding = okResponse.headers().get("Content-Encoding");
         // 如果手动添加Accept-Encoding = gzip。则需要手动处理gzip
-        if ("gzip".equals(contentEncoding)) {
-            if(okResponse.body() != null){
-                String contentType = okResponse.header("Content-Type");
-                GzipSource responseBody = new GzipSource(okResponse.body().source());
-                Headers strippedHeaders = okResponse.headers().newBuilder().build();
-                okResponse = okResponse.newBuilder().headers(strippedHeaders)
-                        .body(new RealResponseBody(contentType, -1L, Okio.buffer(responseBody)))
-                        .build();
-            }
+        if (contentEncoding != null) {
+            String[] encodes = contentEncoding.split(",");
+            isGzip = GzipUtils.isGzip(contentEncoding);
         }
         this.body = okResponse.body();
         this.statusCode = okResponse.code();

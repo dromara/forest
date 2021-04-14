@@ -4,18 +4,22 @@ import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.utils.GzipUtils;
 import com.dtflys.forest.utils.StringUtils;
+import okhttp3.MediaType;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HeaderIterator;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.entity.GzipDecompressingEntity;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Date;
+import java.util.zip.ZipException;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -44,15 +48,24 @@ public class HttpclientForestResponse extends ForestResponse {
                 }
                 this.contentLength = entity.getContentLength();
                 Header encoding = entity.getContentEncoding();
+                if (encoding != null) {
+                    isGzip = GzipUtils.isGzip(encoding.getValue());
+                }
+
                 if (contentType != null) {
                     this.contentEncoding = this.contentType.getCharset();
-                } else if (encoding != null) {
-                    this.contentEncoding = encoding.getValue();
-                    Charset charset = Charset.forName(this.contentEncoding);
-                    if (charset == null || !charset.name().equals(this.contentEncoding)) {
-                        this.contentEncoding = null;
+                }
+                if (this.contentEncoding == null && encoding != null) {
+                    if (isGzip) {
+                        this.contentEncoding = "UTF-8";
+                    } else {
+                        Charset charset = Charset.forName(this.contentEncoding);
+                        if (charset == null || !charset.name().equals(this.contentEncoding)) {
+                            this.contentEncoding = null;
+                        }
                     }
-                } this.content = buildContent();
+                }
+                this.content = buildContent();
             }
         } else {
             this.statusCode = -1;
@@ -86,7 +99,7 @@ public class HttpclientForestResponse extends ForestResponse {
                 content = readContentAsString();
             } else if (!request.isDownloadFile() && contentType.canReadAsString()) {
                 content = readContentAsString();
-            } else if (contentType.canReadAsBinaryStream()) {
+           } else if (contentType.canReadAsBinaryStream()) {
                 StringBuilder builder = new StringBuilder();
                 builder.append("[content-type: ")
                         .append(contentType);

@@ -28,6 +28,7 @@ package com.dtflys.forest.http;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.ByteEncodeUtils;
+import com.dtflys.forest.utils.GzipUtils;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -36,6 +37,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Forest请求响应类
@@ -59,6 +61,11 @@ public abstract class ForestResponse<T> {
      * 响应接受时间
      */
     protected Date responseTime;
+
+    /**
+     * 是否为Gzip压缩
+     */
+    protected boolean isGzip = false;
 
     /**
      * 是否已经打印过响应日志
@@ -432,10 +439,18 @@ public abstract class ForestResponse<T> {
             // Content-Encoding为空的情况下，自动判断字符编码
             encode = ByteEncodeUtils.getCharsetName(bytes);
         }
-        if (encode.toUpperCase().startsWith("GB")) {
+        if (isGzip) {
+            try {
+                return GzipUtils.decompressGzipToString(bytes, encode);
+            } catch (Throwable th) {
+                isGzip = false;
+            }
+        }
+        if ("GB".equalsIgnoreCase(encode)) {
             // 返回的GB中文编码会有多种编码类型，这里统一使用GBK编码
             encode = "GBK";
         }
+
         return IOUtils.toString(bytes, encode);
     }
 }

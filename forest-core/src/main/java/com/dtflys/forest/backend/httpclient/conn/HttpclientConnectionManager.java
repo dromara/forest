@@ -27,6 +27,7 @@ import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.impl.auth.*;
 import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.DecompressingHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
@@ -165,8 +166,8 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
         RequestConfig requestConfig = configBuilder.build();
         HttpClient httpClient = builder
                 .setDefaultRequestConfig(requestConfig)
+                .disableContentCompression()
                 .build();
-
         return httpClient;
     }
 

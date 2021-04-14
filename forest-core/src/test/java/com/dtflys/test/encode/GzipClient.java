@@ -15,7 +15,7 @@ import com.dtflys.forest.http.ForestResponse;
                 , "Accept-Language: zh-CN,zh;q=0.8", "Accept-Encoding: gzip, deflate"
                 , "Cache-Control: no-cache"}
 )
-public interface DemoClient {
+public interface GzipClient {
 
     /**
      * 调用接口的公共请求

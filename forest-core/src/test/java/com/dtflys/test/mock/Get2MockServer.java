@@ -1,9 +1,20 @@
 package com.dtflys.test.mock;
 
+import okio.GzipSource;
+import okio.Source;
+import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.http.HttpHeaders;
 import org.mockserver.client.server.MockServerClient;
 import org.mockserver.junit.MockServerRule;
 import org.mockserver.model.Header;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
@@ -23,6 +34,21 @@ public class Get2MockServer extends MockServerRule {
     }
 
     public void initServer() {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        GZIPOutputStream gzipOut = null;
+        String str = "测试gzip数据";
+        try {
+            gzipOut = new GZIPOutputStream(out);
+            gzipOut.write(str.getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                gzipOut.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
         MockServerClient mockClient = new MockServerClient("localhost", port);
         mockClient.when(
                 request()
@@ -69,8 +95,9 @@ public class Get2MockServer extends MockServerRule {
                 .respond(
                         response()
                                 .withHeader(new Header(HttpHeaders.CONTENT_TYPE, "application/json; charset=utf-8"))
+                                .withHeader(new Header(HttpHeaders.CONTENT_ENCODING, "gzip, deflate"))
                                 .withStatusCode(200)
-                                .withBody("测试gzip数据")
+                                .withBody(out.toByteArray())
                 );
 
     }

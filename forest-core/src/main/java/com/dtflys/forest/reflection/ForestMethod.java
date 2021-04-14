@@ -122,6 +122,7 @@ public class ForestMethod<T> implements VariableScope {
     private boolean logResponseContent = false;
     private ForestLogHandler logHandler = null;
     private LogConfiguration logConfiguration = null;
+    private Map<String, Object> extensionParameters = new HashMap<>();
 
     public ForestMethod(InterfaceProxyHandler interfaceProxyHandler, ForestConfiguration configuration, Method method) {
         this.interfaceProxyHandler = interfaceProxyHandler;
@@ -275,6 +276,26 @@ public class ForestMethod<T> implements VariableScope {
         }
 
         return interceptorClass;
+    }
+
+    /**
+     * 设置扩展参数值
+     *
+     * @param name 参数名
+     * @param value 参数值
+     */
+    public void setExtensionParameterValue(String name, Object value) {
+        this.extensionParameters.put(name, value);
+    }
+
+    /**
+     * 获取扩展参数值
+     *
+     * @param name 参数名
+     * @return 参数值
+     */
+    public Object getExtensionParameterValue(String name) {
+        return this.extensionParameters.get(name);
     }
 
     /**
