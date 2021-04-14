@@ -31,6 +31,7 @@ public class BaseErrorInterceptor implements Interceptor {
     @Override
     public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
         response.setResult("Base OnError is OK");
+        throw new RuntimeException("xxxx");
     }
 
     @Override

@@ -1,9 +1,10 @@
 package com.dtflys.test.http.client;
 
-import com.dtflys.forest.annotation.DataVariable;
-import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.annotation.Get;
+import com.dtflys.forest.annotation.Var;
 import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.extensions.DownloadFile;
+import com.dtflys.forest.http.ForestResponse;
 
 import java.io.File;
 
@@ -13,18 +14,21 @@ import java.io.File;
  */
 public interface DownloadClient {
 
-    @Request(url = "https://www.baidu.com/img/PCfb_5bf082d29588c07f842ccde3f97243ea.png")
+    @Get("https://www.baidu.com/img/PCfb_5bf082d29588c07f842ccde3f97243ea.png")
     @DownloadFile(dir = "${dir}", filename = "${filename}")
-    File downloadImage(@DataVariable("dir") String dir, @DataVariable("filename") String filename, OnProgress onProgress);
+    File downloadImage(@Var("dir") String dir, @Var("filename") String filename, OnProgress onProgress);
 
 
-    @Request(url = "http://forspeed.onlinedown.net/down/QQliveSetup_20_731.exe")
+    @Get("http://forspeed.onlinedown.net/down/QQliveSetup_20_731.exe")
     @DownloadFile(dir = "${dir}")
-    File downloadFile(@DataVariable("dir") String dir, OnProgress onProgress);
+    ForestResponse<File> downloadFile(@Var("dir") String dir, OnProgress onProgress);
 
 
-    @Request(url = "http://forspeed.onlinedown.net/down/QQliveSetup_20_731.exe")
-//    @DownloadFile(dir = "${dir}")
-    byte[] downloadFileToBytes(@DataVariable("dir") String dir, OnProgress onProgress);
+    @Get("http://forspeed.onlinedown.net/down/QQliveSetup_20_731.exe")
+    byte[] downloadFileToBytes(OnProgress onProgress);
+
+    @Get("http://localhost:${port}/download/test-img.jpg")
+    @DownloadFile(dir = "${dir}")
+    File downloadImageFile(@Var("dir") String dir);
 
 }

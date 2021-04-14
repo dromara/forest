@@ -54,10 +54,10 @@ public class DefaultBinaryConverter implements ForestConverter<Object> {
                     return (T) FileUtils.openInputStream(file);
                 }
                 if (byte[].class.isAssignableFrom(targetType)) {
-                        return (T) FileUtils.readFileToByteArray(file);
+                    return (T) FileUtils.readFileToByteArray(file);
                 }
                 if (String.class.isAssignableFrom(targetType)) {
-                        return (T) FileUtils.readFileToString(file);
+                    return (T) FileUtils.readFileToString(file);
                 }
             } catch (IOException e) {
                 throw new ForestConvertException("binary", e);
@@ -73,23 +73,10 @@ public class DefaultBinaryConverter implements ForestConverter<Object> {
 
 
     private byte[] inputStreamToByteArray(InputStream in) {
-        byte[] tmp = new byte[4096];
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
-            int len;
-            while((len = in.read(tmp)) != -1) {
-                out.write(tmp, 0, len);
-            }
-            out.flush();
-            return out.toByteArray();
+            return IOUtils.toByteArray(in);
         } catch (IOException e) {
             throw new ForestConvertException("binary", e);
-        } finally {
-            try {
-                in.close();
-            } catch (IOException e) {
-                throw new ForestConvertException("binary", e);
-            }
         }
     }
 

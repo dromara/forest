@@ -143,7 +143,7 @@ public class MappingParameter {
     /**
      * 获取已根据类型已转换的默认值
      * @param converter 转换器，{@link ForestConverter}接口实例
-     * @return
+     * @return 转换结果
      */
     public Object getConvertedDefaultValue(ForestConverter converter) {
         if (StringUtils.isEmpty(defaultValue)) {

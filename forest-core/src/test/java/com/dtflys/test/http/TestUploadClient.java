@@ -4,7 +4,7 @@ import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
-import com.dtflys.forest.http.NameValueRequestBody;
+import com.dtflys.forest.http.body.NameValueRequestBody;
 import com.dtflys.forest.multipart.ByteArrayMultipart;
 import com.dtflys.forest.multipart.FileMultipart;
 import com.dtflys.forest.multipart.FilePathMultipart;

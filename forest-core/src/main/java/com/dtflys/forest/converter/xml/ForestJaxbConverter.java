@@ -2,6 +2,7 @@ package com.dtflys.forest.converter.xml;
 
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
 
 import javax.xml.bind.JAXBContext;
@@ -10,7 +11,6 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.lang.reflect.MalformedParameterizedTypeException;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +60,8 @@ public class ForestJaxbConverter implements ForestXmlConverter {
 
     @Override
     public <T> T convertToJavaObject(String source, Type targetType) {
-        return convertToJavaObject(source, (Class<? extends T>) targetType);
+        Class clazz = ReflectUtils.getClassByType(targetType);
+        return (T) convertToJavaObject(source, clazz);
     }
 
 

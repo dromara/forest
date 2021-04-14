@@ -30,13 +30,21 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * 默认拦截器工厂
+ *
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-15 11:18
  */
 public class DefaultInterceptorFactory implements InterceptorFactory {
 
+    /**
+     * 拦截器实例缓存
+     */
     protected final Map<Class, Interceptor> interceptorMap = new ConcurrentHashMap<>();
 
+    /**
+     * 拦截器调用链
+     */
     protected InterceptorChain interceptorChain = new InterceptorChain();
 
     @Override

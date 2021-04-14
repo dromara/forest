@@ -7,10 +7,13 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.ForestProgress;
 
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
+ * 拦截器调用链
+ *
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-12 18:30
  */
@@ -53,7 +56,7 @@ public class InterceptorChain implements Interceptor {
     @Override
     public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
         Iterator<Interceptor> iter = interceptors.iterator();
-        for (; iter.hasNext(); ) {
+        for ( ; iter.hasNext(); ) {
             Interceptor item = iter.next();
             if (response != null) {
                 data = response.getResult();

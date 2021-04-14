@@ -8,6 +8,8 @@ import com.dtflys.forest.mapping.MappingVariable;
  */
 public interface VariableScope {
 
+    boolean isVariableDefined(String name);
+
     Object getVariableValue(String name);
 
     MappingVariable getVariable(String name);

@@ -1,5 +1,9 @@
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.http.body.NameValueRequestBody;
+import com.dtflys.forest.http.body.ObjectRequestBody;
+import com.dtflys.forest.http.body.StringRequestBody;
+
 /**
  * Forest请求体
  * <p>该类为Forest请求中所有类型请求体项的父类</p>
@@ -21,17 +25,32 @@ public abstract class ForestRequestBody {
         /**
          * 字符串请求体类型
          */
-        STRING,
+        TEXT,
 
         /**
          * 键值对请求体类型
          */
-        NAME_VALUE,
+        FORM_URL_ENCODED,
 
         /**
-         * 对象请求体类型
+         * JSON格式
          */
-        OBJECT,
+        JSON,
+
+        /**
+         * XML格式
+         */
+        XML,
+
+        /**
+         * 文件请求体类型
+         */
+        BINARY,
+
+        /**
+         * 流请求体类型
+         */
+        INPUT_STREAM,
 
         /**
          * 文件类型
@@ -40,26 +59,11 @@ public abstract class ForestRequestBody {
     }
 
     /**
-     * 请求体类型
-     */
-    protected final BodyType type;
-
-    /**
      * 默认值
      */
     private String defaultValue;
 
-    public ForestRequestBody(BodyType type) {
-        this.type = type;
-    }
 
-    /**
-     * 获取请求体类型
-     * @return 请求体类型，{@link BodyType}枚举实例
-     */
-    public BodyType getType() {
-        return type;
-    }
 
     public String getDefaultValue() {
         return defaultValue;
@@ -69,4 +73,6 @@ public abstract class ForestRequestBody {
         this.defaultValue = defaultValue;
         return this;
     }
+
+    public abstract byte[] getByteArray();
 }

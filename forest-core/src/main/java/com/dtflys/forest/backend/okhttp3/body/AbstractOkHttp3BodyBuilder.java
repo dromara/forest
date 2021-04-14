@@ -1,20 +1,22 @@
 package com.dtflys.forest.backend.okhttp3.body;
 
+import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.body.AbstractBodyBuilder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestRequestBody;
+import com.dtflys.forest.http.body.SupportFormUrlEncoded;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
-import com.twitter.util.Throw;
 import okhttp3.*;
-import org.apache.http.entity.ContentType;
 
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -58,9 +60,15 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
 
 
     @Override
-    protected void setFormBody(Request.Builder builder, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList) {
+    protected void setFormBody(Request.Builder builder, ForestRequest request, String charset, String contentType, List<ForestRequestBody> bodyItems) {
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         FormBody.Builder bodyBuilder = new FormBody.Builder();
+        List<RequestNameValue> nameValueList = new LinkedList<>();
+        for (ForestRequestBody bodyItem : bodyItems) {
+            if (bodyItem instanceof SupportFormUrlEncoded) {
+                nameValueList.addAll(((SupportFormUrlEncoded) bodyItem).getNameValueList(request.getConfiguration()));
+            }
+        }
         nameValueList = processFromNameValueList(nameValueList, request.getConfiguration());
         for (int i = 0; i < nameValueList.size(); i++) {
             RequestNameValue nameValue = nameValueList.get(i);
@@ -85,7 +93,9 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
                                LifeCycleHandler lifeCycleHandler) {
         MultipartBody.Builder bodyBuilder = new MultipartBody.Builder();
         MediaType mediaType = MediaType.parse(contentType);
-        bodyBuilder.setType(mediaType);
+        if ("multipart".equals(mediaType.type())) {
+            bodyBuilder.setType(mediaType);
+        }
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         Charset ch = Charset.forName(charset);
         for (int i = 0; i < nameValueList.size(); i++) {
@@ -147,4 +157,20 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
         return wrappedBody;
     }
 
+    @Override
+    protected void setBinaryBody(
+            Request.Builder builder,
+            ForestRequest request,
+            String charset,
+            String contentType,
+            List<RequestNameValue> nameValueList,
+            byte[] bytes,
+            LifeCycleHandler lifeCycleHandler) {
+        if (StringUtils.isBlank(contentType)) {
+            contentType = ContentType.APPLICATION_OCTET_STREAM;
+        }
+        MediaType mediaType = MediaType.parse(contentType);
+        RequestBody body = RequestBody.create(mediaType, bytes);
+        setBody(builder, body);
+    }
 }

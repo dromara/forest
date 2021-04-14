@@ -1,6 +1,8 @@
 package com.dtflys.forest.backend.okhttp3.logging;
 
+import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.httpclient.body.HttpclientMultipartFileBody;
+import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.logging.LogBodyMessage;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -77,7 +79,12 @@ public class OkHttp3LogBodyMessage implements LogBodyMessage {
         if (requestBody == null) {
             return null;
         }
-        if (requestBody instanceof MultipartBody) {
+        MediaType mediaType = requestBody.contentType();
+        if (mediaType == null) {
+            return getLogContentForStringBody(this.requestBody);
+        }
+        ContentType contentType = new ContentType(mediaType.toString());
+        if (contentType.isMultipart()) {
             MultipartBody multipartBody = (MultipartBody) requestBody;
             String boundary = multipartBody.boundary();
             Long contentLength = null;
@@ -99,8 +106,8 @@ public class OkHttp3LogBodyMessage implements LogBodyMessage {
                 List<String> disposition = part.headers().values("Content-Disposition");
                 builder.append("\n             -- [")
                         .append(disposition.get(0));
-                MediaType mediaType = partBody.contentType();
-                if (mediaType == null) {
+                MediaType partMediaType = partBody.contentType();
+                if (partMediaType == null) {
                     builder.append("; content-type=\"")
                             .append(partBody.contentType())
                             .append("\"");
@@ -124,8 +131,13 @@ public class OkHttp3LogBodyMessage implements LogBodyMessage {
             }
 
             return builder.toString();
+        } else if (contentType.isBinary()) {
+            try {
+                return "[Binary length=" + requestBody.contentLength() + "]";
+            } catch (IOException e) {
+                throw new ForestRuntimeException(e);
+            }
         }
-
         return getLogContentForStringBody(this.requestBody);
     }
 }

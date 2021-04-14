@@ -7,9 +7,9 @@ import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
-import com.dtflys.forest.http.NameValueRequestBody;
-import com.dtflys.forest.http.ObjectRequestBody;
-import com.dtflys.forest.http.StringRequestBody;
+import com.dtflys.forest.http.body.NameValueRequestBody;
+import com.dtflys.forest.http.body.ObjectRequestBody;
+import com.dtflys.forest.http.body.StringRequestBody;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.RequestNameValue;
@@ -75,8 +75,8 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
         ContentType mineContentType = new ContentType(mineType);
 
 
-        if (mineContentType.isFormUrlEncoded() && !nameValueList.isEmpty()) {
-            setFormBody(httpRequest, request, charset, contentType, nameValueList);
+        if (mineContentType.isFormUrlEncoded()) {
+            setFormBody(httpRequest, request, charset, contentType, request.getBody());
         }
         else if (mineContentType.isJson()) {
             ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
@@ -162,6 +162,31 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
             List<ForestMultipart> multiparts = request.getMultiparts();
             setFileBody(httpRequest, request, charset, contentType, nameValueList, multiparts, lifeCycleHandler);
         }
+        else if (mineContentType.isBinary()) {
+            List<ForestRequestBody> bodyList = request.getBody();
+            List<ForestMultipart> multiparts = request.getMultiparts();
+            List<byte[]> byteList = new LinkedList<>();
+            int size = 0;
+            for (ForestMultipart multipart : multiparts) {
+                byte[] byteArray = multipart.getBytes();
+                byteList.add(byteArray);
+                size += byteArray.length;
+            }
+            for (ForestRequestBody body : bodyList) {
+                byte[] byteArray = body.getByteArray();
+                byteList.add(byteArray);
+                size += byteArray.length;
+            }
+            byte[] bytes = new byte[size];
+            int pos = 0;
+            for (byte[] bytesItem : byteList) {
+                for (int i = 0; i < bytesItem.length; i++) {
+                    bytes[pos + i] = bytesItem[i];
+                }
+                pos += bytesItem.length;
+            }
+            setBinaryBody(httpRequest, request, charset, contentType, nameValueList, bytes, lifeCycleHandler);
+        }
         else  {
 //            Map<String, Object> map = convertNameValueListToMap(request, nameValueList);
 //            StringBuilder builder = new StringBuilder();
@@ -172,10 +197,12 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
 //            }
             StringBuilder builder = new StringBuilder();
             List bodyList = request.getBody();
-            for (Object bodyItem : bodyList) {
-                builder.append(bodyItem.toString());
+            if (!bodyList.isEmpty()) {
+                for (Object bodyItem : bodyList) {
+                    builder.append(bodyItem.toString());
+                }
+                setStringBody(httpRequest, builder.toString(), charset, contentType, mergeCharset);
             }
-            setStringBody(httpRequest, builder.toString(), charset, contentType, mergeCharset);
         }
     }
 
@@ -317,9 +344,9 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
      * @param request Forest请求对象
      * @param charset 字符集
      * @param contentType 数据类型
-     * @param nameValueList 键值对列表
+     * @param bodyItems 键值对列表
      */
-    protected abstract void setFormBody(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList);
+    protected abstract void setFormBody(T httpReq, ForestRequest request, String charset, String contentType, List<ForestRequestBody> bodyItems);
 
     /**
      * 设置文件请求体
@@ -332,5 +359,24 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
      * @param lifeCycleHandler 生命周期处理器
      */
     protected abstract void setFileBody(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList,  List<ForestMultipart> multiparts, LifeCycleHandler lifeCycleHandler);
+
+    /**
+     * 设置二进制请求体
+     * @param httpReq 后端请求对象
+     * @param request Forest请求对象
+     * @param charset 字符集
+     * @param contentType 数据类型
+     * @param nameValueList 键值对列表
+     * @param bytes 字节数组
+     * @param lifeCycleHandler 生命周期处理器
+     */
+    protected abstract void setBinaryBody(T httpReq,
+                                 ForestRequest request,
+                                 String charset,
+                                 String contentType,
+                                 List<RequestNameValue> nameValueList,
+                                 byte[] bytes,
+                                 LifeCycleHandler lifeCycleHandler);
+
 
 }

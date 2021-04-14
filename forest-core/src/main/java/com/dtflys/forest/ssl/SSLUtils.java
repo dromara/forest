@@ -1,5 +1,6 @@
 package com.dtflys.forest.ssl;
 
+import com.dtflys.forest.utils.StringUtils;
 import org.apache.http.conn.ssl.SSLContextBuilder;
 import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
@@ -38,37 +39,25 @@ public class SSLUtils {
         if (keyStore != null) {
             try {
 
-//                sslContext = SSLContext.getInstance("TLS");
-
-                //密钥库
+                 //密钥库
+                char[] certPassCharArray = certPass.toCharArray();
                 KeyManagerFactory kmf = KeyManagerFactory.getInstance("sunx509");
-                kmf.init(keyStore, certPass.toCharArray());
+                kmf.init(keyStore, certPassCharArray);
 
                 TrustManagerFactory tmf = TrustManagerFactory
                         .getInstance(TrustManagerFactory.getDefaultAlgorithm());
                 tmf.init(keyStore);
 
-//                X509TrustManager defaultTrustManager = (X509TrustManager) tmf
-//                        .getTrustManagers()[0];
-//                SavingTrustManager tm = new SavingTrustManager(defaultTrustManager);
-//                sslContext.init(kmf.getKeyManagers(), new TrustManager[] { tm }, null);
-//                sslContext.init(null, tmf.getTrustManagers(), null);
-
-//                sslContext =
-//                        SSLContexts.custom().useSSL().loadKeyMaterial(keyStore, certPass.toCharArray())
-//                                .loadTrustMaterial(keyStore).build();
-//                sslContext.init(kmf.getKeyManagers(), new TrustManager[] { tm }, null);
-
                 SSLContextBuilder scBuilder = SSLContexts.custom();
-                if (certPass != null) {
-                    sslContext = scBuilder
-                            .loadKeyMaterial(keyStore, certPass.toCharArray())
-                            .build();
-                } else {
-                    sslContext = scBuilder
-                            .loadTrustMaterial(keyStore, new TrustSelfSignedStrategy())
-                            .build();
+                String protocol = request.getSslProtocol();
+                if (StringUtils.isNotEmpty(protocol)) {
+                    scBuilder.useProtocol(protocol);
                 }
+                scBuilder.loadTrustMaterial(keyStore, new TrustSelfSignedStrategy());
+                if (certPass != null) {
+                    scBuilder.loadKeyMaterial(keyStore, certPassCharArray);
+                }
+                sslContext = scBuilder.build();
             } catch (NoSuchAlgorithmException e) {
                 throw new ForestRuntimeException(e);
             } catch (KeyManagementException e) {

@@ -10,12 +10,14 @@ import com.dtflys.forest.springboot.annotation.ForestScan;
 import com.dtflys.forest.springboot.test.moudle.TestUser;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.springboot.test.client0.BeastshopClient;
+import com.dtflys.forest.springboot.test.service.impl.TestServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -28,12 +30,16 @@ import static org.junit.Assert.*;
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test0")
 @SpringBootTest(classes = Test0.class)
+@ComponentScan(basePackages = "com.dtflys.forest.springboot.test.service")
 @ForestScan(basePackages = "com.dtflys.forest.springboot.test.client0")
 @EnableAutoConfiguration
 public class Test0 {
 
-    @Autowired
+    @Resource
     private BeastshopClient beastshopClient;
+
+    @Autowired
+    private TestServiceImpl testService;
 
     @Resource(name = "config0")
     private ForestConfiguration config0;
@@ -72,6 +78,21 @@ public class Test0 {
         assertEquals("foo", name);
         assertEquals("bar", pass);
     }
+
+    @Test
+    public void testServiceClient0() {
+        beastshopClient.shops();
+        ForestResponse<String> response = testService.shops();
+        assertNotNull(response);
+        assertNotNull(response.getResult());
+        ForestRequest request = response.getRequest();
+        assertNotNull(request);
+        String name = request.getHeaderValue("MyName");
+        String pass = request.getHeaderValue("MyPass");
+        assertEquals("foo", name);
+        assertEquals("bar", pass);
+    }
+
 
     @Test
     public void testBug() {
