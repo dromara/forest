@@ -119,7 +119,7 @@ public class ForestMethod<T> implements VariableScope {
     private boolean logRequest = true;
     private boolean logResponseStatus = true;
     private boolean logResponseContent = false;
-    private ForestLogHandler logHandler = new DefaultLogHandler();
+    private ForestLogHandler logHandler = null;
     private LogConfiguration logConfiguration = null;
 
     public ForestMethod(InterfaceProxyHandler interfaceProxyHandler, ForestConfiguration configuration, Method method) {
@@ -459,7 +459,9 @@ public class ForestMethod<T> implements VariableScope {
         if (logHandler == null && configuration.getLogHandler() != null) {
             logHandler = configuration.getLogHandler();
         }
-
+        if (logHandler == null) {
+            logHandler = new DefaultLogHandler();
+        }
 
         logConfiguration = new LogConfiguration();
         logConfiguration.setLogEnabled(logEnabled);
