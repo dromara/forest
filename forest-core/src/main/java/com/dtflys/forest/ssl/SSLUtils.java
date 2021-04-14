@@ -39,16 +39,15 @@ public class SSLUtils {
         if (keyStore != null) {
             try {
 
-
                  //密钥库
+                char[] certPassCharArray = certPass.toCharArray();
                 KeyManagerFactory kmf = KeyManagerFactory.getInstance("sunx509");
-                kmf.init(keyStore, certPass.toCharArray());
+                kmf.init(keyStore, certPassCharArray);
 
                 TrustManagerFactory tmf = TrustManagerFactory
                         .getInstance(TrustManagerFactory.getDefaultAlgorithm());
                 tmf.init(keyStore);
 
-//
                 SSLContextBuilder scBuilder = SSLContexts.custom();
                 String protocol = request.getSslProtocol();
                 if (StringUtils.isNotEmpty(protocol)) {
@@ -56,7 +55,7 @@ public class SSLUtils {
                 }
                 scBuilder.loadTrustMaterial(keyStore, new TrustSelfSignedStrategy());
                 if (certPass != null) {
-                    scBuilder.loadKeyMaterial(keyStore, certPass.toCharArray());
+                    scBuilder.loadKeyMaterial(keyStore, certPassCharArray);
                 }
                 sslContext = scBuilder.build();
             } catch (NoSuchAlgorithmException e) {
