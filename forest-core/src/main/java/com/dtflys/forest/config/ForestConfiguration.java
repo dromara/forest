@@ -121,7 +121,7 @@ public class ForestConfiguration implements Serializable {
     /**
      * 全局的单向HTTPS请求的SSL协议，默认为 TLSv1.2
      */
-    private String sslProtocol = SSLUtils.TLS_1_2;
+    private String sslProtocol;
 
     /**
      * 是否允许打印请求/响应日志
@@ -243,7 +243,7 @@ public class ForestConfiguration implements Serializable {
         configuration.setRetryer(BackOffRetryer.class);
         configuration.setRetryCount(0);
         configuration.setMaxRetryInterval(0);
-        configuration.setSslProtocol(SSLUtils.TLS_1_2);
+//        configuration.setSslProtocol(SSLUtils.TLS_1_2);
         configuration.registerFilter("json", JSONFilter.class);
         configuration.registerFilter("xml", XmlFilter.class);
         configuration.setLogHandler(new DefaultLogHandler());
