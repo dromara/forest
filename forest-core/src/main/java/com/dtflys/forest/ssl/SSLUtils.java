@@ -9,8 +9,6 @@ import com.dtflys.forest.http.ForestRequest;
 
 import javax.net.ssl.*;
 import java.security.*;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -18,7 +16,6 @@ import java.security.cert.X509Certificate;
  */
 public class SSLUtils {
 
-//    public final static String DEFAULT_PROTOCOL = "SSLv3"; // 已弃用
     public final static String SSL_2 = "SSLv2";
     public final static String SSL_3 = "SSLv3";
     public final static String TLS_1_0 = "TLSv1.0";
@@ -81,9 +78,14 @@ public class SSLUtils {
      * @throws KeyManagementException Key管理异常
      */
     public static SSLContext createIgnoreVerifySSL(String sslProtocol) throws NoSuchAlgorithmException, KeyManagementException {
-        SSLContext sc = SSLContext.getInstance(sslProtocol);
-        TrustAllManager trustManager = new TrustAllManager();
-        sc.init(null, new TrustManager[] { trustManager }, null);
+        SSLContext sc;
+        if (StringUtils.isEmpty(sslProtocol)) {
+            sc = SSLContexts.custom().build();
+        } else {
+            sc = SSLContext.getInstance(sslProtocol);
+            TrustAllManager trustManager = new TrustAllManager();
+            sc.init(null, new TrustManager[] { trustManager }, null);
+        }
         return sc;
     }
 
@@ -120,32 +122,5 @@ public class SSLUtils {
             throw new ForestRuntimeException(e);
         }
     }
-
-/*
-    private static class SavingTrustManager implements X509TrustManager {
-
-        private final X509TrustManager tm;
-        private X509Certificate[] chain;
-
-        SavingTrustManager(X509TrustManager tm) {
-            this.tm = tm;
-        }
-
-        public X509Certificate[] getAcceptedIssuers() {
-            throw new UnsupportedOperationException();
-        }
-
-        public void checkClientTrusted(X509Certificate[] chain, String authType)
-                throws CertificateException {
-            throw new UnsupportedOperationException();
-        }
-
-        public void checkServerTrusted(X509Certificate[] chain, String authType)
-                throws CertificateException {
-            this.chain = chain;
-            tm.checkServerTrusted(chain, authType);
-        }
-    }
-*/
 
 }
