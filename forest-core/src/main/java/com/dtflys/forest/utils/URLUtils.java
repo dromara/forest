@@ -2,6 +2,9 @@ package com.dtflys.forest.utils;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-17 16:35
@@ -9,6 +12,10 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 public final class URLUtils {
 
     private URLUtils() {
+    }
+
+    public static boolean isURL(String str) {
+        return hasProtocol(str) || str.startsWith("file:/");
     }
 
     public static boolean hasProtocol(String url) {
@@ -62,5 +69,11 @@ public final class URLUtils {
         return uri;
     }
 
+    public static String urlEncoding(String query, String encode) throws UnsupportedEncodingException {
+        if (isURL(query)) {
+            return query;
+        }
+        return URLEncoder.encode(query, encode);
+    }
 
 }
