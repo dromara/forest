@@ -1,9 +1,7 @@
-package com.dtflys.test.encode;
+package com.dtflys.test.gzip;
 
 import com.dtflys.forest.backend.HttpBackend;
-import com.dtflys.forest.backend.okhttp3.OkHttp3Backend;
 import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.forest.http.ForestHeader;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.BaseClientTest;
 import com.dtflys.test.mock.Get2MockServer;

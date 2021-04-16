@@ -1,4 +1,4 @@
-package com.dtflys.test.encode;
+package com.dtflys.test.gzip;
 
 import com.dtflys.forest.annotation.*;
 import com.dtflys.forest.http.ForestResponse;
