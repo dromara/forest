@@ -81,6 +81,7 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
                 .addPropertyValue("retryCount", forestConfigurationProperties.getRetryCount())
                 .addPropertyValue("maxRetryInterval", forestConfigurationProperties.getMaxRetryInterval())
                 .addPropertyValue("logEnabled", forestConfigurationProperties.isLogEnabled())
+                .addPropertyValue("forestAnnotation", forestConfigurationProperties.isForestAnnotation())
                 .addPropertyValue("logRequest", forestConfigurationProperties.isLogRequest())
                 .addPropertyValue("logResponseStatus", forestConfigurationProperties.isLogResponseStatus())
                 .addPropertyValue("logResponseContent", forestConfigurationProperties.isLogResponseContent())

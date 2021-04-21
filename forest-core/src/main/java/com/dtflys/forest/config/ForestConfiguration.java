@@ -157,6 +157,12 @@ public class ForestConfiguration implements Serializable {
      */
     private boolean cacheEnabled = true;
 
+
+    /**
+     * 是否@Forest註解全局掃描
+     */
+    private boolean forestAnnotation = false;
+
     /**
      * HTTP后端
      */
@@ -246,6 +252,7 @@ public class ForestConfiguration implements Serializable {
         configuration.setRetryer(BackOffRetryer.class);
         configuration.setRetryCount(0);
         configuration.setMaxRetryInterval(0);
+        configuration.setForestAnnotation(false);
 //        configuration.setSslProtocol(SSLUtils.TLS_1_2);
         configuration.registerFilter("json", JSONFilter.class);
         configuration.registerFilter("xml", XmlFilter.class);
@@ -631,6 +638,22 @@ public class ForestConfiguration implements Serializable {
      */
     public void setCacheEnabled(boolean cacheEnabled) {
         this.cacheEnabled = cacheEnabled;
+    }
+
+    /**
+     * 是否使用@Forest註解全局掃描
+     * @return
+     */
+    public boolean isForestAnnotation() {
+        return forestAnnotation;
+    }
+
+    /**
+     * 設置是否使用@Forest註解全局掃描
+     * @param forestAnnotation
+     */
+    public void setForestAnnotation(boolean forestAnnotation) {
+        this.forestAnnotation = forestAnnotation;
     }
 
     /**
