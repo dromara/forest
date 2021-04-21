@@ -1,5 +1,6 @@
 package com.dtflys.forest.scanner;
 
+import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.file.SpringResource;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.http.body.MultipartRequestBodyBuilder;
@@ -7,14 +8,20 @@ import com.dtflys.forest.http.body.RequestBodyBuilder;
 import com.dtflys.forest.http.body.ResourceRequestBodyBuilder;
 import com.dtflys.forest.multipart.ForestMultipartFactory;
 import com.dtflys.forest.utils.ClientFactoryBeanUtils;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 import org.springframework.core.io.Resource;
+import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
+import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.core.type.filter.TypeFilter;
 
 import java.io.IOException;
@@ -31,11 +38,17 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
 
     private boolean allInterfaces = true;
 
+    private Boolean forestAnnotation;
+
+    private final String FOREST_ANNOTATION = "forestAnnotation";
+
     public ClassPathClientScanner(String configurationId, BeanDefinitionRegistry registry) {
         super(registry, false);
         this.configurationId = configurationId;
         registerFilters();
         registerMultipartTypes();
+        BeanDefinition forestConfiguration = registry.getBeanDefinition(ForestConfiguration.class.getName());
+        forestAnnotation = (Boolean) forestConfiguration.getPropertyValues().getPropertyValue(FOREST_ANNOTATION).getValue();
     }
 
     /**
@@ -58,16 +71,25 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
      * 注册过滤器
      */
     public void registerFilters() {
-        if (allInterfaces) {
-            // include all interfaces
+        if (this.forestAnnotation) {
             addIncludeFilter(new TypeFilter() {
                 @Override
                 public boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory) throws IOException {
-                    return true;
+                    Set<String> annotationTypes = metadataReader.getAnnotationMetadata().getAnnotationTypes();
+                    return annotationTypes.contains("com.dtflys.forest.springboot.annotation.Forest");
                 }
             });
+        } else {
+            if (allInterfaces) {
+                // include all interfaces
+                addIncludeFilter(new TypeFilter() {
+                    @Override
+                    public boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory) throws IOException {
+                        return true;
+                    }
+                });
+            }
         }
-
         // exclude package-info.java
         addExcludeFilter(new TypeFilter() {
             @Override
@@ -116,4 +138,5 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
     protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
         return beanDefinition.getMetadata().isInterface() && beanDefinition.getMetadata().isIndependent();
     }
+
 }

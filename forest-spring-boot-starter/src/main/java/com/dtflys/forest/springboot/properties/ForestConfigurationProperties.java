@@ -67,6 +67,11 @@ public class ForestConfigurationProperties {
     private long maxRetryInterval = 0;
 
     /**
+     * 是否@Forest註解全局掃描
+     */
+    private boolean forestAnnotation = false;
+
+    /**
      * Enable print log of request/response
      */
     private boolean logEnabled = true;
@@ -297,5 +302,13 @@ public class ForestConfigurationProperties {
 
     public void setFilters(Map<String, Class> filters) {
         this.filters = filters;
+    }
+
+    public boolean isForestAnnotation() {
+        return forestAnnotation;
+    }
+
+    public void setForestAnnotation(boolean forestAnnotation) {
+        this.forestAnnotation = forestAnnotation;
     }
 }
