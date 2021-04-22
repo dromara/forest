@@ -50,7 +50,7 @@ public interface ForestJsonConverter extends ForestConverter<String>, ForestEnco
      * @param format 日期格式化模板字符
      * @return {@link ForestConverter}接口实例
      */
-    ForestConverter setDateFormat(String format);
+    void setDateFormat(String format);
 
     /**
      * 获取日期格式
