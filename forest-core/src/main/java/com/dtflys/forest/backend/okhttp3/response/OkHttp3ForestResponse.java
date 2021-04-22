@@ -10,9 +10,6 @@ import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import okhttp3.internal.http.RealResponseBody;
-import okio.GzipSource;
-import okio.Okio;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -42,11 +39,9 @@ public class OkHttp3ForestResponse extends ForestResponse {
             return;
         }
         contentEncoding = okResponse.headers().get("Content-Encoding");
-        // 如果手动添加Accept-Encoding = gzip。则需要手动处理gzip
-        if (contentEncoding != null) {
-            String[] encodes = contentEncoding.split(",");
-            isGzip = GzipUtils.isGzip(contentEncoding);
-        }
+        // 判断是否将Response数据按GZIP来解压
+        isGzip = request.isDecompressResponseGzipEnabled();
+
         this.body = okResponse.body();
         this.statusCode = okResponse.code();
         setupHeaders();

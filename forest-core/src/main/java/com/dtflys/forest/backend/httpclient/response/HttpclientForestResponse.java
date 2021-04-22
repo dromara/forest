@@ -46,11 +46,10 @@ public class HttpclientForestResponse extends ForestResponse {
                 if (type != null) {
                     this.contentType = new ContentType(type.getValue());
                 }
-                this.contentLength = entity.getContentLength();
                 Header encoding = entity.getContentEncoding();
-                if (encoding != null) {
-                    isGzip = GzipUtils.isGzip(encoding.getValue());
-                }
+                this.contentLength = entity.getContentLength();
+                // 是否将Response数据按GZIP来解压
+                isGzip = request.isDecompressResponseGzipEnabled();
 
                 if (contentType != null) {
                     this.contentEncoding = this.contentType.getCharset();
