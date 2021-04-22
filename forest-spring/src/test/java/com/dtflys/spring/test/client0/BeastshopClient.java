@@ -14,4 +14,7 @@ public interface BeastshopClient {
             timeout = 80000
     )
     String index();
+
+
+
 }

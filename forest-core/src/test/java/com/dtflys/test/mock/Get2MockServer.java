@@ -1,19 +1,13 @@
 package com.dtflys.test.mock;
 
-import okio.GzipSource;
-import okio.Source;
-import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.http.HttpHeaders;
 import org.mockserver.client.server.MockServerClient;
 import org.mockserver.junit.MockServerRule;
 import org.mockserver.model.Header;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
-import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import static org.mockserver.model.HttpRequest.request;
@@ -98,6 +92,18 @@ public class Get2MockServer extends MockServerRule {
                                 .withHeader(new Header(HttpHeaders.CONTENT_ENCODING, "gzip, deflate"))
                                 .withStatusCode(200)
                                 .withBody(out.toByteArray())
+                );
+
+        mockClient.when(
+                request()
+                        .withPath("/none-gzip")
+                        .withMethod("GET")
+        )
+                .respond(
+                        response()
+                                .withHeader(new Header(HttpHeaders.CONTENT_TYPE, "application/json; charset=utf-8"))
+                                .withStatusCode(200)
+                                .withBody(str)
                 );
 
     }

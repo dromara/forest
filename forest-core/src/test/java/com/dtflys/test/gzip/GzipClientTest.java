@@ -25,6 +25,8 @@ public class GzipClientTest extends BaseClientTest {
 
     private GzipClient gzipClient;
 
+    private GzipClient2 gzipClient2;
+
     private static ForestConfiguration configuration = ForestConfiguration.configuration();
 
     @BeforeClass
@@ -39,6 +41,7 @@ public class GzipClientTest extends BaseClientTest {
     public GzipClientTest(HttpBackend backend) {
         super(backend, configuration);
         gzipClient = configuration.createInstance(GzipClient.class);
+        gzipClient2 = configuration.createInstance(GzipClient2.class);
     }
 
     @Before
@@ -50,9 +53,21 @@ public class GzipClientTest extends BaseClientTest {
     @Test
     public void testTransaction() {
         ForestResponse<String> response = gzipClient.transaction("gzip");
-//        ForestHeader contentEncoding = response.getHeader("Content-Encoding");
-//        assertNotNull(contentEncoding);
-//        assertEquals("gzip, deflate", contentEncoding.getValue());
         assertEquals("测试gzip数据", response.getResult());
     }
+
+    @Test
+    public void testTransaction2() {
+        ForestResponse<String> response = gzipClient2.transaction("gzip");
+        assertEquals("测试gzip数据", response.getResult());
+    }
+
+
+    @Test
+    public void testNoneGzip() {
+        ForestResponse<String> response = gzipClient2.noneGzip();
+        assertEquals("测试gzip数据", response.getResult());
+    }
+
+
 }
