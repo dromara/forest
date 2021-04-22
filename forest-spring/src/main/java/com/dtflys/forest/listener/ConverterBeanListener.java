@@ -26,7 +26,7 @@ public class ConverterBeanListener implements ApplicationListener<ApplicationCon
         }
         Map<String, ForestConverter> forestConverterMap = applicationContext.getBeansOfType(ForestConverter.class);
         for (ForestConverter forestConverter : forestConverterMap.values()) {
-            forestConfiguration.getConverterMap().put(forestConverter.getDateType(), forestConverter);
+            forestConfiguration.getConverterMap().put(forestConverter.getDataType(), forestConverter);
         }
     }
 }

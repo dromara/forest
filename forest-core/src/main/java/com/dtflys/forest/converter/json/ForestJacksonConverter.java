@@ -140,7 +140,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     }
 
     @Override
-    public ForestDataType getDateType() {
+    public ForestDataType getDataType() {
         return ForestDataType.JSON;
     }
 }

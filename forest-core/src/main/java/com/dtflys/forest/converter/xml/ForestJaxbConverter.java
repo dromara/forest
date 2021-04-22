@@ -89,7 +89,7 @@ public class ForestJaxbConverter implements ForestXmlConverter {
     }
 
     @Override
-    public ForestDataType getDateType() {
+    public ForestDataType getDataType() {
         return ForestDataType.XML;
     }
 

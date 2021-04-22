@@ -88,7 +88,7 @@ public class DefaultBinaryConverter implements ForestConverter<Object> {
     }
 
     @Override
-    public ForestDataType getDateType() {
+    public ForestDataType getDataType() {
         return ForestDataType.BINARY;
     }
 

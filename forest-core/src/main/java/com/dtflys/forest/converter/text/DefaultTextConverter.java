@@ -17,7 +17,7 @@ public class DefaultTextConverter implements ForestConverter<String> {
     }
 
     @Override
-    public ForestDataType getDateType() {
+    public ForestDataType getDataType() {
         return ForestDataType.TEXT;
     }
 }

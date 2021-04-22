@@ -34,5 +34,5 @@ public interface ForestConverter<S> {
      * 获取当前数据转换器转换类型
      * @return
      */
-    ForestDataType getDateType();
+    ForestDataType getDataType();
 }
