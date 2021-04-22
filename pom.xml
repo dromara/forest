@@ -117,7 +117,10 @@
 					<groupId>io.netty</groupId>
 					<artifactId>netty-transport</artifactId>
 				</exclusion>
-
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 
