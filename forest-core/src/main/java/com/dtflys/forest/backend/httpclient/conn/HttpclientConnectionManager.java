@@ -30,7 +30,6 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.DecompressingHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
@@ -41,9 +40,7 @@ import org.apache.http.nio.reactor.ConnectingIOReactor;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 
-import java.lang.reflect.Proxy;
 import java.nio.charset.CodingErrorAction;
-import java.security.*;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]

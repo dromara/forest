@@ -1,6 +1,12 @@
 package com.dtflys.forest.utils;
 
 import com.dtflys.forest.annotation.AliasFor;
+import com.dtflys.forest.annotation.BaseLifeCycle;
+import com.dtflys.forest.annotation.ComposableBaseAnnotation;
+import com.dtflys.forest.annotation.ComposableMethodAnnotation;
+import com.dtflys.forest.annotation.ComposableParamAnnotation;
+import com.dtflys.forest.annotation.MethodLifeCycle;
+import com.dtflys.forest.annotation.ParamLifeCycle;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.converter.json.JSONConverterSelector;
@@ -182,7 +188,197 @@ public class ReflectUtils {
         return results;
     }
 
+    /**
+     * 判断是否为Forest注解
+     *
+     * @param annotation 注解对象
+     * @return {@code true}: 是Forest注解；{@code false}: 不是Forest注解
+     */
+    public static boolean isForestAnnotation(Annotation annotation) {
+        return isForestParamAnnotation(annotation.annotationType());
+    }
 
+    /**
+     * 判断是否为Forest注解
+     *
+     * @param annotationType 注解类
+     * @return {@code true}: 是Forest注解；{@code false}: 不是Forest注解
+     */
+    public static boolean isForestAnnotation(Class annotationType) {
+        return isForestBaseAnnotation(annotationType)
+                || isForestComposableBaseAnnotation(annotationType)
+                || isForestMethodAnnotation(annotationType)
+                || isForestComposableMethodAnnotation(annotationType)
+                || isForestParamAnnotation(annotationType)
+                || isForestComposableParamAnnotation(annotationType);
+    }
+
+    /**
+     * 判断是否为Forest接口注解
+     *
+     * @param annotation 注解对象
+     * @return {@code true}: 是Forest接口注解；{@code false}: 不是Forest接口注解
+     */
+    public static boolean isForestBaseAnnotation(Annotation annotation) {
+        return isForestBaseAnnotation(annotation);
+    }
+
+    /**
+     * 判断是否为Forest接口注解
+     *
+     * @param annotationType 注解类
+     * @return {@code true}: 是Forest接口注解；{@code false}: 不是Forest接口注解
+     */
+    public static boolean isForestBaseAnnotation(Class annotationType) {
+        Annotation mlcAnn = annotationType.getAnnotation(BaseLifeCycle.class);
+        if (mlcAnn != null) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 判断是否为可组合的Forest接口注解
+     *
+     * @param annotation 注解对象
+     * @return {@code true}: 是可组合的Forest接口注解；{@code false}: 不是可组合的Forest接口注解
+     */
+    public static boolean isForestComposableBaseAnnotation(Annotation annotation) {
+        return isForestComposableBaseAnnotation(annotation.annotationType());
+    }
+
+    /**
+     * 判断是否为可组合的Forest接口注解
+     *
+     * @param annotationType 注解类
+     * @return {@code true}: 是可组合的Forest接口注解；{@code false}: 不是可组合的Forest接口注解
+     */
+    public static boolean isForestComposableBaseAnnotation(Class annotationType) {
+        Annotation mlcAnn = annotationType.getAnnotation(ComposableBaseAnnotation.class);
+        if (mlcAnn != null) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 判断是否为Forest方法注解
+     *
+     * @param annotation 注解对象
+     * @return {@code true}: 是Forest方法注解；{@code false}: 不是Forest方法注解
+     */
+    public static boolean isForestMethodAnnotation(Annotation annotation) {
+        return isForestMethodAnnotation(annotation.annotationType());
+    }
+
+    /**
+     * 判断是否为Forest方法注解
+     *
+     * @param annotationType 注解类
+     * @return {@code true}: 是Forest方法注解；{@code false}: 不是Forest方法注解
+     */
+    public static boolean isForestMethodAnnotation(Class annotationType) {
+        Annotation mlcAnn = annotationType.getAnnotation(MethodLifeCycle.class);
+        if (mlcAnn != null) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 判断是否为可组合的Forest方法注解
+     *
+     * @param annotation 注解对象
+     * @return {@code true}: 是可组合的Forest方法注解；{@code false}: 不是可组合的Forest方法注解
+     */
+    public static boolean isForestComposableMethodAnnotation(Annotation annotation) {
+        return isForestComposableMethodAnnotation(annotation.annotationType());
+    }
+
+    /**
+     * 判断是否为可组合的Forest方法注解
+     *
+     * @param annotationType 注解类
+     * @return {@code true}: 是可组合的Forest方法注解；{@code false}: 不是可组合的Forest方法注解
+     */
+    public static boolean isForestComposableMethodAnnotation(Class annotationType) {
+        Annotation mlcAnn = annotationType.getAnnotation(ComposableMethodAnnotation.class);
+        if (mlcAnn != null) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 判断是否为Forest注解
+     *
+     * @param annotation 注解对象
+     * @return {@code true}: 是Forest参数注解；{@code false}: 不是Forest参数注解
+     */
+    public static boolean isForestParamAnnotation(Annotation annotation) {
+        return isForestParamAnnotation(annotation.annotationType());
+    }
+
+    /**
+     * 判断是否为Forest参数注解
+     *
+     * @param annotationType 注解类
+     * @return {@code true}: 是Forest参数注解；{@code false}: 不是Forest参数注解
+     */
+    public static boolean isForestParamAnnotation(Class annotationType) {
+        Annotation mlcAnn = annotationType.getAnnotation(ParamLifeCycle.class);
+        if (mlcAnn != null) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 判断是否为可组合的Forest参数注解
+     *
+     * @param annotation 注解对象
+     * @return {@code true}: 是可组合的Forest参数注解；{@code false}: 不是可组合的Forest参数注解
+     */
+    public static boolean isForestComposableParamAnnotation(Annotation annotation) {
+        return isForestComposableParamAnnotation(annotation.annotationType());
+    }
+
+    public static boolean canAnnotationUseForInterface(Class annotationType) {
+        return isForestBaseAnnotation(annotationType) || isForestComposableBaseAnnotation(annotationType);
+    }
+
+    public static boolean canAnnotationUseForMethod(Class annotationType) {
+        return isForestMethodAnnotation(annotationType) || isForestComposableMethodAnnotation(annotationType);
+    }
+
+    public static boolean canAnnotationUseForParam(Class annotationType) {
+        return isForestParamAnnotation(annotationType) || isForestComposableParamAnnotation(annotationType);
+    }
+
+    /**
+     * 判断是否为可组合的Forest参数注解
+     *
+     * @param annotationType 注解类
+     * @return {@code true}: 是可组合的Forest参数注解；{@code false}: 不是可组合的Forest参数注解
+     */
+    public static boolean isForestComposableParamAnnotation(Class annotationType) {
+        Annotation mlcAnn = annotationType.getAnnotation(ComposableParamAnnotation.class);
+        if (mlcAnn != null) {
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * 调用注解方法
+     *
+     * @param ann 注解对象
+     * @param clazz 注解类
+     * @param name 方法名
+     * @param args 方法调用参数
+     * @return 方法调用返回值
+     */
     private static Object invokeAnnotationMethod(Annotation ann, Class clazz, String name, Object[] args) {
         Method method = null;
         try {

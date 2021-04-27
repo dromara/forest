@@ -24,15 +24,12 @@
 
 package com.dtflys.forest.converter.json;
 
-import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.MapType;
-import com.fasterxml.jackson.databind.util.BeanUtil;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -72,13 +69,12 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     }
 
     @Override
-    public ForestConverter setDateFormat(String dateFormat) {
+    public void setDateFormat(String dateFormat) {
         this.dateFormat = dateFormat;
         if (StringUtils.isNotBlank(dateFormat)) {
             DateFormat format = new SimpleDateFormat(dateFormat);
             mapper.setDateFormat(format);
         }
-        return this;
     }
 
     @Override

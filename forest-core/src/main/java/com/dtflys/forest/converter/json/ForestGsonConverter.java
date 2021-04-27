@@ -24,7 +24,6 @@
 
 package com.dtflys.forest.converter.json;
 
-import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
@@ -52,9 +51,8 @@ public class ForestGsonConverter implements ForestJsonConverter {
     }
 
     @Override
-    public ForestConverter setDateFormat(String dateFormat) {
+    public void setDateFormat(String dateFormat) {
         this.dateFormat = dateFormat;
-        return this;
     }
 
     @Override
