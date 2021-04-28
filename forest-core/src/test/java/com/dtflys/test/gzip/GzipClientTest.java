@@ -33,7 +33,7 @@ public class GzipClientTest extends BaseClientTest {
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
         configuration.setLogResponseContent(true);
-        configuration.getVariables().put("baseUrl", "https://localhost");
+        configuration.getVariables().put("baseUrl", "http://localhost");
         configuration.setVariableValue("port", Get2MockServer.port);
     }
 
