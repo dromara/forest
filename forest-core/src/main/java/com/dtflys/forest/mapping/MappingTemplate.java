@@ -1,6 +1,7 @@
 package com.dtflys.forest.mapping;
 
 
+import com.dtflys.forest.config.ForestProperties;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
 import com.dtflys.forest.reflection.ForestMethod;
@@ -8,7 +9,9 @@ import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -16,11 +19,12 @@ import java.util.*;
  * @since 2016-05-04
  */
 public class MappingTemplate {
+    private final ForestProperties properties;
     private  String template;
     private List<MappingExpr> exprList;
     private VariableScope variableScope;
-
     int readIndex = -1;
+
 
     private boolean isEnd() {
         return readIndex >= template.length() - 1;
@@ -55,6 +59,11 @@ public class MappingTemplate {
         }
     }
 
+    public ForestProperties getProperties() {
+        return properties;
+    }
+
+
     private void match(char except) {
         if (isEnd()) {
             throw new ForestRuntimeException("Template Expression Parse Error:\n Not found '" + except + "', column " + readIndex + " at \"" + template + "\"");
@@ -78,15 +87,16 @@ public class MappingTemplate {
         return template.charAt(readIndex + i);
     }
 
-    public MappingTemplate(String template, VariableScope variableScope) {
+    public MappingTemplate(String template, VariableScope variableScope, ForestProperties properties) {
         this.template = template;
         this.variableScope = variableScope;
+        this.properties = properties;
         compile();
     }
 
     public void compile() {
         readIndex = -1;
-        exprList = new ArrayList<MappingExpr>();
+        exprList = new ArrayList<>();
         StringBuffer buffer = new StringBuffer();
 
         while (!isEnd()) {
@@ -109,10 +119,40 @@ public class MappingTemplate {
                     continue;
                 }
             }
+            else if (ch == '{') {
+                if (buffer.length() > 0) {
+                    MappingString str = new MappingString(buffer.toString());
+                    exprList.add(str);
+                }
+                buffer = new StringBuffer();
+                MappingExpr expr = parseExpression();
+                match('}');
+                if (expr != null) {
+                    expr = new MappingUrlEncodedExpr(expr);
+                    exprList.add(expr);
+                }
+                continue;
+            }
+            if (ch == '#') {
+                char ch1 = watch(1);
+                if (ch1 == '{') {
+                    nextChar();
+                    if (buffer.length() > 0) {
+                        MappingString str = new MappingString(buffer.toString());
+                        exprList.add(str);
+                    }
+                    buffer = new StringBuffer();
+                    MappingExpr expr = parseProperty();
+                    match('}');
+                    if (expr != null) {
+                        exprList.add(expr);
+                    }
+                    continue;
+                }
+            }
             else if (ch == '\\') {
-//                char ch2 = nextChar();
-//                buffer.append(ch);
-                if (watch(1) == '$') {
+                char nc = watch(1);
+                if (nc == '$' || nc == '{') {
                     ch = nextChar();
                     buffer.append(ch);
                 } else {
@@ -150,6 +190,16 @@ public class MappingTemplate {
                 "', column " + (readIndex + n + 1) + " at \"" + template + "\"");
     }
 
+    public MappingProperty parseProperty() {
+        MappingProperty prop = null;
+        char ch = watch(1);
+        if (Character.isAlphabetic(ch) || ch == '_' || ch == '-') {
+            prop = parsePropertyName();
+        } else {
+            syntaxErrorWatch1(ch);
+        }
+        return prop;
+    }
 
     public MappingExpr parseExpression() {
         MappingExpr expr = null;
@@ -232,6 +282,28 @@ public class MappingTemplate {
         matchToken(expr, Token.ID);
         return (MappingIdentity) expr;
     }
+
+
+    public MappingProperty parsePropertyName() {
+        char ch = watch(1);
+        StringBuilder builder = new StringBuilder();
+        if (Character.isAlphabetic(ch) || ch == '_' || ch == '-') {
+            do {
+                builder.append(ch);
+                nextChar();
+                ch = watch(1);
+            } while (Character.isAlphabetic(ch) ||
+                    Character.isDigit(ch) ||
+                    ch == '_' ||
+                    ch == '-' ||
+                    ch == '[' ||
+                    ch == ']' ||
+                    ch == '.');
+        }
+        String text = builder.toString();
+        return new MappingProperty(text);
+    }
+
 
 
     public MappingExpr parseTextToken() {
@@ -456,7 +528,7 @@ public class MappingTemplate {
 
     @Override
     public MappingTemplate clone() {
-        MappingTemplate template = new MappingTemplate(this.template, this.variableScope);
+        MappingTemplate template = new MappingTemplate(this.template, this.variableScope, this.properties);
         template.exprList = this.exprList;
         return template;
     }
@@ -472,6 +544,6 @@ public class MappingTemplate {
     }
 
     public MappingTemplate valueOf(String value, ForestMethod forestMethod) {
-        return new MappingTemplate(value, forestMethod);
+        return new MappingTemplate(value, forestMethod, properties);
     }
 }

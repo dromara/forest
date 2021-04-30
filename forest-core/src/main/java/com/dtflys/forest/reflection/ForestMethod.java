@@ -151,7 +151,7 @@ public class ForestMethod<T> implements VariableScope {
     }
 
     public MappingTemplate makeTemplate(String text) {
-        return new MappingTemplate(text, this);
+        return new MappingTemplate(text, this, configuration.getProperties());
     }
 
 
@@ -739,7 +739,7 @@ public class ForestMethod<T> implements VariableScope {
         if (headerArray != null && headerArray.length > 0) {
             baseHeaders = new MappingTemplate[headerArray.length];
             for (int j = 0; j < baseHeaders.length; j++) {
-                MappingTemplate header = new MappingTemplate(headerArray[j], this);
+                MappingTemplate header = new MappingTemplate(headerArray[j], this, configuration.getProperties());
                 baseHeaders[j] = header;
             }
         }

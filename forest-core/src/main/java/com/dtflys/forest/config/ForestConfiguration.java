@@ -199,6 +199,11 @@ public class ForestConfiguration implements Serializable {
     private InterceptorFactory interceptorFactory;
 
     /**
+     * Properties配置属性
+     */
+    private ForestProperties properties;
+
+    /**
      * HTTP后端选择器
      */
     private HttpBackendSelector httpBackendSelector = new HttpBackendSelector();
@@ -273,7 +278,6 @@ public class ForestConfiguration implements Serializable {
      */
     private ForestConfiguration setupBackend() {
         setBackend(httpBackendSelector.select(this));
-//        log.info("[Forest] Http Backend: " + this.backend.getName());
         return this;
     }
 
@@ -345,6 +349,31 @@ public class ForestConfiguration implements Serializable {
      */
     public void setInterceptorFactory(InterceptorFactory interceptorFactory) {
         this.interceptorFactory = interceptorFactory;
+    }
+
+    /**
+     * 获取Properties配置属性
+     *
+     * @return {@link ForestProperties}类实例
+     */
+    public ForestProperties getProperties() {
+        if (properties == null) {
+            synchronized (this) {
+                if (properties == null) {
+                    properties = new ForestProperties();
+                }
+            }
+        }
+        return properties;
+    }
+
+    /**
+     * 设置Properties配置属性
+     *
+     * @param properties {@link ForestProperties}类实例
+     */
+    public void setProperties(ForestProperties properties) {
+        this.properties = properties;
     }
 
     /**
