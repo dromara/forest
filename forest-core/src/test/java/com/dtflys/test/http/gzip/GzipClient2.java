@@ -1,6 +1,8 @@
-package com.dtflys.test.gzip;
+package com.dtflys.test.http.gzip;
 
-import com.dtflys.forest.annotation.*;
+import com.dtflys.forest.annotation.BaseRequest;
+import com.dtflys.forest.annotation.DecompressGzip;
+import com.dtflys.forest.annotation.Get;
 import com.dtflys.forest.http.ForestResponse;
 
 /**
@@ -15,15 +17,13 @@ import com.dtflys.forest.http.ForestResponse;
                 , "Accept-Language: zh-CN,zh;q=0.8", "Accept-Encoding: gzip, deflate"
                 , "Cache-Control: no-cache"}
 )
-public interface GzipClient {
+@DecompressGzip
+public interface GzipClient2 {
 
-    /**
-     * 调用接口的公共请求
-     *
-     * @param infno
-     * @return
-     */
     @Get("/${0}")
-    @DecompressGzip
     ForestResponse<String> transaction(String infno);
+
+    @Get("/none-gzip")
+    @DecompressGzip(false)
+    ForestResponse<String> noneGzip();
 }
