@@ -1,4 +1,4 @@
-package com.dtflys.test.gzip;
+package com.dtflys.test.http.gzip;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
