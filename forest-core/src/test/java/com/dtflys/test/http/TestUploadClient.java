@@ -5,11 +5,7 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.http.body.NameValueRequestBody;
-import com.dtflys.forest.multipart.ByteArrayMultipart;
-import com.dtflys.forest.multipart.FileMultipart;
-import com.dtflys.forest.multipart.FilePathMultipart;
-import com.dtflys.forest.multipart.ForestMultipart;
-import com.dtflys.forest.multipart.InputStreamMultipart;
+import com.dtflys.forest.multipart.*;
 import com.dtflys.test.http.client.UploadClient;
 import com.dtflys.test.mock.TraceMockServer;
 import org.apache.commons.io.IOUtils;
@@ -23,15 +19,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 public class TestUploadClient extends BaseClientTest {
@@ -82,7 +72,8 @@ public class TestUploadClient extends BaseClientTest {
         if (path.startsWith("/") && isWindows()) {
             path = path.substring(1);
         }
-        ForestRequest<Map> request = uploadClient.upload(path, progress -> {});
+        ForestRequest<Map> request = uploadClient.upload(path, progress -> {
+        });
         assertNotNull(request);
         List<ForestMultipart> multipartList = request.getMultiparts();
         assertEquals(1, multipartList.size());
@@ -104,7 +95,8 @@ public class TestUploadClient extends BaseClientTest {
             path = path.substring(1);
         }
         File file = new File(path);
-        ForestRequest<Map> request = uploadClient.upload(file, progress -> {});
+        ForestRequest<Map> request = uploadClient.upload(file, progress -> {
+        });
         assertNotNull(request);
         List<ForestMultipart> multipartList = request.getMultiparts();
         assertEquals(1, multipartList.size());
@@ -150,7 +142,9 @@ public class TestUploadClient extends BaseClientTest {
     }
 
 
-    /** Test Path Collections **/
+    /**
+     * Test Path Collections
+     **/
 
     @Test
     public void testUploadPathMap() {
@@ -216,7 +210,7 @@ public class TestUploadClient extends BaseClientTest {
 
     @Test
     public void testUploadPathList() {
-        URL[] urlArray = new URL[] {
+        URL[] urlArray = new URL[]{
                 this.getClass().getResource("/test-img.jpg"),
                 this.getClass().getResource("/test-img2.jpg")
         };
@@ -246,7 +240,7 @@ public class TestUploadClient extends BaseClientTest {
 
     @Test
     public void testUploadPathList2() {
-        URL[] urlArray = new URL[] {
+        URL[] urlArray = new URL[]{
                 this.getClass().getResource("/test-img.jpg"),
                 this.getClass().getResource("/test-img2.jpg")
         };
@@ -276,7 +270,7 @@ public class TestUploadClient extends BaseClientTest {
 
     @Test
     public void testUploadPathArray() {
-        URL[] urlArray = new URL[] {
+        URL[] urlArray = new URL[]{
                 this.getClass().getResource("/test-img.jpg"),
                 this.getClass().getResource("/test-img2.jpg")
         };
@@ -304,7 +298,7 @@ public class TestUploadClient extends BaseClientTest {
 
     @Test
     public void testUploadPathArray2() {
-        URL[] urlArray = new URL[] {
+        URL[] urlArray = new URL[]{
                 this.getClass().getResource("/test-img.jpg"),
                 this.getClass().getResource("/test-img2.jpg")
         };
@@ -331,11 +325,13 @@ public class TestUploadClient extends BaseClientTest {
     }
 
 
-    /** Test Byte Array Collections **/
+    /**
+     * Test Byte Array Collections
+     **/
 
     @Test
     public void testUploadByteArrayMap() throws IOException {
-        URL[] urlArray = new URL[] {
+        URL[] urlArray = new URL[]{
                 this.getClass().getResource("/test-img.jpg"),
                 this.getClass().getResource("/test-img2.jpg")
         };
@@ -366,7 +362,7 @@ public class TestUploadClient extends BaseClientTest {
 
     @Test
     public void testUploadByteArrayList() throws IOException {
-        URL[] urlArray = new URL[] {
+        URL[] urlArray = new URL[]{
                 this.getClass().getResource("/test-img.jpg"),
                 this.getClass().getResource("/test-img2.jpg")
         };
@@ -398,7 +394,7 @@ public class TestUploadClient extends BaseClientTest {
 
     @Test
     public void testUploadByteArrayArray() throws IOException {
-        URL[] urlArray = new URL[] {
+        URL[] urlArray = new URL[]{
                 this.getClass().getResource("/test-img.jpg"),
                 this.getClass().getResource("/test-img2.jpg")
         };
@@ -452,6 +448,18 @@ public class TestUploadClient extends BaseClientTest {
         ForestRequestBody body = bodyList.get(0);
         assertTrue(body instanceof NameValueRequestBody);
         assertEquals("meta", ((NameValueRequestBody) body).getName());
+    }
+
+
+    @Test
+    public void updateSpringBoot(){
+        String path = this.getClass().getResource("/test-img.jpg").getPath();
+        if (path.startsWith("/") && isWindows()) {
+            path = path.substring(1);
+        }
+        File file = new File(path);
+        //tomcat 容器 接收
+        uploadClient.updateSpringBoot("localhost:9999/file/upload", file);
     }
 
 }
