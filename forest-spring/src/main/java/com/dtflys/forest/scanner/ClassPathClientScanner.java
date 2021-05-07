@@ -1,5 +1,7 @@
 package com.dtflys.forest.scanner;
 
+import com.dtflys.forest.annotation.BaseLifeCycle;
+import com.dtflys.forest.annotation.MethodLifeCycle;
 import com.dtflys.forest.file.SpringResource;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.http.body.MultipartRequestBodyBuilder;
@@ -18,6 +20,8 @@ import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.core.type.filter.TypeFilter;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -63,7 +67,33 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
             addIncludeFilter(new TypeFilter() {
                 @Override
                 public boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory) throws IOException {
-                    return true;
+                    String className = metadataReader.getClassMetadata().getClassName();
+                    Class clazz = null;
+                    try {
+                        clazz = Class.forName(className);
+                    } catch (ClassNotFoundException e) {
+                    }
+                    if (clazz == null) {
+                        return false;
+                    }
+                    Annotation[] baseAnns = clazz.getAnnotations();
+                    for (Annotation ann : baseAnns) {
+                        Annotation lcAnn = ann.annotationType().getAnnotation(BaseLifeCycle.class);
+                        if (lcAnn != null) {
+                            return true;
+                        }
+                    }
+                    Method[] methods = clazz.getMethods();
+                    for (Method method : methods) {
+                        Annotation[] mthAnns = method.getAnnotations();
+                        for (Annotation ann : mthAnns) {
+                            Annotation mlcAnn = ann.annotationType().getAnnotation(MethodLifeCycle.class);
+                            if (mlcAnn != null) {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
                 }
             });
         }
