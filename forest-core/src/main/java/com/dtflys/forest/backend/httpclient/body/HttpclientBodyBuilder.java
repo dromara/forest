@@ -148,9 +148,9 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
             }
             entityBuilder.addPart(name, contentBody);
         }
-        if (httpReq.getFirstHeader("Content-Type") != null) {
-            httpReq.removeHeaders("Content-Type");
-        }
+//        if (httpReq.getFirstHeader("Content-Type") != null) {
+//            httpReq.removeHeaders("Content-Type");
+//        }
 //        httpReq.addHeader("Content-Type", com.dtflys.forest.backend.ContentType.MULTIPART_FORM_DATA);
         HttpEntity entity = entityBuilder.build();
         httpReq.setEntity(entity);

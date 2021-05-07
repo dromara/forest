@@ -940,9 +940,9 @@ public class ForestMethod<T> implements VariableScope {
 
         List<ForestMultipart> multiparts = new ArrayList<>(multipartFactories.size());
 
-        if (!multipartFactories.isEmpty() && request.getContentType() == null) {
-            request.setContentType(ContentType.MULTIPART_FORM_DATA);
-        }
+//        if (!multipartFactories.isEmpty() && request.getContentType() == null) {
+//            request.setContentType(ContentType.MULTIPART_FORM_DATA);
+//        }
 
         for (int i = 0; i < multipartFactories.size(); i++) {
             ForestMultipartFactory factory = multipartFactories.get(i);
