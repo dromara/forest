@@ -167,7 +167,7 @@ public interface GetClient {
 
 
     @Request(
-            url = "http://localhost:${port}/hello/user?username=${0}",
+            url = "http://localhost:${port}/hello/user?username={0}",
             headers = {
                     "Accept:text/plain",
                     "Content-Type: application/json"
@@ -251,7 +251,7 @@ public interface GetClient {
     @Request(
             url = "http://localhost:${port}/hello/user",
             headers = {"Accept:text/plain"},
-            data = "username=${username}"
+            data = "username={username}"
     )
     String varParamGet(@DataVariable("username") String username);
 
@@ -290,7 +290,7 @@ public interface GetClient {
             async = true,
             headers = {"Accept:text/plain"},
             timeout = 3000,
-            data = "username=${ username.toString() }"
+            data = "username={ username.toString() }"
     )
     Future<String> asyncVarParamGet(@DataVariable("username") String username, OnSuccess<String> onSuccess, OnError onError);
 
@@ -299,7 +299,7 @@ public interface GetClient {
 
 
     @Get(
-            url = "http://localhost:${port}/hello/user?${name}",
+            url = "http://localhost:${port}/hello/user?{name}",
             headers = {"Accept:text/plain"}
     )
     String getWithQueryString(@DataVariable("name") String name);
