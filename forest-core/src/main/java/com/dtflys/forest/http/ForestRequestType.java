@@ -103,6 +103,15 @@ public enum ForestRequestType {
     }
 
     /**
+     * 此类型请求是否一定需要Body
+     *
+     * @return {@code true}: 需要, 否则不需要
+     */
+    public boolean isNeedBody() {
+        return !this.equals(GET);
+    }
+
+    /**
      * 根据请求类型名称（HTTP方法名称）找到对应的Forest请求类型枚举
      *
      * @param name 请求类型名称（HTTP方法名称）
