@@ -86,28 +86,41 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
                 supportAsync = false;
             }
             if (supportAsync) {
-                ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor();
                 if (asyncConnectionManager == null) {
-                    try {
-                        ConnectionConfig connectionConfig = ConnectionConfig.custom()
-                                .setMalformedInputAction(CodingErrorAction.IGNORE)
-                                .setUnmappableInputAction(CodingErrorAction.IGNORE)
-                                .setCharset(Consts.UTF_8).build();
+                    synchronized (this) {
+                        if (asyncConnectionManager == null) {
+                            int errorRetryCount = 0;
+                            while (errorRetryCount < 5) {
+                                try {
+                                    ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor();
+                                    ConnectionConfig connectionConfig = ConnectionConfig.custom()
+                                            .setMalformedInputAction(CodingErrorAction.IGNORE)
+                                            .setUnmappableInputAction(CodingErrorAction.IGNORE)
+                                            .setCharset(Consts.UTF_8).build();
 
-                        authSchemeRegistry = RegistryBuilder
-                                .<AuthSchemeProvider>create()
-                                .register(AuthSchemes.BASIC, new BasicSchemeFactory())
-                                .register(AuthSchemes.DIGEST, new DigestSchemeFactory())
-                                .register(AuthSchemes.NTLM, new NTLMSchemeFactory())
-                                .register(AuthSchemes.SPNEGO, new SPNegoSchemeFactory())
-                                .register(AuthSchemes.KERBEROS, new KerberosSchemeFactory())
-                                .build();
+                                    authSchemeRegistry = RegistryBuilder
+                                            .<AuthSchemeProvider>create()
+                                            .register(AuthSchemes.BASIC, new BasicSchemeFactory())
+                                            .register(AuthSchemes.DIGEST, new DigestSchemeFactory())
+                                            .register(AuthSchemes.NTLM, new NTLMSchemeFactory())
+                                            .register(AuthSchemes.SPNEGO, new SPNegoSchemeFactory())
+                                            .register(AuthSchemes.KERBEROS, new KerberosSchemeFactory())
+                                            .build();
 
-                        asyncConnectionManager = new PoolingNHttpClientConnectionManager(ioReactor);
-                        asyncConnectionManager.setMaxTotal(maxConnections);
-                        asyncConnectionManager.setDefaultMaxPerRoute(maxRouteConnections);
-                        asyncConnectionManager.setDefaultConnectionConfig(connectionConfig);
-                    } catch (Throwable t) {
+                                    asyncConnectionManager = new PoolingNHttpClientConnectionManager(ioReactor);
+                                    asyncConnectionManager.setMaxTotal(maxConnections);
+                                    asyncConnectionManager.setDefaultMaxPerRoute(maxRouteConnections);
+                                    asyncConnectionManager.setDefaultConnectionConfig(connectionConfig);
+                                    break;
+                                } catch (Throwable t) {
+                                    errorRetryCount++;
+                                    if (errorRetryCount < 5) {
+                                        Thread.sleep((long) Math.pow(2F, errorRetryCount) * 100);
+                                    }
+
+                                }
+                            }
+                        }
                     }
                 }
             }
