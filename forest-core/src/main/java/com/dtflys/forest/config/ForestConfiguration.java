@@ -72,7 +72,7 @@ public class ForestConfiguration implements Serializable {
     /**
      * 默认全局配置，再用户没有定义任何全局配置时使用该默认配置
      */
-    private static ForestConfiguration defaultConfiguration = configuration();
+    private final static ForestConfiguration defaultConfiguration = configuration();
 
     /**
      * 请求接口的实例缓存，用于缓存请求接口的动态代理的实例
