@@ -53,6 +53,7 @@ import com.dtflys.forest.interceptor.InterceptorChain;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
+import com.dtflys.forest.utils.URLUtils;
 
 import java.io.File;
 import java.io.InputStream;
@@ -571,7 +572,11 @@ public class ForestRequest<T> {
                     }
                 }
                 if (value != null) {
-                    builder.append(value);
+                    try {
+                        String encodedValue = URLUtils.urlEncoding(value.toString(), getCharset());
+                        builder.append(encodedValue);
+                    } catch (UnsupportedEncodingException e) {
+                    }
                 }
             }
             if (iterator.hasNext()) {

@@ -6,6 +6,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
+import com.dtflys.forest.utils.URLUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -35,17 +36,13 @@ public class QueryableURLBuilder extends URLBuilder {
                 if (name != null) {
                     paramBuilder.append('=');
                 }
-                if (queryParam.isUrlencoded()) {
-                    String encodedValue = null;
-                    try {
-                        encodedValue = URLEncoder.encode(value, request.getCharset());
-                    } catch (UnsupportedEncodingException e) {
-                    }
-                    if (encodedValue != null) {
-                        paramBuilder.append(encodedValue);
-                    }
-                } else {
-                    paramBuilder.append(value);
+                String encodedValue = null;
+                try {
+                    encodedValue = URLUtils.urlEncoding(value, request.getCharset());
+                } catch (UnsupportedEncodingException e) {
+                }
+                if (encodedValue != null) {
+                    paramBuilder.append(encodedValue);
                 }
             }
             if (i < queryParameters.size() - 1) {
