@@ -32,6 +32,8 @@ public class UrlEncodedMockServer extends MockServerRule {
                 request()
                         .withPath("/encoded")
                         .withMethod("GET")
+                        .withQueryStringParameter("url1", "http://www.gitee.com")
+                        .withQueryStringParameter("url2", "http://www.gitee.com")
                         .withQueryStringParameter("lang", "中文")
                         .withQueryStringParameter("code", "AbcD12#$iTXI")
                         .withQueryStringParameter("data", "il&felUFO3o=P")
@@ -47,16 +49,18 @@ public class UrlEncodedMockServer extends MockServerRule {
                 request()
                         .withPath("/encoded")
                         .withMethod("POST")
+                        .withQueryStringParameter("url1", "http://www.gitee.com")
+                        .withQueryStringParameter("url2", "http://www.gitee.com")
                         .withQueryStringParameter("lang",  "中文")
                         .withQueryStringParameter("code",  "AbcD12#$iTXI")
                         .withQueryStringParameter("data",  "il&felUFO3o=P")
                         .withQueryStringParameter("content",  "中文内容")
         )
-                .respond(
-                        response()
-                                .withStatusCode(200)
-                                .withBody(EXPECTED)
-                );
+        .respond(
+                response()
+                        .withStatusCode(200)
+                        .withBody(EXPECTED)
+        );
 
     }
 

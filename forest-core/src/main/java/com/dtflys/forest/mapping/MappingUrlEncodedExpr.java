@@ -31,7 +31,7 @@ public class MappingUrlEncodedExpr extends MappingExpr {
         }
         String str = String.valueOf(ret);
         try {
-            return URLUtils.encode(str, "UTF-8");
+            return URLUtils.forceEncode(str, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             throw new ForestRuntimeException(e);
         }

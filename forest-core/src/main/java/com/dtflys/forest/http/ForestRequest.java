@@ -36,6 +36,7 @@ import com.dtflys.forest.http.body.StringRequestBody;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.RequestLogMessage;
+import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
@@ -419,7 +420,7 @@ public class ForestRequest<T> {
                     }
 
                     addQuery(new ForestQueryParameter(
-                            requestNameValue.getName(), requestNameValue.getValue(), true));
+                            requestNameValue.getName(), requestNameValue.getValue(), true, false, null));
                 }
             }
 
@@ -573,7 +574,7 @@ public class ForestRequest<T> {
                 }
                 if (value != null) {
                     try {
-                        String encodedValue = URLUtils.urlEncoding(value.toString(), getCharset());
+                        String encodedValue = URLUtils.encode(value.toString(), getCharset());
                         builder.append(encodedValue);
                     } catch (UnsupportedEncodingException e) {
                     }
@@ -596,6 +597,20 @@ public class ForestRequest<T> {
         this.query.addQuery(name, value);
         return this;
     }
+
+    /**
+     * 添加请求中的Query参数
+     * @param name Query参数名
+     * @param value Query参数值
+     * @param isUrlEncode 是否进行编码
+     * @param charset 编码字符集
+     * @return {@link ForestRequest}对象实例
+     */
+    public ForestRequest addQuery(String name, Object value, boolean isUrlEncode, String charset) {
+        this.query.addQuery(name, value, isUrlEncode, charset);
+        return this;
+    }
+
 
     /**
      * 添加请求中的Query参数
@@ -1191,6 +1206,7 @@ public class ForestRequest<T> {
     public Object[] getArguments() {
         return arguments;
     }
+
 
     /**
      * 获取该请求的所有请求头信息

@@ -113,6 +113,11 @@ public class ForestQueryMap implements Map<String, Object> {
         queries.add(new ForestQueryParameter(name, value));
     }
 
+    public void addQuery(String name, Object value, boolean isUrlEncode, String charset) {
+        queries.add(new ForestQueryParameter(name, value, isUrlEncode, charset));
+    }
+
+
 
     @Override
     public Object put(String key, Object value) {

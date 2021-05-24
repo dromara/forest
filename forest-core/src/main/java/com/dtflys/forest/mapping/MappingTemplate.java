@@ -9,10 +9,10 @@ import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.utils.URLUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
-import java.net.URLEncoder;
 import java.util.*;
 
 /**
@@ -20,6 +20,7 @@ import java.util.*;
  * @since 2016-05-04
  */
 public class MappingTemplate {
+    private final MappingParameter[] parameters;
     private final ForestProperties properties;
     private  String template;
     private List<MappingExpr> exprList;
@@ -91,10 +92,11 @@ public class MappingTemplate {
         return template.charAt(readIndex + i);
     }
 
-    public MappingTemplate(String template, VariableScope variableScope, ForestProperties properties) {
+    public MappingTemplate(String template, VariableScope variableScope, ForestProperties properties, MappingParameter[] parameters) {
         this.template = template;
         this.variableScope = variableScope;
         this.properties = properties;
+        this.parameters = parameters;
         compile();
     }
 
@@ -448,26 +450,39 @@ public class MappingTemplate {
             for (int i = 0; i < len; i++) {
                 MappingExpr expr = exprList.get(i);
                 Object val = null;
+                MappingParameter param = null;
                 if (expr instanceof MappingString) {
                     builder.append(((MappingString) expr).getText());
                 } else if (expr instanceof MappingIndex) {
                     try {
-                        val = args[((MappingIndex) expr).getIndex()];
+                        Integer index = ((MappingIndex) expr).getIndex();
+                        param = parameters[index];
+                        val = args[index];
                     } catch (Exception ex) {
                     }
                     if (val != null) {
-                        builder.append(getParameterValue(jsonConverter, val));
+                        val = getParameterValue(jsonConverter, val);
+                        if (param != null && param.isUrlEncode()) {
+                            val = URLUtils.forceEncode(String.valueOf(val), param.getCharset());
+                        }
+                        builder.append(val);
                     }
                 } else {
                     val = expr.render(args);
                     if (val != null) {
-                        builder.append(getParameterValue(jsonConverter, val));
+                        val = getParameterValue(jsonConverter, val);
+                        if (param != null && param.isUrlEncode()) {
+                            val = URLUtils.forceEncode(String.valueOf(val), param.getCharset());
+                        }
+                        builder.append(val);
                     }
                 }
             }
             return builder.toString();
         } catch (ForestVariableUndefinedException ex) {
             throw new ForestVariableUndefinedException(ex.getVariableName(), template);
+        } catch (UnsupportedEncodingException e) {
+            throw new ForestRuntimeException(e);
         }
     }
 
@@ -541,7 +556,7 @@ public class MappingTemplate {
 
     @Override
     public MappingTemplate clone() {
-        MappingTemplate template = new MappingTemplate(this.template, this.variableScope, this.properties);
+        MappingTemplate template = new MappingTemplate(this.template, this.variableScope, this.properties, this.parameters);
         template.exprList = this.exprList;
         return template;
     }
@@ -557,7 +572,7 @@ public class MappingTemplate {
     }
 
     public MappingTemplate valueOf(String value, ForestMethod forestMethod) {
-        return new MappingTemplate(value, forestMethod, properties);
+        return new MappingTemplate(value, forestMethod, properties, forestMethod.getParameters());
     }
 
 

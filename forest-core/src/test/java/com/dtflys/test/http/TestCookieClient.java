@@ -1,8 +1,11 @@
 package com.dtflys.test.http;
 
 import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestCookie;
+import com.dtflys.forest.http.ForestCookies;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.client.CookieClient;
 import com.dtflys.test.mock.CookieMockServer;
@@ -57,9 +60,7 @@ public class TestCookieClient extends BaseClientTest {
     @Test
     public void testCookieWithCallback() {
         AtomicReference<ForestCookie> cookieAtomic = new AtomicReference<>(null);
-        cookieClient.testLoginWithCallback((request, cookies) -> {
-            cookieAtomic.set(cookies.allCookies().get(0));
-        });
+        cookieClient.testLoginWithCallback((request, cookies) -> cookieAtomic.set(cookies.allCookies().get(0)));
         ForestCookie cookie = cookieAtomic.get();
         assertNotNull(cookie);
         assertEquals("localhost", cookie.getDomain());

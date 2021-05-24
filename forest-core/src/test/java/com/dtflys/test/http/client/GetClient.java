@@ -222,7 +222,14 @@ public interface GetClient {
             url = "http://localhost:${port}/hello/user",
             headers = {"Accept:text/plain"}
     )
+    String repeatableQuery(@Query("username") String[] usernames, @Query("password") String password);
+
+    @Get(
+            url = "http://localhost:${port}/hello/user",
+            headers = {"Accept:text/plain"}
+    )
     String repeatableQuery(@Query("username") List<String> usernames, @Query("password") String password);
+
 
 
     @Get(

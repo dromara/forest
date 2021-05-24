@@ -58,6 +58,16 @@ public class MappingParameter {
     private boolean isJsonParam = false;
 
     /**
+     * 是否强制URL Encode
+     */
+    private boolean isUrlEncode = false;
+
+    /**
+     * URL Encode的字符集
+     */
+    private String charset;
+
+    /**
      * 子项Content-Type
      */
     private String partContentType;
@@ -174,6 +184,22 @@ public class MappingParameter {
 
     public void setJsonParam(boolean jsonParam) {
         isJsonParam = jsonParam;
+    }
+
+    public boolean isUrlEncode() {
+        return isUrlEncode;
+    }
+
+    public void setUrlEncode(boolean urlEncode) {
+        isUrlEncode = urlEncode;
+    }
+
+    public String getCharset() {
+        return charset;
+    }
+
+    public void setCharset(String charset) {
+        this.charset = charset;
     }
 
     public String getPartContentType() {

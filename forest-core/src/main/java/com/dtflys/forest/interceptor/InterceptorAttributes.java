@@ -1,5 +1,6 @@
 package com.dtflys.forest.interceptor;
 
+import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingTemplate;
 
 import java.util.HashMap;

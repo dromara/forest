@@ -39,13 +39,15 @@ public class TestUrlEncodedClient extends BaseClientTest {
 
     @Test
     public void testGetUrlEncoded() {
-        String result = urlEncodedClient.getUrlEncoded("中文", "AbcD12#$iTXI", "il&felUFO3o=P", "中文内容");
+        String url = "http://www.gitee.com";
+        String result = urlEncodedClient.getUrlEncoded(url, url, "中文", "AbcD12#$iTXI", "il&felUFO3o=P", "中文内容");
         assertEquals(UrlEncodedMockServer.EXPECTED, result);
     }
 
     @Test
     public void testGetUrlEncodedWithQuery() {
-        String result = urlEncodedClient.getUrlEncodedWithQuery("中文", "AbcD12#$iTXI", "il&felUFO3o=P", "中文内容");
+        String url = "http://www.gitee.com";
+        String result = urlEncodedClient.getUrlEncodedWithQuery(url, url, "中文", "AbcD12#$iTXI", "il&felUFO3o=P", "中文内容");
         assertEquals(UrlEncodedMockServer.EXPECTED, result);
     }
 
