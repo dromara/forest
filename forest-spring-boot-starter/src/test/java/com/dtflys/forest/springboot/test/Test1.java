@@ -22,7 +22,6 @@ import static org.junit.Assert.*;
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test1")
 @SpringBootTest(classes = Test1.class)
-@ForestScan("com.dtflys.forest.springboot.test.client1")
 @EnableAutoConfiguration
 public class Test1 {
 
