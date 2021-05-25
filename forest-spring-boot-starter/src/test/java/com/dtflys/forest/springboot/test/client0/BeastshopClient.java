@@ -41,7 +41,7 @@ public interface BeastshopClient {
     String testBug2(@Query TestUser user);
 
     @Request(
-            url = "${baseUrl}/autopage/shops.htm",
+            url = "${baseUrl}/shops.htm",
             logEnabled = true,
             timeout = 1
     )
