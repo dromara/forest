@@ -915,7 +915,10 @@ public class ForestMethod<T> implements VariableScope {
                     obj = parameter.getConvertedDefaultValue(configuration.getJsonConverter());
                 }
                 if (obj != null) {
-                    if (obj.getClass().isArray() && !(obj instanceof byte[]) && !(obj instanceof Byte[])) {
+                    if (MappingParameter.isQuery(target) &&
+                            obj.getClass().isArray() &&
+                            !(obj instanceof byte[]) &&
+                            !(obj instanceof Byte[])) {
                         int len = Array.getLength(obj);
                         for (int idx = 0; idx < len; idx++) {
                             Object arrayItem = Array.get(obj, idx);
