@@ -27,7 +27,7 @@ public class ReflectUtils {
 
     /**
      * JSON转换选择器
-     * @since 1.5.1-BETA4
+     * @since 1.5.0-BETA4
      */
     private static JSONConverterSelector jsonConverterSelector = new JSONConverterSelector();
 
