@@ -86,10 +86,6 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                 ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
                 List<ForestRequestBody> srcBodyList = request.getBody();
                 List<ForestRequestBody> bodyList = new LinkedList(srcBodyList);
-//            Map<String, Object> map = convertNameValueListToMap(request, nameValueList);
-//            if (map != null && !map.isEmpty()) {
-//                bodyList.add(map);
-//            }
                 if (!bodyList.isEmpty()) {
                     Object toJsonObj = bodyList;
                     if (bodyList.size() == 1) {
@@ -111,6 +107,9 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                                 } catch (Throwable th) {
                                 }
                                 if (subMap != null) {
+                                    if (jsonMap == null) {
+                                        jsonMap = new LinkedHashMap<>(bodyList.size());
+                                    }
                                     jsonMap.putAll(subMap);
                                 } else {
                                     if (jsonArray == null) {
@@ -136,6 +135,9 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                                     }
                                     if (subMap == null) {
                                         continue;
+                                    }
+                                    if (jsonMap == null) {
+                                        jsonMap = new LinkedHashMap<>(bodyList.size());
                                     }
                                     jsonMap.putAll(subMap);
                                 }
@@ -190,13 +192,6 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                 }
                 setBinaryBody(httpRequest, request, charset, contentType, nameValueList, bytes, lifeCycleHandler);
             } else {
-//            Map<String, Object> map = convertNameValueListToMap(request, nameValueList);
-//            StringBuilder builder = new StringBuilder();
-//            for (Iterator<Map.Entry<String, Object>> iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
-//                Map.Entry<String, Object> entry = iterator.next();
-//                Object value = entry.getValue();
-//                builder.append(value);
-//            }
                 StringBuilder builder = new StringBuilder();
                 List bodyList = request.getBody();
                 if (!bodyList.isEmpty()) {
