@@ -27,8 +27,8 @@ public class ConverterBeanListener implements ApplicationListener<ApplicationCon
         if (forestConfiguration == null) {
             try {
                 forestConfiguration = applicationContext.getBean(ForestConfiguration.class);
-            }catch (Exception ignored){
-                throw new ForestRuntimeException("property forestConfiguration undefined");
+            } catch (Exception ignored) {
+                throw new ForestRuntimeException("property forestConfiguration undefined", ignored);
             }
         }
         Map<String, ForestConverter> forestConverterMap = applicationContext.getBeansOfType(ForestConverter.class);
