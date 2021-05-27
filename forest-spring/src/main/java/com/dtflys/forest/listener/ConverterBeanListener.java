@@ -2,6 +2,7 @@ package com.dtflys.forest.listener;
 
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ForestConverter;
+import com.dtflys.forest.exceptions.ForestRuntimeException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationContextEvent;
@@ -22,8 +23,13 @@ public class ConverterBeanListener implements ApplicationListener<ApplicationCon
     @Override
     public void onApplicationEvent(ApplicationContextEvent event) {
         ApplicationContext applicationContext = event.getApplicationContext();
+        ForestConfiguration forestConfiguration = this.forestConfiguration;
         if (forestConfiguration == null) {
-            return;
+            try {
+                forestConfiguration = applicationContext.getBean(ForestConfiguration.class);
+            }catch (Exception ignored){
+                throw new ForestRuntimeException("property forestConfiguration undefined");
+            }
         }
         Map<String, ForestConverter> forestConverterMap = applicationContext.getBeansOfType(ForestConverter.class);
         for (ForestConverter forestConverter : forestConverterMap.values()) {
