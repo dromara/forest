@@ -49,6 +49,7 @@ import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
+import okio.ByteString;
 import org.apache.commons.lang3.ObjectUtils;
 
 import java.lang.annotation.Annotation;
@@ -996,7 +997,9 @@ public class ForestMethod<T> implements VariableScope {
         List<ForestMultipart> multiparts = new ArrayList<>(multipartFactories.size());
 
         if (!multipartFactories.isEmpty() && request.getContentType() == null) {
-            request.setContentType(ContentType.MULTIPART_FORM_DATA);
+            UUID uuid = UUID.randomUUID();
+            String boundary = ByteString.encodeUtf8(uuid.toString()).utf8();
+            request.setContentType(ContentType.MULTIPART_FORM_DATA + ";boundary=" + boundary);
         }
 
         for (int i = 0; i < multipartFactories.size(); i++) {

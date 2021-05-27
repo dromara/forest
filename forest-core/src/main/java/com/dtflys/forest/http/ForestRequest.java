@@ -24,6 +24,7 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.callback.OnSaveCookie;
@@ -535,6 +536,33 @@ public class ForestRequest<T> {
         this.lifeCycleHandler = lifeCycleHandler;
         return this;
     }
+
+    /**
+     * 获取Multipart类型请求的boundary字符串
+     * @return boundary字符串
+     */
+    public String getBoundary() {
+        String contentType = getContentType();
+        if (StringUtils.isEmpty(contentType)) {
+            return null;
+        }
+        String[] group = contentType.split(";");
+        if (group.length > 1) {
+            for (int i = 1; i < group.length; i++) {
+                String subContentType = group[i];
+                String[] nvPair = subContentType.split("=");
+                if (nvPair.length > 1) {
+                    String name = nvPair[0];
+                    String value = nvPair[1];
+                    if ("boundary".equalsIgnoreCase(name)) {
+                        return value;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
 
     /**
      * 获取请求的Query参数表
