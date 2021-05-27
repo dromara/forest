@@ -17,10 +17,11 @@ import java.util.Map;
  **/
 public class ConverterBeanListener implements ApplicationListener<ApplicationContextEvent> {
 
+    private ForestConfiguration forestConfiguration;
+
     @Override
     public void onApplicationEvent(ApplicationContextEvent event) {
         ApplicationContext applicationContext = event.getApplicationContext();
-        ForestConfiguration forestConfiguration = applicationContext.getBean(ForestConfiguration.class);
         if (forestConfiguration == null) {
             return;
         }
@@ -28,5 +29,13 @@ public class ConverterBeanListener implements ApplicationListener<ApplicationCon
         for (ForestConverter forestConverter : forestConverterMap.values()) {
             forestConfiguration.getConverterMap().put(forestConverter.getDataType(), forestConverter);
         }
+    }
+
+    public ForestConfiguration getForestConfiguration() {
+        return forestConfiguration;
+    }
+
+    public void setForestConfiguration(ForestConfiguration forestConfiguration) {
+        this.forestConfiguration = forestConfiguration;
     }
 }
