@@ -10,6 +10,7 @@ import com.dtflys.forest.multipart.FileMultipart;
 import com.dtflys.forest.multipart.FilePathMultipart;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.multipart.InputStreamMultipart;
+import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.test.http.client.UploadClient;
 import com.dtflys.test.mock.TraceMockServer;
 import org.apache.commons.io.IOUtils;
@@ -108,6 +109,7 @@ public class TestUploadClient extends BaseClientTest {
         assertNotNull(request);
         List<ForestMultipart> multipartList = request.getMultiparts();
         assertEquals(1, multipartList.size());
+        assertTrue(StringUtils.isNotBlank(request.getBoundary()));
         ForestMultipart multipart = multipartList.get(0);
         assertTrue(Map.class.isAssignableFrom(request.getMethod().getReturnClass()));
         assertTrue(multipart instanceof FileMultipart);
@@ -123,6 +125,7 @@ public class TestUploadClient extends BaseClientTest {
         assertNotNull(request);
         List<ForestMultipart> multipartList = request.getMultiparts();
         assertEquals(1, multipartList.size());
+        assertTrue(StringUtils.isNotBlank(request.getBoundary()));
         ForestMultipart multipart = multipartList.get(0);
         assertTrue(Map.class.isAssignableFrom(request.getMethod().getReturnClass()));
         assertTrue(multipart instanceof ByteArrayMultipart);
@@ -140,6 +143,7 @@ public class TestUploadClient extends BaseClientTest {
         InputStream in = new FileInputStream(file);
         ForestRequest<Map> request = uploadClient.upload(in, "test-byte-array.jpg");
         assertNotNull(request);
+        assertTrue(StringUtils.isNotBlank(request.getBoundary()));
         List<ForestMultipart> multipartList = request.getMultiparts();
         assertEquals(1, multipartList.size());
         ForestMultipart multipart = multipartList.get(0);

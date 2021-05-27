@@ -68,9 +68,15 @@ public class ReflectUtils {
             } catch (ClassNotFoundException e) {
             }
             return null;
+        } else if (genericType instanceof WildcardType && "?".equals(genericType.toString())) {
+            return Object.class;
         } else {
-            Class clz = (Class) genericType;
-            return clz;
+            try {
+                Class clz = (Class) genericType;
+                return clz;
+            } catch (Throwable th) {
+                return Object.class;
+            }
         }
     }
 
