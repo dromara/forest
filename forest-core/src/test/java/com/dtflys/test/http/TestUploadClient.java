@@ -143,7 +143,7 @@ public class TestUploadClient extends BaseClientTest {
         InputStream in = new FileInputStream(file);
         ForestRequest<Map> request = uploadClient.upload(in, "test-byte-array.jpg");
         assertNotNull(request);
-        assertTrue(StringUtils.isNotBlank(request.getBoundary()));
+        assertTrue(StringUtils.isEmpty(request.getBoundary()));
         List<ForestMultipart> multipartList = request.getMultiparts();
         assertEquals(1, multipartList.size());
         ForestMultipart multipart = multipartList.get(0);
