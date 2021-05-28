@@ -61,7 +61,7 @@ public class TestQueryStringClient extends BaseClientTest {
         String result = getClient.getWithQueryString("foo");
         log.info("response: " + result);
         assertNotNull(result);
-        assertEquals(GetMockServer.EXPECTED, result);
+        assertEquals(QueryStringMockServer.EXPECTED, result);
     }
 
     @Test
@@ -69,7 +69,7 @@ public class TestQueryStringClient extends BaseClientTest {
         String result = getClient.getWithQueryString2("foo");
         log.info("response: " + result);
         assertNotNull(result);
-        assertEquals(GetMockServer.EXPECTED, result);
+        assertEquals(QueryStringMockServer.EXPECTED, result);
     }
 
 
