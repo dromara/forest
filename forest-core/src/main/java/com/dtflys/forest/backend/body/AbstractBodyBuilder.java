@@ -74,134 +74,132 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
 
         ContentType mineContentType = new ContentType(mineType);
 
+        List<ForestRequestBody> reqBody = request.getBody();
+        boolean needRequestBody = request.getType().isNeedBody() ||
+                !reqBody.isEmpty() ||
+                !request.getMultiparts().isEmpty();
 
-        if (mineContentType.isFormUrlEncoded()) {
-            setFormBody(httpRequest, request, charset, contentType, request.getBody());
-        }
-        else if (mineContentType.isJson()) {
-            ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
-            List<ForestRequestBody> srcBodyList = request.getBody();
-            List<ForestRequestBody> bodyList = new LinkedList(srcBodyList);
-//            Map<String, Object> map = convertNameValueListToMap(request, nameValueList);
-//            if (map != null && !map.isEmpty()) {
-//                bodyList.add(map);
-//            }
-            if (!bodyList.isEmpty()) {
-                Object toJsonObj = bodyList;
-                if (bodyList.size() == 1) {
-                    toJsonObj = bodyList.get(0);
-                } else {
-                    Map<String, Object> jsonMap = null;
-                    List jsonArray = null;
-                    for (ForestRequestBody bodyItem : bodyList) {
-                        if (bodyItem instanceof NameValueRequestBody) {
-                            if (jsonMap == null) {
-                                jsonMap = new LinkedHashMap<>(bodyList.size());
-                            }
-                            jsonMap.put(((NameValueRequestBody) bodyItem).getName(), ((NameValueRequestBody) bodyItem).getValue());
-                        } else if (bodyItem instanceof StringRequestBody) {
-                            String content = bodyItem.toString();
-                            Map subMap = null;
-                            try {
-                                subMap = jsonConverter.convertObjectToMap(content);
-                            } catch (Throwable th) {}
-                            if (subMap != null) {
-                                jsonMap.putAll(subMap);
-                            } else {
-                                if (jsonArray == null) {
-                                    jsonArray = new LinkedList<>();
+        if (needRequestBody) {
+            if (mineContentType.isFormUrlEncoded()) {
+                setFormBody(httpRequest, request, charset, contentType, reqBody);
+            } else if (mineContentType.isJson()) {
+                ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
+                List<ForestRequestBody> srcBodyList = request.getBody();
+                List<ForestRequestBody> bodyList = new LinkedList(srcBodyList);
+                if (!bodyList.isEmpty()) {
+                    Object toJsonObj = bodyList;
+                    if (bodyList.size() == 1) {
+                        toJsonObj = bodyList.get(0);
+                    } else {
+                        Map<String, Object> jsonMap = null;
+                        List jsonArray = null;
+                        for (ForestRequestBody bodyItem : bodyList) {
+                            if (bodyItem instanceof NameValueRequestBody) {
+                                if (jsonMap == null) {
+                                    jsonMap = new LinkedHashMap<>(bodyList.size());
                                 }
-                                jsonArray.add(content);
-                            }
-                        } else if (bodyItem instanceof ObjectRequestBody) {
-                            Object obj = ((ObjectRequestBody) bodyItem).getObject();
-                            if (obj == null) {
-                                continue;
-                            }
-                            if (obj instanceof List) {
-                                if (jsonArray == null) {
-                                    jsonArray = new LinkedList();
-                                }
-                                jsonArray.addAll((List) obj);
-                            } else {
+                                jsonMap.put(((NameValueRequestBody) bodyItem).getName(), ((NameValueRequestBody) bodyItem).getValue());
+                            } else if (bodyItem instanceof StringRequestBody) {
+                                String content = bodyItem.toString();
                                 Map subMap = null;
                                 try {
-                                    subMap = jsonConverter.convertObjectToMap(obj);
-                                } catch (Throwable th) {}
-                                if (subMap == null) {
+                                    subMap = jsonConverter.convertObjectToMap(content);
+                                } catch (Throwable th) {
+                                }
+                                if (subMap != null) {
+                                    if (jsonMap == null) {
+                                        jsonMap = new LinkedHashMap<>(bodyList.size());
+                                    }
+                                    jsonMap.putAll(subMap);
+                                } else {
+                                    if (jsonArray == null) {
+                                        jsonArray = new LinkedList<>();
+                                    }
+                                    jsonArray.add(content);
+                                }
+                            } else if (bodyItem instanceof ObjectRequestBody) {
+                                Object obj = ((ObjectRequestBody) bodyItem).getObject();
+                                if (obj == null) {
                                     continue;
                                 }
-                                jsonMap.putAll(subMap);
+                                if (obj instanceof List) {
+                                    if (jsonArray == null) {
+                                        jsonArray = new LinkedList();
+                                    }
+                                    jsonArray.addAll((List) obj);
+                                } else {
+                                    Map subMap = null;
+                                    try {
+                                        subMap = jsonConverter.convertObjectToMap(obj);
+                                    } catch (Throwable th) {
+                                    }
+                                    if (subMap == null) {
+                                        continue;
+                                    }
+                                    if (jsonMap == null) {
+                                        jsonMap = new LinkedHashMap<>(bodyList.size());
+                                    }
+                                    jsonMap.putAll(subMap);
+                                }
                             }
                         }
+                        if (jsonMap != null) {
+                            toJsonObj = jsonMap;
+                        } else if (jsonArray != null) {
+                            toJsonObj = jsonArray;
+                        }
                     }
-                    if (jsonMap != null) {
-                        toJsonObj = jsonMap;
-                    } else if (jsonArray != null) {
-                        toJsonObj = jsonArray;
+                    String text = null;
+                    if (toJsonObj instanceof CharSequence || toJsonObj instanceof StringRequestBody) {
+                        text = toJsonObj.toString();
+                    } else if (toJsonObj instanceof ObjectRequestBody) {
+                        text = jsonConverter.encodeToString(((ObjectRequestBody) toJsonObj).getObject());
+                    } else if (toJsonObj instanceof NameValueRequestBody) {
+                        Map<String, Object> subMap = new HashMap<>(1);
+                        subMap.put(((NameValueRequestBody) toJsonObj).getName(), ((NameValueRequestBody) toJsonObj).getValue());
+                        text = jsonConverter.encodeToString(subMap);
+                    } else {
+                        text = jsonConverter.encodeToString(toJsonObj);
                     }
-                }
-                String text = null;
-                if (toJsonObj instanceof CharSequence || toJsonObj instanceof StringRequestBody) {
-                    text = toJsonObj.toString();
-                } else if (toJsonObj instanceof ObjectRequestBody) {
-                    text = jsonConverter.encodeToString(((ObjectRequestBody) toJsonObj).getObject());
-                } else if (toJsonObj instanceof NameValueRequestBody) {
-                    Map<String, Object> subMap = new HashMap<>(1);
-                    subMap.put(((NameValueRequestBody) toJsonObj).getName(), ((NameValueRequestBody) toJsonObj).getValue());
-                    text = jsonConverter.encodeToString(subMap);
+                    setStringBody(httpRequest, text, charset, contentType, mergeCharset);
                 } else {
-                    text = jsonConverter.encodeToString(toJsonObj);
+                    setStringBody(httpRequest, "", charset, contentType, mergeCharset);
                 }
-                setStringBody(httpRequest, text, charset, contentType, mergeCharset);
+            } else if (mineContentType.isMultipart()) {
+                List<ForestMultipart> multiparts = request.getMultiparts();
+                setFileBody(httpRequest, request, charset, contentType, nameValueList, multiparts, lifeCycleHandler);
+            } else if (mineContentType.isBinary()) {
+                List<ForestMultipart> multiparts = request.getMultiparts();
+                List<byte[]> byteList = new LinkedList<>();
+                int size = 0;
+                for (ForestMultipart multipart : multiparts) {
+                    byte[] byteArray = multipart.getBytes();
+                    byteList.add(byteArray);
+                    size += byteArray.length;
+                }
+                for (ForestRequestBody body : reqBody) {
+                    byte[] byteArray = body.getByteArray();
+                    byteList.add(byteArray);
+                    size += byteArray.length;
+                }
+                byte[] bytes = new byte[size];
+                int pos = 0;
+                for (byte[] bytesItem : byteList) {
+                    for (int i = 0; i < bytesItem.length; i++) {
+                        bytes[pos + i] = bytesItem[i];
+                    }
+                    pos += bytesItem.length;
+                }
+                setBinaryBody(httpRequest, request, charset, contentType, nameValueList, bytes, lifeCycleHandler);
             } else {
-                setStringBody(httpRequest, "", charset, contentType, mergeCharset);
-            }
-        }
-        else if (mineContentType.isMultipart()) {
-            List<ForestMultipart> multiparts = request.getMultiparts();
-            setFileBody(httpRequest, request, charset, contentType, nameValueList, multiparts, lifeCycleHandler);
-        }
-        else if (mineContentType.isBinary()) {
-            List<ForestRequestBody> bodyList = request.getBody();
-            List<ForestMultipart> multiparts = request.getMultiparts();
-            List<byte[]> byteList = new LinkedList<>();
-            int size = 0;
-            for (ForestMultipart multipart : multiparts) {
-                byte[] byteArray = multipart.getBytes();
-                byteList.add(byteArray);
-                size += byteArray.length;
-            }
-            for (ForestRequestBody body : bodyList) {
-                byte[] byteArray = body.getByteArray();
-                byteList.add(byteArray);
-                size += byteArray.length;
-            }
-            byte[] bytes = new byte[size];
-            int pos = 0;
-            for (byte[] bytesItem : byteList) {
-                for (int i = 0; i < bytesItem.length; i++) {
-                    bytes[pos + i] = bytesItem[i];
+                StringBuilder builder = new StringBuilder();
+                List bodyList = request.getBody();
+                if (!bodyList.isEmpty()) {
+                    for (Object bodyItem : bodyList) {
+                        builder.append(bodyItem.toString());
+                    }
+                    setStringBody(httpRequest, builder.toString(), charset, contentType, mergeCharset);
                 }
-                pos += bytesItem.length;
-            }
-            setBinaryBody(httpRequest, request, charset, contentType, nameValueList, bytes, lifeCycleHandler);
-        }
-        else  {
-//            Map<String, Object> map = convertNameValueListToMap(request, nameValueList);
-//            StringBuilder builder = new StringBuilder();
-//            for (Iterator<Map.Entry<String, Object>> iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
-//                Map.Entry<String, Object> entry = iterator.next();
-//                Object value = entry.getValue();
-//                builder.append(value);
-//            }
-            StringBuilder builder = new StringBuilder();
-            List bodyList = request.getBody();
-            if (!bodyList.isEmpty()) {
-                for (Object bodyItem : bodyList) {
-                    builder.append(bodyItem.toString());
-                }
-                setStringBody(httpRequest, builder.toString(), charset, contentType, mergeCharset);
             }
         }
     }

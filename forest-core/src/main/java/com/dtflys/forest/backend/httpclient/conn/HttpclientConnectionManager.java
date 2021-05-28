@@ -27,9 +27,9 @@ import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.impl.auth.*;
 import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.DecompressingHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
@@ -40,9 +40,7 @@ import org.apache.http.nio.reactor.ConnectingIOReactor;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 
-import java.lang.reflect.Proxy;
 import java.nio.charset.CodingErrorAction;
-import java.security.*;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -88,28 +86,41 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
                 supportAsync = false;
             }
             if (supportAsync) {
-                ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor();
                 if (asyncConnectionManager == null) {
-                    try {
-                        ConnectionConfig connectionConfig = ConnectionConfig.custom()
-                                .setMalformedInputAction(CodingErrorAction.IGNORE)
-                                .setUnmappableInputAction(CodingErrorAction.IGNORE)
-                                .setCharset(Consts.UTF_8).build();
+                    synchronized (this) {
+                        if (asyncConnectionManager == null) {
+                            int errorRetryCount = 0;
+                            while (errorRetryCount < 5) {
+                                try {
+                                    ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor();
+                                    ConnectionConfig connectionConfig = ConnectionConfig.custom()
+                                            .setMalformedInputAction(CodingErrorAction.IGNORE)
+                                            .setUnmappableInputAction(CodingErrorAction.IGNORE)
+                                            .setCharset(Consts.UTF_8).build();
 
-                        authSchemeRegistry = RegistryBuilder
-                                .<AuthSchemeProvider>create()
-                                .register(AuthSchemes.BASIC, new BasicSchemeFactory())
-                                .register(AuthSchemes.DIGEST, new DigestSchemeFactory())
-                                .register(AuthSchemes.NTLM, new NTLMSchemeFactory())
-                                .register(AuthSchemes.SPNEGO, new SPNegoSchemeFactory())
-                                .register(AuthSchemes.KERBEROS, new KerberosSchemeFactory())
-                                .build();
+                                    authSchemeRegistry = RegistryBuilder
+                                            .<AuthSchemeProvider>create()
+                                            .register(AuthSchemes.BASIC, new BasicSchemeFactory())
+                                            .register(AuthSchemes.DIGEST, new DigestSchemeFactory())
+                                            .register(AuthSchemes.NTLM, new NTLMSchemeFactory())
+                                            .register(AuthSchemes.SPNEGO, new SPNegoSchemeFactory())
+                                            .register(AuthSchemes.KERBEROS, new KerberosSchemeFactory())
+                                            .build();
 
-                        asyncConnectionManager = new PoolingNHttpClientConnectionManager(ioReactor);
-                        asyncConnectionManager.setMaxTotal(maxConnections);
-                        asyncConnectionManager.setDefaultMaxPerRoute(maxRouteConnections);
-                        asyncConnectionManager.setDefaultConnectionConfig(connectionConfig);
-                    } catch (Throwable t) {
+                                    asyncConnectionManager = new PoolingNHttpClientConnectionManager(ioReactor);
+                                    asyncConnectionManager.setMaxTotal(maxConnections);
+                                    asyncConnectionManager.setDefaultMaxPerRoute(maxRouteConnections);
+                                    asyncConnectionManager.setDefaultConnectionConfig(connectionConfig);
+                                    break;
+                                } catch (Throwable t) {
+                                    errorRetryCount++;
+                                    if (errorRetryCount < 5) {
+                                        Thread.sleep((long) Math.pow(2F, errorRetryCount) * 100);
+                                    }
+
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -140,7 +151,6 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
         configBuilder.setStaleConnectionCheckEnabled(true);
         // 设置Cookie策略
         configBuilder.setCookieSpec(CookieSpecs.STANDARD);
-        RequestConfig requestConfig = configBuilder.build();
 
         ForestProxy forestProxy = request.getProxy();
         if (forestProxy != null) {
@@ -163,10 +173,11 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
         }
 
 
+        RequestConfig requestConfig = configBuilder.build();
         HttpClient httpClient = builder
                 .setDefaultRequestConfig(requestConfig)
+                .disableContentCompression()
                 .build();
-
         return httpClient;
     }
 

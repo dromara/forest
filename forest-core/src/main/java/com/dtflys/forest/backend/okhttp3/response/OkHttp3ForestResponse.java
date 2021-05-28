@@ -4,6 +4,7 @@ import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.utils.GzipUtils;
 import com.dtflys.forest.utils.StringUtils;
 import okhttp3.Headers;
 import okhttp3.MediaType;
@@ -34,9 +35,13 @@ public class OkHttp3ForestResponse extends ForestResponse {
         this.okResponse = okResponse;
         if (okResponse == null) {
             this.body = null;
-            this.statusCode = 404;
+            this.statusCode = null;
             return;
         }
+        contentEncoding = okResponse.headers().get("Content-Encoding");
+        // 判断是否将Response数据按GZIP来解压
+        isGzip = request.isDecompressResponseGzipEnabled();
+
         this.body = okResponse.body();
         this.statusCode = okResponse.code();
         setupHeaders();

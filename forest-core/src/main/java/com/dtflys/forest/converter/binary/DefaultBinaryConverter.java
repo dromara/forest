@@ -4,6 +4,7 @@ import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.ByteEncodeUtils;
+import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -84,6 +85,11 @@ public class DefaultBinaryConverter implements ForestConverter<Object> {
     public <T> T convertToJavaObject(Object source, Type targetType) {
         Class clazz = ReflectUtils.getClassByType(targetType);
         return (T) convertToJavaObject(source, clazz);
+    }
+
+    @Override
+    public ForestDataType getDataType() {
+        return ForestDataType.BINARY;
     }
 
 }

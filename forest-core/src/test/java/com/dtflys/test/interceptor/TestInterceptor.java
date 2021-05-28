@@ -1,6 +1,7 @@
 package com.dtflys.test.interceptor;
 
 import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.logging.ForestLogger;
 import com.dtflys.test.http.BaseClientTest;
 import com.dtflys.test.mock.GetMockServer;
@@ -116,5 +117,14 @@ public class TestInterceptor extends BaseClientTest {
         assertNotNull(result);
         assertEquals("XX: Base: " + GetMockServer.EXPECTED, result);
     }
+
+
+    @Test
+    public void testBaseSimpleInterceptorWithGenerationType() {
+        ForestResponse response = baseInterceptorClient.generationType();
+        assertNotNull(response);
+        assertEquals("XX: Base: " + GetMockServer.EXPECTED, response.getResult());
+    }
+
 
 }

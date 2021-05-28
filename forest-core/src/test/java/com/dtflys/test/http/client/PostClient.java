@@ -216,17 +216,17 @@ public interface PostClient {
 
 
     @Request(
-            url = "http://localhost:${port}/json",
+            url = "http://localhost:{port}/json",
             type = "post",
-            data = "{\"username\":\"${0}\",\"password\":\"${1}\",\"cn_name\":\"${2}\"}",
+            data = "{\"username\":\"{0}\",\"password\":\"${1}\",\"cn_name\":\"${2}\"}",
             contentType = "application/json; charset=utf-8"
     )
     String postJson(String username, String password, String cnName);
 
     @Request(
-            url = "http://localhost:${port}/json",
+            url = "http://localhost:{port}/json",
             type = "post",
-            data = "{\"username\":\"${0}\",\"password\":\"${1}\",\"cn_name\":\"${2}\"}",
+            data = "{\"username\":\"{0}\",\"password\":\"${1}\",\"cn_name\":\"${2}\"}",
             headers = {"Content-Type: application/json; charset=utf-8"}
     )
     String postJson2(String username, String password, String cnName);

@@ -7,6 +7,7 @@ import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.ForestLogger;
 import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.forest.springboot.annotation.ForestScan;
+import com.dtflys.forest.springboot.test.client0.DisturbInterface;
 import com.dtflys.forest.springboot.test.moudle.TestUser;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.springboot.test.client0.BeastshopClient;
@@ -31,18 +32,26 @@ import static org.junit.Assert.*;
 @ActiveProfiles("test0")
 @SpringBootTest(classes = Test0.class)
 @ComponentScan(basePackages = "com.dtflys.forest.springboot.test.service")
-@ForestScan(basePackages = "com.dtflys.forest.springboot.test.client0")
 @EnableAutoConfiguration
 public class Test0 {
 
     @Resource
     private BeastshopClient beastshopClient;
 
+    @Autowired(required = false)
+    private DisturbInterface disturbInterface;
+
+
     @Autowired
     private TestServiceImpl testService;
 
     @Resource(name = "config0")
     private ForestConfiguration config0;
+
+    @Test
+    public void testScanFilter() {
+        assertNull(disturbInterface);
+    }
 
     @Test
     public void testConfiguration() {
@@ -55,7 +64,7 @@ public class Test0 {
         assertEquals("okhttp3", config0.getBackend().getName());
         assertEquals("SSLv3", config0.getSslProtocol());
         assertTrue(config0.getLogHandler() instanceof DefaultLogHandler);
-        assertEquals("http://www.thebeastshop.com", config0.getVariableValue("baseUrl"));
+        assertEquals("https://www.thebeastshop.com/autopage", config0.getVariableValue("baseUrl"));
         assertEquals("xxx", config0.getVariableValue("myName"));
         assertNotNull(config0.getVariableValue("user"));
         assertTrue(!config0.isLogEnabled());
@@ -121,19 +130,19 @@ public class Test0 {
         }
         Mockito.verify(logger).info("[Forest] Request: \n" +
                 "\t[Retry]: 1\n" +
-                "\tGET http://www.thebeastshop.com/autopage/shops.htm HTTP");
+                "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS");
         Mockito.verify(logger).info("[Forest] Request: \n" +
                 "\t[Retry]: 2\n" +
-                "\tGET http://www.thebeastshop.com/autopage/shops.htm HTTP");
+                "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS");
         Mockito.verify(logger).info("[Forest] Request: \n" +
                 "\t[Retry]: 3\n" +
-                "\tGET http://www.thebeastshop.com/autopage/shops.htm HTTP");
+                "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS");
         Mockito.verify(logger).info("[Forest] Request: \n" +
                 "\t[Retry]: 4\n" +
-                "\tGET http://www.thebeastshop.com/autopage/shops.htm HTTP");
+                "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS");
         Mockito.verify(logger).info("[Forest] Request: \n" +
                 "\t[Retry]: 5\n" +
-                "\tGET http://www.thebeastshop.com/autopage/shops.htm HTTP");
+                "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS");
 //        Mockito.verify(logger).info("[Forest] [Network Error]: connect timed out");
 
     }

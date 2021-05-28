@@ -24,6 +24,7 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.callback.OnSaveCookie;
@@ -36,6 +37,7 @@ import com.dtflys.forest.http.body.StringRequestBody;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.RequestLogMessage;
+import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
@@ -76,7 +78,7 @@ import static com.dtflys.forest.mapping.MappingParameter.*;
 public class ForestRequest<T> {
 
     /**
- * 默认上传/下载进度监听的步长
+     * 默认上传/下载进度监听的步长
      * 每上传/下载一定的比特数，执行一次监听回调函数
      */
     private final static long DEFAULT_PROGRESS_STEP = 1024 * 10;
@@ -169,6 +171,11 @@ public class ForestRequest<T> {
      * 请求超时时间
      */
     private int timeout = 3000;
+
+    /**
+     * 是否开启解压GZIP响应内容
+     */
+    private boolean decompressResponseGzipEnabled = false;
 
     /**
      * SSL协议
@@ -414,7 +421,7 @@ public class ForestRequest<T> {
                     }
 
                     addQuery(new ForestQueryParameter(
-                            requestNameValue.getName(), requestNameValue.getValue(), true));
+                            requestNameValue.getName(), requestNameValue.getValue(), true, false, null));
                 }
             }
 
@@ -531,6 +538,33 @@ public class ForestRequest<T> {
     }
 
     /**
+     * 获取Multipart类型请求的boundary字符串
+     * @return boundary字符串
+     */
+    public String getBoundary() {
+        String contentType = getContentType();
+        if (StringUtils.isEmpty(contentType)) {
+            return null;
+        }
+        String[] group = contentType.split(";");
+        if (group.length > 1) {
+            for (int i = 1; i < group.length; i++) {
+                String subContentType = group[i];
+                String[] nvPair = subContentType.split("=");
+                if (nvPair.length > 1) {
+                    String name = nvPair[0];
+                    String value = nvPair[1];
+                    if ("boundary".equalsIgnoreCase(name)) {
+                        return value;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+
+    /**
      * 获取请求的Query参数表
      * @return Query参数表
      */
@@ -568,7 +602,7 @@ public class ForestRequest<T> {
                 }
                 if (value != null) {
                     try {
-                        String encodedValue = URLUtils.urlEncoding(value.toString(), getCharset());
+                        String encodedValue = URLUtils.encode(value.toString(), getCharset());
                         builder.append(encodedValue);
                     } catch (UnsupportedEncodingException e) {
                     }
@@ -591,6 +625,20 @@ public class ForestRequest<T> {
         this.query.addQuery(name, value);
         return this;
     }
+
+    /**
+     * 添加请求中的Query参数
+     * @param name Query参数名
+     * @param value Query参数值
+     * @param isUrlEncode 是否进行编码
+     * @param charset 编码字符集
+     * @return {@link ForestRequest}对象实例
+     */
+    public ForestRequest addQuery(String name, Object value, boolean isUrlEncode, String charset) {
+        this.query.addQuery(name, value, isUrlEncode, charset);
+        return this;
+    }
+
 
     /**
      * 添加请求中的Query参数
@@ -870,6 +918,24 @@ public class ForestRequest<T> {
      */
     public ForestRequest setTimeout(int timeout) {
         this.timeout = timeout;
+        return this;
+    }
+
+    /**
+     * 是否开启解压GZIP响应内容
+     * @return {@code true}为开启，否则不开启
+     */
+    public boolean isDecompressResponseGzipEnabled() {
+        return decompressResponseGzipEnabled;
+    }
+
+    /**
+     * 设置是否开启解压GZIP响应内容
+     * @param decompressResponseGzipEnabled {@code true}为开启，否则不开启
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest setDecompressResponseGzipEnabled(boolean decompressResponseGzipEnabled) {
+        this.decompressResponseGzipEnabled = decompressResponseGzipEnabled;
         return this;
     }
 
@@ -1168,6 +1234,7 @@ public class ForestRequest<T> {
     public Object[] getArguments() {
         return arguments;
     }
+
 
     /**
      * 获取该请求的所有请求头信息

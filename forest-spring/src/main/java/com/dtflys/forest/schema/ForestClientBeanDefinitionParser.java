@@ -15,7 +15,7 @@ import org.w3c.dom.Element;
  * @since 2017-04-24 19:49
  */
 public class ForestClientBeanDefinitionParser implements BeanDefinitionParser {
-    private static Logger log = LoggerFactory.getLogger(ForestConfigurationBeanDefinitionParser.class);
+    private static Logger log = LoggerFactory.getLogger(ForestClientBeanDefinitionParser.class);
 
     private final Class factoryBeanClass = ClientFactoryBean.class;
 

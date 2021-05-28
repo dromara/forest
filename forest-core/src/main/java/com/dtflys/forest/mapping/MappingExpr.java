@@ -25,4 +25,6 @@ public abstract class MappingExpr {
     }
 
     public abstract boolean isIterateVariable();
+
+
 }

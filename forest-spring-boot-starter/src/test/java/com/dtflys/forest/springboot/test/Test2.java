@@ -27,7 +27,6 @@ import static org.junit.Assert.*;
 @ActiveProfiles("test2")
 @SpringBootTest(classes = Test2.class)
 @ComponentScan(basePackageClasses = GlobalInterceptor.class)
-@ForestScan(basePackageClasses = GiteeClient.class)
 @EnableAutoConfiguration
 public class Test2 {
 

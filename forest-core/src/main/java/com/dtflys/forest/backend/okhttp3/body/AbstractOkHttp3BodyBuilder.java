@@ -91,7 +91,7 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
                                List<RequestNameValue> nameValueList,
                                List<ForestMultipart> multiparts,
                                LifeCycleHandler lifeCycleHandler) {
-        MultipartBody.Builder bodyBuilder = new MultipartBody.Builder();
+        MultipartBody.Builder bodyBuilder = new MultipartBody.Builder(request.getBoundary());
         MediaType mediaType = MediaType.parse(contentType);
         if ("multipart".equals(mediaType.type())) {
             bodyBuilder.setType(mediaType);

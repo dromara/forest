@@ -3,6 +3,7 @@ package com.dtflys.forest.utils;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URLEncoder;
 
 /**
@@ -19,7 +20,36 @@ public final class URLUtils {
     }
 
     public static boolean hasProtocol(String url) {
-        return url.startsWith("http://") || url.startsWith("https://");
+        int len = url.length();
+        for (int i = 0; i < len; i++) {
+            char ch = url.charAt(i);
+            if (ch == ':') {
+                String protocol = url.substring(0, i);
+                char nc = url.charAt(i + 1);
+                if (nc == '/') {
+                    return isValidProtocol(protocol);
+                }
+            }
+        }
+        return false;
+    }
+
+    private static boolean isValidProtocol(String protocol) {
+        int len = protocol.length();
+        if (len < 1) {
+            return false;
+        }
+        for (int i = 0; i < len; i++) {
+            char ch = protocol.charAt(i);
+            if (!Character.isAlphabetic(ch)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean isValidUrl(String url) {
+        return hasProtocol(url);
     }
 
     public static void checkBaseURL(String baseUrl) {
@@ -69,11 +99,48 @@ public final class URLUtils {
         return uri;
     }
 
-    public static String urlEncoding(String query, String encode) throws UnsupportedEncodingException {
-        if (isURL(query)) {
-            return query;
-        }
+    public static String forceEncode(String query, String encode) throws UnsupportedEncodingException {
         return URLEncoder.encode(query, encode);
+    }
+
+    public static String encode(String content, String charset) throws UnsupportedEncodingException {
+        if (content == null) {
+            return null;
+        }
+        if (isEncoded(content)) {
+            return content;
+        }
+        if (hasProtocol(content)) {
+            String[] group = content.split("\\?");
+            if (group.length > 1) {
+                String query = group[1];
+                String[] queries = query.split("&");
+                if (queries.length > 1) {
+                    return URLEncoder.encode(content, charset);
+                }
+            }
+            return content;
+        }
+        return URLEncoder.encode(content, charset);
+    }
+
+    public static boolean isEncoded(String content) {
+        for (int i = 0; i < content.length() - 1; i++) {
+            char ch = content.charAt(i);
+            if (ch == '%') {
+                char nc = content.charAt(i + 1);
+                if (Character.isDigit(nc)
+                        || nc == 'A'
+                        || nc == 'B'
+                        || nc == 'C'
+                        || nc == 'D'
+                        || nc == 'E'
+                        || nc == 'F') {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }

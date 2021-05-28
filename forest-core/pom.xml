@@ -6,12 +6,12 @@
 
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-core</artifactId>
-    <version>1.5.1-BETA</version>
+    <version>1.5.2-BETA</version>
 
     <parent>
         <groupId>com.dtflys.forest</groupId>
         <artifactId>forest</artifactId>
-        <version>1.5.1-BETA</version>
+        <version>1.5.2-BETA</version>
     </parent>
 
     <properties>
@@ -158,14 +158,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-        <!-- QLExpress -->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>QLExpress</artifactId>
-            <version>3.2.0</version>
-        </dependency>
-
 
         <!-- log4j2 -->
         <dependency>

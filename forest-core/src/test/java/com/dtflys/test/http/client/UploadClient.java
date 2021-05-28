@@ -30,7 +30,7 @@ public interface UploadClient {
     @Post(url = "/upload")
     ForestRequest<Map> upload(@DataFile(value = "file", fileName = "${1}") byte[] bytes, String filename);
 
-    @Post(url = "/upload")
+    @Post(url = "/upload", contentType = "multipart/data-form")
     ForestRequest<Map> upload(@DataFile(value = "file", fileName = "${1}") InputStream in, String filename);
 
     // Path Collection

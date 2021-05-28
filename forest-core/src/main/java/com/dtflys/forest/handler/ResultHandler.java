@@ -51,6 +51,9 @@ public class ResultHandler {
                             Object realResult = getResult(request, response, realType, realClass);
                             response.setResult(realResult);
                         }
+                    } else {
+                        Object realResult = getResult(request, response, Object.class, Object.class);
+                        response.setResult(realResult);
                     }
                     return response;
                 }

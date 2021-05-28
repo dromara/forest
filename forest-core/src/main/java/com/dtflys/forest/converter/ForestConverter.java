@@ -1,5 +1,7 @@
 package com.dtflys.forest.converter;
 
+import com.dtflys.forest.utils.ForestDataType;
+
 import java.lang.reflect.Type;
 
 /**
@@ -27,4 +29,10 @@ public interface ForestConverter<S> {
      * @return 转换后的目标类型对象
      */
     <T> T convertToJavaObject(S source, Type targetType);
+
+    /**
+     * 获取当前数据转换器转换类型
+     * @return
+     */
+    ForestDataType getDataType();
 }

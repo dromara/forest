@@ -4,6 +4,7 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.interceptor.SpringInterceptorFactory;
+import com.dtflys.forest.listener.ConverterBeanListener;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.scanner.ClassPathClientScanner;
 import com.dtflys.forest.schema.ForestConfigurationBeanDefinitionParser;
@@ -124,7 +125,17 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
             registerConverter(configuration, ForestDataType.BINARY, convertProperties.getBinary());
         }
 
+        registerConverterBeanListener(configuration);
         return configuration;
+    }
+
+    public ConverterBeanListener registerConverterBeanListener(ForestConfiguration forestConfiguration) {
+        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(ConverterBeanListener.class);
+        BeanDefinition beanDefinition = beanDefinitionBuilder.getRawBeanDefinition();
+        beanDefinition.getPropertyValues().addPropertyValue("forestConfiguration", forestConfiguration);
+        BeanDefinitionRegistry beanFactory = (BeanDefinitionRegistry) applicationContext.getBeanFactory();
+        beanFactory.registerBeanDefinition("forestConverterBeanListener", beanDefinition);
+        return applicationContext.getBean("forestConverterBeanListener", ConverterBeanListener.class);
     }
 
     private void registerConverter(ForestConfiguration configuration, ForestDataType dataType, ForestConverterItemProperties converterItemProperties) {

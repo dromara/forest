@@ -66,7 +66,12 @@ public enum  Token {
     /**
      * 变量引用标记
      */
-    REF(11, "REF")
+    REF(11, "REF"),
+
+    /**
+     * property配置属性
+     */
+    PROP(12, "PROP")
 
     ;
 

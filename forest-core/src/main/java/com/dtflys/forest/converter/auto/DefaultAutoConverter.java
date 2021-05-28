@@ -198,4 +198,9 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
         }
     }
 
+    @Override
+    public ForestDataType getDataType() {
+        return ForestDataType.AUTO;
+    }
+
 }

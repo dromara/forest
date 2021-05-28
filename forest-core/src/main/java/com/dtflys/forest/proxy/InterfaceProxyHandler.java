@@ -6,6 +6,7 @@ import com.dtflys.forest.annotation.BaseURL;
 import com.dtflys.forest.annotation.MethodLifeCycle;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.VariableScope;
+import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorFactory;
 import com.dtflys.forest.lifecycles.BaseAnnotationLifeCycle;
@@ -19,7 +20,10 @@ import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
@@ -49,6 +53,10 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
 
     private LogConfiguration baseLogConfiguration;
 
+    private final Constructor<MethodHandles.Lookup> defaultMethodConstructor;
+
+    private MethodHandles.Lookup defaultMethodLookup;
+
 
     private List<Annotation> baseAnnotations = new LinkedList<>();
 
@@ -62,6 +70,16 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         this.proxyFactory = proxyFactory;
         this.interfaceClass = interfaceClass;
         this.interceptorFactory = configuration.getInterceptorFactory();
+
+        try {
+            defaultMethodConstructor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
+            if (!defaultMethodConstructor.isAccessible()) {
+                defaultMethodConstructor.setAccessible(true);
+            }
+            defaultMethodLookup = defaultMethodConstructor.newInstance(interfaceClass, MethodHandles.Lookup.PRIVATE);
+        } catch (Throwable e) {
+            throw new ForestRuntimeException(e);
+        }
         prepareBaseInfo();
         initMethods();
     }
@@ -102,6 +120,9 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         Method[] methods = interfaceClass.getDeclaredMethods();
         for (int i = 0; i < methods.length; i++) {
             Method method = methods[i];
+            if(method.isDefault()){
+                continue;
+            }
             ForestMethod forestMethod = new ForestMethod(this, configuration, method);
             forestMethodMap.put(method, forestMethod);
         }
@@ -110,6 +131,9 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         String methodName = method.getName();
+        if (method.isDefault()) {
+          return invokeDefaultMethod(proxy, method, args);
+        }
         if ("toString".equals(methodName) && (args == null || args.length == 0)) {
             return "{Forest Proxy Object of " + interfaceClass.getName() + "}";
         }
@@ -125,6 +149,12 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         ForestMethod forestMethod = forestMethodMap.get(method);
         return forestMethod.invoke(args);
     }
+
+  private Object invokeDefaultMethod(Object proxy, Method method, Object[] args)
+          throws Throwable {
+    return defaultMethodLookup.unreflectSpecial(method, interfaceClass)
+            .bindTo(proxy).invokeWithArguments(args);
+  }
 
     public MetaRequest getBaseMetaRequest() {
         return baseMetaRequest;

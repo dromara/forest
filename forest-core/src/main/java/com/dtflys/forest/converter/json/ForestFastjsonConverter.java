@@ -24,25 +24,17 @@
 
 package com.dtflys.forest.converter.json;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONException;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.*;
 import com.alibaba.fastjson.parser.ParserConfig;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.util.FieldInfo;
 import com.alibaba.fastjson.util.TypeUtils;
-import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -298,12 +290,11 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
     }
 
     @Override
-    public ForestConverter setDateFormat(String format) {
+    public void setDateFormat(String format) {
         this.dateFormat = format;
         if (StringUtils.isNotBlank(format)) {
             JSON.DEFFAULT_DATE_FORMAT = format;
         }
-        return this;
     }
 
     @Override
@@ -316,4 +307,8 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         return (Map<String, Object>) jsonObj;
     }
 
+    @Override
+    public ForestDataType getDataType() {
+        return ForestDataType.JSON;
+    }
 }

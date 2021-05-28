@@ -15,7 +15,6 @@ public class ContentType {
     public final static String MULTIPART_FORM_DATA = "multipart/form-data";
     public final static String X_WWW_FORM_URLENCODED = "x-www-form-urlencoded";
 
-
     private final String type;
 
     private final String subType;
@@ -103,6 +102,7 @@ public class ContentType {
         return "javascript".equals(subType);
     }
 
+
     public boolean isOctetStream() {
         if (subType == null) {
             return false;
@@ -125,7 +125,7 @@ public class ContentType {
     }
 
     public boolean isBinary() {
-        return isStream() || isImage() || isZip();
+        return isMultipart() || isStream() || isImage() || isZip();
     }
 
     public boolean isTorrent() {

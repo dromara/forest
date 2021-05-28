@@ -3,7 +3,6 @@ package com.dtflys.forest.scanner;
 import com.dtflys.forest.annotation.BaseLifeCycle;
 import com.dtflys.forest.annotation.MethodLifeCycle;
 import com.dtflys.forest.file.SpringResource;
-import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.http.body.MultipartRequestBodyBuilder;
 import com.dtflys.forest.http.body.RequestBodyBuilder;
 import com.dtflys.forest.http.body.ResourceRequestBodyBuilder;
