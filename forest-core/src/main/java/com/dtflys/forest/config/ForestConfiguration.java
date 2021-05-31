@@ -729,7 +729,11 @@ public class ForestConfiguration implements Serializable {
      * @return JSON数据转换器
      */
     public ForestJsonConverter getJsonConverter() {
-        return (ForestJsonConverter) getConverterMap().get(ForestDataType.JSON);
+        ForestJsonConverter jsonConverter = (ForestJsonConverter) getConverterMap().get(ForestDataType.JSON);
+        if (jsonConverter == null) {
+            throw new ForestRuntimeException("JSON converter cannot be found. Please check your classpath if there is the JSON framework, eg. Jackson (>= 2.9.10), Gson or Fastjson (>= 1.2.48), is in the dependencies of your project.");
+        }
+        return jsonConverter;
     }
 
     /**
