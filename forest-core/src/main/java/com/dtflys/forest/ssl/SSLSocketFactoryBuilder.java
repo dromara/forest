@@ -10,7 +10,7 @@ import javax.net.ssl.SSLSocketFactory;
  * @author LiFaXin
  * @date 2021/6/21 7:47 下午
  **/
-public interface SslSocketFactoryBuilder {
+public interface SSLSocketFactoryBuilder {
 
     /**
      * 获取SSL Socket Factory

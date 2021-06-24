@@ -1,7 +1,7 @@
 package com.dtflys.forest.springboot.test.ssl;
 
 import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.ssl.SslSocketFactoryBuilder;
+import com.dtflys.forest.ssl.SSLSocketFactoryBuilder;
 import com.dtflys.forest.ssl.TrustAllManager;
 
 import javax.net.ssl.SSLContext;
@@ -15,7 +15,7 @@ import java.security.SecureRandom;
  * @author LiFaXin
  * @date 2021/6/21 8:08 下午
  **/
-public class MySSLSocketFactoryBuilder implements SslSocketFactoryBuilder {
+public class MySSLSocketFactoryBuilder implements SSLSocketFactoryBuilder {
     @Override
     public SSLSocketFactory getSslSocketFactory(ForestRequest request, String protocol) throws Exception{
         SSLContext sslContext = SSLContext.getInstance("SSL");
