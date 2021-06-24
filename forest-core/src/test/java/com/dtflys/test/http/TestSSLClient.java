@@ -65,7 +65,8 @@ public class TestSSLClient extends BaseClientTest {
                 "ssl_client",
                 "ssl_client.keystore",
                 "client",
-                "456789");
+                "456789",
+                "com.dtflys.spring.test.ssl.MySSLSocketFactoryBuilder");
         configuration.registerKeyStore(sslKeyStore);
     }
 

@@ -292,7 +292,8 @@ public interface PostClient {
                     "Accept:application/json",
                     "Authorization: ${token}",
             },
-            contentType = "application/json"
+            contentType = "application/json",
+            keyStore = "ssss"
     )
     @LogEnabled
     ForestResponse<String> postJson5(@DataParam("username") String username, @DataVariable("token") String token);

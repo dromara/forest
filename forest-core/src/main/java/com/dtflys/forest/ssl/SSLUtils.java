@@ -9,6 +9,8 @@ import com.dtflys.forest.http.ForestRequest;
 
 import javax.net.ssl.*;
 import java.security.*;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -106,7 +108,7 @@ public class SSLUtils {
         return SSLUtils.customSSL(request);
     }
 
-    public static SSLSocketFactory getSSLSocketFactory(ForestRequest request, String protocol) {
+    private static SSLSocketFactory getDefaultSSLSocketFactory(ForestRequest request, String protocol) {
         if (request == null) {
             return null;
         }
@@ -121,6 +123,27 @@ public class SSLUtils {
         } catch (NoSuchAlgorithmException e) {
             throw new ForestRuntimeException(e);
         }
+    }
+
+    private static ConcurrentHashMap<String, SslSocketFactoryBuilder> sslSocketFactoryBuilderCache = new ConcurrentHashMap<>();
+    public static SSLSocketFactory getSSLSocketFactory (ForestRequest request, String protocol){
+        if (Objects.isNull(request.getKeyStore())) {
+            return getDefaultSSLSocketFactory(request, request.getSslProtocol());
+        }
+        String key = request.getKeyStore().getSslSocketFactoryBuilder();
+        SslSocketFactoryBuilder sslSocketFactoryBuilder = sslSocketFactoryBuilderCache.get(key);
+        if (Objects.isNull(sslSocketFactoryBuilder)){
+            if (StringUtils.isNotEmpty(key)) {
+                try {
+                    sslSocketFactoryBuilder = (SslSocketFactoryBuilder)Class.forName(key).newInstance();
+                    sslSocketFactoryBuilderCache.put(key, sslSocketFactoryBuilder);
+                    return sslSocketFactoryBuilder.getSslSocketFactory(request, protocol);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return getDefaultSSLSocketFactory(request, request.getSslProtocol());
     }
 
 }

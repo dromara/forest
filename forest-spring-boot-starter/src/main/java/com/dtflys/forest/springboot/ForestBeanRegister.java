@@ -197,7 +197,8 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
                 sslKeyStoreProperties.getKeystorePass(),
                 sslKeyStoreProperties.getCertPass(),
                 sslKeyStoreProperties.getProtocols(),
-                sslKeyStoreProperties.getCipherSuites()
+                sslKeyStoreProperties.getCipherSuites(),
+                sslKeyStoreProperties.getSslSocketFactoryBuilder()
         );
         map.put(id, beanDefinition);
         return beanDefinition;

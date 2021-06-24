@@ -1,23 +1,27 @@
 package com.dtflys.forest.backend.httpclient.conn;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import javax.net.SocketFactory;
-import javax.net.ssl.*;
-import javax.net.ssl.SSLSocketFactory;
-
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.ssl.SSLUtils;
 import org.apache.http.HttpHost;
-//import org.apache.http.annotation.ThreadSafe;
 import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
-import org.apache.http.conn.ssl.*;
+import org.apache.http.conn.ssl.BrowserCompatHostnameVerifier;
+import org.apache.http.conn.ssl.SSLContexts;
+import org.apache.http.conn.ssl.SSLInitializationException;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.Args;
 import org.apache.http.util.TextUtils;
+
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+
+//import org.apache.http.annotation.ThreadSafe;
 
 public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactory {
 
@@ -110,8 +114,8 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
         if (request == null) {
             throw new ForestRuntimeException("Current request is NULL!");
         }
-        SSLSocket sslsock = (SSLSocket) SSLUtils.getSSLSocketFactory(request, request.getSslProtocol())
-                .createSocket(socket, target, port, true);
+        SSLSocketFactory sslSocketFactory = SSLUtils.getSSLSocketFactory(request, request.getSslProtocol());
+        SSLSocket sslsock = (SSLSocket) sslSocketFactory.createSocket(socket, target, port, true);
         if (request != null) {
             SSLKeyStore keyStore = request.getKeyStore();
             if (keyStore != null) {

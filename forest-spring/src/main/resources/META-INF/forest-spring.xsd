@@ -347,6 +347,15 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="sslSocketFactoryBuilder" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           Cert密码
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>
 
 
