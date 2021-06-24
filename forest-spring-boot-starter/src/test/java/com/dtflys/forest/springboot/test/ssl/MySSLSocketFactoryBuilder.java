@@ -17,7 +17,7 @@ import java.security.SecureRandom;
  **/
 public class MySSLSocketFactoryBuilder implements SSLSocketFactoryBuilder {
     @Override
-    public SSLSocketFactory getSslSocketFactory(ForestRequest request, String protocol) throws Exception{
+    public SSLSocketFactory getSSLSocketFactory(ForestRequest request, String protocol) throws Exception{
         SSLContext sslContext = SSLContext.getInstance("SSL");
         sslContext.init(null,
                 new TrustManager[] { new TrustAllManager() },

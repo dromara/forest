@@ -125,19 +125,19 @@ public class SSLUtils {
         }
     }
 
-    private static ConcurrentHashMap<String, SslSocketFactoryBuilder> sslSocketFactoryBuilderCache = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String, SSLSocketFactoryBuilder> sslSocketFactoryBuilderCache = new ConcurrentHashMap<>();
     public static SSLSocketFactory getSSLSocketFactory (ForestRequest request, String protocol){
         if (Objects.isNull(request.getKeyStore())) {
             return getDefaultSSLSocketFactory(request, request.getSslProtocol());
         }
         String key = request.getKeyStore().getSslSocketFactoryBuilder();
-        SslSocketFactoryBuilder sslSocketFactoryBuilder = sslSocketFactoryBuilderCache.get(key);
+        SSLSocketFactoryBuilder sslSocketFactoryBuilder = sslSocketFactoryBuilderCache.get(key);
         if (Objects.isNull(sslSocketFactoryBuilder)){
             if (StringUtils.isNotEmpty(key)) {
                 try {
-                    sslSocketFactoryBuilder = (SslSocketFactoryBuilder)Class.forName(key).newInstance();
+                    sslSocketFactoryBuilder = (SSLSocketFactoryBuilder)Class.forName(key).newInstance();
                     sslSocketFactoryBuilderCache.put(key, sslSocketFactoryBuilder);
-                    return sslSocketFactoryBuilder.getSslSocketFactory(request, protocol);
+                    return sslSocketFactoryBuilder.getSSLSocketFactory(request, protocol);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

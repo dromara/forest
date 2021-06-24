@@ -20,5 +20,5 @@ public interface SSLSocketFactoryBuilder {
      * @throws Exception
      * @return
      */
-    SSLSocketFactory getSslSocketFactory(ForestRequest request, String protocol) throws Exception;
+    SSLSocketFactory getSSLSocketFactory(ForestRequest request, String protocol) throws Exception;
 }
