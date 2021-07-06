@@ -94,9 +94,11 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
                                List<RequestNameValue> nameValueList,
                                List<ForestMultipart> multiparts,
                                LifeCycleHandler lifeCycleHandler) {
-        MultipartEntityBuilder entityBuilder = MultipartEntityBuilder
-                .create()
-                .setBoundary(request.getBoundary());
+        String boundary = request.getBoundary();
+        MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
+        if (StringUtils.isNotEmpty(boundary)) {
+            entityBuilder.setBoundary(request.getBoundary());
+        }
         // 解决文件名乱码问题
         Charset httpCharset = Charset.forName(charset);
         entityBuilder.setCharset(httpCharset);
