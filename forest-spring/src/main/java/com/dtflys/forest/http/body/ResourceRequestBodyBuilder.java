@@ -5,7 +5,7 @@ import org.springframework.core.io.Resource;
 public class ResourceRequestBodyBuilder extends RequestBodyBuilder<Resource, ResourceRequestBody, ResourceRequestBodyBuilder> {
 
     @Override
-    public ResourceRequestBody build() {
+    public ResourceRequestBody build(Resource data, String defaultValue) {
         if (data == null) {
             return null;
         }

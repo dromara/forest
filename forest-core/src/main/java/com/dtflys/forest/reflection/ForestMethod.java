@@ -820,9 +820,7 @@ public class ForestMethod<T> implements VariableScope {
                         } else if (MappingParameter.isBody(target)) {
                             ForestRequestBody body = RequestBodyBuilder
                                     .type(obj.getClass())
-                                    .setData(obj)
-                                    .setDefaultValue(parameter.getDefaultValue())
-                                    .build();
+                                    .build(obj, parameter.getDefaultValue());
                             request.addBody(body);
                         } else {
                             nameValueList.add(new RequestNameValue(obj.toString(), target, parameter.getPartContentType())
@@ -881,16 +879,14 @@ public class ForestMethod<T> implements VariableScope {
                     } else if (MappingParameter.isBody(target)) {
                         ForestRequestBody body = RequestBodyBuilder
                                 .type(obj.getClass())
-                                .setData(obj)
-                                .build();
+                                .build(obj, parameter.getDefaultValue());
                         request.addBody(body);
                     }
                 }
                 else if (MappingParameter.isBody(target)) {
                     ForestRequestBody body = RequestBodyBuilder
                             .type(obj.getClass())
-                            .setData(obj)
-                            .build();
+                            .build(obj, parameter.getDefaultValue());
                     request.addBody(body);
                 } else {
                     try {

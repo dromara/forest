@@ -159,13 +159,8 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
             if (StringUtils.isNotBlank(protocol)) {
                 if (protocol.startsWith("SSL") || protocol.startsWith("ssl")) {
                     protocol = "SSL";
-                } else if (protocol.startsWith("TLS") || protocol.startsWith("TLS")) {
-                    String[] strs = protocol.split("v");
-                    if (strs.length == 1) {
-                        protocol = "TLS";
-                    } else if (strs[1] != "1.1") {
-                        protocol = "TLS";
-                    }
+                } else if (protocol.startsWith("TLS") || protocol.startsWith("tls")) {
+                    protocol = "TLS";
                 }
             }
             SSLSocketFactory sslSocketFactory = SSLUtils.getSSLSocketFactory(request, protocol);

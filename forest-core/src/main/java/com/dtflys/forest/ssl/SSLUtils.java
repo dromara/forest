@@ -128,7 +128,7 @@ public class SSLUtils {
     private static ConcurrentHashMap<String, SSLSocketFactoryBuilder> sslSocketFactoryBuilderCache = new ConcurrentHashMap<>();
     public static SSLSocketFactory getSSLSocketFactory (ForestRequest request, String protocol){
         if (Objects.isNull(request.getKeyStore())) {
-            return getDefaultSSLSocketFactory(request, request.getSslProtocol());
+            return getDefaultSSLSocketFactory(request, protocol);
         }
         String key = request.getKeyStore().getSslSocketFactoryBuilder();
         SSLSocketFactoryBuilder sslSocketFactoryBuilder = sslSocketFactoryBuilderCache.get(key);
