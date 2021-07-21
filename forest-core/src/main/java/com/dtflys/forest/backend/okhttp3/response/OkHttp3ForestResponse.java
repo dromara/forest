@@ -11,7 +11,9 @@ import okhttp3.MediaType;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Date;
 
@@ -103,6 +105,14 @@ public class OkHttp3ForestResponse extends ForestResponse {
         if (StringUtils.isEmpty(this.contentEncoding)) {
             this.contentEncoding = okResponse.header("Content-Encoding");
         }
+    }
+
+    @Override
+    public InputStream getInputStream() throws Exception {
+        if (this.contentLength > Integer.MAX_VALUE) {
+            return body.byteStream();
+        }
+        return new ByteArrayInputStream(getByteArray());
     }
 
     @Override

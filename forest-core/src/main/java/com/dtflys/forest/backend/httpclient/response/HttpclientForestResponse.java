@@ -15,6 +15,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.entity.GzipDecompressingEntity;
 import org.apache.http.util.EntityUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -126,6 +127,14 @@ public class HttpclientForestResponse extends ForestResponse {
         } catch (IOException e) {
             throw new ForestRuntimeException(e);
         }
+    }
+
+    @Override
+    public InputStream getInputStream() throws Exception {
+        if (this.contentLength > Integer.MAX_VALUE) {
+            return entity.getContent();
+        }
+        return new ByteArrayInputStream(getByteArray());
     }
 
     @Override
