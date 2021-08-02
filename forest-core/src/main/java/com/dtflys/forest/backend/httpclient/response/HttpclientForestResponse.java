@@ -4,15 +4,12 @@ import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.utils.GzipUtils;
-import com.dtflys.forest.utils.StringUtils;
-import okhttp3.MediaType;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HeaderIterator;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.entity.GzipDecompressingEntity;
+import org.apache.http.StatusLine;
 import org.apache.http.util.EntityUtils;
 
 import java.io.ByteArrayInputStream;
@@ -20,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Date;
-import java.util.zip.ZipException;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -41,7 +37,9 @@ public class HttpclientForestResponse extends ForestResponse {
         this.entity = entity;
         if (httpResponse != null) {
             setupHeaders();
-            this.statusCode = httpResponse.getStatusLine().getStatusCode();
+            StatusLine statusLine = httpResponse.getStatusLine();
+            this.statusCode = statusLine.getStatusCode();
+            this.reasonPhrase = statusLine.getReasonPhrase();
             if (entity != null) {
                 Header type = entity.getContentType();
                 if (type != null) {

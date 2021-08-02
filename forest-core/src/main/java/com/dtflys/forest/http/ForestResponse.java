@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
-import java.util.zip.GZIPInputStream;
 
 /**
  * Forest请求响应类
@@ -76,6 +75,11 @@ public abstract class ForestResponse<T> {
      * 网络状态码
      */
     protected volatile Integer statusCode;
+
+    /**
+     * 原因短语
+     */
+    protected volatile String reasonPhrase;
 
     /**
      * 响应内容文本（不包括二进制数据内容的文本）
@@ -290,6 +294,15 @@ public abstract class ForestResponse<T> {
      */
     public void setStatusCode(Integer statusCode) {
         this.statusCode = statusCode;
+    }
+
+    /**
+     * 获取请求响应的原因短语
+     *
+     * @return 请求响应的原因短语
+     */
+    public String getReasonPhrase() {
+        return reasonPhrase;
     }
 
     /**

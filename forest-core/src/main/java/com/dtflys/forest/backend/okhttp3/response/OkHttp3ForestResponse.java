@@ -46,6 +46,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
 
         this.body = okResponse.body();
         this.statusCode = okResponse.code();
+        this.reasonPhrase = okResponse.message();
         setupHeaders();
         if (body == null) {
             return;
