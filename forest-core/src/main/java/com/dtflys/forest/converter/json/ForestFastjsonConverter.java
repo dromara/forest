@@ -28,6 +28,7 @@ import com.alibaba.fastjson.*;
 import com.alibaba.fastjson.parser.ParserConfig;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.util.FieldInfo;
+import com.alibaba.fastjson.util.IOUtils;
 import com.alibaba.fastjson.util.TypeUtils;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
@@ -35,7 +36,10 @@ import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.lang.reflect.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -137,6 +141,27 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
 
     }
 
+    @Override
+    public <T> T convertToJavaObject(byte[] source, Class<T> targetType, Charset charset) {
+        if (charset == null) {
+            charset = StandardCharsets.UTF_8;
+        }
+        try {
+            return JSON.parseObject(source, 0, source.length, charset, targetType);
+        } catch (Throwable th) {
+            throw new ForestConvertException("json", th);
+        }
+    }
+
+    @Override
+    public <T> T convertToJavaObject(byte[] source, Type targetType, Charset charset) {
+        try {
+            return JSON.parseObject(source, 0, source.length, charset, targetType);
+        } catch (Throwable th) {
+            throw new ForestConvertException("json", th);
+        }
+    }
+
     public <T> T convertToJavaObject(String source, TypeReference<T> typeReference) {
         try {
             return JSON.parseObject(source, typeReference);
@@ -178,7 +203,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         }
 
         if (javaObject instanceof JSON) {
-            return (JSON) javaObject;
+            return javaObject;
         }
 
         if (javaObject instanceof Map) {
@@ -262,6 +287,17 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
     public Map<String, Object> convertObjectToMap(Object obj) {
         if (obj == null) {
             return null;
+        }
+        if (obj instanceof Map) {
+            Map objMap = (Map) obj;
+            Map<String, Object> newMap = new HashMap<>(objMap.size());
+            for (Object key : objMap.keySet()) {
+                Object val = objMap.get(key);
+                if (val != null) {
+                    newMap.put(String.valueOf(key), val);
+                }
+            }
+            return newMap;
         }
         if (nameField == null && nameMethod == null) {
             return defaultJsonMap(obj);

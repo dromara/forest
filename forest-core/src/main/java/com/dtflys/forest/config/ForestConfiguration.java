@@ -241,8 +241,9 @@ public class ForestConfiguration implements Serializable {
         configuration.setJsonConverterSelector(new JSONConverterSelector());
         configuration.setXmlConverter(new ForestJaxbConverter());
         configuration.setTextConverter();
-        configuration.getConverterMap().put(ForestDataType.AUTO, new DefaultAutoConverter(configuration));
-        configuration.getConverterMap().put(ForestDataType.BINARY, new DefaultBinaryConverter());
+        DefaultAutoConverter autoConverter = new DefaultAutoConverter(configuration);
+        configuration.getConverterMap().put(ForestDataType.AUTO, autoConverter);
+        configuration.getConverterMap().put(ForestDataType.BINARY, new DefaultBinaryConverter(autoConverter));
         setupJSONConverter(configuration);
         configuration.setTimeout(3000);
         configuration.setConnectTimeout(2000);

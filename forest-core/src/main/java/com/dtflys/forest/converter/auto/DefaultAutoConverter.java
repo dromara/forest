@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 
 public class DefaultAutoConverter implements ForestConverter<Object> {
 
@@ -25,6 +26,9 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
 
     @Override
     public <T> T convertToJavaObject(Object source, Class<T> targetType) {
+        if (source == null) {
+            return null;
+        }
         if (source instanceof InputStream
                 || source instanceof byte[]
                 || source instanceof File) {
@@ -40,6 +44,12 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
                 return (T) str;
             }
             String trimmedStr = str.trim();
+            if (trimmedStr.length() == 0) {
+                if (CharSequence.class.isAssignableFrom(targetType)) {
+                    return tryConvert(str, targetType, ForestDataType.TEXT);
+                }
+                return null;
+            }
             char ch = trimmedStr.charAt(0);
             try {
                 if (ch == '{' || ch == '[') {
@@ -89,6 +99,9 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
 
     @Override
     public <T> T convertToJavaObject(Object source, Type targetType) {
+        if (source == null) {
+            return null;
+        }
         if (source instanceof InputStream
                 || source instanceof byte[]
                 || source instanceof File) {
@@ -105,6 +118,12 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
                 return (T) str;
             }
             String trimmedStr = str.trim();
+            if (trimmedStr.length() == 0) {
+                if (CharSequence.class.isAssignableFrom(clazz)) {
+                    return tryConvert(str, targetType, ForestDataType.TEXT);
+                }
+                return null;
+            }
             char ch = trimmedStr.charAt(0);
             try {
                 if (ch == '{' || ch == '[') {
@@ -137,6 +156,16 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
             }
         }
         return result;
+    }
+
+    @Override
+    public <T> T convertToJavaObject(byte[] source, Class<T> targetType, Charset charset) {
+        return convertToJavaObject((Object) source, targetType);
+    }
+
+    @Override
+    public <T> T convertToJavaObject(byte[] source, Type targetType, Charset charset) {
+        return convertToJavaObject((Object) source, targetType);
     }
 
 

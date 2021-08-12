@@ -33,8 +33,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -96,6 +98,26 @@ public class ForestJacksonConverter implements ForestJsonConverter {
 
     }
 
+    @Override
+    public <T> T convertToJavaObject(byte[] source, Class<T> targetType, Charset charset) {
+        try {
+            String str = StringUtils.fromBytes(source, charset);
+            return mapper.readValue(str, mapper.getTypeFactory().constructType(targetType));
+        } catch (IOException e) {
+            throw new ForestConvertException("json", e);
+        }
+    }
+
+    @Override
+    public <T> T convertToJavaObject(byte[] source, Type targetType, Charset charset) {
+        try {
+            String str = StringUtils.fromBytes(source, charset);
+            return mapper.readValue(str, mapper.getTypeFactory().constructType(targetType));
+        } catch (IOException e) {
+            throw new ForestConvertException("json", e);
+        }
+    }
+
     public <T> T convertToJavaObject(String source, Class<?> parametrized, Class<?> ...parameterClasses) {
         try {
             JavaType javaType = mapper.getTypeFactory().constructParametricType(parametrized, parameterClasses);
@@ -106,6 +128,9 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     }
 
     public <T> T convertToJavaObject(String source, JavaType javaType) {
+        if (StringUtils.isBlank(source)) {
+            return null;
+        }
         try {
             return mapper.readValue(source, javaType);
         } catch (IOException e) {
@@ -126,6 +151,17 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     public Map<String, Object> convertObjectToMap(Object obj) {
         if (obj == null) {
             return null;
+        }
+        if (obj instanceof Map) {
+            Map objMap = (Map) obj;
+            Map<String, Object> newMap = new HashMap<>(objMap.size());
+            for (Object key : objMap.keySet()) {
+                Object val = objMap.get(key);
+                if (val != null) {
+                    newMap.put(String.valueOf(key), val);
+                }
+            }
+            return newMap;
         }
         if (obj instanceof CharSequence) {
             return convertToJavaObject(obj.toString(), LinkedHashMap.class);

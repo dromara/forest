@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import java.util.concurrent.Future;
 
 /**
@@ -109,7 +110,12 @@ public class ResultHandler {
                 if (contentType != null && contentType.canReadAsString()) {
                     return converter.convertToJavaObject(responseText, resultType);
                 }
-                return converter.convertToJavaObject(response.getByteArray(), resultType);
+                Charset charset = null;
+                String contentEncoding = response.getContentEncoding();
+                if (contentEncoding != null) {
+                    charset = Charset.forName(contentEncoding);
+                }
+                return converter.convertToJavaObject(response.getByteArray(), resultType, charset);
             } catch (Exception e) {
                 throw new ForestHandlerException(e, request, response);
             }

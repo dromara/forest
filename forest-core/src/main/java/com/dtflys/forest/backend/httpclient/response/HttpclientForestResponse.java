@@ -16,6 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 /**
@@ -54,13 +55,15 @@ public class HttpclientForestResponse extends ForestResponse {
                     this.contentEncoding = this.contentType.getCharset();
                 }
                 if (this.contentEncoding == null && encoding != null) {
-                    if (isGzip) {
-                        this.contentEncoding = "UTF-8";
-                    } else {
-                        Charset charset = Charset.forName(this.contentEncoding);
-                        if (charset == null || !charset.name().equals(this.contentEncoding)) {
-                            this.contentEncoding = null;
-                        }
+                    this.contentEncoding = encoding.getValue();
+                    Charset charset;
+                    try {
+                        charset = Charset.forName(contentEncoding);
+                    } catch (Throwable th) {
+                        charset = StandardCharsets.UTF_8;
+                    }
+                    if (!charset.name().equals(this.contentEncoding)) {
+                        this.contentEncoding = null;
                     }
                 }
                 this.content = buildContent();

@@ -19,7 +19,8 @@ public class AddQueryInterceptor implements Interceptor {
 
     @Override
     public boolean beforeExecute(ForestRequest request) {
-        request.setUrl("http://localhost:5022/hello/user?username=foo");
+        Integer port = (Integer) request.getConfiguration().getVariableValue("port");
+        request.setUrl("http://localhost:" + port + "/hello/user?username=foo");
         request.addQuery("password", "bar");
         return true;
     }

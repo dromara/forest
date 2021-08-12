@@ -1,6 +1,11 @@
 package com.dtflys.forest.utils;
 
+import org.apache.commons.io.IOUtils;
+
+import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author gongjun[dt_flys@hotmail.com]
@@ -79,4 +84,15 @@ public final class StringUtils {
         return builder.toString();
     }
 
+    public static String fromBytes(byte[] bytes, Charset charset, Charset defaultCharset) {
+        if (charset == null) {
+            charset = defaultCharset;
+        }
+        return new String(bytes, charset);
+    }
+
+
+    public static String fromBytes(byte[] bytes, Charset charset) {
+        return fromBytes(bytes, charset, StandardCharsets.UTF_8);
+    }
 }
