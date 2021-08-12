@@ -22,6 +22,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.http.body.ObjectRequestBody;
 import com.dtflys.forest.http.body.RequestBodyBuilder;
 import com.dtflys.forest.http.body.StringRequestBody;
 import com.dtflys.forest.interceptor.Interceptor;
@@ -839,6 +840,11 @@ public class ForestMethod<T> implements VariableScope {
                 }
                 else if (obj instanceof Map) {
                     Map map = (Map) obj;
+                    if (map.isEmpty()) {
+                        if (MappingParameter.isBody(target)) {
+                            request.addBody(new ObjectRequestBody(map));
+                        }
+                    }
                     for (Object key : map.keySet()) {
                         if (key instanceof CharSequence) {
                             Object value = map.get(key);
