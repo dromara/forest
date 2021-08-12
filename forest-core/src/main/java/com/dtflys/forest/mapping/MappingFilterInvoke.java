@@ -20,7 +20,17 @@ public class MappingFilterInvoke extends MappingInvoke {
     public Object render(Object[] args) {
         ForestConfiguration configuration = variableScope.getConfiguration();
         Filter filter = configuration.newFilterInstance(right.getName());
-        return filter.doFilter(configuration, args[0]);
+        List<MappingExpr> exprList = getArgList();
+        Object[] invokeArgs = new Object[exprList.size()];
+        for (int i = 0; i < exprList.size(); i++) {
+            MappingExpr expr = exprList.get(i);
+            Object renderedArg = expr.render(args);
+            invokeArgs[i] = renderedArg;
+        }
+        if (invokeArgs.length > 0) {
+            return filter.doFilter(configuration, invokeArgs[0]);
+        }
+        return null;
     }
 
     @Override
