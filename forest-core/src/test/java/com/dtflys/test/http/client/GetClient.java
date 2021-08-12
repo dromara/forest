@@ -12,6 +12,7 @@ import com.dtflys.test.interceptor.AddQueryInterceptor;
 import com.dtflys.test.interceptor.ErrorInterceptor;
 import com.dtflys.test.model.Result;
 import com.dtflys.test.model.TestResult;
+import com.dtflys.test.model.TokenResult;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.List;
@@ -30,7 +31,8 @@ public interface GetClient {
     )
     String simpleGet();
 
-    @Get(url = "http://localhost:${port}/hello/user?username=foo",
+    @Get(
+            url = "http://localhost:${port}/hello/user?username=foo",
             headers = {"Accept:text/plain"}
     )
     String simpleGet2();
@@ -53,11 +55,6 @@ public interface GetClient {
     @Get(url = "http://localhost:${port}/boolean/false")
     Boolean getBooleanResultFalse();
 
-    @Get("http://localhost:${port}/boolean/true")
-    Boolean getBooleanResultTrue2();
-
-    @Get("http://localhost:${port}/boolean/false")
-    Boolean getBooleanResultFalse2();
 
 
     @Request(
@@ -67,14 +64,14 @@ public interface GetClient {
     String simpleGetMultiQuery2(@Query("username") String username, @Query("password") String password);
 
     @Request(
-            url = "http://localhost:${port}/hello/user",
+            url = "http://localhost:${port}/hello",
             headers = {"Accept:text/plain"},
             interceptor = AddQueryInterceptor.class
     )
     String simpleGetMultiQuery3();
 
     @Request(
-            url = "http://localhost:${port}/hello/user?username=foo",
+            url = "http://localhost:${port}/hello?username=foo",
             headers = {"Accept:text/plain"},
             interceptor = AddQueryInterceptor.class
     )
@@ -82,7 +79,7 @@ public interface GetClient {
 
 
     @Request(
-            url = "http://localhost:${port}/hello/user",
+            url = "http://localhost:${port}/hello",
             headers = {"Accept:text/plain"},
             interceptor = AddQueryInterceptor.class
     )
@@ -141,7 +138,7 @@ public interface GetClient {
             headers = {"Accept:text/plain"},
             data = "username=foo"
     )
-    Map jsonMapGet();
+    ForestResponse<Map> jsonMapGet();
 
     @Request(
             url = "http://localhost:${port}/hello/user",
@@ -301,7 +298,7 @@ public interface GetClient {
     )
     Future<String> asyncVarParamGet(@DataVariable("username") String username, OnSuccess<String> onSuccess, OnError onError);
 
-    @Get(url = "http://localhost:5000?token=YmZlNDYzYmVkMWZjYzgwNjExZDVhMWM1ODZmMWRhYzg0NTcyMGEwMg==")
+    @Get(url = "http://localhost:${port}?token=YmZlNDYzYmVkMWZjYzgwNjExZDVhMWM1ODZmMWRhYzg0NTcyMGEwMg==")
     ForestResponse<String> testUrl();
 
 
@@ -319,10 +316,11 @@ public interface GetClient {
 
     @Get(
             url = "http://xxxxxx:yyyy@localhost:8080/hello/user",
-            headers = {"Accept:text/plain"},
-            timeout = 100
+            headers = {"Accept:text/plain"}
     )
     ForestResponse<String> getUrlWithAt();
 
+    @Get("http://localhost:${port}/token")
+    TokenResult getToken();
 
 }
