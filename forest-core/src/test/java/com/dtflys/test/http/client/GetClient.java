@@ -261,14 +261,14 @@ public interface GetClient {
 
 
     @Request(
-            url = "http://localhost:5000/hello/user?username=foo",
+            url = "http://localhost:${port}/hello/user?username=foo",
             async = true,
             headers = {"Accept:text/plain"}
     )
     void asyncSimpleGet(OnSuccess<String> onSuccess);
 
     @Request(
-            url = "http://localhost:5000/hello/user?username=foo",
+            url = "http://localhost:${port}/hello/user?username=foo",
             async = true,
             headers = {"Accept:text/plain"}
     )
@@ -282,7 +282,7 @@ public interface GetClient {
     void asyncSimpleGet3(OnSuccess<TestResult<JsonTestUser>> onSuccess);
 
     @Request(
-            url = "http://localhost:5000/hello/user?username=foo",
+            url = "http://localhost:${port}/hello/user?username=foo",
             async = true,
             headers = {"Accept:text/plain"}
     )
@@ -290,7 +290,7 @@ public interface GetClient {
 
 
     @Request(
-            url = "http://localhost:5000/hello/user",
+            url = "http://localhost:${port}/hello/user",
             async = true,
             headers = {"Accept:text/plain"},
             timeout = 3000,
