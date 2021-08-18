@@ -538,8 +538,13 @@ public class ForestRequest<T> {
     }
 
     /**
-     * 获取Multipart类型请求的boundary字符串
-     * @return boundary字符串
+     * 获取 Content-Type 请求头的 boundary 字符串
+     * <p>
+     * 如果 Content-Type 请求中没有 boundary 字符串,
+     * 则生成一个新的随机字符串作为 boundary 字符串并返回
+     * </p>
+     *
+     * @return 如果 Content-Type 请求头为空则返回 null, 否则返回 boundary 字符串
      */
     public String getBoundary() {
         String contentType = getContentType();
@@ -552,15 +557,66 @@ public class ForestRequest<T> {
                 String subContentType = group[i];
                 String[] nvPair = subContentType.split("=");
                 if (nvPair.length > 1) {
-                    String name = nvPair[0];
-                    String value = nvPair[1];
+                    String name = nvPair[0].trim();
+                    String value = nvPair[1].trim();
                     if ("boundary".equalsIgnoreCase(name)) {
+                        if (StringUtils.isBlank(value)) {
+                            setBoundary(StringUtils.generateBoundary());
+                            return getBoundary();
+                        }
                         return value;
                     }
                 }
             }
         }
         return null;
+    }
+
+    /**
+     * 设置 Content-Type 请求头中的 boundary 字符串
+     * @param boundary boundary 字符串
+     * @return {@link ForestRequest}对象实例
+     */
+    public ForestRequest setBoundary(String boundary) {
+        String contentType = getContentType();
+        if (StringUtils.isBlank(contentType)) {
+            throw new ForestRuntimeException(
+                    "boundary cannot be add to request, due to the header 'Content-Type' is empty");
+        }
+        String[] group = contentType.split(";");
+        int idx = -1;
+        String boundaryName = "boundary";
+        if (group.length > 1) {
+            for (int i = 1; i < group.length; i++) {
+                String subContentType = group[i];
+                String[] nvPair = subContentType.split("=");
+                if (nvPair.length > 1) {
+                    String name = nvPair[0].trim();
+                    if ("boundary".equalsIgnoreCase(name)) {
+                        idx = i;
+                        boundaryName = name;
+                        break;
+                    }
+                }
+            }
+            if (idx > 0) {
+                StringBuilder builder = new StringBuilder(group[0]);
+                for (int i = 1; i < group.length; i++) {
+                    builder.append("; ");
+                    if (i == idx) {
+                        builder.append(boundaryName)
+                                .append("=")
+                                .append(boundary);
+                    } else {
+                        builder.append(group[i]);
+                    }
+                }
+                this.setContentType(builder.toString());
+            }
+        } else {
+            this.setContentType(contentType + "; boundary=" + boundary);
+        }
+        return this;
     }
 
 

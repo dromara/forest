@@ -997,11 +997,16 @@ public class ForestMethod<T> implements VariableScope {
         }
 
         List<ForestMultipart> multiparts = new ArrayList<>(multipartFactories.size());
+        String contentType = request.getContentType();
 
-        if (!multipartFactories.isEmpty() && request.getContentType() == null) {
-            UUID uuid = UUID.randomUUID();
-            String boundary = ByteString.encodeUtf8(uuid.toString()).utf8();
-            request.setContentType(ContentType.MULTIPART_FORM_DATA + ";boundary=" + boundary);
+        if (!multipartFactories.isEmpty()) {
+            if (StringUtils.isBlank(contentType)) {
+                String boundary = StringUtils.generateBoundary();
+                request.setContentType(ContentType.MULTIPART_FORM_DATA + "; boundary=" + boundary);
+            } else if (ContentType.MULTIPART_FORM_DATA.equalsIgnoreCase(contentType)
+                    && request.getBoundary() == null) {
+                request.setBoundary(StringUtils.generateBoundary());
+            }
         }
 
         for (int i = 0; i < multipartFactories.size(); i++) {

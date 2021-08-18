@@ -26,6 +26,7 @@ import org.apache.http.message.BasicNameValuePair;
 import java.io.UnsupportedEncodingException;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -97,20 +98,21 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
         String boundary = request.getBoundary();
         MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
         if (StringUtils.isNotEmpty(boundary)) {
-            entityBuilder.setBoundary(request.getBoundary());
+            entityBuilder.setBoundary(boundary);
         }
         // 解决文件名乱码问题
-        Charset httpCharset = Charset.forName(charset);
-        entityBuilder.setCharset(httpCharset);
-        entityBuilder.setMode(HttpMultipartMode.RFC6532);
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
-        Charset itemCharset = Consts.UTF_8;
+        Charset httpCharset = Charset.forName(charset);
+        Charset itemCharset = StandardCharsets.UTF_8;
         if (StringUtils.isNotEmpty(charset)) {
             itemCharset = Charset.forName(charset);
         }
+        if (!nameValueList.isEmpty()) {
+            entityBuilder.setCharset(httpCharset);
+            entityBuilder.setMode(HttpMultipartMode.RFC6532);
+        }
 
-        for (int i = 0; i < nameValueList.size(); i++) {
-            RequestNameValue nameValue = nameValueList.get(i);
+        for (RequestNameValue nameValue : nameValueList) {
             if (!nameValue.isInBody()) {
                 continue;
             }
@@ -124,8 +126,7 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
             ContentType itemContentType = ContentType.create(partContentType, itemCharset);
             entityBuilder.addTextBody(name, text, itemContentType);
         }
-        for (int i = 0; i < multiparts.size(); i++) {
-            ForestMultipart multipart = multiparts.get(i);
+        for (ForestMultipart multipart : multiparts) {
             String name = multipart.getName();
             String fileName = multipart.getOriginalFileName();
             String partContentType = multipart.getContentType();

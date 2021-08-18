@@ -1,11 +1,13 @@
 package com.dtflys.forest.utils;
 
+import okio.ByteString;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 /**
  * @author gongjun[dt_flys@hotmail.com]
@@ -94,5 +96,14 @@ public final class StringUtils {
 
     public static String fromBytes(byte[] bytes, Charset charset) {
         return fromBytes(bytes, charset, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * 生成 boundary 字符串
+     * @return boundary 字符串
+     */
+    public static String generateBoundary() {
+        UUID uuid = UUID.randomUUID();
+        return ByteString.encodeUtf8(uuid.toString()).utf8();
     }
 }
