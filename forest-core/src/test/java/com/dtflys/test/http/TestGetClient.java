@@ -4,12 +4,13 @@ import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.mock.MockServerRequest;
 import com.dtflys.test.http.client.EmptyJsonClient;
 import com.dtflys.test.http.client.GetWithBodyClient;
 import com.dtflys.test.http.model.JsonTestUser;
 import com.dtflys.test.mock.GetMockServer;
 import com.dtflys.test.http.client.GetClient;
-import com.dtflys.test.mock.GetWithBodyMockServer;
+import com.dtflys.test.mock.PostJsonMockServer;
 import com.dtflys.test.model.TokenResult;
 import com.google.common.collect.Lists;
 import okhttp3.mockwebserver.MockResponse;
@@ -24,7 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -49,7 +49,6 @@ public class TestGetClient extends BaseClientTest {
 
     private final GetClient getClient;
 
-    private final EmptyJsonClient emptyJsonClient;
 
     private final GetWithBodyClient getWithBodyClient;
 
@@ -64,7 +63,6 @@ public class TestGetClient extends BaseClientTest {
         super(backend, configuration);
         configuration.setVariableValue("port", server.getPort());
         getClient = configuration.createInstance(GetClient.class);
-        emptyJsonClient = configuration.createInstance(EmptyJsonClient.class);
         getWithBodyClient = configuration.createInstance(GetWithBodyClient.class);
     }
 
@@ -477,7 +475,7 @@ public class TestGetClient extends BaseClientTest {
     }
 
     @Test
-    public void testGetToken() {
+    public void testGetToken() throws InterruptedException {
         String token = "eyJjfeljlOfjelajflaFJLjlaefjl";
         String str = "{\"TokenTimeout\": 604800, \"URLToken\": \"" + token + "\"}";
         server.enqueue(
@@ -490,6 +488,11 @@ public class TestGetClient extends BaseClientTest {
         assertNotNull(result);
         assertEquals(604800L, result.getTokenTimeout());
         assertEquals(token, result.getURLToken());
+
+        MockServerRequest.forMockWebServer(server)
+                .assertMethodEquals("GET")
+                .assertPathEquals("/token");
+
     }
 
     @Test
@@ -502,10 +505,12 @@ public class TestGetClient extends BaseClientTest {
         String result = getClient.repeatableQuery();
         assertNotNull(result);
         assertEquals(EXPECTED, result);
-        RecordedRequest request = server.takeRequest();
-        assertEquals(
-                "/hello/user?username=foo&username=bar&username=user1&username=user2&password=123456",
-                request.getPath());
+
+        MockServerRequest.forMockWebServer(server)
+                .assertMethodEquals("GET")
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username=foo&username=bar&username=user1&username=user2&password=123456");
+
     }
 
     @Test
@@ -518,10 +523,13 @@ public class TestGetClient extends BaseClientTest {
         String result = getClient.repeatableQuery("user1", "user2", "123456");
         assertNotNull(result);
         assertEquals(EXPECTED, result);
-        RecordedRequest request = server.takeRequest();
-        assertEquals(
-                "/hello/user?username=foo&username=bar&username=user1&username=user2&password=123456",
-                request.getPath());
+
+        MockServerRequest.forMockWebServer(server)
+                .assertMethodEquals("GET")
+                .assertPathEquals("/hello/user")
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertQueryEquals("username=foo&username=bar&username=user1&username=user2&password=123456");
+
     }
 
     @Test
@@ -535,10 +543,11 @@ public class TestGetClient extends BaseClientTest {
         String result = getClient.repeatableQuery(usernames, "123456");
         assertNotNull(result);
         assertEquals(EXPECTED, result);
-        RecordedRequest request = server.takeRequest();
-        assertEquals(
-                "/hello/user?username=foo&username=bar&username=user1&username=user2&password=123456",
-                request.getPath());
+
+        MockServerRequest.forMockWebServer(server)
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username=foo&username=bar&username=user1&username=user2&password=123456");
+
     }
 
     @Test
@@ -552,10 +561,10 @@ public class TestGetClient extends BaseClientTest {
         String result = getClient.repeatableQuery(usernames, "123456");
         assertNotNull(result);
         assertEquals(EXPECTED, result);
-        RecordedRequest request = server.takeRequest();
-        assertEquals(
-                "/hello/user?username=foo&username=bar&username=user1&username=user2&password=123456",
-                request.getPath());
+
+        MockServerRequest.forMockWebServer(server)
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username=foo&username=bar&username=user1&username=user2&password=123456");
     }
 
 
@@ -570,10 +579,16 @@ public class TestGetClient extends BaseClientTest {
         String result = getClient.arrayQuery(usernames, "123456");
         assertNotNull(result);
         assertEquals(EXPECTED, result);
-        RecordedRequest request = server.takeRequest();
-        assertEquals(
-                "/hello/user/array?username_0=foo&username_1=bar&username_2=user1&username_3=user2&password=123456",
-                request.getPath());
+
+        MockServerRequest.forMockWebServer(server)
+                .assertMethodEquals("GET")
+                .assertPathEquals("/hello/user/array")
+                .assertQueryEquals("username_0", "foo")
+                .assertQueryEquals("username_1", "bar")
+                .assertQueryEquals("username_2", "user1")
+                .assertQueryEquals("username_3", "user2")
+                .assertQueryEquals("password", "123456");
+
     }
 
     @Test
@@ -590,62 +605,13 @@ public class TestGetClient extends BaseClientTest {
         String result = getClient.jsonQuery(idList, userInfo);
         assertNotNull(result);
         assertEquals(EXPECTED, result);
-        String idsJson = URLEncoder.encode(JSON.toJSONString(idList), "UTF-8");
-        String userInfoJson = URLEncoder.encode(JSON.toJSONString(userInfo), "UTF-8");
-        RecordedRequest request = server.takeRequest();
-        assertEquals(
-                "/hello/user?ids=" + idsJson + "&user=" + userInfoJson,
-                request.getPath());
+
+        MockServerRequest.forMockWebServer(server)
+                .assertMethodEquals("GET")
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("ids", JSON.toJSONString(idList))
+                .assertQueryEquals("user", JSON.toJSONString(userInfo));
     }
-
-
-
-    @Test
-    public void emptyJsonMap() throws InterruptedException {
-        Map<String, Object> map = new HashMap<>();
-        server.enqueue(new MockResponse().setBody("success"));
-        String result = emptyJsonClient.postEmptyJsonMap(map);
-        Assert.assertEquals("success", result);
-        RecordedRequest request = server.takeRequest();
-        String body = request.getBody().readString(StandardCharsets.UTF_8);
-        Assert.assertEquals("{}", body);
-    }
-
-    @Test
-    public void emptyJson2Map() throws InterruptedException {
-        Map<String, Object> map = new HashMap<>();
-        server.enqueue(new MockResponse().setBody("success"));
-        String result = emptyJsonClient.postEmptyJson2Map(map, map);
-        Assert.assertEquals("success", result);
-        RecordedRequest request = server.takeRequest();
-        String body = request.getBody().readString(StandardCharsets.UTF_8);
-        Assert.assertEquals("{}", body);
-    }
-
-
-    @Test
-    public void emptyJsonString() throws InterruptedException {
-        Map<String, Object> map = new HashMap<>();
-        server.enqueue(new MockResponse().setBody("success"));
-        String result = emptyJsonClient.postEmptyJsonString(map);
-        Assert.assertEquals("success", result);
-        RecordedRequest request = server.takeRequest();
-        String body = request.getBody().readString(StandardCharsets.UTF_8);
-        Assert.assertEquals("{}", body);
-    }
-
-    @Test
-    public void emptyJsonStringWithParams() throws InterruptedException {
-        Map<String, Object> map = new HashMap<>();
-        server.enqueue(new MockResponse().setBody("success"));
-        String result = emptyJsonClient.postEmptyJsonStringWithParams("ok", map);
-        Assert.assertEquals("success", result);
-        RecordedRequest request = server.takeRequest();
-        String body = request.getBody().readString(StandardCharsets.UTF_8);
-        Assert.assertEquals("{}", body);
-        Assert.assertEquals("/empty/map/ok", request.getPath());
-    }
-
 
 
 

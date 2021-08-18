@@ -26,8 +26,6 @@ import static org.junit.Assert.assertNotNull;
  */
 public class TestGetWithBodyClient extends BaseClientTest {
 
-    private final static Logger log = LoggerFactory.getLogger(TestGetWithBodyClient.class);
-
     @Rule
     public GetWithBodyMockServer server = new GetWithBodyMockServer(this);
 

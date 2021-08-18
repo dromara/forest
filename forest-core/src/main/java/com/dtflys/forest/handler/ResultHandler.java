@@ -42,11 +42,13 @@ public class ResultHandler {
                 if (void.class.isAssignableFrom(resultClass)) {
                     return null;
                 }
-                if (ForestResponse.class.isAssignableFrom(resultClass)) {
+                if (ForestResponse.class.isAssignableFrom(resultClass)
+                        || ForestRequest.class.isAssignableFrom(resultClass)) {
                     if (resultType instanceof ParameterizedType) {
                         ParameterizedType parameterizedType = (ParameterizedType) resultType;
                         Class rowClass = (Class) parameterizedType.getRawType();
-                        if (ForestResponse.class.isAssignableFrom(rowClass)) {
+                        if (ForestResponse.class.isAssignableFrom(rowClass)
+                                || ForestRequest.class.isAssignableFrom(resultClass)) {
                             Type realType = parameterizedType.getActualTypeArguments()[0];
                             Class realClass = ReflectUtils.getClassByType(parameterizedType.getActualTypeArguments()[0]);
                             Object realResult = getResult(request, response, realType, realClass);
