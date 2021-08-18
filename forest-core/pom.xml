@@ -159,6 +159,13 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>com.dtflys.forest</groupId>
+            <artifactId>forest-mock</artifactId>
+            <version>1.5.2-BETA</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- log4j2 -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -204,6 +211,7 @@
             <version>5.5.2</version>
             <scope>test</scope>
         </dependency>
+
 
     </dependencies>
 

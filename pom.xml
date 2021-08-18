@@ -44,13 +44,15 @@
 		<httpnio.version>4.4.5</httpnio.version>
 		<httpclient.version>4.5.2</httpclient.version>
 		<httpasyncclient.version>4.1.2</httpasyncclient.version>
+		<spring.version>5.0.16.RELEASE</spring.version>
 	</properties>
 
 	<modules>
 		<module>forest-core</module>
 		<module>forest-spring</module>
 		<module>forest-spring-boot-starter</module>
-  	</modules>
+		<module>forest-mock</module>
+	</modules>
 
 	<dependencies>
 

@@ -1,5 +1,6 @@
 package com.dtflys.forest.lifecycles.parameter;
 
+import com.dtflys.forest.annotation.DataFile;
 import com.dtflys.forest.annotation.JSONBody;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
@@ -8,6 +9,9 @@ import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MetaRequest;
 import com.dtflys.forest.utils.StringUtils;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Parameter;
 
 /**
  * Forest &#064;JSONBody注解的生命周期
@@ -27,8 +31,16 @@ public class JSONBodyLifeCycle extends AbstractBodyLifeCycle<JSONBody> {
             throw new ForestRuntimeException("[Forest] method '" + methodName +
                     "' has not bind a Forest request annotation. Hence the annotation @JSONBody cannot be bind on a parameter in this method.");
         }
-        String contentType = metaRequest.getContentType();
-        if (StringUtils.isBlank(contentType)) {
+        boolean hasDataFileAnn = false;
+        for (Parameter param : method.getMethod().getParameters()) {
+            Annotation dataFileAnn = param.getAnnotation(DataFile.class);
+            if (dataFileAnn != null) {
+                hasDataFileAnn = true;
+                break;
+            }
+        }
+        String contentTypeStr = metaRequest.getContentType();
+        if (StringUtils.isBlank(contentTypeStr) && !hasDataFileAnn) {
             metaRequest.setContentType(ContentType.APPLICATION_JSON);
         }
         parameter.setTarget(MappingParameter.TARGET_BODY);

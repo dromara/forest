@@ -14,9 +14,6 @@
         <version>1.5.2-BETA</version>
     </parent>
 
-    <properties>
-        <spring.version>5.0.16.RELEASE</spring.version>
-    </properties>
 
     <dependencies>
         <dependency>
