@@ -24,8 +24,8 @@
 <a href="https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html">
     <img src="https://img.shields.io/badge/JDK-1.8+-yellow" alt="JDK">
 </a>
-<a href="https://codecov.io/gh/mySingleLive/forest">
-    <img src="https://codecov.io/gh/mySingleLive/forest/branch/master/graphs/badge.svg?branch=master" alt="Codecov">
+<a href="https://codecov.io/gh/dromara/forest">
+    <img src="https://codecov.io/gh/dromara/forest/branch/master/graphs/badge.svg?branch=master" alt="Codecov">
 </a>
 <a href="https://opensource.org/licenses/mit-license.php">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
