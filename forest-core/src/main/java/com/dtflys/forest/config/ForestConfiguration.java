@@ -57,6 +57,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * global configuration
@@ -216,7 +217,7 @@ public class ForestConfiguration implements Serializable {
     /**
      * 全局变量表
      */
-    private Map<String, Object> variables = new HashMap<String, Object>();
+    private Map<String, Object> variables = new ConcurrentHashMap<>(64);
 
     /**
      * SSL的Key Store集合
@@ -874,7 +875,25 @@ public class ForestConfiguration implements Serializable {
         return this;
     }
 
-     /**
+    /**
+     * 设置合并全局数据转换器表，但不会覆盖整个转换器表
+     * @param converterMap 数据转换器表
+     * @return 当前ForestConfiguration实例
+     */
+    public ForestConfiguration setToMergeConverterMap(Map<ForestDataType, ForestConverter> converterMap) {
+        if (converterMap == null) {
+            return this;
+        }
+        for (Map.Entry<ForestDataType, ForestConverter> entry : converterMap.entrySet()) {
+            ForestDataType dataType = entry.getKey();
+            ForestConverter converter = entry.getValue();
+            this.converterMap.put(dataType, converter);
+        }
+        return this;
+    }
+
+
+    /**
      * 获取全局变量表
      * @return 全局变量表
      */

@@ -10,6 +10,7 @@ import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
@@ -125,7 +126,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
             }
             beanDefinition.getPropertyValues().addPropertyValue("variables", varMap);
             beanDefinition.getPropertyValues().addPropertyValue("sslKeyStores", sslKeyStoreMap);
-            beanDefinition.getPropertyValues().addPropertyValue("converterMap", converterMap);
+            beanDefinition.getPropertyValues().addPropertyValue("toMergeConverterMap", converterMap);
         }
     }
 
