@@ -27,6 +27,7 @@
 <a href="https://codecov.io/gh/dromara/forest">
     <img src="https://codecov.io/gh/dromara/forest/branch/master/graphs/badge.svg?branch=master" alt="Codecov">
 </a>
+
 <a href="https://opensource.org/licenses/mit-license.php">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
 </a>
