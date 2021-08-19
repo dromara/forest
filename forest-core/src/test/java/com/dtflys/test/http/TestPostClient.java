@@ -7,7 +7,6 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.ForestLogger;
 import com.dtflys.forest.logging.RequestLogMessage;
-import com.dtflys.forest.mock.MockServerRequest;
 import com.dtflys.test.http.client.EmptyJsonClient;
 import com.dtflys.test.http.client.PostClient;
 import com.dtflys.test.http.model.Cause;
@@ -19,11 +18,9 @@ import com.dtflys.test.http.model.JsonTestUser2;
 import com.dtflys.test.http.model.JsonTestUser3;
 import com.dtflys.test.http.model.UserParam;
 import com.dtflys.test.http.model.XmlTestParam;
-import com.dtflys.test.mock.PostJsonMockServer;
 import com.google.common.collect.Lists;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,19 +35,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
+import static org.assertj.core.api.Assertions.*;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-11 16:55
  */
 public class TestPostClient extends BaseClientTest {
-
-    private final static Logger log = LoggerFactory.getLogger(TestPostClient.class);
 
     public final static String EXPECTED = "{\"status\":\"ok\"}";
 
@@ -85,12 +77,10 @@ public class TestPostClient extends BaseClientTest {
     @Test
     public void testPostHello() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = postClient.postHello();
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postHello())
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/hello")
                 .assertHeaderEquals("Accept", "text/plain")
@@ -100,28 +90,23 @@ public class TestPostClient extends BaseClientTest {
     @Test
     public void testSimplePost() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = postClient.simplePost("text/plain");
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.simplePost("text/plain"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/hello")
                 .assertHeaderEquals("Accept", "text/plain")
                 .assertBodyEquals("username=foo&password=123456");
-
     }
 
     @Test
     public void testSimplePostWithProxy() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = postClient.simplePostWithProxy(server.getPort(), "text/plain", "xxxyyy");
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.simplePostWithProxy(server.getPort(), "text/plain", "xxxyyy"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertRequestLineEquals("POST http://localhost:" + server.getPort() + "/hello HTTP/1.1")
                 .assertPathEquals("/")
                 .assertHeaderEquals("Accept", "text/plain")
@@ -132,28 +117,23 @@ public class TestPostClient extends BaseClientTest {
     @Test
     public void testSimplePost2() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = postClient.simplePost2();
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.simplePost2())
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/hello")
                 .assertHeaderEquals("Accept", "text/plain")
                 .assertBodyEquals("username=foo&password=123456");
-
     }
 
     @Test
     public void testSimplePost3() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = postClient.simplePost3();
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.simplePost3())
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/hello")
                 .assertHeaderEquals("Accept", "text/plain")
@@ -164,12 +144,10 @@ public class TestPostClient extends BaseClientTest {
     @Test
     public void testTextParamPost() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = postClient.textParamPost("foo", "123456");
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.textParamPost("foo", "123456"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/hello")
                 .assertHeaderEquals("Accept", "text/plain")
@@ -179,12 +157,10 @@ public class TestPostClient extends BaseClientTest {
     @Test
     public void testVarParamPost() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = postClient.varParamPost("foo", "123456");
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.varParamPost("foo", "123456"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/hello")
                 .assertHeaderEquals("Accept", "text/plain")
@@ -197,91 +173,80 @@ public class TestPostClient extends BaseClientTest {
         UserParam userParam = new UserParam();
         userParam.setUsername("foo");
         userParam.setPassword("123456");
-        String result = postClient.modelParamPost(userParam);
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.modelParamPost(userParam))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/hello")
                 .assertHeaderEquals("Accept", "text/plain")
                 .assertBodyEquals("username=foo&password=123456");
-
     }
 
     @Test
     public void testAnnParamPost() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = postClient.annParamPost("foo", "123456");
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.annParamPost("foo", "123456"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/hello")
                 .assertHeaderEquals("Accept", "text/plain")
                 .assertBodyEquals("username=foo&password=123456");
-
     }
 
     @Test
     public void testListBodyPost() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         List<String> list = Lists.newArrayList("xx", "yy", "zz");
-        String result = postClient.listBodyPost(list);
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.listBodyPost(list))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/hello-list")
                 .assertHeaderEquals("Accept", "text/plain")
                 .assertHeaderEquals("Content-Type", "application/x-www-form-urlencoded")
                 .assertBodyEquals("item_0=xx&item_1=yy&item_2=zz");
-
     }
 
     @Test
     public void testEmptyJsonMap() throws InterruptedException {
         Map<String, Object> map = new HashMap<>();
         server.enqueue(new MockResponse().setBody("success"));
-        String result = emptyJsonClient.postEmptyJsonMap(map);
-        Assert.assertEquals("success", result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(emptyJsonClient.postEmptyJsonMap(map))
+                .isNotNull()
+                .isEqualTo("success");
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/empty/map")
                 .assertHeaderEquals("Content-Type", "application/json")
                 .assertBodyEquals("{}");
-
     }
 
     @Test
     public void testEmptyJson2Map() throws InterruptedException {
         Map<String, Object> map = new HashMap<>();
         server.enqueue(new MockResponse().setBody("success"));
-        String result = emptyJsonClient.postEmptyJson2Map(map, map);
-        Assert.assertEquals("success", result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(emptyJsonClient.postEmptyJson2Map(map, map))
+                .isNotNull()
+                .isEqualTo("success");
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/empty/map")
                 .assertHeaderEquals("Content-Type", "application/json")
                 .assertBodyEquals("{}");
     }
 
-
     @Test
     public void testEmptyJsonString() throws InterruptedException {
         Map<String, Object> map = new HashMap<>();
         server.enqueue(new MockResponse().setBody("success"));
-        String result = emptyJsonClient.postEmptyJsonString(map);
-        Assert.assertEquals("success", result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(emptyJsonClient.postEmptyJsonString(map))
+                .isNotNull()
+                .isEqualTo("success");
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/empty/map")
                 .assertHeaderEquals("Content-Type", "application/json")
@@ -292,10 +257,10 @@ public class TestPostClient extends BaseClientTest {
     public void testEmptyJsonStringWithParams() throws InterruptedException {
         Map<String, Object> map = new HashMap<>();
         server.enqueue(new MockResponse().setBody("success"));
-        String result = emptyJsonClient.postEmptyJsonStringWithParams("ok", map);
-        Assert.assertEquals("success", result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(emptyJsonClient.postEmptyJsonStringWithParams("ok", map))
+                .isNotNull()
+                .isEqualTo("success");
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/empty/map/ok")
                 .assertHeaderEquals("Content-Type", "application/json")
@@ -305,9 +270,10 @@ public class TestPostClient extends BaseClientTest {
     @Test
     public void testEmptyBody() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = postClient.emptyBody();
-        assertEquals(EXPECTED, result);
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.emptyBody())
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/hello")
                 .assertHeaderEquals("Accept", "text/plain")
@@ -317,12 +283,10 @@ public class TestPostClient extends BaseClientTest {
     @Test
     public void testComplexPost() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = postClient.complexPost("1", "username=foo&password=123456");
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.complexPost("1", "username=foo&password=123456"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/complex")
                 .assertHeaderEquals("Accept", "text/plain")
@@ -333,12 +297,10 @@ public class TestPostClient extends BaseClientTest {
     @Test
     public void testComplexPost2() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = postClient.complexPost2("1", "foo", "123456");
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.complexPost2("1", "foo", "123456"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/complex")
                 .assertHeaderEquals("Accept", "text/plain")
@@ -349,12 +311,10 @@ public class TestPostClient extends BaseClientTest {
     @Test
     public void testComplexPost3() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = postClient.complexPost3("1", "foo", "123456");
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.complexPost3("1", "foo", "123456"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/complex")
                 .assertHeaderEquals("Accept", "text/plain")
@@ -368,12 +328,10 @@ public class TestPostClient extends BaseClientTest {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("username", "foo");
         map.put("password", "123456");
-        String result = postClient.complexPost3Map("1", map);
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.complexPost3Map("1", map))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/complex")
                 .assertHeaderEquals("Accept", "text/plain")
@@ -384,12 +342,10 @@ public class TestPostClient extends BaseClientTest {
     @Test
     public void testComplexPost4() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = postClient.complexPost4("1", "foo", "123456");
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.complexPost4("1", "foo", "123456"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/complex")
                 .assertHeaderEquals("Accept", "text/plain")
@@ -400,12 +356,10 @@ public class TestPostClient extends BaseClientTest {
     @Test
     public void testPostHead() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = postClient.postHead("username=foo&password=123456");
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postHead("username=foo&password=123456"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/hello/user")
                 .assertHeaderEquals("Accept", "text/plain")
@@ -415,28 +369,23 @@ public class TestPostClient extends BaseClientTest {
     @Test
     public void testPostHead2() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = postClient.postHead2("username=foo&password=123456");
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postHead2("username=foo&password=123456"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/hello/user")
                 .assertHeaderEquals("Accept", "text/plain")
                 .assertBodyEquals("username=foo&password=123456");
-
     }
 
     @Test
     public void testPostJsonWithCnCharacters() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(CN_EXPECTED));
-        String result = postClient.postJsonWithCnCharacters("foo", "123456&&++===", "中文名");
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(CN_EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postJsonWithCnCharacters("foo", "123456&&++===", "中文名"))
+                .isNotNull()
+                .isEqualTo(CN_EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
                 .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
@@ -447,12 +396,10 @@ public class TestPostClient extends BaseClientTest {
     @Test
     public void testPostJsonWithCnCharacters2() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(CN_EXPECTED));
-        String result = postClient.postJsonWithCnCharacters2("foo", "123456&&++===", "中文名");
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(CN_EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postJsonWithCnCharacters2("foo", "123456&&++===", "中文名"))
+                .isNotNull()
+                .isEqualTo(CN_EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
                 .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
@@ -462,12 +409,10 @@ public class TestPostClient extends BaseClientTest {
     @Test
     public void testPostJsonWithCnCharacters3() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(CN_EXPECTED));
-        String result = postClient.postJsonWithCnCharacters3("foo", "123456&&++===", "中文名");
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(CN_EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postJsonWithCnCharacters3("foo", "123456&&++===", "中文名"))
+                .isNotNull()
+                .isEqualTo(CN_EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
                 .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
@@ -477,12 +422,10 @@ public class TestPostClient extends BaseClientTest {
     @Test
     public void testPostJsonWithCnCharacters4() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(CN_EXPECTED));
-        String result = postClient.postJsonWithCnCharacters4("foo", "123456&&++===", "中文名");
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(CN_EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postJsonWithCnCharacters4("foo", "123456&&++===", "中文名"))
+                .isNotNull()
+                .isEqualTo(CN_EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
                 .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
@@ -496,12 +439,10 @@ public class TestPostClient extends BaseClientTest {
         user.setUsername("foo");
         user.setPassword("123456&&++===");
         user.setCnName("中文名");
-        String result = postClient.postJsonWithCnCharacters5(user);
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(CN_EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postJsonWithCnCharacters5(user))
+                .isNotNull()
+                .isEqualTo(CN_EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
                 .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
@@ -515,12 +456,10 @@ public class TestPostClient extends BaseClientTest {
         user.setUsername("foo");
         user.setPassword("123456&&++===");
         user.setCnName("中文名");
-        String result = postClient.postJsonWithCnCharacters6(user);
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(CN_EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postJsonWithCnCharacters6(user))
+                .isNotNull()
+                .isEqualTo(CN_EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
                 .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
@@ -534,12 +473,10 @@ public class TestPostClient extends BaseClientTest {
         user.setUsername("foo");
         user.setPassword("123456&&++===");
         user.setCnName("中文名");
-        String result = postClient.postJsonWithCnCharacters7(user);
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(CN_EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postJsonWithCnCharacters7(user))
+                .isNotNull()
+                .isEqualTo(CN_EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
                 .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
@@ -549,13 +486,11 @@ public class TestPostClient extends BaseClientTest {
     @Test
     public void testPostBodyCnStringWithBodyAnn() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(CN_EXPECTED));
-        String result = postClient.postBodyCnStringWithBodyAnn(
-                "{\"username\":\"foo\",\"password\":\"123456&&++===\",\"cn_name\":\"中文名\"}");
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(CN_EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postBodyCnStringWithBodyAnn(
+                "{\"username\":\"foo\",\"password\":\"123456&&++===\",\"cn_name\":\"中文名\"}"))
+                .isNotNull()
+                .isEqualTo(CN_EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
                 .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
@@ -565,13 +500,11 @@ public class TestPostClient extends BaseClientTest {
     @Test
     public void testPostBodyCnStringWithBodyAnnAndEmptyName() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(CN_EXPECTED));
-        String result = postClient.postBodyCnStringWithBodyAnnAndEmptyName(
-                "{\"username\":\"foo\",\"password\":\"123456&&++===\",\"cn_name\":\"中文名\"}");
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(PostJsonMockServer.EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postBodyCnStringWithBodyAnnAndEmptyName(
+                "{\"username\":\"foo\",\"password\":\"123456&&++===\",\"cn_name\":\"中文名\"}"))
+                .isNotNull()
+                .isEqualTo(CN_EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
                 .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
@@ -582,12 +515,10 @@ public class TestPostClient extends BaseClientTest {
     @Test
     public void testPostBodyCnStringWithDefaultBody() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(CN_EXPECTED));
-        String result = postClient.postBodyCnStringWithDefaultBody(null);
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(CN_EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postBodyCnStringWithDefaultBody(null))
+                .isNotNull()
+                .isEqualTo(CN_EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
                 .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
@@ -602,15 +533,15 @@ public class TestPostClient extends BaseClientTest {
         JsonTestUser user = new JsonTestUser();
         user.setUsername("foo");
         ForestResponse<String> response = postClient.postJsonWithLog("foo", "1111111111111");
-        String result = response.getResult();
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
+        assertThat(response).isNotNull();
+        assertThat(response.getResult())
+                .isNotNull()
+                .isEqualTo(EXPECTED);
         ForestRequest request = response.getRequest();
-        assertNotNull(result);
-        RequestLogMessage logMessage = request.getRequestLogMessage();
-        assertNotNull(logMessage);
-        assertNotNull(logMessage.getRequest());
+        assertThat(request.getRequestLogMessage())
+                .isNotNull()
+                .extracting(RequestLogMessage::getRequest)
+                .isEqualTo(request);
         Mockito.verify(logger).info("[Forest] Request: \n" +
                 "\tPOST http://localhost:" + server.getPort() + "/json HTTP\n" +
                 "\tHeaders: \n" +
@@ -627,10 +558,9 @@ public class TestPostClient extends BaseClientTest {
         configuration.getLogHandler().setLogger(logger);
         Map<String, Object> userMap = new HashMap<>();
         userMap.put("username", "foo");
-        String result = postClient.postJsonMapWithLog(userMap);
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
+        assertThat(postClient.postJsonMapWithLog(userMap))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
         Mockito.verify(logger).info("[Forest] Request: \n" +
                 "\tPOST http://localhost:" + server.getPort() + "/json HTTP\n" +
                 "\tHeaders: \n" +
@@ -645,10 +575,9 @@ public class TestPostClient extends BaseClientTest {
         configuration.getLogHandler().setLogger(logger);
         Map<String, Object> userMap = new HashMap<>();
         userMap.put("username", "foo");
-        String result = postClient.postJsonMapWithoutLog(userMap);
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
+        assertThat(postClient.postJsonMapWithoutLog(userMap))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
         Mockito.verify(logger, Mockito.never()).info("[Forest] Request: \n" +
                 "\tPOST http://localhost:" + server.getPort() + "/json HTTP\n" +
                 "\tHeaders: \n" +
@@ -663,10 +592,9 @@ public class TestPostClient extends BaseClientTest {
         configuration.getLogHandler().setLogger(logger);
         JsonTestUser user = new JsonTestUser();
         user.setUsername("foo");
-        String result = postClient.postJsonObjectWithoutLog(user);
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
+        assertThat(postClient.postJsonObjectWithoutLog(user))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
         Mockito.verify(logger, Mockito.never()).info("[Forest] Request: \n" +
                 "\tPOST http://localhost:" + server.getPort() + "/json HTTP\n" +
                 "\tHeaders: \n" +
@@ -681,10 +609,9 @@ public class TestPostClient extends BaseClientTest {
         configuration.getLogHandler().setLogger(logger);
         JsonTestUser user = new JsonTestUser();
         user.setUsername("foo");
-        String result = postClient.postJsonObjectWithLog_content_noStatus(user);
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
+        assertThat(postClient.postJsonObjectWithLog_content_noStatus(user))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
         Mockito.verify(logger).info("[Forest] Request: \n" +
                 "\tPOST http://localhost:" + server.getPort() + "/json HTTP\n" +
                 "\tHeaders: \n" +
@@ -702,10 +629,9 @@ public class TestPostClient extends BaseClientTest {
         logHandler.setLogger(logger);
         JsonTestUser2 user = new JsonTestUser2();
         user.setUsername("foo");
-        String result = postClient.postJsonObjectWithLog_content_noStatus(user);
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
+        assertThat(postClient.postJsonObjectWithLog_content_noStatus(user))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
         Mockito.verify(logger).info("[Forest] Response Content:\n\t" + EXPECTED);
     }
 
@@ -721,11 +647,9 @@ public class TestPostClient extends BaseClientTest {
         testList.setUserList(Collections.singletonList(user));
         List<JsonTestList> list = new ArrayList<>();
         list.add(testList);
-        String result = postClient.postJsonObjListWithLog_content_noRequest_noStatus(list);
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
-
+        assertThat(postClient.postJsonObjListWithLog_content_noRequest_noStatus(list))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
         Mockito.verify(logger, Mockito.never()).info("[Forest] Request: \n" +
                 "\tPOST http://localhost:" + server.getPort() + "/json HTTP\n" +
                 "\tHeaders: \n" +
@@ -740,12 +664,10 @@ public class TestPostClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Map<String, Object> userMap = new HashMap<>();
         userMap.put("username", "foo");
-        String result = postClient.postJsonBodyMap(userMap);
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postJsonBodyMap(userMap))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
                 .assertHeaderEquals("Content-Type", "application/json")
@@ -755,12 +677,10 @@ public class TestPostClient extends BaseClientTest {
     @Test
     public void testJsonPostBodyMapWithDefaultBody() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = postClient.postJsonBodyMapWithDefaultBody(null);
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postJsonBodyMapWithDefaultBody(null))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
                 .assertHeaderEquals("Content-Type", "application/json")
@@ -772,12 +692,10 @@ public class TestPostClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Map<String, Object> userMap = new HashMap<>();
         userMap.put("username", "foo");
-        String result = postClient.postJsonBodyMap2(userMap);
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postJsonBodyMap2(userMap))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
                 .assertHeaderEquals("Content-Type", "application/json")
@@ -789,12 +707,10 @@ public class TestPostClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         JsonTestUser user = new JsonTestUser();
         user.setUsername("foo");
-        String result = postClient.postJsonBodyObj(user);
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postJsonBodyObj(user))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
                 .assertHeaderEquals("Content-Type", "application/json")
@@ -804,12 +720,10 @@ public class TestPostClient extends BaseClientTest {
     @Test
     public void testJsonPostBodyField() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = postClient.postJsonBodyField("foo");
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postJsonBodyField("foo"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
                 .assertHeaderEquals("Content-Type", "application/json")
@@ -820,12 +734,10 @@ public class TestPostClient extends BaseClientTest {
     @Test
     public void testJsonPostBodyString() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = postClient.postJsonBodyString("{\"username\":\"foo\"}");
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postJsonBodyString("{\"username\":\"foo\"}"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
                 .assertHeaderEquals("Content-Type", "application/json")
@@ -844,8 +756,8 @@ public class TestPostClient extends BaseClientTest {
         } catch (Throwable th) {
             error = true;
         }
-        assertNull(result);
-        assertTrue(error);
+        assertThat(result).isNull();
+        assertThat(error).isTrue();
     }
 
     @Test
@@ -861,8 +773,9 @@ public class TestPostClient extends BaseClientTest {
         } catch (Throwable th) {
             error = true;
         }
-        assertNotNull(result);
-        assertFalse(error);
+        assertThat(result).isNotNull();
+        assertThat(error).isFalse();
+
     }
 
     @Test
@@ -874,12 +787,10 @@ public class TestPostClient extends BaseClientTest {
         testList.setUserList(Collections.singletonList(user));
         List<JsonTestList> list = new ArrayList<>();
         list.add(testList);
-        String result = postClient.postJsonObjListWithDataObjectAnn(list);
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postJsonObjListWithDataObjectAnn(list))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
                 .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
@@ -895,12 +806,10 @@ public class TestPostClient extends BaseClientTest {
         testList.setUserList(Collections.singletonList(user));
         List<JsonTestList> list = new ArrayList<>();
         list.add(testList);
-        String result = postClient.postJsonObjListInDataProperty(list);
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postJsonObjListInDataProperty(list))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
                 .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
@@ -914,12 +823,10 @@ public class TestPostClient extends BaseClientTest {
         user.setUsername("foo");
         JsonTestList testList = new JsonTestList();
         testList.setUserList(Collections.singletonList(user));
-        String result = postClient.postJsonListInObjWithDataObjectAnn(testList);
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postJsonListInObjWithDataObjectAnn(testList))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
                 .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
@@ -933,12 +840,10 @@ public class TestPostClient extends BaseClientTest {
         user.setUsername("foo");
         JsonTestList testList = new JsonTestList();
         testList.setUserList(Collections.singletonList(user));
-        String result = postClient.postJsonListInObjInDataProperty(testList);
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postJsonListInObjInDataProperty(testList))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
                 .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
@@ -948,12 +853,10 @@ public class TestPostClient extends BaseClientTest {
     @Test
     public void testPostJsonListObjWithDefaultBody() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = postClient.postJsonListObjWithDefaultBody(null);
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postJsonListObjWithDefaultBody(null))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
                 .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
@@ -967,12 +870,10 @@ public class TestPostClient extends BaseClientTest {
         List<String> data = Lists.newArrayList("A", "B", "C");
         obj.put("name", "test");
         obj.put("data", data);
-        String result = postClient.postJsonMapWithBodyAnn(obj);
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postJsonMapWithBodyAnn(obj))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
                 .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
@@ -983,12 +884,10 @@ public class TestPostClient extends BaseClientTest {
     public void testPostJsonObjFromMultipleBodyAnnParams() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         List<String> data = Lists.newArrayList("A", "B", "C");
-        String result = postClient.postJsonObjFromMultipleBodyAnnParams("test", data);
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postJsonObjFromMultipleBodyAnnParams("test", data))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
                 .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
@@ -998,12 +897,10 @@ public class TestPostClient extends BaseClientTest {
     @Test
     public void testPostJsonObjFromMultipleBodyAnnParams2() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = postClient.postJsonObjFromMultipleBodyAnnParams2(null, null);
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postJsonObjFromMultipleBodyAnnParams2(null, null))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
                 .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
@@ -1022,10 +919,10 @@ public class TestPostClient extends BaseClientTest {
         cause2.setId(2);
         cause2.setScore(73);
         List<Cause> causes = Lists.newArrayList(cause1, cause2);
-        String result = postClient.postFormListWithBodyAnn("foo", "123456", idList, causes);
-        assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postFormListWithBodyAnn("foo", "123456", idList, causes))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/form-array")
                 .assertHeaderEquals("Content-Type", "application/x-www-form-urlencoded")
@@ -1048,10 +945,10 @@ public class TestPostClient extends BaseClientTest {
         cause2.setScore(73);
         List<Cause> causes = Lists.newArrayList(cause1, cause2);
         param.setCause(causes);
-        String result = postClient.postFormListWithBodyAnn2(param);
-        assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postFormListWithBodyAnn2(param))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/form-array")
                 .assertHeaderEquals("Content-Type", "application/x-www-form-urlencoded")
@@ -1069,10 +966,10 @@ public class TestPostClient extends BaseClientTest {
         cause2.setId(2);
         cause2.setScore(73);
         Cause[] causes = new Cause[] {cause1, cause2};
-        String result = postClient.postFormListWithBodyAnn3("foo", "123456", idList, causes);
-        assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postFormListWithBodyAnn3("foo", "123456", idList, causes))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/form-array")
                 .assertHeaderEquals("Content-Type", "application/x-www-form-urlencoded")
@@ -1094,10 +991,10 @@ public class TestPostClient extends BaseClientTest {
         cause2.setScore(73);
         Cause[] causes = new Cause[] {cause1, cause2};
         param.setCause(causes);
-        String result = postClient.postFormListWithBodyAnn4(param);
-        assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postFormListWithBodyAnn4(param))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/form-array")
                 .assertHeaderEquals("Content-Type", "application/x-www-form-urlencoded")
@@ -1110,12 +1007,10 @@ public class TestPostClient extends BaseClientTest {
         XmlTestParam testParam = new XmlTestParam();
         testParam.setA(1);
         testParam.setB(2);
-        String result = postClient.postXml(testParam);
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postXml(testParam))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/xml")
                 .assertHeaderEquals("Content-Type", "application/xml")
@@ -1132,12 +1027,10 @@ public class TestPostClient extends BaseClientTest {
         XmlTestParam testParam = new XmlTestParam();
         testParam.setA(1);
         testParam.setB(2);
-        String result = postClient.postXmlInDataProperty(testParam);
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postXmlInDataProperty(testParam))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/xml")
                 .assertHeaderEquals("Content-Type", "application/xml")
@@ -1154,12 +1047,10 @@ public class TestPostClient extends BaseClientTest {
         XmlTestParam testParam = new XmlTestParam();
         testParam.setA(1);
         testParam.setB(2);
-        String result = postClient.postXmlInDataProperty2(testParam);
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postXmlInDataProperty2(testParam))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/xml")
                 .assertHeaderEquals("Content-Type", "application/xml")
@@ -1176,12 +1067,10 @@ public class TestPostClient extends BaseClientTest {
         XmlTestParam testParam = new XmlTestParam();
         testParam.setA(1);
         testParam.setB(2);
-        String result = postClient.postXmlWithXMLBodyAnn(testParam);
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postXmlWithXMLBodyAnn(testParam))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/xml")
                 .assertHeaderEquals("Content-Type", "application/xml")
@@ -1195,20 +1084,20 @@ public class TestPostClient extends BaseClientTest {
     @Test
     public void testPostXmlBodyString() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = postClient.postXmlBodyString("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+        assertThat(postClient.postXmlBodyString(
+                "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
                 "<misc>\n" +
                 "    <a>1</a>\n" +
                 "    <b>2</b>\n" +
-                "</misc>\n");
-        log.info("response: " + result);
-        assertNotNull(result);
-        Assert.assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+                "</misc>\n"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/xml")
                 .assertHeaderEquals("Content-Type", "application/xml")
-                .assertBodyEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+                .assertBodyEquals(
+                        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
                         "<misc>\n" +
                         "    <a>1</a>\n" +
                         "    <b>2</b>\n" +
@@ -1227,12 +1116,11 @@ public class TestPostClient extends BaseClientTest {
         XmlTestParam testParam = new XmlTestParam();
         testParam.setA(1);
         testParam.setB(2);
-        XmlTestParam result = postClient.postXmlWithXMLBodyAnnAndReturnObj(testParam);
-        log.info("response: " + result);
-        assertEquals(Integer.valueOf(10), result.getA());
-        assertEquals(Integer.valueOf(20), result.getB());
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(postClient.postXmlWithXMLBodyAnnAndReturnObj(testParam))
+                .isNotNull()
+                .extracting(XmlTestParam::getA, XmlTestParam::getB)
+                .contains(10, 20);
+        mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/xml-response")
                 .assertHeaderEquals("Content-Type", "application/xml")

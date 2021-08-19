@@ -3,18 +3,19 @@ package com.dtflys.test.http;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.test.http.client.OptionsClient;
 import com.dtflys.test.http.client.TraceClient;
 import com.dtflys.test.mock.OptionsMockServer;
 import com.dtflys.test.mock.TraceMockServer;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static junit.framework.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -23,11 +24,10 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestTraceClient extends BaseClientTest {
 
-    private final static Logger log = LoggerFactory.getLogger(TestTraceClient.class);
-
-
     @Rule
-    public TraceMockServer server = new TraceMockServer(this);
+    public MockWebServer server = new MockWebServer();
+
+    public final static String EXPECTED = "{\"status\": \"ok\"}";
 
     private static ForestConfiguration configuration;
 
@@ -37,54 +37,85 @@ public class TestTraceClient extends BaseClientTest {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
-        configuration.setVariableValue("port", TraceMockServer.port);
+    }
+
+    @Override
+    public void afterRequests() {
     }
 
     public TestTraceClient(HttpBackend backend) {
         super(backend, configuration);
+        configuration.setVariableValue("port", server.getPort());
         traceClient = configuration.createInstance(TraceClient.class);
     }
 
-
-    @Before
-    public void prepareMockServer() {
-        server.initServer();
-    }
-
-
     @Test
-    public void testSimpleOptions() {
-        ForestResponse response = traceClient.simpleTrace();
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCode());
-    }
-
-    @Test
-    public void testSimpleOptions2() {
-        ForestResponse response = traceClient.simpleTrace2();
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCode());
+    public void testSimpleOptions() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(traceClient.simpleTrace())
+                .isNotNull()
+                .extracting(ForestResponse::getStatusCode, ForestResponse::getContent)
+                .contains(200, EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("TRACE")
+                .assertPathEquals("/hello/user")
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertQueryEquals("username", "foo");
     }
 
     @Test
-    public void testSimpleOptions3() {
-        ForestResponse response = traceClient.simpleTrace3();
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCode());
+    public void testSimpleOptions2() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(traceClient.simpleTrace2())
+                .isNotNull()
+                .extracting(ForestResponse::getStatusCode, ForestResponse::getContent)
+                .contains(200, EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("TRACE")
+                .assertPathEquals("/hello/user")
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertQueryEquals("username", "foo");
     }
 
     @Test
-    public void testTextParamOptions() {
-        String result = traceClient.textParamTrace("foo");
-        assertNotNull(result);
-        assertEquals(OptionsMockServer.EXPECTED, result);
+    public void testSimpleOptions3() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(traceClient.simpleTrace3())
+                .isNotNull()
+                .extracting(ForestResponse::getStatusCode, ForestResponse::getContent)
+                .contains(200, EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("TRACE")
+                .assertPathEquals("/hello/user")
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertQueryEquals("username", "foo");
     }
 
     @Test
-    public void testAnnParamOptions() {
-        String result = traceClient.annParamTrace("foo");
-        assertNotNull(result);
-        assertEquals(OptionsMockServer.EXPECTED, result);
+    public void testTextParamOptions() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(traceClient.textParamTrace("foo"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("TRACE")
+                .assertPathEquals("/hello/user")
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertQueryEquals("username", "foo");
+    }
+
+    @Test
+    public void testAnnParamOptions() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(traceClient.annParamTrace("foo"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("TRACE")
+                .assertPathEquals("/hello/user")
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertQueryEquals("username", "foo");
+
     }
 
 }

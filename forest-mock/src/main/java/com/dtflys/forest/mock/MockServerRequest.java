@@ -42,7 +42,7 @@ public class MockServerRequest {
         this.url = request.getRequestUrl();
     }
 
-    public static MockServerRequest forMockWebServer(MockWebServer server) throws InterruptedException {
+    public static MockServerRequest mockRequest(MockWebServer server) throws InterruptedException {
         RecordedRequest request = server.takeRequest();
         return new MockServerRequest(request);
     }
@@ -191,6 +191,12 @@ public class MockServerRequest {
         Assert.assertEquals(expected, query(name));
         return this;
     }
+
+    public MockServerRequest assertEncodedQueryEquals(String expected) {
+        Assert.assertEquals(expected, encodedQuery());
+        return this;
+    }
+
 
     public MockServerRequest assertHeaderEquals(String name, String expected) {
         Assert.assertEquals(expected, header(name));

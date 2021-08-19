@@ -57,7 +57,7 @@ public class SSLTest {
         request.getLogConfiguration().getLogHandler().setLogger(logger);
         String result = (String) request.execute();
         assertTrue(result.startsWith("Global: "));
-        Mockito.verify(logger).info("[Forest] [SSLTest] 请求: \n" + "\tGET https://gitee.com/dt_flys HTTPS");
+        Mockito.verify(logger).info("[Forest] [Test2] 请求: \n" + "\tGET https://gitee.com/dt_flys HTTPS");
     }
 
 }

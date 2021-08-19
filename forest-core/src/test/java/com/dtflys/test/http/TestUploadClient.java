@@ -111,7 +111,7 @@ public class TestUploadClient extends BaseClientTest {
         assertEquals("test-img.jpg", multipart.getOriginalFileName());
         Object result = request.execute();
         assertNotNull(result);
-        MockServerRequest.forMockWebServer(server)
+        MockServerRequest.mockRequest(server)
                 .assertMultipart("file", fileItems -> {
                     assertEquals(1, fileItems.size());
                     FileItem fileItem = fileItems.get(0);
@@ -147,7 +147,7 @@ public class TestUploadClient extends BaseClientTest {
         assertEquals("test-img.jpg", multipart.getOriginalFileName());
         Map result = (Map) request.execute();
         assertNotNull(result);
-        MockServerRequest.forMockWebServer(server)
+        MockServerRequest.mockRequest(server)
                 .assertMultipart("file", fileItems -> {
                     assertEquals(1, fileItems.size());
                     FileItem fileItem = fileItems.get(0);
@@ -179,7 +179,7 @@ public class TestUploadClient extends BaseClientTest {
         assertEquals("test-byte-array.jpg", multipart.getOriginalFileName());
         Map result = (Map) request.execute();
         assertNotNull(result);
-        MockServerRequest.forMockWebServer(server)
+        MockServerRequest.mockRequest(server)
                 .assertMultipart("file", fileItems -> {
                     assertEquals(1, fileItems.size());
                     FileItem fileItem = fileItems.get(0);
@@ -215,7 +215,7 @@ public class TestUploadClient extends BaseClientTest {
         assertEquals("test-byte-array.jpg", multipart.getOriginalFileName());
         Map result = (Map) request.execute();
         assertNotNull(result);
-        MockServerRequest.forMockWebServer(server)
+        MockServerRequest.mockRequest(server)
                 .assertMultipart("file", fileItems -> {
                     assertEquals(1, fileItems.size());
                     FileItem fileItem = fileItems.get(0);
@@ -264,7 +264,7 @@ public class TestUploadClient extends BaseClientTest {
         }
         Map result = (Map) request.execute();
         assertNotNull(result);
-        MockServerRequest.forMockWebServer(server)
+        MockServerRequest.mockRequest(server)
                 .assertMultipart("file", fileItems -> {
                     assertEquals(2, fileItems.size());
                     FileItem fileItem1 = fileItems.get(0);
@@ -322,7 +322,7 @@ public class TestUploadClient extends BaseClientTest {
         Map result = (Map) request.execute();
         assertNotNull(result);
 
-        MockServerRequest.forMockWebServer(server)
+        MockServerRequest.mockRequest(server)
                 .assertMultipart("file_0", fileItems1 -> {
                     assertEquals(1, fileItems1.size());
                     FileItem fileItem1 = fileItems1.get(0);
@@ -382,7 +382,7 @@ public class TestUploadClient extends BaseClientTest {
         }
         Map result = (Map) request.execute();
         assertNotNull(result);
-        MockServerRequest.forMockWebServer(server)
+        MockServerRequest.mockRequest(server)
                 .assertMultipart("file", fileItems -> {
                     assertEquals(2, fileItems.size());
                     FileItem fileItem1 = fileItems.get(0);
@@ -444,7 +444,7 @@ public class TestUploadClient extends BaseClientTest {
         }
         Map result = (Map) request.execute();
         assertNotNull(result);
-        MockServerRequest.forMockWebServer(server)
+        MockServerRequest.mockRequest(server)
                 .assertMultipart("file_0", fileItems -> {
                     assertEquals(1, fileItems.size());
                     FileItem fileItem1 = fileItems.get(0);
@@ -506,7 +506,7 @@ public class TestUploadClient extends BaseClientTest {
         }
         Map result = (Map) request.execute();
         assertNotNull(result);
-        MockServerRequest.forMockWebServer(server)
+        MockServerRequest.mockRequest(server)
                 .assertMultipart("file", fileItems -> {
                     assertEquals(2, fileItems.size());
                     FileItem fileItem1 = fileItems.get(0);
@@ -566,7 +566,7 @@ public class TestUploadClient extends BaseClientTest {
         }
         Map result = (Map) request.execute();
         assertNotNull(result);
-        MockServerRequest.forMockWebServer(server)
+        MockServerRequest.mockRequest(server)
                 .assertMultipart("file_0", fileItems -> {
                     assertEquals(1, fileItems.size());
                     FileItem fileItem1 = fileItems.get(0);
@@ -634,7 +634,7 @@ public class TestUploadClient extends BaseClientTest {
         }
         Map result = (Map) request.execute();
         assertNotNull(result);
-        MockServerRequest.forMockWebServer(server)
+        MockServerRequest.mockRequest(server)
                 .assertMultipart("file", fileItems -> {
                     assertEquals(2, fileItems.size());
                     FileItem fileItem1 = fileItems.get(0);
@@ -697,7 +697,7 @@ public class TestUploadClient extends BaseClientTest {
         }
         Map result = (Map) request.execute();
         assertNotNull(result);
-        MockServerRequest.forMockWebServer(server)
+        MockServerRequest.mockRequest(server)
                 .assertMultipart("file", fileItems -> {
                     assertEquals(2, fileItems.size());
                     FileItem fileItem1 = fileItems.get(0);
@@ -762,7 +762,7 @@ public class TestUploadClient extends BaseClientTest {
         }
         Map result = (Map) request.execute();
         assertNotNull(result);
-        MockServerRequest.forMockWebServer(server)
+        MockServerRequest.mockRequest(server)
                 .assertMultipart("file", fileItems -> {
                     assertEquals(2, fileItems.size());
                     FileItem fileItem1 = fileItems.get(0);
@@ -815,7 +815,7 @@ public class TestUploadClient extends BaseClientTest {
         assertEquals("img1.jpg", multipart.getOriginalFileName());
         Map result = (Map) request.execute();
         assertNotNull(result);
-        MockServerRequest.forMockWebServer(server)
+        MockServerRequest.mockRequest(server)
                 .assertMultipart("file", multiparts -> {
                     assertEquals(1, multiparts.size());
                     FileItem fileItem = multiparts.get(0);
@@ -866,7 +866,7 @@ public class TestUploadClient extends BaseClientTest {
         assertEquals("img1.jpg", multipart.getOriginalFileName());
         Map result = (Map) request.execute();
         assertNotNull(result);
-        MockServerRequest.forMockWebServer(server)
+        MockServerRequest.mockRequest(server)
                 .assertMultipart("file", multiparts -> {
                     assertEquals(1, multiparts.size());
                     FileItem fileItem = multiparts.get(0);
@@ -919,7 +919,7 @@ public class TestUploadClient extends BaseClientTest {
         assertEquals("img1.jpg", multipart.getOriginalFileName());
         Map result = (Map) request.execute();
         assertNotNull(result);
-        MockServerRequest.forMockWebServer(server)
+        MockServerRequest.mockRequest(server)
                 .assertMultipart("file", multiparts -> {
                     assertEquals(1, multiparts.size());
                     FileItem fileItem = multiparts.get(0);
@@ -962,7 +962,7 @@ public class TestUploadClient extends BaseClientTest {
         assertEquals("img1.jpg", multipart.getOriginalFileName());
         Map result = (Map) request.execute();
         assertNotNull(result);
-        MockServerRequest.forMockWebServer(server)
+        MockServerRequest.mockRequest(server)
                 .assertMultipart("file", multiparts -> {
                     assertEquals(1, multiparts.size());
                     FileItem fileItem = multiparts.get(0);

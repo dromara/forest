@@ -6,10 +6,8 @@ import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.mock.MockServerRequest;
 import com.dtflys.test.http.client.BinaryClient;
-import com.dtflys.test.mock.BinaryMockServer;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -71,7 +69,7 @@ public class TestUploadBinary extends BaseClientTest {
         String result = binaryClient.uploadOctetStreamWithByteArray(byteArray, "test-xxx.jpg");
         assertEquals(EXPECTED, result);
 
-        MockServerRequest.forMockWebServer(server)
+        MockServerRequest.mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/upload-octet-stream/test-xxx.jpg")
                 .assertHeaderEquals("Content-Type", ContentType.APPLICATION_OCTET_STREAM)
@@ -89,7 +87,7 @@ public class TestUploadBinary extends BaseClientTest {
         String result = binaryClient.uploadOctetStreamWithFile(file, "test-xxx.jpg");
         assertEquals(EXPECTED, result);
 
-        MockServerRequest.forMockWebServer(server)
+        MockServerRequest.mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/upload-octet-stream/test-xxx.jpg")
                 .assertHeaderEquals("Content-Type", ContentType.APPLICATION_OCTET_STREAM)
@@ -107,7 +105,7 @@ public class TestUploadBinary extends BaseClientTest {
         String result = binaryClient.uploadOctetStreamWithDataFile(file, "test-xxx.jpg");
         assertEquals(EXPECTED, result);
 
-        MockServerRequest.forMockWebServer(server)
+        MockServerRequest.mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/upload-octet-stream/test-xxx.jpg")
                 .assertHeaderEquals("Content-Type", ContentType.APPLICATION_OCTET_STREAM)

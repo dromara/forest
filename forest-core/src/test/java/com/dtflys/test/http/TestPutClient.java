@@ -3,17 +3,17 @@ package com.dtflys.test.http;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.test.mock.PutMockServer;
-import com.dtflys.forest.backend.HttpBackend;
-import com.dtflys.forest.backend.okhttp3.OkHttp3Backend;
-import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.test.http.client.PutClient;
-import com.dtflys.test.mock.PutMockServer;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -21,10 +21,10 @@ import static junit.framework.Assert.assertNotNull;
  */
 public class TestPutClient extends BaseClientTest {
 
-    private final static Logger log = LoggerFactory.getLogger(TestPutClient.class);
-
     @Rule
-    public PutMockServer server = new PutMockServer(this);
+    public MockWebServer server = new MockWebServer();
+
+    public final static String EXPECTED = "{\"status\": \"ok\"}";
 
     private static ForestConfiguration configuration;
 
@@ -33,67 +33,97 @@ public class TestPutClient extends BaseClientTest {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
-        configuration.setVariableValue("port", PutMockServer.port);
+    }
+
+    @Override
+    public void afterRequests() {
     }
 
     public TestPutClient(HttpBackend backend) {
         super(backend, configuration);
+        configuration.setVariableValue("port", server.getPort());
         putClient = configuration.createInstance(PutClient.class);
     }
 
-    @Before
-    public void prepareMockServer() {
-        server.initServer();
+
+    @Test
+    public void testPutHello() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(putClient.putHello())
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("PUT")
+                .assertPathEquals("/hello")
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertBodyEquals("username=foo&password=123456");
     }
 
     @Test
-    public void testPutHello() {
-        String result = putClient.putHello();
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(PutMockServer.EXPECTED, result);
+    public void testSimplePut() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(putClient.simplePut())
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("PUT")
+                .assertPathEquals("/hello")
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertBodyEquals("username=foo&password=123456");
     }
 
     @Test
-    public void testSimplePut() {
-        String result = putClient.simplePut();
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(PutMockServer.EXPECTED, result);
+    public void testSimplePut2() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(putClient.simplePut2())
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("PUT")
+                .assertPathEquals("/hello")
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertBodyEquals("username=foo&password=123456");
     }
 
     @Test
-    public void testSimplePut2() {
-        String result = putClient.simplePut2();
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(PutMockServer.EXPECTED, result);
-    }
-
-    @Test
-    public void testSimplePut3() {
-        String result = putClient.simplePut3();
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(PutMockServer.EXPECTED, result);
+    public void testSimplePut3() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(putClient.simplePut3())
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("PUT")
+                .assertPathEquals("/hello")
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertBodyEquals("username=foo&password=123456");
     }
 
 
-
     @Test
-    public void testTextParamPut() {
-        String result = putClient.textParamPut("foo", "123456");
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(PutMockServer.EXPECTED, result);
+    public void testTextParamPut() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(putClient.textParamPut("foo", "123456"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("PUT")
+                .assertPathEquals("/hello")
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertBodyEquals("username=foo&password=123456");
     }
 
     @Test
-    public void testAnnParamPut() {
-        String result = putClient.annParamPut("foo", "123456");
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(PutMockServer.EXPECTED, result);
+    public void testAnnParamPut() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(putClient.annParamPut("foo", "123456"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("PUT")
+                .assertPathEquals("/hello")
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertBodyEquals("username=foo&password=123456");
+
     }
 
 

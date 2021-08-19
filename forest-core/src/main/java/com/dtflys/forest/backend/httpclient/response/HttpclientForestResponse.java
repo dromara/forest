@@ -67,6 +67,9 @@ public class HttpclientForestResponse extends ForestResponse {
                     }
                 }
                 this.content = buildContent();
+            } else {
+                this.bytes = new byte[0];
+                this.content = "";
             }
         } else {
             this.statusCode = -1;
@@ -91,7 +94,7 @@ public class HttpclientForestResponse extends ForestResponse {
 
     @Override
     public boolean isReceivedResponseData() {
-        return entity != null;
+        return entity != null || bytes != null;
     }
 
     private String buildContent() {

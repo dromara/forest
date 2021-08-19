@@ -116,7 +116,7 @@ public interface GetClient {
     @Request(
             url = "http://xxxx:${port}/hello/user?username=foo",
             retryCount = 3,
-            maxRetryInterval = 5000,
+            maxRetryInterval = 2000,
             timeout = 5,
             headers = {"Accept:text/plain"}
     )
@@ -125,7 +125,7 @@ public interface GetClient {
     @Request(
             url = "http://xxxx:${port}/hello/user?username=foo",
             retryCount = 5,
-            maxRetryInterval = 5000,
+            maxRetryInterval = 2000,
             timeout = 1,
             headers = {"Accept:text/plain"}
     )
@@ -306,13 +306,13 @@ public interface GetClient {
             url = "http://localhost:${port}/hello/user?{name}",
             headers = {"Accept:text/plain"}
     )
-    String getWithQueryString(@DataVariable("name") String name);
+    String getQueryStringWithoutName(@DataVariable("name") String name);
 
     @Get(
             url = "http://localhost:${port}/hello/user",
             headers = {"Accept:text/plain"}
     )
-    String getWithQueryString2(@Query String name);
+    String getQueryStringWithoutName2(@Query String name);
 
     @Get(
             url = "http://xxxxxx:yyyy@localhost:8080/hello/user",

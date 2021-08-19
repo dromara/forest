@@ -6,6 +6,8 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.mock.HeadMockServer;
 import com.dtflys.test.http.client.HeadClient;
 import com.dtflys.test.model.TestHeaders;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -16,7 +18,9 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static junit.framework.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -24,10 +28,9 @@ import static junit.framework.Assert.*;
  */
 public class TestHeadClient extends BaseClientTest {
 
-    private final static Logger log = LoggerFactory.getLogger(TestHeadClient.class);
-
     @Rule
-    public HeadMockServer server = new HeadMockServer(this);
+    public MockWebServer server = new MockWebServer();
+
 
     private static ForestConfiguration configuration;
 
@@ -39,39 +42,110 @@ public class TestHeadClient extends BaseClientTest {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
-        configuration.setVariableValue("port", HeadMockServer.port);
+    }
+
+    @Override
+    public void afterRequests() {
     }
 
     public TestHeadClient(HttpBackend backend) {
         super(backend, configuration);
+        configuration.setVariableValue("port", server.getPort());
         headClient = configuration.createInstance(HeadClient.class);
-
-    }
-
-    @Before
-    public void prepareMockServer() {
-        server.initServer();
     }
 
 
     @Test
-    public void testHeadHelloUser() {
+    public void testHeadHelloUser() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody("ok"));
         headClient.headHelloUser();
+        mockRequest(server)
+                .assertMethodEquals("HEAD")
+                .assertPathEquals("/hello/user")
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertHeaderEquals("accessToken", "11111111")
+                .assertHeaderEquals("test", "testquery:dsds")
+                .assertHeaderEquals("test2", "testquery2: dsds")
+                .assertQueryEquals("username", "foo");
     }
 
     @Test
-    public void testHeadHelloUser2() {
+    public void testHeadHelloUser2() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody("ok"));
         headClient.headHelloUser("text/plain", "11111111");
+        mockRequest(server)
+                .assertMethodEquals("HEAD")
+                .assertPathEquals("/hello/user")
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertHeaderEquals("accessToken", "11111111")
+                .assertHeaderEquals("test", "testquery:dsds")
+                .assertHeaderEquals("test2", "testquery2: dsds")
+                .assertQueryEquals("username", "foo");
     }
 
     @Test
-    public void testHeadHelloUser2WithDefaultHeaders() {
+    public void testHeadHelloUser2WithDefaultHeaders() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody("ok"));
         headClient.headHelloUserWithDefaultHeaders(null, null);
+        mockRequest(server)
+                .assertMethodEquals("HEAD")
+                .assertPathEquals("/hello/user")
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertHeaderEquals("accessToken", "11111111")
+                .assertHeaderEquals("test", "testquery:dsds")
+                .assertHeaderEquals("test2", "testquery2: dsds")
+                .assertQueryEquals("username", "foo");
+    }
+
+    @Test
+    public void testSimpleHead() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody("ok"));
+        accessTokenLocal.set("11111111");
+        assertThat(headClient.simpleHead(accessTokenLocal.get(), "testquery:dsds", "testquery2: dsds"))
+            .isNotNull()
+            .isEqualTo("");
+        mockRequest(server)
+                .assertMethodEquals("HEAD")
+                .assertPathEquals("/hello/user")
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertHeaderEquals("accessToken", "11111111")
+                .assertHeaderEquals("test", "testquery:dsds")
+                .assertHeaderEquals("test2", "testquery2: dsds")
+                .assertQueryEquals("username", "foo");
+    }
+
+    @Test
+    public void testSimpleHead2() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody("ok"));
+        headClient.simpleHead2();
+        mockRequest(server)
+                .assertMethodEquals("HEAD")
+                .assertPathEquals("/hello/user")
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertHeaderEquals("accessToken", "11111111")
+                .assertHeaderEquals("test", "testquery:dsds")
+                .assertHeaderEquals("test2", "testquery2: dsds")
+                .assertQueryEquals("username", "foo");
+    }
+
+    @Test
+    public void testSimpleHead3() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody("ok"));
+        headClient.simpleHead3();
+        mockRequest(server)
+                .assertMethodEquals("HEAD")
+                .assertPathEquals("/hello/user")
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertHeaderEquals("accessToken", "11111111")
+                .assertHeaderEquals("test", "testquery:dsds")
+                .assertHeaderEquals("test2", "testquery2: dsds")
+                .assertQueryEquals("username", "foo");
     }
 
 
     @Test
-    public void testHeadHelloUser3() {
+    public void testHeadHelloUser3() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody("ok"));
         accessTokenLocal.set("11111111");
         Map<String, Object> headers = new HashMap<>();
         headers.put("Accept", "text/plain");
@@ -79,45 +153,59 @@ public class TestHeadClient extends BaseClientTest {
         headers.put("test", "testquery:dsds");
         headers.put("test2", "testquery2: dsds");
         headClient.headHelloUser(headers, "foo");
+        mockRequest(server)
+                .assertMethodEquals("HEAD")
+                .assertPathEquals("/hello/user")
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertHeaderEquals("accessToken", "11111111")
+                .assertHeaderEquals("test", "testquery:dsds")
+                .assertHeaderEquals("test2", "testquery2: dsds")
+                .assertQueryEquals("username", "foo");
     }
 
     @Test
-    public void testHeadHelloUser4() {
+    public void testHeadHelloUser4() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody("ok"));
         TestHeaders headers = new TestHeaders();
         headers.setAccept("text/plain");
         headers.setAccessToken("11111111");
         headers.setTest("testquery:dsds");
         headers.setTest2("testquery2: dsds");
         headClient.headHelloUser(headers);
+        mockRequest(server)
+                .assertMethodEquals("HEAD")
+                .assertPathEquals("/hello/user")
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertHeaderEquals("accessToken", "11111111")
+                .assertHeaderEquals("test", "testquery:dsds")
+                .assertHeaderEquals("test2", "testquery2: dsds")
+                .assertQueryEquals("username", "foo");
     }
 
 
-    @Test
-    public void testSimpleHead() {
-        accessTokenLocal.set("11111111");
-        headClient.simpleHead(accessTokenLocal.get(), "testquery:dsds", "testquery2: dsds");
-    }
-
-    @Test
-    public void testSimpleHead2() {
-        headClient.simpleHead2();
-    }
-
-    @Test
-    public void testSimpleHead3() {
-        headClient.simpleHead3();
-    }
-
-
-    @Test
-    public void testResponseHead() {
+   @Test
+    public void testResponseHead() throws InterruptedException {
+        server.enqueue(new MockResponse()
+                .setHeader("server", "mock server")
+                .setHeader("Content-Length", "0"));
         ForestResponse response = headClient.responseHead();
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCode());
-        assertTrue(response.isSuccess());
-        assertFalse(response.isError());
-        assertEquals("mock server", response.getHeaderValue("server"));
-        assertEquals("0", response.getHeaderValue("content-length"));
+        assertThat(response)
+                .isNotNull()
+                .extracting(
+                        ForestResponse::getStatusCode,
+                        ForestResponse::isSuccess,
+                        ForestResponse::isError)
+                .contains(200, true, false);
+        assertThat(response.getHeaderValue("server")).isEqualTo("mock server");
+        assertThat(response.getHeaderValue("content-length")).isEqualTo("0");
+        mockRequest(server)
+                .assertMethodEquals("HEAD")
+                .assertPathEquals("/hello/user")
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertHeaderEquals("accessToken", "11111111")
+                .assertHeaderEquals("test", "testquery:dsds")
+                .assertHeaderEquals("test2", "testquery2: dsds")
+                .assertQueryEquals("username", "foo");
     }
 
 }

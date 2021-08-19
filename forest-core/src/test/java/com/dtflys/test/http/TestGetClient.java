@@ -1,44 +1,39 @@
 package com.dtflys.test.http;
 
 import com.alibaba.fastjson.JSON;
+import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.mock.MockServerRequest;
-import com.dtflys.test.http.client.EmptyJsonClient;
 import com.dtflys.test.http.client.GetWithBodyClient;
 import com.dtflys.test.http.model.JsonTestUser;
-import com.dtflys.test.mock.GetMockServer;
 import com.dtflys.test.http.client.GetClient;
-import com.dtflys.test.mock.PostJsonMockServer;
+import com.dtflys.test.mock.QueryStringMockServer;
 import com.dtflys.test.model.TokenResult;
 import com.google.common.collect.Lists;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-11 15:02
  */
 public class TestGetClient extends BaseClientTest {
-
-    private final static Logger log = LoggerFactory.getLogger(TestGetClient.class);
 
     public final static String EXPECTED = "{\"status\":\"ok\"}";
 
@@ -58,6 +53,10 @@ public class TestGetClient extends BaseClientTest {
         configuration = ForestConfiguration.configuration();
     }
 
+    @Override
+    public void afterRequests() {
+    }
+
 
     public TestGetClient(HttpBackend backend) {
         super(backend, configuration);
@@ -70,35 +69,35 @@ public class TestGetClient extends BaseClientTest {
     @Test
     public void testGet() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = getClient.simpleGet();
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(EXPECTED, result);
-        RecordedRequest request = server.takeRequest();
-        assertEquals("/hello/user?username=foo", request.getPath());
+        assertThat(getClient.simpleGet())
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo");
+
     }
 
     @Test
     public void testGet2() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = getClient.simpleGet2();
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(EXPECTED, result);
-        RecordedRequest request = server.takeRequest();
-        assertEquals("/hello/user?username=foo", request.getPath());
-
+        assertThat(getClient.simpleGet2())
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo");
     }
 
     @Test
     public void testGet3() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = getClient.simpleGet3();
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(GetMockServer.EXPECTED, result);
-        RecordedRequest request = server.takeRequest();
-        assertEquals("/hello/user?username=foo", request.getPath());
+        assertThat(getClient.simpleGet3())
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo");
     }
 
 
@@ -106,15 +105,16 @@ public class TestGetClient extends BaseClientTest {
     public void testJsonMapGet() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         ForestResponse<Map> response = getClient.jsonMapGet();
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCode());
-        assertNull(response.getContentType());
-        assertNull(response.getContentEncoding());
-        Map map  = response.getResult();
-        assertNotNull(map);
-        assertEquals("ok", map.get("status"));
-        RecordedRequest request = server.takeRequest();
-        assertEquals("/hello/user?username=foo", request.getPath());
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getContentType()).isNull();
+        assertThat(response.getContentEncoding()).isNull();
+        assertThat(response.getResult())
+                .isNotNull()
+                .containsOnly(entry("status", "ok"));
+        mockRequest(server)
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo");
     }
 
     @Test
@@ -124,15 +124,16 @@ public class TestGetClient extends BaseClientTest {
                 .setHeader("Content-Encoding", "GBK")
                 .setBody(EXPECTED));
         ForestResponse<Map> response = getClient.jsonMapGet();
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCode());
-        assertNull(response.getContentType());
-        assertEquals("GBK", response.getContentEncoding());
-        Map map  = response.getResult();
-        assertNotNull(map);
-        assertEquals("ok", map.get("status"));
-        RecordedRequest request = server.takeRequest();
-        assertEquals("/hello/user?username=foo", request.getPath());
+        assertThat(response).isNotNull();
+        assertThat(response.getContentType()).isNull();
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getContentEncoding()).isEqualTo("GBK");
+        assertThat(response.getResult())
+                .isNotNull()
+                .containsOnly(entry("status", "ok"));
+        mockRequest(server)
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo");
     }
 
     @Test
@@ -143,16 +144,20 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(EXPECTED));
         ForestResponse<Map> response = getClient.jsonMapGet();
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCode());
-        assertNotNull(response.getContentType());
-        assertEquals("application/json", response.getContentType().toString());
-        assertEquals("UTF-8", response.getContentEncoding());
-        Map map  = response.getResult();
-        assertNotNull(map);
-        assertEquals("ok", map.get("status"));
-        RecordedRequest request = server.takeRequest();
-        assertEquals("/hello/user?username=foo", request.getPath());
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getContentType())
+                .isNotNull()
+                .extracting(ContentType::toStringWithoutParameters)
+                .isEqualTo(ContentType.APPLICATION_JSON);
+        assertThat(response.getContentEncoding()).isEqualTo("UTF-8");
+        assertThat(response.getResult())
+                .isNotNull()
+                .containsOnly(entry("status", "ok"));
+        mockRequest(server)
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo");
     }
 
 
@@ -164,12 +169,13 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Type", "application/json")
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(EXPECTED));
-        String result = getClient.textParamGet("foo");
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(GetMockServer.EXPECTED, result);
-        RecordedRequest request = server.takeRequest();
-        assertEquals("/hello/user?username=foo", request.getPath());
+        assertThat(getClient.textParamGet("foo"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo");
     }
 
     @Test
@@ -179,12 +185,13 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Type", "application/json")
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(EXPECTED));
-        String result = getClient.textParamGetWithDefaultUsername(null);
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(GetMockServer.EXPECTED, result);
-        RecordedRequest request = server.takeRequest();
-        assertEquals("/hello/user?username=foo", request.getPath());
+        assertThat(getClient.textParamGetWithDefaultUsername(null))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo");
     }
 
 
@@ -196,14 +203,16 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Type", "application/json")
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(EXPECTED));
-        String result = getClient.textParamInPathGet("foo", (data, request, response) -> {
-            response.setResult("onSuccess is ok");
-        });
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals("onSuccess is ok", result);
-        RecordedRequest request = server.takeRequest();
-        assertEquals("/hello/user?username=foo", request.getPath());
+        assertThat(
+                getClient.textParamInPathGet("foo", (data, request, response) -> {
+                    response.setResult("onSuccess is ok");
+                }))
+                .isNotNull()
+                .isEqualTo("onSuccess is ok");
+        mockRequest(server)
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo");
     }
 
 
@@ -214,12 +223,13 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Type", "application/json")
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(EXPECTED));
-        String result = getClient.annParamGet("foo");
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(GetMockServer.EXPECTED, result);
-        RecordedRequest request = server.takeRequest();
-        assertEquals("/hello/user?username=foo", request.getPath());
+        assertThat(getClient.annParamGet("foo"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo");
     }
 
     @Test
@@ -229,12 +239,13 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Type", "application/json")
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(EXPECTED));
-        String result = getClient.annQueryGet("foo");
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(GetMockServer.EXPECTED, result);
-        RecordedRequest request = server.takeRequest();
-        assertEquals("/hello/user?username=foo", request.getPath());
+        assertThat(getClient.annQueryGet("foo"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo");
     }
 
 
@@ -247,12 +258,13 @@ public class TestGetClient extends BaseClientTest {
                         .setBody(EXPECTED));
         JsonTestUser user = new JsonTestUser();
         user.setUsername("foo");
-        String result = getClient.annObjectGet(user);
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(GetMockServer.EXPECTED, result);
-        RecordedRequest request = server.takeRequest();
-        assertEquals("/hello/user?username=foo", request.getPath());
+        assertThat(getClient.annObjectGet(user))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo");
     }
 
     @Test
@@ -264,12 +276,13 @@ public class TestGetClient extends BaseClientTest {
                         .setBody(EXPECTED));
         Map<String, Object> map = new HashMap<>();
         map.put("username", "foo");
-        String result = getClient.annObjectGet(map);
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(GetMockServer.EXPECTED, result);
-        RecordedRequest request = server.takeRequest();
-        assertEquals("/hello/user?username=foo", request.getPath());
+        assertThat(getClient.annObjectGet(map))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo");
     }
 
     @Test
@@ -282,12 +295,14 @@ public class TestGetClient extends BaseClientTest {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("username", "foo");
         map.put("password", "bar");
-        String result = getClient.annObjectGet(map);
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(GetMockServer.EXPECTED, result);
-        RecordedRequest request = server.takeRequest();
-        assertEquals("/hello/user?username=foo&password=bar", request.getPath());
+        assertThat(getClient.annObjectGet(map))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo")
+                .assertQueryEquals("password", "bar");
     }
 
 
@@ -300,12 +315,13 @@ public class TestGetClient extends BaseClientTest {
                         .setBody(EXPECTED));
         JsonTestUser user = new JsonTestUser();
         user.setUsername("foo");
-        String result = getClient.queryObjectGet(user);
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(GetMockServer.EXPECTED, result);
-        RecordedRequest request = server.takeRequest();
-        assertEquals("/hello/user?username=foo", request.getPath());
+        assertThat(getClient.queryObjectGet(user))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo");
     }
 
     @Test
@@ -317,17 +333,15 @@ public class TestGetClient extends BaseClientTest {
                         .setBody(EXPECTED));
         Map<String, Object> map = new HashMap<>();
         map.put("username", "foo");
-        String result = getClient.queryObjectGet(map);
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(GetMockServer.EXPECTED, result);
-        RecordedRequest request = server.takeRequest();
-        assertEquals("/hello/user?username=foo", request.getPath());
+        assertThat(getClient.queryObjectGet(map))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo");
     }
 
-    @Override
-    public void afterRequests() {
-    }
 
     @Test
     public void testVarParamGet() throws InterruptedException {
@@ -336,12 +350,13 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Type", "application/json")
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(EXPECTED));
-        String result = getClient.varParamGet("foo");
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(GetMockServer.EXPECTED, result);
-        RecordedRequest request = server.takeRequest();
-        assertEquals("/hello/user?username=foo", request.getPath());
+        assertThat(getClient.varParamGet("foo"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo");
     }
 
     @Test
@@ -352,13 +367,15 @@ public class TestGetClient extends BaseClientTest {
                         .setBody(EXPECTED));
         String token = "YmZlNDYzYmVkMWZjYzgwNjExZDVhMWM1ODZmMWRhYzg0NTcyMGEwMg==";
         ForestResponse<String> response = getClient.testUrl();
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCode());
-        assertNull(response.getContentType());
-        assertEquals("UTF-8", response.getContentEncoding());
-        assertEquals(EXPECTED, response.getResult());
-        RecordedRequest request = server.takeRequest();
-        assertEquals("/?token=" + URLEncoder.encode(token, "UTF-8"), request.getPath());
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
+        assertThat(response.getContentEncoding()).isNotNull().isEqualTo("UTF-8");
+        assertThat(response.getContentType()).isNull();
+        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertEncodedQueryEquals("token=" + URLEncoder.encode(token, StandardCharsets.UTF_8.name()))
+                .assertQueryEquals("token", token);
     }
 
 
@@ -369,12 +386,14 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Type", "application/json")
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(EXPECTED));
-        String result = getClient.simpleGetMultiQuery("bar");
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(EXPECTED, result);
-        RecordedRequest request = server.takeRequest();
-        assertEquals("/hello/user?username=foo&password=bar", request.getPath());
+        assertThat(getClient.simpleGetMultiQuery("bar"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo")
+                .assertQueryEquals("password", "bar");
     }
 
     @Test
@@ -384,12 +403,14 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Type", "text/plain")
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(EXPECTED));
-        String result = getClient.simpleGetMultiQuery2("foo", "bar");
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(EXPECTED, result);
-        RecordedRequest request = server.takeRequest();
-        assertEquals("/hello/user?username=foo&password=bar", request.getPath());
+        assertThat(getClient.simpleGetMultiQuery2("foo", "bar"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo")
+                .assertQueryEquals("password", "bar");
     }
 
 
@@ -400,12 +421,14 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Type", "text/plain")
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(EXPECTED));
-        String result = getClient.simpleGetMultiQuery3();
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(EXPECTED, result);
-        RecordedRequest request = server.takeRequest();
-        assertEquals("/hello/user?username=foo&password=bar", request.getPath());
+        assertThat(getClient.simpleGetMultiQuery3())
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo")
+                .assertQueryEquals("password", "bar");
     }
 
     @Test
@@ -417,17 +440,19 @@ public class TestGetClient extends BaseClientTest {
                         .setBody(EXPECTED));
         ForestResponse<String> response = getClient.simpleGetMultiQuery4();
         assertNotNull(response);
-        assertTrue(response.isSuccess());
-        assertEquals(200, response.getStatusCode());
-        assertNotNull(response.getContentType());
-        assertEquals("text/plain", response.getContentType().toString());
-        assertEquals("UTF-8", response.getContentEncoding());
-        String result = response.getResult();
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(EXPECTED, result);
-        RecordedRequest request = server.takeRequest();
-        assertEquals("/hello/user?username=foo&password=bar", request.getPath());
+        assertThat(response).isNotNull();
+        assertThat(response.isSuccess()).isTrue();
+        assertThat(response.isError()).isFalse();
+        assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
+        assertThat(response.getContentType()).isNotNull()
+                .extracting(ContentType::toString).isEqualTo("text/plain");
+        assertThat(response.getContentEncoding()).isNotNull().isEqualTo("UTF-8");
+        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo")
+                .assertQueryEquals("password", "bar");
     }
 
     @Test
@@ -439,26 +464,26 @@ public class TestGetClient extends BaseClientTest {
                         .setBody(EXPECTED));
         ForestResponse<String> response = getClient.simpleGetMultiQuery5("foo");
         assertNotNull(response);
-        assertTrue(response.isSuccess());
-        assertEquals(200, response.getStatusCode());
-        assertNotNull(response.getContentType());
-        assertEquals("text/plain", response.getContentType().toString());
-        assertEquals("UTF-8", response.getContentEncoding());
-        String result = response.getResult();
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(EXPECTED, result);
-        RecordedRequest request = server.takeRequest();
-        assertEquals("/hello/user?username=foo&username=foo&password=bar", request.getPath());
+        assertThat(response).isNotNull();
+        assertThat(response.isSuccess()).isTrue();
+        assertThat(response.isError()).isFalse();
+        assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
+        assertThat(response.getContentType()).isNotNull()
+                .extracting(ContentType::toString).isEqualTo("text/plain");
+        assertThat(response.getContentEncoding()).isNotNull().isEqualTo("UTF-8");
+        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo")
+                .assertQueryEquals("password", "bar");
     }
 
     @Test
     public void testGetBooleanResultTrue() throws InterruptedException {
         server.enqueue(new MockResponse().setBody("true"));
-        Boolean ret = getClient.getBooleanResultTrue();
-        assertTrue(ret);
-        RecordedRequest request = server.takeRequest();
-        assertEquals("/boolean/true", request.getPath());
+        assertThat(getClient.getBooleanResultTrue()).isTrue();
+        mockRequest(server).assertPathEquals("/boolean/true");
     }
 
     @Test
@@ -468,10 +493,8 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Type", "text/plain")
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody("true"));
-        Boolean ret = getClient.getBooleanResultTrue();
-        assertTrue(ret);
-        RecordedRequest request = server.takeRequest();
-        assertEquals("/boolean/true", request.getPath());
+        assertThat(getClient.getBooleanResultTrue()).isTrue();
+        mockRequest(server).assertPathEquals("/boolean/true");
     }
 
     @Test
@@ -483,16 +506,13 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Type", "text/plain")
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(str));
-        TokenResult result = getClient.getToken();
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(604800L, result.getTokenTimeout());
-        assertEquals(token, result.getURLToken());
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(getClient.getToken())
+                .isNotNull()
+                .extracting(TokenResult::getTokenTimeout, TokenResult::getURLToken)
+                .contains(604800L, token);
+        mockRequest(server)
                 .assertMethodEquals("GET")
                 .assertPathEquals("/token");
-
     }
 
     @Test
@@ -502,15 +522,13 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Type", "text/plain")
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(EXPECTED));
-        String result = getClient.repeatableQuery();
-        assertNotNull(result);
-        assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(getClient.repeatableQuery())
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("GET")
                 .assertPathEquals("/hello/user")
                 .assertQueryEquals("username=foo&username=bar&username=user1&username=user2&password=123456");
-
     }
 
     @Test
@@ -520,16 +538,14 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Type", "text/plain")
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(EXPECTED));
-        String result = getClient.repeatableQuery("user1", "user2", "123456");
-        assertNotNull(result);
-        assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(getClient.repeatableQuery("user1", "user2", "123456"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("GET")
                 .assertPathEquals("/hello/user")
                 .assertHeaderEquals("Accept", "text/plain")
                 .assertQueryEquals("username=foo&username=bar&username=user1&username=user2&password=123456");
-
     }
 
     @Test
@@ -540,14 +556,12 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(EXPECTED));
         List<String> usernames = Lists.newArrayList("foo", "bar", "user1", "user2");
-        String result = getClient.repeatableQuery(usernames, "123456");
-        assertNotNull(result);
-        assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(getClient.repeatableQuery(usernames, "123456"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertPathEquals("/hello/user")
                 .assertQueryEquals("username=foo&username=bar&username=user1&username=user2&password=123456");
-
     }
 
     @Test
@@ -558,11 +572,10 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(EXPECTED));
         String[] usernames = new String[] {"foo", "bar", "user1", "user2"};
-        String result = getClient.repeatableQuery(usernames, "123456");
-        assertNotNull(result);
-        assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(getClient.repeatableQuery(usernames, "123456"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertPathEquals("/hello/user")
                 .assertQueryEquals("username=foo&username=bar&username=user1&username=user2&password=123456");
     }
@@ -576,11 +589,10 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(EXPECTED));
         List<String> usernames = Lists.newArrayList("foo", "bar", "user1", "user2");
-        String result = getClient.arrayQuery(usernames, "123456");
-        assertNotNull(result);
-        assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(getClient.arrayQuery(usernames, "123456"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("GET")
                 .assertPathEquals("/hello/user/array")
                 .assertQueryEquals("username_0", "foo")
@@ -588,7 +600,6 @@ public class TestGetClient extends BaseClientTest {
                 .assertQueryEquals("username_2", "user1")
                 .assertQueryEquals("username_3", "user2")
                 .assertQueryEquals("password", "123456");
-
     }
 
     @Test
@@ -602,17 +613,39 @@ public class TestGetClient extends BaseClientTest {
         Map<String, String> userInfo = new LinkedHashMap<>();
         userInfo.put("username", "foo");
         userInfo.put("password", "bar");
-        String result = getClient.jsonQuery(idList, userInfo);
-        assertNotNull(result);
-        assertEquals(EXPECTED, result);
-
-        MockServerRequest.forMockWebServer(server)
+        assertThat(getClient.jsonQuery(idList, userInfo))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
                 .assertMethodEquals("GET")
                 .assertPathEquals("/hello/user")
                 .assertQueryEquals("ids", JSON.toJSONString(idList))
                 .assertQueryEquals("user", JSON.toJSONString(userInfo));
     }
 
+    @Test
+    public void testGetQueryStringWithoutName() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(getClient.getQueryStringWithoutName("foo"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("GET")
+                .assertPathEquals("/hello/user")
+                .assertEncodedQueryEquals("foo");
+    }
+
+    @Test
+    public void testGetQueryStringWithoutName2() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(getClient.getQueryStringWithoutName2("foo"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("GET")
+                .assertPathEquals("/hello/user")
+                .assertEncodedQueryEquals("foo");
+    }
 
 
 }

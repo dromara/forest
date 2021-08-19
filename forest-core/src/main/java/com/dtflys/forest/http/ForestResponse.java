@@ -227,7 +227,7 @@ public abstract class ForestResponse<T> {
         try {
             byte[] bytes = getByteArray();
             if (bytes == null) {
-                return null;
+                return "";
             }
             return byteToString(bytes);
         } catch (Exception e) {

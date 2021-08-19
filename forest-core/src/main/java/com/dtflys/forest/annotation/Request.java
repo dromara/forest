@@ -92,10 +92,13 @@ public @interface Request {
     Class retryer() default Object.class;
 
     /**
-     * max count to retry
+     * 最大重试次数
      */
     int retryCount() default -1;
 
+    /**
+     * 最大重试间隔时间
+     */
     int maxRetryInterval() default -1;
 
     /**
