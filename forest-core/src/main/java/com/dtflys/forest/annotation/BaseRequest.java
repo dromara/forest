@@ -9,13 +9,17 @@ import java.lang.annotation.Target;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * 接口级别请求配置信息注解<br>
- * The annotation must be on an interface. It allows you to make some configurations shared for all the requests in this interface.<br>
+ * 接口级别请求配置信息注解
+ * <p>
+ * The annotation must be on an interface.
+ * It allows you to make some configurations shared for all the requests in this interface.
+ * <p>
  * 该注解必须绑定在某一个接口类上。在该注解中配置的参数信息将会被次注解绑定的接口中所有方法的请求所共享，
  * 它可以覆盖全局级别的请求配置信息，但不能覆盖方法级别的请求参数信息
  *
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2018-03-30 16:59
+ * @see Request
  */
 @Documented
 @BaseLifeCycle(BaseRequestLifeCycle.class)
@@ -24,53 +28,157 @@ import java.lang.annotation.RetentionPolicy;
 public @interface BaseRequest {
 
     /**
-     * Base URL
+     * 基础 URL（接口级别）
+     * <p>
+     *     请求的最终 url = baseUrl + request Url.
+     *     如果 request Url 是 http:// 或 https:// 等协议形式开头的就会<b>忽略</b> baseUrl
+     * </p>
+     *
+     * @see Request#url()
      */
     String baseURL() default "";
 
     /**
-     * Base Content Type
+     * 接口级别 Content Type
+     * <p>
+     *     在请求的 {@code Content-Type} 头或 {@code contentType} 属性没有设置，
+     *     且此属性不为空字符串的情况下，
+     *     此属性作为默认值填到请求的 {@code Content-Type} 头中
+     * </p>
+     *
+     * @see Request#contentType()
      */
     String contentType() default "";
 
     /**
-     * Base Content Encoding
+     * 接口级别 Content Encoding
+     * <p>
+     *     在请求的 {@code Content-Encoding} 头或 {@code contentEncoding} 属性没有设置，
+     *     且此属性不为空字符串的情况下，
+     *     此属性作为默认值填到请求的 {@code Content-Encoding} 头中
+     * </p>
+     *
+     * @see Request#contentEncoding()
      */
     String contentEncoding() default "";
 
     /**
-     * Base User Agent
+     * 接口级别 User Agent
+     * <p>
+     *     在请求的 {@code User-Agent} 头或 {@code userAgent} 属性没有设置，
+     *     且此属性不为空字符串的情况下，
+     *     此属性作为默认值填到请求的 {@code User-Agent} 头中
+     * </p>
+     *
+     * @see Request#userAgent()
      */
     String userAgent() default "";
 
+    /**
+     * 接口级别请求字符集
+     * <p>
+     *     在请求的 {@code charset} 属性没有设置，
+     *     且此属性不为空字符串的情况下，
+     *     此属性作为默认值填到请求的 {@code charset} 头中
+     * </p>
+     *
+     * @see Request#charset()
+     */
     String charset() default "UTF-8";
 
     /**
-     * Base Headers
+     * 接口级别请求头列表
+     * <p>
+     *     发送请求时，会将此属性中所有请起头信息合并到请求中，
+     *     但请求里的头列表中和此属性的请求头中同名的头信息不做合并
+     * </p>
+     *
+     * @see Request#headers()
      */
     String[] headers() default {};
 
     /**
-     * Base Interceptor
+     * 接口级别拦截器表
+     * <p>
+     *     发送请求时，会将此属性中所有拦截器合并到请求中，
+     *     但请求里的拦截器列表中和此属性的拦截器表中相同的拦截器不做合并
+     * </p>
+     *
+     * @see Request#interceptor()
      */
     Class<?>[] interceptor() default {};
 
+    /**
+     * 接口级别超时时间 (单位为毫秒)
+     * <p>
+     *     在请求的 {@code timeout} 属性没有设置，
+     *     且此属性大于{@code -1}情况下，
+     *     此属性作为默认值填到请求的 {@code timeout} 属性中
+     * </p>
+     *
+     * @see Request#timeout()
+     */
     int timeout() default -1;
 
     /**
-     * SSL protocol
+     * 接口级别 SSL 协议
+     * <p>
+     *     在请求的 {@code sslProtocol} 属性没有设置，
+     *     且此属性不为空字符串的情况下，
+     *     此属性作为默认值填到请求的 {@code sslProtocol} 属性中
+     * </p>
+     *
+     * @see Request#sslProtocol()
      */
     String sslProtocol() default "";
 
     /**
-     * Class of retryer
+     * 接口级别重试器
+     * <p>
+     *     在请求的 {@code retryer} 属性没有设置，
+     *     且此属性不为 {@code Object.class}
+     *     此属性作为默认值填到请求的 {@code retryer} 属性中
+     * </p>
+     *
+     * @see Request#retryer()
      */
-    Class retryer() default Object.class;
+    Class<?> retryer() default Object.class;
 
+
+    /**
+     * 接口级别最大重试次数
+     * <p>
+     *     在请求的 {@code retryCount} 属性没有设置，
+     *     且此属性大于 {@code -1}
+     *     此属性作为默认值填到请求的 {@code retryCount} 属性中
+     * </p>
+     *
+     * @see Request#retryCount()
+     */
     int retryCount() default -1;
 
+    /**
+     * 接口级别最大重试间隔时间
+     * <p>
+     *     在请求的 {@code maxRetryInterval} 属性没有设置，
+     *     且此属性大于 {@code -1}
+     *     此属性作为默认值填到请求的 {@code maxRetryInterval} 属性中
+     * </p>
+     *
+     * @see Request#maxRetryInterval()
+     */
     long maxRetryInterval() default -1;
 
+    /**
+     * 接口级别 KeyStore Id
+     * <p>
+     *     在请求的 {@code keyStore} 属性没有设置，
+     *     且此属性不为空字符串
+     *     此属性作为默认值填到请求的 {@code keyStore} 属性中
+     * </p>
+     *
+     * @see Request#keyStore()
+     */
     String keyStore() default "";
 
 //    boolean[] logEnable() default {};
