@@ -275,7 +275,7 @@ public interface GetClient {
     void asyncSimpleGet2(OnSuccess<TestResult> onSuccess);
 
     @Request(
-            url = "http://localhost:5000/hello/user?username=foo",
+            url = "http://localhost:${port}/hello/user?username=foo",
             async = true,
             headers = {"Accept:text/plain"}
     )

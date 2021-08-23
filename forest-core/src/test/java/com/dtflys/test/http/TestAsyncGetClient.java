@@ -71,7 +71,7 @@ public class TestAsyncGetClient extends BaseClientTest {
     }
 
     @Test
-    public void testAsyncSimpleGet() throws InterruptedException {
+    public void testAsyncSimpleGet1() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         CountDownLatch latch = new CountDownLatch(1);
         final AtomicBoolean success = new AtomicBoolean(false);
@@ -162,7 +162,8 @@ public class TestAsyncGetClient extends BaseClientTest {
         final AtomicBoolean success = new AtomicBoolean(false);
         getClient.asyncSimpleGet2(
                 (data, request, response) -> {
-                    log.info("data: " + data.getStatus());
+                    assertNotNull(data);
+                    assertEquals("ok", data.getStatus());
                     success.set(true);
                     assertEquals(EXPECTED, data);
                     latch.countDown();
@@ -172,6 +173,26 @@ public class TestAsyncGetClient extends BaseClientTest {
         latch.await(2, TimeUnit.SECONDS);
         assertTrue(success.get());
     }
+
+
+    @Test
+    public void testAsyncSimpleGet3() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        CountDownLatch latch = new CountDownLatch(1);
+        final AtomicBoolean success = new AtomicBoolean(false);
+        getClient.asyncSimpleGet3(
+                (data, request, response) -> {
+                    assertNotNull(data);
+                    assertEquals("ok", data.getStatus());
+                    success.set(true);
+                    latch.countDown();
+                });
+        log.info("send async get request");
+        assertFalse(success.get());
+        latch.await(2, TimeUnit.SECONDS);
+        assertTrue(success.get());
+    }
+
 
 
     @Test

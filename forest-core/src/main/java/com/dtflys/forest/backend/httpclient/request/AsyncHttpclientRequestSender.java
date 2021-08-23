@@ -72,9 +72,14 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
 //                    } catch (IOException e) {
 //                    }
 //                }
+
                 ForestResponse response = forestResponseFactory.createResponse(request, null, lifeCycleHandler, ex, startDate);
                 ForestRetryException retryException = new ForestRetryException(
                         ex,  request, request.getRetryCount(), retryCount);
+                try {
+                    client.close();
+                } catch (IOException e) {
+                }
                 try {
                     request.getRetryer().canRetry(retryException);
                 } catch (Throwable throwable) {
