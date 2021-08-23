@@ -6,9 +6,11 @@ import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.client.GetWithBodyClient;
+import com.dtflys.test.http.client.UrlEncodedClient;
 import com.dtflys.test.http.model.JsonTestUser;
 import com.dtflys.test.http.client.GetClient;
 import com.dtflys.test.mock.QueryStringMockServer;
+import com.dtflys.test.mock.UrlEncodedMockServer;
 import com.dtflys.test.model.TokenResult;
 import com.google.common.collect.Lists;
 import okhttp3.mockwebserver.MockResponse;
@@ -27,6 +29,7 @@ import java.util.Map;
 
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -44,6 +47,7 @@ public class TestGetClient extends BaseClientTest {
 
     private final GetClient getClient;
 
+    private final UrlEncodedClient urlEncodedClient;
 
     private final GetWithBodyClient getWithBodyClient;
 
@@ -62,6 +66,7 @@ public class TestGetClient extends BaseClientTest {
         super(backend, configuration);
         configuration.setVariableValue("port", server.getPort());
         getClient = configuration.createInstance(GetClient.class);
+        urlEncodedClient = configuration.createInstance(UrlEncodedClient.class);
         getWithBodyClient = configuration.createInstance(GetWithBodyClient.class);
     }
 
@@ -647,5 +652,40 @@ public class TestGetClient extends BaseClientTest {
                 .assertEncodedQueryEquals("foo");
     }
 
+    @Test
+    public void testGetUrlEncoded() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String url = "http://www.gitee.com";
+        assertThat(urlEncodedClient.getUrlEncoded(url, url, "中文", "AbcD12#$iTXI", "il&felUFO3o=P", "中文内容"))
+            .isNotNull()
+            .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("GET")
+                .assertPathEquals("/encoded")
+                .assertQueryEquals("url1", "http://www.gitee.com")
+                .assertQueryEquals("url2", "http://www.gitee.com")
+                .assertQueryEquals("lang", "中文")
+                .assertQueryEquals("code", "AbcD12#$iTXI")
+                .assertQueryEquals("data", "il&felUFO3o=P")
+                .assertQueryEquals("content", "中文内容");
+    }
+
+    @Test
+    public void testGetUrlEncodedWithQuery() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String url = "http://www.gitee.com";
+        assertThat(urlEncodedClient.getUrlEncodedWithQuery(url, url, "中文", "AbcD12#$iTXI", "il&felUFO3o=P", "中文内容"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("GET")
+                .assertPathEquals("/encoded")
+                .assertQueryEquals("url1", "http://www.gitee.com")
+                .assertQueryEquals("url2", "http://www.gitee.com")
+                .assertQueryEquals("lang", "中文")
+                .assertQueryEquals("code", "AbcD12#$iTXI")
+                .assertQueryEquals("data", "il&felUFO3o=P")
+                .assertQueryEquals("content", "中文内容");
+    }
 
 }

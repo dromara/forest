@@ -2,6 +2,8 @@ package com.dtflys.test.http;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 import org.apache.http.HttpHeaders;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.backend.okhttp3.OkHttp3Backend;
@@ -18,8 +20,10 @@ import org.mockserver.model.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
@@ -31,14 +35,14 @@ public class TestDeleteClient extends BaseClientTest {
 
     private final static Logger log = LoggerFactory.getLogger(TestDeleteClient.class);
 
+    public final static String EXPECTED = "{\"status\":\"ok\"}";
+
     @Rule
-    public MockServerRule server = new MockServerRule(this, 4999);
+    public MockWebServer server = new MockWebServer();
 
     private static ForestConfiguration configuration;
 
-    private static DeleteClient deleteClient;
-
-    private final static String expected = "{\"status\": \"ok\"}";
+    private final DeleteClient deleteClient;
 
 
     @BeforeClass
@@ -48,86 +52,93 @@ public class TestDeleteClient extends BaseClientTest {
 
     public TestDeleteClient(HttpBackend backend) {
         super(backend, configuration);
+        configuration.setVariableValue("port", server.getPort());
         deleteClient = configuration.createInstance(DeleteClient.class);
     }
 
-    @Before
-    public void prepareMockServer() {
-        MockServerClient mockClient = new MockServerClient("localhost", 4999);
-        mockClient.when(
-                request()
-                        .withPath("/xx/user")
-                        .withMethod("DELETE")
-                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plain"))
-                        .withQueryStringParameter("username", "foo")
-        ).respond(
-                response()
-                        .withStatusCode(200)
-                        .withBody(expected)
-        );
-
-        mockClient.when(
-                request()
-                        .withPath("/xx/user/data")
-                        .withMethod("DELETE")
-                        .withHeader(new Header(HttpHeaders.ACCEPT, "text/plain"))
-                        .withBody("username=foo")
-        ).respond(
-                response()
-                        .withStatusCode(200)
-                        .withBody(expected)
-        );
+    @Override
+    public void afterRequests() {
     }
 
     @Test
     public void testDeleteUser() {
-        String result = deleteClient.deleteUser();
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(expected, result);
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(deleteClient.deleteUser())
+            .isNotNull()
+            .isEqualTo(EXPECTED);
+        mockRequest(server)
+            .assertMethodEquals("DELETE")
+            .assertPathEquals("/xx/user")
+            .assertHeaderEquals(HttpHeaders.ACCEPT, "text/plain")
+            .assertQueryEquals("username=foo");
     }
 
 
     @Test
     public void testSimpleDelete() {
-        String result = deleteClient.simpleDelete();
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(expected, result);
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(deleteClient.simpleDelete())
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("DELETE")
+                .assertPathEquals("/xx/user")
+                .assertHeaderEquals(HttpHeaders.ACCEPT, "text/plain")
+                .assertQueryEquals("username=foo");
     }
 
     @Test
     public void testSimpleDelete2() {
-        String result = deleteClient.simpleDelete2();
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(expected, result);
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(deleteClient.simpleDelete2())
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("DELETE")
+                .assertPathEquals("/xx/user")
+                .assertHeaderEquals(HttpHeaders.ACCEPT, "text/plain")
+                .assertQueryEquals("username=foo");
     }
 
     @Test
     public void testSimpleDelete3() {
-        String result = deleteClient.simpleDelete3();
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(expected, result);
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(deleteClient.simpleDelete3())
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("DELETE")
+                .assertPathEquals("/xx/user")
+                .assertHeaderEquals(HttpHeaders.ACCEPT, "text/plain")
+                .assertQueryEquals("username=foo");
     }
 
 
 
     @Test
     public void testTextParamDelete() {
-        String result = deleteClient.textParamDelete("foo");
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(expected, result);
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(deleteClient.textParamDelete("foo"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("DELETE")
+                .assertPathEquals("/xx/user")
+                .assertHeaderEquals(HttpHeaders.ACCEPT, "text/plain")
+                .assertQueryEquals("username=foo");
     }
 
     @Test
     public void testAnnParamDelete() {
-        String result = deleteClient.annParamDelete("foo");
-        log.info("response: " + result);
-        assertNotNull(result);
-        assertEquals(expected, result);
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(deleteClient.annParamDelete("foo"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("DELETE")
+                .assertPathEquals("/xx/user")
+                .assertHeaderEquals(HttpHeaders.ACCEPT, "text/plain")
+                .assertQueryEquals("username=foo");
     }
 
 }

@@ -114,7 +114,7 @@ public interface GetClient {
     ForestResponse<String> errorGet4();
 
     @Request(
-            url = "http://xxxx:${port}/hello/user?username=foo",
+            url = "http://localhost:${port}/hello/user?username=foo",
             retryCount = 3,
             maxRetryInterval = 2000,
             timeout = 5,
@@ -123,7 +123,7 @@ public interface GetClient {
     String errorGetWithRetry(OnError onError);
 
     @Request(
-            url = "http://xxxx:${port}/hello/user?username=foo",
+            url = "http://localhost:${port}/hello/user?username=foo",
             retryCount = 5,
             maxRetryInterval = 2000,
             timeout = 1,

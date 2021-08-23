@@ -40,6 +40,10 @@ public class TestGetWithBodyClient extends BaseClientTest {
         configuration.setVariableValue("port", GetWithBodyMockServer.port);
     }
 
+    @Override
+    public void afterRequests() {
+    }
+
     public TestGetWithBodyClient(HttpBackend backend) {
         super(backend, configuration);
         getWithBodyClient = configuration.createInstance(GetWithBodyClient.class);
