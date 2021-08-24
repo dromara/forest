@@ -33,8 +33,6 @@ import static org.mockserver.model.HttpResponse.response;
  */
 public class TestDeleteClient extends BaseClientTest {
 
-    private final static Logger log = LoggerFactory.getLogger(TestDeleteClient.class);
-
     public final static String EXPECTED = "{\"status\":\"ok\"}";
 
     @Rule

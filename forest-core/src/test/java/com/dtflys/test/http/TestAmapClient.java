@@ -31,7 +31,6 @@ public class TestAmapClient {
         amapClient = configuration.createInstance(AmapClient.class);
     }
 
-
 //    @Test
     public void testGetLocation1() {
         Map result = amapClient.getLocation("121.475078", "31.223577");

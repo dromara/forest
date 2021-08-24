@@ -88,20 +88,25 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         List<RequestNameValue> headerList = request.getHeaderNameValueList();
         String contentType = request.getContentType();
         String contentEncoding = request.getContentEncoding();
+        String contentTypeHeaderName = "Content-Type";
+        String contentEncodingHeaderName = "Content-Encoding";
         if (headerList != null && !headerList.isEmpty()) {
             for (RequestNameValue nameValue : headerList) {
                 String name = nameValue.getName();
-                if (!"Content-Type".equalsIgnoreCase(name)
-                        && !"Content-Encoding".equalsIgnoreCase(name)) {
+                if ("Content-Type".equalsIgnoreCase(name)) {
+                    contentTypeHeaderName = name;
+                } else if ("Content-Encoding".equalsIgnoreCase(name)) {
+                    contentEncodingHeaderName = name;
+                } else {
                     httpRequest.setHeader(name, MappingTemplate.getParameterValue(jsonConverter, nameValue.getValue()));
                 }
             }
         }
         if (StringUtils.isNotEmpty(contentType)) {
-            httpRequest.setHeader("Content-Type", contentType);
+            httpRequest.setHeader(contentTypeHeaderName, contentType);
         }
         if (StringUtils.isNotEmpty(contentEncoding)) {
-            httpRequest.setHeader("Content-Encoding", contentEncoding);
+            httpRequest.setHeader(contentEncodingHeaderName, contentEncoding);
         }
 
     }

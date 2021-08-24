@@ -45,11 +45,6 @@ public abstract class BaseClientTest {
 
     @After
     public void afterRequests() {
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
 }

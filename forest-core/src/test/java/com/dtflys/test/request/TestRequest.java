@@ -1,5 +1,6 @@
 package com.dtflys.test.request;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
@@ -20,6 +21,7 @@ public class TestRequest {
 
     @Test
     public void testDefaultRequest() {
+        ObjectUtil.isBasicType(Object.class);
         ForestConfiguration configuration = ForestConfiguration.configuration();
         ForestRequest request = new ForestRequest(configuration);
         assertEquals(configuration, request.getConfiguration());

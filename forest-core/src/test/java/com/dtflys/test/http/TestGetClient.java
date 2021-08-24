@@ -49,8 +49,6 @@ public class TestGetClient extends BaseClientTest {
 
     private final UrlEncodedClient urlEncodedClient;
 
-    private final GetWithBodyClient getWithBodyClient;
-
 
     @BeforeClass
     public static void prepareClient() {
@@ -67,7 +65,6 @@ public class TestGetClient extends BaseClientTest {
         configuration.setVariableValue("port", server.getPort());
         getClient = configuration.createInstance(GetClient.class);
         urlEncodedClient = configuration.createInstance(UrlEncodedClient.class);
-        getWithBodyClient = configuration.createInstance(GetWithBodyClient.class);
     }
 
 
@@ -79,7 +76,8 @@ public class TestGetClient extends BaseClientTest {
                 .isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/hello/user")
-                .assertQueryEquals("username", "foo");
+                .assertQueryEquals("username", "foo")
+                .assertHeaderEquals("content-type", "text/plain");
 
     }
 
