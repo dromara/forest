@@ -84,7 +84,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         try {
             return mapper.readValue(source, targetType);
         } catch (IOException e) {
-            throw new ForestConvertException("json", e);
+            throw new ForestConvertException(this, e);
         }
     }
 
@@ -93,7 +93,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         try {
             return mapper.readValue(source, mapper.getTypeFactory().constructType(targetType));
         } catch (IOException e) {
-            throw new ForestConvertException("json", e);
+            throw new ForestConvertException(this, e);
         }
 
     }
@@ -104,7 +104,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
             String str = StringUtils.fromBytes(source, charset);
             return mapper.readValue(str, mapper.getTypeFactory().constructType(targetType));
         } catch (IOException e) {
-            throw new ForestConvertException("json", e);
+            throw new ForestConvertException(this, e);
         }
     }
 
@@ -114,7 +114,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
             String str = StringUtils.fromBytes(source, charset);
             return mapper.readValue(str, mapper.getTypeFactory().constructType(targetType));
         } catch (IOException e) {
-            throw new ForestConvertException("json", e);
+            throw new ForestConvertException(this, e);
         }
     }
 
@@ -123,7 +123,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
             JavaType javaType = mapper.getTypeFactory().constructParametricType(parametrized, parameterClasses);
             return mapper.readValue(source, javaType);
         } catch (IOException e) {
-            throw new ForestConvertException("json", e);
+            throw new ForestConvertException(this, e);
         }
     }
 
@@ -134,7 +134,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         try {
             return mapper.readValue(source, javaType);
         } catch (IOException e) {
-            throw new ForestConvertException("json", e);
+            throw new ForestConvertException(this, e);
         }
     }
 
@@ -143,7 +143,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         try {
             return mapper.writeValueAsString(obj);
         } catch (Throwable e) {
-            throw new ForestConvertException("json", e);
+            throw new ForestConvertException(this, e);
         }
     }
 

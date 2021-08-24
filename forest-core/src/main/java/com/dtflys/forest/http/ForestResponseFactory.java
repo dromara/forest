@@ -10,6 +10,6 @@ import java.util.Date;
  */
 public interface ForestResponseFactory<R> {
 
-    ForestResponse createResponse(ForestRequest request, R res, LifeCycleHandler lifeCycleHandler, Throwable exception, Date requestTime);
+    ForestResponse<?> createResponse(ForestRequest<?> request, R res, LifeCycleHandler lifeCycleHandler, Throwable exception, Date requestTime);
 
 }

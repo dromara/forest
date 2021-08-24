@@ -14,6 +14,8 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 import org.springframework.core.io.Resource;
+import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.core.type.ClassMetadata;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.core.type.filter.TypeFilter;
@@ -29,6 +31,24 @@ import java.util.Set;
  * @since 2017-04-24 14:46
  */
 public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
+
+    private final static String[] FOREST_METHOD_ANNOTATION_NAMES = new String[] {
+            "com.dtflys.forest.annotation.Request",
+            "com.dtflys.forest.annotation.Get",
+            "com.dtflys.forest.annotation.GetRequest",
+            "com.dtflys.forest.annotation.Post",
+            "com.dtflys.forest.annotation.PostRequest",
+            "com.dtflys.forest.annotation.Put",
+            "com.dtflys.forest.annotation.PutRequest",
+            "com.dtflys.forest.annotation.HeadRequest",
+            "com.dtflys.forest.annotation.Options",
+            "com.dtflys.forest.annotation.OptionsRequest",
+            "com.dtflys.forest.annotation.Patch",
+            "com.dtflys.forest.annotation.PatchRequest",
+            "com.dtflys.forest.annotation.Trace",
+            "com.dtflys.forest.annotation.TraceRequest",
+    } ;
+
 
     private final String configurationId;
 
@@ -52,7 +72,7 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
             Class springMultipartFileClass = Class.forName("com.dtflys.forest.file.SpringMultipartFile");
             ForestMultipartFactory.registerFactory(multipartFileClass, springMultipartFileClass);
             RequestBodyBuilder.registerBodyBuilder(multipartFileClass, new MultipartRequestBodyBuilder());
-        } catch (ClassNotFoundException e) {
+        } catch (Throwable th) {
         }
     }
 
@@ -63,47 +83,36 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
     public void registerFilters() {
         if (allInterfaces) {
             // include all interfaces
-            addIncludeFilter(new TypeFilter() {
-                @Override
-                public boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory) throws IOException {
-                    String className = metadataReader.getClassMetadata().getClassName();
-                    Class clazz = null;
+            addIncludeFilter((metadataReader, metadataReaderFactory) -> {
+                ClassMetadata classMetadata = metadataReader.getClassMetadata();
+                if (!classMetadata.isInterface() || classMetadata.isFinal()) {
+                    return false;
+                }
+                AnnotationMetadata annotationMetadata = metadataReader.getAnnotationMetadata();
+                Set<String> baseAnnNames = annotationMetadata.getAnnotationTypes();
+                for (String annName : baseAnnNames) {
                     try {
-                        clazz = Class.forName(className);
-                    } catch (ClassNotFoundException e) {
-                    }
-                    if (clazz == null) {
-                        return false;
-                    }
-                    Annotation[] baseAnns = clazz.getAnnotations();
-                    for (Annotation ann : baseAnns) {
-                        Annotation lcAnn = ann.annotationType().getAnnotation(BaseLifeCycle.class);
+                        Class<?> annType = Class.forName(annName);
+                        Annotation lcAnn = annType.getAnnotation(BaseLifeCycle.class);
                         if (lcAnn != null) {
                             return true;
                         }
+                    } catch (Throwable ignored) {
                     }
-                    Method[] methods = clazz.getMethods();
-                    for (Method method : methods) {
-                        Annotation[] mthAnns = method.getAnnotations();
-                        for (Annotation ann : mthAnns) {
-                            Annotation mlcAnn = ann.annotationType().getAnnotation(MethodLifeCycle.class);
-                            if (mlcAnn != null) {
-                                return true;
-                            }
-                        }
-                    }
-                    return false;
                 }
+                for (String methodAnnName : FOREST_METHOD_ANNOTATION_NAMES) {
+                    if (annotationMetadata.hasAnnotatedMethods(methodAnnName)) {
+                        return true;
+                    }
+                }
+                return false;
             });
         }
 
         // exclude package-info.java
-        addExcludeFilter(new TypeFilter() {
-            @Override
-            public boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory) throws IOException {
-                String className = metadataReader.getClassMetadata().getClassName();
-                return className.endsWith("package-info");
-            }
+        addExcludeFilter((metadataReader, metadataReaderFactory) -> {
+            String className = metadataReader.getClassMetadata().getClassName();
+            return className.endsWith("package-info");
         });
     }
 

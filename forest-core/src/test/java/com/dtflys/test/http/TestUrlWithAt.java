@@ -43,7 +43,9 @@ public class TestUrlWithAt extends BaseClientTest {
     }
 
 
-
+    @Override
+    public void afterRequests() {
+    }
 
     @Test
     public void testGetUrlWithAt() {

@@ -11,32 +11,32 @@ import com.dtflys.forest.annotation.Request;
 public interface DeleteClient {
 
     @Request(
-            url = "http://localhost:4999/xx/user?username=foo",
+            url = "http://localhost:${port}/xx/user?username=foo",
             headers = {"Accept:text/plain"}
     )
     String deleteUser();
 
     @Request(
-            url = "http://localhost:4999/xx/user?username=foo",
+            url = "http://localhost:${port}/xx/user?username=foo",
             type = "delete",
             headers = {"Accept:text/plain"}
     )
     String simpleDelete();
 
     @Delete(
-            url = "http://localhost:4999/xx/user?username=foo",
+            url = "http://localhost:${port}/xx/user?username=foo",
             headers = {"Accept:text/plain"}
     )
     String simpleDelete2();
 
     @DeleteRequest(
-            url = "http://localhost:4999/xx/user?username=foo",
+            url = "http://localhost:${port}/xx/user?username=foo",
             headers = {"Accept:text/plain"}
     )
     String simpleDelete3();
 
     @Request(
-            url = "http://localhost:4999/xx/user",
+            url = "http://localhost:${port}/xx/user",
             type = "delete",
             headers = {"Accept:text/plain"},
             data = "username=${0}"
@@ -45,7 +45,7 @@ public interface DeleteClient {
 
 
     @Request(
-            url = "http://localhost:4999/xx/user",
+            url = "http://localhost:${port}/xx/user",
             type = "delete",
             headers = {"Accept:text/plain"}
     )

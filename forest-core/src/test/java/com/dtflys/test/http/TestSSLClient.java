@@ -33,7 +33,6 @@ public class TestSSLClient extends BaseClientTest {
     private static HttpsServer server;
     private final static HttpsCertificate serverCertificate = certificate(
             pathResource("ssl_server.keystore"), "server", "123456");
-//    private static HttpServer server;
 
     @Rule
     public GetMockServer getServer = new GetMockServer(this);
@@ -57,6 +56,9 @@ public class TestSSLClient extends BaseClientTest {
 
     private SSLClient sslClient;
 
+    @Override
+    public void afterRequests() {
+    }
 
     @BeforeClass
     public static void prepareClient() {

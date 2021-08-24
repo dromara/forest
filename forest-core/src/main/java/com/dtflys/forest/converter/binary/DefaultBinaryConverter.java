@@ -81,7 +81,7 @@ public class DefaultBinaryConverter implements ForestConverter<Object> {
                 }
                 return autoConverter.convertToJavaObject(str, targetType);
             } catch (IOException e) {
-                throw new ForestConvertException("binary", e);
+                throw new ForestConvertException(this, e);
             }
         }
         return convertToJavaObjectEx(source, targetType);
@@ -103,7 +103,7 @@ public class DefaultBinaryConverter implements ForestConverter<Object> {
         try {
             return IOUtils.toByteArray(in);
         } catch (IOException e) {
-            throw new ForestConvertException("binary", e);
+            throw new ForestConvertException(this, e);
         }
     }
 

@@ -55,25 +55,24 @@ public class ReflectUtils {
      * @param genericType Java Type类型，{@link Type}接口实例
      * @return  Java类，{@link Class}类实例
      */
-    public static Class getClassByType(Type genericType) {
+    public static Class<?> getClassByType(Type genericType) {
         if (genericType instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType) genericType;
-            Class clz = ((Class) pt.getRawType());
-            return clz;
+            return ((Class<?>) pt.getRawType());
         } else if (genericType instanceof TypeVariable) {
-            TypeVariable tType = (TypeVariable) genericType;
+            TypeVariable<?> tType = (TypeVariable<?>) genericType;
             String className = tType.getGenericDeclaration().toString();
             try {
                 return Class.forName(className);
-            } catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException ignored) {
             }
             return null;
-        } else if (genericType instanceof WildcardType && "?".equals(genericType.toString())) {
+        } else if (genericType instanceof WildcardType
+                && "?".equals(genericType.toString())) {
             return Object.class;
         } else {
             try {
-                Class clz = (Class) genericType;
-                return clz;
+                return (Class<?>) genericType;
             } catch (Throwable th) {
                 return Object.class;
             }
@@ -85,7 +84,7 @@ public class ReflectUtils {
      * @param type Java类，{@link Class}类实例
      * @return {@code true}：是基本类型，{@code false}：不是基本类型
      */
-    public static boolean isPrimaryType(Class type) {
+    public static boolean isPrimaryType(Class<?> type) {
         if (byte.class.isAssignableFrom(type) || Byte.class.isAssignableFrom(type)) {
             return true;
         }
@@ -118,6 +117,7 @@ public class ReflectUtils {
         }
         return false;
     }
+
 
     /**
      * 是否为基本数组类型

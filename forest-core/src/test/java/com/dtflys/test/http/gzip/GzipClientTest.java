@@ -37,6 +37,9 @@ public class GzipClientTest extends BaseClientTest {
         configuration.setVariableValue("port", Get2MockServer.port);
     }
 
+    @Override
+    public void afterRequests() {
+    }
 
     public GzipClientTest(HttpBackend backend) {
         super(backend, configuration);

@@ -31,7 +31,6 @@ public class TestHeadClient extends BaseClientTest {
     @Rule
     public MockWebServer server = new MockWebServer();
 
-
     private static ForestConfiguration configuration;
 
     private static HeadClient headClient;

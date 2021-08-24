@@ -8,7 +8,7 @@ import javax.net.ssl.SSLSocketFactory;
  * SSLSocketFactoryBuilder
  *
  * @author LiFaXin
- * @date 2021/6/21 7:47 下午
+ * @since 2021/6/21 7:47
  **/
 public interface SSLSocketFactoryBuilder {
 

@@ -7,7 +7,8 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.test.http.client.GetClient;
 import com.dtflys.test.mock.ErrorMockServer;
-import com.dtflys.test.model.Result;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
 
 /**
@@ -28,107 +30,120 @@ public class TestErrorClient extends BaseClientTest {
 
     private final static Logger log = LoggerFactory.getLogger(TestErrorClient.class);
 
+    public final static String EXPECTED = "{\"status\": \"error\"}";
+
     @Rule
-    public ErrorMockServer server = new ErrorMockServer(this);
+    public MockWebServer server = new MockWebServer();
 
     private static ForestConfiguration configuration;
 
-    private GetClient getClient;
+    private final GetClient getClient;
 
 
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
-        configuration.setVariableValue("port", ErrorMockServer.port);
     }
 
 
     public TestErrorClient(HttpBackend backend) {
         super(backend, configuration);
+        configuration.setVariableValue("port", server.getPort());
         getClient = configuration.createInstance(GetClient.class);
     }
 
-
-
-    @Before
-    public void prepareMockServer() {
-        server.initServer();
+    @Override
+    public void afterRequests() {
     }
 
     @Test
     public void testErrorGet() {
+        server.enqueue(new MockResponse().setResponseCode(404).setBody(EXPECTED));
         AtomicReference<String> content = new AtomicReference<>(null);
-        String result = getClient.errorGet((ex, request, response) -> {
+        assertThat(getClient.errorGet((ex, request, response) -> {
             content.set(response.getContent());
+            assertThat(response)
+                    .isNotNull()
+                    .extracting(
+                            ForestResponse::isError,
+                            ForestResponse::getStatusCode,
+                            ForestResponse::getContent)
+                    .contains(true, 404, EXPECTED);
             response.setResult("onError=true");
-        });
-        String str = content.get();
-        assertNotNull(str);
-        log.info("response: " + str);
-        assertEquals(ErrorMockServer.EXPECTED, str);
-        assertEquals("onError=true", result);
+        }))
+            .isNotNull()
+            .isEqualTo("onError=true");
+        assertThat(content.get())
+                .isNotNull()
+                .isEqualTo(EXPECTED);
     }
 
     @Test
     public void testErrorGet2() {
-        ForestResponse<String> response = getClient.errorGet2();
-        assertNotNull(response);
-        assertTrue(response.isError());
-        String content = response.getContent();
-        assertNotNull(content);
-        log.info("response: " + content);
-        assertEquals(ErrorMockServer.EXPECTED, content);
+        server.enqueue(new MockResponse().setResponseCode(400).setBody(EXPECTED));
+        assertThat(getClient.errorGet2())
+            .isNotNull()
+            .extracting(
+                    ForestResponse::isError,
+                    ForestResponse::getStatusCode,
+                    ForestResponse::getContent)
+            .contains(true, 400, EXPECTED);
     }
 
     @Test
     public void testErrorGet3() {
+        server.enqueue(new MockResponse().setResponseCode(500).setBody(EXPECTED));
         boolean hasError = false;
         try {
-            Map result = getClient.errorGet3();
+            getClient.errorGet3();
         } catch (ForestNetworkException ex) {
             hasError = true;
-            int status = ex.getStatusCode(); // 获取请求响应状态码
-            ForestResponse<Map> response = ex.getResponse(); // 获取Response对象
-            String content = response.getContent(); // 获取未经序列化的请求响应内容
-            assertEquals(500, status);
-            assertNotNull(response);
-            assertEquals(ErrorMockServer.EXPECTED, content);
+            assertThat(ex.getStatusCode()).isEqualTo(500);
+            assertThat(ex.getResponse())
+                    .isNotNull()
+                    .extracting(ForestResponse::getContent)
+                    .isEqualTo(EXPECTED);
         }
-        assertTrue(hasError);
+        assertThat(hasError).isTrue();
     }
 
     @Test
     public void testErrorGet4() {
-        ForestResponse<String> response = getClient.errorGet4();
-        String result = response.getResult();
-        assertEquals("{\"error\": true, \"interceptor\": true}", result);
+        server.enqueue(new MockResponse().setResponseCode(500).setBody(EXPECTED));
+        assertThat(getClient.errorGet4())
+                .isNotNull()
+                .extracting(
+                        ForestResponse::getStatusCode,
+                        ForestResponse::getResult)
+                .contains(500, "{\"error\": true, \"interceptor\": true}");
     }
 
 
 
     @Test
     public void testErrorGetWithRetry() {
+        server.enqueue(new MockResponse().setResponseCode(400).setBody(EXPECTED));
         AtomicReference<BackOffRetryer> retryerAtomicReference = new AtomicReference<>(null);
         getClient.errorGetWithRetry((ex, request, response) -> {
             retryerAtomicReference.set((BackOffRetryer) request.getRetryer());
         });
         BackOffRetryer retryer = retryerAtomicReference.get();
-        assertNotNull(retryer);
-        assertEquals(3, retryer.getMaxRetryCount());
-        assertEquals(2000, retryer.getMaxRetryInterval());
-        assertEquals(1000 + 2000 + 2000, retryer.getWaitedTime());
+        assertThat(retryer).isNotNull();
+        assertThat(retryer.getMaxRetryCount()).isEqualTo(3);
+        assertThat(retryer.getMaxRetryInterval()).isEqualTo(2000);
+        assertThat(retryer.getWaitedTime()).isEqualTo(1000 + 2000 + 2000);
     }
 
     @Test
     public void testErrorGetWithRetry2() {
+        server.enqueue(new MockResponse().setResponseCode(400).setBody(EXPECTED));
         boolean hasThrow = false;
         try {
             getClient.errorGetWithRetry();
         } catch (Throwable th) {
             hasThrow = true;
-            th.printStackTrace();
         }
-        assertTrue(hasThrow);
+        assertThat(hasThrow).isTrue();
     }
 
 

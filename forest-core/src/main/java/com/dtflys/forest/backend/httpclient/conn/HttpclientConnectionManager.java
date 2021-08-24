@@ -189,9 +189,9 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
 
 
 
-    public CloseableHttpAsyncClient getHttpAsyncClient(ForestRequest request) {
+    public CloseableHttpAsyncClient getHttpAsyncClient(ForestRequest<?> request) {
         if (asyncConnectionManager == null) {
-            throw new ForestUnsupportException("Async forest request is unsupported.");
+            throw new ForestUnsupportException("HttpClient Async");
         }
 
         HttpAsyncClientBuilder builder = HttpAsyncClients.custom();

@@ -25,7 +25,6 @@ import java.util.Collection;
  */
 @RunWith(Parameterized.class)
 public abstract class BaseClientTest {
-    private final static Logger log = LoggerFactory.getLogger(BaseClientTest.class);
 
     protected HttpBackend backend;
 
@@ -45,11 +44,6 @@ public abstract class BaseClientTest {
 
     @After
     public void afterRequests() {
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
 }

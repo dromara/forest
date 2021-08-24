@@ -81,7 +81,7 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
                 try {
                     result = tryConvert(trimmedStr, targetType, ForestDataType.TEXT);
                 } catch (Throwable th2) {
-                    throw new ForestConvertException("auto", th2);
+                    throw new ForestConvertException(this, th2);
                 }
             }
         }
@@ -152,7 +152,7 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
                     result = tryConvert(source, targetType, ForestDataType.TEXT);
                 }
             } catch (Throwable th) {
-                throw new ForestConvertException("auto", th);
+                throw new ForestConvertException(this, th);
             }
         }
         return result;
