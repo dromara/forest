@@ -1,14 +1,29 @@
 package com.dtflys.test.exception;
 
+import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.ForestConverter;
+import com.dtflys.forest.converter.auto.DefaultAutoConverter;
+import com.dtflys.forest.converter.json.ForestFastjsonConverter;
+import com.dtflys.forest.converter.json.ForestJacksonConverter;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
+import com.dtflys.forest.exceptions.ForestConvertException;
+import com.dtflys.forest.exceptions.ForestFileNotFoundException;
 import com.dtflys.forest.exceptions.ForestHandlerException;
+import com.dtflys.forest.exceptions.ForestInterceptorDefineException;
 import com.dtflys.forest.exceptions.ForestNetworkException;
+import com.dtflys.forest.exceptions.ForestNoFileNameException;
+import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.exceptions.ForestUnsupportException;
+import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.test.interceptor.ErrorInterceptor;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -57,10 +72,91 @@ public class TestExceptions {
         }
     }
 
+    private static class TestErrorInterceptor {
+    }
+
+    @Test
+    public void testInterceptorDefineException() {
+        ForestInterceptorDefineException exception = new ForestInterceptorDefineException(TestErrorInterceptor.class);
+        assertThat(exception.getMessage())
+                .isEqualTo("[Forest] Interceptor class 'com.dtflys.test.exception.TestExceptions$TestErrorInterceptor' cannot be initialized, because interceptor class must implements com.dtflys.forest.interceptor.Interceptor");
+        assertThat(exception.getInterceptorClass()).isEqualTo(TestErrorInterceptor.class);
+    }
+
+    @Test
+    public void testConvertException() {
+        Throwable th = new Exception("xxx");
+        ForestConverter<?> converter = new ForestFastjsonConverter();
+        ForestConvertException exception = new ForestConvertException(converter, th);
+        assertThat(exception.getMessage())
+                .isEqualTo("[Forest] json converter: 'ForestFastjsonConverter' error: xxx");
+        assertThat(exception.getConverterClass()).isEqualTo(ForestFastjsonConverter.class);
+
+        converter = new ForestJacksonConverter();
+        exception = new ForestConvertException(converter, th);
+        assertThat(exception.getMessage())
+                .isEqualTo("[Forest] json converter: 'ForestJacksonConverter' error: xxx");
+        assertThat(exception.getConverterClass()).isEqualTo(ForestJacksonConverter.class);
+
+        converter = new DefaultAutoConverter(ForestConfiguration.configuration());
+        exception = new ForestConvertException(converter, th);
+        assertThat(exception.getMessage())
+                .isEqualTo("[Forest] auto converter: 'DefaultAutoConverter' error: xxx");
+        assertThat(exception.getConverterClass()).isEqualTo(DefaultAutoConverter.class);
+    }
+
+    @Test
+    public void testRetryException() {
+        Throwable th = new Exception("xxx");
+        ForestRequest<?> request = mock(ForestRequest.class);
+        ForestRetryException exception = new ForestRetryException(th, request, 3, 1);
+        assertThat(exception.getCause()).isEqualTo(th);
+        assertThat(exception.getRequest()).isEqualTo(request);
+        assertThat(exception.getMaxRetryCount()).isEqualTo(3);
+        assertThat(exception.getCurrentRetryCount()).isEqualTo(1);
+    }
+
+    @Test
+    public void testFileNotFoundException() {
+        ForestFileNotFoundException exception = new ForestFileNotFoundException("/xxx/yyy");
+        assertThat(exception.getMessage()).isEqualTo("File '/xxx/yyy' does not exist");
+        assertThat(exception.getFilePath()).isEqualTo("/xxx/yyy");
+    }
+
+    @Test
+    public void testNoFileNameException() {
+        ForestNoFileNameException exception = new ForestNoFileNameException(byte[].class);
+        assertThat(exception.getMessage())
+                .isEqualTo("[Forest] '[B' parameters width @DataFile annotation must define a fileName");
+        assertThat(exception.getParameterType()).isEqualTo(byte[].class);
+    }
+
+    @Test
+    public void testUnsupportedException() {
+        ForestUnsupportException exception = new ForestUnsupportException("Xxx");
+        assertThat(exception.getMessage()).isEqualTo("[Forest] 'Xxx' is unsupported");
+        assertThat(exception.getUnsupported()).isEqualTo("Xxx");
+    }
+
+    @Test
+    public void testVariableUndefinedException() {
+        ForestVariableUndefinedException exception = new ForestVariableUndefinedException("foo");
+        assertThat(exception.getMessage()).isEqualTo("[Forest] Cannot resolve variable 'foo'");
+        assertThat(exception.getVariableName()).isEqualTo("foo");
+        assertThat(exception.getSource()).isNull();
+
+        exception = new ForestVariableUndefinedException("bar", "${bar}");
+        assertThat(exception.getMessage())
+                .isEqualTo("[Forest] Cannot resolve variable 'bar'" +
+                        "\n\n\t[From Template] ${bar}");
+        assertThat(exception.getVariableName()).isEqualTo("bar");
+        assertThat(exception.getSource()).isEqualTo("${bar}");
+    }
+
     @Test
     public void testForestHandlerException() {
-        ForestRequest request = mock(ForestRequest.class);
-        ForestResponse response = mock(ForestResponse.class);
+        ForestRequest<?> request = mock(ForestRequest.class);
+        ForestResponse<?> response = mock(ForestResponse.class);
         try {
             throw new ForestHandlerException("misc", request, response);
         } catch (ForestHandlerException e) {

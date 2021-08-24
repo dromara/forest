@@ -77,7 +77,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
             Gson gson = createGson();
             return (T) gson.fromJson(source, targetType);
         } catch (Throwable th) {
-            throw new ForestConvertException("json", th);
+            throw new ForestConvertException(this, th);
         }
     }
 
@@ -91,7 +91,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
             }
             return convertToJavaObject(source, (Class<? extends T>) targetType);
         } catch (Exception ex) {
-            throw new ForestConvertException("json", ex);
+            throw new ForestConvertException(this, ex);
         }
     }
 

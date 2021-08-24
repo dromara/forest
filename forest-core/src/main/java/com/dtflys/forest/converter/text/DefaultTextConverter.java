@@ -28,7 +28,7 @@ public class DefaultTextConverter implements ForestConverter<String> {
         try {
             return (T) str;
         } catch (Throwable th) {
-            throw new ForestConvertException("text", th);
+            throw new ForestConvertException(this, th);
         }
     }
 
@@ -38,7 +38,7 @@ public class DefaultTextConverter implements ForestConverter<String> {
         try {
             return (T) str;
         } catch (Throwable th) {
-            throw new ForestConvertException("text", th);
+            throw new ForestConvertException(this, th);
         }
     }
 

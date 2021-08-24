@@ -66,19 +66,12 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
 
             @Override
             public void failed(final Exception ex) {
-//                synchronized (client) {
-//                    try {
-//                        client.close();
-//                    } catch (IOException e) {
-//                    }
-//                }
-
-                ForestResponse response = forestResponseFactory.createResponse(request, null, lifeCycleHandler, ex, startDate);
+                ForestResponse<?> response = forestResponseFactory.createResponse(request, null, lifeCycleHandler, ex, startDate);
                 ForestRetryException retryException = new ForestRetryException(
                         ex,  request, request.getRetryCount(), retryCount);
                 try {
                     client.close();
-                } catch (IOException e) {
+                } catch (IOException ignored) {
                 }
                 try {
                     request.getRetryer().canRetry(retryException);

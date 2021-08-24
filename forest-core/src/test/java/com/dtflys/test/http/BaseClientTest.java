@@ -25,7 +25,6 @@ import java.util.Collection;
  */
 @RunWith(Parameterized.class)
 public abstract class BaseClientTest {
-    private final static Logger log = LoggerFactory.getLogger(BaseClientTest.class);
 
     protected HttpBackend backend;
 

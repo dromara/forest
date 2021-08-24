@@ -15,8 +15,8 @@ import java.util.Date;
 public class OkHttp3ForestResponseFactory implements ForestResponseFactory<Response> {
 
     @Override
-    public ForestResponse createResponse(ForestRequest request, Response res, LifeCycleHandler lifeCycleHandler, Throwable exception, Date requestTime) {
-        ForestResponse response = new OkHttp3ForestResponse(request, res, requestTime, new Date());
+    public ForestResponse<?> createResponse(ForestRequest<?> request, Response res, LifeCycleHandler lifeCycleHandler, Throwable exception, Date requestTime) {
+        ForestResponse<?> response = new OkHttp3ForestResponse(request, res, requestTime, new Date());
         response.setException(exception);
         return response;
     }
