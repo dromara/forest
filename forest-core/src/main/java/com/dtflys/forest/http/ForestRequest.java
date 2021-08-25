@@ -24,7 +24,6 @@
 
 package com.dtflys.forest.http;
 
-import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.callback.OnSaveCookie;
@@ -37,7 +36,6 @@ import com.dtflys.forest.http.body.StringRequestBody;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.RequestLogMessage;
-import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;

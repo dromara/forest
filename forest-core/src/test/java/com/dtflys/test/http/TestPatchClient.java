@@ -2,29 +2,15 @@ package com.dtflys.test.http;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.test.mock.PatchMockServer;
-import com.dtflys.test.mock.PutMockServer;
-import junit.framework.Assert;
-import com.dtflys.forest.backend.HttpBackend;
-import com.dtflys.forest.backend.okhttp3.OkHttp3Backend;
-import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.test.http.client.PatchClient;
-import com.dtflys.test.mock.PatchMockServer;
-import com.dtflys.test.mock.PutMockServer;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.apache.http.HttpHeaders;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockserver.model.Header;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

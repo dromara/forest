@@ -24,7 +24,10 @@ import java.util.Map;
 
 import static com.dtflys.forest.mapping.MappingParameter.TARGET_BODY;
 import static com.dtflys.forest.mapping.MappingParameter.TARGET_HEADER;
-import static junit.framework.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -34,13 +37,13 @@ public class TestForestConfiguration {
 
 
     @Test
-    public void testBackend() throws ClassNotFoundException {
+    public void testBackend() {
         ForestConfiguration configuration = ForestConfiguration.configuration();
         configuration.setBackendName("okhttp3");
-        Assert.assertEquals("okhttp3", configuration.getBackend().getName());
+        assertEquals("okhttp3", configuration.getBackend().getName());
         configuration.setBackend(null);
         configuration.setBackendName("httpclient");
-        Assert.assertEquals("httpclient", configuration.getBackend().getName());
+        assertEquals("httpclient", configuration.getBackend().getName());
 
         HttpBackendSelector originSelector = new HttpBackendSelector();
         HttpBackendSelector selector = Mockito.spy(originSelector);
@@ -106,10 +109,10 @@ public class TestForestConfiguration {
         Map<String, Object> varMap = new HashMap<>();
         varMap.put("name", "Linda");
         varMap.put("abc", "123");
-        configuration.setVariables(varMap);
+        configuration.replaceAllVariables(varMap);
         assertEquals("Linda", configuration.getVariableValue("name"));
         assertEquals("123", configuration.getVariableValue("abc"));
-        assertEquals(varMap, configuration.getVariables());
+        assertEquals(varMap, configuration.copyOfVariableValues());
     }
 
 

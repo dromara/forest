@@ -3,6 +3,7 @@ package com.dtflys.test.http.gzip;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.reflection.BasicVariableValue;
 import com.dtflys.test.http.BaseClientTest;
 import com.dtflys.test.mock.Get2MockServer;
 import org.junit.Before;
@@ -33,7 +34,7 @@ public class GzipClientTest extends BaseClientTest {
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
         configuration.setLogResponseContent(true);
-        configuration.getVariables().put("baseUrl", "http://localhost");
+        configuration.getVariables().put("baseUrl", new BasicVariableValue("http://localhost"));
         configuration.setVariableValue("port", Get2MockServer.port);
     }
 

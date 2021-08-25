@@ -2,14 +2,11 @@ package com.dtflys.forest.http;
 
 import okhttp3.Cookie;
 import okhttp3.HttpUrl;
-import okhttp3.internal.http.HttpDate;
-import org.apache.http.impl.cookie.BasicClientCookie;
 
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.Date;
 
-import static okhttp3.internal.Util.delimiterOffset;
 import static okhttp3.internal.Util.verifyAsIpAddress;
 
 /**
@@ -144,6 +141,7 @@ public class ForestCookie implements Serializable {
     public boolean matchDomain(String domain) {
         return matchDomain(this.domain, domain);
     }
+
 
     public static boolean matchPath(String cookiePath, String urlPath) {
         if (urlPath.equals(cookiePath)) {

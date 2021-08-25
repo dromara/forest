@@ -6,8 +6,6 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.client.BaseReqClient;
 import com.dtflys.test.http.client.BaseURLClient;
 import com.dtflys.test.http.client.BaseURLVarClient;
-import com.dtflys.test.mock.BaseUrlMockServer;
-import com.dtflys.test.mock.GetMockServer;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.BeforeClass;
@@ -67,7 +65,7 @@ public class TestBaseReqClient extends BaseClientTest {
         assertThat(baseReqClient.simpleGet((data, request, response) -> {
             String userAgent = response.getRequest().getHeaderValue("User-Agent");
             assertNotNull(userAgent);
-            assertEquals(BaseUrlMockServer.USER_AGENT, userAgent);
+            assertEquals(USER_AGENT, userAgent);
         }, "UTF-8"))
             .isNotNull()
             .isEqualTo(EXPECTED);
@@ -85,7 +83,7 @@ public class TestBaseReqClient extends BaseClientTest {
         assertThat(baseReqClient.simpleGetWithoutBaseUrl((data, request, response) -> {
             String userAgent = response.getRequest().getHeaderValue("User-Agent");
             assertNotNull(userAgent);
-            assertEquals(BaseUrlMockServer.USER_AGENT, userAgent);
+            assertEquals(USER_AGENT, userAgent);
         }, "GBK"))
             .isNotNull()
             .isEqualTo(EXPECTED);

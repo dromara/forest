@@ -2,20 +2,12 @@ package com.dtflys.test.http;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.forest.exceptions.ForestNetworkException;
 import com.dtflys.test.http.client.GetWithBodyClient;
-import com.dtflys.test.http.client.PostClient;
-import com.dtflys.test.http.model.UserParam;
-import com.dtflys.test.mock.GetMockServer;
 import com.dtflys.test.mock.GetWithBodyMockServer;
-import com.dtflys.test.mock.PostMockServer;
-import com.dtflys.test.mock.PutMockServer;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
