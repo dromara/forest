@@ -934,7 +934,7 @@ public class ForestConfiguration implements Serializable {
      * @param variables 变量表
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setVariables(Map<String, Object> variables) {
+    public ForestConfiguration addAllVariables(Map<String, Object> variables) {
         for (Map.Entry<String, Object> entry : variables.entrySet()) {
             setVariableValue(entry.getKey(), entry.getValue());
         }
@@ -946,9 +946,9 @@ public class ForestConfiguration implements Serializable {
      * @param variables 新变量值表
      * @return
      */
-    public ForestConfiguration replaceAllVariables(Map<String, Object> variables) {
+    public ForestConfiguration setVariables(Map<String, Object> variables) {
         this.variables.clear();
-        setVariables(variables);
+        addAllVariables(variables);
         return this;
     }
 

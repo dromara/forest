@@ -109,12 +109,13 @@ public class TestForestConfiguration {
 
         Map<String, Object> varMap = new HashMap<>();
         varMap.put("name", "Linda");
-        varMap.put("abc", "123");
-        configuration.replaceAllVariables(varMap);
-        assertEquals("Linda", configuration.getVariableValue("name"));
-        assertEquals("123", configuration.getVariableValue("abc"));
+        varMap.put("abc", 123);
+        configuration.setVariables(varMap);
         assertEquals(varMap, configuration.copyOfVariableValues());
-
+        assertThat(configuration.getVariableValue("name")).isEqualTo("Linda");
+        assertThat(configuration.getVariableValue("abc")).isEqualTo(123);
+        assertThat(configuration.copyOfVariableValues())
+                .isEqualTo(varMap);
         configuration.setVariableValue("foo", () -> "bar");
         assertThat(configuration.getVariableValue("foo")).isEqualTo("bar");
     }
