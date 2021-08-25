@@ -65,6 +65,9 @@ public class ForestCookie implements Serializable {
      */
     private final boolean hostOnly;
 
+    /**
+     * 是否持久化
+     */
     private final boolean persistent;
 
     public ForestCookie(String name, String value, Date createTime, Duration maxAge, String domain, String path, boolean secure, boolean httpOnly, boolean hostOnly, boolean persistent) {
@@ -116,6 +119,10 @@ public class ForestCookie implements Serializable {
         return hostOnly;
     }
 
+    public boolean isPersistent() {
+        return persistent;
+    }
+
     public static boolean matchDomain(String leftDomain, String rightDomain) {
         if (leftDomain.equals(rightDomain)) {
             return true;
@@ -138,26 +145,27 @@ public class ForestCookie implements Serializable {
         return matchDomain(this.domain, domain);
     }
 
-    public static boolean matchPath(String leftPath, String rightPath) {
-        if (leftPath.equals(rightPath)) {
+    public static boolean matchPath(String cookiePath, String urlPath) {
+        if (urlPath.equals(cookiePath)) {
             return true;
         }
-        if (leftPath.startsWith(rightPath)) {
-            if (rightPath.endsWith("/")) {
+        if (urlPath.startsWith(cookiePath)) {
+            if (cookiePath.endsWith("/")) {
                 return true;
             }
-            return leftPath.charAt(rightPath.length()) == '/';
+            return urlPath.charAt(cookiePath.length()) == '/';
         }
         return false;
-
     }
 
+    /**
+     * 匹配url路径
+     *
+     * @param path url路径
+     * @return {@code true}: 匹配, 否则：不匹配
+     */
     public boolean matchPath(String path) {
         return matchPath(this.path, path);
-    }
-
-    public void setValue(String value) {
-        this.value = value;
     }
 
     /**
@@ -201,8 +209,7 @@ public class ForestCookie implements Serializable {
     }
 
 
-    public static ForestCookie createFromOkHttpCookie(Cookie okCookie) {
-        long currentTime = System.currentTimeMillis();
+    public static ForestCookie createFromOkHttpCookie(long currentTime, Cookie okCookie) {
         long expiresAt = okCookie.expiresAt();
         long maxAge;
         if (expiresAt > currentTime) {
@@ -228,17 +235,17 @@ public class ForestCookie implements Serializable {
 
     public static ForestCookie parse(String url, String setCookie) {
         HttpUrl httpUrl = HttpUrl.parse(url);
+        long currentTime = System.currentTimeMillis();
         Cookie okCookie = Cookie.parse(httpUrl, setCookie);
-        return createFromOkHttpCookie(okCookie);
+        return createFromOkHttpCookie(currentTime, okCookie);
     }
 
     public long getExpiresTime() {
-        long maxAgeMilis = maxAge.toMillis();
-        if (maxAgeMilis == Long.MAX_VALUE) {
+        long maxAgeMillis = maxAge.toMillis();
+        if (maxAgeMillis == Long.MAX_VALUE) {
             return Long.MAX_VALUE;
         }
-        long expiresTime = createTime.getTime() + maxAge.toMillis();
-        return expiresTime;
+        return createTime.getTime() + maxAge.toMillis();
     }
 
 
@@ -250,12 +257,13 @@ public class ForestCookie implements Serializable {
         result.append(value);
 
         if (persistent) {
-            if (maxAge.toMillis() == 0L) {
-                result.append("; max-age=0");
-            } else {
-                long expiresTime = getExpiresTime();
-                result.append("; expires=").append(HttpDate.format(new Date(expiresTime)));
-            }
+            result.append("; max-age=").append(maxAge.getSeconds());
+//            if (maxAge.toMillis() == 0L) {
+//                result.append("; max-age=0");
+//            } else {
+//                long expiresTime = getExpiresTime();
+//                result.append("; expires=").append(HttpDate.format(new Date(expiresTime)));
+//            }
         }
 
         if (!hostOnly) {
