@@ -14,7 +14,6 @@
         <version>1.5.2-BETA2</version>
     </parent>
 
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -61,28 +60,21 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.9.10</version>
+            <version>${jackson.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.9.10.7</version>
+            <version>${jackson-databind.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.8.6</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.8.6</version>
+            <version>${gson.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -112,6 +104,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot-maven-plugin.version}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -119,12 +112,6 @@
                 <version>2.18.1</version>
                 <configuration>
                     <skipTests>true</skipTests>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
                 </configuration>
             </plugin>
         </plugins>
