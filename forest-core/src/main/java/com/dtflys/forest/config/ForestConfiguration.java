@@ -788,6 +788,17 @@ public class ForestConfiguration implements Serializable {
     }
 
     /**
+     * 设置全局变量
+     * @param name   变量名
+     * @param value  {@link ForestVariableValue}类型变量值
+     * @return 当前ForestConfiguration实例
+     */
+    public ForestConfiguration setVariableValue(String name, ForestVariableValue value) {
+        this.variables.put(name, value);
+        return this;
+    }
+
+    /**
      * 根据变量名获取全局变量值
      * @param name   变量名
      * @return       变量值

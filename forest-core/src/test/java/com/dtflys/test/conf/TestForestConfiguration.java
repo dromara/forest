@@ -24,6 +24,7 @@ import java.util.Map;
 
 import static com.dtflys.forest.mapping.MappingParameter.TARGET_BODY;
 import static com.dtflys.forest.mapping.MappingParameter.TARGET_HEADER;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -113,6 +114,9 @@ public class TestForestConfiguration {
         assertEquals("Linda", configuration.getVariableValue("name"));
         assertEquals("123", configuration.getVariableValue("abc"));
         assertEquals(varMap, configuration.copyOfVariableValues());
+
+        configuration.setVariableValue("foo", () -> "bar");
+        assertThat(configuration.getVariableValue("foo")).isEqualTo("bar");
     }
 
 
