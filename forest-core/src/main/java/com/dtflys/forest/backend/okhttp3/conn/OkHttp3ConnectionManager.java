@@ -94,7 +94,8 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
                     public void saveFromResponse(HttpUrl url, List<Cookie> okCookies) {
                         ForestCookies cookies = new ForestCookies();
                         for (Cookie okCookie: okCookies) {
-                            ForestCookie cookie = ForestCookie.createFromOkHttpCookie(okCookie);
+                            long currentTime = System.currentTimeMillis();
+                            ForestCookie cookie = ForestCookie.createFromOkHttpCookie(currentTime, okCookie);
                             cookies.addCookie(cookie);
                         }
                         lifeCycleHandler.handleSaveCookie(request, cookies);
