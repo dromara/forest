@@ -3,58 +3,62 @@ package com.dtflys.test.interceptor;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.test.http.BaseClientTest;
-import com.dtflys.test.http.TestGetClient;
-import com.dtflys.test.mock.BasicAuthGetMockServer;
-import org.junit.Before;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import org.apache.http.HttpHeaders;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
+import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class TestBaseAuthClient extends BaseClientTest {
 
-    private final static Logger log = LoggerFactory.getLogger(TestGetClient.class);
+    public final static String EXPECTED = "{\"status\": \"ok\"}";
+
+    public final static String AUTHORIZATION = "Basic Zm9vOmJhcg==";
 
     @Rule
-    public BasicAuthGetMockServer server = new BasicAuthGetMockServer(this);
+    public MockWebServer server = new MockWebServer();
 
     private static ForestConfiguration configuration;
 
     private static BaseAuthClient baseAuthClient;
 
-
     public TestBaseAuthClient(HttpBackend backend) {
         super(backend, configuration);
+        configuration.setCacheEnabled(false);
+        configuration.setVariableValue("port", server.getPort());
         baseAuthClient = configuration.createInstance(BaseAuthClient.class);
     }
-
-    @Before
-    public void prepareMockServer() {
-        server.initServer();
-    }
-
 
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
-        configuration.setCacheEnabled(false);
-        configuration.setVariableValue("port", BasicAuthGetMockServer.port);
     }
 
     @Test
     public void testBaseAuth() {
-        String result = baseAuthClient.send("foo");
-        assertNotNull(result);
-        assertEquals(BasicAuthGetMockServer.EXPECTED, result);
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(baseAuthClient.send("foo"))
+            .isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("GET")
+                .assertPathEquals("/hello/user")
+                .assertHeaderEquals("Authorization", AUTHORIZATION)
+                .assertHeaderEquals(HttpHeaders.ACCEPT, "text/plain")
+                .assertQueryEquals("username",  "foo");
 
-        result = baseAuthClient.send2("foo");
-        assertNotNull(result);
-        assertEquals(BasicAuthGetMockServer.EXPECTED, result);
-
+        assertThat(baseAuthClient.send2("foo"))
+                .isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("GET")
+                .assertPathEquals("/hello/user")
+                .assertHeaderEquals("Authorization", AUTHORIZATION)
+                .assertHeaderEquals(HttpHeaders.ACCEPT, "text/plain")
+                .assertQueryEquals("username",  "foo");
     }
 
 }

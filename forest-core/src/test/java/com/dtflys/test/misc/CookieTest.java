@@ -1,6 +1,7 @@
 package com.dtflys.test.misc;
 
 import com.dtflys.forest.http.ForestCookie;
+import com.dtflys.forest.http.ForestCookies;
 import okhttp3.Cookie;
 import okhttp3.HttpUrl;
 import org.apache.http.impl.cookie.BasicClientCookie2;
@@ -261,6 +262,11 @@ public class CookieTest {
         assertThat(cookie.getPath()).isEqualTo("/");
         assertThat(cookie.isPersistent()).isFalse();
         assertThat(cookie.isSecure()).isFalse();
+    }
+
+    @Test
+    public void testCookies() {
+        ForestCookies cookies = new ForestCookies();
     }
 
 }

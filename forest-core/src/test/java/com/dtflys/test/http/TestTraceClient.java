@@ -4,19 +4,14 @@ import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.client.TraceClient;
-import com.dtflys.test.mock.OptionsMockServer;
-import com.dtflys.test.mock.TraceMockServer;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
-import static junit.framework.Assert.assertNotNull;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]

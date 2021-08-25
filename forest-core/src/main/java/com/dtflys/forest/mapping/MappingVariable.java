@@ -19,6 +19,6 @@ public class MappingVariable extends MappingParameter {
 
     @Override
     public String toString() {
-        return "[DataMapping: " + name + "]";
+        return "[Variable name: " + name + "]";
     }
 }
