@@ -207,7 +207,7 @@ public class TestAsyncGetClient extends BaseClientTest {
                 (data, request, response) -> {
                     log.info("data: " + data);
                     success.set(true);
-                    assertEquals(EXPECTED, data);
+                    assertThat(response.getContent()).isEqualTo(EXPECTED);
                     latch.countDown();
                 });
         log.info("send async get request");
@@ -225,9 +225,9 @@ public class TestAsyncGetClient extends BaseClientTest {
         getClient.asyncSimpleGet2(
                 (data, request, response) -> {
                     assertThat(data).isNotNull();
-                    assertEquals("ok", data.getStatus());
+                    assertThat(data.getStatus()).isEqualTo("ok");
                     success.set(true);
-                    assertEquals(EXPECTED, data);
+                    assertThat(response.getContent()).isEqualTo(EXPECTED);
                     latch.countDown();
                 });
         log.info("send async get request");
