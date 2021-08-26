@@ -1,7 +1,6 @@
 package com.dtflys.forest.backend;
 
 
-import com.dtflys.forest.exceptions.ForestNetworkException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
@@ -10,7 +9,6 @@ import com.dtflys.forest.utils.ReflectUtils;
 
 import java.lang.reflect.Type;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.Future;
 
 
@@ -36,10 +34,6 @@ public abstract class AbstractBackendResponseHandler<R> {
         Object result = lifeCycleHandler.handleSync(request, response);
         if (result instanceof ForestResponse) {
             return result;
-        }
-        if (response.isError() && response.getRequest().getOnError() == null) {
-            throw new ForestNetworkException(
-                    msg, statusCode, response);
         }
         return result;
     }

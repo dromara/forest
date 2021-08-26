@@ -41,14 +41,6 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
     @Override
     public void buildBody(T httpRequest, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         String contentType = request.getContentType();
-        if (StringUtils.isEmpty(contentType)) {
-            String value = request.getHeaders().getValue("Content-Type");
-            if (value != null) {
-                if (value.length() > 0) {
-                    contentType = value;
-                }
-            }
-        }
 
         if (StringUtils.isEmpty(contentType)) {
             contentType = ContentType.APPLICATION_X_WWW_FORM_URLENCODED;

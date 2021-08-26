@@ -944,7 +944,7 @@ public class ForestRequest<T> {
      * @return 请求头 Content-Type 的值
      */
     public String getContentType() {
-        return headers.getValue("Content-Type");
+        return headers.getValue(ForestHeader.CONTENT_TYPE);
     }
 
     /**
@@ -953,7 +953,7 @@ public class ForestRequest<T> {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest setContentType(String contentType) {
-        addHeader("Content-Type", contentType);
+        addHeader(ForestHeader.CONTENT_TYPE, contentType);
         return this;
     }
 

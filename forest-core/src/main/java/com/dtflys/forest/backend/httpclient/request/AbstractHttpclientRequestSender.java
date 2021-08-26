@@ -51,9 +51,6 @@ public abstract class AbstractHttpclientRequestSender implements HttpclientReque
     }
 
     protected <T extends  HttpRequestBase> void setLogBody(RequestLogMessage logMessage, T httpReq) {
-        if (!(httpReq instanceof HttpEntityEnclosingRequestBase)) {
-            return;
-        }
         HttpEntityEnclosingRequestBase entityEnclosingRequest = (HttpEntityEnclosingRequestBase) httpReq;
         HttpEntity entity = entityEnclosingRequest.getEntity();
         if (entity == null) {
@@ -106,11 +103,5 @@ public abstract class AbstractHttpclientRequestSender implements HttpclientReque
         }
         return cookies;
     }
-
-    protected static void logContent(String content) {
-        log.info("[Forest] " + content);
-    }
-
-
 
 }

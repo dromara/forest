@@ -270,6 +270,44 @@ public interface GetClient {
     @Request(
             url = "http://localhost:${port}/hello/user?username=foo",
             async = true,
+            maxRetryInterval = 500,
+            headers = {"Accept:text/plain"}
+    )
+    void asyncSimpleGetError(OnError onError);
+
+    @Request(
+            url = "http://localhost:${port}/hello/user?username=foo",
+            async = true,
+            retryCount = 2,
+            maxRetryInterval = 500,
+            headers = {"Accept:text/plain"}
+    )
+    void retrySimpleGetError(OnError onError);
+
+
+    @Request(
+            url = "http://localhost:${port}/hello/user?username=foo",
+            timeout = 1,
+            async = true,
+            headers = {"Accept:text/plain"}
+    )
+    void asyncSimpleGetTimeout(OnError onError);
+
+    @Request(
+            url = "http://localhost:${port}/hello/user?username=foo",
+            timeout = 1,
+            async = true,
+            retryCount = 2,
+            maxRetryInterval = 500,
+            headers = {"Accept:text/plain"}
+    )
+    void retrySimpleGetTimeout(OnError onError);
+
+
+
+    @Request(
+            url = "http://localhost:${port}/hello/user?username=foo",
+            async = true,
             headers = {"Accept:text/plain"}
     )
     void asyncSimpleGet2(OnSuccess<TestResult> onSuccess);
