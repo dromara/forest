@@ -23,24 +23,28 @@ import org.apache.http.config.ConnectionConfig;
 import org.apache.http.config.Lookup;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.impl.auth.*;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.DecompressingHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.IdleConnectionEvictor;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.impl.nio.conn.PoolingNHttpClientConnectionManager;
 import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
+import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.apache.http.nio.reactor.ConnectingIOReactor;
+import org.apache.http.nio.reactor.IOReactorException;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 
 import java.nio.charset.CodingErrorAction;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -89,36 +93,40 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
                 if (asyncConnectionManager == null) {
                     synchronized (this) {
                         if (asyncConnectionManager == null) {
-                            int errorRetryCount = 0;
-                            while (errorRetryCount < 5) {
+                            try {
+                                int threads = Runtime.getRuntime().availableProcessors();
+                                //配置io线程
+                                IOReactorConfig ioReactorConfig = IOReactorConfig.custom().
+                                        setIoThreadCount(threads)
+                                        .setConnectTimeout(configuration.getConnectTimeout())
+                                        .setSoKeepAlive(true)
+                                        .build();
+
+                                ConnectingIOReactor ioReactor = null;
                                 try {
-                                    ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor();
-                                    ConnectionConfig connectionConfig = ConnectionConfig.custom()
-                                            .setMalformedInputAction(CodingErrorAction.IGNORE)
-                                            .setUnmappableInputAction(CodingErrorAction.IGNORE)
-                                            .setCharset(Consts.UTF_8).build();
-
-                                    authSchemeRegistry = RegistryBuilder
-                                            .<AuthSchemeProvider>create()
-                                            .register(AuthSchemes.BASIC, new BasicSchemeFactory())
-                                            .register(AuthSchemes.DIGEST, new DigestSchemeFactory())
-                                            .register(AuthSchemes.NTLM, new NTLMSchemeFactory())
-                                            .register(AuthSchemes.SPNEGO, new SPNegoSchemeFactory())
-                                            .register(AuthSchemes.KERBEROS, new KerberosSchemeFactory())
-                                            .build();
-
-                                    asyncConnectionManager = new PoolingNHttpClientConnectionManager(ioReactor);
-                                    asyncConnectionManager.setMaxTotal(maxConnections);
-                                    asyncConnectionManager.setDefaultMaxPerRoute(maxRouteConnections);
-                                    asyncConnectionManager.setDefaultConnectionConfig(connectionConfig);
-                                    break;
-                                } catch (Throwable t) {
-                                    errorRetryCount++;
-                                    if (errorRetryCount < 5) {
-                                        Thread.sleep((long) Math.pow(2F, errorRetryCount) * 100);
-                                    }
-
+                                    ioReactor = new DefaultConnectingIOReactor(ioReactorConfig);
+                                } catch (IOReactorException e) {
+                                    throw new ForestRuntimeException(e);
                                 }
+                                ConnectionConfig connectionConfig = ConnectionConfig.custom()
+                                        .setMalformedInputAction(CodingErrorAction.IGNORE)
+                                        .setUnmappableInputAction(CodingErrorAction.IGNORE)
+                                        .setCharset(Consts.UTF_8).build();
+
+                                authSchemeRegistry = RegistryBuilder
+                                        .<AuthSchemeProvider>create()
+                                        .register(AuthSchemes.BASIC, new BasicSchemeFactory())
+                                        .register(AuthSchemes.DIGEST, new DigestSchemeFactory())
+                                        .register(AuthSchemes.NTLM, new NTLMSchemeFactory())
+                                        .register(AuthSchemes.SPNEGO, new SPNegoSchemeFactory())
+                                        .register(AuthSchemes.KERBEROS, new KerberosSchemeFactory())
+                                        .build();
+                                asyncConnectionManager = new PoolingNHttpClientConnectionManager(ioReactor);
+                                asyncConnectionManager.setMaxTotal(maxConnections);
+                                asyncConnectionManager.setDefaultMaxPerRoute(maxRouteConnections);
+                                asyncConnectionManager.setDefaultConnectionConfig(connectionConfig);
+                            } catch (Throwable t) {
+                                throw new ForestRuntimeException(t);
                             }
                         }
                     }
@@ -182,16 +190,14 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
     }
 
 
-
     public void afterConnect() {
         sslConnectFactory.removeCurrentRequest();
     }
 
 
-
-    public CloseableHttpAsyncClient getHttpAsyncClient(ForestRequest request) {
+    public CloseableHttpAsyncClient getHttpAsyncClient(ForestRequest<?> request) {
         if (asyncConnectionManager == null) {
-            throw new ForestUnsupportException("Async forest request is unsupported.");
+            throw new ForestUnsupportException("HttpClient Async");
         }
 
         HttpAsyncClientBuilder builder = HttpAsyncClients.custom();
@@ -203,14 +209,17 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
 
         RequestConfig requestConfig = RequestConfig.custom()
                 .setConnectTimeout(timeout)
+                .setSocketTimeout(timeout)
+                .setConnectionRequestTimeout(timeout)
                 .setCookieSpec(CookieSpecs.STANDARD)
-                .setSocketTimeout(HttpConnectionConstants.DEFAULT_READ_TIMEOUT).build();
+                .build();
 
-        return builder
+        CloseableHttpAsyncClient client = builder
                 .setConnectionManager(asyncConnectionManager)
-                .setDefaultAuthSchemeRegistry(authSchemeRegistry)
                 .setDefaultRequestConfig(requestConfig)
                 .build();
+        client.start();
+        return client;
     }
 
 }

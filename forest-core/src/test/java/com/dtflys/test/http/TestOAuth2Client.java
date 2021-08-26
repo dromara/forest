@@ -35,6 +35,10 @@ public class TestOAuth2Client extends BaseClientTest {
         configuration.setVariableValue("port", OAuth2MockServer.port);
     }
 
+    @Override
+    public void afterRequests() {
+    }
+
     @Before
     public void prepareMockServer() {
         server.initServer();

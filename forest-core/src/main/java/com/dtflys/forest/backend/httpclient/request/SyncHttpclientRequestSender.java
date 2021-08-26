@@ -44,24 +44,8 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
     }
 
     protected void setupHttpClient(HttpClient client) {
-//        client0.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, request.getTimeout());
-//        if (client0 instanceof DefaultHttpClient) {
-//            ((DefaultHttpClient) client0).getCookieSpecs().register("default", defaultCookieSF);
-//            client0.getParams().setParameter(ClientPNames.COOKIE_POLICY, "default");
-//        }
     }
 
-    private final static CookieSpecFactory DEFAULT_COOKIE_SF = new CookieSpecFactory() {
-        @Override
-        public CookieSpec newInstance(HttpParams params) {
-            return new BrowserCompatSpec() {
-                @Override
-                public void validate(Cookie cookie, CookieOrigin origin)
-                        throws MalformedCookieException {
-                }
-            };
-        }
-    };
 
 
     public void logResponse(ForestResponse response) {

@@ -33,7 +33,7 @@ public class ForestVariableUndefinedException extends ForestRuntimeException {
         builder.append(variableName);
         builder.append("'");
         if (StringUtils.isNotBlank(source)) {
-            builder.append("\n\n\t[Form Template] ");
+            builder.append("\n\n\t[From Template] ");
             builder.append(source);
         }
         return builder.toString();

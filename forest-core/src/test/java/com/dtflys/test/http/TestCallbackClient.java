@@ -1,28 +1,17 @@
 package com.dtflys.test.http;
 
 import com.dtflys.forest.backend.HttpBackend;
-import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.test.mock.GetMockServer;
-import com.dtflys.forest.backend.HttpBackend;
-import com.dtflys.forest.callback.OnSuccess;
-import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.client.CallbackClient;
-import org.junit.Before;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -30,10 +19,10 @@ import static org.junit.Assert.assertNotNull;
  */
 public class TestCallbackClient extends BaseClientTest {
 
-    private final static Logger log = LoggerFactory.getLogger(TestCallbackClient.class);
+    public final static String EXPECTED = "{\"status\": \"ok\"}";
 
     @Rule
-    public GetMockServer server = new GetMockServer(this);
+    public MockWebServer server = new MockWebServer();
 
     private static ForestConfiguration configuration;
 
@@ -43,43 +32,47 @@ public class TestCallbackClient extends BaseClientTest {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
-        configuration.setVariableValue("port", GetMockServer.port);
+
+    }
+
+    @Override
+    public void afterRequests() {
     }
 
     public TestCallbackClient(HttpBackend backend) {
         super(backend, configuration);
+        configuration.setVariableValue("port", server.getPort());
         callbackClient = configuration.createInstance(CallbackClient.class);
     }
 
-    @Before
-    public void prepareMockServer() {
-        server.initServer();
-    }
-
-
     @Test
     public void testGetOnSuccess() {
-        callbackClient.getOnSuccess("foo", new OnSuccess<String>() {
-            @Override
-            public void onSuccess(String data, ForestRequest request, ForestResponse response) {
-                log.info("response: " + data);
-                assertNotNull(data);
-                assertEquals(GetMockServer.EXPECTED, data);
-            }
-        });
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        AtomicBoolean atomic = new AtomicBoolean(false);
+        assertThat(callbackClient.getOnSuccess("foo", (data, request, response) -> {
+            assertThat(data).isNotNull().isEqualTo(EXPECTED);
+            atomic.set(true);
+        }))
+            .isNotNull()
+            .isEqualTo(EXPECTED);
+        assertThat(atomic.get()).isTrue();
     }
 
 
     @Test
     public void testGetOnSuccessMap() {
-        callbackClient.getOnSuccessMap("foo", new OnSuccess<Map>() {
-            @Override
-            public void onSuccess(Map data, ForestRequest request, ForestResponse response) {
-                log.info("response: " + data);
-                assertNotNull(data);
-                assertEquals("ok", data.get("status"));
-            }
-        });
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        AtomicBoolean atomic = new AtomicBoolean(false);
+        assertThat(callbackClient.getOnSuccessMap("foo", (data, request, response) -> {
+            assertThat(data)
+                    .isNotNull()
+                    .extracting("status")
+                    .isEqualTo("ok");
+            atomic.set(true);
+        }))
+            .isNotNull()
+            .isEqualTo(EXPECTED);
+        assertThat(atomic.get()).isTrue();
     }
 
 }

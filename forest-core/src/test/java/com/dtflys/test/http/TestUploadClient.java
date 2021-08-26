@@ -42,7 +42,6 @@ import static org.junit.Assert.assertTrue;
 
 public class TestUploadClient extends BaseClientTest {
 
-
     public final static String EXPECTED = "{\"status\": \"ok\"}";
 
     @Rule

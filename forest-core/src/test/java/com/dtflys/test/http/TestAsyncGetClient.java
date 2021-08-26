@@ -1,28 +1,13 @@
 package com.dtflys.test.http;
 
 import com.dtflys.forest.backend.HttpBackend;
-import com.dtflys.forest.callback.OnError;
-import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestNetworkException;
-import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.test.mock.AsyncGetMockServer;
-import com.dtflys.forest.backend.HttpBackend;
-import com.dtflys.forest.callback.OnError;
-import com.dtflys.forest.callback.OnSuccess;
-import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.forest.exceptions.ForestNetworkException;
-import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.test.http.client.GetClient;
-import com.dtflys.test.model.Result;
-import com.dtflys.test.model.TestResult;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import org.junit.Before;
+import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,8 +19,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -71,7 +61,7 @@ public class TestAsyncGetClient extends BaseClientTest {
     }
 
     @Test
-    public void testAsyncSimpleGet() throws InterruptedException {
+    public void testAsyncSimpleGet1() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         CountDownLatch latch = new CountDownLatch(1);
         final AtomicBoolean success = new AtomicBoolean(false);
@@ -83,10 +73,82 @@ public class TestAsyncGetClient extends BaseClientTest {
                     latch.countDown();
                 });
         log.info("send async get request");
-        assertFalse(success.get());
+        assertThat(success.get()).isFalse();
         latch.await(2, TimeUnit.SECONDS);
-        assertTrue(success.get());
+        assertThat(success.get()).isTrue();
     }
+
+    @Test
+    public void testAsyncSimpleGetError() throws InterruptedException {
+        server.enqueue(new MockResponse().setResponseCode(404));
+        CountDownLatch latch = new CountDownLatch(1);
+        final AtomicBoolean success = new AtomicBoolean(true);
+        getClient.asyncSimpleGetError((ex, request, response) -> {
+            success.set(false);
+            latch.countDown();
+        });
+        latch.await(2, TimeUnit.SECONDS);
+        assertThat(success.get()).isFalse();
+    }
+
+    @Test
+    public void testRetrySimpleGetError() throws InterruptedException {
+        server.enqueue(new MockResponse().setResponseCode(404));
+        AtomicReference<BackOffRetryer> retryerAtomicReference = new AtomicReference<>(null);
+        CountDownLatch latch = new CountDownLatch(1);
+        final AtomicBoolean success = new AtomicBoolean(true);
+        getClient.retrySimpleGetError((ex, request, response) -> {
+            retryerAtomicReference.set((BackOffRetryer) request.getRetryer());
+            success.set(false);
+            latch.countDown();
+        });
+        latch.await(10, TimeUnit.SECONDS);
+        assertThat(success.get()).isFalse();
+        BackOffRetryer retryer = retryerAtomicReference.get();
+        Assertions.assertThat(retryer).isNotNull();
+        Assertions.assertThat(retryer.getMaxRetryCount()).isEqualTo(2);
+        Assertions.assertThat(retryer.getMaxRetryInterval()).isEqualTo(500);
+        Assertions.assertThat(retryer.getWaitedTime()).isEqualTo(500 + 500);
+    }
+
+    @Test
+    public void testSimpleGetTimeout() throws InterruptedException {
+        server.enqueue(new MockResponse()
+                .setHeadersDelay(10, TimeUnit.SECONDS)
+                .setBody(EXPECTED));
+        CountDownLatch latch = new CountDownLatch(1);
+        final AtomicBoolean success = new AtomicBoolean(true);
+        getClient.asyncSimpleGetTimeout((ex, request, response) -> {
+            success.set(false);
+            latch.countDown();
+        });
+        latch.await(5, TimeUnit.SECONDS);
+        assertThat(success.get()).isFalse();
+    }
+
+
+    @Test
+    public void testRetrySimpleGetTimeout() throws InterruptedException {
+        server.enqueue(new MockResponse()
+                .setHeadersDelay(10, TimeUnit.SECONDS)
+                .setBody(EXPECTED));
+        AtomicReference<BackOffRetryer> retryerAtomicReference = new AtomicReference<>(null);
+        CountDownLatch latch = new CountDownLatch(1);
+        final AtomicBoolean success = new AtomicBoolean(true);
+        getClient.retrySimpleGetTimeout((ex, request, response) -> {
+            success.set(false);
+            retryerAtomicReference.set((BackOffRetryer) request.getRetryer());
+            latch.countDown();
+        });
+        latch.await(20, TimeUnit.SECONDS);
+        assertThat(success.get()).isFalse();
+        BackOffRetryer retryer = retryerAtomicReference.get();
+        Assertions.assertThat(retryer).isNotNull();
+        Assertions.assertThat(retryer.getMaxRetryCount()).isEqualTo(2);
+        Assertions.assertThat(retryer.getMaxRetryInterval()).isEqualTo(500);
+        Assertions.assertThat(retryer.getWaitedTime()).isEqualTo(500 + 500);
+    }
+
 
 
     @Test
@@ -145,7 +207,7 @@ public class TestAsyncGetClient extends BaseClientTest {
                 (data, request, response) -> {
                     log.info("data: " + data);
                     success.set(true);
-                    assertEquals(EXPECTED, data);
+                    assertThat(response.getContent()).isEqualTo(EXPECTED);
                     latch.countDown();
                 });
         log.info("send async get request");
@@ -162,9 +224,10 @@ public class TestAsyncGetClient extends BaseClientTest {
         final AtomicBoolean success = new AtomicBoolean(false);
         getClient.asyncSimpleGet2(
                 (data, request, response) -> {
-                    log.info("data: " + data.getStatus());
+                    assertThat(data).isNotNull();
+                    assertThat(data.getStatus()).isEqualTo("ok");
                     success.set(true);
-                    assertEquals(EXPECTED, data);
+                    assertThat(response.getContent()).isEqualTo(EXPECTED);
                     latch.countDown();
                 });
         log.info("send async get request");
@@ -175,14 +238,34 @@ public class TestAsyncGetClient extends BaseClientTest {
 
 
     @Test
+    public void testAsyncSimpleGet3() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        CountDownLatch latch = new CountDownLatch(1);
+        final AtomicBoolean success = new AtomicBoolean(false);
+        getClient.asyncSimpleGet3(
+                (data, request, response) -> {
+                    assertThat(data).isNotNull();
+                    assertEquals("ok", data.getStatus());
+                    success.set(true);
+                    latch.countDown();
+                });
+        log.info("send async get request");
+        assertFalse(success.get());
+        latch.await(2, TimeUnit.SECONDS);
+        assertTrue(success.get());
+    }
+
+
+
+    @Test
     public void testAsyncSimpleGetWithFuture() throws ExecutionException, InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Future<String> future = getClient.asyncSimpleGetWithFuture();
         log.info("send async get request");
-        assertNotNull(future);
+        assertThat(future).isNotNull();
         String data = future.get();
         log.info("data: " + data);
-        assertNotNull(data);
+        assertThat(data).isNotNull();
         assertEquals(EXPECTED, data);
     }
 
@@ -202,7 +285,7 @@ public class TestAsyncGetClient extends BaseClientTest {
         });
         log.info("send async get request");
         assertFalse(success.get());
-        assertNotNull(future);
+        assertThat(future).isNotNull();
         latch.await(5, TimeUnit.SECONDS);
         assertTrue(success.get());
         assertTrue(future.isDone());
@@ -233,7 +316,7 @@ public class TestAsyncGetClient extends BaseClientTest {
                 });
         log.info("send async get request");
         assertFalse(error.get());
-        assertNotNull(future);
+        assertThat(future).isNotNull();
         latch.await(5, TimeUnit.SECONDS);
         assertFalse(success.get());
         assertTrue(error.get());
@@ -262,7 +345,7 @@ public class TestAsyncGetClient extends BaseClientTest {
                 });
         log.info("send async get request");
         assertFalse(error.get());
-        assertNotNull(future);
+        assertThat(future).isNotNull();
         latch.await(5, TimeUnit.SECONDS);
         assertFalse(success.get());
         assertTrue(error.get());

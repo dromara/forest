@@ -127,7 +127,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         try {
             return JSON.parseObject(source, targetType);
         } catch (Throwable th) {
-            throw new ForestConvertException("json", th);
+            throw new ForestConvertException(this, th);
         }
     }
 
@@ -136,7 +136,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         try {
             return JSON.parseObject(source, targetType);
         } catch (Throwable th) {
-            throw new ForestConvertException("json", th);
+            throw new ForestConvertException(this, th);
         }
 
     }
@@ -149,7 +149,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         try {
             return JSON.parseObject(source, 0, source.length, charset, targetType);
         } catch (Throwable th) {
-            throw new ForestConvertException("json", th);
+            throw new ForestConvertException(this, th);
         }
     }
 
@@ -158,7 +158,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         try {
             return JSON.parseObject(source, 0, source.length, charset, targetType);
         } catch (Throwable th) {
-            throw new ForestConvertException("json", th);
+            throw new ForestConvertException(this, th);
         }
     }
 
@@ -166,7 +166,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         try {
             return JSON.parseObject(source, typeReference);
         } catch (Throwable th) {
-            throw new ForestConvertException("json", th);
+            throw new ForestConvertException(this, th);
         }
 
     }

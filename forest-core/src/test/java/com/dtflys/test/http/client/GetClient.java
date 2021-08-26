@@ -27,7 +27,7 @@ public interface GetClient {
 
     @Request(
             url = "http://localhost:${port}/hello/user?username=foo",
-            headers = {"Accept:text/plain"}
+            headers = {"Accept:text/plain", "content-type: text/plain"}
     )
     String simpleGet();
 
@@ -114,7 +114,7 @@ public interface GetClient {
     ForestResponse<String> errorGet4();
 
     @Request(
-            url = "http://xxxx:${port}/hello/user?username=foo",
+            url = "http://localhost:${port}/hello/user?username=foo",
             retryCount = 3,
             maxRetryInterval = 2000,
             timeout = 5,
@@ -123,7 +123,7 @@ public interface GetClient {
     String errorGetWithRetry(OnError onError);
 
     @Request(
-            url = "http://xxxx:${port}/hello/user?username=foo",
+            url = "http://localhost:${port}/hello/user?username=foo",
             retryCount = 5,
             maxRetryInterval = 2000,
             timeout = 1,
@@ -270,12 +270,50 @@ public interface GetClient {
     @Request(
             url = "http://localhost:${port}/hello/user?username=foo",
             async = true,
+            maxRetryInterval = 500,
+            headers = {"Accept:text/plain"}
+    )
+    void asyncSimpleGetError(OnError onError);
+
+    @Request(
+            url = "http://localhost:${port}/hello/user?username=foo",
+            async = true,
+            retryCount = 2,
+            maxRetryInterval = 500,
+            headers = {"Accept:text/plain"}
+    )
+    void retrySimpleGetError(OnError onError);
+
+
+    @Request(
+            url = "http://localhost:${port}/hello/user?username=foo",
+            timeout = 1,
+            async = true,
+            headers = {"Accept:text/plain"}
+    )
+    void asyncSimpleGetTimeout(OnError onError);
+
+    @Request(
+            url = "http://localhost:${port}/hello/user?username=foo",
+            timeout = 1,
+            async = true,
+            retryCount = 2,
+            maxRetryInterval = 500,
+            headers = {"Accept:text/plain"}
+    )
+    void retrySimpleGetTimeout(OnError onError);
+
+
+
+    @Request(
+            url = "http://localhost:${port}/hello/user?username=foo",
+            async = true,
             headers = {"Accept:text/plain"}
     )
     void asyncSimpleGet2(OnSuccess<TestResult> onSuccess);
 
     @Request(
-            url = "http://localhost:5000/hello/user?username=foo",
+            url = "http://localhost:${port}/hello/user?username=foo",
             async = true,
             headers = {"Accept:text/plain"}
     )

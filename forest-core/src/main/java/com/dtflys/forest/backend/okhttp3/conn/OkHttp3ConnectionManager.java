@@ -54,7 +54,6 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
     public OkHttp3ConnectionManager() {
     }
 
-
     public X509TrustManager getX509TrustManager(ForestRequest request) {
         try {
             SSLKeyStore sslKeyStore = request.getKeyStore();
@@ -68,23 +67,8 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
     }
 
 
-    public X509TrustManager getTrustManager(KeyStore keyStore, ForestRequest request) throws Exception {
-        TrustManagerFactory tmf = TrustManagerFactory
-                .getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        tmf.init(keyStore);
-
-        X509TrustManager defaultTrustManager = (X509TrustManager) tmf
-                .getTrustManagers()[0];
-        return null;
-    }
-
     public OkHttpClient getClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
-
         Integer timeout = request.getTimeout();
-        if (timeout == null) {
-            timeout = request.getConfiguration().getTimeout();
-        }
-
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .connectionPool(pool)
                 .connectTimeout(timeout, TimeUnit.MILLISECONDS)
@@ -94,7 +78,8 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
                     public void saveFromResponse(HttpUrl url, List<Cookie> okCookies) {
                         ForestCookies cookies = new ForestCookies();
                         for (Cookie okCookie: okCookies) {
-                            ForestCookie cookie = ForestCookie.createFromOkHttpCookie(okCookie);
+                            long currentTime = System.currentTimeMillis();
+                            ForestCookie cookie = ForestCookie.createFromOkHttpCookie(currentTime, okCookie);
                             cookies.addCookie(cookie);
                         }
                         lifeCycleHandler.handleSaveCookie(request, cookies);

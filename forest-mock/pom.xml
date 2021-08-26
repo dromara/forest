@@ -6,14 +6,14 @@
 
   <groupId>com.dtflys.forest</groupId>
   <artifactId>forest-mock</artifactId>
-  <version>1.5.2-BETA</version>
+  <version>1.5.2-BETA2</version>
 
   <name>forest-mock</name>
 
   <parent>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest</artifactId>
-    <version>1.5.2-BETA</version>
+    <version>1.5.2-BETA2</version>
   </parent>
 
   <properties>
@@ -27,26 +27,26 @@
     <dependency>
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
-      <version>1.3.1</version>
+      <version>${commons-fileupload.version}</version>
     </dependency>
 
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.4</version>
+      <version>${common-io.version}</version>
     </dependency>
 
     <dependency>
       <groupId>com.squareup.okhttp3</groupId>
       <artifactId>mockwebserver</artifactId>
-      <version>3.14.9</version>
+      <version>${mockwebserver.version}</version>
       <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.11</version>
+      <version>${junit.version}</version>
     </dependency>
   </dependencies>
 

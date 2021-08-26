@@ -5,6 +5,7 @@ import com.dtflys.forest.backend.httpclient.response.HttpclientForestResponseFac
 import com.dtflys.forest.backend.httpclient.response.HttpclientResponseHandler;
 import com.dtflys.forest.exceptions.ForestNetworkException;
 import com.dtflys.forest.exceptions.ForestRetryException;
+import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestRequest;
@@ -38,7 +39,6 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
             final HttpUriRequest httpRequest, LifeCycleHandler lifeCycleHandler,
             CookieStore cookieStore, Date startDate, int retryCount)  {
         final CloseableHttpAsyncClient client = connectionManager.getHttpAsyncClient(request);
-        client.start();
         final ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
         logRequest(retryCount, (HttpRequestBase) httpRequest);
         final Future<HttpResponse> future = client.execute(httpRequest, new FutureCallback<HttpResponse>() {
@@ -66,13 +66,8 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
 
             @Override
             public void failed(final Exception ex) {
-//                synchronized (client) {
-//                    try {
-//                        client.close();
-//                    } catch (IOException e) {
-//                    }
-//                }
-                ForestResponse response = forestResponseFactory.createResponse(request, null, lifeCycleHandler, ex, startDate);
+                ForestResponse<?> response = forestResponseFactory.createResponse(
+                        request, null, lifeCycleHandler, ex, startDate);
                 ForestRetryException retryException = new ForestRetryException(
                         ex,  request, request.getRetryCount(), retryCount);
                 try {
@@ -86,12 +81,6 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
 
             @Override
             public void cancelled() {
-//                synchronized (client) {
-//                    try {
-//                        client.close();
-//                    } catch (IOException e) {
-//                    }
-//                }
             }
         });
         responseHandler.handleFuture(future, startDate, forestResponseFactory);

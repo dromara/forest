@@ -5,6 +5,7 @@ import com.dtflys.forest.backend.HttpExecutor;
 import com.dtflys.forest.backend.okhttp3.logging.OkHttp3LogBodyMessage;
 import com.dtflys.forest.backend.url.URLBuilder;
 import com.dtflys.forest.exceptions.ForestRetryException;
+import com.dtflys.forest.http.ForestHeader;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.logging.LogBodyMessage;
@@ -150,20 +151,25 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
         List<RequestNameValue> headerList = request.getHeaderNameValueList();
         String contentType = request.getContentType();
         String contentEncoding = request.getContentEncoding();
+        String contentTypeHeaderName = ForestHeader.CONTENT_TYPE;
+        String contentEncodingHeaderName = ForestHeader.CONTENT_ENCODING;
         if (headerList != null && !headerList.isEmpty()) {
             for (RequestNameValue nameValue : headerList) {
                 String name = nameValue.getName();
-                if (!"Content-Type".equalsIgnoreCase(name)
-                        && !"Content-Encoding".equalsIgnoreCase(name)) {
+                if (ForestHeader.CONTENT_TYPE.equalsIgnoreCase(name)) {
+                    contentTypeHeaderName = name;
+                } else if (ForestHeader.CONTENT_ENCODING.equalsIgnoreCase(name)) {
+                    contentEncodingHeaderName = name;
+                } else {
                     builder.addHeader(name, MappingTemplate.getParameterValue(jsonConverter, nameValue.getValue()));
                 }
             }
         }
         if (StringUtils.isNotEmpty(contentType)) {
-            builder.addHeader("Content-Type", contentType);
+            builder.addHeader(contentTypeHeaderName, contentType);
         }
         if (StringUtils.isNotEmpty(contentEncoding)) {
-            builder.addHeader("Content-Encoding", contentEncoding);
+            builder.addHeader(contentEncodingHeaderName, contentEncoding);
         }
     }
 
@@ -179,7 +185,6 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
         prepareMethod(builder);
         prepareHeaders(builder);
         prepareBody(builder, lifeCycleHandler);
-
 
         final Request okRequest = builder.build();
         Call call = okHttpClient.newCall(okRequest);

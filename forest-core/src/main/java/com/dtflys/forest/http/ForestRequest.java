@@ -24,7 +24,6 @@
 
 package com.dtflys.forest.http;
 
-import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.callback.OnSaveCookie;
@@ -37,7 +36,6 @@ import com.dtflys.forest.http.body.StringRequestBody;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.RequestLogMessage;
-import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
@@ -946,7 +944,7 @@ public class ForestRequest<T> {
      * @return 请求头 Content-Type 的值
      */
     public String getContentType() {
-        return headers.getValue("Content-Type");
+        return headers.getValue(ForestHeader.CONTENT_TYPE);
     }
 
     /**
@@ -955,7 +953,7 @@ public class ForestRequest<T> {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest setContentType(String contentType) {
-        addHeader("Content-Type", contentType);
+        addHeader(ForestHeader.CONTENT_TYPE, contentType);
         return this;
     }
 

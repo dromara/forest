@@ -42,9 +42,13 @@ public class MockServerRequest {
         this.url = request.getRequestUrl();
     }
 
-    public static MockServerRequest mockRequest(MockWebServer server) throws InterruptedException {
-        RecordedRequest request = server.takeRequest();
-        return new MockServerRequest(request);
+    public static MockServerRequest mockRequest(MockWebServer server) {
+        try {
+            RecordedRequest request = server.takeRequest();
+            return new MockServerRequest(request);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public String requestLine() {

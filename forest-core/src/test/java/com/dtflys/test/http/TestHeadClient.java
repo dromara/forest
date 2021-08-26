@@ -3,23 +3,18 @@ package com.dtflys.test.http;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.test.mock.HeadMockServer;
 import com.dtflys.test.http.client.HeadClient;
 import com.dtflys.test.model.TestHeaders;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
-import static junit.framework.Assert.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -30,7 +25,6 @@ public class TestHeadClient extends BaseClientTest {
 
     @Rule
     public MockWebServer server = new MockWebServer();
-
 
     private static ForestConfiguration configuration;
 

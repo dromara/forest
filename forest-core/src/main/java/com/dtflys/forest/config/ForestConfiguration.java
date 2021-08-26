@@ -34,9 +34,10 @@ import com.dtflys.forest.interceptor.InterceptorFactory;
 import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.proxy.ProxyFactory;
+import com.dtflys.forest.reflection.BasicVariableValue;
+import com.dtflys.forest.reflection.ForestVariableValue;
 import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
-import com.dtflys.forest.ssl.SSLUtils;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.backend.HttpBackendSelector;
@@ -78,7 +79,7 @@ public class ForestConfiguration implements Serializable {
     /**
      * 请求接口的实例缓存，用于缓存请求接口的动态代理的实例
      */
-    private Map<Class, Object> instanceCache = new HashMap<>();
+    private Map<Class, Object> instanceCache = new ConcurrentHashMap<>();
 
     private String id;
 
@@ -217,7 +218,7 @@ public class ForestConfiguration implements Serializable {
     /**
      * 全局变量表
      */
-    private Map<String, Object> variables = new ConcurrentHashMap<>(64);
+    private Map<String, ForestVariableValue> variables = new ConcurrentHashMap<>(64);
 
     /**
      * SSL的Key Store集合
@@ -782,7 +783,18 @@ public class ForestConfiguration implements Serializable {
      * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setVariableValue(String name, Object value) {
-        getVariables().put(name, value);
+        this.variables.put(name, new BasicVariableValue(value));
+        return this;
+    }
+
+    /**
+     * 设置全局变量
+     * @param name   变量名
+     * @param value  {@link ForestVariableValue}类型变量值
+     * @return 当前ForestConfiguration实例
+     */
+    public ForestConfiguration setVariableValue(String name, ForestVariableValue value) {
+        this.variables.put(name, value);
         return this;
     }
 
@@ -792,7 +804,11 @@ public class ForestConfiguration implements Serializable {
      * @return       变量值
      */
     public Object getVariableValue(String name) {
-        return getVariables().get(name);
+        ForestVariableValue variableValue = this.variables.get(name);
+        if (variableValue != null) {
+            return variableValue.getValue();
+        }
+        return null;
     }
 
     /**
@@ -897,8 +913,20 @@ public class ForestConfiguration implements Serializable {
      * 获取全局变量表
      * @return 全局变量表
      */
-    public Map<String, Object> getVariables() {
+    public Map<String, ForestVariableValue> getVariables() {
         return variables;
+    }
+
+    /**
+     * 获取全局变量值表备份
+     * @return 全局变量值表备份
+     */
+    public Map<String, Object> copyOfVariableValues() {
+        Map<String, Object> map = new HashMap<>();
+        for (Map.Entry<String, ForestVariableValue> entry : this.variables.entrySet()) {
+            map.put(entry.getKey(), entry.getValue().getValue());
+        }
+        return map;
     }
 
     /**
@@ -906,8 +934,21 @@ public class ForestConfiguration implements Serializable {
      * @param variables 变量表
      * @return 当前ForestConfiguration实例
      */
+    public ForestConfiguration addAllVariables(Map<String, Object> variables) {
+        for (Map.Entry<String, Object> entry : variables.entrySet()) {
+            setVariableValue(entry.getKey(), entry.getValue());
+        }
+        return this;
+    }
+
+    /**
+     * 替换整个全局变量表
+     * @param variables 新变量值表
+     * @return
+     */
     public ForestConfiguration setVariables(Map<String, Object> variables) {
-        this.variables = variables;
+        this.variables.clear();
+        addAllVariables(variables);
         return this;
     }
 

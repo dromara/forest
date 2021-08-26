@@ -43,7 +43,7 @@ public class ForestJaxbConverter implements ForestXmlConverter {
             createMarshaller(jaxbContext, "UTF-8").marshal(obj, writer);
             return writer.toString();
         } catch (JAXBException e) {
-            throw new ForestConvertException("xml", e);
+            throw new ForestConvertException(this, e);
         }
 
     }
@@ -56,7 +56,7 @@ public class ForestJaxbConverter implements ForestXmlConverter {
             StringReader reader = new StringReader(source);
             return (T) createUnmarshaller(jaxbContext).unmarshal(reader);
         } catch (JAXBException e) {
-            throw new ForestConvertException("xml", e);
+            throw new ForestConvertException(this, e);
         }
 
     }
