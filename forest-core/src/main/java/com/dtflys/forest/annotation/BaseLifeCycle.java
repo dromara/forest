@@ -26,6 +26,7 @@ package com.dtflys.forest.annotation;
 
 import com.dtflys.forest.lifecycles.BaseAnnotationLifeCycle;
 
+import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

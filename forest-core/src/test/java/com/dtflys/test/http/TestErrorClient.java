@@ -28,8 +28,6 @@ import static org.junit.Assert.*;
  */
 public class TestErrorClient extends BaseClientTest {
 
-    private final static Logger log = LoggerFactory.getLogger(TestErrorClient.class);
-
     public final static String EXPECTED = "{\"status\": \"error\"}";
 
     @Rule

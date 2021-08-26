@@ -125,7 +125,8 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
 
     @Override
     public Object handleError(ForestRequest request, ForestResponse response) {
-        ForestNetworkException networkException = new ForestNetworkException("", response.getStatusCode(), response);
+        ForestNetworkException networkException = new ForestNetworkException(
+                "", response.getStatusCode(), response);
         return handleError(request, response, networkException);
     }
 

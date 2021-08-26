@@ -5,6 +5,7 @@ import com.dtflys.forest.backend.HttpExecutor;
 import com.dtflys.forest.backend.okhttp3.logging.OkHttp3LogBodyMessage;
 import com.dtflys.forest.backend.url.URLBuilder;
 import com.dtflys.forest.exceptions.ForestRetryException;
+import com.dtflys.forest.http.ForestHeader;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.logging.LogBodyMessage;
@@ -150,14 +151,14 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
         List<RequestNameValue> headerList = request.getHeaderNameValueList();
         String contentType = request.getContentType();
         String contentEncoding = request.getContentEncoding();
-        String contentTypeHeaderName = "Content-Type";
-        String contentEncodingHeaderName = "Content-Encoding";
+        String contentTypeHeaderName = ForestHeader.CONTENT_TYPE;
+        String contentEncodingHeaderName = ForestHeader.CONTENT_ENCODING;
         if (headerList != null && !headerList.isEmpty()) {
             for (RequestNameValue nameValue : headerList) {
                 String name = nameValue.getName();
-                if ("Content-Type".equalsIgnoreCase(name)) {
+                if (ForestHeader.CONTENT_TYPE.equalsIgnoreCase(name)) {
                     contentTypeHeaderName = name;
-                } else if ("Content-Encoding".equalsIgnoreCase(name)) {
+                } else if (ForestHeader.CONTENT_ENCODING.equalsIgnoreCase(name)) {
                     contentEncodingHeaderName = name;
                 } else {
                     builder.addHeader(name, MappingTemplate.getParameterValue(jsonConverter, nameValue.getValue()));

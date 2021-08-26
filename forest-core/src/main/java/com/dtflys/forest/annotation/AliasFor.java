@@ -17,5 +17,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface AliasFor {
+
+    /**
+     * 属性所对应的别名
+     */
     String value();
 }

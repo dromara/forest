@@ -79,7 +79,7 @@ public class ForestConfiguration implements Serializable {
     /**
      * 请求接口的实例缓存，用于缓存请求接口的动态代理的实例
      */
-    private Map<Class, Object> instanceCache = new HashMap<>();
+    private Map<Class, Object> instanceCache = new ConcurrentHashMap<>();
 
     private String id;
 
