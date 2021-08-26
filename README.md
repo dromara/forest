@@ -401,16 +401,16 @@ String send(@DataVariable("username") String username);
 
 <table>
 <tr>
-<td><img height="60px" src="http://forest.dtflyx.com/img/logo/logo_thebeastshop.jpg" alt="野兽派花店"></td>
-<td><img height="60px" src="http://forest.dtflyx.com/img/logo/logo_geely.png" alt="吉利集团"></td>
-<td><img height="60px" src="http://forest.dtflyx.com/img/logo/logo_woshipm.png" alt="人人都是产品经理"></td>
-<td><img height="60px" src="http://forest.dtflyx.com/img/logo/logo_gzsunrun.jpg" alt="广州尚融网络科技"></td>
+<td><img height="60px" src="doc/images/logo/logo_thebeastshop.jpg" alt="野兽派花店"></td>
+<td><img height="60px" src="doc/images/logo/logo_geely.png" alt="吉利集团"></td>
+<td><img height="60px" src="doc/images/logo/logo_woshipm.png" alt="人人都是产品经理"></td>
+<td><img height="60px" src="doc/images/logo/logo_gzsunrun.jpg" alt="广州尚融网络科技"></td>
 </tr>
 <tr>
-<td><img height="60px" src="http://forest.dtflyx.com/img/logo/logo_weidubim.png" alt="成都万智维度"></td>
-<td><img height="60px" src="http://forest.dtflyx.com/img/logo/logo_ictbda.jpg" alt="中科院计算所大数据研究院"></td>
-<td><img height="60px" src="http://forest.dtflyx.com/img/logo/logo_yiring.png" alt="长沙壹润"></td>
-<td><img height="60px" src="http://forest.dtflyx.com/img/logo/logo_huafangzhilian.png" alt="山东华方智联科技"></td>
+<td><img height="60px" src="doc/images/logo/logo_weidubim.png" alt="成都万智维度"></td>
+<td><img height="60px" src="doc/images/logo/logo_ictbda.jpg" alt="中科院计算所大数据研究院"></td>
+<td><img height="60px" src="doc/images/logo/logo_yiring.png" alt="长沙壹润"></td>
+<td><img height="60px" src="doc/images/logo/logo_huafangzhilian.png" alt="山东华方智联科技"></td>
 
 </tr>
 
