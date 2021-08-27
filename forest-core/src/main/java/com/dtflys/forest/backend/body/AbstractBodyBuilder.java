@@ -7,6 +7,7 @@ import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
+import com.dtflys.forest.http.body.ByteArrayRequestBody;
 import com.dtflys.forest.http.body.NameValueRequestBody;
 import com.dtflys.forest.http.body.ObjectRequestBody;
 import com.dtflys.forest.http.body.StringRequestBody;
@@ -144,16 +145,22 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                     String text = null;
                     if (toJsonObj instanceof CharSequence || toJsonObj instanceof StringRequestBody) {
                         text = toJsonObj.toString();
+                        setStringBody(httpRequest, text, charset, contentType, mergeCharset);
                     } else if (toJsonObj instanceof ObjectRequestBody) {
                         text = jsonConverter.encodeToString(((ObjectRequestBody) toJsonObj).getObject());
+                        setStringBody(httpRequest, text, charset, contentType, mergeCharset);
                     } else if (toJsonObj instanceof NameValueRequestBody) {
                         Map<String, Object> subMap = new HashMap<>(1);
                         subMap.put(((NameValueRequestBody) toJsonObj).getName(), ((NameValueRequestBody) toJsonObj).getValue());
                         text = jsonConverter.encodeToString(subMap);
+                        setStringBody(httpRequest, text, charset, contentType, mergeCharset);
+                    } else if (toJsonObj instanceof ByteArrayRequestBody) {
+                        byte[] bytes = ((ByteArrayRequestBody) toJsonObj).getByteArray();
+                        setBinaryBody(httpRequest, request, charset, contentType, nameValueList, bytes, lifeCycleHandler);
                     } else {
                         text = jsonConverter.encodeToString(toJsonObj);
+                        setStringBody(httpRequest, text, charset, contentType, mergeCharset);
                     }
-                    setStringBody(httpRequest, text, charset, contentType, mergeCharset);
                 } else {
                     setStringBody(httpRequest, "", charset, contentType, mergeCharset);
                 }
