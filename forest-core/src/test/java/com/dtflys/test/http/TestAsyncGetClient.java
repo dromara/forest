@@ -122,7 +122,7 @@ public class TestAsyncGetClient extends BaseClientTest {
             success.set(false);
             latch.countDown();
         });
-        latch.await(5, TimeUnit.SECONDS);
+        latch.await(20, TimeUnit.SECONDS);
         assertThat(success.get()).isFalse();
     }
 
@@ -140,7 +140,7 @@ public class TestAsyncGetClient extends BaseClientTest {
             retryerAtomicReference.set((BackOffRetryer) request.getRetryer());
             latch.countDown();
         });
-        latch.await(20, TimeUnit.SECONDS);
+        latch.await(30, TimeUnit.SECONDS);
         assertThat(success.get()).isFalse();
         BackOffRetryer retryer = retryerAtomicReference.get();
         Assertions.assertThat(retryer).isNotNull();

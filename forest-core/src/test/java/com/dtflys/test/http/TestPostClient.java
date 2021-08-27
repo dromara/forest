@@ -7,6 +7,7 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.ForestLogger;
 import com.dtflys.forest.logging.RequestLogMessage;
+import com.dtflys.forest.utils.Base64Utils;
 import com.dtflys.test.http.client.EmptyJsonClient;
 import com.dtflys.test.http.client.PostClient;
 import com.dtflys.test.http.model.Cause;
@@ -377,6 +378,18 @@ public class TestPostClient extends BaseClientTest {
                 .assertPathEquals("/hello/user")
                 .assertHeaderEquals("Accept", "text/plain")
                 .assertBodyEquals("username=foo&password=123456");
+    }
+
+    @Test
+    public void testPostJsonByteArray() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String json = "{\"a\": \"1\", \"b\": \"2\"}";
+        byte[] data = Base64Utils.encodeToByteArray(json);
+        assertThat(postClient.postJsonByteArray(data))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertBodyEquals(data);
     }
 
     @Test
