@@ -30,6 +30,7 @@ import com.dtflys.forest.backend.HttpBackendSelector;
 import com.dtflys.forest.callback.DefaultRetryWhen;
 import com.dtflys.forest.callback.RetryWhen;
 import com.dtflys.forest.converter.ForestConverter;
+import com.dtflys.forest.ForestGenericClient;
 import com.dtflys.forest.converter.auto.DefaultAutoConverter;
 import com.dtflys.forest.converter.binary.DefaultBinaryConverter;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
@@ -41,6 +42,7 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.filter.JSONFilter;
 import com.dtflys.forest.filter.XmlFilter;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.body.RequestBodyBuilder;
 import com.dtflys.forest.interceptor.DefaultInterceptorFactory;
 import com.dtflys.forest.interceptor.InterceptorFactory;
@@ -79,7 +81,7 @@ public class ForestConfiguration implements Serializable {
     private static Logger log = LoggerFactory.getLogger(ForestConfiguration.class);
 
     /**
-     * 默认全局配置，再用户没有定义任何全局配置时使用该默认配置
+     * 默认配置，再用户没有定义任何全局配置时使用该默认配置
      */
     private final static ForestConfiguration defaultConfiguration = configuration();
 
@@ -271,12 +273,6 @@ public class ForestConfiguration implements Serializable {
         configuration.registerFilter("xml", XmlFilter.class);
         configuration.setLogHandler(new DefaultLogHandler());
         configuration.setRetryWhen(new DefaultRetryWhen());
-        RequestBodyBuilder.registerBodyBuilder(CharSequence.class, new RequestBodyBuilder.StringRequestBodyBuilder());
-        RequestBodyBuilder.registerBodyBuilder(String.class, new RequestBodyBuilder.StringRequestBodyBuilder());
-        RequestBodyBuilder.registerBodyBuilder(File.class, new RequestBodyBuilder.FileRequestBodyBuilder());
-        RequestBodyBuilder.registerBodyBuilder(byte[].class, new RequestBodyBuilder.ByteArrayRequestBodyBuilder());
-        RequestBodyBuilder.registerBodyBuilder(InputStream.class, new RequestBodyBuilder.InputStreamBodyBuilder());
-        RequestBodyBuilder.registerBodyBuilder(Object.class, new RequestBodyBuilder.ObjectRequestBodyBuilder());
         return configuration;
     }
 
@@ -987,11 +983,24 @@ public class ForestConfiguration implements Serializable {
      * @param clazz  请求接口类
      * @param <T>    请求接口类泛型
      * @return       动态代理实例
+     * @see ForestConfiguration#client(Class)
      */
     public <T> T createInstance(Class<T> clazz) {
         ProxyFactory<T> proxyFactory = getProxyFactory(clazz);
         return proxyFactory.createInstance();
     }
+
+    /**
+     * 创建请求接口的动态代理实例
+     * @param clazz  请求接口类
+     * @param <T>    请求接口类泛型
+     * @return       动态代理实例
+     */
+    public <T> T client(Class<T> clazz) {
+        ProxyFactory<T> proxyFactory = getProxyFactory(clazz);
+        return proxyFactory.createInstance();
+    }
+
 
     /**
      * 设置全局JSON数据转换器的选择器
@@ -1063,5 +1072,28 @@ public class ForestConfiguration implements Serializable {
             throw new ForestRuntimeException("An error occurred the initialization of filter \"" + name + "\" ! cause: " + e.getMessage(), e);
         }
     }
+
+    /**
+     * 创建通用 {@link ForestRequest} 对象
+     *
+     * @param <T> 请求响应返回后的接受类型
+     * @return {@link ForestRequest} 对象
+     */
+    public <T> ForestRequest<T> request() {
+        ForestGenericClient client = client(ForestGenericClient.class);
+        return client.request();
+    }
+
+    /**
+     * 创建 GET 请求的 {@link ForestRequest} 对象
+     *
+     * @param url 请求 URL
+     * @param <T> 请求响应返回后的接受类型
+     * @return {@link ForestRequest} 对象
+     */
+    public <T> ForestRequest<T> get(String url) {
+        return request().setUrl(url);
+    }
+
 
 }

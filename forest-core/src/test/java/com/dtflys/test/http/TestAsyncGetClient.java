@@ -1,5 +1,6 @@
 package com.dtflys.test.http;
 
+import com.dtflys.forest.Forest;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestNetworkException;
@@ -47,7 +48,7 @@ public class TestAsyncGetClient extends BaseClientTest {
 
     @BeforeClass
     public static void prepareClient() {
-        configuration = ForestConfiguration.configuration();
+        configuration = Forest.config();
     }
 
     @Override

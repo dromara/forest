@@ -10,7 +10,6 @@ public class FileMultipart extends ForestMultipart<File> {
 
     private File file;
 
-
     @Override
     public String getOriginalFileName() {
         if (StringUtils.isNotBlank(fileName)) {

@@ -1397,8 +1397,27 @@ public class ForestRequest<T> {
         return multiparts;
     }
 
+    /**
+     * 设置 Multiparts 列表
+     *
+     * @param multiparts {@link ForestMultipart} 对象列表
+     * @return {@link ForestRequest}类实例
+     */
     public ForestRequest setMultiparts(List<ForestMultipart> multiparts) {
         this.multiparts = multiparts;
+        return this;
+    }
+
+    /**
+     * 添加 Multipart
+     * @param multipart {@link ForestMultipart} 对象
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest addMultipart(ForestMultipart multipart) {
+        if (this.multiparts == null) {
+            this.multiparts = new LinkedList<>();
+        }
+        this.multiparts.add(multipart);
         return this;
     }
 
