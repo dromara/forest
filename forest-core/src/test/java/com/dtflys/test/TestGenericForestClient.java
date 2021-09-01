@@ -1,12 +1,7 @@
 package com.dtflys.test;
 
 import com.dtflys.forest.Forest;
-import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.interceptor.Interceptor;
-import com.dtflys.forest.multipart.FileMultipart;
-import com.dtflys.forest.reflection.ForestMethod;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.Rule;
@@ -33,15 +28,9 @@ public class TestGenericForestClient {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         assertThat(
                 Forest.get("http://localhost:" + server.getPort())
-                        .setOnSuccess((data, request, response) -> {
-
-                        })
-                        .addMultipart(new FileMultipart())
-                        .setSslProtocol("TLS")
-                        .replaceOrAddQuery("a", "b")
                         .execute())
                 .isNotNull()
-                .isEqualTo(EXPECTED);
+                .isInstanceOf(ForestResponse.class);
     }
 
 
