@@ -1212,12 +1212,11 @@ public class ForestMethod<T> implements VariableScope {
      * @return 调用本对象对应方法结束后返回的值，任意类型的对象实例
      */
     public Object invoke(Object[] args) {
+        Type rType = this.returnType;
+        Class rClass = this.returnClass;
         ForestRequest request = makeRequest(args);
-        MethodLifeCycleHandler<T> lifeCycleHandler = new MethodLifeCycleHandler<>(
-                this, onSuccessClassGenericType);
-        request.setBackend(configuration.getBackend())
-                .setLifeCycleHandler(lifeCycleHandler);
-        lifeCycleHandler.handleInvokeMethod(request, this, args);
+        MethodLifeCycleHandler<T> lifeCycleHandler = null;
+        request.setBackend(configuration.getBackend());
         // 如果返回类型为ForestRequest，直接返回请求对象
         if (ForestRequest.class.isAssignableFrom(returnClass)) {
             Type retType = getReturnType();
@@ -1226,15 +1225,23 @@ public class ForestMethod<T> implements VariableScope {
                 Type[] genTypes = parameterizedType.getActualTypeArguments();
                 if (genTypes.length > 0) {
                     Type targetType = genTypes[0];
-                    returnClass = ReflectUtils.getClassByType(targetType);
-                    returnType = targetType;
+                    rClass = ReflectUtils.getClassByType(targetType);
+                    rType = targetType;
                 } else {
-                    returnClass = String.class;
-                    returnType = String.class;
+                    rClass = String.class;
+                    rType = String.class;
                 }
+                lifeCycleHandler = new MethodLifeCycleHandler<>(
+                        rType, rClass, onSuccessClassGenericType);
+                request.setLifeCycleHandler(lifeCycleHandler);
+                lifeCycleHandler.handleInvokeMethod(request, this, args);
             }
             return request;
         }
+        lifeCycleHandler = new MethodLifeCycleHandler<>(
+                rType, rClass, onSuccessClassGenericType);
+        request.setLifeCycleHandler(lifeCycleHandler);
+        lifeCycleHandler.handleInvokeMethod(request, this, args);
         return request.execute();
     }
 

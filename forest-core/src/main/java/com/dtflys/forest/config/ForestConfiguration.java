@@ -43,6 +43,7 @@ import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.filter.JSONFilter;
 import com.dtflys.forest.filter.XmlFilter;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.body.RequestBodyBuilder;
 import com.dtflys.forest.interceptor.DefaultInterceptorFactory;
 import com.dtflys.forest.interceptor.InterceptorFactory;
@@ -1076,22 +1077,22 @@ public class ForestConfiguration implements Serializable {
     /**
      * 创建通用 {@link ForestRequest} 对象
      *
-     * @param <T> 请求响应返回后的接受类型
      * @return {@link ForestRequest} 对象
      */
-    public <T> ForestRequest<T> request() {
+    public ForestRequest<ForestResponse> request() {
         ForestGenericClient client = client(ForestGenericClient.class);
         return client.request();
     }
+
+
 
     /**
      * 创建 GET 请求的 {@link ForestRequest} 对象
      *
      * @param url 请求 URL
-     * @param <T> 请求响应返回后的接受类型
      * @return {@link ForestRequest} 对象
      */
-    public <T> ForestRequest<T> get(String url) {
+    public ForestRequest<ForestResponse> get(String url) {
         return request().setUrl(url);
     }
 

@@ -25,9 +25,9 @@ import java.lang.reflect.Type;
  */
 public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
 
-    private final Type returnType;
+    private final Type resultType;
 
-    private final Class returnClass;
+    private final Class resultClass;
 
     private final Type onSuccessClassGenericType;
 
@@ -35,11 +35,13 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
 
     private volatile T resultData;
 
-    public MethodLifeCycleHandler(ForestMethod method, Type onSuccessClassGenericType) {
+
+    public MethodLifeCycleHandler(Type resultType, Class resultClass, Type onSuccessClassGenericType) {
         this.onSuccessClassGenericType = onSuccessClassGenericType;
-        this.returnType = method.getReturnType();
-        this.returnClass = method.getReturnClass();
+        this.resultType = resultType;
+        this.resultClass = ReflectUtils.getClassByType(resultType);
     }
+
 
     @Override
     public Object handleSync(ForestRequest request, ForestResponse response) {
@@ -51,7 +53,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
         try {
             Object resultData = null;
             if (response.isSuccess()) {
-                resultData = handleResultType(request, response, returnType, returnClass);
+                resultData = handleResultType(request, response, resultType, resultClass);
                 resultData = handleSuccess(resultData, request, response);
             } else {
                 if (ex != null) {
@@ -61,7 +63,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
                 }
             }
             handleResult(resultData);
-            if (ForestResponse.class.isAssignableFrom(returnClass)) {
+            if (ForestResponse.class.isAssignableFrom(resultClass)) {
                 if (!(resultData instanceof ForestResponse)) {
                     response.setResult(resultData);
                     resultData = response;
@@ -73,7 +75,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
         } catch (Throwable th) {
             Object resultData = response.getResult();
             handleResult(resultData);
-            if (ForestResponse.class.isAssignableFrom(returnClass)) {
+            if (ForestResponse.class.isAssignableFrom(resultClass)) {
                 if (!(resultData instanceof ForestResponse)) {
                     response.setResult(resultData);
                     resultData = response;
@@ -90,7 +92,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
 
     @Override
     public Object handleResultType(ForestRequest request, ForestResponse response) {
-        return handleResultType(request, response, returnType, returnClass);
+        return handleResultType(request, response, resultType, resultClass);
     }
 
 
@@ -103,7 +105,6 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
         this.resultData = (T) resultData;
         return resultData;
     }
-
 
 
     @Override
@@ -191,8 +192,8 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
 
 
     @Override
-    public Type getReturnType() {
-        return returnType;
+    public Type getResultType() {
+        return resultType;
     }
 
     public T getResultData() {

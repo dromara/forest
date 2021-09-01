@@ -51,6 +51,9 @@ public class ResultHandler {
                                 || ForestRequest.class.isAssignableFrom(resultClass)) {
                             Type realType = parameterizedType.getActualTypeArguments()[0];
                             Class realClass = ReflectUtils.getClassByType(parameterizedType.getActualTypeArguments()[0]);
+                            if (realClass == null) {
+                                realClass = String.class;
+                            }
                             Object realResult = getResult(request, response, realType, realClass);
                             response.setResult(realResult);
                         }

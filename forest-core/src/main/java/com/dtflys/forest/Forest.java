@@ -2,6 +2,7 @@ package com.dtflys.forest;
 
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestResponse;
 
 public class Forest {
 
@@ -30,10 +31,9 @@ public class Forest {
     /**
      * 创建通用 {@link ForestRequest} 对象
      *
-     * @param <T> 请求响应返回后的接受类型
      * @return {@link ForestRequest} 对象
      */
-    public static <T> ForestRequest<T> request() {
+    public static ForestRequest<ForestResponse> request() {
         return config().request();
     }
 
@@ -41,12 +41,12 @@ public class Forest {
      * 创建 GET 请求的 {@link ForestRequest} 对象
      *
      * @param url 请求 URL
-     * @param <T> 请求响应返回后的接受类型
      * @return {@link ForestRequest} 对象
      * @see ForestConfiguration#get(String)
      */
-    public static <T> ForestRequest<T> get(String url) {
+    public static ForestRequest get(String url) {
         return config().get(url);
     }
+
 
 }

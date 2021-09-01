@@ -35,7 +35,7 @@ public class HttpclientResponseHandler extends AbstractBackendResponseHandler<Ht
             final Future httpResponseFuture,
             Date requestTime,
             ForestResponseFactory forestResponseFactory) {
-        Type returnType = lifeCycleHandler.getReturnType();
+        Type returnType = lifeCycleHandler.getResultType();
         Type paramType;
         Class paramClass = null;
         if (returnType instanceof ParameterizedType) {

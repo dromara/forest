@@ -46,6 +46,6 @@ public interface LifeCycleHandler {
 
     Type getOnSuccessClassGenericType();
 
-    Type getReturnType();
+    Type getResultType();
 
 }

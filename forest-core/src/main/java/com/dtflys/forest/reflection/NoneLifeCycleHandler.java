@@ -86,7 +86,7 @@ public class NoneLifeCycleHandler implements LifeCycleHandler {
     }
 
     @Override
-    public Type getReturnType() {
+    public Type getResultType() {
         return null;
     }
 }
