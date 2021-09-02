@@ -78,7 +78,8 @@ public class ForestRequest<T> {
 
     /**
      * 默认上传/下载进度监听的步长
-     * <p>每上传/下载一定的比特数，执行一次监听回调函数
+     * <p>
+     * 每上传/下载一定的比特数，执行一次监听回调函数
      */
     private final static long DEFAULT_PROGRESS_STEP = 1024 * 10;
 
@@ -106,6 +107,11 @@ public class ForestRequest<T> {
      * HTTP协议
      */
     private String protocol;
+
+    /**
+     * HTTP版本
+     */
+    private String httpVersion;
 
     /**
      * URL路径
@@ -333,6 +339,7 @@ public class ForestRequest<T> {
 
     /**
      * 获取该请求的配置对象
+     *
      * @return 配置对象
      */
     public ForestConfiguration getConfiguration() {
@@ -341,6 +348,7 @@ public class ForestRequest<T> {
 
     /**
      * 获取请求协议
+     *
      * @return 请求协议
      */
     public String getProtocol() {
@@ -349,11 +357,32 @@ public class ForestRequest<T> {
 
     /**
      * 设置请求协议
+     *
      * @param protocol 请求协议
      * @return {@link ForestRequest}对象实例
      */
     public ForestRequest setProtocol(String protocol) {
         this.protocol = protocol;
+        return this;
+    }
+
+    /**
+     * 获取请求HTTP版本
+     *
+     * @return HTTP版本号
+     */
+    public String getHttpVersion() {
+        return httpVersion;
+    }
+
+    /**
+     * 设置请求HTTP版本
+     *
+     * @param httpVersion HTTP版本号
+     * @return {@link ForestRequest}对象实例
+     */
+    public ForestRequest setHttpVersion(String httpVersion) {
+        this.httpVersion = httpVersion;
         return this;
     }
 
@@ -546,7 +575,6 @@ public class ForestRequest<T> {
      * <p>
      * 如果 Content-Type 请求中没有 boundary 字符串,
      * 则生成一个新的随机字符串作为 boundary 字符串并返回
-     * </p>
      *
      * @return 如果 Content-Type 请求头为空则返回 null, 否则返回 boundary 字符串
      */
@@ -578,6 +606,7 @@ public class ForestRequest<T> {
 
     /**
      * 设置 Content-Type 请求头中的 boundary 字符串
+     *
      * @param boundary boundary 字符串
      * @return {@link ForestRequest}对象实例
      */
@@ -626,6 +655,7 @@ public class ForestRequest<T> {
 
     /**
      * 获取请求的Query参数表
+     *
      * @return Query参数表
      */
     public ForestQueryMap getQuery() {
@@ -634,6 +664,7 @@ public class ForestRequest<T> {
 
     /**
      * 根据名称获取请求的Query参数值
+     *
      * @param name Query参数名称
      * @return Query参数值
      */
@@ -677,6 +708,7 @@ public class ForestRequest<T> {
 
     /**
      * 添加请求中的Query参数
+     *
      * @param name Query参数名
      * @param value Query参数值
      * @return {@link ForestRequest}对象实例
@@ -688,6 +720,7 @@ public class ForestRequest<T> {
 
     /**
      * 添加请求中的Query参数
+     *
      * @param name Query参数名
      * @param value Query参数值
      * @param isUrlEncode 是否进行编码
@@ -702,6 +735,7 @@ public class ForestRequest<T> {
 
     /**
      * 添加请求中的Query参数
+     *
      * @param queryParameter Query参数，{@link ForestQueryParameter}对象实例
      * @return {@link ForestRequest}对象实例
      */
@@ -712,6 +746,7 @@ public class ForestRequest<T> {
 
     /**
      * 批量添加请求中的Query参数
+     *
      * @param queryParameters Query参数集合，{@link ForestQueryParameter}对象实例集合
      * @return {@link ForestRequest}对象实例
      */
@@ -724,6 +759,7 @@ public class ForestRequest<T> {
 
     /**
      * 批量添加请求中的同名Query参数
+     *
      * @param name Query参数名
      * @param queryValues Query参数值集合
      * @return {@link ForestRequest}对象实例
@@ -737,6 +773,7 @@ public class ForestRequest<T> {
 
     /**
      * 批量添加请求中的Query参数
+     *
      * @param queryParameters Query参数数组，{@link ForestQueryParameter}对象实例数组
      * @return {@link ForestRequest}对象实例
      */
@@ -749,6 +786,7 @@ public class ForestRequest<T> {
 
     /**
      * 替换请求中的Query参数值
+     *
      * @param queryParameter Query参数，{@link ForestQueryParameter}对象实例
      * @return {@link ForestRequest}对象实例
      */
@@ -763,6 +801,7 @@ public class ForestRequest<T> {
 
     /**
      * 替换请求中的Query参数值
+     *
      * @param name Query参数名
      * @param value Query参数值
      * @return {@link ForestRequest}对象实例
