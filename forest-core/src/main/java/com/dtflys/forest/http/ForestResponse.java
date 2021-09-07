@@ -347,10 +347,59 @@ public abstract class ForestResponse<T> {
      * @return {@code true}: 成功， {@code false}: 失败
      */
     public boolean isSuccess() {
-        return getException() == null
-                && getStatusCode() >= HttpStatus.OK
+        return getException() == null && (status_1xx() || status_2xx() || status_3xx());
+    }
+
+    /**
+     * 请求响应的状态码是否在 100 ~ 199 范围内
+     *
+     * @return {@code true}: 在 100 ~ 199 范围内, {@code false}: 不在
+     */
+    public boolean status_1xx() {
+        return getStatusCode() >= HttpStatus.CONTINUE
+                && getStatusCode() < HttpStatus.OK;
+    }
+
+    /**
+     * 请求响应的状态码是否在 200 ~ 299 范围内
+     *
+     * @return {@code true}: 在 200 ~ 299 范围内, {@code false}: 不在
+     */
+    public boolean status_2xx() {
+        return getStatusCode() >= HttpStatus.OK
                 && getStatusCode() < HttpStatus.MULTIPLE_CHOICES;
     }
+
+    /**
+     * 请求响应的状态码是否在 300 ~ 399 范围内
+     *
+     * @return {@code true}: 在 300 ~ 399 范围内, {@code false}: 不在
+     */
+    public boolean status_3xx() {
+        return getStatusCode() >= HttpStatus.MULTIPLE_CHOICES
+                && getStatusCode() < HttpStatus.BAD_REQUEST;
+    }
+
+    /**
+     * 请求响应的状态码是否在 400 ~ 499 范围内
+     *
+     * @return {@code true}: 在 400 ~ 499 范围内, {@code false}: 不在
+     */
+    public boolean status_4xx() {
+        return getStatusCode() >= HttpStatus.BAD_REQUEST
+                && getStatusCode() < HttpStatus.INTERNAL_SERVER_ERROR;
+    }
+
+    /**
+     * 请求响应的状态码是否在 500 ~ 599 范围内
+     *
+     * @return {@code true}: 在 500 ~ 599 范围内, {@code false}: 不在
+     */
+    public boolean status_5xx() {
+        return getStatusCode() >= HttpStatus.INTERNAL_SERVER_ERROR
+                && getStatusCode() < 600;
+    }
+
 
     /**
      * 网络请求是否失败
