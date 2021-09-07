@@ -25,9 +25,22 @@
 package com.dtflys.forest.config;
 
 
+import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.forest.backend.HttpBackendSelector;
+import com.dtflys.forest.callback.DefaultRetryWhen;
+import com.dtflys.forest.callback.RetryWhen;
+import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.auto.DefaultAutoConverter;
 import com.dtflys.forest.converter.binary.DefaultBinaryConverter;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
+import com.dtflys.forest.converter.json.JSONConverterSelector;
 import com.dtflys.forest.converter.text.DefaultTextConverter;
+import com.dtflys.forest.converter.xml.ForestJaxbConverter;
+import com.dtflys.forest.converter.xml.ForestXmlConverter;
+import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.filter.Filter;
+import com.dtflys.forest.filter.JSONFilter;
+import com.dtflys.forest.filter.XmlFilter;
 import com.dtflys.forest.http.body.RequestBodyBuilder;
 import com.dtflys.forest.interceptor.DefaultInterceptorFactory;
 import com.dtflys.forest.interceptor.InterceptorFactory;
@@ -40,24 +53,18 @@ import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
-import com.dtflys.forest.backend.HttpBackendSelector;
-import com.dtflys.forest.converter.ForestConverter;
-import com.dtflys.forest.converter.json.JSONConverterSelector;
-import com.dtflys.forest.converter.json.ForestJsonConverter;
-import com.dtflys.forest.converter.xml.ForestJaxbConverter;
-import com.dtflys.forest.converter.xml.ForestXmlConverter;
-import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.backend.HttpBackend;
-import com.dtflys.forest.filter.Filter;
-import com.dtflys.forest.filter.JSONFilter;
-import com.dtflys.forest.filter.XmlFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -181,6 +188,11 @@ public class ForestConfiguration implements Serializable {
     private List<RequestNameValue> defaultHeaders;
 
     /**
+     * 全局重试条件回调函数
+     */
+    private RetryWhen retryWhen;
+
+    /**
      * 全局拦截器列表
      */
     private List<Class> interceptors;
@@ -258,6 +270,7 @@ public class ForestConfiguration implements Serializable {
         configuration.registerFilter("json", JSONFilter.class);
         configuration.registerFilter("xml", XmlFilter.class);
         configuration.setLogHandler(new DefaultLogHandler());
+        configuration.setRetryWhen(new DefaultRetryWhen());
         RequestBodyBuilder.registerBodyBuilder(CharSequence.class, new RequestBodyBuilder.StringRequestBodyBuilder());
         RequestBodyBuilder.registerBodyBuilder(String.class, new RequestBodyBuilder.StringRequestBodyBuilder());
         RequestBodyBuilder.registerBodyBuilder(File.class, new RequestBodyBuilder.FileRequestBodyBuilder());
@@ -699,6 +712,23 @@ public class ForestConfiguration implements Serializable {
     public ForestConfiguration setDefaultHeaders(List<RequestNameValue> defaultHeaders) {
         this.defaultHeaders = defaultHeaders;
         return this;
+    }
+
+    /**
+     * 获取全局重试条件回调函数
+     *
+     * @return 重试条件回调函数 {@link RetryWhen} 实例
+     */
+    public RetryWhen getRetryWhen() {
+        return retryWhen;
+    }
+
+    /**
+     * 设置全局重试条件回调函数
+     * @param retryWhen 重试条件回调函数 {@link RetryWhen} 实例
+     */
+    public void setRetryWhen(RetryWhen retryWhen) {
+        this.retryWhen = retryWhen;
     }
 
     /**

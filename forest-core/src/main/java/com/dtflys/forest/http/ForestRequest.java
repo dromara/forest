@@ -27,6 +27,7 @@ package com.dtflys.forest.http;
 import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.callback.OnSaveCookie;
+import com.dtflys.forest.callback.RetryWhen;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.http.body.ByteArrayRequestBody;
 import com.dtflys.forest.http.body.FileRequestBody;
@@ -77,7 +78,7 @@ public class ForestRequest<T> {
 
     /**
      * 默认上传/下载进度监听的步长
-     * 每上传/下载一定的比特数，执行一次监听回调函数
+     * <p>每上传/下载一定的比特数，执行一次监听回调函数
      */
     private final static long DEFAULT_PROGRESS_STEP = 1024 * 10;
 
@@ -113,9 +114,9 @@ public class ForestRequest<T> {
 
     /**
      * 用户信息
-     * 包含在URL中的用户信息，比如：
-     * URL http://xxx:yyy@localhost:8080 中 xxx:yyy 的部分为用户信息
-     * 其中，xxx为用户名，yyy为用户密码
+     * <p>包含在URL中的用户信息，比如：
+     * <p>URL http://xxx:yyy@localhost:8080 中 xxx:yyy 的部分为用户信息
+     * <p>其中，xxx为用户名，yyy为用户密码
      */
     private String userInfo;
 
@@ -161,7 +162,7 @@ public class ForestRequest<T> {
 
     /**
      * 响应数据类型
-     * 该类型决定请求响应返回的数据将以何种方式进行反序列化
+     * <p>该类型决定请求响应返回的数据将以何种方式进行反序列化
      */
     private ForestDataType dataType;
 
@@ -177,7 +178,7 @@ public class ForestRequest<T> {
 
     /**
      * SSL协议
-     * 该字段在单向HTTPS请求发送时决定哪种SSL协议
+     * <p>该字段在单向HTTPS请求发送时决定哪种SSL协议
      */
     private String sslProtocol;
 
@@ -191,19 +192,19 @@ public class ForestRequest<T> {
      */
     private long maxRetryInterval = 0;
 
-//    private Map<String, Object> data = new LinkedHashMap<String, Object>();
 
     /**
      * 请求体
-     * 该字段为列表类型，列表每一项为请求体项
-     * 都为ForestRequestBody子类的对象实例
+     * <p>
+     * 该字段为列表类型，列表每一项为请求体项,
+     * 都为 {@link ForestRequestBody} 子类的对象实例
      */
     private List<ForestRequestBody> bodyItems = new LinkedList<>();
 
 
     /**
      * 请求体集合
-     * 所有本请求对象中的请求头都在由该请求体集合对象管理
+     * <p>所有本请求对象中的请求头都在由该请求体集合对象管理
      */
     private ForestHeaderMap headers = new ForestHeaderMap();
 
@@ -215,13 +216,13 @@ public class ForestRequest<T> {
 
     /**
      * 文件名
-     * 该字段为文件下载时，保存到本地磁盘时用到的文件名
+     * <p>该字段为文件下载时，保存到本地磁盘时用到的文件名
      */
     private String filename;
 
     /**
      * 参数表
-     * 接口方法调用时传入的参数表
+     * <p>接口方法调用时传入的参数表
      */
     private final Object[] arguments;
 
@@ -236,8 +237,13 @@ public class ForestRequest<T> {
     private OnError onError;
 
     /**
+     * 回调函数：请求重试触发条件
+     */
+    private RetryWhen retryWhen;
+
+    /**
      * 进度回调函数：上传/下载进度监听时调用
-     * 每上传/下载传输 ${progressStep} 个比特数时，执行一次监听回调函数
+     * <p>每上传/下载传输 ${progressStep} 个比特数时，执行一次监听回调函数
      */
     private OnProgress onProgress;
 
@@ -258,7 +264,7 @@ public class ForestRequest<T> {
 
     /**
      * 上传/下载进度监听的步长
-     * 每上传/下载一定的比特数，执行一次监听回调函数
+     * <p>每上传/下载一定的比特数，执行一次监听回调函数
      */
     private long progressStep = DEFAULT_PROGRESS_STEP;
 
@@ -269,19 +275,19 @@ public class ForestRequest<T> {
 
     /**
      * 拦截器属性
-     * 这里的属性只能在绑定的拦截器中被访问
+     * <p>这里的属性只能在绑定的拦截器中被访问
      */
     private Map<Class, InterceptorAttributes> interceptorAttributes = new HashMap<>();
 
     /**
      * 请求重试策略
-     * 可以通过该字段设定自定义的重试策略
+     * <p>可以通过该字段设定自定义的重试策略
      */
     private Retryer retryer;
 
     /**
      * 附件
-     * 附件信息不回随请求发送到远端服务器，但在本地的任何地方都可以通过请求对象访问到附件信息
+     * <p>附件信息不回随请求发送到远端服务器，但在本地的任何地方都可以通过请求对象访问到附件信息
      */
     private Map<String, Object> attachments = new HashMap<>();
 
@@ -298,7 +304,7 @@ public class ForestRequest<T> {
 
     /**
      * SSL KeyStore信息
-     * 在双向HTTPS请求中使用的验证信息
+     * <p>在双向HTTPS请求中使用的验证信息
      */
     private SSLKeyStore keyStore;
 
@@ -791,8 +797,8 @@ public class ForestRequest<T> {
 
     /**
      * 替换或添加请求中的Query参数
-     * <p>当请求中不存在与该方法调用时传递过来{@code name}参数同名的Query参数时，会将{@code name}参数和{@code value}参数添加成新的Query参数到请求中，</p>
-     * <p>若请求中已存在同名Query参数名时，则会替换请求中的所有同名的Query参数值</p>
+     * <p>当请求中不存在与该方法调用时传递过来{@code name}参数同名的Query参数时，会将{@code name}参数和{@code value}参数添加成新的Query参数到请求中，
+     * <p>若请求中已存在同名Query参数名时，则会替换请求中的所有同名的Query参数值
      *
      * @param name Query参数名
      * @param value Query参数值
@@ -809,8 +815,6 @@ public class ForestRequest<T> {
         }
         return this;
     }
-
-
 
     public ForestRequestType getType() {
         return type;
@@ -829,6 +833,7 @@ public class ForestRequest<T> {
 
     /**
      * 获取请求类型变更历史列表
+     *
      * @return 请求类型列表
      */
     public List<ForestRequestType> getTypeChangeHistory() {
@@ -837,6 +842,7 @@ public class ForestRequest<T> {
 
     /**
      * 获取请求类型变更历史字符串列表
+     *
      * @return 字符串列表
      */
     public List<String> getTypeChangeHistoryString() {
@@ -941,6 +947,7 @@ public class ForestRequest<T> {
 
     /**
      * 获取请求头 Content-Type 的值
+     *
      * @return 请求头 Content-Type 的值
      */
     public String getContentType() {
@@ -949,6 +956,7 @@ public class ForestRequest<T> {
 
     /**
      * 设置请求头 Content-Type 的值
+     *
      * @param contentType 请求头 Content-Type 的值
      * @return {@link ForestRequest}类实例
      */
@@ -959,6 +967,7 @@ public class ForestRequest<T> {
 
     /**
      * 获取请求超时时间，时间单位为毫秒
+     *
      * @return 请求超时时间
      */
     public int getTimeout() {
@@ -967,6 +976,7 @@ public class ForestRequest<T> {
 
     /**
      * 设置请求超时时间，时间单位为毫秒
+     *
      * @param timeout 请求超时时间
      * @return {@link ForestRequest}类实例
      */
@@ -977,6 +987,7 @@ public class ForestRequest<T> {
 
     /**
      * 是否开启解压GZIP响应内容
+     *
      * @return {@code true}为开启，否则不开启
      */
     public boolean isDecompressResponseGzipEnabled() {
@@ -985,6 +996,7 @@ public class ForestRequest<T> {
 
     /**
      * 设置是否开启解压GZIP响应内容
+     *
      * @param decompressResponseGzipEnabled {@code true}为开启，否则不开启
      * @return {@link ForestRequest}类实例
      */
@@ -995,6 +1007,7 @@ public class ForestRequest<T> {
 
     /**
      * 获取SSL协议
+     *
      * @return SSL协议字符串
      */
     public String getSslProtocol() {
@@ -1003,6 +1016,7 @@ public class ForestRequest<T> {
 
     /**
      * 设置SSL协议
+     *
      * @param sslProtocol SSL协议字符串
      * @return {@link ForestRequest}类实例
      */
@@ -1013,6 +1027,7 @@ public class ForestRequest<T> {
 
     /**
      * 获取请求失败后的重试次数
+     *
      * @return 重试次数
      */
     public int getRetryCount() {
@@ -1021,6 +1036,7 @@ public class ForestRequest<T> {
 
     /**
      * 设置请求失败后的重试次数
+     *
      * @param retryCount 重试次数
      * @return {@link ForestRequest}类实例
      */
@@ -1031,6 +1047,7 @@ public class ForestRequest<T> {
 
     /**
      * 获取最大请重试的时间间隔，时间单位为毫秒
+     *
      * @return 最大请重试的时间间隔
      */
     public long getMaxRetryInterval() {
@@ -1039,6 +1056,7 @@ public class ForestRequest<T> {
 
     /**
      * 设置最大请重试的时间间隔，时间单位为毫秒
+     *
      * @param maxRetryInterval 最大请重试的时间间隔
      * @return {@link ForestRequest}类实例
      */
@@ -1049,6 +1067,7 @@ public class ForestRequest<T> {
 
     /**
      * 旧的获取Body数据的方法 [已不建议使用]
+     *
      * @return 请求中的数据，{@link Map}对象实例
      */
     @Deprecated
@@ -1058,6 +1077,7 @@ public class ForestRequest<T> {
 
     /**
      * 添加Body数据
+     *
      * @param body Forest请求体，{@link ForestRequestBody}类实例
      * @return {@link ForestRequest}类实例
      */
@@ -1069,6 +1089,7 @@ public class ForestRequest<T> {
 
     /**
      * 添加字符串Body数据
+     *
      * @param stringBody 请求体字符串内容
      * @return {@link ForestRequest}类实例
      */
@@ -1078,6 +1099,7 @@ public class ForestRequest<T> {
 
     /**
      * 添加字节数组Body数据
+     *
      * @param byteArrayBody 请求体字节数组内容
      * @return
      */
@@ -1087,6 +1109,7 @@ public class ForestRequest<T> {
 
     /**
      * 添加文件Body数据
+     *
      * @param fileBody 请求体文件内容
      * @return
      */
@@ -1096,6 +1119,7 @@ public class ForestRequest<T> {
 
     /**
      * 添加输入流Body数据
+     *
      * @param inputStreamBody 请求体输入流内容
      * @return
      */
@@ -1105,6 +1129,7 @@ public class ForestRequest<T> {
 
     /**
      * 添加键值对类型Body数据
+     *
      * @param name 字段名
      * @param value 字段值
      * @return {@link ForestRequest}类实例
@@ -1115,6 +1140,7 @@ public class ForestRequest<T> {
 
     /**
      * 添加键值对类型Body数据
+     *
      * @param name 字段名
      * @param contentType 该请求体项的Content-Type
      * @param value 字段值
@@ -1126,6 +1152,7 @@ public class ForestRequest<T> {
 
     /**
      * 添加键值对类型Body数据
+     *
      * @param nameValue 请求键值对对象
      * @return {@link ForestRequest}类实例
      */
@@ -1136,6 +1163,7 @@ public class ForestRequest<T> {
 
     /**
      * 批量添加键值对类型Body数据
+     *
      * @param nameValueList 请求键值对对象列表
      * @return {@link ForestRequest}类实例
      */
@@ -1149,6 +1177,7 @@ public class ForestRequest<T> {
 
     /**
      * 添加键值对类型Body数据, 已不再建议使用
+     *
      * @param name 键值对名称
      * @param value 键值对的值
      * @return {@link ForestRequest}类实例
@@ -1160,6 +1189,7 @@ public class ForestRequest<T> {
 
     /**
      * 添加键值对类型Body数据, 已不再建议使用
+     *
      * @param nameValue 请求键值对对象
      * @return {@link ForestRequest}类实例
      */
@@ -1170,6 +1200,7 @@ public class ForestRequest<T> {
 
     /**
      * 批量添加键值对类型Body数据, 已不再建议使用
+     *
      * @param data 请求键值对对象列表
      * @return {@link ForestRequest}类实例
      */
@@ -1180,6 +1211,7 @@ public class ForestRequest<T> {
 
     /**
      * 添加键值对
+     *
      * @param nameValue 键值对对象
      * @return {@link ForestRequest}类实例
      */
@@ -1196,6 +1228,7 @@ public class ForestRequest<T> {
 
     /**
      * 添加键值对列表
+     *
      * @param nameValueList 键值对列表
      * @return {@link ForestRequest}类实例
      */
@@ -1208,6 +1241,7 @@ public class ForestRequest<T> {
 
     /**
      * 替换Body数据，原有的Body数据将被清空
+     *
      * @param body 请求体对象
      * @return {@link ForestRequest}类实例
      */
@@ -1219,6 +1253,7 @@ public class ForestRequest<T> {
 
     /**
      * 替换Body为新的字符串数据，原有的Body数据将被清空
+     *
      * @param stringbody 字符串请求体
      * @return {@link ForestRequest}类实例
      */
@@ -1408,6 +1443,26 @@ public class ForestRequest<T> {
     }
 
     /**
+     * 获取RetryWhen回调函数, 回调函数为请求重试的触发条件
+     *
+     * @return {@link RetryWhen}接口实例
+     */
+    public RetryWhen getRetryWhen() {
+        return retryWhen;
+    }
+
+    /**
+     * 设置RetryWhen回调函数, 回调函数为请求重试的触发条件
+     *
+     * @param retryWhen {@link RetryWhen}接口实例
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest setRetryWhen(RetryWhen retryWhen) {
+        this.retryWhen = retryWhen;
+        return this;
+    }
+
+    /**
      * 该请求是否下载文件
      *
      * @return {@code true}: 下载文件，{@code false}: 不下载文件
@@ -1429,7 +1484,8 @@ public class ForestRequest<T> {
 
     /**
      * 获取上传/下载进度监听的步长
-     * <p>每上传/下载一定的比特数，执行一次监听回调函数</p>
+     * <p>
+     * 每上传/下载一定的比特数，执行一次监听回调函数
      *
      * @return 进度监听的步长，{@code long}类型数值
      */
@@ -1439,7 +1495,8 @@ public class ForestRequest<T> {
 
     /**
      * 设置获取上传/下载进度监听的步长
-     * <p>每上传/下载一定的比特数，执行一次监听回调函数</p>
+     * <p>
+     * 每上传/下载一定的比特数，执行一次监听回调函数
      *
      * @param progressStep 进度监听的步长，{@code long}类型数值
      * @return {@link ForestRequest}类实例
@@ -1451,7 +1508,8 @@ public class ForestRequest<T> {
 
     /**
      * 获取进度回调函数：上传/下载进度监听时调用
-     * <p>每上传/下载传输 ${progressStep} 个比特数时，执行一次监听回调函数</p>
+     * <p>
+     * 每上传/下载传输 ${progressStep} 个比特数时，执行一次监听回调函数
      *
      * @return 进度回调函数，{@link OnProgress}接口实例
      */
@@ -1461,7 +1519,8 @@ public class ForestRequest<T> {
 
     /**
      * 设置进度回调函数：上传/下载进度监听时调用
-     * <p>每上传/下载传输 ${progressStep} 个比特数时，执行一次监听回调函数</p>
+     * <p>
+     * 每上传/下载传输 ${progressStep} 个比特数时，执行一次监听回调函数
      *
      * @param onProgress 进度回调函数，{@link OnProgress}接口实例
      * @return {@link ForestRequest}类实例
@@ -1513,7 +1572,7 @@ public class ForestRequest<T> {
 
     /**
      * 添加拦截器到该请求中
-     * <p>拦截器在请求的初始化、发送请求前、发送成功、发送失败等生命周期中都会被调用</p>
+     * <p>拦截器在请求的初始化、发送请求前、发送成功、发送失败等生命周期中都会被调用
      *
      * @param interceptor 拦截器，{@link Interceptor}接口实例
      * @return {@link ForestRequest}类实例
@@ -1534,14 +1593,14 @@ public class ForestRequest<T> {
 
     /**
      * 添加拦截器属性到该请求
-     * <p>被添加的属性会被对应的请求所绑定，同时也会绑定到拦截器类，并且按不同的拦截器进行隔离。</p>
-     * <p>而且这些属性值不能通过网络请求传递到远端服务器。</p>
-     * <p>
-     *     拦截器属性有两个特性：<br>
-     *     1. 按请求隔离： 如有请求A和请求B，都有一个名为attr1的拦截器属性，但它们是两个互不影响的独立的属性。<br>
-     *     2. 按拦截器隔离：如果有拦截器T1和拦截器T2，同一个请求分别对着两个拦截器绑定了一个属性，都名为 attr1。但它们也是两个独立的互不干涉的属性。<br>
-     *     也就是说，在拦截器T1中访问的attr1属性和在拦截器T2中访问的attr1属性是不同的。
-     * </p>
+     * <p>被添加的属性会被对应的请求所绑定，同时也会绑定到拦截器类，并且按不同的拦截器进行隔离。
+     * <p>而且这些属性值不能通过网络请求传递到远端服务器。
+     * <p>拦截器属性有两个特性：
+     * <ul>
+     *     <li>1. 按请求隔离： 如有请求A和请求B，都有一个名为attr1的拦截器属性，但它们是两个互不影响的独立的属性。</li>
+     *     <li>2. 按拦截器隔离：如果有拦截器T1和拦截器T2，同一个请求分别对着两个拦截器绑定了一个属性，都名为 attr1。但它们也是两个独立的互不干涉的属性。
+     *     <p>也就是说，在拦截器T1中访问的attr1属性和在拦截器T2中访问的attr1属性是不同的。</li>
+     * </ul>
      * @param interceptorClass 要绑定的拦截器类
      * @param attributes 拦截器属性，{@link InterceptorAttributes}类实例
      * @return {@link ForestRequest}类实例
@@ -1564,14 +1623,14 @@ public class ForestRequest<T> {
 
     /**
      * 添加拦截器属性到该请求
-     * <p>被添加的属性会被对应的请求所绑定，同时也会绑定到拦截器类，并且按不同的拦截器进行隔离。</p>
-     * <p>而且这些属性值不能通过网络请求传递到远端服务器。</p>
-     * <p>
-     *     拦截器属性有两个特性：<br>
-     *     1. 按请求隔离： 如有请求A和请求B，都有一个名为attr1的拦截器属性，但它们是两个互不影响的独立的属性。<br>
-     *     2. 按拦截器隔离：如果有拦截器T1和拦截器T2，同一个请求分别对着两个拦截器绑定了一个属性，都名为 attr1。但它们也是两个独立的互不干涉的属性。<br>
-     *     也就是说，在拦截器T1中访问的attr1属性和在拦截器T2中访问的attr1属性是不同的。
-     * </p>
+     * <p>被添加的属性会被对应的请求所绑定，同时也会绑定到拦截器类，并且按不同的拦截器进行隔离。
+     * <p>而且这些属性值不能通过网络请求传递到远端服务器。
+     * <p>拦截器属性有两个特性：
+     * <ul>
+     *     <li>1. 按请求隔离： 如有请求A和请求B，都有一个名为attr1的拦截器属性，但它们是两个互不影响的独立的属性。</li>
+     *     <li>2. 按拦截器隔离：如果有拦截器T1和拦截器T2，同一个请求分别对着两个拦截器绑定了一个属性，都名为 attr1。但它们也是两个独立的互不干涉的属性。
+     *     <p>也就是说，在拦截器T1中访问的attr1属性和在拦截器T2中访问的attr1属性是不同的。</li>
+     * </ul>
      *
      * @param interceptorClass 要绑定的拦截器类
      * @param attributeName 拦截器属性名
@@ -1590,12 +1649,12 @@ public class ForestRequest<T> {
 
     /**
      * 获取拦截器属性表
-     * <p>
-     *     拦截器属性有两个特性：<br>
-     *     1. 按请求隔离： 如有请求A和请求B，都有一个名为attr1的拦截器属性，但它们是两个互不影响的独立的属性。<br>
-     *     2. 按拦截器隔离：如果有拦截器T1和拦截器T2，同一个请求分别对着两个拦截器绑定了一个属性，都名为 attr1。但它们也是两个独立的互不干涉的属性。<br>
-     *     也就是说，在拦截器T1中访问的attr1属性和在拦截器T2中访问的attr1属性是不同的。
-     * </p>
+     * <p>拦截器属性有两个特性：
+     * <ul>
+     *     <li>1. 按请求隔离： 如有请求A和请求B，都有一个名为attr1的拦截器属性，但它们是两个互不影响的独立的属性。</li>
+     *     <li>2. 按拦截器隔离：如果有拦截器T1和拦截器T2，同一个请求分别对着两个拦截器绑定了一个属性，都名为 attr1。但它们也是两个独立的互不干涉的属性。
+     *     <p>也就是说，在拦截器T1中访问的attr1属性和在拦截器T2中访问的attr1属性是不同的。</li>
+     * </ul>
      *
      * @return {@link Map}映射，Key: 拦截器类，Value: 拦截器属性集合对象，{@link InterceptorAttributes}类实例
      */
@@ -1605,12 +1664,12 @@ public class ForestRequest<T> {
 
     /**
      * 根据拦截器类获取拦截器属性集合对象
-     * <p>
-     *     拦截器属性有两个特性：<br>
-     *     1. 按请求隔离： 如有请求A和请求B，都有一个名为attr1的拦截器属性，但它们是两个互不影响的独立的属性。<br>
-     *     2. 按拦截器隔离：如果有拦截器T1和拦截器T2，同一个请求分别对着两个拦截器绑定了一个属性，都名为 attr1。但它们也是两个独立的互不干涉的属性。<br>
-     *     也就是说，在拦截器T1中访问的attr1属性和在拦截器T2中访问的attr1属性是不同的。
-     * </p>
+     * <p>拦截器属性有两个特性：
+     * <ul>
+     *     <li>1. 按请求隔离： 如有请求A和请求B，都有一个名为attr1的拦截器属性，但它们是两个互不影响的独立的属性。</li>
+     *     <li>2. 按拦截器隔离：如果有拦截器T1和拦截器T2，同一个请求分别对着两个拦截器绑定了一个属性，都名为 attr1。但它们也是两个独立的互不干涉的属性。
+     *     <p>也就是说，在拦截器T1中访问的attr1属性和在拦截器T2中访问的attr1属性是不同的。</li>
+     * </ul>
      *
      * @param interceptorClass 拦截器类
      * @return 拦截器属性集合对象，{@link InterceptorAttributes}类实例
@@ -1621,12 +1680,12 @@ public class ForestRequest<T> {
 
     /**
      * 根据拦截器类和拦截器属性名获取拦截器属性值
-     * <p>
-     *     拦截器属性有两个特性：<br>
-     *     1. 按请求隔离： 如有请求A和请求B，都有一个名为attr1的拦截器属性，但它们是两个互不影响的独立的属性。<br>
-     *     2. 按拦截器隔离：如果有拦截器T1和拦截器T2，同一个请求分别对着两个拦截器绑定了一个属性，都名为 attr1。但它们也是两个独立的互不干涉的属性。<br>
-     *     也就是说，在拦截器T1中访问的attr1属性和在拦截器T2中访问的attr1属性是不同的。
-     * </p>
+     * <p>拦截器属性有两个特性：
+     * <ul>
+     *     <li>1. 按请求隔离： 如有请求A和请求B，都有一个名为attr1的拦截器属性，但它们是两个互不影响的独立的属性。</li>
+     *     <li>2. 按拦截器隔离：如果有拦截器T1和拦截器T2，同一个请求分别对着两个拦截器绑定了一个属性，都名为 attr1。但它们也是两个独立的互不干涉的属性。
+     *     <p>也就是说，在拦截器T1中访问的attr1属性和在拦截器T2中访问的attr1属性是不同的。</li>
+     * </ul>
      *
      * @param interceptorClass 拦截器类
      * @param attributeName 拦截器属性名
