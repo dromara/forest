@@ -18,6 +18,8 @@ forest:
       type: com.dtflys.forest.converter.json.ForestJacksonConverter
       parameters:
         dateFormat: yyyy/MM/dd hh:mm:ss
+    binary:
+      type: com.dtflys.forest.converter.binary.DefaultBinaryConverter
   variables:
     baseUrl: http://www.xxxxxx.com
     user:
