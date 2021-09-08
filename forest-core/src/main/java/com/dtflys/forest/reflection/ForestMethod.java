@@ -159,7 +159,11 @@ public class ForestMethod<T> implements VariableScope {
         return new MappingTemplate(text, this, configuration.getProperties(), forestParameters);
     }
 
-
+    /**
+     * 获取Forest接口方法的返回类
+     *
+     * @return 返回类 {@link Class} 实例
+     */
     public Class getReturnClass() {
         return returnClass;
     }
@@ -1212,8 +1216,7 @@ public class ForestMethod<T> implements VariableScope {
      * @return 调用本对象对应方法结束后返回的值，任意类型的对象实例
      */
     public Object invoke(Object[] args) {
-        Type rType = this.returnType;
-        Class rClass = this.returnClass;
+        Type rType = this.getReturnType();
         ForestRequest request = makeRequest(args);
         MethodLifeCycleHandler<T> lifeCycleHandler = null;
         request.setBackend(configuration.getBackend());
@@ -1225,21 +1228,19 @@ public class ForestMethod<T> implements VariableScope {
                 Type[] genTypes = parameterizedType.getActualTypeArguments();
                 if (genTypes.length > 0) {
                     Type targetType = genTypes[0];
-                    rClass = ReflectUtils.getClassByType(targetType);
                     rType = targetType;
                 } else {
-                    rClass = String.class;
                     rType = String.class;
                 }
                 lifeCycleHandler = new MethodLifeCycleHandler<>(
-                        rType, rClass, onSuccessClassGenericType);
+                        rType, onSuccessClassGenericType);
                 request.setLifeCycleHandler(lifeCycleHandler);
                 lifeCycleHandler.handleInvokeMethod(request, this, args);
             }
             return request;
         }
         lifeCycleHandler = new MethodLifeCycleHandler<>(
-                rType, rClass, onSuccessClassGenericType);
+                rType, onSuccessClassGenericType);
         request.setLifeCycleHandler(lifeCycleHandler);
         lifeCycleHandler.handleInvokeMethod(request, this, args);
         return request.execute();
@@ -1276,11 +1277,10 @@ public class ForestMethod<T> implements VariableScope {
      * @return 方法返回值类型，{@link Type}接口实例
      */
     public Type getReturnType() {
-        if (returnType != null) {
-            return returnType;
+        if (returnType == null) {
+            returnType = method.getGenericReturnType();
         }
-        Type type = method.getGenericReturnType();
-        return type;
+        return returnType;
     }
 
     /**

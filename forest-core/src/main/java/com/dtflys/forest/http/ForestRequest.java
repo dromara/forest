@@ -59,6 +59,7 @@ import com.dtflys.forest.utils.URLUtils;
 import java.io.File;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -1909,7 +1910,8 @@ public class ForestRequest<T> {
     public Object getMethodReturnValue() {
         if (this.lifeCycleHandler != null) {
             if (this.lifeCycleHandler instanceof MethodLifeCycleHandler) {
-                return ((MethodLifeCycleHandler) lifeCycleHandler).getResultData();
+                Object resultData = ((MethodLifeCycleHandler) lifeCycleHandler).getResultData();
+                return resultData;
             }
         }
         return null;
