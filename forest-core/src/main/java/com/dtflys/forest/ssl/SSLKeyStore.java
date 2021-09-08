@@ -35,13 +35,13 @@ public class SSLKeyStore {
 
     protected String[] cipherSuites;
 
-    protected String sslSocketFactoryBuilder;
+    protected SSLSocketFactoryBuilder sslSocketFactoryBuilder;
 
-    public SSLKeyStore(String id, String filePath, String keystorePass, String certPass, String sslSocketFactoryBuilder) {
+    public SSLKeyStore(String id, String filePath, String keystorePass, String certPass, SSLSocketFactoryBuilder sslSocketFactoryBuilder) {
         this(id, DEFAULT_KEYSTORE_TYPE, filePath, keystorePass, certPass, sslSocketFactoryBuilder);
     }
 
-    public SSLKeyStore(String id, String keystoreType, String filePath, String keystorePass, String certPass, String sslSocketFactoryBuilder) {
+    public SSLKeyStore(String id, String keystoreType, String filePath, String keystorePass, String certPass, SSLSocketFactoryBuilder sslSocketFactoryBuilder) {
         this.id = id;
         this.keystoreType = keystoreType;
         this.filePath = filePath;
@@ -84,11 +84,11 @@ public class SSLKeyStore {
         this.cipherSuites = cipherSuites;
     }
 
-    public String getSslSocketFactoryBuilder() {
+    public SSLSocketFactoryBuilder getSslSocketFactoryBuilder() {
         return sslSocketFactoryBuilder;
     }
 
-    public void setSslSocketFactoryBuilder(String sslSocketFactoryBuilder) {
+    public void setSslSocketFactoryBuilder(SSLSocketFactoryBuilder sslSocketFactoryBuilder) {
         this.sslSocketFactoryBuilder = sslSocketFactoryBuilder;
     }
 

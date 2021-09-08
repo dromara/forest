@@ -125,25 +125,24 @@ public class SSLUtils {
         }
     }
 
-    private static ConcurrentHashMap<String, SSLSocketFactoryBuilder> sslSocketFactoryBuilderCache = new ConcurrentHashMap<>();
-    public static SSLSocketFactory getSSLSocketFactory (ForestRequest request, String protocol){
-        if (Objects.isNull(request.getKeyStore())) {
+    public static SSLSocketFactory getSSLSocketFactory (ForestRequest request, String protocol) {
+        SSLKeyStore keyStore = request.getKeyStore();
+        if (keyStore == null) {
             return getDefaultSSLSocketFactory(request, protocol);
         }
-        String key = request.getKeyStore().getSslSocketFactoryBuilder();
-        SSLSocketFactoryBuilder sslSocketFactoryBuilder = sslSocketFactoryBuilderCache.get(key);
-        if (Objects.isNull(sslSocketFactoryBuilder)){
-            if (StringUtils.isNotEmpty(key)) {
-                try {
-                    sslSocketFactoryBuilder = (SSLSocketFactoryBuilder)Class.forName(key).newInstance();
-                    sslSocketFactoryBuilderCache.put(key, sslSocketFactoryBuilder);
-                    return sslSocketFactoryBuilder.getSSLSocketFactory(request, protocol);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+        SSLSocketFactoryBuilder sslSocketFactoryBuilder = keyStore.getSslSocketFactoryBuilder();
+        if (sslSocketFactoryBuilder == null) {
+            return getDefaultSSLSocketFactory(request, protocol);
         }
-        return getDefaultSSLSocketFactory(request, request.getSslProtocol());
+        try {
+            SSLSocketFactory sslSocketFactory = sslSocketFactoryBuilder.getSSLSocketFactory(request, protocol);
+            if (sslSocketFactory == null) {
+                return getDefaultSSLSocketFactory(request, protocol);
+            }
+            return sslSocketFactory;
+        } catch (Exception e) {
+            throw new ForestRuntimeException(e);
+        }
     }
 
 }
