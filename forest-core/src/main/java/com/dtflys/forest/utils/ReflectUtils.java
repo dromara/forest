@@ -51,11 +51,13 @@ public class ReflectUtils {
 
 
     /**
-     * 从Type获取Class
-     * @param genericType Java Type类型，{@link Type}接口实例
+     * 转换为 {@link Class} 类型对象
+     * <p>将抽象的 {@link Type} 接口实例转换为具体的 {@link Class} 类型对象实例
+     *
+     * @param genericType {@link Type}接口实例
      * @return  Java类，{@link Class}类实例
      */
-    public static Class<?> getClassByType(Type genericType) {
+    public static Class<?> toClass(Type genericType) {
         if (genericType instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType) genericType;
             return ((Class<?>) pt.getRawType());
@@ -80,7 +82,79 @@ public class ReflectUtils {
     }
 
     /**
+     * 转换为 {@link ParameterizedType} 类型对象
+     * <p>将普通的 {@link Type} 类型对象转换为 {@link ParameterizedType} 类型对象
+     * <p>通过 {@link ParameterizedType} 对象可以获取泛型的类型参数
+     *
+     * @param type 普通 Java Type 类型, {@link Type} 接口实例
+     * @return 带泛型参数的 Type 类型, {@link ParameterizedType} 接口实例
+     */
+    public static ParameterizedType toParameterizedType(Type type) {
+        if (null == type) {
+            return null;
+        }
+        ParameterizedType pType = null;
+        if (type instanceof ParameterizedType) {
+            pType = (ParameterizedType) type;
+        } else if (type instanceof Class) {
+            Class<?> clazz = (Class<?>) type;
+            Type genericSuper = clazz.getGenericSuperclass();
+            if (genericSuper == null || Object.class.equals(genericSuper)) {
+                Type[] genericInterfaces = clazz.getGenericInterfaces();
+                if (genericInterfaces == null || genericInterfaces.length == 0) {
+                    genericSuper = genericInterfaces[0];
+                }
+            }
+            pType = toParameterizedType(genericSuper);
+        }
+        return pType;
+    }
+
+    /**
+     * 获取所有泛型参数类型
+     * <p>从一个带泛型的类型中获取其所有的泛型参数类型
+     *
+     * @param type {@link Type} 接口实例
+     * @return 多个泛型参数类型, {@link Type} 接口数组
+     */
+    public static Type[] getGenericTypeArguments(Type type) {
+        ParameterizedType pType = toParameterizedType(type);
+        if (pType != null) {
+            return pType.getActualTypeArguments();
+        }
+        return null;
+    }
+
+    /**
+     * 根据下标获取单个泛型参数类型
+     * <p>从一个带泛型的类型中获取其第 index 个泛型参数类型
+     *
+     * @param type {@link Type} 接口实例
+     * @param index 泛型参数类型下标, 表示第几个泛型参数, 从0开始记
+     * @return 泛型参数类型, {@link Type} 接口实例
+     */
+    public static Type getGenericArgument(Type type, int index) {
+        Type[] arguments = getGenericTypeArguments(type);
+        if (arguments != null && arguments.length > index) {
+            return arguments[index];
+        }
+        return null;
+    }
+
+    /**
+     * 获取第一个泛型参数类型
+     * <p>从一个带泛型的类型中获取其第一个泛型参数类型
+     *
+     * @param type {@link Type} 接口实例
+     * @return 泛型参数类型, {@link Type} 接口实例
+     */
+    public static Type getGenericArgument(Type type) {
+        return getGenericArgument(type, 0);
+    }
+
+    /**
      * 是否是Java基本类型
+     *
      * @param type Java类，{@link Class}类实例
      * @return {@code true}：是基本类型，{@code false}：不是基本类型
      */

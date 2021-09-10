@@ -111,7 +111,7 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
             source = readAsString(source);
         }
         T result = null;
-        Class clazz = ReflectUtils.getClassByType(targetType);
+        Class clazz = ReflectUtils.toClass(targetType);
         if (source instanceof CharSequence) {
             String str = source.toString();
             if (String.class.isAssignableFrom(clazz)) {
@@ -179,7 +179,7 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
     }
 
     private boolean canReadAsBinary(Type targetType) {
-        Class type = ReflectUtils.getClassByType(targetType);
+        Class type = ReflectUtils.toClass(targetType);
         if (byte[].class.isAssignableFrom(type)
                 || InputStream.class.isAssignableFrom(type)
                 || File.class.isAssignableFrom(type)) {

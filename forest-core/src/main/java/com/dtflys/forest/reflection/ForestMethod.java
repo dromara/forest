@@ -50,8 +50,6 @@ import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
-import okio.ByteString;
-import org.apache.commons.lang3.ObjectUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
@@ -1292,7 +1290,7 @@ public class ForestMethod<T> implements VariableScope {
         if (type == null) {
             return Void.class;
         }
-        Class clazz = ReflectUtils.getClassByType(type);
+        Class clazz = ReflectUtils.toClass(type);
         if (ForestResponse.class.isAssignableFrom(clazz)) {
             if (type instanceof ParameterizedType) {
                 Type[] types = ((ParameterizedType) type).getActualTypeArguments();

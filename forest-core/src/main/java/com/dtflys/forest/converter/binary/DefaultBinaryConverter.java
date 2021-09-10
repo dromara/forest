@@ -9,7 +9,6 @@ import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import scala.Char;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -109,7 +108,7 @@ public class DefaultBinaryConverter implements ForestConverter<Object> {
 
     @Override
     public <T> T convertToJavaObject(Object source, Type targetType) {
-        Class clazz = ReflectUtils.getClassByType(targetType);
+        Class clazz = ReflectUtils.toClass(targetType);
         return (T) convertToJavaObject(source, clazz);
     }
 
@@ -120,7 +119,7 @@ public class DefaultBinaryConverter implements ForestConverter<Object> {
 
     @Override
     public <T> T convertToJavaObject(byte[] source, Type targetType, Charset charset) {
-        Class clazz = ReflectUtils.getClassByType(targetType);
+        Class clazz = ReflectUtils.toClass(targetType);
         return (T) convertToJavaObject((Object) source, clazz, StandardCharsets.UTF_8);
     }
 
