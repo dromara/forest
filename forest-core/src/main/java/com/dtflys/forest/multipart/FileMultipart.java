@@ -6,7 +6,7 @@ import com.dtflys.forest.utils.StringUtils;
 
 import java.io.*;
 
-public class FileMultipart extends ForestMultipart<File> {
+public class FileMultipart extends ForestMultipart<File, FileMultipart> {
 
     private File file;
 
@@ -20,8 +20,9 @@ public class FileMultipart extends ForestMultipart<File> {
 
 
     @Override
-    public void setData(File data) {
+    public FileMultipart setData(File data) {
         this.file = data;
+        return this;
     }
 
     @Override

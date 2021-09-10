@@ -9,7 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class FilePathMultipart extends ForestMultipart<String> {
+public class FilePathMultipart extends ForestMultipart<String, FilePathMultipart> {
 
     private String filePath;
 
@@ -32,9 +32,10 @@ public class FilePathMultipart extends ForestMultipart<String> {
     }
 
     @Override
-    public void setData(String data) {
+    public FilePathMultipart setData(String data) {
         this.filePath = data;
         this.path = Paths.get(data).normalize();
+        return this;
     }
 
     @Override

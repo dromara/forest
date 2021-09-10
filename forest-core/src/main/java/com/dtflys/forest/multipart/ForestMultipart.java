@@ -19,7 +19,7 @@ import java.io.InputStream;
  * @see FilePathMultipart
  * @see InputStreamMultipart
  */
-public abstract class ForestMultipart<T> {
+public abstract class ForestMultipart<T, SELF extends ForestMultipart<T, SELF>> {
 
     private int BUFFER_SIZE = 4096;
 
@@ -34,23 +34,26 @@ public abstract class ForestMultipart<T> {
         return name;
     }
 
-    public void setName(String name) {
+    public SELF setName(String name) {
         this.name = name;
+        return (SELF) this;
     }
 
-    public void setFileName(String fileName) {
+    public SELF setFileName(String fileName) {
         this.fileName = fileName;
+        return (SELF) this;
     }
 
     public String getContentType() {
         return contentType;
     }
 
-    public void setContentType(String contentType) {
+    public SELF setContentType(String contentType) {
         this.contentType = contentType;
+        return (SELF) this;
     }
 
-    public abstract void setData(T data);
+    public abstract SELF setData(T data);
 
     public abstract String getOriginalFileName();
 

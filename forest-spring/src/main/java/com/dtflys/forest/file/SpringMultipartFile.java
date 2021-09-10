@@ -9,13 +9,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class SpringMultipartFile extends ForestMultipart<MultipartFile> {
+public class SpringMultipartFile extends ForestMultipart<MultipartFile, SpringMultipartFile> {
 
     private MultipartFile multipartFile;
 
     @Override
-    public void setData(MultipartFile data) {
+    public SpringMultipartFile setData(MultipartFile data) {
         this.multipartFile = data;
+        return this;
     }
 
     @Override

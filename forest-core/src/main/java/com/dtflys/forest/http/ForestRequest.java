@@ -40,7 +40,10 @@ import com.dtflys.forest.http.body.StringRequestBody;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.RequestLogMessage;
+import com.dtflys.forest.multipart.ByteArrayMultipart;
+import com.dtflys.forest.multipart.FileMultipart;
 import com.dtflys.forest.multipart.ForestMultipart;
+import com.dtflys.forest.multipart.InputStreamMultipart;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
 import com.dtflys.forest.retryer.Retryer;
@@ -1083,7 +1086,7 @@ public class ForestRequest<T> {
      *
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> contentTypeFormData() {
+    public ForestRequest<T> contentTypeMultipartFormData() {
         return setContentType(ContentType.MULTIPART_FORM_DATA);
     }
 
@@ -1543,6 +1546,7 @@ public class ForestRequest<T> {
 
     /**
      * 添加 Multipart
+     *
      * @param multipart {@link ForestMultipart} 对象
      * @return {@link ForestRequest}类实例
      */
@@ -1553,6 +1557,116 @@ public class ForestRequest<T> {
         this.multiparts.add(multipart);
         return this;
     }
+
+    /**
+     * 添加文件 Multipart
+     *
+     * @param multipart 文件, {@link FileMultipart} 对象
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest<T> addFile(ForestMultipart multipart) {
+        return addMultipart(multipart);
+    }
+
+    /**
+     * 添加文件 Multipart
+     *
+     * @param name Multipart 参数名称
+     * @param file 文件, {@link FileMultipart} 对象
+     * @param filename 文件名
+     * @param contentType 文件内容类型
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest<T> addFile(String name, File file, String filename, String contentType) {
+        return addMultipart(new FileMultipart()
+                .setName(name)
+                .setContentType(contentType)
+                .setData(file)
+                .setFileName(file.getName()));
+    }
+
+    /**
+     * 添加文件 Multipart
+     *
+     * @param name Multipart 参数名称
+     * @param file 文件, {@link FileMultipart} 对象
+     * @param filename 文件名
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest<T> addFile(String name, File file, String filename) {
+        return addFile(name, file, filename, null);
+    }
+
+    /**
+     * 添加文件 Multipart
+     *
+     * @param name Multipart 参数名称
+     * @param file 文件, {@link FileMultipart} 对象
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest<T> addFile(String name, File file) {
+        return addFile(name, file, file.getName(), null);
+    }
+
+    /**
+     * 添加文件 Multipart
+     *
+     * @param name Multipart 参数名称
+     * @param inputStream 文件输入流对象, {@link InputStream} 接口实例
+     * @param filename 文件名
+     * @param contentType 文件内容类型
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest<T> addFile(String name, InputStream inputStream, String filename, String contentType) {
+        return addMultipart(new InputStreamMultipart()
+                .setName(name)
+                .setData(inputStream)
+                .setFileName(filename)
+                .setContentType(contentType));
+    }
+
+    /**
+     * 添加文件 Multipart
+     *
+     * @param name Multipart 参数名称
+     * @param inputStream 文件输入流对象, {@link InputStream} 接口实例
+     * @param filename 文件名
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest<T> addFile(String name, InputStream inputStream, String filename) {
+        return addFile(name, inputStream, filename, null);
+    }
+
+
+    /**
+     * 添加文件 Multipart
+     *
+     * @param name Multipart 参数名称
+     * @param bytes 文件字节数组
+     * @param filename 文件名
+     * @param contentType 文件内容类型
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest<T> addFile(String name, byte[] bytes, String filename, String contentType) {
+        return addFile(new ByteArrayMultipart()
+                .setName(name)
+                .setData(bytes)
+                .setFileName(filename)
+                .setContentType(contentType));
+    }
+
+    /**
+     * 添加文件 Multipart
+     *
+     * @param name Multipart 参数名称
+     * @param bytes 文件字节数组
+     * @param filename 文件名
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest<T> addFile(String name, byte[] bytes, String filename) {
+        return addFile(name, bytes, filename, null);
+    }
+
 
     /**
      * 获取OnSuccess回调函数，该回调函数在请求成功时被调用

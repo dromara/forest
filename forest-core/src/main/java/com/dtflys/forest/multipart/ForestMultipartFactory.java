@@ -85,11 +85,11 @@ public class ForestMultipartFactory<T> {
         return fileNameTemplate.clone();
     }
 
-    public <M extends ForestMultipart<T>> M create(String name, String fileName, T data, String contentType) {
+    public <M extends ForestMultipart<T, ?>> M create(String name, String fileName, T data, String contentType) {
         return create(paramType, name, fileName, data, contentType);
     }
 
-    public <M extends ForestMultipart<T>> M create(Class<T> pType, String name, String fileName, T data, String contentType) {
+    public <M extends ForestMultipart<T, ?>> M create(Class<T> pType, String name, String fileName, T data, String contentType) {
         if (data instanceof ForestMultipart) {
             ForestMultipart multipart = (ForestMultipart) data;
             if (StringUtils.isEmpty(multipart.getName()) && StringUtils.isNotEmpty(name)) {
