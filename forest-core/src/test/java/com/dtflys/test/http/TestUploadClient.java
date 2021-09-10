@@ -90,7 +90,7 @@ public class TestUploadClient extends BaseClientTest {
 
 
     @Test
-    public void testUploadFilePath() throws InterruptedException, FileUploadException {
+    public void testUploadFilePath() throws FileUploadException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         String path = Objects.requireNonNull(this.getClass().getResource("/test-img.jpg")).getPath();
         if (path.startsWith("/") && isWindows()) {

@@ -12,9 +12,11 @@ import okhttp3.mockwebserver.MockWebServer;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.io.File;
 import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -34,6 +36,10 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest() {
         assertThat(Forest.config().request()).isNotNull();
+    }
+
+    private static boolean isWindows() {
+        return System.getProperties().getProperty("os.name").toUpperCase().contains("WINDOWS");
     }
 
     /**
@@ -455,6 +461,27 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertHeaderEquals(ForestHeader.USER_AGENT, "forest")
                 .assertQueryEquals("a", "1")
                 .assertQueryEquals("b", "2");
+    }
+
+    @Test
+    public void testRequest_upload_file() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        TypeReference<Result<Integer>> typeReference = new TypeReference<Result<Integer>>() {};
+        String path = Objects.requireNonNull(this.getClass().getResource("/test-img.jpg")).getPath();
+        if (path.startsWith("/") && isWindows()) {
+            path = path.substring(1);
+        }
+        File file = new File(path);
+        Result<Integer> result = Forest.post("http://localhost:" + server.getPort())
+                .contentTypeMultipartFormData()
+                .addFile("file", file)
+                .execute(typeReference);
+        assertThat(result).isNotNull();
+        assertThat(result.getStatus()).isEqualTo(1);
+        assertThat(result.getData()).isEqualTo(2);
+        mockRequest(server)
+                .assertMethodEquals("POST")
+                .assertPathEquals("/");
     }
 
 }
