@@ -14,18 +14,18 @@ public class ReflectUtilsTest {
 
     @Test
     public void testGetClassByType() {
-        assertThat(ReflectUtils.getClassByType(byte.class)).isNotNull().isEqualTo(byte.class);
-        assertThat(ReflectUtils.getClassByType(int.class)).isNotNull().isEqualTo(int.class);
-        assertThat(ReflectUtils.getClassByType(Object.class)).isNotNull().isEqualTo(Object.class);
+        assertThat(ReflectUtils.toClass(byte.class)).isNotNull().isEqualTo(byte.class);
+        assertThat(ReflectUtils.toClass(int.class)).isNotNull().isEqualTo(int.class);
+        assertThat(ReflectUtils.toClass(Object.class)).isNotNull().isEqualTo(Object.class);
         List<String> list = new ArrayList<>();
-        assertThat(ReflectUtils.getClassByType(list.getClass()))
+        assertThat(ReflectUtils.toClass(list.getClass()))
                 .isNotNull()
                 .isEqualTo(ArrayList.class);
-        assertThat(ReflectUtils.getClassByType(
+        assertThat(ReflectUtils.toClass(
                 new TypeReference<Map<String, String>>() {}.getType()))
                 .isNotNull()
                 .isEqualTo(Map.class);
-        assertThat(ReflectUtils.getClassByType(
+        assertThat(ReflectUtils.toClass(
                 new TypeReference<String>() {}.getType()))
                 .isNotNull()
                 .isEqualTo(String.class);
