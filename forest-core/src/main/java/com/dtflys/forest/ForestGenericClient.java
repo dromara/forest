@@ -7,5 +7,8 @@ import com.dtflys.forest.http.ForestResponse;
 public interface ForestGenericClient {
 
     @Request("http://localhost/")
-    ForestRequest<ForestResponse> request();
+    ForestRequest<?> request();
+
+    @Request("http://localhost/")
+    <T> ForestRequest<T> request(Class<T> clazz);
 }

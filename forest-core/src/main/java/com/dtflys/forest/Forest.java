@@ -33,9 +33,21 @@ public class Forest {
      *
      * @return {@link ForestRequest} 对象
      */
-    public static ForestRequest<ForestResponse> request() {
+    public static ForestRequest<?> request() {
         return config().request();
     }
+
+    /**
+     * 创建通用 {@link ForestRequest} 对象
+     *
+     * @param clazz 返回结果类型
+     * @param <R> 返回结果类型泛型参数
+     * @return {@link ForestRequest} 对象
+     */
+    public static <R> ForestRequest<R> request(Class<R> clazz) {
+        return config().request(clazz);
+    }
+
 
     /**
      * 创建 GET 请求的 {@link ForestRequest} 对象
@@ -44,9 +56,85 @@ public class Forest {
      * @return {@link ForestRequest} 对象
      * @see ForestConfiguration#get(String)
      */
-    public static ForestRequest get(String url) {
+    public static ForestRequest<?> get(String url) {
         return config().get(url);
     }
 
+    /**
+     * 创建 POST 请求的 {@link ForestRequest} 对象
+     *
+     * @param url 请求 URL
+     * @return {@link ForestRequest} 对象
+     * @see ForestConfiguration#get(String)
+     */
+    public static ForestRequest<?> post(String url) {
+        return config().post(url);
+    }
+
+    /**
+     * 创建 PUT 请求的 {@link ForestRequest} 对象
+     *
+     * @param url 请求 URL
+     * @return {@link ForestRequest} 对象
+     * @see ForestConfiguration#get(String)
+     */
+    public static ForestRequest<?> put(String url) {
+        return config().put(url);
+    }
+
+    /**
+     * 创建 DELETE 请求的 {@link ForestRequest} 对象
+     *
+     * @param url 请求 URL
+     * @return {@link ForestRequest} 对象
+     * @see ForestConfiguration#get(String)
+     */
+    public static ForestRequest<?> delete(String url) {
+        return config().delete(url);
+    }
+
+    /**
+     * 创建 HEAD 请求的 {@link ForestRequest} 对象
+     *
+     * @param url 请求 URL
+     * @return {@link ForestRequest} 对象
+     * @see ForestConfiguration#get(String)
+     */
+    public static ForestRequest<?> head(String url) {
+        return config().head(url);
+    }
+
+    /**
+     * 创建 PATCH 请求的 {@link ForestRequest} 对象
+     *
+     * @param url 请求 URL
+     * @return {@link ForestRequest} 对象
+     * @see ForestConfiguration#get(String)
+     */
+    public static ForestRequest<?> patch(String url) {
+        return config().patch(url);
+    }
+
+    /**
+     * 创建 OPTIONS 请求的 {@link ForestRequest} 对象
+     *
+     * @param url 请求 URL
+     * @return {@link ForestRequest} 对象
+     * @see ForestConfiguration#get(String)
+     */
+    public static ForestRequest<?> options(String url) {
+        return config().options(url);
+    }
+
+    /**
+     * 创建 TRACE 请求的 {@link ForestRequest} 对象
+     *
+     * @param url 请求 URL
+     * @return {@link ForestRequest} 对象
+     * @see ForestConfiguration#get(String)
+     */
+    public static ForestRequest<?> trace(String url) {
+        return config().trace(url);
+    }
 
 }

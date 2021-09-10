@@ -39,7 +39,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
     public MethodLifeCycleHandler(Type resultType, Type onSuccessClassGenericType) {
         this.onSuccessClassGenericType = onSuccessClassGenericType;
         this.resultType = resultType;
-        this.resultRawClass = ReflectUtils.getClassByType(resultType);
+        this.resultRawClass = ReflectUtils.toClass(resultType);
     }
 
 
@@ -112,7 +112,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
         request.getInterceptorChain().onSuccess(resultData, request, response);
         OnSuccess onSuccess = request.getOnSuccess();
         if (onSuccess != null) {
-            resultData = RESULT_HANDLER.getResult(request, response, onSuccessClassGenericType, ReflectUtils.getClassByType(onSuccessClassGenericType));
+            resultData = RESULT_HANDLER.getResult(request, response, onSuccessClassGenericType, ReflectUtils.toClass(onSuccessClassGenericType));
             onSuccess.onSuccess(resultData, request, response);
         }
         resultData = response.getResult();

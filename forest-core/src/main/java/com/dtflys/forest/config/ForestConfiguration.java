@@ -43,6 +43,7 @@ import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.filter.JSONFilter;
 import com.dtflys.forest.filter.XmlFilter;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.body.RequestBodyBuilder;
 import com.dtflys.forest.interceptor.DefaultInterceptorFactory;
@@ -1079,12 +1080,22 @@ public class ForestConfiguration implements Serializable {
      *
      * @return {@link ForestRequest} 对象
      */
-    public ForestRequest<ForestResponse> request() {
+    public ForestRequest<?> request() {
         ForestGenericClient client = client(ForestGenericClient.class);
         return client.request();
     }
 
-
+    /**
+     * 创建通用 {@link ForestRequest} 对象
+     *
+     * @param clazz 返回结果类型
+     * @param <R> 返回结果类型泛型参数
+     * @return {@link ForestRequest} 对象
+     */
+    public <R> ForestRequest<R> request(Class<R> clazz) {
+        ForestGenericClient client = client(ForestGenericClient.class);
+        return client.request(clazz);
+    }
 
     /**
      * 创建 GET 请求的 {@link ForestRequest} 对象
@@ -1092,9 +1103,117 @@ public class ForestConfiguration implements Serializable {
      * @param url 请求 URL
      * @return {@link ForestRequest} 对象
      */
-    public ForestRequest<ForestResponse> get(String url) {
-        return request().setUrl(url);
+    public ForestRequest<?> get(String url) {
+        return request()
+                .setType(null)
+                .clearTypeChangeHistory()
+                .setType(ForestRequestType.GET)
+                .setUrl(url);
+
     }
+
+    /**
+     * 创建 POST 请求的 {@link ForestRequest} 对象
+     *
+     * @param url 请求 URL
+     * @return {@link ForestRequest} 对象
+     */
+    public ForestRequest<?> post(String url) {
+        return request()
+                .setType(null)
+                .clearTypeChangeHistory()
+                .setType(ForestRequestType.POST)
+                .setUrl(url);
+    }
+
+    /**
+     * 创建 PUT 请求的 {@link ForestRequest} 对象
+     *
+     * @param url 请求 URL
+     * @return {@link ForestRequest} 对象
+     */
+    public ForestRequest<?> put(String url) {
+        return request()
+                .setType(null)
+                .clearTypeChangeHistory()
+                .setType(ForestRequestType.PUT)
+                .setUrl(url);
+
+    }
+
+    /**
+     * 创建 DELETE 请求的 {@link ForestRequest} 对象
+     *
+     * @param url 请求 URL
+     * @return {@link ForestRequest} 对象
+     */
+    public ForestRequest<?> delete(String url) {
+        return request()
+                .setType(null)
+                .clearTypeChangeHistory()
+                .setType(ForestRequestType.DELETE)
+                .setUrl(url);
+
+    }
+
+    /**
+     * 创建 HEAD 请求的 {@link ForestRequest} 对象
+     *
+     * @param url 请求 URL
+     * @return {@link ForestRequest} 对象
+     */
+    public ForestRequest<?> head(String url) {
+        return request()
+                .setType(null)
+                .clearTypeChangeHistory()
+                .setType(ForestRequestType.HEAD)
+                .setUrl(url);
+
+    }
+
+    /**
+     * 创建 PATCH 请求的 {@link ForestRequest} 对象
+     *
+     * @param url 请求 URL
+     * @return {@link ForestRequest} 对象
+     */
+    public ForestRequest<?> patch(String url) {
+        return request()
+                .setType(null)
+                .clearTypeChangeHistory()
+                .setType(ForestRequestType.PATCH)
+                .setUrl(url);
+    }
+
+    /**
+     * 创建 OPTIONS 请求的 {@link ForestRequest} 对象
+     *
+     * @param url 请求 URL
+     * @return {@link ForestRequest} 对象
+     */
+    public ForestRequest<?> options(String url) {
+        return request()
+                .setType(null)
+                .clearTypeChangeHistory()
+                .setType(ForestRequestType.OPTIONS)
+                .setUrl(url);
+
+    }
+
+    /**
+     * 创建 TRACE 请求的 {@link ForestRequest} 对象
+     *
+     * @param url 请求 URL
+     * @return {@link ForestRequest} 对象
+     */
+    public ForestRequest<?> trace(String url) {
+        return request()
+                .setType(null)
+                .clearTypeChangeHistory()
+                .setType(ForestRequestType.TRACE)
+                .setUrl(url);
+    }
+
 
 
 }
