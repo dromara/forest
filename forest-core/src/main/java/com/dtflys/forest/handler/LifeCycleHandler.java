@@ -34,7 +34,7 @@ public interface LifeCycleHandler {
 
     Object handleError(ForestRequest request, ForestResponse response, Throwable ex);
 
-    void handleTry(ForestRetryException ex, Retryer retryer) throws Throwable;
+    void handleRetry(ForestRetryException ex, Retryer retryer) throws Throwable;
 
     void handleProgress(ForestRequest request, ForestProgress progress);
 

@@ -56,7 +56,7 @@ public class NoneLifeCycleHandler implements LifeCycleHandler {
     }
 
     @Override
-    public void handleTry(ForestRetryException ex, Retryer retryer) throws Throwable {
+    public void handleRetry(ForestRetryException ex, Retryer retryer) throws Throwable {
 
     }
 

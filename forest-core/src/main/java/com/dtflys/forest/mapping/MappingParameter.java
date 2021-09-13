@@ -25,7 +25,7 @@ public class MappingParameter {
     /**
      * 参数类型
      */
-    protected final Class type;
+    protected final Class<?> type;
 
     /**
      * 参数下标
@@ -86,7 +86,7 @@ public class MappingParameter {
         this.type = type;
     }
 
-    public Class getType() {
+    public Class<?> getType() {
         return type;
     }
 

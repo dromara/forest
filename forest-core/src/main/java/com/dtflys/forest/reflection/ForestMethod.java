@@ -71,6 +71,7 @@ public class ForestMethod<T> implements VariableScope {
     private String[] methodNameItems;
     private Class returnClass;
     private Type returnType;
+    private MappingParameter returnTypeParameter;
     private MetaRequest metaRequest;
     private MappingTemplate baseUrlTemplate;
     private MappingTemplate urlTemplate;
@@ -1271,7 +1272,17 @@ public class ForestMethod<T> implements VariableScope {
     }
 
     /**
+     * 设置方法返回值类型
+     *
+     * @param returnType 方法返回值类型，{@link Type}接口实例
+     */
+    public void setReturnType(Type returnType) {
+        this.returnType = returnType;
+    }
+
+    /**
      * 获取方法返回值类型
+     *
      * @return 方法返回值类型，{@link Type}接口实例
      */
     public Type getReturnType() {
@@ -1279,6 +1290,24 @@ public class ForestMethod<T> implements VariableScope {
             returnType = method.getGenericReturnType();
         }
         return returnType;
+    }
+
+    /**
+     * 获取指定方法返回值类型的参数
+     *
+     * @return {@link MappingParameter}实例
+     */
+    public MappingParameter getReturnTypeParameter() {
+        return returnTypeParameter;
+    }
+
+    /**
+     * 设置指定方法返回值类型的参数
+     *
+     * @param returnTypeParameter {@link MappingParameter}实例
+     */
+    public void setReturnTypeParameter(MappingParameter returnTypeParameter) {
+        this.returnTypeParameter = returnTypeParameter;
     }
 
     /**

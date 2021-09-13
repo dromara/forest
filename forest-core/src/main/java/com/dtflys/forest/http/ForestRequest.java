@@ -58,7 +58,6 @@ import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorChain;
 import com.dtflys.forest.utils.ForestDataType;
-import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.TypeReference;
@@ -107,6 +106,7 @@ public class ForestRequest<T> {
      */
     private HttpBackend backend;
 
+
     /**
      * 生命周期处理器
      */
@@ -114,13 +114,9 @@ public class ForestRequest<T> {
 
     /**
      * HTTP协议
+     * <p>默认为 HTTP 1.1
      */
-    private String protocol;
-
-    /**
-     * HTTP版本
-     */
-    private String httpVersion;
+    private ForestProtocol protocol = ForestProtocol.HTTP_1_1;
 
     /**
      * URL路径
@@ -190,6 +186,11 @@ public class ForestRequest<T> {
      * 是否开启解压GZIP响应内容
      */
     private boolean decompressResponseGzipEnabled = false;
+
+    /**
+     * 是否为HTTPS请求
+     */
+    private boolean ssl = false;
 
     /**
      * SSL协议
@@ -360,9 +361,10 @@ public class ForestRequest<T> {
      *
      * @return 请求协议
      */
-    public String getProtocol() {
+    public ForestProtocol getProtocol() {
         return protocol;
     }
+
 
     /**
      * 设置请求协议
@@ -370,30 +372,12 @@ public class ForestRequest<T> {
      * @param protocol 请求协议
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest setProtocol(String protocol) {
+    public ForestRequest<T> setProtocol(ForestProtocol protocol) {
         this.protocol = protocol;
         return this;
     }
 
-    /**
-     * 获取请求HTTP版本
-     *
-     * @return HTTP版本号
-     */
-    public String getHttpVersion() {
-        return httpVersion;
-    }
 
-    /**
-     * 设置请求HTTP版本
-     *
-     * @param httpVersion HTTP版本号
-     * @return {@link ForestRequest}对象实例
-     */
-    public ForestRequest<T> setHttpVersion(String httpVersion) {
-        this.httpVersion = httpVersion;
-        return this;
-    }
 
     /**
      * 获取请求URL
@@ -430,7 +414,7 @@ public class ForestRequest<T> {
         String newUrl = null;
         String srcUrl = StringUtils.trimBegin(url);
         String query = "";
-        String protocol = "";
+        String scheme = "";
         String userInfo = null;
         String ref = null;
 
@@ -467,21 +451,22 @@ public class ForestRequest<T> {
                 }
             }
 
-            protocol = u.getProtocol();
+            scheme = u.getProtocol();
+            ssl = "https".equals(scheme);
             ref = u.getRef();
             if (StringUtils.isNotEmpty(ref)) {
                 ref = URLEncoder.encode(ref, "UTF-8");
             }
             int port = u.getPort();
             StringBuilder urlBuilder = new StringBuilder();
-            urlBuilder.append(protocol).append("://");
+            urlBuilder.append(scheme).append("://");
             if (userInfo != null) {
                 urlBuilder.append(userInfo).append('@');
             }
             urlBuilder.append(u.getHost());
             if (port != 80 && port != 443 && port > -1 ||
-                    port == 80 && !protocol.equals("http") ||
-                    port == 443 && !protocol.equals("https")) {
+                    port == 80 && !scheme.equals("http") ||
+                    port == 443 && !scheme.equals("https")) {
                 urlBuilder.append(':').append(port);
             }
 
@@ -497,9 +482,6 @@ public class ForestRequest<T> {
         }
 
         this.url = newUrl;
-        if (StringUtils.isNotEmpty(protocol)) {
-            this.protocol = protocol;
-        }
         if (StringUtils.isNotEmpty(userInfo)) {
             this.userInfo = userInfo;
         }
@@ -1149,6 +1131,14 @@ public class ForestRequest<T> {
     public ForestRequest<T> setSslProtocol(String sslProtocol) {
         this.sslProtocol = sslProtocol;
         return this;
+    }
+
+    /**
+     * 是否为HTTPS请求
+     * @return {@code true}: 是HTTPS请求，{@code false}: 不是
+     */
+    public boolean isSSL() {
+        return ssl;
     }
 
     /**
