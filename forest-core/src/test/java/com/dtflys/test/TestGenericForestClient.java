@@ -4,11 +4,14 @@ import com.dtflys.forest.Forest;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.http.ForestHeader;
+import com.dtflys.forest.http.ForestProtocol;
 import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.test.http.BaseClientTest;
 import com.dtflys.test.model.Result;
+import okhttp3.Protocol;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import org.assertj.core.util.Lists;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -69,12 +72,25 @@ public class TestGenericForestClient extends BaseClientTest {
     }
 
 
+
     @Test
     public void testRequest_get_return_string() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         String result = Forest.get("http://localhost:" + server.getPort()).execute(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
     }
+
+    @Test
+    public void testRequest_get_http_1_0() {
+        server.setProtocols(Lists.newArrayList(Protocol.HTTP_2));
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String result = Forest
+                .get("http://localhost:" + server.getPort())
+                .setProtocol(ForestProtocol.HTTP_2)
+                .execute(String.class);
+        assertThat(result).isNotNull().isEqualTo(EXPECTED);
+    }
+
 
     @Test
     public void testRequest_get_return_map() {
@@ -483,5 +499,6 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertMethodEquals("POST")
                 .assertPathEquals("/");
     }
+
 
 }
