@@ -8,6 +8,15 @@ package com.dtflys.forest.http;
  */
 public class ForestURL {
 
+    private String originalUrl;
+
+    private String scheme;
+
+    private String domain;
+
+    private int port;
+
+    private String path;
 
 
 }
