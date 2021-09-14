@@ -5,7 +5,7 @@ import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.retryer.Retryer;
+import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.utils.ForestProgress;
 
 import java.lang.reflect.Type;
@@ -21,7 +21,7 @@ public class NoneLifeCycleHandler implements LifeCycleHandler {
     }
 
     @Override
-    public Object handleSyncWithException(ForestRequest request, ForestResponse response, Exception ex) {
+    public Object handleSyncWithException(ForestRequest request, ForestResponse response, Throwable ex) {
         return null;
     }
 
@@ -56,8 +56,7 @@ public class NoneLifeCycleHandler implements LifeCycleHandler {
     }
 
     @Override
-    public void handleRetry(ForestRetryException ex, Retryer retryer) throws Throwable {
-
+    public void handleRetry(ForestRetryException ex, ForestRetryer retryer) {
     }
 
     @Override

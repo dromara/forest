@@ -31,6 +31,8 @@ import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.callback.RetryWhen;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
+import com.dtflys.forest.exceptions.ForestRetryException;
+import com.dtflys.forest.exceptions.ForestReturnTypeException;
 import com.dtflys.forest.http.body.ByteArrayRequestBody;
 import com.dtflys.forest.http.body.FileRequestBody;
 import com.dtflys.forest.http.body.InputStreamRequestBody;
@@ -46,7 +48,7 @@ import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.multipart.InputStreamMultipart;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
-import com.dtflys.forest.retryer.Retryer;
+import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnSuccess;
@@ -299,7 +301,7 @@ public class ForestRequest<T> {
      * 请求重试策略
      * <p>可以通过该字段设定自定义的重试策略
      */
-    private Retryer retryer;
+    private ForestRetryer retryer;
 
     /**
      * 附件
@@ -1958,19 +1960,19 @@ public class ForestRequest<T> {
     /**
      * 获取Forest请求重试器
      *
-     * @return Forest请求重试器，{@link Retryer}接口实例
+     * @return Forest请求重试器，{@link ForestRetryer}接口实例
      */
-    public Retryer getRetryer() {
+    public ForestRetryer getRetryer() {
         return retryer;
     }
 
     /**
      * 设置Forest请求重试器
      *
-     * @param retryer Forest请求重试器，{@link Retryer}接口实例
+     * @param retryer Forest请求重试器，{@link ForestRetryer}接口实例
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> setRetryer(Retryer retryer) {
+    public ForestRequest<T> setRetryer(ForestRetryer retryer) {
         this.retryer = retryer;
         return this;
     }
@@ -2112,6 +2114,36 @@ public class ForestRequest<T> {
             }
         }
         return null;
+    }
+
+
+    private boolean retryWhen(ForestResponse<?> response) {
+        if (this.retryWhen != null) {
+             return this.retryWhen.retryWhen(this, response);
+        }
+        RetryWhen globalRetryWhen = configuration.getRetryWhen();
+        if (globalRetryWhen != null) {
+            return globalRetryWhen.retryWhen(this, response);
+        }
+        return response.isError();
+    }
+
+    public void canRetry(ForestResponse<?> response, ForestRetryException ex) throws Throwable {
+        if (response == null) {
+            throw ex.getCause();
+        }
+        HttpExecutor executor = backend.createExecutor(this, lifeCycleHandler);
+        if (executor != null) {
+            if (!retryWhen(response)) {
+                throw ex.getCause();
+            }
+            try {
+                retryer.canRetry(ex);
+            } catch (Throwable e) {
+                throw e;
+            }
+            interceptorChain.onRetry(this, response);
+        }
     }
 
     /**

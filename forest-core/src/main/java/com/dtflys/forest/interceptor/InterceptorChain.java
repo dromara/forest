@@ -1,5 +1,6 @@
 package com.dtflys.forest.interceptor;
 
+import com.dtflys.forest.callback.RetryWhen;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestRequest;

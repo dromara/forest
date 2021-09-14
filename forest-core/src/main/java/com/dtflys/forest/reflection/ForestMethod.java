@@ -42,7 +42,7 @@ import com.dtflys.forest.mapping.SubVariableScope;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.multipart.ForestMultipartFactory;
 import com.dtflys.forest.proxy.InterfaceProxyHandler;
-import com.dtflys.forest.retryer.Retryer;
+import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.NameUtils;
@@ -652,7 +652,7 @@ public class ForestMethod<T> implements VariableScope {
     private void setRetryerToRequest(Class retryerClass, ForestRequest request) {
         try {
             Constructor constructor = retryerClass.getConstructor(ForestRequest.class);
-            Retryer retryer = (Retryer) constructor.newInstance(request);
+            ForestRetryer retryer = (ForestRetryer) constructor.newInstance(request);
             request.setRetryer(retryer);
         } catch (NoSuchMethodException e) {
             throw new ForestRuntimeException(e);
@@ -1125,11 +1125,11 @@ public class ForestMethod<T> implements VariableScope {
 
         Class globalRetryerClass = configuration.getRetryer();
 
-        if (retryerClass != null && Retryer.class.isAssignableFrom(retryerClass)) {
+        if (retryerClass != null && ForestRetryer.class.isAssignableFrom(retryerClass)) {
             setRetryerToRequest(retryerClass, request);
-        } else if (baseRetryerClass != null && Retryer.class.isAssignableFrom(baseRetryerClass)) {
+        } else if (baseRetryerClass != null && ForestRetryer.class.isAssignableFrom(baseRetryerClass)) {
             setRetryerToRequest(baseRetryerClass, request);
-        } else if (globalRetryerClass != null && Retryer.class.isAssignableFrom(globalRetryerClass)) {
+        } else if (globalRetryerClass != null && ForestRetryer.class.isAssignableFrom(globalRetryerClass)) {
             setRetryerToRequest(globalRetryerClass, request);
         }
 

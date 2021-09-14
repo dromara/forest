@@ -1,7 +1,5 @@
 package com.dtflys.forest.exceptions;
 
-import com.dtflys.forest.backend.AbstractHttpExecutor;
-import com.dtflys.forest.backend.HttpExecutor;
 import com.dtflys.forest.http.ForestRequest;
 
 public class ForestRetryException extends ForestRuntimeException {

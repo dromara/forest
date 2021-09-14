@@ -80,6 +80,7 @@ public class TestGenericForestClient extends BaseClientTest {
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
     }
 
+/*
     @Test
     public void testRequest_get_http_1_0() {
         server.setProtocols(Lists.newArrayList(Protocol.HTTP_2));
@@ -90,6 +91,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .execute(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
     }
+*/
 
 
     @Test

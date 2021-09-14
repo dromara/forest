@@ -28,7 +28,6 @@ import java.util.concurrent.*;
  */
 public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSender {
 
-
     public AsyncHttpclientRequestSender(HttpclientConnectionManager connectionManager, ForestRequest request) {
         super(connectionManager, request);
     }
@@ -50,9 +49,11 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
                             new ForestNetworkException("", response.getStatusCode(), response);
                     ForestRetryException retryException = new ForestRetryException(
                             networkException,  request, request.getRetryCount(), retryCount);
+                    // 如果重试条件满足，触发重试
                     try {
-                        request.getRetryer().canRetry(retryException);
-                    } catch (Throwable throwable) {
+                        request.canRetry(response, retryException);
+                    } catch (Throwable th) {
+                        response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, th, startDate);
                         responseHandler.handleError(response);
                         return;
                     }
@@ -71,8 +72,10 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
                 ForestRetryException retryException = new ForestRetryException(
                         ex,  request, request.getRetryCount(), retryCount);
                 try {
-                    request.getRetryer().canRetry(retryException);
-                } catch (Throwable throwable) {
+                    request.canRetry(response, retryException);
+                } catch (Throwable e) {
+                    response = forestResponseFactory.createResponse(
+                            request, null, lifeCycleHandler, ex, startDate);
                     responseHandler.handleError(response, ex);
                     return;
                 }

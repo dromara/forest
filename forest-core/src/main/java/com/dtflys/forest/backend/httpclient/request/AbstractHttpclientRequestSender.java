@@ -29,7 +29,6 @@ import java.net.URI;
  * @since 2017-07-21 15:53
  */
 public abstract class AbstractHttpclientRequestSender implements HttpclientRequestSender {
-    private static Logger log = LoggerFactory.getLogger(AbstractHttpclientRequestSender.class);
 
     protected final HttpclientConnectionManager connectionManager;
 

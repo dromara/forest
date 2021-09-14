@@ -43,7 +43,7 @@ import com.dtflys.forest.utils.ForestProgress;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-06-26
  */
-public interface Interceptor<T> extends OnSuccess<T>, OnError, OnProgress, OnLoadCookie, OnSaveCookie, RetryWhen, OnRetry {
+public interface Interceptor<T> extends OnSuccess<T>, OnError, OnProgress, OnLoadCookie, OnSaveCookie, OnRetry {
 
 
     /**
@@ -103,26 +103,6 @@ public interface Interceptor<T> extends OnSuccess<T>, OnError, OnProgress, OnLoa
     default void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
     }
 
-    /**
-     * 默认回调函数: 是否触发重试
-     * <p>
-     * 该回调函数每次请求响应后或失败后被调用，其返回值将决定这次请求是否需要重试
-     *
-     * @param request Forest请求对象
-     * @param response Forest响应对象
-     * @return {@code true} 触发重试, 否则不触发重试
-     */
-    @Override
-    default boolean retryWhen(ForestRequest request, ForestResponse response) {
-        // 先检查全局配置中是否已定义默认的 RetryWhen
-        RetryWhen retryWhen = request.getConfiguration().getRetryWhen();
-        if (retryWhen != null) {
-            // 如有有定义全局 RetryWhen，则执行全局的
-            return retryWhen.retryWhen(request, response);
-        }
-        // 否则根据 response.isError 进行判断是否触发重试
-        return response.isError();
-    }
 
     /**
      * 默认回调函数: 在触发请求重试时执行

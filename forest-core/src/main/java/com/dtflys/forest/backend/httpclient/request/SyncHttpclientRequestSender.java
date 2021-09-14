@@ -86,7 +86,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             ForestRetryException retryException = new ForestRetryException(
                     e,  request, request.getRetryCount(), retryCount);
             try {
-                request.getRetryer().canRetry(retryException);
+                request.canRetry(response, retryException);
             } catch (Throwable throwable) {
                 response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, throwable, startDate);
                 lifeCycleHandler.handleSyncWithException(request, response, e);
@@ -109,7 +109,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             ForestRetryException retryException = new ForestRetryException(
                     networkException,  request, request.getRetryCount(), retryCount);
             try {
-                request.getRetryer().canRetry(retryException);
+                request.canRetry(response, retryException);
             } catch (Throwable throwable) {
                 responseHandler.handleSync(httpResponse, response);
                 return;

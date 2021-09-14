@@ -6,11 +6,9 @@ import com.dtflys.forest.http.ForestRequest;
 /**
  * 基于退避算法的重试器
  */
-public class BackOffRetryer implements Retryer {
+public class BackOffRetryer extends ForestRetryer {
 
     protected final ForestRequest request;
-
-    protected final int maxRetryCount;
 
     protected final long maxRetryInterval;
 
@@ -18,15 +16,16 @@ public class BackOffRetryer implements Retryer {
 
 
     public BackOffRetryer(ForestRequest request) {
+        super(request);
         this.request = request;
-        this.maxRetryCount = request.getRetryCount();
         this.maxRetryInterval = request.getMaxRetryInterval();
         this.waitedTime = 0;
     }
 
     @Override
     public void canRetry(ForestRetryException ex) throws Throwable {
-        int currentCount = ex.getCurrentRetryCount();
+        int currentCount = getAndIncrementCurrentRetryCount();
+        int maxRetryCount = getMaxRetryCount();
         if (currentCount >= maxRetryCount) {
             if (currentCount == 0) {
                 throw ex.getCause();
@@ -56,13 +55,6 @@ public class BackOffRetryer implements Retryer {
         return interval;
     }
 
-    public ForestRequest getRequest() {
-        return request;
-    }
-
-    public int getMaxRetryCount() {
-        return maxRetryCount;
-    }
 
     public long getMaxRetryInterval() {
         return maxRetryInterval;
