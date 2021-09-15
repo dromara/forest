@@ -4,6 +4,24 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 
+/**
+ * Forest 快捷接口
+ *
+ * <p>该类提供 Forest 常用的基本接口方法, 列如:
+ * <pre>
+ *     // 获取 Forest GET请求
+ *     Forest.get("http://localhost:8080")
+ *
+ *     // 获取 Forest POST请求
+ *     Forest.post("http://localhost:8080")
+ *
+ *     // 创建或获取全局默认配置，即 ForestConfiguration 对象
+ *     Forest.config();
+ * </pre>
+ *
+ * @author gongjun [dt_flys@hotmail.com]
+ * @since 1.5.2
+ */
 public class Forest {
 
     private volatile static ForestConfiguration DEFAULT_CONFIG;
