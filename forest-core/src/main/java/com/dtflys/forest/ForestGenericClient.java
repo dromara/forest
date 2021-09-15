@@ -6,6 +6,9 @@ import com.dtflys.forest.http.ForestResponse;
 
 /**
  * Forest 通用客户端接口
+ *
+ * @author gongjun [dt_flys@hotmail.com]
+ * @since 1.5.2
  */
 public interface ForestGenericClient {
 
