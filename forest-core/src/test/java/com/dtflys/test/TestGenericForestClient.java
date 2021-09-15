@@ -4,14 +4,12 @@ import com.dtflys.forest.Forest;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.http.ForestHeader;
-import com.dtflys.forest.http.ForestProtocol;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.test.http.BaseClientTest;
 import com.dtflys.test.model.Result;
-import okhttp3.Protocol;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import org.assertj.core.util.Lists;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -20,6 +18,8 @@ import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -502,5 +502,112 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertPathEquals("/");
     }
 
+    @Test
+    public void testRequest_sync_retryWhen_success() {
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
+        ForestRequest<?> request = Forest.get("http://localhost:" + server.getPort())
+                .setRetryCount(3)
+                .setRetryWhen(((req, res) -> res.getStatusCode() == 203));
+        request.execute();
+        assertThat(request.getCurrentRetryCount()).isEqualTo(3);
+    }
+
+    @Test
+    public void testRequest_async_retryWhen_success() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
+        CountDownLatch latch = new CountDownLatch(1);
+        AtomicBoolean isSuccess = new AtomicBoolean(false);
+        ForestRequest<?> request = Forest.get("http://localhost:" + server.getPort())
+                .setAsync(true)
+                .setRetryCount(3)
+                .setRetryWhen(((req, res) -> res.getStatusCode() == 203))
+                .setOnSuccess(((data, req, res) -> {
+                    isSuccess.set(true);
+                    latch.countDown();
+                }));
+        request.execute();
+        latch.await();
+        assertThat(request.getCurrentRetryCount()).isEqualTo(3);
+        assertThat(isSuccess.get()).isTrue();
+    }
+
+    @Test
+    public void testRequest_sync_retryWhen_error_not_retry() {
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(400));
+        AtomicBoolean isError = new AtomicBoolean(false);
+        ForestRequest<?> request = Forest.get("http://localhost:" + server.getPort())
+                .setRetryCount(3)
+                .setRetryWhen(((req, res) -> res.getStatusCode() == 200))
+                .setOnError(((ex, req, res) -> {
+                    isError.set(true);
+                }));
+        request.execute();
+        assertThat(isError.get()).isTrue();
+        assertThat(request.getCurrentRetryCount()).isEqualTo(0);
+    }
+
+
+    @Test
+    public void testRequest_sync_error_retry() {
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(400));
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(400));
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(400));
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(400));
+        AtomicBoolean isError = new AtomicBoolean(false);
+        ForestRequest<?> request = Forest.get("http://localhost:" + server.getPort())
+                .setRetryCount(3)
+                .setOnError(((ex, req, res) -> {
+                    isError.set(true);
+                }));
+        request.execute();
+        assertThat(isError.get()).isTrue();
+        assertThat(request.getCurrentRetryCount()).isEqualTo(3);
+    }
+
+
+    @Test
+    public void testRequest_async_retryWhen_error_not_retry() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(400));
+        CountDownLatch latch = new CountDownLatch(1);
+        AtomicBoolean isError = new AtomicBoolean(false);
+        ForestRequest<?> request = Forest.get("http://localhost:" + server.getPort())
+                .setRetryCount(3)
+                .setRetryWhen(((req, res) -> res.getStatusCode() == 200))
+                .setOnError(((ex, req, res) -> {
+                    isError.set(true);
+                    latch.countDown();
+                }));
+        request.execute();
+        latch.await();
+        assertThat(isError.get()).isTrue();
+        assertThat(request.getCurrentRetryCount()).isEqualTo(0);
+    }
+
+
+    @Test
+    public void testRequest_async_error_retry() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(400));
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(400));
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(400));
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(400));
+        CountDownLatch latch = new CountDownLatch(1);
+        AtomicBoolean isError = new AtomicBoolean(false);
+        ForestRequest<?> request = Forest.get("http://localhost:" + server.getPort())
+                .setRetryCount(3)
+                .setOnError(((ex, req, res) -> {
+                    isError.set(true);
+                    latch.countDown();
+                }));
+        request.execute();
+        latch.await();
+        assertThat(isError.get()).isTrue();
+        assertThat(request.getCurrentRetryCount()).isEqualTo(3);
+    }
 
 }

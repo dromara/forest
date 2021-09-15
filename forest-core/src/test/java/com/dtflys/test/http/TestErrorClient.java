@@ -130,6 +130,7 @@ public class TestErrorClient extends BaseClientTest {
         assertThat(retryer.getMaxRetryCount()).isEqualTo(3);
         assertThat(retryer.getMaxRetryInterval()).isEqualTo(2000);
         assertThat(retryer.getWaitedTime()).isEqualTo(1000 + 2000 + 2000);
+        assertThat(retryer.getCurrentRetryCount()).isEqualTo(3);
     }
 
     @Test
