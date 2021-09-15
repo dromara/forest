@@ -2,7 +2,6 @@ package com.dtflys.forest;
 
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.http.ForestResponse;
 
 /**
  * Forest 快捷接口
