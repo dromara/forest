@@ -83,6 +83,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, null, startDate);
         } catch (IOException e) {
             httpRequest.abort();
+            response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, e, startDate);
             ForestRetryException retryException = new ForestRetryException(
                     e,  request, request.getRetryCount(), retryCount);
             try {
@@ -103,6 +104,15 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             }
             logResponse(response);
         }
+
+        // 检查是否重试
+        ForestRetryException retryEx = request.canRetry(response);
+        if (retryEx != null && !retryEx.isMaxRetryCountReached()) {
+            sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, cookieStore, startDate, retryCount + 1);
+            return;
+        }
+
+        // 检查响应是否失败
         if (response.isError()) {
             ForestNetworkException networkException =
                     new ForestNetworkException("", response.getStatusCode(), response);
@@ -117,6 +127,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, cookieStore, startDate, retryCount + 1);
             return;
         }
+
 
         try {
             lifeCycleHandler.handleSaveCookie(request, getCookiesFromHttpCookieStore(cookieStore));
