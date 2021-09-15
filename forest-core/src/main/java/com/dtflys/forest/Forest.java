@@ -26,6 +26,11 @@ public class Forest {
 
     private volatile static ForestConfiguration DEFAULT_CONFIG;
 
+    /**
+     * 创建或获取全局默认配置，即 {@link ForestConfiguration} 对象
+     *
+     * @return {@link ForestConfiguration} 对象
+     */
     public static ForestConfiguration config() {
         if (DEFAULT_CONFIG == null) {
             synchronized (Forest.class) {
