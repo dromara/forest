@@ -32,7 +32,6 @@ import com.dtflys.forest.callback.RetryWhen;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRetryException;
-import com.dtflys.forest.exceptions.ForestReturnTypeException;
 import com.dtflys.forest.http.body.ByteArrayRequestBody;
 import com.dtflys.forest.http.body.FileRequestBody;
 import com.dtflys.forest.http.body.InputStreamRequestBody;
@@ -68,6 +67,8 @@ import com.dtflys.forest.utils.URLUtils;
 import java.io.File;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -203,7 +204,7 @@ public class ForestRequest<T> {
     /**
      * 请求失败后的重试次数
      */
-    private int retryCount = 0;
+    private int maxRetryCount = 0;
 
     /**
      * 最大请重试的时间间隔，时间单位为毫秒
@@ -302,6 +303,12 @@ public class ForestRequest<T> {
      * <p>可以通过该字段设定自定义的重试策略
      */
     private ForestRetryer retryer;
+
+    /**
+     * 是否开启请求重试
+     * <p>{@code true}为开启重试, {@code false}为关闭重试
+     */
+    private boolean retryEnabled = true;
 
     /**
      * 附件
@@ -1149,7 +1156,7 @@ public class ForestRequest<T> {
      * @return 重试次数
      */
     public int getRetryCount() {
-        return retryCount;
+        return maxRetryCount;
     }
 
     /**
@@ -1159,9 +1166,19 @@ public class ForestRequest<T> {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> setRetryCount(int retryCount) {
-        this.retryCount = retryCount;
+        this.maxRetryCount = retryCount;
         return this;
     }
+
+    /**
+     * 获取请求当前重试次数
+     *
+     * @return 当前重试次数
+     */
+    public int getCurrentRetryCount() {
+        return retryer.getCurrentRetryCount();
+    }
+
 
     /**
      * 获取最大请重试的时间间隔，时间单位为毫秒
@@ -1170,6 +1187,26 @@ public class ForestRequest<T> {
      */
     public long getMaxRetryInterval() {
         return maxRetryInterval;
+    }
+
+    /**
+     * 是否开启请求重试
+     *
+     * @return {@code true}为开启重试, {@code false}为关闭重试
+     */
+    public boolean isRetryEnabled() {
+        return retryEnabled;
+    }
+
+    /**
+     * 设置是否开启请求重试
+     *
+     * @param retryEnabled {@code true}为开启重试, {@code false}为关闭重试
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest<T> setRetryEnabled(boolean retryEnabled) {
+        this.retryEnabled = retryEnabled;
+        return this;
     }
 
     /**
@@ -1721,6 +1758,29 @@ public class ForestRequest<T> {
     }
 
     /**
+     * 设置RetryWhen回调函数, 回调函数为请求重试的触发条件
+     * <p>输入参数为 {@link RetryWhen} 实现类的 {@link Class} 对象
+     * <p>方法会自动将其实例化，并设置为请求触发条件
+     *
+     * @param conditionClass  {@link RetryWhen} 实现类的 {@link Class} 对象
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest<T> setRetryWhen(Class<? extends RetryWhen> conditionClass) {
+        if (conditionClass != null) {
+            try {
+                RetryWhen condition = conditionClass.newInstance();
+                setRetryWhen(condition);
+            } catch (InstantiationException e) {
+                throw new ForestRuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new ForestRuntimeException(e);
+            }
+        }
+        return this;
+    }
+
+
+    /**
      * 该请求是否下载文件
      *
      * @return {@code true}: 下载文件，{@code false}: 不下载文件
@@ -1978,6 +2038,30 @@ public class ForestRequest<T> {
     }
 
     /**
+     * 设置Forest请求重试器
+     * <p>输入参数为 {@link ForestRetryer} 的子类 {@link Class} 对象
+     * <p>方法会自动将其实例化并设置为请求的重试器
+     *
+     * @param retryerClass {@link ForestRetryer} 的子类 {@link Class} 对象
+     */
+    public void setRetryer(Class<? extends ForestRetryer> retryerClass) {
+        try {
+            Constructor constructor = retryerClass.getConstructor(ForestRequest.class);
+            ForestRetryer retryer = (ForestRetryer) constructor.newInstance(this);
+            this.setRetryer(retryer);
+        } catch (NoSuchMethodException e) {
+            throw new ForestRuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new ForestRuntimeException(e);
+        } catch (InstantiationException e) {
+            throw new ForestRuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new ForestRuntimeException(e);
+        }
+    }
+
+
+    /**
      * 添加附件到请求中
      * <p>Attachment 是和请求绑定的附件属性值，这些值不能通过网络请求传递到远端服务器。</p>
      * <p>不同请求的附件相互独立，即使名称相同，也互不影响。</p>
@@ -2117,7 +2201,7 @@ public class ForestRequest<T> {
     }
 
 
-    private boolean retryWhen(ForestResponse<?> response) {
+    private boolean setRetryWhen(ForestResponse<?> response) {
         if (this.retryWhen != null) {
              return this.retryWhen.retryWhen(this, response);
         }
@@ -2128,13 +2212,30 @@ public class ForestRequest<T> {
         return response.isError();
     }
 
-    public void canRetry(ForestResponse<?> response, ForestRetryException ex) throws Throwable {
-        if (response == null) {
+
+    public ForestRetryException canRetry(ForestResponse<?> response) {
+        try {
+            return canRetry(response, null);
+        } catch (ForestRetryException rex) {
+            return rex;
+        } catch (Throwable ex) {
+            if (ex instanceof ForestRuntimeException) {
+                throw (ForestRuntimeException) ex;
+            }
+        }
+        return null;
+    }
+
+    public ForestRetryException canRetry(ForestResponse<?> response, ForestRetryException ex) throws Throwable {
+        if (ex == null) {
+            ex = new ForestRetryException(this, maxRetryCount, getCurrentRetryCount());
+        }
+        if (response == null || !retryEnabled) {
             throw ex.getCause();
         }
         HttpExecutor executor = backend.createExecutor(this, lifeCycleHandler);
         if (executor != null) {
-            if (!retryWhen(response)) {
+            if (!setRetryWhen(response)) {
                 throw ex.getCause();
             }
             try {
@@ -2143,7 +2244,9 @@ public class ForestRequest<T> {
                 throw e;
             }
             interceptorChain.onRetry(this, response);
+            return ex;
         }
+        return null;
     }
 
     /**

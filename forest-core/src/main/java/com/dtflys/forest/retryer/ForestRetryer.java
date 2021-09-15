@@ -1,15 +1,14 @@
 package com.dtflys.forest.retryer;
 
-import com.dtflys.forest.backend.HttpExecutor;
 import com.dtflys.forest.exceptions.ForestRetryException;
-import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.http.ForestResponse;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Forest请求重试器
+ *
+ * @author gongjun [dt_flys@hotmail.com]
  */
 public abstract class ForestRetryer {
 
@@ -29,6 +28,10 @@ public abstract class ForestRetryer {
         return request.getRetryCount();
     }
 
+    public long getMaxRetryInterval() {
+        return request.getMaxRetryInterval();
+    }
+
     public int getCurrentRetryCount() {
         return currentRetryCount.get();
     }
@@ -36,9 +39,6 @@ public abstract class ForestRetryer {
     public int getAndIncrementCurrentRetryCount() {
         return currentRetryCount.getAndIncrement();
     }
-
-
-
 
     public abstract void canRetry(ForestRetryException ex) throws Throwable;
 

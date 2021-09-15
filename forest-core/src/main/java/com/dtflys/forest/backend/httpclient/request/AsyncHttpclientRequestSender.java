@@ -44,6 +44,15 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
             @Override
             public void completed(final HttpResponse httpResponse) {
                 ForestResponse response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, null, startDate);
+
+                // 是否重试
+                ForestRetryException retryEx = request.canRetry(response);
+                if (retryEx != null && !retryEx.isMaxRetryCountReached()) {
+                    sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, cookieStore, startDate, retryCount + 1);
+                    return;
+                }
+
+                // 验证响应
                 if (response.isError()) {
                     ForestNetworkException networkException =
                             new ForestNetworkException("", response.getStatusCode(), response);
@@ -60,6 +69,7 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
                     sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, cookieStore, startDate, retryCount + 1);
                     return;
                 }
+
                 ForestCookies cookies = getCookiesFromHttpCookieStore(cookieStore);
                 lifeCycleHandler.handleSaveCookie(request, cookies);
                 responseHandler.handleSuccess(response);

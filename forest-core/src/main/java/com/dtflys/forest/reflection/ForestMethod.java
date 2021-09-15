@@ -644,26 +644,6 @@ public class ForestMethod<T> implements VariableScope {
         }
     }
 
-    /**
-     * 给请求设置重试策略
-     * @param retryerClass 重试策略类型
-     * @param request Forest请求对象，{@link ForestRequest}类实例
-     */
-    private void setRetryerToRequest(Class retryerClass, ForestRequest request) {
-        try {
-            Constructor constructor = retryerClass.getConstructor(ForestRequest.class);
-            ForestRetryer retryer = (ForestRetryer) constructor.newInstance(request);
-            request.setRetryer(retryer);
-        } catch (NoSuchMethodException e) {
-            throw new ForestRuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new ForestRuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new ForestRuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new ForestRuntimeException(e);
-        }
-    }
 
     /**
      * 获得最终的请求类型
@@ -1126,11 +1106,11 @@ public class ForestMethod<T> implements VariableScope {
         Class globalRetryerClass = configuration.getRetryer();
 
         if (retryerClass != null && ForestRetryer.class.isAssignableFrom(retryerClass)) {
-            setRetryerToRequest(retryerClass, request);
+            request.setRetryer(retryerClass);
         } else if (baseRetryerClass != null && ForestRetryer.class.isAssignableFrom(baseRetryerClass)) {
-            setRetryerToRequest(baseRetryerClass, request);
+            request.setRetryer(baseRetryerClass);
         } else if (globalRetryerClass != null && ForestRetryer.class.isAssignableFrom(globalRetryerClass)) {
-            setRetryerToRequest(globalRetryerClass, request);
+            request.setRetryer(globalRetryerClass);
         }
 
         if (onSuccessParameter != null) {
@@ -1231,11 +1211,25 @@ public class ForestMethod<T> implements VariableScope {
                 } else {
                     rType = String.class;
                 }
+                if (rType instanceof WildcardType) {
+                    WildcardType wildcardType = (WildcardType) rType;
+                    Type[] bounds = wildcardType.getUpperBounds();
+                    if (bounds.length > 0) {
+                        rType = bounds[0];
+                    } else {
+                        rType = String.class;
+                    }
+                }
+                Type successType = rType;
+                if (onSuccessClassGenericType != null) {
+                    successType = onSuccessClassGenericType;
+                }
                 lifeCycleHandler = new MethodLifeCycleHandler<>(
-                        rType, onSuccessClassGenericType);
+                        rType, successType);
                 request.setLifeCycleHandler(lifeCycleHandler);
                 lifeCycleHandler.handleInvokeMethod(request, this, args);
             }
+            lifeCycleHandler.handleInvokeMethod(request, this, args);
             return request;
         }
         lifeCycleHandler = new MethodLifeCycleHandler<>(

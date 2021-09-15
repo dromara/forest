@@ -213,15 +213,20 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
                 }
 
                 @Override
-                public void onResponse(Call call, Response okResponse) throws IOException {
+                public void onResponse(Call call, Response okResponse) {
                     ForestResponse response = factory.createResponse(request, okResponse, lifeCycleHandler, null, startDate);
                     logResponse(response);
+
+                    ForestRetryException retryEx = request.canRetry(response);
+                    if (retryEx != null && !retryEx.isMaxRetryCountReached()) {
+                        execute(lifeCycleHandler, retryCount + 1);
+                        return;
+                    }
                     Object result = null;
                     if (response.isSuccess()) {
                         if (request.getOnSuccess() != null) {
                             result = okHttp3ResponseHandler.handleSuccess(response);
-                        }
-                        else {
+                        } else {
                             result = okHttp3ResponseHandler.handleSync(okResponse, response);
                         }
                         future.completed(result);
@@ -259,7 +264,14 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
                 }
                 logResponse(response);
             }
+            // 是否重试
+            ForestRetryException retryEx = request.canRetry(response);
+            if (retryEx != null && !retryEx.isMaxRetryCountReached()) {
+                execute(lifeCycleHandler, retryCount + 1);
+                return;
+            }
 
+            // 验证响应
             if (response.isError()) {
                 retryOrDoError(response, okResponse, null, lifeCycleHandler, retryCount, startTime);
                 return;

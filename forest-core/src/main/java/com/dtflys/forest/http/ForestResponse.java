@@ -348,7 +348,7 @@ public abstract class ForestResponse<T> {
      * @return {@code true}: 成功， {@code false}: 失败
      */
     public boolean isSuccess() {
-        return getException() == null && (status_1xx() || status_2xx() || status_3xx());
+        return exception == null && (status_1xx() || status_2xx() || status_3xx());
     }
 
     /**
