@@ -2,6 +2,7 @@ package com.dtflys.forest.lifecycles.method;
 
 import com.dtflys.forest.annotation.Retry;
 import com.dtflys.forest.callback.RetryWhen;
+import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.mapping.MappingTemplate;
@@ -17,12 +18,24 @@ public class RetryLifeCycle implements MethodAnnotationLifeCycle<Retry, Object> 
 
     @Override
     public void onMethodInitialized(ForestMethod method, Retry annotation) {
+        Class<? extends RetryWhen> conditionClass = annotation.condition();
+        if (conditionClass != null && !RetryWhen.class.equals(conditionClass)) {
+            try {
+                RetryWhen retryWhen = conditionClass.newInstance();
+                method.setExtensionParameterValue("retryWhen", retryWhen);
+            } catch (InstantiationException e) {
+                throw new ForestRuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new ForestRuntimeException(e);
+            }
+        }
         method.setExtensionParameterValue("retryAnnotation", annotation);
     }
 
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
         Retry annotation = (Retry) request.getMethod().getExtensionParameterValue("retryAnnotation");
+        Object retryWhen = request.getMethod().getExtensionParameterValue("retryWhen");
         String maxRetryCountStr = annotation.maxRetryCount();
         String maxRetryIntervalStr = annotation.maxRetryInterval();
         if (StringUtils.isNotBlank(maxRetryCountStr)) {
@@ -41,10 +54,8 @@ public class RetryLifeCycle implements MethodAnnotationLifeCycle<Retry, Object> 
             } catch (Throwable ignored) {
             }
         }
-
-        Class conditionClass = annotation.condition();
-        if (conditionClass != null && !RetryWhen.class.equals(conditionClass)) {
-            request.retryWhen(conditionClass);
+        if (retryWhen != null) {
+            request.retryWhen((RetryWhen) retryWhen);
         }
     }
 
