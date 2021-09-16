@@ -16,6 +16,7 @@ import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MetaRequest;
+import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
 
@@ -128,25 +129,69 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         }
     }
 
+    /**
+     * 调用 Forest 动态代理接口对象的方法
+     *
+     * @param proxy 动态代理对象
+     * @param method 所要调用的方法 {@link Method}对象
+     * @param args 所要调用方法的入参数组
+     * @return 方法调用返回结果
+     * @throws Throwable 方法调用过程中可能抛出的异常
+     */
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         String methodName = method.getName();
         if (method.isDefault()) {
           return invokeDefaultMethod(proxy, method, args);
         }
-        if ("toString".equals(methodName) && (args == null || args.length == 0)) {
-            return "{Forest Proxy Object of " + interfaceClass.getName() + "}";
-        }
-        if ("equals".equals(methodName) && (args != null && args.length == 1)) {
-            Object obj = args[0];
-            if (Proxy.isProxyClass(obj.getClass())) {
-                InvocationHandler h1 = Proxy.getInvocationHandler(proxy);
-                InvocationHandler h2 = Proxy.getInvocationHandler(obj);
-                return h1.equals(h2);
-            }
-            return false;
-        }
         ForestMethod forestMethod = forestMethodMap.get(method);
+        if (forestMethod == null) {
+            if (args == null || args.length == 0) {
+                if ("toString".equals(methodName)) {
+                    return "{Forest Proxy Object of " + interfaceClass.getName() + "}";
+                }
+                if ("getClass".equals(methodName)) {
+                    return proxy.getClass();
+                }
+                if ("hashCode".equals(methodName)) {
+                    return proxy.hashCode();
+                }
+                if ("notify".equals(methodName)) {
+                    proxy.notify();
+                    return null;
+                }
+                if ("notifyAll".equals(methodName)) {
+                    proxy.notifyAll();
+                    return null;
+                }
+                if ("wait".equals(methodName)) {
+                    proxy.wait();
+                    return null;
+                }
+            }
+            if (args != null && args.length == 1) {
+                if ("equals".equals(methodName)) {
+                    Object obj = args[0];
+                    if (Proxy.isProxyClass(obj.getClass())) {
+                        InvocationHandler h1 = Proxy.getInvocationHandler(proxy);
+                        InvocationHandler h2 = Proxy.getInvocationHandler(obj);
+                        return h1.equals(h2);
+                    }
+                    return false;
+                }
+                if ("wait".equals(methodName) && args[0] instanceof Long) {
+                    proxy.wait((Long) args[0]);
+                }
+            }
+            if (args != null && args.length == 2 &&
+                    args[0] instanceof Long &&
+                    args[1] instanceof Integer) {
+                if ("wait".equals(methodName)) {
+                    proxy.wait((Long) args[0], (Integer) args[1]);
+                }
+            }
+            throw new NoSuchMethodError(method.getName());
+        }
         return forestMethod.invoke(args);
     }
 
