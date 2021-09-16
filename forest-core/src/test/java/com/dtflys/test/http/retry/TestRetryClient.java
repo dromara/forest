@@ -53,6 +53,7 @@ public class TestRetryClient extends BaseClientTest {
         String ret = request.execute(String.class);
         assertThat(ret).isNotNull().isEqualTo(EXPECTED);
         assertThat(request.getCurrentRetryCount()).isEqualTo(3);
+        assertThat(request.getAttachment("retry-interceptor")).isNotNull().isEqualTo(3);
     }
 
     @Test
@@ -65,6 +66,7 @@ public class TestRetryClient extends BaseClientTest {
         String ret = retryClient.testRetry(3, 10, ((data, req, res) -> {
             count.incrementAndGet();
             assertThat(req.getCurrentRetryCount()).isEqualTo(3);
+            assertThat(req.getAttachment("retry-interceptor")).isNotNull().isEqualTo(3);
         }));
         assertThat(ret).isNotNull().isEqualTo(EXPECTED);
         assertThat(count.get()).isEqualTo(1);

@@ -72,6 +72,15 @@ public class TestGenericForestClient extends BaseClientTest {
     }
 
 
+    @Test
+    public void testRequest_host_port() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String result = Forest.get("http://xxxxx:444")
+                .host("localhost")
+                .port(server.getPort())
+                .execute(String.class);
+        assertThat(result).isNotNull().isEqualTo(EXPECTED);
+    }
 
     @Test
     public void testRequest_get_return_string() {
