@@ -56,10 +56,6 @@ public class NoneLifeCycleHandler implements LifeCycleHandler {
     }
 
     @Override
-    public void handleRetry(ForestRetryException ex, ForestRetryer retryer) {
-    }
-
-    @Override
     public void handleProgress(ForestRequest request, ForestProgress progress) {
 
     }

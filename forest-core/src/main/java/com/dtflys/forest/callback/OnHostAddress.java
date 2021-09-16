@@ -24,23 +24,23 @@
 
 package com.dtflys.forest.callback;
 
-import com.dtflys.forest.http.ForestCookies;
-import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestHostAddress;
 
 /**
- * 回调函数: 加载Cookie时调用
+ * 回调函数: 在创建请求 URL 地址时被调用
+ * <p>用于动态构建请求 URL 的主机地址部分
  *
- * @author gongjun[dt_flys@hotmail.com]
- * @since 1.5.0-RC1
+ * @author gongjun [dt_flys@hotmail.com]
+ * @since 1.5.2
  */
-public interface OnLoadCookie {
+public interface OnHostAddress {
 
     /**
-     * 在发送请求加载Cookie时调用该方法
+     * 回调函数: 在创建请求 URL 地址时被调用
+     * <p>用于动态构建请求 URL 的主机地址部分
      *
-     * @param request Forest请求对象
-     * @param cookies Cookie集合, 需要通过请求发送的Cookie都添加到该集合
+     * @return 注解地址信息, {@link ForestHostAddress}对象实例
      */
-    void onLoadCookie(ForestRequest request, ForestCookies cookies);
+    ForestHostAddress onHostAddress();
 
 }

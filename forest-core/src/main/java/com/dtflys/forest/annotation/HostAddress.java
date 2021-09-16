@@ -22,25 +22,38 @@
  * SOFTWARE.
  */
 
-package com.dtflys.forest.callback;
+package com.dtflys.forest.annotation;
 
-import com.dtflys.forest.http.ForestCookies;
-import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.lifecycles.method.RetryLifeCycle;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * 回调函数: 加载Cookie时调用
+ * 主机地址注解
  *
- * @author gongjun[dt_flys@hotmail.com]
- * @since 1.5.0-RC1
+ * @author gongjun [dt_flys@hotmail.com]
+ * @since 1.5.2
  */
-public interface OnLoadCookie {
+@Documented
+@MethodLifeCycle(RetryLifeCycle.class)
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD, ElementType.TYPE})
+public @interface HostAddress {
 
     /**
-     * 在发送请求加载Cookie时调用该方法
-     *
-     * @param request Forest请求对象
-     * @param cookies Cookie集合, 需要通过请求发送的Cookie都添加到该集合
+     * 主机地址(主机名/ip地址)
      */
-    void onLoadCookie(ForestRequest request, ForestCookies cookies);
+    String host() default "";
+
+    /**
+     * 主机端口号
+     */
+    int port() default -1;
+
+
 
 }

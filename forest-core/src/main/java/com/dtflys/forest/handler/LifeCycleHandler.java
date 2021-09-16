@@ -34,8 +34,6 @@ public interface LifeCycleHandler {
 
     Object handleError(ForestRequest request, ForestResponse response, Throwable ex);
 
-    void handleRetry(ForestRetryException ex, ForestRetryer retryer);
-
     void handleProgress(ForestRequest request, ForestProgress progress);
 
     void handleLoadCookie(ForestRequest request, ForestCookies cookies);

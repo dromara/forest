@@ -67,6 +67,15 @@ public class InterceptorChain implements Interceptor {
     }
 
     @Override
+    public void onRetry(ForestRequest request, ForestResponse response) {
+        Iterator<Interceptor> iter = interceptors.iterator();
+        for ( ; iter.hasNext(); ) {
+            Interceptor item = iter.next();
+            item.onRetry(request, response);
+        }
+    }
+
+    @Override
     public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
         Iterator<Interceptor> iter = interceptors.iterator();
         for ( ; iter.hasNext(); ) {

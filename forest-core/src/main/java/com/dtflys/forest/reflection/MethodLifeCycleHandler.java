@@ -153,10 +153,6 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
     }
 
     @Override
-    public void handleRetry(ForestRetryException ex, ForestRetryer retryer) {
-    }
-
-    @Override
     public void handleProgress(ForestRequest request, ForestProgress progress) {
         request.getInterceptorChain().onProgress(progress);
         OnProgress onProgress = request.getOnProgress();
