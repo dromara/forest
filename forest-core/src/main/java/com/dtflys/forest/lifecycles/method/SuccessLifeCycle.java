@@ -1,6 +1,7 @@
 package com.dtflys.forest.lifecycles.method;
 
 import com.dtflys.forest.annotation.Success;
+import com.dtflys.forest.callback.SuccessWhen;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.reflection.ForestMethod;
@@ -20,6 +21,10 @@ public class SuccessLifeCycle implements MethodAnnotationLifeCycle<Success, Obje
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
         Success annotation = (Success) request.getMethod().getExtensionParameterValue("successAnnotation");
+        Class<? extends SuccessWhen> conditionClass = annotation.condition();
+        if (conditionClass != null && !SuccessWhen.class.equals(conditionClass)) {
+            request.successWhen(conditionClass);
+        }
     }
 
 

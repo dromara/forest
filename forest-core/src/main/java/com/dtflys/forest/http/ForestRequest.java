@@ -2105,6 +2105,32 @@ public class ForestRequest<T> {
      * 设置SuccessWhen回调函数，该回调函数用于判断请求是否成功
      * <p>如果成功, 执行 onSuccess
      * <p>如果失败, 执行 onError
+     * <p>输入参数为 {@link SuccessWhen} 实现类的 {@link Class} 对象
+     * <p>方法会自动将其实例化，并设置为请求成功条件回调函数
+     *
+     * @param conditionClass  {@link SuccessWhen} 实现类的 {@link Class} 对象
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest<T> setSuccessWhen(Class<? extends SuccessWhen> conditionClass) {
+        if (conditionClass != null) {
+            try {
+                SuccessWhen condition = conditionClass.newInstance();
+                setSuccessWhen(condition);
+            } catch (InstantiationException e) {
+                throw new ForestRuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new ForestRuntimeException(e);
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 设置SuccessWhen回调函数，该回调函数用于判断请求是否成功
+     * <p>如果成功, 执行 onSuccess
+     * <p>如果失败, 执行 onError
+     * <p>输入参数为 {@link SuccessWhen} 实现类的 {@link Class} 对象
+     * <p>方法会自动将其实例化，并设置为请求成功条件回调函数
      * <p>同 {@link ForestRequest#setSuccessWhen(SuccessWhen)}
      *
      * @param successWhen {@link SuccessWhen}接口实例
@@ -2114,6 +2140,21 @@ public class ForestRequest<T> {
     public ForestRequest<T> successWhen(SuccessWhen successWhen) {
         return setSuccessWhen(successWhen);
     }
+
+    /**
+     * 设置SuccessWhen回调函数，该回调函数用于判断请求是否成功
+     * <p>如果成功, 执行 onSuccess
+     * <p>如果失败, 执行 onError
+     * <p>同 {@link ForestRequest#setSuccessWhen(SuccessWhen)}
+     *
+     * @param conditionClass  {@link SuccessWhen} 实现类的 {@link Class} 对象
+     * @return {@link ForestRequest}类实例
+     * @see ForestRequest#setSuccessWhen(SuccessWhen)
+     */
+    public ForestRequest<T> successWhen(Class<? extends SuccessWhen> conditionClass) {
+        return setSuccessWhen(conditionClass);
+    }
+
 
 
     /**

@@ -36,6 +36,7 @@ import org.apache.commons.io.IOUtils;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.SocketTimeoutException;
 import java.util.Date;
 import java.util.List;
 
@@ -269,6 +270,27 @@ public abstract class ForestResponse<T> {
     }
 
     /**
+     * 是否没有网络异常
+     *
+     * @return {@code true}: 没有异常, {@code false}: 有异常
+     */
+    public boolean noException() {
+        return exception == null;
+    }
+
+    /**
+     * 请求是否超时
+     *
+     * @return {@code true}: 已超时, {@code false}: 未超时
+     */
+    public boolean isTimeout() {
+        if (noException()) {
+            return false;
+        }
+        return exception instanceof SocketTimeoutException;
+    }
+
+    /**
      * 设置请求发送过程中的异常
      *
      * @param exception 异常对象, {@link Throwable}类及其子类实例
@@ -288,6 +310,21 @@ public abstract class ForestResponse<T> {
         }
         return statusCode;
     }
+
+    /**
+     * 获取请求响应的状态码
+     * <p>同 {@link ForestResponse#getStatusCode()}
+     *
+     * @return 请求响应的状态码
+     * @see ForestResponse#getStatusCode()
+     */
+    public int statusCode() {
+        if (statusCode == null) {
+            return -1;
+        }
+        return getStatusCode();
+    }
+
 
     /**
      * 设置请求响应的状态码
@@ -367,7 +404,7 @@ public abstract class ForestResponse<T> {
                 return globalSuccessWhen.successWhen(request, this);
             }
         }
-        return exception == null && (status_1xx() || status_2xx() || status_3xx());
+        return noException() && statusOk();
     }
 
     /**
@@ -418,6 +455,14 @@ public abstract class ForestResponse<T> {
     public boolean status_5xx() {
         return getStatusCode() >= HttpStatus.INTERNAL_SERVER_ERROR
                 && getStatusCode() < 600;
+    }
+
+    /**
+     * 请求响应码是否在正常 100 ~ 399 范围内
+     * @return
+     */
+    public boolean statusOk() {
+        return status_1xx() || status_2xx() || status_3xx();
     }
 
 

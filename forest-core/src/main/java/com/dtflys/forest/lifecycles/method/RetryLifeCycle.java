@@ -44,7 +44,7 @@ public class RetryLifeCycle implements MethodAnnotationLifeCycle<Retry, Object> 
 
         Class conditionClass = annotation.condition();
         if (conditionClass != null && !RetryWhen.class.equals(conditionClass)) {
-            request.setRetryWhen(conditionClass);
+            request.retryWhen(conditionClass);
         }
     }
 
