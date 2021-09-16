@@ -229,12 +229,6 @@ public class ForestRequest<T> {
     private final Object[] arguments;
 
     /**
-     * 回调函数: 在创建请求 URL 地址时被调用
-     * <p>用于动态构建请求 URL 的主机地址部分
-     */
-    private OnHostAddress onHostAddress;
-
-    /**
      * 回调函数：请求成功时调用
      */
     private OnSuccess onSuccess;
@@ -1975,40 +1969,6 @@ public class ForestRequest<T> {
      */
     public ForestRequest<T> addFile(String name, byte[] bytes, String filename) {
         return addFile(name, bytes, filename, null);
-    }
-
-    /**
-     * 获取OnHostAddress回调函数，该回调函数在创建请求 URL 地址时被调用
-     * <p>用于动态构建请求 URL 的主机地址部分
-     *
-     * @return {@link OnHostAddress}接口实例
-     */
-    public OnHostAddress getOnHostAddress() {
-        return onHostAddress;
-    }
-
-    /**
-     * 设置OnHostAddress回调函数，该回调函数在创建请求 URL 地址时被调用
-     * <p>用于动态构建请求 URL 的主机地址部分
-     *
-     * @param onHostAddress {@link OnHostAddress}接口实例
-     * @return {@link ForestRequest}类实例
-     */
-    public ForestRequest<T> setOnHostAddress(OnHostAddress onHostAddress) {
-        this.onHostAddress = onHostAddress;
-        return this;
-    }
-
-    /**
-     * 设置OnHostAddress回调函数，该回调函数在创建请求 URL 地址时被调用
-     * <p>同 {@link ForestRequest#setOnHostAddress(OnHostAddress)}
-     *
-     * @param onHostAddress {@link OnHostAddress}接口实例
-     * @return {@link ForestRequest}类实例
-     * @see ForestRequest#setOnHostAddress(OnHostAddress)
-     */
-    public ForestRequest<T> onHostAddress(OnHostAddress onHostAddress) {
-        return setOnHostAddress(onHostAddress);
     }
 
 

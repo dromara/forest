@@ -24,6 +24,7 @@
 
 package com.dtflys.forest.annotation;
 
+import com.dtflys.forest.callback.OnHostAddress;
 import com.dtflys.forest.lifecycles.method.RetryLifeCycle;
 
 import java.lang.annotation.Documented;
@@ -52,8 +53,11 @@ public @interface HostAddress {
     /**
      * 主机端口号
      */
-    int port() default -1;
+    String port() default "";
 
-
+    /**
+     * 动态构建主机地址信息的回调函数接口类
+     */
+    Class<? extends OnHostAddress> on() default OnHostAddress.class;
 
 }

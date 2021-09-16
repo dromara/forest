@@ -25,6 +25,7 @@
 package com.dtflys.forest.callback;
 
 import com.dtflys.forest.http.ForestHostAddress;
+import com.dtflys.forest.http.ForestRequest;
 
 /**
  * 回调函数: 在创建请求 URL 地址时被调用
@@ -41,6 +42,6 @@ public interface OnHostAddress {
      *
      * @return 注解地址信息, {@link ForestHostAddress}对象实例
      */
-    ForestHostAddress onHostAddress();
+    ForestHostAddress onHostAddress(ForestRequest request);
 
 }
