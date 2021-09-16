@@ -31,6 +31,7 @@ import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.callback.OnRetry;
 import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.callback.RetryWhen;
+import com.dtflys.forest.callback.SuccessWhen;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRetryException;
@@ -242,6 +243,14 @@ public class ForestRequest<T> {
      * 回调函数：请求失败时调用
      */
     private OnError onError;
+
+    /**
+     * 回调函数: 请求是否成功
+     * <p>该回调函数用于判断请求是否成功
+     * <p>如果成功, 执行 onSuccess
+     * <p>如果失败, 执行 onError
+     */
+    private SuccessWhen successWhen;
 
     /**
      * 回调函数：请求重试时调用
@@ -2066,6 +2075,44 @@ public class ForestRequest<T> {
      */
     public ForestRequest<T> onError(OnError onError) {
         return setOnError(onError);
+    }
+
+    /**
+     * 获取SuccessWhen回调函数，该回调函数用于判断请求是否成功
+     * <p>如果成功, 执行 onSuccess
+     * <p>如果失败, 执行 onError
+     *
+     * @return {@link SuccessWhen}接口实例
+     */
+    public SuccessWhen getSuccessWhen() {
+        return successWhen;
+    }
+
+    /**
+     * 设置SuccessWhen回调函数，该回调函数用于判断请求是否成功
+     * <p>如果成功, 执行 onSuccess
+     * <p>如果失败, 执行 onError
+     *
+     * @param successWhen {@link SuccessWhen}接口实例
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest<T> setSuccessWhen(SuccessWhen successWhen) {
+        this.successWhen = successWhen;
+        return this;
+    }
+
+    /**
+     * 设置SuccessWhen回调函数，该回调函数用于判断请求是否成功
+     * <p>如果成功, 执行 onSuccess
+     * <p>如果失败, 执行 onError
+     * <p>同 {@link ForestRequest#setSuccessWhen(SuccessWhen)}
+     *
+     * @param successWhen {@link SuccessWhen}接口实例
+     * @return {@link ForestRequest}类实例
+     * @see ForestRequest#setSuccessWhen(SuccessWhen)
+     */
+    public ForestRequest<T> successWhen(SuccessWhen successWhen) {
+        return setSuccessWhen(successWhen);
     }
 
 

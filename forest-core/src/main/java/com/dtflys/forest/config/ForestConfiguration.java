@@ -29,6 +29,7 @@ import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.backend.HttpBackendSelector;
 import com.dtflys.forest.callback.DefaultRetryWhen;
 import com.dtflys.forest.callback.RetryWhen;
+import com.dtflys.forest.callback.SuccessWhen;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.ForestGenericClient;
 import com.dtflys.forest.converter.auto.DefaultAutoConverter;
@@ -192,6 +193,11 @@ public class ForestConfiguration implements Serializable {
     private List<RequestNameValue> defaultHeaders;
 
     /**
+     * 全局请求成功条件回调函数
+     */
+    private SuccessWhen successWhen;
+
+    /**
      * 全局重试条件回调函数
      */
     private RetryWhen retryWhen;
@@ -270,11 +276,9 @@ public class ForestConfiguration implements Serializable {
         configuration.setRetryer(BackOffRetryer.class);
         configuration.setRetryCount(0);
         configuration.setMaxRetryInterval(0);
-//        configuration.setSslProtocol(SSLUtils.TLS_1_2);
         configuration.registerFilter("json", JSONFilter.class);
         configuration.registerFilter("xml", XmlFilter.class);
         configuration.setLogHandler(new DefaultLogHandler());
-        configuration.setRetryWhen(new DefaultRetryWhen());
         return configuration;
     }
 
@@ -727,6 +731,24 @@ public class ForestConfiguration implements Serializable {
      */
     public void setRetryWhen(RetryWhen retryWhen) {
         this.retryWhen = retryWhen;
+    }
+
+    /**
+     * 获取全局请求成功条件回调函数
+     *
+     * @return {@link SuccessWhen}接口实例
+     */
+    public SuccessWhen getSuccessWhen() {
+        return successWhen;
+    }
+
+    /**
+     * 设置全局请求成功条件回调函数
+     *
+     * @param successWhen {@link SuccessWhen}接口实例
+     */
+    public void setSuccessWhen(SuccessWhen successWhen) {
+        this.successWhen = successWhen;
     }
 
     /**

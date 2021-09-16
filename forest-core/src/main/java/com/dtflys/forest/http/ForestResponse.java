@@ -26,6 +26,7 @@ package com.dtflys.forest.http;
 
 
 import com.dtflys.forest.backend.ContentType;
+import com.dtflys.forest.callback.SuccessWhen;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.ByteEncodeUtils;
 import com.dtflys.forest.utils.GzipUtils;
@@ -345,9 +346,27 @@ public abstract class ForestResponse<T> {
     /**
      * 网络请求是否成功
      *
-     * @return {@code true}: 成功， {@code false}: 失败
+     * <p>其判断过程如下：
+     * <p>先判断 successWhen 回调函数
+     * <p>再判断全局 successWhen 回调函数
+     * <p>最后判断默认请求成功条件判断逻辑：
+     * <ul>
+     *     <li>1. 判断请求过程是否有异常</li>
+     *     <li>2. 判断HTTP响应状态码是否在正常范围内(100 ~ 399)</li>
+     * </ul>
+     *
+     * @return {@code true}: 请求成功， {@code false}: 请求失败
      */
     public boolean isSuccess() {
+        if (request != null) {
+            if (request.getSuccessWhen() != null) {
+                return request.getSuccessWhen().successWhen(request, this);
+            }
+            SuccessWhen globalSuccessWhen = request.getConfiguration().getSuccessWhen();
+            if (globalSuccessWhen != null) {
+                return globalSuccessWhen.successWhen(request, this);
+            }
+        }
         return exception == null && (status_1xx() || status_2xx() || status_3xx());
     }
 
