@@ -1,9 +1,7 @@
 package com.dtflys.forest.lifecycles.method;
 
 import com.dtflys.forest.annotation.HostAddress;
-import com.dtflys.forest.annotation.Retry;
-import com.dtflys.forest.callback.OnHostAddress;
-import com.dtflys.forest.callback.RetryWhen;
+import com.dtflys.forest.callback.HostAddressSource;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestHostAddress;
 import com.dtflys.forest.http.ForestRequest;
@@ -21,11 +19,11 @@ public class HostAddressLifeCycle implements MethodAnnotationLifeCycle<HostAddre
 
     @Override
     public void onMethodInitialized(ForestMethod method, HostAddress annotation) {
-        Class<? extends OnHostAddress> clazz = annotation.on();
+        Class<? extends HostAddressSource> clazz = annotation.source();
         if (clazz != null) {
             try {
-                OnHostAddress onHostAddress = clazz.newInstance();
-                method.setExtensionParameterValue("onHostAddress", onHostAddress);
+                HostAddressSource hostAddressSource = clazz.newInstance();
+                method.setExtensionParameterValue("hostAddressSource", hostAddressSource);
             } catch (InstantiationException e) {
                 throw new ForestRuntimeException(e);
             } catch (IllegalAccessException e) {
@@ -40,7 +38,7 @@ public class HostAddressLifeCycle implements MethodAnnotationLifeCycle<HostAddre
         HostAddress annotation = (HostAddress) request.getMethod().getExtensionParameterValue("hostAddrAnnotation");
         String hostStr = annotation.host();
         String portStr = annotation.port();
-        Object onHostAddress = request.getMethod().getExtensionParameterValue("onHostAddress");
+        Object onHostAddress = request.getMethod().getExtensionParameterValue("hostAddressSource");
         // 先判断是否有设置 host
         if (StringUtils.isNotBlank(hostStr)) {
             MappingTemplate hostTemplate = request.getMethod().makeTemplate(hostStr.trim());
@@ -64,8 +62,8 @@ public class HostAddressLifeCycle implements MethodAnnotationLifeCycle<HostAddre
         }
 
         // 最后判断有无设置回调函数，此项设置会覆盖 host 和 port 属性的设置
-        if (onHostAddress != null && onHostAddress instanceof OnHostAddress) {
-            ForestHostAddress hostAddress = ((OnHostAddress) onHostAddress).onHostAddress(request);
+        if (onHostAddress != null && onHostAddress instanceof HostAddressSource) {
+            ForestHostAddress hostAddress = ((HostAddressSource) onHostAddress).getHostAddress(request);
             request.hostAddress(hostAddress);
         }
 

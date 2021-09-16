@@ -25,7 +25,6 @@
 package com.dtflys.forest.http;
 
 import com.dtflys.forest.backend.ContentType;
-import com.dtflys.forest.callback.OnHostAddress;
 import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.callback.OnRetry;

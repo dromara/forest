@@ -28,20 +28,23 @@ import com.dtflys.forest.http.ForestHostAddress;
 import com.dtflys.forest.http.ForestRequest;
 
 /**
- * 回调函数: 在创建请求 URL 地址时被调用
+ * 主机地址信息来源接口
+ * <P>
+ * 本质是一个回调函数: 在创建请求 URL 地址时被调用
  * <p>用于动态构建请求 URL 的主机地址部分
  *
  * @author gongjun [dt_flys@hotmail.com]
  * @since 1.5.2
  */
-public interface OnHostAddress {
+public interface HostAddressSource {
 
     /**
-     * 回调函数: 在创建请求 URL 地址时被调用
+     * 获取地址信息
+     * <p>本质是调用回调函数: 在创建请求 URL 地址时被调用
      * <p>用于动态构建请求 URL 的主机地址部分
      *
      * @return 注解地址信息, {@link ForestHostAddress}对象实例
      */
-    ForestHostAddress onHostAddress(ForestRequest request);
+    ForestHostAddress getHostAddress(ForestRequest request);
 
 }
