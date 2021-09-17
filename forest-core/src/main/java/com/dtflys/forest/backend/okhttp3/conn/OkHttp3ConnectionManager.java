@@ -114,6 +114,8 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
                 .connectTimeout(timeout, TimeUnit.MILLISECONDS)
                 .readTimeout(timeout, TimeUnit.MILLISECONDS)
                 .protocols(getProtocols(request))
+                .followRedirects(false)
+                .followSslRedirects(false)
                 .cookieJar(new CookieJar() {
                     @Override
                     public void saveFromResponse(HttpUrl url, List<Cookie> okCookies) {
