@@ -34,6 +34,7 @@ import com.dtflys.forest.callback.SuccessWhen;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRetryException;
+import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
 import com.dtflys.forest.http.body.ByteArrayRequestBody;
 import com.dtflys.forest.http.body.FileRequestBody;
 import com.dtflys.forest.http.body.InputStreamRequestBody;
@@ -43,6 +44,7 @@ import com.dtflys.forest.http.body.StringRequestBody;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.RequestLogMessage;
+import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.multipart.ByteArrayMultipart;
 import com.dtflys.forest.multipart.FileMultipart;
 import com.dtflys.forest.multipart.ForestMultipart;
@@ -466,6 +468,14 @@ public class ForestRequest<T> {
             this.query.clearQueriesFromUrl();
         }
 
+        if (!URLUtils.isValidUrl(url)) {
+            String baseUrl = "http://localhost";
+            if (this.url != null) {
+                baseUrl = this.url.getAuthority();
+            }
+            srcUrl = URLUtils.getValidURL(baseUrl, srcUrl);
+        }
+
         try {
             URL u = new URL(srcUrl);
             this.url = new ForestURL(u);
@@ -634,11 +644,11 @@ public class ForestRequest<T> {
     /**
      * 设置请求的主机地址(主机名/ip地址 + 端口号)
      *
-     * @param hostAddress Forest主机地址信息
+     * @param address Forest主机地址信息
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> setHostAddress(ForestHostAddress hostAddress) {
-        return setHost(hostAddress.getHost()).setPort(hostAddress.getPort());
+    public ForestRequest<T> setAddress(ForestAddress address) {
+        return setHost(address.getHost()).setPort(address.getPort());
     }
 
     /**
@@ -648,34 +658,34 @@ public class ForestRequest<T> {
      * @param port 端口号
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> setHostAddress(String host, int port) {
+    public ForestRequest<T> setAddress(String host, int port) {
         return setHost(host).setPort(port);
     }
 
 
     /**
      * 设置请求的主机地址(主机名/ip地址 + 端口号)
-     * <p>同 {@link ForestRequest#setHostAddress(ForestHostAddress)} 方法
+     * <p>同 {@link ForestRequest#setAddress(ForestAddress)} 方法
      *
-     * @param hostAddress Forest主机地址信息
+     * @param address Forest主机地址信息
      * @return {@link ForestRequest}对象实例
-     * @see ForestRequest#setHostAddress(ForestHostAddress)
+     * @see ForestRequest#setAddress(ForestAddress)
      */
-    public ForestRequest<T> hostAddress(ForestHostAddress hostAddress) {
-        return setHost(hostAddress.getHost()).setPort(hostAddress.getPort());
+    public ForestRequest<T> address(ForestAddress address) {
+        return setHost(address.getHost()).setPort(address.getPort());
     }
 
     /**
      * 设置请求的主机地址(主机名/ip地址 + 端口号)
-     * <p>同 {@link ForestRequest#setHostAddress(String, int)} 方法
+     * <p>同 {@link ForestRequest#setAddress(String, int)} 方法
      *
      * @param host 主机名/ip地址
      * @param port 端口号
      * @return {@link ForestRequest}对象实例
-     * @see ForestRequest#setHostAddress(String, int)
+     * @see ForestRequest#setAddress(String, int)
      */
-    public ForestRequest<T> hostAddress(String host, int port) {
-        return setHostAddress(host, port);
+    public ForestRequest<T> address(String host, int port) {
+        return setAddress(host, port);
     }
 
 
@@ -766,16 +776,16 @@ public class ForestRequest<T> {
     /**
      * 获取HTTP后端对象
      *
-     * @return HTTP后端对象，{@link HttpBackend}接口实例
+     * @return HTTP后端框架对象，{@link HttpBackend}接口实例
      */
     public HttpBackend getBackend() {
         return backend;
     }
 
     /**
-     * 设置HTTP后端对象
+     * 设置HTTP后端框架
      *
-     * @param backend HTTP后端对象，{@link HttpBackend}接口实例
+     * @param backend HTTP后端框架对象，{@link HttpBackend}接口实例
      * @return {@link ForestRequest}对象实例
      */
     public ForestRequest<T> setBackend(HttpBackend backend) {
@@ -784,7 +794,7 @@ public class ForestRequest<T> {
     }
 
     /**
-     * 设置HTTP后端对象
+     * 设置HTTP后端框架
      * <P>同 {@link ForestRequest#setBackend(HttpBackend)} 方法
      *
      * @param backend HTTP后端对象，{@link HttpBackend}接口实例
@@ -794,6 +804,33 @@ public class ForestRequest<T> {
     public ForestRequest<T> backend(HttpBackend backend) {
         this.backend = backend;
         return this;
+    }
+
+    /**
+     * 设置HTTP后端框架
+     *
+     * @param backendName Forest后端框架名称
+     * @return {@link ForestRequest}对象实例
+     */
+    public ForestRequest<T> setBackend(String backendName) {
+        HttpBackend backend = configuration.getBackendSelector().select(backendName);
+        if (backend != null) {
+            backend.init(configuration);
+            this.backend = backend;
+        }
+        return this;
+    }
+
+    /**
+     * 设置HTTP后端框架
+     * <p>同 {@link ForestRequest#setBackend(String)}
+     *
+     * @param backendName Forest后端框架名称
+     * @return {@link ForestRequest}对象实例
+     * @see ForestRequest#setBackend(String)
+     */
+    public ForestRequest<T> backend(String backendName) {
+        return setBackend(backendName);
     }
 
 
@@ -1250,6 +1287,28 @@ public class ForestRequest<T> {
     }
 
     /**
+     * 设置为同步
+     *
+     * @return {@link ForestRequest}类实例
+     * @see ForestRequest#setAsync(boolean)
+     */
+    public ForestRequest<T> sync() {
+        return setAsync(false);
+    }
+
+    /**
+     * 设置为异步
+     *
+     * @return {@link ForestRequest}类实例
+     * @see ForestRequest#setAsync(boolean)
+     */
+    public ForestRequest<T> async() {
+        return setAsync(true);
+    }
+
+
+
+    /**
      * 获取请求体对象列表
      *
      * @return 请求体对象列表, 元素为 {@link ForestRequestBody} 其子类实例
@@ -1445,6 +1504,18 @@ public class ForestRequest<T> {
     }
 
     /**
+     * 设置请求失败后的重试次数
+     * <p> {@link ForestRequest#setRetryCount(int)}
+     *
+     * @param retryCount 重试次数
+     * @return {@link ForestRequest}类实例
+     * @see ForestRequest#setRetryCount(int)
+     */
+    public ForestRequest<T> maxRetryCount(int retryCount) {
+        return setRetryCount(retryCount);
+    }
+
+    /**
      * 获取请求当前重试次数
      *
      * @return 当前重试次数
@@ -1493,6 +1564,19 @@ public class ForestRequest<T> {
         this.maxRetryInterval = maxRetryInterval;
         return this;
     }
+
+    /**
+     * 设置最大请重试的时间间隔，时间单位为毫秒
+     * <p>同 {@link ForestRequest#setMaxRetryInterval(long)}
+     *
+     * @param maxRetryInterval 最大请重试的时间间隔
+     * @return {@link ForestRequest}类实例
+     * @see ForestRequest#setMaxRetryInterval(long)
+     */
+    public ForestRequest<T> maxRetryInterval(long maxRetryInterval) {
+        return setMaxRetryInterval(maxRetryInterval);
+    }
+
 
     /**
      * 旧的获取Body数据的方法 [已不建议使用]
@@ -1755,12 +1839,36 @@ public class ForestRequest<T> {
     }
 
     /**
+     * 根据参数下标获取该请求对应方法的参数值
+     * <p>同 {@link ForestRequest#getArgument(int)}}
+     *
+     * @param index 对应方法的参数下标
+     * @return 参数值
+     * @see ForestRequest#getArgument(int)
+     */
+    public Object argument(int index) {
+        return arguments[index];
+    }
+
+
+    /**
      * 获取该请求对应方法的所有参数值
      *
      * @return 参数值列表
      */
     public Object[] getArguments() {
         return arguments;
+    }
+
+    /**
+     * 获取该请求对应方法的所有参数值
+     * <p>同 {@link ForestRequest#getArguments()}
+     *
+     * @return 参数值列表
+     * @see ForestRequest#getArguments()
+     */
+    public Object[] arguments() {
+        return getArguments();
     }
 
 
@@ -1774,6 +1882,18 @@ public class ForestRequest<T> {
     }
 
     /**
+     * 获取该请求的所有请求头信息
+     * <p>同 {@link ForestRequest#getHeaders()}
+     *
+     * @return 请求头表，{@link ForestHeaderMap}类实例
+     * @see ForestRequest#getHeaders()
+     */
+    public ForestHeaderMap headers() {
+        return getHeaders();
+    }
+
+
+    /**
      * 根据请求头名称获取该请求的请求头信息
      *
      * @param name 请求头名称
@@ -1784,6 +1904,19 @@ public class ForestRequest<T> {
     }
 
     /**
+     * 根据请求头名称获取该请求的请求头信息
+     * <p>同 {@link ForestRequest#getHeader(String)}
+     *
+     * @param name 请求头名称
+     * @return 请求头，{@link ForestHeader}类实例
+     * @see ForestRequest#getHeader(String)
+     */
+    public ForestHeader header(String name) {
+        return getHeader(name);
+    }
+
+
+    /**
      * 根据请求头名称获取该请求的请求头的值
      *
      * @param name 请求头名称
@@ -1792,6 +1925,19 @@ public class ForestRequest<T> {
     public String getHeaderValue(String name) {
         return headers.getValue(name);
     }
+
+    /**
+     * 根据请求头名称获取该请求的请求头的值
+     * <p>同 {@link ForestRequest#getHeaderValue(String)}
+     *
+     * @param name 请求头名称
+     * @return 请求头的值
+     * @see ForestRequest#getHeaderValue(String)
+     */
+    public String headerValue(String name) {
+        return getHeaderValue(name);
+    }
+
 
     /**
      * 添加请求头到该请求中
@@ -2364,6 +2510,35 @@ public class ForestRequest<T> {
         return setOnSaveCookie(onSaveCookie);
     }
 
+    /**
+     * 获取请求所绑定到的变量值
+     *
+     * @param name 变量名
+     * @return 变量值
+     */
+    public Object getVariableValue(String name) {
+        MappingVariable variable = method.getVariable(name);
+        if (variable != null) {
+            return getArgument(variable.getIndex());
+        }
+        if (!method.isVariableDefined(name)) {
+            throw new ForestVariableUndefinedException(name);
+        }
+        return method.getVariableValue(name);
+    }
+
+    /**
+     * 获取请求所绑定到的变量值
+     * <p>同 {@link ForestRequest#getVariableValue(String)}
+     *
+     * @param name 变量名
+     * @return 变量值
+     * @see ForestRequest#getVariableValue(String)
+     */
+    public Object variableValue(String name) {
+        return getVariableValue(name);
+    }
+
 
     /**
      * 添加拦截器到该请求中
@@ -2832,6 +3007,63 @@ public class ForestRequest<T> {
     }
 
     /**
+     * 克隆Forest请求对象
+     *
+     * @return 新的Forest请求对象
+     */
+    public ForestRequest<T> clone() {
+        ForestRequest<T> newRequest = new ForestRequest<>(this.configuration, this.method, this.arguments);
+        newRequest.backend = this.backend;
+        newRequest.lifeCycleHandler = this.lifeCycleHandler;
+        newRequest.protocol = this.protocol;
+        newRequest.sslProtocol = this.sslProtocol;
+        newRequest.url = this.url;
+        newRequest.query = this.query.clone();
+        newRequest.headers = this.headers.clone();
+        List<ForestRequestBody> newBodyItems = new ArrayList<>(this.bodyItems.size());
+        for (ForestRequestBody body : this.bodyItems) {
+            newBodyItems.add(body);
+        }
+        newRequest.bodyItems = newBodyItems;
+        List<ForestMultipart> newMultiparts = new ArrayList<>(this.multiparts.size());
+        for (ForestMultipart part : this.multiparts) {
+            newMultiparts.add(part);
+        }
+        newRequest.multiparts = newMultiparts;
+        newRequest.timeout = this.timeout;
+        newRequest.filename = this.filename;
+        newRequest.charset = this.charset;
+        newRequest.decoder = this.decoder;
+        newRequest.decompressResponseGzipEnabled = this.decompressResponseGzipEnabled;
+        newRequest.responseEncode = this.responseEncode;
+        newRequest.isDownloadFile = this.isDownloadFile;
+        newRequest.proxy = this.proxy;
+        newRequest.keyStore = this.keyStore;
+        newRequest.async = this.async;
+        newRequest.retryer = this.retryer;
+        newRequest.maxRetryCount = this.maxRetryCount;
+        newRequest.maxRetryInterval = this.maxRetryInterval;
+        newRequest.onSuccess = this.onSuccess;
+        newRequest.successWhen = this.successWhen;
+        newRequest.onError = this.onError;
+        newRequest.onLoadCookie = this.onLoadCookie;
+        newRequest.onSaveCookie = this.onSaveCookie;
+        newRequest.onProgress = this.onProgress;
+        newRequest.progressStep = this.progressStep;
+        newRequest.onRetry = this.onRetry;
+        newRequest.retryWhen = this.retryWhen;
+        newRequest.retryEnabled = this.retryEnabled;
+        newRequest.type = this.type;
+        newRequest.dataType = this.dataType;
+        newRequest.interceptorChain = this.interceptorChain;
+        newRequest.interceptorAttributes = this.interceptorAttributes;
+        newRequest.attachments = this.attachments;
+        newRequest.logConfiguration = this.logConfiguration;
+        newRequest.requestLogMessage = this.requestLogMessage;
+        return newRequest;
+    }
+
+    /**
      * 执行请求发送过程
      *
      * @param backend HTTP后端，{@link HttpBackend}接口实例
@@ -2879,6 +3111,96 @@ public class ForestRequest<T> {
         Object ret = execute(getBackend(), methodLifeCycleHandler);
         return (R) ret;
     }
+
+    /**
+     * 执行请求发送过程，并获取字节数组类型结果
+     *
+     * @return 请求执行响应后返回的结果, 其为字节数组类型
+     */
+    public byte[] executeAsByteArray() {
+        return execute(byte[].class);
+    }
+
+    /**
+     * 执行请求发送过程，并获取字节Boolean类型结果
+     *
+     * @return 请求执行响应后返回的结果, 其为Boolean类型
+     */
+    public Boolean executeAsBoolean() {
+        return execute(Boolean.class);
+    }
+
+
+    /**
+     * 执行请求发送过程，并获取整数类型结果
+     *
+     * @return 请求执行响应后返回的结果, 其为整数类型
+     */
+    public Integer executeAsInteger() {
+        return execute(Integer.class);
+    }
+
+    /**
+     * 执行请求发送过程，并获取Long类型结果
+     *
+     * @return 请求执行响应后返回的结果, 其为Long类型
+     */
+    public Long executeAsLong() {
+        return execute(Long.class);
+    }
+
+    /**
+     * 执行请求发送过程，并获取字符串类型结果
+     *
+     * @return 请求执行响应后返回的结果, 其为字符串类型
+     */
+    public String executeAsString() {
+        return execute(String.class);
+    }
+
+    /**
+     * 执行请求发送过程，并获取Map类型结果
+     *
+     * @return 请求执行响应后返回的结果, 其为Map类型
+     */
+    public Map<?, ?> executeAsMap() {
+        return execute(new TypeReference<Map<?, ?>>() {});
+    }
+
+    /**
+     * 执行请求发送过程，并获取Map类型结果
+     *
+     * @param keyClass KEY类型
+     * @param valueClass VALUE类型
+     * @param <KEY> 键的泛型类型参数
+     * @param <VALUE> 值的泛型类型参数
+     * @return 请求执行响应后返回的结果, 其为Map类型
+     */
+    public <KEY, VALUE> Map<KEY, VALUE> executeAsMap(Class<KEY> keyClass, Class<VALUE> valueClass) {
+        return execute(new TypeReference<Map<KEY, VALUE>>() {});
+    }
+
+
+    /**
+     * 执行请求发送过程，并获取List类型结果
+     *
+     * @return 请求执行响应后返回的结果, 其为List类型
+     */
+    public List<?> executeAsList() {
+        return execute(new TypeReference<List<?>>() {});
+    }
+
+    /**
+     * 执行请求发送过程，并获取List类型结果
+     *
+     * @param clazz 列表元素类型
+     * @param <E> 列表元素泛型类型参数
+     * @return 请求执行响应后返回的结果, 其为List类型
+     */
+    public <E> List<E> executeAsList(Class<E> clazz) {
+        return execute(new TypeReference<List<E>>() {});
+    }
+
 
     /**
      * 执行请求发送过程

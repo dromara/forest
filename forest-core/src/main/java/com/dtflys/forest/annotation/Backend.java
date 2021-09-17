@@ -25,7 +25,6 @@
 package com.dtflys.forest.annotation;
 
 import com.dtflys.forest.lifecycles.method.BackendLifeCycle;
-import com.dtflys.forest.lifecycles.method.HostLifeCycle;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
