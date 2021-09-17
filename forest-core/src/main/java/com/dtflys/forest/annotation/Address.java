@@ -24,8 +24,8 @@
 
 package com.dtflys.forest.annotation;
 
-import com.dtflys.forest.callback.HostAddressSource;
-import com.dtflys.forest.lifecycles.method.RetryLifeCycle;
+import com.dtflys.forest.callback.AddressSource;
+import com.dtflys.forest.lifecycles.method.HostLifeCycle;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -40,10 +40,10 @@ import java.lang.annotation.Target;
  * @since 1.5.2
  */
 @Documented
-@MethodLifeCycle(RetryLifeCycle.class)
+@MethodLifeCycle(HostLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
-public @interface HostAddress {
+public @interface Address {
 
     /**
      * 主机地址(主机名/ip地址)
@@ -58,6 +58,6 @@ public @interface HostAddress {
     /**
      * 动态构建主机地址信息的回调函数接口类
      */
-    Class<? extends HostAddressSource> source() default HostAddressSource.class;
+    Class<? extends AddressSource> source() default AddressSource.class;
 
 }
