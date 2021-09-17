@@ -25,7 +25,7 @@
 package com.dtflys.forest.annotation;
 
 import com.dtflys.forest.callback.AddressSource;
-import com.dtflys.forest.lifecycles.method.HostLifeCycle;
+import com.dtflys.forest.lifecycles.method.AddressLifeCycle;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -40,7 +40,7 @@ import java.lang.annotation.Target;
  * @since 1.5.2
  */
 @Documented
-@MethodLifeCycle(HostLifeCycle.class)
+@MethodLifeCycle(AddressLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
 public @interface Address {
