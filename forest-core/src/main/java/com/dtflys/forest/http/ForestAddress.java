@@ -4,7 +4,7 @@ package com.dtflys.forest.http;
  * Forest主机地址信息
  * <p>该地址信息为主机名/ip地址 + 端口号的组合
  */
-public class ForestHostAddress {
+public class ForestAddress {
 
     /**
      * 主机地址(主机名/ip地址)
@@ -16,7 +16,7 @@ public class ForestHostAddress {
      */
     private final int port;
 
-    public ForestHostAddress(String host, int port) {
+    public ForestAddress(String host, int port) {
         this.host = host;
         this.port = port;
     }
