@@ -170,6 +170,11 @@ public class ForestHeader {
      */
     public final static String WARNING = "Warning";
 
+    /**
+     * 标准头字段：重定向地址
+     */
+    public final static String LOCATION = "Location";
+
 
     /**
      * 请求头名称
