@@ -23,15 +23,9 @@ public class AddressLifeCycle implements MethodAnnotationLifeCycle<Address, Obje
     @Override
     public void onMethodInitialized(ForestMethod method, Address annotation) {
         Class<? extends AddressSource> clazz = annotation.source();
-        if (clazz != null && !AddressSource.class.equals(clazz)) {
-            try {
-                AddressSource addressSource = clazz.newInstance();
-                method.setExtensionParameterValue(PARAM_KEY_ADDRESS_SOURCE, addressSource);
-            } catch (InstantiationException e) {
-                throw new ForestRuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new ForestRuntimeException(e);
-            }
+        if (clazz != null && !clazz.isInterface()) {
+            AddressSource addressSource = method.getConfiguration().newInstanceOfForestObject(clazz);
+            method.setExtensionParameterValue(PARAM_KEY_ADDRESS_SOURCE, addressSource);
         }
         method.setExtensionParameterValue(PARAM_KEY_ADDRESS, annotation);
     }

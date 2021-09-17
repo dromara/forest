@@ -6,6 +6,7 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.interceptor.SpringInterceptorFactory;
 import com.dtflys.forest.listener.ConverterBeanListener;
 import com.dtflys.forest.logging.ForestLogHandler;
+import com.dtflys.forest.reflection.SpringForestObjectFactory;
 import com.dtflys.forest.scanner.ClassPathClientScanner;
 import com.dtflys.forest.schema.ForestConfigurationBeanDefinitionParser;
 import com.dtflys.forest.springboot.annotation.ForestScannerRegister;
@@ -94,6 +95,10 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
                 .addPropertyValue("variables", forestConfigurationProperties.getVariables())
                 .setLazyInit(false)
                 .setFactoryMethod("configuration");
+
+        BeanDefinition forestObjectFactoryBeanDefinition = registerFactoryObjectFactoryBean();
+        beanDefinitionBuilder.addPropertyValue("forestObjectFactory", forestObjectFactoryBeanDefinition);
+
 
         BeanDefinition interceptorFactoryBeanDefinition = registerInterceptorFactoryBean();
         beanDefinitionBuilder.addPropertyValue("interceptorFactory", interceptorFactoryBeanDefinition);
@@ -188,6 +193,15 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
             }
         }
     }
+
+    public BeanDefinition registerFactoryObjectFactoryBean() {
+        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(SpringForestObjectFactory.class);
+        BeanDefinition beanDefinition = beanDefinitionBuilder.getRawBeanDefinition();
+        BeanDefinitionRegistry beanFactory = (BeanDefinitionRegistry) applicationContext.getBeanFactory();
+        beanFactory.registerBeanDefinition("forestObjectFactory", beanDefinition);
+        return beanDefinition;
+    }
+
 
     public BeanDefinition registerInterceptorFactoryBean() {
         BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(SpringInterceptorFactory.class);

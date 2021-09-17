@@ -9,5 +9,5 @@ package com.dtflys.forest.reflection;
  */
 public interface ForestObjectFactory {
 
-    <T> T createInstance(Class<T> clazz);
+    <T> T newInstance(Class<T> clazz);
 }

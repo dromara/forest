@@ -19,7 +19,7 @@ public class SpringSSLKeyStore extends SSLKeyStore {
         }
         try {
             Class clazz = Class.forName(sslSocketFactoryBuilderClass);
-            return (SSLSocketFactoryBuilder) Forest.config().getObjectFactory().createInstance(clazz);
+            return (SSLSocketFactoryBuilder) Forest.config().getForestObjectFactory().newInstance(clazz);
         } catch (ClassNotFoundException e) {
             throw new ForestRuntimeException(e);
         }

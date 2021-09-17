@@ -27,7 +27,6 @@ package com.dtflys.forest.config;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.backend.HttpBackendSelector;
-import com.dtflys.forest.callback.DefaultRetryWhen;
 import com.dtflys.forest.callback.RetryWhen;
 import com.dtflys.forest.callback.SuccessWhen;
 import com.dtflys.forest.converter.ForestConverter;
@@ -45,8 +44,6 @@ import com.dtflys.forest.filter.JSONFilter;
 import com.dtflys.forest.filter.XmlFilter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestType;
-import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.http.body.RequestBodyBuilder;
 import com.dtflys.forest.interceptor.DefaultInterceptorFactory;
 import com.dtflys.forest.interceptor.InterceptorFactory;
 import com.dtflys.forest.logging.DefaultLogHandler;
@@ -220,7 +217,7 @@ public class ForestConfiguration implements Serializable {
     /**
      * Forest对象实例化工厂
      */
-    private ForestObjectFactory objectFactory;
+    private ForestObjectFactory forestObjectFactory;
 
     /**
      * 拦截器工厂
@@ -366,25 +363,36 @@ public class ForestConfiguration implements Serializable {
      *
      * @return Forest对象实例化工厂对象
      */
-    public ForestObjectFactory getObjectFactory() {
-        if (objectFactory == null) {
+    public ForestObjectFactory getForestObjectFactory() {
+        if (forestObjectFactory == null) {
             synchronized (this) {
-                if (objectFactory == null) {
-                    objectFactory = new DefaultObjectFactory();
+                if (forestObjectFactory == null) {
+                    forestObjectFactory = new DefaultObjectFactory();
                 }
             }
         }
-        return objectFactory;
-
+        return forestObjectFactory;
     }
+
+    /**
+     * Forest对象实例化
+     *
+     * @param clazz Forest对象接口类
+     * @param <T> Forest对象接口类泛型
+     * @return Forest对象实例
+     */
+    public <T> T newInstanceOfForestObject(Class<T> clazz) {
+        return getForestObjectFactory().newInstance(clazz);
+    }
+
 
     /**
      * 设置Forest对象实例化工厂
      *
-     * @param objectFactory Forest对象实例化工厂对象
+     * @param forestObjectFactory Forest对象实例化工厂对象
      */
-    public void setObjectFactory(ForestObjectFactory objectFactory) {
-        this.objectFactory = objectFactory;
+    public void setForestObjectFactory(ForestObjectFactory forestObjectFactory) {
+        this.forestObjectFactory = forestObjectFactory;
     }
 
     /**

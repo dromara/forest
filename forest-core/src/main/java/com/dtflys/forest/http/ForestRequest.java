@@ -2217,15 +2217,9 @@ public class ForestRequest<T> {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> setSuccessWhen(Class<? extends SuccessWhen> conditionClass) {
-        if (conditionClass != null) {
-            try {
-                SuccessWhen condition = conditionClass.newInstance();
-                setSuccessWhen(condition);
-            } catch (InstantiationException e) {
-                throw new ForestRuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new ForestRuntimeException(e);
-            }
+        if (conditionClass != null && !conditionClass.isInterface()) {
+            SuccessWhen condition = configuration.newInstanceOfForestObject(conditionClass);
+            setSuccessWhen(condition);
         }
         return this;
     }
@@ -2337,15 +2331,9 @@ public class ForestRequest<T> {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> setRetryWhen(Class<? extends RetryWhen> conditionClass) {
-        if (conditionClass != null) {
-            try {
-                RetryWhen condition = conditionClass.newInstance();
-                setRetryWhen(condition);
-            } catch (InstantiationException e) {
-                throw new ForestRuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new ForestRuntimeException(e);
-            }
+        if (conditionClass != null && !conditionClass.isInterface()) {
+            RetryWhen condition = configuration.newInstanceOfForestObject(conditionClass);
+            setRetryWhen(condition);
         }
         return this;
     }
