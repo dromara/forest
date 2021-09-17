@@ -53,6 +53,8 @@ import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.proxy.ProxyFactory;
 import com.dtflys.forest.reflection.BasicVariableValue;
+import com.dtflys.forest.reflection.DefaultObjectFactory;
+import com.dtflys.forest.reflection.ForestObjectFactory;
 import com.dtflys.forest.reflection.ForestVariableValue;
 import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
@@ -61,8 +63,6 @@ import com.dtflys.forest.utils.RequestNameValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -218,6 +218,11 @@ public class ForestConfiguration implements Serializable {
     private JSONConverterSelector jsonConverterSelector;
 
     /**
+     * Forest对象实例化工厂
+     */
+    private ForestObjectFactory objectFactory;
+
+    /**
      * 拦截器工厂
      */
     private InterceptorFactory interceptorFactory;
@@ -300,6 +305,15 @@ public class ForestConfiguration implements Serializable {
     }
 
     /**
+     * 获取Forest后端框架选择器
+     *
+     * @return Forest后端框架选择器
+     */
+    public HttpBackendSelector getBackendSelector() {
+        return httpBackendSelector;
+    }
+
+    /**
      * 设置HTTP后端
      * @param backend HTTP后端对象
      * @return 当前ForestConfiguration实例
@@ -333,6 +347,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 获取当前HTTP后端
+     *
      * @return 当前HTTP后端
      */
     public HttpBackend getBackend() {
@@ -344,6 +359,32 @@ public class ForestConfiguration implements Serializable {
             }
         }
         return backend;
+    }
+
+    /**
+     * 获取Forest对象实例化工厂
+     *
+     * @return Forest对象实例化工厂对象
+     */
+    public ForestObjectFactory getObjectFactory() {
+        if (objectFactory == null) {
+            synchronized (this) {
+                if (objectFactory == null) {
+                    objectFactory = new DefaultObjectFactory();
+                }
+            }
+        }
+        return objectFactory;
+
+    }
+
+    /**
+     * 设置Forest对象实例化工厂
+     *
+     * @param objectFactory Forest对象实例化工厂对象
+     */
+    public void setObjectFactory(ForestObjectFactory objectFactory) {
+        this.objectFactory = objectFactory;
     }
 
     /**
