@@ -181,6 +181,39 @@ public abstract class ForestResponse<T> {
     }
 
     /**
+     * 是否是重定向响应
+     *
+     * @return {@code true}: 是重定向, {@code false}: 不是重定向
+     */
+    public boolean isRedirection() {
+        return getStatusCode() > HttpStatus.MULTIPLE_CHOICES && getStatusCode() <= HttpStatus.TEMPORARY_REDIRECT;
+    }
+
+    /**
+     * 获取重定向地址
+     *
+     * @return 重定向地址
+     */
+    public String getRedirectionLocation() {
+        return getHeaderValue(ForestHeader.LOCATION);
+    }
+
+    /**
+     * 获取重定向Forest请求
+     *
+     * @return Forest请求对象
+     */
+    public ForestRequest<T> redirectionRequest() {
+        if (isRedirection() && request != null) {
+            String location = getRedirectionLocation();
+            ForestRequest<T> newRequest = request.clone();
+            newRequest.setUrl(location);
+            return newRequest;
+        }
+        return null;
+    }
+
+    /**
      * 获取下载文件名
      * @return 文件名
      */
