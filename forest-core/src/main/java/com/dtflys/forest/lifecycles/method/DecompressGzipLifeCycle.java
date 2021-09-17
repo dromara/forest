@@ -14,16 +14,18 @@ import com.dtflys.forest.reflection.ForestMethod;
  */
 public class DecompressGzipLifeCycle implements MethodAnnotationLifeCycle<DecompressGzip, Object> {
 
+    private final static String PARAM_KEY_DECOMPRESS_GZIP = "__decompress_gzip";
+
     @Override
     public void onMethodInitialized(ForestMethod method, DecompressGzip annotation) {
         boolean value = annotation.value();
-        method.setExtensionParameterValue("decompress-gzip", value);
+        method.setExtensionParameterValue(PARAM_KEY_DECOMPRESS_GZIP, value);
     }
 
 
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
-        Boolean value = (Boolean) method.getExtensionParameterValue("decompress-gzip");
+        Boolean value = (Boolean) method.getExtensionParameterValue(PARAM_KEY_DECOMPRESS_GZIP);
         request.setDecompressResponseGzipEnabled(value);
     }
 

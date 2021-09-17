@@ -13,14 +13,16 @@ import com.dtflys.forest.retryer.ForestRetryer;
  */
 public class RetryerLifeCycle implements MethodAnnotationLifeCycle<Retryer, Object> {
 
+    private final static String PARAM_KEY_RETRYER = "__retryer";
+
     @Override
     public void onMethodInitialized(ForestMethod method, Retryer annotation) {
-        method.setExtensionParameterValue("retryerAnnotation", annotation);
+        method.setExtensionParameterValue(PARAM_KEY_RETRYER, annotation);
     }
 
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
-        Retryer annotation = (Retryer) request.getMethod().getExtensionParameterValue("retryerAnnotation");
+        Retryer annotation = (Retryer) request.getMethod().getExtensionParameterValue(PARAM_KEY_RETRYER);
         Class<? extends ForestRetryer> clazz = annotation.value();
         request.setRetryer(clazz);
     }

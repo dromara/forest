@@ -13,14 +13,16 @@ import com.dtflys.forest.reflection.ForestMethod;
  */
 public class SuccessLifeCycle implements MethodAnnotationLifeCycle<Success, Object> {
 
+    private final static String PARAM_KEY_SUCCESS = "__success";
+
     @Override
     public void onMethodInitialized(ForestMethod method, Success annotation) {
-        method.setExtensionParameterValue("successAnnotation", annotation);
+        method.setExtensionParameterValue(PARAM_KEY_SUCCESS, annotation);
     }
 
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
-        Success annotation = (Success) request.getMethod().getExtensionParameterValue("successAnnotation");
+        Success annotation = (Success) request.getMethod().getExtensionParameterValue(PARAM_KEY_SUCCESS);
         Class<? extends SuccessWhen> conditionClass = annotation.condition();
         if (conditionClass != null && !SuccessWhen.class.equals(conditionClass)) {
             request.successWhen(conditionClass);
