@@ -15,13 +15,14 @@ import java.lang.reflect.Type;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.5.2
  */
-public class TypeReference<T> {
+public abstract class TypeReference<T> {
 
     /**
      * {@link Type} 类型引用
      * <p>从泛型参数中获取的 {@link Type} 接口实例
      */
     private final Type type = ReflectUtils.getGenericArgument(this.getClass());
+
 
     public Type getType() {
         return type;
