@@ -38,11 +38,13 @@ public abstract class AbstractHttpBackend implements HttpBackend {
 
     @Override
     public void init(ForestConfiguration configuration) {
-        synchronized (this) {
-            if (!initialized) {
-                this.connectionManager.init(configuration);
-                init();
-                initialized = true;
+        if (!initialized) {
+            synchronized (this) {
+                if (!initialized) {
+                    this.connectionManager.init(configuration);
+                    init();
+                    initialized = true;
+                }
             }
         }
     }
