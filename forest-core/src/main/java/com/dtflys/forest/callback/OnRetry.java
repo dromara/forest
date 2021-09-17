@@ -37,9 +37,9 @@ public interface OnRetry {
     /**
      * 回调函数: 在触发请求重试时执行
      *
-     * @param request Forest请求对象
-     * @param response Forest响应对象
+     * @param req Forest请求对象
+     * @param res Forest响应对象
      */
-    void onRetry(ForestRequest request, ForestResponse response);
+    void onRetry(ForestRequest req, ForestResponse res);
 
 }

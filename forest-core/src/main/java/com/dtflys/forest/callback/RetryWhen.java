@@ -40,9 +40,9 @@ public interface RetryWhen {
      * <p>
      * 该回调函数每次请求响应后或失败后被调用，其返回值将决定这次请求是否需要重试
      *
-     * @param request Forest请求对象
-     * @param response Forest响应对象
+     * @param req Forest请求对象
+     * @param res Forest响应对象
      * @return {@code true} 触发重试, 否则不触发重试
      */
-    boolean retryWhen(ForestRequest request, ForestResponse response);
+    boolean retryWhen(ForestRequest req, ForestResponse res);
 }

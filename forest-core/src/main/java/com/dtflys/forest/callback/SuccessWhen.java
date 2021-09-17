@@ -20,10 +20,10 @@ public interface SuccessWhen {
      * <p>如果成功, 执行 onSuccess
      * <p>如果失败, 执行 onError
      *
-     * @param request Forest请求对象
-     * @param response Forest响应对象
+     * @param req Forest请求对象
+     * @param res Forest响应对象
      * @return {@code true}: 请求成功, {@code false}: 请求失败
      */
-    boolean successWhen(ForestRequest request, ForestResponse response);
+    boolean successWhen(ForestRequest req, ForestResponse res);
 
 }

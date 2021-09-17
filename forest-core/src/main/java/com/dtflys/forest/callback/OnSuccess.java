@@ -38,9 +38,9 @@ public interface OnSuccess<T>  {
     /**
      * 请求成功后调用该方法
      * @param data 请求响应返回后经过序列化后的数据
-     * @param request Forest请求对象
-     * @param response Forest响应对象
+     * @param req Forest请求对象
+     * @param res Forest响应对象
      */
-    void onSuccess(T data, ForestRequest request, ForestResponse response);
+    void onSuccess(T data, ForestRequest req, ForestResponse res);
 
 }
