@@ -250,4 +250,12 @@ public class ForestQueryMap implements Map<String, Object> {
         }
         return set;
     }
+
+    public ForestQueryMap clone() {
+        ForestQueryMap newQueryMap = new ForestQueryMap();
+        for (ForestQueryParameter query : queries) {
+            newQueryMap.addQuery(query);
+        }
+        return newQueryMap;
+    }
 }
