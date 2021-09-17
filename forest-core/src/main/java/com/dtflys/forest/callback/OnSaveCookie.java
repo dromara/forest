@@ -38,8 +38,8 @@ public interface OnSaveCookie {
     /**
      * 在请求响应成功后，需要保存Cookie时调用该方法
      *
-     * @param request Forest请求对象
+     * @param req Forest请求对象
      * @param cookies Cookie集合，通过响应返回的Cookie都从该集合获取
      */
-    void onSaveCookie(ForestRequest request, ForestCookies cookies);
+    void onSaveCookie(ForestRequest req, ForestCookies cookies);
 }
