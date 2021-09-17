@@ -15,17 +15,33 @@ public final class URLUtils {
     private URLUtils() {
     }
 
+    /**
+     * 判断字符串是否是一个URL
+     *
+     * @param str 被判断的字符串
+     * @return {@code true}: 是URL, {@code false}: 不是URL
+     */
     public static boolean isURL(String str) {
         return hasProtocol(str) || str.startsWith("file:/");
     }
 
+    /**
+     * URL字符串中是否包含HTTP协议部分
+     *
+     * @param url 需要被判断的URL字符串
+     * @return {@code true}: 包含HTTP协议, {@code false}: 不包含
+     */
     public static boolean hasProtocol(String url) {
         int len = url.length();
+        char[] chars = url.toCharArray();
         for (int i = 0; i < len; i++) {
-            char ch = url.charAt(i);
+            char ch = chars[i];
             if (ch == ':') {
                 String protocol = url.substring(0, i);
-                char nc = url.charAt(i + 1);
+                if (i + 1 >= len) {
+                    return false;
+                }
+                char nc = chars[i + 1];
                 if (nc == '/') {
                     return isValidProtocol(protocol);
                 }
@@ -34,13 +50,18 @@ public final class URLUtils {
         return false;
     }
 
-    private static boolean isValidProtocol(String protocol) {
-        int len = protocol.length();
-        if (len < 1) {
+    /**
+     * 判断字符数组是否为合法的HTTP协议头
+     *
+     * @param charArray 需要被判断的字符数组
+     * @return {@code true}: 是合法的HTTP协议头, {@code false}: 不是合法的HTTP协议头
+     */
+    private static boolean isValidProtocol(char[] charArray) {
+        if (charArray.length < 1) {
             return false;
         }
-        for (int i = 0; i < len; i++) {
-            char ch = protocol.charAt(i);
+        for (int i = 0; i < charArray.length; i++) {
+            char ch = charArray[i];
             if (!Character.isAlphabetic(ch)) {
                 return false;
             }
@@ -48,6 +69,22 @@ public final class URLUtils {
         return true;
     }
 
+    /**
+     * 判断字符串是否为合法的HTTP协议头
+     *
+     * @param protocol 需要被判断的HTTP协议头字符串
+     * @return {@code true}: 是合法的HTTP协议头, {@code false}: 不是合法的HTTP协议头
+     */
+    private static boolean isValidProtocol(String protocol) {
+        return isValidProtocol(protocol.toCharArray());
+    }
+
+    /**
+     * 判断字符串是否为合法的URL
+     *
+     * @param url 被判断的URL字符串
+     * @return {@code true}: 合法, {@code false}: 不合法
+     */
     public static boolean isValidUrl(String url) {
         return hasProtocol(url);
     }
@@ -59,10 +96,13 @@ public final class URLUtils {
     }
 
     public static String getValidBaseURL(String baseUrl) {
-        if (baseUrl.endsWith("/")) {
-            int i = baseUrl.length() - 1;
+        char[] chars = baseUrl.toCharArray();
+        int len = chars.length;
+        int lastIndex = len - 1;
+        if ('/' == chars[lastIndex]) {
+            int i = lastIndex;
             do {
-                char ch = baseUrl.charAt(i);
+                char ch = chars[i];
                 if (ch != '/') {
                     break;
                 }
@@ -74,6 +114,15 @@ public final class URLUtils {
     }
 
 
+    /**
+     * 获取合法的URL字符串
+     * <p>若 uri 参数不合法，即不包含协议头以及域名/主机名/ip地址部分，则和 baseURL 参数进行合并
+     * <p>若 uri 参数已经是一个合法的URL字符串，则直接返回
+     *
+     * @param baseURL 根URL字符串
+     * @param uri URL字符串
+     * @return 合法的URL字符串
+     */
     public static String getValidURL(String baseURL, String uri) {
         if (StringUtils.isNotEmpty(baseURL) && !URLUtils.hasProtocol(baseURL)) {
             baseURL = "http://" + baseURL;
@@ -99,10 +148,28 @@ public final class URLUtils {
         return uri;
     }
 
-    public static String forceEncode(String query, String encode) throws UnsupportedEncodingException {
-        return URLEncoder.encode(query, encode);
+    /**
+     * 强制进行URL Encoding编码
+     *
+     * @param content 需要编码的原字符串
+     * @param encode 编码字符集
+     * @return URL Encoding编码结果字符串
+     * @throws UnsupportedEncodingException 编码过程中可能抛出的异常
+     */
+    public static String forceEncode(String content, String encode) throws UnsupportedEncodingException {
+        return URLEncoder.encode(content, encode);
     }
 
+    /**
+     * 进行URL Encoding编码
+     * <p>该方法不会强制进行编码，即某些不需要编码的情况就不会去做URL Encoding
+     * <p>如一个合法的URL字符串就不会被编码
+     *
+     * @param content 需要编码的原字符串
+     * @param charset 编码字符集
+     * @return URL Encoding编码结果字符串
+     * @throws UnsupportedEncodingException 编码过程中可能抛出的异常
+     */
     public static String encode(String content, String charset) throws UnsupportedEncodingException {
         if (content == null) {
             return null;
@@ -124,11 +191,19 @@ public final class URLUtils {
         return URLEncoder.encode(content, charset);
     }
 
+    /**
+     * 判断字符串是否已被URL Encoding编码过
+     *
+     * @param content 被判断的原字符串
+     * @return {@code true}: 被编码过, {@code false}: 未被编码过
+     */
     public static boolean isEncoded(String content) {
-        for (int i = 0; i < content.length() - 1; i++) {
-            char ch = content.charAt(i);
+        char[] chars = content.toCharArray();
+        int len = chars.length;
+        for (int i = 0; i < len - 1; i++) {
+            char ch = chars[i];
             if (ch == '%') {
-                char nc = content.charAt(i + 1);
+                char nc = chars[i + 1];
                 if (Character.isDigit(nc)
                         || nc == 'A'
                         || nc == 'B'
