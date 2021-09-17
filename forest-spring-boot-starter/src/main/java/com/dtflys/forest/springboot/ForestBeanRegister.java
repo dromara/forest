@@ -28,8 +28,10 @@ import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.ResourceLoader;
 
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Map;
 
@@ -146,7 +148,19 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
         if (type != null) {
             ForestConverter converter = null;
             try {
-                converter = (ForestConverter) type.newInstance();
+                Constructor<?>[] constructors = type.getConstructors();
+                for (Constructor<?> constructor : constructors) {
+                    Parameter[] params = constructor.getParameters();
+                    if (params.length == 0) {
+                        converter = (ForestConverter) constructor.newInstance(new Object[0]);
+                        break;
+                    } else if (params.length == 1 &&
+                            ForestConfiguration.class.isAssignableFrom(constructor.getParameterTypes()[0])) {
+                        converter = (ForestConverter) constructor.newInstance(new Object[] {constructor});
+                        break;
+                    }
+                }
+
 
                 Map<String, Object> parameters = converterItemProperties.getParameters();
                 PropertyDescriptor[] descriptors = ReflectUtils.getBeanSetters(type);
@@ -168,6 +182,8 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
             } catch (InstantiationException e) {
                 throw new ForestRuntimeException("[Forest] Convert type '" + type.getName() + "' cannot be initialized!", e);
             } catch (IllegalAccessException e) {
+                throw new ForestRuntimeException("[Forest] Convert type '" + type.getName() + "' cannot be initialized!", e);
+            } catch (InvocationTargetException e) {
                 throw new ForestRuntimeException("[Forest] Convert type '" + type.getName() + "' cannot be initialized!", e);
             }
         }
