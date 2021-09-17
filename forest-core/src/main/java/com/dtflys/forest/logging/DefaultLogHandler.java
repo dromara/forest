@@ -1,5 +1,6 @@
 package com.dtflys.forest.logging;
 
+import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.StringUtils;
 
@@ -72,6 +73,19 @@ public class DefaultLogHandler implements ForestLogHandler {
     }
 
     /**
+     * 后端框架名称
+     * @param requestLogMessage 请求日志消息，{@link RequestLogMessage}类实例
+     * @return 后端框架名称字符串
+     */
+    protected String backendContent(RequestLogMessage requestLogMessage) {
+        HttpBackend backend = requestLogMessage.getRequest().getBackend();
+        if (backend == null) {
+            return "";
+        }
+        return "(" + backend.getName() + ")";
+    }
+
+    /**
      * 请求失败重试信息
      * @param requestLogMessage 请求日志消息，{@link RequestLogMessage}类实例
      * @return 重试信息字符串
@@ -104,7 +118,9 @@ public class DefaultLogHandler implements ForestLogHandler {
      */
     protected String requestLoggingContent(RequestLogMessage requestLogMessage) {
         StringBuilder builder = new StringBuilder();
-        builder.append("Request: \n\t");
+        builder.append("Request ");
+        builder.append(backendContent(requestLogMessage));
+        builder.append(": \n\t");
         builder.append(retryContent(requestLogMessage));
         builder.append(proxyContent(requestLogMessage));
         builder.append(requestTypeChangeHistory(requestLogMessage));
