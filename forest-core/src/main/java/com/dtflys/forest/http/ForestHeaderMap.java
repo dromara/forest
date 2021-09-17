@@ -302,4 +302,16 @@ public class ForestHeaderMap implements Map<String, String> {
         return headers.iterator();
     }
 
+    /**
+     * 克隆Forest请求头Map
+     *
+     * @return 新的Forest请求头Map
+     */
+    public ForestHeaderMap clone() {
+        ForestHeaderMap newHeaderMap = new ForestHeaderMap();
+        for (ForestHeader header : headers) {
+            newHeaderMap.addHeader(header);
+        }
+        return newHeaderMap;
+    }
 }
