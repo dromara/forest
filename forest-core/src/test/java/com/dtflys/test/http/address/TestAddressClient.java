@@ -1,4 +1,4 @@
-package com.dtflys.test.http.hostaddr;
+package com.dtflys.test.http.address;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
