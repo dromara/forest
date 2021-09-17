@@ -8,6 +8,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.test.http.BaseClientTest;
 import com.dtflys.test.model.Result;
+import com.google.common.collect.Lists;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.Rule;
@@ -16,6 +17,7 @@ import org.junit.Test;
 import java.io.File;
 import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
@@ -23,6 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.linesOf;
 
 public class TestGenericForestClient extends BaseClientTest {
 
@@ -75,17 +78,79 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_host_port() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = Forest.get("http://xxxxx:444")
+        String result = Forest.get("http://xxxxx:444/path")
                 .host("localhost")
                 .port(server.getPort())
                 .execute(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/path");
     }
+
+    @Test
+    public void testRequest_address() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        ForestRequest<?> request = Forest.get("http://xxxxx:444/path")
+                .address("localhost", server.getPort());
+        assertThat(request.host()).isEqualTo("localhost");
+        String result = request.executeAsString();
+        assertThat(result).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/path");
+    }
+
+
+    @Test
+    public void testRequest_path() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String result = Forest.get("/A")
+                .host("localhost")
+                .port(server.getPort())
+                .execute(String.class);
+        assertThat(result).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/A");
+    }
+
+    @Test
+    public void testRequest_change_path() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String result = Forest.get("/A")
+                .host("localhost")
+                .port(server.getPort())
+                .path("/B")
+                .execute(String.class);
+        assertThat(result).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/B");
+    }
+
+    @Test
+    public void testRequest_change_url() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        ForestRequest<?> request = Forest.get("/A")
+                .host("127.0.0.1")
+                .port(server.getPort())
+                .url("/B");
+        assertThat(request.getHost()).isEqualTo("127.0.0.1");
+        String result = request.executeAsString();
+        assertThat(result).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/B");
+    }
+
 
     @Test
     public void testRequest_get_return_string() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         String result = Forest.get("http://localhost:" + server.getPort()).execute(String.class);
+        assertThat(result).isNotNull().isEqualTo(EXPECTED);
+    }
+
+    @Test
+    public void testRequest_get_return_string2() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String result = Forest.get("http://localhost:" + server.getPort()).executeAsString();
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
     }
 
@@ -106,11 +171,33 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_get_return_map() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        Map result = Forest.get("http://localhost:" + server.getPort()).execute(Map.class);
+        Map result = Forest.get("/")
+                .address("localhost", server.getPort())
+                .executeAsMap();
         assertThat(result).isNotNull();
         assertThat(result.get("status")).isEqualTo("1");
         assertThat(result.get("data")).isEqualTo("2");
     }
+
+    @Test
+    public void testRequest_get_return_list() {
+        server.enqueue(new MockResponse().setBody("[1, 2, 3]"));
+        List<?> result = Forest.get("http://localhost:" + server.getPort()).executeAsList();
+        assertThat(result).isNotNull();
+        assertThat(result).isEqualTo(Lists.newArrayList(1, 2, 3));
+    }
+
+    @Test
+    public void testRequest_get_return_list2() {
+        server.enqueue(new MockResponse().setBody("[\"1\", \"2\", \"3\"]"));
+        List<String> result = Forest.get("/")
+                .address("localhost", server.getPort())
+                .executeAsList(String.class);
+        assertThat(result).isNotNull();
+        assertThat(result).isEqualTo(Lists.newArrayList("1", "2", "3"));
+    }
+
+
 
     @Test
     public void testRequest_get_return_type() {
@@ -518,8 +605,8 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
         server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
         ForestRequest<?> request = Forest.get("http://localhost:" + server.getPort())
-                .setRetryCount(3)
-                .setRetryWhen(((req, res) -> res.getStatusCode() == 203));
+                .maxRetryCount(3)
+                .retryWhen(((req, res) -> res.getStatusCode() == 203));
         request.execute();
         assertThat(request.getCurrentRetryCount()).isEqualTo(3);
     }
@@ -532,11 +619,12 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
         CountDownLatch latch = new CountDownLatch(1);
         AtomicBoolean isSuccess = new AtomicBoolean(false);
-        ForestRequest<?> request = Forest.get("http://localhost:" + server.getPort())
-                .setAsync(true)
-                .setRetryCount(3)
-                .setRetryWhen(((req, res) -> res.getStatusCode() == 203))
-                .setOnSuccess(((data, req, res) -> {
+        ForestRequest<?> request = Forest.get("http://localhost")
+                .port(server.getPort())
+                .async()
+                .maxRetryCount(3)
+                .retryWhen(((req, res) -> res.getStatusCode() == 203))
+                .onSuccess(((data, req, res) -> {
                     isSuccess.set(true);
                     latch.countDown();
                 }));
@@ -550,10 +638,11 @@ public class TestGenericForestClient extends BaseClientTest {
     public void testRequest_sync_retryWhen_error_not_retry() {
         server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(400));
         AtomicBoolean isError = new AtomicBoolean(false);
-        ForestRequest<?> request = Forest.get("http://localhost:" + server.getPort())
-                .setRetryCount(3)
-                .setRetryWhen(((req, res) -> res.getStatusCode() == 200))
-                .setOnError(((ex, req, res) -> {
+        ForestRequest<?> request = Forest.get("http://localhost")
+                .port(server.getPort())
+                .maxRetryCount(3)
+                .retryWhen(((req, res) -> res.getStatusCode() == 200))
+                .onError(((ex, req, res) -> {
                     isError.set(true);
                 }));
         request.execute();
@@ -569,9 +658,11 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(400));
         server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(400));
         AtomicBoolean isError = new AtomicBoolean(false);
-        ForestRequest<?> request = Forest.get("http://localhost:" + server.getPort())
-                .setRetryCount(3)
-                .setOnError(((ex, req, res) -> {
+        ForestRequest<?> request = Forest.get("/")
+                .host("localhost")
+                .port(server.getPort())
+                .maxRetryCount(3)
+                .onError(((ex, req, res) -> {
                     isError.set(true);
                 }));
         request.execute();
@@ -608,7 +699,8 @@ public class TestGenericForestClient extends BaseClientTest {
         CountDownLatch latch = new CountDownLatch(1);
         AtomicBoolean isError = new AtomicBoolean(false);
         ForestRequest<?> request = Forest.get("http://localhost:" + server.getPort())
-                .setRetryCount(3)
+                .maxRetryCount(3)
+                .maxRetryInterval(10L)
                 .setOnError(((ex, req, res) -> {
                     isError.set(true);
                     latch.countDown();
