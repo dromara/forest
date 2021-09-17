@@ -50,8 +50,7 @@ public @interface Retry {
     String maxRetryCount() default "";
 
     /**
-     *
-     * @return
+     * 请求最大重试间隔时间
      */
     String maxRetryInterval() default "";
 
