@@ -78,6 +78,49 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
         }
     }
 
+    private boolean interfaceFilter(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory) {
+        ClassMetadata classMetadata = metadataReader.getClassMetadata();
+        if (!classMetadata.isInterface() || classMetadata.isFinal()) {
+            return false;
+        }
+
+        String[] superClassNames = metadataReader.getClassMetadata().getInterfaceNames();
+        boolean hasSuperForestClient = false;
+        for (String superClassName :superClassNames) {
+            try {
+                MetadataReader superMetaReader = metadataReaderFactory.getMetadataReader(superClassName);
+                hasSuperForestClient = interfaceFilter(superMetaReader, metadataReaderFactory);
+            } catch (IOException e) {
+            }
+            if (hasSuperForestClient) {
+                return true;
+            }
+        }
+
+        AnnotationMetadata annotationMetadata = metadataReader.getAnnotationMetadata();
+        Set<String> baseAnnNames = annotationMetadata.getAnnotationTypes();
+
+        for (String annName : baseAnnNames) {
+            try {
+                Class<?> annType = Class.forName(annName);
+                Annotation lcAnn = annType.getAnnotation(BaseLifeCycle.class);
+                if (lcAnn != null) {
+                    return true;
+                }
+                lcAnn = annType.getAnnotation(MethodLifeCycle.class);
+                if (lcAnn != null) {
+                    return true;
+                }
+            } catch (Throwable ignored) {
+            }
+        }
+        for (String methodAnnName : FOREST_METHOD_ANNOTATION_NAMES) {
+            if (annotationMetadata.hasAnnotatedMethods(methodAnnName)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * 注册过滤器
@@ -85,34 +128,8 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
     public void registerFilters() {
         if (allInterfaces) {
             // include all interfaces
-            addIncludeFilter((metadataReader, metadataReaderFactory) -> {
-                ClassMetadata classMetadata = metadataReader.getClassMetadata();
-                if (!classMetadata.isInterface() || classMetadata.isFinal()) {
-                    return false;
-                }
-                AnnotationMetadata annotationMetadata = metadataReader.getAnnotationMetadata();
-                Set<String> baseAnnNames = annotationMetadata.getAnnotationTypes();
-                for (String annName : baseAnnNames) {
-                    try {
-                        Class<?> annType = Class.forName(annName);
-                        Annotation lcAnn = annType.getAnnotation(BaseLifeCycle.class);
-                        if (lcAnn != null) {
-                            return true;
-                        }
-                        lcAnn = annType.getAnnotation(MethodLifeCycle.class);
-                        if (lcAnn != null) {
-                            return true;
-                        }
-                    } catch (Throwable ignored) {
-                    }
-                }
-                for (String methodAnnName : FOREST_METHOD_ANNOTATION_NAMES) {
-                    if (annotationMetadata.hasAnnotatedMethods(methodAnnName)) {
-                        return true;
-                    }
-                }
-                return false;
-            });
+            addIncludeFilter((metadataReader, metadataReaderFactory) ->
+                    interfaceFilter(metadataReader, metadataReaderFactory));
         }
 
         // exclude package-info.java
