@@ -15,7 +15,6 @@ import java.lang.annotation.Target;
  * @since 1.5.2
  */
 @Documented
-@MethodLifeCycle(DeleteRequestLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface BindingVar {
