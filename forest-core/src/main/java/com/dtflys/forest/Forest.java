@@ -23,7 +23,6 @@ import com.dtflys.forest.http.ForestRequest;
  */
 public abstract class Forest {
 
-    private volatile static ForestConfiguration DEFAULT_CONFIG;
 
     /**
      * 获取或创建全局默认配置，即 {@link ForestConfiguration} 对象
