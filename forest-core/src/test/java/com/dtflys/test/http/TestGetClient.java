@@ -12,12 +12,21 @@ import com.dtflys.test.model.TokenResult;
 import com.google.common.collect.Lists;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import okio.Buffer;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.ReaderInputStream;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -135,6 +144,34 @@ public class TestGetClient extends BaseClientTest {
                 .assertPathEquals("/hello/user")
                 .assertQueryEquals("username", "foo");
     }
+
+    @Test
+    public void testJsonMapGetWithGBKResponse() throws IOException {
+        String body = "{\"status\": \"正常\"}";
+        byte[] byteArray = body.getBytes("GBK");
+        Buffer buffer = new Buffer();
+        try {
+            buffer.readFrom(new ByteArrayInputStream(byteArray));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        server.enqueue(
+                new MockResponse()
+                        .setBody(buffer));
+        ForestResponse<Map> response = getClient.jsonMapGetWithResponseEncoding();
+        assertThat(response).isNotNull();
+        assertThat(response.getContentType()).isNull();
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getContentEncoding()).isEqualTo("GBK");
+        assertThat(response.getResult())
+                .isNotNull()
+                .containsOnly(entry("status", "正常"));
+        mockRequest(server)
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo");
+    }
+
 
     @Test
     public void testJsonMapGetWithJsonResponse() throws InterruptedException {

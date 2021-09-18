@@ -140,6 +140,15 @@ public interface GetClient {
     )
     ForestResponse<Map> jsonMapGet();
 
+    @Get(
+            url = "http://localhost:${port}/hello/user",
+            dataType = "json",
+            headers = {"Accept:text/plain"},
+            responseEncoding = "GBK",
+            data = "username=foo"
+    )
+    ForestResponse<Map> jsonMapGetWithResponseEncoding();
+
     @Request(
             url = "http://localhost:${port}/hello/user",
             dataType = "json",
