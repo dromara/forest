@@ -1293,8 +1293,7 @@ public class ForestConfiguration implements Serializable {
      * @return       动态代理实例
      */
     public <T> T client(Class<T> clazz) {
-        ProxyFactory<T> proxyFactory = getProxyFactory(clazz);
-        return proxyFactory.createInstance();
+        return createInstance(clazz);
     }
 
 

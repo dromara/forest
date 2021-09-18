@@ -252,7 +252,7 @@ public class ForestMethod<T> implements VariableScope {
         }
 
         List<Annotation> baseAnnotationList = interfaceProxyHandler.getBaseAnnotations();
-        Map<Annotation, Class> baseAnnMap = new HashMap<>(baseAnnotationList.size());
+        Map<Annotation, Class> baseAnnMap = new LinkedHashMap<>(baseAnnotationList.size());
         for (Annotation annotation : baseAnnotationList) {
             Class interceptorClass = getAnnotationLifeCycleClass(annotation);
             baseAnnMap.put(annotation, interceptorClass);

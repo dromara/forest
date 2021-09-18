@@ -85,9 +85,17 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         initMethods();
     }
 
-
     private void prepareBaseInfo() {
-        Annotation[] annotations = interfaceClass.getAnnotations();
+        prepareBaseInfo(interfaceClass);
+    }
+
+    private void prepareBaseInfo(Class<?> clazz) {
+        Class<?>[] superClasses = clazz.getInterfaces();
+        for (Class<?> superClass : superClasses) {
+            prepareBaseInfo(superClass);
+        }
+
+        Annotation[] annotations = clazz.getAnnotations();
 
         for (int i = 0; i < annotations.length; i++) {
             Annotation annotation = annotations[i];
@@ -118,7 +126,16 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
 
 
     private void initMethods() {
-        Method[] methods = interfaceClass.getDeclaredMethods();
+        initMethods(interfaceClass);
+    }
+
+    private void initMethods(Class<?> clazz) {
+        Class<?>[] superClasses = clazz.getInterfaces();
+        for (Class<?> superClass : superClasses) {
+            initMethods(superClass);
+        }
+
+        Method[] methods = clazz.getDeclaredMethods();
         for (int i = 0; i < methods.length; i++) {
             Method method = methods[i];
             if(method.isDefault()){
@@ -128,6 +145,7 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
             forestMethodMap.put(method, forestMethod);
         }
     }
+
 
     /**
      * 调用 Forest 动态代理接口对象的方法
