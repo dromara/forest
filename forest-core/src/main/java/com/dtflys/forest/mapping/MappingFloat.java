@@ -1,5 +1,7 @@
 package com.dtflys.forest.mapping;
 
+import com.dtflys.forest.reflection.ForestMethod;
+
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2018-01-09 17:36
@@ -9,7 +11,7 @@ public class MappingFloat extends MappingExpr {
     private final float number;
 
     public MappingFloat(float number) {
-        super(Token.FLOAT);
+        super(null, Token.FLOAT);
         this.number = number;
     }
 

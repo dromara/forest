@@ -1,6 +1,7 @@
 package com.dtflys.test.http.client;
 
 import com.dtflys.forest.annotation.*;
+import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.model.*;
 import com.dtflys.test.http.model.UserParam;
@@ -214,6 +215,11 @@ public interface PostClient {
     )
     String postHead2(String body);
 
+    @Post(
+            url = "http://localhost:${port}/hello/user",
+            contentType = ContentType.APPLICATION_JSON
+    )
+    String postJsonByteArray(@Body byte[] data);
 
     @Request(
             url = "http://localhost:{port}/json",

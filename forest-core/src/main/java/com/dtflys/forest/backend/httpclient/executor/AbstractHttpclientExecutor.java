@@ -125,13 +125,9 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         bodyBuilder.buildBody(httpRequest, request, lifeCycleHandler);
     }
 
+
     @Override
     public void execute(LifeCycleHandler lifeCycleHandler) {
-        execute(0, lifeCycleHandler);
-    }
-
-
-    public void execute(int retryCount, LifeCycleHandler lifeCycleHandler) {
         prepare(lifeCycleHandler);
         Date startDate = new Date();
         ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
@@ -144,13 +140,10 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
                     cookieStore,
                     startDate, 0);
         } catch (IOException e) {
-            if (retryCount >= request.getRetryCount()) {
-                httpRequest.abort();
-                response = forestResponseFactory.createResponse(request, null, lifeCycleHandler, e, startDate);
-                lifeCycleHandler.handleSyncWithException(request, response, e);
-                return;
-            }
-            log.error(e.getMessage());
+            httpRequest.abort();
+            response = forestResponseFactory.createResponse(request, null, lifeCycleHandler, e, startDate);
+            lifeCycleHandler.handleSyncWithException(request, response, e);
+            return;
         } catch (ForestRuntimeException e) {
             httpRequest.abort();
             throw e;

@@ -33,6 +33,8 @@ import java.util.Set;
 public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
 
     private final static String[] FOREST_METHOD_ANNOTATION_NAMES = new String[] {
+            "com.dtflys.forest.annotation.Backend",
+            "com.dtflys.forest.annotation.Address",
             "com.dtflys.forest.annotation.Request",
             "com.dtflys.forest.annotation.Get",
             "com.dtflys.forest.annotation.GetRequest",
@@ -94,6 +96,10 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
                     try {
                         Class<?> annType = Class.forName(annName);
                         Annotation lcAnn = annType.getAnnotation(BaseLifeCycle.class);
+                        if (lcAnn != null) {
+                            return true;
+                        }
+                        lcAnn = annType.getAnnotation(MethodLifeCycle.class);
                         if (lcAnn != null) {
                             return true;
                         }

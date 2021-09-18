@@ -19,6 +19,11 @@ public class Base64Utils {
 		return ENCODER.encodeToString(str.getBytes());
     }
 
+    public static byte[] encodeToByteArray(String str) {
+        return ENCODER.encode(str.getBytes());
+    }
+
+
     public static byte[] decode(String str) {
 		return DECODER.decode(str);
     }

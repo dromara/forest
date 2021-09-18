@@ -5,13 +5,11 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
-import org.apache.commons.io.IOUtils;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.Type;
@@ -64,7 +62,7 @@ public class ForestJaxbConverter implements ForestXmlConverter {
 
     @Override
     public <T> T convertToJavaObject(String source, Type targetType) {
-        Class clazz = ReflectUtils.getClassByType(targetType);
+        Class clazz = ReflectUtils.toClass(targetType);
         return (T) convertToJavaObject(source, clazz);
     }
 
@@ -77,7 +75,7 @@ public class ForestJaxbConverter implements ForestXmlConverter {
 
     @Override
     public <T> T convertToJavaObject(byte[] source, Type targetType, Charset charset) {
-        Class clazz = ReflectUtils.getClassByType(targetType);
+        Class clazz = ReflectUtils.toClass(targetType);
         return (T) convertToJavaObject(source, clazz, charset);
     }
 

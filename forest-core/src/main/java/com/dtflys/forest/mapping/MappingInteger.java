@@ -1,5 +1,7 @@
 package com.dtflys.forest.mapping;
 
+import com.dtflys.forest.reflection.ForestMethod;
+
 /**
  * Created by Administrator on 2016/5/17.
  */
@@ -8,7 +10,7 @@ public class MappingInteger extends MappingExpr {
     private final int number;
 
     public MappingInteger(int number) {
-        super(Token.INT);
+        super(null, Token.INT);
         this.number = number;
     }
 

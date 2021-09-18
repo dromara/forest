@@ -47,7 +47,7 @@ public class TestXmlClient extends BaseClientTest {
 
     @BeforeClass
     public static void prepareClient() {
-        configuration = ForestConfiguration.configuration();
+        configuration = ForestConfiguration.createConfiguration();
     }
 
     public TestXmlClient(HttpBackend backend) {

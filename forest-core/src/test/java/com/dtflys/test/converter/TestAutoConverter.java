@@ -20,7 +20,7 @@ import static junit.framework.Assert.*;
 public class TestAutoConverter {
 
     private DefaultAutoConverter getConverter() {
-        ForestConfiguration configuration = ForestConfiguration.configuration();
+        ForestConfiguration configuration = ForestConfiguration.createConfiguration();
         DefaultAutoConverter autoConverter = (DefaultAutoConverter) configuration.getConverterMap().get(ForestDataType.AUTO);
         assertNotNull(autoConverter);
         return autoConverter;

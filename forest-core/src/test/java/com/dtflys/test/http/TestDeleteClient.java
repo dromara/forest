@@ -45,7 +45,7 @@ public class TestDeleteClient extends BaseClientTest {
 
     @BeforeClass
     public static void prepareClient() {
-        configuration = ForestConfiguration.configuration();
+        configuration = ForestConfiguration.createConfiguration();
     }
 
     public TestDeleteClient(HttpBackend backend) {

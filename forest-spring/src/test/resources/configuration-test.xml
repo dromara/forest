@@ -9,7 +9,7 @@
 
 
     <forest:configuration
-            id="forestConfiguration"
+            id="forestConfiguration2"
             backend="httpclient"
             timeout="30000"
             retryCount="3"

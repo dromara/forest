@@ -44,7 +44,7 @@ public class TestInterceptor extends BaseClientTest {
 
     @BeforeClass
     public static void prepareClient() {
-        configuration = ForestConfiguration.configuration();
+        configuration = ForestConfiguration.createConfiguration();
         configuration.setCacheEnabled(false);
     }
 
@@ -68,7 +68,7 @@ public class TestInterceptor extends BaseClientTest {
         assertThat(interceptorClient.simple())
             .isNotNull()
             .isEqualTo("XX: " + EXPECTED);
-        Mockito.verify(logger).info("[Forest] Request: \n" +
+        Mockito.verify(logger).info("[Forest] Request (" + configuration.getBackend().getName() + "): \n" +
                 "\t[Type Change]: POST -> GET\n" +
                 "\tGET http://localhost:" + server.getPort() + "/hello/user?username=foo&username=foo HTTP\n" +
                 "\tHeaders: \n" +

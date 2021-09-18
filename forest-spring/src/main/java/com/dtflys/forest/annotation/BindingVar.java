@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @MethodLifeCycle(DeleteRequestLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface BindVar {
+public @interface BindingVar {
 
     /**
      * 绑定的变量名

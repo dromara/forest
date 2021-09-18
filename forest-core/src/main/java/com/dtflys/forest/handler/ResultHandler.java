@@ -50,7 +50,10 @@ public class ResultHandler {
                         if (ForestResponse.class.isAssignableFrom(rowClass)
                                 || ForestRequest.class.isAssignableFrom(resultClass)) {
                             Type realType = parameterizedType.getActualTypeArguments()[0];
-                            Class realClass = ReflectUtils.getClassByType(parameterizedType.getActualTypeArguments()[0]);
+                            Class realClass = ReflectUtils.toClass(parameterizedType.getActualTypeArguments()[0]);
+                            if (realClass == null) {
+                                realClass = String.class;
+                            }
                             Object realResult = getResult(request, response, realType, realClass);
                             response.setResult(realResult);
                         }
@@ -66,7 +69,7 @@ public class ResultHandler {
                         Class rowClass = (Class) parameterizedType.getRawType();
                         if (Future.class.isAssignableFrom(rowClass)) {
                             Type realType = parameterizedType.getActualTypeArguments()[0];
-                            Class realClass = ReflectUtils.getClassByType(parameterizedType.getActualTypeArguments()[0]);
+                            Class realClass = ReflectUtils.toClass(parameterizedType.getActualTypeArguments()[0]);
                             return getResult(request, response, realType, realClass);
                         }
                     }

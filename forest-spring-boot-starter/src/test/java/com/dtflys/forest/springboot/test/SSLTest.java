@@ -4,6 +4,7 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.logging.ForestLogger;
 import com.dtflys.forest.springboot.test.client2.GiteeClient;
+import com.dtflys.forest.springboot.test.ssl.MySSLSocketFactoryBuilder;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,7 +18,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.Assert.assertEquals;
+
 
 @RunWith(SpringRunner.class)
 @ActiveProfiles("ssl")
@@ -43,20 +46,20 @@ public class SSLTest {
         assertEquals(Integer.valueOf(2), sslConfig.getRetryCount());
         assertEquals(1, sslConfig.getSslKeyStores().size());
         SSLKeyStore sslKeyStore = sslConfig.getKeyStore("keystore1");
-        assertNotNull(sslKeyStore);
+        assertThat(sslKeyStore).isNotNull();
         assertEquals("keystore1", sslKeyStore.getId());
         assertEquals("test.keystore", sslKeyStore.getFilePath());
         assertEquals("123456", sslKeyStore.getKeystorePass());
         assertEquals("123456", sslKeyStore.getCertPass());
 //        assertEquals(1, sslKeyStore.getProtocols().length);
 //        assertEquals("SSLv3", sslKeyStore.getProtocols()[0]);
-        assertEquals("com.dtflys.forest.springboot.test.ssl.MySSLSocketFactoryBuilder", sslKeyStore.getSslSocketFactoryBuilder());
+        assertThat(sslKeyStore.getSslSocketFactoryBuilder()).isNotNull().isInstanceOf(MySSLSocketFactoryBuilder.class);
 
         ForestRequest<String> request = giteeClient.index2();
-        assertNotNull(request);
+        assertThat(request).isNotNull();
         request.getLogConfiguration().getLogHandler().setLogger(logger);
         String result = (String) request.execute();
-        assertTrue(result.startsWith("Global: "));
+        assertThat(result.startsWith("Global: ")).isTrue();
         Mockito.verify(logger).info("[Forest] [Test2] 请求: \n" + "\tGET https://gitee.com/dt_flys HTTPS");
     }
 

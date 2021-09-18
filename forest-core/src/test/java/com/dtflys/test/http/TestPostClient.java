@@ -7,6 +7,7 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.ForestLogger;
 import com.dtflys.forest.logging.RequestLogMessage;
+import com.dtflys.forest.utils.Base64Utils;
 import com.dtflys.test.http.client.EmptyJsonClient;
 import com.dtflys.test.http.client.PostClient;
 import com.dtflys.test.http.model.Cause;
@@ -59,7 +60,7 @@ public class TestPostClient extends BaseClientTest {
 
     @BeforeClass
     public static void prepareClient() {
-        configuration = ForestConfiguration.configuration();
+        configuration = ForestConfiguration.createConfiguration();
     }
 
     @Override
@@ -380,6 +381,18 @@ public class TestPostClient extends BaseClientTest {
     }
 
     @Test
+    public void testPostJsonByteArray() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String json = "{\"a\": \"1\", \"b\": \"2\"}";
+        byte[] data = Base64Utils.encodeToByteArray(json);
+        assertThat(postClient.postJsonByteArray(data))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertBodyEquals(data);
+    }
+
+    @Test
     public void testPostJsonWithCnCharacters() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(CN_EXPECTED));
         assertThat(postClient.postJsonWithCnCharacters("foo", "123456&&++===", "中文名"))
@@ -542,7 +555,7 @@ public class TestPostClient extends BaseClientTest {
                 .isNotNull()
                 .extracting(RequestLogMessage::getRequest)
                 .isEqualTo(request);
-        Mockito.verify(logger).info("[Forest] Request: \n" +
+        Mockito.verify(logger).info("[Forest] Request (" + configuration.getBackend().getName() + "): \n" +
                 "\tPOST http://localhost:" + server.getPort() + "/json HTTP\n" +
                 "\tHeaders: \n" +
                 "\t\tAccept: application/json\n" +
@@ -561,7 +574,7 @@ public class TestPostClient extends BaseClientTest {
         assertThat(postClient.postJsonMapWithLog(userMap))
                 .isNotNull()
                 .isEqualTo(EXPECTED);
-        Mockito.verify(logger).info("[Forest] Request: \n" +
+        Mockito.verify(logger).info("[Forest] Request (" + configuration.getBackend().getName() + "): \n" +
                 "\tPOST http://localhost:" + server.getPort() + "/json HTTP\n" +
                 "\tHeaders: \n" +
                 "\t\tContent-Type: application/json\n" +
@@ -578,7 +591,7 @@ public class TestPostClient extends BaseClientTest {
         assertThat(postClient.postJsonMapWithoutLog(userMap))
                 .isNotNull()
                 .isEqualTo(EXPECTED);
-        Mockito.verify(logger, Mockito.never()).info("[Forest] Request: \n" +
+        Mockito.verify(logger, Mockito.never()).info("[Forest] Request (" + configuration.getBackend().getName() + "): \n" +
                 "\tPOST http://localhost:" + server.getPort() + "/json HTTP\n" +
                 "\tHeaders: \n" +
                 "\t\tContent-Type: application/json\n" +
@@ -595,7 +608,7 @@ public class TestPostClient extends BaseClientTest {
         assertThat(postClient.postJsonObjectWithoutLog(user))
                 .isNotNull()
                 .isEqualTo(EXPECTED);
-        Mockito.verify(logger, Mockito.never()).info("[Forest] Request: \n" +
+        Mockito.verify(logger, Mockito.never()).info("[Forest] Request (" + configuration.getBackend().getName() + "): \n" +
                 "\tPOST http://localhost:" + server.getPort() + "/json HTTP\n" +
                 "\tHeaders: \n" +
                 "\t\tContent-Type: application/json\n" +
@@ -612,7 +625,7 @@ public class TestPostClient extends BaseClientTest {
         assertThat(postClient.postJsonObjectWithLog_content_noStatus(user))
                 .isNotNull()
                 .isEqualTo(EXPECTED);
-        Mockito.verify(logger).info("[Forest] Request: \n" +
+        Mockito.verify(logger).info("[Forest] Request (" + configuration.getBackend().getName() + "): \n" +
                 "\tPOST http://localhost:" + server.getPort() + "/json HTTP\n" +
                 "\tHeaders: \n" +
                 "\t\tAccept-Encoding: UTF-8\n" +
@@ -650,7 +663,7 @@ public class TestPostClient extends BaseClientTest {
         assertThat(postClient.postJsonObjListWithLog_content_noRequest_noStatus(list))
                 .isNotNull()
                 .isEqualTo(EXPECTED);
-        Mockito.verify(logger, Mockito.never()).info("[Forest] Request: \n" +
+        Mockito.verify(logger, Mockito.never()).info("[Forest] Request (" + configuration.getBackend().getName() + "): \n" +
                 "\tPOST http://localhost:" + server.getPort() + "/json HTTP\n" +
                 "\tHeaders: \n" +
                 "\t\tContent-Type: application/json; charset=utf-8\n" +

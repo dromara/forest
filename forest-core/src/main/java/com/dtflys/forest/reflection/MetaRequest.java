@@ -66,6 +66,12 @@ public class MetaRequest {
     private String charset;
 
     /**
+     * Response Encoding
+     * <p>该属性不填的情况下，根据响应头中的 Content-Encoding 来确定响应内容的编码
+     */
+    private String responseEncoding;
+
+    /**
      * User Agent
      */
     private String userAgent;
@@ -222,6 +228,14 @@ public class MetaRequest {
 
     public void setCharset(String charset) {
         this.charset = charset;
+    }
+
+    public String getResponseEncoding() {
+        return responseEncoding;
+    }
+
+    public void setResponseEncoding(String responseEncoding) {
+        this.responseEncoding = responseEncoding;
     }
 
     public String[] getHeaders() {

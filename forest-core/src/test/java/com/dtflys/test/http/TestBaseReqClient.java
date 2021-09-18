@@ -44,7 +44,7 @@ public class TestBaseReqClient extends BaseClientTest {
 
     @BeforeClass
     public static void prepareClient() {
-        configuration = ForestConfiguration.configuration();
+        configuration = ForestConfiguration.createConfiguration();
     }
 
     public TestBaseReqClient(HttpBackend backend) {

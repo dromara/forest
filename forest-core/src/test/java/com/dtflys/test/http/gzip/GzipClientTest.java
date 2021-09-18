@@ -28,11 +28,11 @@ public class GzipClientTest extends BaseClientTest {
 
     private GzipClient2 gzipClient2;
 
-    private static ForestConfiguration configuration = ForestConfiguration.configuration();
+    private static ForestConfiguration configuration;
 
     @BeforeClass
     public static void prepareClient() {
-        configuration = ForestConfiguration.configuration();
+        configuration = ForestConfiguration.createConfiguration();
         configuration.setLogResponseContent(true);
         configuration.getVariables().put("baseUrl", new BasicVariableValue("http://localhost"));
         configuration.setVariableValue("port", Get2MockServer.port);

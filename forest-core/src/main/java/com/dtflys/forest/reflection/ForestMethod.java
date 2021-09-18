@@ -5,6 +5,7 @@ import com.dtflys.forest.annotation.MethodLifeCycle;
 import com.dtflys.forest.annotation.ParamLifeCycle;
 import com.dtflys.forest.annotation.RequestAttributes;
 import com.dtflys.forest.backend.ContentType;
+import com.dtflys.forest.callback.AddressSource;
 import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
@@ -17,11 +18,13 @@ import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestInterceptorDefineException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.filter.Filter;
+import com.dtflys.forest.http.ForestAddress;
 import com.dtflys.forest.http.ForestQueryParameter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.http.ForestURL;
 import com.dtflys.forest.http.body.ObjectRequestBody;
 import com.dtflys.forest.http.body.RequestBodyBuilder;
 import com.dtflys.forest.http.body.StringRequestBody;
@@ -42,7 +45,7 @@ import com.dtflys.forest.mapping.SubVariableScope;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.multipart.ForestMultipartFactory;
 import com.dtflys.forest.proxy.InterfaceProxyHandler;
-import com.dtflys.forest.retryer.Retryer;
+import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.NameUtils;
@@ -50,11 +53,11 @@ import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
-import okio.ByteString;
-import org.apache.commons.lang3.ObjectUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 
 import static com.dtflys.forest.mapping.MappingParameter.*;
@@ -73,6 +76,7 @@ public class ForestMethod<T> implements VariableScope {
     private String[] methodNameItems;
     private Class returnClass;
     private Type returnType;
+    private MappingParameter returnTypeParameter;
     private MetaRequest metaRequest;
     private MappingTemplate baseUrlTemplate;
     private MappingTemplate urlTemplate;
@@ -89,6 +93,7 @@ public class ForestMethod<T> implements VariableScope {
     private MappingTemplate baseEncodeTemplate = null;
     private MappingTemplate encodeTemplate = null;
     private MappingTemplate charsetTemplate = null;
+    private MappingTemplate responseEncodingTemplate = null;
     private MappingTemplate baseContentTypeTemplate;
     private MappingTemplate baseUserAgentTemplate;
     private MappingTemplate baseCharsetTemplate;
@@ -152,14 +157,23 @@ public class ForestMethod<T> implements VariableScope {
 
     @Override
     public Object getVariableValue(String name) {
-        return configuration.getVariableValue(name);
+        return getVariableValue(name, this);
+    }
+
+    @Override
+    public Object getVariableValue(String name, ForestMethod method) {
+        return configuration.getVariableValue(name, method);
     }
 
     public MappingTemplate makeTemplate(String text) {
-        return new MappingTemplate(text, this, configuration.getProperties(), forestParameters);
+        return new MappingTemplate(this, text, this, configuration.getProperties(), forestParameters);
     }
 
-
+    /**
+     * 获取Forest接口方法的返回类
+     *
+     * @return 返回类 {@link Class} 实例
+     */
     public Class getReturnClass() {
         return returnClass;
     }
@@ -208,7 +222,7 @@ public class ForestMethod<T> implements VariableScope {
         baseRetryCount = baseMetaRequest.getRetryCount();
         baseMaxRetryInterval = baseMetaRequest.getMaxRetryInterval();
 
-        List<Class> globalInterceptorClasses = configuration.getInterceptors();
+        List<Class<? extends Interceptor>> globalInterceptorClasses = configuration.getInterceptors();
         if (globalInterceptorClasses != null && globalInterceptorClasses.size() > 0) {
             globalInterceptorList = new LinkedList<>();
             for (Class clazz : globalInterceptorClasses) {
@@ -453,6 +467,9 @@ public class ForestMethod<T> implements VariableScope {
             encodeTemplate = makeTemplate(metaRequest.getContentEncoding());
         }
         charsetTemplate = makeTemplate(metaRequest.getCharset());
+        if (metaRequest.getResponseEncoding() != null) {
+            responseEncodingTemplate = makeTemplate(metaRequest.getResponseEncoding());
+        }
         sslProtocolTemplate = makeTemplate(metaRequest.getSslProtocol());
         progressStep = metaRequest.getProgressStep();
         async = metaRequest.isAsync();
@@ -641,26 +658,6 @@ public class ForestMethod<T> implements VariableScope {
         }
     }
 
-    /**
-     * 给请求设置重试策略
-     * @param retryerClass 重试策略类型
-     * @param request Forest请求对象，{@link ForestRequest}类实例
-     */
-    private void setRetryerToRequest(Class retryerClass, ForestRequest request) {
-        try {
-            Constructor constructor = retryerClass.getConstructor(ForestRequest.class);
-            Retryer retryer = (Retryer) constructor.newInstance(request);
-            request.setRetryer(retryer);
-        } catch (NoSuchMethodException e) {
-            throw new ForestRuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new ForestRuntimeException(e);
-        } catch (InstantiationException e) {
-            throw new ForestRuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new ForestRuntimeException(e);
-        }
-    }
 
     /**
      * 获得最终的请求类型
@@ -727,6 +724,11 @@ public class ForestMethod<T> implements VariableScope {
             charset = configuration.getCharset();
         }
 
+        String responseEncoding = null;
+        if (responseEncodingTemplate != null) {
+            responseEncoding = responseEncodingTemplate.render(args);
+        }
+
         String sslProtocol = null;
         String renderedSslProtocol = sslProtocolTemplate.render(args);
         if (StringUtils.isNotBlank(renderedSslProtocol)) {
@@ -752,14 +754,27 @@ public class ForestMethod<T> implements VariableScope {
             baseHeaders = new MappingTemplate[headerArray.length];
             for (int j = 0; j < baseHeaders.length; j++) {
                 MappingTemplate header = new MappingTemplate(
-                        headerArray[j], this, configuration.getProperties(), forestParameters);
+                        this, headerArray[j], this, configuration.getProperties(), forestParameters);
                 baseHeaders[j] = header;
             }
         }
 
+        ForestURL baseURL = null;
+        AddressSource addressSource = configuration.getBaseAddressSource();
+        ForestAddress address = configuration.getBaseAddress();
+        try {
+            if (StringUtils.isNotBlank(baseUrl)) {
+                baseURL = new ForestURL(new URL(baseUrl));
+            } else {
+                baseURL = new ForestURL(new URL("http://localhost/"));
+                baseURL.setBaseAddress(address);
+            }
+            baseUrl = baseURL.toString();
+        } catch (MalformedURLException e) {
+            throw new ForestRuntimeException(e);
+        }
 
         renderedUrl = URLUtils.getValidURL(baseUrl, renderedUrl);
-
 
         // createExecutor and initialize http instance
         ForestRequest<T> request = new ForestRequest(configuration, this, args);
@@ -769,6 +784,15 @@ public class ForestMethod<T> implements VariableScope {
                 .setSslProtocol(sslProtocol)
                 .setLogConfiguration(logConfiguration)
                 .setAsync(async);
+
+        if (addressSource != null) {
+            address = addressSource.getAddress(request);
+            request.address(address);
+        }
+
+        if (StringUtils.isNotEmpty(responseEncoding)) {
+            request.setResponseEncode(responseEncoding);
+        }
 
         if (StringUtils.isNotEmpty(renderedContentType)) {
             request.setContentType(renderedContentType);
@@ -1122,12 +1146,12 @@ public class ForestMethod<T> implements VariableScope {
 
         Class globalRetryerClass = configuration.getRetryer();
 
-        if (retryerClass != null && Retryer.class.isAssignableFrom(retryerClass)) {
-            setRetryerToRequest(retryerClass, request);
-        } else if (baseRetryerClass != null && Retryer.class.isAssignableFrom(baseRetryerClass)) {
-            setRetryerToRequest(baseRetryerClass, request);
-        } else if (globalRetryerClass != null && Retryer.class.isAssignableFrom(globalRetryerClass)) {
-            setRetryerToRequest(globalRetryerClass, request);
+        if (retryerClass != null && ForestRetryer.class.isAssignableFrom(retryerClass)) {
+            request.setRetryer(retryerClass);
+        } else if (baseRetryerClass != null && ForestRetryer.class.isAssignableFrom(baseRetryerClass)) {
+            request.setRetryer(baseRetryerClass);
+        } else if (globalRetryerClass != null && ForestRetryer.class.isAssignableFrom(globalRetryerClass)) {
+            request.setRetryer(globalRetryerClass);
         }
 
         if (onSuccessParameter != null) {
@@ -1212,12 +1236,10 @@ public class ForestMethod<T> implements VariableScope {
      * @return 调用本对象对应方法结束后返回的值，任意类型的对象实例
      */
     public Object invoke(Object[] args) {
+        Type rType = this.getReturnType();
         ForestRequest request = makeRequest(args);
-        MethodLifeCycleHandler<T> lifeCycleHandler = new MethodLifeCycleHandler<>(
-                this, onSuccessClassGenericType);
-        request.setBackend(configuration.getBackend())
-                .setLifeCycleHandler(lifeCycleHandler);
-        lifeCycleHandler.handleInvokeMethod(request, this, args);
+        MethodLifeCycleHandler<T> lifeCycleHandler = null;
+        request.setBackend(configuration.getBackend());
         // 如果返回类型为ForestRequest，直接返回请求对象
         if (ForestRequest.class.isAssignableFrom(returnClass)) {
             Type retType = getReturnType();
@@ -1226,15 +1248,35 @@ public class ForestMethod<T> implements VariableScope {
                 Type[] genTypes = parameterizedType.getActualTypeArguments();
                 if (genTypes.length > 0) {
                     Type targetType = genTypes[0];
-                    returnClass = ReflectUtils.getClassByType(targetType);
-                    returnType = targetType;
+                    rType = targetType;
                 } else {
-                    returnClass = String.class;
-                    returnType = String.class;
+                    rType = String.class;
                 }
+                if (rType instanceof WildcardType) {
+                    WildcardType wildcardType = (WildcardType) rType;
+                    Type[] bounds = wildcardType.getUpperBounds();
+                    if (bounds.length > 0) {
+                        rType = bounds[0];
+                    } else {
+                        rType = String.class;
+                    }
+                }
+                Type successType = rType;
+                if (onSuccessClassGenericType != null) {
+                    successType = onSuccessClassGenericType;
+                }
+                lifeCycleHandler = new MethodLifeCycleHandler<>(
+                        rType, successType);
+                request.setLifeCycleHandler(lifeCycleHandler);
+                lifeCycleHandler.handleInvokeMethod(request, this, args);
             }
+            lifeCycleHandler.handleInvokeMethod(request, this, args);
             return request;
         }
+        lifeCycleHandler = new MethodLifeCycleHandler<>(
+                rType, onSuccessClassGenericType);
+        request.setLifeCycleHandler(lifeCycleHandler);
+        lifeCycleHandler.handleInvokeMethod(request, this, args);
         return request.execute();
     }
 
@@ -1265,15 +1307,42 @@ public class ForestMethod<T> implements VariableScope {
     }
 
     /**
+     * 设置方法返回值类型
+     *
+     * @param returnType 方法返回值类型，{@link Type}接口实例
+     */
+    public void setReturnType(Type returnType) {
+        this.returnType = returnType;
+    }
+
+    /**
      * 获取方法返回值类型
+     *
      * @return 方法返回值类型，{@link Type}接口实例
      */
     public Type getReturnType() {
-        if (returnType != null) {
-            return returnType;
+        if (returnType == null) {
+            returnType = method.getGenericReturnType();
         }
-        Type type = method.getGenericReturnType();
-        return type;
+        return returnType;
+    }
+
+    /**
+     * 获取指定方法返回值类型的参数
+     *
+     * @return {@link MappingParameter}实例
+     */
+    public MappingParameter getReturnTypeParameter() {
+        return returnTypeParameter;
+    }
+
+    /**
+     * 设置指定方法返回值类型的参数
+     *
+     * @param returnTypeParameter {@link MappingParameter}实例
+     */
+    public void setReturnTypeParameter(MappingParameter returnTypeParameter) {
+        this.returnTypeParameter = returnTypeParameter;
     }
 
     /**
@@ -1285,7 +1354,7 @@ public class ForestMethod<T> implements VariableScope {
         if (type == null) {
             return Void.class;
         }
-        Class clazz = ReflectUtils.getClassByType(type);
+        Class clazz = ReflectUtils.toClass(type);
         if (ForestResponse.class.isAssignableFrom(clazz)) {
             if (type instanceof ParameterizedType) {
                 Type[] types = ((ParameterizedType) type).getActualTypeArguments();

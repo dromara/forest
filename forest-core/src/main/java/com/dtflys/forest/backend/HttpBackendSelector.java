@@ -8,6 +8,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Forest后端框架选择器
+ * <p>用于选择合适的后端的HTTP框架，Forest提供了两个默认的HTTP框架以供选择：
+ * <ul>
+ *     <li>httpclient</li>
+ *     <li>okhttp3</li>
+ * </ul>
+ *
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2018-03-01 11:24
  */
@@ -32,12 +39,28 @@ public class HttpBackendSelector {
         BACKEND_MAP.put(OKHTTP3_BACKEND_NAME, OKHTTP3_BACKEND_CREATOR);
     }
 
+    /**
+     * 根据全局配置选择Forest后端框架
+     *
+     * @param configuration Forest全局配置对象
+     * @return Forest后端框架
+     */
     public HttpBackend select(ForestConfiguration configuration) {
-        String name = configuration.getBackendName();
-        if (StringUtils.isNotEmpty(name)) {
-            HttpBackendCreator backendCreator = BACKEND_MAP.get(name);
+        String backendName = configuration.getBackendName();
+        return select(backendName);
+    }
+
+    /**
+     * 根据名称选择Forest后端框架
+     *
+     * @param backendName Forest后端框架名称，如：httpclient, okhttp3
+     * @return Forest后端框架
+     */
+    public HttpBackend select(String backendName) {
+        if (StringUtils.isNotEmpty(backendName)) {
+            HttpBackendCreator backendCreator = BACKEND_MAP.get(backendName);
             if (backendCreator == null) {
-                throw new ForestRuntimeException("Http setBackend \"" + name + "\" can not be found.");
+                throw new ForestRuntimeException("Http setBackend \"" + backendName + "\" can not be found.");
             }
             return backendCreator.create();
         }

@@ -5,6 +5,7 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.ssl.SSLKeyStore;
+import com.dtflys.forest.ssl.SSLSocketFactoryBuilder;
 import com.dtflys.test.mock.GetMockServer;
 import com.github.dreamhead.moco.HttpsCertificate;
 import com.github.dreamhead.moco.HttpsServer;
@@ -14,6 +15,8 @@ import com.dtflys.test.http.client.SSLClient;
 import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.net.ssl.SSLSocketFactory;
 
 import static com.github.dreamhead.moco.Moco.*;
 import static com.github.dreamhead.moco.Runner.runner;
@@ -60,15 +63,23 @@ public class TestSSLClient extends BaseClientTest {
     public void afterRequests() {
     }
 
+    private static class MySSLSocketFactoryBuilder implements SSLSocketFactoryBuilder {
+
+        @Override
+        public SSLSocketFactory getSSLSocketFactory(ForestRequest request, String protocol) throws Exception {
+            return null;
+        }
+    }
+
     @BeforeClass
     public static void prepareClient() {
-        configuration = ForestConfiguration.configuration();
+        configuration = ForestConfiguration.createConfiguration();
         SSLKeyStore sslKeyStore = new SSLKeyStore(
                 "ssl_client",
                 "ssl_client.keystore",
                 "client",
                 "456789",
-                "com.dtflys.spring.test.ssl.MySSLSocketFactoryBuilder");
+                new MySSLSocketFactoryBuilder());
         configuration.registerKeyStore(sslKeyStore);
     }
 

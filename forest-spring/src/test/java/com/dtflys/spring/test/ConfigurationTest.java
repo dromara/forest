@@ -22,7 +22,7 @@ public class ConfigurationTest extends TestCase {
         applicationContext = new ClassPathXmlApplicationContext(
                 new String[] { "classpath:configuration-test.xml" });
         ForestConfiguration forestConfiguration =
-                (ForestConfiguration) applicationContext.getBean("forestConfiguration");
+                (ForestConfiguration) applicationContext.getBean("forestConfiguration2");
         assertNotNull(forestConfiguration);
         assertNotNull(forestConfiguration.getBackend());
         assertEquals(forestConfiguration.getTimeout(), new Integer(30000));

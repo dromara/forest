@@ -25,10 +25,10 @@ public class TestBaseErrorClient extends BaseClientTest {
 
     @BeforeClass
     public static void prepareClient() {
-        configuration = ForestConfiguration.configuration();
+        configuration = ForestConfiguration.createConfiguration();
         configuration.setCacheEnabled(false);
     }
-    
+
     @Test
     public void testBaseError() {
         ForestResponse<String> result = baseErrorInterceptorClient.testError();

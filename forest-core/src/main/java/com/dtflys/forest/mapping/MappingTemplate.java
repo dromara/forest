@@ -20,6 +20,7 @@ import java.util.*;
  * @since 2016-05-04
  */
 public class MappingTemplate {
+    private final ForestMethod<?> forestMethod;
     private final MappingParameter[] parameters;
     private final ForestProperties properties;
     private  String template;
@@ -92,7 +93,8 @@ public class MappingTemplate {
         return template.charAt(readIndex + i);
     }
 
-    public MappingTemplate(String template, VariableScope variableScope, ForestProperties properties, MappingParameter[] parameters) {
+    public MappingTemplate(ForestMethod<?> forestMethod, String template, VariableScope variableScope, ForestProperties properties, MappingParameter[] parameters) {
+        this.forestMethod = forestMethod;
         this.template = template;
         this.variableScope = variableScope;
         this.properties = properties;
@@ -142,7 +144,7 @@ public class MappingTemplate {
                 }
                 match('}');
                 if (expr != null) {
-                    expr = new MappingUrlEncodedExpr(expr);
+                    expr = new MappingUrlEncodedExpr(forestMethod, expr);
                     exprList.add(expr);
                 }
                 continue;
@@ -235,7 +237,7 @@ public class MappingTemplate {
                         return new MappingIndex(((MappingInteger) expr).getNumber());
                     }
                     if (expr instanceof MappingIdentity) {
-                        return new MappingReference(variableScope, ((MappingIdentity) expr).getName());
+                        return new MappingReference(forestMethod, variableScope, ((MappingIdentity) expr).getName());
                     }
                     return expr;
                 case '\'':
@@ -255,10 +257,10 @@ public class MappingTemplate {
                 case '.':
                     nextChar();
                     if (expr instanceof MappingIdentity) {
-                        expr = new MappingReference(variableScope, ((MappingIdentity) expr).getName());
+                        expr = new MappingReference(forestMethod, variableScope, ((MappingIdentity) expr).getName());
                     }
                     MappingIdentity id = parseIdentity();
-                    expr = new MappingDot(variableScope, expr, id);
+                    expr = new MappingDot(forestMethod, variableScope, expr, id);
                     break;
                 case '(':
                     nextChar();
@@ -380,9 +382,9 @@ public class MappingTemplate {
         switch (ch) {
             case ')':
                 if (left == null) {
-                    return new MappingFilterInvoke(variableScope, name, argExprList);
+                    return new MappingFilterInvoke(forestMethod, variableScope, name, argExprList);
                 }
-                return new MappingInvoke(variableScope, left, name, argExprList);
+                return new MappingInvoke(forestMethod, variableScope, left, name, argExprList);
             case ',':
                 nextChar();
                 MappingExpr expr = parseExpression();
@@ -556,7 +558,7 @@ public class MappingTemplate {
 
     @Override
     public MappingTemplate clone() {
-        MappingTemplate template = new MappingTemplate(this.template, this.variableScope, this.properties, this.parameters);
+        MappingTemplate template = new MappingTemplate(forestMethod, this.template, this.variableScope, this.properties, this.parameters);
         template.exprList = this.exprList;
         return template;
     }
@@ -571,8 +573,8 @@ public class MappingTemplate {
         return buff.toString();
     }
 
-    public MappingTemplate valueOf(String value, ForestMethod forestMethod) {
-        return new MappingTemplate(value, forestMethod, properties, forestMethod.getParameters());
+    public MappingTemplate valueOf(String value) {
+        return new MappingTemplate(forestMethod, value, forestMethod, properties, forestMethod.getParameters());
     }
 
 

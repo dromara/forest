@@ -41,7 +41,7 @@ public abstract class AbstractBackendResponseHandler<R> {
 
     public Object handleSuccess(ForestResponse response) {
         Type onSuccessGenericType = lifeCycleHandler.getOnSuccessClassGenericType();
-        Object resultData = lifeCycleHandler.handleResultType(request, response, onSuccessGenericType, ReflectUtils.getClassByType(onSuccessGenericType));
+        Object resultData = lifeCycleHandler.handleResultType(request, response, onSuccessGenericType, ReflectUtils.toClass(onSuccessGenericType));
         return lifeCycleHandler.handleSuccess(resultData, request, response);
     }
 

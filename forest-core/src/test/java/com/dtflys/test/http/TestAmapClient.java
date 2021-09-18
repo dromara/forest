@@ -1,6 +1,7 @@
 package com.dtflys.test.http;
 
 import com.alibaba.fastjson.JSON;
+import com.dtflys.forest.Forest;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestJacksonConverter;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
@@ -25,7 +26,7 @@ public class TestAmapClient {
 
 //    @BeforeClass
     public static void prepareClient() {
-        configuration = ForestConfiguration.configuration();
+        configuration = Forest.config();
         configuration.setJsonConverter(new ForestJacksonConverter());
         configuration.setCacheEnabled(false);
         amapClient = configuration.createInstance(AmapClient.class);

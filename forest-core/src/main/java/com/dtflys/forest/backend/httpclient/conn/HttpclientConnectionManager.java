@@ -23,14 +23,12 @@ import org.apache.http.config.ConnectionConfig;
 import org.apache.http.config.Lookup;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.impl.auth.*;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.client.IdleConnectionEvictor;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
@@ -44,7 +42,6 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 
 import java.nio.charset.CodingErrorAction;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -159,6 +156,8 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
         configBuilder.setStaleConnectionCheckEnabled(true);
         // 设置Cookie策略
         configBuilder.setCookieSpec(CookieSpecs.STANDARD);
+        // 禁止自动重定向
+        configBuilder.setRedirectsEnabled(false);
 
         ForestProxy forestProxy = request.getProxy();
         if (forestProxy != null) {
@@ -212,6 +211,7 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
                 .setSocketTimeout(timeout)
                 .setConnectionRequestTimeout(timeout)
                 .setCookieSpec(CookieSpecs.STANDARD)
+                .setRedirectsEnabled(false)
                 .build();
 
         CloseableHttpAsyncClient client = builder

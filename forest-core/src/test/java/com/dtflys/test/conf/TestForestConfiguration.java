@@ -39,7 +39,7 @@ public class TestForestConfiguration {
 
     @Test
     public void testBackend() {
-        ForestConfiguration configuration = ForestConfiguration.configuration();
+        ForestConfiguration configuration = ForestConfiguration.createConfiguration();
         configuration.setBackendName("okhttp3");
         assertEquals("okhttp3", configuration.getBackend().getName());
         configuration.setBackend(null);
@@ -71,7 +71,7 @@ public class TestForestConfiguration {
 
     @Test
     public void testDefault() {
-        ForestConfiguration configuration = ForestConfiguration.configuration();
+        ForestConfiguration configuration = ForestConfiguration.createConfiguration();
         assertEquals("forestConfiguration" + configuration.hashCode(),
                 configuration.getId());
         assertEquals(Integer.valueOf(3000), configuration.getTimeout());
@@ -84,7 +84,7 @@ public class TestForestConfiguration {
 
     @Test
     public void testCustomized() {
-        ForestConfiguration configuration = ForestConfiguration.configuration();
+        ForestConfiguration configuration = ForestConfiguration.createConfiguration();
         configuration.setRetryCount(3);
 //        configuration.setId("config_2");
 //        assertEquals("config_2", configuration.getId());
@@ -101,7 +101,7 @@ public class TestForestConfiguration {
 
     @Test
     public void testVars() {
-        ForestConfiguration configuration = ForestConfiguration.configuration();
+        ForestConfiguration configuration = ForestConfiguration.createConfiguration();
         configuration.setVariableValue("name", "Peter");
         configuration.setVariableValue("baseUrl", "http://abc.com");
         assertEquals("Peter", configuration.getVariableValue("name"));
@@ -111,19 +111,16 @@ public class TestForestConfiguration {
         varMap.put("name", "Linda");
         varMap.put("abc", 123);
         configuration.setVariables(varMap);
-        assertEquals(varMap, configuration.copyOfVariableValues());
         assertThat(configuration.getVariableValue("name")).isEqualTo("Linda");
         assertThat(configuration.getVariableValue("abc")).isEqualTo(123);
-        assertThat(configuration.copyOfVariableValues())
-                .isEqualTo(varMap);
-        configuration.setVariableValue("foo", () -> "bar");
+        configuration.setVariableValue("foo", (args) -> "bar");
         assertThat(configuration.getVariableValue("foo")).isEqualTo("bar");
     }
 
 
     @Test
     public void testDefaultParameters() {
-        ForestConfiguration configuration = ForestConfiguration.configuration();
+        ForestConfiguration configuration = ForestConfiguration.createConfiguration();
         List<RequestNameValue> defaultParameters = new LinkedList<>();
         defaultParameters.add(new RequestNameValue("name", "Peter", TARGET_BODY));
         defaultParameters.add(new RequestNameValue("age", "15", TARGET_BODY));
@@ -133,7 +130,7 @@ public class TestForestConfiguration {
 
     @Test
     public void testDefaultHeaders() {
-        ForestConfiguration configuration = ForestConfiguration.configuration();
+        ForestConfiguration configuration = ForestConfiguration.createConfiguration();
         List<RequestNameValue> defaultHeaders = new LinkedList<>();
         defaultHeaders.add(new RequestNameValue("Accept", "text/html", TARGET_HEADER));
         configuration.setDefaultHeaders(defaultHeaders);
@@ -142,7 +139,7 @@ public class TestForestConfiguration {
 
     @Test
     public void testConverterMap() {
-        ForestConfiguration configuration = ForestConfiguration.configuration();
+        ForestConfiguration configuration = ForestConfiguration.createConfiguration();
         assertNotNull(configuration.getConverterMap());
         Map<ForestDataType, ForestConverter> converterMap = new HashMap<>();
         converterMap.put(ForestDataType.JSON, new ForestFastjsonConverter());

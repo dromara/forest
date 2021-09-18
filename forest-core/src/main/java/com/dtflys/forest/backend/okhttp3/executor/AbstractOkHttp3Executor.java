@@ -197,13 +197,14 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
             call.enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
+                    ForestResponse response = factory.createResponse(request, null, lifeCycleHandler, e, startDate);
                     ForestRetryException retryException = new ForestRetryException(
                             e, request, request.getRetryCount(), retryCount);
                     try {
-                        request.getRetryer().canRetry(retryException);
+                        request.canRetry(response, retryException);
                     } catch (Throwable throwable) {
                         future.failed(e);
-                        ForestResponse response = factory.createResponse(request, null, lifeCycleHandler, throwable, startDate);
+                        response = factory.createResponse(request, null, lifeCycleHandler, throwable, startDate);
                         logResponse(response);
                         lifeCycleHandler.handleError(request, response, e);
                         return;
@@ -212,15 +213,20 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
                 }
 
                 @Override
-                public void onResponse(Call call, Response okResponse) throws IOException {
+                public void onResponse(Call call, Response okResponse) {
                     ForestResponse response = factory.createResponse(request, okResponse, lifeCycleHandler, null, startDate);
                     logResponse(response);
+
+                    ForestRetryException retryEx = request.canRetry(response);
+                    if (retryEx != null && !retryEx.isMaxRetryCountReached()) {
+                        execute(lifeCycleHandler, retryCount + 1);
+                        return;
+                    }
                     Object result = null;
                     if (response.isSuccess()) {
                         if (request.getOnSuccess() != null) {
                             result = okHttp3ResponseHandler.handleSuccess(response);
-                        }
-                        else {
+                        } else {
                             result = okHttp3ResponseHandler.handleSync(okResponse, response);
                         }
                         future.completed(result);
@@ -237,14 +243,15 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
             try {
                 okResponse = call.execute();
             } catch (IOException e) {
+                response = factory.createResponse(request, null, lifeCycleHandler, e, startDate);
                 ForestRetryException retryException = new ForestRetryException(
                         e, request, request.getRetryCount(), retryCount);
                 try {
-                    request.getRetryer().canRetry(retryException);
+                    request.canRetry(response, retryException);
                 } catch (Throwable throwable) {
-                    response = factory.createResponse(request, null, lifeCycleHandler, e, startDate);
+                    response = factory.createResponse(request, null, lifeCycleHandler, throwable, startDate);
                     logResponse(response);
-                    lifeCycleHandler.handleSyncWithException(request, response, e);
+                    lifeCycleHandler.handleSyncWithException(request, response, throwable);
                     return;
                 }
                 response = factory.createResponse(request, null, lifeCycleHandler, e, startDate);
@@ -257,7 +264,14 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
                 }
                 logResponse(response);
             }
+            // 是否重试
+            ForestRetryException retryEx = request.canRetry(response);
+            if (retryEx != null && !retryEx.isMaxRetryCountReached()) {
+                execute(lifeCycleHandler, retryCount + 1);
+                return;
+            }
 
+            // 验证响应
             if (response.isError()) {
                 retryOrDoError(response, okResponse, null, lifeCycleHandler, retryCount, startTime);
                 return;
@@ -276,7 +290,7 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
         ForestRetryException retryException = new ForestRetryException(
                 networkException, request, request.getRetryCount(), retryCount);
         try {
-            request.getRetryer().canRetry(retryException);
+            request.canRetry(response, retryException);
         } catch (Throwable throwable) {
             if (future != null) {
                 future.failed(new ForestNetworkException(okResponse.message(), okResponse.code(), response));

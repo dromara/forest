@@ -83,10 +83,11 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, null, startDate);
         } catch (IOException e) {
             httpRequest.abort();
+            response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, e, startDate);
             ForestRetryException retryException = new ForestRetryException(
                     e,  request, request.getRetryCount(), retryCount);
             try {
-                request.getRetryer().canRetry(retryException);
+                request.canRetry(response, retryException);
             } catch (Throwable throwable) {
                 response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, throwable, startDate);
                 lifeCycleHandler.handleSyncWithException(request, response, e);
@@ -103,13 +104,22 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             }
             logResponse(response);
         }
+
+        // 检查是否重试
+        ForestRetryException retryEx = request.canRetry(response);
+        if (retryEx != null && !retryEx.isMaxRetryCountReached()) {
+            sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, cookieStore, startDate, retryCount + 1);
+            return;
+        }
+
+        // 检查响应是否失败
         if (response.isError()) {
             ForestNetworkException networkException =
                     new ForestNetworkException("", response.getStatusCode(), response);
             ForestRetryException retryException = new ForestRetryException(
                     networkException,  request, request.getRetryCount(), retryCount);
             try {
-                request.getRetryer().canRetry(retryException);
+                request.canRetry(response, retryException);
             } catch (Throwable throwable) {
                 responseHandler.handleSync(httpResponse, response);
                 return;
@@ -117,6 +127,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, cookieStore, startDate, retryCount + 1);
             return;
         }
+
 
         try {
             lifeCycleHandler.handleSaveCookie(request, getCookiesFromHttpCookieStore(cookieStore));

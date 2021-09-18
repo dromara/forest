@@ -1,6 +1,7 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.ForestProperties;
+import com.dtflys.forest.reflection.ForestMethod;
 
 public class MappingProperty extends MappingExpr {
 
@@ -8,7 +9,7 @@ public class MappingProperty extends MappingExpr {
     private ForestProperties properties;
 
     protected MappingProperty(String propertyName) {
-        super(Token.PROP);
+        super(null, Token.PROP);
         this.propertyName = propertyName;
     }
 

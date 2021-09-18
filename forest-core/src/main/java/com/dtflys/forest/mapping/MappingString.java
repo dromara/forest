@@ -1,5 +1,7 @@
 package com.dtflys.forest.mapping;
 
+import com.dtflys.forest.reflection.ForestMethod;
+
 /**
  * Created by Administrator on 2016/5/4.
  */
@@ -12,7 +14,7 @@ public class MappingString extends MappingExpr {
     }
 
     public MappingString(String text) {
-        super(Token.STRING);
+        super(null, Token.STRING);
         this.text = text;
     }
 

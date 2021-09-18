@@ -40,6 +40,15 @@ public abstract class RequestBodyBuilder<T, B extends ForestRequestBody, D exten
         return builder;
     }
 
+    static {
+        registerBodyBuilder(CharSequence.class, new RequestBodyBuilder.StringRequestBodyBuilder());
+        registerBodyBuilder(String.class, new RequestBodyBuilder.StringRequestBodyBuilder());
+        registerBodyBuilder(File.class, new RequestBodyBuilder.FileRequestBodyBuilder());
+        registerBodyBuilder(byte[].class, new RequestBodyBuilder.ByteArrayRequestBodyBuilder());
+        registerBodyBuilder(InputStream.class, new RequestBodyBuilder.InputStreamBodyBuilder());
+        registerBodyBuilder(Object.class, new RequestBodyBuilder.ObjectRequestBodyBuilder());
+    }
+
 
     public abstract B build(T data, String defaultValue);
 

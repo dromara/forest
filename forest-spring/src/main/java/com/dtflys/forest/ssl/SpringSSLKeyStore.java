@@ -1,6 +1,8 @@
 package com.dtflys.forest.ssl;
 
+import com.dtflys.forest.Forest;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.utils.StringUtils;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.*;
@@ -11,8 +13,20 @@ import java.io.*;
  */
 public class SpringSSLKeyStore extends SSLKeyStore {
 
-    public SpringSSLKeyStore(String id, String keystoreType, String filePath, String keystorePass, String certPass, String sslSocketFactoryBuilder) {
-        super(id, keystoreType, filePath, keystorePass, certPass, sslSocketFactoryBuilder);
+    private static SSLSocketFactoryBuilder getSSLSocketFactoryBuilder(String sslSocketFactoryBuilderClass) {
+        if (StringUtils.isBlank(sslSocketFactoryBuilderClass)) {
+            return null;
+        }
+        try {
+            Class clazz = Class.forName(sslSocketFactoryBuilderClass);
+            return (SSLSocketFactoryBuilder) Forest.config().getForestObjectFactory().getObject(clazz);
+        } catch (ClassNotFoundException e) {
+            throw new ForestRuntimeException(e);
+        }
+    }
+
+    public SpringSSLKeyStore(String id, String keystoreType, String filePath, String keystorePass, String certPass, String sslSocketFactoryBuilderClass) {
+        super(id, keystoreType, filePath, keystorePass, certPass, getSSLSocketFactoryBuilder(sslSocketFactoryBuilderClass));
     }
 
     @Override

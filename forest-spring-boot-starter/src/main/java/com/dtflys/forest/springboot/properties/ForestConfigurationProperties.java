@@ -1,5 +1,10 @@
 package com.dtflys.forest.springboot.properties;
 
+import com.dtflys.forest.callback.AddressSource;
+import com.dtflys.forest.callback.RetryWhen;
+import com.dtflys.forest.callback.SuccessWhen;
+import com.dtflys.forest.http.ForestAddress;
+import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.retryer.BackOffRetryer;
@@ -37,19 +42,44 @@ public class ForestConfigurationProperties {
     private int maxRouteConnections = 500;
 
     /**
-     * timeout in milliseconds
+     * Timeout in milliseconds
      */
     private int timeout = 3000;
 
     /**
-     * connect timeout in milliseconds
+     * Connect timeout in milliseconds
      */
     private int connectTimeout = 2000;
 
     /**
-     * request charset
+     * Request charset
      */
     private String charset = "UTF-8";
+
+    /**
+     * Global default http scheme
+     * <p>it can be:
+     * <ul>
+     *     <li>http</li>
+     *     <li>https</li>
+     * </ul>
+     */
+    private String baseAddressScheme;
+
+    /**
+     * Global default host
+     */
+    private String baseAddressHost;
+
+    /**
+     * Global default port
+     */
+    private Integer baseAddressPort;
+
+    /**
+     * The source of global default address
+     */
+    private Class<? extends AddressSource> baseAddressSource;
 
     /**
      * Class of retryer
@@ -57,12 +87,12 @@ public class ForestConfigurationProperties {
     private Class retryer = BackOffRetryer.class;
 
     /**
-     * count of retry times
+     * Max count of retry times
      */
     private Integer retryCount = 0;
 
     /**
-     * max interval of retrying request
+     * Max interval of retrying request
      */
     private long maxRetryInterval = 0;
 
@@ -93,12 +123,16 @@ public class ForestConfigurationProperties {
 
 
     /**
-     * default SSL protocol for https requests
+     * Default SSL protocol for https requests
      */
     private String sslProtocol = SSLUtils.TLS_1_2;
 
     /**
-     * backend of forest: httpclient, okhttp3
+     * Backend HTTP framework of forest, following backend can be chosen:
+     * <ul>
+     *     <li>httpclient</li>
+     *     <li>okhttp3</li>
+     * </ul>
      */
     private String backend = "okhttp3";
 
@@ -110,7 +144,17 @@ public class ForestConfigurationProperties {
     /**
      * Class list of interceptors
      */
-    private List<Class> interceptors = new ArrayList<>();
+    private List<Class<? extends Interceptor>> interceptors = new ArrayList<>();
+
+    /**
+     * Success When callback function: used to judge whether the request is successful
+     */
+    private Class<? extends SuccessWhen> successWhen;
+
+    /**
+     * Retry When callback function: used to determine whether to trigger a retry request
+     */
+    private Class<? extends RetryWhen> retryWhen;
 
     /**
      * SSL Key Stores
@@ -177,6 +221,38 @@ public class ForestConfigurationProperties {
 
     public void setCharset(String charset) {
         this.charset = charset;
+    }
+
+    public String getBaseAddressScheme() {
+        return baseAddressScheme;
+    }
+
+    public void setBaseAddressScheme(String baseAddressScheme) {
+        this.baseAddressScheme = baseAddressScheme;
+    }
+
+    public String getBaseAddressHost() {
+        return baseAddressHost;
+    }
+
+    public void setBaseAddressHost(String baseAddressHost) {
+        this.baseAddressHost = baseAddressHost;
+    }
+
+    public Integer getBaseAddressPort() {
+        return baseAddressPort;
+    }
+
+    public void setBaseAddressPort(Integer baseAddressPort) {
+        this.baseAddressPort = baseAddressPort;
+    }
+
+    public Class<? extends AddressSource> getBaseAddressSource() {
+        return baseAddressSource;
+    }
+
+    public void setBaseAddressSource(Class<? extends AddressSource> baseAddressSource) {
+        this.baseAddressSource = baseAddressSource;
     }
 
     public Class getRetryer() {
@@ -267,12 +343,28 @@ public class ForestConfigurationProperties {
         this.variables = variables;
     }
 
-    public List<Class> getInterceptors() {
+    public List<Class<? extends Interceptor>> getInterceptors() {
         return interceptors;
     }
 
-    public void setInterceptors(List<Class> interceptors) {
+    public void setInterceptors(List<Class<? extends Interceptor>> interceptors) {
         this.interceptors = interceptors;
+    }
+
+    public Class<? extends SuccessWhen> getSuccessWhen() {
+        return successWhen;
+    }
+
+    public void setSuccessWhen(Class<? extends SuccessWhen> successWhen) {
+        this.successWhen = successWhen;
+    }
+
+    public Class<? extends RetryWhen> getRetryWhen() {
+        return retryWhen;
+    }
+
+    public void setRetryWhen(Class<? extends RetryWhen> retryWhen) {
+        this.retryWhen = retryWhen;
     }
 
     public List<ForestSSLKeyStoreProperties> getSslKeyStores() {

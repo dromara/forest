@@ -1,5 +1,6 @@
 package com.dtflys.forest.springboot.test;
 
+import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
@@ -128,19 +129,21 @@ public class Test0 {
             beastshopClient.testRetry();
         } catch (ForestRuntimeException e) {
         }
-        Mockito.verify(logger).info("[Forest] Request: \n" +
+        HttpBackend backend = config0.getBackend();
+        String backendName = backend.getName();
+        Mockito.verify(logger).info("[Forest] Request (" + backendName + "): \n" +
                 "\t[Retry]: 1\n" +
                 "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS");
-        Mockito.verify(logger).info("[Forest] Request: \n" +
+        Mockito.verify(logger).info("[Forest] Request (" + backendName + "): \n" +
                 "\t[Retry]: 2\n" +
                 "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS");
-        Mockito.verify(logger).info("[Forest] Request: \n" +
+        Mockito.verify(logger).info("[Forest] Request (" + backendName + "): \n" +
                 "\t[Retry]: 3\n" +
                 "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS");
-        Mockito.verify(logger).info("[Forest] Request: \n" +
+        Mockito.verify(logger).info("[Forest] Request (" + backendName + "): \n" +
                 "\t[Retry]: 4\n" +
                 "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS");
-        Mockito.verify(logger).info("[Forest] Request: \n" +
+        Mockito.verify(logger).info("[Forest] Request (" + backendName + "): \n" +
                 "\t[Retry]: 5\n" +
                 "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS");
 //        Mockito.verify(logger).info("[Forest] [Network Error]: connect timed out");

@@ -42,7 +42,6 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
     @Override
     public BeanDefinition parse(Element element, ParserContext parserContext) {
         RootBeanDefinition beanDefinition = new RootBeanDefinition();
-
         beanDefinition.setBeanClass(FOREST_CONFIGURATION_CLASS);
         beanDefinition.setLazyInit(false);
         beanDefinition.setFactoryMethodName("configuration");
@@ -53,6 +52,9 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
                 throw new IllegalStateException("Duplicate spring bean id " + id);
             }
             parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);
+            ConstructorArgumentValues argumentValues = new ConstructorArgumentValues();
+            argumentValues.addIndexedArgumentValue(0, id);
+            beanDefinition.setConstructorArgumentValues(argumentValues);
         }
 
         Method[] methods = FOREST_CONFIGURATION_CLASS.getMethods();

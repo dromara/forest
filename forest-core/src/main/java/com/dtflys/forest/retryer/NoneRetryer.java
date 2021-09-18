@@ -8,9 +8,10 @@ import com.dtflys.forest.http.ForestRequest;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2020-08-09 20:17
  */
-public class NoneRetryer implements Retryer {
+public class NoneRetryer extends ForestRetryer {
 
     public NoneRetryer(ForestRequest request) {
+        super(request);
     }
 
     @Override

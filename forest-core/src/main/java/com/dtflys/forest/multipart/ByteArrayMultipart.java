@@ -7,11 +7,9 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 
-public class ByteArrayMultipart extends ForestMultipart<byte[]> {
+public class ByteArrayMultipart extends ForestMultipart<byte[], ByteArrayMultipart> {
 
     private byte[] bytes;
-
-
 
     @Override
     public String getOriginalFileName() {
@@ -27,8 +25,9 @@ public class ByteArrayMultipart extends ForestMultipart<byte[]> {
     }
 
     @Override
-    public void setData(byte[] data) {
+    public ByteArrayMultipart setData(byte[] data) {
         this.bytes = data;
+        return this;
     }
 
 

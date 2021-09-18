@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-public class InputStreamMultipart extends ForestMultipart<InputStream> {
+public class InputStreamMultipart extends ForestMultipart<InputStream, InputStreamMultipart> {
 
     private InputStream inputStream;
 
@@ -21,8 +21,9 @@ public class InputStreamMultipart extends ForestMultipart<InputStream> {
 
 
     @Override
-    public void setData(InputStream data) {
+    public InputStreamMultipart setData(InputStream data) {
         this.inputStream = data;
+        return this;
     }
 
     @Override

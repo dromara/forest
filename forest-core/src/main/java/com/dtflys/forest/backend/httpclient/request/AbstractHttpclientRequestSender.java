@@ -18,8 +18,6 @@ import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.cookie.Cookie;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 
@@ -29,7 +27,6 @@ import java.net.URI;
  * @since 2017-07-21 15:53
  */
 public abstract class AbstractHttpclientRequestSender implements HttpclientRequestSender {
-    private static Logger log = LoggerFactory.getLogger(AbstractHttpclientRequestSender.class);
 
     protected final HttpclientConnectionManager connectionManager;
 
