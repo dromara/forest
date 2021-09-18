@@ -28,7 +28,7 @@ import com.dtflys.forest.http.ForestAddress;
 import com.dtflys.forest.http.ForestRequest;
 
 /**
- * 主机地址信息来源接口
+ * 主机地址信息动态来源接口
  * <P>
  * 本质是一个回调函数: 在创建请求 URL 地址时被调用
  * <p>用于动态构建请求 URL 的主机地址部分

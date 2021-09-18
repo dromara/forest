@@ -46,6 +46,16 @@ import java.lang.annotation.Target;
 public @interface Address {
 
     /**
+     * HTTP协议头
+     * <p>协议头可以是：
+     * <ul>
+     *     <li>http</li>
+     *     <li>https</li>
+     * </ul>
+     */
+    String scheme() default "";
+
+    /**
      * 主机地址(主机名/ip地址)
      */
     String host() default "";
