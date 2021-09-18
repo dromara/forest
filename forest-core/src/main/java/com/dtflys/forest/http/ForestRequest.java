@@ -156,7 +156,7 @@ public class ForestRequest<T> {
     /**
      * 请求响应返回数据的字符编码
      */
-    private String responseEncode = "UTF-8";
+    private String responseEncode;
 
     /**
      * 是否异步
@@ -194,7 +194,6 @@ public class ForestRequest<T> {
      * 最大请重试的时间间隔，时间单位为毫秒
      */
     private long maxRetryInterval = 0;
-
 
     /**
      * 请求体
@@ -3151,43 +3150,21 @@ public class ForestRequest<T> {
      *
      * @return 请求执行响应后返回的结果, 其为Map类型
      */
-    public Map<?, ?> executeAsMap() {
-        return execute(new TypeReference<Map<?, ?>>() {});
-    }
-
-    /**
-     * 执行请求发送过程，并获取Map类型结果
-     *
-     * @param keyClass KEY类型
-     * @param valueClass VALUE类型
-     * @param <KEY> 键的泛型类型参数
-     * @param <VALUE> 值的泛型类型参数
-     * @return 请求执行响应后返回的结果, 其为Map类型
-     */
-    public <KEY, VALUE> Map<KEY, VALUE> executeAsMap(Class<KEY> keyClass, Class<VALUE> valueClass) {
+    public <KEY, VALUE> Map<KEY, VALUE> executeAsMap() {
         return execute(new TypeReference<Map<KEY, VALUE>>() {});
     }
 
 
-    /**
-     * 执行请求发送过程，并获取List类型结果
-     *
-     * @return 请求执行响应后返回的结果, 其为List类型
-     */
-    public List<?> executeAsList() {
-        return execute(new TypeReference<List<?>>() {});
-    }
 
     /**
      * 执行请求发送过程，并获取List类型结果
      *
-     * @param clazz 列表元素类型
-     * @param <E> 列表元素泛型类型参数
      * @return 请求执行响应后返回的结果, 其为List类型
      */
-    public <E> List<E> executeAsList(Class<E> clazz) {
+    public <E> List<E> executeAsList() {
         return execute(new TypeReference<List<E>>() {});
     }
+
 
 
     /**

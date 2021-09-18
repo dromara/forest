@@ -4,6 +4,7 @@ import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.utils.StringUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HeaderIterator;
@@ -50,8 +51,9 @@ public class HttpclientForestResponse extends ForestResponse {
                 this.contentLength = entity.getContentLength();
                 // 是否将Response数据按GZIP来解压
                 isGzip = request.isDecompressResponseGzipEnabled();
-
-                if (contentType != null) {
+                if (StringUtils.isNotBlank(request.getResponseEncode())) {
+                    this.contentEncoding = request.getResponseEncode();
+                } else if (contentType != null) {
                     this.contentEncoding = this.contentType.getCharset();
                 }
                 if (this.contentEncoding == null && encoding != null) {
@@ -66,6 +68,7 @@ public class HttpclientForestResponse extends ForestResponse {
                         this.contentEncoding = null;
                     }
                 }
+
                 this.content = buildContent();
             } else {
                 this.bytes = new byte[0];

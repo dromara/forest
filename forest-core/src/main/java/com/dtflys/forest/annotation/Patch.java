@@ -104,6 +104,12 @@ public @interface Patch {
     String charset() default "";
 
     /**
+     * Response Encoding
+     * <p>该属性不填的情况下，根据响应头中的 Content-Encoding 来确定响应内容的编码
+     */
+    String responseEncoding() default "";
+
+    /**
      * User Agent
      */
     String userAgent() default "";

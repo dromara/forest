@@ -21,29 +21,26 @@ import java.util.Map;
  * @author guihuo   (E-mail:1620657419@qq.com)
  * @since 2018-09-25 11:59
  */
-public class ForestScannerRegister implements BeanFactoryAware, ImportBeanDefinitionRegistrar, ResourceLoaderAware {
+public class ForestScannerRegister implements BeanFactoryAware, ImportBeanDefinitionRegistrar {
 
+    /**
+     * 所要扫描的所有包名
+     */
+    private static List<String> basePackages = new ArrayList<>();
 
-    private ResourceLoader resourceLoader;
-
-    public static List<String> basePackages = new ArrayList<>();
-
-    public static String configurationId;
+    /**
+     * Forest全局配置ID
+     */
+    private static String configurationId;
 
     private BeanFactory beanFactory;
 
-    @Override
-    public void setResourceLoader(ResourceLoader resourceLoader) {
-        this.resourceLoader = resourceLoader;
-    }
 
     @Override
     public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
-
         Map<String, Object> annotationAttributes = importingClassMetadata.getAnnotationAttributes(ForestScan.class.getName());
-        if (annotationAttributes == null) {
-            ForestScannerRegister.basePackages.addAll(AutoConfigurationPackages.get(beanFactory));
-        } else {
+        // 先扫描 @ForestScan 注解中定义的包
+        if (annotationAttributes != null) {
             AnnotationAttributes annoAttrs = AnnotationAttributes.fromMap(annotationAttributes);
             for (String pkg : annoAttrs.getStringArray("value")) {
                 if (StringUtils.hasText(pkg)) {
@@ -64,19 +61,32 @@ public class ForestScannerRegister implements BeanFactoryAware, ImportBeanDefini
             configurationId = annoAttrs.getString("configuration");
         }
 
-//        ClassPathClientScanner scanner = new ClassPathClientScanner(configurationId, registry);
-//        // this check is needed in Spring 3.1
-//        if (resourceLoader != null) {
-//            scanner.setResourceLoader(resourceLoader);
-//        }
-//
-//        scanner.registerFilters();
-//        scanner.doScan(StringUtils.toStringArray(basePackages));
-
+        // 若 @ForestScan 注解未定义扫描包名，则扫描整个项目
+        if (basePackages.isEmpty()) {
+            basePackages.addAll(AutoConfigurationPackages.get(beanFactory));
+        }
     }
 
     @Override
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
         this.beanFactory = beanFactory;
+    }
+
+    /**
+     * 获取所要扫描的所有包名
+     *
+     * @return 包名字符串列表
+     */
+    public static List<String> getBasePackages() {
+        return basePackages;
+    }
+
+    /**
+     * 获取Forest全局配置ID
+     *
+     * @return Forest全局配置ID字符串
+     */
+    public static String getConfigurationId() {
+        return configurationId;
     }
 }

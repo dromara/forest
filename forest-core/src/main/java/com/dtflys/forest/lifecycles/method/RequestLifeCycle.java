@@ -1,5 +1,6 @@
 package com.dtflys.forest.lifecycles.method;
 
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MetaRequest;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
@@ -14,7 +15,6 @@ public class RequestLifeCycle implements MethodAnnotationLifeCycle<Annotation, O
         MetaRequest metaRequest = new MetaRequest(annotation);
         ReflectUtils.copyAnnotationAttributes(annotation, metaRequest);
         return metaRequest;
-
     }
 
     @Override
@@ -23,4 +23,8 @@ public class RequestLifeCycle implements MethodAnnotationLifeCycle<Annotation, O
         method.setMetaRequest(metaRequest);
     }
 
+    @Override
+    public boolean beforeExecute(ForestRequest request) {
+        return MethodAnnotationLifeCycle.super.beforeExecute(request);
+    }
 }

@@ -52,7 +52,9 @@ public class OkHttp3ForestResponse extends ForestResponse {
             return;
         }
         setupContentTypeAndEncoding();
-        if (contentType == null || contentType.isEmpty()) {
+        if (StringUtils.isNotBlank(request.getResponseEncode())) {
+            this.contentEncoding = request.getResponseEncode();
+        } else if (contentType == null || contentType.isEmpty()) {
             this.content = readContentAsString();
         } else if (!request.isDownloadFile() && contentType.canReadAsString()) {
             this.content = readContentAsString();

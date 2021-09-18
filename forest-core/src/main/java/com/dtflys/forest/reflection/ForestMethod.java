@@ -88,6 +88,7 @@ public class ForestMethod<T> implements VariableScope {
     private MappingTemplate baseEncodeTemplate = null;
     private MappingTemplate encodeTemplate = null;
     private MappingTemplate charsetTemplate = null;
+    private MappingTemplate responseEncodingTemplate = null;
     private MappingTemplate baseContentTypeTemplate;
     private MappingTemplate baseUserAgentTemplate;
     private MappingTemplate baseCharsetTemplate;
@@ -456,6 +457,9 @@ public class ForestMethod<T> implements VariableScope {
             encodeTemplate = makeTemplate(metaRequest.getContentEncoding());
         }
         charsetTemplate = makeTemplate(metaRequest.getCharset());
+        if (metaRequest.getResponseEncoding() != null) {
+            responseEncodingTemplate = makeTemplate(metaRequest.getResponseEncoding());
+        }
         sslProtocolTemplate = makeTemplate(metaRequest.getSslProtocol());
         progressStep = metaRequest.getProgressStep();
         async = metaRequest.isAsync();
@@ -710,6 +714,11 @@ public class ForestMethod<T> implements VariableScope {
             charset = configuration.getCharset();
         }
 
+        String responseEncoding = null;
+        if (responseEncodingTemplate != null) {
+            responseEncoding = responseEncodingTemplate.render(args);
+        }
+
         String sslProtocol = null;
         String renderedSslProtocol = sslProtocolTemplate.render(args);
         if (StringUtils.isNotBlank(renderedSslProtocol)) {
@@ -740,9 +749,7 @@ public class ForestMethod<T> implements VariableScope {
             }
         }
 
-
         renderedUrl = URLUtils.getValidURL(baseUrl, renderedUrl);
-
 
         // createExecutor and initialize http instance
         ForestRequest<T> request = new ForestRequest(configuration, this, args);
@@ -752,6 +759,10 @@ public class ForestMethod<T> implements VariableScope {
                 .setSslProtocol(sslProtocol)
                 .setLogConfiguration(logConfiguration)
                 .setAsync(async);
+
+        if (StringUtils.isNotEmpty(responseEncoding)) {
+            request.setResponseEncode(responseEncoding);
+        }
 
         if (StringUtils.isNotEmpty(renderedContentType)) {
             request.setContentType(renderedContentType);
