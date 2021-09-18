@@ -66,88 +66,129 @@ public @interface GetRequest {
 
     /**
      * whether can use async http request or not
+     * @return whether can use async http request or not
      */
     boolean async() default false;
 
+    /**
+     * request timeout
+     * @return request timeout
+     */
     int timeout() default -1;
 
     /**
      * SSL protocol
+     * @return SSL protocol
      */
     String sslProtocol() default "";
 
     /**
      * Class of retryer
+     * @return Class of retryer
      */
     Class retryer() default Object.class;
 
     /**
      * max count to retry
+     * @return max count to retry
      */
     int retryCount() default -1;
 
+    /**
+     * max retry interval
+     * @return max retry interval
+     */
     int maxRetryInterval() default -1;
 
     /**
      * Content Type
+     * @return Content Type
      */
     String contentType() default "";
 
     /**
      * Content Encoding
+     * @return Content Encoding
      */
     String contentEncoding() default "";
 
     /**
      * User Agent
+     * @return User Agent
      */
     String userAgent() default "";
 
 
     /**
      * Charset, Default is UTF-8
+     * @return Charset
      */
     String charset() default "";
 
     /**
      * Response Encoding
      * <p>该属性不填的情况下，根据响应头中的 Content-Encoding 来确定响应内容的编码
+     *
+     * @return Response Encoding
      */
     String responseEncoding() default "";
 
     /**
      * reqest headers: <br>
-     *     use the key-value format: key: value <br>
-     *     <pre>
-     *         headers = "Content-Type: application/json"
-     *     </pre>
-     *     multiple headers <br>
-     *     <pre>
-     *         headers = {
-     *            "Content-Type: application/json",
-     *            "Accept: text/plain"
-     *         }
-     *     </pre>
-     *     variables and parameters <br>
-     *     <pre>
-     *         headers = {"Accept: ${value}"}
-     *     </pre>
+     * use the key-value format: key: value
+     * <pre>
+     *     headers = "Content-Type: application/json"
+     * </pre>
+     * multiple headers <br>
+     * <pre>
+     *     headers = {
+     *        "Content-Type: application/json",
+     *        "Accept: text/plain"
+     *     }
+     * </pre>
+     * variables and parameters <br>
+     * <pre>
+     *     headers = {"Accept: ${value}"}
+     * </pre>
+     *
+     * @return reqest headers
      */
     String[] headers() default {};
 
+    /**
+     * Interceptor classes
+     * @return Interceptor classes
+     */
     Class<?>[] interceptor() default {};
 
+    /**
+     * data to send
+     * @return data to send
+     */
     String[] data() default {};
 
+    /**
+     * progress step
+     * @return progress step
+     */
     long progressStep() default -1L;
 
+    /**
+     * Decoder class
+     * @return Decoder class
+     */
     Class<?> decoder() default Object.class;
 
     /**
      * KeyStore Id
+     * @return KeyStore Id
      */
     String keyStore() default "";
 
+    /**
+     * If should print logs
+     * @return If should print logs
+     */
     boolean logEnabled() default false;
 
 }

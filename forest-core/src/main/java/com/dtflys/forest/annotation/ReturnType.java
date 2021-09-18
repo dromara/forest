@@ -39,13 +39,13 @@ import java.lang.annotation.Target;
  * 主要用于指定带未知泛型参数的返回类型，如:
  * <pre>
  *     // 可以修饰 Class 类型参数
- *     <T> T getResult(@ReturnType Class<T> clazz);
+ *      &lt;T&gt; T getResult(@ReturnType Class&lt;T&gt; clazz);
  *
  *     // 可以修饰 Type 类型参数
- *     <T> T getResult(@ReturnType Type type);
+ *      &lt;T&gt; T getResult(@ReturnType Type type);
  *
  *     // 可以修饰 com.dtflys.forest.utils.TypeReference 类型参数
- *     <T> T getResult(@ReturnType TypeReference<T> typeReference);
+ *     &lt;T&gt; T getResult(@ReturnType TypeReference&lt;T&gt; typeReference);
  * </pre>
  *
  * @author gongjun [dt_flys@hotmail.com]

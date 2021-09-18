@@ -8,9 +8,9 @@ import java.lang.reflect.Type;
  *
  * 该工具类使用方式如下:
  * <pre>
- *     Type type = new TypeReference<Map<String, Integer>>() {}.getType();
+ *     Type type = new TypeReference&lt;Map&lt;String, Integer&gt;&gt;() {}.getType();
  * </pre>
- * 这里的 type 即为 Map&lt String, Integer &gt
+ * 这里的 type 即为 Map&lt;String, Integer&gt;
  *
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.5.2

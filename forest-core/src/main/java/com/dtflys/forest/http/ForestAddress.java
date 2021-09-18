@@ -1,6 +1,7 @@
 package com.dtflys.forest.http;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import scala.Int;
 
 import java.net.MalformedURLException;
 import java.net.URL;

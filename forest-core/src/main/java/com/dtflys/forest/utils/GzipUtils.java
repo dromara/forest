@@ -19,7 +19,7 @@ public class GzipUtils {
      * 判断是否为gzip
      * <p>根据Response传回的Content-Encoding来判断是否为gzip压缩的内容</p>
      *
-     * @param contentEncoding
+     * @param contentEncoding 内容编码
      * @return {@code true}为gzip压缩内容, 否则不是
      */
     public static boolean isGzip(String contentEncoding) {

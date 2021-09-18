@@ -287,6 +287,7 @@ public class ForestConfiguration implements Serializable {
     /**
      * 实例化ForestConfiguration对象，并初始化默认值
      *
+     * @param id 配置ID
      * @return 新创建的ForestConfiguration实例
      */
     public static ForestConfiguration configuration(String id) {

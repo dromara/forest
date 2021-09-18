@@ -19,26 +19,26 @@ import com.dtflys.forest.utils.ForestProgress;
  * <p>拦截器在请求的初始化、发送请求前、发送成功、发送失败等生命周期中都会被调用
  * <p>总的生命周期回调函数调用顺序如下:
  * <pre>
- * Forest接口方法调用 ->
- *  | onInvokeMethod ->
- *  | beforeExecute ->
- *     | 如果返回 false -> 中断请求，直接返回
- *     | 如果返回 true ->
- *        | 发送请求 ->
- *          | 发送请求失败 ->
- *              | retryWhen ->
- *                 | 返回 true 则触发请求重试
- *                 | 返回 false 则跳转到 [onError]
- *              | onError -> 跳转到 [afterExecute]
- *          | 发送请求成功 ->
- *             | 等待响应 ->
- *             | 接受到响应 ->
- *             | retryWhen ->
- *                 | 返回 true 则触发请求重试
- *                 | 返回 false 判断响应状态 ->
- *                     | 响应失败 -> onError -> 跳转到 [afterExecute]
- *                     | 响应成功 -> onSuccess -> 跳转到 [afterExecute]
- *  | afterExecute -> 退出 Forest 接口方法，并返回数据
+ * Forest接口方法调用 -&gt;
+ *  &#166; onInvokeMethod -&gt;
+ *  &#166; beforeExecute -&gt;
+ *     &#166; 如果返回 false -&gt; 中断请求，直接返回
+ *     &#166; 如果返回 true -&gt;
+ *        &#166; 发送请求 -&gt;
+ *          &#166; 发送请求失败 -&gt;
+ *              &#166; retryWhen -&gt;
+ *                 &#166; 返回 true 则触发请求重试
+ *                 &#166; 返回 false 则跳转到 [onError]
+ *              &#166; onError -&gt; 跳转到 [afterExecute]
+ *          &#166; 发送请求成功 -&gt;
+ *             &#166; 等待响应 -&gt;
+ *             &#166; 接受到响应 -&gt;
+ *             &#166; retryWhen -&gt;
+ *                 &#166; 返回 true 则触发请求重试
+ *                 &#166; 返回 false 判断响应状态 -&gt;
+ *                     &#166; 响应失败 -&gt; onError -&gt; 跳转到 [afterExecute]
+ *                     &#166; 响应成功 -&gt; onSuccess -&gt; 跳转到 [afterExecute]
+ *  &#166; afterExecute -&gt; 退出 Forest 接口方法，并返回数据
  * </pre>
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-06-26
@@ -50,9 +50,9 @@ public interface Interceptor<T> extends OnSuccess<T>, OnError, OnProgress, OnLoa
      * 默认回调函数: 接口方法执行时调用该方法
      * <p>默认为什么都不做
      *
-     * @param request
-     * @param method
-     * @param args
+     * @param request Forest请求对象
+     * @param method Forest方法对象
+     * @param args 方法调用入参数组
      */
     default void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
     }
