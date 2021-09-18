@@ -9,6 +9,7 @@ import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.utils.ForestProgress;
 
 import java.lang.reflect.Type;
+import java.util.concurrent.Future;
 
 /**
  * @author gongjun[dt_flys@hotmail.com]
@@ -72,6 +73,11 @@ public class NoneLifeCycleHandler implements LifeCycleHandler {
 
     @Override
     public Object handleResult(Object resultData) {
+        return null;
+    }
+
+    @Override
+    public Object handleFuture(Future resultData) {
         return null;
     }
 

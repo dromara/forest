@@ -1,6 +1,7 @@
 package com.dtflys.forest.logging;
 
 import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.StringUtils;
 
@@ -99,6 +100,27 @@ public class DefaultLogHandler implements ForestLogHandler {
     }
 
     /**
+     * 请求重定向信息
+     * @param requestLogMessage
+     * @return 请求重定向信息字符串
+     */
+    protected String redirection(RequestLogMessage requestLogMessage) {
+        ForestRequest request = requestLogMessage.getRequest();
+        if (request.isRedirection()) {
+            ForestRequest prevRequest = request.getPrevRequest();
+            ForestResponse prevResponse = request.getPrevResponse();
+            return "[Redirect]: From " +
+                    prevRequest.getType().getName() +
+                    " " +
+                    prevRequest.getUrl() +
+                    " -> " +
+                    prevResponse.getStatusCode() +
+                    "\n\t";
+        }
+        return "";
+    }
+
+    /**
      * 正向代理信息
      * @param requestLogMessage 请求日志消息，{@link RequestLogMessage}类实例
      * @return 正向代理日志字符串
@@ -122,6 +144,7 @@ public class DefaultLogHandler implements ForestLogHandler {
         builder.append(backendContent(requestLogMessage));
         builder.append(": \n\t");
         builder.append(retryContent(requestLogMessage));
+        builder.append(redirection(requestLogMessage));
         builder.append(proxyContent(requestLogMessage));
         builder.append(requestTypeChangeHistory(requestLogMessage));
         builder.append(requestLogMessage.getRequestLine());

@@ -27,6 +27,7 @@ package com.dtflys.forest.http;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
+import com.dtflys.forest.callback.OnRedirection;
 import com.dtflys.forest.callback.OnRetry;
 import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.callback.RetryWhen;
@@ -164,6 +165,11 @@ public class ForestRequest<T> {
     private boolean async;
 
     /**
+     * 是否打开自动重定向
+     */
+    private boolean autoRedirection;
+
+    /**
      * 响应数据类型
      * <p>该类型决定请求响应返回的数据将以何种方式进行反序列化
      */
@@ -255,6 +261,23 @@ public class ForestRequest<T> {
      * 回调函数：请求重试触发条件
      */
     private RetryWhen retryWhen;
+
+    /**
+     * 回调函数: 在请求重定向时触发
+     */
+    private OnRedirection onRedirection;
+
+    /**
+     * 重定向的上一个请求
+     * <p>触发重定向时的第一个请求
+     */
+    ForestRequest<?> prevRequest;
+
+    /**
+     * 重定向的上一个响应
+     * <p>触发重定向时的第一个响应，即带有301、302等状态码的响应
+     */
+    ForestResponse<?> prevResponse;
 
     /**
      * 进度回调函数：上传/下载进度监听时调用
@@ -771,6 +794,19 @@ public class ForestRequest<T> {
     }
 
     /**
+     * 获取URL路径
+     * <p>该路径为整个URL去除前面协议 + Host + Port 后部分
+     * <p>同 {@link ForestRequest#getPath()}
+     *
+     * @return URL路径
+     * @see ForestRequest#getPath()
+     */
+    public String path() {
+        return getPath();
+    }
+
+
+    /**
      * 获取Reference, 即URL井号(#)后面的字符串
      *
      * <p>列如：http://localhost:8080/xxx#yyyyy
@@ -811,6 +847,21 @@ public class ForestRequest<T> {
     }
 
     /**
+     * 获取Reference, 即URL井号(#)后面的字符串
+     * <p>同 {@link ForestRequest#getRef()}
+     *
+     * <p>列如：http://localhost:8080/xxx#yyyyy
+     * <p>上例中 yyyy 便是 Reference
+     *
+     * @return URL井号(#)后面的字符串
+     * @see ForestRequest#getRef()
+     */
+    public String ref() {
+        return getRef();
+    }
+
+
+    /**
      * 获取请求对应的Forest方法
      *
      * @return Forest方法对象
@@ -827,6 +878,18 @@ public class ForestRequest<T> {
     public HttpBackend getBackend() {
         return backend;
     }
+
+    /**
+     * 获取HTTP后端对象
+     * <p>同 {@link ForestRequest#getBackend()}
+     *
+     * @return HTTP后端框架对象，{@link HttpBackend}接口实例
+     * @see ForestRequest#getBackend()
+     */
+    public HttpBackend backend() {
+        return getBackend();
+    }
+
 
     /**
      * 设置HTTP后端框架
@@ -1331,6 +1394,69 @@ public class ForestRequest<T> {
         this.async = async;
         return this;
     }
+
+    /**
+     * 是否打开自动重定向
+     *
+     * @return {@code true}: 打开, {@code false}: 禁止
+     */
+    public boolean isAutoRedirection() {
+        return autoRedirection;
+    }
+
+    /**
+     * 获取重定向上一个的请求对象
+     * <p>触发重定向时的第一个请求
+     *
+     * @return 定向上一个的请求对象
+     */
+    public ForestRequest<?> getPrevRequest() {
+        return prevRequest;
+    }
+
+    /**
+     * 获取重定向的上一个响应
+     * <p>触发重定向时的第一个响应，即带有301、302等状态码的响应
+     *
+     * @return 重定向的上一个响应
+     */
+    public ForestResponse<?> getPrevResponse() {
+        return prevResponse;
+    }
+
+    /**
+     * 是否为重定向请求
+     * <p>即是否为接受到 301, 302 等重定向状态码后进行地址转移的那个请求
+     *
+     * @return {@code true}: 是重定向请求，{@code false}: 不是
+     */
+    public boolean isRedirection() {
+        return this.prevRequest != null && this.prevResponse != null;
+    }
+
+    /**
+     * 设置是否打开自动重定向
+     *
+     * @param autoRedirection {@code true}: 打开, {@code false}: 禁止
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest<T> setAutoRedirection(boolean autoRedirection) {
+        this.autoRedirection = autoRedirection;
+        return this;
+    }
+
+    /**
+     * 设置是否打开自动重定向
+     * <p>同 {@link ForestRequest#setAutoRedirection(boolean)}
+     *
+     * @param autoRedirects {@code true}: 打开, {@code false}: 禁止
+     * @return {@link ForestRequest}类实例
+     * @see ForestRequest#setAutoRedirection(boolean)
+     */
+    public ForestRequest<T> autoRedirects(boolean autoRedirects) {
+        return setAutoRedirection(autoRedirects);
+    }
+
 
     /**
      * 设置为同步
@@ -2443,6 +2569,40 @@ public class ForestRequest<T> {
     }
 
     /**
+     * 获取重定向回调函数: 在请求重定向时触发
+     *
+     * @return 重定向回调函数， {@link OnRedirection}接口实例
+     */
+    public OnRedirection getOnRedirection() {
+        return onRedirection;
+    }
+
+    /**
+     * 设置重定向回调函数: 在请求重定向时触发
+     *
+     * @param onRedirection 重定向回调函数， {@link OnRedirection}接口实例
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest<T> setOnRedirection(OnRedirection onRedirection) {
+        this.onRedirection = onRedirection;
+        return this;
+    }
+
+    /**
+     * 设置重定向回调函数: 在请求重定向时触发
+     * <p>同 {@link ForestRequest#setOnRedirection(OnRedirection)}方法
+     *
+     * @param onRedirection 重定向回调函数， {@link OnRedirection}接口实例
+     * @return {@link ForestRequest}类实例
+     * @see ForestRequest#setOnRedirection(OnRedirection)
+     */
+    public ForestRequest<T> onRedirection(OnRedirection onRedirection) {
+        this.onRedirection = onRedirection;
+        return this;
+    }
+
+
+    /**
      * 获取进度回调函数：上传/下载进度监听时调用
      * <p>
      * 每上传/下载传输 ${progressStep} 个比特数时，执行一次监听回调函数
@@ -2957,6 +3117,21 @@ public class ForestRequest<T> {
     }
 
     /**
+     * 获取该请求所返回的响应对象
+     *
+     * @return Forest响应对象, {@link ForestResponse}实例
+     */
+    private ForestResponse<T> getResponse() {
+        if (this.lifeCycleHandler != null) {
+            if (this.lifeCycleHandler instanceof MethodLifeCycleHandler) {
+                return ((MethodLifeCycleHandler) lifeCycleHandler).getResponse();
+            }
+        }
+        return null;
+
+    }
+
+    /**
      * 执行 {@code retryWhen} 回调函数，判断是否触发请求重试条件
      * <p>判断过程如下：
      * <ul>
@@ -3080,6 +3255,7 @@ public class ForestRequest<T> {
         newRequest.onSuccess = this.onSuccess;
         newRequest.successWhen = this.successWhen;
         newRequest.onError = this.onError;
+        newRequest.onRedirection = this.onRedirection;
         newRequest.onLoadCookie = this.onLoadCookie;
         newRequest.onSaveCookie = this.onSaveCookie;
         newRequest.onProgress = this.onProgress;
@@ -3106,10 +3282,14 @@ public class ForestRequest<T> {
      */
     public Object execute(HttpBackend backend, LifeCycleHandler lifeCycleHandler) {
         setLifeCycleHandler(lifeCycleHandler);
+        processRedirectionRequest();
+        // 执行 beforeExecute
         if (interceptorChain.beforeExecute(this)) {
+            // 从后端HTTP框架创建HTTP请求执行器
             HttpExecutor executor  = backend.createExecutor(this, lifeCycleHandler);
             if (executor != null) {
                 try {
+                    // 执行请求，即发生请求到服务端
                     executor.execute(lifeCycleHandler);
                 } catch (ForestRuntimeException e) {
                     throw e;
@@ -3118,7 +3298,24 @@ public class ForestRequest<T> {
                 }
             }
         }
+        // 返回结果
         return getMethodReturnValue();
+    }
+
+
+    /**
+     * 处理重定向请求
+     * <p>如果此请求为将要进行重定向的请求，会去执行 onRedirection 回调函数
+     */
+    private void processRedirectionRequest() {
+        if (isRedirection()) {
+            if (onRedirection != null) {
+                // 执行 onRedirection 对应的回调函数
+                onRedirection.onRedirection(this, prevRequest, prevResponse);
+            }
+            // 执行拦截器中的额 onRedirection 方法
+            interceptorChain.onRedirection(this, prevRequest, prevResponse);
+        }
     }
 
     /**

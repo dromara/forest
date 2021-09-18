@@ -97,6 +97,11 @@ public class ForestConfigurationProperties {
     private long maxRetryInterval = 0;
 
     /**
+     * Enable auto redirection
+     */
+    private boolean autoRedirection = true;
+
+    /**
      * Enable print log of request/response
      */
     private boolean logEnabled = true;
@@ -277,6 +282,14 @@ public class ForestConfigurationProperties {
 
     public void setMaxRetryInterval(long maxRetryInterval) {
         this.maxRetryInterval = maxRetryInterval;
+    }
+
+    public boolean isAutoRedirection() {
+        return autoRedirection;
+    }
+
+    public void setAutoRedirection(boolean autoRedirection) {
+        this.autoRedirection = autoRedirection;
     }
 
     public boolean isLogEnabled() {

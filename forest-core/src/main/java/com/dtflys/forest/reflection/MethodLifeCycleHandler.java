@@ -17,6 +17,7 @@ import com.dtflys.forest.utils.ForestProgress;
 import com.dtflys.forest.utils.ReflectUtils;
 
 import java.lang.reflect.Type;
+import java.util.concurrent.Future;
 
 /**
  * 请求方法生命周期处理器
@@ -32,6 +33,8 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
     private final Type onSuccessClassGenericType;
 
     private static final ResultHandler RESULT_HANDLER = new ResultHandler();
+
+    private volatile ForestResponse<T> response;
 
     private volatile T resultData;
 
@@ -50,6 +53,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
 
     @Override
     public Object handleSyncWithException(ForestRequest request, ForestResponse response, Throwable ex) {
+        this.response = response;
         try {
             Object resultData = null;
             if (response.isSuccess()) {
@@ -98,6 +102,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
 
     @Override
     public synchronized Object handleResultType(ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
+        this.response = response;
         Object resultData = RESULT_HANDLER.getResult(request, response, resultType, resultClass);
         if (!(resultData instanceof ForestResponse)) {
             response.setResult(resultData);
@@ -109,6 +114,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
 
     @Override
     public Object handleSuccess(Object resultData, ForestRequest request, ForestResponse response) {
+        this.response = response;
         request.getInterceptorChain().onSuccess(resultData, request, response);
         OnSuccess onSuccess = request.getOnSuccess();
         if (onSuccess != null) {
@@ -133,6 +139,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
 
     @Override
     public Object handleError(ForestRequest request, ForestResponse response, Throwable ex) {
+        this.response = response;
         ForestRuntimeException e = null;
         if (ex instanceof ForestRuntimeException) {
             e = (ForestRuntimeException) ex;
@@ -185,6 +192,18 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
         return resultData;
     }
 
+    @Override
+    public Object handleFuture(Future resultData) {
+        if (Future.class.isAssignableFrom(resultRawClass)) {
+            this.resultData = (T) resultData;
+            return resultData;
+        }
+        return null;
+    }
+
+    public ForestResponse<T> getResponse() {
+        return response;
+    }
 
     @Override
     public Type getResultType() {

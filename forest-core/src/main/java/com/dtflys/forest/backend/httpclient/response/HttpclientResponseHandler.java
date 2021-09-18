@@ -62,7 +62,7 @@ public class HttpclientResponseHandler extends AbstractBackendResponseHandler<Ht
     protected void handleFutureResult(Future httpResponseFuture, Date requestTime, Class innerType, ForestResponseFactory forestResponseFactory) {
         HttpclientForestFuture<HttpResponse, HttpResponse> future = new HttpclientForestFuture<>(
                 request, requestTime, innerType, lifeCycleHandler, httpResponseFuture, forestResponseFactory);
-        lifeCycleHandler.handleResult(future);
+        lifeCycleHandler.handleFuture(future);
     }
 
 }

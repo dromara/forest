@@ -9,6 +9,7 @@ import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.utils.ForestProgress;
 
 import java.lang.reflect.Type;
+import java.util.concurrent.Future;
 
 
 /**
@@ -41,6 +42,8 @@ public interface LifeCycleHandler {
     void handleSaveCookie(ForestRequest request, ForestCookies cookies);
 
     Object handleResult(Object resultData);
+
+    Object handleFuture(Future resultData);
 
     Type getOnSuccessClassGenericType();
 

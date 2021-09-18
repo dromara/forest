@@ -31,7 +31,7 @@ public class OkHttp3ResponseHandler extends AbstractBackendResponseHandler<Objec
 
     @Override
     public void handleFuture(Future<Object> httpResponseFuture, Date requestTime, ForestResponseFactory forestResponseFactory) {
-        lifeCycleHandler.handleResult(httpResponseFuture);
+        lifeCycleHandler.handleFuture(httpResponseFuture);
     }
 
 

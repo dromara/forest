@@ -85,6 +85,15 @@ public class InterceptorChain implements Interceptor {
     }
 
     @Override
+    public void onRedirection(ForestRequest redirectReq, ForestRequest prevReq, ForestResponse prevRes) {
+        Iterator<Interceptor> iter = interceptors.iterator();
+        for ( ; iter.hasNext(); ) {
+            Interceptor item = iter.next();
+            item.onRedirection(redirectReq, prevReq, prevRes);
+        }
+    }
+
+    @Override
     public void onProgress(ForestProgress progress) {
         Iterator<Interceptor> iter = interceptors.iterator();
         for (; iter.hasNext(); ) {

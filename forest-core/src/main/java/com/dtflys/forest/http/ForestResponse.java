@@ -211,9 +211,14 @@ public abstract class ForestResponse<T> {
     public ForestRequest<T> redirectionRequest() {
         if (isRedirection() && request != null) {
             String location = getRedirectionLocation();
-            ForestRequest<T> newRequest = request.clone();
-            newRequest.setUrl(location);
-            return newRequest;
+            if (StringUtils.isBlank(location)) {
+                return null;
+            }
+            ForestRequest<T> redirectRequest = request.clone();
+            redirectRequest.setUrl(location);
+            redirectRequest.prevRequest = request;
+            redirectRequest.prevResponse = this;
+            return redirectRequest;
         }
         return null;
     }

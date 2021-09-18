@@ -9,6 +9,7 @@ import com.dtflys.forest.callback.AddressSource;
 import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
+import com.dtflys.forest.callback.OnRedirection;
 import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.config.ForestConfiguration;
@@ -112,6 +113,7 @@ public class ForestMethod<T> implements VariableScope {
     private Map<String, MappingVariable> variables = new HashMap<>();
     private MappingParameter onSuccessParameter = null;
     private MappingParameter onErrorParameter = null;
+    private MappingParameter onRedirectionParameter = null;
     private MappingParameter onProgressParameter = null;
     private MappingParameter onLoadCookieParameter = null;
     private MappingParameter onSaveCookieParameter = null;
@@ -579,6 +581,8 @@ public class ForestMethod<T> implements VariableScope {
                 onSuccessClassGenericType = getGenericClassOrType(genType, 0);
             } else if (OnError.class.isAssignableFrom(paramType)) {
                 onErrorParameter = parameter;
+            } else if (OnRedirection.class.isAssignableFrom(paramType)) {
+                onRedirectionParameter = parameter;
             } else if (OnProgress.class.isAssignableFrom(paramType)) {
                 onProgressParameter = parameter;
             } else if (OnSaveCookie.class.isAssignableFrom(paramType)) {
@@ -776,11 +780,14 @@ public class ForestMethod<T> implements VariableScope {
 
         renderedUrl = URLUtils.getValidURL(baseUrl, renderedUrl);
 
+        boolean autoRedirection = configuration.isAutoRedirection();
+
         // createExecutor and initialize http instance
         ForestRequest<T> request = new ForestRequest(configuration, this, args);
         request.setUrl(renderedUrl)
                 .setType(type)
                 .setCharset(charset)
+                .setAutoRedirection(autoRedirection)
                 .setSslProtocol(sslProtocol)
                 .setLogConfiguration(logConfiguration)
                 .setAsync(async);
@@ -1161,6 +1168,10 @@ public class ForestMethod<T> implements VariableScope {
         if (onErrorParameter != null) {
             OnError onErrorCallback = (OnError) args[onErrorParameter.getIndex()];
             request.setOnError(onErrorCallback);
+        }
+        if (onRedirectionParameter != null) {
+            OnRedirection onRedirectionCallback = (OnRedirection) args[onRedirectionParameter.getIndex()];
+            request.setOnRedirection(onRedirectionCallback);
         }
         if (onProgressParameter != null) {
             OnProgress onProgressCallback = (OnProgress) args[onProgressParameter.getIndex()];

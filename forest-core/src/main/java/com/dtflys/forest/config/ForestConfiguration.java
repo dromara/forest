@@ -65,7 +65,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -108,6 +107,11 @@ public class ForestConfiguration implements Serializable {
      * maximum number of connections allowed per route
      */
     private Integer maxRouteConnections;
+
+    /**
+     * 是否自动重定向开关
+     */
+    private boolean autoRedirection = true;
 
     /**
      * 全局的请求超时时间，单位为毫秒
@@ -572,6 +576,27 @@ public class ForestConfiguration implements Serializable {
      */
     public ForestConfiguration setMaxRouteConnections(Integer maxRouteConnections) {
         this.maxRouteConnections = maxRouteConnections;
+        return this;
+    }
+
+    /**
+     * 是否自动重定向开关
+     *
+     * @return {@code true}: 打开, {@code false}: 禁止
+     */
+    public boolean isAutoRedirection() {
+        return autoRedirection;
+    }
+
+    /**
+     /**
+     * 设置是否打开自动重定向
+     *
+     * @param autoRedirection {@code true}: 打开, {@code false}: 禁止
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestConfiguration setAutoRedirection(boolean autoRedirection) {
+        this.autoRedirection = autoRedirection;
         return this;
     }
 

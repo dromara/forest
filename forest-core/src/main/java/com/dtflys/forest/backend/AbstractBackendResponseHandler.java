@@ -31,6 +31,11 @@ public abstract class AbstractBackendResponseHandler<R> {
 
 
     public Object handleSync(ForestResponse response, int statusCode, String msg) {
+        if (request.isAutoRedirection() && response.isRedirection()) {
+            // 进行重定向
+            ForestRequest redirectionRequest = response.redirectionRequest();
+            return redirectionRequest.execute();
+        }
         Object result = lifeCycleHandler.handleSync(request, response);
         if (result instanceof ForestResponse) {
             return result;
@@ -40,10 +45,17 @@ public abstract class AbstractBackendResponseHandler<R> {
 
 
     public Object handleSuccess(ForestResponse response) {
+        if (request.isAutoRedirection() && response.isRedirection()) {
+            // 进行重定向
+            ForestRequest redirectionRequest = response.redirectionRequest();
+            return redirectionRequest.execute();
+        }
         Type onSuccessGenericType = lifeCycleHandler.getOnSuccessClassGenericType();
         Object resultData = lifeCycleHandler.handleResultType(request, response, onSuccessGenericType, ReflectUtils.toClass(onSuccessGenericType));
         return lifeCycleHandler.handleSuccess(resultData, request, response);
     }
+
+
 
 
     public void handleError(ForestResponse response) {

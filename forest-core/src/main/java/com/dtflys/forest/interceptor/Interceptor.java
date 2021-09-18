@@ -3,6 +3,7 @@ package com.dtflys.forest.interceptor;
 import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
+import com.dtflys.forest.callback.OnRedirection;
 import com.dtflys.forest.callback.OnRetry;
 import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.callback.OnSuccess;
@@ -43,7 +44,7 @@ import com.dtflys.forest.utils.ForestProgress;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-06-26
  */
-public interface Interceptor<T> extends OnSuccess<T>, OnError, OnProgress, OnLoadCookie, OnSaveCookie, OnRetry {
+public interface Interceptor<T> extends OnSuccess<T>, OnError, OnProgress, OnLoadCookie, OnSaveCookie, OnRetry, OnRedirection {
 
 
     /**
@@ -123,6 +124,18 @@ public interface Interceptor<T> extends OnSuccess<T>, OnError, OnProgress, OnLoa
      */
     @Override
     default void onProgress(ForestProgress progress) {
+    }
+
+    /**
+     * 默认回调函数:在请求重定向时触发
+     * <p>默认为什么都不做
+     *
+     * @param redirectReq 进行重定向的新请求
+     * @param prevReq 上一个请求
+     * @param prevRes 上一个请求的响应
+     */
+    @Override
+    default void onRedirection(ForestRequest<?> redirectReq, ForestRequest<?> prevReq, ForestResponse<?> prevRes) {
     }
 
     /**
