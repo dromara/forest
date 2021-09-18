@@ -36,7 +36,7 @@ public class TestRequest {
         assertThat(request.getPath()).isEqualTo("/xxx/yyy");
         request.address(new ForestAddress("2.2.2.2", -1));
         assertThat(request.host()).isEqualTo("2.2.2.2");
-        assertThat(request.port()).isEqualTo(80);
+        assertThat(request.port()).isEqualTo(10);
         assertThat(request.getPath()).isEqualTo("/xxx/yyy");
 
         request.address("3.3.3.3", 8080);
@@ -46,7 +46,7 @@ public class TestRequest {
 
         request.address("4.4.4.4", -1);
         assertThat(request.host()).isEqualTo("4.4.4.4");
-        assertThat(request.port()).isEqualTo(80);
+        assertThat(request.port()).isEqualTo(8080);
         assertThat(request.getPath()).isEqualTo("/xxx/yyy");
     }
 

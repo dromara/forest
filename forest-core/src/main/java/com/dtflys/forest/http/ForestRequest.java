@@ -550,6 +550,51 @@ public class ForestRequest<T> {
         return setUserInfo(userInfo);
     }
 
+    /**
+     * 设置URL地址的HTTP协议头
+     *
+     * @param scheme HTTP协议头
+     * @return {@link ForestRequest}对象实例
+     */
+    public ForestRequest<T> setScheme(String scheme) {
+        this.url.setScheme(scheme);
+        return this;
+    }
+
+    /**
+     * 设置URL地址的HTTP协议头
+     * <p>同 {@link ForestRequest#setScheme(String)}
+     *
+     * @param scheme HTTP协议头
+     * @return {@link ForestRequest}对象实例
+     * @see ForestRequest#setScheme(String)
+     */
+    public ForestRequest<T> scheme(String scheme) {
+        this.url.setScheme(scheme);
+        return setScheme(scheme);
+    }
+
+
+    /**
+     * 获取URL地址的HTTP协议头
+     *
+     * @return {@link ForestRequest}对象实例
+     */
+    public String getScheme() {
+        return this.url.getScheme();
+    }
+
+    /**
+     * 获取URL地址的HTTP协议头
+     * <p>同 {@link ForestRequest#getScheme()}
+     *
+     * @return {@link ForestRequest}对象实例
+     * @see ForestRequest#getScheme()
+     */
+    public String scheme() {
+        return getScheme();
+    }
+
 
     /**
      * 设置URL主机地址
@@ -647,7 +692,8 @@ public class ForestRequest<T> {
      * @return {@link ForestRequest}对象实例
      */
     public ForestRequest<T> setAddress(ForestAddress address) {
-        return setHost(address.getHost()).setPort(address.getPort());
+        this.url.setBaseAddress(address);
+        return this;
     }
 
     /**
@@ -658,7 +704,7 @@ public class ForestRequest<T> {
      * @return {@link ForestRequest}对象实例
      */
     public ForestRequest<T> setAddress(String host, int port) {
-        return setHost(host).setPort(port);
+        return setAddress(new ForestAddress(host, port));
     }
 
 
@@ -671,7 +717,8 @@ public class ForestRequest<T> {
      * @see ForestRequest#setAddress(ForestAddress)
      */
     public ForestRequest<T> address(ForestAddress address) {
-        return setHost(address.getHost()).setPort(address.getPort());
+        this.url.setBaseAddress(address);
+        return this;
     }
 
     /**
@@ -2217,7 +2264,7 @@ public class ForestRequest<T> {
      */
     public ForestRequest<T> setSuccessWhen(Class<? extends SuccessWhen> conditionClass) {
         if (conditionClass != null && !conditionClass.isInterface()) {
-            SuccessWhen condition = configuration.newInstanceOfForestObject(conditionClass);
+            SuccessWhen condition = configuration.getForestObject(conditionClass);
             setSuccessWhen(condition);
         }
         return this;
@@ -2331,7 +2378,7 @@ public class ForestRequest<T> {
      */
     public ForestRequest<T> setRetryWhen(Class<? extends RetryWhen> conditionClass) {
         if (conditionClass != null && !conditionClass.isInterface()) {
-            RetryWhen condition = configuration.newInstanceOfForestObject(conditionClass);
+            RetryWhen condition = configuration.getForestObject(conditionClass);
             setRetryWhen(condition);
         }
         return this;
@@ -2511,7 +2558,7 @@ public class ForestRequest<T> {
         if (!method.isVariableDefined(name)) {
             throw new ForestVariableUndefinedException(name);
         }
-        return method.getVariableValue(name);
+        return method.getVariableValue(name, method);
     }
 
     /**

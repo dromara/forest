@@ -21,23 +21,30 @@ import com.dtflys.forest.http.ForestRequest;
  * @author gongjun [dt_flys@hotmail.com]
  * @since 1.5.2
  */
-public class Forest {
+public abstract class Forest {
 
     private volatile static ForestConfiguration DEFAULT_CONFIG;
 
     /**
-     * 创建或获取全局默认配置，即 {@link ForestConfiguration} 对象
+     * 获取或创建全局默认配置，即 {@link ForestConfiguration} 对象
+     * <p>全局默认配置的配置ID为 forestConfiguration
      *
      * @return {@link ForestConfiguration} 对象
      */
     public static ForestConfiguration config() {
-        if (DEFAULT_CONFIG == null) {
-            synchronized (Forest.class) {
-                DEFAULT_CONFIG = ForestConfiguration.configuration();
-            }
-        }
-        return DEFAULT_CONFIG;
+        return ForestConfiguration.configuration();
     }
+
+    /**
+     * 根据配置ID获取或创建配置，即 {@link ForestConfiguration} 对象
+     *
+     * @param id 配置 ID
+     * @return {@link ForestConfiguration} 对象
+     */
+    public static ForestConfiguration config(String id) {
+        return ForestConfiguration.configuration(id);
+    }
+
 
     /**
      * 创建 Forest 客户端接口实例

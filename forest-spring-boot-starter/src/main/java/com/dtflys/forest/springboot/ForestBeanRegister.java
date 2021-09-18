@@ -4,11 +4,12 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.interceptor.SpringInterceptorFactory;
-import com.dtflys.forest.listener.ConverterBeanListener;
+import com.dtflys.forest.spring.ConverterBeanListener;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.reflection.SpringForestObjectFactory;
 import com.dtflys.forest.scanner.ClassPathClientScanner;
 import com.dtflys.forest.schema.ForestConfigurationBeanDefinitionParser;
+import com.dtflys.forest.spring.ForestBeanProcessor;
 import com.dtflys.forest.springboot.annotation.ForestScannerRegister;
 import com.dtflys.forest.springboot.properties.ForestConverterItemProperties;
 import com.dtflys.forest.springboot.properties.ForestSSLKeyStoreProperties;
@@ -90,6 +91,12 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
                 .addPropertyValue("logResponseContent", forestConfigurationProperties.isLogResponseContent())
                 .addPropertyValue("logHandler", logHandler)
                 .addPropertyValue("backendName", forestConfigurationProperties.getBackend())
+                .addPropertyValue("baseAddressScheme", forestConfigurationProperties.getBaseAddressScheme())
+                .addPropertyValue("baseAddressHost", forestConfigurationProperties.getBaseAddressHost())
+                .addPropertyValue("baseAddressPort", forestConfigurationProperties.getBaseAddressPort())
+                .addPropertyValue("baseAddressSourceClass", forestConfigurationProperties.getBaseAddressSource())
+                .addPropertyValue("successWhenClass", forestConfigurationProperties.getSuccessWhen())
+                .addPropertyValue("retryWhenClass", forestConfigurationProperties.getRetryWhen())
                 .addPropertyValue("interceptors", forestConfigurationProperties.getInterceptors())
                 .addPropertyValue("sslProtocol", forestConfigurationProperties.getSslProtocol())
                 .addPropertyValue("variables", forestConfigurationProperties.getVariables())
@@ -131,7 +138,6 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
             registerConverter(configuration, ForestDataType.XML, convertProperties.getXml());
             registerConverter(configuration, ForestDataType.BINARY, convertProperties.getBinary());
         }
-
         registerConverterBeanListener(configuration);
         return configuration;
     }
@@ -144,6 +150,7 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
         beanFactory.registerBeanDefinition("forestConverterBeanListener", beanDefinition);
         return applicationContext.getBean("forestConverterBeanListener", ConverterBeanListener.class);
     }
+
 
     private void registerConverter(ForestConfiguration configuration, ForestDataType dataType, ForestConverterItemProperties converterItemProperties) {
         if (converterItemProperties == null) {

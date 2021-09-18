@@ -20,11 +20,11 @@ public class TestBackendClient {
 
     private BackendClient2 backendClient2;
 
-    private static ForestConfiguration configuration = ForestConfiguration.configuration();
+    private static ForestConfiguration configuration = ForestConfiguration.createConfiguration();
 
     @BeforeClass
     public static void prepareClient() {
-        configuration = ForestConfiguration.configuration();
+        configuration = ForestConfiguration.createConfiguration();
     }
 
     public TestBackendClient() {

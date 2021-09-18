@@ -73,7 +73,7 @@ public class TestSSLClient extends BaseClientTest {
 
     @BeforeClass
     public static void prepareClient() {
-        configuration = ForestConfiguration.configuration();
+        configuration = ForestConfiguration.createConfiguration();
         SSLKeyStore sslKeyStore = new SSLKeyStore(
                 "ssl_client",
                 "ssl_client.keystore",

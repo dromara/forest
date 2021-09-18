@@ -28,7 +28,7 @@ public class TestGetWithBodyClient extends BaseClientTest {
 
     @BeforeClass
     public static void prepareClient() {
-        configuration = ForestConfiguration.configuration();
+        configuration = ForestConfiguration.createConfiguration();
         configuration.setVariableValue("port", GetWithBodyMockServer.port);
     }
 

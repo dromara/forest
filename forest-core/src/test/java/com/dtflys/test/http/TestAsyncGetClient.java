@@ -48,7 +48,7 @@ public class TestAsyncGetClient extends BaseClientTest {
 
     @BeforeClass
     public static void prepareClient() {
-        configuration = Forest.config();
+        configuration = ForestConfiguration.createConfiguration();
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.VariableScope;
+import com.dtflys.forest.reflection.ForestMethod;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,9 +33,14 @@ public class SubVariableScope implements VariableScope {
 
     @Override
     public Object getVariableValue(String name) {
+        return getVariableValue(name, null);
+    }
+
+    @Override
+    public Object getVariableValue(String name, ForestMethod method) {
         Object value = variables.get(name);
         if (value == null) {
-            return parent.getVariableValue(name);
+            return parent.getVariableValue(name, method);
         }
         return value;
     }

@@ -92,6 +92,26 @@ public class ForestURL {
         return this;
     }
 
+    /**
+     * 设置基础地址信息
+     *
+     * @param baseAddress {@link ForestAddress}对象
+     * @return {@link ForestURL}对象
+     */
+    public ForestURL setBaseAddress(ForestAddress baseAddress) {
+        if (baseAddress != null) {
+            String baseScheme = baseAddress.getScheme();
+            String baseHost = baseAddress.getHost();
+            int basePort = baseAddress.getPort();
+            setScheme(baseScheme);
+            setHost(baseHost);
+            if (basePort != -1) {
+                setPort(basePort);
+            }
+        }
+        return this;
+    }
+
     public String getScheme() {
         return scheme;
     }
@@ -102,6 +122,7 @@ public class ForestURL {
         }
         this.scheme = scheme.trim();
         this.ssl = "https".equals(this.scheme);
+        this.originalUrl = toURLString();
         return this;
     }
 

@@ -2,7 +2,6 @@ package com.dtflys.forest.lifecycles.method;
 
 import com.dtflys.forest.annotation.Retry;
 import com.dtflys.forest.callback.RetryWhen;
-import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.mapping.MappingTemplate;
@@ -23,7 +22,7 @@ public class RetryLifeCycle implements MethodAnnotationLifeCycle<Retry, Object> 
     public void onMethodInitialized(ForestMethod method, Retry annotation) {
         Class<? extends RetryWhen> conditionClass = annotation.condition();
         if (conditionClass != null && !conditionClass.isInterface()) {
-            RetryWhen retryWhen = method.getConfiguration().newInstanceOfForestObject(conditionClass);
+            RetryWhen retryWhen = method.getConfiguration().getForestObject(conditionClass);
             method.setExtensionParameterValue(PARAM_KEY_RETRY_WHEN, retryWhen);
         }
         method.setExtensionParameterValue(PARAM_KEY_RETRY, annotation);

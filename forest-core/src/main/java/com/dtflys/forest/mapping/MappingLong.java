@@ -1,5 +1,7 @@
 package com.dtflys.forest.mapping;
 
+import com.dtflys.forest.reflection.ForestMethod;
+
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2018-01-09 17:49
@@ -9,7 +11,7 @@ public class MappingLong extends MappingExpr {
     private final long number;
 
     public MappingLong(long number) {
-        super(Token.LONG);
+        super(null, Token.LONG);
         this.number = number;
     }
 

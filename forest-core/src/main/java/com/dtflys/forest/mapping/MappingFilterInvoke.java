@@ -3,6 +3,7 @@ package com.dtflys.forest.mapping;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.filter.Filter;
+import com.dtflys.forest.reflection.ForestMethod;
 
 import java.util.List;
 
@@ -12,8 +13,8 @@ import java.util.List;
  */
 public class MappingFilterInvoke extends MappingInvoke {
 
-    public MappingFilterInvoke(VariableScope variableScope, MappingIdentity name, List<MappingExpr> argList) {
-        super(Token.FILTER_INVOKE, variableScope, null, name, argList);
+    public MappingFilterInvoke(ForestMethod<?> forestMethod, VariableScope variableScope, MappingIdentity name, List<MappingExpr> argList) {
+        super(forestMethod, Token.FILTER_INVOKE, variableScope, null, name, argList);
     }
 
     @Override

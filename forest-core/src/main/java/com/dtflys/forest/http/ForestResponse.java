@@ -75,6 +75,11 @@ public abstract class ForestResponse<T> {
     protected volatile boolean logged = false;
 
     /**
+     * 响应是否成功
+     */
+    private volatile Boolean success = null;
+
+    /**
      * 网络状态码
      */
     protected volatile Integer statusCode;
@@ -425,19 +430,28 @@ public abstract class ForestResponse<T> {
      *     <li>2. 判断HTTP响应状态码是否在正常范围内(100 ~ 399)</li>
      * </ul>
      *
+     * 以上过程一个响应只会执行一次！执行过后被会缓存到 success 字段中
+     * <p>下次再调用 isSuccess() 用是第一次执行的结果
+     *
      * @return {@code true}: 请求成功， {@code false}: 请求失败
      */
     public boolean isSuccess() {
-        if (request != null) {
-            if (request.getSuccessWhen() != null) {
-                return request.getSuccessWhen().successWhen(request, this);
+        if (success == null) {
+            if (request != null) {
+                if (request.getSuccessWhen() != null) {
+                    success = request.getSuccessWhen().successWhen(request, this);
+                } else {
+                    SuccessWhen globalSuccessWhen = request.getConfiguration().getSuccessWhen();
+                    if (globalSuccessWhen != null) {
+                        success = globalSuccessWhen.successWhen(request, this);
+                    }
+                }
             }
-            SuccessWhen globalSuccessWhen = request.getConfiguration().getSuccessWhen();
-            if (globalSuccessWhen != null) {
-                return globalSuccessWhen.successWhen(request, this);
+            if (success == null) {
+                success = noException() && statusOk();
             }
         }
-        return noException() && statusOk();
+        return success;
     }
 
     /**
@@ -498,6 +512,25 @@ public abstract class ForestResponse<T> {
         return status_1xx() || status_2xx() || status_3xx();
     }
 
+    /**
+     * 请求响应码是否和输入参数相同
+     *
+     * @param statusCode 被比较的响应码
+     * @return {@code true}: 相同, {@code false}: 不同
+     */
+    public boolean statusIs(int statusCode) {
+        return this.statusCode == statusCode;
+    }
+
+    /**
+     * 请求响应码是否和输入参数不同
+     *
+     * @param statusCode 被比较的响应码
+     * @return {@code true}: 不同, {@code false}: 相同
+     */
+    public boolean statusIsNot(int statusCode) {
+        return this.statusCode != statusCode;
+    }
 
     /**
      * 网络请求是否失败

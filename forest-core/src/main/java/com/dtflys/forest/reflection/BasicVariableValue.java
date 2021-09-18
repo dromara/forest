@@ -10,7 +10,7 @@ public class BasicVariableValue implements ForestVariableValue {
 
 
     @Override
-    public Object getValue() {
+    public Object getValue(ForestMethod method) {
         return this.value;
     }
 }

@@ -2,6 +2,7 @@ package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -17,12 +18,12 @@ public class MappingDot extends MappingExpr {
     protected final MappingExpr left;
     protected final MappingIdentity right;
 
-    public MappingDot(VariableScope variableScope, MappingExpr left, MappingIdentity right) {
-        this(Token.DOT, variableScope, left, right);
+    public MappingDot(ForestMethod forestMethod, VariableScope variableScope, MappingExpr left, MappingIdentity right) {
+        this(forestMethod, Token.DOT, variableScope, left, right);
     }
 
-    protected MappingDot(Token token, VariableScope variableScope, MappingExpr left, MappingIdentity right) {
-        super(token);
+    protected MappingDot(ForestMethod forestMethod, Token token, VariableScope variableScope, MappingExpr left, MappingIdentity right) {
+        super(forestMethod, token);
         this.variableScope = variableScope;
         this.left = left;
         this.right = right;

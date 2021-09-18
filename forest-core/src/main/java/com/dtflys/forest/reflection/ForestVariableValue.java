@@ -5,6 +5,6 @@ package com.dtflys.forest.reflection;
  */
 public interface ForestVariableValue {
 
-    Object getValue();
+    Object getValue(ForestMethod method);
 
 }

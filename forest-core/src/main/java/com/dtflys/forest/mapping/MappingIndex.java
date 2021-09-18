@@ -1,6 +1,7 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.reflection.ForestMethod;
 
 /**
  * Created by Administrator on 2016/5/17.
@@ -10,7 +11,7 @@ public class MappingIndex extends MappingExpr {
     private final Integer index;
 
     public MappingIndex(Integer index) {
-        super(Token.INDEX);
+        super(null, Token.INDEX);
         this.index = index;
     }
 

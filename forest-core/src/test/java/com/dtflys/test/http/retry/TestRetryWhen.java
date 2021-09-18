@@ -8,7 +8,7 @@ public class TestRetryWhen implements RetryWhen {
 
     @Override
     public boolean retryWhen(ForestRequest request, ForestResponse response) {
-        return response.getStatusCode() == 203;
+        return response.statusIs(203);
     }
 
 }

@@ -2,6 +2,7 @@ package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
+import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.util.HashSet;
@@ -20,8 +21,8 @@ public class MappingReference extends MappingExpr {
         ITERATE_VARS.add("_key");
     }
 
-    public MappingReference(VariableScope variableScope, String name) {
-        super(Token.REF);
+    public MappingReference(ForestMethod<?> forestMethod, VariableScope variableScope, String name) {
+        super(forestMethod, Token.REF);
         this.variableScope = variableScope;
         this.name = name;
     }
@@ -39,7 +40,7 @@ public class MappingReference extends MappingExpr {
         if (!variableScope.isVariableDefined(name)) {
             throw new ForestVariableUndefinedException(name);
         }
-        return variableScope.getVariableValue(name);
+        return variableScope.getVariableValue(name, forestMethod);
     }
 
     @Override

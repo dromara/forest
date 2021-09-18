@@ -5,6 +5,7 @@ import com.dtflys.forest.annotation.MethodLifeCycle;
 import com.dtflys.forest.annotation.ParamLifeCycle;
 import com.dtflys.forest.annotation.RequestAttributes;
 import com.dtflys.forest.backend.ContentType;
+import com.dtflys.forest.callback.AddressSource;
 import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
@@ -17,11 +18,13 @@ import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestInterceptorDefineException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.filter.Filter;
+import com.dtflys.forest.http.ForestAddress;
 import com.dtflys.forest.http.ForestQueryParameter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.http.ForestURL;
 import com.dtflys.forest.http.body.ObjectRequestBody;
 import com.dtflys.forest.http.body.RequestBodyBuilder;
 import com.dtflys.forest.http.body.StringRequestBody;
@@ -53,6 +56,8 @@ import com.dtflys.forest.utils.URLUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 
 import static com.dtflys.forest.mapping.MappingParameter.*;
@@ -152,11 +157,16 @@ public class ForestMethod<T> implements VariableScope {
 
     @Override
     public Object getVariableValue(String name) {
-        return configuration.getVariableValue(name);
+        return getVariableValue(name, this);
+    }
+
+    @Override
+    public Object getVariableValue(String name, ForestMethod method) {
+        return configuration.getVariableValue(name, method);
     }
 
     public MappingTemplate makeTemplate(String text) {
-        return new MappingTemplate(text, this, configuration.getProperties(), forestParameters);
+        return new MappingTemplate(this, text, this, configuration.getProperties(), forestParameters);
     }
 
     /**
@@ -212,7 +222,7 @@ public class ForestMethod<T> implements VariableScope {
         baseRetryCount = baseMetaRequest.getRetryCount();
         baseMaxRetryInterval = baseMetaRequest.getMaxRetryInterval();
 
-        List<Class> globalInterceptorClasses = configuration.getInterceptors();
+        List<Class<? extends Interceptor>> globalInterceptorClasses = configuration.getInterceptors();
         if (globalInterceptorClasses != null && globalInterceptorClasses.size() > 0) {
             globalInterceptorList = new LinkedList<>();
             for (Class clazz : globalInterceptorClasses) {
@@ -744,9 +754,24 @@ public class ForestMethod<T> implements VariableScope {
             baseHeaders = new MappingTemplate[headerArray.length];
             for (int j = 0; j < baseHeaders.length; j++) {
                 MappingTemplate header = new MappingTemplate(
-                        headerArray[j], this, configuration.getProperties(), forestParameters);
+                        this, headerArray[j], this, configuration.getProperties(), forestParameters);
                 baseHeaders[j] = header;
             }
+        }
+
+        ForestURL baseURL = null;
+        AddressSource addressSource = configuration.getBaseAddressSource();
+        ForestAddress address = configuration.getBaseAddress();
+        try {
+            if (StringUtils.isNotBlank(baseUrl)) {
+                baseURL = new ForestURL(new URL(baseUrl));
+            } else {
+                baseURL = new ForestURL(new URL("http://localhost/"));
+                baseURL.setBaseAddress(address);
+            }
+            baseUrl = baseURL.toString();
+        } catch (MalformedURLException e) {
+            throw new ForestRuntimeException(e);
         }
 
         renderedUrl = URLUtils.getValidURL(baseUrl, renderedUrl);
@@ -759,6 +784,11 @@ public class ForestMethod<T> implements VariableScope {
                 .setSslProtocol(sslProtocol)
                 .setLogConfiguration(logConfiguration)
                 .setAsync(async);
+
+        if (addressSource != null) {
+            address = addressSource.getAddress(request);
+            request.address(address);
+        }
 
         if (StringUtils.isNotEmpty(responseEncoding)) {
             request.setResponseEncode(responseEncoding);

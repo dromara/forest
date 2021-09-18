@@ -212,9 +212,13 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
 
     @Override
     public Object getVariableValue(String name) {
-        return configuration.getVariableValue(name);
+        return getVariableValue(name, null);
     }
 
+    @Override
+    public Object getVariableValue(String name, ForestMethod method) {
+        return configuration.getVariableValue(name, method);
+    }
 
     public List<Annotation> getBaseAnnotations() {
         return baseAnnotations;

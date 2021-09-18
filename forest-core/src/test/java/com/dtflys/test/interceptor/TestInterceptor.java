@@ -44,7 +44,7 @@ public class TestInterceptor extends BaseClientTest {
 
     @BeforeClass
     public static void prepareClient() {
-        configuration = ForestConfiguration.configuration();
+        configuration = ForestConfiguration.createConfiguration();
         configuration.setCacheEnabled(false);
     }
 

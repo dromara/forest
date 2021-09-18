@@ -618,7 +618,7 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
         ForestRequest<?> request = Forest.get("http://localhost:" + server.getPort())
                 .maxRetryCount(3)
-                .retryWhen(((req, res) -> res.getStatusCode() == 203));
+                .retryWhen(((req, res) -> res.statusIs(203)));
         request.execute();
         assertThat(request.getCurrentRetryCount()).isEqualTo(3);
     }
@@ -635,7 +635,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .port(server.getPort())
                 .async()
                 .maxRetryCount(3)
-                .retryWhen(((req, res) -> res.getStatusCode() == 203))
+                .retryWhen(((req, res) -> res.statusIs(203)))
                 .onSuccess(((data, req, res) -> {
                     isSuccess.set(true);
                     latch.countDown();
@@ -653,7 +653,7 @@ public class TestGenericForestClient extends BaseClientTest {
         ForestRequest<?> request = Forest.get("http://localhost")
                 .port(server.getPort())
                 .maxRetryCount(3)
-                .retryWhen(((req, res) -> res.getStatusCode() == 200))
+                .retryWhen(((req, res) -> res.statusIs(200)))
                 .onError(((ex, req, res) -> {
                     isError.set(true);
                 }));
