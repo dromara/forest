@@ -235,8 +235,8 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
     }
 
     public ClassPathClientScanner registerScanner(ForestConfigurationProperties forestConfigurationProperties) {
-        List<String> basePackages = ForestScannerRegister.basePackages;
-        String configurationId = ForestScannerRegister.configurationId;
+        List<String> basePackages = ForestScannerRegister.getBasePackages();
+        String configurationId = ForestScannerRegister.getConfigurationId();
 
         BeanDefinitionRegistry registry = (BeanDefinitionRegistry) applicationContext.getBeanFactory();
 
