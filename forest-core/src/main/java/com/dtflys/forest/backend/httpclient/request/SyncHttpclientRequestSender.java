@@ -71,8 +71,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
     public void sendRequest(
             ForestRequest request, HttpclientResponseHandler responseHandler,
             HttpUriRequest httpRequest, LifeCycleHandler lifeCycleHandler,
-            CookieStore cookieStore, Date startDate, int retryCount)
-            throws IOException {
+            CookieStore cookieStore, Date startDate, int retryCount)  {
         HttpResponse httpResponse = null;
         ForestResponse response = null;
         client = getHttpClient(cookieStore);
@@ -80,8 +79,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
         try {
             logRequest(retryCount, (HttpRequestBase) httpRequest);
             httpResponse = client.execute(httpRequest);
-            response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, null, startDate);
-        } catch (IOException e) {
+        } catch (Throwable e) {
             httpRequest.abort();
             response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, e, startDate);
             ForestRetryException retryException = new ForestRetryException(
@@ -104,7 +102,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             }
             logResponse(response);
         }
-
+        response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, null, startDate);
         // 检查是否重试
         ForestRetryException retryEx = request.canRetry(response);
         if (retryEx != null && !retryEx.isMaxRetryCountReached()) {
