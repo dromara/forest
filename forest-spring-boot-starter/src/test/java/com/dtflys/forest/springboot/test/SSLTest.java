@@ -43,7 +43,7 @@ public class SSLTest {
         assertEquals(Integer.valueOf(300), sslConfig.getMaxRouteConnections());
         assertEquals(Integer.valueOf(3000), sslConfig.getTimeout());
         assertEquals(Integer.valueOf(3000), sslConfig.getConnectTimeout());
-        assertEquals(Integer.valueOf(2), sslConfig.getRetryCount());
+        assertEquals(Integer.valueOf(2), sslConfig.getMaxRetryCount());
         assertEquals(1, sslConfig.getSslKeyStores().size());
         SSLKeyStore sslKeyStore = sslConfig.getKeyStore("keystore1");
         assertThat(sslKeyStore).isNotNull();

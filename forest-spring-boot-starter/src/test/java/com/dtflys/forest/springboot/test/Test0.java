@@ -61,7 +61,7 @@ public class Test0 {
         assertEquals(Integer.valueOf(1000), config0.getTimeout());
         assertEquals(Integer.valueOf(1123), config0.getConnectTimeout());
         assertEquals("UTF-8", config0.getCharset());
-        assertEquals(Integer.valueOf(5), config0.getRetryCount());
+        assertEquals(Integer.valueOf(5), config0.getMaxRetryCount());
         assertEquals("okhttp3", config0.getBackend().getName());
         assertEquals("SSLv3", config0.getSslProtocol());
         assertTrue(config0.getLogHandler() instanceof DefaultLogHandler);
@@ -71,7 +71,7 @@ public class Test0 {
         assertTrue(!config0.isLogEnabled());
         assertEquals(Integer.valueOf(12), config0.getVariableValue("myCount"));
         assertEquals(BackOffRetryer.class, config0.getRetryer());
-        assertEquals(Integer.valueOf(5), config0.getRetryCount());
+        assertEquals(Integer.valueOf(5), config0.getMaxRetryCount());
         assertEquals(Long.valueOf(2000), Long.valueOf(config0.getMaxRetryInterval()));
 
     }

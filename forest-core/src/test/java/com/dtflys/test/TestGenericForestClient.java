@@ -689,8 +689,8 @@ public class TestGenericForestClient extends BaseClientTest {
         CountDownLatch latch = new CountDownLatch(1);
         AtomicBoolean isError = new AtomicBoolean(false);
         ForestRequest<?> request = Forest.get("http://localhost:" + server.getPort())
-                .setRetryCount(3)
-                .setRetryWhen(((req, res) -> res.getStatusCode() == 200))
+                .maxRetryCount(3)
+                .retryWhen(((req, res) -> res.getStatusCode() == 200))
                 .setOnError(((ex, req, res) -> {
                     isError.set(true);
                     latch.countDown();
