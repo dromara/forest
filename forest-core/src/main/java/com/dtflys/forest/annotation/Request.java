@@ -94,6 +94,7 @@ public @interface Request {
     /**
      * 最大重试次数
      */
+    @Deprecated
     int retryCount() default -1;
 
     /**

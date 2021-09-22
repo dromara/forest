@@ -88,7 +88,7 @@ public class ForestConfigurationProperties {
     /**
      * Max count of retry times
      */
-    private Integer retryCount = 0;
+    private Integer maxRetryCount = 0;
 
     /**
      * Max interval of retrying request
@@ -267,13 +267,24 @@ public class ForestConfigurationProperties {
         this.retryer = retryer;
     }
 
+    @Deprecated
     public int getRetryCount() {
-        return retryCount;
+        return maxRetryCount;
     }
 
+    @Deprecated
     public void setRetryCount(int retryCount) {
-        this.retryCount = retryCount;
+        this.maxRetryCount = retryCount;
     }
+
+    public int getMaxRetryCount() {
+        return maxRetryCount;
+    }
+
+    public void setMaxRetryCount(int retryCount) {
+        this.maxRetryCount = retryCount;
+    }
+
 
     public long getMaxRetryInterval() {
         return maxRetryInterval;

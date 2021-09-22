@@ -84,6 +84,7 @@ public @interface TraceRequest {
     /**
      * max count to retry
      */
+    @Deprecated
     int retryCount() default -1;
 
     int maxRetryInterval() default -1;

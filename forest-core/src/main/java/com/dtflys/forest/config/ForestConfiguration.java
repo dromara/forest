@@ -136,7 +136,7 @@ public class ForestConfiguration implements Serializable {
     /**
      * 全局的最大请求失败重试次数
      */
-    private Integer retryCount;
+    private Integer maxRetryCount;
 
     /**
      * 全局的最大请求重试之间的时间间隔，单位为毫秒
@@ -324,7 +324,7 @@ public class ForestConfiguration implements Serializable {
         configuration.setMaxConnections(500);
         configuration.setMaxRouteConnections(500);
         configuration.setRetryer(BackOffRetryer.class);
-        configuration.setRetryCount(0);
+        configuration.setMaxRetryCount(0);
         configuration.setMaxRetryInterval(0);
         configuration.registerFilter("json", JSONFilter.class);
         configuration.registerFilter("xml", XmlFilter.class);
@@ -681,8 +681,9 @@ public class ForestConfiguration implements Serializable {
      *
      * @return 重试次数
      */
+    @Deprecated
     public Integer getRetryCount() {
-        return retryCount;
+        return maxRetryCount;
     }
 
     /**
@@ -691,10 +692,33 @@ public class ForestConfiguration implements Serializable {
      * @param retryCount 重试次数
      * @return 当前ForestConfiguration实例
      */
+    @Deprecated
     public ForestConfiguration setRetryCount(Integer retryCount) {
-        this.retryCount = retryCount;
+        this.maxRetryCount = retryCount;
         return this;
     }
+
+    /**
+     * 获取全局的最大请求失败重试次数
+     *
+     * @return 重试次数
+     */
+    public Integer getMaxRetryCount() {
+        return maxRetryCount;
+    }
+
+
+    /**
+     * 设置全局的最大请求失败重试次数
+     *
+     * @param maxRetryCount 最大重试次数
+     * @return 当前ForestConfiguration实例
+     */
+    public ForestConfiguration setMaxRetryCount(Integer maxRetryCount) {
+        this.maxRetryCount = maxRetryCount;
+        return this;
+    }
+
 
     /**
      * 获取全局的最大请求重试之间的时间间隔，单位为毫秒

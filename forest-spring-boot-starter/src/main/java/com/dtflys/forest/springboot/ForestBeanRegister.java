@@ -27,6 +27,7 @@ import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.cglib.core.ReflectUtils;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.ResourceLoaderAware;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.io.ResourceLoader;
 
 import java.beans.PropertyDescriptor;
@@ -83,7 +84,7 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
                 .addPropertyValue("connectTimeout", forestConfigurationProperties.getConnectTimeout())
                 .addPropertyValue("charset", forestConfigurationProperties.getCharset())
                 .addPropertyValue("retryer", forestConfigurationProperties.getRetryer())
-                .addPropertyValue("retryCount", forestConfigurationProperties.getRetryCount())
+                .addPropertyValue("maxRetryCount", forestConfigurationProperties.getMaxRetryCount())
                 .addPropertyValue("maxRetryInterval", forestConfigurationProperties.getMaxRetryInterval())
                 .addPropertyValue("autoRedirection", forestConfigurationProperties.isAutoRedirection())
                 .addPropertyValue("logEnabled", forestConfigurationProperties.isLogEnabled())

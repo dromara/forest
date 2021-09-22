@@ -92,6 +92,7 @@ public @interface GetRequest {
      * max count to retry
      * @return max count to retry
      */
+    @Deprecated
     int retryCount() default -1;
 
     /**
