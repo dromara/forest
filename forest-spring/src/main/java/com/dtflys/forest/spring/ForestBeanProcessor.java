@@ -5,12 +5,13 @@ import com.dtflys.forest.annotation.BindingVar;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.utils.StringUtils;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.context.annotation.Bean;
+import org.springframework.beans.PropertyValues;
+import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
 
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 
-public class ForestBeanProcessor implements BeanPostProcessor {
+public class ForestBeanProcessor implements InstantiationAwareBeanPostProcessor {
 
     private void processBean(Object bean, Class beanClass) {
         Method[] methods = beanClass.getDeclaredMethods();
@@ -33,9 +34,29 @@ public class ForestBeanProcessor implements BeanPostProcessor {
     }
 
     @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+    public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
+        return null;
+    }
+
+    @Override
+    public boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException {
         Class beanClass = bean.getClass();
         processBean(bean, beanClass);
+        return true;
+    }
+
+    @Override
+    public PropertyValues postProcessPropertyValues(PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) throws BeansException {
+        return pvs;
+    }
+
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        return bean;
+    }
+
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         return bean;
     }
 
