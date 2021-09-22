@@ -1660,6 +1660,7 @@ public class ForestRequest<T> {
      *
      * @return 重试次数
      */
+    @Deprecated
     public int getRetryCount() {
         return maxRetryCount;
     }
@@ -1670,21 +1671,54 @@ public class ForestRequest<T> {
      * @param retryCount 重试次数
      * @return {@link ForestRequest}类实例
      */
+    @Deprecated
     public ForestRequest<T> setRetryCount(int retryCount) {
         this.maxRetryCount = retryCount;
         return this;
     }
 
     /**
+     * 获取请求失败后的重试次数
+     *
+     * @return 重试次数
+     */
+    public int getMaxRetryCount() {
+        return maxRetryCount;
+    }
+
+    /**
      * 设置请求失败后的重试次数
-     * <p> {@link ForestRequest#setRetryCount(int)}
      *
      * @param retryCount 重试次数
      * @return {@link ForestRequest}类实例
-     * @see ForestRequest#setRetryCount(int)
+     */
+    public ForestRequest<T> setMaxRetryCount(int retryCount) {
+        this.maxRetryCount = retryCount;
+        return this;
+    }
+
+    /**
+     * 设置请求失败后的重试次数
+     * <p> {@link ForestRequest#getMaxRetryCount()}
+     *
+     * @return {@link ForestRequest}类实例
+     * @see ForestRequest#getMaxRetryCount()
+     */
+    public int maxRetryCount() {
+        return getMaxRetryCount();
+    }
+
+
+    /**
+     * 设置请求失败后的重试次数
+     * <p> {@link ForestRequest#setMaxRetryCount(int)}
+     *
+     * @param retryCount 重试次数
+     * @return {@link ForestRequest}类实例
+     * @see ForestRequest#setMaxRetryCount(int)
      */
     public ForestRequest<T> maxRetryCount(int retryCount) {
-        return setRetryCount(retryCount);
+        return setMaxRetryCount(retryCount);
     }
 
     /**

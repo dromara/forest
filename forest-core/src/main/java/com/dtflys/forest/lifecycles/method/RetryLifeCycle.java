@@ -38,7 +38,7 @@ public class RetryLifeCycle implements MethodAnnotationLifeCycle<Retry, Object> 
             MappingTemplate maxRetryCountTemplate = method.makeTemplate(maxRetryCountStr);
             try {
                 Integer maxRetryCount = Integer.parseInt(maxRetryCountTemplate.render(args));
-                request.setRetryCount(maxRetryCount);
+                request.maxRetryCount(maxRetryCount);
             } catch (Throwable ignored) {
             }
         }

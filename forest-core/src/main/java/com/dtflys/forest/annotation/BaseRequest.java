@@ -155,6 +155,7 @@ public @interface BaseRequest {
      *
      * @see Request#retryCount()
      */
+    @Deprecated
     int retryCount() default -1;
 
     /**
