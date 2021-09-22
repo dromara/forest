@@ -3,7 +3,6 @@ package com.dtflys.forest.springboot.properties;
 import com.dtflys.forest.callback.AddressSource;
 import com.dtflys.forest.callback.RetryWhen;
 import com.dtflys.forest.callback.SuccessWhen;
-import com.dtflys.forest.http.ForestAddress;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.ForestLogHandler;
