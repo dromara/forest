@@ -43,6 +43,7 @@ public @interface ParamLifeCycle {
 
     /**
      * 注解所绑定的生命周期类(参数级别)
+     * @return 生命周期类
      */
     Class<? extends ParameterAnnotationLifeCycle> value();
 }

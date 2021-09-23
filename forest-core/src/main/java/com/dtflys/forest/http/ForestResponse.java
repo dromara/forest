@@ -511,7 +511,8 @@ public abstract class ForestResponse<T> {
 
     /**
      * 请求响应码是否在正常 100 ~ 399 范围内
-     * @return
+     *
+     * @return {@code true}: 在 100 ~ 399 范围内, {@code false}: 不在
      */
     public boolean statusOk() {
         return status_1xx() || status_2xx() || status_3xx();
@@ -565,7 +566,7 @@ public abstract class ForestResponse<T> {
      * 以输入流的形式获取请求响应内容
      *
      * @return 输入流形式的响应内容, {@link InputStream}实例
-     * @throws Exception
+     * @throws Exception 可能抛出的异常类型
      */
     public InputStream getInputStream() throws Exception {
         return new ByteArrayInputStream(getByteArray());

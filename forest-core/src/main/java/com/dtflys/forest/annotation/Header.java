@@ -73,18 +73,21 @@ public @interface Header {
 
     /**
      * 请求头名（可省略）[同value]
+     * @return 请求头名
      */
     @AliasFor("name")
     String value() default "";
 
     /**
      * 请求头名（可省略）[同name]
+     * @return 请求头名
      */
     @AliasFor("value")
     String name() default "";
 
     /**
      * 默认值
+     * @return 默认值
      */
     String defaultValue() default "";
 

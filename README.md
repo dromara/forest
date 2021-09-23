@@ -93,7 +93,7 @@ Forest有哪些特性？
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-spring-boot-starter</artifactId>
-    <version>1.5.2-BETA2</version>
+    <version>1.5.3</version>
 </dependency>
 ```
 

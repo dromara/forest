@@ -24,7 +24,6 @@ public @interface Redirection {
     /**
      * 是否打开自动重定向
      * <p>默认为 true，即打开自动重定向
-     *
      * @return {@code true}: 打开, {@code false}: 禁止
      */
     boolean value() default true;

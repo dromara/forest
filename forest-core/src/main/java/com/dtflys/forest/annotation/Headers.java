@@ -15,22 +15,23 @@ import java.lang.annotation.Target;
 public @interface Headers {
 
     /**
-     * request headers: <br>
-     *     use the key-value format: key: value <br>
+     * request headers:
+     * <p>    use the key-value format: key: value
      *     <pre>
-     *         @Headers("Content-Type: application/json")
+     *         &#64;Headers("Content-Type: application/json")
      *     </pre>
-     *     multiple headers <br>
+     *     multiple headers
      *     <pre>
-     *         @Headers({
+     *         &#64;Headers({
      *            "Content-Type: application/json",
      *            "Accept: text/plain"
      *         })
      *     </pre>
-     *     variables and parameters <br>
+     *     variables and parameters
      *     <pre>
-     *         @Headers({"Accept: ${value}"})
+     *         &#64;Headers({"Accept: ${value}"})
      *     </pre>
+     * @return headers
      */
     String[] value();
 

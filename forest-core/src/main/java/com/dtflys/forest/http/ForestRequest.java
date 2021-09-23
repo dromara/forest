@@ -807,12 +807,12 @@ public class ForestRequest<T> {
 
 
     /**
-     * 获取Reference, 即URL井号(#)后面的字符串
+     * 获取Reference, 即URL井号后面的字符串
      *
      * <p>列如：http://localhost:8080/xxx#yyyyy
      * <p>上例中 yyyy 便是 Reference
      *
-     * @return URL井号(#)后面的字符串
+     * @return URL井号后面的字符串
      */
     public String getRef() {
         return url.getRef();
@@ -825,6 +825,7 @@ public class ForestRequest<T> {
      * <p>上例中 yyyy 便是 Reference
      *
      * @param ref URL井号(#)后面的字符串
+     * @return {@link ForestRequest}对象实例
      */
     public ForestRequest<T> setRef(String ref) {
         this.url.setRef(ref);
@@ -832,13 +833,14 @@ public class ForestRequest<T> {
     }
 
     /**
-     * 设置Reference, 即URL井号(#)后面的字符串
+     * 设置Reference, 即URL井号后面的字符串
      *
      * <p>列如：http://localhost:8080/xxx#yyyyy
      * <p>上例中 yyyy 便是 Reference
      * <p>同 {@link ForestRequest#setRef(String)} 方法
      *
-     * @param ref URL井号(#)后面的字符串
+     * @param ref URL井号后面的字符串
+     * @return {@link ForestRequest}对象实例
      * @see ForestRequest#setRef(String)
      */
     public ForestRequest<T> ref(String ref) {
@@ -847,13 +849,13 @@ public class ForestRequest<T> {
     }
 
     /**
-     * 获取Reference, 即URL井号(#)后面的字符串
+     * 获取Reference, 即URL井号后面的字符串
      * <p>同 {@link ForestRequest#getRef()}
      *
      * <p>列如：http://localhost:8080/xxx#yyyyy
      * <p>上例中 yyyy 便是 Reference
      *
-     * @return URL井号(#)后面的字符串
+     * @return URL井号后面的字符串
      * @see ForestRequest#getRef()
      */
     public String ref() {
@@ -3221,7 +3223,7 @@ public class ForestRequest<T> {
      * @param response Forest响应对象
      * @param ex 当重试条件不能满足时，抛出 Forest重试异常对象
      * @return 需要重试时，会返回 {@link ForestRetryException} 异常对象
-     * @throws Throwable
+     * @throws Throwable 当重试条件不满足时所抛出的异常类型
      */
     public final ForestRetryException canRetry(ForestResponse<?> response, ForestRetryException ex) throws Throwable {
         if (ex == null) {
@@ -3426,23 +3428,23 @@ public class ForestRequest<T> {
     /**
      * 执行请求发送过程，并获取Map类型结果
      *
+     * @param <KEY> 泛型参数: 结果表的键类型
+     * @param <VALUE> 泛型参数: 结果表的值类型
      * @return 请求执行响应后返回的结果, 其为Map类型
      */
     public <KEY, VALUE> Map<KEY, VALUE> executeAsMap() {
         return execute(new TypeReference<Map<KEY, VALUE>>() {});
     }
 
-
-
     /**
      * 执行请求发送过程，并获取List类型结果
      *
+     * @param <E> 泛型参数: 结果列表项类型
      * @return 请求执行响应后返回的结果, 其为List类型
      */
     public <E> List<E> executeAsList() {
         return execute(new TypeReference<List<E>>() {});
     }
-
 
 
     /**

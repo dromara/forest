@@ -47,7 +47,8 @@ public @interface BaseLifeCycle {
 
     /**
      * 命周期处理类
-     * <p>该类会处理自定义注解所对应的请求生命周期各个环节的逻辑</p>
+     * <p>该类会处理自定义注解所对应的请求生命周期各个环节的逻辑
+     * @return 命周期处理类
      */
     Class<? extends BaseAnnotationLifeCycle> value();
 }

@@ -46,16 +46,19 @@ public @interface Retry {
 
     /**
      * 请求最大重试次数
+     * @return 请求最大重试次数
      */
     String maxRetryCount() default "";
 
     /**
      * 请求最大重试间隔时间
+     * @return 请求最大重试间隔时间
      */
     String maxRetryInterval() default "";
 
     /**
-     * 请求重试触发条件
+     * 请求重试触发条件回调函数类
+     * @return 请求重试触发条件回调函数类
      */
     Class<? extends RetryWhen> condition() default RetryWhen.class;
 

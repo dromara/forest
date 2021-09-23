@@ -48,83 +48,98 @@ public @interface Request {
 
     /**
      * 目标请求URL [同url属性]
+     * @return URL字符串
      */
     @AliasFor("url")
     String value() default "";
 
     /**
      * 目标请求URL [同value属性]
+     * @return URL字符串
      */
     @AliasFor("value")
     String url() default "";
 
     /**
-     * HTTP Method: <br>
-     * GET POST PUT HEAD OPTIONS DELETE PATCH TRACE
+     * HTTP Method, for example:
+     * <p>GET POST PUT HEAD OPTIONS DELETE PATCH TRACE
+     * @return HTTP Method
      */
     String type() default "";
 
     /**
-     * 请求响应后接受的数据类型: <br>
-     *     text json xml <br>
-     *     default value is "auto"
+     * type of response data:
+     * <p>    text json xml binary auto
+     * <p>default value is "auto"
+     * @return type of response data
      */
     String dataType() default "auto";
 
     /**
      * whether can use async http request or not
+     * @return {@code true}: async, {@code false}: sync
      */
     boolean async() default false;
 
     /**
-     * 请求超时时间 (单位毫秒)
+     * 请求超时时间, 单位为毫秒
+     * @return 请求超时时间
      */
     int timeout() default -1;
 
     /**
      * SSL protocol
+     * @return SSL protocol
      */
     String sslProtocol() default "";
 
     /**
      * Class of retryer
+     * @return Class of retryer
      */
     Class retryer() default Object.class;
 
     /**
-     * 最大重试次数
+     * Max count to retry
+     * @return Max count to retry
      */
     @Deprecated
     int retryCount() default -1;
 
     /**
-     * 最大重试间隔时间
+     * Max count to retry
+     * @return Max count to retry
      */
     int maxRetryInterval() default -1;
 
     /**
-     * Content Type
+     * Content Type of request
+     * @return Content Type
      */
     String contentType() default "";
 
     /**
-     * Content Encoding
+     * Content Encoding of request
+     * @return Content Encoding
      */
     String contentEncoding() default "";
 
     /**
-     * User Agent
+     * User Agent of request
+     * @return User Agent
      */
     String userAgent() default "";
 
     /**
      * Charset, Default is UTF-8
+     * @return Charset
      */
     String charset() default "";
 
     /**
      * Response Encoding
      * <p>该属性不填的情况下，根据响应头中的 Content-Encoding 来确定响应内容的编码
+     * @return Response Encoding
      */
     String responseEncoding() default "";
 
@@ -145,37 +160,44 @@ public @interface Request {
      *     <pre>
      *         headers = {"Accept: ${value}"}
      *     </pre>
+     * @return headers
      */
     String[] headers() default {};
 
     /**
      * 拦截器类列表
+     * @return 拦截器类列表
      */
     Class<?>[] interceptor() default {};
 
     /**
-     * 请求数据项列表
+     * 请求数据
+     * @return 请求数据
      */
     String[] data() default {};
 
     /**
-     * 请求进度步长 (单位：比特)<br>
-     * 适用于文件上传/下载
+     * 上传/下载进度步长
+     * @return 上传/下载进度步长
      */
     long progressStep() default -1L;
 
     /**
-     * 数据反序列化器类
+     * 请求反序列化器
+     * @return 请求反序列化器
      */
     Class<?> decoder() default Object.class;
 
     /**
      * KeyStore Id
+     * @return KeyStore Id
      */
     String keyStore() default "";
 
     /**
-     * 请求日志开关
+     * 是否打印请求日志
+     * @return {@code true}: 打印, {@code false}: 不打印
      */
+    @Deprecated
     boolean logEnabled() default false;
 }

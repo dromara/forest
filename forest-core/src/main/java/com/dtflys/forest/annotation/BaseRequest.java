@@ -28,12 +28,12 @@ import java.lang.annotation.RetentionPolicy;
 public @interface BaseRequest {
 
     /**
-     * 基础 URL（接口级别）
+     * 接口级别基础 URL
      * <p>
      *     请求的最终 url = baseUrl + request Url.
      *     如果 request Url 是 http:// 或 https:// 等协议形式开头的就会<b>忽略</b> baseUrl
      * </p>
-     *
+     * @return 接口级别基础 URL
      * @see Request#url()
      */
     String baseURL() default "";
@@ -45,7 +45,7 @@ public @interface BaseRequest {
      *     且此属性不为空字符串的情况下，
      *     此属性作为默认值填到请求的 {@code Content-Type} 头中
      * </p>
-     *
+     * @return 接口级别 Content Type
      * @see Request#contentType()
      */
     String contentType() default "";
@@ -57,7 +57,7 @@ public @interface BaseRequest {
      *     且此属性不为空字符串的情况下，
      *     此属性作为默认值填到请求的 {@code Content-Encoding} 头中
      * </p>
-     *
+     * @return 接口级别 Content Encoding
      * @see Request#contentEncoding()
      */
     String contentEncoding() default "";
@@ -69,7 +69,7 @@ public @interface BaseRequest {
      *     且此属性不为空字符串的情况下，
      *     此属性作为默认值填到请求的 {@code User-Agent} 头中
      * </p>
-     *
+     * @return 接口级别 User Agent
      * @see Request#userAgent()
      */
     String userAgent() default "";
@@ -81,7 +81,7 @@ public @interface BaseRequest {
      *     且此属性不为空字符串的情况下，
      *     此属性作为默认值填到请求的 {@code charset} 头中
      * </p>
-     *
+     * @return 接口级别请求字符集
      * @see Request#charset()
      */
     String charset() default "UTF-8";
@@ -92,7 +92,7 @@ public @interface BaseRequest {
      *     发送请求时，会将此属性中所有请起头信息合并到请求中，
      *     但请求里的头列表中和此属性的请求头中同名的头信息不做合并
      * </p>
-     *
+     * @return 接口级别请求头列表
      * @see Request#headers()
      */
     String[] headers() default {};
@@ -103,7 +103,7 @@ public @interface BaseRequest {
      *     发送请求时，会将此属性中所有拦截器合并到请求中，
      *     但请求里的拦截器列表中和此属性的拦截器表中相同的拦截器不做合并
      * </p>
-     *
+     * @return 接口级别拦截器表
      * @see Request#interceptor()
      */
     Class<?>[] interceptor() default {};
@@ -115,7 +115,7 @@ public @interface BaseRequest {
      *     且此属性大于{@code -1}情况下，
      *     此属性作为默认值填到请求的 {@code timeout} 属性中
      * </p>
-     *
+     * @return 接口级别超时时间
      * @see Request#timeout()
      */
     int timeout() default -1;
@@ -127,7 +127,7 @@ public @interface BaseRequest {
      *     且此属性不为空字符串的情况下，
      *     此属性作为默认值填到请求的 {@code sslProtocol} 属性中
      * </p>
-     *
+     * @return 接口级别 SSL 协议
      * @see Request#sslProtocol()
      */
     String sslProtocol() default "";
@@ -139,7 +139,7 @@ public @interface BaseRequest {
      *     且此属性不为 {@code Object.class}
      *     此属性作为默认值填到请求的 {@code retryer} 属性中
      * </p>
-     *
+     * @return 接口级别重试器
      * @see Request#retryer()
      */
     Class<?> retryer() default Object.class;
@@ -152,7 +152,7 @@ public @interface BaseRequest {
      *     且此属性大于 {@code -1}
      *     此属性作为默认值填到请求的 {@code retryCount} 属性中
      * </p>
-     *
+     * @return 接口级别最大重试次数
      * @see Request#retryCount()
      */
     @Deprecated
@@ -165,7 +165,7 @@ public @interface BaseRequest {
      *     且此属性大于 {@code -1}
      *     此属性作为默认值填到请求的 {@code maxRetryInterval} 属性中
      * </p>
-     *
+     * @return 接口级别最大重试间隔时间
      * @see Request#maxRetryInterval()
      */
     long maxRetryInterval() default -1;
@@ -177,7 +177,7 @@ public @interface BaseRequest {
      *     且此属性不为空字符串
      *     此属性作为默认值填到请求的 {@code keyStore} 属性中
      * </p>
-     *
+     * @return KeyStore Id
      * @see Request#keyStore()
      */
     String keyStore() default "";

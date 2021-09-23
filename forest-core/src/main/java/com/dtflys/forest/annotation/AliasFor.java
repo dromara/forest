@@ -44,6 +44,7 @@ public @interface AliasFor {
 
     /**
      * 属性所对应的别名
+     * @return 别名
      */
     String value();
 }

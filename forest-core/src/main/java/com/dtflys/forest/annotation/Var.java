@@ -32,13 +32,16 @@ import java.lang.annotation.Target;
 public @interface Var {
 
     /**
-     * The name of the variable. The variable name can be referenced in some places (ex. request URL, Body, Headers)
+     * The name of the variable
+     * <p>The variable name can be referenced in some places (ex. request URL, Body, Headers)
+     * @return The name of the variable
      */
     String value();
 
 
     /**
-     * The filters will do some processing for the variable value before sending request.
+     * The filters will do some processing for the variable value before sending request
+     * @return filter names
      */
     String filter() default "";
 

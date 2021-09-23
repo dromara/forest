@@ -43,6 +43,7 @@ public @interface MethodLifeCycle {
 
     /**
      * 注解所绑定的生命周期类(方法级别)
+     * @return 生命周期类
      */
     Class<? extends MethodAnnotationLifeCycle> value();
 }

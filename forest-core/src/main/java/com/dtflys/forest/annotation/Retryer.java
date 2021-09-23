@@ -46,6 +46,7 @@ public @interface Retryer {
 
     /**
      * 所要的配置的 Forest 请求重试器类
+     * @return 请求重试器类
      */
     Class<? extends ForestRetryer> value();
 }

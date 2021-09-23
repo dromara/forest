@@ -76,7 +76,7 @@ public class ForestAddress {
 
     /**
      * 获取HTTP协议头
-     * @return
+     * @return HTTP协议头字符串
      */
     public String getScheme() {
         return scheme;

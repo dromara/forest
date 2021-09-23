@@ -52,21 +52,25 @@ public @interface Address {
      *     <li>http</li>
      *     <li>https</li>
      * </ul>
+     * @return HTTP协议头
      */
     String scheme() default "";
 
     /**
      * 主机地址(主机名/ip地址)
+     * @return 主机地址
      */
     String host() default "";
 
     /**
      * 主机端口号
+     * @return 主机端口号
      */
     String port() default "";
 
     /**
      * 动态构建主机地址信息的回调函数接口类
+     * @return 回调函数接口类
      */
     Class<? extends AddressSource> source() default AddressSource.class;
 
