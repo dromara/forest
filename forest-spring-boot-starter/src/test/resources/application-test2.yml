@@ -8,3 +8,7 @@ forest:
   retry-count: 0
   interceptors:
     com.dtflys.forest.springboot.test.interceptor.GlobalInterceptor
+
+
+test:
+  path: forest
