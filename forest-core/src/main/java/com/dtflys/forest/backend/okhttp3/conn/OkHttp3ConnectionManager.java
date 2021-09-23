@@ -211,4 +211,13 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
     public void init(ForestConfiguration configuration) {
         pool = new ConnectionPool();
     }
+
+    /**
+     * 获取OkHttp连接池对象
+     *
+     * @return {@link ConnectionPool}实例
+     */
+    public ConnectionPool getOkHttpPool() {
+        return pool;
+    }
 }

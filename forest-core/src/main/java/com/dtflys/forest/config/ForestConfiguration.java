@@ -411,6 +411,15 @@ public class ForestConfiguration implements Serializable {
     }
 
     /**
+     * 获取所有已创建的Forest后端框架
+     *
+     * @return Map实例，Key: 后端框架名称, Value: {@link HttpBackend}接口实例
+     */
+    public Map<String, HttpBackend> getAllCreatedBackends() {
+        return httpBackendSelector.getAllCreatedBackends();
+    }
+
+    /**
      * 获取Forest对象实例化工厂
      *
      * @return Forest对象实例化工厂对象

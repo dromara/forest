@@ -40,7 +40,7 @@ import java.lang.annotation.Target;
 @Documented
 @ParamLifeCycle(XMLBodyLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PARAMETER)
+@Target({ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
 public @interface XMLBody {
 
     /**

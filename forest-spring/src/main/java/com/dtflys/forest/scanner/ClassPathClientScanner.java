@@ -18,7 +18,6 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.ClassMetadata;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
-import org.springframework.core.type.filter.TypeFilter;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -34,6 +33,7 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
 
     private final static String[] FOREST_METHOD_ANNOTATION_NAMES = new String[] {
             "com.dtflys.forest.annotation.Backend",
+            "com.dtflys.forest.annotation.Headers",
             "com.dtflys.forest.annotation.Address",
             "com.dtflys.forest.annotation.Request",
             "com.dtflys.forest.annotation.Get",
@@ -86,7 +86,7 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
 
         String[] superClassNames = metadataReader.getClassMetadata().getInterfaceNames();
         boolean hasSuperForestClient = false;
-        for (String superClassName :superClassNames) {
+        for (String superClassName : superClassNames) {
             try {
                 MetadataReader superMetaReader = metadataReaderFactory.getMetadataReader(superClassName);
                 hasSuperForestClient = interfaceFilter(superMetaReader, metadataReaderFactory);
@@ -98,8 +98,22 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
         }
 
         AnnotationMetadata annotationMetadata = metadataReader.getAnnotationMetadata();
-        Set<String> baseAnnNames = annotationMetadata.getAnnotationTypes();
+        for (String annotationTypeName : annotationMetadata.getAnnotationTypes()) {
+            if ("com.dtflys.forest.annotation.ForestClient".equals(annotationTypeName)) {
+                return true;
+            }
+            if ("com.dtflys.forest.annotation.BaseRequest".equals(annotationTypeName)) {
+                return true;
+            }
+        }
+        for (String methodAnnName : FOREST_METHOD_ANNOTATION_NAMES) {
+            if (annotationMetadata.hasAnnotatedMethods(methodAnnName)) {
+                return true;
+            }
+        }
 
+/*
+        Set<String> baseAnnNames = annotationMetadata.getAnnotationTypes();
         for (String annName : baseAnnNames) {
             try {
                 Class<?> annType = Class.forName(annName);
@@ -114,11 +128,7 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
             } catch (Throwable ignored) {
             }
         }
-        for (String methodAnnName : FOREST_METHOD_ANNOTATION_NAMES) {
-            if (annotationMetadata.hasAnnotatedMethods(methodAnnName)) {
-                return true;
-            }
-        }
+*/
         return false;
     }
 

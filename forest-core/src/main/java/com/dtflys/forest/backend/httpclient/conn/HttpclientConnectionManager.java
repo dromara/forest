@@ -222,4 +222,21 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
         return client;
     }
 
+    /**
+     * 获取Httpclient连接池管理对象
+     *
+     * @return {@link PoolingHttpClientConnectionManager}实例
+     */
+    public static PoolingHttpClientConnectionManager getPoolingHttpClientConnectionManager() {
+        return tsConnectionManager;
+    }
+
+    /**
+     * 获取AsyncHttpclient连接池管理对象
+     *
+     * @return {@link PoolingNHttpClientConnectionManager}实例
+     */
+    public static PoolingNHttpClientConnectionManager getPoolingNHttpClientConnectionManager() {
+        return asyncConnectionManager;
+    }
 }

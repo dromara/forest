@@ -317,7 +317,7 @@ public class MappingTemplate {
                     ch == '.');
         }
         String text = builder.toString();
-        return new MappingProperty(text);
+        return new MappingProperty(forestMethod, text);
     }
 
 

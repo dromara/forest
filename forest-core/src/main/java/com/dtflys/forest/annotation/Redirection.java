@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @Documented
 @MethodLifeCycle(RedirectionLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.TYPE})
+@Target({ElementType.METHOD, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 public @interface Redirection {
 
     /**

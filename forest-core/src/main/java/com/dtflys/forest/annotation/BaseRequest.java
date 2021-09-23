@@ -24,7 +24,7 @@ import java.lang.annotation.RetentionPolicy;
 @Documented
 @BaseLifeCycle(BaseRequestLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
+@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 public @interface BaseRequest {
 
     /**

@@ -42,7 +42,7 @@ import java.lang.annotation.Target;
 @Documented
 @MethodLifeCycle(PutRequestLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 public @interface PutRequest {
 
     /**
@@ -116,7 +116,7 @@ public @interface PutRequest {
     String responseEncoding() default "";
 
     /**
-     * reqest headers: <br>
+     * request headers: <br>
      *     use the key-value format: key: value <br>
      *     <pre>
      *         headers = "Content-Type: application/json"

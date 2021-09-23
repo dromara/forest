@@ -27,7 +27,7 @@ public class ForestAutoConfiguration {
     }
 
     @Bean
-    public ForestBeanRegister forestBeanRegister(ForestBeanProcessor forestBeanProcessor, ForestConfigurationProperties forestConfigurationProperties) {
+    public ForestBeanRegister forestBeanRegister(ForestConfigurationProperties forestConfigurationProperties) {
         ForestBeanRegister forestBeanRegister = new ForestBeanRegister(applicationContext, forestConfigurationProperties);
         forestBeanRegister.registerForestConfiguration(forestConfigurationProperties);
         forestBeanRegister.registerScanner(forestConfigurationProperties);

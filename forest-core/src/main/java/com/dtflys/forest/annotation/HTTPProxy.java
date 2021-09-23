@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @MethodLifeCycle(HTTPProxyLifeCycle.class)
 @RequestAttributes
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target({ElementType.TYPE, ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 public @interface HTTPProxy {
 
     /**

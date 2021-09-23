@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Documented
 @ParamLifeCycle(URLEncodeLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PARAMETER)
+@Target({ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
 public @interface URLEncode {
 
     @AliasFor("charset")

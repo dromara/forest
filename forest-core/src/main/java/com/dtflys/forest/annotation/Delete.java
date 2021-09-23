@@ -42,7 +42,7 @@ import java.lang.annotation.Target;
 @Documented
 @MethodLifeCycle(DeleteRequestLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 public @interface Delete {
 
     /**
@@ -115,7 +115,7 @@ public @interface Delete {
     String charset() default "";
 
     /**
-     * reqest headers: <br>
+     * request headers: <br>
      *     use the key-value format: key: value <br>
      *     <pre>
      *         headers = "Content-Type: application/json"

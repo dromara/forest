@@ -49,6 +49,11 @@ public abstract class AbstractHttpBackend implements HttpBackend {
         }
     }
 
+    @Override
+    public ForestConnectionManager getConnectionManager() {
+        return connectionManager;
+    }
+
     protected abstract HttpExecutor createHeadExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler);
 
     protected abstract HttpExecutor createGetExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler);

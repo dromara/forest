@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @BaseLifeCycle(BaseLogHandlerLifeCycle.class)
 @MethodLifeCycle(LogHandlerLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.TYPE})
+@Target({ElementType.METHOD, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 public @interface LogHandler {
 
     /**

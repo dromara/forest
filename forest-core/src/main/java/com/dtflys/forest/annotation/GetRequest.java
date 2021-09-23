@@ -42,7 +42,7 @@ import java.lang.annotation.Target;
 @Documented
 @MethodLifeCycle(GetRequestLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 public @interface GetRequest {
 
     /**
@@ -135,7 +135,7 @@ public @interface GetRequest {
     String responseEncoding() default "";
 
     /**
-     * reqest headers: <br>
+     * request headers: <br>
      * use the key-value format: key: value
      * <pre>
      *     headers = "Content-Type: application/json"
@@ -152,7 +152,7 @@ public @interface GetRequest {
      *     headers = {"Accept: ${value}"}
      * </pre>
      *
-     * @return reqest headers
+     * @return request headers
      */
     String[] headers() default {};
 

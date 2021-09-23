@@ -274,7 +274,27 @@ public class ForestMethod<T> implements VariableScope {
     }
 
 
-    private Class getAnnotationLifeCycleClass(Annotation annotation) {
+    private Map<Annotation, Class<? extends Interceptor>> getAnnotationLifeCycleClassMap(Annotation annotation) {
+        Class<? extends Annotation> annType = annotation.annotationType();
+        if (annType.getPackage().getName().startsWith("java.")) {
+            return null;
+        }
+        Map<Annotation, Class<? extends Interceptor>> resultMap = new LinkedHashMap<>();
+        Annotation[] annArray = annType.getAnnotations();
+        for (Annotation ann : annArray) {
+            Map<Annotation, Class<? extends Interceptor>> parentMap = getAnnotationLifeCycleClassMap(ann);
+            if (parentMap != null && !parentMap.isEmpty()) {
+                resultMap.putAll(parentMap);
+            }
+        }
+        Class<? extends Interceptor> lifeCycleClass = getAnnotationLifeCycleClass(annotation);
+        if (lifeCycleClass != null) {
+            resultMap.put(annotation, lifeCycleClass);
+        }
+        return resultMap;
+    }
+
+    private Class<? extends Interceptor> getAnnotationLifeCycleClass(Annotation annotation) {
         Class<? extends Annotation> annType = annotation.annotationType();
         Class<? extends MethodAnnotationLifeCycle> interceptorClass = null;
         MethodLifeCycle methodLifeCycleAnn = annType.getAnnotation(MethodLifeCycle.class);
@@ -421,7 +441,20 @@ public class ForestMethod<T> implements VariableScope {
         // 对注解分类
         for (int i = 0; i < annotations.length; i++) {
             Annotation ann = annotations[i];
-            Class interceptorClass = getAnnotationLifeCycleClass(ann);
+            Map<Annotation, Class<? extends Interceptor>> lifeCycleClassMap = getAnnotationLifeCycleClassMap(ann);
+            if (lifeCycleClassMap != null && !lifeCycleClassMap.isEmpty()) {
+                for (Map.Entry<Annotation, Class<? extends Interceptor>> entry : lifeCycleClassMap.entrySet()) {
+                    Annotation subAnn = entry.getKey();
+                    Class<? extends Interceptor> lifeCycleClass = entry.getValue();
+                    if (RequestLifeCycle.class.isAssignableFrom(lifeCycleClass)) {
+                        requestAnns.put(subAnn, lifeCycleClass);
+                    } else {
+                        methodAnns.put(subAnn, lifeCycleClass);
+                    }
+                }
+            }
+/*
+            Class<? extends Interceptor> interceptorClass = getAnnotationLifeCycleClass(ann);
             if (interceptorClass == null) {
                 continue;
             }
@@ -430,6 +463,7 @@ public class ForestMethod<T> implements VariableScope {
             } else {
                 methodAnns.put(ann, interceptorClass);
             }
+*/
         }
 
         // 先添加请求类注解
@@ -603,6 +637,13 @@ public class ForestMethod<T> implements VariableScope {
         for (int i = 0; i < anns.length; i++) {
             Annotation ann = anns[i];
             Class annType = ann.annotationType();
+            if (annType.getPackage().getName().startsWith("java.")) {
+                continue;
+            }
+            Annotation[] subAnnArray = annType.getAnnotations();
+            if (subAnnArray.length > 0) {
+                processParameterAnnotation(parameter, subAnnArray);
+            }
             ParamLifeCycle paramLifeCycleAnn = (ParamLifeCycle) annType.getAnnotation(ParamLifeCycle.class);
             if (paramLifeCycleAnn != null) {
                 Class<? extends ParameterAnnotationLifeCycle> interceptorClass = paramLifeCycleAnn.value();

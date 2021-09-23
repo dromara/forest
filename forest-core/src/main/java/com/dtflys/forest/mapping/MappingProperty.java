@@ -1,5 +1,6 @@
 package com.dtflys.forest.mapping;
 
+import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.ForestProperties;
 import com.dtflys.forest.reflection.ForestMethod;
 
@@ -8,8 +9,8 @@ public class MappingProperty extends MappingExpr {
     private final String propertyName;
     private ForestProperties properties;
 
-    protected MappingProperty(String propertyName) {
-        super(null, Token.PROP);
+    protected MappingProperty(ForestMethod<?> forestMethod, String propertyName) {
+        super(forestMethod, Token.PROP);
         this.propertyName = propertyName;
     }
 
@@ -32,6 +33,6 @@ public class MappingProperty extends MappingExpr {
 
     @Override
     public Object render(Object[] args) {
-        return System.getProperty(propertyName);
+        return forestMethod.getConfiguration().getProperties().getProperty(propertyName, null);
     }
 }
