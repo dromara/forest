@@ -28,10 +28,18 @@ public interface PostClient {
     @Request(
             url = "http://localhost:${port}/hello",
             data = "username=foo&password=123456",
-            headers = {"Accept:text/plain"}
+            headers = "Accept: text/html"
     )
+    @Headers({
+            "Accept: text/plain",
+            "Content-Type: application/x-www-form-urlencoded"
+    })
     String postHello();
 
+    @Headers({
+            "Accept: text/plain",
+            "Content-Type: application/x-www-form-urlencoded"
+    })
     @Request(
             url = "http://localhost:${port}/hello",
             type = "post",

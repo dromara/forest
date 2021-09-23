@@ -85,6 +85,7 @@ public class TestPostClient extends BaseClientTest {
                 .assertMethodEquals("POST")
                 .assertPathEquals("/hello")
                 .assertHeaderEquals("Accept", "text/plain")
+                .assertHeaderEquals("Content-Type", "application/x-www-form-urlencoded")
                 .assertBodyEquals("username=foo&password=123456");
     }
 
@@ -98,6 +99,7 @@ public class TestPostClient extends BaseClientTest {
                 .assertMethodEquals("POST")
                 .assertPathEquals("/hello")
                 .assertHeaderEquals("Accept", "text/plain")
+                .assertHeaderEquals("Content-Type", "application/x-www-form-urlencoded")
                 .assertBodyEquals("username=foo&password=123456");
     }
 
