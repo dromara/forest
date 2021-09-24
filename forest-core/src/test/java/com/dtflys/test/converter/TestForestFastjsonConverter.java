@@ -44,7 +44,6 @@ public class TestForestFastjsonConverter extends JSONConverter {
                 defaultSerializerFeatureName);
         assertEquals(defaultSerializerFeature.name(),
                 defaultSerializerFeatureName);
-
         forestFastjsonConverter.setSerializerFeatureName(SerializerFeature.WriteClassName.name());
         assertEquals(SerializerFeature.WriteClassName.name(),
                 forestFastjsonConverter.getSerializerFeatureName());
