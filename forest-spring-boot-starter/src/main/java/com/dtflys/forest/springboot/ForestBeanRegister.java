@@ -182,6 +182,9 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
                 for (PropertyDescriptor descriptor : descriptors) {
                     String name = descriptor.getName();
                     Object value = parameters.get(name);
+                    if (value == null) {
+                        continue;
+                    }
                     Method method = descriptor.getWriteMethod();
                     if (method != null) {
                         try {
