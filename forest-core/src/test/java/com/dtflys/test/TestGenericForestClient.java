@@ -3,8 +3,11 @@ package com.dtflys.test;
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.forest.http.ForestAddress;
 import com.dtflys.forest.http.ForestHeader;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestRequestType;
+import com.dtflys.forest.http.ForestURL;
 import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.test.http.BaseClientTest;
 import com.dtflys.test.model.Result;
@@ -16,6 +19,8 @@ import org.junit.Test;
 
 import java.io.File;
 import java.lang.reflect.Type;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +78,71 @@ public class TestGenericForestClient extends BaseClientTest {
             this.b = b;
         }
     }
+
+
+    @Test
+    public void testRequest_url() throws MalformedURLException {
+        ForestRequest<?> request = Forest.request();
+        assertThat(request).isNotNull();
+        assertThat(request.scheme()).isEqualTo("http");
+        assertThat(request.host()).isEqualTo("localhost");
+        assertThat(request.path()).isEqualTo("/");
+        request.url("http://127.0.0.1:8080/test");
+        assertThat(request.urlString()).isEqualTo("http://127.0.0.1:8080/test");
+        request.url("/abc");
+        assertThat(request.urlString()).isEqualTo("http://127.0.0.1:8080/abc");
+        request.url("http://forest.dtflyx.com/111");
+        assertThat(request.urlString()).isEqualTo("http://forest.dtflyx.com/111");
+        request.path("/222");
+        assertThat(request.urlString()).isEqualTo("http://forest.dtflyx.com/222");
+        request.url(new ForestURL(new URL("http://localhost:8080/333")));
+        assertThat(request.urlString()).isEqualTo("http://localhost:8080/333");
+        request.address(new ForestAddress("192.168.0.1", 8881));
+        assertThat(request.urlString()).isEqualTo("http://192.168.0.1:8881/333");
+        request.address("192.168.0.2", 8882);
+        assertThat(request.urlString()).isEqualTo("http://192.168.0.2:8882/333");
+    }
+
+    @Test
+    public void testRequest_query() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.get("/")
+                .port(server.getPort())
+                .addQuery("a", "1")
+                .addQuery("a", "2")
+                .addQuery("a", "3")
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertQueryEquals("a=1&a=2&a=3");
+    }
+
+    @Test
+    public void testRequest_query2() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.get("/")
+                .port(server.getPort())
+                .addQuery("a", "1")
+                .replaceQuery("a", 2)
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertQueryEquals("a=2");
+    }
+
+    @Test
+    public void testRequest_query3() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.get("/")
+                .port(server.getPort())
+                .replaceOrAddQuery("a", "1")
+                .replaceOrAddQuery("a", "2")
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertQueryEquals("a=2");
+    }
+
 
 
     @Test
