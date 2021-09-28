@@ -1,6 +1,5 @@
 package com.dtflys.forest.backend.okhttp3.conn;
 
-import com.dtflys.forest.Forest;
 import com.dtflys.forest.backend.ForestConnectionManager;
 import com.dtflys.forest.backend.okhttp3.response.OkHttpResponseBody;
 import com.dtflys.forest.config.ForestConfiguration;
@@ -17,7 +16,6 @@ import com.dtflys.forest.ssl.SSLUtils;
 import com.dtflys.forest.ssl.TrustAllHostnameVerifier;
 import com.dtflys.forest.ssl.TrustAllManager;
 import com.dtflys.forest.utils.StringUtils;
-import com.google.common.collect.Lists;
 import okhttp3.Authenticator;
 import okhttp3.ConnectionPool;
 import okhttp3.Cookie;
@@ -32,13 +30,13 @@ import okhttp3.Route;
 
 import javax.annotation.Nullable;
 import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
+import java.lang.reflect.Array;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
-import java.security.KeyStore;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -59,17 +57,17 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
     /**
      * 协议版本: http 1.0
      */
-    private final static List<Protocol> HTTP_1_0 = Lists.newArrayList(Protocol.HTTP_1_0, Protocol.HTTP_1_1);
+    private final static List<Protocol> HTTP_1_0 = Arrays.asList(Protocol.HTTP_1_0, Protocol.HTTP_1_1);
 
     /**
      * 协议版本: http 1.1
      */
-    private final static List<Protocol> HTTP_1_1 = Lists.newArrayList(Protocol.HTTP_1_1);
+    private final static List<Protocol> HTTP_1_1 = Arrays.asList(Protocol.HTTP_1_1);
 
     /**
      * 协议版本: http 2
      */
-    private final static List<Protocol> HTTP_2 = Lists.newArrayList(Protocol.HTTP_2, Protocol.HTTP_1_1);
+    private final static List<Protocol> HTTP_2 = Arrays.asList(Protocol.HTTP_2, Protocol.HTTP_1_1);
 
     /**
      * 协议版本映射表
