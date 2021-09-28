@@ -68,6 +68,7 @@ import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.forest.utils.URLUtils;
+import org.apache.commons.lang3.reflect.TypeUtils;
 
 import java.io.File;
 import java.io.InputStream;
@@ -79,6 +80,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.dtflys.forest.mapping.MappingParameter.*;
 
@@ -315,7 +317,7 @@ public class ForestRequest<T> {
      * 拦截器属性
      * <p>这里的属性只能在绑定的拦截器中被访问
      */
-    private Map<Class, InterceptorAttributes> interceptorAttributes = new HashMap<>();
+    private Map<Class, InterceptorAttributes> interceptorAttributes = new ConcurrentHashMap<>();
 
     /**
      * 请求重试策略
@@ -333,7 +335,7 @@ public class ForestRequest<T> {
      * 附件
      * <p>附件信息不回随请求发送到远端服务器，但在本地的任何地方都可以通过请求对象访问到附件信息
      */
-    private Map<String, Object> attachments = new HashMap<>();
+    private Map<String, Object> attachments = new ConcurrentHashMap<>();
 
     /**
      * 反序列化器
@@ -2346,7 +2348,7 @@ public class ForestRequest<T> {
     }
 
     /**
-     * 获取OnSuccess回调函数，该回调函数在请求成功时被调用
+     * 设置OnSuccess回调函数，该回调函数在请求成功时被调用
      * <p>同 {@link ForestRequest#setOnSuccess(OnSuccess)}
      *
      * @param onSuccess {@link OnSuccess}接口实例
@@ -2840,7 +2842,7 @@ public class ForestRequest<T> {
     public ForestRequest<T> addInterceptorAttribute(Class interceptorClass, String attributeName, Object attributeValue) {
         InterceptorAttributes attributes = getInterceptorAttributes(interceptorClass);
         if (attributes == null) {
-            attributes = new InterceptorAttributes(interceptorClass, new HashMap<>());
+            attributes = new InterceptorAttributes(interceptorClass, new ConcurrentHashMap<>());
             addInterceptorAttributes(interceptorClass, attributes);
         }
         attributes.addAttribute(attributeName, attributeValue);
@@ -3387,6 +3389,7 @@ public class ForestRequest<T> {
     public byte[] executeAsByteArray() {
         return execute(byte[].class);
     }
+
 
     /**
      * 执行请求发送过程，并获取字节Boolean类型结果
