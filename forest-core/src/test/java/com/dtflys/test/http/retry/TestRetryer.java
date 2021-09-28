@@ -9,4 +9,8 @@ public class TestRetryer extends BackOffRetryer {
         super(request);
     }
 
+    @Override
+    protected long nextInterval(int currentCount) {
+        return 1000;
+    }
 }

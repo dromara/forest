@@ -1,7 +1,5 @@
 package com.dtflys.forest.utils;
 
-import com.dtflys.forest.converter.json.ForestJsonConverter;
-
 import static com.dtflys.forest.mapping.MappingParameter.*;
 
 /**

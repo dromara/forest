@@ -18,15 +18,18 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -137,12 +140,26 @@ public class TestGenericForestClient extends BaseClientTest {
                 .port(server.getPort())
                 .replaceOrAddQuery("a", "1")
                 .replaceOrAddQuery("a", "2")
+                .addQuery("url", "http://localhost/test")
                 .execute();
         mockRequest(server)
                 .assertPathEquals("/")
-                .assertQueryEquals("a=2");
+                .assertQueryEquals("a=2&url=http://localhost/test");
     }
 
+    @Test
+    public void testRequest_query4() throws UnsupportedEncodingException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        ForestRequest<?> request = Forest.get("/")
+                .port(server.getPort())
+                .replaceOrAddQuery("a", "1")
+                .replaceOrAddQuery("a", "2")
+                .addQuery("url", "http://localhost/test", true, "UTF-8");
+        request.execute();
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertQueryEquals("a=2&url=http://localhost/test");
+    }
 
 
     @Test
@@ -624,6 +641,7 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         TypeReference<Result<Integer>> typeReference = new TypeReference<Result<Integer>>() {};
         Result<Integer> result = Forest.patch("http://localhost:" + server.getPort())
+                .addHeader(ForestHeader.USER_AGENT, "httpclient")
                 .addHeader(ForestHeader.USER_AGENT, "forest")
                 .addQuery("a", 1)
                 .addQuery("b", 2)
@@ -688,6 +706,7 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
         ForestRequest<?> request = Forest.get("http://localhost:" + server.getPort())
                 .maxRetryCount(3)
+                .maxRetryInterval(2)
                 .retryWhen(((req, res) -> res.statusIs(203)));
         request.execute();
         assertThat(request.getCurrentRetryCount()).isEqualTo(3);
@@ -701,17 +720,22 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
         CountDownLatch latch = new CountDownLatch(1);
         AtomicBoolean isSuccess = new AtomicBoolean(false);
+        AtomicInteger atomicRetryCount = new AtomicInteger(0);
         ForestRequest<?> request = Forest.get("http://localhost")
                 .port(server.getPort())
                 .async()
                 .maxRetryCount(3)
                 .retryWhen(((req, res) -> res.statusIs(203)))
+                .onRetry(((req, res) -> {
+                    atomicRetryCount.incrementAndGet();
+                }))
                 .onSuccess(((data, req, res) -> {
                     isSuccess.set(true);
                     latch.countDown();
                 }));
         request.execute();
         latch.await();
+        assertThat(atomicRetryCount.get()).isEqualTo(3);
         assertThat(request.getCurrentRetryCount()).isEqualTo(3);
         assertThat(isSuccess.get()).isTrue();
     }
