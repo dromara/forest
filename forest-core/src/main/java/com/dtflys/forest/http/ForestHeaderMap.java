@@ -280,7 +280,7 @@ public class ForestHeaderMap implements Map<String, String> {
 
     /**
      * 设置请求头
-     * 当前设置的请求头名称在本集合中已存在的情况下会覆盖原有同名请求头的值，负责便新增一个请求头
+     * 当前设置的请求头名称在本集合中已存在的情况下会覆盖原有同名请求头的值，否则便新增一个请求头
      * @param name 请求头名称
      * @param value 请求头的值
      */
