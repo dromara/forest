@@ -28,6 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -311,15 +312,23 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Type", "application/json")
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(EXPECTED));
-        Map<String, Object> map = new HashMap<>();
+        List<String> list = new ArrayList<>();
+        list.add("a");
+        list.add("b");
+        list.add("c");
+        Map<String, Object> map = new LinkedHashMap<>();
         map.put("username", "foo");
+        map.put("password", "bar");
+        map.put("list", list);
         assertThat(getClient.annObjectGet(map))
                 .isNotNull()
                 .isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertHeaderEquals("Accept", "text/plain")
                 .assertPathEquals("/hello/user")
-                .assertQueryEquals("username", "foo");
+                .assertQueryEquals("username=foo&password=bar&list=a&list=b&list=c")
+                .assertQueryEquals("username", "foo")
+                .assertQueryEquals("password", "bar");
     }
 
     @Test

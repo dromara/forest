@@ -294,6 +294,22 @@ public class ForestHeaderMap implements Map<String, String> {
     }
 
     /**
+     * 通过 Map 批量设置请求头
+     *
+     * @param map {@link Map}对象
+     */
+    public void setHeader(Map map) {
+        if (map == null) {
+            return;
+        }
+        for (Object key : map.keySet()) {
+            Object value = map.get(key);
+            setHeader(String.valueOf(key), String.valueOf(value));
+        }
+    }
+
+
+    /**
      * 获取本请求头集合的迭代器对象
      *
      * @return 本请求头集合的迭代器对象

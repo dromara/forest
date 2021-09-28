@@ -110,11 +110,94 @@ public class ForestQueryMap implements Map<String, Object> {
     }
 
     public void addQuery(String name, Object value) {
-        queries.add(new ForestQueryParameter(name, value));
+        addQuery(name, value, false, null);
     }
 
+    /**
+     * 添加 Query 参数
+     *
+     * @param name 参数名
+     * @param value 参数值
+     * @param isUrlEncode 是否强制 UrlEncode
+     * @param charset 编码字符集
+     */
     public void addQuery(String name, Object value, boolean isUrlEncode, String charset) {
-        queries.add(new ForestQueryParameter(name, value, isUrlEncode, charset));
+        if (value instanceof Collection) {
+            addQuery(name, (Collection) value, isUrlEncode, charset);
+        } else {
+            queries.add(new ForestQueryParameter(name, value, isUrlEncode, charset));
+        }
+    }
+
+    /**
+     * 添加集合类 Query 参数
+     *
+     * @param name 参数名
+     * @param collection 集合对象
+     * @since 1.5.4
+     */
+    public void addQuery(String name, Collection collection) {
+        addQuery(name, collection, true, null);
+    }
+
+
+    /**
+     * 添加集合类 Query 参数
+     *
+     * @param name 参数名
+     * @param collection 集合对象
+     * @param isUrlEncode 是否强制 UrlEncode
+     * @param charset 编码字符集
+     * @since 1.5.4
+     */
+    public void addQuery(String name, Collection collection, boolean isUrlEncode, String charset) {
+        for (Object item : collection) {
+            addQuery(name, item, isUrlEncode, charset);
+        }
+    }
+
+    /**
+     * 添加 Map 类 Query 参数
+     *
+     * @param map Map对象
+     * @since 1.5.4
+     */
+    public void addQuery(Map map) {
+        for (Object key : map.keySet()) {
+            Object value = map.get(key);
+            addQuery(String.valueOf(key), value);
+        }
+    }
+
+
+    /**
+     * 添加 Map 类 Query 参数
+     *
+     * @param map Map对象
+     * @param isUrlEncode 是否强制 UrlEncode
+     * @param charset 编码字符集
+     * @since 1.5.4
+     */
+    public void addQuery(Map map, boolean isUrlEncode, String charset) {
+        if (map == null) {
+            return;
+        }
+        for (Object key : map.keySet()) {
+            Object value = map.get(key);
+            addQuery(String.valueOf(key), value, isUrlEncode, charset);
+        }
+    }
+
+
+    /**
+     * 添加 JSON Query 参数
+     *
+     * @param name 参数名
+     * @param value 参数值
+     * @since 1.5.4
+     */
+    public void addJSONQuery(String name, Object value) {
+        queries.add(new ForestQueryParameter(name, value));
     }
 
 

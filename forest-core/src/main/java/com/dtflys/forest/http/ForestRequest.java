@@ -1131,6 +1131,84 @@ public class ForestRequest<T> {
     /**
      * 添加请求中的Query参数
      *
+     * @param name Query参数名
+     * @param collection 集合对象
+     * @return {@link ForestRequest}对象实例
+     * @since 1.5.4
+     */
+    public ForestRequest<T> addQuery(String name, Collection collection) {
+        this.query.addQuery(name, collection);
+        return this;
+    }
+
+
+    /**
+     * 添加请求中的Query参数
+     * <p>用于传递列表或数组类 Query 参数
+     *
+     * @param name Query参数名
+     * @param collection 集合对象
+     * @param isUrlEncode 是否进行编码
+     * @param charset 编码字符集
+     * @return {@link ForestRequest}对象实例
+     * @since 1.5.4
+     */
+    public ForestRequest<T> addQuery(String name, Collection collection, boolean isUrlEncode, String charset) {
+        this.query.addQuery(name, collection, isUrlEncode, charset);
+        return this;
+    }
+
+    /**
+     * 添加 Map 类 Query 参数
+     * <p>将 Map 的 key 作为 Query 参数名
+     * <p>Map 的 value 作为 Query 参数值
+     * <p>批量插入到请求的 Query 参数中
+     *
+     * @param queryMap {@link Map}对象
+     * @return {@link ForestRequest}对象实例
+     * @since 1.5.4
+     */
+    public ForestRequest<T> addQuery(Map queryMap) {
+        this.query.addQuery(queryMap);
+        return this;
+    }
+
+
+    /**
+     * 添加 Map 类 Query 参数
+     * <p>将 Map 的 key 作为 Query 参数名
+     * <p>Map 的 value 作为 Query 参数值
+     * <p>批量插入到请求的 Query 参数中
+     *
+     * @param queryMap {@link Map}对象
+     * @param isUrlEncode 是否进行编码
+     * @param charset 编码字符集
+     * @return {@link ForestRequest}对象实例
+     * @since 1.5.4
+     */
+    public ForestRequest<T> addQuery(Map queryMap, boolean isUrlEncode, String charset) {
+        this.query.addQuery(queryMap, isUrlEncode, charset);
+        return this;
+    }
+
+
+    /**
+     * 添加 JSON Query 参数
+     *
+     * @param name Query参数名
+     * @param value Query参数值
+     * @return {@link ForestRequest}对象实例
+     * @since 1.5.4
+     */
+    public ForestRequest<T> addJSONQuery(String name, Object value) {
+        this.query.addJSONQuery(name, value);
+        return this;
+    }
+
+
+    /**
+     * 添加请求中的Query参数
+     *
      * @param queryParameter Query参数，{@link ForestQueryParameter}对象实例
      * @return {@link ForestRequest}对象实例
      */
@@ -1872,6 +1950,33 @@ public class ForestRequest<T> {
     }
 
     /**
+     * 添加 Map 类型 Body 数据
+     * <p>将 Map 的 key 作为键值对的 key
+     * <p>Map 的 value 作为键值对的 value
+     * <p>批量插入到请求的请求体中
+     *
+     * @param bodyMap 字段名
+     * @param contentType 该请求体项的Content-Type
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.4
+     */
+    public ForestRequest<T> addBody(Map bodyMap, String contentType) {
+        if (bodyMap == null) {
+            return this;
+        }
+        if (bodyMap.isEmpty()) {
+            addBody(new ObjectRequestBody(bodyMap));
+            return this;
+        }
+        for (Object key : bodyMap.keySet()) {
+            Object value = bodyMap.get(key);
+            addBody(String.valueOf(key), contentType, value);
+        }
+        return this;
+    }
+
+
+    /**
      * 添加键值对类型Body数据
      *
      * @param name 字段名
@@ -2147,6 +2252,19 @@ public class ForestRequest<T> {
     public String headerValue(String name) {
         return getHeaderValue(name);
     }
+
+    /**
+     * 通过 Map 批量添加请求头到该请求中
+     *
+     * @param headerMap 请求头表，{@link Map}对象
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.4
+     */
+    public ForestRequest<T> addHeader(Map headerMap) {
+        this.headers.setHeader(headerMap);
+        return this;
+    }
+
 
 
     /**

@@ -910,23 +910,12 @@ public class ForestMethod<T> implements VariableScope {
                 }
                 else if (obj instanceof Map) {
                     Map map = (Map) obj;
-                    if (map.isEmpty()) {
-                        if (MappingParameter.isBody(target)) {
-                            request.addBody(new ObjectRequestBody(map));
-                        }
-                    }
-                    for (Object key : map.keySet()) {
-                        if (key instanceof CharSequence) {
-                            Object value = map.get(key);
-                            if (MappingParameter.isHeader(target)) {
-                                request.addHeader(new RequestNameValue(String.valueOf(key), value, target));
-                            } else if (MappingParameter.isBody(target)) {
-                                request.addBody(String.valueOf(key), parameter.getPartContentType(), value);
-                            } else if (MappingParameter.isQuery(target)) {
-                                request.addQuery(String.valueOf(key), value,
-                                        parameter.isUrlEncode(), parameter.getCharset());
-                            }
-                        }
+                    if (MappingParameter.isQuery(target)) {
+                        request.addQuery(map, parameter.isUrlEncode(), parameter.getCharset());
+                    } else if (MappingParameter.isBody(target)) {
+                        request.addBody(map, parameter.getPartContentType());
+                    } else if (MappingParameter.isHeader(target)) {
+                        request.addHeader(map);
                     }
                 }
                 else if (obj instanceof Iterable
@@ -1019,6 +1008,8 @@ public class ForestMethod<T> implements VariableScope {
                                             name, subItem,
                                             parameter.isUrlEncode(), parameter.getCharset());
                                 }
+                            } else if (parameter.isJsonParam()) {
+                                request.addJSONQuery(parameter.getName(), obj);
                             } else {
                                 request.addQuery(
                                         parameter.getName(), obj,
