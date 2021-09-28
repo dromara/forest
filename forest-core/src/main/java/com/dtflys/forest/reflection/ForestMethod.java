@@ -886,7 +886,7 @@ public class ForestMethod<T> implements VariableScope {
                         if (MappingParameter.isHeader(target)) {
                             request.addHeader(new RequestNameValue(null, obj, target));
                         } else if (MappingParameter.isQuery(target)) {
-                            request.addQuery(obj.toString(), null,
+                            request.addQuery(obj.toString(), (Object) null,
                                     parameter.isUrlEncode(), parameter.getCharset());
                         } else if (MappingParameter.isBody(target)) {
                             ForestRequestBody body = RequestBodyBuilder

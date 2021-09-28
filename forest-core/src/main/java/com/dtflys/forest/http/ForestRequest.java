@@ -1129,7 +1129,7 @@ public class ForestRequest<T> {
 
 
     /**
-     * 添加请求中的Query参数
+     * 添加请求中的集合类Query参数 (重复 Query 参数名)
      *
      * @param name Query参数名
      * @param collection 集合对象
@@ -1141,9 +1141,8 @@ public class ForestRequest<T> {
         return this;
     }
 
-
     /**
-     * 添加请求中的Query参数
+     * 添加请求中的集合类Query参数 (重复 Query 参数名)
      * <p>用于传递列表或数组类 Query 参数
      *
      * @param name Query参数名
@@ -1157,6 +1156,35 @@ public class ForestRequest<T> {
         this.query.addQuery(name, collection, isUrlEncode, charset);
         return this;
     }
+
+    /**
+     * 添加请求中的数组类Query参数 (重复 Query 参数名)
+     *
+     * @param name Query参数名
+     * @param array 数组
+     * @return {@link ForestRequest}对象实例
+     * @since 1.5.4
+     */
+    public ForestRequest<T> addQuery(String name, Object... array) {
+        return addQuery(name, array, false, null);
+    }
+
+
+    /**
+     * 添加请求中的数组类Query参数 (重复 Query 参数名)
+     *
+     * @param name Query参数名
+     * @param array 数组
+     * @param isUrlEncode 是否进行编码
+     * @param charset 编码字符集
+     * @return {@link ForestRequest}对象实例
+     * @since 1.5.4
+     */
+    public ForestRequest<T> addQuery(String name, Object[] array, boolean isUrlEncode, String charset) {
+        this.query.addQuery(name, array, isUrlEncode, charset);
+        return this;
+    }
+
 
     /**
      * 添加 Map 类 Query 参数
@@ -1191,6 +1219,67 @@ public class ForestRequest<T> {
         return this;
     }
 
+    /**
+     * 添加请求中的集合类Query参数 (带数组下标的 Query 参数名)
+     * <p>用于传递列表或数组类 Query 参数
+     *
+     * @param name Query参数名
+     * @param collection 集合对象
+     * @return {@link ForestRequest}对象实例
+     * @since 1.5.4
+     */
+    public ForestRequest<T> addArrayQuery(String name, Collection collection) {
+        return addArrayQuery(name, collection, false, null);
+    }
+
+
+    /**
+     * 添加请求中的集合类Query参数 (带数组下标的 Query 参数名)
+     * <p>用于传递列表或数组类 Query 参数
+     *
+     * @param name Query参数名
+     * @param collection 集合对象
+     * @param isUrlEncode 是否进行编码
+     * @param charset 编码字符集
+     * @return {@link ForestRequest}对象实例
+     * @since 1.5.4
+     */
+    public ForestRequest<T> addArrayQuery(String name, Collection collection, boolean isUrlEncode, String charset) {
+        this.query.addArrayQuery(name, collection, isUrlEncode, charset);
+        return this;
+    }
+
+    /**
+     * 添加请求中的数组类Query参数 (带数组方括号[]的 Query 参数名)
+     * <p>用于传递列表或数组类 Query 参数
+     *
+     * @param name Query参数名
+     * @param array 数组
+     * @return {@link ForestRequest}对象实例
+     * @since 1.5.4
+     */
+    public ForestRequest<T> addArrayQuery(String name, Object... array) {
+        return addArrayQuery(name, array, false, null);
+    }
+
+
+    /**
+     * 添加请求中的数组类Query参数 (带数组方括号[]的 Query 参数名)
+     * <p>用于传递列表或数组类 Query 参数
+     *
+     * @param name Query参数名
+     * @param array 数组
+     * @param isUrlEncode 是否进行编码
+     * @param charset 编码字符集
+     * @return {@link ForestRequest}对象实例
+     * @since 1.5.4
+     */
+    public ForestRequest<T> addArrayQuery(String name, Object[] array, boolean isUrlEncode, String charset) {
+        this.query.addArrayQuery(name, array, isUrlEncode, charset);
+        return this;
+    }
+
+
 
     /**
      * 添加 JSON Query 参数
@@ -1201,7 +1290,9 @@ public class ForestRequest<T> {
      * @since 1.5.4
      */
     public ForestRequest<T> addJSONQuery(String name, Object value) {
-        this.query.addJSONQuery(name, value);
+        ForestJsonConverter jsonConverter = configuration.getJsonConverter();
+        String json = jsonConverter.encodeToString(value);
+        this.query.addQuery(name, json);
         return this;
     }
 
@@ -1267,7 +1358,11 @@ public class ForestRequest<T> {
         ForestJsonConverter jsonConverter = getConfiguration().getJsonConverter();
         Map<String, Object> map = jsonConverter.convertObjectToMap(queryParameters);
         if (map != null && map.size() > 0) {
-            map.forEach((key, value) -> addQuery(String.valueOf(key), value));
+            map.forEach((key, value) -> {
+                if (value != null) {
+                    addQuery(String.valueOf(key), value);
+                }
+            });
         }
         return this;
     }
