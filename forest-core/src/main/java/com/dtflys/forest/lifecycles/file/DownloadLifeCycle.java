@@ -5,6 +5,9 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.extensions.DownloadFile;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.logging.ForestLogHandler;
+import com.dtflys.forest.logging.ForestLogger;
+import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.utils.ForestDataType;
@@ -14,6 +17,9 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.lang.reflect.Type;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
 
 /**
  * 文件下载生命周期
@@ -21,6 +27,8 @@ import java.lang.reflect.Type;
  * @since 2020-08-04 02:29
  */
 public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile, Object> {
+
+    public final static String ATTACHMENT_NAME_FILE = "__file";
 
     @Override
     public void onMethodInitialized(ForestMethod method, DownloadFile annotation) {
@@ -30,7 +38,7 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
         Type resultType = method.getResultType();
-        addAttribute(request, "resultType", resultType);
+        addAttribute(request, "__resultType", resultType);
         request.setDownloadFile(true);
     }
 
@@ -38,15 +46,23 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
     public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
         String dirPath = getAttributeAsString(request, "dir");
         String filename = getAttributeAsString(request, "filename");
-        Type resultType = getAttribute(request, "resultType", Type.class);
+        Type resultType = getAttribute(request, "__resultType", Type.class);
 
         if (StringUtils.isBlank(filename)) {
             filename = response.getFilename();
         }
-
+        LogConfiguration logConfiguration = request.getLogConfiguration();
+        ForestLogHandler logHandler = logConfiguration.getLogHandler();
         File dir = new File(dirPath);
         if (!dir.exists()) {
-            dir.mkdirs();
+            try {
+                dir.mkdirs();
+                if (logConfiguration.isLogEnabled()) {
+                    logHandler.logContent("Created directory '" + dirPath + "' successful.");
+                }
+            } catch (Throwable th) {
+                throw new ForestRuntimeException(th);
+            }
         }
         InputStream in = null;
         if (data != null && data instanceof byte[]) {
@@ -62,7 +78,10 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
         File file = new File(path);
         try {
             FileUtils.copyInputStreamToFile(in, file);
-            request.addAttachment("file", file);
+            if (logConfiguration.isLogEnabled()) {
+                logHandler.logContent("Saved file '" + path + "' successful.");
+            }
+            request.addAttachment(ATTACHMENT_NAME_FILE, file);
             if (resultType != null) {
                 ForestConverter converter = request.getConfiguration().getConverterMap().get(ForestDataType.AUTO);
                 data = converter.convertToJavaObject(file, resultType);

@@ -184,6 +184,7 @@ public class DefaultLogHandler implements ForestLogHandler {
      * 打印日志内容
      * @param content 日志内容字符串
      */
+    @Override
     public void logContent(String content) {
         getLogger().info("[Forest] " + content);
     }
@@ -232,4 +233,5 @@ public class DefaultLogHandler implements ForestLogHandler {
             }
         }
     }
+
 }
