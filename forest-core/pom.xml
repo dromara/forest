@@ -143,6 +143,7 @@
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java-util</artifactId>
             <version>${protobuf.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
