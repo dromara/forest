@@ -21,6 +21,7 @@ public class OAuth2MockServer extends MockServerRule {
             "\"access_token\": \"" + TOKEN + "\"," +
             "\"expires_in\": \"1\"" +
             "}";
+    public final static String DEFINITION_TOKEN_JSON = "{\"token\":\"" + TOKEN + "\"}";
 
 
     public final static Integer port = 5071;
@@ -59,7 +60,7 @@ public class OAuth2MockServer extends MockServerRule {
                 request()
                         .withPath("/auth/test/password_at_url")
                         .withMethod("GET")
-                .withQueryStringParameter("access_token", TOKEN)
+                        .withQueryStringParameter("access_token", TOKEN)
         ).respond(
                 response()
                         .withStatusCode(200)
@@ -99,7 +100,16 @@ public class OAuth2MockServer extends MockServerRule {
                         .withStatusCode(200)
                         .withBody(EXPECTED)
         );
-
+        mockClient.when(
+                request()
+                        .withPath("/auth/oauth/token/definition")
+                        .withMethod("POST")
+                        .withBody("client_id=password&client_secret=123456&scope=any&grant_type=password&username=root&password=123456")
+        ).respond(
+                response()
+                        .withStatusCode(200)
+                        .withBody(DEFINITION_TOKEN_JSON)
+        );
 
     }
 
