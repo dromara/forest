@@ -1,7 +1,6 @@
 package com.dtflys.forest.backend;
 
 
-import com.dtflys.forest.exceptions.ForestNetworkException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
@@ -10,7 +9,6 @@ import com.dtflys.forest.utils.ReflectUtils;
 
 import java.lang.reflect.Type;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.Future;
 
 
@@ -33,23 +31,31 @@ public abstract class AbstractBackendResponseHandler<R> {
 
 
     public Object handleSync(ForestResponse response, int statusCode, String msg) {
+        if (request.isAutoRedirection() && response.isRedirection()) {
+            // 进行重定向
+            ForestRequest redirectionRequest = response.redirectionRequest();
+            return redirectionRequest.execute();
+        }
         Object result = lifeCycleHandler.handleSync(request, response);
         if (result instanceof ForestResponse) {
             return result;
-        }
-        if (response.isError() && response.getRequest().getOnError() == null) {
-            throw new ForestNetworkException(
-                    msg, statusCode, response);
         }
         return result;
     }
 
 
     public Object handleSuccess(ForestResponse response) {
+        if (request.isAutoRedirection() && response.isRedirection()) {
+            // 进行重定向
+            ForestRequest redirectionRequest = response.redirectionRequest();
+            return redirectionRequest.execute();
+        }
         Type onSuccessGenericType = lifeCycleHandler.getOnSuccessClassGenericType();
-        Object resultData = lifeCycleHandler.handleResultType(request, response, onSuccessGenericType, ReflectUtils.getClassByType(onSuccessGenericType));
+        Object resultData = lifeCycleHandler.handleResultType(request, response, onSuccessGenericType, ReflectUtils.toClass(onSuccessGenericType));
         return lifeCycleHandler.handleSuccess(resultData, request, response);
     }
+
+
 
 
     public void handleError(ForestResponse response) {

@@ -1,5 +1,6 @@
 package com.dtflys.test.request;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
@@ -20,7 +21,8 @@ public class TestRequest {
 
     @Test
     public void testDefaultRequest() {
-        ForestConfiguration configuration = ForestConfiguration.configuration();
+        ObjectUtil.isBasicType(Object.class);
+        ForestConfiguration configuration = ForestConfiguration.createConfiguration();
         ForestRequest request = new ForestRequest(configuration);
         assertEquals(configuration, request.getConfiguration());
         assertEquals(configuration.getTimeout().intValue(),
@@ -31,7 +33,7 @@ public class TestRequest {
 
     @Test
     public void testInterceptorAttribute() {
-        ForestConfiguration configuration = ForestConfiguration.configuration();
+        ForestConfiguration configuration = ForestConfiguration.createConfiguration();
         ForestRequest request = new ForestRequest(configuration);
         request.addInterceptorAttribute(BasicAuthClient.class, "Xxx", "foo");
         request.addInterceptorAttribute(BasicAuthClient.class, "Yyy", "bar");
@@ -59,7 +61,7 @@ public class TestRequest {
 
     @Test
     public void testAttachment() {
-        ForestConfiguration configuration = ForestConfiguration.configuration();
+        ForestConfiguration configuration = ForestConfiguration.createConfiguration();
         ForestRequest request = new ForestRequest(configuration);
         request.addAttachment("Xxx", "foo");
         request.addAttachment("Yyy", "bar");

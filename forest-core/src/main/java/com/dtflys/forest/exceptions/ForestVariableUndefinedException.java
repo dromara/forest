@@ -10,19 +10,21 @@ import com.dtflys.forest.utils.StringUtils;
  */
 public class ForestVariableUndefinedException extends ForestRuntimeException {
 
-    private String variableName;
+    private final String variableName;
 
-    private String source;
+    private final String source;
 
     public ForestVariableUndefinedException(String variableName) {
         super(getErrorMessage(variableName, null));
         this.variableName = variableName;
+        this.source = null;
     }
 
 
     public ForestVariableUndefinedException(String variableName, String source) {
         super(getErrorMessage(variableName, source));
         this.variableName = variableName;
+        this.source = source;
     }
 
     private static String getErrorMessage(String variableName, String source) {
@@ -31,7 +33,7 @@ public class ForestVariableUndefinedException extends ForestRuntimeException {
         builder.append(variableName);
         builder.append("'");
         if (StringUtils.isNotBlank(source)) {
-            builder.append("\n\n\t[Form Template] ");
+            builder.append("\n\n\t[From Template] ");
             builder.append(source);
         }
         return builder.toString();

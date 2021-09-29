@@ -2,6 +2,7 @@ package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.reflection.ForestMethod;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -15,12 +16,12 @@ public class MappingInvoke extends MappingDot {
 
     private List<MappingExpr> argList;
 
-    public MappingInvoke(VariableScope variableScope, MappingExpr left, MappingIdentity name, List<MappingExpr> argList) {
-        this(Token.INVOKE, variableScope, left, name, argList);
+    public MappingInvoke(ForestMethod<?> forestMethod, VariableScope variableScope, MappingExpr left, MappingIdentity name, List<MappingExpr> argList) {
+        this(forestMethod, Token.INVOKE, variableScope, left, name, argList);
     }
 
-    protected MappingInvoke(Token token, VariableScope variableScope, MappingExpr left, MappingIdentity name, List<MappingExpr> argList) {
-        super(token, variableScope, left, name);
+    protected MappingInvoke(ForestMethod<?> forestMethod, Token token, VariableScope variableScope, MappingExpr left, MappingIdentity name, List<MappingExpr> argList) {
+        super(forestMethod, token, variableScope, left, name);
         this.argList = argList;
     }
 

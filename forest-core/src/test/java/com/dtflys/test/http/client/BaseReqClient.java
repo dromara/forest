@@ -11,7 +11,7 @@ import com.dtflys.forest.http.ForestResponse;
  * @since 2018-04-09 16:27
  */
 @BaseRequest(
-        baseURL = "http://localhost:${port}",
+        baseURL = "http://localhost:${port}/base",
         headers = {
                 "Accept-Charset: ${encoding}",
                 "Accept: text/plain"
@@ -24,7 +24,7 @@ public interface BaseReqClient {
     @Request(
             url = ""
     )
-    ForestResponse simpleBaseUrl(@Var("encoding") String encoding);
+    ForestResponse simpleGetWithEmptyPath(@Var("encoding") String encoding);
 
 
     @Request(
@@ -35,7 +35,7 @@ public interface BaseReqClient {
     @Request(
             url = "http://localhost:${port}/hello/user?username=foo"
     )
-    String simpleGet2(OnSuccess onSuccess, @Var("encoding") String encoding);
+    String simpleGetWithoutBaseUrl(OnSuccess onSuccess, @Var("encoding") String encoding);
 
 
 }

@@ -1,0 +1,10 @@
+
+forest:
+  enabled: true
+  max-connections: 300
+  max-route-connections: 300
+  timeout: 3000
+  connect-timeout: 3000
+  retry-count: 0
+  success-when: com.dtflys.forest.springboot.test.when.MyWhenCondition
+  retry-when: com.dtflys.forest.springboot.test.when.MyWhenCondition

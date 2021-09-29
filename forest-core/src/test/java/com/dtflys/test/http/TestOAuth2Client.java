@@ -31,8 +31,12 @@ public class TestOAuth2Client extends BaseClientTest {
 
     @BeforeClass
     public static void prepareClient() {
-        configuration = ForestConfiguration.configuration();
+        configuration = ForestConfiguration.createConfiguration();
         configuration.setVariableValue("port", OAuth2MockServer.port);
+    }
+
+    @Override
+    public void afterRequests() {
     }
 
     @Before

@@ -12,17 +12,12 @@ import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.LogHeaderMessage;
 import com.dtflys.forest.logging.RequestLogMessage;
 import com.dtflys.forest.logging.RequestProxyLogMessage;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.cookie.Cookie;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 
@@ -32,7 +27,6 @@ import java.net.URI;
  * @since 2017-07-21 15:53
  */
 public abstract class AbstractHttpclientRequestSender implements HttpclientRequestSender {
-    private static Logger log = LoggerFactory.getLogger(AbstractHttpclientRequestSender.class);
 
     protected final HttpclientConnectionManager connectionManager;
 
@@ -54,9 +48,6 @@ public abstract class AbstractHttpclientRequestSender implements HttpclientReque
     }
 
     protected <T extends  HttpRequestBase> void setLogBody(RequestLogMessage logMessage, T httpReq) {
-        if (!(httpReq instanceof HttpEntityEnclosingRequestBase)) {
-            return;
-        }
         HttpEntityEnclosingRequestBase entityEnclosingRequest = (HttpEntityEnclosingRequestBase) httpReq;
         HttpEntity entity = entityEnclosingRequest.getEntity();
         if (entity == null) {
@@ -109,11 +100,5 @@ public abstract class AbstractHttpclientRequestSender implements HttpclientReque
         }
         return cookies;
     }
-
-    protected static void logContent(String content) {
-        log.info("[Forest] " + content);
-    }
-
-
 
 }

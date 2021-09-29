@@ -1,6 +1,11 @@
 package com.dtflys.forest.utils;
 
+import okio.ByteString;
+
 import java.lang.reflect.Method;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 /**
  * @author gongjun[dt_flys@hotmail.com]
@@ -18,23 +23,37 @@ public final class StringUtils {
         return !isEmpty(text);
     }
 
+    /**
+     * 是否为空白字符串
+     * <p>字符串为null，空串，或都是空格的情况为 {@code true}
+     *
+     * @param text 字符串
+     * @return {@code true}: 是空白字符串, {@code false}: 不是空白字符串
+     */
     public static boolean isBlank(String text) {
         if (text == null) {
             return true;
         }
-        int strLen = text.length();
-        if (text != null && strLen != 0) {
-            for (int i = 0; i < strLen; ++i) {
-                if (!Character.isWhitespace(text.charAt(i))) {
-                    return false;
-                }
-            }
-            return true;
-        } else {
+        char[] chars = text.toCharArray();
+        int len = chars.length;
+        if (len == 0) {
             return true;
         }
+        for (int i = 0; i < len; ++i) {
+            if (!Character.isWhitespace(chars[i])) {
+                return false;
+            }
+        }
+        return true;
     }
 
+    /**
+     * 是否为非空白字符串，即 {@link StringUtils#isBlank(String)}的逆否命题
+     * <p>字符串为null，空串，或都是空格的情况为 {@code false}
+     *
+     * @param text 字符串
+     * @return {@code true}: 不是空白字符串, {@code false}: 是空白字符串
+     */
     public static boolean isNotBlank(String text) {
         return !isBlank(text);
     }
@@ -79,4 +98,24 @@ public final class StringUtils {
         return builder.toString();
     }
 
+    public static String fromBytes(byte[] bytes, Charset charset, Charset defaultCharset) {
+        if (charset == null) {
+            charset = defaultCharset;
+        }
+        return new String(bytes, charset);
+    }
+
+
+    public static String fromBytes(byte[] bytes, Charset charset) {
+        return fromBytes(bytes, charset, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * 生成 boundary 字符串
+     * @return boundary 字符串
+     */
+    public static String generateBoundary() {
+        UUID uuid = UUID.randomUUID();
+        return ByteString.encodeUtf8(uuid.toString()).utf8();
+    }
 }

@@ -1,12 +1,10 @@
 package com.dtflys.forest.springboot.test;
 
-import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.logging.ForestLogger;
-import com.dtflys.forest.springboot.annotation.ForestScan;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.interceptor.SpringInterceptorFactory;
+import com.dtflys.forest.reflection.SpringForestObjectFactory;
 import com.dtflys.forest.springboot.test.client2.GiteeClient;
 import com.dtflys.forest.springboot.test.interceptor.GlobalInterceptor;
 import org.junit.Test;
@@ -20,14 +18,14 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test2")
 @SpringBootTest(classes = Test2.class)
 @ComponentScan(basePackageClasses = GlobalInterceptor.class)
-@ForestScan(basePackageClasses = GiteeClient.class)
 @EnableAutoConfiguration
 public class Test2 {
 
@@ -44,9 +42,10 @@ public class Test2 {
         assertEquals(Integer.valueOf(6600), forestConfiguration.getMaxRouteConnections());
         assertEquals(Integer.valueOf(6000), forestConfiguration.getTimeout());
         assertEquals(Integer.valueOf(5000), forestConfiguration.getConnectTimeout());
-        assertEquals(Integer.valueOf(0), forestConfiguration.getRetryCount());
-        assertTrue(forestConfiguration.isLogEnabled());
-        assertEquals(SpringInterceptorFactory.class, forestConfiguration.getInterceptorFactory().getClass());
+        assertEquals(Integer.valueOf(0), forestConfiguration.getMaxRetryCount());
+        assertThat(forestConfiguration.isLogEnabled()).isTrue();
+        assertThat(forestConfiguration.getInterceptorFactory()).isInstanceOf(SpringInterceptorFactory.class);
+        assertThat(forestConfiguration.getForestObjectFactory()).isInstanceOf(SpringForestObjectFactory.class);
         assertEquals(1, forestConfiguration.getInterceptors().size());
         assertEquals(GlobalInterceptor.class, forestConfiguration.getInterceptors().get(0));
     }
@@ -55,10 +54,10 @@ public class Test2 {
     public void testClient1() {
         ForestLogger logger = Mockito.mock(ForestLogger.class);
         ForestRequest<String> request = giteeClient.index();
-        assertNotNull(request);
+        assertThat(request).isNotNull();
         request.getLogConfiguration().getLogHandler().setLogger(logger);
         String result = (String) request.execute();
-        assertTrue(result.startsWith("Global: "));
+        assertThat(result.startsWith("Global: ")).isTrue();
         Mockito.verify(logger).info("[Forest] [Test1] 请求: \n" +
                 "\tGET https://gitee.com/dt_flys/forest HTTPS");
 
@@ -68,10 +67,10 @@ public class Test2 {
     public void testClient2() {
         ForestLogger logger = Mockito.mock(ForestLogger.class);
         ForestRequest<String> request = giteeClient.index2();
-        assertNotNull(request);
+        assertThat(request).isNotNull();
         request.getLogConfiguration().getLogHandler().setLogger(logger);
         String result = (String) request.execute();
-        assertTrue(result.startsWith("Global: "));
+        assertThat(result.startsWith("Global: ")).isTrue();
         Mockito.verify(logger).info("[Forest] [Test2] 请求: \n" +
                 "\tGET https://gitee.com/dt_flys HTTPS");
     }

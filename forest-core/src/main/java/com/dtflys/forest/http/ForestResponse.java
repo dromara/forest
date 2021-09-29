@@ -26,14 +26,17 @@ package com.dtflys.forest.http;
 
 
 import com.dtflys.forest.backend.ContentType;
+import com.dtflys.forest.callback.SuccessWhen;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.ByteEncodeUtils;
+import com.dtflys.forest.utils.GzipUtils;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.SocketTimeoutException;
 import java.util.Date;
 import java.util.List;
 
@@ -50,6 +53,7 @@ public abstract class ForestResponse<T> {
      */
     protected ForestRequest request;
 
+
     /**
      * 请求开始时间
      */
@@ -61,14 +65,29 @@ public abstract class ForestResponse<T> {
     protected Date responseTime;
 
     /**
+     * 是否为Gzip压缩
+     */
+    protected boolean isGzip = false;
+
+    /**
      * 是否已经打印过响应日志
      */
     protected volatile boolean logged = false;
 
     /**
+     * 响应是否成功
+     */
+    private volatile Boolean success = null;
+
+    /**
      * 网络状态码
      */
     protected volatile Integer statusCode;
+
+    /**
+     * 原因短语
+     */
+    protected volatile String reasonPhrase;
 
     /**
      * 响应内容文本（不包括二进制数据内容的文本）
@@ -167,6 +186,44 @@ public abstract class ForestResponse<T> {
     }
 
     /**
+     * 是否是重定向响应
+     *
+     * @return {@code true}: 是重定向, {@code false}: 不是重定向
+     */
+    public boolean isRedirection() {
+        return getStatusCode() > HttpStatus.MULTIPLE_CHOICES && getStatusCode() <= HttpStatus.TEMPORARY_REDIRECT;
+    }
+
+    /**
+     * 获取重定向地址
+     *
+     * @return 重定向地址
+     */
+    public String getRedirectionLocation() {
+        return getHeaderValue(ForestHeader.LOCATION);
+    }
+
+    /**
+     * 获取重定向Forest请求
+     *
+     * @return Forest请求对象
+     */
+    public ForestRequest<T> redirectionRequest() {
+        if (isRedirection() && request != null) {
+            String location = getRedirectionLocation();
+            if (StringUtils.isBlank(location)) {
+                return null;
+            }
+            ForestRequest<T> redirectRequest = request.clone();
+            redirectRequest.setUrl(location);
+            redirectRequest.prevRequest = request;
+            redirectRequest.prevResponse = this;
+            return redirectRequest;
+        }
+        return null;
+    }
+
+    /**
      * 获取下载文件名
      * @return 文件名
      */
@@ -177,7 +234,11 @@ public abstract class ForestResponse<T> {
             if (StringUtils.isNotEmpty(dispositionValue)) {
                 String[] disGroup = dispositionValue.split(";");
                 for (int i = disGroup.length - 1; i >= 0 ; i--) {
-                    String disStr = disGroup[i];
+                    /**
+                     * content-disposition: attachment; filename="50db602db30cf6df60698510003d2415.jpg"
+                     * need replace trim
+                     */
+                    String disStr = StringUtils.trimBegin(disGroup[i]);
                     if (disStr.startsWith("filename=")) {
                         return disStr.substring("filename=".length());
                     }
@@ -212,7 +273,7 @@ public abstract class ForestResponse<T> {
         try {
             byte[] bytes = getByteArray();
             if (bytes == null) {
-                return null;
+                return "";
             }
             return byteToString(bytes);
         } catch (Exception e) {
@@ -252,6 +313,27 @@ public abstract class ForestResponse<T> {
     }
 
     /**
+     * 是否没有网络异常
+     *
+     * @return {@code true}: 没有异常, {@code false}: 有异常
+     */
+    public boolean noException() {
+        return exception == null;
+    }
+
+    /**
+     * 请求是否超时
+     *
+     * @return {@code true}: 已超时, {@code false}: 未超时
+     */
+    public boolean isTimeout() {
+        if (noException()) {
+            return false;
+        }
+        return exception instanceof SocketTimeoutException;
+    }
+
+    /**
      * 设置请求发送过程中的异常
      *
      * @param exception 异常对象, {@link Throwable}类及其子类实例
@@ -266,8 +348,26 @@ public abstract class ForestResponse<T> {
      * @return 请求响应的状态码
      */
     public int getStatusCode() {
+        if (statusCode == null) {
+            return -1;
+        }
         return statusCode;
     }
+
+    /**
+     * 获取请求响应的状态码
+     * <p>同 {@link ForestResponse#getStatusCode()}
+     *
+     * @return 请求响应的状态码
+     * @see ForestResponse#getStatusCode()
+     */
+    public int statusCode() {
+        if (statusCode == null) {
+            return -1;
+        }
+        return getStatusCode();
+    }
+
 
     /**
      * 设置请求响应的状态码
@@ -276,6 +376,15 @@ public abstract class ForestResponse<T> {
      */
     public void setStatusCode(Integer statusCode) {
         this.statusCode = statusCode;
+    }
+
+    /**
+     * 获取请求响应的原因短语
+     *
+     * @return 请求响应的原因短语
+     */
+    public String getReasonPhrase() {
+        return reasonPhrase;
     }
 
     /**
@@ -317,12 +426,116 @@ public abstract class ForestResponse<T> {
     /**
      * 网络请求是否成功
      *
-     * @return {@code true}: 成功， {@code false}: 失败
+     * <p>其判断过程如下：
+     * <p>先判断 successWhen 回调函数
+     * <p>再判断全局 successWhen 回调函数
+     * <p>最后判断默认请求成功条件判断逻辑：
+     * <ul>
+     *     <li>1. 判断请求过程是否有异常</li>
+     *     <li>2. 判断HTTP响应状态码是否在正常范围内(100 ~ 399)</li>
+     * </ul>
+     *
+     * 以上过程一个响应只会执行一次！执行过后被会缓存到 success 字段中
+     * <p>下次再调用 isSuccess() 用是第一次执行的结果
+     *
+     * @return {@code true}: 请求成功， {@code false}: 请求失败
      */
     public boolean isSuccess() {
-        return getException() == null
-                && getStatusCode() >= HttpStatus.OK
+        if (success == null) {
+            if (request != null) {
+                if (request.getSuccessWhen() != null) {
+                    success = request.getSuccessWhen().successWhen(request, this);
+                } else {
+                    SuccessWhen globalSuccessWhen = request.getConfiguration().getSuccessWhen();
+                    if (globalSuccessWhen != null) {
+                        success = globalSuccessWhen.successWhen(request, this);
+                    }
+                }
+            }
+            if (success == null) {
+                success = noException() && statusOk();
+            }
+        }
+        return success;
+    }
+
+    /**
+     * 请求响应的状态码是否在 100 ~ 199 范围内
+     *
+     * @return {@code true}: 在 100 ~ 199 范围内, {@code false}: 不在
+     */
+    public boolean status_1xx() {
+        return getStatusCode() >= HttpStatus.CONTINUE
+                && getStatusCode() < HttpStatus.OK;
+    }
+
+    /**
+     * 请求响应的状态码是否在 200 ~ 299 范围内
+     *
+     * @return {@code true}: 在 200 ~ 299 范围内, {@code false}: 不在
+     */
+    public boolean status_2xx() {
+        return getStatusCode() >= HttpStatus.OK
                 && getStatusCode() < HttpStatus.MULTIPLE_CHOICES;
+    }
+
+    /**
+     * 请求响应的状态码是否在 300 ~ 399 范围内
+     *
+     * @return {@code true}: 在 300 ~ 399 范围内, {@code false}: 不在
+     */
+    public boolean status_3xx() {
+        return getStatusCode() >= HttpStatus.MULTIPLE_CHOICES
+                && getStatusCode() < HttpStatus.BAD_REQUEST;
+    }
+
+    /**
+     * 请求响应的状态码是否在 400 ~ 499 范围内
+     *
+     * @return {@code true}: 在 400 ~ 499 范围内, {@code false}: 不在
+     */
+    public boolean status_4xx() {
+        return getStatusCode() >= HttpStatus.BAD_REQUEST
+                && getStatusCode() < HttpStatus.INTERNAL_SERVER_ERROR;
+    }
+
+    /**
+     * 请求响应的状态码是否在 500 ~ 599 范围内
+     *
+     * @return {@code true}: 在 500 ~ 599 范围内, {@code false}: 不在
+     */
+    public boolean status_5xx() {
+        return getStatusCode() >= HttpStatus.INTERNAL_SERVER_ERROR
+                && getStatusCode() < 600;
+    }
+
+    /**
+     * 请求响应码是否在正常 100 ~ 399 范围内
+     *
+     * @return {@code true}: 在 100 ~ 399 范围内, {@code false}: 不在
+     */
+    public boolean statusOk() {
+        return status_1xx() || status_2xx() || status_3xx();
+    }
+
+    /**
+     * 请求响应码是否和输入参数相同
+     *
+     * @param statusCode 被比较的响应码
+     * @return {@code true}: 相同, {@code false}: 不同
+     */
+    public boolean statusIs(int statusCode) {
+        return this.statusCode == statusCode;
+    }
+
+    /**
+     * 请求响应码是否和输入参数不同
+     *
+     * @param statusCode 被比较的响应码
+     * @return {@code true}: 不同, {@code false}: 相同
+     */
+    public boolean statusIsNot(int statusCode) {
+        return this.statusCode != statusCode;
     }
 
     /**
@@ -353,7 +566,7 @@ public abstract class ForestResponse<T> {
      * 以输入流的形式获取请求响应内容
      *
      * @return 输入流形式的响应内容, {@link InputStream}实例
-     * @throws Exception
+     * @throws Exception 可能抛出的异常类型
      */
     public InputStream getInputStream() throws Exception {
         return new ByteArrayInputStream(getByteArray());
@@ -425,10 +638,18 @@ public abstract class ForestResponse<T> {
             // Content-Encoding为空的情况下，自动判断字符编码
             encode = ByteEncodeUtils.getCharsetName(bytes);
         }
-        if (encode.toUpperCase().startsWith("GB")) {
+        if (isGzip) {
+            try {
+                return GzipUtils.decompressGzipToString(bytes, encode);
+            } catch (Throwable th) {
+                isGzip = false;
+            }
+        }
+        if ("GB".equalsIgnoreCase(encode)) {
             // 返回的GB中文编码会有多种编码类型，这里统一使用GBK编码
             encode = "GBK";
         }
+
         return IOUtils.toString(bytes, encode);
     }
 }

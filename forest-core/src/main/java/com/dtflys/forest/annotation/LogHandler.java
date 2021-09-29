@@ -19,11 +19,12 @@ import java.lang.annotation.Target;
 @BaseLifeCycle(BaseLogHandlerLifeCycle.class)
 @MethodLifeCycle(LogHandlerLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.TYPE})
+@Target({ElementType.METHOD, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 public @interface LogHandler {
 
     /**
      * 指定Forest请求日志的处理器类
+     * @return 日志处理器类
      */
     Class<? extends ForestLogHandler> value();
 }

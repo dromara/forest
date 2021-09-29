@@ -32,7 +32,6 @@ public class BaseInterceptor implements Interceptor {
 
     @Override
     public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
-
     }
 
     @Override

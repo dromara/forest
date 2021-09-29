@@ -12,11 +12,12 @@ import com.dtflys.forest.handler.ResultHandler;
 import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.retryer.Retryer;
+import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.utils.ForestProgress;
 import com.dtflys.forest.utils.ReflectUtils;
 
 import java.lang.reflect.Type;
+import java.util.concurrent.Future;
 
 /**
  * 请求方法生命周期处理器
@@ -25,21 +26,25 @@ import java.lang.reflect.Type;
  */
 public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
 
-    private final Type returnType;
+    private final Type resultType;
 
-    private final Class returnClass;
+    private final Class resultRawClass;
 
     private final Type onSuccessClassGenericType;
 
     private static final ResultHandler RESULT_HANDLER = new ResultHandler();
 
+    private volatile ForestResponse<T> response;
+
     private volatile T resultData;
 
-    public MethodLifeCycleHandler(ForestMethod method, Type onSuccessClassGenericType) {
+
+    public MethodLifeCycleHandler(Type resultType, Type onSuccessClassGenericType) {
         this.onSuccessClassGenericType = onSuccessClassGenericType;
-        this.returnType = method.getReturnType();
-        this.returnClass = method.getReturnClass();
+        this.resultType = resultType;
+        this.resultRawClass = ReflectUtils.toClass(resultType);
     }
+
 
     @Override
     public Object handleSync(ForestRequest request, ForestResponse response) {
@@ -47,11 +52,12 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
     }
 
     @Override
-    public Object handleSyncWithException(ForestRequest request, ForestResponse response, Exception ex) {
+    public Object handleSyncWithException(ForestRequest request, ForestResponse response, Throwable ex) {
+        this.response = response;
         try {
             Object resultData = null;
             if (response.isSuccess()) {
-                resultData = handleResultType(request, response, returnType, returnClass);
+                resultData = handleResultType(request, response, resultType, resultRawClass);
                 resultData = handleSuccess(resultData, request, response);
             } else {
                 if (ex != null) {
@@ -61,7 +67,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
                 }
             }
             handleResult(resultData);
-            if (ForestResponse.class.isAssignableFrom(returnClass)) {
+            if (ForestResponse.class.isAssignableFrom(resultRawClass)) {
                 if (!(resultData instanceof ForestResponse)) {
                     response.setResult(resultData);
                     resultData = response;
@@ -73,7 +79,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
         } catch (Throwable th) {
             Object resultData = response.getResult();
             handleResult(resultData);
-            if (ForestResponse.class.isAssignableFrom(returnClass)) {
+            if (ForestResponse.class.isAssignableFrom(resultRawClass)) {
                 if (!(resultData instanceof ForestResponse)) {
                     response.setResult(resultData);
                     resultData = response;
@@ -90,12 +96,13 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
 
     @Override
     public Object handleResultType(ForestRequest request, ForestResponse response) {
-        return handleResultType(request, response, returnType, returnClass);
+        return handleResultType(request, response, resultType, resultRawClass);
     }
 
 
     @Override
     public synchronized Object handleResultType(ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
+        this.response = response;
         Object resultData = RESULT_HANDLER.getResult(request, response, resultType, resultClass);
         if (!(resultData instanceof ForestResponse)) {
             response.setResult(resultData);
@@ -105,13 +112,13 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
     }
 
 
-
     @Override
     public Object handleSuccess(Object resultData, ForestRequest request, ForestResponse response) {
+        this.response = response;
         request.getInterceptorChain().onSuccess(resultData, request, response);
         OnSuccess onSuccess = request.getOnSuccess();
         if (onSuccess != null) {
-            resultData = RESULT_HANDLER.getResult(request, response, onSuccessClassGenericType, ReflectUtils.getClassByType(onSuccessClassGenericType));
+            resultData = RESULT_HANDLER.getResult(request, response, onSuccessClassGenericType, ReflectUtils.toClass(onSuccessClassGenericType));
             onSuccess.onSuccess(resultData, request, response);
         }
         resultData = response.getResult();
@@ -125,12 +132,14 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
 
     @Override
     public Object handleError(ForestRequest request, ForestResponse response) {
-        ForestNetworkException networkException = new ForestNetworkException("", response.getStatusCode(), response);
+        ForestNetworkException networkException = new ForestNetworkException(
+                "", response.getStatusCode(), response);
         return handleError(request, response, networkException);
     }
 
     @Override
     public Object handleError(ForestRequest request, ForestResponse response, Throwable ex) {
+        this.response = response;
         ForestRuntimeException e = null;
         if (ex instanceof ForestRuntimeException) {
             e = (ForestRuntimeException) ex;
@@ -148,11 +157,6 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
         else {
             throw e;
         }
-    }
-
-    @Override
-    public void handleTry(ForestRetryException ex, Retryer retryer) throws Throwable {
-        retryer.canRetry(ex);
     }
 
     @Override
@@ -188,10 +192,22 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
         return resultData;
     }
 
+    @Override
+    public Object handleFuture(Future resultData) {
+        if (Future.class.isAssignableFrom(resultRawClass)) {
+            this.resultData = (T) resultData;
+            return resultData;
+        }
+        return null;
+    }
+
+    public ForestResponse<T> getResponse() {
+        return response;
+    }
 
     @Override
-    public Type getReturnType() {
-        return returnType;
+    public Type getResultType() {
+        return resultType;
     }
 
     public T getResultData() {

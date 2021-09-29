@@ -9,8 +9,12 @@ import java.util.List;
  */
 public class NameUtils {
 
+    private final static String SETTER_PREFIX = "set";
+    private final static String IS_PREFIX = "set";
+
     /**
      * 按驼峰命名法的规则将字符串分割
+     *
      * @param name 源字符串
      * @return 分割后的字符串数组
      */
@@ -41,20 +45,22 @@ public class NameUtils {
     public static String setterName(String name) {
         String[] strs = splitCamelName(name);
         String prefix = strs[0];
-        if ("set".equals(prefix)) {
+        if (SETTER_PREFIX.equals(prefix)) {
             return name;
-        } else if ("is".equals(prefix)) {
-            StringBuilder builder = new StringBuilder("set");
+        } else if (IS_PREFIX.equals(prefix)) {
+            StringBuilder builder = new StringBuilder(SETTER_PREFIX);
             for (int i = 1; i < strs.length; i++) {
                 String str = strs[i];
-                builder.append(Character.toUpperCase(str.charAt(0)) + str.substring(1));
+                builder.append(Character.toUpperCase(str.charAt(0)))
+                        .append(str.substring(1));
             }
             return builder.toString();
         } else {
-            StringBuilder builder = new StringBuilder("set");
+            StringBuilder builder = new StringBuilder(SETTER_PREFIX);
             for (int i = 0; i < strs.length; i++) {
                 String str = strs[i];
-                builder.append(Character.toUpperCase(str.charAt(0)) + str.substring(1));
+                builder.append(Character.toUpperCase(str.charAt(0)))
+                        .append(str.substring(1));
             }
             return builder.toString();
         }

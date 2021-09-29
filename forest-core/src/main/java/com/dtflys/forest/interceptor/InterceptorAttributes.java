@@ -1,9 +1,12 @@
 package com.dtflys.forest.interceptor;
 
+import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingTemplate;
+import com.dtflys.forest.reflection.ForestMethod;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 拦截器属性类，用于封装通过注解传入的拦截器属性
@@ -14,7 +17,7 @@ public class InterceptorAttributes {
 
     private final Map<String, Object> attributeTemplates;
 
-    private Map<String, Object> attributes = new HashMap();
+    private Map<String, Object> attributes = new ConcurrentHashMap<>();
 
     public InterceptorAttributes(Class interceptorClass, Map<String, Object> attributeTemplates) {
         this.interceptorClass = interceptorClass;

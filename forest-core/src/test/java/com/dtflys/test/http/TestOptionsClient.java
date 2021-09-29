@@ -3,27 +3,16 @@ package com.dtflys.test.http;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.test.mock.OptionsMockServer;
-import junit.framework.Assert;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 import org.apache.http.HttpHeaders;
-import com.dtflys.forest.backend.HttpBackend;
-import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.client.OptionsClient;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockserver.client.server.MockServerClient;
-import org.mockserver.junit.MockServerRule;
-import org.mockserver.model.Header;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import static junit.framework.Assert.assertNotNull;
-import static org.junit.Assert.assertEquals;
-import static org.mockserver.model.HttpRequest.request;
-import static org.mockserver.model.HttpResponse.response;
+import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -31,11 +20,10 @@ import static org.mockserver.model.HttpResponse.response;
  */
 public class TestOptionsClient extends BaseClientTest {
 
-    private final static Logger log = LoggerFactory.getLogger(TestOptionsClient.class);
-
+    public final static String EXPECTED = "{\"status\": \"ok\"}";
 
     @Rule
-    public OptionsMockServer server = new OptionsMockServer(this);
+    public MockWebServer server = new MockWebServer();
 
     private static ForestConfiguration configuration;
 
@@ -44,57 +32,90 @@ public class TestOptionsClient extends BaseClientTest {
 
     @BeforeClass
     public static void prepareClient() {
-        configuration = ForestConfiguration.configuration();
-        configuration.setVariableValue("port", OptionsMockServer.port);
+        configuration = ForestConfiguration.createConfiguration();
+    }
+
+    @Override
+    public void afterRequests() {
     }
 
     public TestOptionsClient(HttpBackend backend) {
         super(backend, configuration);
+        configuration.setVariableValue("port", server.getPort());
         optionsClient = configuration.createInstance(OptionsClient.class);
-    }
-
-
-    @Before
-    public void prepareMockServer() {
-        server.initServer();
     }
 
 
     @Test
     public void testSimpleOptions() {
-        ForestResponse response = optionsClient.simpleOptions();
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCode());
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(optionsClient.simpleOptions())
+            .isNotNull()
+            .extracting(ForestResponse::getStatusCode, ForestResponse::getContent)
+            .contains(200, EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("OPTIONS")
+                .assertPathEquals("/hello/user")
+                .assertHeaderEquals(HttpHeaders.ACCEPT, "text/plain")
+                .assertQueryEquals("username", "foo");
     }
 
     @Test
     public void testSimpleOptions2() {
-        ForestResponse response = optionsClient.simpleOptions2();
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCode());
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(optionsClient.simpleOptions2())
+                .isNotNull()
+                .extracting(ForestResponse::getStatusCode, ForestResponse::getContent)
+                .contains(200, EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("OPTIONS")
+                .assertPathEquals("/hello/user")
+                .assertHeaderEquals(HttpHeaders.ACCEPT, "text/plain")
+                .assertQueryEquals("username", "foo");
     }
 
     @Test
     public void testSimpleOptions3() {
-        ForestResponse response = optionsClient.simpleOptions3();
-        assertNotNull(response);
-        assertEquals(200, response.getStatusCode());
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(optionsClient.simpleOptions3())
+                .isNotNull()
+                .extracting(ForestResponse::getStatusCode, ForestResponse::getContent)
+                .contains(200, EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("OPTIONS")
+                .assertPathEquals("/hello/user")
+                .assertHeaderEquals(HttpHeaders.ACCEPT, "text/plain")
+                .assertQueryEquals("username", "foo");
     }
 
 
 
     @Test
     public void testTextParamOptions() {
-        String result = optionsClient.textParamOptions("foo");
-        assertNotNull(result);
-        assertEquals(OptionsMockServer.EXPECTED, result);
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(optionsClient.textParamOptions("foo"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("OPTIONS")
+                .assertPathEquals("/hello/user")
+                .assertHeaderEquals(HttpHeaders.ACCEPT, "text/plain")
+                .assertQueryEquals("username", "foo");
+
     }
 
     @Test
     public void testAnnParamOptions() {
-        String result = optionsClient.annParamOptions("foo");
-        assertNotNull(result);
-        assertEquals(OptionsMockServer.EXPECTED, result);
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(optionsClient.annParamOptions("foo"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("OPTIONS")
+                .assertPathEquals("/hello/user")
+                .assertHeaderEquals(HttpHeaders.ACCEPT, "text/plain")
+                .assertQueryEquals("username", "foo");
+
     }
 
 }

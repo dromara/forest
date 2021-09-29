@@ -2,6 +2,9 @@ package com.dtflys.forest.backend;
 
 import com.dtflys.forest.utils.StringUtils;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2020-08-05 23:42
@@ -21,6 +24,8 @@ public class ContentType {
 
     private String charset;
 
+    private final Map<String, String> parameters = new LinkedHashMap<>();
+
     public ContentType(String type, String subType) {
         this.type = type;
         this.subType = subType;
@@ -37,12 +42,17 @@ public class ContentType {
             this.subType = null;
         }
         if (group.length > 1) {
-            String chartExpr = group[1];
-            String[] expr = chartExpr.split("=");
-            String charsetLabel = expr[0].trim();
-            if ("charset".equalsIgnoreCase(charsetLabel) && expr.length > 1) {
-                String charsetValue = expr[1].trim();
-                this.charset = charsetValue.replace("\"", "");
+            for (int i = 1; i < group.length; i++) {
+                String chartExpr = group[1];
+                String[] expr = chartExpr.split("=");
+                if (expr.length > 1) {
+                    parameters.put(expr[0], expr[1]);
+                    String charsetLabel = expr[0].trim();
+                    if ("charset".equalsIgnoreCase(charsetLabel)) {
+                        String charsetValue = expr[1].trim();
+                        this.charset = charsetValue.replace("\"", "");
+                    }
+                }
             }
         }
     }
@@ -174,6 +184,23 @@ public class ContentType {
 
     @Override
     public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(type);
+        if (StringUtils.isNotEmpty(subType)) {
+            builder.append("/").append(subType);
+        }
+        if (!parameters.isEmpty()) {
+            for (Map.Entry<String, String> entry : parameters.entrySet()) {
+                builder.append("; ")
+                        .append(entry.getKey())
+                        .append("=")
+                        .append(entry.getValue());
+            }
+        }
+        return builder.toString();
+    }
+
+    public String toStringWithoutParameters() {
         StringBuilder builder = new StringBuilder();
         builder.append(type);
         if (StringUtils.isNotEmpty(subType)) {

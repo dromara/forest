@@ -5,10 +5,11 @@ import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.retryer.Retryer;
+import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.utils.ForestProgress;
 
 import java.lang.reflect.Type;
+import java.util.concurrent.Future;
 
 /**
  * @author gongjun[dt_flys@hotmail.com]
@@ -21,7 +22,7 @@ public class NoneLifeCycleHandler implements LifeCycleHandler {
     }
 
     @Override
-    public Object handleSyncWithException(ForestRequest request, ForestResponse response, Exception ex) {
+    public Object handleSyncWithException(ForestRequest request, ForestResponse response, Throwable ex) {
         return null;
     }
 
@@ -56,11 +57,6 @@ public class NoneLifeCycleHandler implements LifeCycleHandler {
     }
 
     @Override
-    public void handleTry(ForestRetryException ex, Retryer retryer) throws Throwable {
-
-    }
-
-    @Override
     public void handleProgress(ForestRequest request, ForestProgress progress) {
 
     }
@@ -81,12 +77,17 @@ public class NoneLifeCycleHandler implements LifeCycleHandler {
     }
 
     @Override
+    public Object handleFuture(Future resultData) {
+        return null;
+    }
+
+    @Override
     public Type getOnSuccessClassGenericType() {
         return null;
     }
 
     @Override
-    public Type getReturnType() {
+    public Type getResultType() {
         return null;
     }
 }

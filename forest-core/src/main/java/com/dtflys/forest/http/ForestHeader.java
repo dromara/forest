@@ -10,6 +10,173 @@ package com.dtflys.forest.http;
 public class ForestHeader {
 
     /**
+     * 标准头字段：接受的内容类型
+     */
+    private final static String ACCEPT = "Accept";
+
+    /**
+     * 标准头字段：接受的字符编码
+     */
+    private final static String ACCEPT_CHARSET = "Accept-Charset";
+
+    /**
+     * 标准头字段：接受的版本时间
+     */
+    private final static String ACCEPT_ENCODING = "Accept-Encoding";
+
+    /**
+     * 标准头字段：接受的语言
+     */
+    private final static String ACCEPT_LANGUAGE = "Accept-Language";
+
+    /**
+     * 标准头字段：HTTP身份验证的凭证
+     */
+    private final static String AUTHORIZATION = "Authorization";
+
+    /**
+     * 标准头字段：请求响应链上所有的缓存机制必须遵守的指令
+     */
+    private final static String CACHE_CONTROL = "Cache-Control";
+
+    /**
+     * 标准头字段：请求体的字节长度
+     */
+    private final static String CONTENT_LENGTH = "Content-Length";
+
+    /**
+     * 标准头字段：基于MD5算法对请求体内容进行Base64二进制编码
+     */
+    private final static String CONTENT_MD5 = "Content-MD5";
+
+    /**
+     * 标准头字段：请求体的MIME类型
+     */
+    public final static String CONTENT_TYPE = "Content-Type";
+
+    /**
+     * 非标准头字段：数据使用的编码类型
+     */
+    public final static String CONTENT_ENCODING = "Content-Encoding";
+
+
+    /**
+     * 标准头字段：HTTP请求携带的COOKIE信息
+     */
+    public final static String COOKIE = "Cookie";
+
+    /**
+     * 标准头字段：消息发送的日期和时间
+     */
+    public final static String DATE = "Cookie";
+
+    /**
+     * 标准头字段：标识客户端需要的特殊浏览器行为
+     */
+    public final static String EXPECT = "Expect";
+
+    /**
+     * 标准头字段：披露客户端通过http代理连接web服务的源信息
+     */
+    public final static String FORWARDED = "Forwarded";
+
+    /**
+     * 标准头字段：设置发送请求的用户的email地址
+     */
+    public final static String FROM = "From";
+
+    /**
+     * 标准头字段：服务器域名和TCP端口号
+     */
+    public final static String HOST = "Host";
+
+    /**
+     * 标准头字段：客户端的ETag
+     * 当时客户端ETag和服务器生成的ETag一致才执行，适用于更新自从上次更新之后没有改变的资源
+     */
+    public final static String IF_MATCH = "If-Match";
+
+    /**
+     * 标准头字段：更新时间
+     * 从更新时间到服务端接受请求这段时间内如果资源没有改变，允许服务端返回304 Not
+     */
+    public final static String IF_MODIFIED_SINCE = "If-Modified-Since";
+
+    /**
+     * 标准头字段：客户端的ETag
+     * 如果和服务端接受请求生成的ETage相同，允许服务端返回304 Not Modified
+     */
+    public final static String IF_NONE_MATCH = "If-None-Match";
+
+    /**
+     * 标准头字段：客户端的ETag
+     * 如果和服务端接受请求生成的ETage相同，返回缺失的实体部分；否则返回整个新的实体
+     */
+    public final static String IF_RANGE = "If-Range";
+
+    /**
+     * 标准头字段：限制代理或网关转发消息的次数
+     */
+    public final static String MAX_FORWARDS = "Max-Forwards";
+
+    /**
+     * 标准头字段：标识跨域资源请求
+     * 请求服务端设置Access-Control-Allow-Origin响应字段
+     */
+    public final static String ORIGIN = "Origin";
+
+    /**
+     * 标准头字段：设置特殊实现字段，可能会对请求响应链有多种影响
+     */
+    public final static String PRAGMA = "Pragma";
+
+    /**
+     * 标准头字段：为连接代理授权认证信息
+     */
+    public final static String PROXY_AUTHORIZATION = "Proxy-Authorization";
+
+    /**
+     * 标准头字段：请求部分实体，设置请求实体的字节数范围
+     */
+    public final static String RANGE = "Range";
+
+    /**
+     * 标准头字段：设置前一个页面的地址，并且前一个页面中的连接指向当前请求
+     */
+    public final static String REFERER = "Referer";
+
+    /**
+     * 标准头字段：用户代理期望接受的传输编码格式，和响应头中的Transfer-Encoding字段一样
+     */
+    public final static String TE = "TE";
+
+    /**
+     * 标准头字段：请求服务端升级协议
+     */
+    public final static String Upgrade = "Upgrade";
+
+    /**
+     * 标准头字段：用户代理字符串
+     */
+    public final static String USER_AGENT = "User-Agent";
+
+    /**
+     * 标准头字段：通知服务器代理请求
+     */
+    public final static String VIA = "Via";
+
+    /**
+     * 标准头字段：实体可能会发生的问题的通用警告
+     */
+    public final static String WARNING = "Warning";
+
+    /**
+     * 标准头字段：重定向地址
+     */
+    public final static String LOCATION = "Location";
+
+
+    /**
      * 请求头名称
      */
     private final String name;

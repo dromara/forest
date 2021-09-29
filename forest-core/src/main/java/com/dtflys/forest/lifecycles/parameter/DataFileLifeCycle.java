@@ -27,6 +27,7 @@ public class DataFileLifeCycle implements ParameterAnnotationLifeCycle<DataFile,
             parameter.setPartContentType(partContentType.trim());
         }
         ForestMultipartFactory factory = ForestMultipartFactory.createFactory(
+                method,
                 parameter.getType(),
                 parameter.getIndex(),
                 nameTemplate,

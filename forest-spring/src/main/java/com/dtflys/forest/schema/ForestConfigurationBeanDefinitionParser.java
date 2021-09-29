@@ -30,10 +30,10 @@ import java.util.Map;
  * @since 2017-04-21 14:49
  */
 public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionParser {
-    private static Logger log = LoggerFactory.getLogger(ForestConfigurationBeanDefinitionParser.class);
+    private final static Logger LOG = LoggerFactory.getLogger(ForestConfigurationBeanDefinitionParser.class);
 
-    private final static Class configurationBeanClass = ForestConfiguration.class;
-    private final static Class sslKeyStoreBeanClass = SpringSSLKeyStore.class;
+    private final static Class<?> FOREST_CONFIGURATION_CLASS = ForestConfiguration.class;
+    private final static Class<?> SPRING_SSL_KEY_STORE_CLASS = SpringSSLKeyStore.class;
 
 
     public ForestConfigurationBeanDefinitionParser() {
@@ -42,20 +42,22 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
     @Override
     public BeanDefinition parse(Element element, ParserContext parserContext) {
         RootBeanDefinition beanDefinition = new RootBeanDefinition();
-
-        beanDefinition.setBeanClass(configurationBeanClass);
+        beanDefinition.setBeanClass(FOREST_CONFIGURATION_CLASS);
         beanDefinition.setLazyInit(false);
         beanDefinition.setFactoryMethodName("configuration");
         String id = element.getAttribute("id");
-        id = ClientFactoryBeanUtils.getBeanId(id, configurationBeanClass, parserContext);
+        id = ClientFactoryBeanUtils.getBeanId(id, FOREST_CONFIGURATION_CLASS, parserContext);
         if (id != null && id.length() > 0) {
             if (parserContext.getRegistry().containsBeanDefinition(id))  {
                 throw new IllegalStateException("Duplicate spring bean id " + id);
             }
             parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);
+            ConstructorArgumentValues argumentValues = new ConstructorArgumentValues();
+            argumentValues.addIndexedArgumentValue(0, id);
+            beanDefinition.setConstructorArgumentValues(argumentValues);
         }
 
-        Method[] methods = configurationBeanClass.getMethods();
+        Method[] methods = FOREST_CONFIGURATION_CLASS.getMethods();
         for (Method method : methods) {
             String methodName = method.getName();
             Class[] paramTypes = method.getParameterTypes();
@@ -97,7 +99,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
             }
         }
         parseChildren(element.getChildNodes(), beanDefinition);
-        log.info("[Forest] Created Forest Configuration Bean: " + beanDefinition);
+        LOG.info("[Forest] Created Forest Configuration Bean: " + beanDefinition);
         return beanDefinition;
 
     }
@@ -125,7 +127,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
             }
             beanDefinition.getPropertyValues().addPropertyValue("variables", varMap);
             beanDefinition.getPropertyValues().addPropertyValue("sslKeyStores", sslKeyStoreMap);
-            beanDefinition.getPropertyValues().addPropertyValue("converterMap", converterMap);
+            beanDefinition.getPropertyValues().addPropertyValue("toMergeConverterMap", converterMap);
         }
     }
 
@@ -144,6 +146,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         String certPass = elem.getAttribute("certPass");
         String protocolsStr = elem.getAttribute("protocols");
         String cipherSuitesStr = elem.getAttribute("cipher-suites");
+        String sslSocketFactoryBuilder = elem.getAttribute("sslSocketFactoryBuilder");
 
         if (StringUtils.isEmpty(keystoreType)) {
             keystoreType = SSLKeyStore.DEFAULT_KEYSTORE_TYPE;
@@ -153,7 +156,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
                     "The file of SSL KeyStore \"" + id + "\" is empty!");
         }
         BeanDefinition beanDefinition = createSSLKeyStoreBean(
-                id, keystoreType, filePath, keystorePass, certPass, protocolsStr, cipherSuitesStr);
+                id, keystoreType, filePath, keystorePass, certPass, protocolsStr, cipherSuitesStr, sslSocketFactoryBuilder);
         sslKeyStoreMap.put(id, beanDefinition);
     }
 
@@ -166,15 +169,17 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
                                                        String keystorePass,
                                                        String certPass,
                                                        String protocolsStr,
-                                                       String cipherSuitesStr) {
+                                                       String cipherSuitesStr,
+                                                       String sslSocketFactoryBuilder) {
         BeanDefinition beanDefinition = new GenericBeanDefinition();
-        beanDefinition.setBeanClassName(sslKeyStoreBeanClass.getName());
+        beanDefinition.setBeanClassName(SPRING_SSL_KEY_STORE_CLASS.getName());
         ConstructorArgumentValues beanDefValues = beanDefinition.getConstructorArgumentValues();
         beanDefValues.addGenericArgumentValue(id);
         beanDefValues.addGenericArgumentValue(keystoreType);
         beanDefValues.addGenericArgumentValue(filePath);
         beanDefValues.addGenericArgumentValue(keystorePass);
         beanDefValues.addGenericArgumentValue(certPass);
+        beanDefValues.addGenericArgumentValue(sslSocketFactoryBuilder);
         if (StringUtils.isNotEmpty(protocolsStr)) {
             String[] strs = protocolsStr.split("[ /t]*,[ /t]*");
             String[] protocols = new String[strs.length];

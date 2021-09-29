@@ -2,9 +2,6 @@ package com.dtflys.forest.utils;
 
 import com.dtflys.forest.annotation.AliasFor;
 import com.dtflys.forest.annotation.BaseLifeCycle;
-import com.dtflys.forest.annotation.ComposableBaseAnnotation;
-import com.dtflys.forest.annotation.ComposableMethodAnnotation;
-import com.dtflys.forest.annotation.ComposableParamAnnotation;
 import com.dtflys.forest.annotation.MethodLifeCycle;
 import com.dtflys.forest.annotation.ParamLifeCycle;
 import com.dtflys.forest.config.ForestConfiguration;
@@ -20,6 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ReflectUtils {
 
@@ -27,7 +25,7 @@ public class ReflectUtils {
 
     /**
      * JSON转换选择器
-     * @since 1.5.1-BETA4
+     * @since 1.5.0-BETA4
      */
     private static JSONConverterSelector jsonConverterSelector = new JSONConverterSelector();
 
@@ -51,35 +49,114 @@ public class ReflectUtils {
 
 
     /**
-     * 从Type获取Class
-     * @param genericType Java Type类型，{@link Type}接口实例
+     * 转换为 {@link Class} 类型对象
+     * <p>将抽象的 {@link Type} 接口实例转换为具体的 {@link Class} 类型对象实例
+     *
+     * @param genericType {@link Type}接口实例
      * @return  Java类，{@link Class}类实例
      */
-    public static Class getClassByType(Type genericType) {
+    public static Class<?> toClass(Type genericType) {
         if (genericType instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType) genericType;
-            Class clz = ((Class) pt.getRawType());
-            return clz;
+            return ((Class<?>) pt.getRawType());
         } else if (genericType instanceof TypeVariable) {
-            TypeVariable tType = (TypeVariable) genericType;
+            TypeVariable<?> tType = (TypeVariable<?>) genericType;
             String className = tType.getGenericDeclaration().toString();
             try {
                 return Class.forName(className);
-            } catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException ignored) {
             }
             return null;
+        } else if (genericType instanceof WildcardType
+                && "?".equals(genericType.toString())) {
+            return Object.class;
         } else {
-            Class clz = (Class) genericType;
-            return clz;
+            try {
+                return (Class<?>) genericType;
+            } catch (Throwable th) {
+                return Object.class;
+            }
         }
     }
 
     /**
+     * 转换为 {@link ParameterizedType} 类型对象
+     * <p>将普通的 {@link Type} 类型对象转换为 {@link ParameterizedType} 类型对象
+     * <p>通过 {@link ParameterizedType} 对象可以获取泛型的类型参数
+     *
+     * @param type 普通 Java Type 类型, {@link Type} 接口实例
+     * @return 带泛型参数的 Type 类型, {@link ParameterizedType} 接口实例
+     */
+    public static ParameterizedType toParameterizedType(Type type) {
+        if (null == type) {
+            return null;
+        }
+        ParameterizedType pType = null;
+        if (type instanceof ParameterizedType) {
+            pType = (ParameterizedType) type;
+        } else if (type instanceof Class) {
+            Class<?> clazz = (Class<?>) type;
+            Type genericSuper = clazz.getGenericSuperclass();
+            if (genericSuper == null || Object.class.equals(genericSuper)) {
+                Type[] genericInterfaces = clazz.getGenericInterfaces();
+                if (genericInterfaces == null || genericInterfaces.length == 0) {
+                    genericSuper = genericInterfaces[0];
+                }
+            }
+            pType = toParameterizedType(genericSuper);
+        }
+        return pType;
+    }
+
+    /**
+     * 获取所有泛型参数类型
+     * <p>从一个带泛型的类型中获取其所有的泛型参数类型
+     *
+     * @param type {@link Type} 接口实例
+     * @return 多个泛型参数类型, {@link Type} 接口数组
+     */
+    public static Type[] getGenericTypeArguments(Type type) {
+        ParameterizedType pType = toParameterizedType(type);
+        if (pType != null) {
+            return pType.getActualTypeArguments();
+        }
+        return null;
+    }
+
+    /**
+     * 根据下标获取单个泛型参数类型
+     * <p>从一个带泛型的类型中获取其第 index 个泛型参数类型
+     *
+     * @param type {@link Type} 接口实例
+     * @param index 泛型参数类型下标, 表示第几个泛型参数, 从0开始记
+     * @return 泛型参数类型, {@link Type} 接口实例
+     */
+    public static Type getGenericArgument(Type type, int index) {
+        Type[] arguments = getGenericTypeArguments(type);
+        if (arguments != null && arguments.length > index) {
+            return arguments[index];
+        }
+        return null;
+    }
+
+    /**
+     * 获取第一个泛型参数类型
+     * <p>从一个带泛型的类型中获取其第一个泛型参数类型
+     *
+     * @param type {@link Type} 接口实例
+     * @return 泛型参数类型, {@link Type} 接口实例
+     */
+    public static Type getGenericArgument(Type type) {
+        return getGenericArgument(type, 0);
+    }
+
+    /**
      * 是否是Java基本类型
+     *
      * @param type Java类，{@link Class}类实例
      * @return {@code true}：是基本类型，{@code false}：不是基本类型
      */
-    public static boolean isPrimaryType(Class type) {
+    public static boolean isPrimaryType(Class<?> type) {
         if (byte.class.isAssignableFrom(type) || Byte.class.isAssignableFrom(type)) {
             return true;
         }
@@ -112,6 +189,7 @@ public class ReflectUtils {
         }
         return false;
     }
+
 
     /**
      * 是否为基本数组类型
@@ -162,7 +240,7 @@ public class ReflectUtils {
      * @return 注解对象中有属性 {@link Map}表对象，Key：属性名 Value：属性值
      */
     public static Map<String, Object> getAttributesFromAnnotation(Annotation ann) {
-        Map<String, Object> results = new HashMap<>();
+        Map<String, Object> results = new ConcurrentHashMap<>();
         Class clazz = ann.annotationType();
         Method[] methods = clazz.getMethods();
         Object[] args = new Object[0];
@@ -206,11 +284,8 @@ public class ReflectUtils {
      */
     public static boolean isForestAnnotation(Class annotationType) {
         return isForestBaseAnnotation(annotationType)
-                || isForestComposableBaseAnnotation(annotationType)
                 || isForestMethodAnnotation(annotationType)
-                || isForestComposableMethodAnnotation(annotationType)
-                || isForestParamAnnotation(annotationType)
-                || isForestComposableParamAnnotation(annotationType);
+                || isForestParamAnnotation(annotationType);
     }
 
     /**
@@ -237,29 +312,6 @@ public class ReflectUtils {
         return false;
     }
 
-    /**
-     * 判断是否为可组合的Forest接口注解
-     *
-     * @param annotation 注解对象
-     * @return {@code true}: 是可组合的Forest接口注解；{@code false}: 不是可组合的Forest接口注解
-     */
-    public static boolean isForestComposableBaseAnnotation(Annotation annotation) {
-        return isForestComposableBaseAnnotation(annotation.annotationType());
-    }
-
-    /**
-     * 判断是否为可组合的Forest接口注解
-     *
-     * @param annotationType 注解类
-     * @return {@code true}: 是可组合的Forest接口注解；{@code false}: 不是可组合的Forest接口注解
-     */
-    public static boolean isForestComposableBaseAnnotation(Class annotationType) {
-        Annotation mlcAnn = annotationType.getAnnotation(ComposableBaseAnnotation.class);
-        if (mlcAnn != null) {
-            return true;
-        }
-        return false;
-    }
 
     /**
      * 判断是否为Forest方法注解
@@ -285,29 +337,6 @@ public class ReflectUtils {
         return false;
     }
 
-    /**
-     * 判断是否为可组合的Forest方法注解
-     *
-     * @param annotation 注解对象
-     * @return {@code true}: 是可组合的Forest方法注解；{@code false}: 不是可组合的Forest方法注解
-     */
-    public static boolean isForestComposableMethodAnnotation(Annotation annotation) {
-        return isForestComposableMethodAnnotation(annotation.annotationType());
-    }
-
-    /**
-     * 判断是否为可组合的Forest方法注解
-     *
-     * @param annotationType 注解类
-     * @return {@code true}: 是可组合的Forest方法注解；{@code false}: 不是可组合的Forest方法注解
-     */
-    public static boolean isForestComposableMethodAnnotation(Class annotationType) {
-        Annotation mlcAnn = annotationType.getAnnotation(ComposableMethodAnnotation.class);
-        if (mlcAnn != null) {
-            return true;
-        }
-        return false;
-    }
 
     /**
      * 判断是否为Forest注解
@@ -333,42 +362,17 @@ public class ReflectUtils {
         return false;
     }
 
-    /**
-     * 判断是否为可组合的Forest参数注解
-     *
-     * @param annotation 注解对象
-     * @return {@code true}: 是可组合的Forest参数注解；{@code false}: 不是可组合的Forest参数注解
-     */
-    public static boolean isForestComposableParamAnnotation(Annotation annotation) {
-        return isForestComposableParamAnnotation(annotation.annotationType());
-    }
-
     public static boolean canAnnotationUseForInterface(Class annotationType) {
-        return isForestBaseAnnotation(annotationType) || isForestComposableBaseAnnotation(annotationType);
+        return isForestBaseAnnotation(annotationType);
     }
 
     public static boolean canAnnotationUseForMethod(Class annotationType) {
-        return isForestMethodAnnotation(annotationType) || isForestComposableMethodAnnotation(annotationType);
+        return isForestMethodAnnotation(annotationType);
     }
 
     public static boolean canAnnotationUseForParam(Class annotationType) {
-        return isForestParamAnnotation(annotationType) || isForestComposableParamAnnotation(annotationType);
+        return isForestParamAnnotation(annotationType);
     }
-
-    /**
-     * 判断是否为可组合的Forest参数注解
-     *
-     * @param annotationType 注解类
-     * @return {@code true}: 是可组合的Forest参数注解；{@code false}: 不是可组合的Forest参数注解
-     */
-    public static boolean isForestComposableParamAnnotation(Class annotationType) {
-        Annotation mlcAnn = annotationType.getAnnotation(ComposableParamAnnotation.class);
-        if (mlcAnn != null) {
-            return true;
-        }
-        return false;
-    }
-
 
     /**
      * 调用注解方法

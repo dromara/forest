@@ -44,24 +44,8 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
     }
 
     protected void setupHttpClient(HttpClient client) {
-//        client0.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, request.getTimeout());
-//        if (client0 instanceof DefaultHttpClient) {
-//            ((DefaultHttpClient) client0).getCookieSpecs().register("default", defaultCookieSF);
-//            client0.getParams().setParameter(ClientPNames.COOKIE_POLICY, "default");
-//        }
     }
 
-    private final static CookieSpecFactory DEFAULT_COOKIE_SF = new CookieSpecFactory() {
-        @Override
-        public CookieSpec newInstance(HttpParams params) {
-            return new BrowserCompatSpec() {
-                @Override
-                public void validate(Cookie cookie, CookieOrigin origin)
-                        throws MalformedCookieException {
-                }
-            };
-        }
-    };
 
 
     public void logResponse(ForestResponse response) {
@@ -87,8 +71,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
     public void sendRequest(
             ForestRequest request, HttpclientResponseHandler responseHandler,
             HttpUriRequest httpRequest, LifeCycleHandler lifeCycleHandler,
-            CookieStore cookieStore, Date startDate, int retryCount)
-            throws IOException {
+            CookieStore cookieStore, Date startDate, int retryCount)  {
         HttpResponse httpResponse = null;
         ForestResponse response = null;
         client = getHttpClient(cookieStore);
@@ -96,13 +79,13 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
         try {
             logRequest(retryCount, (HttpRequestBase) httpRequest);
             httpResponse = client.execute(httpRequest);
-            response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, null, startDate);
-        } catch (IOException e) {
+        } catch (Throwable e) {
             httpRequest.abort();
+            response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, e, startDate);
             ForestRetryException retryException = new ForestRetryException(
                     e,  request, request.getRetryCount(), retryCount);
             try {
-                request.getRetryer().canRetry(retryException);
+                request.canRetry(response, retryException);
             } catch (Throwable throwable) {
                 response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, throwable, startDate);
                 lifeCycleHandler.handleSyncWithException(request, response, e);
@@ -119,13 +102,22 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             }
             logResponse(response);
         }
+        response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, null, startDate);
+        // 检查是否重试
+        ForestRetryException retryEx = request.canRetry(response);
+        if (retryEx != null && !retryEx.isMaxRetryCountReached()) {
+            sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, cookieStore, startDate, retryCount + 1);
+            return;
+        }
+
+        // 检查响应是否失败
         if (response.isError()) {
             ForestNetworkException networkException =
                     new ForestNetworkException("", response.getStatusCode(), response);
             ForestRetryException retryException = new ForestRetryException(
                     networkException,  request, request.getRetryCount(), retryCount);
             try {
-                request.getRetryer().canRetry(retryException);
+                request.canRetry(response, retryException);
             } catch (Throwable throwable) {
                 responseHandler.handleSync(httpResponse, response);
                 return;
@@ -133,6 +125,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, cookieStore, startDate, retryCount + 1);
             return;
         }
+
 
         try {
             lifeCycleHandler.handleSaveCookie(request, getCookiesFromHttpCookieStore(cookieStore));

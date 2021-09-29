@@ -6,17 +6,13 @@
 
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-spring</artifactId>
-    <version>1.5.0</version>
+    <version>1.5.4</version>
 
     <parent>
         <groupId>com.dtflys.forest</groupId>
         <artifactId>forest</artifactId>
-        <version>1.5.0</version>
+        <version>1.5.4</version>
     </parent>
-
-    <properties>
-        <spring.version>5.0.16.RELEASE</spring.version>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -32,7 +28,6 @@
             <version>${spring.version}</version>
             <optional>true</optional>
         </dependency>
-
 
         <dependency>
             <groupId>org.springframework</groupId>
@@ -54,8 +49,6 @@
             <version>${spring.version}</version>
             <optional>true</optional>
         </dependency>
-
-
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -109,52 +102,13 @@
             <scope>test</scope>
         </dependency>
 
-<!--
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.2.48</version>
+            <version>${fastjson.version}</version>
             <scope>test</scope>
         </dependency>
--->
-
     </dependencies>
-
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.2.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-<!--
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring-boot.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
--->
-
-        </plugins>
-
-    </build>
 
 
 </project>

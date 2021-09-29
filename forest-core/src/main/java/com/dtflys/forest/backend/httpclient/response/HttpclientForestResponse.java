@@ -10,11 +10,14 @@ import org.apache.http.Header;
 import org.apache.http.HeaderIterator;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
 import org.apache.http.util.EntityUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 /**
@@ -36,23 +39,40 @@ public class HttpclientForestResponse extends ForestResponse {
         this.entity = entity;
         if (httpResponse != null) {
             setupHeaders();
-            this.statusCode = httpResponse.getStatusLine().getStatusCode();
+            StatusLine statusLine = httpResponse.getStatusLine();
+            this.statusCode = statusLine.getStatusCode();
+            this.reasonPhrase = statusLine.getReasonPhrase();
             if (entity != null) {
                 Header type = entity.getContentType();
                 if (type != null) {
                     this.contentType = new ContentType(type.getValue());
                 }
-                this.contentLength = entity.getContentLength();
                 Header encoding = entity.getContentEncoding();
-                if (contentType != null) {
+                this.contentLength = entity.getContentLength();
+                // 是否将Response数据按GZIP来解压
+                isGzip = request.isDecompressResponseGzipEnabled();
+                if (StringUtils.isNotBlank(request.getResponseEncode())) {
+                    this.contentEncoding = request.getResponseEncode();
+                } else if (contentType != null) {
                     this.contentEncoding = this.contentType.getCharset();
-                } else if (encoding != null) {
+                }
+                if (this.contentEncoding == null && encoding != null) {
                     this.contentEncoding = encoding.getValue();
-                    Charset charset = Charset.forName(this.contentEncoding);
-                    if (charset == null || !charset.name().equals(this.contentEncoding)) {
+                    Charset charset;
+                    try {
+                        charset = Charset.forName(contentEncoding);
+                    } catch (Throwable th) {
+                        charset = StandardCharsets.UTF_8;
+                    }
+                    if (!charset.name().equals(this.contentEncoding)) {
                         this.contentEncoding = null;
                     }
-                } this.content = buildContent();
+                }
+
+                this.content = buildContent();
+            } else {
+                this.bytes = new byte[0];
+                this.content = "";
             }
         } else {
             this.statusCode = -1;
@@ -77,7 +97,7 @@ public class HttpclientForestResponse extends ForestResponse {
 
     @Override
     public boolean isReceivedResponseData() {
-        return entity != null;
+        return entity != null || bytes != null;
     }
 
     private String buildContent() {
@@ -86,7 +106,7 @@ public class HttpclientForestResponse extends ForestResponse {
                 content = readContentAsString();
             } else if (!request.isDownloadFile() && contentType.canReadAsString()) {
                 content = readContentAsString();
-            } else if (contentType.canReadAsBinaryStream()) {
+           } else if (contentType.canReadAsBinaryStream()) {
                 StringBuilder builder = new StringBuilder();
                 builder.append("[content-type: ")
                         .append(contentType);
@@ -114,6 +134,14 @@ public class HttpclientForestResponse extends ForestResponse {
         } catch (IOException e) {
             throw new ForestRuntimeException(e);
         }
+    }
+
+    @Override
+    public InputStream getInputStream() throws Exception {
+        if (this.contentLength > Integer.MAX_VALUE) {
+            return entity.getContent();
+        }
+        return new ByteArrayInputStream(getByteArray());
     }
 
     @Override

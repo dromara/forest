@@ -13,7 +13,7 @@ forest:
 #  max-retry-interval: 2000                # 最大重试之间间隔时间
   ssl-protocol: SSLv3                     # 单向验证的HTTPS的默认SSL协议
   variables:                              # 自定义全局变量：key为变量名，value为值，可以在任何模板表达式中引用
-    baseUrl: http://www.thebeastshop.com
+    baseUrl: https://www.thebeastshop.com/autopage
     myName: xxx
     myCount: 12
     idServiceUrl: http://www.thebeastshop.com

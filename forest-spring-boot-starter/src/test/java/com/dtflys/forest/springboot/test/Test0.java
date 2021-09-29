@@ -1,5 +1,6 @@
 package com.dtflys.forest.springboot.test;
 
+import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
@@ -32,7 +33,6 @@ import static org.junit.Assert.*;
 @ActiveProfiles("test0")
 @SpringBootTest(classes = Test0.class)
 @ComponentScan(basePackages = "com.dtflys.forest.springboot.test.service")
-@ForestScan(basePackages = "com.dtflys.forest.springboot.test.client0")
 @EnableAutoConfiguration
 public class Test0 {
 
@@ -61,17 +61,17 @@ public class Test0 {
         assertEquals(Integer.valueOf(1000), config0.getTimeout());
         assertEquals(Integer.valueOf(1123), config0.getConnectTimeout());
         assertEquals("UTF-8", config0.getCharset());
-        assertEquals(Integer.valueOf(5), config0.getRetryCount());
+        assertEquals(Integer.valueOf(5), config0.getMaxRetryCount());
         assertEquals("okhttp3", config0.getBackend().getName());
         assertEquals("SSLv3", config0.getSslProtocol());
         assertTrue(config0.getLogHandler() instanceof DefaultLogHandler);
-        assertEquals("http://www.thebeastshop.com", config0.getVariableValue("baseUrl"));
+        assertEquals("https://www.thebeastshop.com/autopage", config0.getVariableValue("baseUrl"));
         assertEquals("xxx", config0.getVariableValue("myName"));
         assertNotNull(config0.getVariableValue("user"));
         assertTrue(!config0.isLogEnabled());
         assertEquals(Integer.valueOf(12), config0.getVariableValue("myCount"));
         assertEquals(BackOffRetryer.class, config0.getRetryer());
-        assertEquals(Integer.valueOf(5), config0.getRetryCount());
+        assertEquals(Integer.valueOf(5), config0.getMaxRetryCount());
         assertEquals(Long.valueOf(2000), Long.valueOf(config0.getMaxRetryInterval()));
 
     }
@@ -129,21 +129,23 @@ public class Test0 {
             beastshopClient.testRetry();
         } catch (ForestRuntimeException e) {
         }
-        Mockito.verify(logger).info("[Forest] Request: \n" +
+        HttpBackend backend = config0.getBackend();
+        String backendName = backend.getName();
+        Mockito.verify(logger).info("[Forest] Request (" + backendName + "): \n" +
                 "\t[Retry]: 1\n" +
-                "\tGET http://www.thebeastshop.com/autopage/shops.htm HTTP");
-        Mockito.verify(logger).info("[Forest] Request: \n" +
+                "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS");
+        Mockito.verify(logger).info("[Forest] Request (" + backendName + "): \n" +
                 "\t[Retry]: 2\n" +
-                "\tGET http://www.thebeastshop.com/autopage/shops.htm HTTP");
-        Mockito.verify(logger).info("[Forest] Request: \n" +
+                "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS");
+        Mockito.verify(logger).info("[Forest] Request (" + backendName + "): \n" +
                 "\t[Retry]: 3\n" +
-                "\tGET http://www.thebeastshop.com/autopage/shops.htm HTTP");
-        Mockito.verify(logger).info("[Forest] Request: \n" +
+                "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS");
+        Mockito.verify(logger).info("[Forest] Request (" + backendName + "): \n" +
                 "\t[Retry]: 4\n" +
-                "\tGET http://www.thebeastshop.com/autopage/shops.htm HTTP");
-        Mockito.verify(logger).info("[Forest] Request: \n" +
+                "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS");
+        Mockito.verify(logger).info("[Forest] Request (" + backendName + "): \n" +
                 "\t[Retry]: 5\n" +
-                "\tGET http://www.thebeastshop.com/autopage/shops.htm HTTP");
+                "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS");
 //        Mockito.verify(logger).info("[Forest] [Network Error]: connect timed out");
 
     }

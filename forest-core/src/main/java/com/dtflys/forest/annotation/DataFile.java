@@ -98,22 +98,25 @@ import java.lang.annotation.Target;
 @Documented
 @ParamLifeCycle(DataFileLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PARAMETER)
+@Target({ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
 public @interface DataFile {
 
     /**
      * Multipart类型请求体中，要上传的文件所对应的参数名
+     * @return 参数名
      */
     String value();
 
 
     /**
      * 要上传的文件的目标文件名（可省略）
+     * @return 目标文件名
      */
     String fileName() default "";
 
     /**
      * 子项Content-Type
+     * @return 子项Content-Type
      */
     String partContentType() default "";
 }

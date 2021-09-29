@@ -13,6 +13,7 @@ import javax.xml.bind.Unmarshaller;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +41,7 @@ public class ForestJaxbConverter implements ForestXmlConverter {
             createMarshaller(jaxbContext, "UTF-8").marshal(obj, writer);
             return writer.toString();
         } catch (JAXBException e) {
-            throw new ForestConvertException("xml", e);
+            throw new ForestConvertException(this, e);
         }
 
     }
@@ -53,7 +54,7 @@ public class ForestJaxbConverter implements ForestXmlConverter {
             StringReader reader = new StringReader(source);
             return (T) createUnmarshaller(jaxbContext).unmarshal(reader);
         } catch (JAXBException e) {
-            throw new ForestConvertException("xml", e);
+            throw new ForestConvertException(this, e);
         }
 
     }
@@ -61,8 +62,21 @@ public class ForestJaxbConverter implements ForestXmlConverter {
 
     @Override
     public <T> T convertToJavaObject(String source, Type targetType) {
-        Class clazz = ReflectUtils.getClassByType(targetType);
+        Class clazz = ReflectUtils.toClass(targetType);
         return (T) convertToJavaObject(source, clazz);
+    }
+
+    @Override
+    public <T> T convertToJavaObject(byte[] source, Class<T> targetType, Charset charset) {
+        String str = StringUtils.fromBytes(source, charset);
+        return (T) convertToJavaObject(str, targetType);
+
+    }
+
+    @Override
+    public <T> T convertToJavaObject(byte[] source, Type targetType, Charset charset) {
+        Class clazz = ReflectUtils.toClass(targetType);
+        return (T) convertToJavaObject(source, clazz, charset);
     }
 
 
@@ -89,7 +103,7 @@ public class ForestJaxbConverter implements ForestXmlConverter {
     }
 
     @Override
-    public ForestDataType getDateType() {
+    public ForestDataType getDataType() {
         return ForestDataType.XML;
     }
 

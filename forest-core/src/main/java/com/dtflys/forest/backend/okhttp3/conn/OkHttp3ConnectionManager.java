@@ -7,6 +7,7 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestCookie;
 import com.dtflys.forest.http.ForestCookies;
+import com.dtflys.forest.http.ForestProtocol;
 import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.ssl.ForestX509TrustManager;
@@ -22,21 +23,24 @@ import okhttp3.CookieJar;
 import okhttp3.Credentials;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
+import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.Route;
 
 import javax.annotation.Nullable;
 import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
+import java.lang.reflect.Array;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
-import java.security.KeyStore;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -50,10 +54,35 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
      */
     private ConnectionPool pool;
 
+    /**
+     * 协议版本: http 1.0
+     */
+    private final static List<Protocol> HTTP_1_0 = Arrays.asList(Protocol.HTTP_1_0, Protocol.HTTP_1_1);
+
+    /**
+     * 协议版本: http 1.1
+     */
+    private final static List<Protocol> HTTP_1_1 = Arrays.asList(Protocol.HTTP_1_1);
+
+    /**
+     * 协议版本: http 2
+     */
+    private final static List<Protocol> HTTP_2 = Arrays.asList(Protocol.HTTP_2, Protocol.HTTP_1_1);
+
+    /**
+     * 协议版本映射表
+     */
+    private final static Map<ForestProtocol, List<Protocol>> PROTOCOL_VERSION_MAP = new HashMap<>();
+
+    static {
+        PROTOCOL_VERSION_MAP.put(ForestProtocol.HTTP_1_0, HTTP_1_0);
+        PROTOCOL_VERSION_MAP.put(ForestProtocol.HTTP_1_1, HTTP_1_1);
+        PROTOCOL_VERSION_MAP.put(ForestProtocol.HTTP_2, HTTP_2);
+    }
+
 
     public OkHttp3ConnectionManager() {
     }
-
 
     public X509TrustManager getX509TrustManager(ForestRequest request) {
         try {
@@ -67,34 +96,31 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
         }
     }
 
-
-    public X509TrustManager getTrustManager(KeyStore keyStore, ForestRequest request) throws Exception {
-        TrustManagerFactory tmf = TrustManagerFactory
-                .getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        tmf.init(keyStore);
-
-        X509TrustManager defaultTrustManager = (X509TrustManager) tmf
-                .getTrustManagers()[0];
-        return null;
+    private List<Protocol> getProtocols(ForestRequest request) {
+        ForestProtocol protocol = request.getProtocol();
+        if (protocol == null) {
+            protocol = ForestProtocol.HTTP_1_0;
+        }
+        List<Protocol> protocols = PROTOCOL_VERSION_MAP.get(protocol);
+        return protocols;
     }
 
     public OkHttpClient getClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
-
         Integer timeout = request.getTimeout();
-        if (timeout == null) {
-            timeout = request.getConfiguration().getTimeout();
-        }
-
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .connectionPool(pool)
                 .connectTimeout(timeout, TimeUnit.MILLISECONDS)
                 .readTimeout(timeout, TimeUnit.MILLISECONDS)
+                .protocols(getProtocols(request))
+                .followRedirects(false)
+                .followSslRedirects(false)
                 .cookieJar(new CookieJar() {
                     @Override
                     public void saveFromResponse(HttpUrl url, List<Cookie> okCookies) {
                         ForestCookies cookies = new ForestCookies();
                         for (Cookie okCookie: okCookies) {
-                            ForestCookie cookie = ForestCookie.createFromOkHttpCookie(okCookie);
+                            long currentTime = System.currentTimeMillis();
+                            ForestCookie cookie = ForestCookie.createFromOkHttpCookie(currentTime, okCookie);
                             cookies.addCookie(cookie);
                         }
                         lifeCycleHandler.handleSaveCookie(request, cookies);
@@ -154,18 +180,13 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
             }
         }
 
-        if ("https".equals(request.getProtocol())) {
+        if (request.isSSL()) {
             String protocol = request.getSslProtocol();
             if (StringUtils.isNotBlank(protocol)) {
                 if (protocol.startsWith("SSL") || protocol.startsWith("ssl")) {
                     protocol = "SSL";
-                } else if (protocol.startsWith("TLS") || protocol.startsWith("TLS")) {
-                    String[] strs = protocol.split("v");
-                    if (strs.length == 1) {
-                        protocol = "TLS";
-                    } else if (strs[1] != "1.1") {
-                        protocol = "TLS";
-                    }
+                } else if (protocol.startsWith("TLS") || protocol.startsWith("tls")) {
+                    protocol = "TLS";
                 }
             }
             SSLSocketFactory sslSocketFactory = SSLUtils.getSSLSocketFactory(request, protocol);
@@ -187,5 +208,14 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
     @Override
     public void init(ForestConfiguration configuration) {
         pool = new ConnectionPool();
+    }
+
+    /**
+     * 获取OkHttp连接池对象
+     *
+     * @return {@link ConnectionPool}实例
+     */
+    public ConnectionPool getOkHttpPool() {
+        return pool;
     }
 }

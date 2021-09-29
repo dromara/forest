@@ -5,6 +5,7 @@ import com.dtflys.forest.backend.httpclient.response.HttpclientForestResponseFac
 import com.dtflys.forest.backend.httpclient.response.HttpclientResponseHandler;
 import com.dtflys.forest.exceptions.ForestNetworkException;
 import com.dtflys.forest.exceptions.ForestRetryException;
+import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestRequest;
@@ -27,7 +28,6 @@ import java.util.concurrent.*;
  */
 public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSender {
 
-
     public AsyncHttpclientRequestSender(HttpclientConnectionManager connectionManager, ForestRequest request) {
         super(connectionManager, request);
     }
@@ -38,27 +38,38 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
             final HttpUriRequest httpRequest, LifeCycleHandler lifeCycleHandler,
             CookieStore cookieStore, Date startDate, int retryCount)  {
         final CloseableHttpAsyncClient client = connectionManager.getHttpAsyncClient(request);
-        client.start();
         final ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
         logRequest(retryCount, (HttpRequestBase) httpRequest);
         final Future<HttpResponse> future = client.execute(httpRequest, new FutureCallback<HttpResponse>() {
             @Override
             public void completed(final HttpResponse httpResponse) {
                 ForestResponse response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, null, startDate);
+
+                // 是否重试
+                ForestRetryException retryEx = request.canRetry(response);
+                if (retryEx != null && !retryEx.isMaxRetryCountReached()) {
+                    sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, cookieStore, startDate, retryCount + 1);
+                    return;
+                }
+
+                // 验证响应
                 if (response.isError()) {
                     ForestNetworkException networkException =
                             new ForestNetworkException("", response.getStatusCode(), response);
                     ForestRetryException retryException = new ForestRetryException(
                             networkException,  request, request.getRetryCount(), retryCount);
+                    // 如果重试条件满足，触发重试
                     try {
-                        request.getRetryer().canRetry(retryException);
-                    } catch (Throwable throwable) {
+                        request.canRetry(response, retryException);
+                    } catch (Throwable th) {
+                        response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, th, startDate);
                         responseHandler.handleError(response);
                         return;
                     }
                     sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, cookieStore, startDate, retryCount + 1);
                     return;
                 }
+
                 ForestCookies cookies = getCookiesFromHttpCookieStore(cookieStore);
                 lifeCycleHandler.handleSaveCookie(request, cookies);
                 responseHandler.handleSuccess(response);
@@ -66,18 +77,15 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
 
             @Override
             public void failed(final Exception ex) {
-                synchronized (client) {
-                    try {
-                        client.close();
-                    } catch (IOException e) {
-                    }
-                }
-                ForestResponse response = forestResponseFactory.createResponse(request, null, lifeCycleHandler, ex, startDate);
+                ForestResponse<?> response = forestResponseFactory.createResponse(
+                        request, null, lifeCycleHandler, ex, startDate);
                 ForestRetryException retryException = new ForestRetryException(
                         ex,  request, request.getRetryCount(), retryCount);
                 try {
-                    request.getRetryer().canRetry(retryException);
-                } catch (Throwable throwable) {
+                    request.canRetry(response, retryException);
+                } catch (Throwable e) {
+                    response = forestResponseFactory.createResponse(
+                            request, null, lifeCycleHandler, ex, startDate);
                     responseHandler.handleError(response, ex);
                     return;
                 }
@@ -86,12 +94,6 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
 
             @Override
             public void cancelled() {
-                synchronized (client) {
-                    try {
-                        client.close();
-                    } catch (IOException e) {
-                    }
-                }
             }
         });
         responseHandler.handleFuture(future, startDate, forestResponseFactory);

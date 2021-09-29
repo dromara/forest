@@ -5,14 +5,12 @@ import com.dtflys.forest.backend.BodyBuilder;
 import com.dtflys.forest.backend.httpclient.HttpclientRequestProvider;
 import com.dtflys.forest.backend.httpclient.body.HttpclientBodyBuilder;
 import com.dtflys.forest.backend.url.URLBuilder;
+import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.http.ForestCookie;
 import com.dtflys.forest.http.ForestCookies;
+import com.dtflys.forest.http.ForestHeader;
 import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
-import com.dtflys.forest.logging.LogConfiguration;
-import com.dtflys.forest.logging.ForestLogHandler;
-import com.dtflys.forest.logging.ResponseLogMessage;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.http.client.CookieStore;
@@ -24,7 +22,6 @@ import com.dtflys.forest.backend.httpclient.response.HttpclientResponseHandler;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.mapping.MappingTemplate;
-
 
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.cookie.BasicClientCookie;
@@ -49,7 +46,6 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
     protected BodyBuilder<T> bodyBuilder;
     protected CookieStore cookieStore;
 
-
     protected T buildRequest() {
         url = buildUrl();
         return getRequestProvider().getRequest(url);
@@ -59,11 +55,9 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
 
     protected abstract URLBuilder getURLBuilder();
 
-
     protected String buildUrl() {
         return getURLBuilder().buildUrl(request);
     }
-
 
     protected void prepareBodyBuilder() {
         bodyBuilder = new HttpclientBodyBuilder();
@@ -88,24 +82,27 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         List<RequestNameValue> headerList = request.getHeaderNameValueList();
         String contentType = request.getContentType();
         String contentEncoding = request.getContentEncoding();
+        String contentTypeHeaderName = ForestHeader.CONTENT_TYPE;
+        String contentEncodingHeaderName = ForestHeader.CONTENT_ENCODING;
         if (headerList != null && !headerList.isEmpty()) {
             for (RequestNameValue nameValue : headerList) {
                 String name = nameValue.getName();
-                if (!"Content-Type".equalsIgnoreCase(name)
-                        && !"Content-Encoding".equalsIgnoreCase(name)) {
+                if (ForestHeader.CONTENT_TYPE.equalsIgnoreCase(name)) {
+                    contentTypeHeaderName = name;
+                } else if (ForestHeader.CONTENT_ENCODING.equalsIgnoreCase(name)) {
+                    contentEncodingHeaderName = name;
+                } else {
                     httpRequest.setHeader(name, MappingTemplate.getParameterValue(jsonConverter, nameValue.getValue()));
                 }
             }
         }
         if (StringUtils.isNotEmpty(contentType)) {
-            httpRequest.setHeader("Content-Type", contentType);
+            httpRequest.setHeader(contentTypeHeaderName, contentType);
         }
         if (StringUtils.isNotEmpty(contentEncoding)) {
-            httpRequest.setHeader("Content-Encoding", contentEncoding);
+            httpRequest.setHeader(contentEncodingHeaderName, contentEncoding);
         }
-
     }
-
 
     public void prepareCookies(LifeCycleHandler lifeCycleHandler) {
         cookieStore = new BasicCookieStore();
@@ -129,34 +126,9 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
     }
 
 
-
-    public void logResponse(ForestResponse response) {
-        LogConfiguration logConfiguration = request.getLogConfiguration();
-        if (!logConfiguration.isLogEnabled() || response.isLogged()) {
-            return;
-        }
-        response.setLogged(true);
-        ResponseLogMessage logMessage = new ResponseLogMessage(response, response.getStatusCode());
-        ForestLogHandler logHandler = logConfiguration.getLogHandler();
-        if (logHandler != null) {
-            if (logConfiguration.isLogResponseStatus()) {
-                logHandler.logResponseStatus(logMessage);
-            }
-            if (logConfiguration.isLogResponseContent() && logConfiguration.isLogResponseContent()) {
-                logHandler.logResponseContent(logMessage);
-            }
-        }
-    }
-
-
     @Override
     public void execute(LifeCycleHandler lifeCycleHandler) {
         prepare(lifeCycleHandler);
-        execute(0, lifeCycleHandler);
-    }
-
-
-    public void execute(int retryCount, LifeCycleHandler lifeCycleHandler) {
         Date startDate = new Date();
         ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
         try {
@@ -168,13 +140,10 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
                     cookieStore,
                     startDate, 0);
         } catch (IOException e) {
-            if (retryCount >= request.getRetryCount()) {
-                httpRequest.abort();
-                response = forestResponseFactory.createResponse(request, null, lifeCycleHandler, e, startDate);
-                lifeCycleHandler.handleSyncWithException(request, response, e);
-                return;
-            }
-            log.error(e.getMessage());
+            httpRequest.abort();
+            response = forestResponseFactory.createResponse(request, null, lifeCycleHandler, e, startDate);
+            lifeCycleHandler.handleSyncWithException(request, response, e);
+            return;
         } catch (ForestRuntimeException e) {
             httpRequest.abort();
             throw e;
@@ -183,16 +152,6 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
 
     @Override
     public void close() {
-/*
-        if (httpResponse != null) {
-            try {
-                EntityUtils.consume(httpResponse.getEntity());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        client0.getConnectionManager().closeExpiredConnections();
-*/
     }
 
 

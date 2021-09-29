@@ -14,17 +14,17 @@ import java.io.File;
  */
 public interface DownloadClient {
 
-    @Get("https://www.baidu.com/img/PCfb_5bf082d29588c07f842ccde3f97243ea.png")
+    @Get("http://localhost:${port}/download/test-img.jpg")
     @DownloadFile(dir = "${dir}", filename = "${filename}")
     File downloadImage(@Var("dir") String dir, @Var("filename") String filename, OnProgress onProgress);
 
 
-    @Get(value = "http://forspeed.onlinedown.net/down/QQliveSetup_20_731.exe", progressStep = 100)
+    @Get(value = "http://localhost:${port}/download/test-img.jpg", progressStep = 100)
     @DownloadFile(dir = "${dir}")
     ForestResponse<File> downloadFile(@Var("dir") String dir, OnProgress onProgress);
 
 
-    @Get("http://forspeed.onlinedown.net/down/QQliveSetup_20_731.exe")
+    @Get("http://localhost:${port}/download/test-img.jpg")
     byte[] downloadFileToBytes(OnProgress onProgress);
 
     @Get("http://localhost:${port}/download/test-img.jpg")

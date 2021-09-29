@@ -13,20 +13,21 @@ import com.dtflys.forest.springboot.test.logging.TestLogHandler2;
  * @since 2018-09-25 18:30
  */
 @LogHandler(TestLogHandler2.class)
-@LogEnabled(logResponseStatus = false)
+@LogEnabled(logResponseStatus = true)
 public interface GiteeClient {
 
     @Request(
-            url = "https://gitee.com/dt_flys/forest",
+            url = "https://gitee.com/dt_flys/#{test.path}",
             timeout = 80000
     )
     @LogHandler(TestLogHandler.class)
-    @LogEnabled(logResponseStatus = false, logResponseContent = true)
+    @LogEnabled(logResponseStatus = true, logResponseContent = true)
     ForestRequest<String> index();
 
     @Request(
             url = "https://gitee.com/dt_flys",
-            timeout = 80000
+            timeout = 80000,
+            keyStore = "keystore1"
     )
     ForestRequest<String> index2();
 

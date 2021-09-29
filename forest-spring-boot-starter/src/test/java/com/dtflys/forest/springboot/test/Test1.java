@@ -22,7 +22,6 @@ import static org.junit.Assert.*;
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test1")
 @SpringBootTest(classes = Test1.class)
-@ForestScan("com.dtflys.forest.springboot.test.client1")
 @EnableAutoConfiguration
 public class Test1 {
 
@@ -39,7 +38,7 @@ public class Test1 {
         assertEquals(Integer.valueOf(50), forestConfiguration.getTimeout());
         assertEquals(Integer.valueOf(4000), forestConfiguration.getConnectTimeout());
         assertEquals("GBK", forestConfiguration.getCharset());
-        assertEquals(Integer.valueOf(0), forestConfiguration.getRetryCount());
+        assertEquals(Integer.valueOf(0), forestConfiguration.getMaxRetryCount());
         assertTrue(forestConfiguration.isLogEnabled());
         assertEquals("okhttp3", forestConfiguration.getBackend().getName());
         assertEquals("TLSv1.2", forestConfiguration.getSslProtocol());

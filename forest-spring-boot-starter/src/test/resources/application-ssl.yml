@@ -12,4 +12,6 @@ forest:
       file: test.keystore
       keystore-pass: 123456
       cert-pass: 123456
-      protocols: SSLv3
+      ssl-socket-factory-builder: com.dtflys.forest.springboot.test.ssl.MySSLSocketFactoryBuilder
+  interceptors:
+    - com.dtflys.forest.springboot.test.interceptor.GlobalInterceptor

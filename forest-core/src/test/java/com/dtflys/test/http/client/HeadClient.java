@@ -66,7 +66,7 @@ public interface HeadClient {
                 "test2: ${2}"
             }
     )
-    void simpleHead(@DataVariable("accessToken") String accessToken, String test, String test2);
+    String simpleHead(@DataVariable("accessToken") String accessToken, String test, String test2);
 
     @HeadRequest(
             url = "http://localhost:${port}/hello/user?username=foo",

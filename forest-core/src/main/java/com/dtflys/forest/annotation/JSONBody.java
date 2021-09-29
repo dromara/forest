@@ -58,13 +58,14 @@ import java.lang.annotation.Target;
 @Documented
 @ParamLifeCycle(JSONBodyLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PARAMETER)
+@Target({ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
 public @interface JSONBody {
 
     /**
      * 键值对名称（可选参数）[同name]
      * <p>有键值对名称时（有value值时），被该注解修饰的参数将被作为一个键值对合并到请求体中。</p>
      * <p>没有键值对名称时（没有设value值时），被该注解修饰的参数将被作为一个对象，根据对象的属性拆成一个个键值对，然后合并到请求体中</p>
+     * @return 键值对名称
      */
     @AliasFor("name")
     String value() default "";
@@ -73,23 +74,27 @@ public @interface JSONBody {
      * 键值对名称（可选参数）[同value]
      * <p>有键值对名称时（有value值时），被该注解修饰的参数将被作为一个键值对合并到请求体中。</p>
      * <p>没有键值对名称时（没有设value值时），被该注解修饰的参数将被作为一个对象，根据对象的属性拆成一个个键值对，然后合并到请求体中</p>
+     * @return 键值对名称
      */
     @AliasFor("value")
     String name() default "";
 
 
     /**
-     * The filters will do some processing for the query value before sending request.
+     * The filters will do some processing for the query value before sending request
+     * @return filter names
      */
     String filter() default "";
 
     /**
      * 子项Content-Type
+     * @return 子项Content-Type
      */
     String partContentType() default ContentType.APPLICATION_JSON;
 
     /**
      * 默认值
+     * @return 默认值
      */
     String defaultValue() default "";
 

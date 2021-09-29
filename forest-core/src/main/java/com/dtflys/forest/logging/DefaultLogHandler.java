@@ -1,5 +1,7 @@
 package com.dtflys.forest.logging;
 
+import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.StringUtils;
 
@@ -72,6 +74,19 @@ public class DefaultLogHandler implements ForestLogHandler {
     }
 
     /**
+     * 后端框架名称
+     * @param requestLogMessage 请求日志消息，{@link RequestLogMessage}类实例
+     * @return 后端框架名称字符串
+     */
+    protected String backendContent(RequestLogMessage requestLogMessage) {
+        HttpBackend backend = requestLogMessage.getRequest().getBackend();
+        if (backend == null) {
+            return "";
+        }
+        return "(" + backend.getName() + ")";
+    }
+
+    /**
      * 请求失败重试信息
      * @param requestLogMessage 请求日志消息，{@link RequestLogMessage}类实例
      * @return 重试信息字符串
@@ -80,6 +95,27 @@ public class DefaultLogHandler implements ForestLogHandler {
         int retryCount = requestLogMessage.getRetryCount();
         if (retryCount > 0) {
             return "[Retry]: " + retryCount + "\n\t";
+        }
+        return "";
+    }
+
+    /**
+     * 请求重定向信息
+     * @param requestLogMessage
+     * @return 请求重定向信息字符串
+     */
+    protected String redirection(RequestLogMessage requestLogMessage) {
+        ForestRequest request = requestLogMessage.getRequest();
+        if (request.isRedirection()) {
+            ForestRequest prevRequest = request.getPrevRequest();
+            ForestResponse prevResponse = request.getPrevResponse();
+            return "[Redirect]: From " +
+                    prevRequest.getType().getName() +
+                    " " +
+                    prevRequest.getUrl() +
+                    " -> " +
+                    prevResponse.getStatusCode() +
+                    "\n\t";
         }
         return "";
     }
@@ -104,8 +140,11 @@ public class DefaultLogHandler implements ForestLogHandler {
      */
     protected String requestLoggingContent(RequestLogMessage requestLogMessage) {
         StringBuilder builder = new StringBuilder();
-        builder.append("Request: \n\t");
+        builder.append("Request ");
+        builder.append(backendContent(requestLogMessage));
+        builder.append(": \n\t");
         builder.append(retryContent(requestLogMessage));
+        builder.append(redirection(requestLogMessage));
         builder.append(proxyContent(requestLogMessage));
         builder.append(requestTypeChangeHistory(requestLogMessage));
         builder.append(requestLogMessage.getRequestLine());
@@ -145,6 +184,7 @@ public class DefaultLogHandler implements ForestLogHandler {
      * 打印日志内容
      * @param content 日志内容字符串
      */
+    @Override
     public void logContent(String content) {
         getLogger().info("[Forest] " + content);
     }
@@ -193,4 +233,5 @@ public class DefaultLogHandler implements ForestLogHandler {
             }
         }
     }
+
 }

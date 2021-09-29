@@ -10,13 +10,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class SpringResource extends ForestMultipart<Resource> {
+public class SpringResource extends ForestMultipart<Resource, SpringResource> {
 
     private Resource resource;
 
     @Override
-    public void setData(Resource data) {
+    public SpringResource setData(Resource data) {
         this.resource = data;
+        return this;
     }
 
     @Override

@@ -4,11 +4,10 @@ import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.ForestQueryParameter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.mapping.MappingTemplate;
-import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
+import com.dtflys.forest.utils.URLUtils;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.List;
 
 /**
@@ -35,17 +34,25 @@ public class QueryableURLBuilder extends URLBuilder {
                 if (name != null) {
                     paramBuilder.append('=');
                 }
-                if (queryParam.isUrlencoded()) {
-                    String encodedValue = null;
-                    try {
-                        encodedValue = URLEncoder.encode(value, request.getCharset());
-                    } catch (UnsupportedEncodingException e) {
+                String charset = queryParam.getCharset();
+                if (StringUtils.isBlank(charset)) {
+                    charset = request.getCharset();
+                }
+                if (StringUtils.isBlank(charset)) {
+                    charset = "UTF-8";
+                }
+                String encodedValue = null;
+                try {
+                    if (queryParam.isUrlencoded()) {
+                        encodedValue = URLUtils.forceEncode(value, charset);
+                    } else {
+//                        encodedValue = value;
+                        encodedValue = URLUtils.encode(value, charset);
                     }
-                    if (encodedValue != null) {
-                        paramBuilder.append(encodedValue);
-                    }
-                } else {
-                    paramBuilder.append(value);
+                } catch (UnsupportedEncodingException e) {
+                }
+                if (encodedValue != null) {
+                    paramBuilder.append(encodedValue);
                 }
             }
             if (i < queryParameters.size() - 1) {

@@ -5,6 +5,7 @@ import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestHandlerException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.lifecycles.file.DownloadLifeCycle;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
 
@@ -12,6 +13,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import java.util.concurrent.Future;
 
 /**
@@ -41,16 +43,24 @@ public class ResultHandler {
                 if (void.class.isAssignableFrom(resultClass)) {
                     return null;
                 }
-                if (ForestResponse.class.isAssignableFrom(resultClass)) {
+                if (ForestResponse.class.isAssignableFrom(resultClass)
+                        || ForestRequest.class.isAssignableFrom(resultClass)) {
                     if (resultType instanceof ParameterizedType) {
                         ParameterizedType parameterizedType = (ParameterizedType) resultType;
                         Class rowClass = (Class) parameterizedType.getRawType();
-                        if (ForestResponse.class.isAssignableFrom(rowClass)) {
+                        if (ForestResponse.class.isAssignableFrom(rowClass)
+                                || ForestRequest.class.isAssignableFrom(resultClass)) {
                             Type realType = parameterizedType.getActualTypeArguments()[0];
-                            Class realClass = ReflectUtils.getClassByType(parameterizedType.getActualTypeArguments()[0]);
+                            Class realClass = ReflectUtils.toClass(parameterizedType.getActualTypeArguments()[0]);
+                            if (realClass == null) {
+                                realClass = String.class;
+                            }
                             Object realResult = getResult(request, response, realType, realClass);
                             response.setResult(realResult);
                         }
+                    } else {
+                        Object realResult = getResult(request, response, Object.class, Object.class);
+                        response.setResult(realResult);
                     }
                     return response;
                 }
@@ -60,7 +70,7 @@ public class ResultHandler {
                         Class rowClass = (Class) parameterizedType.getRawType();
                         if (Future.class.isAssignableFrom(rowClass)) {
                             Type realType = parameterizedType.getActualTypeArguments()[0];
-                            Class realClass = ReflectUtils.getClassByType(parameterizedType.getActualTypeArguments()[0]);
+                            Class realClass = ReflectUtils.toClass(parameterizedType.getActualTypeArguments()[0]);
                             return getResult(request, response, realType, realClass);
                         }
                     }
@@ -70,7 +80,7 @@ public class ResultHandler {
                         return response.getByteArray();
                     }
                 }
-                Object attFile = request.getAttachment("file");
+                Object attFile = request.getAttachment(DownloadLifeCycle.ATTACHMENT_NAME_FILE);
                 if (attFile != null && attFile instanceof File) {
                     ForestConverter converter = request.getConfiguration().getConverter(ForestDataType.JSON);
                     return converter.convertToJavaObject(attFile, resultClass);
@@ -106,7 +116,12 @@ public class ResultHandler {
                 if (contentType != null && contentType.canReadAsString()) {
                     return converter.convertToJavaObject(responseText, resultType);
                 }
-                return converter.convertToJavaObject(response.getByteArray(), resultType);
+                Charset charset = null;
+                String contentEncoding = response.getContentEncoding();
+                if (contentEncoding != null) {
+                    charset = Charset.forName(contentEncoding);
+                }
+                return converter.convertToJavaObject(response.getByteArray(), resultType, charset);
             } catch (Exception e) {
                 throw new ForestHandlerException(e, request, response);
             }

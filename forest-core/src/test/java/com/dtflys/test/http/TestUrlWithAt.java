@@ -5,11 +5,7 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.client.GetClient;
-import com.dtflys.test.mock.GetMockServer;
-import com.dtflys.test.mock.QueryStringMockServer;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +39,9 @@ public class TestUrlWithAt extends BaseClientTest {
     }
 
 
-
+    @Override
+    public void afterRequests() {
+    }
 
     @Test
     public void testGetUrlWithAt() {

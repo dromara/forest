@@ -22,19 +22,19 @@ public class TestMappingReference {
         ageVar.setIndex(1);
         Mockito.when(forestMethod.getVariable("name")).thenReturn(nameVar);
         Mockito.when(forestMethod.getVariable("age")).thenReturn(ageVar);
-        Mockito.when(forestMethod.getVariableValue("name")).thenReturn("Marry");
-        Mockito.when(forestMethod.getVariableValue("motherName")).thenReturn("Linda");
-        Mockito.when(forestMethod.getVariableValue("age")).thenReturn(12);
+        Mockito.when(forestMethod.getVariableValue("name", forestMethod)).thenReturn("Marry");
+        Mockito.when(forestMethod.getVariableValue("motherName", forestMethod)).thenReturn("Linda");
+        Mockito.when(forestMethod.getVariableValue("age", forestMethod)).thenReturn(12);
         Mockito.when(forestMethod.isVariableDefined("motherName")).thenReturn(true);
-        MappingReference nameRef = new MappingReference(forestMethod, "name");
-        MappingReference ageRef = new MappingReference(forestMethod, "age");
-        MappingReference motherNameRef = new MappingReference(forestMethod, "motherName");
+        MappingReference nameRef = new MappingReference(forestMethod, forestMethod, "name");
+        MappingReference ageRef = new MappingReference(forestMethod, forestMethod, "age");
+        MappingReference motherNameRef = new MappingReference(forestMethod, forestMethod, "motherName");
         Assert.assertEquals("Peter", nameRef.render(new Object[] {"Peter", 15}));
         Mockito.verify(forestMethod).getVariable("name");
         Mockito.verify(forestMethod, Mockito.never()).getVariableValue("name");
         Assert.assertEquals(15, ageRef.render(new Object[] {"Peter", 15}));
         Mockito.verify(forestMethod, Mockito.never()).getVariableValue("motherName");
         Assert.assertEquals("Linda", motherNameRef.render(new Object[] {"Peter", 15}));
-        Mockito.verify(forestMethod).getVariableValue("motherName");
+        Mockito.verify(forestMethod).getVariableValue("motherName", forestMethod);
     }
 }

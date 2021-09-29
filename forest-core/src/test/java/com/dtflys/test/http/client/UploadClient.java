@@ -1,6 +1,14 @@
 package com.dtflys.test.http.client;
 
-import com.dtflys.forest.annotation.*;
+import com.dtflys.forest.annotation.BaseRequest;
+import com.dtflys.forest.annotation.Body;
+import com.dtflys.forest.annotation.DataFile;
+import com.dtflys.forest.annotation.JSONBody;
+import com.dtflys.forest.annotation.LogEnabled;
+import com.dtflys.forest.annotation.Post;
+import com.dtflys.forest.annotation.PostRequest;
+import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.http.ForestRequest;
 
@@ -9,6 +17,8 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
+@BaseRequest(baseURL = "http://localhost:${port}")
+@LogEnabled
 public interface UploadClient {
 
     @Request(
@@ -26,7 +36,7 @@ public interface UploadClient {
     @Post(url = "/upload")
     ForestRequest<Map> upload(@DataFile(value = "file", fileName = "${1}") byte[] bytes, String filename);
 
-    @Post(url = "/upload")
+    @Post(url = "/upload", contentType = "multipart/form-data")
     ForestRequest<Map> upload(@DataFile(value = "file", fileName = "${1}") InputStream in, String filename);
 
     // Path Collection
@@ -62,10 +72,21 @@ public interface UploadClient {
     ForestRequest<Map> uploadByteArrayArray(@DataFile(value = "file", fileName = "test-img-${_index}.jpg") byte[][] byteArrayArray);
 
     // mixture
-    @PostRequest(url = "localhost:9999/tool/b")
-    ForestRequest<Map> imageUpload(String fileName, @DataFile(value = "file", fileName = "${0}") File file, @JSONBody("meta") Map map);
+    @PostRequest(url = "/upload")
+    ForestRequest<Map> imageUploadWithMapParams(String fileName, @DataFile(value = "file", fileName = "${0}") File file,
+                                                @Body Map params);
+
+    @PostRequest(url = "/upload")
+    ForestRequest<Map> imageUploadWithBodyParams(String fileName, @DataFile(value = "file", fileName = "${0}") File file,
+                                                 @Body("a") String a, @Body("b") String b);
+
+    @PostRequest(url = "/upload", contentType = ContentType.MULTIPART_FORM_DATA)
+    ForestRequest<Map> imageUploadWithJSONBodyParams(String fileName, @DataFile(value = "file", fileName = "${0}") File file,
+                                                 @JSONBody("params") Map params);
+
+    @PostRequest(url = "/upload")
+    ForestRequest<Map> imageUploadWithJSONBodyParamsAndWithoutContentType(String fileName, @DataFile(value = "file", fileName = "${0}") File file,
+                                                     @JSONBody("params") Map params);
 
 
-    @PostRequest("${url}")
-    void updateSpringBoot(@Var("url") String url, @DataFile(value = "file") File multipartFile);
 }

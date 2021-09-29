@@ -14,7 +14,7 @@ import static org.mockserver.model.HttpResponse.response;
  */
 public class GetMockServer extends MockServerRule {
 
-    public final static String EXPECTED = "{\"status\": \"ok\"}";
+    public final static String EXPECTED = "{\"status\":\"ok\"}";
 
     public final static Integer port = 5002;
 

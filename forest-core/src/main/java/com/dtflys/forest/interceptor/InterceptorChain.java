@@ -1,5 +1,6 @@
 package com.dtflys.forest.interceptor;
 
+import com.dtflys.forest.callback.RetryWhen;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestRequest;
@@ -66,11 +67,29 @@ public class InterceptorChain implements Interceptor {
     }
 
     @Override
+    public void onRetry(ForestRequest request, ForestResponse response) {
+        Iterator<Interceptor> iter = interceptors.iterator();
+        for ( ; iter.hasNext(); ) {
+            Interceptor item = iter.next();
+            item.onRetry(request, response);
+        }
+    }
+
+    @Override
     public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
         Iterator<Interceptor> iter = interceptors.iterator();
         for ( ; iter.hasNext(); ) {
             Interceptor item = iter.next();
             item.onError(ex, request, response);
+        }
+    }
+
+    @Override
+    public void onRedirection(ForestRequest redirectReq, ForestRequest prevReq, ForestResponse prevRes) {
+        Iterator<Interceptor> iter = interceptors.iterator();
+        for ( ; iter.hasNext(); ) {
+            Interceptor item = iter.next();
+            item.onRedirection(redirectReq, prevReq, prevRes);
         }
     }
 

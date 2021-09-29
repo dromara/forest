@@ -21,7 +21,12 @@ public class ForestQueryParameter {
     /**
      * 是否做URLEncode
      */
-    private boolean urlencoded = true;
+    private boolean urlencoded = false;
+
+    /**
+     * 字符集
+     */
+    private String charset;
 
     /**
      * 默认值
@@ -39,21 +44,28 @@ public class ForestQueryParameter {
     }
 
     public ForestQueryParameter(String name, Object value) {
-        this(name, value, false);
+        this(name, value, false, null);
     }
 
-    public ForestQueryParameter(String name, Object value, boolean fromUrl) {
+    public ForestQueryParameter(String name, Object value, Boolean urlencoded, String charset) {
+        this(name, value, false, urlencoded, charset);
+    }
+
+    public ForestQueryParameter(String name, Object value, boolean fromUrl, Boolean urlencoded, String charset) {
         this.name = name;
         this.value = value;
         this.fromUrl = fromUrl;
-        if (fromUrl) {
+        if (urlencoded != null) {
+            this.urlencoded = urlencoded;
+        } else if (fromUrl) {
             this.urlencoded = false;
         }
+        this.charset = charset;
     }
 
 
     public ForestQueryParameter(String name) {
-        this(name, null, false);
+        this(name, null, false, null);
     }
 
 
@@ -76,6 +88,14 @@ public class ForestQueryParameter {
 
     public void setUrlencoded(boolean urlencoded) {
         this.urlencoded = urlencoded;
+    }
+
+    public String getCharset() {
+        return charset;
+    }
+
+    public void setCharset(String charset) {
+        this.charset = charset;
     }
 
     /**

@@ -1,13 +1,17 @@
 package com.dtflys.forest.mapping;
 
 
+import com.dtflys.forest.config.ForestProperties;
 import com.dtflys.forest.config.VariableScope;
+import com.dtflys.forest.exceptions.ForestTemplateSyntaxError;
 import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.utils.URLUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -16,11 +20,17 @@ import java.util.*;
  * @since 2016-05-04
  */
 public class MappingTemplate {
+    private final ForestMethod<?> forestMethod;
+    private final MappingParameter[] parameters;
+    private final ForestProperties properties;
     private  String template;
     private List<MappingExpr> exprList;
     private VariableScope variableScope;
-
     int readIndex = -1;
+
+    private boolean isEnd(int index) {
+        return index >= template.length() - 1;
+    }
 
     private boolean isEnd() {
         return readIndex >= template.length() - 1;
@@ -55,19 +65,24 @@ public class MappingTemplate {
         }
     }
 
+    public ForestProperties getProperties() {
+        return properties;
+    }
+
+
     private void match(char except) {
         if (isEnd()) {
-            throw new ForestRuntimeException("Template Expression Parse Error:\n Not found '" + except + "', column " + readIndex + " at \"" + template + "\"");
+            throw new ForestTemplateSyntaxError("Template Expression Parse Error:\n Not found '" + except + "', column " + readIndex + " at \"" + template + "\"");
         }
         char real = nextChar();
         if (except != real) {
-            throw new ForestRuntimeException("Template Expression Parse Error:\n It except '" + except + "', But found '" + real + "', column " + readIndex + " at \"" + template + "\"");
+            throw new ForestTemplateSyntaxError("Template Expression Parse Error:\n It except '" + except + "', But found '" + real + "', column " + readIndex + " at \"" + template + "\"");
         }
     }
 
     private void matchToken(MappingExpr expr, Token token) {
         if (expr.token != token) {
-            throw new ForestRuntimeException("Template Expression Parse Error:\n It except " + token.getName() + ", But found " + expr.token.getName() + ", column " + readIndex + " at \"" + template + "\"");
+            throw new ForestTemplateSyntaxError("Template Expression Parse Error:\n It except " + token.getName() + ", But found " + expr.token.getName() + ", column " + readIndex + " at \"" + template + "\"");
         }
     }
 
@@ -78,15 +93,18 @@ public class MappingTemplate {
         return template.charAt(readIndex + i);
     }
 
-    public MappingTemplate(String template, VariableScope variableScope) {
+    public MappingTemplate(ForestMethod<?> forestMethod, String template, VariableScope variableScope, ForestProperties properties, MappingParameter[] parameters) {
+        this.forestMethod = forestMethod;
         this.template = template;
         this.variableScope = variableScope;
+        this.properties = properties;
+        this.parameters = parameters;
         compile();
     }
 
     public void compile() {
         readIndex = -1;
-        exprList = new ArrayList<MappingExpr>();
+        exprList = new ArrayList<>();
         StringBuffer buffer = new StringBuffer();
 
         while (!isEnd()) {
@@ -109,10 +127,48 @@ public class MappingTemplate {
                     continue;
                 }
             }
+            else if (ch == '{') {
+                if (buffer.length() > 0) {
+                    MappingString str = new MappingString(buffer.toString());
+                    exprList.add(str);
+                }
+                int oldIndex = readIndex;
+                buffer = new StringBuffer();
+                MappingExpr expr = null;
+                try {
+                    expr = parseExpression();
+                } catch (ForestTemplateSyntaxError th) {
+                    exprList.add(new MappingString("{"));
+                    readIndex = oldIndex;
+                    continue;
+                }
+                match('}');
+                if (expr != null) {
+                    expr = new MappingUrlEncodedExpr(forestMethod, expr);
+                    exprList.add(expr);
+                }
+                continue;
+            }
+            if (ch == '#') {
+                char ch1 = watch(1);
+                if (ch1 == '{') {
+                    nextChar();
+                    if (buffer.length() > 0) {
+                        MappingString str = new MappingString(buffer.toString());
+                        exprList.add(str);
+                    }
+                    buffer = new StringBuffer();
+                    MappingExpr expr = parseProperty();
+                    match('}');
+                    if (expr != null) {
+                        exprList.add(expr);
+                    }
+                    continue;
+                }
+            }
             else if (ch == '\\') {
-//                char ch2 = nextChar();
-//                buffer.append(ch);
-                if (watch(1) == '$') {
+                char nc = watch(1);
+                if (nc == '$' || nc == '{') {
                     ch = nextChar();
                     buffer.append(ch);
                 } else {
@@ -140,16 +196,26 @@ public class MappingTemplate {
 
 
     private void syntaxErrorWatch1(char ch) {
-        throw new ForestRuntimeException("Template Expression Parse Error:\n Character '" + ch +
+        throw new ForestTemplateSyntaxError("Template Expression Parse Error:\n Character '" + ch +
                 "', column " + (readIndex + 2) + " at \"" + template + "\"");
     }
 
 
     private void syntaxErrorWatchN(char ch, int n) {
-        throw new ForestRuntimeException("Template Expression Parse Error:\n Character '" + ch +
+        throw new ForestTemplateSyntaxError("Template Expression Parse Error:\n Character '" + ch +
                 "', column " + (readIndex + n + 1) + " at \"" + template + "\"");
     }
 
+    public MappingProperty parseProperty() {
+        MappingProperty prop = null;
+        char ch = watch(1);
+        if (Character.isAlphabetic(ch) || ch == '_' || ch == '-') {
+            prop = parsePropertyName();
+        } else {
+            syntaxErrorWatch1(ch);
+        }
+        return prop;
+    }
 
     public MappingExpr parseExpression() {
         MappingExpr expr = null;
@@ -171,7 +237,7 @@ public class MappingTemplate {
                         return new MappingIndex(((MappingInteger) expr).getNumber());
                     }
                     if (expr instanceof MappingIdentity) {
-                        return new MappingReference(variableScope, ((MappingIdentity) expr).getName());
+                        return new MappingReference(forestMethod, variableScope, ((MappingIdentity) expr).getName());
                     }
                     return expr;
                 case '\'':
@@ -191,10 +257,10 @@ public class MappingTemplate {
                 case '.':
                     nextChar();
                     if (expr instanceof MappingIdentity) {
-                        expr = new MappingReference(variableScope, ((MappingIdentity) expr).getName());
+                        expr = new MappingReference(forestMethod, variableScope, ((MappingIdentity) expr).getName());
                     }
                     MappingIdentity id = parseIdentity();
-                    expr = new MappingDot(variableScope, expr, id);
+                    expr = new MappingDot(forestMethod, variableScope, expr, id);
                     break;
                 case '(':
                     nextChar();
@@ -234,6 +300,28 @@ public class MappingTemplate {
     }
 
 
+    public MappingProperty parsePropertyName() {
+        char ch = watch(1);
+        StringBuilder builder = new StringBuilder();
+        if (Character.isAlphabetic(ch) || ch == '_' || ch == '-') {
+            do {
+                builder.append(ch);
+                nextChar();
+                ch = watch(1);
+            } while (Character.isAlphabetic(ch) ||
+                    Character.isDigit(ch) ||
+                    ch == '_' ||
+                    ch == '-' ||
+                    ch == '[' ||
+                    ch == ']' ||
+                    ch == '.');
+        }
+        String text = builder.toString();
+        return new MappingProperty(forestMethod, text);
+    }
+
+
+
     public MappingExpr parseTextToken() {
         char ch = watch(1);
         StringBuilder builder = new StringBuilder();
@@ -270,6 +358,7 @@ public class MappingTemplate {
     }
 
 
+
     public MappingString parseString(char quoteChar) {
         StringBuilder builder = new StringBuilder();
         char ch = watch(1);
@@ -293,9 +382,9 @@ public class MappingTemplate {
         switch (ch) {
             case ')':
                 if (left == null) {
-                    return new MappingFilterInvoke(variableScope, name, argExprList);
+                    return new MappingFilterInvoke(forestMethod, variableScope, name, argExprList);
                 }
-                return new MappingInvoke(variableScope, left, name, argExprList);
+                return new MappingInvoke(forestMethod, variableScope, left, name, argExprList);
             case ',':
                 nextChar();
                 MappingExpr expr = parseExpression();
@@ -363,26 +452,39 @@ public class MappingTemplate {
             for (int i = 0; i < len; i++) {
                 MappingExpr expr = exprList.get(i);
                 Object val = null;
+                MappingParameter param = null;
                 if (expr instanceof MappingString) {
                     builder.append(((MappingString) expr).getText());
                 } else if (expr instanceof MappingIndex) {
                     try {
-                        val = args[((MappingIndex) expr).getIndex()];
+                        Integer index = ((MappingIndex) expr).getIndex();
+                        param = parameters[index];
+                        val = args[index];
                     } catch (Exception ex) {
                     }
                     if (val != null) {
-                        builder.append(getParameterValue(jsonConverter, val));
+                        val = getParameterValue(jsonConverter, val);
+                        if (param != null && param.isUrlEncode()) {
+                            val = URLUtils.forceEncode(String.valueOf(val), param.getCharset());
+                        }
+                        builder.append(val);
                     }
                 } else {
                     val = expr.render(args);
                     if (val != null) {
-                        builder.append(getParameterValue(jsonConverter, val));
+                        val = getParameterValue(jsonConverter, val);
+                        if (param != null && param.isUrlEncode()) {
+                            val = URLUtils.forceEncode(String.valueOf(val), param.getCharset());
+                        }
+                        builder.append(val);
                     }
                 }
             }
             return builder.toString();
         } catch (ForestVariableUndefinedException ex) {
             throw new ForestVariableUndefinedException(ex.getVariableName(), template);
+        } catch (UnsupportedEncodingException e) {
+            throw new ForestRuntimeException(e);
         }
     }
 
@@ -456,7 +558,7 @@ public class MappingTemplate {
 
     @Override
     public MappingTemplate clone() {
-        MappingTemplate template = new MappingTemplate(this.template, this.variableScope);
+        MappingTemplate template = new MappingTemplate(forestMethod, this.template, this.variableScope, this.properties, this.parameters);
         template.exprList = this.exprList;
         return template;
     }
@@ -471,7 +573,9 @@ public class MappingTemplate {
         return buff.toString();
     }
 
-    public MappingTemplate valueOf(String value, ForestMethod forestMethod) {
-        return new MappingTemplate(value, forestMethod);
+    public MappingTemplate valueOf(String value) {
+        return new MappingTemplate(forestMethod, value, forestMethod, properties, forestMethod.getParameters());
     }
+
+
 }

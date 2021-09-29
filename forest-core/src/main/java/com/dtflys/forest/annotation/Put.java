@@ -42,74 +42,101 @@ import java.lang.annotation.Target;
 @Documented
 @MethodLifeCycle(PutRequestLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 public @interface Put {
 
     /**
      * 目标请求URL [同url属性]
+     * @return URL字符串
      */
     @AliasFor("url")
     String value() default "";
 
     /**
      * 目标请求URL [同value属性]
+     * @return URL字符串
      */
     @AliasFor("value")
     String url() default "";
 
     /**
-     * type of response data: <br>
-     *     text json xml <br>
-     * default value is "auto"
+     * type of response data:
+     * <p>    text json xml binary auto
+     * <p>default value is "auto"
+     * @return type of response data
      */
     String dataType() default "auto";
 
     /**
      * whether can use async http request or not
+     * @return {@code true}: async, {@code false}: sync
      */
     boolean async() default false;
 
+    /**
+     * 请求超时时间, 单位为毫秒
+     * @return 请求超时时间
+     */
     int timeout() default -1;
 
     /**
      * SSL protocol
+     * @return SSL protocol
      */
     String sslProtocol() default "";
 
     /**
      * Class of retryer
+     * @return Class of retryer
      */
     Class retryer() default Object.class;
 
     /**
-     * max count to retry
+     * Max count to retry
+     * @return Max count to retry
      */
+    @Deprecated
     int retryCount() default -1;
 
+    /**
+     * Max count to retry
+     * @return Max count to retry
+     */
     int maxRetryInterval() default -1;
 
     /**
-     * Content Type
+     * Content Type of request
+     * @return Content Type
      */
     String contentType() default "";
 
     /**
-     * Content Encoding
+     * Content Encoding of request
+     * @return Content Encoding
      */
     String contentEncoding() default "";
 
     /**
-     * User Agent
+     * User Agent of request
+     * @return User Agent
      */
     String userAgent() default "";
 
     /**
      * Charset, Default is UTF-8
+     * @return Charset
      */
     String charset() default "";
 
     /**
-     * reqest headers: <br>
+     * Response Encoding
+     * <p>该属性不填的情况下，根据响应头中的 Content-Encoding 来确定响应内容的编码
+     * @return Response Encoding
+     */
+    String responseEncoding() default "";
+
+    /**
+     * request headers: <br>
      *     use the key-value format: key: value <br>
      *     <pre>
      *         headers = "Content-Type: application/json"
@@ -125,22 +152,45 @@ public @interface Put {
      *     <pre>
      *         headers = {"Accept: ${value}"}
      *     </pre>
+     * @return headers
      */
     String[] headers() default {};
 
+    /**
+     * 拦截器类列表
+     * @return 拦截器类列表
+     */
     Class<?>[] interceptor() default {};
 
+    /**
+     * 请求数据
+     * @return 请求数据
+     */
     String[] data() default {};
 
+    /**
+     * 上传/下载进度步长
+     * @return 上传/下载进度步长
+     */
     long progressStep() default -1L;
 
+    /**
+     * 请求反序列化器
+     * @return 请求反序列化器
+     */
     Class<?> decoder() default Object.class;
 
     /**
      * KeyStore Id
+     * @return KeyStore Id
      */
     String keyStore() default "";
 
+    /**
+     * 是否打印请求日志
+     * @return {@code true}: 打印, {@code false}: 不打印
+     */
+    @Deprecated
     boolean logEnabled() default false;
 
 }

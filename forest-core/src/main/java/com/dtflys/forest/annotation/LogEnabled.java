@@ -18,26 +18,30 @@ import java.lang.annotation.Target;
 @BaseLifeCycle(BaseLogEnabledLifeCycle.class)
 @MethodLifeCycle(LogEnabledLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.TYPE})
+@Target({ElementType.METHOD, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 public @interface LogEnabled {
 
     /**
      * 是否打印请求/响应日志
+     * @return {@code true}: 打印, {@code false}: 不打印
      */
     boolean value() default true;
 
     /**
      * 是否打印请求日志
+     * @return {@code true}: 打印, {@code false}: 不打印
      */
     boolean logRequest() default true;
 
     /**
      * 是否打印响应状态日志
+     * @return {@code true}: 打印, {@code false}: 不打印
      */
     boolean logResponseStatus() default true;
 
     /**
      * 是否打印响应内容日志
+     * @return {@code true}: 打印, {@code false}: 不打印
      */
     boolean logResponseContent() default false;
 

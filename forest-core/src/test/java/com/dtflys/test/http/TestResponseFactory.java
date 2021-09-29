@@ -12,8 +12,7 @@ import org.junit.Test;
 
 import java.util.Date;
 
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -34,8 +33,13 @@ public class TestResponseFactory {
         when(httpResponse.getStatusLine()).thenReturn(statusLine);
         LifeCycleHandler lifeCycleHandler = new NoneLifeCycleHandler();
         ForestResponse response = responseFactory.createResponse(request, httpResponse, lifeCycleHandler, null, requestTime);
-        assertNotNull(response);
-        assertNull(response.getContent());
+        assertThat(response)
+                .isNotNull()
+                .extracting(
+                        ForestResponse::getStatusCode,
+                        ForestResponse::getContent,
+                        ForestResponse::getResult)
+                .contains(200, "", null);
     }
 
 }

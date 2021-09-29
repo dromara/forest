@@ -6,8 +6,14 @@ package com.dtflys.forest.exceptions;
  */
 public class ForestUnsupportException extends ForestRuntimeException {
 
+    private final String unsupported;
 
-    public ForestUnsupportException(String message) {
-        super(message);
+    public ForestUnsupportException(String unsupported) {
+        super("[Forest] '" + unsupported + "' is unsupported");
+        this.unsupported = unsupported;
+    }
+
+    public String getUnsupported() {
+        return unsupported;
     }
 }

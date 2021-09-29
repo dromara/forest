@@ -24,27 +24,22 @@
 
 package com.dtflys.forest.converter.json;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONException;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.*;
 import com.alibaba.fastjson.parser.ParserConfig;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.util.FieldInfo;
+import com.alibaba.fastjson.util.IOUtils;
 import com.alibaba.fastjson.util.TypeUtils;
-import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -132,7 +127,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         try {
             return JSON.parseObject(source, targetType);
         } catch (Throwable th) {
-            throw new ForestConvertException("json", th);
+            throw new ForestConvertException(this, th);
         }
     }
 
@@ -141,16 +136,37 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         try {
             return JSON.parseObject(source, targetType);
         } catch (Throwable th) {
-            throw new ForestConvertException("json", th);
+            throw new ForestConvertException(this, th);
         }
 
+    }
+
+    @Override
+    public <T> T convertToJavaObject(byte[] source, Class<T> targetType, Charset charset) {
+        if (charset == null) {
+            charset = StandardCharsets.UTF_8;
+        }
+        try {
+            return JSON.parseObject(source, 0, source.length, charset, targetType);
+        } catch (Throwable th) {
+            throw new ForestConvertException(this, th);
+        }
+    }
+
+    @Override
+    public <T> T convertToJavaObject(byte[] source, Type targetType, Charset charset) {
+        try {
+            return JSON.parseObject(source, 0, source.length, charset, targetType);
+        } catch (Throwable th) {
+            throw new ForestConvertException(this, th);
+        }
     }
 
     public <T> T convertToJavaObject(String source, TypeReference<T> typeReference) {
         try {
             return JSON.parseObject(source, typeReference);
         } catch (Throwable th) {
-            throw new ForestConvertException("json", th);
+            throw new ForestConvertException(this, th);
         }
 
     }
@@ -187,7 +203,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         }
 
         if (javaObject instanceof JSON) {
-            return (JSON) javaObject;
+            return javaObject;
         }
 
         if (javaObject instanceof Map) {
@@ -272,6 +288,17 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         if (obj == null) {
             return null;
         }
+        if (obj instanceof Map) {
+            Map objMap = (Map) obj;
+            Map<String, Object> newMap = new HashMap<>(objMap.size());
+            for (Object key : objMap.keySet()) {
+                Object val = objMap.get(key);
+                if (val != null) {
+                    newMap.put(String.valueOf(key), val);
+                }
+            }
+            return newMap;
+        }
         if (nameField == null && nameMethod == null) {
             return defaultJsonMap(obj);
         }
@@ -299,12 +326,11 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
     }
 
     @Override
-    public ForestConverter setDateFormat(String format) {
+    public void setDateFormat(String format) {
         this.dateFormat = format;
         if (StringUtils.isNotBlank(format)) {
             JSON.DEFFAULT_DATE_FORMAT = format;
         }
-        return this;
     }
 
     @Override
@@ -318,7 +344,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
     }
 
     @Override
-    public ForestDataType getDateType() {
+    public ForestDataType getDataType() {
         return ForestDataType.JSON;
     }
 }

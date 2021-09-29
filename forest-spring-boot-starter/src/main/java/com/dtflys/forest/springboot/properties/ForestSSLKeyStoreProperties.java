@@ -20,6 +20,8 @@ public class ForestSSLKeyStoreProperties {
 
     protected String cipherSuites;
 
+    protected String sslSocketFactoryBuilder;
+
     public String getId() {
         return id;
     }
@@ -82,5 +84,13 @@ public class ForestSSLKeyStoreProperties {
 
     public void setCipherSuites(String cipherSuites) {
         this.cipherSuites = cipherSuites;
+    }
+
+    public String getSslSocketFactoryBuilder() {
+        return sslSocketFactoryBuilder;
+    }
+
+    public void setSslSocketFactoryBuilder(String sslSocketFactoryBuilder) {
+        this.sslSocketFactoryBuilder = sslSocketFactoryBuilder;
     }
 }

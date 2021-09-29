@@ -5,6 +5,7 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.ssl.SSLKeyStore;
+import com.dtflys.forest.ssl.SSLSocketFactoryBuilder;
 import com.dtflys.test.mock.GetMockServer;
 import com.github.dreamhead.moco.HttpsCertificate;
 import com.github.dreamhead.moco.HttpsServer;
@@ -14,6 +15,8 @@ import com.dtflys.test.http.client.SSLClient;
 import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.net.ssl.SSLSocketFactory;
 
 import static com.github.dreamhead.moco.Moco.*;
 import static com.github.dreamhead.moco.Runner.runner;
@@ -33,7 +36,6 @@ public class TestSSLClient extends BaseClientTest {
     private static HttpsServer server;
     private final static HttpsCertificate serverCertificate = certificate(
             pathResource("ssl_server.keystore"), "server", "123456");
-//    private static HttpServer server;
 
     @Rule
     public GetMockServer getServer = new GetMockServer(this);
@@ -57,15 +59,27 @@ public class TestSSLClient extends BaseClientTest {
 
     private SSLClient sslClient;
 
+    @Override
+    public void afterRequests() {
+    }
+
+    private static class MySSLSocketFactoryBuilder implements SSLSocketFactoryBuilder {
+
+        @Override
+        public SSLSocketFactory getSSLSocketFactory(ForestRequest request, String protocol) throws Exception {
+            return null;
+        }
+    }
 
     @BeforeClass
     public static void prepareClient() {
-        configuration = ForestConfiguration.configuration();
+        configuration = ForestConfiguration.createConfiguration();
         SSLKeyStore sslKeyStore = new SSLKeyStore(
                 "ssl_client",
                 "ssl_client.keystore",
                 "client",
-                "456789");
+                "456789",
+                new MySSLSocketFactoryBuilder());
         configuration.registerKeyStore(sslKeyStore);
     }
 
@@ -91,7 +105,6 @@ public class TestSSLClient extends BaseClientTest {
     }
 
 
-/*
     @Test
     public void truestAllGet() {
         sslClient.truestAllGet();
@@ -100,7 +113,6 @@ public class TestSSLClient extends BaseClientTest {
         assertNotNull(result);
         assertEquals(EXPECTED, result);
     }
-*/
 
     @Test
     public void truestSSLGet() {

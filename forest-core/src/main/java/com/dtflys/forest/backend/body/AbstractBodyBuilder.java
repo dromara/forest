@@ -7,6 +7,7 @@ import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
+import com.dtflys.forest.http.body.ByteArrayRequestBody;
 import com.dtflys.forest.http.body.NameValueRequestBody;
 import com.dtflys.forest.http.body.ObjectRequestBody;
 import com.dtflys.forest.http.body.StringRequestBody;
@@ -27,7 +28,6 @@ import java.util.Map;
 
 /**
  * 通用的请求体构造器抽象类
- *
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2018-02-27 18:06
  */
@@ -35,22 +35,13 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
 
     /**
      * 构建请求体
-     *
-     * @param httpRequest      后端http请求对象
-     * @param request          Forest请求对象
+     * @param httpRequest 后端http请求对象
+     * @param request Forest请求对象
      * @param lifeCycleHandler 生命周期处理器
      */
     @Override
     public void buildBody(T httpRequest, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         String contentType = request.getContentType();
-        if (StringUtils.isEmpty(contentType)) {
-            String value = request.getHeaders().getValue("Content-Type");
-            if (value != null) {
-                if (value.length() > 0) {
-                    contentType = value;
-                }
-            }
-        }
 
         if (StringUtils.isEmpty(contentType)) {
             contentType = ContentType.APPLICATION_X_WWW_FORM_URLENCODED;
@@ -76,144 +67,149 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
 
         ContentType mineContentType = new ContentType(mineType);
 
+        List<ForestRequestBody> reqBody = request.getBody();
+        boolean needRequestBody = request.getType().isNeedBody() ||
+                !reqBody.isEmpty() ||
+                !request.getMultiparts().isEmpty();
 
-        if (mineContentType.isFormUrlEncoded() && request.getMultiparts().isEmpty()) {
-            setFormBody(httpRequest, request, charset, contentType, request.getBody());
-        } else if (mineContentType.isJson()) {
-            ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
-            List<ForestRequestBody> srcBodyList = request.getBody();
-            List<ForestRequestBody> bodyList = new LinkedList(srcBodyList);
-//            Map<String, Object> map = convertNameValueListToMap(request, nameValueList);
-//            if (map != null && !map.isEmpty()) {
-//                bodyList.add(map);
-//            }
-            if (!bodyList.isEmpty()) {
-                Object toJsonObj = bodyList;
-                if (bodyList.size() == 1) {
-                    toJsonObj = bodyList.get(0);
-                } else {
-                    Map<String, Object> jsonMap = null;
-                    List jsonArray = null;
-                    for (ForestRequestBody bodyItem : bodyList) {
-                        if (bodyItem instanceof NameValueRequestBody) {
-                            if (jsonMap == null) {
-                                jsonMap = new LinkedHashMap<>(bodyList.size());
-                            }
-                            jsonMap.put(((NameValueRequestBody) bodyItem).getName(), ((NameValueRequestBody) bodyItem).getValue());
-                        } else if (bodyItem instanceof StringRequestBody) {
-                            String content = bodyItem.toString();
-                            Map subMap = null;
-                            try {
-                                subMap = jsonConverter.convertObjectToMap(content);
-                            } catch (Throwable th) {
-                            }
-                            if (subMap != null) {
-                                jsonMap.putAll(subMap);
-                            } else {
-                                if (jsonArray == null) {
-                                    jsonArray = new LinkedList<>();
+        if (needRequestBody) {
+            if (mineContentType.isFormUrlEncoded()) {
+                setFormBody(httpRequest, request, charset, contentType, reqBody);
+            } else if (mineContentType.isJson()) {
+                ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
+                List<ForestRequestBody> srcBodyList = request.getBody();
+                List<ForestRequestBody> bodyList = new LinkedList(srcBodyList);
+                if (!bodyList.isEmpty()) {
+                    Object toJsonObj = bodyList;
+                    if (bodyList.size() == 1) {
+                        toJsonObj = bodyList.get(0);
+                    } else {
+                        Map<String, Object> jsonMap = null;
+                        List jsonArray = null;
+                        for (ForestRequestBody bodyItem : bodyList) {
+                            if (bodyItem instanceof NameValueRequestBody) {
+                                if (jsonMap == null) {
+                                    jsonMap = new LinkedHashMap<>(bodyList.size());
                                 }
-                                jsonArray.add(content);
-                            }
-                        } else if (bodyItem instanceof ObjectRequestBody) {
-                            Object obj = ((ObjectRequestBody) bodyItem).getObject();
-                            if (obj == null) {
-                                continue;
-                            }
-                            if (obj instanceof List) {
-                                if (jsonArray == null) {
-                                    jsonArray = new LinkedList();
-                                }
-                                jsonArray.addAll((List) obj);
-                            } else {
+                                jsonMap.put(((NameValueRequestBody) bodyItem).getName(), ((NameValueRequestBody) bodyItem).getValue());
+                            } else if (bodyItem instanceof StringRequestBody) {
+                                String content = bodyItem.toString();
                                 Map subMap = null;
                                 try {
-                                    subMap = jsonConverter.convertObjectToMap(obj);
+                                    subMap = jsonConverter.convertObjectToMap(content);
                                 } catch (Throwable th) {
                                 }
-                                if (subMap == null) {
+                                if (subMap != null) {
+                                    if (jsonMap == null) {
+                                        jsonMap = new LinkedHashMap<>(bodyList.size());
+                                    }
+                                    jsonMap.putAll(subMap);
+                                } else {
+                                    if (jsonArray == null) {
+                                        jsonArray = new LinkedList<>();
+                                    }
+                                    jsonArray.add(content);
+                                }
+                            } else if (bodyItem instanceof ObjectRequestBody) {
+                                Object obj = ((ObjectRequestBody) bodyItem).getObject();
+                                if (obj == null) {
                                     continue;
                                 }
-                                jsonMap.putAll(subMap);
+                                if (obj instanceof List) {
+                                    if (jsonArray == null) {
+                                        jsonArray = new LinkedList();
+                                    }
+                                    jsonArray.addAll((List) obj);
+                                } else {
+                                    Map subMap = null;
+                                    try {
+                                        subMap = jsonConverter.convertObjectToMap(obj);
+                                    } catch (Throwable th) {
+                                    }
+                                    if (subMap == null) {
+                                        continue;
+                                    }
+                                    if (jsonMap == null) {
+                                        jsonMap = new LinkedHashMap<>(bodyList.size());
+                                    }
+                                    jsonMap.putAll(subMap);
+                                }
                             }
                         }
+                        if (jsonMap != null) {
+                            toJsonObj = jsonMap;
+                        } else if (jsonArray != null) {
+                            toJsonObj = jsonArray;
+                        }
                     }
-                    if (jsonMap != null) {
-                        toJsonObj = jsonMap;
-                    } else if (jsonArray != null) {
-                        toJsonObj = jsonArray;
+                    String text = null;
+                    if (toJsonObj instanceof CharSequence || toJsonObj instanceof StringRequestBody) {
+                        text = toJsonObj.toString();
+                        setStringBody(httpRequest, text, charset, contentType, mergeCharset);
+                    } else if (toJsonObj instanceof ObjectRequestBody) {
+                        text = jsonConverter.encodeToString(((ObjectRequestBody) toJsonObj).getObject());
+                        setStringBody(httpRequest, text, charset, contentType, mergeCharset);
+                    } else if (toJsonObj instanceof NameValueRequestBody) {
+                        Map<String, Object> subMap = new HashMap<>(1);
+                        subMap.put(((NameValueRequestBody) toJsonObj).getName(), ((NameValueRequestBody) toJsonObj).getValue());
+                        text = jsonConverter.encodeToString(subMap);
+                        setStringBody(httpRequest, text, charset, contentType, mergeCharset);
+                    } else if (toJsonObj instanceof ByteArrayRequestBody) {
+                        byte[] bytes = ((ByteArrayRequestBody) toJsonObj).getByteArray();
+                        setBinaryBody(httpRequest, request, charset, contentType, nameValueList, bytes, lifeCycleHandler);
+                    } else {
+                        text = jsonConverter.encodeToString(toJsonObj);
+                        setStringBody(httpRequest, text, charset, contentType, mergeCharset);
                     }
-                }
-                String text = null;
-                if (toJsonObj instanceof CharSequence || toJsonObj instanceof StringRequestBody) {
-                    text = toJsonObj.toString();
-                } else if (toJsonObj instanceof ObjectRequestBody) {
-                    text = jsonConverter.encodeToString(((ObjectRequestBody) toJsonObj).getObject());
-                } else if (toJsonObj instanceof NameValueRequestBody) {
-                    Map<String, Object> subMap = new HashMap<>(1);
-                    subMap.put(((NameValueRequestBody) toJsonObj).getName(), ((NameValueRequestBody) toJsonObj).getValue());
-                    text = jsonConverter.encodeToString(subMap);
                 } else {
-                    text = jsonConverter.encodeToString(toJsonObj);
+                    setStringBody(httpRequest, "", charset, contentType, mergeCharset);
                 }
-                setStringBody(httpRequest, text, charset, contentType, mergeCharset);
+            } else if (mineContentType.isMultipart()) {
+                List<ForestMultipart> multiparts = request.getMultiparts();
+                setFileBody(httpRequest, request, charset, contentType, nameValueList, multiparts, lifeCycleHandler);
+            } else if (mineContentType.isBinary()) {
+                List<ForestMultipart> multiparts = request.getMultiparts();
+                List<byte[]> byteList = new LinkedList<>();
+                int size = 0;
+                for (ForestMultipart multipart : multiparts) {
+                    byte[] byteArray = multipart.getBytes();
+                    byteList.add(byteArray);
+                    size += byteArray.length;
+                }
+                for (ForestRequestBody body : reqBody) {
+                    byte[] byteArray = body.getByteArray();
+                    byteList.add(byteArray);
+                    size += byteArray.length;
+                }
+                byte[] bytes = new byte[size];
+                int pos = 0;
+                for (byte[] bytesItem : byteList) {
+                    for (int i = 0; i < bytesItem.length; i++) {
+                        bytes[pos + i] = bytesItem[i];
+                    }
+                    pos += bytesItem.length;
+                }
+                setBinaryBody(httpRequest, request, charset, contentType, nameValueList, bytes, lifeCycleHandler);
             } else {
-                setStringBody(httpRequest, "", charset, contentType, mergeCharset);
-            }
-        } else if (mineContentType.isMultipart() || request.getMultiparts().size() > 0) {
-            List<ForestMultipart> multiparts = request.getMultiparts();
-            setFileBody(httpRequest, request, charset, contentType, nameValueList, multiparts, lifeCycleHandler);
-        } else if (mineContentType.isBinary()) {
-            List<ForestRequestBody> bodyList = request.getBody();
-            List<ForestMultipart> multiparts = request.getMultiparts();
-            List<byte[]> byteList = new LinkedList<>();
-            int size = 0;
-            for (ForestMultipart multipart : multiparts) {
-                byte[] byteArray = multipart.getBytes();
-                byteList.add(byteArray);
-                size += byteArray.length;
-            }
-            for (ForestRequestBody body : bodyList) {
-                byte[] byteArray = body.getByteArray();
-                byteList.add(byteArray);
-                size += byteArray.length;
-            }
-            byte[] bytes = new byte[size];
-            int pos = 0;
-            for (byte[] bytesItem : byteList) {
-                for (int i = 0; i < bytesItem.length; i++) {
-                    bytes[pos + i] = bytesItem[i];
+                StringBuilder builder = new StringBuilder();
+                List bodyList = request.getBody();
+                if (!bodyList.isEmpty()) {
+                    for (Object bodyItem : bodyList) {
+                        builder.append(bodyItem.toString());
+                    }
+                    setStringBody(httpRequest, builder.toString(), charset, contentType, mergeCharset);
                 }
-                pos += bytesItem.length;
-            }
-            setBinaryBody(httpRequest, request, charset, contentType, nameValueList, bytes, lifeCycleHandler);
-        } else {
-//            Map<String, Object> map = convertNameValueListToMap(request, nameValueList);
-//            StringBuilder builder = new StringBuilder();
-//            for (Iterator<Map.Entry<String, Object>> iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
-//                Map.Entry<String, Object> entry = iterator.next();
-//                Object value = entry.getValue();
-//                builder.append(value);
-//            }
-            StringBuilder builder = new StringBuilder();
-            List bodyList = request.getBody();
-            if (!bodyList.isEmpty()) {
-                for (Object bodyItem : bodyList) {
-                    builder.append(bodyItem.toString());
-                }
-                setStringBody(httpRequest, builder.toString(), charset, contentType, mergeCharset);
             }
         }
     }
 
     /**
      * 处理Form表单中的集合项
-     *
      * @param newNameValueList 键值对列表
-     * @param configuration    Forest配置
-     * @param name             表单项目名
-     * @param collection       集合对象
-     * @param target           请求目标位置
+     * @param configuration Forest配置
+     * @param name 表单项目名
+     * @param collection 集合对象
+     * @param target 请求目标位置
      */
     protected void processFormCollectionItem(List<RequestNameValue> newNameValueList, ForestConfiguration configuration, String name, Collection collection, int target) {
         int index = 0;
@@ -227,12 +223,11 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
 
     /**
      * 处理Form表单中的数组项
-     *
      * @param newNameValueList 键值对列表
-     * @param configuration    Forest配置
-     * @param name             表单项目名
-     * @param array            数组
-     * @param target           请求目标位置
+     * @param configuration Forest配置
+     * @param name 表单项目名
+     * @param array 数组
+     * @param target 请求目标位置
      */
     protected void processFormArrayItem(List<RequestNameValue> newNameValueList, ForestConfiguration configuration, String name, Object array, int target) {
         int len = Array.getLength(array);
@@ -245,12 +240,11 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
 
     /**
      * 处理Form表单中的Map项
-     *
      * @param newNameValueList 键值对列表
-     * @param configuration    Forest配置
-     * @param name             表单项目名
-     * @param map              Map对象
-     * @param target           请求目标位置
+     * @param configuration Forest配置
+     * @param name 表单项目名
+     * @param map Map对象
+     * @param target 请求目标位置
      */
     protected void processFormMapItem(List<RequestNameValue> newNameValueList, ForestConfiguration configuration, String name, Map map, int target) {
         for (Iterator<Map.Entry> iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
@@ -264,12 +258,11 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
 
     /**
      * 处理Form表单中的项
-     *
      * @param newNameValueList 键值对列表
-     * @param configuration    Forest配置
-     * @param name             表单项目名
-     * @param value            表单项目值
-     * @param target           请求目标位置
+     * @param configuration Forest配置
+     * @param name 表单项目名
+     * @param value 表单项目值
+     * @param target 请求目标位置
      */
     protected void processFormItem(List<RequestNameValue> newNameValueList, ForestConfiguration configuration, String name, Object value, int target) {
         if (StringUtils.isEmpty(name) && value == null) {
@@ -318,7 +311,6 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
 
     /**
      * 处理Form表单中的键值对列表
-     *
      * @param nameValueList 键值对列表
      * @return 处理过的新键值对列表
      */
@@ -328,64 +320,60 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
             String name = nameValue.getName();
             Object value = nameValue.getValue();
             int target = nameValue.getTarget();
-            processFormItem(newNameValueList, configuration, name, value, target);
+            processFormItem(newNameValueList, configuration,  name, value, target);
         }
         return newNameValueList;
     }
 
     /**
      * 设置字符串请求体
-     *
-     * @param httpReq      后端请求对象
-     * @param text         字符串文本
-     * @param charset      字符集
-     * @param contentType  数据类型
+     * @param httpReq 后端请求对象
+     * @param text 字符串文本
+     * @param charset 字符集
+     * @param contentType 数据类型
      * @param mergeCharset 是否合并字符集
      */
     protected abstract void setStringBody(T httpReq, String text, String charset, String contentType, boolean mergeCharset);
 
     /**
      * 设置表单请求体
-     *
-     * @param httpReq     后端请求对象
-     * @param request     Forest请求对象
-     * @param charset     字符集
+     * @param httpReq 后端请求对象
+     * @param request Forest请求对象
+     * @param charset 字符集
      * @param contentType 数据类型
-     * @param bodyItems   键值对列表
+     * @param bodyItems 键值对列表
      */
     protected abstract void setFormBody(T httpReq, ForestRequest request, String charset, String contentType, List<ForestRequestBody> bodyItems);
 
     /**
      * 设置文件请求体
-     *
-     * @param httpReq          后端请求对象
-     * @param request          Forest请求对象
-     * @param charset          字符集
-     * @param contentType      数据类型
-     * @param nameValueList    键值对列表
-     * @param multiparts       Multiparts
+     * @param httpReq 后端请求对象
+     * @param request Forest请求对象
+     * @param charset 字符集
+     * @param contentType 数据类型
+     * @param nameValueList 键值对列表
+     * @param multiparts Multiparts
      * @param lifeCycleHandler 生命周期处理器
      */
-    protected abstract void setFileBody(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList, List<ForestMultipart> multiparts, LifeCycleHandler lifeCycleHandler);
+    protected abstract void setFileBody(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList,  List<ForestMultipart> multiparts, LifeCycleHandler lifeCycleHandler);
 
     /**
      * 设置二进制请求体
-     *
-     * @param httpReq          后端请求对象
-     * @param request          Forest请求对象
-     * @param charset          字符集
-     * @param contentType      数据类型
-     * @param nameValueList    键值对列表
-     * @param bytes            字节数组
+     * @param httpReq 后端请求对象
+     * @param request Forest请求对象
+     * @param charset 字符集
+     * @param contentType 数据类型
+     * @param nameValueList 键值对列表
+     * @param bytes 字节数组
      * @param lifeCycleHandler 生命周期处理器
      */
     protected abstract void setBinaryBody(T httpReq,
-                                          ForestRequest request,
-                                          String charset,
-                                          String contentType,
-                                          List<RequestNameValue> nameValueList,
-                                          byte[] bytes,
-                                          LifeCycleHandler lifeCycleHandler);
+                                 ForestRequest request,
+                                 String charset,
+                                 String contentType,
+                                 List<RequestNameValue> nameValueList,
+                                 byte[] bytes,
+                                 LifeCycleHandler lifeCycleHandler);
 
 
 }

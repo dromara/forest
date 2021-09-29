@@ -1,6 +1,7 @@
 package com.dtflys.test.http;
 
 import com.alibaba.fastjson.JSON;
+import com.dtflys.forest.Forest;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestJacksonConverter;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
@@ -23,14 +24,13 @@ public class TestAmapClient {
     private static AmapClient amapClient;
 
 
-    @BeforeClass
+//    @BeforeClass
     public static void prepareClient() {
-        configuration = ForestConfiguration.configuration();
+        configuration = Forest.config();
         configuration.setJsonConverter(new ForestJacksonConverter());
         configuration.setCacheEnabled(false);
         amapClient = configuration.createInstance(AmapClient.class);
     }
-
 
 //    @Test
     public void testGetLocation1() {
@@ -39,14 +39,14 @@ public class TestAmapClient {
         System.out.println(JSON.toJSONString(result));
     }
 
-    @Test
+//    @Test
     public void testGetLocation2() {
         Map result = amapClient.getLocation(new Coordinate("121.475078", "31.223577"));
         assertNotNull(result);
         System.out.println(JSON.toJSONString(result));
     }
 
-    @Test
+//    @Test
     public void testGetLocation3() {
         Result<Location> result = amapClient.getLocationWithJavaObject(new Coordinate("121.475078", "31.223577"));
         assertNotNull(result);
@@ -82,21 +82,21 @@ public class TestAmapClient {
     }
 */
 
-    @Test
+//    @Test
     public void testGetLocation6() {
         Map result = amapClient.getLocation(new SubCoordinate("121.475078", "31.223577"));
         assertNotNull(result);
         System.out.println(JSON.toJSONString(result));
     }
 
-    @Test
+//    @Test
     public void testGetLocationWithDecoder() {
         Map result = amapClient.getLocationWithDecoder(new SubCoordinate("121.475078", "31.223577"));
         assertNotNull(result);
         System.out.println(JSON.toJSONString(result));
     }
 
-    @Test
+//    @Test
     public void testGetLocationWithDecoder2() {
         Map result = amapClient.getLocationWithDecoder2(new SubCoordinate("121.475078", "31.223577"));
         assertNotNull(result);

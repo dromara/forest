@@ -4,13 +4,16 @@ import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.utils.GzipUtils;
 import com.dtflys.forest.utils.StringUtils;
 import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Date;
 
@@ -34,17 +37,24 @@ public class OkHttp3ForestResponse extends ForestResponse {
         this.okResponse = okResponse;
         if (okResponse == null) {
             this.body = null;
-            this.statusCode = 404;
+            this.statusCode = null;
             return;
         }
+        contentEncoding = okResponse.headers().get("Content-Encoding");
+        // 判断是否将Response数据按GZIP来解压
+        isGzip = request.isDecompressResponseGzipEnabled();
+
         this.body = okResponse.body();
         this.statusCode = okResponse.code();
+        this.reasonPhrase = okResponse.message();
         setupHeaders();
         if (body == null) {
             return;
         }
         setupContentTypeAndEncoding();
-        if (contentType == null || contentType.isEmpty()) {
+        if (StringUtils.isNotBlank(request.getResponseEncode())) {
+            this.contentEncoding = request.getResponseEncode();
+        } else if (contentType == null || contentType.isEmpty()) {
             this.content = readContentAsString();
         } else if (!request.isDownloadFile() && contentType.canReadAsString()) {
             this.content = readContentAsString();
@@ -98,6 +108,14 @@ public class OkHttp3ForestResponse extends ForestResponse {
         if (StringUtils.isEmpty(this.contentEncoding)) {
             this.contentEncoding = okResponse.header("Content-Encoding");
         }
+    }
+
+    @Override
+    public InputStream getInputStream() throws Exception {
+        if (this.contentLength > Integer.MAX_VALUE) {
+            return body.byteStream();
+        }
+        return new ByteArrayInputStream(getByteArray());
     }
 
     @Override

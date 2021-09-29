@@ -5,10 +5,11 @@ import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.reflection.ForestMethod;
-import com.dtflys.forest.retryer.Retryer;
+import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.utils.ForestProgress;
 
 import java.lang.reflect.Type;
+import java.util.concurrent.Future;
 
 
 /**
@@ -20,7 +21,7 @@ public interface LifeCycleHandler {
 
     Object handleSync(ForestRequest request, ForestResponse response);
 
-    Object handleSyncWithException(ForestRequest request, ForestResponse response, Exception ex);
+    Object handleSyncWithException(ForestRequest request, ForestResponse response, Throwable ex);
 
     Object handleResultType(ForestRequest request, ForestResponse response);
 
@@ -34,8 +35,6 @@ public interface LifeCycleHandler {
 
     Object handleError(ForestRequest request, ForestResponse response, Throwable ex);
 
-    void handleTry(ForestRetryException ex, Retryer retryer) throws Throwable;
-
     void handleProgress(ForestRequest request, ForestProgress progress);
 
     void handleLoadCookie(ForestRequest request, ForestCookies cookies);
@@ -44,8 +43,10 @@ public interface LifeCycleHandler {
 
     Object handleResult(Object resultData);
 
+    Object handleFuture(Future resultData);
+
     Type getOnSuccessClassGenericType();
 
-    Type getReturnType();
+    Type getResultType();
 
 }

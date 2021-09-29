@@ -1,10 +1,13 @@
 package com.dtflys.forest.springboot;
 
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.config.SpringForestProperties;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.interceptor.SpringInterceptorFactory;
+import com.dtflys.forest.spring.ConverterBeanListener;
 import com.dtflys.forest.logging.ForestLogHandler;
+import com.dtflys.forest.reflection.SpringForestObjectFactory;
 import com.dtflys.forest.scanner.ClassPathClientScanner;
 import com.dtflys.forest.schema.ForestConfigurationBeanDefinitionParser;
 import com.dtflys.forest.springboot.annotation.ForestScannerRegister;
@@ -27,8 +30,10 @@ import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.ResourceLoader;
 
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Map;
 
@@ -78,19 +83,32 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
                 .addPropertyValue("connectTimeout", forestConfigurationProperties.getConnectTimeout())
                 .addPropertyValue("charset", forestConfigurationProperties.getCharset())
                 .addPropertyValue("retryer", forestConfigurationProperties.getRetryer())
-                .addPropertyValue("retryCount", forestConfigurationProperties.getRetryCount())
+                .addPropertyValue("maxRetryCount", forestConfigurationProperties.getMaxRetryCount())
                 .addPropertyValue("maxRetryInterval", forestConfigurationProperties.getMaxRetryInterval())
+                .addPropertyValue("autoRedirection", forestConfigurationProperties.isAutoRedirection())
                 .addPropertyValue("logEnabled", forestConfigurationProperties.isLogEnabled())
                 .addPropertyValue("logRequest", forestConfigurationProperties.isLogRequest())
                 .addPropertyValue("logResponseStatus", forestConfigurationProperties.isLogResponseStatus())
                 .addPropertyValue("logResponseContent", forestConfigurationProperties.isLogResponseContent())
                 .addPropertyValue("logHandler", logHandler)
                 .addPropertyValue("backendName", forestConfigurationProperties.getBackend())
+                .addPropertyValue("baseAddressScheme", forestConfigurationProperties.getBaseAddressScheme())
+                .addPropertyValue("baseAddressHost", forestConfigurationProperties.getBaseAddressHost())
+                .addPropertyValue("baseAddressPort", forestConfigurationProperties.getBaseAddressPort())
+                .addPropertyValue("baseAddressSourceClass", forestConfigurationProperties.getBaseAddressSource())
+                .addPropertyValue("successWhenClass", forestConfigurationProperties.getSuccessWhen())
+                .addPropertyValue("retryWhenClass", forestConfigurationProperties.getRetryWhen())
                 .addPropertyValue("interceptors", forestConfigurationProperties.getInterceptors())
                 .addPropertyValue("sslProtocol", forestConfigurationProperties.getSslProtocol())
                 .addPropertyValue("variables", forestConfigurationProperties.getVariables())
                 .setLazyInit(false)
                 .setFactoryMethod("configuration");
+
+        BeanDefinition forestPropertiesBean  = registerForestPropertiesBean();
+        beanDefinitionBuilder.addPropertyValue("properties", forestPropertiesBean);
+
+        BeanDefinition forestObjectFactoryBeanDefinition = registerForestObjectFactoryBean();
+        beanDefinitionBuilder.addPropertyValue("forestObjectFactory", forestObjectFactoryBeanDefinition);
 
         BeanDefinition interceptorFactoryBeanDefinition = registerInterceptorFactoryBean();
         beanDefinitionBuilder.addPropertyValue("interceptorFactory", interceptorFactoryBeanDefinition);
@@ -123,9 +141,19 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
             registerConverter(configuration, ForestDataType.XML, convertProperties.getXml());
             registerConverter(configuration, ForestDataType.BINARY, convertProperties.getBinary());
         }
-
+        registerConverterBeanListener(configuration);
         return configuration;
     }
+
+    public ConverterBeanListener registerConverterBeanListener(ForestConfiguration forestConfiguration) {
+        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(ConverterBeanListener.class);
+        BeanDefinition beanDefinition = beanDefinitionBuilder.getRawBeanDefinition();
+        beanDefinition.getPropertyValues().addPropertyValue("forestConfiguration", forestConfiguration);
+        BeanDefinitionRegistry beanFactory = (BeanDefinitionRegistry) applicationContext.getBeanFactory();
+        beanFactory.registerBeanDefinition("forestConverterBeanListener", beanDefinition);
+        return applicationContext.getBean("forestConverterBeanListener", ConverterBeanListener.class);
+    }
+
 
     private void registerConverter(ForestConfiguration configuration, ForestDataType dataType, ForestConverterItemProperties converterItemProperties) {
         if (converterItemProperties == null) {
@@ -135,7 +163,19 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
         if (type != null) {
             ForestConverter converter = null;
             try {
-                converter = (ForestConverter) type.newInstance();
+                Constructor<?>[] constructors = type.getConstructors();
+                for (Constructor<?> constructor : constructors) {
+                    Parameter[] params = constructor.getParameters();
+                    if (params.length == 0) {
+                        converter = (ForestConverter) constructor.newInstance(new Object[0]);
+                        break;
+                    } else if (params.length == 1 &&
+                            ForestConfiguration.class.isAssignableFrom(constructor.getParameterTypes()[0])) {
+                        converter = (ForestConverter) constructor.newInstance(new Object[] {constructor});
+                        break;
+                    }
+                }
+
 
                 Map<String, Object> parameters = converterItemProperties.getParameters();
                 PropertyDescriptor[] descriptors = ReflectUtils.getBeanSetters(type);
@@ -158,9 +198,29 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
                 throw new ForestRuntimeException("[Forest] Convert type '" + type.getName() + "' cannot be initialized!", e);
             } catch (IllegalAccessException e) {
                 throw new ForestRuntimeException("[Forest] Convert type '" + type.getName() + "' cannot be initialized!", e);
+            } catch (InvocationTargetException e) {
+                throw new ForestRuntimeException("[Forest] Convert type '" + type.getName() + "' cannot be initialized!", e);
             }
         }
     }
+
+    public BeanDefinition registerForestPropertiesBean() {
+        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(SpringForestProperties.class);
+        BeanDefinition beanDefinition = beanDefinitionBuilder.getRawBeanDefinition();
+        BeanDefinitionRegistry beanFactory = (BeanDefinitionRegistry) applicationContext.getBeanFactory();
+        beanFactory.registerBeanDefinition("forestProperties", beanDefinition);
+        return beanDefinition;
+    }
+
+
+    public BeanDefinition registerForestObjectFactoryBean() {
+        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(SpringForestObjectFactory.class);
+        BeanDefinition beanDefinition = beanDefinitionBuilder.getRawBeanDefinition();
+        BeanDefinitionRegistry beanFactory = (BeanDefinitionRegistry) applicationContext.getBeanFactory();
+        beanFactory.registerBeanDefinition("forestObjectFactory", beanDefinition);
+        return beanDefinition;
+    }
+
 
     public BeanDefinition registerInterceptorFactoryBean() {
         BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(SpringInterceptorFactory.class);
@@ -186,15 +246,16 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
                 sslKeyStoreProperties.getKeystorePass(),
                 sslKeyStoreProperties.getCertPass(),
                 sslKeyStoreProperties.getProtocols(),
-                sslKeyStoreProperties.getCipherSuites()
+                sslKeyStoreProperties.getCipherSuites(),
+                sslKeyStoreProperties.getSslSocketFactoryBuilder()
         );
         map.put(id, beanDefinition);
         return beanDefinition;
     }
 
     public ClassPathClientScanner registerScanner(ForestConfigurationProperties forestConfigurationProperties) {
-        List<String> basePackages = ForestScannerRegister.basePackages;
-        String configurationId = ForestScannerRegister.configurationId;
+        List<String> basePackages = ForestScannerRegister.getBasePackages();
+        String configurationId = ForestScannerRegister.getConfigurationId();
 
         BeanDefinitionRegistry registry = (BeanDefinitionRegistry) applicationContext.getBeanFactory();
 

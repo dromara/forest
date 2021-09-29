@@ -58,6 +58,7 @@ public class ForestProxy {
      * 设置代理用户名
      *
      * @param username 代理用户名
+     * @return {@link ForestProxy}对象实例
      */
     public ForestProxy setUsername(String username) {
         this.username = username;

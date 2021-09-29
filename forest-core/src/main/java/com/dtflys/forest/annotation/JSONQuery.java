@@ -20,7 +20,7 @@ import java.lang.annotation.Target;
 @Documented
 @ParamLifeCycle(JSONQueryLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PARAMETER)
+@Target({ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
 public @interface JSONQuery {
 
     /**
@@ -28,6 +28,7 @@ public @interface JSONQuery {
      * <p>如有参数名，将会以 [参数名]=[参数值] 的形式添加到URL中的Query参数部分（即'?'后的那部分）</p>
      * <p>如没有参数名，将直接以 [参数值] 的形式添加到URL中的Query参数部分，</p>
      * <p>如 &#064;Query String name，且参数name的值为yyy的话，产生的URL便会是 http://xxx.xxx.xxx/xxx?yyy</p>
+     * @return 参数名
      */
     @AliasFor("name")
     String value() default "";
@@ -37,18 +38,21 @@ public @interface JSONQuery {
      * <p>如有参数名，将会以 [参数名]=[参数值] 的形式添加到URL中的Query参数部分（即'?'后的那部分）</p>
      * <p>如没有参数名，将直接以 [参数值] 的形式添加到URL中的Query参数部分，</p>
      * <p>如 &#064;Query String name，且参数name的值为yyy的话，产生的URL便会是 http://xxx.xxx.xxx/xxx?yyy</p>
+     * @return 参数名
      */
     @AliasFor("value")
     String name() default "";
 
 
     /**
-     * The filters will do some processing for the query value before sending request.
+     * The filters will do some processing for the query value before sending request
+     * @return filter names
      */
     String filter() default "";
 
     /**
      * 默认值
+     * @return 默认值
      */
     String defaultValue() default "";
 

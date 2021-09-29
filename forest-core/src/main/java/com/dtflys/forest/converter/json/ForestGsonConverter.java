@@ -24,15 +24,17 @@
 
 package com.dtflys.forest.converter.json;
 
-import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 import com.google.gson.*;
+import org.apache.commons.io.IOUtils;
 
+import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import java.nio.charset.Charset;
 import java.util.*;
 
 /**
@@ -52,13 +54,15 @@ public class ForestGsonConverter implements ForestJsonConverter {
     }
 
     @Override
-    public ForestConverter setDateFormat(String dateFormat) {
+    public void setDateFormat(String dateFormat) {
         this.dateFormat = dateFormat;
-        return this;
     }
 
     @Override
     public <T> T convertToJavaObject(String source, Class<T> targetType) {
+        if (StringUtils.isBlank(source)) {
+            return null;
+        }
         try {
             if (Map.class.isAssignableFrom(targetType)) {
                 JsonParser jsonParser = new JsonParser();
@@ -73,7 +77,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
             Gson gson = createGson();
             return (T) gson.fromJson(source, targetType);
         } catch (Throwable th) {
-            throw new ForestConvertException("json", th);
+            throw new ForestConvertException(this, th);
         }
     }
 
@@ -87,8 +91,20 @@ public class ForestGsonConverter implements ForestJsonConverter {
             }
             return convertToJavaObject(source, (Class<? extends T>) targetType);
         } catch (Exception ex) {
-            throw new ForestConvertException("json", ex);
+            throw new ForestConvertException(this, ex);
         }
+    }
+
+    @Override
+    public <T> T convertToJavaObject(byte[] source, Class<T> targetType, Charset charset) {
+        String str = StringUtils.fromBytes(source, charset);
+        return convertToJavaObject(str, targetType);
+    }
+
+    @Override
+    public <T> T convertToJavaObject(byte[] source, Type targetType, Charset charset) {
+        String str = StringUtils.fromBytes(source, charset);
+        return convertToJavaObject(str, targetType);
     }
 
     private static Map<String, Object> toMap(JsonObject json, boolean singleLevel){
@@ -208,6 +224,17 @@ public class ForestGsonConverter implements ForestJsonConverter {
         if (obj == null) {
             return null;
         }
+        if (obj instanceof Map) {
+            Map objMap = (Map) obj;
+            Map<String, Object> newMap = new HashMap<>(objMap.size());
+            for (Object key : objMap.keySet()) {
+                Object val = objMap.get(key);
+                if (val != null) {
+                    newMap.put(String.valueOf(key), val);
+                }
+            }
+            return newMap;
+        }
         if (obj instanceof CharSequence) {
             return convertToJavaObject(obj.toString(), LinkedHashMap.class);
         }
@@ -224,7 +251,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
     }
 
     @Override
-    public ForestDataType getDateType() {
+    public ForestDataType getDataType() {
         return ForestDataType.JSON;
     }
 

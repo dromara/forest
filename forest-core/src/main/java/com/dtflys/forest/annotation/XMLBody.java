@@ -40,16 +40,18 @@ import java.lang.annotation.Target;
 @Documented
 @ParamLifeCycle(XMLBodyLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PARAMETER)
+@Target({ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
 public @interface XMLBody {
 
     /**
-     * The filters will do some processing for the query value before sending request.
+     * The filters will do some processing for the query value before sending request
+     * @return filter names
      */
     String filter() default "";
 
     /**
      * 子项Content-Type
+     * @return 子项Content-Type
      */
     String partContentType() default ContentType.APPLICATION_XML;
 

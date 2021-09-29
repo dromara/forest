@@ -24,20 +24,19 @@
 
 package com.dtflys.forest.converter.json;
 
-import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.MapType;
-import com.fasterxml.jackson.databind.util.BeanUtil;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -72,13 +71,12 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     }
 
     @Override
-    public ForestConverter setDateFormat(String dateFormat) {
+    public void setDateFormat(String dateFormat) {
         this.dateFormat = dateFormat;
         if (StringUtils.isNotBlank(dateFormat)) {
             DateFormat format = new SimpleDateFormat(dateFormat);
             mapper.setDateFormat(format);
         }
-        return this;
     }
 
     @Override
@@ -86,7 +84,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         try {
             return mapper.readValue(source, targetType);
         } catch (IOException e) {
-            throw new ForestConvertException("json", e);
+            throw new ForestConvertException(this, e);
         }
     }
 
@@ -95,9 +93,29 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         try {
             return mapper.readValue(source, mapper.getTypeFactory().constructType(targetType));
         } catch (IOException e) {
-            throw new ForestConvertException("json", e);
+            throw new ForestConvertException(this, e);
         }
 
+    }
+
+    @Override
+    public <T> T convertToJavaObject(byte[] source, Class<T> targetType, Charset charset) {
+        try {
+            String str = StringUtils.fromBytes(source, charset);
+            return mapper.readValue(str, mapper.getTypeFactory().constructType(targetType));
+        } catch (IOException e) {
+            throw new ForestConvertException(this, e);
+        }
+    }
+
+    @Override
+    public <T> T convertToJavaObject(byte[] source, Type targetType, Charset charset) {
+        try {
+            String str = StringUtils.fromBytes(source, charset);
+            return mapper.readValue(str, mapper.getTypeFactory().constructType(targetType));
+        } catch (IOException e) {
+            throw new ForestConvertException(this, e);
+        }
     }
 
     public <T> T convertToJavaObject(String source, Class<?> parametrized, Class<?> ...parameterClasses) {
@@ -105,15 +123,18 @@ public class ForestJacksonConverter implements ForestJsonConverter {
             JavaType javaType = mapper.getTypeFactory().constructParametricType(parametrized, parameterClasses);
             return mapper.readValue(source, javaType);
         } catch (IOException e) {
-            throw new ForestConvertException("json", e);
+            throw new ForestConvertException(this, e);
         }
     }
 
     public <T> T convertToJavaObject(String source, JavaType javaType) {
+        if (StringUtils.isBlank(source)) {
+            return null;
+        }
         try {
             return mapper.readValue(source, javaType);
         } catch (IOException e) {
-            throw new ForestConvertException("json", e);
+            throw new ForestConvertException(this, e);
         }
     }
 
@@ -122,7 +143,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         try {
             return mapper.writeValueAsString(obj);
         } catch (Throwable e) {
-            throw new ForestConvertException("json", e);
+            throw new ForestConvertException(this, e);
         }
     }
 
@@ -130,6 +151,17 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     public Map<String, Object> convertObjectToMap(Object obj) {
         if (obj == null) {
             return null;
+        }
+        if (obj instanceof Map) {
+            Map objMap = (Map) obj;
+            Map<String, Object> newMap = new HashMap<>(objMap.size());
+            for (Object key : objMap.keySet()) {
+                Object val = objMap.get(key);
+                if (val != null) {
+                    newMap.put(String.valueOf(key), val);
+                }
+            }
+            return newMap;
         }
         if (obj instanceof CharSequence) {
             return convertToJavaObject(obj.toString(), LinkedHashMap.class);
@@ -140,7 +172,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     }
 
     @Override
-    public ForestDataType getDateType() {
+    public ForestDataType getDataType() {
         return ForestDataType.JSON;
     }
 }

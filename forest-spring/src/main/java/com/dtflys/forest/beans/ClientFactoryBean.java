@@ -36,7 +36,7 @@ public class ClientFactoryBean<T> implements FactoryBean<T>, ApplicationContextA
     }
 
     @Override
-    public T getObject() throws Exception {
+    public T getObject() {
         if (forestConfiguration == null) {
             synchronized (this) {
                 if (forestConfiguration == null) {

@@ -54,6 +54,7 @@ import java.lang.annotation.Target;
 @ParamLifeCycle(VariableLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = ElementType.PARAMETER)
+@Deprecated
 public @interface DataVariable {
 
     /**
