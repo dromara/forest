@@ -15,15 +15,10 @@ import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
+import com.google.protobuf.Message;
 
 import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -75,6 +70,14 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
         if (needRequestBody) {
             if (mineContentType.isFormUrlEncoded()) {
                 setFormBody(httpRequest, request, charset, contentType, reqBody);
+            }else if(mineType.equals(ContentType.APPLICATION_PROTOBUF)) {
+                Object[] arguments = request.getArguments();
+                if (arguments != null) {
+                    Optional<Object> first = Arrays.stream(arguments).filter(e -> Message.class.isAssignableFrom(e.getClass())).findFirst();
+                    if (first.isPresent()) {
+                        setProtobuf(httpRequest, request, charset, contentType, nameValueList, first.get());
+                    }
+                }
             } else if (mineContentType.isJson()) {
                 ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
                 List<ForestRequestBody> srcBodyList = request.getBody();
@@ -375,5 +378,15 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                                  byte[] bytes,
                                  LifeCycleHandler lifeCycleHandler);
 
+
+    /**
+     * @param httpReq       后端请求对象
+     * @param request       Forest请求对象
+     * @param charset       字符集
+     * @param contentType   数据类型
+     * @param nameValueList 键值对列表
+     * @param source        protobuf 对象
+     */
+    protected abstract void setProtobuf(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList, Object source);
 
 }

@@ -61,6 +61,9 @@ public class ForestDataType {
     /** 数据类型： 二进制类型 */
     public final static ForestDataType BINARY = ForestDataType.createDataType("binary");
 
+    /** 数据类型： Protobuf类型 */
+    public final static ForestDataType PROTOBUF = ForestDataType.createDataType("protobuf");
+
     /** 数据类型名称 */
     private String name;
 
