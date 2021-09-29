@@ -36,6 +36,7 @@ import com.dtflys.forest.converter.auto.DefaultAutoConverter;
 import com.dtflys.forest.converter.binary.DefaultBinaryConverter;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.converter.json.JSONConverterSelector;
+import com.dtflys.forest.converter.protobuf.ForestProtobufConverter;
 import com.dtflys.forest.converter.text.DefaultTextConverter;
 import com.dtflys.forest.converter.xml.ForestJaxbConverter;
 import com.dtflys.forest.converter.xml.ForestXmlConverter;
@@ -318,6 +319,7 @@ public class ForestConfiguration implements Serializable {
         DefaultAutoConverter autoConverter = new DefaultAutoConverter(configuration);
         configuration.getConverterMap().put(ForestDataType.AUTO, autoConverter);
         configuration.getConverterMap().put(ForestDataType.BINARY, new DefaultBinaryConverter(autoConverter));
+        configuration.getConverterMap().put(ForestDataType.PROTOBUF, new ForestProtobufConverter());
         setupJSONConverter(configuration);
         configuration.setTimeout(3000);
         configuration.setConnectTimeout(2000);
@@ -388,6 +390,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 获取HTTP后端名称
+     *
      * @return HTTP后端名称
      */
     public String getBackendName() {
@@ -441,7 +444,7 @@ public class ForestConfiguration implements Serializable {
      * <p>当这些类没有实例的情况下，会先实例化并缓存下来，以后再取会通过缓存获取对象
      *
      * @param clazz Forest对象接口类
-     * @param <T> Forest对象接口类泛型
+     * @param <T>   Forest对象接口类泛型
      * @return Forest对象实例
      */
     public <T> T getForestObject(Class<T> clazz) {
@@ -598,7 +601,7 @@ public class ForestConfiguration implements Serializable {
     }
 
     /**
-     /**
+     * /**
      * 设置是否打开自动重定向
      *
      * @param autoRedirection {@code true}: 打开, {@code false}: 禁止
@@ -794,6 +797,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 设置全局地址的 port
+     *
      * @param port 全局地址的端口号
      */
     public void setBaseAddressPort(Integer port) {
@@ -986,6 +990,7 @@ public class ForestConfiguration implements Serializable {
 
     /**
      * 设置全局默认请求头信息列表
+     *
      * @param defaultHeaders 请求头信息列表
      * @return 当前ForestConfiguration实例
      */
@@ -1113,7 +1118,7 @@ public class ForestConfiguration implements Serializable {
      *
      * @param clazz 请求接口类
      * @param <T>   请求接口类泛型
-     * @return      动态代理工厂
+     * @return 动态代理工厂
      */
     public <T> ProxyFactory<T> getProxyFactory(Class<T> clazz) {
         return new ProxyFactory<T>(this, clazz);
@@ -1122,8 +1127,8 @@ public class ForestConfiguration implements Serializable {
     /**
      * 设置全局变量
      *
-     * @param name   变量名
-     * @param value  变量值
+     * @param name  变量名
+     * @param value 变量值
      * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setVariableValue(String name, Object value) {
@@ -1134,8 +1139,8 @@ public class ForestConfiguration implements Serializable {
     /**
      * 设置全局变量
      *
-     * @param name   变量名
-     * @param value  {@link ForestVariableValue}类型变量值
+     * @param name  变量名
+     * @param value {@link ForestVariableValue}类型变量值
      * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setVariableValue(String name, ForestVariableValue value) {
@@ -1146,8 +1151,8 @@ public class ForestConfiguration implements Serializable {
     /**
      * 根据变量名获取全局变量值
      *
-     * @param name   变量名
-     * @return       变量值
+     * @param name 变量名
+     * @return 变量值
      */
     public Object getVariableValue(String name) {
         return getVariableValue(name, null);
@@ -1308,9 +1313,9 @@ public class ForestConfiguration implements Serializable {
     /**
      * 创建请求接口的动态代理实例
      *
-     * @param clazz  请求接口类
-     * @param <T>    请求接口类泛型
-     * @return       动态代理实例
+     * @param clazz 请求接口类
+     * @param <T>   请求接口类泛型
+     * @return 动态代理实例
      * @see ForestConfiguration#client(Class)
      */
     public <T> T createInstance(Class<T> clazz) {
@@ -1321,9 +1326,9 @@ public class ForestConfiguration implements Serializable {
     /**
      * 创建请求接口的动态代理实例
      *
-     * @param clazz  请求接口类
-     * @param <T>    请求接口类泛型
-     * @return       动态代理实例
+     * @param clazz 请求接口类
+     * @param <T>   请求接口类泛型
+     * @return 动态代理实例
      */
     public <T> T client(Class<T> clazz) {
         return createInstance(clazz);
@@ -1345,7 +1350,7 @@ public class ForestConfiguration implements Serializable {
     /**
      * 注册全局过滤器
      *
-     * @param name 过滤器名称
+     * @param name        过滤器名称
      * @param filterClass 过滤器类
      * @return 当前ForestConfiguration实例
      */
@@ -1420,7 +1425,7 @@ public class ForestConfiguration implements Serializable {
      * 创建通用 {@link ForestRequest} 对象
      *
      * @param clazz 返回结果类型
-     * @param <R> 返回结果类型泛型参数
+     * @param <R>   返回结果类型泛型参数
      * @return {@link ForestRequest} 对象
      */
     public <R> ForestRequest<R> request(Class<R> clazz) {
@@ -1544,7 +1549,6 @@ public class ForestConfiguration implements Serializable {
                 .setType(ForestRequestType.TRACE)
                 .setUrl(url);
     }
-
 
 
 }

@@ -17,6 +17,7 @@ public class ContentType {
     public final static String APPLICATION_OCTET_STREAM = "application/octet-stream";
     public final static String MULTIPART_FORM_DATA = "multipart/form-data";
     public final static String X_WWW_FORM_URLENCODED = "x-www-form-urlencoded";
+    public final static String APPLICATION_PROTOBUF = "application/x-protobuf";
 
     private final String type;
 

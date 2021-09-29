@@ -2,12 +2,14 @@ package com.dtflys.forest.backend.httpclient.body;
 
 import com.dtflys.forest.backend.body.AbstractBodyBuilder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
+import com.dtflys.forest.converter.protobuf.ForestProtobufConverter;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.http.body.SupportFormUrlEncoded;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.multipart.ForestMultipart;
+import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.http.Consts;
@@ -31,6 +33,7 @@ import java.util.*;
 
 /**
  * HttpClient后端的请求Body构造器
+ *
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-19 14:52
  */
@@ -177,6 +180,15 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
         ContentType ctype = ContentType.create(contentType, charset);
         HttpEntity entity = new ByteArrayEntity(bytes, ctype);
         httpReq.setEntity(entity);
+    }
+
+    @Override
+    protected void setProtobuf(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList, Object source) {
+        ForestProtobufConverter forestConverter = (ForestProtobufConverter) request.getConfiguration().getConverterMap().get(ForestDataType.PROTOBUF);
+        byte[] bytes = forestConverter.convertToByte(source);
+        ByteArrayEntity byteArrayEntity = new ByteArrayEntity(bytes);
+        byteArrayEntity.setContentType(contentType);
+        httpReq.setEntity(byteArrayEntity);
     }
 
 }

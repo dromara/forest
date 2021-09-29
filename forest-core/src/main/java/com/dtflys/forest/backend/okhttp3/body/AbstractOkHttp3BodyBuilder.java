@@ -3,6 +3,7 @@ package com.dtflys.forest.backend.okhttp3.body;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.body.AbstractBodyBuilder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
+import com.dtflys.forest.converter.protobuf.ForestProtobufConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
@@ -10,6 +11,7 @@ import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.http.body.SupportFormUrlEncoded;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.multipart.ForestMultipart;
+import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import okhttp3.*;
@@ -29,6 +31,14 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
 
 
     protected abstract void setBody(Request.Builder builder, RequestBody body);
+
+
+    @Override
+    protected void setProtobuf(Request.Builder builder, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList, Object source) {
+        ForestProtobufConverter forestConverter = (ForestProtobufConverter)request.getConfiguration().getConverterMap().get(ForestDataType.PROTOBUF);
+        byte[] bytes = forestConverter.convertToByte(source);
+        setBody(builder, RequestBody.create(MediaType.get(contentType), bytes));
+    }
 
     @Override
     protected void setStringBody(Request.Builder builder, String text, String charset, String contentType, boolean mergeCharset) {
