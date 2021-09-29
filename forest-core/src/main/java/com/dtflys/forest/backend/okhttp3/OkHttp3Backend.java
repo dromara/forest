@@ -15,10 +15,11 @@ import com.dtflys.forest.http.ForestRequest;
  */
 public class OkHttp3Backend extends AbstractHttpBackend {
 
+    public final static String NAME = "okhttp3";
 
     @Override
     public String getName() {
-        return "okhttp3";
+        return NAME;
     }
 
     public OkHttp3Backend() {

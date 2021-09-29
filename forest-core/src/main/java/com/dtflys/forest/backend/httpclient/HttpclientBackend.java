@@ -19,6 +19,13 @@ import com.dtflys.forest.http.ForestRequest;
  */
 public class HttpclientBackend extends AbstractHttpBackend {
 
+    public final static String NAME = "httpclient";
+
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
     @Override
     protected HttpExecutor createHeadExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         return new HttpclientHeadExecutor(request,
@@ -98,11 +105,6 @@ public class HttpclientBackend extends AbstractHttpBackend {
 
 
 
-
-    @Override
-    public String getName() {
-        return "httpclient";
-    }
 
 
 }
