@@ -2,6 +2,7 @@ package com.dtflys.forest.http;
 
 import com.dtflys.forest.utils.StringUtils;
 
+import java.net.CookieHandler;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -110,11 +111,164 @@ public class ForestQueryMap implements Map<String, Object> {
     }
 
     public void addQuery(String name, Object value) {
-        queries.add(new ForestQueryParameter(name, value));
+        addQuery(name, value, false, null);
     }
 
+    /**
+     * 添加 Query 参数
+     *
+     * @param name 参数名
+     * @param value 参数值
+     * @param isUrlEncode 是否强制 UrlEncode
+     * @param charset 编码字符集
+     */
     public void addQuery(String name, Object value, boolean isUrlEncode, String charset) {
-        queries.add(new ForestQueryParameter(name, value, isUrlEncode, charset));
+        if (value instanceof Collection) {
+            addQuery(name, (Collection) value, isUrlEncode, charset);
+        } else {
+            queries.add(new ForestQueryParameter(name, value, isUrlEncode, charset));
+        }
+    }
+
+    /**
+     * 添加集合类 Query 参数
+     *
+     * @param name 参数名
+     * @param collection 集合对象
+     * @since 1.5.4
+     */
+    public void addQuery(String name, Collection collection) {
+        addQuery(name, collection, false, null);
+    }
+
+
+    /**
+     * 添加集合类 Query 参数
+     *
+     * @param name 参数名
+     * @param collection 集合对象
+     * @param isUrlEncode 是否强制 UrlEncode
+     * @param charset 编码字符集
+     * @since 1.5.4
+     */
+    public void addQuery(String name, Collection collection, boolean isUrlEncode, String charset) {
+        for (Object item : collection) {
+            addQuery(name, item, isUrlEncode, charset);
+        }
+    }
+
+    /**
+     * 添加数组 Query 参数
+     *
+     * @param name 参数名
+     * @param array 数组
+     * @since 1.5.4
+     */
+    public void addQuery(String name, Object[] array) {
+        addQuery(name, array, false, null);
+    }
+
+
+    /**
+     * 添加数组 Query 参数
+     *
+     * @param name 参数名
+     * @param array 数组
+     * @param isUrlEncode 是否强制 UrlEncode
+     * @param charset 编码字符集
+     * @since 1.5.4
+     */
+    public void addQuery(String name, Object[] array, boolean isUrlEncode, String charset) {
+        for (Object item : array) {
+            addQuery(name, item, isUrlEncode, charset);
+        }
+    }
+
+
+    /**
+     * 添加 Map 类 Query 参数
+     *
+     * @param map Map对象
+     * @since 1.5.4
+     */
+    public void addQuery(Map map) {
+        for (Object key : map.keySet()) {
+            Object value = map.get(key);
+            addQuery(String.valueOf(key), value);
+        }
+    }
+
+
+    /**
+     * 添加 Map 类 Query 参数
+     *
+     * @param map Map对象
+     * @param isUrlEncode 是否强制 UrlEncode
+     * @param charset 编码字符集
+     * @since 1.5.4
+     */
+    public void addQuery(Map map, boolean isUrlEncode, String charset) {
+        if (map == null) {
+            return;
+        }
+        for (Object key : map.keySet()) {
+            Object value = map.get(key);
+            addQuery(String.valueOf(key), value, isUrlEncode, charset);
+        }
+    }
+
+    /**
+     * 添加带数组下标的 Query 参数
+     *
+     * @param name 参数名
+     * @param collection 集合对象
+     * @since 1.5.4
+     */
+    public void addArrayQuery(String name, Collection collection) {
+        addArrayQuery(name, collection, false, null);
+    }
+
+
+    /**
+     * 添加带数组下标的 Query 参数
+     *
+     * @param name 参数名
+     * @param collection 集合对象
+     * @param isUrlEncode 是否强制 UrlEncode
+     * @param charset 编码字符集
+     * @since 1.5.4
+     */
+    public void addArrayQuery(String name, Collection collection, boolean isUrlEncode, String charset) {
+        for (Object item : collection) {
+            addQuery(name + "[]", item, isUrlEncode, charset);
+        }
+    }
+
+    /**
+     * 添加带数组方括号的 Query 参数
+     *
+     * @param name 参数名
+     * @param array 集合对象
+     * @since 1.5.4
+     */
+    public void addArrayQuery(String name, Object[] array) {
+        addArrayQuery(name, array, false, null);
+    }
+
+
+    /**
+     * 添加带数组方括号的 Query 参数
+     *
+     * @param name 参数名
+     * @param array 集合对象
+     * @param isUrlEncode 是否强制 UrlEncode
+     * @param charset 编码字符集
+     * @since 1.5.4
+     */
+    public void addArrayQuery(String name, Object[] array, boolean isUrlEncode, String charset) {
+        for (Object item : array) {
+            addQuery(name + "[]", item, isUrlEncode, charset);
+        }
     }
 
 

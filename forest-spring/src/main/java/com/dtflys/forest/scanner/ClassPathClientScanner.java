@@ -153,12 +153,6 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
         GenericBeanDefinition definition;
         for (BeanDefinitionHolder holder : beanDefinitions) {
             definition = (GenericBeanDefinition) holder.getBeanDefinition();
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("[Forest] Creating Forest Client Bean with name '" + holder.getBeanName()
-                        + "' and Proxy of '" + definition.getBeanClassName() + "' client interface");
-            }
-
             String beanClassName = definition.getBeanClassName();
             ClientFactoryBeanUtils.setupClientFactoryBean(definition, configurationId, beanClassName);
             logger.info("[Forest] Created Forest Client Bean with name '" + holder.getBeanName()

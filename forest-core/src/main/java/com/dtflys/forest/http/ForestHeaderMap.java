@@ -280,7 +280,7 @@ public class ForestHeaderMap implements Map<String, String> {
 
     /**
      * 设置请求头
-     * 当前设置的请求头名称在本集合中已存在的情况下会覆盖原有同名请求头的值，负责便新增一个请求头
+     * 当前设置的请求头名称在本集合中已存在的情况下会覆盖原有同名请求头的值，否则便新增一个请求头
      * @param name 请求头名称
      * @param value 请求头的值
      */
@@ -292,6 +292,22 @@ public class ForestHeaderMap implements Map<String, String> {
             addHeader(name, value);
         }
     }
+
+    /**
+     * 通过 Map 批量设置请求头
+     *
+     * @param map {@link Map}对象
+     */
+    public void setHeader(Map map) {
+        if (map == null) {
+            return;
+        }
+        for (Object key : map.keySet()) {
+            Object value = map.get(key);
+            setHeader(String.valueOf(key), String.valueOf(value));
+        }
+    }
+
 
     /**
      * 获取本请求头集合的迭代器对象

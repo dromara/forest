@@ -10,6 +10,12 @@ package com.dtflys.forest.logging;
 public interface ForestLogHandler {
 
     /**
+     * 打印日志内容
+     * @param content 日志内容字符串
+     */
+    void logContent(String content);
+
+    /**
      * 获取Forest日志控制对象
      * @return Forest日志控制对象，{@link ForestLogger}类实例
      */

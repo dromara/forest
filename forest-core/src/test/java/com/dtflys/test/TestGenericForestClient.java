@@ -1,10 +1,14 @@
 package com.dtflys.test;
 
+import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.forest.http.ForestAddress;
 import com.dtflys.forest.http.ForestHeader;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestRequestType;
+import com.dtflys.forest.http.ForestURL;
 import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.test.http.BaseClientTest;
 import com.dtflys.test.model.Result;
@@ -15,13 +19,21 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -72,6 +84,258 @@ public class TestGenericForestClient extends BaseClientTest {
         public void setB(Integer b) {
             this.b = b;
         }
+    }
+
+
+    @Test
+    public void testRequest_url() throws MalformedURLException {
+        ForestRequest<?> request = Forest.request();
+        assertThat(request).isNotNull();
+        assertThat(request.scheme()).isEqualTo("http");
+        assertThat(request.host()).isEqualTo("localhost");
+        assertThat(request.path()).isEqualTo("/");
+        request.url("http://127.0.0.1:8080/test");
+        assertThat(request.urlString()).isEqualTo("http://127.0.0.1:8080/test");
+        request.url("/abc");
+        assertThat(request.urlString()).isEqualTo("http://127.0.0.1:8080/abc");
+        request.url("http://forest.dtflyx.com/111");
+        assertThat(request.urlString()).isEqualTo("http://forest.dtflyx.com/111");
+        request.path("/222");
+        assertThat(request.urlString()).isEqualTo("http://forest.dtflyx.com/222");
+        request.url(new ForestURL(new URL("http://localhost:8080/333")));
+        assertThat(request.urlString()).isEqualTo("http://localhost:8080/333");
+        request.address(new ForestAddress("192.168.0.1", 8881));
+        assertThat(request.urlString()).isEqualTo("http://192.168.0.1:8881/333");
+        request.address("192.168.0.2", 8882);
+        assertThat(request.urlString()).isEqualTo("http://192.168.0.2:8882/333");
+    }
+
+    @Test
+    public void testRequest_query_repeat() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.get("/")
+                .port(server.getPort())
+                .addQuery("a", "1")
+                .addQuery("a", "2")
+                .addQuery("a", "3")
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertQueryEquals("a=1&a=2&a=3");
+    }
+
+    @Test
+    public void testRequest_query_repeat2() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.get("/")
+                .port(server.getPort())
+                .addQuery("a", Arrays.asList(1, 2, 3))
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertQueryEquals("a=1&a=2&a=3");
+    }
+
+    @Test
+    public void testRequest_query_repeat3() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.get("/")
+                .port(server.getPort())
+                .addQuery("a", 1, 2, 3)
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertQueryEquals("a=1&a=2&a=3");
+    }
+
+    @Test
+    public void testRequest_query_array() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.get("/")
+                .port(server.getPort())
+                .addArrayQuery("a", Arrays.asList(1, 2, 3))
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertQueryEquals("a[]=1&a[]=2&a[]=3");
+    }
+
+    @Test
+    public void testRequest_query_array2() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.get("/")
+                .port(server.getPort())
+                .addArrayQuery("a", 1, 2, 3)
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertQueryEquals("a[]=1&a[]=2&a[]=3");
+    }
+
+
+    @Test
+    public void testRequest_query_replace() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.get("/")
+                .port(server.getPort())
+                .addQuery("a", "1")
+                .replaceQuery("a", 2)
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertQueryEquals("a=2");
+    }
+
+    @Test
+    public void testRequest_query_replace_add() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.get("/")
+                .port(server.getPort())
+                .replaceOrAddQuery("a", "1")
+                .replaceOrAddQuery("a", "2")
+                .addQuery("url", "http://localhost/test")
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertQueryEquals("a=2&url=http://localhost/test");
+    }
+
+    @Test
+    public void testRequest_query_replace_add2() throws UnsupportedEncodingException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        ForestRequest<?> request = Forest.get("/")
+                .port(server.getPort())
+                .replaceOrAddQuery("a", "1")
+                .replaceOrAddQuery("a", "2")
+                .addQuery("url", "http://localhost/test", true, "UTF-8");
+        request.execute();
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertQueryEquals("a=2&url=http://localhost/test");
+    }
+
+    @Test
+    public void testRequest_query_map() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("a", 1);
+        map.put("b", 2);
+        map.put("c", 3);
+        Forest.get("/")
+                .port(server.getPort())
+                .addQuery(map)
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertQueryEquals("a=1&b=2&c=3");
+    }
+
+    @Test
+    public void testRequest_query_map2() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Map<String, Object> map = new LinkedHashMap<>();
+        List<Integer> list = Arrays.asList(10, 20, 30);
+        map.put("a", 1);
+        map.put("b", 2);
+        map.put("c", 3);
+        map.put("x", list);
+        Forest.get("/")
+                .port(server.getPort())
+                .addQuery(map)
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertQueryEquals("a=1&b=2&c=3&x=10&x=20&x=30");
+    }
+
+    public static class MyQuery {
+        private Integer a;
+        private Integer b;
+        private Integer c;
+        private List<Integer> x;
+
+        public Integer getA() {
+            return a;
+        }
+
+        public void setA(Integer a) {
+            this.a = a;
+        }
+
+        public Integer getB() {
+            return b;
+        }
+
+        public void setB(Integer b) {
+            this.b = b;
+        }
+
+        public Integer getC() {
+            return c;
+        }
+
+        public void setC(Integer c) {
+            this.c = c;
+        }
+
+        public List<Integer> getX() {
+            return x;
+        }
+
+        public void setX(List<Integer> x) {
+            this.x = x;
+        }
+    }
+
+    @Test
+    public void testRequest_query_obj() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        MyQuery myQuery = new MyQuery();
+        myQuery.setA(1);
+        myQuery.setB(2);
+        myQuery.setC(3);
+        Forest.get("/")
+                .port(server.getPort())
+                .addQuery(myQuery)
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertQueryEquals("a=1&b=2&c=3");
+    }
+
+
+    @Test
+    public void testRequest_query_obj2() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        MyQuery myQuery = new MyQuery();
+        myQuery.setA(1);
+        myQuery.setB(2);
+        myQuery.setC(3);
+        myQuery.setX(Arrays.asList(10, 20, 30));
+        Forest.get("/")
+                .port(server.getPort())
+                .addQuery(myQuery)
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertQueryEquals("a=1&b=2&c=3&x=10&x=20&x=30");
+    }
+
+    @Test
+    public void testRequest_query_json() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        MyQuery myQuery = new MyQuery();
+        myQuery.setA(1);
+        myQuery.setB(2);
+        myQuery.setC(3);
+        myQuery.setX(Arrays.asList(10, 20, 30));
+        Forest.get("/")
+                .port(server.getPort())
+                .addJSONQuery("json", myQuery)
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertQueryEquals("json", JSON.toJSONString(myQuery));
     }
 
 
@@ -554,6 +818,7 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         TypeReference<Result<Integer>> typeReference = new TypeReference<Result<Integer>>() {};
         Result<Integer> result = Forest.patch("http://localhost:" + server.getPort())
+                .addHeader(ForestHeader.USER_AGENT, "httpclient")
                 .addHeader(ForestHeader.USER_AGENT, "forest")
                 .addQuery("a", 1)
                 .addQuery("b", 2)
@@ -618,6 +883,7 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
         ForestRequest<?> request = Forest.get("http://localhost:" + server.getPort())
                 .maxRetryCount(3)
+                .maxRetryInterval(2)
                 .retryWhen(((req, res) -> res.statusIs(203)));
         request.execute();
         assertThat(request.getCurrentRetryCount()).isEqualTo(3);
@@ -631,17 +897,22 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
         CountDownLatch latch = new CountDownLatch(1);
         AtomicBoolean isSuccess = new AtomicBoolean(false);
+        AtomicInteger atomicRetryCount = new AtomicInteger(0);
         ForestRequest<?> request = Forest.get("http://localhost")
                 .port(server.getPort())
                 .async()
                 .maxRetryCount(3)
                 .retryWhen(((req, res) -> res.statusIs(203)))
+                .onRetry(((req, res) -> {
+                    atomicRetryCount.incrementAndGet();
+                }))
                 .onSuccess(((data, req, res) -> {
                     isSuccess.set(true);
                     latch.countDown();
                 }));
         request.execute();
         latch.await();
+        assertThat(atomicRetryCount.get()).isEqualTo(3);
         assertThat(request.getCurrentRetryCount()).isEqualTo(3);
         assertThat(isSuccess.get()).isTrue();
     }

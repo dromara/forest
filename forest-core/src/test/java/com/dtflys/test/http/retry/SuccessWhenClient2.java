@@ -14,11 +14,11 @@ import com.dtflys.forest.http.ForestRequest;
 public interface SuccessWhenClient2 {
 
     @Get("http://localhost:${port}/")
-    @Retry(maxRetryCount = "${0}")
+    @Retry(maxRetryCount = "3")
     ForestRequest<String> testRetryRequest(int retryCount, OnError onError);
 
     @Get("http://localhost:${port}/")
-    @Retry(maxRetryCount = "${0}")
+    @Retry(maxRetryCount = "3")
     @Success(condition = TestSuccessWhen2.class)
     ForestRequest<String> testRetryRequest_success(int retryCount, OnError onError);
 

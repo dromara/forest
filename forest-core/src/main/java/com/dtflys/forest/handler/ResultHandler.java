@@ -5,6 +5,7 @@ import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestHandlerException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.lifecycles.file.DownloadLifeCycle;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
 
@@ -79,7 +80,7 @@ public class ResultHandler {
                         return response.getByteArray();
                     }
                 }
-                Object attFile = request.getAttachment("file");
+                Object attFile = request.getAttachment(DownloadLifeCycle.ATTACHMENT_NAME_FILE);
                 if (attFile != null && attFile instanceof File) {
                     ForestConverter converter = request.getConfiguration().getConverter(ForestDataType.JSON);
                     return converter.convertToJavaObject(attFile, resultClass);

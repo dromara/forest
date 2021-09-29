@@ -68,6 +68,7 @@ import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.forest.utils.URLUtils;
+import org.apache.commons.lang3.reflect.TypeUtils;
 
 import java.io.File;
 import java.io.InputStream;
@@ -79,6 +80,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.dtflys.forest.mapping.MappingParameter.*;
 
@@ -315,7 +317,7 @@ public class ForestRequest<T> {
      * 拦截器属性
      * <p>这里的属性只能在绑定的拦截器中被访问
      */
-    private Map<Class, InterceptorAttributes> interceptorAttributes = new HashMap<>();
+    private Map<Class, InterceptorAttributes> interceptorAttributes = new ConcurrentHashMap<>();
 
     /**
      * 请求重试策略
@@ -333,7 +335,7 @@ public class ForestRequest<T> {
      * 附件
      * <p>附件信息不回随请求发送到远端服务器，但在本地的任何地方都可以通过请求对象访问到附件信息
      */
-    private Map<String, Object> attachments = new HashMap<>();
+    private Map<String, Object> attachments = new ConcurrentHashMap<>();
 
     /**
      * 反序列化器
@@ -1127,6 +1129,175 @@ public class ForestRequest<T> {
 
 
     /**
+     * 添加请求中的集合类Query参数 (重复 Query 参数名)
+     *
+     * @param name Query参数名
+     * @param collection 集合对象
+     * @return {@link ForestRequest}对象实例
+     * @since 1.5.4
+     */
+    public ForestRequest<T> addQuery(String name, Collection collection) {
+        this.query.addQuery(name, collection);
+        return this;
+    }
+
+    /**
+     * 添加请求中的集合类Query参数 (重复 Query 参数名)
+     * <p>用于传递列表或数组类 Query 参数
+     *
+     * @param name Query参数名
+     * @param collection 集合对象
+     * @param isUrlEncode 是否进行编码
+     * @param charset 编码字符集
+     * @return {@link ForestRequest}对象实例
+     * @since 1.5.4
+     */
+    public ForestRequest<T> addQuery(String name, Collection collection, boolean isUrlEncode, String charset) {
+        this.query.addQuery(name, collection, isUrlEncode, charset);
+        return this;
+    }
+
+    /**
+     * 添加请求中的数组类Query参数 (重复 Query 参数名)
+     *
+     * @param name Query参数名
+     * @param array 数组
+     * @return {@link ForestRequest}对象实例
+     * @since 1.5.4
+     */
+    public ForestRequest<T> addQuery(String name, Object... array) {
+        return addQuery(name, array, false, null);
+    }
+
+
+    /**
+     * 添加请求中的数组类Query参数 (重复 Query 参数名)
+     *
+     * @param name Query参数名
+     * @param array 数组
+     * @param isUrlEncode 是否进行编码
+     * @param charset 编码字符集
+     * @return {@link ForestRequest}对象实例
+     * @since 1.5.4
+     */
+    public ForestRequest<T> addQuery(String name, Object[] array, boolean isUrlEncode, String charset) {
+        this.query.addQuery(name, array, isUrlEncode, charset);
+        return this;
+    }
+
+
+    /**
+     * 添加 Map 类 Query 参数
+     * <p>将 Map 的 key 作为 Query 参数名
+     * <p>Map 的 value 作为 Query 参数值
+     * <p>批量插入到请求的 Query 参数中
+     *
+     * @param queryMap {@link Map}对象
+     * @return {@link ForestRequest}对象实例
+     * @since 1.5.4
+     */
+    public ForestRequest<T> addQuery(Map queryMap) {
+        this.query.addQuery(queryMap);
+        return this;
+    }
+
+
+    /**
+     * 添加 Map 类 Query 参数
+     * <p>将 Map 的 key 作为 Query 参数名
+     * <p>Map 的 value 作为 Query 参数值
+     * <p>批量插入到请求的 Query 参数中
+     *
+     * @param queryMap {@link Map}对象
+     * @param isUrlEncode 是否进行编码
+     * @param charset 编码字符集
+     * @return {@link ForestRequest}对象实例
+     * @since 1.5.4
+     */
+    public ForestRequest<T> addQuery(Map queryMap, boolean isUrlEncode, String charset) {
+        this.query.addQuery(queryMap, isUrlEncode, charset);
+        return this;
+    }
+
+    /**
+     * 添加请求中的集合类Query参数 (带数组下标的 Query 参数名)
+     * <p>用于传递列表或数组类 Query 参数
+     *
+     * @param name Query参数名
+     * @param collection 集合对象
+     * @return {@link ForestRequest}对象实例
+     * @since 1.5.4
+     */
+    public ForestRequest<T> addArrayQuery(String name, Collection collection) {
+        return addArrayQuery(name, collection, false, null);
+    }
+
+
+    /**
+     * 添加请求中的集合类Query参数 (带数组下标的 Query 参数名)
+     * <p>用于传递列表或数组类 Query 参数
+     *
+     * @param name Query参数名
+     * @param collection 集合对象
+     * @param isUrlEncode 是否进行编码
+     * @param charset 编码字符集
+     * @return {@link ForestRequest}对象实例
+     * @since 1.5.4
+     */
+    public ForestRequest<T> addArrayQuery(String name, Collection collection, boolean isUrlEncode, String charset) {
+        this.query.addArrayQuery(name, collection, isUrlEncode, charset);
+        return this;
+    }
+
+    /**
+     * 添加请求中的数组类Query参数 (带数组方括号[]的 Query 参数名)
+     * <p>用于传递列表或数组类 Query 参数
+     *
+     * @param name Query参数名
+     * @param array 数组
+     * @return {@link ForestRequest}对象实例
+     * @since 1.5.4
+     */
+    public ForestRequest<T> addArrayQuery(String name, Object... array) {
+        return addArrayQuery(name, array, false, null);
+    }
+
+
+    /**
+     * 添加请求中的数组类Query参数 (带数组方括号[]的 Query 参数名)
+     * <p>用于传递列表或数组类 Query 参数
+     *
+     * @param name Query参数名
+     * @param array 数组
+     * @param isUrlEncode 是否进行编码
+     * @param charset 编码字符集
+     * @return {@link ForestRequest}对象实例
+     * @since 1.5.4
+     */
+    public ForestRequest<T> addArrayQuery(String name, Object[] array, boolean isUrlEncode, String charset) {
+        this.query.addArrayQuery(name, array, isUrlEncode, charset);
+        return this;
+    }
+
+
+
+    /**
+     * 添加 JSON Query 参数
+     *
+     * @param name Query参数名
+     * @param value Query参数值
+     * @return {@link ForestRequest}对象实例
+     * @since 1.5.4
+     */
+    public ForestRequest<T> addJSONQuery(String name, Object value) {
+        ForestJsonConverter jsonConverter = configuration.getJsonConverter();
+        String json = jsonConverter.encodeToString(value);
+        this.query.addQuery(name, json);
+        return this;
+    }
+
+
+    /**
      * 添加请求中的Query参数
      *
      * @param queryParameter Query参数，{@link ForestQueryParameter}对象实例
@@ -1187,7 +1358,11 @@ public class ForestRequest<T> {
         ForestJsonConverter jsonConverter = getConfiguration().getJsonConverter();
         Map<String, Object> map = jsonConverter.convertObjectToMap(queryParameters);
         if (map != null && map.size() > 0) {
-            map.forEach((key, value) -> addQuery(String.valueOf(key), value));
+            map.forEach((key, value) -> {
+                if (value != null) {
+                    addQuery(String.valueOf(key), value);
+                }
+            });
         }
         return this;
     }
@@ -1870,6 +2045,33 @@ public class ForestRequest<T> {
     }
 
     /**
+     * 添加 Map 类型 Body 数据
+     * <p>将 Map 的 key 作为键值对的 key
+     * <p>Map 的 value 作为键值对的 value
+     * <p>批量插入到请求的请求体中
+     *
+     * @param bodyMap 字段名
+     * @param contentType 该请求体项的Content-Type
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.4
+     */
+    public ForestRequest<T> addBody(Map bodyMap, String contentType) {
+        if (bodyMap == null) {
+            return this;
+        }
+        if (bodyMap.isEmpty()) {
+            addBody(new ObjectRequestBody(bodyMap));
+            return this;
+        }
+        for (Object key : bodyMap.keySet()) {
+            Object value = bodyMap.get(key);
+            addBody(String.valueOf(key), contentType, value);
+        }
+        return this;
+    }
+
+
+    /**
      * 添加键值对类型Body数据
      *
      * @param name 字段名
@@ -2146,6 +2348,19 @@ public class ForestRequest<T> {
         return getHeaderValue(name);
     }
 
+    /**
+     * 通过 Map 批量添加请求头到该请求中
+     *
+     * @param headerMap 请求头表，{@link Map}对象
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.4
+     */
+    public ForestRequest<T> addHeader(Map headerMap) {
+        this.headers.setHeader(headerMap);
+        return this;
+    }
+
+
 
     /**
      * 添加请求头到该请求中
@@ -2346,7 +2561,7 @@ public class ForestRequest<T> {
     }
 
     /**
-     * 获取OnSuccess回调函数，该回调函数在请求成功时被调用
+     * 设置OnSuccess回调函数，该回调函数在请求成功时被调用
      * <p>同 {@link ForestRequest#setOnSuccess(OnSuccess)}
      *
      * @param onSuccess {@link OnSuccess}接口实例
@@ -2840,7 +3055,7 @@ public class ForestRequest<T> {
     public ForestRequest<T> addInterceptorAttribute(Class interceptorClass, String attributeName, Object attributeValue) {
         InterceptorAttributes attributes = getInterceptorAttributes(interceptorClass);
         if (attributes == null) {
-            attributes = new InterceptorAttributes(interceptorClass, new HashMap<>());
+            attributes = new InterceptorAttributes(interceptorClass, new ConcurrentHashMap<>());
             addInterceptorAttributes(interceptorClass, attributes);
         }
         attributes.addAttribute(attributeName, attributeValue);
@@ -3387,6 +3602,7 @@ public class ForestRequest<T> {
     public byte[] executeAsByteArray() {
         return execute(byte[].class);
     }
+
 
     /**
      * 执行请求发送过程，并获取字节Boolean类型结果

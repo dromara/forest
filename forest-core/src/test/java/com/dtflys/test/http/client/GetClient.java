@@ -10,7 +10,6 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.model.JsonTestUser;
 import com.dtflys.test.interceptor.AddQueryInterceptor;
 import com.dtflys.test.interceptor.ErrorInterceptor;
-import com.dtflys.test.model.Result;
 import com.dtflys.test.model.TestResult;
 import com.dtflys.test.model.TokenResult;
 import com.fasterxml.jackson.databind.JsonNode;

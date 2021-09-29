@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ReflectUtils {
 
@@ -239,7 +240,7 @@ public class ReflectUtils {
      * @return 注解对象中有属性 {@link Map}表对象，Key：属性名 Value：属性值
      */
     public static Map<String, Object> getAttributesFromAnnotation(Annotation ann) {
-        Map<String, Object> results = new HashMap<>();
+        Map<String, Object> results = new ConcurrentHashMap<>();
         Class clazz = ann.annotationType();
         Method[] methods = clazz.getMethods();
         Object[] args = new Object[0];
