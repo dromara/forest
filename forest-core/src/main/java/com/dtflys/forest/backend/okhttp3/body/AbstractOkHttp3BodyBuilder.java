@@ -4,6 +4,7 @@ import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.body.AbstractBodyBuilder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.converter.protobuf.ForestProtobufConverter;
+import com.dtflys.forest.converter.protobuf.ProtobufConverterInstance;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
@@ -35,8 +36,10 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
 
     @Override
     protected void setProtobuf(Request.Builder builder, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList, Object source) {
-        ForestProtobufConverter forestConverter = (ForestProtobufConverter)request.getConfiguration().getConverterMap().get(ForestDataType.PROTOBUF);
-        byte[] bytes = forestConverter.convertToByte(source);
+        ProtobufConverterInstance instance = ProtobufConverterInstance.getInstance();
+        ForestProtobufConverter converter = instance.getForestProtobufConverter();
+        request.getConfiguration().getConverterMap().computeIfAbsent(ForestDataType.PROTOBUF,v -> converter);
+        byte[] bytes = converter.convertToByte(source);
         setBody(builder, RequestBody.create(MediaType.get(contentType), bytes));
     }
 
