@@ -1439,6 +1439,11 @@ public class ForestRequest<T> {
         return this;
     }
 
+    /**
+     * 获取请求类型
+     *
+     * @return 请求类型, 即 HTTP 方法
+     */
     public ForestRequestType getType() {
         return type;
     }
@@ -1458,6 +1463,19 @@ public class ForestRequest<T> {
         }
         this.type = type;
         return this;
+    }
+
+    /**
+     * 设置请求类型
+     * <p>设置请求类型的同事，并情况请求类型变更记录
+     *
+     * @param type 请求类型, 即 HTTP 方法
+     * @return {@link ForestRequest}对象实例
+     */
+    public ForestRequest<T> type(ForestRequestType type) {
+        return setType(null)
+                .clearTypeChangeHistory()
+                .setType(type);
     }
 
     /**
@@ -3269,6 +3287,7 @@ public class ForestRequest<T> {
         this.logConfiguration = logConfiguration;
         return this;
     }
+
 
     /**
      * 获取SSL KeyStore信息
