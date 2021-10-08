@@ -1,5 +1,6 @@
 package com.dtflys.forest.backend.httpclient.request;
 
+import com.dtflys.forest.backend.AbstractHttpExecutor;
 import com.dtflys.forest.backend.httpclient.response.HttpclientResponseHandler;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
@@ -16,11 +17,11 @@ import java.util.Date;
 public interface HttpclientRequestSender {
 
     void sendRequest(ForestRequest request,
+                     AbstractHttpExecutor executor,
                      HttpclientResponseHandler responseHandler,
                      HttpUriRequest httpRequest,
                      LifeCycleHandler lifeCycleHandler,
                      CookieStore cookieStore,
-                     Date startDate,
-                     int retryCount) throws IOException;
+                     Date startDate) throws IOException;
 
 }

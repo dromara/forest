@@ -1,5 +1,6 @@
 package com.dtflys.forest.backend.httpclient.request;
 
+import com.dtflys.forest.backend.AbstractHttpExecutor;
 import com.dtflys.forest.backend.httpclient.conn.HttpclientConnectionManager;
 import com.dtflys.forest.backend.httpclient.response.HttpclientForestResponseFactory;
 import com.dtflys.forest.backend.httpclient.response.HttpclientResponseHandler;
@@ -34,12 +35,13 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
 
     @Override
     public void sendRequest(
-            final ForestRequest request, final HttpclientResponseHandler responseHandler,
+            final ForestRequest request, final AbstractHttpExecutor executor,
+            final HttpclientResponseHandler responseHandler,
             final HttpUriRequest httpRequest, LifeCycleHandler lifeCycleHandler,
-            CookieStore cookieStore, Date startDate, int retryCount)  {
+            CookieStore cookieStore, Date startDate)  {
         final CloseableHttpAsyncClient client = connectionManager.getHttpAsyncClient(request);
         final ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
-        logRequest(retryCount, (HttpRequestBase) httpRequest);
+        logRequest(request.getCurrentRetryCount(), (HttpRequestBase) httpRequest);
         final Future<HttpResponse> future = client.execute(httpRequest, new FutureCallback<HttpResponse>() {
             @Override
             public void completed(final HttpResponse httpResponse) {
@@ -48,7 +50,7 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
                 // 是否重试
                 ForestRetryException retryEx = request.canRetry(response);
                 if (retryEx != null && !retryEx.isMaxRetryCountReached()) {
-                    sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, cookieStore, startDate, retryCount + 1);
+                    executor.execute(lifeCycleHandler);
                     return;
                 }
 
@@ -57,7 +59,7 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
                     ForestNetworkException networkException =
                             new ForestNetworkException("", response.getStatusCode(), response);
                     ForestRetryException retryException = new ForestRetryException(
-                            networkException,  request, request.getRetryCount(), retryCount);
+                            networkException,  request, request.getRetryCount(), request.getCurrentRetryCount());
                     // 如果重试条件满足，触发重试
                     try {
                         request.canRetry(response, retryException);
@@ -66,7 +68,7 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
                         responseHandler.handleError(response);
                         return;
                     }
-                    sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, cookieStore, startDate, retryCount + 1);
+                    executor.execute(lifeCycleHandler);
                     return;
                 }
 
@@ -80,7 +82,7 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
                 ForestResponse<?> response = forestResponseFactory.createResponse(
                         request, null, lifeCycleHandler, ex, startDate);
                 ForestRetryException retryException = new ForestRetryException(
-                        ex,  request, request.getRetryCount(), retryCount);
+                        ex,  request, request.getRetryCount(), request.getCurrentRetryCount());
                 try {
                     request.canRetry(response, retryException);
                 } catch (Throwable e) {
@@ -89,7 +91,7 @@ public class AsyncHttpclientRequestSender extends AbstractHttpclientRequestSende
                     responseHandler.handleError(response, ex);
                     return;
                 }
-                sendRequest(request, responseHandler, httpRequest, lifeCycleHandler, cookieStore, startDate, retryCount + 1);
+                executor.execute(lifeCycleHandler);
             }
 
             @Override

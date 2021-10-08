@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class TestRetryClient extends BaseClientTest {
@@ -54,6 +55,10 @@ public class TestRetryClient extends BaseClientTest {
         assertThat(ret).isNotNull().isEqualTo(EXPECTED);
         assertThat(request.getCurrentRetryCount()).isEqualTo(3);
         assertThat(request.getAttachment("retry-interceptor")).isNotNull().isEqualTo(3);
+        mockRequest(server).assertQueryEquals(null);
+        mockRequest(server).assertQueryEquals("a=1");
+        mockRequest(server).assertQueryEquals("a=1&a=2");
+        mockRequest(server).assertQueryEquals("a=1&a=2&a=3");
     }
 
     @Test
