@@ -18,52 +18,9 @@ import com.dtflys.forest.http.body.StringRequestBody;
 public abstract class ForestRequestBody {
 
     /**
-     * 请求体类型枚举类
-     */
-    public enum BodyType {
-
-        /**
-         * 字符串请求体类型
-         */
-        TEXT,
-
-        /**
-         * 键值对请求体类型
-         */
-        FORM_URL_ENCODED,
-
-        /**
-         * JSON格式
-         */
-        JSON,
-
-        /**
-         * XML格式
-         */
-        XML,
-
-        /**
-         * 文件请求体类型
-         */
-        BINARY,
-
-        /**
-         * 流请求体类型
-         */
-        INPUT_STREAM,
-
-        /**
-         * 文件类型
-         */
-        MULTIPART,
-    }
-
-    /**
      * 默认值
      */
     private String defaultValue;
-
-
 
     public String getDefaultValue() {
         return defaultValue;

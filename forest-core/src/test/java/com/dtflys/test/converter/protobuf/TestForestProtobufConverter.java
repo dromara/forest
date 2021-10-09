@@ -1,6 +1,8 @@
 package com.dtflys.test.converter.protobuf;
 
+import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.test.http.BaseClientTest;
 import com.dtflys.test.http.client.ProtobufClient;
 import com.dtflys.test.mock.ProtobufMockServer;
 import com.google.common.io.BaseEncoding;
@@ -23,7 +25,7 @@ import static org.junit.Assert.*;
  * @author YAKAX
  * @since 2020/12/18 21:11
  **/
-public class TestForestProtobufConverter {
+public class TestForestProtobufConverter extends BaseClientTest {
 
     @Rule
     public ProtobufMockServer server = new ProtobufMockServer(this);
@@ -32,6 +34,10 @@ public class TestForestProtobufConverter {
     private static ForestConfiguration configuration;
 
     private static ProtobufClient protobufClient;
+
+    public TestForestProtobufConverter(HttpBackend backend) {
+        super(backend, configuration);
+    }
 
     @BeforeClass
     public static void prepareClient() {
@@ -189,4 +195,16 @@ public class TestForestProtobufConverter {
         assertEquals("中文字符串", resData.getStringVal());
         assertEquals(Double.valueOf(3.2), Double.valueOf(resData.getDoubleVal()));
     }
+
+    @Test
+    public void protobufHttpTest2() {
+        ProtobufProto.BaseData.Builder builder = ProtobufProto.BaseData.newBuilder();
+        builder.setInt32Val(1);
+        ProtobufProto.BaseData reqData = builder.build();
+        ProtobufProto.BaseData resData = protobufClient.protobufTest2(reqData);
+        assertNotNull(resData);
+        assertEquals("中文字符串", resData.getStringVal());
+        assertEquals(Double.valueOf(3.2), Double.valueOf(resData.getDoubleVal()));
+    }
+
 }

@@ -6,7 +6,7 @@ import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.Base64Utils;
 
-public class IgnoreAllIntercetporsLifeCycle implements MethodAnnotationLifeCycle<BasicAuth, Object> {
+public class IgnoreAllInterceptorsLifeCycle implements MethodAnnotationLifeCycle<BasicAuth, Object> {
 
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {

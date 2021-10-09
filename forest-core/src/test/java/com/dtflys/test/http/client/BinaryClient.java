@@ -1,5 +1,6 @@
 package com.dtflys.test.http.client;
 
+import com.dtflys.forest.annotation.BinaryBody;
 import com.dtflys.forest.annotation.Body;
 import com.dtflys.forest.annotation.DataFile;
 import com.dtflys.forest.annotation.LogEnabled;
@@ -25,12 +26,19 @@ public interface BinaryClient {
     @LogEnabled(logResponseContent = true)
     String uploadOctetStreamWithFile(@Body File file, @Var("filename") String filename);
 
-
     @Post(
             url = "http://localhost:${port}/upload-octet-stream/${filename}",
             contentType = ContentType.APPLICATION_OCTET_STREAM
     )
     @LogEnabled(logResponseContent = true)
     String uploadOctetStreamWithDataFile(@DataFile("file") File file, @Var("filename") String filename);
+
+
+    @Post(
+            url = "http://localhost:${port}/upload-octet-stream/${filename}",
+            contentType = ContentType.APPLICATION_OCTET_STREAM
+    )
+    @LogEnabled(logResponseContent = true)
+    String uploadOctetStreamWithBinaryBody(@BinaryBody File file, @Var("filename") String filename);
 
 }

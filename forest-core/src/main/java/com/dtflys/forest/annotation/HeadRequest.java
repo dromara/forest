@@ -175,6 +175,12 @@ public @interface HeadRequest {
     long progressStep() default -1L;
 
     /**
+     * 请求序列化器
+     * @return 请求序列化器
+     */
+    Class<?> encoder() default Object.class;
+
+    /**
      * 请求反序列化器
      * @return 请求反序列化器
      */

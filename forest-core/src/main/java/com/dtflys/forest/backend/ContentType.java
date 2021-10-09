@@ -1,5 +1,6 @@
 package com.dtflys.forest.backend;
 
+import com.dtflys.forest.http.ForestBodyType;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.util.LinkedHashMap;
@@ -17,7 +18,7 @@ public class ContentType {
     public final static String APPLICATION_OCTET_STREAM = "application/octet-stream";
     public final static String MULTIPART_FORM_DATA = "multipart/form-data";
     public final static String X_WWW_FORM_URLENCODED = "x-www-form-urlencoded";
-    public final static String APPLICATION_PROTOBUF = "application/x-protobuf";
+    public final static String APPLICATION_X_PROTOBUF = "application/x-protobuf";
 
     private final String type;
 
@@ -135,8 +136,15 @@ public class ContentType {
         return subType.contains("stream");
     }
 
+    public boolean isProtobuf() {
+        if (subType == null) {
+            return false;
+        }
+        return subType.contains("protobuf");
+    }
+
     public boolean isBinary() {
-        return isMultipart() || isStream() || isImage() || isZip();
+        return isMultipart() || isStream() || isImage() || isZip() || isProtobuf();
     }
 
     public boolean isTorrent() {
@@ -174,13 +182,38 @@ public class ContentType {
         return "video".equals(type);
     }
 
-
     public boolean canReadAsString() {
         return isJson() || isXml() || isJavaScript() || isText();
     }
 
     public boolean canReadAsBinaryStream() {
         return isAudio() || isImage() || isMultipart() || isVideo() || isStream() || isPdf() || isZip();
+    }
+
+    /**
+     * 获取ContentType对应的请求体类型
+     * @return 请求体类型, {@link ForestBodyType}枚举对象
+     */
+    public ForestBodyType bodyType() {
+        if (isFormUrlEncoded()) {
+            return ForestBodyType.FORM;
+        }
+        if (isJson()) {
+            return ForestBodyType.JSON;
+        }
+        if (isXml()) {
+            return ForestBodyType.XML;
+        }
+        if (isMultipart()) {
+            return ForestBodyType.FILE;
+        }
+        if (canReadAsBinaryStream()) {
+            return ForestBodyType.BINARY;
+        }
+        if (isProtobuf()) {
+            return ForestBodyType.PROTOBUF;
+        }
+        return ForestBodyType.TEXT;
     }
 
     @Override

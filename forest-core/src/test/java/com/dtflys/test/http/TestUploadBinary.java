@@ -112,4 +112,22 @@ public class TestUploadBinary extends BaseClientTest {
                 .assertBodyEquals(getUploadByteArray());
     }
 
+    @Test
+    public void testUploadBinaryBody() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String path = this.getClass().getResource("/test-img.jpg").getPath();
+        if (path.startsWith("/") && isWindows()) {
+            path = path.substring(1);
+        }
+        File file = new File(path);
+        String result = binaryClient.uploadOctetStreamWithBinaryBody(file, "test-xxx.jpg");
+        assertEquals(EXPECTED, result);
+
+        MockServerRequest.mockRequest(server)
+                .assertMethodEquals("POST")
+                .assertPathEquals("/upload-octet-stream/test-xxx.jpg")
+                .assertBodyEquals(getUploadByteArray());
+    }
+
+
 }

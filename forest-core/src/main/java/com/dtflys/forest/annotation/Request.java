@@ -25,6 +25,7 @@
 package com.dtflys.forest.annotation;
 
 
+import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.lifecycles.method.RequestLifeCycle;
 
 import java.lang.annotation.Documented;
@@ -183,10 +184,16 @@ public @interface Request {
     long progressStep() default -1L;
 
     /**
+     * 请求序列化器
+     * @return 请求序列化器
+     */
+    Class<? extends ForestConverter> encoder() default ForestConverter.class;
+
+    /**
      * 请求反序列化器
      * @return 请求反序列化器
      */
-    Class<?> decoder() default Object.class;
+    Class<? extends ForestConverter> decoder() default ForestConverter.class;
 
     /**
      * KeyStore Id

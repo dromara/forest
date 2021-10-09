@@ -1,6 +1,6 @@
 package com.dtflys.test.mock;
 
-import com.dtflys.forest.converter.auto.DefaultAutoConverter;
+import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.converter.protobuf.ForestProtobufConverter;
 import com.dtflys.test.converter.protobuf.ProtobufProto;
 import org.apache.http.HttpHeaders;
@@ -42,13 +42,26 @@ public class ProtobufMockServer extends MockServerRule {
                 request()
                         .withPath("/proto/test")
                         .withMethod("POST")
-                        .withHeader(new Header(HttpHeaders.CONTENT_TYPE, "application/x-protobuf"))
+                        .withHeader(new Header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_X_PROTOBUF))
                         .withBody(reqByteArray)
         ).respond(
                 response()
                         .withStatusCode(200)
                         .withBody(resByteArray)
         );
+
+        mockClient.when(
+                request()
+                        .withPath("/proto/test2")
+                        .withMethod("POST")
+                        .withHeader(new Header(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_OCTET_STREAM))
+                        .withBody(reqByteArray)
+        ).respond(
+                response()
+                        .withStatusCode(200)
+                        .withBody(resByteArray)
+        );
+
     }
 
 }

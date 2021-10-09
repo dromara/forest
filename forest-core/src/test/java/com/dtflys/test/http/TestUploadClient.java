@@ -37,6 +37,7 @@ import java.util.Objects;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 
@@ -974,7 +975,7 @@ public class TestUploadClient extends BaseClientTest {
                     ContentType contentType = new ContentType(item.getContentType());
                     assertEquals("application/json", contentType.toStringWithoutParameters());
                     try {
-                        assertEquals(JSON.toJSONString(map), IOUtils.toString(item.getInputStream()));
+                        assertEquals(JSON.toJSONString(map), IOUtils.toString(item.getInputStream(), "UTF-8"));
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }

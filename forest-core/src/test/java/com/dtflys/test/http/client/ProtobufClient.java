@@ -3,6 +3,8 @@ package com.dtflys.test.http.client;
 import com.dtflys.forest.annotation.BaseRequest;
 import com.dtflys.forest.annotation.Body;
 import com.dtflys.forest.annotation.Post;
+import com.dtflys.forest.annotation.ProtobufBody;
+import com.dtflys.forest.backend.ContentType;
 import com.dtflys.test.converter.protobuf.ProtobufProto;
 
 /**
@@ -14,7 +16,12 @@ import com.dtflys.test.converter.protobuf.ProtobufProto;
 @BaseRequest(contentType = "application/x-protobuf")
 public interface ProtobufClient {
 
-    @Post(url = "http://localhost:${port}/proto/test")
+    @Post("http://localhost:${port}/proto/test")
     ProtobufProto.BaseData protobufTest(@Body ProtobufProto.BaseData baseData);
+
+    @Post(
+            url = "http://localhost:${port}/proto/test2",
+            contentType = ContentType.APPLICATION_OCTET_STREAM)
+    ProtobufProto.BaseData protobufTest2(@ProtobufBody ProtobufProto.BaseData baseData);
 
 }

@@ -20,6 +20,7 @@ import com.dtflys.forest.exceptions.ForestInterceptorDefineException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.http.ForestAddress;
+import com.dtflys.forest.http.ForestBodyType;
 import com.dtflys.forest.http.ForestQueryParameter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
@@ -83,6 +84,7 @@ public class ForestMethod<T> implements VariableScope {
     private MappingTemplate urlTemplate;
     private MappingTemplate typeTemplate;
     private MappingTemplate dataTypeTemplate;
+    private ForestBodyType bodyType;
     private Integer baseTimeout = null;
     private Integer timeout = null;
     private MappingTemplate sslProtocolTemplate;
@@ -102,6 +104,7 @@ public class ForestMethod<T> implements VariableScope {
     private MappingTemplate contentTypeTemplate;
     private MappingTemplate userAgentTemplate;
     private long progressStep = -1;
+    private ForestConverter encoder = null;
     private ForestConverter decoder = null;
     private MappingTemplate sslKeyStoreId;
     private MappingTemplate[] dataTemplateArray;
@@ -488,7 +491,7 @@ public class ForestMethod<T> implements VariableScope {
 
         parameterTemplateArray = new MappingParameter[paramTypes.length];
         processParameters(parameters, genericParamTypes, paramAnns);
-
+        bodyType = metaRequest.getBodyType();
         urlTemplate = makeTemplate(metaRequest.getUrl());
         typeTemplate = makeTemplate(metaRequest.getType());
         dataTypeTemplate = makeTemplate(metaRequest.getDataType());
@@ -510,7 +513,8 @@ public class ForestMethod<T> implements VariableScope {
         progressStep = metaRequest.getProgressStep();
         async = metaRequest.isAsync();
         retryerClass = metaRequest.getRetryer();
-        Class decoderClass = metaRequest.getDecoder();
+        Class<? extends ForestConverter> encoderClass = metaRequest.getEncoder();
+        Class<? extends ForestConverter> decoderClass = metaRequest.getDecoder();
         String[] dataArray = metaRequest.getData();
         String[] headerArray = metaRequest.getHeaders();
         int tout = metaRequest.getTimeout();
@@ -581,8 +585,20 @@ public class ForestMethod<T> implements VariableScope {
             }
         }
 
+        if (encoderClass != null && !encoderClass.isInterface()
+                && ForestConverter.class.isAssignableFrom(encoderClass)) {
+            try {
+                this.encoder = (ForestConverter) encoderClass.newInstance();
+            } catch (InstantiationException e) {
+                throw new ForestRuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new ForestRuntimeException(e);
+            }
+        }
 
-        if (decoderClass != null && ForestConverter.class.isAssignableFrom(decoderClass)) {
+
+        if (decoderClass != null && !encoderClass.isInterface()
+                && ForestConverter.class.isAssignableFrom(decoderClass)) {
             try {
                 this.decoder = (ForestConverter) decoderClass.newInstance();
             } catch (InstantiationException e) {
@@ -827,6 +843,7 @@ public class ForestMethod<T> implements VariableScope {
         ForestRequest<T> request = new ForestRequest(configuration, this, args);
         request.setUrl(renderedUrl)
                 .setType(type)
+                .setBodyType(bodyType)
                 .setCharset(charset)
                 .setAutoRedirection(autoRedirection)
                 .setSslProtocol(sslProtocol)
@@ -1089,7 +1106,9 @@ public class ForestMethod<T> implements VariableScope {
                 request.setKeyStore(sslKeyStore);
             }
         }
-
+        if (encoder != null) {
+            request.setEncoder(encoder);
+        }
         if (decoder != null) {
             request.setDecoder(decoder);
         }
