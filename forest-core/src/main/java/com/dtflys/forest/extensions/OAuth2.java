@@ -2,6 +2,8 @@ package com.dtflys.forest.extensions;
 
 import com.dtflys.forest.annotation.MethodLifeCycle;
 import com.dtflys.forest.annotation.RequestAttributes;
+import com.dtflys.forest.handler.AutoOAuth2DefinitionHandler;
+import com.dtflys.forest.handler.OAuth2DefinitionHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.lifecycles.authorization.OAuth2LifeCycle;
 import com.dtflys.forest.utils.StringUtils;
@@ -159,6 +161,13 @@ public @interface OAuth2 {
     String tokenPrefix() default "";
 
     /**
+     * 处理认证响应实体
+     *
+     * @return OAuth2Token
+     */
+    Class<? extends OAuth2DefinitionHandler> OAuth2TokenHandler() default AutoOAuth2DefinitionHandler.class;
+
+    /**
      * 验证类型
      *
      * @author HouKunLin
@@ -238,7 +247,7 @@ public @interface OAuth2 {
          * 获取变量名
          *
          * @param defaultTokenVariable 默认的变量名，这个参数传入的应该为 @OAuth2.tokenVariable 的值
-         * @return                     变量名
+         * @return 变量名
          */
         public String getTokenVariable(String defaultTokenVariable) {
             if (StringUtils.isBlank(defaultTokenVariable)) {
@@ -253,7 +262,7 @@ public @interface OAuth2 {
          *
          * @param defaultPrefix 默认的前缀，这个参数传入的应该为 @OAuth2.tokenPrefix 的值
          * @param token         实际的 Token 值
-         * @return              Token 值
+         * @return Token 值
          */
         public String getTokenValue(String defaultPrefix, String token) {
             // 优先使用 @OAuth2.tokenPrefix 值

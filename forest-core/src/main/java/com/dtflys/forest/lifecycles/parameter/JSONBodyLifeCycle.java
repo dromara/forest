@@ -4,6 +4,7 @@ import com.dtflys.forest.annotation.DataFile;
 import com.dtflys.forest.annotation.JSONBody;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.http.ForestBodyType;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.reflection.ForestMethod;
@@ -42,6 +43,9 @@ public class JSONBodyLifeCycle extends AbstractBodyLifeCycle<JSONBody> {
         String contentTypeStr = metaRequest.getContentType();
         if (StringUtils.isBlank(contentTypeStr) && !hasDataFileAnn) {
             metaRequest.setContentType(ContentType.APPLICATION_JSON);
+        }
+        if (metaRequest.getBodyType() == null) {
+            metaRequest.setBodyType(ForestBodyType.JSON);
         }
         parameter.setTarget(MappingParameter.TARGET_BODY);
     }

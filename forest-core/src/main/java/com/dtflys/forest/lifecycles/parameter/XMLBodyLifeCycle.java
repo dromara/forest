@@ -1,9 +1,11 @@
 package com.dtflys.forest.lifecycles.parameter;
 
+import com.dtflys.forest.annotation.DataFile;
 import com.dtflys.forest.annotation.XMLBody;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.filter.Filter;
+import com.dtflys.forest.http.ForestBodyType;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.lifecycles.ParameterAnnotationLifeCycle;
 import com.dtflys.forest.mapping.MappingParameter;
@@ -11,6 +13,9 @@ import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MetaRequest;
 import com.dtflys.forest.utils.StringUtils;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Parameter;
 
 /**
  * Forest &#064;XMLBody注解的生命周期
@@ -36,10 +41,21 @@ public class XMLBodyLifeCycle extends AbstractBodyLifeCycle<XMLBody> {
                     methodName + "' has already been set value '" + contentType +
                     "', not 'application/xml'. Hence the annotation @XMLBody cannot be bind on a parameter in this method.");
         }
+        boolean hasDataFileAnn = false;
+        for (Parameter param : method.getMethod().getParameters()) {
+            Annotation dataFileAnn = param.getAnnotation(DataFile.class);
+            if (dataFileAnn != null) {
+                hasDataFileAnn = true;
+                break;
+            }
+        }
         Filter filter = method.getConfiguration().newFilterInstance("xml");
         parameter.addFilter(filter);
-        if (StringUtils.isBlank(contentType)) {
+        if (StringUtils.isBlank(contentType) && !hasDataFileAnn) {
             metaRequest.setContentType(ContentType.APPLICATION_XML);
+        }
+        if (metaRequest.getBodyType() == null) {
+            metaRequest.setBodyType(ForestBodyType.XML);
         }
     }
 

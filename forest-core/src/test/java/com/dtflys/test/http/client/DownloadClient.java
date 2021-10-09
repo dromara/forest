@@ -14,7 +14,7 @@ import java.io.File;
  */
 public interface DownloadClient {
 
-    @Get("http://localhost:${port}/download/test-img.jpg")
+    @Get(url = "http://localhost:${port}/download/test-img.jpg", timeout = 3600 * 1000)
     @DownloadFile(dir = "${dir}", filename = "${filename}")
     File downloadImage(@Var("dir") String dir, @Var("filename") String filename, OnProgress onProgress);
 

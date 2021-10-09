@@ -17,5 +17,6 @@ public class TestRetryInterceptor implements Interceptor<Object> {
     public void onRetry(ForestRequest request, ForestResponse response) {
         // 将当前重试次数添加到 Forest 请求对象的附件中
         request.addAttachment("retry-interceptor", request.getCurrentRetryCount());
+        request.addQuery("a", request.getCurrentRetryCount());
     }
 }

@@ -6,6 +6,7 @@ import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
+import com.google.protobuf.Message;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -28,6 +29,9 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
     public <T> T convertToJavaObject(Object source, Class<T> targetType) {
         if (source == null) {
             return null;
+        }
+        if (Message.class.isAssignableFrom(targetType)) {
+            return tryConvert(source, targetType, ForestDataType.PROTOBUF);
         }
         if (source instanceof InputStream
                 || source instanceof byte[]
@@ -65,7 +69,7 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
                 } else if ("true".equalsIgnoreCase(trimmedStr)) {
                     if (boolean.class.isAssignableFrom(targetType) || Boolean.class.isAssignableFrom(targetType)) {
                         result = (T) Boolean.TRUE;
-                    } else  {
+                    } else {
                         result = tryConvert(trimmedStr, targetType, ForestDataType.TEXT);
                     }
                 } else if ("false".equalsIgnoreCase(trimmedStr)) {
@@ -102,6 +106,9 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
         if (source == null) {
             return null;
         }
+        if (targetType.getClass() == Class.class && Message.class.isAssignableFrom((Class<?>) targetType)) {
+            return tryConvert(source, targetType, ForestDataType.PROTOBUF);
+        }
         if (source instanceof InputStream
                 || source instanceof byte[]
                 || source instanceof File) {
@@ -136,7 +143,7 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
                     } catch (Throwable th) {
                         result = tryConvert(source, targetType, ForestDataType.TEXT);
                     }
-                }  else if ("true".equalsIgnoreCase(trimmedStr)) {
+                } else if ("true".equalsIgnoreCase(trimmedStr)) {
                     if (boolean.class.isAssignableFrom(clazz) || Boolean.class.isAssignableFrom(clazz)) {
                         result = (T) Boolean.TRUE;
                     } else {
@@ -171,8 +178,8 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
 
     private boolean canReadAsBinary(Class targetType) {
         if (byte[].class.isAssignableFrom(targetType)
-            || InputStream.class.isAssignableFrom(targetType)
-            || File.class.isAssignableFrom(targetType)) {
+                || InputStream.class.isAssignableFrom(targetType)
+                || File.class.isAssignableFrom(targetType)) {
             return true;
         }
         return false;

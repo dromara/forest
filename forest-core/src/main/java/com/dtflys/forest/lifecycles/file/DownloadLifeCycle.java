@@ -14,6 +14,7 @@ import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -29,6 +30,8 @@ import java.util.concurrent.locks.Lock;
 public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile, Object> {
 
     public final static String ATTACHMENT_NAME_FILE = "__file";
+
+    private final int FILE_WAIT_SECONDS = 3600;
 
     @Override
     public void onMethodInitialized(ForestMethod method, DownloadFile annotation) {
@@ -74,11 +77,12 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
                 throw new ForestRuntimeException(e);
             }
         }
-        String path = dir.getPath() + File.separator + filename;
+        String path = dir.getAbsolutePath() + File.separator + filename;
         File file = new File(path);
         try {
             FileUtils.copyInputStreamToFile(in, file);
-            if (logConfiguration.isLogEnabled()) {
+            FileUtils.waitFor(file, FILE_WAIT_SECONDS);
+            if (logConfiguration.isLogEnabled() || !file.exists()) {
                 logHandler.logContent("Saved file '" + path + "' successful.");
             }
             request.addAttachment(ATTACHMENT_NAME_FILE, file);
@@ -90,6 +94,5 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
         } catch (IOException e) {
             throw new ForestRuntimeException(e);
         }
-
     }
 }

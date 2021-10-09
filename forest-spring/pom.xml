@@ -6,12 +6,12 @@
 
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-spring</artifactId>
-    <version>1.5.4</version>
+    <version>1.5.5</version>
 
     <parent>
         <groupId>com.dtflys.forest</groupId>
         <artifactId>forest</artifactId>
-        <version>1.5.4</version>
+        <version>1.5.5</version>
     </parent>
 
     <dependencies>
@@ -108,6 +108,7 @@
             <version>${fastjson.version}</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
 

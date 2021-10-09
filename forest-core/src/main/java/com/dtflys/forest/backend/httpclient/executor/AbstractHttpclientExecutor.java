@@ -37,8 +37,6 @@ import java.util.List;
  * @since 2016-06-14
  */
 public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> extends AbstractHttpExecutor {
-    private static Logger log = LoggerFactory.getLogger(AbstractHttpclientExecutor.class);
-
     protected final HttpclientResponseHandler httpclientResponseHandler;
     protected String url;
     protected final String typeName;
@@ -134,11 +132,12 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
         try {
             requestSender.sendRequest(
                     request,
+                    this,
                     httpclientResponseHandler,
                     httpRequest,
                     lifeCycleHandler,
                     cookieStore,
-                    startDate, 0);
+                    startDate);
         } catch (IOException e) {
             httpRequest.abort();
             response = forestResponseFactory.createResponse(request, null, lifeCycleHandler, e, startDate);

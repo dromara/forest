@@ -3,8 +3,10 @@ package com.dtflys.forest.backend.body;
 import com.dtflys.forest.backend.BodyBuilder;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.handler.LifeCycleHandler;
+import com.dtflys.forest.http.ForestBodyType;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.http.body.ByteArrayRequestBody;
@@ -15,15 +17,10 @@ import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
+import com.google.protobuf.Message;
 
 import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -73,10 +70,27 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                 !request.getMultiparts().isEmpty();
 
         if (needRequestBody) {
-            if (mineContentType.isFormUrlEncoded()) {
+            ForestBodyType bodyType = request.bodyType();
+            if (bodyType == null) {
+                bodyType = mineContentType.bodyType();
+            }
+            if (bodyType == ForestBodyType.FORM) {
                 setFormBody(httpRequest, request, charset, contentType, reqBody);
-            } else if (mineContentType.isJson()) {
+            } else if(bodyType == ForestBodyType.PROTOBUF) {
+                Object[] arguments = request.getArguments();
+                if (arguments != null) {
+                    Optional<Object> first = Arrays.stream(arguments).filter(e -> Message.class.isAssignableFrom(e.getClass())).findFirst();
+                    if (first.isPresent()) {
+                        setProtobuf(httpRequest, request, charset, contentType, nameValueList, first.get());
+                    }
+                }
+            } else if (bodyType == ForestBodyType.JSON) {
+                ForestConverter encoder = request.getEncoder();
+                ForestConverter converter = request.getConfiguration().getJsonConverter();
                 ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
+                if (encoder != null) {
+                    converter = encoder;
+                }
                 List<ForestRequestBody> srcBodyList = request.getBody();
                 List<ForestRequestBody> bodyList = new LinkedList(srcBodyList);
                 if (!bodyList.isEmpty()) {
@@ -96,7 +110,11 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                                 String content = bodyItem.toString();
                                 Map subMap = null;
                                 try {
-                                    subMap = jsonConverter.convertObjectToMap(content);
+                                    if (converter instanceof ForestJsonConverter) {
+                                        subMap = ((ForestJsonConverter) converter).convertObjectToMap(content);
+                                    } else {
+                                        subMap = jsonConverter.convertObjectToMap(content);
+                                    }
                                 } catch (Throwable th) {
                                 }
                                 if (subMap != null) {
@@ -123,7 +141,11 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                                 } else {
                                     Map subMap = null;
                                     try {
-                                        subMap = jsonConverter.convertObjectToMap(obj);
+                                        if (converter instanceof ForestJsonConverter) {
+                                            subMap = ((ForestJsonConverter) converter).convertObjectToMap(obj);
+                                        } else {
+                                            subMap = jsonConverter.convertObjectToMap(obj);
+                                        }
                                     } catch (Throwable th) {
                                     }
                                     if (subMap == null) {
@@ -147,27 +169,39 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                         text = toJsonObj.toString();
                         setStringBody(httpRequest, text, charset, contentType, mergeCharset);
                     } else if (toJsonObj instanceof ObjectRequestBody) {
-                        text = jsonConverter.encodeToString(((ObjectRequestBody) toJsonObj).getObject());
+                        if (converter instanceof ForestJsonConverter) {
+                            text = ((ForestJsonConverter) converter).encodeToString(((ObjectRequestBody) toJsonObj).getObject());
+                        } else {
+                            text = jsonConverter.encodeToString(((ObjectRequestBody) toJsonObj).getObject());
+                        }
                         setStringBody(httpRequest, text, charset, contentType, mergeCharset);
                     } else if (toJsonObj instanceof NameValueRequestBody) {
                         Map<String, Object> subMap = new HashMap<>(1);
                         subMap.put(((NameValueRequestBody) toJsonObj).getName(), ((NameValueRequestBody) toJsonObj).getValue());
-                        text = jsonConverter.encodeToString(subMap);
+                        if (converter instanceof ForestJsonConverter) {
+                            text = ((ForestJsonConverter) converter).encodeToString(subMap);
+                        } else {
+                            text = jsonConverter.encodeToString(subMap);
+                        }
                         setStringBody(httpRequest, text, charset, contentType, mergeCharset);
                     } else if (toJsonObj instanceof ByteArrayRequestBody) {
                         byte[] bytes = ((ByteArrayRequestBody) toJsonObj).getByteArray();
                         setBinaryBody(httpRequest, request, charset, contentType, nameValueList, bytes, lifeCycleHandler);
                     } else {
-                        text = jsonConverter.encodeToString(toJsonObj);
+                        if (converter instanceof ForestJsonConverter) {
+                            text = ((ForestJsonConverter) converter).encodeToString(toJsonObj);
+                        } else {
+                            text = jsonConverter.encodeToString(toJsonObj);
+                        }
                         setStringBody(httpRequest, text, charset, contentType, mergeCharset);
                     }
                 } else {
                     setStringBody(httpRequest, "", charset, contentType, mergeCharset);
                 }
-            } else if (mineContentType.isMultipart()) {
+            } else if (bodyType == ForestBodyType.FILE) {
                 List<ForestMultipart> multiparts = request.getMultiparts();
                 setFileBody(httpRequest, request, charset, contentType, nameValueList, multiparts, lifeCycleHandler);
-            } else if (mineContentType.isBinary()) {
+            } else if (bodyType == ForestBodyType.BINARY) {
                 List<ForestMultipart> multiparts = request.getMultiparts();
                 List<byte[]> byteList = new LinkedList<>();
                 int size = 0;
@@ -375,5 +409,15 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                                  byte[] bytes,
                                  LifeCycleHandler lifeCycleHandler);
 
+
+    /**
+     * @param httpReq       后端请求对象
+     * @param request       Forest请求对象
+     * @param charset       字符集
+     * @param contentType   数据类型
+     * @param nameValueList 键值对列表
+     * @param source        protobuf 对象
+     */
+    protected abstract void setProtobuf(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList, Object source);
 
 }

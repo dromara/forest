@@ -6,12 +6,12 @@
 
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-core</artifactId>
-    <version>1.5.4</version>
+    <version>1.5.5</version>
 
     <parent>
         <groupId>com.dtflys.forest</groupId>
         <artifactId>forest</artifactId>
-        <version>1.5.4</version>
+        <version>1.5.5</version>
     </parent>
 
     <properties>
@@ -139,6 +139,12 @@
             <version>${gson.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java-util</artifactId>
+            <version>${protobuf.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>commons-logging</groupId>
@@ -155,7 +161,7 @@
         <dependency>
             <groupId>com.dtflys.forest</groupId>
             <artifactId>forest-mock</artifactId>
-            <version>1.5.4</version>
+            <version>1.5.5</version>
             <scope>test</scope>
         </dependency>
 

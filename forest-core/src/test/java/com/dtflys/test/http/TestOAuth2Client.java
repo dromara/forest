@@ -73,4 +73,12 @@ public class TestOAuth2Client extends BaseClientTest {
 
     }
 
+
+    @Test
+    public void testDefinitionOAuth2() {
+        String result = oAuth2Client.testDefinitionOAuth2();
+        assertNotNull(result);
+        assertEquals(OAuth2MockServer.EXPECTED, result);
+    }
+
 }

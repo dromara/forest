@@ -137,6 +137,11 @@ public class ForestRequest<T> {
     private ForestQueryMap query = new ForestQueryMap();
 
     /**
+     * 请求体类型
+     */
+    private ForestBodyType bodyType;
+
+    /**
      * 请求类型
      */
     private ForestRequestType type;
@@ -336,6 +341,12 @@ public class ForestRequest<T> {
      * <p>附件信息不回随请求发送到远端服务器，但在本地的任何地方都可以通过请求对象访问到附件信息
      */
     private Map<String, Object> attachments = new ConcurrentHashMap<>();
+
+    /**
+     * 反序列化器
+     */
+    private ForestConverter encoder;
+
 
     /**
      * 反序列化器
@@ -1439,6 +1450,54 @@ public class ForestRequest<T> {
         return this;
     }
 
+    /**
+     * 获取请求体类型
+     *
+     * @return 求体类型, {@link ForestBodyType}枚举对象
+     */
+    public ForestBodyType getBodyType() {
+        return bodyType;
+    }
+
+    /**
+     * 设置请求体类型
+     *
+     * @param bodyType 求体类型, {@link ForestBodyType}枚举对象
+     * @return {@link ForestRequest}对象实例
+     */
+    public ForestRequest<T> setBodyType(ForestBodyType bodyType) {
+        this.bodyType = bodyType;
+        return this;
+    }
+
+    /**
+     * 获取请求体类型
+     * <p>同{@link ForestRequest#getBodyType()}方法
+     *
+     * @return 求体类型, {@link ForestBodyType}枚举对象
+     * @see ForestRequest#getBodyType()
+     */
+    public ForestBodyType bodyType() {
+        return getBodyType();
+    }
+
+    /**
+     * 设置请求体类型
+     * <p>同{@link ForestRequest#setBodyType(ForestBodyType)}
+     *
+     * @param bodyType 求体类型, {@link ForestBodyType}枚举对象
+     * @return {@link ForestRequest}对象实例
+     * @see ForestRequest#setBodyType(ForestBodyType)
+     */
+    public ForestRequest<T> bodyType(ForestBodyType bodyType) {
+        return setBodyType(bodyType);
+    }
+
+    /**
+     * 获取请求类型
+     *
+     * @return 请求类型, 即 HTTP 方法
+     */
     public ForestRequestType getType() {
         return type;
     }
@@ -1458,6 +1517,19 @@ public class ForestRequest<T> {
         }
         this.type = type;
         return this;
+    }
+
+    /**
+     * 设置请求类型
+     * <p>设置请求类型的同事，并情况请求类型变更记录
+     *
+     * @param type 请求类型, 即 HTTP 方法
+     * @return {@link ForestRequest}对象实例
+     */
+    public ForestRequest<T> type(ForestRequestType type) {
+        return setType(null)
+                .clearTypeChangeHistory()
+                .setType(type);
     }
 
     /**
@@ -3214,6 +3286,26 @@ public class ForestRequest<T> {
     }
 
     /**
+     * 获取序列化器
+     *
+     * @return 序列化器，{@link ForestConverter}接口实例
+     */
+    public ForestConverter getEncoder() {
+        return encoder;
+    }
+
+    /**
+     * 设置序列化器
+     *
+     * @param encoder 序列化器，{@link ForestConverter}接口实例
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest<T> setEncoder(ForestConverter encoder) {
+        this.encoder = encoder;
+        return this;
+    }
+
+    /**
      * 获取反序列化器
      * @return 反序列化器，{@link ForestConverter}接口实例
      */
@@ -3244,9 +3336,9 @@ public class ForestRequest<T> {
         return setDecoder(decoder);
     }
 
-
     /**
      * 是否允许打印请求/响应日志
+     *
      * @return {@code true}：允许，{@code false}：不允许
      */
     @Deprecated
@@ -3259,6 +3351,7 @@ public class ForestRequest<T> {
 
     /**
      * 获取请求日志配置信息
+     *
      * @return 请求日志配置信息，{@link LogConfiguration}类实例
      */
     public LogConfiguration getLogConfiguration() {
@@ -3269,6 +3362,7 @@ public class ForestRequest<T> {
         this.logConfiguration = logConfiguration;
         return this;
     }
+
 
     /**
      * 获取SSL KeyStore信息
