@@ -28,6 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -85,29 +86,42 @@ public class TestDownloadClient extends BaseClientTest {
     }
 
     @Test
-    public void testDownloadImage() {
-        server.enqueue(new MockResponse().setBody(getImageBuffer()));
-        String dir = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "TestDownload";
+    public void testDownloadImage() throws InterruptedException {
+        int count = 100;
+        for (int i = 0; i < count; i++) {
+            server.enqueue(new MockResponse().setBody(getImageBuffer()));
+        }
         AtomicReference<ForestProgress> atomicProgress = new AtomicReference<>(null);
-        File file = downloadClient.downloadImage(dir, "temp-img.png", progress -> {
-            System.out.println("------------------------------------------");
-            System.out.println("total bytes: " + progress.getTotalBytes());
-            System.out.println("current bytes: " + progress.getCurrentBytes());
-            System.out.println("progress: " + Math.round(progress.getRate() * 100) + "%");
-            if (progress.isDone()) {
-                atomicProgress.set(progress);
-                assertThat(progress.getRequest()).isNotNull();
-            }
-        });
-        assertThat(file)
-                .isNotNull()
-                .isFile();
-        assertThat(atomicProgress.get())
-                .isNotNull()
-                .extracting(
-                        ForestProgress::isDone,
-                        ForestProgress::getRate)
-                .contains(true, 1D);
+        CountDownLatch latch = new CountDownLatch(count);
+        for (int i = 0; i < count; i++) {
+            int finalI = i;
+            String dir = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "TestDownload/" + i;
+            CompletableFuture.runAsync(() -> {
+                File file = downloadClient.downloadImage(dir, "temp-img-" + finalI + ".png", progress -> {
+                    System.out.println("------------------------------------------");
+                    System.out.println("total bytes: " + progress.getTotalBytes());
+                    System.out.println("current bytes: " + progress.getCurrentBytes());
+                    System.out.println("progress: " + Math.round(progress.getRate() * 100) + "%");
+                    if (progress.isDone()) {
+                        atomicProgress.set(progress);
+                        assertThat(progress.getRequest()).isNotNull();
+                    }
+                });
+                assertThat(file)
+                        .isNotNull()
+                        .isFile();
+                assertThat(file.exists()).isTrue();
+                assertThat(atomicProgress.get())
+                        .isNotNull()
+                        .extracting(
+                                ForestProgress::isDone,
+                                ForestProgress::getRate)
+                        .contains(true, 1D);
+                latch.countDown();
+            });
+
+        }
+        latch.await();
     }
 
     @Test

@@ -27,7 +27,6 @@ import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestURL;
-import com.dtflys.forest.http.body.ObjectRequestBody;
 import com.dtflys.forest.http.body.RequestBodyBuilder;
 import com.dtflys.forest.http.body.StringRequestBody;
 import com.dtflys.forest.interceptor.Interceptor;
@@ -1250,8 +1249,9 @@ public class ForestMethod<T> implements VariableScope {
 
         if (interceptorAttributesList != null && interceptorAttributesList.size() > 0) {
             for (InterceptorAttributes attributes : interceptorAttributesList) {
-                request.addInterceptorAttributes(attributes.getInterceptorClass(), attributes);
-                request.getInterceptorAttributes(attributes.getInterceptorClass()).render(args);
+                InterceptorAttributes newAttrs = attributes.clone();
+                request.addInterceptorAttributes(newAttrs.getInterceptorClass(), newAttrs);
+                request.getInterceptorAttributes(newAttrs.getInterceptorClass()).render(args);
             }
         }
 

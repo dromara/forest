@@ -295,7 +295,7 @@ public class ForestConfiguration implements Serializable {
      * @return 新创建的ForestConfiguration实例
      */
     public static ForestConfiguration configuration(String id) {
-        ForestConfiguration configuration = CONFIGURATION_CACHE.get(id);
+        ForestConfiguration configuration = ForestConfiguration.CONFIGURATION_CACHE.get(id);
         if (configuration == null) {
             synchronized (ForestConfiguration.class) {
                 if (!CONFIGURATION_CACHE.containsKey(id)) {
@@ -1119,7 +1119,7 @@ public class ForestConfiguration implements Serializable {
      * @return 动态代理工厂
      */
     public <T> ProxyFactory<T> getProxyFactory(Class<T> clazz) {
-        return new ProxyFactory<T>(this, clazz);
+        return new ProxyFactory<>(this, clazz);
     }
 
     /**
