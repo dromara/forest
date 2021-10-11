@@ -36,6 +36,8 @@ import com.dtflys.forest.converter.auto.DefaultAutoConverter;
 import com.dtflys.forest.converter.binary.DefaultBinaryConverter;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.converter.json.JSONConverterSelector;
+import com.dtflys.forest.converter.protobuf.ForestProtobufConverter;
+import com.dtflys.forest.converter.protobuf.ForestProtobufConverterFactory;
 import com.dtflys.forest.converter.text.DefaultTextConverter;
 import com.dtflys.forest.converter.xml.ForestJaxbConverter;
 import com.dtflys.forest.converter.xml.ForestXmlConverter;
@@ -313,8 +315,10 @@ public class ForestConfiguration implements Serializable {
         ForestConfiguration configuration = new ForestConfiguration();
         configuration.setId("forestConfiguration" + configuration.hashCode());
         configuration.setJsonConverterSelector(new JSONConverterSelector());
+        ForestProtobufConverterFactory protobufConverterFactory = ForestProtobufConverterFactory.getInstance();
+        configuration.setProtobufConverter(protobufConverterFactory.getForestProtobufConverter());
         configuration.setXmlConverter(new ForestJaxbConverter());
-        configuration.setTextConverter();
+        configuration.setTextConverter(new DefaultTextConverter());
         DefaultAutoConverter autoConverter = new DefaultAutoConverter(configuration);
         configuration.getConverterMap().put(ForestDataType.AUTO, autoConverter);
         configuration.getConverterMap().put(ForestDataType.BINARY, new DefaultBinaryConverter(autoConverter));
@@ -1076,7 +1080,7 @@ public class ForestConfiguration implements Serializable {
     public ForestJsonConverter getJsonConverter() {
         ForestJsonConverter jsonConverter = (ForestJsonConverter) getConverterMap().get(ForestDataType.JSON);
         if (jsonConverter == null) {
-            throw new ForestRuntimeException("JSON converter cannot be found. Please check your classpath if there is the JSON framework, eg. Jackson (>= 2.9.10), Gson or Fastjson (>= 1.2.48), is in the dependencies of your project.");
+            throw new ForestRuntimeException("JSON converter cannot be found. Please check your classpath if there is the JSON framework, eg. Jackson (>= 2.9.10), Gson or Fastjson (>= 1.2.48), in the dependencies of your project.");
         }
         return jsonConverter;
     }
@@ -1102,14 +1106,50 @@ public class ForestConfiguration implements Serializable {
     }
 
     /**
-     * 设置默认的全局文本数据转换器
+     * 设置全局XML数据转换器
+     *
+     * @param converter XML数据转换器
+     * @return 当前ForestConfiguration实例
+     */
+    public ForestConfiguration setProtobufConverter(ForestProtobufConverter converter) {
+        getConverterMap().put(ForestDataType.PROTOBUF, converter);
+        return this;
+    }
+
+    /**
+     * 获取当前全局XML数据转换器
+     *
+     * @return XML数据转换器
+     */
+    public ForestProtobufConverter getProtobufConverter() {
+        ForestProtobufConverter converter =  (ForestProtobufConverter) getConverterMap().get(ForestDataType.PROTOBUF);
+        if (converter == null) {
+            throw new ForestRuntimeException("Protobuf converter cannot be found. Please check your classpath if there is the Protobuf framework in the dependencies of your project.");
+        }
+
+        return converter;
+    }
+
+
+    /**
+     * 设置全局文本数据转换器
      *
      * @return 当前ForestConfiguration实例
      */
-    private ForestConfiguration setTextConverter() {
-        getConverterMap().put(ForestDataType.TEXT, new DefaultTextConverter());
+    private ForestConfiguration setTextConverter(ForestConverter converter) {
+        getConverterMap().put(ForestDataType.TEXT, converter);
         return this;
     }
+
+    /**
+     * 获取全局文本数据转换器
+     *
+     * @return 当前ForestConfiguration实例
+     */
+    private ForestConverter getTextConverter() {
+        return getConverterMap().get(ForestDataType.TEXT);
+    }
+
 
     /**
      * 根据请求接口类创建并获取请求接口的动态代理工厂

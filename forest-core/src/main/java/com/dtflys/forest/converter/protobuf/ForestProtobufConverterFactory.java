@@ -34,18 +34,18 @@ import java.io.Serializable;
  * @author YAKAX
  * @since 2020/12/18
  **/
-public class ProtobufConverterFactory implements Serializable {
+public class ForestProtobufConverterFactory implements Serializable {
 
-    private static ProtobufConverterFactory instance;
+    private static ForestProtobufConverterFactory instance;
     private final static String PROTOBUF_CONVERTER_CLASS = "com.dtflys.forest.converter.protobuf.ForestGoogleProtobufConverter";
 
     private ForestProtobufConverter forestProtobufConverter;
 
-    public static ProtobufConverterFactory getInstance() {
+    public static ForestProtobufConverterFactory getInstance() {
         if (instance != null) {
             return instance;
         }
-        instance = new ProtobufConverterFactory();
+        instance = new ForestProtobufConverterFactory();
         return instance;
     }
 

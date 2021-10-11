@@ -3,7 +3,7 @@ package com.dtflys.forest.backend.httpclient.body;
 import com.dtflys.forest.backend.body.AbstractBodyBuilder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.converter.protobuf.ForestProtobufConverter;
-import com.dtflys.forest.converter.protobuf.ProtobufConverterFactory;
+import com.dtflys.forest.converter.protobuf.ForestProtobufConverterFactory;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
@@ -184,8 +184,7 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
 
     @Override
     protected void setProtobuf(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList, Object source) {
-        ProtobufConverterFactory instance = ProtobufConverterFactory.getInstance();
-        ForestProtobufConverter converter = instance.getForestProtobufConverter();
+        ForestProtobufConverter converter = request.getConfiguration().getProtobufConverter();
         request.getConfiguration().getConverterMap().computeIfAbsent(ForestDataType.PROTOBUF,v -> converter);
         byte[] bytes = converter.convertToByte(source);
         ByteArrayEntity byteArrayEntity = new ByteArrayEntity(bytes);
