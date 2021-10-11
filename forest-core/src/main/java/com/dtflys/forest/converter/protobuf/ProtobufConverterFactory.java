@@ -63,7 +63,6 @@ public class ProtobufConverterFactory implements Serializable {
                         checkProtobufClass();
                         Class clazz = Class.forName(PROTOBUF_CONVERTER_CLASS);
                         forestProtobufConverter = (ForestProtobufConverter) clazz.newInstance();
-                        return forestProtobufConverter;
                     } catch (Throwable e) {
                         throw new ForestRuntimeException("forestProtobufConverter create exception", e);
                     }
