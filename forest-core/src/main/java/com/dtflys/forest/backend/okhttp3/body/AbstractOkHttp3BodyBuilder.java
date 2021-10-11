@@ -3,6 +3,7 @@ package com.dtflys.forest.backend.okhttp3.body;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.body.AbstractBodyBuilder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
+import com.dtflys.forest.converter.protobuf.ForestGoogleProtobufConverter;
 import com.dtflys.forest.converter.protobuf.ForestProtobufConverter;
 import com.dtflys.forest.converter.protobuf.ProtobufConverterInstance;
 import com.dtflys.forest.exceptions.ForestRuntimeException;

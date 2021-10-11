@@ -37,6 +37,7 @@ import java.io.Serializable;
 public class ProtobufConverterInstance implements Serializable {
 
     private static ProtobufConverterInstance instance;
+    private final static String PROTOBUF_CONVERTER_CLASS = "com.dtflys.forest.converter.protobuf.ForestGoogleProtobufConverter";
 
     private ForestProtobufConverter forestProtobufConverter;
 
@@ -55,15 +56,20 @@ public class ProtobufConverterInstance implements Serializable {
 
 
     public ForestProtobufConverter getForestProtobufConverter() {
-        if (forestProtobufConverter != null) {
-            return forestProtobufConverter;
+        if (forestProtobufConverter == null) {
+            synchronized (this) {
+                if (forestProtobufConverter == null) {
+                    try {
+                        checkProtobufClass();
+                        Class clazz = Class.forName(PROTOBUF_CONVERTER_CLASS);
+                        forestProtobufConverter = (ForestProtobufConverter) clazz.newInstance();
+                        return forestProtobufConverter;
+                    } catch (Throwable e) {
+                        throw new ForestRuntimeException("forestProtobufConverter create exception", e);
+                    }
+                }
+            }
         }
-        try {
-            checkProtobufClass();
-            forestProtobufConverter = new ForestProtobufConverter();
-            return forestProtobufConverter;
-        } catch (Throwable e) {
-            throw new ForestRuntimeException("forestProtobufConverter create exception", e);
-        }
+        return forestProtobufConverter;
     }
 }

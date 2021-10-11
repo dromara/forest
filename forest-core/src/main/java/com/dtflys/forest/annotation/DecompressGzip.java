@@ -50,4 +50,10 @@ public @interface DecompressGzip {
      */
     boolean value() default true;
 
+    /**
+     *
+     * @return
+     */
+    String encoding() default "gzip";
+
 }
