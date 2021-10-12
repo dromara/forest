@@ -72,8 +72,9 @@ Forest有哪些特性？
 * 支持过滤器来过滤传入的数据
 * 基于注解、配置化的方式定义Http请求
 * 支持Spring和Springboot集成
-* JSON字符串到Java对象的自动化解析
-* XML文本到Java对象的自动化解析
+* JSON格式数据序列化和反序列化
+* XML格式数据序列化和反序列化
+* Protobuf格式数据序列化和反序列化
 * JSON、XML或其他类型转换器可以随意扩展和替换
 * 支持JSON转换框架: Fastjson, Jackson, Gson
 * 支持JAXB形式的XML转换
@@ -188,6 +189,19 @@ String sendXmlMessage(@XMLBody MyMessage message);
 @Post("/test/xml")
 String postXmlBodyString(@XMLBody String xml);
 ```
+
+## 发送Protobuf数据
+
+```java
+/**
+ * ProtobufProto.MyMessage 为 Protobuf 生成的数据类
+ * 将 Protobuf 生成的数据对象转换为 Protobuf 格式的字节流
+ * 并放在请求的Body进行传输
+ */
+@Post(url = "/message", contentType = "application/octet-stream")
+String sendProtobufMessage(@ProtobufBody ProtobufProto.MyMessage message);
+```
+
 
 ## 文件上传
 
