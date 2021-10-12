@@ -5,6 +5,7 @@ import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
+import com.dtflys.forest.converter.protobuf.ForestProtobufConverterManager;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestBodyType;
 import com.dtflys.forest.http.ForestRequest;
@@ -17,7 +18,6 @@ import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
-import com.google.protobuf.Message;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -29,6 +29,7 @@ import java.util.*;
  * @since 2018-02-27 18:06
  */
 public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
+
 
     /**
      * 构建请求体
@@ -79,7 +80,10 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
             } else if(bodyType == ForestBodyType.PROTOBUF) {
                 Object[] arguments = request.getArguments();
                 if (arguments != null) {
-                    Optional<Object> first = Arrays.stream(arguments).filter(e -> Message.class.isAssignableFrom(e.getClass())).findFirst();
+                    ForestProtobufConverterManager protobufConverterManager = ForestProtobufConverterManager.getInstance();
+                    Optional<Object> first = Arrays.stream(arguments).filter(e ->
+                                            protobufConverterManager.isProtobufMessageClass(e.getClass()))
+                            .findFirst();
                     if (first.isPresent()) {
                         setProtobuf(httpRequest, request, charset, contentType, nameValueList, first.get());
                     }

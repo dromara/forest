@@ -25,8 +25,10 @@
 package com.dtflys.forest.converter.protobuf;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.utils.ReflectUtils;
 
 import java.io.Serializable;
+import java.lang.reflect.Type;
 
 /**
  * JSON转换器选择策略
@@ -34,37 +36,90 @@ import java.io.Serializable;
  * @author YAKAX
  * @since 2020/12/18
  **/
-public class ForestProtobufConverterFactory implements Serializable {
+public class ForestProtobufConverterManager implements Serializable {
 
-    private static ForestProtobufConverterFactory instance;
+    private static ForestProtobufConverterManager instance;
     private final static String PROTOBUF_CONVERTER_CLASS = "com.dtflys.forest.converter.protobuf.ForestGoogleProtobufConverter";
+    private final static String PROTOBUF_MESSAGE_CLASS = "com.google.protobuf.Message";
 
     private ForestProtobufConverter forestProtobufConverter;
 
-    public static ForestProtobufConverterFactory getInstance() {
+    private volatile Class messageClass;
+
+    private volatile Boolean supportProtobuf;
+
+    public static ForestProtobufConverterManager getInstance() {
         if (instance != null) {
             return instance;
         }
-        instance = new ForestProtobufConverterFactory();
+        instance = new ForestProtobufConverterManager();
         return instance;
     }
 
 
-    public boolean checkProtobufClass() {
+    public boolean checkSupportProtobuf() {
+        if (supportProtobuf != null) {
+            return supportProtobuf;
+        }
         try {
             Class.forName("com.google.protobuf.Parser");
         } catch (Throwable ignored) {
+            supportProtobuf = false;
             return false;
         }
+        supportProtobuf = true;
         return true;
     }
 
+    private Class getMessageClass() {
+        if (!checkSupportProtobuf()) {
+            return null;
+        }
+        if (messageClass == null) {
+            try {
+                messageClass = Class.forName(PROTOBUF_MESSAGE_CLASS);
+            } catch (ClassNotFoundException e) {
+            }
+        }
+        return messageClass;
+    }
+
+    public boolean isProtobufMessageClass(Class clazz) {
+        if (clazz == null) {
+            return false;
+        }
+        if (!checkSupportProtobuf()) {
+            return false;
+        }
+        Class messageClazz = getMessageClass();
+        return messageClazz.isAssignableFrom(clazz);
+    }
+
+
+    public boolean isProtobufMessageType(Type type) {
+        if (type == null) {
+            return false;
+        }
+        Class clazz = ReflectUtils.toClass(type);
+        return isProtobufMessageClass(clazz);
+    }
+
+    public boolean isProtobufMessageInstance(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (!checkSupportProtobuf()) {
+            return false;
+        }
+        Class messageClazz = getMessageClass();
+        return messageClazz.isAssignableFrom(obj.getClass());
+    }
 
     public ForestProtobufConverter getForestProtobufConverter() {
         if (forestProtobufConverter == null) {
             synchronized (this) {
                 if (forestProtobufConverter == null) {
-                    if (checkProtobufClass()) {
+                    if (checkSupportProtobuf()) {
                         try {
                             Class clazz = Class.forName(PROTOBUF_CONVERTER_CLASS);
                             forestProtobufConverter = (ForestProtobufConverter) clazz.newInstance();

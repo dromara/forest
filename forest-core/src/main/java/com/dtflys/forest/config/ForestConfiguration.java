@@ -37,7 +37,7 @@ import com.dtflys.forest.converter.binary.DefaultBinaryConverter;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.converter.json.JSONConverterSelector;
 import com.dtflys.forest.converter.protobuf.ForestProtobufConverter;
-import com.dtflys.forest.converter.protobuf.ForestProtobufConverterFactory;
+import com.dtflys.forest.converter.protobuf.ForestProtobufConverterManager;
 import com.dtflys.forest.converter.text.DefaultTextConverter;
 import com.dtflys.forest.converter.xml.ForestJaxbConverter;
 import com.dtflys.forest.converter.xml.ForestXmlConverter;
@@ -324,7 +324,7 @@ public class ForestConfiguration implements Serializable {
         ForestConfiguration configuration = new ForestConfiguration();
         configuration.setId("forestConfiguration" + configuration.hashCode());
         configuration.setJsonConverterSelector(new JSONConverterSelector());
-        ForestProtobufConverterFactory protobufConverterFactory = ForestProtobufConverterFactory.getInstance();
+        ForestProtobufConverterManager protobufConverterFactory = ForestProtobufConverterManager.getInstance();
         configuration.setProtobufConverter(protobufConverterFactory.getForestProtobufConverter());
         configuration.setXmlConverter(new ForestJaxbConverter());
         configuration.setTextConverter(new DefaultTextConverter());

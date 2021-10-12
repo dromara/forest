@@ -1,13 +1,10 @@
 package com.dtflys.forest.converter.protobuf;
 
-import com.dtflys.forest.converter.ForestConverter;
-import com.dtflys.forest.converter.auto.DefaultAutoConverter;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.utils.ForestDataType;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.google.protobuf.Parser;
-import scala.annotation.meta.field;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
