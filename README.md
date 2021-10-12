@@ -197,6 +197,8 @@ String postXmlBodyString(@XMLBody String xml);
  * ProtobufProto.MyMessage 为 Protobuf 生成的数据类
  * 将 Protobuf 生成的数据对象转换为 Protobuf 格式的字节流
  * 并放在请求的Body进行传输
+ * 
+ * 注: 需要引入 google protobuf 依赖
  */
 @Post(url = "/message", contentType = "application/octet-stream")
 String sendProtobufMessage(@ProtobufBody ProtobufProto.MyMessage message);
