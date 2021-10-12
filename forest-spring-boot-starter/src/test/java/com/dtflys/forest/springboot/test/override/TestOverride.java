@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @RunWith(SpringRunner.class)
-@ActiveProfiles("test1")
+@ActiveProfiles("test2")
 @SpringBootTest(classes = TestOverride.class)
 @ComponentScan(basePackages = "com.dtflys.forest.springboot.test.override")
 @EnableAutoConfiguration
@@ -51,7 +51,7 @@ public class TestOverride {
     public void test1() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         String result = myClient.test1();
-        assertThat(result).isNotNull().isEqualTo(EXPECTED);
+        assertThat(result).isNotNull().isEqualTo("Global: " + EXPECTED);
     }
 
     @Test

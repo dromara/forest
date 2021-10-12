@@ -5,12 +5,11 @@ forest:
   max-connections: 1200                   # 连接池最大连接数
   max-route-connections: 1100             # 每个路由的最大连接数
   timeout: 1000                           # 请求超时时间
-  connect-timeout: 1123                   # 连接超时时间
   log-enabled: false                      # 全局日志开关
-  retry-count: 5                          # 请求失败后重试次数
+  max-retry-count: 5                      # 请求失败后重试次数
   max-retry-interval: 2000                # 请求重试之间最大间隔时间
-  #  retry-interval: 500                     # 起始重试之间间隔时间
-#  max-retry-interval: 2000                # 最大重试之间间隔时间
+  #  retry-interval: 500                  # 起始重试之间间隔时间
+#  max-retry-interval: 2000               # 最大重试之间间隔时间
   ssl-protocol: SSLv3                     # 单向验证的HTTPS的默认SSL协议
   variables:                              # 自定义全局变量：key为变量名，value为值，可以在任何模板表达式中引用
     baseUrl: https://www.thebeastshop.com/autopage
@@ -20,3 +19,4 @@ forest:
     user:
       name: foo
       password: bar
+

@@ -39,7 +39,20 @@ public class MetaRequest {
      */
     private boolean async;
 
+    /**
+     * timeout
+     */
     private Integer timeout;
+
+    /**
+     * connect timeout
+     */
+    private Integer connectTimeout;
+
+    /**
+     * read timeout
+     */
+    private Integer readTimeout;
 
     /**
      * SSL protocol
@@ -178,6 +191,22 @@ public class MetaRequest {
 
     public void setTimeout(Integer timeout) {
         this.timeout = timeout;
+    }
+
+    public Integer getConnectTimeout() {
+        return connectTimeout;
+    }
+
+    public void setConnectTimeout(Integer connectTimeout) {
+        this.connectTimeout = connectTimeout;
+    }
+
+    public Integer getReadTimeout() {
+        return readTimeout;
+    }
+
+    public void setReadTimeout(Integer readTimeout) {
+        this.readTimeout = readTimeout;
     }
 
     public String getSslProtocol() {

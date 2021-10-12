@@ -85,7 +85,11 @@ public class ForestMethod<T> implements VariableScope {
     private MappingTemplate dataTypeTemplate;
     private ForestBodyType bodyType;
     private Integer baseTimeout = null;
+    private Integer baseConnectTimeout = null;
+    private Integer baseReadTimeout = null;
     private Integer timeout = null;
+    private Integer connectTimeout = null;
+    private Integer readTimeout = null;
     private MappingTemplate sslProtocolTemplate;
     private Class baseRetryerClass = null;
     private Integer baseRetryCount = null;
@@ -222,6 +226,8 @@ public class ForestMethod<T> implements VariableScope {
         baseLogConfiguration = interfaceProxyHandler.getBaseLogConfiguration();
 
         baseTimeout = baseMetaRequest.getTimeout();
+        baseConnectTimeout = baseMetaRequest.getConnectTimeout();
+        baseReadTimeout = baseMetaRequest.getReadTimeout();
         baseRetryerClass = baseMetaRequest.getRetryer();
         baseRetryCount = baseMetaRequest.getRetryCount();
         baseMaxRetryInterval = baseMetaRequest.getMaxRetryInterval();
@@ -516,9 +522,17 @@ public class ForestMethod<T> implements VariableScope {
         Class<? extends ForestConverter> decoderClass = metaRequest.getDecoder();
         String[] dataArray = metaRequest.getData();
         String[] headerArray = metaRequest.getHeaders();
-        int tout = metaRequest.getTimeout();
-        if (tout > 0) {
+        Integer tout = metaRequest.getTimeout();
+        if (tout != null && tout >= 0) {
             timeout = tout;
+        }
+        Integer ctout = metaRequest.getConnectTimeout();
+        if (ctout != null && ctout >= 0) {
+            connectTimeout = ctout;
+        }
+        Integer rtout = metaRequest.getReadTimeout();
+        if (rtout != null && rtout >= 0) {
+            readTimeout = rtout;
         }
         Integer rtnum = metaRequest.getRetryCount();
         if (rtnum != null && rtnum >= 0) {
@@ -1185,12 +1199,28 @@ public class ForestMethod<T> implements VariableScope {
             request.setTimeout(configuration.getTimeout());
         }
 
+        if (connectTimeout != null) {
+            request.setConnectTimeout(connectTimeout);
+        } else if (baseConnectTimeout != null) {
+            request.setConnectTimeout(baseConnectTimeout);
+        } else if (configuration.getConnectTimeout() != null) {
+            request.setConnectTimeout(configuration.getConnectTimeout());
+        }
+
+        if (readTimeout != null) {
+            request.setReadTimeout(readTimeout);
+        } else if (baseReadTimeout != null) {
+            request.setReadTimeout(baseReadTimeout);
+        } else if (configuration.getReadTimeout() != null) {
+            request.setReadTimeout(configuration.getReadTimeout());
+        }
+
         if (retryCount != null) {
-            request.setRetryCount(retryCount);
+            request.setMaxRetryCount(retryCount);
         } else if (baseRetryCount != null) {
-            request.setRetryCount(baseRetryCount);
-        } else if (configuration.getRetryCount() != null) {
-            request.setRetryCount(configuration.getRetryCount());
+            request.setMaxRetryCount(baseRetryCount);
+        } else if (configuration.getMaxRetryCount() != null) {
+            request.setMaxRetryCount(configuration.getMaxRetryCount());
         }
 
         if (maxRetryInterval >= 0) {
@@ -1331,7 +1361,12 @@ public class ForestMethod<T> implements VariableScope {
                         rType, successType);
                 request.setLifeCycleHandler(lifeCycleHandler);
                 lifeCycleHandler.handleInvokeMethod(request, this, args);
+                return request;
+            } else {
+                lifeCycleHandler = new MethodLifeCycleHandler<>(
+                        rType, onSuccessClassGenericType);
             }
+            request.setLifeCycleHandler(lifeCycleHandler);
             lifeCycleHandler.handleInvokeMethod(request, this, args);
             return request;
         }

@@ -36,7 +36,6 @@ public class Test1 {
         assertEquals(Integer.valueOf(5000), forestConfiguration.getMaxConnections());
         assertEquals(Integer.valueOf(5500), forestConfiguration.getMaxRouteConnections());
         assertEquals(Integer.valueOf(50), forestConfiguration.getTimeout());
-        assertEquals(Integer.valueOf(4000), forestConfiguration.getConnectTimeout());
         assertEquals("GBK", forestConfiguration.getCharset());
         assertEquals(Integer.valueOf(0), forestConfiguration.getMaxRetryCount());
         assertTrue(forestConfiguration.isLogEnabled());
@@ -62,7 +61,7 @@ public class Test1 {
         assertEquals(50, reqTimeout);
         long time = sw.getTotalTimeMillis();
         assertTrue(time >= 50);
-        assertTrue(time <= 900);
+        assertTrue(time <= 1200);
         LogConfiguration logConfiguration = request.getLogConfiguration();
         assertTrue(logConfiguration.isLogEnabled());
         assertTrue(logConfiguration.isLogRequest());

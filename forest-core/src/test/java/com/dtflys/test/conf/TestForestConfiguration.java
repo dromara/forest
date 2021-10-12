@@ -75,7 +75,8 @@ public class TestForestConfiguration {
         assertEquals("forestConfiguration" + configuration.hashCode(),
                 configuration.getId());
         assertEquals(Integer.valueOf(3000), configuration.getTimeout());
-        assertEquals(Integer.valueOf(2000), configuration.getConnectTimeout());
+        assertEquals(null, configuration.getConnectTimeout());
+        assertEquals(null, configuration.getReadTimeout());
         assertEquals(Integer.valueOf(500), configuration.getMaxConnections());
         assertEquals(Integer.valueOf(500), configuration.getMaxRouteConnections());
         assertNotNull(configuration.getJsonConverter());

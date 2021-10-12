@@ -50,8 +50,13 @@ public class ForestProtobufConverterFactory implements Serializable {
     }
 
 
-    public Class checkProtobufClass() throws Throwable {
-        return Class.forName("com.google.protobuf.Parser");
+    public boolean checkProtobufClass() {
+        try {
+            Class.forName("com.google.protobuf.Parser");
+        } catch (Throwable ignored) {
+            return false;
+        }
+        return true;
     }
 
 
@@ -59,12 +64,13 @@ public class ForestProtobufConverterFactory implements Serializable {
         if (forestProtobufConverter == null) {
             synchronized (this) {
                 if (forestProtobufConverter == null) {
-                    try {
-                        checkProtobufClass();
-                        Class clazz = Class.forName(PROTOBUF_CONVERTER_CLASS);
-                        forestProtobufConverter = (ForestProtobufConverter) clazz.newInstance();
-                    } catch (Throwable e) {
-                        throw new ForestRuntimeException("forestProtobufConverter create exception", e);
+                    if (checkProtobufClass()) {
+                        try {
+                            Class clazz = Class.forName(PROTOBUF_CONVERTER_CLASS);
+                            forestProtobufConverter = (ForestProtobufConverter) clazz.newInstance();
+                        } catch (Throwable th) {
+                            throw new ForestRuntimeException("forestProtobufConverter create exception", th);
+                        }
                     }
                 }
             }

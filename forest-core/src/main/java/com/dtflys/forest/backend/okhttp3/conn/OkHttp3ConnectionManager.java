@@ -16,6 +16,7 @@ import com.dtflys.forest.ssl.SSLUtils;
 import com.dtflys.forest.ssl.TrustAllHostnameVerifier;
 import com.dtflys.forest.ssl.TrustAllManager;
 import com.dtflys.forest.utils.StringUtils;
+import com.dtflys.forest.utils.TimeUtils;
 import okhttp3.Authenticator;
 import okhttp3.ConnectionPool;
 import okhttp3.Cookie;
@@ -107,10 +108,18 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
 
     public OkHttpClient getClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         Integer timeout = request.getTimeout();
+        Integer connectTimeout = request.connectTimeout();
+        Integer readTimeout = request.readTimeout();
+        if (TimeUtils.isNone(connectTimeout)) {
+            connectTimeout = timeout;
+        }
+        if (TimeUtils.isNone(readTimeout)) {
+            readTimeout = timeout;
+        }
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .connectionPool(pool)
-                .connectTimeout(timeout, TimeUnit.MILLISECONDS)
-                .readTimeout(timeout, TimeUnit.MILLISECONDS)
+                .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
+                .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
                 .protocols(getProtocols(request))
                 .followRedirects(false)
                 .followSslRedirects(false)

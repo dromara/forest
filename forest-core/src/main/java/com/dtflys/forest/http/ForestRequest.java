@@ -66,6 +66,7 @@ import com.dtflys.forest.interceptor.InterceptorChain;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
+import com.dtflys.forest.utils.TimeUtils;
 import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.forest.utils.URLUtils;
 import org.apache.commons.lang3.reflect.TypeUtils;
@@ -79,8 +80,10 @@ import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import static com.dtflys.forest.mapping.MappingParameter.*;
 
@@ -186,6 +189,16 @@ public class ForestRequest<T> {
      * 请求超时时间
      */
     private int timeout = 3000;
+
+    /**
+     * 请求连接超时时间
+     */
+    private Integer connectTimeout = -1;
+
+    /**
+     * 请求读取超时时间
+     */
+    private Integer readTimeout = -1;
 
     /**
      * 是否开启解压GZIP响应内容
@@ -1841,6 +1854,7 @@ public class ForestRequest<T> {
      *
      * @return 请求超时时间
      */
+    @Deprecated
     public int getTimeout() {
         return timeout;
     }
@@ -1851,10 +1865,156 @@ public class ForestRequest<T> {
      * @param timeout 请求超时时间
      * @return {@link ForestRequest}类实例
      */
+    @Deprecated
     public ForestRequest<T> setTimeout(int timeout) {
         this.timeout = timeout;
         return this;
     }
+
+    /**
+     * 获取连接超时时间，时间单位为毫秒
+     *
+     * @return 连接超时时间
+     */
+    public Integer getConnectTimeout() {
+        return connectTimeout;
+    }
+
+    /**
+     * 设置连接超时时间，时间单位为毫秒
+     *
+     * @param connectTimeout 连接超时时间
+     * @return {@link ForestRequest}对象实例
+     */
+    public ForestRequest<T> setConnectTimeout(int connectTimeout) {
+        this.connectTimeout = connectTimeout;
+        return this;
+    }
+
+    /**
+     * 获取连接超时时间，时间单位为毫秒
+     * <p>同{@link ForestRequest#getConnectTimeout()}
+     *
+     * @return 连接超时时间
+     * @see ForestRequest#getConnectTimeout()
+     * @since 1.5.6
+     */
+    public Integer connectTimeout() {
+        return getConnectTimeout();
+    }
+
+    /**
+     * 设置连接超时时间，时间单位为毫秒
+     * <p>同{@link ForestRequest#setConnectTimeout(int)}
+     *
+     * @param connectTimeout 连接超时时间
+     * @see ForestRequest#setConnectTimeout(int)
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.6
+     */
+    public ForestRequest<T> connectTimeout(int connectTimeout) {
+        this.connectTimeout = connectTimeout;
+        return this;
+    }
+
+    /**
+     * 设置连接超时时间
+     *
+     * @param connectTimeout 连接超时时间, 整数
+     * @param timeUnit 时间单位
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.6
+     */
+    public ForestRequest<T> connectTimeout(int connectTimeout, TimeUnit timeUnit) {
+        this.connectTimeout = TimeUtils.toMillis("connect timeout", connectTimeout, timeUnit);
+        return this;
+    }
+
+    /**
+     * 设置连接超时时间
+     *
+     * @param connectTimeout 连接超时时间, {@link Duration}对象
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.6
+     */
+    public ForestRequest<T> connectTimeout(Duration connectTimeout) {
+        this.connectTimeout = TimeUtils.toMillis("connect timeout", connectTimeout);
+        return this;
+    }
+
+
+    /**
+     * 获取读取超时时间，时间单位为毫秒
+     *
+     * @return 读取超时时间
+     * @since 1.5.6
+     */
+    public Integer getReadTimeout() {
+        return readTimeout;
+    }
+
+    /**
+     * 设置读取超时时间，时间单位为毫秒
+     *
+     * @param readTimeout 读取超时时间
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.6
+     */
+    public ForestRequest<T> setReadTimeout(int readTimeout) {
+        this.readTimeout = readTimeout;
+        return this;
+    }
+
+    /**
+     * 获取读取超时时间，时间单位为毫秒
+     * <p>同{@link ForestRequest#getReadTimeout()}
+     *
+     * @return 读取超时时间
+     * @see ForestRequest#getReadTimeout()
+     * @since 1.5.6
+     */
+    public Integer readTimeout() {
+        return getReadTimeout();
+    }
+
+    /**
+     * 设置读取超时时间，时间单位为毫秒
+     * <p>同{@link ForestRequest#setReadTimeout(int)}
+     *
+     * @param readTimeout 读取超时时间
+     * @see ForestRequest#setReadTimeout(int)
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.6
+     */
+    public ForestRequest<T> readTimeout(int readTimeout) {
+        return setReadTimeout(readTimeout);
+    }
+
+    /**
+     * 设置读取超时时间
+     *
+     * @param readTimeout 读取超时时间
+     * @param timeUnit 时间单位
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.6
+     */
+    public ForestRequest<T> readTimeout(int readTimeout, TimeUnit timeUnit) {
+        this.readTimeout = TimeUtils.toMillis("read timeout", readTimeout, timeUnit);
+        return this;
+    }
+
+    /**
+     * 设置读取超时时间
+     *
+     * @param readTimeout 读取超时时间, {@link Duration}对象
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.6
+     */
+    public ForestRequest<T> readTimeout(Duration readTimeout) {
+        this.readTimeout = TimeUtils.toMillis("read timeout", readTimeout);
+        return this;
+    }
+
 
     /**
      * 是否开启解压GZIP响应内容

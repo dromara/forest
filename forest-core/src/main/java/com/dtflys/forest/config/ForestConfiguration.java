@@ -63,10 +63,12 @@ import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
+import com.dtflys.forest.utils.TimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -74,6 +76,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * global configuration
@@ -126,9 +129,15 @@ public class ForestConfiguration implements Serializable {
     private String charset = "UTF-8";
 
     /**
-     * 局的请求连接超时时间，单位为毫秒
+     * 全局的请求连接超时时间，单位为毫秒
      */
     private Integer connectTimeout;
+
+    /**
+     * 全局的请求读取超时时间，单位为毫秒
+     */
+    private Integer readTimeout;
+
 
     /**
      * 全局的请求失败重试策略类
@@ -324,7 +333,6 @@ public class ForestConfiguration implements Serializable {
         configuration.getConverterMap().put(ForestDataType.BINARY, new DefaultBinaryConverter(autoConverter));
         setupJSONConverter(configuration);
         configuration.setTimeout(3000);
-        configuration.setConnectTimeout(2000);
         configuration.setMaxConnections(500);
         configuration.setMaxRouteConnections(500);
         configuration.setRetryer(BackOffRetryer.class);
@@ -458,9 +466,11 @@ public class ForestConfiguration implements Serializable {
      * 设置Forest对象实例化工厂
      *
      * @param forestObjectFactory Forest对象实例化工厂对象
+     * @return 当前ForestConfiguration实例
      */
-    public void setForestObjectFactory(ForestObjectFactory forestObjectFactory) {
+    public ForestConfiguration setForestObjectFactory(ForestObjectFactory forestObjectFactory) {
         this.forestObjectFactory = forestObjectFactory;
+        return this;
     }
 
     /**
@@ -483,9 +493,11 @@ public class ForestConfiguration implements Serializable {
      * 设置拦截器工厂
      *
      * @param interceptorFactory 拦截器工厂
+     * @return 当前ForestConfiguration实例
      */
-    public void setInterceptorFactory(InterceptorFactory interceptorFactory) {
+    public ForestConfiguration setInterceptorFactory(InterceptorFactory interceptorFactory) {
         this.interceptorFactory = interceptorFactory;
+        return this;
     }
 
     /**
@@ -508,9 +520,11 @@ public class ForestConfiguration implements Serializable {
      * 设置Properties配置属性
      *
      * @param properties {@link ForestProperties}类实例
+     * @return 当前ForestConfiguration实例
      */
-    public void setProperties(ForestProperties properties) {
+    public ForestConfiguration setProperties(ForestProperties properties) {
         this.properties = properties;
+        return this;
     }
 
     /**
@@ -619,6 +633,7 @@ public class ForestConfiguration implements Serializable {
      *
      * @return 请求超时时间，单位为毫秒
      */
+    @Deprecated
     public Integer getTimeout() {
         return timeout;
     }
@@ -629,6 +644,7 @@ public class ForestConfiguration implements Serializable {
      * @param timeout 请求超时时间，单位为毫秒
      * @return 当前ForestConfiguration实例
      */
+    @Deprecated
     public ForestConfiguration setTimeout(Integer timeout) {
         this.timeout = timeout;
         return this;
@@ -647,9 +663,11 @@ public class ForestConfiguration implements Serializable {
      * 设置全局的请求数据字符集
      *
      * @param charset 字符集名称
+     * @return 当前ForestConfiguration实例
      */
-    public void setCharset(String charset) {
+    public ForestConfiguration setCharset(String charset) {
         this.charset = charset;
+        return this;
     }
 
     /**
@@ -673,6 +691,80 @@ public class ForestConfiguration implements Serializable {
     }
 
     /**
+     * 设置全局的请求连接超时时间
+     *
+     * @param connectTimeout 连接超时时间, 整数
+     * @param timeUnit 时间单位
+     * @return 当前ForestConfiguration实例
+     * @since 1.5.6
+     */
+    public ForestConfiguration setConnectTimeout(int connectTimeout, TimeUnit timeUnit) {
+        this.connectTimeout = TimeUtils.toMillis("global connect timeout", connectTimeout, timeUnit);
+        return this;
+    }
+
+    /**
+     * 设置全局的请求连接超时时间
+     *
+     * @param connectTimeout 连接超时时间, {@link Duration}对象
+     * @return 当前ForestConfiguration实例
+     * @since 1.5.6
+     */
+    public ForestConfiguration setConnectTimeout(Duration connectTimeout) {
+        this.connectTimeout = TimeUtils.toMillis("global connect timeout", connectTimeout);
+        return this;
+    }
+
+
+    /**
+     * 获取全局的请求读取超时时间，单位为毫秒
+     *
+     * @return 读取超时时间
+     * @since 1.5.6
+     */
+    public Integer getReadTimeout() {
+        return readTimeout;
+    }
+
+    /**
+     * 设置全局的请求读取超时时间，单位为毫秒
+     *
+     * @param readTimeout 读取超时时间，单位为毫秒
+     * @return 当前ForestConfiguration实例
+     * @since 1.5.6
+     */
+    public ForestConfiguration setReadTimeout(Integer readTimeout) {
+        this.readTimeout = readTimeout;
+        return this;
+    }
+
+    /**
+     * 设置全局的请求读取超时时间
+     *
+     * @param readTimeout 读取超时时间
+     * @param timeUnit 时间单位
+     * @return 当前ForestConfiguration实例
+     * @since 1.5.6
+     */
+    public ForestConfiguration setReadTimeout(int readTimeout, TimeUnit timeUnit) {
+        this.readTimeout = TimeUtils.toMillis("global read timeout", readTimeout, timeUnit);
+        return this;
+    }
+
+    /**
+     * 设置全局的请求读取超时时间
+     *
+     * @param readTimeout 读取超时时间, {@link Duration}
+     * @return 当前ForestConfiguration实例
+     * @since 1.5.6
+     */
+    public ForestConfiguration setReadTimeout(Duration readTimeout) {
+        this.readTimeout = TimeUtils.toMillis("global read timeout", readTimeout);
+        return this;
+    }
+
+
+    /**
      * 获取全局的请求失败重试策略类
      *
      * @return 重试策略类
@@ -685,9 +777,11 @@ public class ForestConfiguration implements Serializable {
      * 设置全局的请求失败重试策略类
      *
      * @param retryer 重试策略类
+     * @return 当前ForestConfiguration实例
      */
-    public void setRetryer(Class retryer) {
+    public ForestConfiguration setRetryer(Class retryer) {
         this.retryer = retryer;
+        return this;
     }
 
     /**
@@ -747,9 +841,11 @@ public class ForestConfiguration implements Serializable {
      * 设置全局的最大请求重试之间的时间间隔，单位为毫秒
      *
      * @param maxRetryInterval 最大请求重试之间的时间间隔
+     * @return 当前ForestConfiguration实例
      */
-    public void setMaxRetryInterval(long maxRetryInterval) {
+    public ForestConfiguration setMaxRetryInterval(long maxRetryInterval) {
         this.maxRetryInterval = maxRetryInterval;
+        return this;
     }
 
     /**
@@ -765,22 +861,26 @@ public class ForestConfiguration implements Serializable {
      * 设置全局默认地址(主机名/域名/ip地址 + 端口号)
      *
      * @param baseAddress 全局默认地址 {@link ForestAddress}对象
+     * @return 当前ForestConfiguration实例
      */
-    public void setBaseAddress(ForestAddress baseAddress) {
+    public ForestConfiguration setBaseAddress(ForestAddress baseAddress) {
         this.baseAddress = baseAddress;
+        return this;
     }
 
     /**
      * 设置全局地址的HTTP协议头
      *
      * @param scheme HTTP 协议头
+     * @return 当前ForestConfiguration实例
      */
-    public void setBaseAddressScheme(String scheme) {
+    public ForestConfiguration setBaseAddressScheme(String scheme) {
         if (baseAddress == null) {
             baseAddress = new ForestAddress(scheme, null, null);
         } else {
             baseAddress = new ForestAddress(scheme, baseAddress.getHost(), baseAddress.getPort());
         }
+        return this;
     }
 
 
@@ -788,29 +888,33 @@ public class ForestConfiguration implements Serializable {
      * 设置全局地址的 host
      *
      * @param host 全局地址的主机名/ip地址
+     * @return 当前ForestConfiguration实例
      */
-    public void setBaseAddressHost(String host) {
+    public ForestConfiguration setBaseAddressHost(String host) {
         if (baseAddress == null) {
             baseAddress = new ForestAddress(host, null);
         } else {
             baseAddress = new ForestAddress(baseAddress.getScheme(), host, baseAddress.getPort());
         }
+        return this;
     }
 
     /**
      * 设置全局地址的 port
      *
      * @param port 全局地址的端口号
+     * @return 当前ForestConfiguration实例
      */
-    public void setBaseAddressPort(Integer port) {
+    public ForestConfiguration setBaseAddressPort(Integer port) {
         if (port == null) {
-            return;
+            return this;
         }
         if (baseAddress == null) {
             baseAddress = new ForestAddress(null, port);
         } else {
             baseAddress = new ForestAddress(baseAddress.getScheme(), baseAddress.getHost(), port);
         }
+        return this;
     }
 
 
@@ -830,9 +934,11 @@ public class ForestConfiguration implements Serializable {
      * 设置全局默认的主机地址信息动态来源接口实现类
      *
      * @param baseAddressSourceClass {@link AddressSource}接口实现类
+     * @return 当前ForestConfiguration实例
      */
-    public void setBaseAddressSourceClass(Class<? extends AddressSource> baseAddressSourceClass) {
+    public ForestConfiguration setBaseAddressSourceClass(Class<? extends AddressSource> baseAddressSourceClass) {
         this.baseAddressSourceClass = baseAddressSourceClass;
+        return this;
     }
 
     /**
@@ -848,9 +954,11 @@ public class ForestConfiguration implements Serializable {
      * 设置全局的单向HTTPS请求的SSL协议
      *
      * @param sslProtocol SSL协议名称
+     * @return 当前ForestConfiguration实例
      */
-    public void setSslProtocol(String sslProtocol) {
+    public ForestConfiguration setSslProtocol(String sslProtocol) {
         this.sslProtocol = sslProtocol;
+        return this;
     }
 
     /**
@@ -866,9 +974,11 @@ public class ForestConfiguration implements Serializable {
      * 设置是否允许打印请求日志
      *
      * @param logEnabled 允许为 {@code true} , 否则为 {@code false}
+     * @return 当前ForestConfiguration实例
      */
-    public void setLogEnabled(boolean logEnabled) {
+    public ForestConfiguration setLogEnabled(boolean logEnabled) {
         this.logEnabled = logEnabled;
+        return this;
     }
 
     /**
@@ -884,9 +994,11 @@ public class ForestConfiguration implements Serializable {
      * 设置是否允许打印请求/响应日志
      *
      * @param logRequest 允许为 {@code true} , 否则为 {@code false}
+     * @return 当前ForestConfiguration实例
      */
-    public void setLogRequest(boolean logRequest) {
+    public ForestConfiguration setLogRequest(boolean logRequest) {
         this.logRequest = logRequest;
+        return this;
     }
 
     /**
@@ -902,9 +1014,11 @@ public class ForestConfiguration implements Serializable {
      * 设置是否允许打印响应日志
      *
      * @param logResponseStatus 允许为 {@code true}, 否则为 {@code false}
+     * @return 当前ForestConfiguration实例
      */
-    public void setLogResponseStatus(boolean logResponseStatus) {
+    public ForestConfiguration setLogResponseStatus(boolean logResponseStatus) {
         this.logResponseStatus = logResponseStatus;
+        return this;
     }
 
     /**
@@ -920,9 +1034,11 @@ public class ForestConfiguration implements Serializable {
      * 设置是否允许打印响应日志
      *
      * @param logResponseContent 允许为 {@code true}, 否则为 {@code false}
+     * @return 当前ForestConfiguration实例
      */
-    public void setLogResponseContent(boolean logResponseContent) {
+    public ForestConfiguration setLogResponseContent(boolean logResponseContent) {
         this.logResponseContent = logResponseContent;
+        return this;
     }
 
     /**
@@ -938,9 +1054,11 @@ public class ForestConfiguration implements Serializable {
      * 设置日志处理器
      *
      * @param logHandler 日志处理器接口实例
+     * @return 当前ForestConfiguration实例
      */
-    public void setLogHandler(ForestLogHandler logHandler) {
+    public ForestConfiguration setLogHandler(ForestLogHandler logHandler) {
         this.logHandler = logHandler;
+        return this;
     }
 
     /**
@@ -956,9 +1074,11 @@ public class ForestConfiguration implements Serializable {
      * 设置是否缓存请求接口实例
      *
      * @param cacheEnabled 如果允许缓存实例为 {@code true}, 否则为 {@code false}
+     * @return 当前ForestConfiguration实例
      */
-    public void setCacheEnabled(boolean cacheEnabled) {
+    public ForestConfiguration setCacheEnabled(boolean cacheEnabled) {
         this.cacheEnabled = cacheEnabled;
+        return this;
     }
 
     /**
@@ -1017,9 +1137,11 @@ public class ForestConfiguration implements Serializable {
      * 设置全局重试条件回调函数
      *
      * @param retryWhenClass {@link RetryWhen}接口实现类
+     * @return 当前ForestConfiguration实例
      */
-    public void setRetryWhenClass(Class<? extends RetryWhen> retryWhenClass) {
+    public ForestConfiguration setRetryWhenClass(Class<? extends RetryWhen> retryWhenClass) {
         this.retryWhenClass = retryWhenClass;
+        return this;
     }
 
     /**
@@ -1038,9 +1160,11 @@ public class ForestConfiguration implements Serializable {
      * 设置全局请求成功条件回调函数
      *
      * @param successWhenClass {@link SuccessWhen}接口实现类
+     * @return 当前ForestConfiguration实例
      */
-    public void setSuccessWhenClass(Class<? extends SuccessWhen> successWhenClass) {
+    public ForestConfiguration setSuccessWhenClass(Class<? extends SuccessWhen> successWhenClass) {
         this.successWhenClass = successWhenClass;
+        return this;
     }
 
     /**
@@ -1056,9 +1180,11 @@ public class ForestConfiguration implements Serializable {
      * 设置全局拦截器列表
      *
      * @param interceptors 全局拦截器列表
+     * @return 当前ForestConfiguration实例
      */
-    public void setInterceptors(List<Class<? extends Interceptor>> interceptors) {
+    public ForestConfiguration setInterceptors(List<Class<? extends Interceptor>> interceptors) {
         this.interceptors = interceptors;
+        return this;
     }
 
     /**
