@@ -3,14 +3,13 @@ forest:
   max-connections: 5000
   max-route-connections: 5500
   timeout: 50
-  connect-timeout: 4000
   charset: GBK
+  max-retry-count: 0
   log-enabled: true
   log-request: true
   log-response-status: false
   log-response-content: true
   log-handler: com.dtflys.forest.springboot.test.logging.TestLogHandler
-  retry-count: 0
   filters:
     test: com.dtflys.forest.springboot.test.filter.TestFilter
   converters:
@@ -25,5 +24,6 @@ forest:
     user:
       name: foo
       password: bar
+
 
 

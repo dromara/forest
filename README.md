@@ -12,13 +12,13 @@
     <img src="https://gitee.com/dromara/forest/badge/star.svg" alt="Gitee Stars">
 </a>
 <!--
-<a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.5.5/jar">
+<a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.5.8/jar">
     <img src="https://img.shields.io/badge/maven%20central-1.5.1-brightgreen.svg" alt="Maven Central">
 </a>
 -->
 <!--
-<a href="https://gitee.com/dromara/forest/releases/v1.5.5">
-    <img src="https://img.shields.io/badge/release-v1.5.5" alt="Release">
+<a href="https://gitee.com/dromara/forest/releases/v1.5.8">
+    <img src="https://img.shields.io/badge/release-v1.5.8" alt="Release">
 </a>
 -->
 <a href="https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html">
@@ -72,8 +72,9 @@ Forest有哪些特性？
 * 支持过滤器来过滤传入的数据
 * 基于注解、配置化的方式定义Http请求
 * 支持Spring和Springboot集成
-* JSON字符串到Java对象的自动化解析
-* XML文本到Java对象的自动化解析
+* JSON格式数据序列化和反序列化
+* XML格式数据序列化和反序列化
+* Protobuf格式数据序列化和反序列化
 * JSON、XML或其他类型转换器可以随意扩展和替换
 * 支持JSON转换框架: Fastjson, Jackson, Gson
 * 支持JAXB形式的XML转换
@@ -93,7 +94,7 @@ Forest有哪些特性？
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-spring-boot-starter</artifactId>
-    <version>1.5.5</version>
+    <version>1.5.8</version>
 </dependency>
 ```
 
@@ -188,6 +189,21 @@ String sendXmlMessage(@XMLBody MyMessage message);
 @Post("/test/xml")
 String postXmlBodyString(@XMLBody String xml);
 ```
+
+## 发送Protobuf数据
+
+```java
+/**
+ * ProtobufProto.MyMessage 为 Protobuf 生成的数据类
+ * 将 Protobuf 生成的数据对象转换为 Protobuf 格式的字节流
+ * 并放在请求的Body进行传输
+ * 
+ * 注: 需要引入 google protobuf 依赖
+ */
+@Post(url = "/message", contentType = "application/octet-stream")
+String sendProtobufMessage(@ProtobufBody ProtobufProto.MyMessage message);
+```
+
 
 ## 文件上传
 

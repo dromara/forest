@@ -94,6 +94,24 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="connectTimeout" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           全局的请求连接超时时间，单位为毫秒
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="readTimeout" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           全局的请求读取超时时间，单位为毫秒
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
         <xsd:attribute name="maxConnections" type="xsd:string" use="optional">
             <xsd:annotation>
                 <xsd:documentation>
@@ -122,20 +140,65 @@
             </xsd:annotation>
         </xsd:attribute>
 
-        <xsd:attribute name="connectTimeout" type="xsd:string" use="optional">
-            <xsd:annotation>
-                <xsd:documentation>
-                    <![CDATA[
-                            局的请求连接超时时间，单位为毫秒
-                        ]]>
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
         <xsd:attribute name="retryCount" type="xsd:string" use="optional">
             <xsd:annotation>
                 <xsd:documentation>
                     <![CDATA[
                            全局的最大请求失败重试次数
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="maxRetryCount" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           全局的最大请求失败重试次数
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="maxRetryInterval" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           全局的最大请求重试之间的时间间隔，单位为毫秒
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="baseAddress" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           全局默认地址(主机名/域名/ip地址 + 端口号)
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="baseAddressSourceClass" type="xsd:token" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           全局默认的主机地址信息动态来源接口实现类
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="successWhenClass" type="xsd:token" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           全局请求成功条件回调函数类
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="retryWhenClass" type="xsd:token" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           全局重试条件回调函数
                         ]]>
                 </xsd:documentation>
             </xsd:annotation>

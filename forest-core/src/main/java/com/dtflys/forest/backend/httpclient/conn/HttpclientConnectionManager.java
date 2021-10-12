@@ -8,6 +8,7 @@ import com.dtflys.forest.exceptions.ForestUnsupportException;
 import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.utils.StringUtils;
+import com.dtflys.forest.utils.TimeUtils;
 import org.apache.http.Consts;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthSchemeProvider;
@@ -93,11 +94,19 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
                             try {
                                 int threads = Runtime.getRuntime().availableProcessors();
                                 //配置io线程
-                                IOReactorConfig ioReactorConfig = IOReactorConfig.custom().
+                                IOReactorConfig.Builder ioReactorConfigBuilder = IOReactorConfig.custom().
                                         setIoThreadCount(threads)
-                                        .setConnectTimeout(configuration.getConnectTimeout())
-                                        .setSoKeepAlive(true)
-                                        .build();
+                                        .setSoKeepAlive(true);
+/*
+                                if (configuration.getConnectTimeout() != null) {
+                                    ioReactorConfigBuilder.setConnectTimeout(configuration.getConnectTimeout());
+                                }
+                                if (configuration.getReadTimeout() != null) {
+                                    ioReactorConfigBuilder.setSoTimeout(configuration.getReadTimeout());
+                                }
+*/
+
+                                IOReactorConfig ioReactorConfig = ioReactorConfigBuilder.build();
 
                                 ConnectingIOReactor ioReactor = null;
                                 try {
@@ -140,18 +149,25 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
         builder.setConnectionManager(tsConnectionManager);
 
         RequestConfig.Builder configBuilder = RequestConfig.custom();
-        // 设置连接超时
-        configBuilder.setConnectTimeout(request.getTimeout());
-
-        // 设置读取超时
-
+        // 超时时间
         Integer timeout = request.getTimeout();
-        if (timeout == null) {
-            timeout = request.getConfiguration().getTimeout();
+        // 连接超时时间
+        Integer connectTimeout = request.connectTimeout();
+        // 读取超时时间
+        Integer readTimeout = request.readTimeout();
+
+        if (TimeUtils.isNone(connectTimeout)) {
+            connectTimeout = timeout;
         }
-        configBuilder.setSocketTimeout(timeout);
+        if (TimeUtils.isNone(readTimeout)) {
+            readTimeout = timeout;
+        }
+        // 设置请求连接超时时间
+        configBuilder.setConnectTimeout(connectTimeout);
+        // 设置请求数据传输超时时间
+        configBuilder.setSocketTimeout(readTimeout);
         // 设置从连接池获取连接实例的超时
-        configBuilder.setConnectionRequestTimeout(HttpConnectionConstants.DEFAULT_READ_TIMEOUT);
+//        configBuilder.setConnectionRequestTimeout(-1);
         // 在提交请求之前 测试连接是否可用
         configBuilder.setStaleConnectionCheckEnabled(true);
         // 设置Cookie策略

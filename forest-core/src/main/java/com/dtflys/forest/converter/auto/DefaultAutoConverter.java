@@ -2,11 +2,11 @@ package com.dtflys.forest.converter.auto;
 
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ForestConverter;
+import com.dtflys.forest.converter.protobuf.ForestProtobufConverterManager;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
-import com.google.protobuf.Message;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -21,6 +21,8 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
 
     private final ForestConfiguration configuration;
 
+    private final ForestProtobufConverterManager protobufConverterManager = ForestProtobufConverterManager.getInstance();
+
     public DefaultAutoConverter(ForestConfiguration configuration) {
         this.configuration = configuration;
     }
@@ -30,14 +32,14 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
         if (source == null) {
             return null;
         }
-        if (Message.class.isAssignableFrom(targetType)) {
-            return tryConvert(source, targetType, ForestDataType.PROTOBUF);
-        }
         if (source instanceof InputStream
                 || source instanceof byte[]
                 || source instanceof File) {
             if (canReadAsBinary(targetType)) {
                 return tryConvert(source, targetType, ForestDataType.BINARY);
+            }
+            if (protobufConverterManager.isProtobufMessageClass(targetType)) {
+                return tryConvert(source, targetType, ForestDataType.PROTOBUF);
             }
             source = readAsString(source);
         }
@@ -106,14 +108,14 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
         if (source == null) {
             return null;
         }
-        if (targetType.getClass() == Class.class && Message.class.isAssignableFrom((Class<?>) targetType)) {
-            return tryConvert(source, targetType, ForestDataType.PROTOBUF);
-        }
         if (source instanceof InputStream
                 || source instanceof byte[]
                 || source instanceof File) {
             if (canReadAsBinary(targetType)) {
                 return tryConvert(source, targetType, ForestDataType.BINARY);
+            }
+            if (protobufConverterManager.isProtobufMessageType(targetType)) {
+                return tryConvert(source, targetType, ForestDataType.PROTOBUF);
             }
             source = readAsString(source);
         }

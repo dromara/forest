@@ -90,10 +90,18 @@ public class ResultHandler {
                     responseText = result.toString();
                 }
                 else if (CharSequence.class.isAssignableFrom(resultClass)) {
-                    responseText = response.readAsString();
+                    try {
+                        responseText = response.readAsString();
+                    } catch (Throwable th) {
+                        request.getLifeCycleHandler().handleError(request, response, th);
+                    }
                 }
                 else {
-                    responseText = response.getContent();
+                    try {
+                        responseText = response.getContent();
+                    } catch (Throwable th) {
+                        request.getLifeCycleHandler().handleError(request, response, th);
+                    }
                 }
                 response.setContent(responseText);
                 if (CharSequence.class.isAssignableFrom(resultClass)) {

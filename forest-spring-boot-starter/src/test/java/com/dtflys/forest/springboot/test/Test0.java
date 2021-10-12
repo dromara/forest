@@ -59,7 +59,6 @@ public class Test0 {
         assertEquals(Integer.valueOf(1200), config0.getMaxConnections());
         assertEquals(Integer.valueOf(1100), config0.getMaxRouteConnections());
         assertEquals(Integer.valueOf(1000), config0.getTimeout());
-        assertEquals(Integer.valueOf(1123), config0.getConnectTimeout());
         assertEquals("UTF-8", config0.getCharset());
         assertEquals(Integer.valueOf(5), config0.getMaxRetryCount());
         assertEquals("okhttp3", config0.getBackend().getName());

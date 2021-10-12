@@ -1,7 +1,7 @@
 package com.dtflys.test.mock;
 
 import com.dtflys.forest.backend.ContentType;
-import com.dtflys.forest.converter.protobuf.ForestProtobufConverter;
+import com.dtflys.forest.converter.protobuf.ForestGoogleProtobufConverter;
 import com.dtflys.test.converter.protobuf.ProtobufProto;
 import org.apache.http.HttpHeaders;
 import org.mockserver.client.server.MockServerClient;
@@ -24,7 +24,7 @@ public class ProtobufMockServer extends MockServerRule {
 
         MockServerClient mockClient = new MockServerClient("localhost", port);
 
-        ForestProtobufConverter protobufConverter = new ForestProtobufConverter();
+        ForestGoogleProtobufConverter protobufConverter = new ForestGoogleProtobufConverter();
 
         ProtobufProto.BaseData.Builder reqBuilder = ProtobufProto.BaseData.newBuilder();
         reqBuilder.setInt32Val(1);

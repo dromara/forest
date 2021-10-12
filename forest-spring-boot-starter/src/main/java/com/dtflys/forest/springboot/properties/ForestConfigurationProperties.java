@@ -8,9 +8,11 @@ import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.forest.ssl.SSLUtils;
+import com.dtflys.forest.utils.TimeUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +50,12 @@ public class ForestConfigurationProperties {
     /**
      * Connect timeout in milliseconds
      */
-    private int connectTimeout = 2000;
+    private Duration connectTimeout = null;
+
+    /**
+     * Read timeout in milliseconds
+     */
+    private Duration readTimeout = null;
 
     /**
      * Request charset
@@ -211,12 +218,28 @@ public class ForestConfigurationProperties {
         this.timeout = timeout;
     }
 
-    public int getConnectTimeout() {
+    public Duration getConnectTimeout() {
         return connectTimeout;
     }
 
-    public void setConnectTimeout(int connectTimeout) {
+    public Integer getConnectTimeoutAsMillis() {
+        return TimeUtils.toMillis("connect timeout", connectTimeout);
+    }
+
+    public void setConnectTimeout(Duration connectTimeout) {
         this.connectTimeout = connectTimeout;
+    }
+
+    public Duration getReadTimeout() {
+        return readTimeout;
+    }
+
+    public Integer getReadTimeoutAsMillis() {
+        return TimeUtils.toMillis("read timeout", readTimeout);
+    }
+
+    public void setReadTimeout(Duration readTimeout) {
+        this.readTimeout = readTimeout;
     }
 
     public String getCharset() {

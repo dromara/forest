@@ -121,6 +121,18 @@ public @interface BaseRequest {
     int timeout() default -1;
 
     /**
+     * 请求连接超时时间, 单位为毫秒
+     * @return 请求连接超时时间
+     */
+    int connectTimeout() default -1;
+
+    /**
+     * 请求读取超时时间, 单位为毫秒
+     * @return 读取超时时间
+     */
+    int readTimeout() default -1;
+
+    /**
      * 接口级别 SSL 协议
      * <p>
      *     在请求的 {@code sslProtocol} 属性没有设置，
