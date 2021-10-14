@@ -2,6 +2,7 @@ package com.dtflys.forest.http;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.StringUtils;
+import com.dtflys.forest.utils.URLUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -75,6 +76,20 @@ public class ForestURL {
         path = url.getPath();
         userInfo = url.getUserInfo();
         setRef(url.getRef());
+        originalUrl = toURLString();
+    }
+
+    public ForestURL(String schema, String userInfo, String host, Integer port) {
+        setScheme(schema);
+        if (userInfo != null) {
+            this.userInfo = userInfo;
+        }
+        if (host != null) {
+            this.host = host;
+        }
+        if (port != null) {
+            this.port = port;
+        }
         originalUrl = toURLString();
     }
 

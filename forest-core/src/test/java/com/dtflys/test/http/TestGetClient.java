@@ -1,5 +1,6 @@
 package com.dtflys.test.http;
 
+import cn.hutool.core.util.URLUtil;
 import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
@@ -108,6 +109,32 @@ public class TestGetClient extends BaseClientTest {
         mockRequest(server)
                 .assertPathEquals("/hello/user")
                 .assertQueryEquals("username", "foo");
+    }
+
+    @Test
+    public void testPath() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(getClient.testPath("hello &(user)a:a?b=1/2&c=http://localhost:8080/?x=0&d=1"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/hello%20&(user)a:a")
+                .assertQueryEquals("b", "1/2")
+                .assertQueryEquals("c", "http://localhost:8080/?x=0")
+                .assertQueryEquals("d", "1");
+    }
+
+    @Test
+    public void testPath2() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(getClient.testPath2("hello &(user)a:a?b=1/2&c=http://localhost:8080/?x=0&d=1"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/hello%20&(user)a:a")
+                .assertQueryEquals("b", "1/2")
+                .assertQueryEquals("c", "http://localhost:8080/?x=0")
+                .assertQueryEquals("d", "1");
     }
 
 
@@ -420,7 +447,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/")
-                .assertEncodedQueryEquals("token=" + URLEncoder.encode(token, StandardCharsets.UTF_8.name()))
+                .assertEncodedQueryEquals("token=" + token)
                 .assertQueryEquals("token", token);
     }
 

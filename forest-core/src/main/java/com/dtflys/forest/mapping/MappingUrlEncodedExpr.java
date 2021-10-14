@@ -1,12 +1,9 @@
 package com.dtflys.forest.mapping;
 
-import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MetaRequest;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
-
-import java.io.UnsupportedEncodingException;
 
 public class MappingUrlEncodedExpr extends MappingExpr {
 
@@ -33,6 +30,7 @@ public class MappingUrlEncodedExpr extends MappingExpr {
             return null;
         }
         String str = String.valueOf(ret);
+/*
         MetaRequest metaRequest = forestMethod.getMetaRequest();
         String charset = null;
         if (metaRequest != null) {
@@ -40,19 +38,13 @@ public class MappingUrlEncodedExpr extends MappingExpr {
         }
         Object encoded = null;
         if (StringUtils.isNotBlank(charset)) {
-            try {
-                encoded = URLUtils.forceEncode(str, charset);
-            } catch (UnsupportedEncodingException e) {
-                throw new ForestRuntimeException(e);
-            }
+            encoded = URLUtils.pathEncode(str, charset);
         }
         if (encoded == null) {
-            try {
-                encoded = URLUtils.forceEncode(str, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                throw new ForestRuntimeException(e);
-            }
+            encoded = URLUtils.pathEncode(str, "UTF-8");
         }
         return encoded;
+*/
+        return str;
     }
 }

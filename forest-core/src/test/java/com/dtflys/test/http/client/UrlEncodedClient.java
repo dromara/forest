@@ -10,7 +10,7 @@ import com.dtflys.forest.annotation.URLEncode;
 public interface UrlEncodedClient {
 
 
-    @Get("/encoded?url1={0}&url2=${1}&lang={2}&code={3}&data={4}&content={5}")
+    @Get("/encoded/?url1={0}&url2=${1}&lang={2}&code={3}&data={4}&content={5}")
     String getUrlEncoded(String url1, String url2, String lang, String code, String data, String content);
 
     @Get("/encoded")

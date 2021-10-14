@@ -41,6 +41,7 @@ import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingTemplate;
+import com.dtflys.forest.mapping.MappingURLTemplate;
 import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.mapping.SubVariableScope;
 import com.dtflys.forest.multipart.ForestMultipart;
@@ -80,7 +81,7 @@ public class ForestMethod<T> implements VariableScope {
     private MappingParameter returnTypeParameter;
     private MetaRequest metaRequest;
     private MappingTemplate baseUrlTemplate;
-    private MappingTemplate urlTemplate;
+    private MappingURLTemplate urlTemplate;
     private MappingTemplate typeTemplate;
     private MappingTemplate dataTypeTemplate;
     private ForestBodyType bodyType;
@@ -177,6 +178,10 @@ public class ForestMethod<T> implements VariableScope {
         return new MappingTemplate(this, text, this, configuration.getProperties(), forestParameters);
     }
 
+    public MappingURLTemplate makeURLTemplate(String text) {
+        return new MappingURLTemplate(this, text, this, configuration.getProperties(), forestParameters);
+    }
+
     /**
      * 获取Forest接口方法的返回类
      *
@@ -200,7 +205,7 @@ public class ForestMethod<T> implements VariableScope {
         MetaRequest baseMetaRequest = interfaceProxyHandler.getBaseMetaRequest();
         String baseUrl = baseMetaRequest.getUrl();
         if (StringUtils.isNotBlank(baseUrl)) {
-            baseUrlTemplate = makeTemplate(baseUrl);
+            baseUrlTemplate = makeURLTemplate(baseUrl);
         }
         String baseContentEncoding = baseMetaRequest.getContentEncoding();
         if (StringUtils.isNotBlank(baseContentEncoding)) {
@@ -497,7 +502,7 @@ public class ForestMethod<T> implements VariableScope {
         parameterTemplateArray = new MappingParameter[paramTypes.length];
         processParameters(parameters, genericParamTypes, paramAnns);
         bodyType = metaRequest.getBodyType();
-        urlTemplate = makeTemplate(metaRequest.getUrl());
+        urlTemplate = makeURLTemplate(metaRequest.getUrl());
         typeTemplate = makeTemplate(metaRequest.getType());
         dataTypeTemplate = makeTemplate(metaRequest.getDataType());
         if (StringUtils.isNotEmpty(metaRequest.getContentType())) {

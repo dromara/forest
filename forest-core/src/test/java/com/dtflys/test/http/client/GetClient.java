@@ -42,6 +42,19 @@ public interface GetClient {
     )
     String simpleGet3();
 
+    @Get(
+            url = "http://localhost:${port}/${path}",
+            headers = {"Accept:text/plain"}
+    )
+    String testPath(@Var("path") String path);
+
+    @Get(
+            url = "http://localhost:${port}/{path}",
+            headers = {"Accept:text/plain"}
+    )
+    String testPath2(@Var("path") String path);
+
+
     @Request(
             url = "http://localhost:${port}/hello/user?username=foo",
             headers = {"Accept:text/plain"}
@@ -53,7 +66,6 @@ public interface GetClient {
 
     @Get(url = "http://localhost:${port}/boolean/false")
     Boolean getBooleanResultFalse();
-
 
 
     @Request(
