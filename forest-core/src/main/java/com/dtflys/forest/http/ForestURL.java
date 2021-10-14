@@ -207,9 +207,9 @@ public class ForestURL {
     public String getAuthority() {
         StringBuilder builder = new StringBuilder();
         if (StringUtils.isNotEmpty(userInfo)) {
-            builder.append(userInfo).append("@");
+            builder.append(URLUtils.userInfoEncode(userInfo, "UTF-8")).append("@");
         }
-        builder.append(host);
+        builder.append(URLUtils.userInfoEncode(host, "UTF-8"));
         if (URLUtils.isNotNonePort(port) &&
                 ((port != 80 && port != 443 && port > -1) ||
                 (port == 80 && !ssl) ||
@@ -249,7 +249,7 @@ public class ForestURL {
             builder.append(authority);
         }
         if (StringUtils.isNotEmpty(path)) {
-            builder.append(path);
+            builder.append(URLUtils.pathEncode(path, "UTF-8"));
         }
         if (StringUtils.isNotEmpty(ref)) {
             builder.append("#").append(ref);
