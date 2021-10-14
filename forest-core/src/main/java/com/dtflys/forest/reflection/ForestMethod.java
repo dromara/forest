@@ -21,6 +21,7 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.http.ForestAddress;
 import com.dtflys.forest.http.ForestBodyType;
+import com.dtflys.forest.http.ForestQueryMap;
 import com.dtflys.forest.http.ForestQueryParameter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
@@ -80,7 +81,7 @@ public class ForestMethod<T> implements VariableScope {
     private Type returnType;
     private MappingParameter returnTypeParameter;
     private MetaRequest metaRequest;
-    private MappingTemplate baseUrlTemplate;
+    private MappingURLTemplate baseUrlTemplate;
     private MappingURLTemplate urlTemplate;
     private MappingTemplate typeTemplate;
     private MappingTemplate dataTypeTemplate;
@@ -767,14 +768,20 @@ public class ForestMethod<T> implements VariableScope {
      */
     private ForestRequest makeRequest(Object[] args) {
         MetaRequest baseMetaRequest = interfaceProxyHandler.getBaseMetaRequest();
-        String baseUrl = null;
+//        String baseUrl = null;
+        ForestURL baseURL = null;
+        ForestQueryMap queries = new ForestQueryMap();
         if (baseUrlTemplate != null) {
-            baseUrl = StringUtils.trimBegin(baseUrlTemplate.render(args));
+            baseUrlTemplate.render(args);
+            baseURL = baseUrlTemplate.getURL();
+            queries.addAllQueries(baseUrlTemplate.getQueries());
         }
         if (urlTemplate == null) {
             throw new ForestRuntimeException("request URL is empty");
         }
-        String renderedUrl = urlTemplate.render(args);
+        urlTemplate.render(args);
+        ForestURL renderedURL = urlTemplate.getURL();
+        queries.addAllQueries(urlTemplate.getQueries());
         ForestRequestType type = type(args);
         String baseContentEncoding = null;
         if (baseEncodeTemplate != null) {
@@ -838,32 +845,31 @@ public class ForestMethod<T> implements VariableScope {
             }
         }
 
-        ForestURL baseURL = null;
         AddressSource addressSource = configuration.getBaseAddressSource();
         ForestAddress address = configuration.getBaseAddress();
-        try {
-            if (StringUtils.isNotBlank(baseUrl)) {
-                baseURL = new ForestURL(new URL(baseUrl));
-            } else {
-                baseURL = new ForestURL(new URL("http://localhost/"));
-                baseURL.setBaseAddress(address);
+        ForestURL addressURL = null;
+        if (address != null) {
+            try {
+                addressURL = new ForestURL(new URL("http://localhost/"));
+                addressURL.setBaseAddress(address);
+                baseURL = baseURL.mergeURLWith(addressURL);
+            } catch (MalformedURLException e) {
+                throw new ForestRuntimeException(e);
             }
-            baseUrl = baseURL.toString();
-        } catch (MalformedURLException e) {
-            throw new ForestRuntimeException(e);
         }
 
-        renderedUrl = URLUtils.getValidURL(baseUrl, renderedUrl);
 
+        renderedURL.setBaseURL(baseURL);
         boolean autoRedirection = configuration.isAutoRedirection();
 
         // createExecutor and initialize http instance
         ForestRequest<T> request = new ForestRequest(configuration, this, args);
-        request.setUrl(renderedUrl)
-                .setType(type)
-                .setBodyType(bodyType)
-                .setCharset(charset)
-                .setAutoRedirection(autoRedirection)
+        request.url(renderedURL)
+                .type(type)
+                .bodyType(bodyType)
+                .addAllQuery(queries)
+                .charset(charset)
+                .autoRedirects(autoRedirection)
                 .setSslProtocol(sslProtocol)
                 .setLogConfiguration(logConfiguration)
                 .setAsync(async);

@@ -1,6 +1,7 @@
 package com.dtflys.forest.utils;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.http.ForestURL;
 import jdk.nashorn.internal.runtime.regexp.joni.ast.StringNode;
 
 import java.io.UnsupportedEncodingException;
@@ -23,6 +24,7 @@ public final class URLUtils {
     public static boolean isURL(String str) {
         return hasProtocol(str) || str.startsWith("file:/");
     }
+
 
     /**
      * URL字符串中是否包含HTTP协议部分
@@ -146,6 +148,30 @@ public final class URLUtils {
         }
         return uri;
     }
+
+    /**
+     * 判断端口号是否为空
+     *
+     * @param port 端口号
+     * @return {@code true}: 空端口, {@code false}: 不为空
+     */
+    public static boolean isNonePort(Integer port) {
+        if (port == null) {
+            return true;
+        }
+        return port < 0;
+    }
+
+    /**
+     * 判断端口号是否不为空
+     *
+     * @param port 端口号
+     * @return {@code true}: 不为空, {@code false}: 空端口
+     */
+    public static boolean isNotNonePort(Integer port) {
+        return !isNonePort(port);
+    }
+
 
     /**
      * 强制URL Encoding编码

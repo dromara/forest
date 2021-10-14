@@ -110,6 +110,12 @@ public class ForestQueryMap implements Map<String, Object> {
         queries.add(query);
     }
 
+    public void addAllQueries(ForestQueryMap queries) {
+        if (queries != null) {
+            this.queries.addAll(queries.queries);
+        }
+    }
+
     public void addQuery(String name, Object value) {
         addQuery(name, value, false, null);
     }

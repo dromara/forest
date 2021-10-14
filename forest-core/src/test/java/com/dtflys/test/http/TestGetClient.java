@@ -723,15 +723,16 @@ public class TestGetClient extends BaseClientTest {
     @Test
     public void testGetUrlEncoded() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String url = "http://www.gitee.com";
-        assertThat(urlEncodedClient.getUrlEncoded(url, url, "中文", "AbcD12#$iTXI", "il&felUFO3o=P", "中文内容"))
+        String url1 = "http://www.gitee.com";
+        String url2 = "http://search.gitee.com?type=repository&q=forest";
+        assertThat(urlEncodedClient.getUrlEncoded(url1, url2, "中文", "AbcD12#$iTXI", "il&felUFO3o=P", "中文内容"))
             .isNotNull()
             .isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertMethodEquals("GET")
                 .assertPathEquals("/encoded")
                 .assertQueryEquals("url1", "http://www.gitee.com")
-                .assertQueryEquals("url2", "http://www.gitee.com")
+                .assertQueryEquals("url2", "http://search.gitee.com?type=repository&q=forest")
                 .assertQueryEquals("lang", "中文")
                 .assertQueryEquals("code", "AbcD12#$iTXI")
                 .assertQueryEquals("data", "il&felUFO3o=P")

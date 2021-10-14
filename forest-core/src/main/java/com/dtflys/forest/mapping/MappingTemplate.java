@@ -5,6 +5,7 @@ import com.dtflys.forest.config.ForestProperties;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.exceptions.ForestTemplateSyntaxError;
 import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
+import com.dtflys.forest.http.ForestURL;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.converter.json.ForestJsonConverter;

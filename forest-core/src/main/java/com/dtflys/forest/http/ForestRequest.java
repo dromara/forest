@@ -160,7 +160,7 @@ public class ForestRequest<T> {
     private RequestLogMessage requestLogMessage;
 
     /**
-     * 请求字符集
+     * 请求参数编码字符集
      */
     private String charset;
 
@@ -1346,6 +1346,18 @@ public class ForestRequest<T> {
     }
 
     /**
+     * 批量添加请求中的Query参数
+     *
+     * @param queryParameters Query参数集合，{@link ForestQueryParameter}对象实例集合
+     * @return {@link ForestRequest}对象实例
+     */
+    public ForestRequest<T> addAllQuery(ForestQueryMap queries) {
+        this.query.addAllQueries(queries);
+        return this;
+    }
+
+
+    /**
      * 批量添加请求中的同名Query参数
      *
      * @param name Query参数名
@@ -1619,14 +1631,49 @@ public class ForestRequest<T> {
         return this;
     }
 
+    /**
+     * 获取请求参数编码字符集
+     *
+     * @return 请求参数编码字符集
+     */
     public String getCharset() {
         return charset;
     }
 
+    /**
+     * 设置请求参数编码字符集
+     *
+     * @param charset 请求参数编码字符集
+     * @return {@link ForestRequest}类实例
+     */
     public ForestRequest<T> setCharset(String charset) {
         this.charset = charset;
         return this;
     }
+
+    /**
+     * 获取请求参数编码字符集
+     * <p>同{@link ForestRequest#getCharset()}
+     *
+     * @return 请求参数编码字符集
+     * @see ForestRequest#getCharset()
+     */
+    public String charset() {
+        return getCharset();
+    }
+
+    /**
+     * 设置请求参数编码字符集
+     * <p>同{@link ForestRequest#setCharset(String)}
+     *
+     * @param charset 请求参数编码字符集
+     * @return {@link ForestRequest}类实例
+     * @see ForestRequest#setCharset(String)
+     */
+    public ForestRequest<T> charset(String charset) {
+        return setCharset(charset);
+    }
+
 
     public String getResponseEncode() {
         return responseEncode;

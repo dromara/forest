@@ -1,5 +1,6 @@
 package com.dtflys.forest.mapping;
 
+import com.dtflys.forest.Forest;
 import com.dtflys.forest.config.ForestProperties;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
@@ -14,6 +15,7 @@ import com.dtflys.forest.utils.StringUtils;
 import java.net.MalformedURLException;
 
 public class MappingURLTemplate extends MappingTemplate {
+
 
     private String schema;
 
@@ -34,6 +36,7 @@ public class MappingURLTemplate extends MappingTemplate {
     @Override
     public String render(Object[] args) {
         boolean renderedQuery = false;
+        boolean nextIsPort = false;
         queries = new ForestQueryMap();
         try {
             ForestJsonConverter jsonConverter = variableScope.getConfiguration().getJsonConverter();
@@ -42,9 +45,9 @@ public class MappingURLTemplate extends MappingTemplate {
             ForestQueryParameter lastQuery  = null;
             for (int i = 0; i < len; i++) {
                 MappingExpr expr = exprList.get(i);
-                String val = renderExpression(jsonConverter, expr, args);
-                if (val != null) {
-                    builder.append(val);
+                String exprVal = renderExpression(jsonConverter, expr, args);
+                if (exprVal != null) {
+                    builder.append(exprVal);
                 }
                 if (renderedQuery) {
                     // 已渲染到查询参数
@@ -56,14 +59,14 @@ public class MappingURLTemplate extends MappingTemplate {
                             || expr instanceof MappingIndex)) {
                         // 在查询参数的位置进行变量引用
                         Object lastQueryValue = lastQuery.getValue();
-                        String queryVal = lastQueryValue == null ? val : lastQueryValue + val;
+                        String queryVal = lastQueryValue == null ? exprVal : lastQueryValue + exprVal;
                         lastQuery.setValue(queryVal);
                     } else {
                         // 非变量引用
-                        String[] subQueries = val.split("&");
+                        String[] subQueries = exprVal.split("&");
                         int subQueryLen = subQueries.length;
                         int k = 1;
-                        if (val.charAt(0) != '&') {
+                        if (exprVal.charAt(0) != '&') {
                             // 非连接符 & 开头
                             String lastQueryPartVal = subQueries[0];
                             if (lastQuery != null) {
@@ -82,6 +85,7 @@ public class MappingURLTemplate extends MappingTemplate {
                                 queries.addQuery(lastQuery);
                             }
                         }
+                        // 解析查询参数
                         for ( ; k < subQueryLen; k++) {
                             String queryItem = subQueries[k];
                             String[] keyValue = queryItem.split("=", 2);
@@ -98,47 +102,88 @@ public class MappingURLTemplate extends MappingTemplate {
                         }
                     }
                 } else {
-                    // 未渲染到查询参数
-                    int queryIndex = val.indexOf('?');
+                    // 查询参数前面部分
+                    int queryIndex = exprVal.indexOf('?');
                     renderedQuery = queryIndex >= 0;
 
-                    String prefix = builder.toString();
-                    String baseUrl = prefix.substring(0, queryIndex > 0 ? queryIndex : prefix.length());
+                    String baseUrl = exprVal;
+                    if (renderedQuery) {
+                        baseUrl = exprVal.substring(0, queryIndex);
+                    }
                     char[] baseUrlChars = baseUrl.toCharArray();
                     int baseLen = baseUrlChars.length;
                     char ch;
                     StringBuilder subBuilder = new StringBuilder();
-                    for (int k = 0; k < baseLen; k++) {
-                        ch = baseUrlChars[k];
+                    for (int pathCharIndex = 0 ; pathCharIndex < baseLen; pathCharIndex++) {
+                        ch = baseUrlChars[pathCharIndex];
                         if (ch == ':') {
-                            if (schema == null && k + 1 < baseLen
-                                    && baseUrlChars[k + 1] == '/') {
+                            if (schema == null && pathCharIndex + 1 < baseLen
+                                    && baseUrlChars[pathCharIndex + 1] == '/') {
+                                // 解析协议部分
                                 schema = subBuilder.toString();
                                 subBuilder = new StringBuilder();
-                                k++;
+                                pathCharIndex++;
+                                ch = baseUrlChars[pathCharIndex];
+                                if (ch != '/') {
+                                    throw new ForestRuntimeException("URI '" + super.render(args) + "' is invalid.");
+                                }
+                                pathCharIndex++;
+                                if (pathCharIndex + 1 < baseLen && baseUrlChars[pathCharIndex + 1] == '/') {
+                                    do {
+                                        pathCharIndex++;
+                                    } while (pathCharIndex + 1 < baseLen && baseUrlChars[pathCharIndex + 1] == '/');
+                                }
                                 continue;
-                            } else if (host == null && port == null && k + 1 < baseLen
-                                    && Character.isDigit(baseUrlChars[k + 1])) {
+                            }
+                            if (schema != null && host == null) {
+                                // 解析地址部分
                                 host = subBuilder.toString();
                                 subBuilder = new StringBuilder();
-                                k++;
-                                while (k < baseLen) {
-                                    ch = baseUrlChars[k];
-                                    if (Character.isDigit(ch)) {
-                                        subBuilder.append(ch);
-                                    } else {
-                                        throw new ForestRuntimeException("URL Path '" + baseUrl + "' can not be parsed");
-                                    }
+                                nextIsPort = true;
+                                continue;
+                            } else {
+                                subBuilder.append(ch);
+                            }
+                        } else if (ch == '/' || pathCharIndex + 1 == baseLen) {
+                            if (nextIsPort && port == null) {
+                                // 解析端口号
+                                if (pathCharIndex + 1 == baseLen) {
+                                    subBuilder.append(ch);
                                 }
                                 port = Integer.parseInt(subBuilder.toString());
+                                subBuilder = new StringBuilder();
+                                nextIsPort = false;
+                                if (ch == '/') {
+                                    pathCharIndex--;
+                                }
+                                continue;
+                            } else if (schema != null && host == null) {
+                                // 解析地址部分
+                                host = subBuilder.toString();
+                                subBuilder = new StringBuilder();
+                                if (ch == '/') {
+                                    pathCharIndex--;
+                                }
+                                continue;
+                            } else {
+                                subBuilder.append(ch);
+                                if (pathCharIndex + 1 == baseLen) {
+                                    path = subBuilder.toString();
+                                }
                             }
+                        } else {
+                            subBuilder.append(ch);
                         }
-                        subBuilder.append(ch);
+                    }
+                    if (schema != null && host == null) {
+                        host = subBuilder.toString();
+                    } else if ((schema != null && port != null) || schema == null) {
+                        path = subBuilder.toString();
                     }
 
                     if (renderedQuery) {
-                        if (queryIndex + 1 < prefix.length()) {
-                            String queryStr = prefix.substring(queryIndex + 1);
+                        if (queryIndex + 1 < exprVal.length()) {
+                            String queryStr = exprVal.substring(queryIndex + 1);
                             String[] queryItems = queryStr.split("&");
                             if (queryItems.length > 0) {
                                 for (String queryItem : queryItems) {
@@ -158,5 +203,13 @@ public class MappingURLTemplate extends MappingTemplate {
         } catch (ForestVariableUndefinedException ex) {
             throw new ForestVariableUndefinedException(ex.getVariableName(), template);
         }
+    }
+
+    public ForestQueryMap getQueries() {
+        return queries;
+    }
+
+    public ForestURL getURL() {
+        return new ForestURL(schema, userInfo, host, port, path);
     }
 }

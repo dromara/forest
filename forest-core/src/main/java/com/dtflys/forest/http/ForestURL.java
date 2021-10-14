@@ -38,7 +38,7 @@ public class ForestURL {
     /**
      * 主机端口
      */
-    private int port;
+    private Integer port;
 
     /**
      * URL路径
@@ -79,17 +79,12 @@ public class ForestURL {
         originalUrl = toURLString();
     }
 
-    public ForestURL(String schema, String userInfo, String host, Integer port) {
+    public ForestURL(String schema, String userInfo, String host, Integer port, String path) {
         setScheme(schema);
-        if (userInfo != null) {
-            this.userInfo = userInfo;
-        }
-        if (host != null) {
-            this.host = host;
-        }
-        if (port != null) {
-            this.port = port;
-        }
+        this.userInfo = userInfo;
+        this.host = host;
+        this.port = port;
+        this.path = path;
         originalUrl = toURLString();
     }
 
@@ -215,9 +210,10 @@ public class ForestURL {
             builder.append(userInfo).append("@");
         }
         builder.append(host);
-        if ((port != 80 && port != 443 && port > -1) ||
+        if (URLUtils.isNotNonePort(port) &&
+                ((port != 80 && port != 443 && port > -1) ||
                 (port == 80 && !ssl) ||
-                (port == 443 && !ssl)) {
+                (port == 443 && !ssl))) {
             builder.append(':').append(port);
         }
         return builder.toString();
@@ -244,8 +240,17 @@ public class ForestURL {
     }
 
     public String toURLString() {
-        StringBuilder builder = new StringBuilder(scheme).append("://");
-        builder.append(getAuthority()).append(path);
+        StringBuilder builder = new StringBuilder();
+        if (StringUtils.isNotEmpty(scheme)) {
+            builder.append(scheme).append("://");
+        }
+        String authority = getAuthority();
+        if (StringUtils.isNotEmpty(authority)) {
+            builder.append(authority);
+        }
+        if (StringUtils.isNotEmpty(path)) {
+            builder.append(path);
+        }
         if (StringUtils.isNotEmpty(ref)) {
             builder.append("#").append(ref);
         }
@@ -273,4 +278,83 @@ public class ForestURL {
             throw new ForestRuntimeException(e);
         }
     }
+
+    /**
+     * 合并两个URL
+     * @param url 被合并的一个URL
+     * @return 合并完的新URL
+     */
+    public ForestURL mergeURLWith(ForestURL url) {
+        String newSchema = this.scheme == null ? url.scheme : this.scheme;
+        String newUserInfo = this.userInfo == null ? url.userInfo : this.userInfo;
+        String newHost = this.host == null ? url.host : this.host;
+        int newPort = URLUtils.isNonePort(this.port) ? url.port : this.port;
+        String newPath = this.path == null ? url.path : this.path;
+        return new ForestURL(newSchema, newUserInfo, newHost, newPort, newPath);
+    }
+
+    /**
+     * 设置基地址URL
+     *
+     * @param baseURL 基地址URL
+     * @return {@link ForestURL}对象实例
+     */
+    public ForestURL setBaseURL(ForestURL baseURL) {
+        String baseSchema = "http";
+        String baseUserInfo = null;
+        String baseHost = "localhost";
+        int basePort = -1;
+        String basePath = null;
+        if (baseURL != null) {
+            if (baseURL.scheme != null) {
+                baseSchema = baseURL.scheme;
+            }
+            if (baseURL.userInfo != null) {
+                baseUserInfo = baseURL.userInfo;
+            }
+            if (baseURL.host != null) {
+                baseHost = baseURL.host;
+            }
+            if (baseURL.port >= 0) {
+                basePort = baseURL.port;
+            }
+            if (baseURL.path != null) {
+                basePath = baseURL.path;
+            }
+        }
+        boolean needBasePath = false;
+        if (this.scheme == null) {
+            this.scheme = baseSchema;
+            needBasePath = true;
+        }
+        if (this.userInfo == null) {
+            this.userInfo = baseUserInfo;
+        }
+        if (this.host == null) {
+            this.host = baseHost;
+            needBasePath = true;
+        }
+
+        if (URLUtils.isNonePort(this.port)) {
+            this.port = basePort;
+        }
+        if (StringUtils.isNotBlank(this.path)) {
+            if (this.path.charAt(0) != '/') {
+                this.path = '/' + this.path;
+            }
+        }
+        if (needBasePath && StringUtils.isNotBlank(basePath)) {
+            if (basePath.charAt(basePath.length() - 1) == '/') {
+                basePath = basePath.substring(0, basePath.length() - 1);
+            }
+            if (StringUtils.isEmpty(this.path)) {
+                this.path = basePath;
+            } else {
+                this.path = basePath + this.path;
+            }
+        }
+        this.originalUrl = toURLString();
+        return this;
+    }
+
 }
