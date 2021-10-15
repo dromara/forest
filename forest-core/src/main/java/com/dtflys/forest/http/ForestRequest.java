@@ -1348,7 +1348,7 @@ public class ForestRequest<T> {
     /**
      * 批量添加请求中的Query参数
      *
-     * @param queryParameters Query参数集合，{@link ForestQueryParameter}对象实例集合
+     * @param queries Query参数集合，{@link ForestQueryParameter}对象实例集合
      * @return {@link ForestRequest}对象实例
      */
     public ForestRequest<T> addAllQuery(ForestQueryMap queries) {
