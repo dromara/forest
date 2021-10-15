@@ -4,7 +4,7 @@
 
 	<groupId>com.dtflys.forest</groupId>
 	<artifactId>forest</artifactId>
-	<version>1.5.9</version>
+	<version>1.5.10</version>
 	<packaging>pom</packaging>
 	<name>forest</name>
 	<description>A easy HTTP client framework for Java</description>
@@ -31,7 +31,7 @@
 		<url>https://github.com/mySingleLive/forest</url>
 		<connection>scm:git:https://github.com/mySingleLive/forest.git</connection>
 		<developerConnection>http://www.dtflys.com</developerConnection>
-		<tag>1.5.9</tag>
+		<tag>1.5.10</tag>
 	</scm>
 
 	<properties>
