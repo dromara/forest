@@ -768,13 +768,15 @@ public class ForestMethod<T> implements VariableScope {
      */
     private ForestRequest makeRequest(Object[] args) {
         MetaRequest baseMetaRequest = interfaceProxyHandler.getBaseMetaRequest();
-//        String baseUrl = null;
         ForestURL baseURL = null;
         ForestQueryMap queries = new ForestQueryMap();
         if (baseUrlTemplate != null) {
             baseUrlTemplate.render(args);
             baseURL = baseUrlTemplate.getURL();
             queries.addAllQueries(baseUrlTemplate.getQueries());
+        } else {
+            // 默认基地址URL
+            baseURL = new ForestURL("http", null, "localhost", null, null);
         }
         if (urlTemplate == null) {
             throw new ForestRuntimeException("request URL is empty");
@@ -848,7 +850,7 @@ public class ForestMethod<T> implements VariableScope {
         AddressSource addressSource = configuration.getBaseAddressSource();
         ForestAddress address = configuration.getBaseAddress();
         ForestURL addressURL = null;
-        if (address != null) {
+        if (address != null && baseURL != null) {
             try {
                 addressURL = new ForestURL(new URL("http://localhost/"));
                 addressURL.setBaseAddress(address);
@@ -857,7 +859,6 @@ public class ForestMethod<T> implements VariableScope {
                 throw new ForestRuntimeException(e);
             }
         }
-
 
         renderedURL.setBaseURL(baseURL);
         boolean autoRedirection = configuration.isAutoRedirection();
