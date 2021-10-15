@@ -711,6 +711,35 @@ public class TestGetClient extends BaseClientTest {
     }
 
     @Test
+    public void testGetEncodedArgs1() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(urlEncodedClient.getEncodedArgs("1&x=10&y=20", "http://www.baidu.com"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("GET")
+                .assertPathEquals("/encoded/")
+                .assertQueryEquals("a", "1")
+                .assertQueryEquals("x", "10")
+                .assertQueryEquals("y", "20")
+                .assertQueryEquals("b", "http://www.baidu.com");
+    }
+
+    @Test
+    public void testGetEncodedArgs2() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(urlEncodedClient.getEncodedArgs2("1&x=10&y=20", "http://www.baidu.com"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("GET")
+                .assertPathEquals("/encoded/")
+                .assertQueryEquals("a", "1&x=10&y=20")
+                .assertQueryEquals("b", "http://www.baidu.com");
+    }
+
+
+    @Test
     public void testGetUrlEncoded() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         String url1 = "http://www.gitee.com";

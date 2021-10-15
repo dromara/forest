@@ -47,4 +47,9 @@ public class MappingUrlEncodedExpr extends MappingExpr {
 */
         return str;
     }
+
+    @Override
+    public String toString() {
+        return "[Encode: " + expr.toString() + "]";
+    }
 }

@@ -15,6 +15,7 @@ import org.junit.Assert;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.InputStream;
+import java.io.PushbackReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -69,6 +70,14 @@ public class MockServerRequest {
 
     public String query() {
         return url.query();
+    }
+
+    public String username() {
+        return url.username();
+    }
+
+    public String password() {
+        return url.password();
     }
 
     public String encodedQuery() {
@@ -178,6 +187,16 @@ public class MockServerRequest {
 
     public MockServerRequest assertBodyEquals(byte[] expected) {
         Assert.assertArrayEquals(expected, bodyAsBytes());
+        return this;
+    }
+
+    public MockServerRequest assertUsernameEquals(String username) {
+        Assert.assertEquals(username, username());
+        return this;
+    }
+
+    public MockServerRequest assertPasswordEquals(String password) {
+        Assert.assertEquals(password, password());
         return this;
     }
 

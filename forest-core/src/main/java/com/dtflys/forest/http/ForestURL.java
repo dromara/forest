@@ -315,7 +315,7 @@ public class ForestURL {
             if (baseURL.host != null) {
                 baseHost = baseURL.host;
             }
-            if (baseURL.port >= 0) {
+            if (URLUtils.isNotNonePort(baseURL.port)) {
                 basePort = baseURL.port;
             }
             if (baseURL.path != null) {

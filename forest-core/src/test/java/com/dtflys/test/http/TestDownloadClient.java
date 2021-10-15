@@ -87,16 +87,16 @@ public class TestDownloadClient extends BaseClientTest {
 
     @Test
     public void testDownloadImage() throws InterruptedException {
-        int count = 100;
+        int count = 10;
         for (int i = 0; i < count; i++) {
             server.enqueue(new MockResponse().setBody(getImageBuffer()));
         }
         AtomicReference<ForestProgress> atomicProgress = new AtomicReference<>(null);
-        CountDownLatch latch = new CountDownLatch(count);
+//        CountDownLatch latch = new CountDownLatch(count);
         for (int i = 0; i < count; i++) {
             int finalI = i;
             String dir = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "TestDownload/" + i;
-            CompletableFuture.runAsync(() -> {
+//            CompletableFuture.runAsync(() -> {
                 File file = downloadClient.downloadImage(dir, "temp-img-" + finalI + ".png", progress -> {
                     System.out.println("------------------------------------------");
                     System.out.println("total bytes: " + progress.getTotalBytes());
@@ -117,11 +117,10 @@ public class TestDownloadClient extends BaseClientTest {
                                 ForestProgress::isDone,
                                 ForestProgress::getRate)
                         .contains(true, 1D);
-                latch.countDown();
-            });
-
+//                latch.countDown();
+//            });
         }
-        latch.await();
+//        latch.await();
     }
 
     @Test

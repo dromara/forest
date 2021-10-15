@@ -35,9 +35,15 @@ public class MappingURLTemplate extends MappingTemplate {
 
     @Override
     public String render(Object[] args) {
+        this.schema = null;
+        this.userInfo = null;
+        this.host = null;
+        this.port = null;
+        this.path = null;
+        this.queries = new ForestQueryMap();
+
         boolean renderedQuery = false;
         boolean nextIsPort = false;
-        queries = new ForestQueryMap();
         try {
             ForestJsonConverter jsonConverter = variableScope.getConfiguration().getJsonConverter();
             int len = exprList.size();
@@ -52,11 +58,7 @@ public class MappingURLTemplate extends MappingTemplate {
                 if (renderedQuery) {
                     // 已渲染到查询参数
                     if (lastQuery != null && (
-                            expr instanceof MappingReference
-                            || expr instanceof MappingUrlEncodedExpr
-                            || expr instanceof MappingProperty
-                            || expr instanceof MappingInvoke
-                            || expr instanceof MappingIndex)) {
+                            expr instanceof MappingUrlEncodedExpr)) {
                         // 在查询参数的位置进行变量引用
                         Object lastQueryValue = lastQuery.getValue();
                         String queryVal = lastQueryValue == null ? exprVal : lastQueryValue + exprVal;
@@ -137,19 +139,49 @@ public class MappingURLTemplate extends MappingTemplate {
                             }
                             if (schema != null && host == null) {
                                 // 解析地址部分
-                                host = subBuilder.toString();
-                                subBuilder = new StringBuilder();
+                                boolean hasNext = pathCharIndex + 1 < baseLen;
+                                if (!hasNext || (hasNext && Character.isDigit(baseUrlChars[pathCharIndex + 1]))) {
+                                    host = subBuilder.toString();
+                                    subBuilder = new StringBuilder();
+                                    nextIsPort = true;
+                                    continue;
+                                } else if (hasNext && !Character.isDigit(baseUrlChars[pathCharIndex + 1])) {
+                                    if (userInfo == null) {
+                                        userInfo = subBuilder.toString() + ':';
+                                    } else {
+                                        userInfo += subBuilder.toString() + ':';
+                                    }
+                                    subBuilder = new StringBuilder();
+                                    continue;
+                                }
+                            } else if (host != null && port == null) {
                                 nextIsPort = true;
-                                continue;
                             } else {
                                 subBuilder.append(ch);
                             }
+                        } else if (ch == '@') {
+                            // 解析用户名密码
+                            if (userInfo == null) {
+                                if (host != null) {
+                                    userInfo = host + ":";
+                                    host = null;
+                                } else {
+                                    userInfo = "";
+                                }
+                                if (port != null) {
+                                    userInfo += port;
+                                    port = null;
+                                }
+                            }
+                            userInfo += subBuilder.toString();
+                            subBuilder = new StringBuilder();
+                            continue;
                         } else if (ch == '/' || pathCharIndex + 1 == baseLen) {
+                            if (ch != '/') {
+                                subBuilder.append(ch);
+                            }
                             if (nextIsPort && port == null) {
                                 // 解析端口号
-                                if (pathCharIndex + 1 == baseLen) {
-                                    subBuilder.append(ch);
-                                }
                                 port = Integer.parseInt(subBuilder.toString());
                                 subBuilder = new StringBuilder();
                                 nextIsPort = false;
@@ -166,19 +198,20 @@ public class MappingURLTemplate extends MappingTemplate {
                                 }
                                 continue;
                             } else {
-                                subBuilder.append(ch);
+                                if (ch == '/') {
+                                    subBuilder.append(ch);
+                                }
                                 if (pathCharIndex + 1 == baseLen) {
-                                    path = subBuilder.toString();
+                                    if (path == null) {
+                                        path = subBuilder.toString();
+                                    } else {
+                                        path += subBuilder.toString();
+                                    }
                                 }
                             }
                         } else {
                             subBuilder.append(ch);
                         }
-                    }
-                    if (schema != null && host == null) {
-                        host = subBuilder.toString();
-                    } else if ((schema != null && port != null) || schema == null) {
-                        path = subBuilder.toString();
                     }
 
                     if (renderedQuery) {

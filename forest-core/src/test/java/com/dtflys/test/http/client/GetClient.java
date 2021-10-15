@@ -373,12 +373,26 @@ public interface GetClient {
     String getQueryStringWithoutName2(@Query String name);
 
     @Get(
-            url = "http://xxxxxx:yyyy@localhost:8080/hello/user",
+            url = "http://xxxxxx:yyyy@localhost:{port}/hello/user",
             headers = {"Accept:text/plain"}
     )
-    ForestResponse<String> getUrlWithAt();
+    ForestResponse<String> getUrlWithUserInfo();
 
-    @Get("http://localhost:${port}/token")
+    @Get(
+            url = "http://xxxxxx:1234@localhost:{port}/hello/user",
+            headers = {"Accept:text/plain"}
+    )
+    ForestResponse<String> getUrlWithUserInfo2();
+
+    @Get(
+            url = "http://{userInfo}@localhost:{port}/hello/user",
+            headers = {"Accept:text/plain"}
+    )
+    ForestResponse<String> getUrlWithUserInfo3(@Var("userInfo") String userInfo);
+
+
+
+    @Get("http://localhost:{port}/token")
     TokenResult getToken();
 
 }
