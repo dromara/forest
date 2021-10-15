@@ -71,6 +71,8 @@ import static com.dtflys.forest.mapping.MappingParameter.*;
  * @since 2016-05-03
  */
 public class ForestMethod<T> implements VariableScope {
+    // 默认根地址
+    private static final ForestAddress DEFAULT_ADDRESS = new ForestAddress("http", "localhost", -1);
 
     private final InterfaceProxyHandler interfaceProxyHandler;
     private final ForestConfiguration configuration;
@@ -774,9 +776,6 @@ public class ForestMethod<T> implements VariableScope {
             baseUrlTemplate.render(args);
             baseURL = baseUrlTemplate.getURL();
             queries.addAllQueries(baseUrlTemplate.getQueries());
-        } else {
-            // 默认基地址URL
-            baseURL = new ForestURL("http", null, "localhost", null, null);
         }
         if (urlTemplate == null) {
             throw new ForestRuntimeException("request URL is empty");
@@ -849,18 +848,22 @@ public class ForestMethod<T> implements VariableScope {
 
         AddressSource addressSource = configuration.getBaseAddressSource();
         ForestAddress address = configuration.getBaseAddress();
+        if (address == null) {
+            // 默认根地址
+            address = DEFAULT_ADDRESS;
+        }
         ForestURL addressURL = null;
-        if (address != null && baseURL != null) {
-            try {
-                addressURL = new ForestURL(new URL("http://localhost/"));
-                addressURL.setBaseAddress(address);
-                baseURL = baseURL.mergeURLWith(addressURL);
-            } catch (MalformedURLException e) {
-                throw new ForestRuntimeException(e);
-            }
+        if (baseURL != null) {
+            renderedURL.setBaseURL(baseURL);
+        }
+        try {
+            addressURL = new ForestURL(new URL("http://localhost/"));
+            addressURL.setBaseAddress(address);
+            renderedURL = renderedURL.mergeURLWith(addressURL);
+        } catch (MalformedURLException e) {
+            throw new ForestRuntimeException(e);
         }
 
-        renderedURL.setBaseURL(baseURL);
         boolean autoRedirection = configuration.isAutoRedirection();
 
         // createExecutor and initialize http instance

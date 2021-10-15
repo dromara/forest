@@ -153,7 +153,7 @@ public class ForestURL {
     }
 
     public int getPort() {
-        if (port == -1) {
+        if (URLUtils.isNonePort(port)) {
             return ssl ? 443 : 80;
         }
         return port;
