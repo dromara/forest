@@ -2,6 +2,7 @@ package com.dtflys.test.http.retry;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.test.http.BaseClientTest;
 import okhttp3.mockwebserver.MockResponse;
@@ -76,6 +77,28 @@ public class TestRetryClient extends BaseClientTest {
         assertThat(ret).isNotNull().isEqualTo(EXPECTED);
         assertThat(count.get()).isEqualTo(1);
     }
+
+    @Test
+    public void testRetryWhen_with_error() {
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
+        AtomicInteger count = new AtomicInteger(0);
+        String ret = null;
+        ForestRuntimeException exception = null;
+        try {
+            ret = retryClient.testRetryWhenWithError(3, 10, ((data, req, res) -> {
+                count.incrementAndGet();
+            }));
+        } catch (ForestRuntimeException ex) {
+            exception = ex;
+        }
+        assertThat(ret).isNull();
+        assertThat(count.get()).isEqualTo(0);
+        assertThat(exception).isNotNull();
+    }
+
 
     @Test
     public void testRetry_base() {

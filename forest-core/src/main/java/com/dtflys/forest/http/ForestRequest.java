@@ -3720,9 +3720,10 @@ public class ForestRequest<T> {
         } catch (Throwable ex) {
             if (ex instanceof ForestRuntimeException) {
                 throw (ForestRuntimeException) ex;
+            } else {
+                throw new ForestRuntimeException(ex);
             }
         }
-        return null;
     }
 
     /**

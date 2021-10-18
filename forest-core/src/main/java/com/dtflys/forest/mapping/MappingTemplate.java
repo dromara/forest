@@ -5,14 +5,12 @@ import com.dtflys.forest.config.ForestProperties;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.exceptions.ForestTemplateSyntaxError;
 import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
-import com.dtflys.forest.http.ForestURL;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
-import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.URLUtils;
 
-import java.io.UnsupportedEncodingException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -21,6 +19,8 @@ import java.util.*;
  * @since 2016-05-04
  */
 public class MappingTemplate {
+    protected final Class<? extends Annotation> annotationType;
+    protected final String attributeName;
     protected final ForestMethod<?> forestMethod;
     protected final MappingParameter[] parameters;
     protected final ForestProperties properties;
@@ -94,7 +94,9 @@ public class MappingTemplate {
         return template.charAt(readIndex + i);
     }
 
-    public MappingTemplate(ForestMethod<?> forestMethod, String template, VariableScope variableScope, ForestProperties properties, MappingParameter[] parameters) {
+    public MappingTemplate(Class<? extends Annotation> annotationType, String attributeName, ForestMethod<?> forestMethod, String template, VariableScope variableScope, ForestProperties properties, MappingParameter[] parameters) {
+        this.annotationType = annotationType;
+        this.attributeName = attributeName;
         this.forestMethod = forestMethod;
         this.template = template;
         this.variableScope = variableScope;
@@ -491,7 +493,7 @@ public class MappingTemplate {
             }
             return builder.toString();
         } catch (ForestVariableUndefinedException ex) {
-            throw new ForestVariableUndefinedException(ex.getVariableName(), template);
+            throw new ForestVariableUndefinedException(annotationType, attributeName, forestMethod, ex.getVariableName(), template);
         }
     }
 
@@ -565,7 +567,7 @@ public class MappingTemplate {
 
     @Override
     public MappingTemplate clone() {
-        MappingTemplate template = new MappingTemplate(forestMethod, this.template, this.variableScope, this.properties, this.parameters);
+        MappingTemplate template = new MappingTemplate(annotationType, attributeName, forestMethod, this.template, this.variableScope, this.properties, this.parameters);
         template.exprList = this.exprList;
         return template;
     }
@@ -581,7 +583,8 @@ public class MappingTemplate {
     }
 
     public MappingTemplate valueOf(String value) {
-        return new MappingTemplate(forestMethod, value, forestMethod, properties, forestMethod.getParameters());
+        return new MappingTemplate(
+                annotationType, attributeName, forestMethod, value, forestMethod, properties, forestMethod.getParameters());
     }
 
 

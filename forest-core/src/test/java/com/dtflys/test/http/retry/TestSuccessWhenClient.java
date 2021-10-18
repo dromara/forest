@@ -2,6 +2,7 @@ package com.dtflys.test.http.retry;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.test.http.BaseClientTest;
 import okhttp3.mockwebserver.MockResponse;
@@ -46,13 +47,13 @@ public class TestSuccessWhenClient extends BaseClientTest {
 
 
     @Test
-    public void testRetry() {
+    public void testRetry_with_successWhen() {
         server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
         server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
         server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
         server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
         AtomicReference<Boolean> isError = new AtomicReference<>(false);
-        ForestRequest<String> request = successWhenClient.testRetryRequest(3, (ex, req, res) -> {
+        ForestRequest<String> request = successWhenClient.testRetryRequest_with_successWhen(3, (ex, req, res) -> {
             isError.set(true);
         });
         assertThat(request).isNotNull();
@@ -63,6 +64,31 @@ public class TestSuccessWhenClient extends BaseClientTest {
         assertThat(request.getRetryCount()).isEqualTo(3);
         assertThat(isError.get()).isTrue();
     }
+
+    @Test
+    public void testRetry_with_error_successWhen() {
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
+        AtomicReference<Boolean> isError = new AtomicReference<>(false);
+        ForestRequest<String> request = successWhenClient.testRetryRequest_with_error_successWhen(3, (ex, req, res) -> {
+            isError.set(true);
+        });
+        assertThat(request).isNotNull();
+        assertThat(request.getSuccessWhen()).isNotNull().isInstanceOf(ErrorSuccessWhen.class);
+        ForestRuntimeException exception = null;
+        try {
+            request.execute();
+        } catch (ForestRuntimeException ex) {
+            exception = ex;
+        }
+        assertThat(request.getMaxRetryCount()).isEqualTo(3);
+        assertThat(request.getCurrentRetryCount()).isEqualTo(0);
+        assertThat(isError.get()).isFalse();
+        assertThat(exception).isNotNull();
+    }
+
 
     @Test
     public void testRetry_base() {

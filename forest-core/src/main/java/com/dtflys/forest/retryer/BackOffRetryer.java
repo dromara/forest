@@ -26,7 +26,7 @@ public class BackOffRetryer extends ForestRetryer {
         long maxRetryInterval = getMaxRetryInterval();
         if (currentCount >= maxRetryCount) {
             if (currentCount == 0) {
-                throw ex.getCause();
+                throw ex.getCause() == null ? ex : ex.getCause();
             }
             throw ex;
         }

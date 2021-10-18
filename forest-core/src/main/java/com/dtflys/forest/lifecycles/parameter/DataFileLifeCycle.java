@@ -25,8 +25,8 @@ public class DataFileLifeCycle implements ParameterAnnotationLifeCycle<DataFile,
         String fileName = annotation.fileName();
         MetaRequest metaRequest = method.getMetaRequest();
         String partContentType = annotation.partContentType();
-        MappingTemplate nameTemplate = method.makeTemplate(name);
-        MappingTemplate fileNameTemplate = method.makeTemplate(fileName);
+        MappingTemplate nameTemplate = method.makeTemplate(DataFile.class, "name", name);
+        MappingTemplate fileNameTemplate = method.makeTemplate(DataFile.class, "fileName", fileName);
         if (StringUtils.isNotBlank(partContentType)) {
             parameter.setPartContentType(partContentType.trim());
         }

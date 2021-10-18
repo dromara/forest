@@ -266,7 +266,7 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
             }
             // 是否重试
             ForestRetryException retryEx = request.canRetry(response);
-            if (retryEx != null && !retryEx.isMaxRetryCountReached()) {
+            if (retryEx != null && retryEx.isNeedRetry() && !retryEx.isMaxRetryCountReached()) {
                 execute(lifeCycleHandler, retryCount + 1);
                 return;
             }

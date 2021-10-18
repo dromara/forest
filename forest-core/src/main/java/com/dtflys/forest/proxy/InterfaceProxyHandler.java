@@ -89,15 +89,17 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         prepareBaseInfo(interfaceClass);
     }
 
-    private void processBaseAnnotation(Annotation[] annotations) {
+    private void processBaseAnnotation(Class parentAnnType, Annotation[] annotations) {
         for (int i = 0; i < annotations.length; i++) {
             Annotation annotation = annotations[i];
             Class<? extends Annotation> annType = annotation.annotationType();
-            if (annType.getPackage().getName().startsWith("java.")) {
+            if (annType.getName().startsWith("java.")) {
                 continue;
             }
             Annotation[] subAnnotations = annType.getAnnotations();
-            processBaseAnnotation(subAnnotations);
+            if (parentAnnType != null && !annType.equals(parentAnnType)) {
+                processBaseAnnotation(annType, subAnnotations);
+            }
             if (annotation instanceof BaseURL) {
                 BaseURL baseURLAnn = (BaseURL) annotation;
                 String value = baseURLAnn.value();
@@ -129,7 +131,7 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
             prepareBaseInfo(superClass);
         }
         Annotation[] annotations = clazz.getAnnotations();
-        processBaseAnnotation(annotations);
+        processBaseAnnotation(null, annotations);
     }
 
 

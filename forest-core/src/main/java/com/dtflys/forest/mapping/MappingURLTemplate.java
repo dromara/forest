@@ -1,6 +1,5 @@
 package com.dtflys.forest.mapping;
 
-import com.dtflys.forest.Forest;
 import com.dtflys.forest.config.ForestProperties;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
@@ -12,35 +11,26 @@ import com.dtflys.forest.http.ForestURL;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.StringUtils;
 
-import java.net.MalformedURLException;
+import java.lang.annotation.Annotation;
 
 public class MappingURLTemplate extends MappingTemplate {
 
 
-    private String schema;
-
-    private String userInfo;
-
-    private String host;
-
-    private Integer port;
-
-    private String path;
-
-    private ForestQueryMap queries;
-
-    public MappingURLTemplate(ForestMethod<?> forestMethod, String template, VariableScope variableScope, ForestProperties properties, MappingParameter[] parameters) {
-        super(forestMethod, template, variableScope, properties, parameters);
+    public MappingURLTemplate(Class<? extends Annotation> annotationType, String attributeName, ForestMethod<?> forestMethod, String template, VariableScope variableScope, ForestProperties properties, MappingParameter[] parameters) {
+        super(annotationType, attributeName, forestMethod, template, variableScope, properties, parameters);
     }
 
     @Override
     public String render(Object[] args) {
-        this.schema = null;
-        this.userInfo = null;
-        this.host = null;
-        this.port = null;
-        this.path = null;
-        this.queries = new ForestQueryMap();
+        return super.render(args);
+    }
+
+    public ForestURL render(Object[] args, ForestQueryMap queries) {
+        String schema = null;
+        String userInfo = null;
+        String host = null;
+        Integer port = null;
+        String path = null;
 
         boolean renderedQuery = false;
         boolean nextIsPort = false;
@@ -232,17 +222,13 @@ public class MappingURLTemplate extends MappingTemplate {
                     }
                 }
             }
-            return builder.toString();
+            return new ForestURL(schema, userInfo, host, port, path);
         } catch (ForestVariableUndefinedException ex) {
-            throw new ForestVariableUndefinedException(ex.getVariableName(), template);
+            throw new ForestVariableUndefinedException(annotationType, attributeName, forestMethod, ex.getVariableName(), template);
         }
     }
 
-    public ForestQueryMap getQueries() {
-        return queries;
-    }
-
     public ForestURL getURL() {
-        return new ForestURL(schema, userInfo, host, port, path);
+        return null;
     }
 }

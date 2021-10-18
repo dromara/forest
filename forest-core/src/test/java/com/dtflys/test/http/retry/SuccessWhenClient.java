@@ -15,6 +15,11 @@ public interface SuccessWhenClient {
     @Get("http://localhost:${port}/")
     @Retry(maxRetryCount = "${0}")
     @Success(condition = TestSuccessWhen.class)
-    ForestRequest<String> testRetryRequest(int retryCount, OnError onError);
+    ForestRequest<String> testRetryRequest_with_successWhen(int retryCount, OnError onError);
+
+    @Get("http://localhost:${port}/")
+    @Retry(maxRetryCount = "${0}")
+    @Success(condition = ErrorSuccessWhen.class)
+    ForestRequest<String> testRetryRequest_with_error_successWhen(int retryCount, OnError onError);
 
 }

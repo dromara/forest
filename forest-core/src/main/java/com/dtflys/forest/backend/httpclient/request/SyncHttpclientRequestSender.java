@@ -107,7 +107,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
         response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, null, startDate);
         // 检查是否重试
         ForestRetryException retryEx = request.canRetry(response);
-        if (retryEx != null && !retryEx.isMaxRetryCountReached()) {
+        if (retryEx != null && retryEx.isNeedRetry() && !retryEx.isMaxRetryCountReached()) {
             executor.execute(lifeCycleHandler);
             return;
         }
