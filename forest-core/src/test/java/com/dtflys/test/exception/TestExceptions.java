@@ -146,12 +146,13 @@ public class TestExceptions {
         assertThat(exception.getVariableName()).isEqualTo("foo");
         assertThat(exception.getSource()).isNull();
 
-        exception = new ForestVariableUndefinedException("bar", "${bar}");
+        exception = new ForestVariableUndefinedException("bar", "foo=${bar}");
         assertThat(exception.getMessage())
                 .isEqualTo("[Forest] Cannot resolve variable 'bar'" +
-                        "\n\n\t[From Template] ${bar}");
+                        "\n\n\t[From Template]" +
+                        "\n\ttemplate: foo=${bar}\n");
         assertThat(exception.getVariableName()).isEqualTo("bar");
-        assertThat(exception.getSource()).isEqualTo("${bar}");
+        assertThat(exception.getSource()).isEqualTo("foo=${bar}");
     }
 
     public interface TestClient {

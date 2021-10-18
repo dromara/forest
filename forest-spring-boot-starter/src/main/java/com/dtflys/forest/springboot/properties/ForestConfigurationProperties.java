@@ -50,12 +50,12 @@ public class ForestConfigurationProperties {
     /**
      * Connect timeout in milliseconds
      */
-    private Duration connectTimeout = null;
+    private Integer connectTimeout = null;
 
     /**
      * Read timeout in milliseconds
      */
-    private Duration readTimeout = null;
+    private Integer readTimeout = null;
 
     /**
      * Request charset
@@ -218,27 +218,27 @@ public class ForestConfigurationProperties {
         this.timeout = timeout;
     }
 
-    public Duration getConnectTimeout() {
+    public Integer getConnectTimeout() {
         return connectTimeout;
     }
 
-    public Integer getConnectTimeoutAsMillis() {
-        return TimeUtils.toMillis("connect timeout", connectTimeout);
+    public Integer getConnectTimeoutMillis() {
+        return connectTimeout;
     }
 
-    public void setConnectTimeout(Duration connectTimeout) {
+    public void setConnectTimeout(Integer connectTimeout) {
         this.connectTimeout = connectTimeout;
     }
 
-    public Duration getReadTimeout() {
+    public Integer getReadTimeout() {
         return readTimeout;
     }
 
-    public Integer getReadTimeoutAsMillis() {
-        return TimeUtils.toMillis("read timeout", readTimeout);
+    public Integer getReadTimeoutMillis() {
+        return readTimeout;
     }
 
-    public void setReadTimeout(Duration readTimeout) {
+    public void setReadTimeout(Integer readTimeout) {
         this.readTimeout = readTimeout;
     }
 

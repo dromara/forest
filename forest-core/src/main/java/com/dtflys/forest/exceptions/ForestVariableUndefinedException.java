@@ -97,6 +97,7 @@ public class ForestVariableUndefinedException extends ForestRuntimeException {
                         .append(source)
                         .append("\"\n");
             } else {
+                builder.append("template: ");
                 builder.append(source);
                 builder.append("\n");
             }
