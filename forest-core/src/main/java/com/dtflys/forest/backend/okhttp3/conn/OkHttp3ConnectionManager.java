@@ -22,6 +22,7 @@ import okhttp3.ConnectionPool;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.Credentials;
+import okhttp3.Dispatcher;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Protocol;
@@ -56,6 +57,11 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
     private ConnectionPool pool;
 
     /**
+     * dispatcher
+     */
+    private Dispatcher dispatcher;
+
+    /**
      * 协议版本: http 1.0
      */
     private final static List<Protocol> HTTP_1_0 = Arrays.asList(Protocol.HTTP_1_0, Protocol.HTTP_1_1);
@@ -74,6 +80,8 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
      * 协议版本映射表
      */
     private final static Map<ForestProtocol, List<Protocol>> PROTOCOL_VERSION_MAP = new HashMap<>();
+
+
 
     static {
         PROTOCOL_VERSION_MAP.put(ForestProtocol.HTTP_1_0, HTTP_1_0);
@@ -118,6 +126,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
         }
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .connectionPool(pool)
+                .dispatcher(dispatcher)
                 .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
                 .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
                 .protocols(getProtocols(request))
@@ -217,6 +226,9 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
     @Override
     public void init(ForestConfiguration configuration) {
         pool = new ConnectionPool();
+        dispatcher = new Dispatcher();
+        dispatcher.setMaxRequests(configuration.getMaxConnections());
+        dispatcher.setMaxRequestsPerHost(configuration.getMaxRouteConnections());
     }
 
     /**
@@ -226,5 +238,9 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
      */
     public ConnectionPool getOkHttpPool() {
         return pool;
+    }
+
+    public Dispatcher getDispatcher() {
+        return dispatcher;
     }
 }

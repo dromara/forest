@@ -333,6 +333,13 @@ public interface PostClient {
     )
     String postJsonBodyMapError(@JSONBody Map user, String contentType);
 
+    @Post(
+            url = "http://localhost:{port}/json",
+            contentType = "{1}"
+    )
+    ForestResponse<String> postJsonBodyMapError2(@JSONBody Map user, String contentType);
+
+
     @Post(url = "http://localhost:{port}/json")
     String postJsonBodyObj(@JSONBody JsonTestUser user);
 

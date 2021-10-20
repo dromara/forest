@@ -776,6 +776,18 @@ public class TestPostClient extends BaseClientTest {
     }
 
     @Test
+    public void testJsonPostBodyMapErrorCheck_500() {
+        server.enqueue(new MockResponse().setResponseCode(500).setBody(EXPECTED));
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("username", "foo");
+        ForestResponse<String> response = null;
+        response = postClient.postJsonBodyMapError2(userMap, "application/xml");
+        assertThat(response.getContent()).isNotNull().isEqualTo(EXPECTED);
+        assertThat(response.getStatusCode()).isEqualTo(500);
+    }
+
+
+    @Test
     public void testJsonPostBodyMapErrorCheck2() {
         server.enqueue(new MockResponse().setResponseCode(200).setBody(EXPECTED));
         Map<String, Object> userMap = new HashMap<>();
