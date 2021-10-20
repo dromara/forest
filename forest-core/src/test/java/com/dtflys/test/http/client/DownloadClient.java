@@ -14,9 +14,9 @@ import java.io.File;
  */
 public interface DownloadClient {
 
-    @Get(url = "http://localhost:${port}/download/test-img.jpg", connectTimeout = 3600 * 1000, readTimeout = 3600 * 1000)
+    @Get(url = "http://localhost:${port}/download/test-img-{2}.jpg", connectTimeout = 3600 * 1000, readTimeout = 3600 * 1000)
     @DownloadFile(dir = "${dir}", filename = "${filename}")
-    File downloadImage(@Var("dir") String dir, @Var("filename") String filename, OnProgress onProgress);
+    File downloadImage(@Var("dir") String dir, @Var("filename") String filename, Integer index, OnProgress onProgress);
 
 
     @Get(value = "http://localhost:${port}/download/test-img.jpg", progressStep = 100)

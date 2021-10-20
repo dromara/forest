@@ -1,9 +1,7 @@
 package com.dtflys.forest.mapping;
 
+import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.reflection.ForestMethod;
-import com.dtflys.forest.reflection.MetaRequest;
-import com.dtflys.forest.utils.StringUtils;
-import com.dtflys.forest.utils.URLUtils;
 
 public class MappingUrlEncodedExpr extends MappingExpr {
 
@@ -12,6 +10,12 @@ public class MappingUrlEncodedExpr extends MappingExpr {
     protected MappingUrlEncodedExpr(ForestMethod<?> forestMethod, MappingExpr expr) {
         super(forestMethod, expr.token);
         this.expr = expr;
+    }
+
+    @Override
+    public void setVariableScope(VariableScope variableScope) {
+        super.setVariableScope(variableScope);
+        expr.setVariableScope(variableScope);
     }
 
     @Override
