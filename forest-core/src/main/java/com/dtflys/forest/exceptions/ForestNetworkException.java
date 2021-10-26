@@ -25,6 +25,7 @@
 package com.dtflys.forest.exceptions;
 
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.utils.StringUtils;
 
 /**
  * @author gongjun
@@ -37,7 +38,7 @@ public class ForestNetworkException extends ForestRuntimeException {
     private ForestResponse response;
 
     public ForestNetworkException(String message, Integer statusCode, ForestResponse response) {
-        super("HTTP " + statusCode + " Error: " + message);
+        super(errorMessage(message, statusCode, response));
         this.statusCode = statusCode;
         this.response = response;
     }
@@ -48,5 +49,21 @@ public class ForestNetworkException extends ForestRuntimeException {
 
     public ForestResponse getResponse() {
         return response;
+    }
+
+    private static String errorMessage(String message, Integer statusCode, ForestResponse response) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("HTTP ").append(statusCode).append(" Error: ");
+        if (StringUtils.isNotEmpty(message)) {
+            builder.append(message);
+        }
+        String content = response.getContent();
+        if (content != null) {
+            if (StringUtils.isNotEmpty(message)) {
+                builder.append("; ");
+            }
+            builder.append("Content=").append(content);
+        }
+        return builder.toString();
     }
 }

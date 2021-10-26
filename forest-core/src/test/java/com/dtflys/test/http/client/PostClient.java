@@ -74,6 +74,9 @@ public interface PostClient {
     )
     String simplePost3();
 
+    @Post
+    String emptyPath();
+
     @Request(
             url = "http://localhost:{port}/hello",
             type = "post",

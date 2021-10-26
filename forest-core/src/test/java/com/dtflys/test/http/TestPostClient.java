@@ -143,6 +143,16 @@ public class TestPostClient extends BaseClientTest {
                 .assertBodyEquals("username=foo&password=123456");
     }
 
+    @Test
+    public void testEmptyPath() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(postClient.emptyPath())
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("POST")
+                .assertPathEquals("/");
+    }
 
     @Test
     public void testTextParamPost() throws InterruptedException {
