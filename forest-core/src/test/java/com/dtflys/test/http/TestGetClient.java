@@ -20,6 +20,7 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -458,6 +459,27 @@ public class TestGetClient extends BaseClientTest {
                 .assertQueryEquals("username", "foo")
                 .assertQueryEquals("password", "bar");
     }
+
+    @Test
+    public void testSimpleGetMultiQuery_encoded() throws UnsupportedEncodingException {
+        String pwd = "中文";
+        String encoded = URLEncoder.encode(pwd, "UTF-8");
+        System.out.println(pwd + " => " + encoded);
+        server.enqueue(
+                new MockResponse()
+                        .setHeader("Content-Type", "application/json")
+                        .setHeader("Content-Encoding", "UTF-8")
+                        .setBody(EXPECTED));
+        assertThat(getClient.simpleGetMultiQuery(encoded))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo")
+                .assertQueryEquals("password", pwd);
+    }
+
 
     @Test
     public void testSimpleGetMultiQuery2() throws InterruptedException {

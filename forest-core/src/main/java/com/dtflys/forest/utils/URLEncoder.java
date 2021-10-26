@@ -23,19 +23,19 @@ public class URLEncoder {
     private static final char[] HEX_DIGITS_UPPER = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
     /**
-     * 查询参数值中不会被编码的字符集
+     * URI用户信息部分中不会被编码的字符集
      */
-    private static final char[] USER_INFO_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '*', ':', '=', '@'};
+    private static final char[] USER_INFO_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '*', ':', '=', '@', '%'};
 
     /**
      * URI路径中不会被编码的字符集
      */
-    private static final char[] PATH_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '*', '/', ':', '?', '=', '&'};
+    private static final char[] PATH_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '*', '/', ':', '?', '=', '&', '%'};
 
     /**
      * 查询参数值中不会被编码的字符集
      */
-    private static final char[] QUERY_VALUE_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '*', '/', ':', '?', '='};
+    private static final char[] QUERY_VALUE_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '*', '/', ':', '?', '=', '%'};
 
 
     /**
