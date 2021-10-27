@@ -53,16 +53,18 @@ public class ForestNetworkException extends ForestRuntimeException {
 
     private static String errorMessage(String message, Integer statusCode, ForestResponse response) {
         StringBuilder builder = new StringBuilder();
-        builder.append("HTTP ").append(statusCode).append(" Error: ");
+        builder.append("HTTP ").append(statusCode).append(" Error");
         if (StringUtils.isNotEmpty(message)) {
-            builder.append(message);
+            builder.append(": ").append(message);
         }
-        String content = response.getContent();
-        if (content != null) {
-            if (StringUtils.isNotEmpty(message)) {
-                builder.append("; ");
+        if (response != null) {
+            String content = response.getContent();
+            if (content != null) {
+                if (StringUtils.isNotEmpty(message)) {
+                    builder.append("; ");
+                }
+                builder.append("Content=").append(content);
             }
-            builder.append("Content=").append(content);
         }
         return builder.toString();
     }
