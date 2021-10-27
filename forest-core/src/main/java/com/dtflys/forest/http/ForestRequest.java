@@ -69,7 +69,6 @@ import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.TimeUtils;
 import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.forest.utils.URLUtils;
-import org.apache.commons.lang3.reflect.TypeUtils;
 
 import java.io.File;
 import java.io.InputStream;
@@ -138,11 +137,6 @@ public class ForestRequest<T> {
      * URL中的Query参数表
      */
     private ForestQueryMap query = new ForestQueryMap();
-
-    /**
-     * 请求体类型
-     */
-    private ForestBodyType bodyType;
 
     /**
      * 请求类型
@@ -227,7 +221,7 @@ public class ForestRequest<T> {
      * 该字段为列表类型，列表每一项为请求体项,
      * 都为 {@link ForestRequestBody} 子类的对象实例
      */
-    private List<ForestRequestBody> bodyItems = new LinkedList<>();
+    private ForestBody body = new ForestBody();
 
 
     /**
@@ -1481,7 +1475,7 @@ public class ForestRequest<T> {
      * @return 求体类型, {@link ForestBodyType}枚举对象
      */
     public ForestBodyType getBodyType() {
-        return bodyType;
+        return body.getBodyType();
     }
 
     /**
@@ -1491,7 +1485,7 @@ public class ForestRequest<T> {
      * @return {@link ForestRequest}对象实例
      */
     public ForestRequest<T> setBodyType(ForestBodyType bodyType) {
-        this.bodyType = bodyType;
+        this.body.setBodyType(bodyType);
         return this;
     }
 
@@ -1795,17 +1789,17 @@ public class ForestRequest<T> {
      * @return 请求体对象列表, 元素为 {@link ForestRequestBody} 其子类实例
      */
     public List<ForestRequestBody> getBody() {
-        return bodyItems;
+        return body;
     }
 
     @Deprecated
     public List getBodyList() {
-        return bodyItems;
+        return body;
     }
 
     @Deprecated
-    public void setBodyList(List bodyList) {
-        this.bodyItems = bodyList;
+    public void setBodyList(ForestBody body) {
+        this.body = body;
     }
 
     public ForestDataType getDataType() {
@@ -2257,7 +2251,7 @@ public class ForestRequest<T> {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> addBody(ForestRequestBody body) {
-        this.bodyItems.add(body);
+        this.body.add(body);
         return this;
     }
 
@@ -2458,7 +2452,7 @@ public class ForestRequest<T> {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> replaceBody(ForestRequestBody body) {
-        this.bodyItems.clear();
+        this.body.clear();
         this.addBody(body);
         return this;
     }
@@ -2470,7 +2464,7 @@ public class ForestRequest<T> {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> replaceBody(String stringbody) {
-        this.bodyItems.clear();
+        this.body.clear();
         this.addBody(stringbody);
         return this;
     }
@@ -2494,7 +2488,7 @@ public class ForestRequest<T> {
 
     public List<RequestNameValue> getDataNameValueList() {
         List<RequestNameValue> nameValueList = new ArrayList<>();
-        for (ForestRequestBody item : bodyItems) {
+        for (ForestRequestBody item : body) {
             if (item instanceof NameValueRequestBody) {
                 NameValueRequestBody nameValueRequestBody = (NameValueRequestBody) item;
                 String name = nameValueRequestBody.getName();
@@ -3782,11 +3776,12 @@ public class ForestRequest<T> {
         newRequest.url = this.url;
         newRequest.query = this.query.clone();
         newRequest.headers = this.headers.clone();
-        List<ForestRequestBody> newBodyItems = new ArrayList<>(this.bodyItems.size());
-        for (ForestRequestBody body : this.bodyItems) {
-            newBodyItems.add(body);
+        ForestBody newBody = new ForestBody();
+        newBody.setBodyType(body.getBodyType());
+        for (ForestRequestBody body : this.body) {
+            newBody.add(body);
         }
-        newRequest.bodyItems = newBodyItems;
+        newRequest.body = newBody;
         List<ForestMultipart> newMultiparts = new ArrayList<>(this.multiparts.size());
         for (ForestMultipart part : this.multiparts) {
             newMultiparts.add(part);
