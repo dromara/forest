@@ -40,7 +40,7 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
 
 
     @Override
-    protected void setStringBody(T httpReq, String text, String charset, String contentType, boolean mergeCharset) {
+    protected void setStringBody(T httpReq, ForestRequest request, String text, String charset, String contentType, boolean mergeCharset) {
         StringEntity entity = new StringEntity(text, charset);
         if (StringUtils.isNotEmpty(charset) && mergeCharset) {
             if (!contentType.contains("charset=")) {

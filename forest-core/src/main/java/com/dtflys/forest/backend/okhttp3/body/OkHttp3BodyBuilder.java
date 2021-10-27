@@ -25,12 +25,15 @@ import java.util.List;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2018-02-27 18:18
  */
-public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
+public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
 
     private static Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
 
 
-    protected abstract void setBody(Request.Builder builder, RequestBody body);
+
+    protected void setBody(ForestRequest request, Request.Builder builder, RequestBody body) {
+        builder.method(request.getType().getName(), body);
+    }
 
 
     @Override
@@ -38,11 +41,11 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
         ForestProtobufConverter converter = request.getConfiguration().getProtobufConverter();
         request.getConfiguration().getConverterMap().computeIfAbsent(ForestDataType.PROTOBUF,v -> converter);
         byte[] bytes = converter.convertToByte(source);
-        setBody(builder, RequestBody.create(MediaType.get(contentType), bytes));
+        setBody(request, builder, RequestBody.create(MediaType.get(contentType), bytes));
     }
 
     @Override
-    protected void setStringBody(Request.Builder builder, String text, String charset, String contentType, boolean mergeCharset) {
+    protected void setStringBody(Request.Builder builder, ForestRequest request, String text, String charset, String contentType, boolean mergeCharset) {
         MediaType mediaType = MediaType.parse(contentType);
         Charset cs = DEFAULT_CHARSET;
         if (StringUtils.isNotEmpty(charset)) {
@@ -66,7 +69,7 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
         byte[] bytes = text.getBytes(cs);
 
         RequestBody body = RequestBody.create(mediaType, bytes);
-        setBody(builder, body);
+        setBody(request, builder, body);
     }
 
 
@@ -92,7 +95,7 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
         }
 
         FormBody body = bodyBuilder.build();
-        setBody(builder, body);
+        setBody(request, builder, body);
     }
 
     @Override
@@ -141,7 +144,7 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
         }
 
         MultipartBody body = bodyBuilder.build();
-        setBody(builder, body);
+        setBody(request, builder, body);
     }
 
     private RequestBody createFileBody(ForestRequest request, ForestMultipart multipart, Charset charset, LifeCycleHandler lifeCycleHandler) {
@@ -189,6 +192,6 @@ public abstract class AbstractOkHttp3BodyBuilder extends AbstractBodyBuilder<Req
         }
         MediaType mediaType = MediaType.parse(contentType);
         RequestBody body = RequestBody.create(mediaType, bytes);
-        setBody(builder, body);
+        setBody(request, builder, body);
     }
 }

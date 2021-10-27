@@ -2,11 +2,15 @@ package com.dtflys.forest.backend.okhttp3.executor;
 
 import com.dtflys.forest.backend.BodyBuilder;
 import com.dtflys.forest.backend.HttpExecutor;
+import com.dtflys.forest.backend.body.NoneBodyBuilder;
+import com.dtflys.forest.backend.okhttp3.body.OkHttp3BodyBuilder;
 import com.dtflys.forest.backend.okhttp3.logging.OkHttp3LogBodyMessage;
+import com.dtflys.forest.backend.url.QueryableURLBuilder;
 import com.dtflys.forest.backend.url.URLBuilder;
 import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.http.ForestHeader;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.logging.LogBodyMessage;
 import com.dtflys.forest.logging.LogConfiguration;
@@ -15,6 +19,7 @@ import com.dtflys.forest.logging.LogHeaderMessage;
 import com.dtflys.forest.logging.RequestLogMessage;
 import com.dtflys.forest.logging.RequestProxyLogMessage;
 import com.dtflys.forest.logging.ResponseLogMessage;
+import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.backend.okhttp3.conn.OkHttp3ConnectionManager;
@@ -33,8 +38,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -48,9 +51,11 @@ import java.util.List;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2018-02-27 17:55
  */
-public abstract class AbstractOkHttp3Executor implements HttpExecutor {
+public class OkHttp3Executor implements HttpExecutor {
 
-    private final static Logger log = LoggerFactory.getLogger(AbstractOkHttp3Executor.class);
+    private static final BodyBuilder BODY_BUILDER = new OkHttp3BodyBuilder();
+
+    private static final URLBuilder URL_BUILDER = new QueryableURLBuilder();
 
     protected final ForestRequest request;
 
@@ -129,21 +134,15 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
         }
     }
 
-    protected AbstractOkHttp3Executor(ForestRequest request, OkHttp3ConnectionManager connectionManager, OkHttp3ResponseHandler okHttp3ResponseHandler) {
+    public OkHttp3Executor(ForestRequest request, OkHttp3ConnectionManager connectionManager, OkHttp3ResponseHandler okHttp3ResponseHandler) {
         this.request = request;
         this.connectionManager = connectionManager;
         this.okHttp3ResponseHandler = okHttp3ResponseHandler;
     }
 
-    protected abstract BodyBuilder<Request.Builder> getBodyBuilder();
-
-    protected abstract URLBuilder getURLBuilder();
 
     protected OkHttpClient getClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         return connectionManager.getClient(request, lifeCycleHandler);
-    }
-
-    protected void prepareMethod(Request.Builder builder) {
     }
 
     protected void prepareHeaders(Request.Builder builder) {
@@ -173,18 +172,22 @@ public abstract class AbstractOkHttp3Executor implements HttpExecutor {
         }
     }
 
-    protected void prepareBody(Request.Builder builder, final LifeCycleHandler lifeCycleHandler) {
-        getBodyBuilder().buildBody(builder, request, lifeCycleHandler);
+    protected void prepareMethodAndBody(Request.Builder builder, final LifeCycleHandler lifeCycleHandler) {
+        ForestRequestType type = request.getType() == null ? ForestRequestType.GET : request.getType();
+        if (type.isNeedBody()) {
+            BODY_BUILDER.buildBody(builder, request, lifeCycleHandler);
+        } else {
+            builder.method(type.getName(), null);
+        }
     }
 
     public void execute(final LifeCycleHandler lifeCycleHandler, int retryCount) {
         OkHttpClient okHttpClient = getClient(request, lifeCycleHandler);
-        URLBuilder urlBuilder = getURLBuilder();
+        URLBuilder urlBuilder = URL_BUILDER;
         String url = urlBuilder.buildUrl(request);
         Request.Builder builder = new Request.Builder().url(url);
-        prepareMethod(builder);
         prepareHeaders(builder);
-        prepareBody(builder, lifeCycleHandler);
+        prepareMethodAndBody(builder, lifeCycleHandler);
 
         final Request okRequest = builder.build();
         Call call = okHttpClient.newCall(okRequest);
