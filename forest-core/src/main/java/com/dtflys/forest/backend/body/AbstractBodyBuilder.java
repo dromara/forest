@@ -171,14 +171,14 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                     String text = null;
                     if (toJsonObj instanceof CharSequence || toJsonObj instanceof StringRequestBody) {
                         text = toJsonObj.toString();
-                        setStringBody(httpRequest, text, charset, contentType, mergeCharset);
+                        setStringBody(httpRequest, request, text, charset, contentType, mergeCharset);
                     } else if (toJsonObj instanceof ObjectRequestBody) {
                         if (converter instanceof ForestJsonConverter) {
                             text = ((ForestJsonConverter) converter).encodeToString(((ObjectRequestBody) toJsonObj).getObject());
                         } else {
                             text = jsonConverter.encodeToString(((ObjectRequestBody) toJsonObj).getObject());
                         }
-                        setStringBody(httpRequest, text, charset, contentType, mergeCharset);
+                        setStringBody(httpRequest, request, text, charset, contentType, mergeCharset);
                     } else if (toJsonObj instanceof NameValueRequestBody) {
                         Map<String, Object> subMap = new HashMap<>(1);
                         subMap.put(((NameValueRequestBody) toJsonObj).getName(), ((NameValueRequestBody) toJsonObj).getValue());
@@ -187,7 +187,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                         } else {
                             text = jsonConverter.encodeToString(subMap);
                         }
-                        setStringBody(httpRequest, text, charset, contentType, mergeCharset);
+                        setStringBody(httpRequest, request, text, charset, contentType, mergeCharset);
                     } else if (toJsonObj instanceof ByteArrayRequestBody) {
                         byte[] bytes = ((ByteArrayRequestBody) toJsonObj).getByteArray();
                         setBinaryBody(httpRequest, request, charset, contentType, nameValueList, bytes, lifeCycleHandler);
@@ -197,10 +197,10 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                         } else {
                             text = jsonConverter.encodeToString(toJsonObj);
                         }
-                        setStringBody(httpRequest, text, charset, contentType, mergeCharset);
+                        setStringBody(httpRequest, request, text, charset, contentType, mergeCharset);
                     }
                 } else {
-                    setStringBody(httpRequest, "", charset, contentType, mergeCharset);
+                    setStringBody(httpRequest, request, "", charset, contentType, mergeCharset);
                 }
             } else if (bodyType == ForestBodyType.FILE) {
                 List<ForestMultipart> multiparts = request.getMultiparts();
@@ -235,7 +235,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                     for (Object bodyItem : bodyList) {
                         builder.append(bodyItem.toString());
                     }
-                    setStringBody(httpRequest, builder.toString(), charset, contentType, mergeCharset);
+                    setStringBody(httpRequest, request, builder.toString(), charset, contentType, mergeCharset);
                 }
             }
         }
@@ -366,12 +366,13 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
     /**
      * 设置字符串请求体
      * @param httpReq 后端请求对象
+     * @param request Forest请求对象
      * @param text 字符串文本
      * @param charset 字符集
      * @param contentType 数据类型
      * @param mergeCharset 是否合并字符集
      */
-    protected abstract void setStringBody(T httpReq, String text, String charset, String contentType, boolean mergeCharset);
+    protected abstract void setStringBody(T httpReq, ForestRequest request, String text, String charset, String contentType, boolean mergeCharset);
 
     /**
      * 设置表单请求体
