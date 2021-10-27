@@ -108,7 +108,7 @@ public enum ForestRequestType {
      * @return {@code true}: 需要, 否则不需要
      */
     public boolean isNeedBody() {
-        return !this.equals(GET);
+        return !this.equals(GET) && !this.equals(HEAD) && !this.equals(OPTIONS);
     }
 
     /**
