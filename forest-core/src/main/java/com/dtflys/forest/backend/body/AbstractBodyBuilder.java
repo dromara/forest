@@ -4,9 +4,11 @@ import com.dtflys.forest.backend.BodyBuilder;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ForestConverter;
+import com.dtflys.forest.converter.form.ForestFormConvertor;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.converter.protobuf.ForestProtobufConverterManager;
 import com.dtflys.forest.handler.LifeCycleHandler;
+import com.dtflys.forest.http.ForestBody;
 import com.dtflys.forest.http.ForestBodyType;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
@@ -20,6 +22,7 @@ import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.lang.reflect.Array;
+import java.nio.charset.Charset;
 import java.util.*;
 
 
@@ -65,7 +68,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
 
         ContentType mineContentType = new ContentType(mineType);
 
-        List<ForestRequestBody> reqBody = request.getBody();
+        ForestBody reqBody = request.getBody();
         boolean needRequestBody = request.getType().isNeedBody() ||
                 !reqBody.isEmpty() ||
                 !request.getMultiparts().isEmpty();
@@ -76,7 +79,9 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                 bodyType = mineContentType.bodyType();
             }
             if (bodyType == ForestBodyType.FORM) {
-                setFormBody(httpRequest, request, charset, contentType, reqBody);
+                ForestFormConvertor forestFormConvertor = new ForestFormConvertor(request.getConfiguration());
+                byte[] bodyBytes = forestFormConvertor.encodeRequestBody(reqBody, Charset.forName(request.charset()));
+                setBinaryBody(httpRequest, request, charset, contentType, bodyBytes);
             } else if(bodyType == ForestBodyType.PROTOBUF) {
                 Object[] arguments = request.getArguments();
                 if (arguments != null) {
@@ -190,7 +195,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                         setStringBody(httpRequest, request, text, charset, contentType, mergeCharset);
                     } else if (toJsonObj instanceof ByteArrayRequestBody) {
                         byte[] bytes = ((ByteArrayRequestBody) toJsonObj).getByteArray();
-                        setBinaryBody(httpRequest, request, charset, contentType, nameValueList, bytes, lifeCycleHandler);
+                        setBinaryBody(httpRequest, request, charset, contentType, bytes);
                     } else {
                         if (converter instanceof ForestJsonConverter) {
                             text = ((ForestJsonConverter) converter).encodeToString(toJsonObj);
@@ -227,7 +232,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                     }
                     pos += bytesItem.length;
                 }
-                setBinaryBody(httpRequest, request, charset, contentType, nameValueList, bytes, lifeCycleHandler);
+                setBinaryBody(httpRequest, request, charset, contentType, bytes);
             } else {
                 StringBuilder builder = new StringBuilder();
                 List bodyList = request.getBody();
@@ -402,17 +407,13 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
      * @param request Forest请求对象
      * @param charset 字符集
      * @param contentType 数据类型
-     * @param nameValueList 键值对列表
      * @param bytes 字节数组
-     * @param lifeCycleHandler 生命周期处理器
      */
     protected abstract void setBinaryBody(T httpReq,
                                  ForestRequest request,
                                  String charset,
                                  String contentType,
-                                 List<RequestNameValue> nameValueList,
-                                 byte[] bytes,
-                                 LifeCycleHandler lifeCycleHandler);
+                                 byte[] bytes);
 
 
     /**

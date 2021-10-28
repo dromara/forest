@@ -32,6 +32,7 @@ import com.alibaba.fastjson.util.IOUtils;
 import com.alibaba.fastjson.util.TypeUtils;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.http.ForestBody;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 
@@ -190,6 +191,11 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         } catch (Throwable th) {
             throw new ForestRuntimeException(th);
         }
+    }
+
+    @Override
+    public byte[] encodeRequestBody(ForestBody body, Charset charset) {
+        return new byte[0];
     }
 
     private static final Object toJSON(Object javaObject) {

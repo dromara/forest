@@ -1,9 +1,8 @@
 package com.dtflys.forest.utils;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.ObjectUtils;
 
 import java.util.Collection;
+import java.util.Map;
 
 public class Validations {
 
@@ -13,9 +12,14 @@ public class Validations {
         }
     }
 
-
     public static void assertParamNotEmpty(Object obj, String paramName) {
-        if (ObjectUtils.isEmpty(obj)) {
+        if (obj == null) {
+            throwParameterEmptyException(paramName);
+        }
+        if (obj instanceof Collection && ((Collection<?>) obj).isEmpty()) {
+            throwParameterEmptyException(paramName);
+        }
+        if (obj instanceof Map && ((Map<?, ?>) obj).isEmpty()) {
             throwParameterEmptyException(paramName);
         }
     }
@@ -27,7 +31,7 @@ public class Validations {
     }
 
     public static void assertParamNotEmpty(Collection collection, String paramName) {
-        if (CollectionUtils.isEmpty(collection)) {
+        if (collection == null || collection.isEmpty()) {
             throwParameterEmptyException(paramName);
         }
     }

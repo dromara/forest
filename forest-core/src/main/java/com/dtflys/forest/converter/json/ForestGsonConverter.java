@@ -25,6 +25,7 @@
 package com.dtflys.forest.converter.json;
 
 import com.dtflys.forest.exceptions.ForestConvertException;
+import com.dtflys.forest.http.ForestBody;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 import com.google.gson.*;
@@ -217,6 +218,11 @@ public class ForestGsonConverter implements ForestJsonConverter {
     public String encodeToString(Object obj) {
         Gson gson = createGson();
         return gson.toJson(obj);
+    }
+
+    @Override
+    public byte[] encodeRequestBody(ForestBody body, Charset charset) {
+        return new byte[0];
     }
 
     @Override

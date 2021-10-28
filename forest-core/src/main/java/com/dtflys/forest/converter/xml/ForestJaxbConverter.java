@@ -2,6 +2,7 @@ package com.dtflys.forest.converter.xml;
 
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.http.ForestBody;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
@@ -44,6 +45,11 @@ public class ForestJaxbConverter implements ForestXmlConverter {
             throw new ForestConvertException(this, e);
         }
 
+    }
+
+    @Override
+    public byte[] encodeRequestBody(ForestBody body, Charset charset) {
+        return new byte[0];
     }
 
     @Override

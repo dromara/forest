@@ -963,7 +963,7 @@ public class TestPostClient extends BaseClientTest {
                 .assertMethodEquals("POST")
                 .assertPathEquals("/form-array")
                 .assertHeaderEquals("Content-Type", "application/x-www-form-urlencoded")
-                .assertBodyEquals("username=foo&password=123456&idList=1%2C2%2C3&cause%5B0%5D.id=1&cause%5B0%5D.score=87&cause%5B1%5D.id=2&cause%5B1%5D.score=73");
+                .assertBodyEquals("username=foo&password=123456&idList=1%2C2%2C3&cause[0].id=1&cause[0].score=87&cause[1].id=2&cause[1].score=73");
     }
 
     @Test
@@ -989,7 +989,7 @@ public class TestPostClient extends BaseClientTest {
                 .assertMethodEquals("POST")
                 .assertPathEquals("/form-array")
                 .assertHeaderEquals("Content-Type", "application/x-www-form-urlencoded")
-                .assertBodyEquals("username=foo&password=123456&idList=1%2C2%2C3&cause%5B0%5D.id=1&cause%5B0%5D.score=87&cause%5B1%5D.id=2&cause%5B1%5D.score=73");
+                .assertBodyEquals("username=foo&password=123456&idList=1%2C2%2C3&cause[0].id=1&cause[0].score=87&cause[1].id=2&cause[1].score=73");
     }
 
     @Test
@@ -1010,7 +1010,7 @@ public class TestPostClient extends BaseClientTest {
                 .assertMethodEquals("POST")
                 .assertPathEquals("/form-array")
                 .assertHeaderEquals("Content-Type", "application/x-www-form-urlencoded")
-                .assertBodyEquals("username=foo&password=123456&idList=1%2C2%2C3&cause%5B0%5D.id=1&cause%5B0%5D.score=87&cause%5B1%5D.id=2&cause%5B1%5D.score=73");
+                .assertBodyEquals("username=foo&password=123456&idList=1%2C2%2C3&cause[0].id=1&cause[0].score=87&cause[1].id=2&cause[1].score=73");
     }
 
     @Test
@@ -1035,7 +1035,7 @@ public class TestPostClient extends BaseClientTest {
                 .assertMethodEquals("POST")
                 .assertPathEquals("/form-array")
                 .assertHeaderEquals("Content-Type", "application/x-www-form-urlencoded")
-                .assertBodyEquals("username=foo&password=123456&idList=1%2C2%2C3&cause%5B0%5D.id=1&cause%5B0%5D.score=87&cause%5B1%5D.id=2&cause%5B1%5D.score=73");
+                .assertBodyEquals("username=foo&password=123456&idList=1%2C2%2C3&cause[0].id=1&cause[0].score=87&cause[1].id=2&cause[1].score=73");
     }
 
     @Test

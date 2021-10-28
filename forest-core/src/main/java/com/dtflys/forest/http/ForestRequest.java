@@ -1788,7 +1788,7 @@ public class ForestRequest<T> {
      *
      * @return 请求体对象列表, 元素为 {@link ForestRequestBody} 其子类实例
      */
-    public List<ForestRequestBody> getBody() {
+    public ForestBody getBody() {
         return body;
     }
 

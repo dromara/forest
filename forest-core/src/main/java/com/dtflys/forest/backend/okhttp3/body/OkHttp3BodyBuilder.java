@@ -6,6 +6,7 @@ import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.converter.protobuf.ForestProtobufConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.LifeCycleHandler;
+import com.dtflys.forest.http.ForestBody;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.http.body.SupportFormUrlEncoded;
@@ -14,10 +15,12 @@ import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
+import com.dtflys.forest.utils.URLEncoder;
 import okhttp3.*;
 
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -78,12 +81,14 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         FormBody.Builder bodyBuilder = new FormBody.Builder();
         List<RequestNameValue> nameValueList = new LinkedList<>();
-        for (ForestRequestBody bodyItem : bodyItems) {
+        ForestBody body = request.getBody();
+        for (ForestRequestBody bodyItem : body) {
             if (bodyItem instanceof SupportFormUrlEncoded) {
                 nameValueList.addAll(((SupportFormUrlEncoded) bodyItem).getNameValueList(request.getConfiguration()));
             }
         }
         nameValueList = processFromNameValueList(nameValueList, request.getConfiguration());
+        StringBuilder strBuilder = new StringBuilder();
         for (int i = 0; i < nameValueList.size(); i++) {
             RequestNameValue nameValue = nameValueList.get(i);
             if (!nameValue.isInBody()) {
@@ -91,11 +96,21 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
             }
             String name = nameValue.getName();
             Object value = nameValue.getValue();
+            strBuilder.append(name);
+            if (value != null) {
+                value = MappingTemplate.getFormValueString(jsonConverter, value);
+                strBuilder.append("=").append(URLEncoder.QUERY_VALUE.encode(String.valueOf(value), charset));
+            }
+            if (i < nameValueList.size() - 1) {
+                strBuilder.append("&");
+            }
             bodyBuilder.addEncoded(name, MappingTemplate.getFormValueString(jsonConverter, value));
         }
-
-        FormBody body = bodyBuilder.build();
-        setBody(request, builder, body);
+        ContentType objContentType = new ContentType(contentType);
+        Charset encode = Charset.forName(charset);
+        MediaType mediaType = MediaType.parse(objContentType.toStringWithoutParameters());
+        RequestBody okBody = RequestBody.create(mediaType, strBuilder.toString().getBytes(encode));
+        setBody(request, builder, okBody);
     }
 
     @Override
@@ -184,9 +199,7 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
             ForestRequest request,
             String charset,
             String contentType,
-            List<RequestNameValue> nameValueList,
-            byte[] bytes,
-            LifeCycleHandler lifeCycleHandler) {
+            byte[] bytes) {
         if (StringUtils.isBlank(contentType)) {
             contentType = ContentType.APPLICATION_OCTET_STREAM;
         }

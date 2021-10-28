@@ -169,9 +169,7 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
                                  ForestRequest request,
                                  String charset,
                                  String contentType,
-                                 List<RequestNameValue> nameValueList,
-                                 byte[] bytes,
-                                 LifeCycleHandler lifeCycleHandler) {
+                                 byte[] bytes) {
 
         if (StringUtils.isBlank(contentType)) {
             contentType = ContentType.APPLICATION_OCTET_STREAM.toString();

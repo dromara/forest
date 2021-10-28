@@ -52,6 +52,9 @@ public class ForestDataType {
     /** 数据类型： 文本类型 */
     public final static ForestDataType TEXT = ForestDataType.createDataType("text");
 
+    /** 数据类型： 表单类型 */
+    public final static ForestDataType FORM = ForestDataType.createDataType("form");
+
     /** 数据类型： JSON类型 */
     public final static ForestDataType JSON = ForestDataType.createDataType("json");
 

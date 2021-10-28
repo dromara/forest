@@ -3,6 +3,8 @@ package com.dtflys.forest.http;
 import com.dtflys.forest.http.body.NameValueRequestBody;
 import com.dtflys.forest.utils.Validations;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;

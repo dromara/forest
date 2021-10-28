@@ -1,7 +1,9 @@
 package com.dtflys.forest.converter.text;
 
 import com.dtflys.forest.converter.ForestConverter;
+import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.exceptions.ForestConvertException;
+import com.dtflys.forest.http.ForestBody;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.commons.io.IOUtils;
@@ -11,7 +13,7 @@ import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-public class DefaultTextConverter implements ForestConverter<String> {
+public class DefaultTextConverter implements ForestConverter<String>, ForestEncoder {
     @Override
     public <T> T convertToJavaObject(String source, Class<T> targetType) {
         return (T) source;
@@ -45,5 +47,15 @@ public class DefaultTextConverter implements ForestConverter<String> {
     @Override
     public ForestDataType getDataType() {
         return ForestDataType.TEXT;
+    }
+
+    @Override
+    public String encodeToString(Object obj) {
+        return null;
+    }
+
+    @Override
+    public byte[] encodeRequestBody(ForestBody body, Charset charset) {
+        return new byte[0];
     }
 }
