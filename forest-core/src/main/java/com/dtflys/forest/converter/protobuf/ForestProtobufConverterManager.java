@@ -58,8 +58,8 @@ public class ForestProtobufConverterManager implements Serializable {
 
 
     public boolean checkSupportProtobuf() {
-        if (supportProtobuf != null) {
-            return supportProtobuf;
+        if (supportProtobuf != null && !supportProtobuf) {
+            throw new ForestRuntimeException("Protobuf is not supported.");
         }
         try {
             Class.forName("com.google.protobuf.Parser");

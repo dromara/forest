@@ -205,7 +205,7 @@ public class ContentType {
             return ForestBodyType.XML;
         }
         if (isMultipart()) {
-            return ForestBodyType.FILE;
+            return ForestBodyType.MULTIPART;
         }
         if (canReadAsBinaryStream()) {
             return ForestBodyType.BINARY;

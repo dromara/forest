@@ -33,17 +33,6 @@ public class ForestGoogleProtobufConverter implements ForestProtobufConverter {
         }
     }
 
-    @Override
-    public <T> T convertToJavaObject(byte[] source, Class<T> targetType) {
-        try {
-            Method method = targetType.getDeclaredMethod("parser");
-            //noinspection unchecked
-            Parser<T> parser = (Parser<T>) method.invoke(null);
-            return parser.parseFrom(source);
-        } catch (ReflectiveOperationException | InvalidProtocolBufferException e) {
-            throw new ForestConvertException(this, e);
-        }
-    }
 
     @Override
     public byte[] convertToByte(Object source) {
@@ -69,6 +58,5 @@ public class ForestGoogleProtobufConverter implements ForestProtobufConverter {
     public ForestDataType getDataType() {
         return ForestDataType.PROTOBUF;
     }
-
 
 }

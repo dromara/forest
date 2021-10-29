@@ -7,6 +7,7 @@ import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.ForestBody;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.http.body.SupportFormUrlEncoded;
+import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
@@ -32,10 +33,6 @@ public class ForestFormConvertor implements ForestConverter<String>, ForestEncod
         this.configuration = configuration;
     }
 
-    @Override
-    public <T> T convertToJavaObject(String source, Class<T> targetType) {
-        return null;
-    }
 
     @Override
     public <T> T convertToJavaObject(String source, Type targetType) {
@@ -54,12 +51,21 @@ public class ForestFormConvertor implements ForestConverter<String>, ForestEncod
 
     @Override
     public ForestDataType getDataType() {
-        return null;
+        return ForestDataType.FORM;
     }
 
     @Override
     public String encodeToString(Object obj) {
-        return null;
+        ForestJsonConverter jsonConverter = configuration.getJsonConverter();
+        Map<String, Object> map = jsonConverter.convertObjectToMap(obj);
+        List<RequestNameValue> nameValueList = new LinkedList<>();
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            RequestNameValue nameValue = new RequestNameValue(entry.getKey(), MappingParameter.TARGET_BODY);
+            nameValue.setValue(entry.getValue());
+            nameValueList.add(nameValue);
+        }
+        nameValueList = processFromNameValueList(nameValueList, configuration);
+        return formUrlEncodedString(nameValueList, StandardCharsets.UTF_8);
     }
 
     /**
@@ -169,6 +175,7 @@ public class ForestFormConvertor implements ForestConverter<String>, ForestEncod
     }
 
 
+
     /**
      * 处理Form表单中的键值对列表
      * @param nameValueList 键值对列表
@@ -185,20 +192,8 @@ public class ForestFormConvertor implements ForestConverter<String>, ForestEncod
         return newNameValueList;
     }
 
-
-    @Override
-    public byte[] encodeRequestBody(ForestBody body, Charset charset) {
+    private String formUrlEncodedString(List<RequestNameValue> nameValueList, Charset charset) {
         ForestJsonConverter jsonConverter = configuration.getJsonConverter();
-        List<RequestNameValue> nameValueList = new LinkedList<>();
-        if (charset == null) {
-            charset = StandardCharsets.UTF_8;
-        }
-        for (ForestRequestBody bodyItem : body) {
-            if (bodyItem instanceof SupportFormUrlEncoded) {
-                nameValueList.addAll(((SupportFormUrlEncoded) bodyItem).getNameValueList(configuration));
-            }
-        }
-        nameValueList = processFromNameValueList(nameValueList, configuration);
         StringBuilder strBuilder = new StringBuilder();
         for (int i = 0; i < nameValueList.size(); i++) {
             RequestNameValue nameValue = nameValueList.get(i);
@@ -216,7 +211,22 @@ public class ForestFormConvertor implements ForestConverter<String>, ForestEncod
                 strBuilder.append("&");
             }
         }
-        String strBody = strBuilder.toString();
+        return strBuilder.toString();
+    }
+
+    @Override
+    public byte[] encodeRequestBody(ForestBody body, Charset charset) {
+        List<RequestNameValue> nameValueList = new LinkedList<>();
+        if (charset == null) {
+            charset = StandardCharsets.UTF_8;
+        }
+        for (ForestRequestBody bodyItem : body) {
+            if (bodyItem instanceof SupportFormUrlEncoded) {
+                nameValueList.addAll(((SupportFormUrlEncoded) bodyItem).getNameValueList(configuration));
+            }
+        }
+        nameValueList = processFromNameValueList(nameValueList, configuration);
+        String strBody = formUrlEncodedString(nameValueList, charset);
         byte[] bytes = strBody.getBytes(charset);
         return bytes;
     }

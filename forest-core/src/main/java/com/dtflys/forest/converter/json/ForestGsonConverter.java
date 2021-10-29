@@ -27,6 +27,7 @@ package com.dtflys.forest.converter.json;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.http.ForestBody;
 import com.dtflys.forest.utils.ForestDataType;
+import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
 import com.google.gson.*;
 import org.apache.commons.io.IOUtils;
@@ -59,38 +60,36 @@ public class ForestGsonConverter implements ForestJsonConverter {
         this.dateFormat = dateFormat;
     }
 
-    @Override
-    public <T> T convertToJavaObject(String source, Class<T> targetType) {
-        if (StringUtils.isBlank(source)) {
-            return null;
-        }
-        try {
-            if (Map.class.isAssignableFrom(targetType)) {
-                JsonParser jsonParser = new JsonParser();
-                JsonObject jsonObject = jsonParser.parse(source).getAsJsonObject();
-                return (T) toMap(jsonObject, false);
-            }
-            else if (List.class.isAssignableFrom(targetType)) {
-                JsonParser jsonParser = new JsonParser();
-                JsonArray jsonArray = jsonParser.parse(source).getAsJsonArray();
-                return (T) toList(jsonArray);
-            }
-            Gson gson = createGson();
-            return (T) gson.fromJson(source, targetType);
-        } catch (Throwable th) {
-            throw new ForestConvertException(this, th);
-        }
-    }
 
     @Override
     public <T> T convertToJavaObject(String source, Type targetType) {
+        if (StringUtils.isBlank(source)) {
+            return null;
+        }
         try {
             if (targetType instanceof ParameterizedType
                     || targetType.getClass().getName().startsWith("com.google.gson")) {
                 Gson gson = createGson();
                 return gson.fromJson(source, targetType);
             }
-            return convertToJavaObject(source, (Class<? extends T>) targetType);
+            Class clazz = ReflectUtils.toClass(targetType);
+            try {
+                if (Map.class.isAssignableFrom(clazz)) {
+                    JsonParser jsonParser = new JsonParser();
+                    JsonObject jsonObject = jsonParser.parse(source).getAsJsonObject();
+                    return (T) toMap(jsonObject, false);
+                }
+                else if (List.class.isAssignableFrom(clazz)) {
+                    JsonParser jsonParser = new JsonParser();
+                    JsonArray jsonArray = jsonParser.parse(source).getAsJsonArray();
+                    return (T) toList(jsonArray);
+                }
+                Gson gson = createGson();
+                return (T) gson.fromJson(source, targetType);
+            } catch (Throwable th) {
+                throw new ForestConvertException(this, th);
+            }
+
         } catch (Exception ex) {
             throw new ForestConvertException(this, ex);
         }
@@ -220,10 +219,6 @@ public class ForestGsonConverter implements ForestJsonConverter {
         return gson.toJson(obj);
     }
 
-    @Override
-    public byte[] encodeRequestBody(ForestBody body, Charset charset) {
-        return new byte[0];
-    }
 
     @Override
     public Map<String, Object> convertObjectToMap(Object obj) {

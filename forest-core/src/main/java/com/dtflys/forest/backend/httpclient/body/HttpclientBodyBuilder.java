@@ -57,42 +57,9 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
 
 
     @Override
-    protected void setFormBody(T httpReq, ForestRequest request, String charset, String contentType, List<ForestRequestBody> bodyItems) {
-        ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
-        List<RequestNameValue> nameValueList = new LinkedList<>();
-        for (ForestRequestBody bodyItem : bodyItems) {
-            if (bodyItem instanceof SupportFormUrlEncoded) {
-                nameValueList.addAll(((SupportFormUrlEncoded) bodyItem).getNameValueList(request.getConfiguration()));
-            }
-        }
-        List<NameValuePair> nameValuePairs = new ArrayList<>(nameValueList.size());
-        nameValueList = processFromNameValueList(nameValueList, request.getConfiguration());
-        for (int i = 0; i < nameValueList.size(); i++) {
-            RequestNameValue nameValue = nameValueList.get(i);
-            if (!nameValue.isInBody()) {
-                continue;
-            }
-            String name = nameValue.getName();
-            Object value = nameValue.getValue();
-            NameValuePair nameValuePair = new BasicNameValuePair(name, MappingTemplate.getFormValueString(jsonConverter, value));
-            nameValuePairs.add(nameValuePair);
-        }
-
-        try {
-            StringEntity entity = new UrlEncodedFormEntity(nameValuePairs, charset);
-            if (StringUtils.isNotEmpty(contentType)) {
-                entity.setContentType(contentType);
-            }
-            httpReq.setEntity(entity);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
     protected void setFileBody(T httpReq,
                                ForestRequest request,
-                               String charset,
+                               Charset charset,
                                String contentType,
                                List<RequestNameValue> nameValueList,
                                List<ForestMultipart> multiparts,
@@ -104,10 +71,10 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
         }
         // 解决文件名乱码问题
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
-        Charset httpCharset = Charset.forName(charset);
+        Charset httpCharset = charset;
         Charset itemCharset = StandardCharsets.UTF_8;
-        if (StringUtils.isNotEmpty(charset)) {
-            itemCharset = Charset.forName(charset);
+        if (charset != null) {
+            itemCharset = charset;
         }
         if (!nameValueList.isEmpty()) {
             entityBuilder.setCharset(httpCharset);
@@ -179,14 +146,5 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
         httpReq.setEntity(entity);
     }
 
-    @Override
-    protected void setProtobuf(T httpReq, ForestRequest request, String charset, String contentType, List<RequestNameValue> nameValueList, Object source) {
-        ForestProtobufConverter converter = request.getConfiguration().getProtobufConverter();
-        request.getConfiguration().getConverterMap().computeIfAbsent(ForestDataType.PROTOBUF,v -> converter);
-        byte[] bytes = converter.convertToByte(source);
-        ByteArrayEntity byteArrayEntity = new ByteArrayEntity(bytes);
-        byteArrayEntity.setContentType(contentType);
-        httpReq.setEntity(byteArrayEntity);
-    }
 
 }

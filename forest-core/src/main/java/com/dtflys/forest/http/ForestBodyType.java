@@ -62,6 +62,6 @@ public enum ForestBodyType {
     /**
      * 文件类型
      */
-    FILE,
+    MULTIPART,
 
 }

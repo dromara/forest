@@ -123,14 +123,6 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         }
     }
 
-    @Override
-    public <T> T convertToJavaObject(String source, Class<T> targetType) {
-        try {
-            return JSON.parseObject(source, targetType);
-        } catch (Throwable th) {
-            throw new ForestConvertException(this, th);
-        }
-    }
 
     @Override
     public <T> T convertToJavaObject(String source, Type targetType) {
@@ -193,10 +185,6 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         }
     }
 
-    @Override
-    public byte[] encodeRequestBody(ForestBody body, Charset charset) {
-        return new byte[0];
-    }
 
     private static final Object toJSON(Object javaObject) {
         ParserConfig parserConfig = ParserConfig.getGlobalInstance();

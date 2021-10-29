@@ -34,11 +34,11 @@ public final class StringUtils {
         if (text == null) {
             return true;
         }
-        char[] chars = text.toCharArray();
-        int len = chars.length;
-        if (len == 0) {
+        if (text.length() == 0) {
             return true;
         }
+        char[] chars = text.toCharArray();
+        int len = chars.length;
         for (int i = 0; i < len; ++i) {
             if (!Character.isWhitespace(chars[i])) {
                 return false;

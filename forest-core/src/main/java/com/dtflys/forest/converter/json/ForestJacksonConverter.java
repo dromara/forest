@@ -80,14 +80,6 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         }
     }
 
-    @Override
-    public <T> T convertToJavaObject(String source, Class<T> targetType) {
-        try {
-            return mapper.readValue(source, targetType);
-        } catch (IOException e) {
-            throw new ForestConvertException(this, e);
-        }
-    }
 
     @Override
     public <T> T convertToJavaObject(String source, Type targetType) {
@@ -146,11 +138,6 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         } catch (Throwable e) {
             throw new ForestConvertException(this, e);
         }
-    }
-
-    @Override
-    public byte[] encodeRequestBody(ForestBody body, Charset charset) {
-        return new byte[0];
     }
 
     @Override

@@ -4,6 +4,8 @@ import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.http.ForestBody;
+import com.dtflys.forest.http.ForestRequestBody;
+import com.dtflys.forest.http.body.NameValueRequestBody;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.commons.io.IOUtils;
@@ -14,10 +16,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class DefaultTextConverter implements ForestConverter<String>, ForestEncoder {
-    @Override
-    public <T> T convertToJavaObject(String source, Class<T> targetType) {
-        return (T) source;
-    }
 
     @Override
     public <T> T convertToJavaObject(String source, Type targetType) {
@@ -56,6 +54,20 @@ public class DefaultTextConverter implements ForestConverter<String>, ForestEnco
 
     @Override
     public byte[] encodeRequestBody(ForestBody body, Charset charset) {
-        return new byte[0];
+        if (charset == null) {
+            charset = StandardCharsets.UTF_8;
+        }
+        StringBuilder builder = new StringBuilder();
+        ForestRequestBody lastBodyItem = null;
+        for (ForestRequestBody bodyItem : body) {
+            if (lastBodyItem != null && lastBodyItem instanceof NameValueRequestBody) {
+                builder.append("&");
+            }
+            builder.append(bodyItem.toString());
+            lastBodyItem = bodyItem;
+        }
+        String strBody = builder.toString();
+        byte[] bytes = strBody.getBytes(charset);
+        return bytes;
     }
 }
