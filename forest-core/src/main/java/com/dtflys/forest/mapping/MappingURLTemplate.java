@@ -34,6 +34,7 @@ public class MappingURLTemplate extends MappingTemplate {
 
         boolean renderedQuery = false;
         boolean nextIsPort = false;
+        boolean renderedPath = false;
         try {
             ForestJsonConverter jsonConverter = variableScope.getConfiguration().getJsonConverter();
             int len = exprList.size();
@@ -144,7 +145,7 @@ public class MappingURLTemplate extends MappingTemplate {
                                     subBuilder = new StringBuilder();
                                     continue;
                                 }
-                            } else if (host != null && port == null) {
+                            } else if (host != null && port == null && !renderedPath) {
                                 nextIsPort = true;
                             } else {
                                 subBuilder.append(ch);
@@ -170,13 +171,14 @@ public class MappingURLTemplate extends MappingTemplate {
                             if (ch != '/') {
                                 subBuilder.append(ch);
                             }
-                            if (nextIsPort && port == null) {
+                            if (!renderedPath && nextIsPort && port == null) {
                                 // 解析端口号
                                 port = Integer.parseInt(subBuilder.toString());
                                 subBuilder = new StringBuilder();
                                 nextIsPort = false;
                                 if (ch == '/') {
                                     pathCharIndex--;
+                                    renderedPath = true;
                                 }
                                 continue;
                             } else if (schema != null && host == null) {
@@ -185,11 +187,13 @@ public class MappingURLTemplate extends MappingTemplate {
                                 subBuilder = new StringBuilder();
                                 if (ch == '/') {
                                     pathCharIndex--;
+                                    renderedPath = true;
                                 }
                                 continue;
                             } else {
                                 if (ch == '/') {
                                     subBuilder.append(ch);
+                                    renderedPath = true;
                                 }
                                 if (pathCharIndex + 1 == baseLen) {
                                     if (path == null) {

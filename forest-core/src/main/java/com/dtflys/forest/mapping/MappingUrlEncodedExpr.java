@@ -34,21 +34,6 @@ public class MappingUrlEncodedExpr extends MappingExpr {
             return null;
         }
         String str = String.valueOf(ret);
-/*
-        MetaRequest metaRequest = forestMethod.getMetaRequest();
-        String charset = null;
-        if (metaRequest != null) {
-            charset = metaRequest.getCharset();
-        }
-        Object encoded = null;
-        if (StringUtils.isNotBlank(charset)) {
-            encoded = URLUtils.pathEncode(str, charset);
-        }
-        if (encoded == null) {
-            encoded = URLUtils.pathEncode(str, "UTF-8");
-        }
-        return encoded;
-*/
         return str;
     }
 

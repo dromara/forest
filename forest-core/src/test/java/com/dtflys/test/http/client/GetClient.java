@@ -6,6 +6,7 @@ import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.annotation.DataParam;
 import com.dtflys.forest.annotation.DataVariable;
 import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.model.JsonTestUser;
 import com.dtflys.test.interceptor.AddQueryInterceptor;
@@ -53,6 +54,12 @@ public interface GetClient {
             headers = {"Accept:text/plain"}
     )
     String testPath2(@Var("path") String path);
+
+    @Get("https://localhost/xxx:yyy")
+    ForestRequest testPath3();
+
+    @Get("https://localhost/xxx:111")
+    ForestRequest testPath4();
 
 
     @Request(

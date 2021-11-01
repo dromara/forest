@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.client.UrlEncodedClient;
 import com.dtflys.test.http.model.JsonTestUser;
@@ -126,6 +127,23 @@ public class TestGetClient extends BaseClientTest {
                 .assertQueryEquals("b", "1/2")
                 .assertQueryEquals("c", "http://localhost:8080/?x=0")
                 .assertQueryEquals("d", "1");
+    }
+
+
+    @Test
+    public void testPath3() {
+        ForestRequest request = getClient.testPath3();
+        assertThat(request).isNotNull();
+        assertThat(request.urlString()).isEqualTo("https://localhost/xxx:yyy");
+        System.out.println(request.urlString());
+    }
+
+    @Test
+    public void testPath4() {
+        ForestRequest request = getClient.testPath4();
+        assertThat(request).isNotNull();
+        assertThat(request.urlString()).isEqualTo("https://localhost/xxx:111");
+        System.out.println(request.urlString());
     }
 
 
