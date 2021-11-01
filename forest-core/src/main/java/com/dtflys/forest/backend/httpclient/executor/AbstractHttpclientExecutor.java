@@ -4,8 +4,8 @@ import com.dtflys.forest.backend.AbstractHttpExecutor;
 import com.dtflys.forest.backend.BodyBuilder;
 import com.dtflys.forest.backend.httpclient.HttpclientRequestProvider;
 import com.dtflys.forest.backend.httpclient.body.HttpclientBodyBuilder;
+import com.dtflys.forest.backend.httpclient.entity.AbstractHttpWithBodyEntity;
 import com.dtflys.forest.backend.url.URLBuilder;
-import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.http.ForestCookie;
 import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestHeader;
@@ -14,7 +14,6 @@ import com.dtflys.forest.http.ForestResponseFactory;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.http.client.CookieStore;
-import org.apache.http.client.methods.HttpRequestBase;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.backend.httpclient.request.HttpclientRequestSender;
 import com.dtflys.forest.backend.httpclient.response.HttpclientForestResponseFactory;
@@ -23,10 +22,9 @@ import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.mapping.MappingTemplate;
 
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.cookie.BasicClientCookie;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Date;
@@ -36,7 +34,7 @@ import java.util.List;
  * @author gongjun
  * @since 2016-06-14
  */
-public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> extends AbstractHttpExecutor {
+public abstract class AbstractHttpclientExecutor<T extends HttpUriRequest> extends AbstractHttpExecutor {
     protected final HttpclientResponseHandler httpclientResponseHandler;
     protected String url;
     protected final String typeName;
@@ -46,7 +44,7 @@ public abstract class AbstractHttpclientExecutor<T extends  HttpRequestBase> ext
 
     protected T buildRequest() {
         url = buildUrl();
-        return getRequestProvider().getRequest(url);
+        return (T) new AbstractHttpWithBodyEntity(url, request.type().getName()) {};
     }
 
     protected abstract HttpclientRequestProvider<T> getRequestProvider();

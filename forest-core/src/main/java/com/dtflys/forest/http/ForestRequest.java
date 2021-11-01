@@ -1552,6 +1552,17 @@ public class ForestRequest<T> {
     }
 
     /**
+     * 获取请求类型
+     * <p>同{@link ForestRequest#getType()}
+     *
+     * @return 请求类型, 即 HTTP 方法
+     * @see ForestRequest#getType()
+     */
+    public ForestRequestType type() {
+        return getType();
+    }
+
+    /**
      * 获取请求类型变更历史列表
      *
      * @return 请求类型列表
