@@ -195,6 +195,7 @@ public class OkHttp3Executor implements HttpExecutor {
         logRequest(retryCount, okRequest, okHttpClient);
         Date startDate = new Date();
         long startTime = startDate.getTime();
+/*
         if (request.isAsync()) {
             final OkHttp3ResponseFuture future = new OkHttp3ResponseFuture();
             call.enqueue(new Callback() {
@@ -234,13 +235,14 @@ public class OkHttp3Executor implements HttpExecutor {
                         }
                         future.completed(result);
                     } else {
-                        retryOrDoError(response, okResponse, future, lifeCycleHandler, retryCount, startTime);
+                        retryOrDoError(response, okResponse, future, lifeCycleHandler, retryCount);
                     }
                 }
             });
             okHttp3ResponseHandler.handleFuture(future, startDate, factory);
         }
         else {
+*/
             Response okResponse = null;
             ForestResponse response = null;
             try {
@@ -276,18 +278,18 @@ public class OkHttp3Executor implements HttpExecutor {
 
             // 验证响应
             if (response.isError()) {
-                retryOrDoError(response, okResponse, null, lifeCycleHandler, retryCount, startTime);
+                retryOrDoError(response, okResponse, null, lifeCycleHandler, retryCount);
                 return;
             }
             okHttp3ResponseHandler.handleSync(okResponse, response);
-        }
+//        }
     }
 
 
     private void retryOrDoError(
             ForestResponse response, Response okResponse,
             OkHttp3ResponseFuture future, LifeCycleHandler lifeCycleHandler,
-            int retryCount, long startTime) {
+            int retryCount) {
         ForestNetworkException networkException =
                 new ForestNetworkException(okResponse.message(), okResponse.code(), response);
         ForestRetryException retryException = new ForestRetryException(

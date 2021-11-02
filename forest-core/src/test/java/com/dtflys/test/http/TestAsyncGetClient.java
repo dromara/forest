@@ -75,7 +75,7 @@ public class TestAsyncGetClient extends BaseClientTest {
                 });
         log.info("send async get request");
         assertThat(success.get()).isFalse();
-        latch.await(2, TimeUnit.SECONDS);
+        latch.await(20, TimeUnit.SECONDS);
         assertThat(success.get()).isTrue();
     }
 

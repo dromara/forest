@@ -11,7 +11,6 @@ import com.dtflys.forest.http.ForestResponse;
  */
 public abstract class AbstractHttpExecutor implements HttpExecutor {
 
-
     protected final ForestRequest request;
 
     protected HttpclientRequestSender requestSender;

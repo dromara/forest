@@ -2,9 +2,9 @@ package com.dtflys.forest.backend.httpclient.executor;
 
 import com.dtflys.forest.backend.AbstractHttpExecutor;
 import com.dtflys.forest.backend.BodyBuilder;
-import com.dtflys.forest.backend.httpclient.HttpclientRequestProvider;
 import com.dtflys.forest.backend.httpclient.body.HttpclientBodyBuilder;
-import com.dtflys.forest.backend.httpclient.entity.AbstractHttpWithBodyEntity;
+import com.dtflys.forest.backend.httpclient.entity.HttpclientRequestWithBodyEntity;
+import com.dtflys.forest.backend.url.QueryableURLBuilder;
 import com.dtflys.forest.backend.url.URLBuilder;
 import com.dtflys.forest.http.ForestCookie;
 import com.dtflys.forest.http.ForestCookies;
@@ -34,22 +34,21 @@ import java.util.List;
  * @author gongjun
  * @since 2016-06-14
  */
-public abstract class AbstractHttpclientExecutor<T extends HttpUriRequest> extends AbstractHttpExecutor {
-    protected final HttpclientResponseHandler httpclientResponseHandler;
-    protected String url;
-    protected final String typeName;
-    protected T httpRequest;
-    protected BodyBuilder<T> bodyBuilder;
-    protected CookieStore cookieStore;
+public class HttpclientExecutor extends AbstractHttpExecutor {
+    private final static URLBuilder URL_BUILDER = new QueryableURLBuilder();
+    private final HttpclientResponseHandler httpclientResponseHandler;
+    private HttpUriRequest httpRequest;
+    private BodyBuilder<HttpUriRequest> bodyBuilder;
+    private CookieStore cookieStore;
 
-    protected T buildRequest() {
-        url = buildUrl();
-        return (T) new AbstractHttpWithBodyEntity(url, request.type().getName()) {};
+    protected HttpUriRequest buildRequest() {
+        String url = buildUrl();
+        return new HttpclientRequestWithBodyEntity(url, request.type().getName());
     }
 
-    protected abstract HttpclientRequestProvider<T> getRequestProvider();
-
-    protected abstract URLBuilder getURLBuilder();
+    private URLBuilder getURLBuilder() {
+        return URL_BUILDER;
+    }
 
     protected String buildUrl() {
         return getURLBuilder().buildUrl(request);
@@ -67,9 +66,8 @@ public abstract class AbstractHttpclientExecutor<T extends HttpUriRequest> exten
         prepareBody(lifeCycleHandler);
     }
 
-    public AbstractHttpclientExecutor(ForestRequest request, HttpclientResponseHandler httpclientResponseHandler, HttpclientRequestSender requestSender) {
+    public HttpclientExecutor(ForestRequest request, HttpclientResponseHandler httpclientResponseHandler, HttpclientRequestSender requestSender) {
         super(request, requestSender);
-        this.typeName = request.getType().getName();
         this.httpclientResponseHandler = httpclientResponseHandler;
     }
 

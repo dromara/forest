@@ -1,6 +1,5 @@
 package com.dtflys.forest.springboot;
 
-import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.spring.ForestBeanProcessor;
 import com.dtflys.forest.springboot.annotation.ForestScannerRegister;
 import com.dtflys.forest.springboot.properties.ForestConfigurationProperties;
