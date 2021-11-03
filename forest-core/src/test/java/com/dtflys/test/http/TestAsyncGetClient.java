@@ -1,6 +1,5 @@
 package com.dtflys.test.http;
 
-import com.dtflys.forest.Forest;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestNetworkException;
@@ -75,7 +74,7 @@ public class TestAsyncGetClient extends BaseClientTest {
                 });
         log.info("send async get request");
         assertThat(success.get()).isFalse();
-        latch.await(20, TimeUnit.SECONDS);
+        latch.await(2, TimeUnit.SECONDS);
         assertThat(success.get()).isTrue();
     }
 

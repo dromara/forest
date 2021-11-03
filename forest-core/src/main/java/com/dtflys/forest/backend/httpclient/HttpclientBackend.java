@@ -5,7 +5,6 @@ import com.dtflys.forest.backend.ForestConnectionManager;
 import com.dtflys.forest.backend.HttpExecutor;
 import com.dtflys.forest.backend.httpclient.conn.HttpclientConnectionManager;
 import com.dtflys.forest.backend.httpclient.executor.*;
-import com.dtflys.forest.backend.httpclient.request.AsyncHttpclientRequestSender;
 import com.dtflys.forest.backend.httpclient.request.HttpclientRequestSender;
 import com.dtflys.forest.backend.httpclient.request.SyncHttpclientRequestSender;
 import com.dtflys.forest.backend.httpclient.response.HttpclientResponseHandler;

@@ -18,13 +18,13 @@ import java.util.concurrent.Future;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 1.3.0
  */
-public abstract class AbstractBackendResponseHandler<R> {
+public abstract class ResponseHandler<R> {
 
     protected final ForestRequest request;
 
     protected final LifeCycleHandler lifeCycleHandler;
 
-    public AbstractBackendResponseHandler(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
+    public ResponseHandler(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         this.request = request;
         this.lifeCycleHandler = lifeCycleHandler;
     }

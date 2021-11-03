@@ -2,6 +2,7 @@ package com.dtflys.forest.backend.httpclient.executor;
 
 import com.dtflys.forest.backend.AbstractHttpExecutor;
 import com.dtflys.forest.backend.BodyBuilder;
+import com.dtflys.forest.backend.ResponseHandler;
 import com.dtflys.forest.backend.httpclient.body.HttpclientBodyBuilder;
 import com.dtflys.forest.backend.httpclient.entity.HttpclientRequestWithBodyEntity;
 import com.dtflys.forest.backend.url.QueryableURLBuilder;
@@ -143,6 +144,11 @@ public class HttpclientExecutor extends AbstractHttpExecutor {
             httpRequest.abort();
             throw e;
         }
+    }
+
+    @Override
+    public ResponseHandler getResponseHandler() {
+        return httpclientResponseHandler;
     }
 
     @Override

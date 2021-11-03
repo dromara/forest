@@ -1,6 +1,6 @@
 package com.dtflys.forest.backend.httpclient.response;
 
-import com.dtflys.forest.backend.AbstractBackendResponseHandler;
+import com.dtflys.forest.backend.ResponseHandler;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
@@ -17,7 +17,7 @@ import java.util.concurrent.Future;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-19 15:46
  */
-public class HttpclientResponseHandler extends AbstractBackendResponseHandler<HttpResponse> {
+public class HttpclientResponseHandler extends ResponseHandler<HttpResponse> {
 
     public HttpclientResponseHandler(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         super(request, lifeCycleHandler);

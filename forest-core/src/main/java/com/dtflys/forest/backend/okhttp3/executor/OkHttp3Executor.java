@@ -2,6 +2,7 @@ package com.dtflys.forest.backend.okhttp3.executor;
 
 import com.dtflys.forest.backend.BodyBuilder;
 import com.dtflys.forest.backend.HttpExecutor;
+import com.dtflys.forest.backend.ResponseHandler;
 import com.dtflys.forest.backend.body.NoneBodyBuilder;
 import com.dtflys.forest.backend.okhttp3.body.OkHttp3BodyBuilder;
 import com.dtflys.forest.backend.okhttp3.logging.OkHttp3LogBodyMessage;
@@ -194,8 +195,8 @@ public class OkHttp3Executor implements HttpExecutor {
         final OkHttp3ForestResponseFactory factory = new OkHttp3ForestResponseFactory();
         logRequest(retryCount, okRequest, okHttpClient);
         Date startDate = new Date();
+        /*
         long startTime = startDate.getTime();
-/*
         if (request.isAsync()) {
             final OkHttp3ResponseFuture future = new OkHttp3ResponseFuture();
             call.enqueue(new Callback() {
@@ -310,6 +311,11 @@ public class OkHttp3Executor implements HttpExecutor {
     @Override
     public void execute(final LifeCycleHandler lifeCycleHandler) {
         execute(lifeCycleHandler, 0);
+    }
+
+    @Override
+    public ResponseHandler getResponseHandler() {
+        return okHttp3ResponseHandler;
     }
 
     @Override

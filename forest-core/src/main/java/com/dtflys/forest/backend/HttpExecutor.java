@@ -11,5 +11,7 @@ public interface HttpExecutor {
 
     void execute(LifeCycleHandler lifeCycleHandler);
 
+    ResponseHandler getResponseHandler();
+
     void close();
 }
