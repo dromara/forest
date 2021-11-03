@@ -32,9 +32,9 @@ public class HttpclientResponseHandler extends ResponseHandler<HttpResponse> {
 
     @Override
     public void handleFuture(
-            final Future httpResponseFuture,
-            Date requestTime,
-            ForestResponseFactory forestResponseFactory) {
+            final Future httpResponseFuture) {
+        lifeCycleHandler.handleFuture(httpResponseFuture);
+/*
         Type returnType = lifeCycleHandler.getResultType();
         Type paramType;
         Class paramClass = null;
@@ -56,6 +56,7 @@ public class HttpclientResponseHandler extends ResponseHandler<HttpResponse> {
             paramClass = Object.class;
         }
         handleFutureResult(httpResponseFuture, requestTime, paramClass, forestResponseFactory);
+*/
     }
 
 

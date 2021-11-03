@@ -67,10 +67,7 @@ public abstract class ResponseHandler<R> {
     }
 
 
-    public abstract void handleFuture(
-                     final Future<R> httpResponseFuture,
-                     Date requestTime,
-                     ForestResponseFactory forestResponseFactory);
+    public abstract void handleFuture(final Future<R> httpResponseFuture);
 
 
 
