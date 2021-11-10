@@ -2,21 +2,18 @@ package com.dtflys.forest.backend.body;
 
 import com.dtflys.forest.backend.BodyBuilder;
 import com.dtflys.forest.backend.ContentType;
-import com.dtflys.forest.converter.form.ForestFormConvertor;
-import com.dtflys.forest.converter.json.ForestJsonConverter;
-import com.dtflys.forest.converter.protobuf.ForestProtobufConverter;
+import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.converter.text.DefaultTextConverter;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestBody;
-import com.dtflys.forest.http.ForestBodyType;
 import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.multipart.ForestMultipart;
+import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
-import scala.Char;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 
@@ -46,19 +43,20 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
         String[] typeGroup = contentType.split(";[ ]*charset=");
         String mineType = typeGroup[0];
         String strCharset = request.getCharset();
-        boolean mergeCharset = false;
         Charset charset = null;
+        boolean mergeCharset = typeGroup.length > 1;
         if (StringUtils.isEmpty(strCharset)) {
             if (typeGroup.length > 1) {
                 strCharset = typeGroup[1];
-                mergeCharset = true;
                 charset = Charset.forName(strCharset);
             } else {
-                strCharset = "UTF-8";
+                charset = StandardCharsets.UTF_8;
             }
         } else {
             charset = Charset.forName(strCharset);
         }
+
+
 
         if (StringUtils.isEmpty(mineType)) {
             mineType = ContentType.APPLICATION_X_WWW_FORM_URLENCODED;
@@ -66,6 +64,15 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
         List<RequestNameValue> nameValueList = request.getDataNameValueList();
 
         ContentType mineContentType = new ContentType(mineType);
+        String ctypeWithoutParams = mineContentType.toStringWithoutParameters();
+
+        ForestEncoder encoder = request.getEncoder();
+        if (encoder != null) {
+            byte[] bodyBytes = encoder.encodeRequestBody(request, charset);
+            setBinaryBody(httpRequest, request, charset, ctypeWithoutParams, bodyBytes, mergeCharset);
+            return;
+        }
+
 
         ForestBody reqBody = request.getBody();
         boolean needRequestBody = request.getType().isNeedBody() ||
@@ -73,61 +80,30 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                 !request.getMultiparts().isEmpty();
 
         if (needRequestBody) {
-            ForestBodyType bodyType = request.bodyType();
-            if (bodyType == null) {
+            ForestDataType bodyType = request.bodyType();
+            if (bodyType == null || bodyType == ForestDataType.AUTO) {
                 bodyType = mineContentType.bodyType();
             }
-            if (bodyType == ForestBodyType.FORM) {
-                ForestFormConvertor forestFormConvertor = new ForestFormConvertor(request.getConfiguration());
-                byte[] bodyBytes = forestFormConvertor.encodeRequestBody(reqBody, charset);
-                setBinaryBody(httpRequest, request, strCharset, contentType, bodyBytes);
-            } else if(bodyType == ForestBodyType.PROTOBUF) {
-                ForestProtobufConverter protobufConverter = request.getConfiguration().getProtobufConverter();
-                byte[] bodyBytes = protobufConverter.encodeRequestBody(reqBody, charset);
-                setBinaryBody(httpRequest, request, strCharset, contentType, bodyBytes);
-            } else if (bodyType == ForestBodyType.JSON) {
-                ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
-                byte[] bytes = jsonConverter.encodeRequestBody(reqBody, charset);
-                setBody(httpRequest, request, bytes, charset, contentType, mergeCharset);
-            } else if (bodyType == ForestBodyType.MULTIPART) {
+            if (bodyType == ForestDataType.MULTIPART) {
                 List<ForestMultipart> multiparts = request.getMultiparts();
-                setFileBody(httpRequest, request, charset, contentType, nameValueList, multiparts, lifeCycleHandler);
-            } else if (bodyType == ForestBodyType.BINARY) {
-                List<ForestMultipart> multiparts = request.getMultiparts();
-                List<byte[]> byteList = new LinkedList<>();
-                int size = 0;
-                for (ForestMultipart multipart : multiparts) {
-                    byte[] byteArray = multipart.getBytes();
-                    byteList.add(byteArray);
-                    size += byteArray.length;
-                }
-                for (ForestRequestBody body : reqBody) {
-                    byte[] byteArray = body.getByteArray();
-                    byteList.add(byteArray);
-                    size += byteArray.length;
-                }
-                byte[] bytes = new byte[size];
-                int pos = 0;
-                for (byte[] bytesItem : byteList) {
-                    for (int i = 0; i < bytesItem.length; i++) {
-                        bytes[pos + i] = bytesItem[i];
-                    }
-                    pos += bytesItem.length;
-                }
-                setBinaryBody(httpRequest, request, strCharset, contentType, bytes);
-            } else {
-                byte[] bodyBytes = textConverter.encodeRequestBody(reqBody, charset);
-                setBinaryBody(httpRequest, request, strCharset, contentType, bodyBytes);
+                setFileBody(httpRequest, request, charset, ctypeWithoutParams, nameValueList, multiparts, lifeCycleHandler);
+                return;
             }
+            ForestEncoder bodyEncoder = (ForestEncoder) request.getConfiguration().getConverterMap().get(bodyType);
+            if (bodyEncoder == null) {
+                bodyEncoder = (ForestEncoder) request.getConfiguration().getConverterMap().get(ForestDataType.TEXT);
+            }
+            byte[] bodyBytes = bodyEncoder.encodeRequestBody(request, charset);
+            setBinaryBody(httpRequest, request, charset, ctypeWithoutParams, bodyBytes, mergeCharset);
         }
     }
 
     public void setBody(T httpReq, ForestRequest request, byte[] bytes, Charset charset, String contentType, boolean mergeCharset) {
         if (charset != null) {
             String text = new String(bytes, charset);
-            setStringBody(httpReq, request, text, charset.name(), contentType, mergeCharset);
+            setStringBody(httpReq, request, text, charset, contentType, mergeCharset);
         } else {
-            setBinaryBody(httpReq, request, charset.name(), contentType, bytes);
+            setBinaryBody(httpReq, request, charset, contentType, bytes, mergeCharset);
         }
     }
 
@@ -140,7 +116,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
      * @param contentType 数据类型
      * @param mergeCharset 是否合并字符集
      */
-    protected abstract void setStringBody(T httpReq, ForestRequest request, String text, String charset, String contentType, boolean mergeCharset);
+    protected abstract void setStringBody(T httpReq, ForestRequest request, String text, Charset charset, String contentType, boolean mergeCharset);
 
 
     /**
@@ -165,9 +141,10 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
      */
     protected abstract void setBinaryBody(T httpReq,
                                  ForestRequest request,
-                                 String charset,
+                                 Charset charset,
                                  String contentType,
-                                 byte[] bytes);
+                                 byte[] bytes,
+                                 boolean mergeCharset);
 
 
 

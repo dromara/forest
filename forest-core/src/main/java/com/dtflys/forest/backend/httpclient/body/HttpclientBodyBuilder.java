@@ -2,19 +2,13 @@ package com.dtflys.forest.backend.httpclient.body;
 
 import com.dtflys.forest.backend.body.AbstractBodyBuilder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
-import com.dtflys.forest.converter.protobuf.ForestProtobufConverter;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.http.ForestRequestBody;
-import com.dtflys.forest.http.body.SupportFormUrlEncoded;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.multipart.ForestMultipart;
-import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
@@ -22,9 +16,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.AbstractContentBody;
-import org.apache.http.message.BasicNameValuePair;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -40,16 +32,16 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
 
 
     @Override
-    protected void setStringBody(T httpReq, ForestRequest request, String text, String charset, String contentType, boolean mergeCharset) {
+    protected void setStringBody(T httpReq, ForestRequest request, String text, Charset charset, String contentType, boolean mergeCharset) {
         StringEntity entity = new StringEntity(text, charset);
-        if (StringUtils.isNotEmpty(charset) && mergeCharset) {
+        if (charset == null && mergeCharset) {
             if (!contentType.contains("charset=")) {
-                contentType = contentType + "; charset=" + charset.toLowerCase();
+                contentType = contentType + "; charset=" + charset.name().toLowerCase();
             } else {
                 String[] strs = contentType.split("charset=");
-                contentType = strs[0] + " charset=" + charset.toLowerCase();
+                contentType = strs[0] + " charset=" + charset.name().toLowerCase();
             }
-            entity.setContentEncoding(charset);
+            entity.setContentEncoding(charset.name());
         }
         entity.setContentType(contentType);
         httpReq.setEntity(entity);
@@ -122,10 +114,6 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
             }
             entityBuilder.addPart(name, contentBody);
         }
-//        if (httpReq.getFirstHeader("Content-Type") != null) {
-//            httpReq.removeHeaders("Content-Type");
-//        }
-//        httpReq.addHeader("Content-Type", com.dtflys.forest.backend.ContentType.MULTIPART_FORM_DATA);
         HttpEntity entity = entityBuilder.build();
         httpReq.setEntity(entity);
     }
@@ -134,12 +122,21 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
     @Override
     protected void setBinaryBody(T httpReq,
                                  ForestRequest request,
-                                 String charset,
+                                 Charset charset,
                                  String contentType,
-                                 byte[] bytes) {
+                                 byte[] bytes,
+                                 boolean mergeCharset) {
 
         if (StringUtils.isBlank(contentType)) {
             contentType = ContentType.APPLICATION_OCTET_STREAM.toString();
+        }
+        if (charset == null && mergeCharset) {
+            if (!contentType.contains("charset=")) {
+                contentType = contentType + "; charset=" + charset.name().toLowerCase();
+            } else {
+                String[] strs = contentType.split("charset=");
+                contentType = strs[0] + " charset=" + charset.name().toLowerCase();
+            }
         }
         ContentType ctype = ContentType.create(contentType, charset);
         HttpEntity entity = new ByteArrayEntity(bytes, ctype);

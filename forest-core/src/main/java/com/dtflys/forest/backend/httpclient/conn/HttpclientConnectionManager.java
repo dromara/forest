@@ -37,9 +37,6 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
     private HttpParams httpParams;
     private static PoolingHttpClientConnectionManager tsConnectionManager;
 
-
-    private static Lookup<AuthSchemeProvider> authSchemeRegistry;
-
     private final ForestSSLConnectionFactory sslConnectFactory = new ForestSSLConnectionFactory();
 
     public HttpclientConnectionManager() {

@@ -33,6 +33,7 @@ import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.callback.RetryWhen;
 import com.dtflys.forest.callback.SuccessWhen;
 import com.dtflys.forest.converter.ForestConverter;
+import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
@@ -352,7 +353,7 @@ public class ForestRequest<T> {
     /**
      * 反序列化器
      */
-    private ForestConverter encoder;
+    private ForestEncoder encoder;
 
 
     /**
@@ -1472,19 +1473,19 @@ public class ForestRequest<T> {
     /**
      * 获取请求体类型
      *
-     * @return 求体类型, {@link ForestBodyType}枚举对象
+     * @return 求体类型, {@link ForestDataType}枚举对象
      */
-    public ForestBodyType getBodyType() {
+    public ForestDataType getBodyType() {
         return body.getBodyType();
     }
 
     /**
      * 设置请求体类型
      *
-     * @param bodyType 求体类型, {@link ForestBodyType}枚举对象
+     * @param bodyType 求体类型, {@link ForestDataType}枚举对象
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> setBodyType(ForestBodyType bodyType) {
+    public ForestRequest<T> setBodyType(ForestDataType bodyType) {
         this.body.setBodyType(bodyType);
         return this;
     }
@@ -1493,22 +1494,22 @@ public class ForestRequest<T> {
      * 获取请求体类型
      * <p>同{@link ForestRequest#getBodyType()}方法
      *
-     * @return 求体类型, {@link ForestBodyType}枚举对象
+     * @return 求体类型, {@link ForestDataType}枚举对象
      * @see ForestRequest#getBodyType()
      */
-    public ForestBodyType bodyType() {
+    public ForestDataType bodyType() {
         return getBodyType();
     }
 
     /**
      * 设置请求体类型
-     * <p>同{@link ForestRequest#setBodyType(ForestBodyType)}
+     * <p>同{@link ForestRequest#setBodyType(ForestDataType)}
      *
-     * @param bodyType 求体类型, {@link ForestBodyType}枚举对象
+     * @param bodyType 求体类型, {@link ForestDataType}枚举对象
      * @return {@link ForestRequest}对象实例
-     * @see ForestRequest#setBodyType(ForestBodyType)
+     * @see ForestRequest#setBodyType(ForestDataType)
      */
-    public ForestRequest<T> bodyType(ForestBodyType bodyType) {
+    public ForestRequest<T> bodyType(ForestDataType bodyType) {
         return setBodyType(bodyType);
     }
 
@@ -1801,6 +1802,17 @@ public class ForestRequest<T> {
      */
     public ForestBody getBody() {
         return body;
+    }
+
+    /**
+     * 获取请求体对象列表
+     * <p>同{@link ForestRequest#getBody()}
+     *
+     * @return 请求体对象列表, 元素为 {@link ForestRequestBody} 其子类实例
+     * @see ForestRequest#getBody()
+     */
+    public ForestBody body() {
+        return getBody();
     }
 
     @Deprecated
@@ -3500,19 +3512,19 @@ public class ForestRequest<T> {
     /**
      * 获取序列化器
      *
-     * @return 序列化器，{@link ForestConverter}接口实例
+     * @return 序列化器，{@link ForestEncoder}接口实例
      */
-    public ForestConverter getEncoder() {
+    public ForestEncoder getEncoder() {
         return encoder;
     }
 
     /**
      * 设置序列化器
      *
-     * @param encoder 序列化器，{@link ForestConverter}接口实例
+     * @param encoder 序列化器，{@link ForestEncoder}接口实例
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> setEncoder(ForestConverter encoder) {
+    public ForestRequest<T> setEncoder(ForestEncoder encoder) {
         this.encoder = encoder;
         return this;
     }

@@ -1,6 +1,6 @@
 package com.dtflys.forest.backend;
 
-import com.dtflys.forest.http.ForestBodyType;
+import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.util.LinkedHashMap;
@@ -192,28 +192,28 @@ public class ContentType {
 
     /**
      * 获取ContentType对应的请求体类型
-     * @return 请求体类型, {@link ForestBodyType}枚举对象
+     * @return 请求体类型, {@link ForestDataType}枚举对象
      */
-    public ForestBodyType bodyType() {
+    public ForestDataType bodyType() {
         if (isFormUrlEncoded()) {
-            return ForestBodyType.FORM;
+            return ForestDataType.FORM;
         }
         if (isJson()) {
-            return ForestBodyType.JSON;
+            return ForestDataType.JSON;
         }
         if (isXml()) {
-            return ForestBodyType.XML;
+            return ForestDataType.XML;
         }
         if (isMultipart()) {
-            return ForestBodyType.MULTIPART;
+            return ForestDataType.MULTIPART;
         }
         if (canReadAsBinaryStream()) {
-            return ForestBodyType.BINARY;
+            return ForestDataType.BINARY;
         }
         if (isProtobuf()) {
-            return ForestBodyType.PROTOBUF;
+            return ForestDataType.PROTOBUF;
         }
-        return ForestBodyType.TEXT;
+        return ForestDataType.TEXT;
     }
 
     @Override

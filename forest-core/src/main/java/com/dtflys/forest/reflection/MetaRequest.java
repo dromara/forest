@@ -1,8 +1,9 @@
 package com.dtflys.forest.reflection;
 
 import com.dtflys.forest.converter.ForestConverter;
-import com.dtflys.forest.http.ForestBodyType;
+import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.logging.LogConfiguration;
+import com.dtflys.forest.utils.ForestDataType;
 
 import java.lang.annotation.Annotation;
 
@@ -19,7 +20,7 @@ public class MetaRequest {
      * request body type: <br>
      *     FORM JSON XML TEXT PROTOBUF FILE BINARY
      */
-    private ForestBodyType bodyType;
+    private ForestDataType bodyType;
 
     /**
      * http method type: <br>
@@ -111,7 +112,7 @@ public class MetaRequest {
 
     private long progressStep;
 
-    private Class<? extends ForestConverter> encoder;
+    private Class<? extends ForestEncoder> encoder;
 
     private Class<? extends ForestConverter> decoder;
 
@@ -153,11 +154,11 @@ public class MetaRequest {
         this.url = url;
     }
 
-    public ForestBodyType getBodyType() {
+    public ForestDataType getBodyType() {
         return bodyType;
     }
 
-    public void setBodyType(ForestBodyType bodyType) {
+    public void setBodyType(ForestDataType bodyType) {
         this.bodyType = bodyType;
     }
 
@@ -317,11 +318,11 @@ public class MetaRequest {
         this.progressStep = progressStep;
     }
 
-    public Class<? extends ForestConverter> getEncoder() {
+    public Class<? extends ForestEncoder> getEncoder() {
         return encoder;
     }
 
-    public void setEncoder(Class<? extends ForestConverter> encoder) {
+    public void setEncoder(Class<? extends ForestEncoder> encoder) {
         this.encoder = encoder;
     }
 

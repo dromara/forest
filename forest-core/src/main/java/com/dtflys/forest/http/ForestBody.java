@@ -1,22 +1,26 @@
 package com.dtflys.forest.http;
 
 import com.dtflys.forest.http.body.NameValueRequestBody;
+import com.dtflys.forest.http.body.ObjectRequestBody;
+import com.dtflys.forest.http.body.StringRequestBody;
+import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.Validations;
 
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
+import java.util.Objects;
 
 public class ForestBody implements List<ForestRequestBody> {
 
     /**
      * 请求体类型
      */
-    private ForestBodyType bodyType;
+    private ForestDataType bodyType;
 
     /**
      * 请求体项列表
@@ -61,12 +65,32 @@ public class ForestBody implements List<ForestRequestBody> {
         return bodies;
     }
 
+    /**
+     * 获取所有键值对请求体项
+     *
+     * @return 键值对类型请求体项组成的 {@link Map}
+     */
+    public Map<String, Object> nameValuesMap() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        for (ForestRequestBody body : bodyItems) {
+            if (body instanceof NameValueRequestBody) {
+                NameValueRequestBody nameValueRequestBody = (NameValueRequestBody) body;
+                String name = nameValueRequestBody.getName();
+                if (!map.containsKey(name)) {
+                    map.put(name, nameValueRequestBody.getValue());
+                }
+            }
+        }
+        return map;
+    }
 
-    public ForestBodyType getBodyType() {
+
+
+    public ForestDataType getBodyType() {
         return bodyType;
     }
 
-    public void setBodyType(ForestBodyType bodyType) {
+    public void setBodyType(ForestDataType bodyType) {
         this.bodyType = bodyType;
     }
 
@@ -78,6 +102,63 @@ public class ForestBody implements List<ForestRequestBody> {
     @Override
     public boolean isEmpty() {
         return bodyItems.isEmpty();
+    }
+
+    public boolean containsKey(Object key) {
+        if (key == null) {
+            return false;
+        }
+        for (ForestRequestBody body : bodyItems) {
+            if (body instanceof NameValueRequestBody) {
+                if (key.equals(((NameValueRequestBody) body).getName())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean containsValue(Object value) {
+        if (value == null) {
+            return false;
+        }
+        for (ForestRequestBody body : bodyItems) {
+            if (body instanceof NameValueRequestBody) {
+                if (value.equals(((NameValueRequestBody) body).getValue())) {
+                    return true;
+                }
+            }
+            if (body instanceof ObjectRequestBody) {
+                if (value.equals(((ObjectRequestBody) body).getObject())) {
+                    return true;
+                }
+            }
+            if (body instanceof StringRequestBody) {
+                if (value.equals(((StringRequestBody) body).getContent())) {
+                    return true;
+                }
+            }
+            if (byte[].class.isAssignableFrom(value.getClass())) {
+                byte[] bytes = body.getByteArray();
+                if (Objects.equals(bytes, bytes)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public Object setNameValue(String key, Object value) {
+        if (key == null) {
+            return null;
+        }
+        NameValueRequestBody body = getNameValueBody(key);
+        Object oldValue = null;
+        if (key != null) {
+            oldValue = body.getValue();
+            body.setValue(value);
+        }
+        return oldValue;
     }
 
     @Override
@@ -110,6 +191,7 @@ public class ForestBody implements List<ForestRequestBody> {
         return bodyItems.remove(o);
     }
 
+
     @Override
     public boolean containsAll(Collection<?> c) {
         return bodyItems.containsAll(c);
@@ -139,6 +221,8 @@ public class ForestBody implements List<ForestRequestBody> {
     public void clear() {
         bodyItems.clear();
     }
+
+
 
     @Override
     public ForestRequestBody get(int index) {

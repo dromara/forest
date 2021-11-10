@@ -64,6 +64,10 @@ public class ForestDataType {
     /** 数据类型： 二进制类型 */
     public final static ForestDataType BINARY = ForestDataType.createDataType("binary");
 
+    /** 数据类型： 文件类型 */
+    public final static ForestDataType MULTIPART = ForestDataType.createDataType("multipart");
+
+
     /** 数据类型： Protobuf类型 */
     public final static ForestDataType PROTOBUF = ForestDataType.createDataType("protobuf");
 

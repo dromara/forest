@@ -16,12 +16,12 @@ import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.converter.ForestConverter;
+import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestInterceptorDefineException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.http.ForestAddress;
-import com.dtflys.forest.http.ForestBodyType;
 import com.dtflys.forest.http.ForestQueryMap;
 import com.dtflys.forest.http.ForestQueryParameter;
 import com.dtflys.forest.http.ForestRequest;
@@ -89,7 +89,7 @@ public class ForestMethod<T> implements VariableScope {
     private MappingURLTemplate urlTemplate;
     private MappingTemplate typeTemplate;
     private MappingTemplate dataTypeTemplate;
-    private ForestBodyType bodyType;
+    private ForestDataType bodyType;
     private Integer baseTimeout = null;
     private Integer baseConnectTimeout = null;
     private Integer baseReadTimeout = null;
@@ -113,7 +113,7 @@ public class ForestMethod<T> implements VariableScope {
     private MappingTemplate contentTypeTemplate;
     private MappingTemplate userAgentTemplate;
     private long progressStep = -1;
-    private ForestConverter encoder = null;
+    private ForestEncoder encoder = null;
     private ForestConverter decoder = null;
     private MappingTemplate sslKeyStoreId;
     private MappingTemplate[] dataTemplateArray;
@@ -476,17 +476,6 @@ public class ForestMethod<T> implements VariableScope {
                     }
                 }
             }
-/*
-            Class<? extends Interceptor> interceptorClass = getAnnotationLifeCycleClass(ann);
-            if (interceptorClass == null) {
-                continue;
-            }
-            if (RequestLifeCycle.class.isAssignableFrom(interceptorClass)) {
-                requestAnns.put(ann, interceptorClass);
-            } else {
-                methodAnns.put(ann, interceptorClass);
-            }
-*/
         }
 
         // 先添加请求类注解
@@ -533,7 +522,7 @@ public class ForestMethod<T> implements VariableScope {
         progressStep = metaRequest.getProgressStep();
         async = metaRequest.isAsync();
         retryerClass = metaRequest.getRetryer();
-        Class<? extends ForestConverter> encoderClass = metaRequest.getEncoder();
+        Class<? extends ForestEncoder> encoderClass = metaRequest.getEncoder();
         Class<? extends ForestConverter> decoderClass = metaRequest.getDecoder();
         String[] dataArray = metaRequest.getData();
         String[] headerArray = metaRequest.getHeaders();
@@ -615,27 +604,13 @@ public class ForestMethod<T> implements VariableScope {
 
         if (encoderClass != null && !encoderClass.isInterface()
                 && ForestConverter.class.isAssignableFrom(encoderClass)) {
-            try {
-                this.encoder = (ForestConverter) encoderClass.newInstance();
-            } catch (InstantiationException e) {
-                throw new ForestRuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new ForestRuntimeException(e);
-            }
+            this.encoder = configuration.getForestObjectFactory().getObject(encoderClass);
         }
-
 
         if (decoderClass != null && !encoderClass.isInterface()
                 && ForestConverter.class.isAssignableFrom(decoderClass)) {
-            try {
-                this.decoder = (ForestConverter) decoderClass.newInstance();
-            } catch (InstantiationException e) {
-                throw new ForestRuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new ForestRuntimeException(e);
-            }
+            this.decoder = configuration.getForestObjectFactory().getObject(decoderClass);
         }
-
     }
 
     /**

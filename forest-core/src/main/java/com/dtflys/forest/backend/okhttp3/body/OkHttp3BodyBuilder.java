@@ -24,15 +24,11 @@ import java.util.List;
 public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
 
     @Override
-    protected void setStringBody(Request.Builder builder, ForestRequest request, String text, String charset, String contentType, boolean mergeCharset) {
+    protected void setStringBody(Request.Builder builder, ForestRequest request, String text, Charset charset, String contentType, boolean mergeCharset) {
         MediaType mediaType = MediaType.parse(contentType);
         Charset cs = StandardCharsets.UTF_8;
-        if (StringUtils.isNotEmpty(charset)) {
-            try {
-                cs = Charset.forName(charset);
-            } catch (Throwable th) {
-                throw new ForestRuntimeException("[Forest] '" + charset + "' is not a valid charset", th);
-            }
+        if (charset != null) {
+            cs = charset;
         }
         if (contentType != null) {
             if (mediaType == null) {
@@ -40,8 +36,8 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
             }
             Charset mtcs = mediaType.charset();
             if (mtcs == null) {
-                if (StringUtils.isNotEmpty(charset) && mergeCharset) {
-                    mediaType = MediaType.parse(contentType + "; charset=" + charset.toLowerCase());
+                if (charset != null && mergeCharset) {
+                    mediaType = MediaType.parse(contentType + "; charset=" + charset.name().toLowerCase());
                 }
             }
         }
@@ -134,13 +130,20 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
     protected void setBinaryBody(
             Request.Builder builder,
             ForestRequest request,
-            String charset,
+            Charset charset,
             String contentType,
-            byte[] bytes) {
+            byte[] bytes,
+            boolean mergeCharset) {
         if (StringUtils.isBlank(contentType)) {
             contentType = ContentType.APPLICATION_OCTET_STREAM;
         }
         MediaType mediaType = MediaType.parse(contentType);
+        Charset mtcs = mediaType.charset();
+        if (mtcs == null) {
+            if (charset != null && mergeCharset) {
+                mediaType = MediaType.parse(contentType + "; charset=" + charset.name().toLowerCase());
+            }
+        }
         RequestBody body = RequestBody.create(mediaType, bytes);
         builder.method(request.getType().getName(), body);
     }

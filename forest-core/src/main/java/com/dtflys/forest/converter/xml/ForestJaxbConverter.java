@@ -3,6 +3,10 @@ package com.dtflys.forest.converter.xml;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestBody;
+import com.dtflys.forest.http.ForestRequestBody;
+import com.dtflys.forest.http.body.ObjectRequestBody;
+import com.dtflys.forest.http.body.StringRequestBody;
+import com.dtflys.forest.reflection.ForestObjectFactory;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
@@ -15,6 +19,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +54,17 @@ public class ForestJaxbConverter implements ForestXmlConverter {
 
     @Override
     public byte[] encodeRequestBody(ForestBody body, Charset charset) {
-        return new byte[0];
+        StringBuilder builder = new StringBuilder();
+        for (ForestRequestBody item : body) {
+            if (item instanceof ObjectRequestBody) {
+                Object obj = ((ObjectRequestBody) item).getObject();
+                String text = encodeToString(obj);
+                builder.append(text);
+            } else if (item instanceof StringRequestBody) {
+                builder.append(((StringRequestBody) item).getContent());
+            }
+        }
+        return builder.toString().getBytes(charset);
     }
 
     @Override

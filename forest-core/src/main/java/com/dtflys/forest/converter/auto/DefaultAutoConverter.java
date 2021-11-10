@@ -2,9 +2,12 @@ package com.dtflys.forest.converter.auto;
 
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ForestConverter;
+import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.converter.protobuf.ForestProtobufConverterManager;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.http.ForestBody;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
 import org.apache.commons.io.FileUtils;
@@ -28,14 +31,20 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
     }
 
 
-    private <T> T tryConvert(Object source, Class<T> targetType, ForestDataType dataType) {
-        return (T) configuration.getConverterMap().get(dataType).convertToJavaObject(source, targetType);
-    }
-
     private <T> T tryConvert(Object source, Type targetType, ForestDataType dataType) {
         return (T) configuration.getConverterMap().get(dataType).convertToJavaObject(source, targetType);
     }
 
+    private byte[] tryEncodeRequest(ForestRequest request, ForestDataType dataType, Charset charset) {
+        ForestConverter converter = configuration.getConverterMap().get(dataType);
+        if (converter == null || !(converter instanceof ForestEncoder)) {
+            converter = configuration.getConverterMap().get(ForestDataType.TEXT);
+        }
+        if (converter != null && converter instanceof ForestEncoder) {
+            return ((ForestEncoder) converter).encodeRequestBody(request, charset);
+        }
+        throw new ForestRuntimeException("Cannot resolve encoder '" + dataType.getName() + "'");
+    }
 
     @Override
     public <T> T convertToJavaObject(Object source, Type targetType) {

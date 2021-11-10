@@ -1,6 +1,8 @@
 package com.dtflys.forest.converter;
 
 import com.dtflys.forest.http.ForestBody;
+import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.utils.ForestDataType;
 
 import java.nio.charset.Charset;
 
@@ -10,7 +12,15 @@ import java.nio.charset.Charset;
  */
 public interface ForestEncoder {
 
-    String encodeToString(Object obj);
+    default String encodeToString(Object obj) {
+        return "";
+    }
 
-    byte[] encodeRequestBody(ForestBody body, Charset charset);
+    default byte[] encodeRequestBody(ForestBody body, Charset charset) {
+        return new byte[0];
+    }
+
+    default byte[] encodeRequestBody(ForestRequest request, Charset charset) {
+        return encodeRequestBody(request.body(), charset);
+    }
 }

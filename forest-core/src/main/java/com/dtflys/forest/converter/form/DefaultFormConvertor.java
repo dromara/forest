@@ -25,11 +25,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class ForestFormConvertor implements ForestConverter<String>, ForestEncoder {
+public class DefaultFormConvertor implements ForestConverter<String>, ForestEncoder {
 
     private final ForestConfiguration configuration;
 
-    public ForestFormConvertor(ForestConfiguration configuration) {
+    public DefaultFormConvertor(ForestConfiguration configuration) {
         this.configuration = configuration;
     }
 

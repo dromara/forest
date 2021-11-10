@@ -2,13 +2,13 @@ package com.dtflys.forest.lifecycles.parameter;
 
 import com.dtflys.forest.annotation.DataFile;
 import com.dtflys.forest.backend.ContentType;
-import com.dtflys.forest.http.ForestBodyType;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.multipart.ForestMultipartFactory;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.lifecycles.ParameterAnnotationLifeCycle;
 import com.dtflys.forest.reflection.MetaRequest;
+import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 
 /**
@@ -39,7 +39,7 @@ public class DataFileLifeCycle implements ParameterAnnotationLifeCycle<DataFile,
         method.addMultipartFactory(factory);
         String contentType = metaRequest.getContentType();
         if (metaRequest.getBodyType() == null && !ContentType.APPLICATION_OCTET_STREAM.equals(contentType)) {
-            metaRequest.setBodyType(ForestBodyType.MULTIPART);
+            metaRequest.setBodyType(ForestDataType.MULTIPART);
         }
     }
 
