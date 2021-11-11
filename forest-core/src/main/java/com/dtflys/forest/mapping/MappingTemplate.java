@@ -102,6 +102,9 @@ public class MappingTemplate {
         this.variableScope = variableScope;
         this.properties = properties;
         this.parameters = parameters;
+        if (this.template == null) {
+            this.template = "";
+        }
         compile();
     }
 

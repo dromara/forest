@@ -6,8 +6,12 @@ import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestRequestBody;
+import com.dtflys.forest.http.body.NameValueRequestBody;
+import com.dtflys.forest.http.body.ObjectRequestBody;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.multipart.ForestMultipart;
+import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import okhttp3.*;
@@ -16,6 +20,7 @@ import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -46,13 +51,26 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
         builder.method(request.getType().getName(), body);
     }
 
+    private void addMultipart(MultipartBody.Builder bodyBuilder,
+                              String name, Object value, String contentType,
+                              Charset charset, ForestJsonConverter jsonConverter) {
+        if (StringUtils.isEmpty(contentType)) {
+            contentType = "text/plain";
+        }
+        MediaType partMediaType = MediaType.parse(contentType);
+        if (partMediaType.charset() == null) {
+            partMediaType.charset(charset);
+        }
+        RequestBody requestBody = RequestBody.create(partMediaType, MappingTemplate.getParameterValue(jsonConverter, value));
+        MultipartBody.Part part = MultipartBody.Part.createFormData(name, null, requestBody);
+        bodyBuilder.addPart(part);
+    }
+
 
     @Override
     protected void setFileBody(Request.Builder builder,
                                ForestRequest request,
                                Charset charset, String contentType,
-                               List<RequestNameValue> nameValueList,
-                               List<ForestMultipart> multiparts,
                                LifeCycleHandler lifeCycleHandler) {
         String boundary = request.getBoundary();
         MultipartBody.Builder bodyBuilder = null;
@@ -67,24 +85,26 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
             bodyBuilder.setType(mediaType);
         }
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
-        for (int i = 0; i < nameValueList.size(); i++) {
-            RequestNameValue nameValue = nameValueList.get(i);
-            if (!nameValue.isInBody()) {
-                continue;
+        List<ForestMultipart> multiparts = request.getMultiparts();
+        for (ForestRequestBody item : request.body()) {
+            if (item instanceof NameValueRequestBody) {
+                NameValueRequestBody nameValueItem = (NameValueRequestBody) item;
+                String name = nameValueItem.getName();
+                Object value = nameValueItem.getValue();
+                String partContentType = nameValueItem.getContentType();
+                addMultipart(bodyBuilder, name, value, partContentType, charset, jsonConverter);
+            } else if (item instanceof ObjectRequestBody) {
+                Object obj = ((ObjectRequestBody) item).getObject();
+                if (obj == null) {
+                    continue;
+                }
+                Map<String, Object> attrs = jsonConverter.convertObjectToMap(obj);
+                for (Map.Entry<String, Object> entry : attrs.entrySet()) {
+                    String name = entry.getKey();
+                    Object value = entry.getValue();
+                    addMultipart(bodyBuilder, name, value, null, charset, jsonConverter);
+                }
             }
-            String name = nameValue.getName();
-            Object value = nameValue.getValue();
-            String partContentType = nameValue.getPartContentType();
-            if (StringUtils.isEmpty(partContentType)) {
-                partContentType = "text/plain";
-            }
-            MediaType partMediaType = MediaType.parse(partContentType);
-            if (partMediaType.charset() == null) {
-                partMediaType.charset(charset);
-            }
-            RequestBody requestBody = RequestBody.create(partMediaType, MappingTemplate.getParameterValue(jsonConverter, value));
-            MultipartBody.Part part = MultipartBody.Part.createFormData(name, null, requestBody);
-            bodyBuilder.addPart(part);
         }
         for (ForestMultipart multipart : multiparts) {
             RequestBody fileBody = createFileBody(request, multipart, charset, lifeCycleHandler);

@@ -61,7 +61,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
         if (StringUtils.isEmpty(mineType)) {
             mineType = ContentType.APPLICATION_X_WWW_FORM_URLENCODED;
         }
-        List<RequestNameValue> nameValueList = request.getDataNameValueList();
+
 
         ContentType mineContentType = new ContentType(mineType);
         String ctypeWithoutParams = mineContentType.toStringWithoutParameters();
@@ -85,8 +85,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                 bodyType = mineContentType.bodyType();
             }
             if (bodyType == ForestDataType.MULTIPART) {
-                List<ForestMultipart> multiparts = request.getMultiparts();
-                setFileBody(httpRequest, request, charset, ctypeWithoutParams, nameValueList, multiparts, lifeCycleHandler);
+                setFileBody(httpRequest, request, charset, ctypeWithoutParams, lifeCycleHandler);
                 return;
             }
             ForestEncoder bodyEncoder = (ForestEncoder) request.getConfiguration().getConverterMap().get(bodyType);
@@ -125,11 +124,9 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
      * @param request Forest请求对象
      * @param charset 字符集
      * @param contentType 数据类型
-     * @param nameValueList 键值对列表
-     * @param multiparts Multiparts
      * @param lifeCycleHandler 生命周期处理器
      */
-    protected abstract void setFileBody(T httpReq, ForestRequest request, Charset charset, String contentType, List<RequestNameValue> nameValueList, List<ForestMultipart> multiparts, LifeCycleHandler lifeCycleHandler);
+    protected abstract void setFileBody(T httpReq, ForestRequest request, Charset charset, String contentType, LifeCycleHandler lifeCycleHandler);
 
     /**
      * 设置二进制请求体

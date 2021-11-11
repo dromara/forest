@@ -20,7 +20,7 @@ public class MetaRequest {
      * request body type: <br>
      *     FORM JSON XML TEXT PROTOBUF FILE BINARY
      */
-    private ForestDataType bodyType;
+    private String bodyType;
 
     /**
      * http method type: <br>
@@ -154,13 +154,18 @@ public class MetaRequest {
         this.url = url;
     }
 
-    public ForestDataType getBodyType() {
+    public String getBodyType() {
         return bodyType;
     }
 
-    public void setBodyType(ForestDataType bodyType) {
+    public void setBodyType(String bodyType) {
         this.bodyType = bodyType;
     }
+
+    public void setBodyType(ForestDataType bodyType) {
+        this.bodyType = bodyType.getName();
+    }
+
 
     public String getType() {
         return type;

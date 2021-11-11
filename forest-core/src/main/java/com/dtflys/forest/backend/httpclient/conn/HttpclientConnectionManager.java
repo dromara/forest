@@ -55,6 +55,7 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
                             .register("https", sslConnectFactory)
                             .register("http", new PlainConnectionSocketFactory())
                             .build();
+
             tsConnectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
             tsConnectionManager.setMaxTotal(maxConnections);
             tsConnectionManager.setDefaultMaxPerRoute(maxRouteConnections);

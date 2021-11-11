@@ -56,14 +56,12 @@ import com.dtflys.forest.utils.NameUtils;
 import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
-import com.dtflys.forest.utils.URLUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
-import java.util.function.Supplier;
 
 import static com.dtflys.forest.mapping.MappingParameter.*;
 
@@ -89,7 +87,7 @@ public class ForestMethod<T> implements VariableScope {
     private MappingURLTemplate urlTemplate;
     private MappingTemplate typeTemplate;
     private MappingTemplate dataTypeTemplate;
-    private ForestDataType bodyType;
+    private MappingTemplate bodyTypeTemplate;
     private Integer baseTimeout = null;
     private Integer baseConnectTimeout = null;
     private Integer baseReadTimeout = null;
@@ -500,7 +498,7 @@ public class ForestMethod<T> implements VariableScope {
         Class<? extends Annotation> reqAnnType = metaRequest.getRequestAnnotation().annotationType();
         parameterTemplateArray = new MappingParameter[paramTypes.length];
         processParameters(parameters, genericParamTypes, paramAnns);
-        bodyType = metaRequest.getBodyType();
+        bodyTypeTemplate = makeTemplate(reqAnnType, "type", metaRequest.getBodyType());
         urlTemplate = makeURLTemplate(reqAnnType, "url", metaRequest.getUrl());
         typeTemplate = makeTemplate(reqAnnType, "type", metaRequest.getType());
         dataTypeTemplate = makeTemplate(reqAnnType, "dataType", metaRequest.getDataType());
@@ -603,7 +601,7 @@ public class ForestMethod<T> implements VariableScope {
         }
 
         if (encoderClass != null && !encoderClass.isInterface()
-                && ForestConverter.class.isAssignableFrom(encoderClass)) {
+                && ForestEncoder.class.isAssignableFrom(encoderClass)) {
             this.encoder = configuration.getForestObjectFactory().getObject(encoderClass);
         }
 
@@ -844,6 +842,12 @@ public class ForestMethod<T> implements VariableScope {
         }
 
         boolean autoRedirection = configuration.isAutoRedirection();
+
+        String bodyTypeName = "text";
+        if (bodyTypeTemplate != null) {
+            bodyTypeName = bodyTypeTemplate.render(args);
+        }
+        ForestDataType bodyType = ForestDataType.findByName(bodyTypeName);
 
         // createExecutor and initialize http instance
         ForestRequest<T> request = new ForestRequest(configuration, this, args);

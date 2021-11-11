@@ -4,10 +4,16 @@ import com.dtflys.forest.backend.body.AbstractBodyBuilder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestRequestBody;
+import com.dtflys.forest.http.body.NameValueRequestBody;
+import com.dtflys.forest.http.body.ObjectRequestBody;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.entity.ByteArrayEntity;
@@ -47,14 +53,23 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
         httpReq.setEntity(entity);
     }
 
+    private void addMultipart(MultipartEntityBuilder entityBuilder,
+                              String name, Object value, String contentType,
+                              Charset charset, ForestJsonConverter jsonConverter) {
+        if (StringUtils.isEmpty(contentType)) {
+            contentType = "text/plain";
+        }
+        String text =  MappingTemplate.getParameterValue(jsonConverter, value);
+        ContentType itemContentType = ContentType.create(contentType, charset);
+        entityBuilder.addTextBody(name, text, itemContentType);
+    }
+
 
     @Override
     protected void setFileBody(T httpReq,
                                ForestRequest request,
                                Charset charset,
                                String contentType,
-                               List<RequestNameValue> nameValueList,
-                               List<ForestMultipart> multiparts,
                                LifeCycleHandler lifeCycleHandler) {
         String boundary = request.getBoundary();
         MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
@@ -68,25 +83,35 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
         if (charset != null) {
             itemCharset = charset;
         }
-        if (!nameValueList.isEmpty()) {
+        boolean needSetMode = false;
+        for (ForestRequestBody item : request.body()) {
+            if (item instanceof NameValueRequestBody) {
+                needSetMode = true;
+                NameValueRequestBody nameValueItem = (NameValueRequestBody) item;
+                String name = nameValueItem.getName();
+                Object value = nameValueItem.getValue();
+                String partContentType = nameValueItem.getContentType();
+                addMultipart(entityBuilder, name, value, partContentType, itemCharset, jsonConverter);
+
+            } else if (item instanceof ObjectRequestBody) {
+                Object obj = ((ObjectRequestBody) item).getObject();
+                if (obj == null) {
+                    continue;
+                }
+                needSetMode = true;
+                Map<String, Object> attrs = jsonConverter.convertObjectToMap(obj);
+                for (Map.Entry<String, Object> entry : attrs.entrySet()) {
+                    String name = entry.getKey();
+                    Object value = entry.getValue();
+                    addMultipart(entityBuilder, name, value, null, itemCharset, jsonConverter);
+                }
+            }
+        }
+        if (needSetMode) {
             entityBuilder.setCharset(httpCharset);
             entityBuilder.setMode(HttpMultipartMode.RFC6532);
         }
-
-        for (RequestNameValue nameValue : nameValueList) {
-            if (!nameValue.isInBody()) {
-                continue;
-            }
-            String name = nameValue.getName();
-            Object value = nameValue.getValue();
-            String text = MappingTemplate.getParameterValue(jsonConverter, value);
-            String partContentType = nameValue.getPartContentType();
-            if (StringUtils.isEmpty(partContentType)) {
-                partContentType = "text/plain";
-            }
-            ContentType itemContentType = ContentType.create(partContentType, itemCharset);
-            entityBuilder.addTextBody(name, text, itemContentType);
-        }
+        List<ForestMultipart> multiparts = request.getMultiparts();
         for (ForestMultipart multipart : multiparts) {
             String name = multipart.getName();
             String fileName = multipart.getOriginalFileName();

@@ -84,8 +84,6 @@ public class ForestBody implements List<ForestRequestBody> {
         return map;
     }
 
-
-
     public ForestDataType getBodyType() {
         return bodyType;
     }
