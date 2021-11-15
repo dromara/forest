@@ -1,30 +1,22 @@
 package com.dtflys.forest.proxy;
 
 import com.dtflys.forest.annotation.BaseLifeCycle;
-import com.dtflys.forest.annotation.BaseRequest;
 import com.dtflys.forest.annotation.BaseURL;
 import com.dtflys.forest.annotation.MethodLifeCycle;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorFactory;
 import com.dtflys.forest.lifecycles.BaseAnnotationLifeCycle;
-import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.LogConfiguration;
-import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MetaRequest;
-import com.dtflys.forest.utils.ReflectUtils;
-import com.dtflys.forest.utils.StringUtils;
-import com.dtflys.forest.utils.URLUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
@@ -38,28 +30,23 @@ import java.util.Map;
  */
 public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScope {
 
-    private ForestConfiguration configuration;
+    private final ForestConfiguration configuration;
 
-    private ProxyFactory proxyFactory;
+    private final ProxyFactory proxyFactory;
 
-    private Class<T> interfaceClass;
+    private final Class<T> interfaceClass;
 
-    private Map<Method, ForestMethod> forestMethodMap = new HashMap<Method, ForestMethod>();
+    private final Map<Method, ForestMethod> forestMethodMap = new HashMap<>();
 
-    private MetaRequest baseMetaRequest = new MetaRequest();
+    private final MetaRequest baseMetaRequest = new MetaRequest();
 
-    private InterceptorFactory interceptorFactory;
-
-    private String baseURL;
+    private final InterceptorFactory interceptorFactory;
 
     private LogConfiguration baseLogConfiguration;
 
-    private final Constructor<MethodHandles.Lookup> defaultMethodConstructor;
+    private final MethodHandles.Lookup defaultMethodLookup;
 
-    private MethodHandles.Lookup defaultMethodLookup;
-
-
-    private List<Annotation> baseAnnotations = new LinkedList<>();
+    private final List<Annotation> baseAnnotations = new LinkedList<>();
 
 
     public ProxyFactory getProxyFactory() {
@@ -73,7 +60,7 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         this.interceptorFactory = configuration.getInterceptorFactory();
 
         try {
-            defaultMethodConstructor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
+            Constructor<MethodHandles.Lookup> defaultMethodConstructor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
             if (!defaultMethodConstructor.isAccessible()) {
                 defaultMethodConstructor.setAccessible(true);
             }
@@ -89,6 +76,7 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         prepareBaseInfo(interfaceClass);
     }
 
+    @SuppressWarnings("deprecation")
     private void processBaseAnnotation(Class parentAnnType, Annotation[] annotations) {
         for (int i = 0; i < annotations.length; i++) {
             Annotation annotation = annotations[i];
@@ -106,7 +94,7 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
                 if (value == null || value.trim().length() == 0) {
                     continue;
                 }
-                baseURL = value.trim();
+                String baseURL = value.trim();
                 baseMetaRequest.setUrl(baseURL);
             } else {
                 BaseLifeCycle baseLifeCycle = annotation.annotationType().getAnnotation(BaseLifeCycle.class);
