@@ -32,7 +32,7 @@ public interface GetClient {
     String simpleGet();
 
     @Get(
-            url = "http://localhost:${port}/hello/user?username=foo",
+            url = "http://localhost:{port}/hello/user?username=foo",
             headers = {"Accept:text/plain"}
     )
     String simpleGet2();
@@ -61,9 +61,11 @@ public interface GetClient {
     @Get("https://localhost/xxx:111")
     ForestRequest testPath4();
 
+    @Get("http://aaa/bbb/skip:123456@localhost:{port}")
+    ForestRequest testPath_userInfo();
 
     @Request(
-            url = "http://localhost:${port}/hello/user?username=foo",
+            url = "http://localhost:{port}/hello/user?username=foo",
             headers = {"Accept:text/plain"}
     )
     String simpleGetMultiQuery(@Query("password") String password);

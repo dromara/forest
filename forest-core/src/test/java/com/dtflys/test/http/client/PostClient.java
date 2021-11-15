@@ -197,6 +197,14 @@ public interface PostClient {
     String postFormListWithBodyAnn4(@Body FormArrayParam param);
 
     @Request(
+            url = "http://localhost:{port}/form-array",
+            type = "post",
+            headers = {"Accept:text/plain"},
+            contentType = "application/x-www-form-urlencoded"
+    )
+    String postFormListWithBodyAnn_jsonParam(@Body(value = "param") String param);
+
+    @Request(
             url = "http://localhost:{port}/complex",
             type = "post",
             headers = {"Accept:text/plain"},

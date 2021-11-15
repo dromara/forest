@@ -69,7 +69,7 @@ public class TestGetClient extends BaseClientTest {
 
 
     @Test
-    public void testGet() throws InterruptedException {
+    public void testGet() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         assertThat(getClient.simpleGet())
                 .isNotNull()
@@ -82,7 +82,7 @@ public class TestGetClient extends BaseClientTest {
     }
 
     @Test
-    public void testGet2() throws InterruptedException {
+    public void testGet2() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         assertThat(getClient.simpleGet2())
                 .isNotNull()
@@ -93,7 +93,7 @@ public class TestGetClient extends BaseClientTest {
     }
 
     @Test
-    public void testGet3() throws InterruptedException {
+    public void testGet3() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         assertThat(getClient.simpleGet3())
                 .isNotNull()
@@ -104,7 +104,7 @@ public class TestGetClient extends BaseClientTest {
     }
 
     @Test
-    public void testPath() throws InterruptedException {
+    public void testPath() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         assertThat(getClient.testPath("hello &(user)a:a?b=1/2&c=http://localhost:8080/?x=0&d=1"))
                 .isNotNull()
@@ -117,7 +117,7 @@ public class TestGetClient extends BaseClientTest {
     }
 
     @Test
-    public void testPath2() throws InterruptedException {
+    public void testPath2() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         assertThat(getClient.testPath2("hello &(user)a:a?b=1/2&c=http://localhost:8080/?x=0&d=1"))
                 .isNotNull()
@@ -146,9 +146,21 @@ public class TestGetClient extends BaseClientTest {
         System.out.println(request.urlString());
     }
 
+    @Test
+    public void testPath_userInfo() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        ForestRequest request = getClient.testPath_userInfo();
+        assertThat(request).isNotNull();
+        assertThat(request.urlString()).isEqualTo("http://aaa%2Fbbb%2Fskip:123456@localhost:" + server.getPort());
+        System.out.println(request.urlString());
+        assertThat(request.executeAsString())
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+    }
+
 
     @Test
-    public void testJsonMapGet() throws InterruptedException {
+    public void testJsonMapGet() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         ForestResponse<Map> response = getClient.jsonMapGet();
         assertThat(response).isNotNull();

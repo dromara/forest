@@ -834,7 +834,7 @@ public class ForestMethod<T> implements VariableScope {
             renderedURL.setBaseURL(baseURL);
         }
         try {
-            addressURL = new ForestURL(new URL("http://localhost/"));
+            addressURL = new ForestURL(new URL("http://localhost"));
             addressURL.setBaseAddress(address);
             renderedURL = renderedURL.mergeURLWith(addressURL);
         } catch (MalformedURLException e) {

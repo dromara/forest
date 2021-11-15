@@ -44,6 +44,11 @@ public class URLEncoder {
 
 
     /**
+     * 查询参数值中不会被编码的字符集
+     */
+    private static final char[] X_WWW_FORM_URLENCODED_VALUE_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '{', '}', '[', ']', ',', '"', '*', '/', ':', '?', ' ', '=', '%'};
+
+    /**
      * 强制全编码中不会被编码的字符集
      */
     private static final char[] ALL_EXCLUDED_CHARACTERS = {'*', '-', '.', '_'};
@@ -62,6 +67,12 @@ public class URLEncoder {
      * 用于查询参数值部分的编码{@link URLEncoder}
      */
     public static final URLEncoder QUERY_VALUE = createQueryValueUrlEncoder();
+
+    /**
+     * 用于表单参数值部分的编码{@link URLEncoder}
+     */
+    public static final URLEncoder FORM_VALUE = createXWwwFormUrlEncodedValueUrlEncoder();
+
 
     /**
      * 强制全编码的编码{@link URLEncoder}
@@ -108,6 +119,16 @@ public class URLEncoder {
     public static URLEncoder createQueryValueUrlEncoder() {
         return createURLEncoder(QUERY_VALUE_EXCLUDED_CHARACTERS, false);
     }
+
+    /**
+     * 创建用于表单参数值编码的{@link URLEncoder}
+     *
+     * @return {@link URLEncoder}实例
+     */
+    public static URLEncoder createXWwwFormUrlEncodedValueUrlEncoder() {
+        return createURLEncoder(X_WWW_FORM_URLENCODED_VALUE_EXCLUDED_CHARACTERS, false);
+    }
+
 
     /**
      * 创建用于强制编码的{@link URLEncoder}

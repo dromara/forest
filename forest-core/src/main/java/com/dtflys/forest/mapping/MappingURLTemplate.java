@@ -154,7 +154,12 @@ public class MappingURLTemplate extends MappingTemplate {
                             // 解析用户名密码
                             if (userInfo == null) {
                                 if (host != null) {
-                                    userInfo = host + ":";
+                                    StringBuilder userInfoBuilder = new StringBuilder(host);
+                                    if (subBuilder.length() > 0) {
+                                        userInfoBuilder.append(subBuilder);
+                                        subBuilder = new StringBuilder();
+                                    }
+                                    userInfo = userInfoBuilder.toString();
                                     host = null;
                                 } else {
                                     userInfo = "";
@@ -164,6 +169,7 @@ public class MappingURLTemplate extends MappingTemplate {
                                     port = null;
                                 }
                             }
+                            renderedPath = false;
                             userInfo += subBuilder.toString();
                             subBuilder = new StringBuilder();
                             continue;

@@ -1,5 +1,6 @@
 package com.dtflys.test.http;
 
+import com.alibaba.fastjson.JSONObject;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
@@ -29,6 +30,8 @@ import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -946,7 +949,7 @@ public class TestPostClient extends BaseClientTest {
 
 
     @Test
-    public void postFormListWithBodyAnn() throws InterruptedException {
+    public void postFormListWithBodyAnn() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         List<Integer> idList = Lists.newArrayList(1, 2, 3);
         Cause cause1 = new Cause();
@@ -963,11 +966,11 @@ public class TestPostClient extends BaseClientTest {
                 .assertMethodEquals("POST")
                 .assertPathEquals("/form-array")
                 .assertHeaderEquals("Content-Type", "application/x-www-form-urlencoded")
-                .assertBodyEquals("username=foo&password=123456&idList=1%2C2%2C3&cause[0].id=1&cause[0].score=87&cause[1].id=2&cause[1].score=73");
+                .assertBodyEquals("username=foo&password=123456&idList=1,2,3&cause[0].id=1&cause[0].score=87&cause[1].id=2&cause[1].score=73");
     }
 
     @Test
-    public void postFormListWithBodyAnn2() throws InterruptedException {
+    public void postFormListWithBodyAnn2() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         FormListParam param = new FormListParam();
         List<Integer> idList = Lists.newArrayList(1, 2, 3);
@@ -989,7 +992,7 @@ public class TestPostClient extends BaseClientTest {
                 .assertMethodEquals("POST")
                 .assertPathEquals("/form-array")
                 .assertHeaderEquals("Content-Type", "application/x-www-form-urlencoded")
-                .assertBodyEquals("username=foo&password=123456&idList=1%2C2%2C3&cause[0].id=1&cause[0].score=87&cause[1].id=2&cause[1].score=73");
+                .assertBodyEquals("username=foo&password=123456&idList=1,2,3&cause[0].id=1&cause[0].score=87&cause[1].id=2&cause[1].score=73");
     }
 
     @Test
@@ -1010,11 +1013,11 @@ public class TestPostClient extends BaseClientTest {
                 .assertMethodEquals("POST")
                 .assertPathEquals("/form-array")
                 .assertHeaderEquals("Content-Type", "application/x-www-form-urlencoded")
-                .assertBodyEquals("username=foo&password=123456&idList=1%2C2%2C3&cause[0].id=1&cause[0].score=87&cause[1].id=2&cause[1].score=73");
+                .assertBodyEquals("username=foo&password=123456&idList=1,2,3&cause[0].id=1&cause[0].score=87&cause[1].id=2&cause[1].score=73");
     }
 
     @Test
-    public void postFormListWithBodyAnn4() throws InterruptedException {
+    public void postFormListWithBodyAnn4() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         FormArrayParam param = new FormArrayParam();
         param.setUsername("foo");
@@ -1035,8 +1038,37 @@ public class TestPostClient extends BaseClientTest {
                 .assertMethodEquals("POST")
                 .assertPathEquals("/form-array")
                 .assertHeaderEquals("Content-Type", "application/x-www-form-urlencoded")
-                .assertBodyEquals("username=foo&password=123456&idList=1%2C2%2C3&cause[0].id=1&cause[0].score=87&cause[1].id=2&cause[1].score=73");
+                .assertBodyEquals("username=foo&password=123456&idList=1,2,3&cause[0].id=1&cause[0].score=87&cause[1].id=2&cause[1].score=73");
     }
+
+    @Test
+    public void postFormListWithBodyAnn_jsonParam() throws UnsupportedEncodingException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        FormArrayParam param = new FormArrayParam();
+        param.setUsername("中文名");
+        param.setPassword("123456");
+        param.setIdList(new Integer[] {1, 2, 3});
+        Cause cause1 = new Cause();
+        cause1.setId(1);
+        cause1.setScore(87);
+        Cause cause2 = new Cause();
+        cause2.setId(2);
+        cause2.setScore(73);
+        Cause[] causes = new Cause[] {cause1, cause2};
+        param.setCause(causes);
+        String paramStr = JSONObject.toJSONString(param);
+        assertThat(postClient.postFormListWithBodyAnn_jsonParam(paramStr))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("POST")
+                .assertPathEquals("/form-array")
+                .assertHeaderEquals("Content-Type", "application/x-www-form-urlencoded")
+                .assertBodyEquals("param={\"username\":\"" +
+                        URLEncoder.encode("中文名", "UTF-8") +
+                        "\",\"password\":\"123456\",\"idList\":[1,2,3],\"cause\":[{\"id\":1,\"score\":87},{\"id\":2,\"score\":73}]}");
+    }
+
 
     @Test
     public void testPostXml() throws InterruptedException {

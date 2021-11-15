@@ -195,94 +195,45 @@ public class OkHttp3Executor implements HttpExecutor {
         final OkHttp3ForestResponseFactory factory = new OkHttp3ForestResponseFactory();
         logRequest(retryCount, okRequest, okHttpClient);
         Date startDate = new Date();
-        /*
-        long startTime = startDate.getTime();
-        if (request.isAsync()) {
-            final OkHttp3ResponseFuture future = new OkHttp3ResponseFuture();
-            call.enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    ForestResponse response = factory.createResponse(request, null, lifeCycleHandler, e, startDate);
-                    ForestRetryException retryException = new ForestRetryException(
-                            e, request, request.getRetryCount(), retryCount);
-                    try {
-                        request.canRetry(response, retryException);
-                    } catch (Throwable throwable) {
-                        future.failed(e);
-                        response = factory.createResponse(request, null, lifeCycleHandler, throwable, startDate);
-                        logResponse(response);
-                        lifeCycleHandler.handleError(request, response, e);
-                        return;
-                    }
-                    execute(lifeCycleHandler, retryCount + 1);
-                }
-
-                @Override
-                public void onResponse(Call call, Response okResponse) {
-                    ForestResponse response = factory.createResponse(request, okResponse, lifeCycleHandler, null, startDate);
-                    logResponse(response);
-
-                    ForestRetryException retryEx = request.canRetry(response);
-                    if (retryEx != null && !retryEx.isMaxRetryCountReached()) {
-                        execute(lifeCycleHandler, retryCount + 1);
-                        return;
-                    }
-                    Object result = null;
-                    if (response.isSuccess()) {
-                        if (request.getOnSuccess() != null) {
-                            result = okHttp3ResponseHandler.handleSuccess(response);
-                        } else {
-                            result = okHttp3ResponseHandler.handleSync(okResponse, response);
-                        }
-                        future.completed(result);
-                    } else {
-                        retryOrDoError(response, okResponse, future, lifeCycleHandler, retryCount);
-                    }
-                }
-            });
-            okHttp3ResponseHandler.handleFuture(future, startDate, factory);
-        }
-        else {
-*/
-            Response okResponse = null;
-            ForestResponse response = null;
+        Response okResponse = null;
+        ForestResponse response = null;
+        try {
+            okResponse = call.execute();
+        } catch (Throwable e) {
+            response = factory.createResponse(request, null, lifeCycleHandler, e, startDate);
+            ForestRetryException retryException = new ForestRetryException(
+                    e, request, request.getRetryCount(), retryCount);
             try {
-                okResponse = call.execute();
-            } catch (Throwable e) {
-                response = factory.createResponse(request, null, lifeCycleHandler, e, startDate);
-                ForestRetryException retryException = new ForestRetryException(
-                        e, request, request.getRetryCount(), retryCount);
-                try {
-                    request.canRetry(response, retryException);
-                } catch (Throwable throwable) {
-                    response = factory.createResponse(request, null, lifeCycleHandler, throwable, startDate);
-                    logResponse(response);
-                    lifeCycleHandler.handleSyncWithException(request, response, throwable);
-                    return;
-                }
-                response = factory.createResponse(request, null, lifeCycleHandler, e, startDate);
+                request.canRetry(response, retryException);
+            } catch (Throwable throwable) {
+                response = factory.createResponse(request, null, lifeCycleHandler, throwable, startDate);
                 logResponse(response);
-                execute(lifeCycleHandler, retryCount + 1);
-                return;
-            } finally {
-                if (response == null) {
-                    response = factory.createResponse(request, okResponse, lifeCycleHandler, null, startDate);
-                }
-                logResponse(response);
-            }
-            // 是否重试
-            ForestRetryException retryEx = request.canRetry(response);
-            if (retryEx != null && retryEx.isNeedRetry() && !retryEx.isMaxRetryCountReached()) {
-                execute(lifeCycleHandler, retryCount + 1);
+                lifeCycleHandler.handleSyncWithException(request, response, throwable);
                 return;
             }
+            response = factory.createResponse(request, null, lifeCycleHandler, e, startDate);
+            logResponse(response);
+            execute(lifeCycleHandler, retryCount + 1);
+            return;
+        } finally {
+            if (response == null) {
+                response = factory.createResponse(request, okResponse, lifeCycleHandler, null, startDate);
+            }
+            logResponse(response);
+        }
+        // 是否重试
+        ForestRetryException retryEx = request.canRetry(response);
+        if (retryEx != null && retryEx.isNeedRetry() && !retryEx.isMaxRetryCountReached()) {
+            execute(lifeCycleHandler, retryCount + 1);
+            return;
+        }
 
-            // 验证响应
-            if (response.isError()) {
-                retryOrDoError(response, okResponse, null, lifeCycleHandler, retryCount);
-                return;
-            }
-            okHttp3ResponseHandler.handleSync(okResponse, response);
+        // 验证响应
+        if (response.isError()) {
+            retryOrDoError(response, okResponse, null, lifeCycleHandler, retryCount);
+            return;
+        }
+        okHttp3ResponseHandler.handleSync(okResponse, response);
 //        }
     }
 

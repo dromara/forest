@@ -205,7 +205,7 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
             strBuilder.append(name);
             if (value != null) {
                 value = MappingTemplate.getFormValueString(jsonConverter, value);
-                strBuilder.append("=").append(URLEncoder.QUERY_VALUE.encode(String.valueOf(value), charset));
+                strBuilder.append("=").append(URLEncoder.FORM_VALUE.encode(String.valueOf(value), charset));
             }
             if (i < nameValueList.size() - 1) {
                 strBuilder.append("&");
