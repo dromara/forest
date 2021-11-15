@@ -12,6 +12,7 @@ import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
 
 public class MappingURLTemplate extends MappingTemplate {
 
@@ -155,6 +156,9 @@ public class MappingURLTemplate extends MappingTemplate {
                             if (userInfo == null) {
                                 if (host != null) {
                                     StringBuilder userInfoBuilder = new StringBuilder(host);
+                                    if (!renderedPath) {
+                                        userInfoBuilder.append(':');
+                                    }
                                     if (subBuilder.length() > 0) {
                                         userInfoBuilder.append(subBuilder);
                                         subBuilder = new StringBuilder();
