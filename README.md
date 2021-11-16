@@ -114,9 +114,9 @@ public interface AmapClient {
 
     /**
      * 聪明的你一定看出来了@Get注解代表该方法专做GET请求
-     * 在url中的${0}代表引用第一个参数，${1}引用第二个参数
+     * 在url中的{0}代表引用第一个参数，{1}引用第二个参数
      */
-    @Get("http://ditu.amap.com/service/regeo?longitude=${0}&latitude=${1}")
+    @Get("http://ditu.amap.com/service/regeo?longitude={0}&latitude={1}")
     Map getLocation(String longitude, String latitude);
 }
 
@@ -231,16 +231,16 @@ Map result = myClient.upload("D:\\TestUpload\\xxx.jpg", progress -> {
 
 ```java
 /**
- * 上传Map包装的文件列表，其中 ${_key} 代表Map中每一次迭代中的键值
+ * 上传Map包装的文件列表，其中 {_key} 代表Map中每一次迭代中的键值
  */
 @Post("/upload")
-ForestRequest<Map> uploadByteArrayMap(@DataFile(value = "file", fileName = "${_key}") Map<String, byte[]> byteArrayMap);
+ForestRequest<Map> uploadByteArrayMap(@DataFile(value = "file", fileName = "{_key}") Map<String, byte[]> byteArrayMap);
 
 /**
- * 上传List包装的文件列表，其中 ${_index} 代表每次迭代List的循环计数（从零开始计）
+ * 上传List包装的文件列表，其中 {_index} 代表每次迭代List的循环计数（从零开始计）
  */
 @Post("/upload")
-ForestRequest<Map> uploadByteArrayList(@DataFile(value = "file", fileName = "test-img-${_index}.jpg") List<byte[]> byteArrayList);
+ForestRequest<Map> uploadByteArrayList(@DataFile(value = "file", fileName = "test-img-{_index}.jpg") List<byte[]> byteArrayList);
 ```
 
 ## 文件下载
@@ -252,10 +252,10 @@ ForestRequest<Map> uploadByteArrayList(@DataFile(value = "file", fileName = "tes
  * 在方法上加上@DownloadFile注解
  * dir属性表示文件下载到哪个目录
  * OnProgress参数为监听上传进度的回调函数
- * ${0}代表引用第一个参数
+ * {0}代表引用第一个参数
  */
 @Get("http://localhost:8080/images/xxx.jpg")
-@DownloadFile(dir = "${0}")
+@DownloadFile(dir = "{0}")
 File downloadFile(String dir, OnProgress onProgress);
 ```
 
@@ -274,8 +274,8 @@ File file = myClient.downloadFile("D:\\TestDownload", progress -> {
 ## 基本签名验证
 
 ```java
-@Post("/hello/user?username=${username}")
-@BasicAuth(username = "${username}", password = "bar")
+@Post("/hello/user?username={username}")
+@BasicAuth(username = "{username}", password = "bar")
 String send(@DataVariable("username") String username);
 ```
 
@@ -387,8 +387,8 @@ public class MyAuthLifeCycle implements MethodAnnotationLifeCycle<MyAuth, Object
  * 注解的参数可以是字符串模板，通过方法调用的时候动态传入
  * 也可以是写死的字符串
  */
-@Get("/hello/user?username=${username}")
-@MyAuth(username = "${username}", password = "bar")
+@Get("/hello/user?username={username}")
+@MyAuth(username = "{username}", password = "bar")
 String send(@DataVariable("username") String username);
 ```
 
