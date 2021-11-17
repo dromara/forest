@@ -39,13 +39,13 @@
 </a>
 </p>
 
-<h1 align="center">Forest - 轻量级HTTP客户端框架</h1>
+<h1 align="center">Forest - 声明式HTTP客户端框架</h1>
 
 
 项目介绍：
 -------------------------------------
 
-Forest是一个高层的、极简的轻量级HTTP调用API框架。<br>
+Forest是一个高层的、极简的声明式HTTP调用API框架。<br>
 相比于直接使用Httpclient您不再用写一大堆重复的代码了，而是像调用本地方法一样去发送HTTP请求。
 
 文档和示例：
