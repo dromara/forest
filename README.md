@@ -12,13 +12,13 @@
     <img src="https://gitee.com/dromara/forest/badge/star.svg" alt="Gitee Stars">
 </a>
 <!--
-<a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.5.8/jar">
+<a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.5.13/jar">
     <img src="https://img.shields.io/badge/maven%20central-1.5.1-brightgreen.svg" alt="Maven Central">
 </a>
 -->
 <!--
-<a href="https://gitee.com/dromara/forest/releases/v1.5.8">
-    <img src="https://img.shields.io/badge/release-v1.5.8" alt="Release">
+<a href="https://gitee.com/dromara/forest/releases/v1.5.13">
+    <img src="https://img.shields.io/badge/release-v1.5.13" alt="Release">
 </a>
 -->
 <a href="https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html">
@@ -39,13 +39,13 @@
 </a>
 </p>
 
-<h1 align="center">Forest - 轻量级HTTP客户端框架</h1>
+<h1 align="center">Forest - 声明式HTTP客户端框架</h1>
 
 
 项目介绍：
 -------------------------------------
 
-Forest是一个高层的、极简的轻量级HTTP调用API框架。<br>
+Forest是一个高层的、极简的声明式HTTP调用API框架。<br>
 相比于直接使用Httpclient您不再用写一大堆重复的代码了，而是像调用本地方法一样去发送HTTP请求。
 
 文档和示例：
@@ -94,10 +94,9 @@ Forest有哪些特性？
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-spring-boot-starter</artifactId>
-    <version>1.5.8</version>
+    <version>1.5.13</version>
 </dependency>
 ```
-
 
 ### 第二步：创建一个`interface`
 
@@ -114,9 +113,9 @@ public interface AmapClient {
 
     /**
      * 聪明的你一定看出来了@Get注解代表该方法专做GET请求
-     * 在url中的${0}代表引用第一个参数，${1}引用第二个参数
+     * 在url中的{0}代表引用第一个参数，{1}引用第二个参数
      */
-    @Get("http://ditu.amap.com/service/regeo?longitude=${0}&latitude=${1}")
+    @Get("http://ditu.amap.com/service/regeo?longitude={0}&latitude={1}")
     Map getLocation(String longitude, String latitude);
 }
 
@@ -231,16 +230,16 @@ Map result = myClient.upload("D:\\TestUpload\\xxx.jpg", progress -> {
 
 ```java
 /**
- * 上传Map包装的文件列表，其中 ${_key} 代表Map中每一次迭代中的键值
+ * 上传Map包装的文件列表，其中 {_key} 代表Map中每一次迭代中的键值
  */
 @Post("/upload")
-ForestRequest<Map> uploadByteArrayMap(@DataFile(value = "file", fileName = "${_key}") Map<String, byte[]> byteArrayMap);
+ForestRequest<Map> uploadByteArrayMap(@DataFile(value = "file", fileName = "{_key}") Map<String, byte[]> byteArrayMap);
 
 /**
- * 上传List包装的文件列表，其中 ${_index} 代表每次迭代List的循环计数（从零开始计）
+ * 上传List包装的文件列表，其中 {_index} 代表每次迭代List的循环计数（从零开始计）
  */
 @Post("/upload")
-ForestRequest<Map> uploadByteArrayList(@DataFile(value = "file", fileName = "test-img-${_index}.jpg") List<byte[]> byteArrayList);
+ForestRequest<Map> uploadByteArrayList(@DataFile(value = "file", fileName = "test-img-{_index}.jpg") List<byte[]> byteArrayList);
 ```
 
 ## 文件下载
@@ -252,10 +251,10 @@ ForestRequest<Map> uploadByteArrayList(@DataFile(value = "file", fileName = "tes
  * 在方法上加上@DownloadFile注解
  * dir属性表示文件下载到哪个目录
  * OnProgress参数为监听上传进度的回调函数
- * ${0}代表引用第一个参数
+ * {0}代表引用第一个参数
  */
 @Get("http://localhost:8080/images/xxx.jpg")
-@DownloadFile(dir = "${0}")
+@DownloadFile(dir = "{0}")
 File downloadFile(String dir, OnProgress onProgress);
 ```
 
@@ -274,8 +273,8 @@ File file = myClient.downloadFile("D:\\TestDownload", progress -> {
 ## 基本签名验证
 
 ```java
-@Post("/hello/user?username=${username}")
-@BasicAuth(username = "${username}", password = "bar")
+@Post("/hello/user?username={username}")
+@BasicAuth(username = "{username}", password = "bar")
 String send(@DataVariable("username") String username);
 ```
 
@@ -387,8 +386,8 @@ public class MyAuthLifeCycle implements MethodAnnotationLifeCycle<MyAuth, Object
  * 注解的参数可以是字符串模板，通过方法调用的时候动态传入
  * 也可以是写死的字符串
  */
-@Get("/hello/user?username=${username}")
-@MyAuth(username = "${username}", password = "bar")
+@Get("/hello/user?username={username}")
+@MyAuth(username = "{username}", password = "bar")
 String send(@DataVariable("username") String username);
 ```
 
@@ -420,13 +419,14 @@ String send(@DataVariable("username") String username);
 <td><img height="60px" src="doc/images/logo/logo_geely.png" alt="吉利集团"></td>
 <td><img height="60px" src="doc/images/logo/logo_woshipm.png" alt="人人都是产品经理"></td>
 <td><img height="60px" src="doc/images/logo/logo_gzsunrun.jpg" alt="广州尚融网络科技"></td>
+<td><img height="60px" src="doc/images/logo/logo_tldt.png" alt="神州通立电梯"></td>
 </tr>
 <tr>
 <td><img height="60px" src="doc/images/logo/logo_weidubim.png" alt="成都万智维度"></td>
 <td><img height="60px" src="doc/images/logo/logo_ictbda.jpg" alt="中科院计算所大数据研究院"></td>
 <td><img height="60px" src="doc/images/logo/logo_yiring.png" alt="长沙壹润"></td>
 <td><img height="60px" src="doc/images/logo/logo_huafangzhilian.png" alt="山东华方智联科技"></td>
-
+<td><img height="60px" src="doc/images/logo/logo_hzqianqi.png" alt="杭州仟奇"></td>
 </tr>
 
 </table>

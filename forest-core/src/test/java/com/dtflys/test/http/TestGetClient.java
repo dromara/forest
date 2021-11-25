@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.client.UrlEncodedClient;
 import com.dtflys.test.http.model.JsonTestUser;
@@ -13,21 +14,14 @@ import com.google.common.collect.Lists;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okio.Buffer;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.ReaderInputStream;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -36,7 +30,6 @@ import java.util.Map;
 
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -76,7 +69,7 @@ public class TestGetClient extends BaseClientTest {
 
 
     @Test
-    public void testGet() throws InterruptedException {
+    public void testGet() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         assertThat(getClient.simpleGet())
                 .isNotNull()
@@ -89,7 +82,7 @@ public class TestGetClient extends BaseClientTest {
     }
 
     @Test
-    public void testGet2() throws InterruptedException {
+    public void testGet2() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         assertThat(getClient.simpleGet2())
                 .isNotNull()
@@ -100,7 +93,7 @@ public class TestGetClient extends BaseClientTest {
     }
 
     @Test
-    public void testGet3() throws InterruptedException {
+    public void testGet3() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         assertThat(getClient.simpleGet3())
                 .isNotNull()
@@ -110,9 +103,64 @@ public class TestGetClient extends BaseClientTest {
                 .assertQueryEquals("username", "foo");
     }
 
+    @Test
+    public void testPath() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(getClient.testPath("hello &(user)a:a?b=1/2&c=http://localhost:8080/?x=0&d=1"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/hello%20&(user)a:a")
+                .assertQueryEquals("b", "1/2")
+                .assertQueryEquals("c", "http://localhost:8080/?x=0")
+                .assertQueryEquals("d", "1");
+    }
 
     @Test
-    public void testJsonMapGet() throws InterruptedException {
+    public void testPath2() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(getClient.testPath2("hello &(user)a:a?b=1/2&c=http://localhost:8080/?x=0&d=1"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/hello%20&(user)a:a")
+                .assertQueryEquals("b", "1/2")
+                .assertQueryEquals("c", "http://localhost:8080/?x=0")
+                .assertQueryEquals("d", "1");
+    }
+
+
+    @Test
+    public void testPath3() {
+        ForestRequest request = getClient.testPath3();
+        assertThat(request).isNotNull();
+        assertThat(request.urlString()).isEqualTo("https://localhost/xxx:yyy");
+        System.out.println(request.urlString());
+    }
+
+    @Test
+    public void testPath4() {
+        ForestRequest request = getClient.testPath4();
+        assertThat(request).isNotNull();
+        assertThat(request.urlString()).isEqualTo("https://localhost/xxx:111");
+        System.out.println(request.urlString());
+    }
+
+    @Test
+    public void testPath_userInfo() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        ForestRequest request = getClient.testPath_userInfo();
+        assertThat(request).isNotNull();
+        assertThat(request.urlString()).isEqualTo("http://aaa%2Fbbb%2Fskip:123456@localhost:" + server.getPort());
+        System.out.println(request.urlString());
+        assertThat(request.executeAsString())
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+    }
+
+
+    @Test
+    public void testJsonMapGet() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         ForestResponse<Map> response = getClient.jsonMapGet();
         assertThat(response).isNotNull();
@@ -420,7 +468,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/")
-                .assertEncodedQueryEquals("token=" + URLEncoder.encode(token, StandardCharsets.UTF_8.name()))
+                .assertEncodedQueryEquals("token=" + token)
                 .assertQueryEquals("token", token);
     }
 
@@ -441,6 +489,27 @@ public class TestGetClient extends BaseClientTest {
                 .assertQueryEquals("username", "foo")
                 .assertQueryEquals("password", "bar");
     }
+
+    @Test
+    public void testSimpleGetMultiQuery_encoded() throws UnsupportedEncodingException {
+        String pwd = "中文";
+        String encoded = URLEncoder.encode(pwd, "UTF-8");
+        System.out.println(pwd + " => " + encoded);
+        server.enqueue(
+                new MockResponse()
+                        .setHeader("Content-Type", "application/json")
+                        .setHeader("Content-Encoding", "UTF-8")
+                        .setBody(EXPECTED));
+        assertThat(getClient.simpleGetMultiQuery(encoded))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo")
+                .assertQueryEquals("password", pwd);
+    }
+
 
     @Test
     public void testSimpleGetMultiQuery2() throws InterruptedException {
@@ -694,17 +763,47 @@ public class TestGetClient extends BaseClientTest {
     }
 
     @Test
+    public void testGetEncodedArgs1() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(urlEncodedClient.getEncodedArgs("1&x=10&y=20", "http://www.baidu.com"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("GET")
+                .assertPathEquals("/encoded/")
+                .assertQueryEquals("a", "1")
+                .assertQueryEquals("x", "10")
+                .assertQueryEquals("y", "20")
+                .assertQueryEquals("b", "http://www.baidu.com");
+    }
+
+    @Test
+    public void testGetEncodedArgs2() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(urlEncodedClient.getEncodedArgs2("1&x=10&y=20", "http://www.baidu.com"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("GET")
+                .assertPathEquals("/encoded/")
+                .assertQueryEquals("a", "1&x=10&y=20")
+                .assertQueryEquals("b", "http://www.baidu.com");
+    }
+
+
+    @Test
     public void testGetUrlEncoded() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String url = "http://www.gitee.com";
-        assertThat(urlEncodedClient.getUrlEncoded(url, url, "中文", "AbcD12#$iTXI", "il&felUFO3o=P", "中文内容"))
+        String url1 = "http://www.gitee.com";
+        String url2 = "http://search.gitee.com?type=repository&q=forest";
+        assertThat(urlEncodedClient.getUrlEncoded(url1, url2, "中文", "AbcD12#$iTXI", "il&felUFO3o=P", "中文内容"))
             .isNotNull()
             .isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertMethodEquals("GET")
-                .assertPathEquals("/encoded")
+                .assertPathEquals("/encoded/")
                 .assertQueryEquals("url1", "http://www.gitee.com")
-                .assertQueryEquals("url2", "http://www.gitee.com")
+                .assertQueryEquals("url2", "http://search.gitee.com?type=repository&q=forest")
                 .assertQueryEquals("lang", "中文")
                 .assertQueryEquals("code", "AbcD12#$iTXI")
                 .assertQueryEquals("data", "il&felUFO3o=P")

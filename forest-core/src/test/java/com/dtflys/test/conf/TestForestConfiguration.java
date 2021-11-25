@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.dtflys.forest.mapping.MappingParameter.TARGET_BODY;
 import static com.dtflys.forest.mapping.MappingParameter.TARGET_HEADER;
@@ -114,8 +115,10 @@ public class TestForestConfiguration {
         configuration.setVariables(varMap);
         assertThat(configuration.getVariableValue("name")).isEqualTo("Linda");
         assertThat(configuration.getVariableValue("abc")).isEqualTo(123);
-        configuration.setVariableValue("foo", (args) -> "bar");
-        assertThat(configuration.getVariableValue("foo")).isEqualTo("bar");
+        AtomicInteger value = new AtomicInteger(0);
+        configuration.setVariableValue("foo", (method) -> value.getAndIncrement());
+        assertThat(configuration.getVariableValue("foo")).isEqualTo(0);
+        assertThat(configuration.getVariableValue("foo")).isEqualTo(1);
     }
 
 

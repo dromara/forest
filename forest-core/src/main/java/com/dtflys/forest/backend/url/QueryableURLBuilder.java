@@ -42,14 +42,10 @@ public class QueryableURLBuilder extends URLBuilder {
                     charset = "UTF-8";
                 }
                 String encodedValue = null;
-                try {
-                    if (queryParam.isUrlencoded()) {
-                        encodedValue = URLUtils.forceEncode(value, charset);
-                    } else {
-//                        encodedValue = value;
-                        encodedValue = URLUtils.encode(value, charset);
-                    }
-                } catch (UnsupportedEncodingException e) {
+                if (queryParam.isUrlencoded()) {
+                    encodedValue = URLUtils.allEncode(value, charset);
+                } else {
+                    encodedValue = URLUtils.queryValueEncode(value, charset);
                 }
                 if (encodedValue != null) {
                     paramBuilder.append(encodedValue);

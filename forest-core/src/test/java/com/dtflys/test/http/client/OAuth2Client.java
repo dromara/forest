@@ -1,6 +1,7 @@
 package com.dtflys.test.http.client;
 
 import com.dtflys.forest.annotation.GetRequest;
+import com.dtflys.forest.backend.okhttp3.OkHttp3;
 import com.dtflys.forest.extensions.OAuth2;
 import com.dtflys.test.handler.OAuth2TokenTestHandler;
 

@@ -31,6 +31,9 @@ public class SpringSSLKeyStore extends SSLKeyStore {
 
     @Override
     public void init() {
+        if (StringUtils.isBlank(filePath)) {
+            return;
+        }
         if (filePath.indexOf(":/") == 1
                 || filePath.indexOf(":\\") == 1
                 || filePath.startsWith("/")) {

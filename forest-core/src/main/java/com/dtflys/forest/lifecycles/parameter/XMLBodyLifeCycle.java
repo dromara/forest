@@ -5,13 +5,11 @@ import com.dtflys.forest.annotation.XMLBody;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.filter.Filter;
-import com.dtflys.forest.http.ForestBodyType;
 import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.lifecycles.ParameterAnnotationLifeCycle;
 import com.dtflys.forest.mapping.MappingParameter;
-import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MetaRequest;
+import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.lang.annotation.Annotation;
@@ -55,7 +53,7 @@ public class XMLBodyLifeCycle extends AbstractBodyLifeCycle<XMLBody> {
             metaRequest.setContentType(ContentType.APPLICATION_XML);
         }
         if (metaRequest.getBodyType() == null) {
-            metaRequest.setBodyType(ForestBodyType.XML);
+            metaRequest.setBodyType(ForestDataType.XML);
         }
     }
 

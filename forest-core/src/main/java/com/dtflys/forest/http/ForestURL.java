@@ -1,7 +1,32 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2016 Jun Gong
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.dtflys.forest.http;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.StringUtils;
+import com.dtflys.forest.utils.URLUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -37,7 +62,7 @@ public class ForestURL {
     /**
      * 主机端口
      */
-    private int port;
+    private Integer port;
 
     /**
      * URL路径
@@ -75,6 +100,15 @@ public class ForestURL {
         path = url.getPath();
         userInfo = url.getUserInfo();
         setRef(url.getRef());
+        originalUrl = toURLString();
+    }
+
+    public ForestURL(String schema, String userInfo, String host, Integer port, String path) {
+        setScheme(schema);
+        this.userInfo = userInfo;
+        this.host = host;
+        this.port = port;
+        this.path = path;
         originalUrl = toURLString();
     }
 
@@ -143,7 +177,7 @@ public class ForestURL {
     }
 
     public int getPort() {
-        if (port == -1) {
+        if (URLUtils.isNonePort(port)) {
             return ssl ? 443 : 80;
         }
         return port;
@@ -197,12 +231,13 @@ public class ForestURL {
     public String getAuthority() {
         StringBuilder builder = new StringBuilder();
         if (StringUtils.isNotEmpty(userInfo)) {
-            builder.append(userInfo).append("@");
+            builder.append(URLUtils.userInfoEncode(userInfo, "UTF-8")).append("@");
         }
-        builder.append(host);
-        if ((port != 80 && port != 443 && port > -1) ||
+        builder.append(URLUtils.userInfoEncode(host, "UTF-8"));
+        if (URLUtils.isNotNonePort(port) &&
+                ((port != 80 && port != 443 && port > -1) ||
                 (port == 80 && !ssl) ||
-                (port == 443 && !ssl)) {
+                (port == 443 && !ssl))) {
             builder.append(':').append(port);
         }
         return builder.toString();
@@ -229,8 +264,17 @@ public class ForestURL {
     }
 
     public String toURLString() {
-        StringBuilder builder = new StringBuilder(scheme).append("://");
-        builder.append(getAuthority()).append(path);
+        StringBuilder builder = new StringBuilder();
+        if (StringUtils.isNotEmpty(scheme)) {
+            builder.append(scheme).append("://");
+        }
+        String authority = getAuthority();
+        if (StringUtils.isNotEmpty(authority)) {
+            builder.append(authority);
+        }
+        if (StringUtils.isNotEmpty(path)) {
+            builder.append(URLUtils.pathEncode(path, "UTF-8"));
+        }
         if (StringUtils.isNotEmpty(ref)) {
             builder.append("#").append(ref);
         }
@@ -258,4 +302,83 @@ public class ForestURL {
             throw new ForestRuntimeException(e);
         }
     }
+
+    /**
+     * 合并两个URL
+     * @param url 被合并的一个URL
+     * @return 合并完的新URL
+     */
+    public ForestURL mergeURLWith(ForestURL url) {
+        String newSchema = this.scheme == null ? url.scheme : this.scheme;
+        String newUserInfo = this.userInfo == null ? url.userInfo : this.userInfo;
+        String newHost = this.host == null ? url.host : this.host;
+        int newPort = URLUtils.isNonePort(this.port) ? url.port : this.port;
+        String newPath = this.path == null ? url.path : this.path;
+        return new ForestURL(newSchema, newUserInfo, newHost, newPort, newPath);
+    }
+
+    /**
+     * 设置基地址URL
+     *
+     * @param baseURL 基地址URL
+     * @return {@link ForestURL}对象实例
+     */
+    public ForestURL setBaseURL(ForestURL baseURL) {
+        String baseSchema = "http";
+        String baseUserInfo = null;
+        String baseHost = "localhost";
+        int basePort = -1;
+        String basePath = null;
+        if (baseURL != null) {
+            if (baseURL.scheme != null) {
+                baseSchema = baseURL.scheme;
+            }
+            if (baseURL.userInfo != null) {
+                baseUserInfo = baseURL.userInfo;
+            }
+            if (baseURL.host != null) {
+                baseHost = baseURL.host;
+            }
+            if (URLUtils.isNotNonePort(baseURL.port)) {
+                basePort = baseURL.port;
+            }
+            if (baseURL.path != null) {
+                basePath = baseURL.path;
+            }
+        }
+        boolean needBasePath = false;
+        if (this.scheme == null) {
+            this.scheme = baseSchema;
+            needBasePath = true;
+        }
+        if (this.userInfo == null) {
+            this.userInfo = baseUserInfo;
+        }
+        if (this.host == null) {
+            this.host = baseHost;
+            needBasePath = true;
+        }
+
+        if (URLUtils.isNonePort(this.port)) {
+            this.port = basePort;
+        }
+        if (StringUtils.isNotBlank(this.path)) {
+            if (this.path.charAt(0) != '/') {
+                this.path = '/' + this.path;
+            }
+        }
+        if (needBasePath && StringUtils.isNotBlank(basePath)) {
+            if (basePath.charAt(basePath.length() - 1) == '/') {
+                basePath = basePath.substring(0, basePath.length() - 1);
+            }
+            if (StringUtils.isEmpty(this.path)) {
+                this.path = basePath;
+            } else {
+                this.path = basePath + this.path;
+            }
+        }
+        this.originalUrl = toURLString();
+        return this;
+    }
+
 }

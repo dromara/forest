@@ -10,8 +10,18 @@ public class ForestConvertException extends ForestRuntimeException {
     public ForestConvertException(ForestConverter<?> converter, Throwable th) {
         super("[Forest] " + converter.getDataType().getName() +
                 " converter: '" + converter.getClass().getSimpleName() +
-                "' error: " + th.getMessage(), th);
+                "' error: " + errorMessage(th), th);
         this.converterClass = (Class<? extends Converter>) converter.getClass();
+    }
+
+    private static String errorMessage(Throwable th) {
+        if (th.getMessage() != null) {
+            return th.getMessage();
+        }
+        if (th.getCause() == null || th.getClass().equals(th.getCause().getClass())) {
+            return "";
+        }
+        return errorMessage(th.getCause());
     }
 
     public Class<? extends Converter> getConverterClass() {

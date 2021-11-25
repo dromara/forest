@@ -6,12 +6,12 @@
 
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-core</artifactId>
-    <version>1.5.8</version>
+    <version>1.5.13</version>
 
     <parent>
         <groupId>com.dtflys.forest</groupId>
         <artifactId>forest</artifactId>
-        <version>1.5.8</version>
+        <version>1.5.13</version>
     </parent>
 
     <properties>
@@ -59,32 +59,6 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>
             <version>${httpclient.version}</version>
-        </dependency>
-
-
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore-nio</artifactId>
-            <version>${httpnio.version}</version>
-            <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>httpcore</artifactId>
-                    <groupId>org.apache.httpcomponents</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpasyncclient</artifactId>
-            <version>${httpasyncclient.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>httpcore</artifactId>
-                    <groupId>org.apache.httpcomponents</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
@@ -161,7 +135,7 @@
         <dependency>
             <groupId>com.dtflys.forest</groupId>
             <artifactId>forest-mock</artifactId>
-            <version>1.5.8</version>
+            <version>1.5.13</version>
             <scope>test</scope>
         </dependency>
 
@@ -195,7 +169,6 @@
             <version>${log4j.version}</version>
             <scope>test</scope>
         </dependency>
-
 
 
     </dependencies>

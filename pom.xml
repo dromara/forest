@@ -4,7 +4,7 @@
 
 	<groupId>com.dtflys.forest</groupId>
 	<artifactId>forest</artifactId>
-	<version>1.5.8</version>
+	<version>1.5.13</version>
 	<packaging>pom</packaging>
 	<name>forest</name>
 	<description>A easy HTTP client framework for Java</description>
@@ -31,7 +31,7 @@
 		<url>https://github.com/mySingleLive/forest</url>
 		<connection>scm:git:https://github.com/mySingleLive/forest.git</connection>
 		<developerConnection>http://www.dtflys.com</developerConnection>
-		<tag>1.5.8</tag>
+		<tag>1.5.13</tag>
 	</scm>
 
 	<properties>
@@ -55,9 +55,7 @@
 		<log4j.version>2.4.1</log4j.version>
 		<okhttp.version>3.14.9</okhttp.version>
 		<httpcore.version>4.4.14</httpcore.version>
-		<httpnio.version>4.4.6</httpnio.version>
 		<httpclient.version>4.5.13</httpclient.version>
-		<httpasyncclient.version>4.1.4</httpasyncclient.version>
 
 		<mockwebserver.version>3.14.9</mockwebserver.version>
 		<mockserver-netty.version>3.10.4</mockserver-netty.version>

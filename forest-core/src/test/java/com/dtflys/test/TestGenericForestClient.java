@@ -139,6 +139,7 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_query_repeat3() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config().setLogEnabled(true);
         Forest.get("/")
                 .port(server.getPort())
                 .addQuery("a", 1, 2, 3)

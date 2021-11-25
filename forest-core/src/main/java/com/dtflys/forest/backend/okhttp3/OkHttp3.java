@@ -2,8 +2,6 @@ package com.dtflys.forest.backend.okhttp3;
 
 
 import com.dtflys.forest.annotation.Backend;
-import com.dtflys.forest.backend.HttpBackendSelector;
-import com.dtflys.forest.backend.okhttp3.OkHttp3Backend;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

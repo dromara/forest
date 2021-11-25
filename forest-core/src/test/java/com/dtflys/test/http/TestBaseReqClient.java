@@ -120,9 +120,21 @@ public class TestBaseReqClient extends BaseClientTest {
             .isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertMethodEquals("GET")
-                .assertPathEquals("/hello/user")
+                .assertPathEquals("/xxx/hello/user")
                 .assertHeaderEquals("Accept", "text/plain");
     }
+
+    @Test
+    public void testBaseURL_emptyPath() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(baseURLClient.emptyPathGet())
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("GET")
+                .assertPathEquals("/xxx");
+    }
+
 
     @Test
     public void testBaseURLVar() {

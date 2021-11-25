@@ -19,11 +19,13 @@ public @interface BindingVar {
 
     /**
      * 绑定的变量名
+     * @return 绑定的变量名
      */
     String value();
 
     /**
      * 所绑定的 ForestConfiguration Bean Id
+     * @return 所绑定的 ForestConfiguration Bean Id
      */
     String configuration() default "";
 

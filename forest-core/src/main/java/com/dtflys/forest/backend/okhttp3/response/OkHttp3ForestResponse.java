@@ -55,7 +55,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
         if (StringUtils.isNotBlank(request.getResponseEncode())) {
             this.contentEncoding = request.getResponseEncode();
         } else if (contentType == null || contentType.isEmpty()) {
-//            this.content = readContentAsString();
+            this.content = readContentAsString();
         } else if (!request.isDownloadFile() && contentType.canReadAsString()) {
 //            this.content = readContentAsString();
         } else if (contentType.canReadAsBinaryStream()) {

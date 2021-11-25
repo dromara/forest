@@ -20,7 +20,9 @@ public interface ForestConverter<S> {
      * @param <T>          目标类型泛型
      * @return 转换后的目标类型对象
      */
-    <T> T convertToJavaObject(S source, Class<T> targetType);
+    default  <T> T convertToJavaObject(S source, Class<T> targetType) {
+        return convertToJavaObject(source, (Type) targetType);
+    }
 
     /**
      * 将源数据转换为目标类型（Type）的java对象

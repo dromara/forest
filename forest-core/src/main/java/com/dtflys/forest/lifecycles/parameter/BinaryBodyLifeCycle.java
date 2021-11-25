@@ -2,14 +2,13 @@ package com.dtflys.forest.lifecycles.parameter;
 
 import com.dtflys.forest.annotation.BinaryBody;
 import com.dtflys.forest.annotation.DataFile;
-import com.dtflys.forest.annotation.JSONBody;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.http.ForestBodyType;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MetaRequest;
+import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.lang.annotation.Annotation;
@@ -46,7 +45,7 @@ public class BinaryBodyLifeCycle extends AbstractBodyLifeCycle<BinaryBody> {
             metaRequest.setContentType(ContentType.APPLICATION_OCTET_STREAM);
         }
         if (metaRequest.getBodyType() == null) {
-            metaRequest.setBodyType(ForestBodyType.BINARY);
+            metaRequest.setBodyType(ForestDataType.BINARY);
         }
         parameter.setTarget(MappingParameter.TARGET_BODY);
     }
