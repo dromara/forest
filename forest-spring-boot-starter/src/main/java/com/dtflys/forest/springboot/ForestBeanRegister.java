@@ -77,6 +77,7 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
         }
 
         beanDefinitionBuilder
+                .addPropertyValue("maxAsyncThreadSize", forestConfigurationProperties.getMaxAsyncThreadSize())
                 .addPropertyValue("maxConnections", forestConfigurationProperties.getMaxConnections())
                 .addPropertyValue("maxRouteConnections", forestConfigurationProperties.getMaxRouteConnections())
                 .addPropertyValue("timeout", forestConfigurationProperties.getTimeout())
@@ -141,6 +142,7 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
             registerConverter(configuration, ForestDataType.JSON, convertProperties.getJson());
             registerConverter(configuration, ForestDataType.XML, convertProperties.getXml());
             registerConverter(configuration, ForestDataType.BINARY, convertProperties.getBinary());
+            registerConverter(configuration, ForestDataType.PROTOBUF, convertProperties.getProtobuf());
         }
         registerConverterBeanListener(configuration);
         return configuration;
