@@ -84,12 +84,26 @@ public class TestUrlWithAt extends BaseClientTest {
     @Test
     public void testGetUrlWithUserInfo3() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        ForestResponse<String> response = getClient.getUrlWithUserInfo3("xxxxxx:1234");
+        ForestResponse<String> response = getClient.getUrlWithUserInfo3("xxx/yyy/foo");
         assertNotNull(response);
         log.info("response: " + response);
         ForestRequest request = response.getRequest();
         String userInfo = request.getUserInfo();
-        assertEquals("xxxxxx:1234", userInfo);
+        assertEquals("xxx/yyy/foo", userInfo);
+        mockRequest(server)
+                .assertMethodEquals("GET")
+                .assertPathEquals("/hello/user");
+    }
+
+    @Test
+    public void testGetUrlWithUserInfo4() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        ForestResponse<String> response = getClient.getUrlWithUserInfo3("foo");
+        assertNotNull(response);
+        log.info("response: " + response);
+        ForestRequest request = response.getRequest();
+        String userInfo = request.getUserInfo();
+        assertEquals("foo", userInfo);
         mockRequest(server)
                 .assertMethodEquals("GET")
                 .assertPathEquals("/hello/user");

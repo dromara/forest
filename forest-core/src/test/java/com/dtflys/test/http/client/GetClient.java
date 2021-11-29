@@ -394,7 +394,7 @@ public interface GetClient {
     ForestResponse<String> getUrlWithUserInfo2();
 
     @Get(
-            url = "http://{userInfo}@localhost:{port}/hello/user",
+            url = "http://{userInfo}@localhost:{port}/hello/user?name=foo",
             headers = {"Accept:text/plain"}
     )
     ForestResponse<String> getUrlWithUserInfo3(@Var("userInfo") String userInfo);

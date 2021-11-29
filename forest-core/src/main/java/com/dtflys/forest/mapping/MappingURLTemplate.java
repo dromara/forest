@@ -12,6 +12,8 @@ import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.lang.annotation.Annotation;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 
 public class MappingURLTemplate extends MappingTemplate {
@@ -32,6 +34,7 @@ public class MappingURLTemplate extends MappingTemplate {
         String host = null;
         Integer port = null;
         String path = null;
+        StringBuilder urlBuilder = new StringBuilder();
 
         boolean renderedQuery = false;
         boolean nextIsPort = false;
@@ -103,6 +106,9 @@ public class MappingURLTemplate extends MappingTemplate {
                     String baseUrl = exprVal;
                     if (renderedQuery) {
                         baseUrl = exprVal.substring(0, queryIndex);
+                        urlBuilder.append(baseUrl);
+                    } else {
+                        urlBuilder.append(baseUrl);
                     }
                     char[] baseUrlChars = baseUrl.toCharArray();
                     int baseLen = baseUrlChars.length;
@@ -156,10 +162,14 @@ public class MappingURLTemplate extends MappingTemplate {
                             if (userInfo == null) {
                                 if (host != null) {
                                     StringBuilder userInfoBuilder = new StringBuilder(host);
-                                    if (!renderedPath) {
-                                        userInfoBuilder.append(':');
+                                    if (StringUtils.isNotEmpty(path)) {
+                                        userInfoBuilder.append(path);
+                                        path = "";
                                     }
                                     if (subBuilder.length() > 0) {
+                                        if (!renderedPath) {
+                                            userInfoBuilder.append(':');
+                                        }
                                         userInfoBuilder.append(subBuilder);
                                         subBuilder = new StringBuilder();
                                     }
@@ -172,10 +182,11 @@ public class MappingURLTemplate extends MappingTemplate {
                                     userInfo += port;
                                     port = null;
                                 }
+                            } else {
+                                userInfo += subBuilder.toString();
+                                subBuilder = new StringBuilder();
                             }
                             renderedPath = false;
-                            userInfo += subBuilder.toString();
-                            subBuilder = new StringBuilder();
                             continue;
                         } else if (ch == '/' || pathCharIndex + 1 == baseLen) {
                             if (ch != '/') {
