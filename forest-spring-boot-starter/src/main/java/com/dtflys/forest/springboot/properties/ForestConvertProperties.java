@@ -10,6 +10,8 @@ public class ForestConvertProperties {
 
     private ForestConverterItemProperties binary;
 
+    private ForestConverterItemProperties protobuf;
+
     public ForestConverterItemProperties getText() {
         return text;
     }
@@ -40,5 +42,13 @@ public class ForestConvertProperties {
 
     public void setBinary(ForestConverterItemProperties binary) {
         this.binary = binary;
+    }
+
+    public ForestConverterItemProperties getProtobuf() {
+        return protobuf;
+    }
+
+    public void setProtobuf(ForestConverterItemProperties protobuf) {
+        this.protobuf = protobuf;
     }
 }

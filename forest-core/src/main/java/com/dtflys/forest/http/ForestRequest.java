@@ -222,7 +222,7 @@ public class ForestRequest<T> {
      * 该字段为列表类型，列表每一项为请求体项,
      * 都为 {@link ForestRequestBody} 子类的对象实例
      */
-    private ForestBody body = new ForestBody();
+    private final ForestBody body;
 
 
     /**
@@ -379,9 +379,15 @@ public class ForestRequest<T> {
     private ForestProxy proxy;
 
     public ForestRequest(ForestConfiguration configuration, ForestMethod method, Object[] arguments) {
+        this(configuration, method, arguments, new ForestBody(configuration));
+    }
+
+
+    public ForestRequest(ForestConfiguration configuration, ForestMethod method, Object[] arguments, ForestBody body) {
         this.configuration = configuration;
         this.method = method;
         this.arguments = arguments;
+        this.body = body;
     }
 
     public ForestRequest(ForestConfiguration configuration, ForestMethod method) {
@@ -1822,7 +1828,6 @@ public class ForestRequest<T> {
 
     @Deprecated
     public void setBodyList(ForestBody body) {
-        this.body = body;
     }
 
     public ForestDataType getDataType() {
@@ -3791,7 +3796,13 @@ public class ForestRequest<T> {
      * @return 新的Forest请求对象
      */
     public ForestRequest<T> clone() {
-        ForestRequest<T> newRequest = new ForestRequest<>(this.configuration, this.method, this.arguments);
+        ForestBody newBody = new ForestBody(configuration);
+        newBody.setBodyType(body.getBodyType());
+        for (ForestRequestBody body : this.body) {
+            newBody.add(body);
+        }
+
+        ForestRequest<T> newRequest = new ForestRequest<>(this.configuration, this.method, this.arguments, body);
         newRequest.backend = this.backend;
         newRequest.lifeCycleHandler = this.lifeCycleHandler;
         newRequest.protocol = this.protocol;
@@ -3799,12 +3810,6 @@ public class ForestRequest<T> {
         newRequest.url = this.url;
         newRequest.query = this.query.clone();
         newRequest.headers = this.headers.clone();
-        ForestBody newBody = new ForestBody();
-        newBody.setBodyType(body.getBodyType());
-        for (ForestRequestBody body : this.body) {
-            newBody.add(body);
-        }
-        newRequest.body = newBody;
         List<ForestMultipart> newMultiparts = new ArrayList<>(this.multiparts.size());
         for (ForestMultipart part : this.multiparts) {
             newMultiparts.add(part);
