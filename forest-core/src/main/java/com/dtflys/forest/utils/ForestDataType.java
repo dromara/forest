@@ -47,32 +47,34 @@ public class ForestDataType {
     public final static Map<String, ForestDataType> DATA_TYPES = new HashMap<>();
 
     /** 数据类型： 自动类型 */
-    public final static ForestDataType AUTO = ForestDataType.createDataType("auto");
+    public final static ForestDataType AUTO = ForestDataType.createDataType("auto", null);
 
     /** 数据类型： 文本类型 */
-    public final static ForestDataType TEXT = ForestDataType.createDataType("text");
+    public final static ForestDataType TEXT = ForestDataType.createDataType("text", false);
 
     /** 数据类型： 表单类型 */
-    public final static ForestDataType FORM = ForestDataType.createDataType("form");
+    public final static ForestDataType FORM = ForestDataType.createDataType("form", true);
 
     /** 数据类型： JSON类型 */
-    public final static ForestDataType JSON = ForestDataType.createDataType("json");
+    public final static ForestDataType JSON = ForestDataType.createDataType("json", true);
 
     /** 数据类型： XML类型 */
-    public final static ForestDataType XML = ForestDataType.createDataType("xml");
+    public final static ForestDataType XML = ForestDataType.createDataType("xml", false);
 
     /** 数据类型： 二进制类型 */
-    public final static ForestDataType BINARY = ForestDataType.createDataType("binary");
+    public final static ForestDataType BINARY = ForestDataType.createDataType("binary", false);
 
     /** 数据类型： 文件类型 */
-    public final static ForestDataType MULTIPART = ForestDataType.createDataType("multipart");
+    public final static ForestDataType MULTIPART = ForestDataType.createDataType("multipart", true);
 
 
     /** 数据类型： Protobuf类型 */
-    public final static ForestDataType PROTOBUF = ForestDataType.createDataType("protobuf");
+    public final static ForestDataType PROTOBUF = ForestDataType.createDataType("protobuf", true);
 
     /** 数据类型名称 */
-    private String name;
+    private final String name;
+
+    private final Boolean hasNameValue;
 
     /**
      * 创建新的数据类型
@@ -81,12 +83,12 @@ public class ForestDataType {
      * @return New instance of {@code com.dtflys.forest.utils.ForestDataType}
      * @since 1.5.0-BETA4
      */
-    public static ForestDataType createDataType(String name) {
+    public static ForestDataType createDataType(String name, Boolean hasNameValue) {
         if (StringUtils.isEmpty(name)) {
             throw new ForestRuntimeException("Data type name cannot be empty!");
         }
         name = name.toLowerCase();
-        ForestDataType dataType = new ForestDataType(name);
+        ForestDataType dataType = new ForestDataType(name, hasNameValue);
         if (DATA_TYPES.containsKey(name)) {
             throw new ForestRuntimeException("Data type '" + name + "' has already been existed!" );
         }
@@ -100,10 +102,12 @@ public class ForestDataType {
      * <p>需要通过静态方法ForestDataType.createDataType或ForestDataType.findOrCreateDataType进行创建</p>
      *
      * @param name Date type name
+     * @param hasNameValue
      * @since 1.5.0-BETA4
      */
-    private ForestDataType(String name) {
+    private ForestDataType(String name, Boolean hasNameValue) {
         this.name = name;
+        this.hasNameValue = hasNameValue;
     }
 
     /**
@@ -140,7 +144,7 @@ public class ForestDataType {
         name = name.toLowerCase();
         ForestDataType dataType = DATA_TYPES.get(name);
         if (dataType == null) {
-            dataType = createDataType(name);
+            dataType = createDataType(name, null);
         }
         return dataType;
     }
@@ -160,6 +164,10 @@ public class ForestDataType {
         }
         ForestDataType that = (ForestDataType) o;
         return Objects.equals(getName(), that.getName());
+    }
+
+    public Boolean hasNameValue() {
+        return hasNameValue;
     }
 
     /**

@@ -1,5 +1,8 @@
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.ForestConverter;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.body.NameValueRequestBody;
 import com.dtflys.forest.http.body.ObjectRequestBody;
 import com.dtflys.forest.http.body.StringRequestBody;
@@ -17,6 +20,8 @@ import java.util.Objects;
 
 public class ForestBody implements List<ForestRequestBody> {
 
+    private final ForestConfiguration configuration;
+
     /**
      * 请求体类型
      */
@@ -29,6 +34,10 @@ public class ForestBody implements List<ForestRequestBody> {
      * 都为 {@link ForestRequestBody} 子类的对象实例
      */
     private List<ForestRequestBody> bodyItems = new LinkedList<>();
+
+    public ForestBody(ForestConfiguration configuration) {
+        this.configuration = configuration;
+    }
 
     /**
      * 根据名称获取键值对类型请求体项
@@ -83,6 +92,39 @@ public class ForestBody implements List<ForestRequestBody> {
         }
         return map;
     }
+
+    public Map<String, Object> nameValuesMapWithObject() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        ForestJsonConverter jsonConverter = configuration.getJsonConverter();
+        boolean hasNameValue = bodyType.hasNameValue() != null && bodyType.hasNameValue();
+        for (ForestRequestBody body : bodyItems) {
+            if (body instanceof NameValueRequestBody) {
+                NameValueRequestBody nameValueRequestBody = (NameValueRequestBody) body;
+                String name = nameValueRequestBody.getName();
+                if (!map.containsKey(name)) {
+                    map.put(name, nameValueRequestBody.getValue());
+                }
+            } else if (body instanceof ObjectRequestBody) {
+                ObjectRequestBody objectRequestBody = (ObjectRequestBody) body;
+                Map<String, Object> keyValueMap = jsonConverter.convertObjectToMap(objectRequestBody);
+                for (Map.Entry<String, Object> entry : keyValueMap.entrySet()) {
+                    String name = entry.getKey();
+                    Object value = entry.getValue();
+                    if (!map.containsKey(name)) {
+                        map.put(name, value);
+                    }
+                }
+            } else if (hasNameValue) {
+                byte[] bytes = body.getByteArray();
+                String str = new String(bytes);
+                ForestConverter converter = configuration.getConverter(bodyType);
+
+            }
+        }
+        return map;
+    }
+
+
 
     public ForestDataType getBodyType() {
         return bodyType;
