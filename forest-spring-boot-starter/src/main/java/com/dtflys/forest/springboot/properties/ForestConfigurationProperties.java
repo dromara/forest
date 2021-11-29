@@ -43,6 +43,11 @@ public class ForestConfigurationProperties {
     private int maxRouteConnections = 500;
 
     /**
+     * maximum number of async requests threads
+     */
+    private int maxAsyncThreadSize = 100;
+
+    /**
      * Timeout in milliseconds
      */
     private int timeout = 3000;
@@ -208,6 +213,14 @@ public class ForestConfigurationProperties {
 
     public void setMaxRouteConnections(int maxRouteConnections) {
         this.maxRouteConnections = maxRouteConnections;
+    }
+
+    public int getMaxAsyncThreadSize() {
+        return maxAsyncThreadSize;
+    }
+
+    public void setMaxAsyncThreadSize(int maxAsyncThreadSize) {
+        this.maxAsyncThreadSize = maxAsyncThreadSize;
     }
 
     public int getTimeout() {

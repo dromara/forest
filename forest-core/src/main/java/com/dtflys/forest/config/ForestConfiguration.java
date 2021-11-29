@@ -25,6 +25,7 @@
 package com.dtflys.forest.config;
 
 
+import com.dtflys.forest.backend.AsyncHttpExecutor;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.backend.HttpBackendSelector;
 import com.dtflys.forest.callback.AddressSource;
@@ -113,6 +114,11 @@ public class ForestConfiguration implements Serializable {
      * maximum number of connections allowed per route
      */
     private Integer maxRouteConnections;
+
+    /**
+     * 最大异步线程池大小
+     */
+    private Integer maxAsyncThreadSize;
 
     /**
      * 是否自动重定向开关
@@ -606,6 +612,29 @@ public class ForestConfiguration implements Serializable {
      */
     public ForestConfiguration setMaxRouteConnections(Integer maxRouteConnections) {
         this.maxRouteConnections = maxRouteConnections;
+        return this;
+    }
+
+    /**
+     * 获取最大异步线程池大小
+     *
+     * @return 最大异步线程池大小
+     */
+    public Integer getMaxAsyncThreadSize() {
+        return maxAsyncThreadSize;
+    }
+
+    /**
+     * 设置最大异步线程池大小
+     *
+     * @param maxAsyncThreadSize 最大异步线程池大小
+     * @return 当前ForestConfiguration实例
+     */
+    public ForestConfiguration setMaxAsyncThreadSize(Integer maxAsyncThreadSize) {
+        this.maxAsyncThreadSize = maxAsyncThreadSize;
+        if (maxAsyncThreadSize != null) {
+            AsyncHttpExecutor.initAsyncThreads(this);
+        }
         return this;
     }
 

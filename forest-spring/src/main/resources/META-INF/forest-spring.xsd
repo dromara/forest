@@ -112,6 +112,16 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="maxAsyncThreadSize" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           Maximum number of async requests threads.
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+
         <xsd:attribute name="maxConnections" type="xsd:string" use="optional">
             <xsd:annotation>
                 <xsd:documentation>
