@@ -256,6 +256,11 @@ public class OkHttp3Executor implements HttpExecutor {
     }
 
     @Override
+    public ForestRequest getRequest() {
+        return this.request;
+    }
+
+    @Override
     public void execute(final LifeCycleHandler lifeCycleHandler) {
         execute(lifeCycleHandler, 0);
     }

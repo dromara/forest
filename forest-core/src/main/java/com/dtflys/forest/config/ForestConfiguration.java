@@ -631,10 +631,10 @@ public class ForestConfiguration implements Serializable {
      * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setMaxAsyncThreadSize(Integer maxAsyncThreadSize) {
-        this.maxAsyncThreadSize = maxAsyncThreadSize;
-        if (maxAsyncThreadSize != null) {
-            AsyncHttpExecutor.initAsyncThreads(this);
+        if (maxAsyncThreadSize != null && maxAsyncThreadSize != this.maxAsyncThreadSize) {
+            AsyncHttpExecutor.initAsyncThreads(maxAsyncThreadSize);
         }
+        this.maxAsyncThreadSize = maxAsyncThreadSize;
         return this;
     }
 
