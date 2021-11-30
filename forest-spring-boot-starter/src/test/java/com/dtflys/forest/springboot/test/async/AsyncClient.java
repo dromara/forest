@@ -2,9 +2,11 @@ package com.dtflys.forest.springboot.test.async;
 
 import com.dtflys.forest.annotation.Post;
 
+import java.util.concurrent.Future;
+
 public interface AsyncClient {
 
-    @Post("http://localhost:{port}/")
-    String postData();
+    @Post(url = "http://localhost:{port}/", async = true)
+    Future<String> postFuture();
 
 }

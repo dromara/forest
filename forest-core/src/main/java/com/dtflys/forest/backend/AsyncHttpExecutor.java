@@ -2,12 +2,10 @@ package com.dtflys.forest.backend;
 
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.handler.LifeCycleHandler;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
-import com.twitter.concurrent.Spool;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -28,7 +26,7 @@ public class AsyncHttpExecutor implements HttpExecutor {
     /**
      * Forest同步请求执行器
      */
-    protected final HttpExecutor executor;
+    protected final HttpExecutor syncExecutor;
 
     /**
      * Forest响应对象处理器
@@ -53,23 +51,20 @@ public class AsyncHttpExecutor implements HttpExecutor {
     /**
      * 初始化异步请求线程池
      *
-     * @param configuration Forest配置对象
+     * @param maxAsyncThreadSize 最大异步线程数
      */
-    public static synchronized void initAsyncThreads(ForestConfiguration configuration) {
-        if (initialized) {
-            return;
-        }
-        Integer asyncThreadSize = configuration.getMaxAsyncThreadSize();
+    public static synchronized void initAsyncThreads(Integer maxAsyncThreadSize) {
+        maxAsyncThreadSize = maxAsyncThreadSize != null ? maxAsyncThreadSize : DEFAULT_MAX_THREAD_SIZE;
+        int coreSize = maxAsyncThreadSize > 10 ? 10 : maxAsyncThreadSize;
         pool = new ThreadPoolExecutor(
-                10, asyncThreadSize != null ? asyncThreadSize : DEFAULT_MAX_THREAD_SIZE,
+                coreSize, maxAsyncThreadSize != null ? maxAsyncThreadSize : DEFAULT_MAX_THREAD_SIZE,
                 3, TimeUnit.MINUTES,
                 new SynchronousQueue<>(),
                 tf -> {
                     Thread thread = new Thread(tf, "forest-async-" + threadCount.getAndIncrement());
                     thread.setDaemon(true);
                     return thread;
-                });
-        initialized = true;
+                }, new AsyncAbortPolicy());
     }
 
     /**
@@ -84,17 +79,44 @@ public class AsyncHttpExecutor implements HttpExecutor {
         return pool.getPoolSize();
     }
 
-    public AsyncHttpExecutor(ForestConfiguration configuration, HttpExecutor executor, ResponseHandler responseHandler) {
+    public AsyncHttpExecutor(ForestConfiguration configuration, HttpExecutor syncExecutor, ResponseHandler responseHandler) {
         this.configuration = configuration;
-        this.executor = executor;
+        this.syncExecutor = syncExecutor;
         this.responseHandler = responseHandler;
     }
 
-    @Override
-    public void execute(LifeCycleHandler lifeCycleHandler) {
-        final CompletableFuture future = new CompletableFuture();
-        pool.submit(() -> {
+    public static class AsyncTask implements Runnable {
+
+        private final CompletableFuture future;
+
+        private final HttpExecutor executor;
+
+        private final LifeCycleHandler lifeCycleHandler;
+
+        private String threadName;
+
+        public AsyncTask(CompletableFuture future, HttpExecutor executor, LifeCycleHandler lifeCycleHandler) {
+            this.future = future;
+            this.executor = executor;
+            this.lifeCycleHandler = lifeCycleHandler;
+        }
+
+        public HttpExecutor getExecutor() {
+            return executor;
+        }
+
+        public CompletableFuture getFuture() {
+            return future;
+        }
+
+        public LifeCycleHandler getLifeCycleHandler() {
+            return lifeCycleHandler;
+        }
+
+        @Override
+        public void run() {
             try {
+                this.threadName = Thread.currentThread().getName();
                 executor.execute(lifeCycleHandler);
                 if (lifeCycleHandler instanceof MethodLifeCycleHandler) {
                     Object result = ((MethodLifeCycleHandler<?>) lifeCycleHandler).getResultData();
@@ -105,7 +127,19 @@ public class AsyncHttpExecutor implements HttpExecutor {
             } catch (Throwable th) {
                 future.completeExceptionally(th);
             }
-        });
+
+        }
+    }
+
+    @Override
+    public ForestRequest getRequest() {
+        return syncExecutor.getRequest();
+    }
+
+    @Override
+    public void execute(LifeCycleHandler lifeCycleHandler) {
+        final CompletableFuture future = new CompletableFuture();
+        pool.submit(new AsyncTask(future, syncExecutor, lifeCycleHandler));
         responseHandler.handleFuture(future);
     }
 

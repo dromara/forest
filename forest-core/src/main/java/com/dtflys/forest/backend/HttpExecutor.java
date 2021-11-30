@@ -1,6 +1,7 @@
 package com.dtflys.forest.backend;
 
 import com.dtflys.forest.handler.LifeCycleHandler;
+import com.dtflys.forest.http.ForestRequest;
 
 /**
  * HTTP执行器
@@ -8,6 +9,8 @@ import com.dtflys.forest.handler.LifeCycleHandler;
  * @since 2017-04-20 13:33
  */
 public interface HttpExecutor {
+
+    ForestRequest getRequest();
 
     void execute(LifeCycleHandler lifeCycleHandler);
 

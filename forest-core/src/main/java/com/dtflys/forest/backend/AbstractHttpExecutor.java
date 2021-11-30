@@ -23,6 +23,9 @@ public abstract class AbstractHttpExecutor implements HttpExecutor {
         this.requestSender = requestSender;
     }
 
+    public ForestRequest getRequest() {
+        return request;
+    }
 
     @Override
     public abstract void execute(LifeCycleHandler lifeCycleHandler);
