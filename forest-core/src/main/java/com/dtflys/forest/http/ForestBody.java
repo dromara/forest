@@ -78,7 +78,8 @@ public class ForestBody implements List<ForestRequestBody> {
     }
 
     /**
-     * 获取所有键值对请求体项
+     * 获取请求体中的键值对
+     * <p>仅包含{@link NameValueRequestBody}类型请求体项数据
      *
      * @return 键值对类型请求体项组成的 {@link Map}
      */
@@ -96,6 +97,12 @@ public class ForestBody implements List<ForestRequestBody> {
         return map;
     }
 
+    /**
+     * 获取请求体中的键值对
+     * <p>包含{@link NameValueRequestBody}类型请求体项、以及{@link ObjectRequestBody}类请求体项拆解出来的键值对数据
+     *
+     * @return
+     */
     public Map<String, Object> nameValuesMapWithObject() {
         Map<String, Object> map = new LinkedHashMap<>();
         ForestJsonConverter jsonConverter = configuration.getJsonConverter();
