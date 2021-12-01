@@ -24,8 +24,6 @@ import java.util.*;
  */
 public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
 
-    private static final DefaultTextConverter textConverter = new DefaultTextConverter();
-
     /**
      * 构建请求体
      * @param httpRequest 后端http请求对象

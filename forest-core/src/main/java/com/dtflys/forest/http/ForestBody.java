@@ -3,6 +3,9 @@ package com.dtflys.forest.http;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
+import com.dtflys.forest.http.body.ByteArrayRequestBody;
+import com.dtflys.forest.http.body.FileRequestBody;
+import com.dtflys.forest.http.body.InputStreamRequestBody;
 import com.dtflys.forest.http.body.NameValueRequestBody;
 import com.dtflys.forest.http.body.ObjectRequestBody;
 import com.dtflys.forest.http.body.StringRequestBody;
@@ -96,7 +99,6 @@ public class ForestBody implements List<ForestRequestBody> {
     public Map<String, Object> nameValuesMapWithObject() {
         Map<String, Object> map = new LinkedHashMap<>();
         ForestJsonConverter jsonConverter = configuration.getJsonConverter();
-        boolean hasNameValue = bodyType.hasNameValue() != null && bodyType.hasNameValue();
         for (ForestRequestBody body : bodyItems) {
             if (body instanceof NameValueRequestBody) {
                 NameValueRequestBody nameValueRequestBody = (NameValueRequestBody) body;
@@ -106,7 +108,7 @@ public class ForestBody implements List<ForestRequestBody> {
                 }
             } else if (body instanceof ObjectRequestBody) {
                 ObjectRequestBody objectRequestBody = (ObjectRequestBody) body;
-                Map<String, Object> keyValueMap = jsonConverter.convertObjectToMap(objectRequestBody);
+                Map<String, Object> keyValueMap = jsonConverter.convertObjectToMap(objectRequestBody.getObject());
                 for (Map.Entry<String, Object> entry : keyValueMap.entrySet()) {
                     String name = entry.getKey();
                     Object value = entry.getValue();
@@ -114,16 +116,45 @@ public class ForestBody implements List<ForestRequestBody> {
                         map.put(name, value);
                     }
                 }
-            } else if (hasNameValue) {
-                byte[] bytes = body.getByteArray();
-                String str = new String(bytes);
-                ForestConverter converter = configuration.getConverter(bodyType);
-
             }
         }
         return map;
     }
 
+    public  <T extends ForestRequestBody> List<T> getItems(Class<T> bodyItemClass) {
+        List<T> items = new LinkedList<>();
+        for (ForestRequestBody item : bodyItems) {
+            Class itemClass = item.getClass();
+            if (bodyItemClass.isAssignableFrom(itemClass)) {
+                items.add((T) item);
+            }
+        }
+        return items;
+    }
+
+    public List<StringRequestBody> getStringItems() {
+        return getItems(StringRequestBody.class);
+    }
+
+    public List<NameValueRequestBody> getNameValueItems() {
+        return getItems(NameValueRequestBody.class);
+    }
+
+    public List<ObjectRequestBody> getObjectItems() {
+        return getItems(ObjectRequestBody.class);
+    }
+
+    public List<ByteArrayRequestBody> getByteArrayItems() {
+        return getItems(ByteArrayRequestBody.class);
+    }
+
+    public List<InputStreamRequestBody> getInputStreamItems() {
+        return getItems(InputStreamRequestBody.class);
+    }
+
+    public List<FileRequestBody> getFileItems() {
+        return getItems(FileRequestBody.class);
+    }
 
 
     public ForestDataType getBodyType() {

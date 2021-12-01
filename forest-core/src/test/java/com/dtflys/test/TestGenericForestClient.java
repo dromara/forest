@@ -37,6 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.entry;
 import static org.assertj.core.api.AssertionsForClassTypes.linesOf;
 
 public class TestGenericForestClient extends BaseClientTest {
@@ -575,11 +576,12 @@ public class TestGenericForestClient extends BaseClientTest {
     public void testRequest_post_form_body_keys() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         TypeReference<Result<Integer>> typeReference = new TypeReference<Result<Integer>>() {};
-        Result<Integer> result = Forest.post("http://localhost:" + server.getPort() + "/post")
+        ForestRequest request = Forest.post("http://localhost:" + server.getPort() + "/post")
                 .contentFormUrlEncoded()
                 .addBody("a", 1)
-                .addBody("b", 2)
-                .execute(typeReference);
+                .addBody("b", 2);
+        assertThat(request.body().nameValuesMapWithObject()).extracting("a", "b").contains(1, 2);
+        Result<Integer> result = (Result<Integer>) request.execute(typeReference);
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(1);
         assertThat(result.getData()).isEqualTo(2);
@@ -700,11 +702,14 @@ public class TestGenericForestClient extends BaseClientTest {
         Map<String, Integer> map = new LinkedHashMap<>();
         map.put("a", 1);
         map.put("b", 2);
-        Result<Integer> result = Forest.post("http://localhost:" + server.getPort() + "/post")
+        ForestRequest request = Forest.post("http://localhost:" + server.getPort() + "/post")
                 .contentTypeJson()
                 .addBody(map)
-                .addBody("c", 3)
-                .execute(typeReference);
+                .addBody("c", 3);
+        assertThat(request.body().nameValuesMapWithObject())
+                .extracting("a", "b", "c")
+                .contains(1, 2, 3);
+        Result<Integer> result = (Result<Integer>) request.execute(typeReference);
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(1);
         assertThat(result.getData()).isEqualTo(2);
