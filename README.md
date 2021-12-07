@@ -41,6 +41,7 @@
 
 <h1 align="center">Forest - 声明式HTTP客户端框架</h1>
 
+[2021年度OSC中国开源项目评选，请投Forest一票!](https://www.oschina.net/project/top_cn_2021/?id=573)
 
 项目介绍：
 -------------------------------------
