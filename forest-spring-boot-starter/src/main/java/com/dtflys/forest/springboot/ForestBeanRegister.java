@@ -5,29 +5,33 @@ import com.dtflys.forest.config.SpringForestProperties;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.interceptor.SpringInterceptorFactory;
-import com.dtflys.forest.spring.ConverterBeanListener;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.reflection.SpringForestObjectFactory;
 import com.dtflys.forest.scanner.ClassPathClientScanner;
 import com.dtflys.forest.schema.ForestConfigurationBeanDefinitionParser;
+import com.dtflys.forest.spring.ConverterBeanListener;
 import com.dtflys.forest.springboot.annotation.ForestScannerRegister;
+import com.dtflys.forest.springboot.properties.ForestConfigurationProperties;
+import com.dtflys.forest.springboot.properties.ForestConvertProperties;
 import com.dtflys.forest.springboot.properties.ForestConverterItemProperties;
 import com.dtflys.forest.springboot.properties.ForestSSLKeyStoreProperties;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
-import com.dtflys.forest.springboot.properties.ForestConfigurationProperties;
-import com.dtflys.forest.springboot.properties.ForestConvertProperties;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.ManagedMap;
+import org.springframework.boot.context.properties.bind.BindResult;
+import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.cglib.core.ReflectUtils;
-import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.EnvironmentAware;
 import org.springframework.context.ResourceLoaderAware;
+import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.type.AnnotationMetadata;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Constructor;
@@ -37,27 +41,28 @@ import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Map;
 
-public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcessor {
-
-    private final ConfigurableApplicationContext applicationContext;
+public class ForestBeanRegister implements ResourceLoaderAware, EnvironmentAware, ImportBeanDefinitionRegistrar {
 
     private ResourceLoader resourceLoader;
 
-    private ForestConfigurationProperties forestConfigurationProperties;
-
-
-    public ForestBeanRegister(ConfigurableApplicationContext applicationContext, ForestConfigurationProperties forestConfigurationProperties) {
-        this.applicationContext = applicationContext;
-        this.forestConfigurationProperties = forestConfigurationProperties;
-    }
+    private Environment environment;
 
     @Override
     public void setResourceLoader(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
     }
 
+    @Override
+    public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) throws BeansException {
+        BindResult<ForestConfigurationProperties> forest = Binder.get(environment)
+                .bind("forest", ForestConfigurationProperties.class);
+        if (!forest.isBound()) {
+            forest.orElseThrow(() -> new IllegalStateException("forest property bound failed"));
+        }
+        registerForestConfiguration(forest.get(), registry);
+    }
 
-    public ForestConfiguration registerForestConfiguration(ForestConfigurationProperties forestConfigurationProperties) {
+    public ForestConfiguration registerForestConfiguration(ForestConfigurationProperties forestConfigurationProperties, BeanDefinitionRegistry registry) {
         BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(ForestConfiguration.class);
         String id = forestConfigurationProperties.getBeanId();
         if (StringUtils.isBlank(id)) {
@@ -105,13 +110,13 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
                 .setLazyInit(false)
                 .setFactoryMethod("configuration");
 
-        BeanDefinition forestPropertiesBean  = registerForestPropertiesBean();
+        BeanDefinition forestPropertiesBean = registerForestPropertiesBean(registry);
         beanDefinitionBuilder.addPropertyValue("properties", forestPropertiesBean);
 
-        BeanDefinition forestObjectFactoryBeanDefinition = registerForestObjectFactoryBean();
+        BeanDefinition forestObjectFactoryBeanDefinition = registerForestObjectFactoryBean(registry);
         beanDefinitionBuilder.addPropertyValue("forestObjectFactory", forestObjectFactoryBeanDefinition);
 
-        BeanDefinition interceptorFactoryBeanDefinition = registerInterceptorFactoryBean();
+        BeanDefinition interceptorFactoryBeanDefinition = registerInterceptorFactoryBean(registry);
         beanDefinitionBuilder.addPropertyValue("interceptorFactory", interceptorFactoryBeanDefinition);
 
         List<ForestSSLKeyStoreProperties> sslKeyStorePropertiesList = forestConfigurationProperties.getSslKeyStores();
@@ -122,11 +127,10 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
 
         BeanDefinition beanDefinition = beanDefinitionBuilder.getRawBeanDefinition();
         beanDefinition.getPropertyValues().addPropertyValue("sslKeyStores", sslKeystoreMap);
+        registry.registerBeanDefinition(id, beanDefinition);
 
-        BeanDefinitionRegistry beanFactory = (BeanDefinitionRegistry) applicationContext.getBeanFactory();
-        beanFactory.registerBeanDefinition(id, beanDefinition);
-
-        ForestConfiguration configuration = applicationContext.getBean(id, ForestConfiguration.class);
+        ConfigurableBeanFactory beanFactory = registry instanceof ConfigurableBeanFactory ? (ConfigurableBeanFactory) registry : null;
+        ForestConfiguration configuration = beanFactory.getBean(id, ForestConfiguration.class);
 
         Map<String, Class> filters = forestConfigurationProperties.getFilters();
         for (Map.Entry<String, Class> entry : filters.entrySet()) {
@@ -142,17 +146,19 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
             registerConverter(configuration, ForestDataType.XML, convertProperties.getXml());
             registerConverter(configuration, ForestDataType.BINARY, convertProperties.getBinary());
         }
-        registerConverterBeanListener(configuration);
+
+        registerConverterBeanListener(registry, configuration);
+        //beanFactory.getBean("forestConverterBeanListener", ConverterBeanListener.class);
+
+        registerScanner(registry);
         return configuration;
     }
 
-    public ConverterBeanListener registerConverterBeanListener(ForestConfiguration forestConfiguration) {
+    public void registerConverterBeanListener(BeanDefinitionRegistry beanDefinitionRegistry, ForestConfiguration forestConfiguration) {
         BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(ConverterBeanListener.class);
         BeanDefinition beanDefinition = beanDefinitionBuilder.getRawBeanDefinition();
         beanDefinition.getPropertyValues().addPropertyValue("forestConfiguration", forestConfiguration);
-        BeanDefinitionRegistry beanFactory = (BeanDefinitionRegistry) applicationContext.getBeanFactory();
-        beanFactory.registerBeanDefinition("forestConverterBeanListener", beanDefinition);
-        return applicationContext.getBean("forestConverterBeanListener", ConverterBeanListener.class);
+        beanDefinitionRegistry.registerBeanDefinition("forestConverterBeanListener", beanDefinition);
     }
 
 
@@ -172,7 +178,7 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
                         break;
                     } else if (params.length == 1 &&
                             ForestConfiguration.class.isAssignableFrom(constructor.getParameterTypes()[0])) {
-                        converter = (ForestConverter) constructor.newInstance(new Object[] {constructor});
+                        converter = (ForestConverter) constructor.newInstance(new Object[]{constructor});
                         break;
                     }
                 }
@@ -208,29 +214,26 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
         }
     }
 
-    public BeanDefinition registerForestPropertiesBean() {
+    public BeanDefinition registerForestPropertiesBean(BeanDefinitionRegistry beanDefinitionRegistry) {
         BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(SpringForestProperties.class);
         BeanDefinition beanDefinition = beanDefinitionBuilder.getRawBeanDefinition();
-        BeanDefinitionRegistry beanFactory = (BeanDefinitionRegistry) applicationContext.getBeanFactory();
-        beanFactory.registerBeanDefinition("forestProperties", beanDefinition);
+        beanDefinitionRegistry.registerBeanDefinition("forestProperties", beanDefinition);
         return beanDefinition;
     }
 
 
-    public BeanDefinition registerForestObjectFactoryBean() {
+    public BeanDefinition registerForestObjectFactoryBean(BeanDefinitionRegistry beanDefinitionRegistry) {
         BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(SpringForestObjectFactory.class);
         BeanDefinition beanDefinition = beanDefinitionBuilder.getRawBeanDefinition();
-        BeanDefinitionRegistry beanFactory = (BeanDefinitionRegistry) applicationContext.getBeanFactory();
-        beanFactory.registerBeanDefinition("forestObjectFactory", beanDefinition);
+        beanDefinitionRegistry.registerBeanDefinition("forestObjectFactory", beanDefinition);
         return beanDefinition;
     }
 
 
-    public BeanDefinition registerInterceptorFactoryBean() {
+    public BeanDefinition registerInterceptorFactoryBean(BeanDefinitionRegistry beanDefinitionRegistry) {
         BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(SpringInterceptorFactory.class);
         BeanDefinition beanDefinition = beanDefinitionBuilder.getRawBeanDefinition();
-        BeanDefinitionRegistry beanFactory = (BeanDefinitionRegistry) applicationContext.getBeanFactory();
-        beanFactory.registerBeanDefinition("forestInterceptorFactory", beanDefinition);
+        beanDefinitionRegistry.registerBeanDefinition("forestInterceptorFactory", beanDefinition);
         return beanDefinition;
     }
 
@@ -257,11 +260,9 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
         return beanDefinition;
     }
 
-    public ClassPathClientScanner registerScanner(ForestConfigurationProperties forestConfigurationProperties) {
+    public ClassPathClientScanner registerScanner(BeanDefinitionRegistry registry) {
         List<String> basePackages = ForestScannerRegister.getBasePackages();
         String configurationId = ForestScannerRegister.getConfigurationId();
-
-        BeanDefinitionRegistry registry = (BeanDefinitionRegistry) applicationContext.getBeanFactory();
 
         ClassPathClientScanner scanner = new ClassPathClientScanner(configurationId, registry);
         // this check is needed in Spring 3.1
@@ -276,19 +277,9 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
         return scanner;
     }
 
-
-    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        registerForestConfiguration(forestConfigurationProperties);
-        registerScanner(forestConfigurationProperties);
-    }
-
     @Override
-    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-        return bean;
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
     }
 
-    @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        return bean;
-    }
 }
