@@ -628,6 +628,15 @@ public abstract class ForestResponse<T> {
     }
 
     /**
+     * 获取请求响应的内容编码字符集
+     *
+     * @return 编码字符集
+     */
+    public String getCharset() {
+        return charset;
+    }
+
+    /**
      * 把字节数组转换成字符串（自动根据字符串编码转换）
      *
      * @param bytes 字节数组
