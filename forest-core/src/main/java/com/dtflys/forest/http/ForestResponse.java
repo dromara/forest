@@ -646,7 +646,7 @@ public abstract class ForestResponse<T> {
                 isGzip = false;
             }
         }
-        if ("GB".startsWith(charset)) {
+        if (org.apache.commons.lang3.StringUtils.startsWithIgnoreCase(charset, "GB")) {
             // 返回的GB中文编码会有多种编码类型，这里统一使用GBK编码
             charset = "GBK";
         }
