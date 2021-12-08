@@ -19,6 +19,12 @@ public interface SSLClient {
     String truestAllGet();
 
     @Request(
+            url = "https://{0}:5555/hello/user",
+            keyStore = "ssl_client2"
+    )
+    String testHostVerifier(String domain);
+
+    @Request(
             url = "https://localhost:5555/hello/user",
             sslProtocol = "${sslProtocol}"
     )

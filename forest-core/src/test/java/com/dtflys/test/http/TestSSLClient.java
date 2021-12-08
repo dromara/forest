@@ -2,6 +2,7 @@ package com.dtflys.test.http;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.ssl.SSLKeyStore;
@@ -16,6 +17,9 @@ import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 
 import static com.github.dreamhead.moco.Moco.*;
@@ -23,6 +27,7 @@ import static com.github.dreamhead.moco.Runner.runner;
 import static com.github.dreamhead.moco.HttpsCertificate.certificate;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.*;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -82,6 +87,23 @@ public class TestSSLClient extends BaseClientTest {
                 null,
                 new MySSLSocketFactoryBuilder());
         configuration.registerKeyStore(sslKeyStore);
+
+        SSLKeyStore sslKeyStore2 = new SSLKeyStore(
+                "ssl_client2",
+                "ssl_client.keystore",
+                "client",
+                "456789",
+                new HostnameVerifier() {
+                    @Override
+                    public boolean verify(String s, SSLSession sslSession) {
+                        if ("localhost".equals(s)) {
+                            return false;
+                        }
+                        return true;
+                    }
+                },
+                new MySSLSocketFactoryBuilder());
+        configuration.registerKeyStore(sslKeyStore2);
     }
 
 
@@ -114,6 +136,28 @@ public class TestSSLClient extends BaseClientTest {
         assertNotNull(result);
         assertEquals(EXPECTED, result);
     }
+
+    @Test
+    public void testHostVerifier() {
+        sslClient.truestAllGet();
+        Throwable th = null;
+        String result = null;
+        try {
+            result = sslClient.testHostVerifier("localhost");
+        } catch (ForestRuntimeException ex) {
+            th = ex.getCause();
+        }
+        assertThat(th).isNotNull().isInstanceOf(SSLPeerUnverifiedException.class);
+        th = null;
+        try {
+            result = sslClient.testHostVerifier("127.0.0.1");
+        } catch (ForestRuntimeException ex) {
+            th = ex.getCause();
+        }
+        assertThat(th).isNull();
+        assertThat(result).isNotNull().isEqualTo(EXPECTED);
+    }
+
 
     @Test
     public void truestSSLGet() {

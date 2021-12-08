@@ -343,6 +343,7 @@ public class ForestConfiguration implements Serializable {
         configuration.setTimeout(3000);
         configuration.setMaxConnections(500);
         configuration.setMaxRouteConnections(500);
+        configuration.setMaxAsyncThreadSize(AsyncHttpExecutor.DEFAULT_MAX_THREAD_SIZE);
         configuration.setRetryer(BackOffRetryer.class);
         configuration.setMaxRetryCount(0);
         configuration.setMaxRetryInterval(0);

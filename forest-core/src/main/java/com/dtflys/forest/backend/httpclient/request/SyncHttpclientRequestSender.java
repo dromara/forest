@@ -1,6 +1,7 @@
 package com.dtflys.forest.backend.httpclient.request;
 
 import com.dtflys.forest.backend.AbstractHttpExecutor;
+import com.dtflys.forest.backend.httpclient.conn.ForestSSLConnectionFactory;
 import com.dtflys.forest.backend.httpclient.conn.HttpclientConnectionManager;
 import com.dtflys.forest.backend.httpclient.response.HttpclientForestResponseFactory;
 import com.dtflys.forest.backend.httpclient.response.HttpclientResponseHandler;
@@ -80,6 +81,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
         ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
         try {
             logRequest(request.getCurrentRetryCount(), (HttpRequestBase) httpRequest);
+            connectionManager.hostnameVerifier(request);
             httpResponse = client.execute(httpRequest);
         } catch (Throwable e) {
             httpRequest.abort();

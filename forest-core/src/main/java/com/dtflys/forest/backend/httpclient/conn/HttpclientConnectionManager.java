@@ -29,12 +29,13 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 
+import javax.net.ssl.SSLPeerUnverifiedException;
+
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-04-20 17:23
  */
 public class HttpclientConnectionManager implements ForestConnectionManager {
-    private HttpParams httpParams;
     private static PoolingHttpClientConnectionManager tsConnectionManager;
 
     private final ForestSSLConnectionFactory sslConnectFactory = new ForestSSLConnectionFactory();
@@ -45,7 +46,6 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
     @Override
     public void init(ForestConfiguration configuration) {
         try {
-            httpParams = new BasicHttpParams();
             Integer maxConnections = configuration.getMaxConnections() != null ?
                     configuration.getMaxConnections() : HttpConnectionConstants.DEFAULT_MAX_TOTAL_CONNECTIONS;
             Integer maxRouteConnections = configuration.getMaxRouteConnections() != null ?
@@ -55,7 +55,6 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
                             .register("https", sslConnectFactory)
                             .register("http", new PlainConnectionSocketFactory())
                             .build();
-
             tsConnectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
             tsConnectionManager.setMaxTotal(maxConnections);
             tsConnectionManager.setDefaultMaxPerRoute(maxRouteConnections);
@@ -123,6 +122,11 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
                 .disableContentCompression()
                 .build();
         return httpClient;
+    }
+
+
+    public void hostnameVerifier(ForestRequest request) throws SSLPeerUnverifiedException {
+        sslConnectFactory.verifyHostname(request, request.host());;
     }
 
     public void afterConnect() {

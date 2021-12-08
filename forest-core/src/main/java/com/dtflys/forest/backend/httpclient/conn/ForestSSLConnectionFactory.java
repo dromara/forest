@@ -4,6 +4,9 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.ssl.SSLUtils;
+import okhttp3.CertificatePinner;
+import okhttp3.internal.tls.OkHostnameVerifier;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
 import org.apache.http.conn.ssl.BrowserCompatHostnameVerifier;
@@ -16,6 +19,8 @@ import org.apache.http.util.TextUtils;
 import javax.net.SocketFactory;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
@@ -23,6 +28,9 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.util.List;
 
 //import org.apache.http.annotation.ThreadSafe;
 
@@ -31,7 +39,9 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
     public static final X509HostnameVerifier BROWSER_COMPATIBLE_HOSTNAME_VERIFIER = new BrowserCompatHostnameVerifier();
 
     private final static ThreadLocal<ForestRequest> REQUEST_LOCAL = new ThreadLocal<>();
-    private final HostnameVerifier hostnameVerifier;
+
+    private SSLSocket sslSocket;
+
 
 
     private static String[] split(String s) {
@@ -40,12 +50,6 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
 
 
     public ForestSSLConnectionFactory() {
-        this(BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
-    }
-
-
-    public ForestSSLConnectionFactory(HostnameVerifier hostnameVerifier) {
-        this.hostnameVerifier = hostnameVerifier != null?hostnameVerifier:BROWSER_COMPATIBLE_HOSTNAME_VERIFIER;
     }
 
     protected void prepareSocket(SSLSocket socket) throws IOException {
@@ -78,9 +82,8 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
         }
 
         if(sock instanceof SSLSocket) {
-            SSLSocket sslsock = (SSLSocket)sock;
-            sslsock.startHandshake();
-            this.verifyHostname(host.getHostName(), sslsock);
+            SSLSocket sslSocket = (SSLSocket)sock;
+            sslSocket.startHandshake();
             return sock;
         } else {
             return this.createLayeredSocket(sock, host.getHostName(), remoteAddress.getPort(), context);
@@ -112,21 +115,8 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
             throw new ForestRuntimeException("Current request is NULL!");
         }
 
-        try {
-            SSLContext sslContext = SSLUtils.getSSLContext(request, request.getSslProtocol());
-            SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext);
-        } catch (KeyManagementException e) {
-            throw new ForestRuntimeException(e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new ForestRuntimeException(e);
-        }
-
-
         SSLSocketFactory sslSocketFactory = SSLUtils.getSSLSocketFactory(request, request.getSslProtocol());
-
-
-        SSLSocket sslSocket = (SSLSocket) sslSocketFactory.createSocket(socket, target, port, true);
-
+        this.sslSocket = (SSLSocket) sslSocketFactory.createSocket(socket, target, port, true);
 
         if (request != null) {
             SSLKeyStore keyStore = request.getKeyStore();
@@ -142,15 +132,30 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
             }
         }
         this.prepareSocket(sslSocket);
-        sslSocket.startHandshake();
-        this.verifyHostname(target, sslSocket);
+        this.sslSocket.startHandshake();
         return sslSocket;
     }
 
 
+    public void verifyHostname(ForestRequest request, String hostname) throws SSLPeerUnverifiedException {
+        if (sslSocket == null) {
+            return;
+        }
+        SSLSession session = this.sslSocket.getSession();
+        if (!request.hostnameVerifier().verify(hostname, sslSocket.getSession())) {
+            Certificate[] certs = session.getPeerCertificates();
+            if (ArrayUtils.isEmpty(certs)) {
+                X509Certificate cert = (X509Certificate) certs[0];
+                throw new SSLPeerUnverifiedException(
+                        "Hostname " + hostname + " not verified:"
+                                + "\n    certificate: " + CertificatePinner.pin(cert)
+                                + "\n    DN: " + cert.getSubjectDN().getName()
+                                + "\n    subjectAltNames: " + OkHostnameVerifier.allSubjectAltNames(cert));
+            } else {
+                throw new SSLPeerUnverifiedException(
+                        "Hostname " + hostname + " not verified (no certificates)");
+            }
+        }
 
-
-    private void verifyHostname(String hostname, SSLSocket sslSocket) {
-        this.hostnameVerifier.verify(hostname, sslSocket.getSession());
     }
 }

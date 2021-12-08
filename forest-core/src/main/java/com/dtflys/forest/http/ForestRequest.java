@@ -2136,7 +2136,11 @@ public class ForestRequest<T> {
         if (keyStore == null) {
             return TrustAllHostnameVerifier.DEFAULT;
         }
-        return keyStore.getHostnameVerifier();
+        HostnameVerifier hostnameVerifier = keyStore.getHostnameVerifier();
+        if (hostnameVerifier == null) {
+            hostnameVerifier = TrustAllHostnameVerifier.DEFAULT;
+        }
+        return hostnameVerifier;
     }
 
     /**

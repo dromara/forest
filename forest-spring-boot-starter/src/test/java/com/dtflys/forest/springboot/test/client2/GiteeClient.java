@@ -32,4 +32,12 @@ public interface GiteeClient {
     ForestRequest<String> index2();
 
 
+    @Request(
+            url = "https://baidu.com/",
+            timeout = 80000,
+            keyStore = "keystore1"
+    )
+    String index3();
+
+
 }

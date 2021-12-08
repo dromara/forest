@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class AsyncHttpExecutor implements HttpExecutor {
 
-    protected final static Integer DEFAULT_MAX_THREAD_SIZE = 100;
+    public final static Integer DEFAULT_MAX_THREAD_SIZE = 100;
 
     protected final ForestConfiguration configuration;
 

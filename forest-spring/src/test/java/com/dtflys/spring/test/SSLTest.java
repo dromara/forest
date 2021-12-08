@@ -1,9 +1,11 @@
 package com.dtflys.spring.test;
 
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.spring.test.client0.BeastshopClient;
 import com.dtflys.spring.test.client1.BaiduClient;
+import com.dtflys.spring.test.ssl.MyHostnameVerifier;
 import com.dtflys.spring.test.ssl.MySSLSocketFactoryBuilder;
 import junit.framework.TestCase;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -32,11 +34,21 @@ public class SSLTest extends TestCase {
         assertEquals("123456", keyStore.getKeystorePass());
         assertEquals("jks", keyStore.getKeystoreType());
         assertThat(keyStore.getSslSocketFactoryBuilder()).isNotNull().isInstanceOf(MySSLSocketFactoryBuilder.class);
+        assertThat(keyStore.getHostnameVerifier()).isNotNull().isInstanceOf(MyHostnameVerifier.class);
         BeastshopClient beastshopClient =
                 (BeastshopClient) applicationContext.getBean("beastshopClient");
         assertNotNull(beastshopClient);
         String result = beastshopClient.index();
         assertNotNull(result);
+
+        Throwable th = null;
+        try {
+            beastshopClient.index2();
+        } catch (ForestRuntimeException ex) {
+            th = ex.getCause();
+        }
+        assertThat(th).isNotNull();
+
     }
 
 }
