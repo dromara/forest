@@ -26,4 +26,14 @@ public interface GzipClient {
     @Get("/${0}")
     @DecompressGzip
     ForestResponse<String> transaction(String infno);
+
+    /**
+     * 调用接口的公共请求
+     *
+     * @param infno
+     * @return
+     */
+    @Get("/${0}")
+    ForestResponse<String> transaction_without_annotation(String infno);
+
 }

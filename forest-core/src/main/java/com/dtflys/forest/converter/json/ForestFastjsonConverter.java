@@ -92,9 +92,11 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
      * @param serializerFeatureName FastJson的序列化特性名字符串
      */
     public void setSerializerFeatureName(String serializerFeatureName) {
-        this.serializerFeatureName = serializerFeatureName;
-        SerializerFeature feature = SerializerFeature.valueOf(serializerFeatureName);
-        setSerializerFeature(feature);
+        if (StringUtils.isNotBlank(serializerFeatureName)) {
+            this.serializerFeatureName = serializerFeatureName;
+            SerializerFeature feature = SerializerFeature.valueOf(serializerFeatureName);
+            setSerializerFeature(feature);
+        }
     }
 
     /**

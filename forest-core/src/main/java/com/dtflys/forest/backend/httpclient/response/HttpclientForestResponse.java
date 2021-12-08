@@ -4,20 +4,16 @@ import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.utils.GzipUtils;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.Header;
-import org.apache.http.HeaderIterator;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
+import org.apache.http.*;
 import org.apache.http.util.EntityUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 /**
@@ -47,29 +43,14 @@ public class HttpclientForestResponse extends ForestResponse {
                 if (type != null) {
                     this.contentType = new ContentType(type.getValue());
                 }
-                Header encoding = entity.getContentEncoding();
+                //响应消息的编码格式: gzip...
+                setupContentEncoding();
+                //响应文本的字符串编码
+                setupResponseCharset();
+                //是否将Response数据按GZIP来解压
+                setupGzip();
+                setupContent();
                 this.contentLength = entity.getContentLength();
-                // 是否将Response数据按GZIP来解压
-                isGzip = request.isDecompressResponseGzipEnabled();
-                if (StringUtils.isNotBlank(request.getResponseEncode())) {
-                    this.contentEncoding = request.getResponseEncode();
-                } else if (contentType != null) {
-                    this.contentEncoding = this.contentType.getCharset();
-                }
-                if (this.contentEncoding == null && encoding != null) {
-                    this.contentEncoding = encoding.getValue();
-                    Charset charset;
-                    try {
-                        charset = Charset.forName(contentEncoding);
-                    } catch (Throwable th) {
-                        charset = StandardCharsets.UTF_8;
-                    }
-                    if (!charset.name().equals(this.contentEncoding)) {
-                        this.contentEncoding = null;
-                    }
-                }
-
-                this.content = buildContent();
             } else {
                 this.bytes = new byte[0];
                 this.content = "";
@@ -79,6 +60,68 @@ public class HttpclientForestResponse extends ForestResponse {
         }
     }
 
+    private void setupContentEncoding() {
+        Header contentEncodingHeader = entity.getContentEncoding();
+        if(contentEncodingHeader!= null){
+            this.contentEncoding = contentEncodingHeader.getValue();
+        }
+    }
+
+    private void setupResponseCharset() {
+        if (StringUtils.isNotBlank(request.getResponseEncode())) {
+            this.charset = request.getResponseEncode();
+        } else if (contentType != null) {
+            this.charset = this.contentType.getCharset();
+        } else {
+            if (this.contentEncoding != null) {
+                try {
+                    Charset.forName(this.contentEncoding);
+                    this.charset = this.contentEncoding;
+                } catch (Throwable ignored) {
+                }
+            }
+        }
+    }
+
+    private void setupContent() {
+        if (content == null) {
+            if (contentType == null || contentType.isEmpty()) {
+                content = readContentAsString();
+            } else if (!request.isDownloadFile() && contentType.canReadAsString()) {
+                content = readContentAsString();
+            } else if (contentType.canReadAsBinaryStream()) {
+                StringBuilder builder = new StringBuilder();
+                builder.append("[content-type: ")
+                        .append(contentType);
+                if (contentEncoding != null) {
+                    builder.append("; encoding: ")
+                            .append(contentEncoding);
+                }
+                builder.append("; length: ")
+                        .append(contentLength)
+                        .append("]");
+                this.content = builder.toString();
+            }
+        }
+    }
+
+    /**
+     * @author designer[19901753334@163.com]
+     * @date 2021/12/8 23:51
+     **/
+    private void setupGzip() {
+        //响应消息的编码格式: gzip...
+        if(this.contentEncoding != null && !request.isDecompressResponseGzipEnabled()){
+            isGzip = GzipUtils.isGzip(contentEncoding);
+        } else {
+            isGzip = true;
+        }
+    }
+
+    /**
+     * @author designer[19901753334@163.com]
+     * @date 2021/12/8 23:51
+     **/
     private void setupHeaders() {
         if (httpResponse != null) {
             HeaderIterator it = httpResponse.headerIterator();
@@ -98,29 +141,6 @@ public class HttpclientForestResponse extends ForestResponse {
     @Override
     public boolean isReceivedResponseData() {
         return entity != null || bytes != null;
-    }
-
-    private String buildContent() {
-        if (content == null) {
-            if (contentType == null || contentType.isEmpty()) {
-                content = readContentAsString();
-            } else if (!request.isDownloadFile() && contentType.canReadAsString()) {
-                content = readContentAsString();
-           } else if (contentType.canReadAsBinaryStream()) {
-                StringBuilder builder = new StringBuilder();
-                builder.append("[content-type: ")
-                        .append(contentType);
-                if (contentEncoding != null) {
-                    builder.append("; encoding: ")
-                            .append(contentEncoding);
-                }
-                builder.append("; length: ")
-                        .append(contentLength)
-                        .append("]");
-                return builder.toString();
-            }
-        }
-        return content;
     }
 
     private String readContentAsString() {

@@ -105,6 +105,11 @@ public abstract class ForestResponse<T> {
     protected volatile String contentEncoding;
 
     /**
+     * 响应内容的编码字符集
+     */
+    protected volatile String charset;
+
+    /**
      * 请求响应内容的数据长度
      */
     protected volatile long contentLength;
@@ -623,6 +628,15 @@ public abstract class ForestResponse<T> {
     }
 
     /**
+     * 获取请求响应的内容编码字符集
+     *
+     * @return 编码字符集
+     */
+    public String getCharset() {
+        return charset;
+    }
+
+    /**
      * 把字节数组转换成字符串（自动根据字符串编码转换）
      *
      * @param bytes 字节数组
@@ -630,26 +644,21 @@ public abstract class ForestResponse<T> {
      * @throws IOException 字符串处理异常
      */
     protected String byteToString(byte[] bytes) throws IOException {
-        String encode;
-        if (StringUtils.isNotEmpty(contentEncoding)) {
-            // 默认从Content-Encoding获取字符编码
-            encode = contentEncoding;
-        } else {
+        if (StringUtils.isEmpty(charset)) {
             // Content-Encoding为空的情况下，自动判断字符编码
-            encode = ByteEncodeUtils.getCharsetName(bytes);
+            charset = ByteEncodeUtils.getCharsetName(bytes);
         }
         if (isGzip) {
             try {
-                return GzipUtils.decompressGzipToString(bytes, encode);
+                return GzipUtils.decompressGzipToString(bytes, charset);
             } catch (Throwable th) {
                 isGzip = false;
             }
         }
-        if ("GB".equalsIgnoreCase(encode)) {
+        if (org.apache.commons.lang3.StringUtils.startsWithIgnoreCase(charset, "GB")) {
             // 返回的GB中文编码会有多种编码类型，这里统一使用GBK编码
-            encode = "GBK";
+            charset = "GBK";
         }
-
-        return IOUtils.toString(bytes, encode);
+        return IOUtils.toString(bytes, charset);
     }
 }
