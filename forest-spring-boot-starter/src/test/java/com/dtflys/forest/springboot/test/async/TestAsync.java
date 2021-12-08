@@ -49,17 +49,13 @@ public class TestAsync {
     @Resource
     private ForestConfiguration configuration;
 
-    @Test
-    public void testConfig() {
-        assertThat(configuration.getMaxAsyncThreadSize()).isEqualTo(300);
-        assertThat(AsyncHttpExecutor.getMaxAsyncThreadSize()).isEqualTo(300);
-    }
 
     @Test
     public void testFuture() {
         server.enqueue(new MockResponse().setBody(EXPECTED).setHeadersDelay(500, TimeUnit.MILLISECONDS));
         server.enqueue(new MockResponse().setBody(EXPECTED).setHeadersDelay(500, TimeUnit.MILLISECONDS));
         server.enqueue(new MockResponse().setBody(EXPECTED).setHeadersDelay(500, TimeUnit.MILLISECONDS));
+        configuration.setMaxAsyncThreadSize(300);
         for (int i = 0; i < 3; i++) {
             asyncClient.postFuture();
         }
@@ -71,6 +67,10 @@ public class TestAsync {
 
     @Test
     public void testFuture2() {
+        assertThat(configuration.getMaxAsyncThreadSize()).isEqualTo(300);
+        assertThat(AsyncHttpExecutor.getMaxAsyncThreadSize()).isEqualTo(300);
+
+
         int size = 16;
         int threads = 8;
         boolean threadPoolFull = false;

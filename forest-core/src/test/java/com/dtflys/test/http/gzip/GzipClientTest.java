@@ -62,6 +62,7 @@ public class GzipClientTest extends BaseClientTest {
         assertEquals("测试gzip数据", response.getResult());
     }
 
+
     @Test
     public void testTransaction_without_annotation() {
         ForestResponse<String> response = gzipClient.transaction_without_annotation("gzip");

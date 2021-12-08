@@ -125,9 +125,9 @@ public class ResultHandler {
                     return converter.convertToJavaObject(responseText, resultType);
                 }
                 Charset charset = null;
-                String contentEncoding = response.getContentEncoding();
-                if (contentEncoding != null) {
-                    charset = Charset.forName(contentEncoding);
+                String resCharset  = response.getCharset();
+                if (resCharset != null) {
+                    charset = Charset.forName(resCharset);
                 }
                 return converter.convertToJavaObject(response.getByteArray(), resultType, charset);
             } catch (Exception e) {

@@ -138,6 +138,13 @@ public class AsyncHttpExecutor implements HttpExecutor {
 
     @Override
     public void execute(LifeCycleHandler lifeCycleHandler) {
+        if (pool == null) {
+            synchronized (this) {
+                if (pool == null) {
+                    initAsyncThreads(configuration.getMaxAsyncThreadSize());
+                }
+            }
+        }
         final CompletableFuture future = new CompletableFuture();
         pool.submit(new AsyncTask(future, syncExecutor, lifeCycleHandler));
         responseHandler.handleFuture(future);

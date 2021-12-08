@@ -166,7 +166,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(200);
         assertThat(response.getContentType()).isNull();
-        assertThat(response.getContentEncoding()).isNull();
+        assertThat(response.getCharset()).isEqualTo("UTF-8");
         assertThat(response.getResult())
                 .isNotNull()
                 .containsOnly(entry("status", "ok"));
@@ -185,7 +185,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response).isNotNull();
         assertThat(response.getContentType()).isNull();
         assertThat(response.getStatusCode()).isEqualTo(200);
-        assertThat(response.getContentEncoding()).isEqualTo("GBK");
+        assertThat(response.getCharset()).isEqualTo("GBK");
         assertThat(response.getResult())
                 .isNotNull()
                 .containsOnly(entry("status", "ok"));
@@ -212,7 +212,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response).isNotNull();
         assertThat(response.getContentType()).isNull();
         assertThat(response.getStatusCode()).isEqualTo(200);
-        assertThat(response.getContentEncoding()).isEqualTo("GBK");
+        assertThat(response.getCharset()).isEqualTo("GBK");
         assertThat(response.getResult())
                 .isNotNull()
                 .containsOnly(entry("status", "正常"));
@@ -236,7 +236,7 @@ public class TestGetClient extends BaseClientTest {
                 .isNotNull()
                 .extracting(ContentType::toStringWithoutParameters)
                 .isEqualTo(ContentType.APPLICATION_JSON);
-        assertThat(response.getContentEncoding()).isEqualTo("UTF-8");
+        assertThat(response.getCharset()).isEqualTo("UTF-8");
         assertThat(response.getResult())
                 .isNotNull()
                 .containsOnly(entry("status", "ok"));
@@ -463,7 +463,7 @@ public class TestGetClient extends BaseClientTest {
         ForestResponse<String> response = getClient.testUrl();
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
-        assertThat(response.getContentEncoding()).isNotNull().isEqualTo("UTF-8");
+        assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
         assertThat(response.getContentType()).isNull();
         assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
@@ -561,7 +561,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getContentType()).isNotNull()
                 .extracting(ContentType::toString).isEqualTo("text/plain");
-        assertThat(response.getContentEncoding()).isNotNull().isEqualTo("UTF-8");
+        assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
         assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertHeaderEquals("Accept", "text/plain")
@@ -585,7 +585,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getContentType()).isNotNull()
                 .extracting(ContentType::toString).isEqualTo("text/plain");
-        assertThat(response.getContentEncoding()).isNotNull().isEqualTo("UTF-8");
+        assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
         assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertHeaderEquals("Accept", "text/plain")

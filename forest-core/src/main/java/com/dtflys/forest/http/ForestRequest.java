@@ -1422,6 +1422,7 @@ public class ForestRequest<T> {
     }
 
 
+
     /**
      * 替换请求中的Query参数值
      *
@@ -1475,6 +1476,27 @@ public class ForestRequest<T> {
                 parameter.setValue(value);
             }
         }
+        return this;
+    }
+
+    /**
+     * 根据查询名删除URL查询参数
+     *
+     * @param name 查询名称
+     * @return {@link ForestRequest}对象实例
+     */
+    public ForestRequest<T> removeQuery(String name) {
+         this.query.removeQueries(name);
+         return this;
+    }
+
+    /**
+     * 删除请求的所有URL查询参数
+     *
+     * @return {@link ForestRequest}对象实例
+     */
+    public ForestRequest<T> clearQueries() {
+        this.query.clear();
         return this;
     }
 

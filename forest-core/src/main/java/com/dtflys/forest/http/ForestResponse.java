@@ -220,6 +220,7 @@ public abstract class ForestResponse<T> {
                 return null;
             }
             ForestRequest<T> redirectRequest = request.clone();
+            redirectRequest.clearQueries();
             redirectRequest.setUrl(location);
             redirectRequest.prevRequest = request;
             redirectRequest.prevResponse = this;
