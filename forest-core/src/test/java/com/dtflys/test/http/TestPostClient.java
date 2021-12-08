@@ -107,8 +107,10 @@ public class TestPostClient extends BaseClientTest {
     }
 
     @Test
-    public void testSimplePostWithProxy() throws InterruptedException {
+    public void testSimplePostWithProxy() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
+        ForestLogger logger = Mockito.mock(ForestLogger.class);
+        configuration.getLogHandler().setLogger(logger);
         assertThat(postClient.simplePostWithProxy(server.getPort(), "text/plain", "xxxyyy"))
                 .isNotNull()
                 .isEqualTo(EXPECTED);
@@ -117,6 +119,13 @@ public class TestPostClient extends BaseClientTest {
                 .assertPathEquals("/")
                 .assertHeaderEquals("Accept", "text/plain")
                 .assertBodyEquals("username=foo&password=123456");
+        Mockito.verify(logger).info("[Forest] Request (" + configuration.getBackendName() + "): \n" +
+                "\t[Proxy]: host: 127.0.0.1, port: " + server.getPort() + "\n" +
+                "\tPOST http://localhost:" + server.getPort() + "/hello HTTP\n" +
+                "\tHeaders: \n" +
+                "\t\tAccept: text/plain\n" +
+                "\t\tContent-Type: application/json\n" +
+                "\tBody: username=foo&password=123456");
     }
 
 

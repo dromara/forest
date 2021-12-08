@@ -2,6 +2,7 @@ package com.dtflys.forest.ssl;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 
+import javax.net.ssl.HostnameVerifier;
 import java.io.*;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -35,18 +36,25 @@ public class SSLKeyStore {
 
     protected String[] cipherSuites;
 
+    protected HostnameVerifier hostnameVerifier;
+
     protected SSLSocketFactoryBuilder sslSocketFactoryBuilder;
 
-    public SSLKeyStore(String id, String filePath, String keystorePass, String certPass, SSLSocketFactoryBuilder sslSocketFactoryBuilder) {
-        this(id, DEFAULT_KEYSTORE_TYPE, filePath, keystorePass, certPass, sslSocketFactoryBuilder);
+    public SSLKeyStore(String id, String filePath, String keystorePass, String certPass,
+                       HostnameVerifier hostnameVerifier,
+                       SSLSocketFactoryBuilder sslSocketFactoryBuilder) {
+        this(id, DEFAULT_KEYSTORE_TYPE, filePath, keystorePass, certPass, hostnameVerifier, sslSocketFactoryBuilder);
     }
 
-    public SSLKeyStore(String id, String keystoreType, String filePath, String keystorePass, String certPass, SSLSocketFactoryBuilder sslSocketFactoryBuilder) {
+    public SSLKeyStore(String id, String keystoreType, String filePath,
+                       String keystorePass, String certPass,
+                       HostnameVerifier hostnameVerifier, SSLSocketFactoryBuilder sslSocketFactoryBuilder) {
         this.id = id;
         this.keystoreType = keystoreType;
         this.filePath = filePath;
         this.keystorePass = keystorePass;
         this.certPass = certPass;
+        this.hostnameVerifier = hostnameVerifier;
         this.sslSocketFactoryBuilder = sslSocketFactoryBuilder;
         init();
         loadTrustStore();
@@ -82,6 +90,14 @@ public class SSLKeyStore {
 
     public void setCipherSuites(String[] cipherSuites) {
         this.cipherSuites = cipherSuites;
+    }
+
+    public HostnameVerifier getHostnameVerifier() {
+        return hostnameVerifier;
+    }
+
+    public void setHostnameVerifier(HostnameVerifier hostnameVerifier) {
+        this.hostnameVerifier = hostnameVerifier;
     }
 
     public SSLSocketFactoryBuilder getSslSocketFactoryBuilder() {

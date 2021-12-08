@@ -146,6 +146,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         String certPass = elem.getAttribute("certPass");
         String protocolsStr = elem.getAttribute("protocols");
         String cipherSuitesStr = elem.getAttribute("cipher-suites");
+        String hostnameVerifier = elem.getAttribute("hostnameVerifier");
         String sslSocketFactoryBuilder = elem.getAttribute("sslSocketFactoryBuilder");
 
         if (StringUtils.isEmpty(keystoreType)) {
@@ -156,7 +157,10 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
                     "The file of SSL KeyStore \"" + id + "\" is empty!");
         }
         BeanDefinition beanDefinition = createSSLKeyStoreBean(
-                id, keystoreType, filePath, keystorePass, certPass, protocolsStr, cipherSuitesStr, sslSocketFactoryBuilder);
+                id, keystoreType, filePath,
+                keystorePass, certPass,
+                protocolsStr, cipherSuitesStr,
+                hostnameVerifier, sslSocketFactoryBuilder);
         sslKeyStoreMap.put(id, beanDefinition);
     }
 
@@ -170,6 +174,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
                                                        String certPass,
                                                        String protocolsStr,
                                                        String cipherSuitesStr,
+                                                       String hostnameVerifierClass,
                                                        String sslSocketFactoryBuilder) {
         BeanDefinition beanDefinition = new GenericBeanDefinition();
         beanDefinition.setBeanClassName(SPRING_SSL_KEY_STORE_CLASS.getName());
@@ -179,6 +184,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         beanDefValues.addGenericArgumentValue(filePath);
         beanDefValues.addGenericArgumentValue(keystorePass);
         beanDefValues.addGenericArgumentValue(certPass);
+        beanDefValues.addGenericArgumentValue(hostnameVerifierClass);
         beanDefValues.addGenericArgumentValue(sslSocketFactoryBuilder);
         if (StringUtils.isNotEmpty(protocolsStr)) {
             String[] strs = protocolsStr.split("[ /t]*,[ /t]*");

@@ -96,9 +96,9 @@ public class OkHttp3Executor implements HttpExecutor {
         if (!logConfiguration.isLogEnabled() || !logConfiguration.isLogRequest()) {
             return;
         }
-        RequestLogMessage requestLogMessage = buildRequestMessage(retryCount, okRequest);
-        requestLogMessage.setRequest(request);
-        requestLogMessage.setRetryCount(retryCount);
+        RequestLogMessage logMessage = buildRequestMessage(retryCount, okRequest);
+        logMessage.setRequest(request);
+        logMessage.setRetryCount(retryCount);
         Proxy proxy = okHttpClient.proxy();
         if (proxy != null) {
             RequestProxyLogMessage proxyLogMessage = new RequestProxyLogMessage();
@@ -107,10 +107,11 @@ public class OkHttp3Executor implements HttpExecutor {
                 InetSocketAddress inetSocketAddress = (InetSocketAddress) address;
                 proxyLogMessage.setHost(inetSocketAddress.getHostString());
                 proxyLogMessage.setPort(inetSocketAddress.getPort() + "");
+                logMessage.setProxy(proxyLogMessage);
             }
         }
-        request.setRequestLogMessage(requestLogMessage);
-        logConfiguration.getLogHandler().logRequest(requestLogMessage);
+        request.setRequestLogMessage(logMessage);
+        logConfiguration.getLogHandler().logRequest(logMessage);
     }
 
     public void logResponse(ForestResponse response) {

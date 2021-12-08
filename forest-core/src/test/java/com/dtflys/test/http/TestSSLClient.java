@@ -79,6 +79,7 @@ public class TestSSLClient extends BaseClientTest {
                 "ssl_client.keystore",
                 "client",
                 "456789",
+                null,
                 new MySSLSocketFactoryBuilder());
         configuration.registerKeyStore(sslKeyStore);
     }

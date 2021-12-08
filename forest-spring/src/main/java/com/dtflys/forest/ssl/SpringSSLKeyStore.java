@@ -5,6 +5,7 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.StringUtils;
 import org.springframework.core.io.ClassPathResource;
 
+import javax.net.ssl.HostnameVerifier;
 import java.io.*;
 
 /**
@@ -19,14 +20,58 @@ public class SpringSSLKeyStore extends SSLKeyStore {
         }
         try {
             Class clazz = Class.forName(sslSocketFactoryBuilderClass);
+            if (!SSLSocketFactoryBuilder.class.isAssignableFrom(clazz)) {
+                throw new ForestRuntimeException("[Forest] The value of property 'sslSocketFactoryBuilder' must be a class inherited from com.dtflys.forest.ssl.SSLSocketFactoryBuilder");
+            }
             return (SSLSocketFactoryBuilder) Forest.config().getForestObjectFactory().getObject(clazz);
         } catch (ClassNotFoundException e) {
             throw new ForestRuntimeException(e);
         }
     }
 
-    public SpringSSLKeyStore(String id, String keystoreType, String filePath, String keystorePass, String certPass, String sslSocketFactoryBuilderClass) {
-        super(id, keystoreType, filePath, keystorePass, certPass, getSSLSocketFactoryBuilder(sslSocketFactoryBuilderClass));
+
+    private static HostnameVerifier getHostnameVerifier(String hostnameVerifierClass) {
+        if (StringUtils.isBlank(hostnameVerifierClass)) {
+            return null;
+        }
+        try {
+            Class clazz = Class.forName(hostnameVerifierClass);
+            if (!HostnameVerifier.class.isAssignableFrom(clazz)) {
+                throw new ForestRuntimeException("[Forest] The value of property 'hostnameVerifier' must be a class inherited from javax.net.ssl.HostnameVerifier");
+            }
+            return (HostnameVerifier) Forest.config().getForestObjectFactory().getObject(clazz);
+        } catch (ClassNotFoundException e) {
+            throw new ForestRuntimeException(e);
+        }
+    }
+
+    /**
+     * Spring SSL Key Store 构造函数
+     *
+     * @param id KeyStore Id
+     * @param keystoreType  KeyStore类型
+     * @param filePath 证书文件路径
+     * @param keystorePass KeyStore密码
+     * @param certPass 验证密码
+     * @param hostnameVerifierClass 域名验证器类
+     * @param sslSocketFactoryBuilderClass SSL上下文工厂构造器类
+     */
+    public SpringSSLKeyStore(
+            String id,
+            String keystoreType,
+            String filePath,
+            String keystorePass,
+            String certPass,
+            String hostnameVerifierClass,
+            String sslSocketFactoryBuilderClass) {
+        super(
+                id,
+                keystoreType,
+                filePath,
+                keystorePass,
+                certPass,
+                getHostnameVerifier(hostnameVerifierClass),
+                getSSLSocketFactoryBuilder(sslSocketFactoryBuilderClass));
     }
 
     @Override

@@ -7,19 +7,22 @@ import com.dtflys.forest.ssl.SSLUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
 import org.apache.http.conn.ssl.BrowserCompatHostnameVerifier;
-import org.apache.http.conn.ssl.SSLContexts;
-import org.apache.http.conn.ssl.SSLInitializationException;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.Args;
 import org.apache.http.util.TextUtils;
 
 import javax.net.SocketFactory;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 
 //import org.apache.http.annotation.ThreadSafe;
 
@@ -28,26 +31,20 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
     public static final X509HostnameVerifier BROWSER_COMPATIBLE_HOSTNAME_VERIFIER = new BrowserCompatHostnameVerifier();
 
     private final static ThreadLocal<ForestRequest> REQUEST_LOCAL = new ThreadLocal<>();
-    private final X509HostnameVerifier hostnameVerifier;
+    private final HostnameVerifier hostnameVerifier;
 
-    public static org.apache.http.conn.ssl.SSLConnectionSocketFactory getSocketFactory() throws SSLInitializationException {
-        return new org.apache.http.conn.ssl.SSLConnectionSocketFactory(SSLContexts.createDefault(), BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
-    }
 
     private static String[] split(String s) {
         return TextUtils.isBlank(s)?null:s.split(" *, *");
     }
 
-    public static org.apache.http.conn.ssl.SSLConnectionSocketFactory getSystemSocketFactory() throws SSLInitializationException {
-        return new org.apache.http.conn.ssl.SSLConnectionSocketFactory((SSLSocketFactory)SSLSocketFactory.getDefault(), split(System.getProperty("https.protocols")), split(System.getProperty("https.cipherSuites")), BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
-    }
 
     public ForestSSLConnectionFactory() {
         this(BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
     }
 
 
-    public ForestSSLConnectionFactory(X509HostnameVerifier hostnameVerifier) {
+    public ForestSSLConnectionFactory(HostnameVerifier hostnameVerifier) {
         this.hostnameVerifier = hostnameVerifier != null?hostnameVerifier:BROWSER_COMPATIBLE_HOSTNAME_VERIFIER;
     }
 
@@ -83,7 +80,7 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
         if(sock instanceof SSLSocket) {
             SSLSocket sslsock = (SSLSocket)sock;
             sslsock.startHandshake();
-            this.verifyHostname(sslsock, host.getHostName());
+            this.verifyHostname(host.getHostName(), sslsock);
             return sock;
         } else {
             return this.createLayeredSocket(sock, host.getHostName(), remoteAddress.getPort(), context);
@@ -114,39 +111,46 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
         if (request == null) {
             throw new ForestRuntimeException("Current request is NULL!");
         }
+
+        try {
+            SSLContext sslContext = SSLUtils.getSSLContext(request, request.getSslProtocol());
+            SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext);
+        } catch (KeyManagementException e) {
+            throw new ForestRuntimeException(e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new ForestRuntimeException(e);
+        }
+
+
         SSLSocketFactory sslSocketFactory = SSLUtils.getSSLSocketFactory(request, request.getSslProtocol());
-        SSLSocket sslsock = (SSLSocket) sslSocketFactory.createSocket(socket, target, port, true);
+
+
+        SSLSocket sslSocket = (SSLSocket) sslSocketFactory.createSocket(socket, target, port, true);
+
+
         if (request != null) {
             SSLKeyStore keyStore = request.getKeyStore();
             if (keyStore != null) {
                 String[] protocols = keyStore.getProtocols();
                 String[] cipherSuites = keyStore.getCipherSuites();
                 if (protocols != null) {
-                    sslsock.setEnabledProtocols(protocols);
+                    sslSocket.setEnabledProtocols(protocols);
                 }
                 if (cipherSuites != null) {
-                    sslsock.setEnabledCipherSuites(cipherSuites);
+                    sslSocket.setEnabledCipherSuites(cipherSuites);
                 }
             }
         }
-        this.prepareSocket(sslsock);
-        sslsock.startHandshake();
-        this.verifyHostname(sslsock, target);
-        return sslsock;
+        this.prepareSocket(sslSocket);
+        sslSocket.startHandshake();
+        this.verifyHostname(target, sslSocket);
+        return sslSocket;
     }
 
 
-    private void verifyHostname(SSLSocket sslsock, String hostname) throws IOException {
-        try {
-            this.hostnameVerifier.verify(hostname, sslsock);
-        } catch (IOException var6) {
-            try {
-                sslsock.close();
-            } catch (Exception var5) {
-                ;
-            }
 
-            throw var6;
-        }
+
+    private void verifyHostname(String hostname, SSLSocket sslSocket) {
+        this.hostnameVerifier.verify(hostname, sslSocket.getSession());
     }
 }

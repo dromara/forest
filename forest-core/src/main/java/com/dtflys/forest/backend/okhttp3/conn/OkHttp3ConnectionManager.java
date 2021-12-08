@@ -31,6 +31,7 @@ import okhttp3.Response;
 import okhttp3.Route;
 
 import javax.annotation.Nullable;
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
 import java.lang.reflect.Array;
@@ -104,6 +105,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
             throw new ForestRuntimeException(e);
         }
     }
+
 
     private List<Protocol> getProtocols(ForestRequest request) {
         ForestProtocol protocol = request.getProtocol();
@@ -210,7 +212,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
             SSLSocketFactory sslSocketFactory = SSLUtils.getSSLSocketFactory(request, protocol);
             builder
                     .sslSocketFactory(sslSocketFactory, getX509TrustManager(request))
-                    .hostnameVerifier(TrustAllHostnameVerifier.DEFAULT);
+                    .hostnameVerifier(request.hostnameVerifier());
         }
         // add default interceptor
         builder.addNetworkInterceptor(chain -> {

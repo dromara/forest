@@ -64,6 +64,7 @@ import com.dtflys.forest.backend.HttpExecutor;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorChain;
+import com.dtflys.forest.ssl.TrustAllHostnameVerifier;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
@@ -71,6 +72,7 @@ import com.dtflys.forest.utils.TimeUtils;
 import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.forest.utils.URLUtils;
 
+import javax.net.ssl.HostnameVerifier;
 import java.io.File;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -2123,6 +2125,28 @@ public class ForestRequest<T> {
     public ForestRequest<T> setSslProtocol(String sslProtocol) {
         this.sslProtocol = sslProtocol;
         return this;
+    }
+
+    /**
+     * 获取SSL域名验证器
+     *
+     * @return SSL域名验证器, 即{@link HostnameVerifier}接口实例
+     */
+    public HostnameVerifier getHostnameVerifier() {
+        if (keyStore == null) {
+            return TrustAllHostnameVerifier.DEFAULT;
+        }
+        return keyStore.getHostnameVerifier();
+    }
+
+    /**
+     * 获取SSL域名验证器
+     * <p>同{@link ForestRequest#getHostnameVerifier()}方法
+     *
+     * @return SSL域名验证器, 即{@link HostnameVerifier}接口实例
+     */
+    public HostnameVerifier hostnameVerifier() {
+        return getHostnameVerifier();
     }
 
     /**

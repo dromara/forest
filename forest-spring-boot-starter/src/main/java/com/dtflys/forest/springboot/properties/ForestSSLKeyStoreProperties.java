@@ -20,6 +20,8 @@ public class ForestSSLKeyStoreProperties {
 
     protected String cipherSuites;
 
+    protected String hostnameVerifier;
+
     protected String sslSocketFactoryBuilder;
 
     public String getId() {
@@ -84,6 +86,14 @@ public class ForestSSLKeyStoreProperties {
 
     public void setCipherSuites(String cipherSuites) {
         this.cipherSuites = cipherSuites;
+    }
+
+    public String getHostnameVerifier() {
+        return hostnameVerifier;
+    }
+
+    public void setHostnameVerifier(String hostnameVerifier) {
+        this.hostnameVerifier = hostnameVerifier;
     }
 
     public String getSslSocketFactoryBuilder() {

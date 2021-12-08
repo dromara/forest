@@ -412,6 +412,9 @@ public class ForestConfiguration implements Serializable {
      * @return HTTP后端名称
      */
     public String getBackendName() {
+        if (backend != null) {
+            return backend.getName();
+        }
         return backendName;
     }
 
