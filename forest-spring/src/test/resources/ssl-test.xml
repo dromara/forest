@@ -25,7 +25,6 @@
 
         <forest:ssl-keystore
                 id="keystore2"
-                file="test.keystore"
                 hostnameVerifier="com.dtflys.spring.test.ssl.MyHostnameVerifier"/>
 
     </forest:configuration>

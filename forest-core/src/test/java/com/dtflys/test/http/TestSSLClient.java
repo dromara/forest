@@ -7,6 +7,8 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.ssl.SSLSocketFactoryBuilder;
+import com.dtflys.test.http.ssl.MyHostnameVerifier;
+import com.dtflys.test.http.ssl.MySSLSocketFactoryBuilder;
 import com.dtflys.test.mock.GetMockServer;
 import com.github.dreamhead.moco.HttpsCertificate;
 import com.github.dreamhead.moco.HttpsServer;
@@ -104,6 +106,22 @@ public class TestSSLClient extends BaseClientTest {
                 },
                 new MySSLSocketFactoryBuilder());
         configuration.registerKeyStore(sslKeyStore2);
+        configuration.registerKeyStore(new SSLKeyStore(
+                "ssl_client3",
+                null,
+                null,
+                null,
+                new HostnameVerifier() {
+                    @Override
+                    public boolean verify(String s, SSLSession sslSession) {
+                        if ("localhost".equals(s)) {
+                            return false;
+                        }
+                        return true;
+                    }
+                },
+                null
+            ));
     }
 
 
@@ -157,6 +175,38 @@ public class TestSSLClient extends BaseClientTest {
         assertThat(th).isNull();
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
     }
+
+    @Test
+    public void testHostVerifier2() {
+        sslClient.truestAllGet();
+        Throwable th = null;
+        String result = null;
+        ForestRequest<String> request = sslClient.testHostVerifier2("localhost");
+        assertThat(request.getHostnameVerifier()).isNotNull().isInstanceOf(MyHostnameVerifier.class);
+        assertThat(request.getSslSocketFactoryBuilder())
+                .isNotNull().
+                isInstanceOf(com.dtflys.test.http.ssl.MySSLSocketFactoryBuilder.class);
+        try {
+            result = request.executeAsString();
+        } catch (ForestRuntimeException ex) {
+            th = ex.getCause();
+        }
+        assertThat(th).isNotNull().isInstanceOf(SSLPeerUnverifiedException.class);
+        th = null;
+        request = sslClient.testHostVerifier2("127.0.0.1");
+        assertThat(request.getHostnameVerifier()).isNotNull().isInstanceOf(MyHostnameVerifier.class);
+        assertThat(request.getSslSocketFactoryBuilder())
+                .isNotNull().
+                isInstanceOf(com.dtflys.test.http.ssl.MySSLSocketFactoryBuilder.class);
+        try {
+            result = request.executeAsString();
+        } catch (ForestRuntimeException ex) {
+            th = ex.getCause();
+        }
+        assertThat(th).isNull();
+        assertThat(result).isNotNull().isEqualTo(EXPECTED);
+    }
+
 
 
     @Test

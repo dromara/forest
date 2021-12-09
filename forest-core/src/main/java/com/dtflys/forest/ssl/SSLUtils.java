@@ -108,7 +108,7 @@ public class SSLUtils {
         return SSLUtils.customSSL(request);
     }
 
-    private static SSLSocketFactory getDefaultSSLSocketFactory(ForestRequest request, String protocol) {
+    public static SSLSocketFactory getDefaultSSLSocketFactory(ForestRequest request, String protocol) {
         if (request == null) {
             return null;
         }
@@ -121,42 +121,6 @@ public class SSLUtils {
         } catch (KeyManagementException e) {
             throw new ForestRuntimeException(e);
         } catch (NoSuchAlgorithmException e) {
-            throw new ForestRuntimeException(e);
-        }
-    }
-
-    public static SSLConnectionSocketFactory getSSLConnectionSocketFactory(ForestRequest request, String protocol) {
-        SSLKeyStore keyStore = request.getKeyStore();
-        SSLContext sslContext = null;
-        try {
-            sslContext = getSSLContext(request, protocol);
-        } catch (KeyManagementException e) {
-            throw new ForestRuntimeException(e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new ForestRuntimeException(e);
-        }
-        if (keyStore == null) {
-            return new SSLConnectionSocketFactory(sslContext);
-        }
-        return null;
-    }
-
-    public static SSLSocketFactory getSSLSocketFactory (ForestRequest request, String protocol) {
-        SSLKeyStore keyStore = request.getKeyStore();
-        if (keyStore == null) {
-            return getDefaultSSLSocketFactory(request, protocol);
-        }
-        SSLSocketFactoryBuilder sslSocketFactoryBuilder = keyStore.getSslSocketFactoryBuilder();
-        if (sslSocketFactoryBuilder == null) {
-            return getDefaultSSLSocketFactory(request, protocol);
-        }
-        try {
-            SSLSocketFactory sslSocketFactory = sslSocketFactoryBuilder.getSSLSocketFactory(request, protocol);
-            if (sslSocketFactory == null) {
-                return getDefaultSSLSocketFactory(request, protocol);
-            }
-            return sslSocketFactory;
-        } catch (Exception e) {
             throw new ForestRuntimeException(e);
         }
     }

@@ -1,6 +1,7 @@
 package com.dtflys.forest.ssl;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.utils.StringUtils;
 
 import javax.net.ssl.HostnameVerifier;
 import java.io.*;
@@ -111,26 +112,28 @@ public class SSLKeyStore {
     }
 
     public void init() {
-        String path = filePath.trim();
-        File file = new File(path);
-        if (!file.exists()) {
-            java.net.URL url = getClass().getClassLoader().getResource(path);
-            if (url == null) {
-                throw new ForestRuntimeException(
-                        "The file of SSL KeyStore \"" + id + "\" " + filePath + " cannot be found!");
-            }
-            path = url.getFile();
-            file = new File(path);
+        if (StringUtils.isNotBlank(filePath)) {
+            String path = filePath.trim();
+            File file = new File(path);
             if (!file.exists()) {
-                throw new ForestRuntimeException(
-                        "The file of SSL KeyStore \"" + id + "\" " + filePath + " cannot be found!");
+                java.net.URL url = getClass().getClassLoader().getResource(path);
+                if (url == null) {
+                    throw new ForestRuntimeException(
+                            "The file of SSL KeyStore \"" + id + "\" " + filePath + " cannot be found!");
+                }
+                path = url.getFile();
+                file = new File(path);
+                if (!file.exists()) {
+                    throw new ForestRuntimeException(
+                            "The file of SSL KeyStore \"" + id + "\" " + filePath + " cannot be found!");
+                }
             }
-        }
-        try {
-            inputStream = new FileInputStream(file);
-        } catch (FileNotFoundException e) {
-            throw new ForestRuntimeException(
-                    "An error occurred while reading he file of SSL KeyStore \"\" + id + \"\"", e);
+            try {
+                inputStream = new FileInputStream(file);
+            } catch (FileNotFoundException e) {
+                throw new ForestRuntimeException(
+                        "An error occurred while reading he file of SSL KeyStore \"\" + id + \"\"", e);
+            }
         }
     }
 

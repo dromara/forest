@@ -209,7 +209,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
                     protocol = "TLS";
                 }
             }
-            SSLSocketFactory sslSocketFactory = SSLUtils.getSSLSocketFactory(request, protocol);
+            SSLSocketFactory sslSocketFactory = request.getSSLSocketFactory();
             builder
                     .sslSocketFactory(sslSocketFactory, getX509TrustManager(request))
                     .hostnameVerifier(request.hostnameVerifier());

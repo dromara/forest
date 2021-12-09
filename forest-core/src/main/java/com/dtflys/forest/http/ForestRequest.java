@@ -64,6 +64,8 @@ import com.dtflys.forest.backend.HttpExecutor;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorChain;
+import com.dtflys.forest.ssl.SSLSocketFactoryBuilder;
+import com.dtflys.forest.ssl.SSLUtils;
 import com.dtflys.forest.ssl.TrustAllHostnameVerifier;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
@@ -73,6 +75,7 @@ import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.forest.utils.URLUtils;
 
 import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.File;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -374,6 +377,16 @@ public class ForestRequest<T> {
      * <p>在双向HTTPS请求中使用的验证信息
      */
     private SSLKeyStore keyStore;
+
+    /**
+     * SSL主机名/域名验证器
+     */
+    private HostnameVerifier hostnameVerifier;
+
+    /**
+     * SSL Socket 工厂构造器
+     */
+    private SSLSocketFactoryBuilder sslSocketFactoryBuilder;
 
     /**
      * 正向代理
@@ -2150,11 +2163,14 @@ public class ForestRequest<T> {
     }
 
     /**
-     * 获取SSL域名验证器
+     * 获取SSL主机名/域名验证器
      *
      * @return SSL域名验证器, 即{@link HostnameVerifier}接口实例
      */
     public HostnameVerifier getHostnameVerifier() {
+        if (hostnameVerifier != null) {
+            return hostnameVerifier;
+        }
         if (keyStore == null) {
             return TrustAllHostnameVerifier.DEFAULT;
         }
@@ -2166,7 +2182,18 @@ public class ForestRequest<T> {
     }
 
     /**
-     * 获取SSL域名验证器
+     * 设置SSL主机名/域名验证器
+     *
+     * @param hostnameVerifier SSL主机名/域名验证器
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest<T> setHostnameVerifier(HostnameVerifier hostnameVerifier) {
+        this.hostnameVerifier = hostnameVerifier;
+        return this;
+    }
+
+    /**
+     * 获取SSL主机名/域名验证器
      * <p>同{@link ForestRequest#getHostnameVerifier()}方法
      *
      * @return SSL域名验证器, 即{@link HostnameVerifier}接口实例
@@ -2174,6 +2201,90 @@ public class ForestRequest<T> {
     public HostnameVerifier hostnameVerifier() {
         return getHostnameVerifier();
     }
+
+    /**
+     * 设置SSL主机名/域名验证器
+     * <p>同{@link ForestRequest#setHostnameVerifier(HostnameVerifier)}方法
+     *
+     * @param hostnameVerifier SSL主机名/域名验证器
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest<T> hostnameVerifier(HostnameVerifier hostnameVerifier) {
+        return this.setHostnameVerifier(hostnameVerifier);
+    }
+
+    /**
+     * 获取 SSL Socket 工厂构造器
+     *
+     * @return SSL Socket 工厂构造器
+     */
+    public SSLSocketFactoryBuilder getSslSocketFactoryBuilder() {
+        return sslSocketFactoryBuilder;
+    }
+
+    /**
+     * 设置 SSL Socket 工厂构造器
+     *
+     * @param sslSocketFactoryBuilder SSL Socket 工厂构造器
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest<T> setSslSocketFactoryBuilder(SSLSocketFactoryBuilder sslSocketFactoryBuilder) {
+        this.sslSocketFactoryBuilder = sslSocketFactoryBuilder;
+        return this;
+    }
+
+    /**
+     * 获取 SSL Socket 工厂构造器
+     *
+     * @return SSL Socket 工厂构造器
+     */
+    public SSLSocketFactoryBuilder sslSocketFactoryBuilder() {
+        return getSslSocketFactoryBuilder();
+    }
+
+    /**
+     * 设置 SSL Socket 工厂构造器
+     *
+     * @param sslSocketFactoryBuilder SSL Socket 工厂构造器
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest<T> sslSocketFactoryBuilder(SSLSocketFactoryBuilder sslSocketFactoryBuilder) {
+        return setSslSocketFactoryBuilder(sslSocketFactoryBuilder);
+    }
+
+
+    /**
+     * 获取 SSL Socket 工厂
+     *
+     * @return SSL Socket 工厂
+     */
+    public SSLSocketFactory getSSLSocketFactory() {
+        if (sslSocketFactoryBuilder != null) {
+            try {
+                return sslSocketFactoryBuilder.getSSLSocketFactory(this, getSslProtocol());
+            } catch (Exception e) {
+                throw new ForestRuntimeException(e);
+            }
+        }
+        SSLKeyStore keyStore = this.getKeyStore();
+        if (keyStore == null) {
+            return SSLUtils.getDefaultSSLSocketFactory(this, getSslProtocol());
+        }
+        SSLSocketFactoryBuilder sslSocketFactoryBuilder = keyStore.getSslSocketFactoryBuilder();
+        if (sslSocketFactoryBuilder == null) {
+            return SSLUtils.getDefaultSSLSocketFactory(this, getSslProtocol());
+        }
+        try {
+            SSLSocketFactory sslSocketFactory = sslSocketFactoryBuilder.getSSLSocketFactory(this, getSslProtocol());
+            if (sslSocketFactory == null) {
+                return SSLUtils.getDefaultSSLSocketFactory(this, getSslProtocol());
+            }
+            return sslSocketFactory;
+        } catch (Exception e) {
+            throw new ForestRuntimeException(e);
+        }
+    }
+
 
     /**
      * 是否为HTTPS请求
