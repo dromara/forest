@@ -3,7 +3,6 @@ package com.dtflys.test.http.annmerge;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.test.http.BaseClientTest;
-import com.dtflys.test.http.client.CallbackClient;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.BeforeClass;
@@ -12,6 +11,7 @@ import org.junit.Test;
 
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
 
 public class TestAnnotationMergeClient extends BaseClientTest {
 

@@ -21,24 +21,18 @@ import javax.annotation.Resource;
 @Import({ForestScannerRegister.class})
 public class ForestAutoConfiguration {
 
-    @Resource
+    @Autowired(required = false)
     private ConfigurableApplicationContext applicationContext;
 
-    @Resource
-    private ForestConfigurationProperties forestConfigurationProperties;
 
     @Bean
-    @ConditionalOnClass(ForestBeanRegister.class)
-    @ConditionalOnMissingBean
     public ForestBeanProcessor forestBeanProcessor() {
         return new ForestBeanProcessor();
     }
 
 
     @Bean
-    @ConditionalOnClass(ForestScannerRegister.class)
-    @ConditionalOnMissingBean
-    public ForestBeanRegister getForestBeanRegister() {
+    public ForestBeanRegister getForestBeanRegister(ForestConfigurationProperties forestConfigurationProperties) {
         ForestBeanRegister register = new ForestBeanRegister(applicationContext, forestConfigurationProperties);
         register.registerForestConfiguration(forestConfigurationProperties);
         register.registerScanner(forestConfigurationProperties);

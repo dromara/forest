@@ -40,7 +40,7 @@ import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Map;
 
-public class ForestBeanRegister implements ResourceLoaderAware {
+public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcessor {
 
     private final ConfigurableApplicationContext applicationContext;
 
