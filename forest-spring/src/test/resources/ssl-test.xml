@@ -22,6 +22,12 @@
                 certPass="123456"
                 hostnameVerifier="com.dtflys.spring.test.ssl.MyHostnameVerifier"
                 sslSocketFactoryBuilder="com.dtflys.spring.test.ssl.MySSLSocketFactoryBuilder"/>
+
+        <forest:ssl-keystore
+                id="keystore2"
+                file="test.keystore"
+                hostnameVerifier="com.dtflys.spring.test.ssl.MyHostnameVerifier"/>
+
     </forest:configuration>
 
     <forest:client id="beastshopClient" configuration="forestConfiguration" class="com.dtflys.spring.test.client0.BeastshopClient"/>

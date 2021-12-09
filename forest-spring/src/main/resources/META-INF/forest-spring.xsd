@@ -393,7 +393,7 @@
         </xsd:attribute>
         <xsd:attribute name="cipher-suites" type="xsd:string" use="optional">
         </xsd:attribute>
-        <xsd:attribute name="file" type="xsd:string" use="required">
+        <xsd:attribute name="file" type="xsd:string" use="optional">
             <xsd:annotation>
                 <xsd:documentation>
                     <![CDATA[
