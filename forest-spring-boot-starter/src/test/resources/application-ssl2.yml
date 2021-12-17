@@ -1,0 +1,15 @@
+
+forest:
+  enabled: true
+  bean-id: sslConfig
+  max-connections: 300
+  max-route-connections: 300
+  timeout: 3000
+  connect-timeout: 3000
+  retry-count: 2
+  ssl-key-stores:
+    - id: keystore1
+      hostname-verifier: com.dtflys.forest.springboot.test.ssl.MyHostnameVerifier
+      ssl-socket-factory-builder: com.dtflys.forest.springboot.test.ssl.MySSLSocketFactoryBuilder
+  interceptors:
+    - com.dtflys.forest.springboot.test.interceptor.GlobalInterceptor

@@ -1,8 +1,9 @@
 package com.dtflys.forest.reflection;
 
 import com.dtflys.forest.converter.ForestConverter;
-import com.dtflys.forest.http.ForestBodyType;
+import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.logging.LogConfiguration;
+import com.dtflys.forest.utils.ForestDataType;
 
 import java.lang.annotation.Annotation;
 
@@ -19,7 +20,7 @@ public class MetaRequest {
      * request body type: <br>
      *     FORM JSON XML TEXT PROTOBUF FILE BINARY
      */
-    private ForestBodyType bodyType;
+    private String bodyType;
 
     /**
      * http method type: <br>
@@ -88,7 +89,13 @@ public class MetaRequest {
 
     /**
      * Response Encoding
-     * <p>该属性不填的情况下，根据响应头中的 Content-Encoding 来确定响应内容的编码
+     * <p>响应内容的字符编码[UTF-8, GBK...]
+     *  <p>优先根据该字段来确认字符编码格式,再根据如下顺序来获取
+     *  <ul>
+     *      <li>1. 从ContentType中获取</li>
+     *      <li>2. 从响应头中的 Content-Encoding 获取</li>
+     *      <li>3. 根据响应内容智能识别</li>
+     *  </ul>
      */
     private String responseEncoding;
 
@@ -111,7 +118,7 @@ public class MetaRequest {
 
     private long progressStep;
 
-    private Class<? extends ForestConverter> encoder;
+    private Class<? extends ForestEncoder> encoder;
 
     private Class<? extends ForestConverter> decoder;
 
@@ -153,13 +160,18 @@ public class MetaRequest {
         this.url = url;
     }
 
-    public ForestBodyType getBodyType() {
+    public String getBodyType() {
         return bodyType;
     }
 
-    public void setBodyType(ForestBodyType bodyType) {
+    public void setBodyType(String bodyType) {
         this.bodyType = bodyType;
     }
+
+    public void setBodyType(ForestDataType bodyType) {
+        this.bodyType = bodyType.getName();
+    }
+
 
     public String getType() {
         return type;
@@ -317,11 +329,11 @@ public class MetaRequest {
         this.progressStep = progressStep;
     }
 
-    public Class<? extends ForestConverter> getEncoder() {
+    public Class<? extends ForestEncoder> getEncoder() {
         return encoder;
     }
 
-    public void setEncoder(Class<? extends ForestConverter> encoder) {
+    public void setEncoder(Class<? extends ForestEncoder> encoder) {
         this.encoder = encoder;
     }
 

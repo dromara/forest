@@ -1,6 +1,7 @@
 package com.dtflys.forest.ssl;
 
 import com.dtflys.forest.utils.StringUtils;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContextBuilder;
 import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
@@ -37,7 +38,6 @@ public class SSLUtils {
         String certPass = fKeyStore.getCertPass();
         if (keyStore != null) {
             try {
-
                  //密钥库
                 char[] certPassCharArray = certPass.toCharArray();
                 KeyManagerFactory kmf = KeyManagerFactory.getInstance("sunx509");
@@ -123,6 +123,22 @@ public class SSLUtils {
         } catch (NoSuchAlgorithmException e) {
             throw new ForestRuntimeException(e);
         }
+    }
+
+    public static SSLConnectionSocketFactory getSSLConnectionSocketFactory(ForestRequest request, String protocol) {
+        SSLKeyStore keyStore = request.getKeyStore();
+        SSLContext sslContext = null;
+        try {
+            sslContext = getSSLContext(request, protocol);
+        } catch (KeyManagementException e) {
+            throw new ForestRuntimeException(e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new ForestRuntimeException(e);
+        }
+        if (keyStore == null) {
+            return new SSLConnectionSocketFactory(sslContext);
+        }
+        return null;
     }
 
     public static SSLSocketFactory getSSLSocketFactory (ForestRequest request, String protocol) {

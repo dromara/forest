@@ -23,6 +23,7 @@ public interface GzipClient2 {
     @Get("/${0}")
     ForestResponse<String> transaction(String infno);
 
+
     @Get("/none-gzip")
     @DecompressGzip(false)
     ForestResponse<String> noneGzip();

@@ -25,6 +25,7 @@
 package com.dtflys.forest.config;
 
 
+import com.dtflys.forest.backend.AsyncHttpExecutor;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.backend.HttpBackendSelector;
 import com.dtflys.forest.callback.AddressSource;
@@ -34,6 +35,7 @@ import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.ForestGenericClient;
 import com.dtflys.forest.converter.auto.DefaultAutoConverter;
 import com.dtflys.forest.converter.binary.DefaultBinaryConverter;
+import com.dtflys.forest.converter.form.DefaultFormConvertor;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.converter.json.JSONConverterSelector;
 import com.dtflys.forest.converter.protobuf.ForestProtobufConverter;
@@ -112,6 +114,11 @@ public class ForestConfiguration implements Serializable {
      * maximum number of connections allowed per route
      */
     private Integer maxRouteConnections;
+
+    /**
+     * 最大异步线程池大小
+     */
+    private Integer maxAsyncThreadSize;
 
     /**
      * 是否自动重定向开关
@@ -331,6 +338,7 @@ public class ForestConfiguration implements Serializable {
         DefaultAutoConverter autoConverter = new DefaultAutoConverter(configuration);
         configuration.getConverterMap().put(ForestDataType.AUTO, autoConverter);
         configuration.getConverterMap().put(ForestDataType.BINARY, new DefaultBinaryConverter(autoConverter));
+        configuration.getConverterMap().put(ForestDataType.FORM, new DefaultFormConvertor(configuration));
         setupJSONConverter(configuration);
         configuration.setTimeout(3000);
         configuration.setMaxConnections(500);
@@ -404,6 +412,9 @@ public class ForestConfiguration implements Serializable {
      * @return HTTP后端名称
      */
     public String getBackendName() {
+        if (backend != null) {
+            return backend.getName();
+        }
         return backendName;
     }
 
@@ -604,6 +615,29 @@ public class ForestConfiguration implements Serializable {
      */
     public ForestConfiguration setMaxRouteConnections(Integer maxRouteConnections) {
         this.maxRouteConnections = maxRouteConnections;
+        return this;
+    }
+
+    /**
+     * 获取最大异步线程池大小
+     *
+     * @return 最大异步线程池大小
+     */
+    public Integer getMaxAsyncThreadSize() {
+        return maxAsyncThreadSize;
+    }
+
+    /**
+     * 设置最大异步线程池大小
+     *
+     * @param maxAsyncThreadSize 最大异步线程池大小
+     * @return 当前ForestConfiguration实例
+     */
+    public ForestConfiguration setMaxAsyncThreadSize(Integer maxAsyncThreadSize) {
+        if (maxAsyncThreadSize != null && maxAsyncThreadSize != this.maxAsyncThreadSize) {
+            AsyncHttpExecutor.initAsyncThreads(maxAsyncThreadSize);
+        }
+        this.maxAsyncThreadSize = maxAsyncThreadSize;
         return this;
     }
 

@@ -72,6 +72,7 @@ public abstract class AbstractHttpclientRequestSender implements HttpclientReque
             RequestProxyLogMessage proxyLogMessage = new RequestProxyLogMessage();
             proxyLogMessage.setHost(proxy.getHost());
             proxyLogMessage.setPort(proxy.getPort() + "");
+            logMessage.setProxy(proxyLogMessage);
         }
         return logMessage;
     }

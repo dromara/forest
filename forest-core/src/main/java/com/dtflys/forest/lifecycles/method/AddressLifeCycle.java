@@ -40,21 +40,21 @@ public class AddressLifeCycle implements MethodAnnotationLifeCycle<Address, Obje
 
         // 判断是否有设置 scheme
         if (StringUtils.isNotBlank(schemeStr)) {
-            MappingTemplate schemeTemplate = request.getMethod().makeTemplate(schemeStr.trim());
+            MappingTemplate schemeTemplate = request.getMethod().makeTemplate(Address.class, "schema", schemeStr.trim());
             String scheme = schemeTemplate.render(args);
             request.scheme(scheme);
         }
 
         // 判断是否有设置 host
         if (StringUtils.isNotBlank(hostStr)) {
-            MappingTemplate hostTemplate = request.getMethod().makeTemplate(hostStr.trim());
+            MappingTemplate hostTemplate = request.getMethod().makeTemplate(Address.class, "host", hostStr.trim());
             String host = hostTemplate.render(args);
             request.host(host);
         }
 
         // 判断是否有设置 port
         if (StringUtils.isNotBlank(portStr)) {
-            MappingTemplate portTemplate = request.getMethod().makeTemplate(portStr.trim());
+            MappingTemplate portTemplate = request.getMethod().makeTemplate(Address.class, "port", portStr.trim());
             String portRendered = portTemplate.render(args);
             if (!Character.isDigit(portRendered.charAt(0))) {
                 throw new ForestRuntimeException("[Forest] property 'port' of annotation @Address must be a number!");

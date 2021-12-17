@@ -22,6 +22,7 @@ import okhttp3.ConnectionPool;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.Credentials;
+import okhttp3.Dispatcher;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Protocol;
@@ -30,6 +31,7 @@ import okhttp3.Response;
 import okhttp3.Route;
 
 import javax.annotation.Nullable;
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
 import java.lang.reflect.Array;
@@ -56,6 +58,11 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
     private ConnectionPool pool;
 
     /**
+     * dispatcher
+     */
+    private Dispatcher dispatcher;
+
+    /**
      * 协议版本: http 1.0
      */
     private final static List<Protocol> HTTP_1_0 = Arrays.asList(Protocol.HTTP_1_0, Protocol.HTTP_1_1);
@@ -74,6 +81,8 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
      * 协议版本映射表
      */
     private final static Map<ForestProtocol, List<Protocol>> PROTOCOL_VERSION_MAP = new HashMap<>();
+
+
 
     static {
         PROTOCOL_VERSION_MAP.put(ForestProtocol.HTTP_1_0, HTTP_1_0);
@@ -97,6 +106,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
         }
     }
 
+
     private List<Protocol> getProtocols(ForestRequest request) {
         ForestProtocol protocol = request.getProtocol();
         if (protocol == null) {
@@ -118,6 +128,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
         }
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .connectionPool(pool)
+                .dispatcher(dispatcher)
                 .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
                 .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
                 .protocols(getProtocols(request))
@@ -201,7 +212,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
             SSLSocketFactory sslSocketFactory = SSLUtils.getSSLSocketFactory(request, protocol);
             builder
                     .sslSocketFactory(sslSocketFactory, getX509TrustManager(request))
-                    .hostnameVerifier(TrustAllHostnameVerifier.DEFAULT);
+                    .hostnameVerifier(request.hostnameVerifier());
         }
         // add default interceptor
         builder.addNetworkInterceptor(chain -> {
@@ -217,6 +228,9 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
     @Override
     public void init(ForestConfiguration configuration) {
         pool = new ConnectionPool();
+        dispatcher = new Dispatcher();
+        dispatcher.setMaxRequests(configuration.getMaxConnections());
+        dispatcher.setMaxRequestsPerHost(configuration.getMaxRouteConnections());
     }
 
     /**
@@ -226,5 +240,9 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
      */
     public ConnectionPool getOkHttpPool() {
         return pool;
+    }
+
+    public Dispatcher getDispatcher() {
+        return dispatcher;
     }
 }

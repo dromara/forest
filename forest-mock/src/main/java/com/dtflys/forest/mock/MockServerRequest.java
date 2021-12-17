@@ -10,11 +10,14 @@ import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.PushbackReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -23,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author gongjun
@@ -69,6 +74,14 @@ public class MockServerRequest {
 
     public String query() {
         return url.query();
+    }
+
+    public String username() {
+        return url.username();
+    }
+
+    public String password() {
+        return url.password();
     }
 
     public String encodedQuery() {
@@ -181,6 +194,16 @@ public class MockServerRequest {
         return this;
     }
 
+    public MockServerRequest assertUsernameEquals(String username) {
+        Assert.assertEquals(username, username());
+        return this;
+    }
+
+    public MockServerRequest assertPasswordEquals(String password) {
+        Assert.assertEquals(password, password());
+        return this;
+    }
+
     public MockServerRequest assertPathEquals(String path) {
         Assert.assertEquals(path, path());
         return this;
@@ -217,5 +240,18 @@ public class MockServerRequest {
     public MockServerRequest assertMultipart(String name, Consumer<List<FileItem>> itemConsumer) throws FileUploadException {
         return assertMultipart(name, header(FileUploadBase.CONTENT_TYPE), itemConsumer);
     }
+
+    public MockServerRequest assertMultipart(String name, String contentType, String text) throws FileUploadException {
+        return assertMultipart(name, contentType, params -> {
+            assertEquals(1, params.size());
+            FileItem item = params.get(0);
+            try {
+                assertEquals(text, IOUtils.toString(item.getInputStream(), StandardCharsets.UTF_8));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
 
 }

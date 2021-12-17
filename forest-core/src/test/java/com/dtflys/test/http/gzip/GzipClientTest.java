@@ -13,6 +13,8 @@ import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 /**
  * @author caihongming
@@ -60,6 +62,14 @@ public class GzipClientTest extends BaseClientTest {
         assertEquals("测试gzip数据", response.getResult());
     }
 
+
+    @Test
+    public void testTransaction_without_annotation() {
+        ForestResponse<String> response = gzipClient.transaction_without_annotation("gzip");
+        assertEquals("测试gzip数据", response.getResult());
+    }
+
+
     @Test
     public void testTransaction2() {
         ForestResponse<String> response = gzipClient2.transaction("gzip");
@@ -70,6 +80,9 @@ public class GzipClientTest extends BaseClientTest {
     @Test
     public void testNoneGzip() {
         ForestResponse<String> response = gzipClient2.noneGzip();
+        assertThat(response).isNotNull();
+        assertThat(response.getCharset()).isEqualToIgnoringCase("UTF-8");
+        assertThat(response.getContentEncoding()).isNull();
         assertEquals("测试gzip数据", response.getResult());
     }
 

@@ -23,16 +23,16 @@ public class BackendLifeCycle implements MethodAnnotationLifeCycle<Backend, Obje
     public void onMethodInitialized(ForestMethod method, Backend annotation) {
         String backendName = annotation.value();
         if (StringUtils.isNotBlank(backendName)) {
-            method.setExtensionParameterValue(PARAM_KEY_BACKEND_NAME, backendName);
+            MappingTemplate template = method.makeTemplate(Backend.class, "value", backendName);
+            method.setExtensionParameterValue(PARAM_KEY_BACKEND_NAME, template);
         }
     }
 
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
         Object backendName = request.getMethod().getExtensionParameterValue(PARAM_KEY_BACKEND_NAME);
-        if (backendName != null && backendName instanceof String) {
-            MappingTemplate template = request.getMethod().makeTemplate((String) backendName);
-            request.setBackend(template.render(args));
+        if (backendName != null && backendName instanceof MappingTemplate) {
+            request.setBackend(((MappingTemplate) backendName).render(args));
         }
     }
 

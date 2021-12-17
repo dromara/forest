@@ -23,10 +23,10 @@ public class HTTPProxyLifeCycle implements MethodAnnotationLifeCycle<HTTPProxy, 
         String usernameStr = (String) getAttribute(request, "username");
         String passwordStr = (String) getAttribute(request, "password");
 
-        MappingTemplate hostTemplate = method.makeTemplate(hostStr);
-        MappingTemplate portTemplate = method.makeTemplate(portStr);
-        MappingTemplate usernameTemplate = method.makeTemplate(usernameStr);
-        MappingTemplate passwordTemplate = method.makeTemplate(passwordStr);
+        MappingTemplate hostTemplate = method.makeTemplate(HTTPProxy.class, "host", hostStr);
+        MappingTemplate portTemplate = method.makeTemplate(HTTPProxy.class, "port", portStr);
+        MappingTemplate usernameTemplate = method.makeTemplate(HTTPProxy.class, "username", usernameStr);
+        MappingTemplate passwordTemplate = method.makeTemplate(HTTPProxy.class, "password", passwordStr);
 
         addAttribute(request, "host_temp", hostTemplate);
         addAttribute(request, "port_temp", portTemplate);

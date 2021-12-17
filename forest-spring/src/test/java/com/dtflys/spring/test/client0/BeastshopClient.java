@@ -17,5 +17,10 @@ public interface BeastshopClient {
     String index();
 
 
-
+    @Request(
+            url = "https://www.baidu.com/",
+            timeout = 80000,
+            keyStore = "keystore1"
+    )
+    String index2();
 }

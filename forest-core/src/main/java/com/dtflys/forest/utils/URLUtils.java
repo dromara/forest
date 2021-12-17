@@ -1,10 +1,10 @@
 package com.dtflys.forest.utils;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.http.ForestURL;
+import jdk.nashorn.internal.runtime.regexp.joni.ast.StringNode;
 
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URLEncoder;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -24,6 +24,7 @@ public final class URLUtils {
     public static boolean isURL(String str) {
         return hasProtocol(str) || str.startsWith("file:/");
     }
+
 
     /**
      * URL字符串中是否包含HTTP协议部分
@@ -149,16 +150,75 @@ public final class URLUtils {
     }
 
     /**
-     * 强制进行URL Encoding编码
+     * 判断端口号是否为空
+     *
+     * @param port 端口号
+     * @return {@code true}: 空端口, {@code false}: 不为空
+     */
+    public static boolean isNonePort(Integer port) {
+        if (port == null) {
+            return true;
+        }
+        return port < 0;
+    }
+
+    /**
+     * 判断端口号是否不为空
+     *
+     * @param port 端口号
+     * @return {@code true}: 不为空, {@code false}: 空端口
+     */
+    public static boolean isNotNonePort(Integer port) {
+        return !isNonePort(port);
+    }
+
+
+    /**
+     * 强制URL Encoding编码
      *
      * @param content 需要编码的原字符串
      * @param encode 编码字符集
      * @return URL Encoding编码结果字符串
-     * @throws UnsupportedEncodingException 编码过程中可能抛出的异常
      */
-    public static String forceEncode(String content, String encode) throws UnsupportedEncodingException {
-        return URLEncoder.encode(content, encode);
+    public static String allEncode(String content, String encode) {
+        return URLEncoder.ALL.encode(content, encode);
     }
+
+
+    /**
+     * 进行用户验证信息的URL Encoding编码
+     *
+     * @param content 需要编码的原字符串
+     * @param encode 编码字符集
+     * @return URL Encoding编码结果字符串
+     */
+    public static String userInfoEncode(String content, String encode) {
+        return URLEncoder.USER_INFO.encode(content, encode);
+    }
+
+
+    /**
+     * 进行URI路径的URL Encoding编码
+     *
+     * @param content 需要编码的原字符串
+     * @param encode 编码字符集
+     * @return URL Encoding编码结果字符串
+     */
+    public static String pathEncode(String content, String encode) {
+        return URLEncoder.PATH.encode(content, encode);
+    }
+
+    /**
+     * 进行查询参数值部分的URL Encoding编码
+     *
+     * @param content 需要编码的原字符串
+     * @param encode 编码字符集
+     * @return URL Encoding编码结果字符串
+     */
+    public static String queryValueEncode(String content, String encode) {
+        return URLEncoder.QUERY_VALUE.encode(content, encode);
+    }
+
 
     /**
      * 进行URL Encoding编码
@@ -183,12 +243,12 @@ public final class URLUtils {
                 String query = group[1];
                 String[] queries = query.split("&");
                 if (queries.length > 1) {
-                    return URLEncoder.encode(content, charset);
+                    return URLEncoder.PATH.encode(content, charset);
                 }
             }
             return content;
         }
-        return URLEncoder.encode(content, charset);
+        return URLEncoder.PATH.encode(content, charset);
     }
 
     /**

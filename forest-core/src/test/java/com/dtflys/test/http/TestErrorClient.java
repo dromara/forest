@@ -95,6 +95,7 @@ public class TestErrorClient extends BaseClientTest {
         try {
             getClient.errorGet3();
         } catch (ForestNetworkException ex) {
+            ex.printStackTrace();
             hasError = true;
             assertThat(ex.getStatusCode()).isEqualTo(500);
             assertThat(ex.getResponse())

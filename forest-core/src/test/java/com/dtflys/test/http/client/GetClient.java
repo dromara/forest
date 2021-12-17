@@ -6,6 +6,7 @@ import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.annotation.DataParam;
 import com.dtflys.forest.annotation.DataVariable;
 import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.model.JsonTestUser;
 import com.dtflys.test.interceptor.AddQueryInterceptor;
@@ -31,7 +32,7 @@ public interface GetClient {
     String simpleGet();
 
     @Get(
-            url = "http://localhost:${port}/hello/user?username=foo",
+            url = "http://localhost:{port}/hello/user?username=foo",
             headers = {"Accept:text/plain"}
     )
     String simpleGet2();
@@ -42,8 +43,29 @@ public interface GetClient {
     )
     String simpleGet3();
 
+    @Get(
+            url = "http://localhost:${port}/${path}",
+            headers = {"Accept:text/plain"}
+    )
+    String testPath(@Var("path") String path);
+
+    @Get(
+            url = "http://localhost:${port}/{path}",
+            headers = {"Accept:text/plain"}
+    )
+    String testPath2(@Var("path") String path);
+
+    @Get("https://localhost/xxx:yyy")
+    ForestRequest testPath3();
+
+    @Get("https://localhost/xxx:111")
+    ForestRequest testPath4();
+
+    @Get("http://aaa/bbb/skip:123456@localhost:{port}")
+    ForestRequest testPath_userInfo();
+
     @Request(
-            url = "http://localhost:${port}/hello/user?username=foo",
+            url = "http://localhost:{port}/hello/user?username=foo",
             headers = {"Accept:text/plain"}
     )
     String simpleGetMultiQuery(@Query("password") String password);
@@ -53,7 +75,6 @@ public interface GetClient {
 
     @Get(url = "http://localhost:${port}/boolean/false")
     Boolean getBooleanResultFalse();
-
 
 
     @Request(
@@ -361,12 +382,26 @@ public interface GetClient {
     String getQueryStringWithoutName2(@Query String name);
 
     @Get(
-            url = "http://xxxxxx:yyyy@localhost:8080/hello/user",
+            url = "http://xxxxxx:yyyy@localhost:{port}/hello/user",
             headers = {"Accept:text/plain"}
     )
-    ForestResponse<String> getUrlWithAt();
+    ForestResponse<String> getUrlWithUserInfo();
 
-    @Get("http://localhost:${port}/token")
+    @Get(
+            url = "http://xxxxxx:1234@localhost:{port}/hello/user",
+            headers = {"Accept:text/plain"}
+    )
+    ForestResponse<String> getUrlWithUserInfo2();
+
+    @Get(
+            url = "http://{userInfo}@localhost:{port}/hello/user?name=foo",
+            headers = {"Accept:text/plain"}
+    )
+    ForestResponse<String> getUrlWithUserInfo3(@Var("userInfo") String userInfo);
+
+
+
+    @Get("http://localhost:{port}/token")
     TokenResult getToken();
 
 }

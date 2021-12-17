@@ -17,4 +17,8 @@ public interface RetryClient {
     @Retry(maxRetryCount = "${0}", maxRetryInterval = "${1}", condition = TestRetryWhen.class)
     String testRetry(int retryCount, long retryInterval, OnSuccess<String> onSuccess);
 
+    @Get("/")
+    @Retry(maxRetryCount = "${0}", maxRetryInterval = "${1}", condition = ErrorRetryWhen.class)
+    String testRetryWhenWithError(int retryCount, long retryInterval, OnSuccess<String> onSuccess);
+
 }

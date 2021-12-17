@@ -112,6 +112,16 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="maxAsyncThreadSize" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           Maximum number of async requests threads.
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+
         <xsd:attribute name="maxConnections" type="xsd:string" use="optional">
             <xsd:annotation>
                 <xsd:documentation>
@@ -410,11 +420,22 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+
+        <xsd:attribute name="hostnameVerifier" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           域名验证器
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+
         <xsd:attribute name="sslSocketFactoryBuilder" type="xsd:string" use="optional">
             <xsd:annotation>
                 <xsd:documentation>
                     <![CDATA[
-                           Cert密码
+                           SSL Socket工厂构造器
                         ]]>
                 </xsd:documentation>
             </xsd:annotation>

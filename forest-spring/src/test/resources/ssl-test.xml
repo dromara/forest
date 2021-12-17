@@ -15,7 +15,13 @@
             maxConnections="500"
             maxRouteConnections="500">
 
-        <forest:ssl-keystore id="keystore1" file="test.keystore" keystorePass="123456" certPass="123456" sslSocketFactoryBuilder="com.dtflys.spring.test.ssl.MySSLSocketFactoryBuilder"/>
+        <forest:ssl-keystore
+                id="keystore1"
+                file="test.keystore"
+                keystorePass="123456"
+                certPass="123456"
+                hostnameVerifier="com.dtflys.spring.test.ssl.MyHostnameVerifier"
+                sslSocketFactoryBuilder="com.dtflys.spring.test.ssl.MySSLSocketFactoryBuilder"/>
     </forest:configuration>
 
     <forest:client id="beastshopClient" configuration="forestConfiguration" class="com.dtflys.spring.test.client0.BeastshopClient"/>

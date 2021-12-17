@@ -1,6 +1,7 @@
 package com.dtflys.forest.backend.httpclient.request;
 
 import com.dtflys.forest.backend.AbstractHttpExecutor;
+import com.dtflys.forest.backend.httpclient.conn.ForestSSLConnectionFactory;
 import com.dtflys.forest.backend.httpclient.conn.HttpclientConnectionManager;
 import com.dtflys.forest.backend.httpclient.response.HttpclientForestResponseFactory;
 import com.dtflys.forest.backend.httpclient.response.HttpclientResponseHandler;
@@ -80,6 +81,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
         ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
         try {
             logRequest(request.getCurrentRetryCount(), (HttpRequestBase) httpRequest);
+            connectionManager.hostnameVerifier(request);
             httpResponse = client.execute(httpRequest);
         } catch (Throwable e) {
             httpRequest.abort();
@@ -107,7 +109,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
         response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, null, startDate);
         // 检查是否重试
         ForestRetryException retryEx = request.canRetry(response);
-        if (retryEx != null && !retryEx.isMaxRetryCountReached()) {
+        if (retryEx != null && retryEx.isNeedRetry() && !retryEx.isMaxRetryCountReached()) {
             executor.execute(lifeCycleHandler);
             return;
         }

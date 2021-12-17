@@ -46,7 +46,7 @@ public class ForestProtobufConverterManager implements Serializable {
 
     private volatile Class messageClass;
 
-    private volatile Boolean supportProtobuf;
+    private volatile Boolean supportProtobuf = null;
 
     public static ForestProtobufConverterManager getInstance() {
         if (instance != null) {
@@ -56,10 +56,9 @@ public class ForestProtobufConverterManager implements Serializable {
         return instance;
     }
 
-
     public boolean checkSupportProtobuf() {
-        if (supportProtobuf != null) {
-            return supportProtobuf;
+        if (supportProtobuf != null && !supportProtobuf) {
+            throw new ForestRuntimeException("Protobuf is not supported.");
         }
         try {
             Class.forName("com.google.protobuf.Parser");
@@ -95,24 +94,12 @@ public class ForestProtobufConverterManager implements Serializable {
         return messageClazz.isAssignableFrom(clazz);
     }
 
-
     public boolean isProtobufMessageType(Type type) {
         if (type == null) {
             return false;
         }
         Class clazz = ReflectUtils.toClass(type);
         return isProtobufMessageClass(clazz);
-    }
-
-    public boolean isProtobufMessageInstance(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (!checkSupportProtobuf()) {
-            return false;
-        }
-        Class messageClazz = getMessageClass();
-        return messageClazz.isAssignableFrom(obj.getClass());
     }
 
     public ForestProtobufConverter getForestProtobufConverter() {

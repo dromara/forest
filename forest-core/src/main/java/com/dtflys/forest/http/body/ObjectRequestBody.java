@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ public class ObjectRequestBody extends ForestRequestBody implements SupportFormU
     public Object getObject() {
         return object;
     }
+
 
     public void setObject(Object object) {
         this.object = object;

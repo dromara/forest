@@ -81,6 +81,7 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
         File file = new File(path);
         try {
             FileUtils.copyInputStreamToFile(in, file);
+            FileUtils.waitFor(file, 10);
             if (logConfiguration.isLogEnabled() || !file.exists()) {
                 logHandler.logContent("Saved file '" + path + "' successful.");
             }

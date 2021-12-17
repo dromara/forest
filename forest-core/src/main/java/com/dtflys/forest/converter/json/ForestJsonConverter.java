@@ -26,7 +26,19 @@ package com.dtflys.forest.converter.json;
 
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.ForestEncoder;
+import com.dtflys.forest.http.ForestBody;
+import com.dtflys.forest.http.ForestRequestBody;
+import com.dtflys.forest.http.body.ByteArrayRequestBody;
+import com.dtflys.forest.http.body.NameValueRequestBody;
+import com.dtflys.forest.http.body.ObjectRequestBody;
+import com.dtflys.forest.http.body.StringRequestBody;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -56,4 +68,88 @@ public interface ForestJsonConverter extends ForestConverter<String>, ForestEnco
      * @return 日期格式化模板字符
      */
     String getDateFormat();
+
+    @Override
+    default byte[] encodeRequestBody(ForestBody body, Charset charset) {
+        if (charset == null) {
+            charset = StandardCharsets.UTF_8;
+        }
+        List<ForestRequestBody> bodyList = new LinkedList(body);
+        if (!bodyList.isEmpty()) {
+            Object toJsonObj = bodyList;
+            if (bodyList.size() == 1) {
+                toJsonObj = bodyList.get(0);
+            } else {
+                Map<String, Object> jsonMap = null;
+                List jsonArray = null;
+                for (ForestRequestBody bodyItem : bodyList) {
+                    if (bodyItem instanceof NameValueRequestBody) {
+                        if (jsonMap == null) {
+                            jsonMap = new LinkedHashMap<>(bodyList.size());
+                        }
+                        jsonMap.put(((NameValueRequestBody) bodyItem).getName(), ((NameValueRequestBody) bodyItem).getValue());
+                    } else if (bodyItem instanceof StringRequestBody) {
+                        String content = bodyItem.toString();
+                        Map subMap = this.convertObjectToMap(content);
+                        if (subMap != null) {
+                            if (jsonMap == null) {
+                                jsonMap = new LinkedHashMap<>(bodyList.size());
+                            }
+                            jsonMap.putAll(subMap);
+                        } else {
+                            if (jsonArray == null) {
+                                jsonArray = new LinkedList<>();
+                            }
+                            jsonArray.add(content);
+                        }
+                    } else if (bodyItem instanceof ObjectRequestBody) {
+                        Object obj = ((ObjectRequestBody) bodyItem).getObject();
+                        if (obj == null) {
+                            continue;
+                        }
+                        if (obj instanceof List) {
+                            if (jsonArray == null) {
+                                jsonArray = new LinkedList();
+                            }
+                            jsonArray.addAll((List) obj);
+                        } else {
+                            Map subMap = this.convertObjectToMap(obj);
+                            if (subMap == null) {
+                                continue;
+                            }
+                            if (jsonMap == null) {
+                                jsonMap = new LinkedHashMap<>(bodyList.size());
+                            }
+                            jsonMap.putAll(subMap);
+                        }
+                    }
+                }
+                if (jsonMap != null) {
+                    toJsonObj = jsonMap;
+                } else if (jsonArray != null) {
+                    toJsonObj = jsonArray;
+                }
+            }
+            String text = null;
+            if (toJsonObj instanceof CharSequence || toJsonObj instanceof StringRequestBody) {
+                text = toJsonObj.toString();
+                return text.getBytes(charset);
+            } else if (toJsonObj instanceof ObjectRequestBody) {
+                text = this.encodeToString(((ObjectRequestBody) toJsonObj).getObject());
+                return text.getBytes(charset);
+            } else if (toJsonObj instanceof NameValueRequestBody) {
+                Map<String, Object> subMap = new HashMap<>(1);
+                subMap.put(((NameValueRequestBody) toJsonObj).getName(), ((NameValueRequestBody) toJsonObj).getValue());
+                text = this.encodeToString(subMap);
+                return text.getBytes(charset);
+            } else if (toJsonObj instanceof ByteArrayRequestBody) {
+                byte[] bytes = ((ByteArrayRequestBody) toJsonObj).getByteArray();
+                return bytes;
+            } else {
+                text = this.encodeToString(toJsonObj);
+                return text.getBytes(charset);
+            }
+        }
+        return new byte[0];
+    }
 }

@@ -1,6 +1,7 @@
 package com.dtflys.forest.multipart;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -20,8 +21,6 @@ import java.io.InputStream;
  * @see InputStreamMultipart
  */
 public abstract class ForestMultipart<T, SELF extends ForestMultipart<T, SELF>> {
-
-    private int BUFFER_SIZE = 4096;
 
     protected String name;
 
@@ -66,25 +65,11 @@ public abstract class ForestMultipart<T, SELF extends ForestMultipart<T, SELF>> 
     public abstract File getFile();
 
     public byte[] getBytes() {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         InputStream inputStream = getInputStream();
-        byte[] buffer = new byte[BUFFER_SIZE];
-        int len = 0;
         try {
-            while ((len = inputStream.read(buffer)) != -1) {
-                byteArrayOutputStream.write(buffer, 0, len);
-            }
-            byteArrayOutputStream.flush();
-            return byteArrayOutputStream.toByteArray();
+            return IOUtils.toByteArray(inputStream);
         } catch (IOException e) {
             throw new ForestRuntimeException(e);
-        } finally {
-            try {
-                inputStream.close();
-                byteArrayOutputStream.close();
-            } catch (IOException e) {
-                throw new ForestRuntimeException(e);
-            }
         }
     }
 

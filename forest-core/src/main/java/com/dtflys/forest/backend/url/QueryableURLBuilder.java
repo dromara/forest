@@ -30,7 +30,7 @@ public class QueryableURLBuilder extends URLBuilder {
                 paramBuilder.append(queryParam.getName());
             }
             String value = MappingTemplate.getParameterValue(jsonConverter, queryParam.getValue());
-            if (StringUtils.isNotEmpty(value) && request.getCharset() != null) {
+            if (value != null && request.getCharset() != null) {
                 if (name != null) {
                     paramBuilder.append('=');
                 }
@@ -42,14 +42,10 @@ public class QueryableURLBuilder extends URLBuilder {
                     charset = "UTF-8";
                 }
                 String encodedValue = null;
-                try {
-                    if (queryParam.isUrlencoded()) {
-                        encodedValue = URLUtils.forceEncode(value, charset);
-                    } else {
-//                        encodedValue = value;
-                        encodedValue = URLUtils.encode(value, charset);
-                    }
-                } catch (UnsupportedEncodingException e) {
+                if (queryParam.isUrlencoded()) {
+                    encodedValue = URLUtils.allEncode(value, charset);
+                } else {
+                    encodedValue = URLUtils.queryValueEncode(value, charset);
                 }
                 if (encodedValue != null) {
                     paramBuilder.append(encodedValue);

@@ -27,73 +27,13 @@ public class OkHttp3Backend extends AbstractHttpBackend {
     }
 
     @Override
-    protected HttpExecutor createHeadExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
-        return new OkHttp3HeadExecutor(
+    public HttpExecutor createSyncExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
+        return new OkHttp3Executor(
+                request,
                 (OkHttp3ConnectionManager) connectionManager,
-                getOkHttp3ResponseHandler(request, lifeCycleHandler),
-                request);
+                getOkHttp3ResponseHandler(request, lifeCycleHandler));
     }
 
-    @Override
-    protected HttpExecutor createGetExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
-        return new OkHttp3GetExecutor(
-                (OkHttp3ConnectionManager) connectionManager,
-                getOkHttp3ResponseHandler(request, lifeCycleHandler),
-                request);
-
-    }
-
-    @Override
-    protected HttpExecutor createPostExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
-        return new OkHttp3PostExecutor(
-                (OkHttp3ConnectionManager) connectionManager,
-                getOkHttp3ResponseHandler(request, lifeCycleHandler),
-                request);
-    }
-
-    @Override
-    protected HttpExecutor createPutExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
-            return new OkHttp3PutExecutor(
-                    (OkHttp3ConnectionManager) connectionManager,
-                    getOkHttp3ResponseHandler(request, lifeCycleHandler),
-                    request);
-
-        }
-
-    @Override
-    protected HttpExecutor createDeleteExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
-        return new OkHttp3DeleteExecutor(
-                (OkHttp3ConnectionManager) connectionManager,
-                getOkHttp3ResponseHandler(request, lifeCycleHandler),
-                request);
-
-    }
-
-    @Override
-    protected HttpExecutor createOptionsExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
-        return new OkHttp3OptionsExecutor(
-                (OkHttp3ConnectionManager) connectionManager,
-                getOkHttp3ResponseHandler(request, lifeCycleHandler),
-                request);
-
-    }
-
-    @Override
-    protected HttpExecutor createTraceExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
-        return new OkHttp3TraceExecutor(
-                (OkHttp3ConnectionManager) connectionManager,
-                getOkHttp3ResponseHandler(request, lifeCycleHandler),
-                request);
-
-    }
-
-    @Override
-    protected HttpExecutor createPatchExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
-        return new OkHttp3PatchExecutor(
-                (OkHttp3ConnectionManager) connectionManager,
-                getOkHttp3ResponseHandler(request, lifeCycleHandler),
-                request);
-    }
 
 
     private OkHttp3ResponseHandler getOkHttp3ResponseHandler(ForestRequest request, LifeCycleHandler lifeCycleHandler) {

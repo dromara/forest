@@ -40,22 +40,28 @@ public class OkHttp3ForestResponse extends ForestResponse {
             this.statusCode = null;
             return;
         }
-        contentEncoding = okResponse.headers().get("Content-Encoding");
-        // 判断是否将Response数据按GZIP来解压
-        isGzip = request.isDecompressResponseGzipEnabled();
 
         this.body = okResponse.body();
         this.statusCode = okResponse.code();
         this.reasonPhrase = okResponse.message();
         setupHeaders();
+        setupContentEncoding();
+        // 判断是否将Response数据按GZIP来解压
+        setupGzip();
         if (body == null) {
             return;
         }
-        setupContentTypeAndEncoding();
-        if (StringUtils.isNotBlank(request.getResponseEncode())) {
-            this.contentEncoding = request.getResponseEncode();
-        } else if (contentType == null || contentType.isEmpty()) {
-//            this.content = readContentAsString();
+        setupContentTypeAndCharset();
+        setupContent();
+    }
+
+    /**
+     * @author designer[19901753334@163.com]
+     * @date 2021/12/8 23:51
+     **/
+    private void setupContent() {
+        if (contentType == null || contentType.isEmpty()) {
+            this.content = readContentAsString();
         } else if (!request.isDownloadFile() && contentType.canReadAsString()) {
 //            this.content = readContentAsString();
         } else if (contentType.canReadAsBinaryStream()) {
@@ -63,13 +69,29 @@ public class OkHttp3ForestResponse extends ForestResponse {
             builder.append("[content-type: ")
                     .append(contentType.toString());
             if (contentEncoding != null) {
-                builder.append("; encoding: ")
+                builder.append("; content-encoding: ")
                         .append(contentEncoding);
+            }
+            if (charset != null) {
+                builder.append("; charset: ")
+                        .append(charset);
             }
             builder.append("; length: ")
                     .append(contentLength)
                     .append("]");
             this.content = builder.toString();
+        }
+    }
+
+    /**
+     * @author designer[19901753334@163.com]
+     * @date 2021/12/8 23:51
+     **/
+    private void setupGzip() {
+        if(this.contentEncoding != null && !request.isDecompressResponseGzipEnabled()){
+            isGzip = GzipUtils.isGzip(contentEncoding);
+        } else {
+            isGzip = true;
         }
     }
 
@@ -94,7 +116,12 @@ public class OkHttp3ForestResponse extends ForestResponse {
         }
     }
 
-    private void setupContentTypeAndEncoding() {
+
+    /**
+     * @author designer[19901753334@163.com]
+     * @date 2021/12/8 23:51
+     **/
+    private void setupContentTypeAndCharset() {
         MediaType mediaType = body.contentType();
         if (mediaType != null) {
             String type = mediaType.type();
@@ -102,9 +129,39 @@ public class OkHttp3ForestResponse extends ForestResponse {
             this.contentType = new ContentType(type, subType);
             Charset charset = mediaType.charset();
             if (charset != null) {
-                this.contentEncoding = charset.name();
+                this.charset = charset.name();
+                return;
             }
         }
+        setupResponseCharset();
+    }
+
+
+    /**
+     * @author designer[19901753334@163.com]
+     * @date 2021/12/8 23:51
+     **/
+    private void setupResponseCharset() {
+        if (StringUtils.isNotBlank(request.getResponseEncode())) {
+            this.charset = request.getResponseEncode();
+        } else if (contentType != null) {
+            this.charset = this.contentType.getCharset();
+        } else {
+            if (this.contentEncoding != null) {
+                try {
+                    Charset.forName(this.contentEncoding);
+                    this.charset = this.contentEncoding;
+                } catch (Throwable ignored) {
+                }
+            }
+        }
+    }
+
+    /**
+     * @author designer[19901753334@163.com]
+     * @date 2021/12/8 23:51
+     **/
+    private void setupContentEncoding() {
         if (StringUtils.isEmpty(this.contentEncoding)) {
             this.contentEncoding = okResponse.header("Content-Encoding");
         }

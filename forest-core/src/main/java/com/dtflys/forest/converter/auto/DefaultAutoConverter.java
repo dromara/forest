@@ -2,9 +2,12 @@ package com.dtflys.forest.converter.auto;
 
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ForestConverter;
+import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.converter.protobuf.ForestProtobufConverterManager;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.http.ForestBody;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
 import org.apache.commons.io.FileUtils;
@@ -27,81 +30,21 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
         this.configuration = configuration;
     }
 
-    @Override
-    public <T> T convertToJavaObject(Object source, Class<T> targetType) {
-        if (source == null) {
-            return null;
-        }
-        if (source instanceof InputStream
-                || source instanceof byte[]
-                || source instanceof File) {
-            if (canReadAsBinary(targetType)) {
-                return tryConvert(source, targetType, ForestDataType.BINARY);
-            }
-            if (protobufConverterManager.isProtobufMessageClass(targetType)) {
-                return tryConvert(source, targetType, ForestDataType.PROTOBUF);
-            }
-            source = readAsString(source);
-        }
-        T result = null;
-        if (source instanceof CharSequence) {
-            String str = source.toString();
-            if (String.class.isAssignableFrom(targetType)) {
-                return (T) str;
-            }
-            String trimmedStr = str.trim();
-            if (trimmedStr.length() == 0) {
-                if (CharSequence.class.isAssignableFrom(targetType)) {
-                    return tryConvert(str, targetType, ForestDataType.TEXT);
-                }
-                return null;
-            }
-            char ch = trimmedStr.charAt(0);
-            try {
-                if (ch == '{' || ch == '[') {
-                    result = tryConvert(trimmedStr, targetType, ForestDataType.JSON);
-                } else if (ch == '<') {
-                    result = tryConvert(trimmedStr, targetType, ForestDataType.XML);
-                } else if (Character.isDigit(ch)) {
-                    try {
-                        result = tryConvert(trimmedStr, targetType, ForestDataType.JSON);
-                    } catch (Throwable th) {
-                        result = tryConvert(source, targetType, ForestDataType.TEXT);
-                    }
-                } else if ("true".equalsIgnoreCase(trimmedStr)) {
-                    if (boolean.class.isAssignableFrom(targetType) || Boolean.class.isAssignableFrom(targetType)) {
-                        result = (T) Boolean.TRUE;
-                    } else {
-                        result = tryConvert(trimmedStr, targetType, ForestDataType.TEXT);
-                    }
-                } else if ("false".equalsIgnoreCase(trimmedStr)) {
-                    if (boolean.class.isAssignableFrom(targetType) || Boolean.class.isAssignableFrom(targetType)) {
-                        result = (T) Boolean.FALSE;
-                    } else {
-                        result = tryConvert(trimmedStr, targetType, ForestDataType.TEXT);
-                    }
-                } else {
-                    result = tryConvert(source, targetType, ForestDataType.TEXT);
-                }
-            } catch (Throwable th) {
-                try {
-                    result = tryConvert(trimmedStr, targetType, ForestDataType.TEXT);
-                } catch (Throwable th2) {
-                    throw new ForestConvertException(this, th2);
-                }
-            }
-        }
-        return result;
-    }
-
-    private <T> T tryConvert(Object source, Class<T> targetType, ForestDataType dataType) {
-        return (T) configuration.getConverterMap().get(dataType).convertToJavaObject(source, targetType);
-    }
 
     private <T> T tryConvert(Object source, Type targetType, ForestDataType dataType) {
         return (T) configuration.getConverterMap().get(dataType).convertToJavaObject(source, targetType);
     }
 
+    private byte[] tryEncodeRequest(ForestRequest request, ForestDataType dataType, Charset charset) {
+        ForestConverter converter = configuration.getConverterMap().get(dataType);
+        if (converter == null || !(converter instanceof ForestEncoder)) {
+            converter = configuration.getConverterMap().get(ForestDataType.TEXT);
+        }
+        if (converter != null && converter instanceof ForestEncoder) {
+            return ((ForestEncoder) converter).encodeRequestBody(request, charset);
+        }
+        throw new ForestRuntimeException("Cannot resolve encoder '" + dataType.getName() + "'");
+    }
 
     @Override
     public <T> T convertToJavaObject(Object source, Type targetType) {

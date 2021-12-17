@@ -25,6 +25,7 @@
 package com.dtflys.forest.converter.json;
 
 import com.dtflys.forest.exceptions.ForestConvertException;
+import com.dtflys.forest.http.ForestBody;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -79,14 +80,6 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         }
     }
 
-    @Override
-    public <T> T convertToJavaObject(String source, Class<T> targetType) {
-        try {
-            return mapper.readValue(source, targetType);
-        } catch (IOException e) {
-            throw new ForestConvertException(this, e);
-        }
-    }
 
     @Override
     public <T> T convertToJavaObject(String source, Type targetType) {

@@ -1,9 +1,14 @@
 package com.dtflys.forest.converter.binary;
 
 import com.dtflys.forest.converter.ForestConverter;
+import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.converter.auto.DefaultAutoConverter;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.http.ForestBody;
+import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestRequestBody;
+import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.ByteEncodeUtils;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
@@ -14,6 +19,8 @@ import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * 默认的二进制数据转换器
@@ -21,7 +28,7 @@ import java.nio.charset.StandardCharsets;
  * @author gongjun
  * @since 2020-08-03 20:05
  */
-public class DefaultBinaryConverter implements ForestConverter<Object> {
+public class DefaultBinaryConverter implements ForestConverter<Object>, ForestEncoder {
 
     private DefaultAutoConverter autoConverter;
 
@@ -128,4 +135,30 @@ public class DefaultBinaryConverter implements ForestConverter<Object> {
         return ForestDataType.BINARY;
     }
 
+    @Override
+    public byte[] encodeRequestBody(ForestRequest request, Charset charset) {
+        ForestBody reqBody = request.body();
+        List<ForestMultipart> multiparts = request.getMultiparts();
+        List<byte[]> byteList = new LinkedList<>();
+        int size = 0;
+        for (ForestMultipart multipart : multiparts) {
+            byte[] byteArray = multipart.getBytes();
+            byteList.add(byteArray);
+            size += byteArray.length;
+        }
+        for (ForestRequestBody body : reqBody) {
+            byte[] byteArray = body.getByteArray();
+            byteList.add(byteArray);
+            size += byteArray.length;
+        }
+        byte[] bytes = new byte[size];
+        int pos = 0;
+        for (byte[] bytesItem : byteList) {
+            for (int i = 0; i < bytesItem.length; i++) {
+                bytes[pos + i] = bytesItem[i];
+            }
+            pos += bytesItem.length;
+        }
+        return bytes;
+    }
 }
