@@ -13,11 +13,13 @@ public interface AddressClient {
 
     @Post("/")
     @Address(host = "${0}", port = "${1}")
-    ForestRequest<String> sendHostPort(String host, int port);
+    ForestRequest<String> testHostPort(String host, int port);
 
     @Post("/")
     @Address(source = MyAddressSource.class)
-    ForestRequest<String> sendAddressSource(@Var("port") int port);
+    ForestRequest<String> testAddressSource(@Var("port") int port);
 
-
+    @Post("/xxx")
+    @Address(host = "{0}", port = "{1}", basePath = "{2}")
+    ForestRequest<String> testBasePath(String host, int port, String basePath);
 }

@@ -76,6 +76,10 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         prepareBaseInfo(interfaceClass);
     }
 
+    public Class<T> getInterfaceClass() {
+        return this.interfaceClass;
+    }
+
     @SuppressWarnings("deprecation")
     private void processBaseAnnotation(Class parentAnnType, Annotation[] annotations) {
         for (int i = 0; i < annotations.length; i++) {

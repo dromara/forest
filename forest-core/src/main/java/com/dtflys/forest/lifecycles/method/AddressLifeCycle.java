@@ -36,7 +36,15 @@ public class AddressLifeCycle implements MethodAnnotationLifeCycle<Address, Obje
         String schemeStr = annotation.scheme();
         String hostStr = annotation.host();
         String portStr = annotation.port();
+        String basePathStr = annotation.basePath();
         Object addressSource = request.getMethod().getExtensionParameterValue(PARAM_KEY_ADDRESS_SOURCE);
+
+        // 判断是否有设置 basePath
+        if (StringUtils.isNotBlank(basePathStr)) {
+            MappingTemplate basePathTemplate = request.getMethod().makeTemplate(Address.class, "basePath", basePathStr.trim());
+            String basePath = basePathTemplate.render(args);
+            request.basePath(basePath);
+        }
 
         // 判断是否有设置 scheme
         if (StringUtils.isNotBlank(schemeStr)) {
@@ -66,6 +74,7 @@ public class AddressLifeCycle implements MethodAnnotationLifeCycle<Address, Obje
                 throw new ForestRuntimeException("[Forest] property 'port' of annotation @Address must be a number!");
             }
         }
+
 
         // 最后判断有无设置回调函数，此项设置会覆盖 host 和 port 以及 scheme 属性的设置
         if (addressSource != null && addressSource instanceof AddressSource) {

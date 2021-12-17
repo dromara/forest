@@ -65,6 +65,11 @@ public class ForestURL {
     private Integer port;
 
     /**
+     * URL根路径
+     */
+    private String basePath;
+
+    /**
      * URL路径
      * <p>该路径为整个URL去除前面协议 + Host + Port 后部分
      */
@@ -136,6 +141,7 @@ public class ForestURL {
         if (baseAddress != null) {
             String baseScheme = baseAddress.getScheme();
             String baseHost = baseAddress.getHost();
+
             int basePort = baseAddress.getPort();
             setScheme(baseScheme);
             setHost(baseHost);
@@ -190,8 +196,49 @@ public class ForestURL {
     }
 
     /**
-     * 获取URL路径
+     * 获取URL根路径
      * <p>该路径为整个URL去除前面协议 + Host + Port 后部分
+     *
+     * @return URL根路径
+     */
+    public String getBasePath() {
+        return basePath;
+    }
+
+    /**
+     * 设置URL根路径
+     * <p>该路径为整个URL去除前面协议 + Host + Port 后部分
+     *
+     * @param basePath
+     */
+    public ForestURL setBasePath(String basePath) {
+        if (basePath == null) {
+            return this;
+        }
+        this.basePath = basePath.trim();
+        if (!this.basePath.startsWith("/")) {
+            if (URLUtils.isURL(this.basePath)) {
+                try {
+                    URL url = new URL(this.basePath);
+                    this.scheme = url.getProtocol();
+                    this.userInfo = url.getUserInfo();
+                    this.host = url.getHost();
+                    this.port = url.getPort();
+                    this.basePath = url.getPath();
+                } catch (MalformedURLException e) {
+                    throw new ForestRuntimeException(e);
+                }
+            } else {
+                this.basePath = "/" + this.basePath;
+            }
+        }
+        this.originalUrl = toURLString();
+        return this;
+    }
+
+    /**
+     * 获取URL路径
+     * <p>该路径为整个URL去除前面协议 + Host + Port + BasePath 后部分
      *
      * @return URL路径
      */
@@ -201,7 +248,7 @@ public class ForestURL {
 
     /**
      * 设置URL路径
-     * <p>该路径为整个URL去除前面协议 + Host + Port 后部分
+     * <p>该路径为整个URL去除前面协议 + Host + Port + BasePath 后部分
      *
      * @param path URL路径
      * @return {@link ForestURL}对象实例
@@ -272,6 +319,9 @@ public class ForestURL {
         if (StringUtils.isNotEmpty(authority)) {
             builder.append(authority);
         }
+        if (StringUtils.isNotEmpty(basePath)) {
+            builder.append(URLUtils.pathEncode(basePath, "UTF-8"));
+        }
         if (StringUtils.isNotEmpty(path)) {
             builder.append(URLUtils.pathEncode(path, "UTF-8"));
         }
@@ -316,6 +366,9 @@ public class ForestURL {
         String newPath = this.path == null ? url.path : this.path;
         return new ForestURL(newSchema, newUserInfo, newHost, newPort, newPath);
     }
+
+
+
 
     /**
      * 设置基地址URL

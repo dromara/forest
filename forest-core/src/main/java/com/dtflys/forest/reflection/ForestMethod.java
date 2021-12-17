@@ -272,13 +272,15 @@ public class ForestMethod<T> implements VariableScope {
             }
         }
 
+/*
         List<Annotation> baseAnnotationList = interfaceProxyHandler.getBaseAnnotations();
-        Map<Annotation, Class> baseAnnMap = new LinkedHashMap<>(baseAnnotationList.size());
+        List<ForestAnnotation> baseAnns = new LinkedList<>();
         for (Annotation annotation : baseAnnotationList) {
             Class interceptorClass = getAnnotationLifeCycleClass(annotation);
-            baseAnnMap.put(annotation, interceptorClass);
+            baseAnns.add(new ForestAnnotation(annotation, interceptorClass));
         }
-        addMetaRequestAnnotations(baseAnnMap);
+        addMetaRequestAnnotations(baseAnns);
+*/
     }
 
     private <T extends Interceptor> T addInterceptor(Class<T> interceptorClass) {
@@ -366,11 +368,11 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 添加元请求注释表
-     * @param annMap 请求注释表
+     * @param anns 请求注释表
      */
-    private void addMetaRequestAnnotations(Map<Annotation, Class> annMap) {
-        for (Map.Entry<Annotation, Class> entry : annMap.entrySet()) {
-            addMetaRequestAnnotation(entry.getKey(), entry.getValue());
+    private void addMetaRequestAnnotations(List<ForestAnnotation> anns) {
+        for (ForestAnnotation ann : anns) {
+            addMetaRequestAnnotation(ann.getAnnotation(), ann.getInterceptor());
         }
     }
 
@@ -450,27 +452,64 @@ public class ForestMethod<T> implements VariableScope {
         return metaRequest;
     }
 
+    private static class ForestAnnotation {
+        private final Annotation annotation;
+        private final Class<? extends Interceptor> interceptor;
+
+        private ForestAnnotation(Annotation annotation, Class<? extends Interceptor> interceptor) {
+            this.annotation = annotation;
+            this.interceptor = interceptor;
+        }
+
+        public Annotation getAnnotation() {
+            return annotation;
+        }
+
+        public Class<? extends Interceptor> getInterceptor() {
+            return interceptor;
+        }
+    }
+
+    private void fetchAnnotationsFromClasses(List<Annotation> annotationList, Class[] classes) {
+        for (Class clazz : classes) {
+            if (clazz == null || clazz == Object.class) {
+                continue;
+            }
+            fetchAnnotationsFromClasses(annotationList, clazz.getInterfaces());
+            for (Annotation ann : clazz.getAnnotations()) {
+                annotationList.add(ann);
+            }
+        }
+    }
 
     /**
      * 处理方法上的注解列表
      */
     private void processMethodAnnotations() {
-        Annotation[] annotations = method.getAnnotations();
-        Map<Annotation, Class> requestAnns = new LinkedHashMap();
-        Map<Annotation, Class> methodAnns = new LinkedHashMap<>();
+        List<Annotation> annotationList = new LinkedList<>();
+        fetchAnnotationsFromClasses(annotationList, new Class[] {interfaceProxyHandler.getInterfaceClass()});
+
+        for (Annotation ann : method.getAnnotations()) {
+            annotationList.add(ann);
+        }
+
+        List<ForestAnnotation> requestAnns = new LinkedList<>();
+        List<ForestAnnotation> methodAnns = new LinkedList<>();
 
         // 对注解分类
-        for (int i = 0; i < annotations.length; i++) {
-            Annotation ann = annotations[i];
+        for (Annotation ann : annotationList) {
+            if (ann instanceof BaseRequest) {
+                continue;
+            }
             Map<Annotation, Class<? extends Interceptor>> lifeCycleClassMap = getAnnotationLifeCycleClassMap(ann);
             if (lifeCycleClassMap != null && !lifeCycleClassMap.isEmpty()) {
                 for (Map.Entry<Annotation, Class<? extends Interceptor>> entry : lifeCycleClassMap.entrySet()) {
                     Annotation subAnn = entry.getKey();
                     Class<? extends Interceptor> lifeCycleClass = entry.getValue();
                     if (RequestLifeCycle.class.isAssignableFrom(lifeCycleClass)) {
-                        requestAnns.put(subAnn, lifeCycleClass);
+                        requestAnns.add(new ForestAnnotation(subAnn, lifeCycleClass));
                     } else {
-                        methodAnns.put(subAnn, lifeCycleClass);
+                        methodAnns.add(new ForestAnnotation(subAnn, lifeCycleClass));
                     }
                 }
             }

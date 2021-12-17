@@ -7,14 +7,14 @@ import com.dtflys.forest.annotation.Post;
 import com.dtflys.forest.annotation.Var;
 import com.dtflys.forest.http.ForestRequest;
 
-@OkHttp3
+@HttpClient
 @Address(host = "localhost", port = "${port}")
 public interface BackendClient2 {
 
     @Post("/")
     ForestRequest<String> testBaseBackend(@Var("port") int port);
 
-    @HttpClient
+    @OkHttp3
     @Post("/")
     ForestRequest<String> testMethodBackend(@Var("port") int port);
 

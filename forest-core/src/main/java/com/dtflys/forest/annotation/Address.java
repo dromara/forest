@@ -69,6 +69,34 @@ public @interface Address {
     String port() default "";
 
     /**
+     * URL根路径
+     * <p>两种使用方式：
+     *
+     * <ul>
+     *     <li>
+     *         <p>1. 短路径
+     *         <pre>
+     *             basePath = "/abc"
+     *             basePath = "/abc/123"
+     *         </pre>
+     *     </li>
+     *     <li>
+     *         <p>2. 完整URL
+     *         <pre>
+     *             basePath = "http://localhost:8080/abc"
+     *             basePath = "http://localhost:8080/abc/123"
+     *         </pre>
+     *     </li>
+     * </ul>
+     *
+     * <p>在使用完整URL时候会覆盖原有的 schema, host, 以及 port 属性
+     * <p>但若在本注解中设置以上三个属性，则它们的优先级高于 basePath 属性
+     *
+     * @return URL根路径
+     */
+    String basePath() default "";
+
+    /**
      * 动态构建主机地址信息的回调函数接口类
      * @return 回调函数接口类
      */

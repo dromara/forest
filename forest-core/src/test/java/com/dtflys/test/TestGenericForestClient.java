@@ -392,6 +392,95 @@ public class TestGenericForestClient extends BaseClientTest {
     }
 
     @Test
+    public void testRequest_change_base_path() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String result = Forest.get("/A")
+                .host("localhost")
+                .port(server.getPort())
+                .basePath("1/2/3/a/b/c")
+                .basePath("X/Y/Z")
+                .execute(String.class);
+        assertThat(result).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/X/Y/Z/A");
+    }
+
+    @Test
+    public void testRequest_change_base_path2() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String result = Forest.get("/A")
+                .host("localhost")
+                .port(server.getPort())
+                .basePath("X")
+                .path("B")
+                .execute(String.class);
+        assertThat(result).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/X/B");
+    }
+
+    @Test
+    public void testRequest_change_base_path3() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String result = Forest.get("/A")
+                .host("localhost")
+                .port(server.getPort())
+                .path("B")
+                .basePath("X")
+                .execute(String.class);
+        assertThat(result).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/X/B");
+    }
+
+    @Test
+    public void testRequest_change_base_path4() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String result = Forest.get("http://localhost:" + server.getPort() + "/abc/A")
+                .basePath("X")
+                .execute(String.class);
+        assertThat(result).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/X/abc/A");
+    }
+
+    @Test
+    public void testRequest_change_base_path5() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String result = Forest.get("/A")
+                .basePath("http://localhost:" + server.getPort() +  "/X1/X2")
+                .execute(String.class);
+        assertThat(result).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/X1/X2/A");
+    }
+
+    @Test
+    public void testRequest_change_base_path6() {
+        ForestRequest request = Forest.get("/A")
+                .host("baidu.com")
+                .port(1234)
+                .basePath("http://localhost:8080/X1/X2");
+        assertThat(request).isNotNull();
+        assertThat(request.host()).isEqualTo("localhost");
+        assertThat(request.port()).isEqualTo(8080);
+        assertThat(request.urlString()).isEqualTo("http://localhost:8080/X1/X2/A");
+    }
+
+    @Test
+    public void testRequest_change_base_path7() {
+        ForestRequest request = Forest.get("/A")
+                .basePath("http://localhost:8080/X1/X2")
+                .host("baidu.com")
+                .port(1234);
+        assertThat(request).isNotNull();
+        assertThat(request.host()).isEqualTo("baidu.com");
+        assertThat(request.port()).isEqualTo(1234);
+        assertThat(request.urlString()).isEqualTo("http://baidu.com:1234/X1/X2/A");
+    }
+
+
+    @Test
     public void testRequest_change_url() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         ForestRequest<?> request = Forest.get("/A")

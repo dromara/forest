@@ -84,7 +84,7 @@ public class TestBackendClient {
     public void testBaseBackend() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         ForestRequest<String> request = backendClient2.testBaseBackend(server.getPort());
-        assertThat(request.getBackend().getName()).isEqualTo("okhttp3");
+        assertThat(request.getBackend().getName()).isEqualTo("httpclient");
         String result = request.executeAsString();
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
     }
@@ -93,7 +93,7 @@ public class TestBackendClient {
     public void testMethodBackend() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         ForestRequest<String> request = backendClient2.testMethodBackend(server.getPort());
-        assertThat(request.getBackend().getName()).isEqualTo("httpclient");
+        assertThat(request.getBackend().getName()).isEqualTo("okhttp3");
         String result = request.executeAsString();
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
     }

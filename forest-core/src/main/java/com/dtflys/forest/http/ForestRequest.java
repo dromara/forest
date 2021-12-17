@@ -799,10 +799,57 @@ public class ForestRequest<T> {
         return setAddress(host, port);
     }
 
+    /**
+     * 设置URL根路径
+     * <p>该路径为整个URL去除前面协议 + Host + Port 后部分
+     *
+     * @param path URL根路径
+     * @return {@link ForestRequest}对象实例
+     */
+    public ForestRequest<T> setBasePath(String path) {
+        this.url.setBasePath(path);
+        return this;
+    }
+
+
+    /**
+     * 设置URL根路径
+     * <p>同 {@link ForestRequest#setBasePath(String)}方法
+     *
+     * @param path URL根路径
+     * @return {@link ForestRequest}对象实例
+     * @see ForestRequest#setBasePath(String)
+     */
+    public ForestRequest<T> basePath(String path) {
+        return setBasePath(path);
+    }
+
+    /**
+     * 获取URL根路径
+     * <p>该路径为整个URL去除前面协议 + Host + Port 后部分
+     *
+     * @return URL根路径
+     */
+    public String getBasePath() {
+        return this.url.getBasePath();
+    }
+
+    /**
+     * 获取URL根路径
+     * <p>该路径为整个URL去除前面协议 + Host + Port 后部分
+     * <p>同 {@link ForestRequest#getPath()}
+     *
+     * @return URL根路径
+     * @see ForestRequest#getPath()
+     */
+    public String basePath() {
+        return getBasePath();
+    }
+
 
     /**
      * 设置URL路径
-     * <p>该路径为整个URL去除前面协议 + Host + Port 后部分
+     * <p>该路径为整个URL去除前面协议 + Host + Port + BasePath 后部分
      *
      * @param path URL路径
      * @return {@link ForestRequest}对象实例
@@ -827,7 +874,7 @@ public class ForestRequest<T> {
 
     /**
      * 获取URL路径
-     * <p>该路径为整个URL去除前面协议 + Host + Port 后部分
+     * <p>该路径为整个URL去除前面协议 + Host + Port + BasePath 后部分
      *
      * @return URL路径
      */
@@ -837,7 +884,7 @@ public class ForestRequest<T> {
 
     /**
      * 获取URL路径
-     * <p>该路径为整个URL去除前面协议 + Host + Port 后部分
+     * <p>该路径为整个URL去除前面协议 + Host + Port + BasePath 后部分
      * <p>同 {@link ForestRequest#getPath()}
      *
      * @return URL路径

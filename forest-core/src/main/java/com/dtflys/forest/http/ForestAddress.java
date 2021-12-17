@@ -46,6 +46,38 @@ public class ForestAddress {
     private final int port;
 
     /**
+     * URL根路径
+     */
+    private final String basePath;
+
+    /**
+     * 实例化Forest主机地址信息
+     *
+     * @param scheme HTTP协议头
+     * @param host 主机地址(主机名/ip地址)
+     * @param port 主机端口号，如果为 -1， 代表未设置端口号
+     * @param basePath URL根路径
+     */
+    public ForestAddress(String scheme, String host, int port, String basePath) {
+        this.scheme = scheme;
+        this.host = host;
+        this.port = port;
+        this.basePath = basePath;
+    }
+
+    /**
+     * 实例化Forest主机地址信息
+     *
+     * @param scheme HTTP协议头
+     * @param host 主机地址(主机名/ip地址)
+     * @param port 主机端口号，如果为 -1， 代表未设置端口号
+     * @param basePath URL根路径
+     */
+    public ForestAddress(String scheme, String host, Integer port, String basePath) {
+        this(scheme, host, port == null ? -1 : port, basePath);
+    }
+
+    /**
      * 实例化Forest主机地址信息
      *
      * @param scheme HTTP协议头
@@ -53,10 +85,9 @@ public class ForestAddress {
      * @param port 主机端口号，如果为 -1， 代表未设置端口号
      */
     public ForestAddress(String scheme, String host, int port) {
-        this.scheme = scheme;
-        this.host = host;
-        this.port = port;
+        this(scheme, host, port, null);
     }
+
 
     /**
      * 实例化Forest主机地址信息
@@ -119,5 +150,13 @@ public class ForestAddress {
         return port;
     }
 
+    /**
+     * 获取URL根路径
+     *
+     * @return URL根路径
+     */
+    public String getBasePath() {
+        return basePath;
+    }
 
 }
