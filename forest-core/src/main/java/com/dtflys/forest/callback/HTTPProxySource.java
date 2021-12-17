@@ -10,8 +10,7 @@ import com.dtflys.forest.http.ForestRequest;
  * <p>用于动态构建请求的正向代理部分
  *
  * @author caihongming
- * @version v1.0
- * @since 2021-12-17
+ * @since 1.5.17
  **/
 public interface HTTPProxySource {
 
