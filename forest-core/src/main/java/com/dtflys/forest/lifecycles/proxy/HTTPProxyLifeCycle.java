@@ -1,6 +1,7 @@
 package com.dtflys.forest.lifecycles.proxy;
 
 import com.dtflys.forest.annotation.HTTPProxy;
+import com.dtflys.forest.callback.HTTPProxySource;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
@@ -11,10 +12,14 @@ import com.dtflys.forest.utils.StringUtils;
 
 /**
  * HTTP正向代理生命周期类
+ *
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.5.0-BETA5
  */
 public class HTTPProxyLifeCycle implements MethodAnnotationLifeCycle<HTTPProxy, Object> {
+
+    private final static String PARAM_KEY_HTTP_PROXY_SOURCE = "__http_proxy_source";
+    private final static String PARAM_KEY_HTTP_PROXY = "__http_proxy";
 
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
@@ -40,6 +45,7 @@ public class HTTPProxyLifeCycle implements MethodAnnotationLifeCycle<HTTPProxy, 
         MappingTemplate portTemplate = (MappingTemplate) getAttribute(request, "port_temp");
         MappingTemplate usernameTemplate = (MappingTemplate) getAttribute(request, "username_temp");
         MappingTemplate passwordTemplate = (MappingTemplate) getAttribute(request, "password_temp");
+        Object httpProxySource = request.getMethod().getExtensionParameterValue(PARAM_KEY_HTTP_PROXY_SOURCE);
 
         Object[] args = request.getArguments();
         String host = hostTemplate.render(args);
@@ -55,6 +61,10 @@ public class HTTPProxyLifeCycle implements MethodAnnotationLifeCycle<HTTPProxy, 
 
         int port = 80;
         if (StringUtils.isBlank(host)) {
+            if (httpProxySource != null && httpProxySource instanceof HTTPProxySource) {
+                request.setProxy(((HTTPProxySource) httpProxySource).getProxy(request));
+                return true;
+            }
             throw new ForestRuntimeException("[Forest] Proxy host cannot be empty!");
         }
         if (StringUtils.isNotBlank(portStr)) {
@@ -77,6 +87,11 @@ public class HTTPProxyLifeCycle implements MethodAnnotationLifeCycle<HTTPProxy, 
 
     @Override
     public void onMethodInitialized(ForestMethod method, HTTPProxy annotation) {
-
+        Class<? extends HTTPProxySource> clazz = annotation.source();
+        if (clazz != null && !clazz.isInterface()) {
+            HTTPProxySource proxySource = method.getConfiguration().getForestObject(clazz);
+            method.setExtensionParameterValue(PARAM_KEY_HTTP_PROXY_SOURCE, proxySource);
+        }
+        method.setExtensionParameterValue(PARAM_KEY_HTTP_PROXY, annotation);
     }
 }

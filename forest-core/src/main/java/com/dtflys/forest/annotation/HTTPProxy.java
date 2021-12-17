@@ -1,5 +1,6 @@
 package com.dtflys.forest.annotation;
 
+import com.dtflys.forest.callback.HTTPProxySource;
 import com.dtflys.forest.lifecycles.proxy.HTTPProxyLifeCycle;
 
 import java.lang.annotation.Documented;
@@ -25,7 +26,7 @@ public @interface HTTPProxy {
      * 代理服务主机地址
      * @return 代理服务主机地址
      */
-    String host();
+    String host() default "";
 
     /**
      * 代理服务端口号
@@ -44,5 +45,11 @@ public @interface HTTPProxy {
      * @return 代理密码
      */
     String password() default "";
+
+    /**
+     * 动态构建正向代理信息的回调函数接口类
+     * @return 回调函数接口类
+     */
+    Class<? extends HTTPProxySource> source() default HTTPProxySource.class;
 
 }
