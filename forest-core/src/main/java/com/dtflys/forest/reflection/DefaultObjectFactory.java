@@ -14,17 +14,22 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DefaultObjectFactory implements ForestObjectFactory {
 
-    private final static Map<Class<?>, Object> FOREST_OBJECT_CACHE = new ConcurrentHashMap<>();
+    private final Map<Class<?>, Object> forestObjectCache = new ConcurrentHashMap<>();
+
+    /**
+     * 框架中各种对象的构造方法
+     */
+    private Map<Class<?>, ObjectConstructor> constructorMap = new ConcurrentHashMap<>();
 
     /**
      * 从缓存获取Forest接口对象实例
      *
      * @param clazz Forest对象接口类
-     * @param <T> Forest对象接口类泛型
+     * @param <T>   Forest对象接口类泛型
      * @return Forest对象实例
      */
     protected <T> T getObjectFromCache(Class<T> clazz) {
-        return (T) FOREST_OBJECT_CACHE.get(clazz);
+        return (T) forestObjectCache.get(clazz);
     }
 
 
@@ -35,7 +40,7 @@ public class DefaultObjectFactory implements ForestObjectFactory {
      * <p>实例化方式：通过JDK反射去实例化对象
      *
      * @param clazz Forest对象接口类
-     * @param <T> Forest对象接口类泛型
+     * @param <T>   Forest对象接口类泛型
      * @return Forest对象实例
      */
     @Override
@@ -45,9 +50,18 @@ public class DefaultObjectFactory implements ForestObjectFactory {
         }
         Object obj = getObjectFromCache(clazz);
         if (obj == null) {
+            ObjectConstructor<T> constructor = constructorMap.get(clazz);
+            if (constructor != null) {
+                obj = constructor.construct();
+                if (obj != null) {
+                    forestObjectCache.put(clazz, obj);
+                    return (T) obj;
+                }
+
+            }
             try {
                 obj = clazz.newInstance();
-                FOREST_OBJECT_CACHE.put(clazz, obj);
+                forestObjectCache.put(clazz, obj);
             } catch (InstantiationException e) {
                 throw new ForestRuntimeException(e);
             } catch (IllegalAccessException e) {
@@ -55,5 +69,15 @@ public class DefaultObjectFactory implements ForestObjectFactory {
             }
         }
         return (T) obj;
+    }
+
+    @Override
+    public Map<Class<?>, ObjectConstructor> getConstructorMap() {
+        return constructorMap;
+    }
+
+    @Override
+    public void  putConstructor(Class<?> cls, ObjectConstructor constructor) {
+        constructorMap.put(cls, constructor);
     }
 }

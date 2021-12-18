@@ -1,5 +1,7 @@
 package com.dtflys.forest.reflection;
 
+import java.util.Map;
+
 /**
  * Forest对象工厂
  * <p>适用于Forest相关接口(非请求客户端接口)和回调函数的工厂接口
@@ -20,4 +22,19 @@ public interface ForestObjectFactory {
      * @return Forest对象实例
      */
     <T> T getObject(Class<T> clazz);
+
+    /**
+     * 获取构造对象接口map
+     *
+     * @return ObjectConstructor
+     */
+    Map<Class<?>, ObjectConstructor> getConstructorMap();
+
+    /**
+     * 新增构造对象接口
+     *
+     * @param cls         Forest对象接口类
+     * @param constructor 对象构造接口类
+     */
+    void putConstructor(Class<?> cls, ObjectConstructor constructor);
 }
