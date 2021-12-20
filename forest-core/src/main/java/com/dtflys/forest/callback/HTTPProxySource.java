@@ -12,6 +12,7 @@ import com.dtflys.forest.http.ForestRequest;
  * @author caihongming
  * @since 1.5.17
  **/
+@FunctionalInterface
 public interface HTTPProxySource {
 
 

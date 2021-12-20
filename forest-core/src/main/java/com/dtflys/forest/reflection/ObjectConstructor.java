@@ -6,6 +6,7 @@ package com.dtflys.forest.reflection;
  * @author caihongming
  * @since 1.5.17
  **/
+@FunctionalInterface
 public interface ObjectConstructor<T> {
 
     /**
