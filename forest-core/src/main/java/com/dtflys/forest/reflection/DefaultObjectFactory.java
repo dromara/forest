@@ -45,39 +45,43 @@ public class DefaultObjectFactory implements ForestObjectFactory {
      */
     @Override
     public <T> T getObject(Class<T> clazz) {
-        if (clazz == null || clazz.isInterface()) {
+        if (clazz == null) {
             return null;
         }
         Object obj = getObjectFromCache(clazz);
-        if (obj == null) {
-            ObjectConstructor<T> constructor = constructorMap.get(clazz);
-            if (constructor != null) {
-                obj = constructor.construct();
-                if (obj != null) {
-                    forestObjectCache.put(clazz, obj);
-                    return (T) obj;
-                }
+        if (obj != null) {
+            return (T) obj;
+        }
 
-            }
-            try {
-                obj = clazz.newInstance();
+        ObjectConstructor<T> constructor = constructorMap.get(clazz);
+        if (constructor != null) {
+            obj = constructor.construct();
+            if (obj != null) {
                 forestObjectCache.put(clazz, obj);
-            } catch (InstantiationException e) {
-                throw new ForestRuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new ForestRuntimeException(e);
+                return (T) obj;
             }
         }
-        return (T) obj;
+        try {
+            if(!clazz.isInterface()){
+                obj = clazz.newInstance();
+                forestObjectCache.put(clazz, obj);
+                return (T) obj;
+            }
+        } catch (InstantiationException e) {
+            throw new ForestRuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new ForestRuntimeException(e);
+        }
+        return null;
     }
 
     @Override
-    public Map<Class<?>, ObjectConstructor> getConstructorMap() {
-        return constructorMap;
-    }
-
-    @Override
-    public void  putConstructor(Class<?> cls, ObjectConstructor constructor) {
+    public void registerConstructor(Class<?> cls, ObjectConstructor constructor) {
         constructorMap.put(cls, constructor);
+    }
+
+    @Override
+    public void registerObject(Class<?> cls, Object o) {
+        forestObjectCache.put(cls, o);
     }
 }
