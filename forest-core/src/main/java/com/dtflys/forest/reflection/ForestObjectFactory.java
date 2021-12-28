@@ -16,8 +16,23 @@ public interface ForestObjectFactory {
      * <p>当这些类没有实例的情况下，会先实例化并缓存下来，以后再取会通过缓存获取对象
      *
      * @param clazz Forest对象接口类
-     * @param <T> Forest对象接口类泛型
+     * @param <T>   Forest对象接口类泛型
      * @return Forest对象实例
      */
     <T> T getObject(Class<T> clazz);
+
+    /**
+     * 注册构造对象接口
+     *
+     * @param cls         Forest对象接口类
+     * @param constructor 对象构造接口类
+     */
+    void registerConstructor(Class<?> cls, ObjectConstructor constructor);
+
+    /**
+     * 注册forest对象
+     *
+     * @param o
+     */
+    void registerObject(Class<?> cls, Object o);
 }

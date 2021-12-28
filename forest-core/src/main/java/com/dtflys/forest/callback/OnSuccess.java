@@ -33,6 +33,7 @@ import com.dtflys.forest.http.ForestResponse;
  * @author gongjun
  * @since 1.0.0
  */
+@FunctionalInterface
 public interface OnSuccess<T>  {
 
     /**
