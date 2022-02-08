@@ -422,8 +422,8 @@ public class ReflectUtils {
                 if (setterMethod != null) {
                     setterMethod.invoke(target, attrs.get(name));
                 }
-            } catch (IllegalAccessException e) {
-            } catch (InvocationTargetException e) {
+            } catch (Throwable e) {
+                throw new ForestRuntimeException(e);
             }
         }
     }

@@ -123,7 +123,7 @@ public @interface Request {
      * Max count to retry
      * @return Max count to retry
      */
-    int maxRetryInterval() default -1;
+    long maxRetryInterval() default -1;
 
     /**
      * Content Type of request

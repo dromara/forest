@@ -70,7 +70,7 @@ public class MetaRequest {
      */
     private Integer retryCount;
 
-    private long maxRetryInterval;
+    private Long maxRetryInterval;
 
     /**
      * Content Type
@@ -249,11 +249,11 @@ public class MetaRequest {
         }
     }
 
-    public long getMaxRetryInterval() {
+    public Long getMaxRetryInterval() {
         return maxRetryInterval;
     }
 
-    public void setMaxRetryInterval(long maxRetryInterval) {
+    public void setMaxRetryInterval(Long maxRetryInterval) {
         this.maxRetryInterval = maxRetryInterval;
     }
 
