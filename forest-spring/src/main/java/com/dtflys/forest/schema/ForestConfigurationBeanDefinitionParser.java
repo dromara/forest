@@ -152,10 +152,6 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         if (StringUtils.isEmpty(keystoreType)) {
             keystoreType = SSLKeyStore.DEFAULT_KEYSTORE_TYPE;
         }
-        if (StringUtils.isEmpty(filePath)) {
-            throw new ForestRuntimeException(
-                    "The file of SSL KeyStore \"" + id + "\" is empty!");
-        }
         BeanDefinition beanDefinition = createSSLKeyStoreBean(
                 id, keystoreType, filePath,
                 keystorePass, certPass,
