@@ -15,7 +15,7 @@ import com.dtflys.forest.springboot.test.moudle.TestUser;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-04-20 19:02
  */
-@BaseRequest(baseURL = "${baseUrl}")
+@BaseRequest(baseURL = "${baseUrl}", sslProtocol = "TLS")
 public interface BeastshopClient {
 
     @Request(
@@ -31,7 +31,6 @@ public interface BeastshopClient {
 
     @Request(
             url = "${idServiceUrl}",
-            sslProtocol = "TLS",
             logEnabled = true
     )
     String testBug(@DataParam("num") Integer num);
