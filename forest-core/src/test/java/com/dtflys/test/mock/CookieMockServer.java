@@ -1,7 +1,7 @@
 package com.dtflys.test.mock;
 
 import org.apache.http.HttpHeaders;
-import org.mockserver.client.server.MockServerClient;
+import org.mockserver.integration.ClientAndServer;
 import org.mockserver.junit.MockServerRule;
 import org.mockserver.model.Cookie;
 import org.mockserver.model.Header;
@@ -24,8 +24,8 @@ public class CookieMockServer extends MockServerRule {
     }
 
     public void initServer() {
-        MockServerClient mockClient = new MockServerClient("localhost", port);
-        mockClient.when(
+        ClientAndServer clientAndServer = new ClientAndServer(port);
+        clientAndServer.when(
                 request()
                         .withPath("/login")
                         .withMethod("POST")
@@ -40,7 +40,7 @@ public class CookieMockServer extends MockServerRule {
         );
 
 
-        mockClient.when(
+        clientAndServer.when(
                 request()
                         .withPath("/test")
                         .withMethod("POST")

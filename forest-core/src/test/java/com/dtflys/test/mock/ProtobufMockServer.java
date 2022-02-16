@@ -4,7 +4,7 @@ import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.converter.protobuf.ForestGoogleProtobufConverter;
 import com.dtflys.test.converter.protobuf.ProtobufProto;
 import org.apache.http.HttpHeaders;
-import org.mockserver.client.server.MockServerClient;
+import org.mockserver.integration.ClientAndServer;
 import org.mockserver.junit.MockServerRule;
 import org.mockserver.model.Header;
 
@@ -22,7 +22,7 @@ public class ProtobufMockServer extends MockServerRule {
 
     public void initServer() {
 
-        MockServerClient mockClient = new MockServerClient("localhost", port);
+        ClientAndServer mockClient = new ClientAndServer(port);
 
         ForestGoogleProtobufConverter protobufConverter = new ForestGoogleProtobufConverter();
 

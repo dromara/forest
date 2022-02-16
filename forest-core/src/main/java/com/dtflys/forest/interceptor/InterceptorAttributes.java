@@ -1,9 +1,6 @@
 package com.dtflys.forest.interceptor;
 
-import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingTemplate;
-import com.dtflys.forest.reflection.ForestMethod;
-import org.apache.commons.collections.MapUtils;
 
 import java.util.HashMap;
 import java.util.Map;

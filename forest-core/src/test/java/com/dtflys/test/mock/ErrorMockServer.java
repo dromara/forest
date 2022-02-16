@@ -1,7 +1,7 @@
 package com.dtflys.test.mock;
 
 import org.apache.http.HttpHeaders;
-import org.mockserver.client.server.MockServerClient;
+import org.mockserver.integration.ClientAndServer;
 import org.mockserver.junit.MockServerRule;
 import org.mockserver.model.Header;
 
@@ -23,8 +23,8 @@ public class ErrorMockServer extends MockServerRule {
     }
 
     public void initServer() {
-        MockServerClient mockClient = new MockServerClient("localhost", port);
-        mockClient.when(
+        ClientAndServer clientAndServer = new ClientAndServer(port);
+        clientAndServer.when(
                 request()
                         .withPath("/hello/user")
                         .withMethod("GET")

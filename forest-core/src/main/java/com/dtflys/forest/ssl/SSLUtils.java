@@ -33,9 +33,9 @@ public class SSLUtils {
      */
     public static SSLContext customSSL(ForestRequest request) {
         SSLContext sslContext = null;
-        SSLKeyStore fKeyStore = request.getKeyStore();
+        final SSLKeyStore fKeyStore = request.getKeyStore();
         final KeyStore keyStore = fKeyStore.getTrustStore();
-        String certPass = fKeyStore.getCertPass();
+        final String certPass = fKeyStore.getCertPass();
         if (keyStore != null) {
             try {
                  //密钥库

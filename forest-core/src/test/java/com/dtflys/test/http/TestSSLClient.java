@@ -1,5 +1,6 @@
 package com.dtflys.test.http;
 
+import cn.hutool.core.map.MapUtil;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
@@ -8,12 +9,11 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.ssl.SSLSocketFactoryBuilder;
 import com.dtflys.test.http.ssl.MyHostnameVerifier;
-import com.dtflys.test.http.ssl.MySSLSocketFactoryBuilder;
-import com.dtflys.test.mock.GetMockServer;
+import com.dtflys.test.mock.SSLMockServer;
+import com.github.dreamhead.moco.HttpRequest;
 import com.github.dreamhead.moco.HttpsCertificate;
 import com.github.dreamhead.moco.HttpsServer;
 import com.github.dreamhead.moco.Runner;
-import com.dtflys.test.http.client.GetClient;
 import com.dtflys.test.http.client.SSLClient;
 import org.junit.*;
 import org.slf4j.Logger;
@@ -23,6 +23,13 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.github.dreamhead.moco.Moco.*;
 import static com.github.dreamhead.moco.Runner.runner;
@@ -44,11 +51,6 @@ public class TestSSLClient extends BaseClientTest {
     private final static HttpsCertificate serverCertificate = certificate(
             pathResource("ssl_server.keystore"), "server", "123456");
 
-    @Rule
-    public GetMockServer getServer = new GetMockServer(this);
-
-    private GetClient getClient;
-
 
     public final static String EXPECTED = "{\"status\": \"ok\", \"ssl\": \"true\"}";
 
@@ -58,7 +60,15 @@ public class TestSSLClient extends BaseClientTest {
         server = httpsServer(5555, serverCertificate);
         server
                 .get(by(uri("/hello/user")))
-                .response(EXPECTED);
+                .response(
+                        text(request -> {
+                            HttpRequest httpRequest = (HttpRequest) request;
+                            Object id = httpRequest.getQueries().get("id");
+                            if (id == null) {
+                                return EXPECTED;
+                            }
+                            return  "{\"id\": \"" + ((String[]) id)[0] + "\"}";
+                }));
     }
 
 
@@ -127,8 +137,8 @@ public class TestSSLClient extends BaseClientTest {
 
     public TestSSLClient(HttpBackend backend) {
         super(backend, configuration);
+        configuration.setVariableValue("port", SSLMockServer.port);
         sslClient = configuration.createInstance(SSLClient.class);
-        getClient = configuration.createInstance(GetClient.class);
     }
 
 
@@ -137,7 +147,6 @@ public class TestSSLClient extends BaseClientTest {
     public void prepareMockServer() {
         runner = runner(server);
         runner.start();
-        getServer.initServer();
     }
 
     @After
@@ -193,7 +202,14 @@ public class TestSSLClient extends BaseClientTest {
         }
         assertThat(th).isNotNull().isInstanceOf(SSLPeerUnverifiedException.class);
         th = null;
-        request = sslClient.testHostVerifier2("127.0.0.1");
+        String host = null;
+        try {
+            InetAddress addr = InetAddress.getLocalHost();
+            host = addr.getHostAddress();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        request = sslClient.testHostVerifier2(host);
         assertThat(request.getHostnameVerifier()).isNotNull().isInstanceOf(MyHostnameVerifier.class);
         assertThat(request.getSslSocketFactoryBuilder())
                 .isNotNull().
@@ -231,19 +247,44 @@ public class TestSSLClient extends BaseClientTest {
     }
 
 
-
     @Test
-    public void mixAllGet() {
-/*
-        for (int i = 0; i < 10; i++) {
-            String simpleResult = getClient.simpleGet();
-            assertEquals(GetMockServer.EXPECTED, simpleResult);
-            String result = sslClient.truestAllGet();
-            log.info("response: " + result);
-            assertNotNull(result);
-            assertEquals(EXPECTED, result);
+    public void testConcurrent() throws InterruptedException {
+        int len = 100;
+        CountDownLatch latch = new CountDownLatch(len);
+        ExecutorService executor = Executors.newFixedThreadPool(len);
+        for (int i = 0; i < len / 2; i++) {
+            int finalI = i;
+            executor.execute(() -> {
+                ForestResponse<String> response = sslClient.testConcurrent(finalI);
+                ForestRequest req = response.getRequest();
+                String reqId = String.valueOf(req.getQuery("id"));
+                String json = response.getContent();
+                Map<String, Object> map = configuration.getJsonConverter().convertObjectToMap(json);
+                String resId = MapUtil.getStr(map, "id");
+                System.out.println(finalI + " -> " + reqId + " -> " + resId);
+                assertThat(reqId).isEqualTo(String.valueOf(finalI));
+                assertThat(resId).isEqualTo(String.valueOf(finalI));
+                latch.countDown();
+            });
         }
-*/
+        for (int i = len / 2; i < len; i++) {
+            Thread.sleep(20);
+            int finalI = i;
+            executor.execute(() -> {
+                ForestResponse<String> response = sslClient.testConcurrent(finalI);
+                ForestRequest req = response.getRequest();
+                String reqId = String.valueOf(req.getQuery("id"));
+                String json = response.getContent();
+                Map<String, Object> map = configuration.getJsonConverter().convertObjectToMap(json);
+                String resId = MapUtil.getStr(map, "id");
+                System.out.println(finalI + " -> " + reqId + " -> " + resId);
+                assertThat(reqId).isEqualTo(String.valueOf(finalI));
+                assertThat(resId).isEqualTo(String.valueOf(finalI));
+                latch.countDown();
+            });
+        }
+
+        latch.await();
     }
 
 

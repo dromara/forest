@@ -59,10 +59,10 @@
 		<httpclient.version>4.5.13</httpclient.version>
 
 		<mockwebserver.version>3.14.9</mockwebserver.version>
-		<mockserver-netty.version>3.10.4</mockserver-netty.version>
+		<mockserver-netty.version>5.4.1</mockserver-netty.version>
 		<mockito.version>1.9.5</mockito.version>
 		<junit.version>4.13.2</junit.version>
-		<moco-core.version>0.12.0</moco-core.version>
+		<moco-core.version>1.2.0</moco-core.version>
 		<spring-boot-starter-test.version>1.5.1.RELEASE</spring-boot-starter-test.version>
 
 		<maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
@@ -109,6 +109,14 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<!-- Netty -->
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-all</artifactId>
+			<version>4.1.45.Final</version>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- mock server -->
 		<dependency>
 			<groupId>org.mock-server</groupId>
@@ -147,6 +155,23 @@
 				<exclusion>
 					<groupId>io.netty</groupId>
 					<artifactId>netty-transport</artifactId>
+				</exclusion>
+				<exclusion>
+					<artifactId>guava</artifactId>
+					<groupId>com.google.guava</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mock-server</groupId>
+			<artifactId>mockserver-client-java</artifactId>
+			<version>${mockserver-netty.version}</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>guava</artifactId>
+					<groupId>com.google.guava</groupId>
 				</exclusion>
 			</exclusions>
 		</dependency>

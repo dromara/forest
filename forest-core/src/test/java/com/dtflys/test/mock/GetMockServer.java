@@ -1,7 +1,7 @@
 package com.dtflys.test.mock;
 
 import org.apache.http.HttpHeaders;
-import org.mockserver.client.server.MockServerClient;
+import org.mockserver.integration.ClientAndServer;
 import org.mockserver.junit.MockServerRule;
 import org.mockserver.model.Header;
 
@@ -16,15 +16,14 @@ public class GetMockServer extends MockServerRule {
 
     public final static String EXPECTED = "{\"status\":\"ok\"}";
 
-    public final static Integer port = 5002;
 
     public GetMockServer(Object target) {
-        super(target, port);
+        super(target);
     }
 
     public void initServer() {
-        MockServerClient mockClient = new MockServerClient("localhost", port);
-        mockClient.when(
+        ClientAndServer clientAndServer = new ClientAndServer("localhost", getPort());
+        clientAndServer.when(
                 request()
                         .withPath("/hello/user")
                         .withMethod("GET")
@@ -40,6 +39,23 @@ public class GetMockServer extends MockServerRule {
                         )
                         .withBody(EXPECTED)
         );
+
+        clientAndServer.when(
+                        request()
+                                .withPath("/con")
+                                .withMethod("GET")
+                                .withHeader(new Header(HttpHeaders.ACCEPT, "text/plain"))
+                                .withQueryStringParameter("username",  "foo")
+                )
+                .respond(
+                        httpRequest -> {
+                            String id = httpRequest.getFirstQueryStringParameter("id");
+                            return response()
+                                    .withStatusCode(200)
+                                    .withBody("{\"id\": \"" + id +"\"}");
+                        }
+                );
+
 
     }
 

@@ -1,7 +1,7 @@
 package com.dtflys.test.mock;
 
 import cn.hutool.core.io.FileUtil;
-import org.mockserver.client.server.MockServerClient;
+import org.mockserver.integration.ClientAndServer;
 import org.mockserver.junit.MockServerRule;
 import org.mockserver.model.Header;
 
@@ -32,8 +32,8 @@ public class DownloadMockServer extends MockServerRule {
         File file = new File(path);
         byte[] byteArray = FileUtil.readBytes(file);
 
-        MockServerClient mockClient = new MockServerClient("localhost", port);
-        mockClient.when(
+        ClientAndServer clientAndServer = new ClientAndServer(port);
+        clientAndServer.when(
                 request()
                         .withPath("/download/test-img.jpg")
                         .withMethod("GET"))

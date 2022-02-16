@@ -1,7 +1,7 @@
 package com.dtflys.test.mock;
 
 import org.apache.http.HttpHeaders;
-import org.mockserver.client.server.MockServerClient;
+import org.mockserver.integration.ClientAndServer;
 import org.mockserver.junit.MockServerRule;
 import org.mockserver.model.Header;
 
@@ -43,8 +43,8 @@ public class Get2MockServer extends MockServerRule {
                 throw new RuntimeException(e);
             }
         }
-        MockServerClient mockClient = new MockServerClient("localhost", port);
-        mockClient.when(
+        ClientAndServer clientAndServer = new ClientAndServer(port);
+        clientAndServer.when(
                 request()
                         .withPath("/hello/user")
                         .withMethod("GET")
@@ -58,7 +58,7 @@ public class Get2MockServer extends MockServerRule {
                                 .withBody(EXPECTED)
                 );
 
-        mockClient.when(
+        clientAndServer.when(
                 request()
                         .withPath("/boolean/true")
                         .withMethod("GET")
@@ -70,7 +70,7 @@ public class Get2MockServer extends MockServerRule {
                 );
 
 
-        mockClient.when(
+        clientAndServer.when(
                 request()
                         .withPath("/boolean/false")
                         .withMethod("GET")
@@ -81,7 +81,7 @@ public class Get2MockServer extends MockServerRule {
                                 .withBody("false")
                 );
 
-        mockClient.when(
+        clientAndServer.when(
                 request()
                         .withPath("/gzip")
                         .withMethod("GET")
@@ -94,7 +94,7 @@ public class Get2MockServer extends MockServerRule {
                                 .withBody(out.toByteArray())
                 );
 
-        mockClient.when(
+        clientAndServer.when(
                 request()
                         .withPath("/none-gzip")
                         .withMethod("GET")
