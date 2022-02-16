@@ -1,28 +1,20 @@
 package com.dtflys.test.http;
 
-import com.alibaba.fastjson.JSONObject;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestNetworkException;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.test.http.client.GetClient;
-import com.dtflys.test.mock.ErrorMockServer;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]

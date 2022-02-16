@@ -5,38 +5,27 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.ForestProgress;
 import com.dtflys.test.http.client.DownloadClient;
-import com.dtflys.test.mock.DownloadMockServer;
-import com.fasterxml.jackson.core.util.ByteArrayBuilder;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okio.Buffer;
-import okio.BufferedSource;
 import okio.Okio;
-import okio.Sink;
 import org.apache.commons.io.IOUtils;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static junit.framework.Assert.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -47,8 +36,6 @@ public class TestDownloadClient extends BaseClientTest {
 
     @Rule
     public MockWebServer server = new MockWebServer();
-
-    public DownloadMockServer mockserver = new DownloadMockServer(this);
 
     private static ForestConfiguration configuration;
 

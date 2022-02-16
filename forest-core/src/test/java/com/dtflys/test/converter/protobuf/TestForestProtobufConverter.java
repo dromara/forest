@@ -37,13 +37,14 @@ public class TestForestProtobufConverter extends BaseClientTest {
 
     public TestForestProtobufConverter(HttpBackend backend) {
         super(backend, configuration);
+        configuration.setVariableValue("port", server.getPort());
+
     }
 
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.configuration();
         protobufClient = configuration.createInstance(ProtobufClient.class);
-        configuration.setVariableValue("port", ProtobufMockServer.port);
     }
 
     @Before

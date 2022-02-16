@@ -29,7 +29,6 @@ public class TestGetWithBodyClient extends BaseClientTest {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.createConfiguration();
-        configuration.setVariableValue("port", GetWithBodyMockServer.port);
     }
 
     @Override
@@ -38,6 +37,7 @@ public class TestGetWithBodyClient extends BaseClientTest {
 
     public TestGetWithBodyClient(HttpBackend backend) {
         super(backend, configuration);
+        configuration.setVariableValue("port", server.getPort());
         getWithBodyClient = configuration.createInstance(GetWithBodyClient.class);
     }
 

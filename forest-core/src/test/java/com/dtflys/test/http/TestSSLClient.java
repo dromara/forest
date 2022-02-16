@@ -9,7 +9,6 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.ssl.SSLSocketFactoryBuilder;
 import com.dtflys.test.http.ssl.MyHostnameVerifier;
-import com.dtflys.test.mock.SSLMockServer;
 import com.github.dreamhead.moco.HttpRequest;
 import com.github.dreamhead.moco.HttpsCertificate;
 import com.github.dreamhead.moco.HttpsServer;
@@ -137,7 +136,6 @@ public class TestSSLClient extends BaseClientTest {
 
     public TestSSLClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVariableValue("port", SSLMockServer.port);
         sslClient = configuration.createInstance(SSLClient.class);
     }
 

@@ -1,6 +1,7 @@
 package com.dtflys.test.mock;
 
 import org.apache.http.HttpHeaders;
+import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.junit.MockServerRule;
 import org.mockserver.model.Header;
@@ -21,10 +22,8 @@ public class Get2MockServer extends MockServerRule {
 
     public final static String EXPECTED = "{\"status\": \"ok\"}";
 
-    public final static Integer port = 5022;
-
     public Get2MockServer(Object target) {
-        super(target, port);
+        super(target);
     }
 
     public void initServer() {
@@ -43,8 +42,8 @@ public class Get2MockServer extends MockServerRule {
                 throw new RuntimeException(e);
             }
         }
-        ClientAndServer clientAndServer = new ClientAndServer(port);
-        clientAndServer.when(
+        MockServerClient server = new MockServerClient("localhost", getPort());
+        server.when(
                 request()
                         .withPath("/hello/user")
                         .withMethod("GET")
@@ -58,7 +57,7 @@ public class Get2MockServer extends MockServerRule {
                                 .withBody(EXPECTED)
                 );
 
-        clientAndServer.when(
+        server.when(
                 request()
                         .withPath("/boolean/true")
                         .withMethod("GET")
@@ -70,7 +69,7 @@ public class Get2MockServer extends MockServerRule {
                 );
 
 
-        clientAndServer.when(
+        server.when(
                 request()
                         .withPath("/boolean/false")
                         .withMethod("GET")
@@ -81,7 +80,7 @@ public class Get2MockServer extends MockServerRule {
                                 .withBody("false")
                 );
 
-        clientAndServer.when(
+        server.when(
                 request()
                         .withPath("/gzip")
                         .withMethod("GET")
@@ -94,7 +93,7 @@ public class Get2MockServer extends MockServerRule {
                                 .withBody(out.toByteArray())
                 );
 
-        clientAndServer.when(
+        server.when(
                 request()
                         .withPath("/none-gzip")
                         .withMethod("GET")

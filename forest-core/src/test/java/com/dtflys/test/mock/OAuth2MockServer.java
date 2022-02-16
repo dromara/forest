@@ -1,5 +1,6 @@
 package com.dtflys.test.mock;
 
+import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.junit.MockServerRule;
 
@@ -24,15 +25,14 @@ public class OAuth2MockServer extends MockServerRule {
     public final static String DEFINITION_TOKEN_JSON = "{\"token\":\"" + TOKEN + "\"}";
 
 
-    public final static Integer port = 5071;
 
     public OAuth2MockServer(Object target) {
-        super(target, port);
+        super(target);
     }
 
     public void initServer() {
-        ClientAndServer clientAndServer = new ClientAndServer(port);
-        clientAndServer.when(
+        MockServerClient server = new MockServerClient("localhost", getPort());
+        server.when(
                 request()
                         .withPath("/auth/oauth/token")
                         .withMethod("POST")
@@ -44,7 +44,7 @@ public class OAuth2MockServer extends MockServerRule {
         );
 
 
-        clientAndServer.when(
+        server.when(
                 request()
                         .withPath("/auth/test/password")
                         .withMethod("GET")
@@ -56,7 +56,7 @@ public class OAuth2MockServer extends MockServerRule {
                         .withBody(EXPECTED)
         );
 
-        clientAndServer.when(
+        server.when(
                 request()
                         .withPath("/auth/test/password_at_url")
                         .withMethod("GET")
@@ -67,7 +67,7 @@ public class OAuth2MockServer extends MockServerRule {
                         .withBody(EXPECTED)
         );
 
-        clientAndServer.when(
+        server.when(
                 request()
                         .withPath("/auth/oauth/client_credentials/token")
                         .withMethod("POST")
@@ -78,7 +78,7 @@ public class OAuth2MockServer extends MockServerRule {
                         .withBody(TOKEN_JSON)
         );
 
-        clientAndServer.when(
+        server.when(
                 request()
                         .withPath("/auth/test/client_credentials")
                         .withMethod("GET")
@@ -90,7 +90,7 @@ public class OAuth2MockServer extends MockServerRule {
                         .withBody(EXPECTED)
         );
 
-        clientAndServer.when(
+        server.when(
                 request()
                         .withPath("/auth/test/client_credentials_at_url")
                         .withMethod("GET")
@@ -100,7 +100,7 @@ public class OAuth2MockServer extends MockServerRule {
                         .withStatusCode(200)
                         .withBody(EXPECTED)
         );
-        clientAndServer.when(
+        server.when(
                 request()
                         .withPath("/auth/oauth/token/definition")
                         .withMethod("POST")
