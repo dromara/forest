@@ -5,8 +5,14 @@ import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.RequestLogMessage;
 import com.dtflys.forest.logging.ResponseLogMessage;
 import com.dtflys.forest.utils.StringUtils;
+import com.dtflys.spring.test.component.ComponentA;
+
+import javax.annotation.Resource;
 
 public class TestLogHandler extends DefaultLogHandler {
+
+    @Resource
+    private ComponentA componentA;
 
     @Override
     public void logContent(String content) {

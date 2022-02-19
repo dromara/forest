@@ -8,6 +8,7 @@
        http://forest.dtflyx.com/schema/forest
        http://forest.dtflyx.com/schema/forest/forest-spring.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
 
+
     <forest:configuration
             id="forestConfiguration"
             timeout="30000"
@@ -15,16 +16,13 @@
             connectTimeout="10000"
             maxConnections="500"
             maxRouteConnections="500">
-
-        <forest:var name="baseUrl" value="http://www.thebeastshop.com"/>
-        <forest:var name="x" value="0"/>
-        <forest:var name="y" value="1"/>
-
     </forest:configuration>
 
-    <forest:client id="beastshopClient" configuration="forestConfiguration" class="com.dtflys.spring.test.interceptor.InterceptorClient"/>
+    <forest:scan configuration="forestConfiguration"
+                 base-package="com.dtflys.spring.test.interceptor"/>
 
     <context:component-scan base-package="com.dtflys.spring.test.component"/>
     <context:component-scan base-package="com.dtflys.spring.test.interceptor"/>
+
 
 </beans>

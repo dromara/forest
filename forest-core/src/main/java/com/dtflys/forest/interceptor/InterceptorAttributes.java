@@ -22,10 +22,6 @@ public class InterceptorAttributes {
         this.attributeTemplates = attributeTemplates;
     }
 
-    public void addAttributeTemplate(String attributeName, Object template) {
-        attributeTemplates.put(attributeName, template);
-    }
-
     public Map<String, Object> render(Object[] args) {
         for (Map.Entry<String, Object> entry : attributeTemplates.entrySet()) {
             String name = entry.getKey();

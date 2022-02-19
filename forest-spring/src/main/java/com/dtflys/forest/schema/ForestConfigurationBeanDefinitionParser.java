@@ -10,7 +10,6 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
-import org.mockserver.model.ObjectWithReflectiveEqualsHashCodeToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -50,11 +49,11 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         beanDefinition.setBeanClass(FOREST_CONFIGURATION_CLASS);
         beanDefinition.setLazyInit(false);
         beanDefinition.setFactoryMethodName("configuration");
+        BeanDefinition interceptorBean = createInterceptorFactoryBean();
+        beanDefinition.getPropertyValues().addPropertyValue("interceptorFactory", interceptorBean);
+        BeanDefinition forestObjectFactoryBean = createForestObjectFactoryBean();
+        beanDefinition.getPropertyValues().addPropertyValue("forestObjectFactory", forestObjectFactoryBean);
         String id = element.getAttribute("id");
-        BeanDefinition objectFactoryBean = createForestObjectFactoryBean();
-        beanDefinition.getPropertyValues().addPropertyValue("forestObjectFactory", objectFactoryBean);
-        BeanDefinition interceptorFactoryBean = createInterceptorFactoryBean();
-        beanDefinition.getPropertyValues().addPropertyValue("interceptorFactory", interceptorFactoryBean);
         id = ClientFactoryBeanUtils.getBeanId(id, FOREST_CONFIGURATION_CLASS, parserContext);
         if (id != null && id.length() > 0) {
             if (parserContext.getRegistry().containsBeanDefinition(id))  {
@@ -243,15 +242,14 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         return beanDefinition;
     }
 
-    public BeanDefinition createForestObjectFactoryBean() {
-        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(SpringForestObjectFactory.class);
+    public BeanDefinition createInterceptorFactoryBean() {
+        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(SpringInterceptorFactory.class);
         BeanDefinition beanDefinition = beanDefinitionBuilder.getRawBeanDefinition();
         return beanDefinition;
     }
 
-
-    public BeanDefinition createInterceptorFactoryBean() {
-        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(SpringInterceptorFactory.class);
+    public BeanDefinition createForestObjectFactoryBean() {
+        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(SpringForestObjectFactory.class);
         BeanDefinition beanDefinition = beanDefinitionBuilder.getRawBeanDefinition();
         return beanDefinition;
     }
