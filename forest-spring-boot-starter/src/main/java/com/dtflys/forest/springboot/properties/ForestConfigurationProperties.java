@@ -26,11 +26,6 @@ import java.util.Map;
 public class ForestConfigurationProperties {
 
     /**
-     * Enable forest, default true
-     */
-//    private boolean enabled = true;
-
-    /**
      * spring bean id of forest configuration
      */
     private String beanId;

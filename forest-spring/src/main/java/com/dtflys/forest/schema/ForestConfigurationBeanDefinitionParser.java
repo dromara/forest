@@ -1,6 +1,8 @@
 package com.dtflys.forest.schema;
 
+import com.dtflys.forest.interceptor.SpringInterceptorFactory;
 import com.dtflys.forest.logging.ForestLogHandler;
+import com.dtflys.forest.reflection.SpringForestObjectFactory;
 import com.dtflys.forest.ssl.SpringSSLKeyStore;
 import com.dtflys.forest.utils.ClientFactoryBeanUtils;
 import com.dtflys.forest.config.ForestConfiguration;
@@ -8,10 +10,13 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
+import org.mockserver.model.ObjectWithReflectiveEqualsHashCodeToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -46,6 +51,10 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         beanDefinition.setLazyInit(false);
         beanDefinition.setFactoryMethodName("configuration");
         String id = element.getAttribute("id");
+        BeanDefinition objectFactoryBean = createForestObjectFactoryBean();
+        beanDefinition.getPropertyValues().addPropertyValue("forestObjectFactory", objectFactoryBean);
+        BeanDefinition interceptorFactoryBean = createInterceptorFactoryBean();
+        beanDefinition.getPropertyValues().addPropertyValue("interceptorFactory", interceptorFactoryBean);
         id = ClientFactoryBeanUtils.getBeanId(id, FOREST_CONFIGURATION_CLASS, parserContext);
         if (id != null && id.length() > 0) {
             if (parserContext.getRegistry().containsBeanDefinition(id))  {
@@ -233,4 +242,18 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         beanDefinition.setBeanClassName(className);
         return beanDefinition;
     }
+
+    public BeanDefinition createForestObjectFactoryBean() {
+        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(SpringForestObjectFactory.class);
+        BeanDefinition beanDefinition = beanDefinitionBuilder.getRawBeanDefinition();
+        return beanDefinition;
+    }
+
+
+    public BeanDefinition createInterceptorFactoryBean() {
+        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(SpringInterceptorFactory.class);
+        BeanDefinition beanDefinition = beanDefinitionBuilder.getRawBeanDefinition();
+        return beanDefinition;
+    }
+
 }
