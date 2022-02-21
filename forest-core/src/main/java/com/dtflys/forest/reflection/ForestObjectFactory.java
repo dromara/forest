@@ -32,7 +32,8 @@ public interface ForestObjectFactory {
     /**
      * 注册forest对象
      *
-     * @param o
+     * @param cls 对象类型
+     * @param o 对象实例
      */
     void registerObject(Class<?> cls, Object o);
 }
