@@ -39,8 +39,8 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
         SSLKeyStore keyStore = request.getKeyStore();
         SSLConnectionSocketFactory factory = new SSLConnectionSocketFactory(
                 sslSocketFactory,
-                keyStore.getProtocols(),
-                keyStore.getCipherSuites(),
+                keyStore == null ? null : keyStore.getProtocols(),
+                keyStore == null ? null : keyStore.getCipherSuites(),
                 request.hostnameVerifier());
         Socket connectSocket = factory.connectSocket(connectTimeout, socket, host, remoteAddress, localAddress, context);
         return connectSocket;
