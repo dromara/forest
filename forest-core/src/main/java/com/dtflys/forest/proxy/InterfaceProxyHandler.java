@@ -15,6 +15,7 @@ import com.dtflys.forest.reflection.MetaRequest;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -60,11 +61,7 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         this.interceptorFactory = configuration.getInterceptorFactory();
 
         try {
-            Constructor<MethodHandles.Lookup> defaultMethodConstructor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
-            if (!defaultMethodConstructor.isAccessible()) {
-                defaultMethodConstructor.setAccessible(true);
-            }
-            defaultMethodLookup = defaultMethodConstructor.newInstance(interfaceClass, MethodHandles.Lookup.PRIVATE);
+            defaultMethodLookup = MethodHandles.lookup();
         } catch (Throwable e) {
             throw new ForestRuntimeException(e);
         }
@@ -217,7 +214,8 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
 
   private Object invokeDefaultMethod(Object proxy, Method method, Object[] args)
           throws Throwable {
-    return defaultMethodLookup.unreflectSpecial(method, interfaceClass)
+    return defaultMethodLookup.findSpecial(interfaceClass, method.getName(), MethodType.methodType(method.getReturnType(),
+                    method.getParameterTypes()), interfaceClass)
             .bindTo(proxy).invokeWithArguments(args);
   }
 
