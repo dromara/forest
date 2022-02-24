@@ -12,11 +12,11 @@ import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MetaRequest;
+import com.dtflys.forest.utils.MethodHandlesUtil;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -61,7 +61,7 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         this.interceptorFactory = configuration.getInterceptorFactory();
 
         try {
-            defaultMethodLookup = MethodHandles.lookup();
+            defaultMethodLookup = MethodHandlesUtil.lookup(interfaceClass);
         } catch (Throwable e) {
             throw new ForestRuntimeException(e);
         }
@@ -137,7 +137,7 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         Method[] methods = clazz.getDeclaredMethods();
         for (int i = 0; i < methods.length; i++) {
             Method method = methods[i];
-            if(method.isDefault()){
+            if (method.isDefault()) {
                 continue;
             }
             ForestMethod forestMethod = new ForestMethod(this, configuration, method);
