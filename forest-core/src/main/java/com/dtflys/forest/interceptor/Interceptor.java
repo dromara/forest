@@ -114,7 +114,6 @@ public interface Interceptor<T> extends OnSuccess<T>, OnError, OnProgress, OnLoa
     default void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
     }
 
-
     /**
      * 默认回调函数: 在触发请求重试时执行
      * <p>默认为什么都不做
