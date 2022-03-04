@@ -1,9 +1,6 @@
 package com.dtflys.forest.interceptor;
 
-import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingTemplate;
-import com.dtflys.forest.reflection.ForestMethod;
-import org.apache.commons.collections.MapUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,10 +20,6 @@ public class InterceptorAttributes {
     public InterceptorAttributes(Class interceptorClass, Map<String, Object> attributeTemplates) {
         this.interceptorClass = interceptorClass;
         this.attributeTemplates = attributeTemplates;
-    }
-
-    public void addAttributeTemplate(String attributeName, Object template) {
-        attributeTemplates.put(attributeName, template);
     }
 
     public Map<String, Object> render(Object[] args) {

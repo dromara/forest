@@ -199,7 +199,7 @@ public class OkHttp3Executor implements HttpExecutor {
         } catch (Throwable e) {
             response = factory.createResponse(request, null, lifeCycleHandler, e, startDate);
             ForestRetryException retryException = new ForestRetryException(
-                    e, request, request.getRetryCount(), retryCount);
+                    e, request, request.getMaxRetryCount(), retryCount);
             try {
                 request.canRetry(response, retryException);
             } catch (Throwable throwable) {

@@ -32,6 +32,7 @@ import com.dtflys.forest.utils.ForestProgress;
  * @author gongjun
  * @since 1.4.0
  */
+@FunctionalInterface
 public interface OnProgress {
 
     /**

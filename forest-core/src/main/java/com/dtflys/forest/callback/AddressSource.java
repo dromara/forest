@@ -36,6 +36,7 @@ import com.dtflys.forest.http.ForestRequest;
  * @author gongjun [dt_flys@hotmail.com]
  * @since 1.5.2
  */
+@FunctionalInterface
 public interface AddressSource {
 
     /**

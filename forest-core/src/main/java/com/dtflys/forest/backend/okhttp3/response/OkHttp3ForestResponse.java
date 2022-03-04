@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -110,8 +112,13 @@ public class OkHttp3ForestResponse extends ForestResponse {
     private void setupHeaders() {
         if (okResponse != null) {
             Headers hs = okResponse.headers();
-            for (String name : hs.names()) {
-                headers.addHeader(name, hs.get(name));
+            Map<String, List<String>> hsMap = hs.toMultimap();
+            for (Map.Entry<String, List<String>> entry : hsMap.entrySet()) {
+                String name = entry.getKey();
+                List<String> values = entry.getValue();
+                for (String value : values) {
+                    headers.addHeader(name, value);
+                }
             }
         }
     }

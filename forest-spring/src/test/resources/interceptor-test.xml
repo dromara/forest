@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:forest="http://forest.dtflyx.com/schema/forest"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://forest.dtflyx.com/schema/forest
+       http://forest.dtflyx.com/schema/forest/forest-spring.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+
+
+    <forest:configuration
+            id="forestConfiguration"
+            timeout="30000"
+            retryCount="3"
+            connectTimeout="10000"
+            maxConnections="500"
+            maxRouteConnections="500">
+    </forest:configuration>
+
+    <forest:scan configuration="forestConfiguration"
+                 base-package="com.dtflys.spring.test.interceptor"/>
+
+    <context:component-scan base-package="com.dtflys.spring.test.component"/>
+    <context:component-scan base-package="com.dtflys.spring.test.interceptor"/>
+
+
+</beans>

@@ -1,6 +1,8 @@
 package com.dtflys.forest.schema;
 
+import com.dtflys.forest.interceptor.SpringInterceptorFactory;
 import com.dtflys.forest.logging.ForestLogHandler;
+import com.dtflys.forest.reflection.SpringForestObjectFactory;
 import com.dtflys.forest.ssl.SpringSSLKeyStore;
 import com.dtflys.forest.utils.ClientFactoryBeanUtils;
 import com.dtflys.forest.config.ForestConfiguration;
@@ -12,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -45,6 +49,10 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         beanDefinition.setBeanClass(FOREST_CONFIGURATION_CLASS);
         beanDefinition.setLazyInit(false);
         beanDefinition.setFactoryMethodName("configuration");
+        BeanDefinition interceptorBean = createInterceptorFactoryBean();
+        beanDefinition.getPropertyValues().addPropertyValue("interceptorFactory", interceptorBean);
+        BeanDefinition forestObjectFactoryBean = createForestObjectFactoryBean();
+        beanDefinition.getPropertyValues().addPropertyValue("forestObjectFactory", forestObjectFactoryBean);
         String id = element.getAttribute("id");
         id = ClientFactoryBeanUtils.getBeanId(id, FOREST_CONFIGURATION_CLASS, parserContext);
         if (id != null && id.length() > 0) {
@@ -152,10 +160,6 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         if (StringUtils.isEmpty(keystoreType)) {
             keystoreType = SSLKeyStore.DEFAULT_KEYSTORE_TYPE;
         }
-        if (StringUtils.isEmpty(filePath)) {
-            throw new ForestRuntimeException(
-                    "The file of SSL KeyStore \"" + id + "\" is empty!");
-        }
         BeanDefinition beanDefinition = createSSLKeyStoreBean(
                 id, keystoreType, filePath,
                 keystorePass, certPass,
@@ -237,4 +241,17 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         beanDefinition.setBeanClassName(className);
         return beanDefinition;
     }
+
+    public BeanDefinition createInterceptorFactoryBean() {
+        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(SpringInterceptorFactory.class);
+        BeanDefinition beanDefinition = beanDefinitionBuilder.getRawBeanDefinition();
+        return beanDefinition;
+    }
+
+    public BeanDefinition createForestObjectFactoryBean() {
+        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(SpringForestObjectFactory.class);
+        BeanDefinition beanDefinition = beanDefinitionBuilder.getRawBeanDefinition();
+        return beanDefinition;
+    }
+
 }

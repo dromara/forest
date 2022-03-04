@@ -4,7 +4,8 @@ import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.converter.protobuf.ForestGoogleProtobufConverter;
 import com.dtflys.test.converter.protobuf.ProtobufProto;
 import org.apache.http.HttpHeaders;
-import org.mockserver.client.server.MockServerClient;
+import org.mockserver.client.MockServerClient;
+import org.mockserver.integration.ClientAndServer;
 import org.mockserver.junit.MockServerRule;
 import org.mockserver.model.Header;
 
@@ -13,16 +14,14 @@ import static org.mockserver.model.HttpResponse.response;
 
 public class ProtobufMockServer extends MockServerRule {
 
-    public final static Integer port = 5088;
-
 
     public ProtobufMockServer(Object target) {
-        super(target, port);
+        super(target);
     }
 
     public void initServer() {
 
-        MockServerClient mockClient = new MockServerClient("localhost", port);
+        MockServerClient server = new MockServerClient("localhost", getPort());
 
         ForestGoogleProtobufConverter protobufConverter = new ForestGoogleProtobufConverter();
 
@@ -38,7 +37,7 @@ public class ProtobufMockServer extends MockServerRule {
         ProtobufProto.BaseData resData = resBuilder.build();
         byte[] resByteArray = protobufConverter.convertToByte(resData);
 
-        mockClient.when(
+        server.when(
                 request()
                         .withPath("/proto/test")
                         .withMethod("POST")
@@ -50,7 +49,7 @@ public class ProtobufMockServer extends MockServerRule {
                         .withBody(resByteArray)
         );
 
-        mockClient.when(
+        server.when(
                 request()
                         .withPath("/proto/test2")
                         .withMethod("POST")

@@ -32,8 +32,7 @@ public interface GetClient {
     String simpleGet();
 
     @Get(
-            url = "http://localhost:{port}/hello/user?username=foo",
-            headers = {"Accept:text/plain"}
+            url = "https://gitee.com/notifications/unread_count"
     )
     String simpleGet2();
 

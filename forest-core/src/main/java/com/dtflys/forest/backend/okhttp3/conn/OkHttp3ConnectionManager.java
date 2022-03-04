@@ -12,8 +12,6 @@ import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.ssl.ForestX509TrustManager;
 import com.dtflys.forest.ssl.SSLKeyStore;
-import com.dtflys.forest.ssl.SSLUtils;
-import com.dtflys.forest.ssl.TrustAllHostnameVerifier;
 import com.dtflys.forest.ssl.TrustAllManager;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.TimeUtils;
@@ -31,10 +29,8 @@ import okhttp3.Response;
 import okhttp3.Route;
 
 import javax.annotation.Nullable;
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
-import java.lang.reflect.Array;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.time.Duration;
@@ -201,14 +197,6 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
         }
 
         if (request.isSSL()) {
-            String protocol = request.getSslProtocol();
-            if (StringUtils.isNotBlank(protocol)) {
-                if (protocol.startsWith("SSL") || protocol.startsWith("ssl")) {
-                    protocol = "SSL";
-                } else if (protocol.startsWith("TLS") || protocol.startsWith("tls")) {
-                    protocol = "TLS";
-                }
-            }
             SSLSocketFactory sslSocketFactory = request.getSSLSocketFactory();
             builder
                     .sslSocketFactory(sslSocketFactory, getX509TrustManager(request))

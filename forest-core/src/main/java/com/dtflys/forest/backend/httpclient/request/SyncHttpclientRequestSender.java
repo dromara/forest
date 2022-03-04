@@ -20,9 +20,12 @@ import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.cookie.*;
 import org.apache.http.impl.cookie.BrowserCompatSpec;
 import org.apache.http.params.HttpParams;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
 
 import java.io.IOException;
 import java.util.Date;
@@ -77,12 +80,14 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             CookieStore cookieStore, Date startDate)  {
         HttpResponse httpResponse = null;
         ForestResponse response = null;
+        HttpContext httpContext = new BasicHttpContext();
+        httpContext.setAttribute("REQUEST", request);
+        HttpClientContext httpClientContext = HttpClientContext.adapt(httpContext);
         client = getHttpClient(cookieStore);
         ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
         try {
             logRequest(request.getCurrentRetryCount(), (HttpRequestBase) httpRequest);
-            connectionManager.hostnameVerifier(request);
-            httpResponse = client.execute(httpRequest);
+            httpResponse = client.execute(httpRequest, httpClientContext);
         } catch (Throwable e) {
             httpRequest.abort();
             response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, e, startDate);
@@ -100,7 +105,6 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             executor.execute(lifeCycleHandler);
             return;
         } finally {
-            connectionManager.afterConnect();
             if (response == null) {
                 response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, null, startDate);
             }

@@ -9,7 +9,9 @@ import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.forest.ssl.SSLUtils;
 import com.dtflys.forest.utils.TimeUtils;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Role;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -19,13 +21,9 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 @ConfigurationProperties(prefix = "forest", ignoreUnknownFields = true)
 public class ForestConfigurationProperties {
-
-    /**
-     * Enable forest, default true
-     */
-//    private boolean enabled = true;
 
     /**
      * spring bean id of forest configuration

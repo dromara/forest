@@ -1,7 +1,7 @@
 
 forest:
   bean-id: config0                        # 在spring上下文中bean的id
-  backend: okhttp3                        # 后端HTTP API： okhttp3
+  backend: httpclient                     # 后端HTTP API： okhttp3
   max-connections: 1200                   # 连接池最大连接数
   max-route-connections: 1100             # 每个路由的最大连接数
   timeout: 1000                           # 请求超时时间
@@ -19,4 +19,3 @@ forest:
     user:
       name: foo
       password: bar
-

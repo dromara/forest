@@ -10,7 +10,6 @@ import java.util.List;
 public class NameUtils {
 
     private final static String SETTER_PREFIX = "set";
-    private final static String IS_PREFIX = "set";
 
     /**
      * 按驼峰命名法的规则将字符串分割
@@ -47,14 +46,6 @@ public class NameUtils {
         String prefix = strs[0];
         if (SETTER_PREFIX.equals(prefix)) {
             return name;
-        } else if (IS_PREFIX.equals(prefix)) {
-            StringBuilder builder = new StringBuilder(SETTER_PREFIX);
-            for (int i = 1; i < strs.length; i++) {
-                String str = strs[i];
-                builder.append(Character.toUpperCase(str.charAt(0)))
-                        .append(str.substring(1));
-            }
-            return builder.toString();
         } else {
             StringBuilder builder = new StringBuilder(SETTER_PREFIX);
             for (int i = 0; i < strs.length; i++) {

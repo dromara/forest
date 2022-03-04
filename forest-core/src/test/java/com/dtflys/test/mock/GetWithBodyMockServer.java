@@ -1,7 +1,8 @@
 package com.dtflys.test.mock;
 
 import org.apache.http.HttpHeaders;
-import org.mockserver.client.server.MockServerClient;
+import org.mockserver.client.MockServerClient;
+import org.mockserver.integration.ClientAndServer;
 import org.mockserver.junit.MockServerRule;
 import org.mockserver.model.Header;
 
@@ -16,15 +17,13 @@ public class GetWithBodyMockServer extends MockServerRule {
 
     public final static String EXPECTED = "{\"status\": \"ok\"}";
 
-    public final static Integer port = 5026;
-
     public GetWithBodyMockServer(Object target) {
-        super(target, port);
+        super(target);
     }
 
     public void initServer() {
-        MockServerClient mockClient = new MockServerClient("localhost", port);
-        mockClient.when(
+        MockServerClient clientAndServer = new MockServerClient("localhost", getPort());
+        clientAndServer.when(
                 request()
                         .withPath("/hello/user")
                         .withMethod("GET")

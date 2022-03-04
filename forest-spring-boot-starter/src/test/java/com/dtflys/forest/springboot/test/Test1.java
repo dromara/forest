@@ -61,7 +61,7 @@ public class Test1 {
         assertEquals(50, reqTimeout);
         long time = sw.getTotalTimeMillis();
         assertTrue(time >= 50);
-        assertTrue(time <= 1200);
+        assertTrue(time <= 3600);
         LogConfiguration logConfiguration = request.getLogConfiguration();
         assertTrue(logConfiguration.isLogEnabled());
         assertTrue(logConfiguration.isLogRequest());

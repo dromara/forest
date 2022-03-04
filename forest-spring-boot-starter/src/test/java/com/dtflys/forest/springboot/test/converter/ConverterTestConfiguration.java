@@ -3,6 +3,8 @@ package com.dtflys.forest.springboot.test.converter;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.json.ForestFastjsonConverter;
 import com.dtflys.forest.converter.json.ForestGsonConverter;
+import com.dtflys.forest.converter.json.ForestJacksonConverter;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

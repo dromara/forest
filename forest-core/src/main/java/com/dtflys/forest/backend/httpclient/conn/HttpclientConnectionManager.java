@@ -28,6 +28,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
+import org.apache.http.protocol.HttpContext;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 
@@ -52,7 +53,7 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
                     configuration.getMaxRouteConnections() : HttpConnectionConstants.DEFAULT_MAX_TOTAL_CONNECTIONS;
             Registry<ConnectionSocketFactory> socketFactoryRegistry =
                     RegistryBuilder.<ConnectionSocketFactory>create()
-                            .register("https", sslConnectFactory)
+                            .register("https", new ForestSSLConnectionFactory())
                             .register("http", new PlainConnectionSocketFactory())
                             .build();
             tsConnectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
@@ -64,7 +65,6 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
     }
 
     public HttpClient getHttpClient(ForestRequest request, CookieStore cookieStore) {
-        sslConnectFactory.setCurrentRequest(request);
         HttpClientBuilder builder = HttpClients.custom();
         builder.setConnectionManager(tsConnectionManager);
 
@@ -122,15 +122,6 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
                 .disableContentCompression()
                 .build();
         return httpClient;
-    }
-
-
-    public void hostnameVerifier(ForestRequest request) throws SSLPeerUnverifiedException {
-        sslConnectFactory.verifyHostname(request, request.host());;
-    }
-
-    public void afterConnect() {
-        sslConnectFactory.removeCurrentRequest();
     }
 
     /**
