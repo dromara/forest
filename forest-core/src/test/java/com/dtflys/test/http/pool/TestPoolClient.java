@@ -2,19 +2,16 @@ package com.dtflys.test.http.pool;
 
 import com.dtflys.forest.backend.ForestConnectionManager;
 import com.dtflys.forest.backend.HttpBackend;
-import com.dtflys.forest.backend.okhttp3.OkHttp3Backend;
 import com.dtflys.forest.backend.okhttp3.conn.OkHttp3ConnectionManager;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.test.http.BaseClientTest;
 import okhttp3.ConnectionPool;
-import okhttp3.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-import javax.annotation.Resource;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -29,7 +26,6 @@ public class TestPoolClient extends BaseClientTest {
 
     private static ForestConfiguration configuration;
 
-    @Resource
     private PoolClient poolClient;
 
     @BeforeClass
