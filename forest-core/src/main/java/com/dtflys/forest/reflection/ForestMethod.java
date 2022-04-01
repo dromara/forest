@@ -299,7 +299,7 @@ public class ForestMethod<T> implements VariableScope {
 
     private Map<Annotation, Class<? extends Interceptor>> getAnnotationLifeCycleClassMap(Annotation annotation) {
         Class<? extends Annotation> annType = annotation.annotationType();
-        if (annType.getPackage().getName().startsWith("java.")) {
+        if (annType.getPackage().getName().startsWith("java.") || annType.getPackage().getName().startsWith("kotlin")) {
             return null;
         }
         Map<Annotation, Class<? extends Interceptor>> resultMap = new LinkedHashMap<>();
