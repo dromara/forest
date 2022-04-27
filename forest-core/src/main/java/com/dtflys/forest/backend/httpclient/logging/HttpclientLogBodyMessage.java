@@ -10,7 +10,6 @@ import org.apache.http.entity.mime.MinimalField;
 import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.entity.mime.content.StringBody;
 
-import javax.xml.bind.helpers.AbstractUnmarshallerImpl;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

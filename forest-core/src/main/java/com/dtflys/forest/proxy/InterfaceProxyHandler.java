@@ -12,10 +12,11 @@ import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MetaRequest;
+import com.dtflys.forest.utils.MethodHandlesUtil;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Constructor;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -60,11 +61,7 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         this.interceptorFactory = configuration.getInterceptorFactory();
 
         try {
-            Constructor<MethodHandles.Lookup> defaultMethodConstructor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
-            if (!defaultMethodConstructor.isAccessible()) {
-                defaultMethodConstructor.setAccessible(true);
-            }
-            defaultMethodLookup = defaultMethodConstructor.newInstance(interfaceClass, MethodHandles.Lookup.PRIVATE);
+            defaultMethodLookup = MethodHandlesUtil.lookup(interfaceClass);
         } catch (Throwable e) {
             throw new ForestRuntimeException(e);
         }
@@ -140,7 +137,7 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         Method[] methods = clazz.getDeclaredMethods();
         for (int i = 0; i < methods.length; i++) {
             Method method = methods[i];
-            if(method.isDefault()){
+            if (method.isDefault()) {
                 continue;
             }
             ForestMethod forestMethod = new ForestMethod(this, configuration, method);
@@ -188,6 +185,9 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
                     proxy.wait();
                     return null;
                 }
+                if ("getProxyHandler".equals(methodName)) {
+                    return this;
+                }
             }
             if (args != null && args.length == 1) {
                 if ("equals".equals(methodName)) {
@@ -217,7 +217,8 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
 
   private Object invokeDefaultMethod(Object proxy, Method method, Object[] args)
           throws Throwable {
-    return defaultMethodLookup.unreflectSpecial(method, interfaceClass)
+    return defaultMethodLookup.findSpecial(interfaceClass, method.getName(), MethodType.methodType(method.getReturnType(),
+                    method.getParameterTypes()), interfaceClass)
             .bindTo(proxy).invokeWithArguments(args);
   }
 

@@ -10,6 +10,7 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 /**
  * Forest异步请求执行器
@@ -85,49 +86,30 @@ public class AsyncHttpExecutor implements HttpExecutor {
         this.responseHandler = responseHandler;
     }
 
-    public static class AsyncTask implements Runnable {
-
-        private final CompletableFuture future;
+    public static class AsyncTask implements Supplier {
 
         private final HttpExecutor executor;
 
         private final LifeCycleHandler lifeCycleHandler;
 
-        private String threadName;
-
-        public AsyncTask(CompletableFuture future, HttpExecutor executor, LifeCycleHandler lifeCycleHandler) {
-            this.future = future;
+        public AsyncTask(HttpExecutor executor, LifeCycleHandler lifeCycleHandler) {
             this.executor = executor;
             this.lifeCycleHandler = lifeCycleHandler;
-        }
-
-        public HttpExecutor getExecutor() {
-            return executor;
-        }
-
-        public CompletableFuture getFuture() {
-            return future;
         }
 
         public LifeCycleHandler getLifeCycleHandler() {
             return lifeCycleHandler;
         }
 
-        @Override
-        public void run() {
-            try {
-                this.threadName = Thread.currentThread().getName();
-                executor.execute(lifeCycleHandler);
-                if (lifeCycleHandler instanceof MethodLifeCycleHandler) {
-                    Object result = ((MethodLifeCycleHandler<?>) lifeCycleHandler).getResultData();
-                    future.complete(result);
-                } else {
-                    future.complete(null);
-                }
-            } catch (Throwable th) {
-                future.completeExceptionally(th);
-            }
 
+        @Override
+        public Object get() {
+            executor.execute(lifeCycleHandler);
+            if (lifeCycleHandler instanceof MethodLifeCycleHandler) {
+                Object result = ((MethodLifeCycleHandler<?>) lifeCycleHandler).getResultData();
+                return result;
+            }
+            return null;
         }
     }
 
@@ -145,8 +127,8 @@ public class AsyncHttpExecutor implements HttpExecutor {
                 }
             }
         }
-        final CompletableFuture future = new CompletableFuture();
-        pool.submit(new AsyncTask(future, syncExecutor, lifeCycleHandler));
+        final AsyncTask task = new AsyncTask(syncExecutor, lifeCycleHandler);
+        final CompletableFuture<?> future = CompletableFuture.supplyAsync(task, pool);
         responseHandler.handleFuture(future);
     }
 
@@ -160,3 +142,6 @@ public class AsyncHttpExecutor implements HttpExecutor {
 
     }
 }
+
+
+

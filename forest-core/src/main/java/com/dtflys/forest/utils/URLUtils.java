@@ -1,8 +1,6 @@
 package com.dtflys.forest.utils;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.http.ForestURL;
-import jdk.nashorn.internal.runtime.regexp.joni.ast.StringNode;
 
 import java.io.UnsupportedEncodingException;
 

@@ -231,11 +231,11 @@ public class TestSSLClient extends BaseClientTest {
         assertNotNull(protocol);
         assertEquals("SSLv3", protocol);
 
-        response = sslClient.truestSSLGet("TLSv1.3");
+        response = sslClient.truestSSLGet("TLS");
         request = response.getRequest();
         protocol = request.getSslProtocol();
         assertNotNull(protocol);
-        assertEquals("TLSv1.3", protocol);
+        assertEquals("TLS", protocol);
 
         response = sslClient.truestSSLGet(null);
         request = response.getRequest();

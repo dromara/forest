@@ -40,7 +40,6 @@ public class TestTimeoutClient extends BaseClientTest {
 
     @Test
     public void testConnectTimeout() {
-        server.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
         ForestRequest request = timeoutClient.testConnectTimeout();
         assertThat(request).isNotNull();
         assertThat(request.getConnectTimeout()).isEqualTo(10);
