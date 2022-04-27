@@ -141,8 +141,10 @@ public class ForestURL {
         if (baseAddress != null) {
             String baseScheme = baseAddress.getScheme();
             String baseHost = baseAddress.getHost();
+            String bastPath = baseAddress.getBasePath();
 
             int basePort = baseAddress.getPort();
+            setBasePath(bastPath);
             setScheme(baseScheme);
             setHost(baseHost);
             if (basePort != -1) {
