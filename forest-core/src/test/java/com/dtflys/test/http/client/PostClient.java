@@ -246,6 +246,7 @@ public interface PostClient {
             data = "{\"username\":\"{0}\",\"password\":\"{1}\",\"cn_name\":\"{2}\"}",
             contentType = "application/json; charset=utf-8"
     )
+    @BodyType("binary")
     String postJsonWithCnCharacters(String username, String password, String cnName);
 
     @Request(

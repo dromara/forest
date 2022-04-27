@@ -1,5 +1,6 @@
 package com.dtflys.test.interceptor;
 
+import com.dtflys.forest.annotation.BaseRequest;
 import com.dtflys.forest.annotation.Post;
 import com.dtflys.forest.annotation.Request;
 
@@ -8,6 +9,7 @@ import com.dtflys.forest.annotation.Request;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-15 17:00
  */
+@BaseRequest(interceptor = BaseErrorInterceptor.class)
 public interface InterceptorClient {
 
     @Post(

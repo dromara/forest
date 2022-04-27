@@ -185,6 +185,9 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
                     proxy.wait();
                     return null;
                 }
+                if ("getProxyHandler".equals(methodName)) {
+                    return this;
+                }
             }
             if (args != null && args.length == 1) {
                 if ("equals".equals(methodName)) {
