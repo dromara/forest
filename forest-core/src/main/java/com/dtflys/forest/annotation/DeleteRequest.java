@@ -76,6 +76,7 @@ public @interface DeleteRequest {
     /**
      * 请求超时时间, 单位为毫秒
      * @return 请求超时时间
+     * @deprecated 请使用 {@link #connectTimeout()} 和 {@link #readTimeout()}
      */
     int timeout() default -1;
 

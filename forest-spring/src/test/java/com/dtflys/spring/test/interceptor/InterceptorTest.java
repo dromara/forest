@@ -18,7 +18,7 @@ public class InterceptorTest extends TestCase {
         componentA.setName("XXX");
         InterceptorClient interceptorClient = applicationContext.getBean(InterceptorClient.class);
         assertThat(interceptorClient).isNotNull();
-        interceptorClient.index();
+        interceptorClient.testValue();
         assertThat(componentA.getName()).isEqualTo("YYY");
     }
 }

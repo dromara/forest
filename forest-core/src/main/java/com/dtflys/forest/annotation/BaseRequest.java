@@ -117,6 +117,7 @@ public @interface BaseRequest {
      * </p>
      * @return 接口级别超时时间
      * @see Request#timeout()
+     * @deprecated 请使用 {@link #connectTimeout()} 和 {@link #readTimeout()}
      */
     int timeout() default -1;
 

@@ -12,6 +12,10 @@ public class MyAddressSource2 implements AddressSource {
 
     @Override
     public ForestAddress getAddress(ForestRequest request) {
-        return new ForestAddress("localhost", (Integer) request.variableValue("port"));
+        return new ForestAddress(
+                "http",
+                "localhost",
+                (Integer) request.variableValue("port"),
+                "/base/path");
     }
 }
