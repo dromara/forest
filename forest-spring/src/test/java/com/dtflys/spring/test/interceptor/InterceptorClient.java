@@ -8,7 +8,9 @@ import com.dtflys.forest.annotation.Get;
  */
 public interface InterceptorClient {
 
-    @Get(url = "http://www.baidu.com", interceptor = TestInterceptor.class)
-    String testValue();
+    @Get(url = "http://www.baidu.com", interceptor = TestInterceptorA.class)
+    String testComponentA();
 
+    @Get(url = "http://www.baidu.com", interceptor = TestInterceptorB.class)
+    String testComponentB();
 }
