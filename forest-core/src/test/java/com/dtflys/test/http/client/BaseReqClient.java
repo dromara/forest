@@ -17,7 +17,9 @@ import com.dtflys.forest.http.ForestResponse;
                 "Accept: text/plain"
         },
         userAgent = "${userAgent}",
-        timeout = 2000
+        timeout = 2000,
+        connectTimeout = 3000,
+        readTimeout = 4000
 )
 public interface BaseReqClient {
 

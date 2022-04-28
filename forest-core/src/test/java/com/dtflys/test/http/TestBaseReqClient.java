@@ -2,6 +2,7 @@ package com.dtflys.test.http;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.client.BaseReqClient;
 import com.dtflys.test.http.client.BaseURLClient;
@@ -99,10 +100,15 @@ public class TestBaseReqClient extends BaseClientTest {
     @Test
     public void testBaseGetWithEmptyUrl() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        assertThat(baseReqClient.simpleGetWithEmptyPath("UTF-8"))
+        ForestResponse response = baseReqClient.simpleGetWithEmptyPath("UTF-8");
+        assertThat(response)
             .isNotNull()
             .extracting(ForestResponse::isSuccess, ForestResponse::getContent)
             .contains(true, EXPECTED);
+        ForestRequest request = response.getRequest();
+        assertThat(request.getTimeout()).isEqualTo(2000);
+        assertThat(request.getConnectTimeout()).isEqualTo(3000);
+        assertThat(request.getReadTimeout()).isEqualTo(4000);
         mockRequest(server)
                 .assertMethodEquals("GET")
                 .assertPathEquals("/base")

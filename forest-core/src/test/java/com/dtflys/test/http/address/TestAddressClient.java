@@ -96,6 +96,7 @@ public class TestAddressClient extends BaseClientTest {
         assertThat(request.getPort()).isEqualTo(server.getPort());
         String result = request.execute(String.class);
         assertThat(result).isEqualTo(EXPECTED);
+        mockRequest(server).assertPathEquals("/");
     }
 
     @Test
@@ -106,6 +107,7 @@ public class TestAddressClient extends BaseClientTest {
         assertThat(request.getPort()).isEqualTo(server.getPort());
         String result = request.execute(String.class);
         assertThat(result).isEqualTo(EXPECTED);
+        mockRequest(server).assertPathEquals("/base/path/");
     }
 
 

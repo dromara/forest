@@ -37,7 +37,13 @@ public class BaseRequestLifeCycle implements BaseAnnotationLifeCycle<BaseRequest
         String [] headerArray = annotation.headers();
 
         Integer baseTimeout = annotation.timeout();
+        Integer baseConnectTimeout = annotation.connectTimeout();
+        Integer baseReadTimeout = annotation.readTimeout();
+
         baseTimeout = baseTimeout == -1 ? null : baseTimeout;
+        baseConnectTimeout = baseConnectTimeout == -1 ? null : baseConnectTimeout;
+        baseReadTimeout = baseReadTimeout == -1 ? null : baseReadTimeout;
+
         Class baseRetryerClass = annotation.retryer();
         Integer baseRetryCount = annotation.retryCount();
         baseRetryCount = baseRetryCount == -1 ? null : baseRetryCount;
@@ -50,6 +56,15 @@ public class BaseRequestLifeCycle implements BaseAnnotationLifeCycle<BaseRequest
         if (baseTimeout != null) {
             baseMetaRequest.setTimeout(baseTimeout);
         }
+
+        if (baseConnectTimeout != null) {
+            baseMetaRequest.setConnectTimeout(baseConnectTimeout);
+        }
+
+        if (baseTimeout != null) {
+            baseMetaRequest.setReadTimeout(baseReadTimeout);
+        }
+
         baseMetaRequest.setRetryer(baseRetryerClass);
         if (baseRetryCount != null &&baseRetryCount >= 0) {
             baseMetaRequest.setRetryCount(baseRetryCount);
