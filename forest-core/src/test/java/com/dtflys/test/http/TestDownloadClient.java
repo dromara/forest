@@ -1,5 +1,6 @@
 package com.dtflys.test.http;
 
+import com.dtflys.forest.Forest;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestResponse;
@@ -19,6 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -201,6 +203,55 @@ public class TestDownloadClient extends BaseClientTest {
         buffer.readAll(Okio.sink(bytesOut));
         byte[] out = bytesOut.toByteArray();
         byte[] fileBytes = IOUtils.toByteArray(new FileInputStream(file));
+        assertThat(fileBytes)
+                .hasSize(out.length)
+                .isEqualTo(out);
+    }
+
+
+    @Test
+    public void testDownloadAsInputStream() throws IOException {
+        Buffer buffer = getImageBuffer();
+        server.enqueue(new MockResponse().setBody(buffer));
+        InputStream in = downloadClient.downloadAsInputStream();
+
+        ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
+        buffer.readAll(Okio.sink(bytesOut));
+        byte[] out = bytesOut.toByteArray();
+        byte[] fileBytes = IOUtils.toByteArray(in);
+        assertThat(fileBytes)
+                .hasSize(out.length)
+                .isEqualTo(out);
+    }
+
+
+    @Test
+    public void testDownloadAsResponse() throws Exception {
+        Buffer buffer = getImageBuffer();
+        server.enqueue(new MockResponse().setBody(buffer));
+        ForestResponse response = downloadClient.downloadAsInputResponse();
+        InputStream in = response.getInputStream();
+
+        ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
+        buffer.readAll(Okio.sink(bytesOut));
+        byte[] out = bytesOut.toByteArray();
+        byte[] fileBytes = IOUtils.toByteArray(in);
+        assertThat(fileBytes)
+                .hasSize(out.length)
+                .isEqualTo(out);
+    }
+
+    @Test
+    public void testDownloadWithQuickApi() throws IOException {
+        Buffer buffer = getImageBuffer();
+        server.enqueue(new MockResponse().setBody(buffer));
+        InputStream in = Forest.get("http://localhost:" + server.getPort() + "/download/test-img.jpg")
+                .execute(InputStream.class);
+
+        ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
+        buffer.readAll(Okio.sink(bytesOut));
+        byte[] out = bytesOut.toByteArray();
+        byte[] fileBytes = IOUtils.toByteArray(in);
         assertThat(fileBytes)
                 .hasSize(out.length)
                 .isEqualTo(out);

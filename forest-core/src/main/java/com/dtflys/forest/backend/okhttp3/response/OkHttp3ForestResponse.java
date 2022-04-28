@@ -5,6 +5,7 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.GzipUtils;
+import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
 import okhttp3.Headers;
 import okhttp3.MediaType;
@@ -59,17 +60,17 @@ public class OkHttp3ForestResponse extends ForestResponse {
 
     /**
      * @author designer[19901753334@163.com]
+     * @author gongjun[dt_flys@hotmail.com]
      * @date 2021/12/8 23:51
      **/
     private void setupContent() {
-        if (contentType == null || contentType.isEmpty()) {
-            this.content = readContentAsString();
-        } else if (!request.isDownloadFile() && contentType.canReadAsString()) {
-//            this.content = readContentAsString();
-        } else if (contentType.canReadAsBinaryStream()) {
+        if (request.isDownloadFile()
+                || InputStream.class.isAssignableFrom(request.getMethod().getReturnClass())
+                || InputStream.class.isAssignableFrom(ReflectUtils.toClass(request.getLifeCycleHandler().getResultType()))
+                || (contentType != null && contentType.canReadAsBinaryStream())) {
             StringBuilder builder = new StringBuilder();
-            builder.append("[content-type: ")
-                    .append(contentType.toString());
+            builder.append("[stream content-type: ")
+                    .append(contentType == null ? "undefined" : contentType.toString());
             if (contentEncoding != null) {
                 builder.append("; content-encoding: ")
                         .append(contentEncoding);
@@ -82,6 +83,8 @@ public class OkHttp3ForestResponse extends ForestResponse {
                     .append(contentLength)
                     .append("]");
             this.content = builder.toString();
+        } else {
+            this.content = readContentAsString();
         }
     }
 
@@ -176,10 +179,10 @@ public class OkHttp3ForestResponse extends ForestResponse {
 
     @Override
     public InputStream getInputStream() throws Exception {
-        if (this.contentLength > Integer.MAX_VALUE) {
-            return body.byteStream();
+        if (bytes != null) {
+            return new ByteArrayInputStream(getByteArray());
         }
-        return new ByteArrayInputStream(getByteArray());
+        return body.byteStream();
     }
 
     @Override
