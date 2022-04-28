@@ -3,6 +3,7 @@ package com.dtflys.spring.test.interceptor;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.spring.test.component.ComponentA;
+import com.dtflys.spring.test.component.ComponentB;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -12,14 +13,14 @@ import javax.annotation.Resource;
  * @since 2022-02-19 18:07
  */
 @Component
-public class TestInterceptor implements Interceptor<String> {
+public class TestInterceptorB implements Interceptor<String> {
 
     @Resource
-    private ComponentA componentA;
+    private ComponentB componentB;
 
     @Override
     public boolean beforeExecute(ForestRequest request) {
-        componentA.setName("yyy");
+        componentB.setName("bbb");
         return true;
     }
 }
