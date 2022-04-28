@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2022-02-19 18:08
  */
-@Component("componentA")
-public class ComponentA {
+@Component("componentB")
+public class ComponentB {
 
     private String name;
 
