@@ -48,6 +48,8 @@ import java.util.List;
  */
 public abstract class ForestResponse<T> {
 
+    protected final static int MAX_BYTES_CAPACITY = 1024 * 1024 * 2;
+
     /**
      * 请求对象
      */
@@ -574,9 +576,7 @@ public abstract class ForestResponse<T> {
      * @return 输入流形式的响应内容, {@link InputStream}实例
      * @throws Exception 可能抛出的异常类型
      */
-    public InputStream getInputStream() throws Exception {
-        return new ByteArrayInputStream(getByteArray());
-    }
+    public abstract InputStream getInputStream() throws Exception;
 
     /**
      * 根据响应头名称获取单个请求响应头

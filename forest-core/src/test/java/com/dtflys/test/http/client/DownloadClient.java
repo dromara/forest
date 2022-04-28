@@ -7,6 +7,7 @@ import com.dtflys.forest.extensions.DownloadFile;
 import com.dtflys.forest.http.ForestResponse;
 
 import java.io.File;
+import java.io.InputStream;
 
 /**
  * @author gongjun[dt_flys@hotmail.com]
@@ -30,5 +31,11 @@ public interface DownloadClient {
     @Get("http://localhost:${port}/download/test-img.jpg")
     @DownloadFile(dir = "${dir}")
     File downloadImageFile(@Var("dir") String dir);
+
+    @Get("http://localhost:${port}/download/test-img.jpg")
+    InputStream downloadAsInputStream();
+
+    @Get("http://localhost:${port}/download/test-img.jpg")
+    ForestResponse downloadAsInputResponse();
 
 }

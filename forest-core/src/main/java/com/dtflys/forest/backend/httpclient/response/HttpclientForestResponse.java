@@ -5,6 +5,7 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.GzipUtils;
+import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.*;
@@ -85,14 +86,13 @@ public class HttpclientForestResponse extends ForestResponse {
 
     private void setupContent() {
         if (content == null) {
-            if (contentType == null || contentType.isEmpty()) {
-                content = readContentAsString();
-            } else if (!request.isDownloadFile() && contentType.canReadAsString()) {
-                content = readContentAsString();
-            } else if (contentType.canReadAsBinaryStream()) {
+            if (request.isDownloadFile()
+                    || InputStream.class.isAssignableFrom(request.getMethod().getReturnClass())
+                    || InputStream.class.isAssignableFrom(ReflectUtils.toClass(request.getLifeCycleHandler().getResultType()))
+                    || (contentType != null && contentType.canReadAsBinaryStream())) {
                 StringBuilder builder = new StringBuilder();
-                builder.append("[content-type: ")
-                        .append(contentType);
+                builder.append("[stream content-type: ")
+                        .append(contentType == null ? "undefined" : contentType);
                 if (contentEncoding != null) {
                     builder.append("; encoding: ")
                             .append(contentEncoding);
@@ -101,6 +101,8 @@ public class HttpclientForestResponse extends ForestResponse {
                         .append(contentLength)
                         .append("]");
                 this.content = builder.toString();
+            } else {
+                content = readContentAsString();
             }
         }
     }
@@ -158,10 +160,10 @@ public class HttpclientForestResponse extends ForestResponse {
 
     @Override
     public InputStream getInputStream() throws Exception {
-        if (this.contentLength > Integer.MAX_VALUE) {
-            return entity.getContent();
+        if (bytes != null) {
+            return new ByteArrayInputStream(getByteArray());
         }
-        return new ByteArrayInputStream(getByteArray());
+        return entity.getContent();
     }
 
     @Override
