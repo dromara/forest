@@ -6,14 +6,14 @@
 
   <groupId>com.dtflys.forest</groupId>
   <artifactId>forest-mock</artifactId>
-  <version>1.5.19</version>
+  <version>1.5.20</version>
 
   <name>forest-mock</name>
 
   <parent>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest</artifactId>
-    <version>1.5.19</version>
+    <version>1.5.20</version>
   </parent>
 
   <properties>
