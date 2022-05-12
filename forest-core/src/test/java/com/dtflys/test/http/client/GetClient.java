@@ -83,11 +83,17 @@ public interface GetClient {
     String simpleGetMultiQuery2(@Query("username") String username, @Query("password") String password);
 
     @Request(
+            url = "http://localhost:${port}/hello/user?username=${username}&password=${password}",
+            headers = {"Accept:text/plain"}
+    )
+    String simpleGetMultiQuery2WithVar(@Var("username") String username, @Var("password") String password);
+
+    @Request(
             url = "http://localhost:${port}/hello",
             headers = {"Accept:text/plain"},
             interceptor = AddQueryInterceptor.class
     )
-    String simpleGetMultiQuery3();
+    String simpleGetMultiQuery2();
 
     @Request(
             url = "http://localhost:${port}/hello?username=foo",
