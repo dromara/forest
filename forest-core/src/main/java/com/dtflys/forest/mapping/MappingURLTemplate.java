@@ -46,10 +46,8 @@ public class MappingURLTemplate extends MappingTemplate {
             ForestQueryParameter lastQuery  = null;
             for (int i = 0; i < len; i++) {
                 MappingExpr expr = exprList.get(i);
-                String exprVal = renderExpression(jsonConverter, expr, args);
-                if (exprVal != null) {
-                    builder.append(exprVal);
-                }
+                String exprVal = String.valueOf(renderExpression(jsonConverter, expr, args));
+                builder.append(exprVal);
                 if (renderedQuery) {
                     // 已渲染到查询参数
                     if (lastQuery != null && (
