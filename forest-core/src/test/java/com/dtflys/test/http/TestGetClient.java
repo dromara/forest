@@ -21,6 +21,7 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -120,7 +121,18 @@ public class TestGetClient extends BaseClientTest {
     }
 
     @Test
-    public void testPath2() {
+    public void testPathWithAt() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(getClient.testPath("aaa@bbb"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/aaa@bbb");
+    }
+
+
+    @Test
+    public void testPath2() throws MalformedURLException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         assertThat(getClient.testPath2("hello &(user)a:a?b=1/2&c=http://localhost:8080/?x=0&d=1"))
                 .isNotNull()
@@ -531,6 +543,23 @@ public class TestGetClient extends BaseClientTest {
                 .assertQueryEquals("password", "bar");
     }
 
+    @Test
+    public void testSimpleGetMultiQuery3WithVar() throws InterruptedException {
+        server.enqueue(
+                new MockResponse()
+                        .setHeader("Content-Type", "text/plain")
+                        .setHeader("Content-Encoding", "UTF-8")
+                        .setBody(EXPECTED));
+        assertThat(getClient.simpleGetMultiQuery2WithVar(null, "bar"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "null")
+                .assertQueryEquals("password", "bar");
+    }
+
 
     @Test
     public void testSimpleGetMultiQuery3() throws InterruptedException {
@@ -539,7 +568,7 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Type", "text/plain")
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(EXPECTED));
-        assertThat(getClient.simpleGetMultiQuery3())
+        assertThat(getClient.simpleGetMultiQuery2())
                 .isNotNull()
                 .isEqualTo(EXPECTED);
         mockRequest(server)
