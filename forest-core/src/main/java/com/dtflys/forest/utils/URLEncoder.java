@@ -25,12 +25,12 @@ public class URLEncoder {
     /**
      * URI用户信息部分中不会被编码的字符集
      */
-    private static final char[] USER_INFO_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '*', ':', '=', '@', '%'};
+    private static final char[] USER_INFO_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '*', ':', '=', '%'};
 
     /**
      * URI路径中不会被编码的字符集
      */
-    private static final char[] PATH_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '*', '/', ':', '?', '=', '&', '%'};
+    private static final char[] PATH_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '[', ']', '*', '/', ':', '?', '=', '@', '&', '%'};
 
     /**
      * 查询参数值中不会被编码的字符集

@@ -77,7 +77,7 @@ public class Test0 {
 
     @Test
     public void testClient0() {
-        ForestResponse<String> response = beastshopClient.shops();
+        ForestResponse<String> response = beastshopClient.shops("xxx");
         assertNotNull(response);
         assertNotNull(response.getResult());
         ForestRequest request = response.getRequest();

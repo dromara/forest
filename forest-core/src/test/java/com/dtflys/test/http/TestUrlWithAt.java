@@ -89,7 +89,7 @@ public class TestUrlWithAt extends BaseClientTest {
         log.info("response: " + response);
         ForestRequest request = response.getRequest();
         String userInfo = request.getUserInfo();
-        assertEquals("xxx/yyy/foo", userInfo);
+        assertEquals("xxx%2Fyyy%2Ffoo", userInfo);
         mockRequest(server)
                 .assertMethodEquals("GET")
                 .assertPathEquals("/hello/user");
