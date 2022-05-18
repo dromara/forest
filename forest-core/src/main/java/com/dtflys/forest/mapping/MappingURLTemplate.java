@@ -30,10 +30,10 @@ public class MappingURLTemplate extends MappingTemplate {
 
     public ForestURL render(Object[] args, ForestQueryMap queries) {
         String schema = null;
-        String userInfo = null;
+        StringBuilder userInfo = null;
         String host = null;
         Integer port = null;
-        String path = null;
+        StringBuilder path = null;
         StringBuilder urlBuilder = new StringBuilder();
 
         boolean renderedQuery = false;
@@ -104,17 +104,15 @@ public class MappingURLTemplate extends MappingTemplate {
                     String baseUrl = exprVal;
                     if (renderedQuery) {
                         baseUrl = exprVal.substring(0, queryIndex);
-                        urlBuilder.append(baseUrl);
-                    } else {
-                        urlBuilder.append(baseUrl);
                     }
+                    urlBuilder.append(baseUrl);
                     char[] baseUrlChars = baseUrl.toCharArray();
                     int baseLen = baseUrlChars.length;
                     char ch;
                     StringBuilder subBuilder = new StringBuilder();
                     for (int pathCharIndex = 0 ; pathCharIndex < baseLen; pathCharIndex++) {
                         ch = baseUrlChars[pathCharIndex];
-                        if (ch == ':') {
+                        if (!renderedPath && ch == ':') {
                             if (schema == null && pathCharIndex + 1 < baseLen
                                     && baseUrlChars[pathCharIndex + 1] == '/') {
                                 // 解析协议部分
@@ -143,48 +141,33 @@ public class MappingURLTemplate extends MappingTemplate {
                                     continue;
                                 } else if (hasNext && !Character.isDigit(baseUrlChars[pathCharIndex + 1])) {
                                     if (userInfo == null) {
-                                        userInfo = subBuilder.toString() + ':';
+                                        userInfo = new StringBuilder(subBuilder.toString() + ':');
                                     } else {
-                                        userInfo += subBuilder.toString() + ':';
+                                        userInfo.append(subBuilder.toString()).append(':');
                                     }
                                     subBuilder = new StringBuilder();
                                     continue;
                                 }
-                            } else if (host != null && port == null && !renderedPath) {
+                            } else if (host != null && port == null) {
                                 nextIsPort = true;
                             } else {
                                 subBuilder.append(ch);
                             }
-                        } else if (ch == '@') {
+                        } else if (!renderedPath && ch == '@') {
                             // 解析用户名密码
                             if (userInfo == null) {
                                 if (host != null) {
-                                    StringBuilder userInfoBuilder = new StringBuilder(host);
-                                    if (StringUtils.isNotEmpty(path)) {
-                                        userInfoBuilder.append(path);
-                                        path = "";
-                                    }
-                                    if (subBuilder.length() > 0) {
-                                        if (!renderedPath) {
-                                            userInfoBuilder.append(':');
-                                        }
-                                        userInfoBuilder.append(subBuilder);
-                                        subBuilder = new StringBuilder();
-                                    }
-                                    userInfo = userInfoBuilder.toString();
+                                    userInfo = new StringBuilder(host);
                                     host = null;
                                 } else {
-                                    userInfo = "";
+                                    userInfo = new StringBuilder();
                                 }
-                                if (port != null) {
-                                    userInfo += port;
-                                    port = null;
-                                }
-                            } else {
-                                userInfo += subBuilder.toString();
-                                subBuilder = new StringBuilder();
                             }
-                            renderedPath = false;
+                            if (nextIsPort) {
+                                userInfo.append(':');
+                            }
+                            userInfo.append(subBuilder.toString());
+                            subBuilder = new StringBuilder();
                             continue;
                         } else if (ch == '/' || pathCharIndex + 1 == baseLen) {
                             if (ch != '/') {
@@ -214,12 +197,13 @@ public class MappingURLTemplate extends MappingTemplate {
                                     subBuilder.append(ch);
                                     renderedPath = true;
                                 }
-                                if (pathCharIndex + 1 == baseLen) {
+                                if (renderedPath) {
                                     if (path == null) {
-                                        path = subBuilder.toString();
+                                        path = new StringBuilder(subBuilder.toString());
                                     } else {
-                                        path += subBuilder.toString();
+                                        path.append(subBuilder.toString());
                                     }
+                                    subBuilder = new StringBuilder();
                                 }
                             }
                         } else {
@@ -245,7 +229,12 @@ public class MappingURLTemplate extends MappingTemplate {
                     }
                 }
             }
-            return new ForestURL(schema, userInfo, host, port, path);
+            return new ForestURL(
+                    schema,
+                    userInfo != null ? userInfo.toString() : null,
+                    host,
+                    port,
+                    path != null ? path.toString() : null);
         } catch (ForestVariableUndefinedException ex) {
             throw new ForestVariableUndefinedException(annotationType, attributeName, forestMethod, ex.getVariableName(), template);
         }

@@ -19,3 +19,7 @@ forest:
     user:
       name: foo
       password: bar
+
+
+my-props:
+  base-url: https://www.thebeastshop.com/autopage/shops.htm

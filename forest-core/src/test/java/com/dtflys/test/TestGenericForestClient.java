@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -982,6 +984,24 @@ public class TestGenericForestClient extends BaseClientTest {
                 .retryWhen(((req, res) -> res.statusIs(203)));
         request.execute();
         assertThat(request.getCurrentRetryCount()).isEqualTo(3);
+    }
+
+
+    @Test
+    public void testRequest_async_future() throws ExecutionException, InterruptedException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Future<String> future = Forest.get("/")
+                .port(server.getPort())
+                .async()
+                .addQuery("a", "1")
+                .addQuery("a", "2")
+                .addQuery("a", "3")
+                .execute(new TypeReference<Future<String>>() {});
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertQueryEquals("a=1&a=2&a=3");
+        String result = future.get();
+        assertThat(result).isEqualTo(EXPECTED);
     }
 
     @Test

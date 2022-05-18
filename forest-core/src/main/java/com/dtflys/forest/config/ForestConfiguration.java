@@ -44,6 +44,11 @@ import com.dtflys.forest.converter.text.DefaultTextConverter;
 import com.dtflys.forest.converter.xml.ForestJaxbConverter;
 import com.dtflys.forest.converter.xml.ForestXmlConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.filter.EncodeFilter;
+import com.dtflys.forest.filter.EncodeFormFilter;
+import com.dtflys.forest.filter.EncodePathFilter;
+import com.dtflys.forest.filter.EncodeQueryFilter;
+import com.dtflys.forest.filter.EncodeUserInfoFilter;
 import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.filter.JSONFilter;
 import com.dtflys.forest.filter.XmlFilter;
@@ -348,6 +353,11 @@ public class ForestConfiguration implements Serializable {
         configuration.setMaxRetryInterval(0);
         configuration.registerFilter("json", JSONFilter.class);
         configuration.registerFilter("xml", XmlFilter.class);
+        configuration.registerFilter("encode", EncodeFilter.class);
+        configuration.registerFilter("encodeUserInfo", EncodeUserInfoFilter.class);
+        configuration.registerFilter("encodePath", EncodePathFilter.class);
+        configuration.registerFilter("encodeQuery", EncodeQueryFilter.class);
+        configuration.registerFilter("encodeForm", EncodeFormFilter.class);
         configuration.setLogHandler(new DefaultLogHandler());
         return configuration;
     }
