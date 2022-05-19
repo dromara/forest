@@ -51,18 +51,6 @@ public class Test2 {
         assertEquals(GlobalInterceptor.class, forestConfiguration.getInterceptors().get(0));
     }
 
-    @Test
-    public void testClient1() {
-        ForestLogger logger = Mockito.mock(ForestLogger.class);
-        ForestRequest<String> request = giteeClient.index();
-        assertThat(request).isNotNull();
-        request.getLogConfiguration().getLogHandler().setLogger(logger);
-        String result = (String) request.execute();
-        assertThat(result.startsWith("Global: ")).isTrue();
-        Mockito.verify(logger).info("[Forest] [Test1] 请求: \n" +
-                "\tGET https://gitee.com/dt_flys/forest HTTPS");
-
-    }
 
     @Test
     public void testClient2() {

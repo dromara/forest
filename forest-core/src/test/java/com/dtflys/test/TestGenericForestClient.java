@@ -336,6 +336,7 @@ public class TestGenericForestClient extends BaseClientTest {
         Forest.get("/")
                 .port(server.getPort())
                 .addJSONQuery("json", myQuery)
+                .addQuery("x", "\"`~\"")
                 .execute();
         mockRequest(server)
                 .assertPathEquals("/")

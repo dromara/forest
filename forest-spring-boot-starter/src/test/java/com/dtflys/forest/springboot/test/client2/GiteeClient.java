@@ -18,7 +18,8 @@ public interface GiteeClient {
 
     @Request(
             url = "https://gitee.com/dt_flys/#{test.path}",
-            timeout = 80000
+            timeout = 80000,
+            sslProtocol = "SSL"
     )
     @LogHandler(TestLogHandler.class)
     @LogEnabled(logResponseStatus = true, logResponseContent = true)
