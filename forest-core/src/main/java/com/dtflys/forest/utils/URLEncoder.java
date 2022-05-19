@@ -10,8 +10,6 @@ import java.util.BitSet;
 
 public class URLEncoder {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * 空格字符
      */
@@ -30,23 +28,18 @@ public class URLEncoder {
     /**
      * URI路径中不会被编码的字符集
      */
-    private static final char[] PATH_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '[', ']', '*', '/', ':', '?', '=', '@', '&', '%'};
+    private static final char[] PATH_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '[', ']', '*', '/', ':', '?', '=', '@', '&', '%', '~'};
 
     /**
      * 查询参数值中不会被编码的字符集
      */
-    private static final char[] QUERY_NAME_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '{', '}', '[', ']', '*', '/', ':', '?', '=', '%'};
-
-    /**
-     * 查询参数值中不会被编码的字符集
-     */
-    private static final char[] QUERY_VALUE_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '{', '}', '[', ']', ',', '*', '/', ':', '?', '=', '%'};
+    private static final char[] QUERY_VALUE_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '[', ']', ',', '*', '/', ':', '?', '=', '%', '~'};
 
 
     /**
      * 查询参数值中不会被编码的字符集
      */
-    private static final char[] X_WWW_FORM_URLENCODED_VALUE_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '{', '}', '[', ']', ',', '"', '*', '/', ':', '?', ' ', '=', '%'};
+    private static final char[] X_WWW_FORM_URLENCODED_VALUE_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '{', '}', '[', ']', ',', '"', '*', '/', ':', '?', ' ', '=', '%', '~'};
 
     /**
      * 强制全编码中不会被编码的字符集

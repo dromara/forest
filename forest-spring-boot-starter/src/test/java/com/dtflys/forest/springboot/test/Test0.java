@@ -79,13 +79,11 @@ public class Test0 {
     public void testClient0() {
         ForestResponse<String> response = beastshopClient.shops("xxx");
         assertNotNull(response);
-        assertNotNull(response.getResult());
+        assertNotNull(response.getContent());
         ForestRequest request = response.getRequest();
         assertNotNull(request);
-        String name = request.getHeaderValue("MyName");
-        String pass = request.getHeaderValue("MyPass");
-        assertEquals("foo", name);
-        assertEquals("bar", pass);
+        assertEquals("www.thebeastshop.com", request.getHost());
+        assertEquals("/autopage", request.getPath());
     }
 
     @Test
