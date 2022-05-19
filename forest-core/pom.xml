@@ -6,12 +6,12 @@
 
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-core</artifactId>
-    <version>1.5.20</version>
+    <version>1.5.21</version>
 
     <parent>
         <groupId>com.dtflys.forest</groupId>
         <artifactId>forest</artifactId>
-        <version>1.5.20</version>
+        <version>1.5.21</version>
     </parent>
 
     <properties>
@@ -164,7 +164,7 @@
         <dependency>
             <groupId>com.dtflys.forest</groupId>
             <artifactId>forest-mock</artifactId>
-            <version>1.5.20</version>
+            <version>1.5.21</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
