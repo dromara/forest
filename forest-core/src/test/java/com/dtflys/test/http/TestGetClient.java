@@ -466,7 +466,7 @@ public class TestGetClient extends BaseClientTest {
     }
 
     @Test
-    public void testUrl() throws UnsupportedEncodingException, InterruptedException {
+    public void testUrl() {
         server.enqueue(
                 new MockResponse()
                         .setHeader("Content-Encoding", "UTF-8")
@@ -484,9 +484,28 @@ public class TestGetClient extends BaseClientTest {
                 .assertQueryEquals("token", token);
     }
 
+    @Test
+    public void testUrl2() {
+        server.enqueue(
+                new MockResponse()
+                        .setHeader("Content-Encoding", "UTF-8")
+                        .setBody(EXPECTED));
+        String token = "YmZlNDYzYmVkMWZjYzgwNjExZDVhMWM1ODZmMWRhYzg0NTcyMGEwMg==";
+        ForestResponse<String> response = getClient.testUrl2("http", "localhost", "xxx");
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
+        assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
+        assertThat(response.getContentType()).isNull();
+        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/xxx")
+                .assertEncodedQueryEquals("token=" + token)
+                .assertQueryEquals("token", token);
+    }
+
 
     @Test
-    public void testSimpleGetMultiQuery() throws InterruptedException {
+    public void testSimpleGetMultiQuery() {
         server.enqueue(
                 new MockResponse()
                         .setHeader("Content-Type", "application/json")
