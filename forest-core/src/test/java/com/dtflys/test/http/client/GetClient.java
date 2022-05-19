@@ -373,6 +373,9 @@ public interface GetClient {
     @Get(url = "http://localhost:${port}?token=YmZlNDYzYmVkMWZjYzgwNjExZDVhMWM1ODZmMWRhYzg0NTcyMGEwMg==")
     ForestResponse<String> testUrl();
 
+    @Get(url = "${schema}://${host}:${port}/${path}?token=YmZlNDYzYmVkMWZjYzgwNjExZDVhMWM1ODZmMWRhYzg0NTcyMGEwMg==")
+    ForestResponse<String> testUrl2(@Var("schema") String schema, @Var("host") String host, @Var("path") String path);
+
 
     @Get(
             url = "http://localhost:${port}/hello/user?{name}",
