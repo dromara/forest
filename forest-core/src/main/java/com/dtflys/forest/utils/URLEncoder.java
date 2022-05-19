@@ -40,7 +40,7 @@ public class URLEncoder {
     /**
      * 查询参数值中不会被编码的字符集
      */
-    private static final char[] QUERY_VALUE_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '*', '/', ':', '?', '=', '%'};
+    private static final char[] QUERY_VALUE_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '{', '}', '[', ']', ',', '*', '/', ':', '?', '=', '%'};
 
 
     /**
