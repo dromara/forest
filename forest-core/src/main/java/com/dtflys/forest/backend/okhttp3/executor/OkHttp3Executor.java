@@ -226,7 +226,7 @@ public class OkHttp3Executor implements HttpExecutor {
         }
 
         // 验证响应
-        if (response.isError()) {
+        if (retryEx == null && response.isError()) {
             retryOrDoError(response, okResponse, null, lifeCycleHandler, retryCount);
             return;
         }

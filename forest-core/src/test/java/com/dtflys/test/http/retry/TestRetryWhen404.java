@@ -6,10 +6,14 @@ import com.dtflys.forest.http.ForestResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class TestRetryWhen implements RetryWhen {
 
-    private final static Logger logger = LoggerFactory.getLogger(TestRetryWhen.class);
+public class TestRetryWhen404 implements RetryWhen {
+
+    private final static Logger logger = LoggerFactory.getLogger(TestRetryWhen404.class);
+
+    private AtomicInteger doRetryWhenCount = new AtomicInteger(0);
 
     /**
      * 请求重试条件
@@ -20,7 +24,11 @@ public class TestRetryWhen implements RetryWhen {
     @Override
     public boolean retryWhen(ForestRequest request, ForestResponse response) {
         logger.info("do retryWhen: 当前重试次数[" + request.getCurrentRetryCount() + "]");
-        return response.statusIs(203);
+        doRetryWhenCount.incrementAndGet();
+        return response.statusIs(404);
     }
 
+    public AtomicInteger getDoRetryWhenCount() {
+        return doRetryWhenCount;
+    }
 }

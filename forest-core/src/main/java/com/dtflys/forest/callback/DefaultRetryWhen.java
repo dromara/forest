@@ -35,6 +35,7 @@ public class DefaultRetryWhen implements RetryWhen {
 
     @Override
     public boolean retryWhen(ForestRequest request, ForestResponse response) {
+        System.out.println("Do RetryWhen");
         return response.isError();
     }
 }

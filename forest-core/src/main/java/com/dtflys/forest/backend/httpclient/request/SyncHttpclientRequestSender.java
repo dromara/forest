@@ -119,7 +119,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
         }
 
         // 检查响应是否失败
-        if (response.isError()) {
+        if (retryEx == null && response.isError()) {
             ForestNetworkException networkException =
                     new ForestNetworkException("", response.getStatusCode(), response);
             ForestRetryException retryException = new ForestRetryException(
