@@ -3,8 +3,6 @@ package com.dtflys.test.sub;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.test.http.BaseClientTest;
-import com.dtflys.test.http.address.AddressClient;
-import com.dtflys.test.http.address.AddressClient2;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.BeforeClass;

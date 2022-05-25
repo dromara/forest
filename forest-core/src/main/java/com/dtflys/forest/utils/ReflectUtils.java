@@ -99,7 +99,7 @@ public class ReflectUtils {
             Type genericSuper = clazz.getGenericSuperclass();
             if (genericSuper == null || Object.class.equals(genericSuper)) {
                 Type[] genericInterfaces = clazz.getGenericInterfaces();
-                if (genericInterfaces == null || genericInterfaces.length == 0) {
+                if (genericInterfaces.length > 0) {
                     genericSuper = genericInterfaces[0];
                 }
             }

@@ -1,9 +1,11 @@
 package com.dtflys.test.http.retry;
 
 import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.forest.callback.RetryWhen;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.BaseClientTest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -61,6 +63,33 @@ public class TestRetryClient extends BaseClientTest {
         mockRequest(server).assertQueryEquals("a=1&a=2");
         mockRequest(server).assertQueryEquals("a=1&a=2&a=3");
     }
+
+    @Test
+    public void testRetryRequest_status_404() {
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(404));
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(404));
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(404));
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(404));
+        ForestRequest<ForestResponse> request = retryClient.testRetryRequest_404(3, 10);
+        RetryWhen retryWhen = request.getRetryWhen();
+        assertThat(retryWhen).isNotNull().isInstanceOf(TestRetryWhen404.class);
+        TestRetryWhen404 retryWhen404 = (TestRetryWhen404) retryWhen;
+        retryWhen404.getDoRetryWhenCount().set(0);
+        assertThat(request).isNotNull();
+        assertThat(request.getRetryCount()).isEqualTo(3);
+        assertThat(request.getMaxRetryInterval()).isEqualTo(10);
+        ForestResponse response = request.execute(ForestResponse.class);
+        assertThat(response).isNotNull();
+        assertThat(response.isError()).isTrue();
+        assertThat(retryWhen404.getDoRetryWhenCount().get()).isEqualTo(4);
+        assertThat(request.getCurrentRetryCount()).isEqualTo(3);
+        assertThat(request.getAttachment("retry-interceptor")).isNotNull().isEqualTo(3);
+        mockRequest(server).assertQueryEquals(null);
+        mockRequest(server).assertQueryEquals("a=1");
+        mockRequest(server).assertQueryEquals("a=1&a=2");
+        mockRequest(server).assertQueryEquals("a=1&a=2&a=3");
+    }
+
 
     @Test
     public void testRetry() {
