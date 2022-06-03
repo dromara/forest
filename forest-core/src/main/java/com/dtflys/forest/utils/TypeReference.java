@@ -15,7 +15,7 @@ import java.lang.reflect.Type;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.5.2
  */
-public abstract class TypeReference<T> {
+public abstract class TypeReference<T> implements Type {
 
     /**
      * {@link Type} 类型引用
