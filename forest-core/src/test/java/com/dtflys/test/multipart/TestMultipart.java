@@ -36,7 +36,7 @@ public class TestMultipart extends TestCase {
     }
 
     public void testFileMultipart() throws IOException {
-        URL url = TestMultipart.class.getClassLoader().getResource("log4j2.xml");
+        URL url = TestMultipart.class.getClassLoader().getResource("logback.xml");
         File file = new File(url.getFile());
         assertNotNull(file);
         FileMultipart fileMultipart = new FileMultipart();
@@ -46,7 +46,7 @@ public class TestMultipart extends TestCase {
         assertNotNull(resultFile);
         assertEquals(file, resultFile);
         assertEquals("file", fileMultipart.getName());
-        assertEquals("log4j2.xml", fileMultipart.getOriginalFileName());
+        assertEquals("logback.xml", fileMultipart.getOriginalFileName());
         long fileSize = FileUtils.sizeOf(file);
         assertEquals(fileSize, fileMultipart.getSize());
         String text = FileUtils.readFileToString(file);
@@ -60,7 +60,7 @@ public class TestMultipart extends TestCase {
 
 
     public void testFilePathMultipart() throws IOException {
-        URL url = TestMultipart.class.getClassLoader().getResource("log4j2.xml");
+        URL url = TestMultipart.class.getClassLoader().getResource("logback.xml");
         String filePath = url.getFile();
         File file = new File(filePath);
         FilePathMultipart filePathMultipart = new FilePathMultipart();
@@ -70,7 +70,7 @@ public class TestMultipart extends TestCase {
         assertNotNull(resultFile);
         assertEquals(file.getAbsoluteFile(), resultFile.getAbsoluteFile());
         assertEquals("file", filePathMultipart.getName());
-        assertEquals("log4j2.xml", filePathMultipart.getOriginalFileName());
+        assertEquals("logback.xml", filePathMultipart.getOriginalFileName());
         long fileSize = FileUtils.sizeOf(file);
         assertEquals(fileSize, filePathMultipart.getSize());
         String text = FileUtils.readFileToString(file);
@@ -84,7 +84,7 @@ public class TestMultipart extends TestCase {
 
 
     public void testInputStreamMultipart() throws IOException {
-        URL url = TestMultipart.class.getClassLoader().getResource("log4j2.xml");
+        URL url = TestMultipart.class.getClassLoader().getResource("logback.xml");
         String filePath = url.getFile();
         File file = new File(filePath);
         InputStream in = new FileInputStream(file);
@@ -92,10 +92,10 @@ public class TestMultipart extends TestCase {
         inputStreamMultipart.setName("file");
         inputStreamMultipart.setData(in);
         File resultFile = inputStreamMultipart.getFile();
-        inputStreamMultipart.setFileName("log4j2.xml");
+        inputStreamMultipart.setFileName("logback.xml");
         assertNull(resultFile);
         assertEquals("file", inputStreamMultipart.getName());
-        assertEquals("log4j2.xml", inputStreamMultipart.getOriginalFileName());
+        assertEquals("logback.xml", inputStreamMultipart.getOriginalFileName());
         assertEquals(-1, inputStreamMultipart.getSize());
         String text = FileUtils.readFileToString(file);
         String resultText = IOUtils.toString(inputStreamMultipart.getInputStream());
@@ -104,16 +104,16 @@ public class TestMultipart extends TestCase {
 
 
     public void testInputStreamMultipart2() throws IOException {
-        URL url = TestMultipart.class.getClassLoader().getResource("log4j2.xml");
+        URL url = TestMultipart.class.getClassLoader().getResource("logback.xml");
         String filePath = url.getFile();
         File file = new File(filePath);
         InputStream in = new FileInputStream(file);
         InputStreamMultipart inputStreamMultipart = new InputStreamMultipart();
         inputStreamMultipart.setData(in);
         File resultFile = inputStreamMultipart.getFile();
-        inputStreamMultipart.setFileName("log4j2.xml");
+        inputStreamMultipart.setFileName("logback.xml");
         assertNull(resultFile);
-        assertEquals("log4j2.xml", inputStreamMultipart.getOriginalFileName());
+        assertEquals("logback.xml", inputStreamMultipart.getOriginalFileName());
         assertEquals(-1, inputStreamMultipart.getSize());
         String text = FileUtils.readFileToString(file);
         byte[] byteArray = inputStreamMultipart.getBytes();
