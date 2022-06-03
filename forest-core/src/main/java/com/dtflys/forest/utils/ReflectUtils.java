@@ -49,6 +49,19 @@ public class ReflectUtils {
 
 
     /**
+     * 转换为 {@link Type} 接口实例
+     *
+     * @param type {@link Type}接口实例
+     * @return  {@link Type} 接口实例
+     */
+    public static Type toType(Type type) {
+        if (type instanceof TypeReference) {
+            return ((TypeReference<?>) type).getType();
+        }
+        return type;
+    }
+
+    /**
      * 转换为 {@link Class} 类型对象
      * <p>将抽象的 {@link Type} 接口实例转换为具体的 {@link Class} 类型对象实例
      *
@@ -56,6 +69,9 @@ public class ReflectUtils {
      * @return  Java类，{@link Class}类实例
      */
     public static Class<?> toClass(Type genericType) {
+        if (genericType instanceof TypeReference) {
+            return toClass(((TypeReference<?>) genericType).getType());
+        }
         if (genericType instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType) genericType;
             return ((Class<?>) pt.getRawType());

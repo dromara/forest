@@ -51,10 +51,9 @@ import java.lang.annotation.Target;
  * @author gongjun [dt_flys@hotmail.com]
  * @since 1.5.2
  */
-@Deprecated
 @Documented
 @ParamLifeCycle(ReturnLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
-public @interface ReturnType {
+public @interface Return {
 }

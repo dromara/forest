@@ -26,11 +26,11 @@ import java.util.concurrent.Future;
  */
 public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
 
-    private final Type resultType;
+    private Type resultType;
 
-    private final Class resultRawClass;
+    private Class resultRawClass;
 
-    private final Type onSuccessClassGenericType;
+    private Type onSuccessClassGenericType;
 
     private static final ResultHandler RESULT_HANDLER = new ResultHandler();
 
@@ -41,7 +41,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
 
     public MethodLifeCycleHandler(Type resultType, Type onSuccessClassGenericType) {
         this.onSuccessClassGenericType = onSuccessClassGenericType;
-        this.resultType = resultType;
+        this.resultType = ReflectUtils.toType(resultType);
         this.resultRawClass = ReflectUtils.toClass(resultType);
     }
 
@@ -212,6 +212,19 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
 
     public T getResultData() {
         return resultData;
+    }
+
+    public void setResultType(Type resultType) {
+        this.resultType = ReflectUtils.toType(resultType);
+        this.resultRawClass = ReflectUtils.toClass(resultType);
+    }
+
+    public void setResultRawClass(Class resultRawClass) {
+        this.resultRawClass = resultRawClass;
+    }
+
+    public void setOnSuccessClassGenericType(Type onSuccessClassGenericType) {
+        this.onSuccessClassGenericType = onSuccessClassGenericType;
     }
 
     @Override
