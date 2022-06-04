@@ -3,6 +3,7 @@ package com.dtflys.test.http
 import com.dtflys.forest.annotation.Address
 import com.dtflys.forest.annotation.Body
 import com.dtflys.forest.annotation.Get
+import com.dtflys.forest.annotation.JSONBody
 import com.dtflys.forest.annotation.Post
 import com.dtflys.forest.annotation.Query
 import com.dtflys.forest.backend.HttpBackend
@@ -50,6 +51,10 @@ class TestKotlinClient(backend: HttpBackend?) : BaseClientTest(backend, configur
 
         @Post("/")
         fun postText(@Body("text") text: String) : String
+
+        @Post("/")
+        fun postJson(@JSONBody text: Map<String, String>) : String
+
     }
 
     @Test
@@ -79,5 +84,18 @@ class TestKotlinClient(backend: HttpBackend?) : BaseClientTest(backend, configur
             .assertPathEquals("/")
             .assertBodyEquals("text=ok")
     }
+
+
+    @Test
+    fun testKotlinPostJson() {
+        server.enqueue(MockResponse().setBody(EXPECTED))
+        val map = mapOf<String, String>("name" to "ok")
+        val result = client?.postJson(map)
+        assertThat(result).isNotNull.isEqualTo(EXPECTED)
+        MockServerRequest.mockRequest(server)
+            .assertPathEquals("/")
+            .assertBodyEquals("{\"name\":\"ok\"}")
+    }
+
 
 }
