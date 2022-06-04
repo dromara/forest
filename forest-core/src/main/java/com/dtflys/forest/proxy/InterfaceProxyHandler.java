@@ -31,6 +31,41 @@ import java.util.Map;
  */
 public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScope {
 
+    private interface NonParamsInvocation {
+        Object invoke(InterfaceProxyHandler<?> handler, Object proxy) throws Throwable;
+    }
+
+    private final static Map<String, NonParamsInvocation> NON_PARAMS_INVOCATION_MAP = new HashMap<>();
+
+    private static void registerNonParamsInvocation(String methodName, NonParamsInvocation invocation) {
+        NON_PARAMS_INVOCATION_MAP.put(methodName, invocation);
+    }
+
+    private static NonParamsInvocation getNonParamsInvocation(String methodName) {
+        return NON_PARAMS_INVOCATION_MAP.get(methodName);
+    }
+
+    static {
+        registerNonParamsInvocation("toString", (handler, proxy) ->
+            "{Forest Proxy Object of " + handler.interfaceClass.getName() + "}"
+        );
+        registerNonParamsInvocation("getClass", (handler, proxy) -> proxy.getClass());
+        registerNonParamsInvocation("hashCode", (handler, proxy) -> proxy.hashCode());
+        registerNonParamsInvocation("notify", (handler, proxy) -> {
+            proxy.notify();
+            return null;
+        });
+        registerNonParamsInvocation("notifyAll", (handler, proxy) -> {
+            proxy.notifyAll();
+            return null;
+        });
+        registerNonParamsInvocation("wait", (handler, proxy) -> {
+            proxy.wait();
+            return null;
+        });
+        registerNonParamsInvocation("getProxyHandler", (handler, proxy) -> handler);
+    }
+
     private final ForestConfiguration configuration;
 
     private final ProxyFactory proxyFactory;
@@ -82,7 +117,8 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         for (int i = 0; i < annotations.length; i++) {
             Annotation annotation = annotations[i];
             Class<? extends Annotation> annType = annotation.annotationType();
-            if (annType.getName().startsWith("java.")) {
+            String annName = annType.getName();
+            if (annName.startsWith("java.") || annName.startsWith("javax.") || annName.startsWith("kotlin.")) {
                 continue;
             }
             Annotation[] subAnnotations = annType.getAnnotations();
@@ -164,29 +200,9 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         ForestMethod forestMethod = forestMethodMap.get(method);
         if (forestMethod == null) {
             if (args == null || args.length == 0) {
-                if ("toString".equals(methodName)) {
-                    return "{Forest Proxy Object of " + interfaceClass.getName() + "}";
-                }
-                if ("getClass".equals(methodName)) {
-                    return proxy.getClass();
-                }
-                if ("hashCode".equals(methodName)) {
-                    return proxy.hashCode();
-                }
-                if ("notify".equals(methodName)) {
-                    proxy.notify();
-                    return null;
-                }
-                if ("notifyAll".equals(methodName)) {
-                    proxy.notifyAll();
-                    return null;
-                }
-                if ("wait".equals(methodName)) {
-                    proxy.wait();
-                    return null;
-                }
-                if ("getProxyHandler".equals(methodName)) {
-                    return this;
+                NonParamsInvocation invocation = getNonParamsInvocation(methodName);
+                if (invocation != null) {
+                    return invocation.invoke(this, proxy);
                 }
             }
             if (args != null && args.length == 1) {

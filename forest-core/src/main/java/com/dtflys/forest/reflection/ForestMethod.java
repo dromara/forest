@@ -39,8 +39,8 @@ import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.lifecycles.ParameterAnnotationLifeCycle;
 import com.dtflys.forest.lifecycles.method.RequestLifeCycle;
 import com.dtflys.forest.logging.DefaultLogHandler;
-import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.LogConfiguration;
+import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingURLTemplate;
@@ -58,22 +58,12 @@ import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.WildcardType;
+import java.lang.reflect.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static com.dtflys.forest.mapping.MappingParameter.TARGET_HEADER;
+import static com.dtflys.forest.mapping.MappingParameter.*;
 
 /**
  * 通过代理调用的实际执行的方法对象
@@ -309,9 +299,10 @@ public class ForestMethod<T> implements VariableScope {
 
     private Map<Annotation, Class<? extends Interceptor>> getAnnotationLifeCycleClassMap(Annotation annotation) {
         Class<? extends Annotation> annType = annotation.annotationType();
-        if (annType.getPackage().getName().startsWith("java.")
-                || annType.getPackage().getName().startsWith("kotlin")
-                || annType.getPackage().getName().startsWith("kotlinx.")) {
+        String annName = annType.getPackage().getName();
+        if (annName.startsWith("java.")
+            || annName.startsWith("javax.")
+            || annName.startsWith("kotlin")) {
             return null;
         }
         Map<Annotation, Class<? extends Interceptor>> resultMap = new LinkedHashMap<>();
@@ -705,9 +696,7 @@ public class ForestMethod<T> implements VariableScope {
         for (int i = 0; i < anns.length; i++) {
             Annotation ann = anns[i];
             Class annType = ann.annotationType();
-            if (annType.getPackage().getName().startsWith("java.")
-                    || annType.getPackage().getName().startsWith("kotlin.")
-                    || annType.getPackage().getName().startsWith("kotlinx.")) {
+            if (annType.getPackage().getName().startsWith("java.")) {
                 continue;
             }
             Annotation[] subAnnArray = annType.getAnnotations();
