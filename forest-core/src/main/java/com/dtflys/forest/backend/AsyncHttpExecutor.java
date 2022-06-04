@@ -45,21 +45,15 @@ public class AsyncHttpExecutor implements HttpExecutor {
     protected static ThreadPoolExecutor pool;
 
     /**
-     * 异步线程池是否已初始化
-     */
-    protected static volatile boolean initialized = false;
-
-    /**
      * 初始化异步请求线程池
      *
      * @param maxAsyncThreadSize 最大异步线程数
      */
     public static synchronized void initAsyncThreads(Integer maxAsyncThreadSize) {
-        maxAsyncThreadSize = maxAsyncThreadSize != null ? maxAsyncThreadSize : DEFAULT_MAX_THREAD_SIZE;
-        int coreSize = maxAsyncThreadSize > 10 ? 10 : maxAsyncThreadSize;
+        int threadSize = maxAsyncThreadSize != null ? maxAsyncThreadSize : DEFAULT_MAX_THREAD_SIZE;
         pool = new ThreadPoolExecutor(
-                coreSize, maxAsyncThreadSize != null ? maxAsyncThreadSize : DEFAULT_MAX_THREAD_SIZE,
-                3, TimeUnit.MINUTES,
+                threadSize, threadSize,
+                0, TimeUnit.MINUTES,
                 new SynchronousQueue<>(),
                 tf -> {
                     Thread thread = new Thread(tf, "forest-async-" + threadCount.getAndIncrement());
