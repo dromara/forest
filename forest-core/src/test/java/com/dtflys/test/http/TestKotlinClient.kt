@@ -14,7 +14,7 @@ import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 
-class TestKotlinClient: BaseClientTest {
+class TestKotlinClient(backend: HttpBackend?) : BaseClientTest(backend, configuration) {
     companion object {
         const val EXPECTED = "{\"status\":\"ok\"}"
         @JvmStatic
@@ -32,7 +32,7 @@ class TestKotlinClient: BaseClientTest {
 
     var client : Client?
 
-    constructor(backend: HttpBackend?) : super(backend, configuration) {
+    init {
         configuration?.setVariableValue("port", server.port)
         client = configuration?.client(Client::class.java)
     }
