@@ -9,8 +9,6 @@ import com.dtflys.forest.annotation.Query
 import com.dtflys.forest.backend.HttpBackend
 import com.dtflys.forest.callback.OnSuccess
 import com.dtflys.forest.config.ForestConfiguration
-import com.dtflys.forest.http.ForestRequest
-import com.dtflys.forest.http.ForestResponse
 import com.dtflys.forest.mock.MockServerRequest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -95,8 +93,7 @@ class TestKotlinClient(backend: HttpBackend?) : BaseClientTest(backend, configur
     @Test
     fun testKotlinPostJson() {
         server.enqueue(MockResponse().setBody(EXPECTED))
-        val map = mapOf("name" to "ok")
-        val result = client?.postJson(map)
+        val result = client?.postJson(mapOf("name" to "ok"))
         assertThat(result).isNotNull.isEqualTo(EXPECTED)
         MockServerRequest.mockRequest(server)
             .assertPathEquals("/")
