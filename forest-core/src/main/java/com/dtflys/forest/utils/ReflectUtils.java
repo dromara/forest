@@ -13,7 +13,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -192,6 +191,9 @@ public class ReflectUtils {
             return true;
         }
         if (double.class.isAssignableFrom(type) || Double.class.isAssignableFrom(type)) {
+            return true;
+        }
+        if (char.class.isAssignableFrom(type) || Character.class.isAssignableFrom(type)) {
             return true;
         }
         if (BigDecimal.class.isAssignableFrom(type)) {
