@@ -7,7 +7,10 @@ import com.dtflys.forest.annotation.JSONBody
 import com.dtflys.forest.annotation.Post
 import com.dtflys.forest.annotation.Query
 import com.dtflys.forest.backend.HttpBackend
+import com.dtflys.forest.callback.OnSuccess
 import com.dtflys.forest.config.ForestConfiguration
+import com.dtflys.forest.http.ForestRequest
+import com.dtflys.forest.http.ForestResponse
 import com.dtflys.forest.mock.MockServerRequest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -55,6 +58,9 @@ class TestKotlinClient(backend: HttpBackend?) : BaseClientTest(backend, configur
         @Post("/")
         fun postJson(@JSONBody text: Map<String, String>) : String
 
+        @Get("/")
+        fun callSuccess(onSuccess: OnSuccess<String>)
+
     }
 
     @Test
@@ -89,12 +95,26 @@ class TestKotlinClient(backend: HttpBackend?) : BaseClientTest(backend, configur
     @Test
     fun testKotlinPostJson() {
         server.enqueue(MockResponse().setBody(EXPECTED))
-        val map = mapOf<String, String>("name" to "ok")
+        val map = mapOf("name" to "ok")
         val result = client?.postJson(map)
         assertThat(result).isNotNull.isEqualTo(EXPECTED)
         MockServerRequest.mockRequest(server)
             .assertPathEquals("/")
             .assertBodyEquals("{\"name\":\"ok\"}")
+    }
+
+
+    @Test
+    fun testKotlinOnSuccess() {
+        server.enqueue(MockResponse().setBody(EXPECTED))
+        var called = false
+        client?.callSuccess { data, req, res ->
+            assertThat(data).isNotNull.isEqualTo(EXPECTED)
+            assertThat(req).isNotNull
+            assertThat(res).isNotNull
+            called = true
+        }
+        assertThat(called).isTrue
     }
 
 
