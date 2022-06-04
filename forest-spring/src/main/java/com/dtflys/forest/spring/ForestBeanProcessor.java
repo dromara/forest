@@ -7,11 +7,15 @@ import com.dtflys.forest.utils.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
+import org.springframework.context.annotation.Lazy;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 
 public class ForestBeanProcessor implements InstantiationAwareBeanPostProcessor {
+
+    public ForestBeanProcessor() {
+    }
 
     private void processBean(Object bean, Class beanClass) {
         Method[] methods = beanClass.getDeclaredMethods();
