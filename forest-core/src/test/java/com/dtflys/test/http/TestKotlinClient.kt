@@ -4,6 +4,7 @@ import com.dtflys.forest.annotation.Address
 import com.dtflys.forest.annotation.Body
 import com.dtflys.forest.annotation.Get
 import com.dtflys.forest.annotation.Post
+import com.dtflys.forest.annotation.Query
 import com.dtflys.forest.backend.HttpBackend
 import com.dtflys.forest.config.ForestConfiguration
 import com.dtflys.forest.mock.MockServerRequest
@@ -44,6 +45,9 @@ class TestKotlinClient(backend: HttpBackend?) : BaseClientTest(backend, configur
         @Get("/")
         fun getText() : String
 
+        @Get("/")
+        fun getWithQuery(@Query("name") name: String) : String
+
         @Post("/")
         fun postText(@Body("text") text: String) : String
     }
@@ -54,6 +58,17 @@ class TestKotlinClient(backend: HttpBackend?) : BaseClientTest(backend, configur
         val result = client?.getText()
         assertThat(result).isNotNull.isEqualTo(EXPECTED)
     }
+
+    @Test
+    fun testKotlinGetWithQuery() {
+        server.enqueue(MockResponse().setBody(EXPECTED))
+        val result = client?.getWithQuery("ok")
+        assertThat(result).isNotNull.isEqualTo(EXPECTED)
+        MockServerRequest.mockRequest(server)
+            .assertPathEquals("/")
+            .assertQueryEquals("name", "ok")
+    }
+
 
     @Test
     fun testKotlinPost() {
