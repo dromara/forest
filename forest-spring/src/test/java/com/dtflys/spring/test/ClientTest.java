@@ -27,8 +27,12 @@ public class ClientTest extends TestCase {
         assertNotNull(beastshopClient);
         String result = beastshopClient.index();
         assertNotNull(result);
-
-        Object baseUrl = Forest.config().getVariableValue("baseUrl");
+        ForestConfiguration configuration = Forest.config();
+        assertThat(configuration.getConnectTimeout()).isEqualTo(10000);
+        assertThat(configuration.getMaxConnections()).isEqualTo(700);
+        assertThat(configuration.getMaxRouteConnections()).isEqualTo(600);
+        assertThat(configuration.getMaxRequestQueueSize()).isEqualTo(300);
+        Object baseUrl = configuration.getVariableValue("baseUrl");
         assertThat(baseUrl).isNotNull().isEqualTo("http://www.thebeastshop.com");
     }
 

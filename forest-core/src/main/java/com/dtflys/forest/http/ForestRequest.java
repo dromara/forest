@@ -51,6 +51,7 @@ import com.dtflys.forest.multipart.ByteArrayMultipart;
 import com.dtflys.forest.multipart.FileMultipart;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.multipart.InputStreamMultipart;
+import com.dtflys.forest.pool.ForestRequestPool;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
 import com.dtflys.forest.retryer.ForestRetryer;
@@ -511,6 +512,28 @@ public class ForestRequest<T> {
      */
     public URI getURI() {
         return this.url.toURI();
+    }
+
+    /**
+     * 获取请求的路由
+     *
+     * @return {@link ForestRoute}对象实例
+     * @author gongjun [dt_flys@hotmail.com]
+     * @since 1.5.22
+     */
+    public ForestRoute getRoute() {
+        return url.getRoute();
+    }
+
+    /**
+     * 获取请求的路由
+     *
+     * @return {@link ForestRoute}对象实例
+     * @author gongjun [dt_flys@hotmail.com]
+     * @since 1.5.22
+     */
+    public ForestRoute route() {
+        return getRoute();
     }
 
     /**
@@ -3996,6 +4019,15 @@ public class ForestRequest<T> {
             return ex;
         }
         return null;
+    }
+
+    /**
+     * 获取请求池
+     *
+     * @return Forest请求池
+     */
+    public ForestRequestPool pool() {
+        return this.configuration.getPool();
     }
 
     /**

@@ -186,7 +186,7 @@ public class OkHttp3Executor implements HttpExecutor {
         Request.Builder builder = new Request.Builder().url(url);
         prepareHeaders(builder);
         prepareMethodAndBody(builder, lifeCycleHandler);
-
+        request.pool().awaitRequest(request);
         final Request okRequest = builder.build();
         Call call = okHttpClient.newCall(okRequest);
         final OkHttp3ForestResponseFactory factory = new OkHttp3ForestResponseFactory();
@@ -213,6 +213,7 @@ public class OkHttp3Executor implements HttpExecutor {
             execute(lifeCycleHandler, retryCount + 1);
             return;
         } finally {
+            request.pool().finish(request);
             if (response == null) {
                 response = factory.createResponse(request, okResponse, lifeCycleHandler, null, startDate);
             }

@@ -8,13 +8,11 @@ import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.forest.ssl.SSLUtils;
-import com.dtflys.forest.utils.TimeUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Role;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +37,12 @@ public class ForestConfigurationProperties {
      * maximum number of connections allowed per route
      */
     private int maxRouteConnections = 500;
+
+
+    /**
+     * maximum number of requests queue
+     */
+    private int maxRequestQueueSize = 200;
 
     /**
      * maximum number of async requests threads
@@ -211,6 +215,14 @@ public class ForestConfigurationProperties {
 
     public void setMaxRouteConnections(int maxRouteConnections) {
         this.maxRouteConnections = maxRouteConnections;
+    }
+
+    public int getMaxRequestQueueSize() {
+        return maxRequestQueueSize;
+    }
+
+    public void setMaxRequestQueueSize(int maxRequestQueueSize) {
+        this.maxRequestQueueSize = maxRequestQueueSize;
     }
 
     public int getMaxAsyncThreadSize() {
