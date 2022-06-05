@@ -4,6 +4,7 @@ forest:
   backend: httpclient                     # 后端HTTP API： okhttp3
   max-connections: 1200                   # 连接池最大连接数
   max-route-connections: 1100             # 每个路由的最大连接数
+  max-request-queue-size: 800             # 最大请求等待队列大小
   timeout: 1000                           # 请求超时时间
   log-enabled: false                      # 全局日志开关
   max-retry-count: 5                      # 请求失败后重试次数
@@ -19,6 +20,7 @@ forest:
     user:
       name: foo
       password: bar
+
 
 
 my-props:

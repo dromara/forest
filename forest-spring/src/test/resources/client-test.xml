@@ -12,8 +12,9 @@
             timeout="30000"
             retryCount="3"
             connectTimeout="10000"
-            maxConnections="500"
-            maxRouteConnections="500">
+            maxConnections="700"
+            maxRequestQueueSize="300"
+            maxRouteConnections="600">
 
         <forest:var name="baseUrl" value="http://www.thebeastshop.com"/>
         <forest:var name="x" value="0"/>
