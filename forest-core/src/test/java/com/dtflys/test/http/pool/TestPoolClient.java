@@ -1,11 +1,12 @@
 package com.dtflys.test.http.pool;
 
-import com.dtflys.forest.backend.ForestConnectionManager;
+import com.dtflys.forest.Forest;
 import com.dtflys.forest.backend.HttpBackend;
-import com.dtflys.forest.backend.okhttp3.conn.OkHttp3ConnectionManager;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.pool.ForestAbortException;
+import com.dtflys.forest.pool.ForestRequestPool;
 import com.dtflys.test.http.BaseClientTest;
-import okhttp3.ConnectionPool;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.BeforeClass;
@@ -16,6 +17,11 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class TestPoolClient extends BaseClientTest {
 
@@ -26,41 +32,100 @@ public class TestPoolClient extends BaseClientTest {
 
     private static ForestConfiguration configuration;
 
-    private PoolClient poolClient;
 
     @BeforeClass
     public static void prepareClient() {
-        configuration = ForestConfiguration.createConfiguration()
-                .setMaxConnections(10);
+        configuration = ForestConfiguration.createConfiguration();
     }
 
     public TestPoolClient(HttpBackend backend) {
         super(backend, configuration);
         configuration.setVariableValue("port", server.getPort());
-        poolClient = configuration.client(PoolClient.class);
     }
 
     @Test
     public void testPool() throws InterruptedException {
+        ForestConfiguration poolConf = ForestConfiguration.createConfiguration()
+                .setVariableValue("port", server.getPort())
+                .setMaxConnections(10)
+                .setMaxRequestQueueSize(1);
+        PoolClient poolClient = poolConf.client(PoolClient.class);
         int count = 100;
         for (int i = 0; i < count; i++) {
             server.enqueue(new MockResponse().setBody(EXPECTED).setHeadersDelay(1, TimeUnit.SECONDS));
         }
-        HttpBackend backend = configuration.getBackend();
-        ForestConnectionManager connectionManager = backend.getConnectionManager();
+        ForestRequestPool pool = poolConf.getPool();
         ExecutorService executorService = Executors.newFixedThreadPool(count);
         CountDownLatch latch = new CountDownLatch(count);
+        AtomicBoolean hasOut = new AtomicBoolean(false);
+        AtomicReference<ForestAbortException> exceptionRef = new AtomicReference<>(null);
         for (int i = 0; i < count; i++) {
             executorService.execute(() -> {
-                poolClient.send();
-                if (connectionManager instanceof OkHttp3ConnectionManager) {
-                    ConnectionPool pool = ((OkHttp3ConnectionManager) connectionManager).getOkHttpPool();
-                    System.out.println("connect count = " + pool.connectionCount());
+                try {
+                    poolClient.send();
+                    if (pool.getRunningPoolSize() > pool.getMaxPoolSize()) {
+                        hasOut.set(true);
+                    } else {
+                        System.out.println("pool running size: " + pool.getRunningPoolSize() + ", max size: " + pool.getMaxPoolSize() + ", queue size: " + pool.getQueueSize());
+                    }
+                } catch (ForestAbortException e) {
+                    e.printStackTrace();
+                    exceptionRef.set(e);
+                } finally {
+                    latch.countDown();
                 }
-                latch.countDown();
             });
         }
         latch.await();
+        assertThat(hasOut.get()).isFalse();
+        assertThat(exceptionRef.get()).isNotNull();
+    }
+
+
+
+    @Test
+    public void testPoolPerRoute() throws InterruptedException {
+        ForestConfiguration poolConf = ForestConfiguration.createConfiguration()
+                .setVariableValue("port", server.getPort())
+                .setMaxConnections(100)
+                .setMaxRouteConnections(10)
+                .setMaxRequestQueueSize(1);
+        PoolClient poolClient = poolConf.client(PoolClient.class);
+        int count = 100;
+        for (int i = 0; i < count; i++) {
+            server.enqueue(new MockResponse().setBody(EXPECTED).setHeadersDelay(1, TimeUnit.SECONDS));
+        }
+        ForestRequestPool pool = poolConf.getPool();
+        ExecutorService executorService = Executors.newFixedThreadPool(count);
+        CountDownLatch latch = new CountDownLatch(count);
+        AtomicBoolean hasOut = new AtomicBoolean(false);
+        AtomicReference<ForestAbortException> exceptionRef = new AtomicReference<>(null);
+        for (int i = 0; i < count; i++) {
+            int finalI = i;
+            executorService.execute(() -> {
+                try {
+                    String host = finalI % 2 == 0 ? "localhost" : "127.0.0.1";
+                    ForestResponse response = poolClient.send(host);
+                    if (pool.getRunningPoolSize() > pool.getMaxPoolSize()) {
+                        hasOut.set(true);
+                    } else {
+                        System.out.println("pool running size: " + pool.getRunningPoolSize() +
+                                ", max size: " + pool.getMaxPoolSize() +
+                                ", queue size: " + pool.getQueueSize() +
+                                ", max route size: " + pool.getMaxPoolSizePerRoute() +
+                                ", route size: " + response.getRequest().route().getRequestCount().get());
+                    }
+                } catch (ForestAbortException e) {
+                    e.printStackTrace();
+                    exceptionRef.set(e);
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+        latch.await();
+        assertThat(hasOut.get()).isFalse();
+        assertThat(exceptionRef.get()).isNotNull();
     }
 
 }

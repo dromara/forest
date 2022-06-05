@@ -331,7 +331,17 @@ public class ForestURL {
             builder.append("#").append(ref);
         }
         return builder.toString();
+    }
 
+    /**
+     * 获取URL对应的路由
+     *
+     * @return {@link ForestRoute}对象实例
+     * @author gongjun [dt_flys@hotmail.com]
+     * @since 1.5.22
+     */
+    public ForestRoute getRoute() {
+        return ForestRoutes.getRoute(host, port);
     }
 
     @Override

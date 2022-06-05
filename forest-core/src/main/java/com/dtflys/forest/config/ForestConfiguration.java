@@ -60,6 +60,8 @@ import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorFactory;
 import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.ForestLogHandler;
+import com.dtflys.forest.pool.FixedRequestPool;
+import com.dtflys.forest.pool.ForestRequestPool;
 import com.dtflys.forest.proxy.ProxyFactory;
 import com.dtflys.forest.reflection.BasicVariableValue;
 import com.dtflys.forest.reflection.DefaultObjectFactory;
@@ -119,6 +121,11 @@ public class ForestConfiguration implements Serializable {
      * maximum number of connections allowed per route
      */
     private Integer maxRouteConnections;
+
+    /**
+     * 最大请求等待队列大小
+     */
+    private Integer maxRequestQueueSize;
 
     /**
      * 最大异步线程池大小
@@ -293,6 +300,11 @@ public class ForestConfiguration implements Serializable {
      * SSL的Key Store集合
      */
     private Map<String, SSLKeyStore> sslKeyStores = new HashMap<>();
+
+    /**
+     * Forest请求池
+     */
+    private ForestRequestPool pool;
 
     private ForestConfiguration() {
     }
@@ -625,6 +637,26 @@ public class ForestConfiguration implements Serializable {
      */
     public ForestConfiguration setMaxRouteConnections(Integer maxRouteConnections) {
         this.maxRouteConnections = maxRouteConnections;
+        return this;
+    }
+
+    /**
+     * 获取全局的最大请求等待队列大小
+     *
+     * @return 最大请求等待队列大小
+     */
+    public Integer getMaxRequestQueueSize() {
+        return maxRequestQueueSize;
+    }
+
+    /**
+     * 设置全局的最大请求等待队列大小
+     *
+     * @param maxRequestQueueSize 最大请求等待队列大小
+     * @return 当前ForestConfiguration实例
+     */
+    public ForestConfiguration setMaxRequestQueueSize(Integer maxRequestQueueSize) {
+        this.maxRequestQueueSize = maxRequestQueueSize;
         return this;
     }
 
@@ -1404,6 +1436,31 @@ public class ForestConfiguration implements Serializable {
     public ForestConfiguration setSslKeyStores(Map<String, SSLKeyStore> sslKeyStores) {
         this.sslKeyStores = sslKeyStores;
         return this;
+    }
+
+    /**
+     * 获取全局请求池
+     *
+     * @return Forest请求池
+     */
+    public ForestRequestPool getPool() {
+        if (pool == null) {
+            synchronized (this) {
+                if (pool == null) {
+                    pool = new FixedRequestPool(this);
+                }
+            }
+        }
+        return pool;
+    }
+
+    /**
+     * 设置全局请求池
+     *
+     * @param pool Forest请求池
+     */
+    public void setPool(ForestRequestPool pool) {
+        this.pool = pool;
     }
 
     /**
