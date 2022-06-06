@@ -194,9 +194,6 @@ public class ReflectUtils {
         if (double.class.isAssignableFrom(type) || Double.class.isAssignableFrom(type)) {
             return true;
         }
-        if (char.class.isAssignableFrom(type) || Character.class.isAssignableFrom(type)) {
-            return true;
-        }
         if (BigDecimal.class.isAssignableFrom(type)) {
             return true;
         }
