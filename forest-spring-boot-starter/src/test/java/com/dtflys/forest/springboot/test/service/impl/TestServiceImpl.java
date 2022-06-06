@@ -18,6 +18,10 @@ public class TestServiceImpl implements TestService {
     @Autowired
     private BeastshopClient beastshopClient;
 
+    public TestServiceImpl() {
+        System.out.println("创建 TestService");
+    }
+
     @Override
     public ForestResponse<String> shops() {
         return beastshopClient.shops();

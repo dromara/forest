@@ -17,8 +17,11 @@ import com.dtflys.forest.springboot.properties.ForestConverterItemProperties;
 import com.dtflys.forest.springboot.properties.ForestSSLKeyStoreProperties;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.ManagedMap;
@@ -35,17 +38,30 @@ import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Map;
 
-public class ForestBeanRegister implements ResourceLoaderAware {
+public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcessor {
 
     private final ConfigurableApplicationContext applicationContext;
 
     private ResourceLoader resourceLoader;
 
+    private SpringForestProperties properties;
+    private SpringForestObjectFactory forestObjectFactory;
+
+    private SpringInterceptorFactory forestInterceptorFactory;
+
     private ForestConfigurationProperties forestConfigurationProperties;
 
 
-    public ForestBeanRegister(ConfigurableApplicationContext applicationContext, ForestConfigurationProperties forestConfigurationProperties) {
+    public ForestBeanRegister(
+            ConfigurableApplicationContext applicationContext,
+            ForestConfigurationProperties forestConfigurationProperties,
+            SpringForestProperties properties,
+            SpringForestObjectFactory forestObjectFactory,
+            SpringInterceptorFactory forestInterceptorFactory) {
         this.applicationContext = applicationContext;
+        this.forestConfigurationProperties = forestConfigurationProperties;
+        this.properties = properties;
+        this.forestObjectFactory = forestObjectFactory;
         this.forestConfigurationProperties = forestConfigurationProperties;
     }
 
@@ -55,11 +71,7 @@ public class ForestBeanRegister implements ResourceLoaderAware {
     }
 
 
-    public ForestConfiguration registerForestConfiguration(
-            SpringForestProperties properties,
-            SpringForestObjectFactory forestObjectFactory,
-            SpringInterceptorFactory forestInterceptorFactory,
-            ForestConfigurationProperties forestConfigurationProperties) {
+    public ForestConfiguration registerForestConfiguration() {
         BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(ForestConfiguration.class);
         String id = forestConfigurationProperties.getBeanId();
         if (StringUtils.isBlank(id)) {
@@ -228,7 +240,7 @@ public class ForestBeanRegister implements ResourceLoaderAware {
         return beanDefinition;
     }
 
-    public ClassPathClientScanner registerScanner(ForestConfigurationProperties forestConfigurationProperties) {
+    public ClassPathClientScanner registerScanner() {
         List<String> basePackages = ForestScannerRegister.getBasePackages();
         String configurationId = ForestScannerRegister.getConfigurationId();
 
@@ -246,6 +258,5 @@ public class ForestBeanRegister implements ResourceLoaderAware {
         scanner.doScan(org.springframework.util.StringUtils.toStringArray(basePackages));
         return scanner;
     }
-
 
 }

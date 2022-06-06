@@ -32,8 +32,8 @@ import static org.junit.Assert.*;
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test0")
 @SpringBootTest(classes = Test0.class)
-@ComponentScan(basePackages = "com.dtflys.forest.springboot.test.service")
 @EnableAutoConfiguration
+@ComponentScan(basePackages = "com.dtflys.forest.springboot.test.service")
 public class Test0 {
 
     @Resource
