@@ -9,9 +9,12 @@ import com.dtflys.forest.mock.MockServerRequest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+
+import java.lang.reflect.Field;
 
 /**
  * @author tanglingyan[xiao4852@qq.com]
@@ -48,6 +51,9 @@ public class TestBodyAnnotation extends BaseClientTest {
     public void afterRequests() {
     }
 
+    /**
+     * 测试被@Body标识对象的属性是否都传递到服务端
+     */
     @Test
     public void testAnalysisBodyParameter() {
         TestHttpEntity testHttpEntity = new TestHttpEntity();
@@ -63,6 +69,9 @@ public class TestBodyAnnotation extends BaseClientTest {
         //byte
         testHttpEntity.setTempObjByte(Byte.MAX_VALUE);
         testHttpEntity.setTempByte(Byte.MAX_VALUE);
+        //double
+        testHttpEntity.setTempDouble(Double.MAX_VALUE);
+        testHttpEntity.setTempObjDouble(Double.MAX_VALUE);
         //String
         testHttpEntity.setTempObjString("test");
 
@@ -70,7 +79,17 @@ public class TestBodyAnnotation extends BaseClientTest {
         //发送http请求
         testBodyAnnotationClient.testAnalysisBodyParameter(testHttpEntity);
         //检查参数是否缺少
-        mockRequest(server).assertBodyEquals("tempByte=127&tempChar=1&tempDouble=0.0&tempLong=9223372036854775807&tempObjByte=127&tempObjCharacter=1&tempObjLong=9223372036854775807&tempObjShort=32767&tempObjString=test&tempShort=32767");
+        String body = mockRequest(server).bodyAsString();
+        Field[] declaredFields = testHttpEntity.getClass().getDeclaredFields();
+        boolean flag = true;
+        for (int i = 0; i < declaredFields.length; i++) {
+            Field declaredField = declaredFields[i];
+            if (body.indexOf(declaredField.getName()) == -1) {
+                flag = false;
+                break;
+            }
+        }
+        Assert.assertTrue(flag);
     }
 
 
@@ -95,7 +114,7 @@ public class TestBodyAnnotation extends BaseClientTest {
      * @author tanglingyan[xiao4852@qq.com]
      * @since 2022-06-04 10:57
      */
-    public class TestHttpEntity {
+    public static class TestHttpEntity {
         private String tempObjString;
         private Character tempObjCharacter;
         private char tempChar;
