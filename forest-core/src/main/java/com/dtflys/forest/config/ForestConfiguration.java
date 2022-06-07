@@ -133,6 +133,11 @@ public class ForestConfiguration implements Serializable {
     private Integer maxAsyncThreadSize;
 
     /**
+     * 最大异步线程池队列大小
+     */
+    private Integer maxAsyncQueueSize;
+
+    /**
      * 是否自动重定向开关
      */
     private boolean autoRedirection = true;
@@ -644,6 +649,8 @@ public class ForestConfiguration implements Serializable {
      * 获取全局的最大请求等待队列大小
      *
      * @return 最大请求等待队列大小
+     * @author dt_flys@hotmail.com
+     * @since 1.5.22
      */
     public Integer getMaxRequestQueueSize() {
         return maxRequestQueueSize;
@@ -654,6 +661,8 @@ public class ForestConfiguration implements Serializable {
      *
      * @param maxRequestQueueSize 最大请求等待队列大小
      * @return 当前ForestConfiguration实例
+     * @author dt_flys@hotmail.com
+     * @since 1.5.22
      */
     public ForestConfiguration setMaxRequestQueueSize(Integer maxRequestQueueSize) {
         this.maxRequestQueueSize = maxRequestQueueSize;
@@ -676,10 +685,31 @@ public class ForestConfiguration implements Serializable {
      * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setMaxAsyncThreadSize(Integer maxAsyncThreadSize) {
-        if (maxAsyncThreadSize != null && maxAsyncThreadSize != this.maxAsyncThreadSize) {
-            AsyncHttpExecutor.initAsyncThreads(maxAsyncThreadSize);
-        }
         this.maxAsyncThreadSize = maxAsyncThreadSize;
+        return this;
+    }
+
+    /**
+     * 获取最大异步线程池队列大小
+     *
+     * @return 最大异步线程池队列大小
+     * @author dt_flys@hotmail.com
+     * @since 1.5.22
+     */
+    public Integer getMaxAsyncQueueSize() {
+        return maxAsyncQueueSize;
+    }
+
+    /**
+     * 设置最大异步线程池队列大小
+     *
+     * @param maxAsyncQueueSize 最大异步线程池队列大小
+     * @return 当前ForestConfiguration实例
+     * @author dt_flys@hotmail.com
+     * @since 1.5.22
+     */
+    public ForestConfiguration setMaxAsyncQueueSize(Integer maxAsyncQueueSize) {
+        this.maxAsyncQueueSize = maxAsyncQueueSize;
         return this;
     }
 

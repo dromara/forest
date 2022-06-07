@@ -25,6 +25,7 @@
 package com.dtflys.forest.http;
 
 import com.dtflys.forest.backend.ContentType;
+import com.dtflys.forest.backend.httpclient.response.HttpclientForestResponseFactory;
 import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.callback.OnRedirection;
@@ -35,6 +36,7 @@ import com.dtflys.forest.callback.SuccessWhen;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
+import com.dtflys.forest.exceptions.ForestAsyncAbortException;
 import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
 import com.dtflys.forest.http.body.ByteArrayRequestBody;
@@ -4133,7 +4135,14 @@ public class ForestRequest<T> {
                     // 执行请求，即发生请求到服务端
                     executor.execute(lifeCycleHandler);
                 } catch (ForestRuntimeException e) {
-                    throw e;
+                    if (e instanceof ForestAsyncAbortException) {
+                        ((ForestAsyncAbortException) e).setRequest(this);
+                        ForestResponseFactory forestResponseFactory = executor.getResponseFactory();
+                        ForestResponse response = forestResponseFactory.createResponse(this, null, lifeCycleHandler, e, new Date());
+                        executor.getResponseHandler().handleError(response, e);
+                    } else {
+                        throw e;
+                    }
                 } finally {
                     executor.close();
                 }

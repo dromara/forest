@@ -3,6 +3,7 @@ package com.dtflys.forest.backend.okhttp3.executor;
 import com.dtflys.forest.backend.BodyBuilder;
 import com.dtflys.forest.backend.HttpExecutor;
 import com.dtflys.forest.backend.ResponseHandler;
+import com.dtflys.forest.backend.httpclient.response.HttpclientForestResponseFactory;
 import com.dtflys.forest.backend.okhttp3.body.OkHttp3BodyBuilder;
 import com.dtflys.forest.backend.okhttp3.logging.OkHttp3LogBodyMessage;
 import com.dtflys.forest.backend.url.QueryableURLBuilder;
@@ -12,6 +13,7 @@ import com.dtflys.forest.http.ForestHeader;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.http.ForestResponseFactory;
 import com.dtflys.forest.logging.LogBodyMessage;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.ForestLogHandler;
@@ -186,7 +188,6 @@ public class OkHttp3Executor implements HttpExecutor {
         Request.Builder builder = new Request.Builder().url(url);
         prepareHeaders(builder);
         prepareMethodAndBody(builder, lifeCycleHandler);
-        request.pool().awaitRequest(request);
         final Request okRequest = builder.build();
         Call call = okHttpClient.newCall(okRequest);
         final OkHttp3ForestResponseFactory factory = new OkHttp3ForestResponseFactory();
@@ -195,6 +196,7 @@ public class OkHttp3Executor implements HttpExecutor {
         Response okResponse = null;
         ForestResponse response = null;
         try {
+            request.pool().awaitRequest(request);
             okResponse = call.execute();
         } catch (Throwable e) {
             response = factory.createResponse(request, null, lifeCycleHandler, e, startDate);
@@ -270,6 +272,11 @@ public class OkHttp3Executor implements HttpExecutor {
     @Override
     public ResponseHandler getResponseHandler() {
         return okHttp3ResponseHandler;
+    }
+
+    @Override
+    public ForestResponseFactory getResponseFactory() {
+        return new OkHttp3ForestResponseFactory();
     }
 
     @Override

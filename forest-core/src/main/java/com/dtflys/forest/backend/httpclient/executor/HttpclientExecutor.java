@@ -126,8 +126,8 @@ public class HttpclientExecutor extends AbstractHttpExecutor {
         prepare(lifeCycleHandler);
         Date startDate = new Date();
         ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
-        request.pool().awaitRequest(request);
         try {
+            request.pool().awaitRequest(request);
             requestSender.sendRequest(
                     request,
                     this,
@@ -152,6 +152,11 @@ public class HttpclientExecutor extends AbstractHttpExecutor {
     @Override
     public ResponseHandler getResponseHandler() {
         return httpclientResponseHandler;
+    }
+
+    @Override
+    public ForestResponseFactory getResponseFactory() {
+        return new HttpclientForestResponseFactory();
     }
 
     @Override

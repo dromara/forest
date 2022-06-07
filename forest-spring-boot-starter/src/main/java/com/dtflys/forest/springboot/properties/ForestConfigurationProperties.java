@@ -47,7 +47,12 @@ public class ForestConfigurationProperties {
     /**
      * maximum number of async requests threads
      */
-    private int maxAsyncThreadSize = 100;
+    private int maxAsyncThreadSize = 200;
+
+    /**
+     * capacity of async requests queue
+     */
+    private int maxAsyncQueueSize = 100;
 
     /**
      * Timeout in milliseconds
@@ -231,6 +236,14 @@ public class ForestConfigurationProperties {
 
     public void setMaxAsyncThreadSize(int maxAsyncThreadSize) {
         this.maxAsyncThreadSize = maxAsyncThreadSize;
+    }
+
+    public int getMaxAsyncQueueSize() {
+        return maxAsyncQueueSize;
+    }
+
+    public void setMaxAsyncQueueSize(int maxAsyncQueueSize) {
+        this.maxAsyncQueueSize = maxAsyncQueueSize;
     }
 
     public int getTimeout() {
