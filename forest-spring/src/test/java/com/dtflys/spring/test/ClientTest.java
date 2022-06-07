@@ -32,6 +32,8 @@ public class ClientTest extends TestCase {
         assertThat(configuration.getMaxConnections()).isEqualTo(700);
         assertThat(configuration.getMaxRouteConnections()).isEqualTo(600);
         assertThat(configuration.getMaxRequestQueueSize()).isEqualTo(300);
+        assertThat(configuration.getMaxAsyncThreadSize()).isEqualTo(256);
+        assertThat(configuration.getMaxAsyncQueueSize()).isEqualTo(128);
         Object baseUrl = configuration.getVariableValue("baseUrl");
         assertThat(baseUrl).isNotNull().isEqualTo("http://www.thebeastshop.com");
     }

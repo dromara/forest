@@ -116,7 +116,16 @@
             <xsd:annotation>
                 <xsd:documentation>
                     <![CDATA[
-                           Maximum number of async requests threads
+                           设置全局最大异步请求线程数
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="maxAsyncQueueSize" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           设置全局最大异步请求线程池队列大小
                         ]]>
                 </xsd:documentation>
             </xsd:annotation>
@@ -126,7 +135,7 @@
             <xsd:annotation>
                 <xsd:documentation>
                     <![CDATA[
-                           设置全局的最大请求连接数
+                           设置全局最大请求连接数
                         ]]>
                 </xsd:documentation>
             </xsd:annotation>

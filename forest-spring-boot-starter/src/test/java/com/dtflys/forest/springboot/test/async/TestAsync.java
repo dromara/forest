@@ -3,6 +3,7 @@ package com.dtflys.forest.springboot.test.async;
 import com.dtflys.forest.annotation.BindingVar;
 import com.dtflys.forest.backend.AsyncHttpExecutor;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.exceptions.ForestAsyncAbortException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.springboot.test.address.TestAddress;
 import com.dtflys.forest.springboot.test.binding.BindingVarClient;
@@ -56,6 +57,7 @@ public class TestAsync {
         server.enqueue(new MockResponse().setBody(EXPECTED).setHeadersDelay(500, TimeUnit.MILLISECONDS));
         server.enqueue(new MockResponse().setBody(EXPECTED).setHeadersDelay(500, TimeUnit.MILLISECONDS));
         configuration.setMaxAsyncThreadSize(300);
+        configuration.setMaxAsyncQueueSize(100);
         for (int i = 0; i < 3; i++) {
             asyncClient.postFuture();
         }
@@ -68,13 +70,14 @@ public class TestAsync {
     @Test
     public void testFuture2() {
         assertThat(configuration.getMaxAsyncThreadSize()).isEqualTo(300);
-        assertThat(AsyncHttpExecutor.getMaxAsyncThreadSize()).isEqualTo(300);
+        assertThat(configuration.getMaxAsyncQueueSize()).isEqualTo(350);
 
 
         int size = 16;
         int threads = 8;
         boolean threadPoolFull = false;
         configuration.setMaxAsyncThreadSize(threads);
+        configuration.setMaxAsyncQueueSize(0);
         for (int i = 0; i < size; i++) {
             server.enqueue(new MockResponse().setBody(EXPECTED).setHeadersDelay(500, TimeUnit.MILLISECONDS));
         }
@@ -83,9 +86,9 @@ public class TestAsync {
                 asyncClient.postFuture();
             }
         } catch (RuntimeException e) {
-            if (e instanceof RejectedExecutionException) {
-                assertThat(e.getMessage()).isEqualTo("[Forest] Asynchronous thread pool is full!\n" +
-                        "\tThread name: main, Max pool size: 8, core pool size: 8, Active pool size: 8, Task count: 8");
+            if (e instanceof ForestAsyncAbortException) {
+                assertThat(e.getMessage()).isEqualTo("[Forest] Asynchronous thread pool is full! " +
+                        "[Thread name: main, Max pool size: 8, core pool size: 8, Active pool size: 8, Task count: 8]");
                 threadPoolFull = true;
             } else {
                 throw e;

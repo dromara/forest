@@ -1,11 +1,15 @@
 package com.dtflys.forest.backend;
 
+import com.dtflys.forest.backend.httpclient.response.HttpclientForestResponseFactory;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestResponseFactory;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
 
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -20,7 +24,9 @@ import java.util.function.Supplier;
  */
 public class AsyncHttpExecutor implements HttpExecutor {
 
-    public final static Integer DEFAULT_MAX_THREAD_SIZE = 100;
+    public final static Integer DEFAULT_MAX_THREAD_SIZE = 200;
+
+    public final static Integer DEFAULT_MAX_QUEUE_SIZE = 100;
 
     protected final ForestConfiguration configuration;
 
@@ -48,13 +54,16 @@ public class AsyncHttpExecutor implements HttpExecutor {
      * 初始化异步请求线程池
      *
      * @param maxAsyncThreadSize 最大异步线程数
+     * @param maxQueueSize 最大线程池队列大小
      */
-    public static synchronized void initAsyncThreads(Integer maxAsyncThreadSize) {
+    public static synchronized void initAsyncThreads(Integer maxAsyncThreadSize, Integer maxQueueSize) {
         int threadSize = maxAsyncThreadSize != null ? maxAsyncThreadSize : DEFAULT_MAX_THREAD_SIZE;
+        int queueSize = maxQueueSize == null ? DEFAULT_MAX_QUEUE_SIZE : maxQueueSize;
+        BlockingQueue queue = queueSize > 0 ? new LinkedBlockingQueue<>(queueSize) : new SynchronousQueue<>();
         pool = new ThreadPoolExecutor(
                 threadSize, threadSize,
                 0, TimeUnit.MINUTES,
-                new SynchronousQueue<>(),
+                queue,
                 tf -> {
                     Thread thread = new Thread(tf, "forest-async-" + threadCount.getAndIncrement());
                     thread.setDaemon(true);
@@ -69,6 +78,7 @@ public class AsyncHttpExecutor implements HttpExecutor {
     public static int getMaxAsyncThreadSize() {
         return pool.getMaximumPoolSize();
     }
+
 
     public static int getAsyncThreadSize() {
         return pool.getPoolSize();
@@ -117,7 +127,7 @@ public class AsyncHttpExecutor implements HttpExecutor {
         if (pool == null) {
             synchronized (this) {
                 if (pool == null) {
-                    initAsyncThreads(configuration.getMaxAsyncThreadSize());
+                    initAsyncThreads(configuration.getMaxAsyncThreadSize(), configuration.getMaxAsyncQueueSize());
                 }
             }
         }
@@ -129,6 +139,11 @@ public class AsyncHttpExecutor implements HttpExecutor {
     @Override
     public ResponseHandler getResponseHandler() {
         return responseHandler;
+    }
+
+    @Override
+    public ForestResponseFactory getResponseFactory() {
+        return syncExecutor.getResponseFactory();
     }
 
     @Override

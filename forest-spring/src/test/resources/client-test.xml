@@ -14,7 +14,9 @@
             connectTimeout="10000"
             maxConnections="700"
             maxRequestQueueSize="300"
-            maxRouteConnections="600">
+            maxRouteConnections="600"
+            maxAsyncThreadSize="256"
+            maxAsyncQueueSize="128">
 
         <forest:var name="baseUrl" value="http://www.thebeastshop.com"/>
         <forest:var name="x" value="0"/>

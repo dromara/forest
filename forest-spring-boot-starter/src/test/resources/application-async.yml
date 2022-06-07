@@ -6,7 +6,7 @@ forest:
   connect-timeout: 3000
   max-retry-count: 0
   max-async-thread-size: 300
-
+  max-async-queue-size: 350
 
 
 
