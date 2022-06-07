@@ -1,11 +1,13 @@
 package com.dtflys.test.http;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.test.http.client.UrlEncodedClient;
 import com.dtflys.test.http.model.JsonTestUser;
 import com.dtflys.test.http.client.GetClient;
@@ -217,9 +219,7 @@ public class TestGetClient extends BaseClientTest {
             throw new RuntimeException(e);
         }
 
-        server.enqueue(
-                new MockResponse()
-                        .setBody(buffer));
+        server.enqueue(new MockResponse().setBody(buffer));
         ForestResponse<Map> response = getClient.jsonMapGetWithResponseEncoding();
         assertThat(response).isNotNull();
         assertThat(response.getContentType()).isNull();
@@ -501,6 +501,230 @@ public class TestGetClient extends BaseClientTest {
                 .assertPathEquals("/xxx")
                 .assertEncodedQueryEquals("token=" + token)
                 .assertQueryEquals("token", token);
+    }
+
+    @Test
+    public void testUrl3() {
+        server.enqueue(
+                new MockResponse()
+                        .setHeader("Content-Encoding", "UTF-8")
+                        .setBody(EXPECTED));
+        String url = StrUtil.format("http://localhost:{}/test", server.getPort());
+        ForestResponse<String> response = getClient.testUrl3(url);
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
+        assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
+        assertThat(response.getContentType()).isNull();
+        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/test");
+    }
+
+    @Test
+    public void testUrl4() {
+        server.enqueue(
+                new MockResponse()
+                        .setHeader("Content-Encoding", "UTF-8")
+                        .setBody(EXPECTED));
+        String url = StrUtil.format("/test", server.getPort());
+        ForestRequest<String> request = getClient.testUrl4(url);
+        request.port(server.getPort());
+        ForestResponse<String> response = request.execute(new TypeReference<ForestResponse<String>>() {});
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
+        assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
+        assertThat(response.getContentType()).isNull();
+        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/test");
+    }
+
+    @Test
+    public void testUrl4_2() {
+        server.enqueue(
+                new MockResponse()
+                        .setHeader("Content-Encoding", "UTF-8")
+                        .setBody(EXPECTED));
+        String url = StrUtil.format("test/xxx", server.getPort());
+        ForestRequest<String> request = getClient.testUrl4(url);
+        request.port(server.getPort());
+        ForestResponse<String> response = request.execute(new TypeReference<ForestResponse<String>>() {});
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
+        assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
+        assertThat(response.getContentType()).isNull();
+        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/test/xxx");
+    }
+
+    @Test
+    public void testUrl4_3() {
+        server.enqueue(
+                new MockResponse()
+                        .setHeader("Content-Encoding", "UTF-8")
+                        .setBody(EXPECTED));
+        String url = StrUtil.format("test/xxx", server.getPort());
+        ForestRequest<String> request = getClient.testUrl4(url);
+        request.setPort(server.getPort());
+        ForestResponse<String> response = request.execute(new TypeReference<ForestResponse<String>>() {});
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
+        assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
+        assertThat(response.getContentType()).isNull();
+        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/test/xxx");
+    }
+
+    @Test
+    public void testUrl4_4() {
+        server.enqueue(
+                new MockResponse()
+                        .setHeader("Content-Encoding", "UTF-8")
+                        .setBody(EXPECTED));
+        String url = StrUtil.format("/test?a=1&b=2#?ref=ok", server.getPort());
+        ForestRequest<String> request = getClient.testUrl4(url);
+        assertThat(request.ref()).isEqualTo("?ref=ok");
+        request.port(server.getPort());
+        ForestResponse<String> response = request.execute(new TypeReference<ForestResponse<String>>() {});
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
+        assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
+        assertThat(response.getContentType()).isNull();
+        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/test")
+                .assertQueryEquals("a", "1")
+                .assertQueryEquals("b", "2");
+    }
+
+
+    @Test
+    public void testUrl4_5() {
+        server.enqueue(
+                new MockResponse()
+                        .setHeader("Content-Encoding", "UTF-8")
+                        .setBody(EXPECTED));
+        String url = StrUtil.format("/test#?ref=ok", server.getPort());
+        ForestRequest<String> request = getClient.testUrl4(url);
+        assertThat(request.ref()).isEqualTo("?ref=ok");
+        request.port(server.getPort());
+        ForestResponse<String> response = request.execute(new TypeReference<ForestResponse<String>>() {});
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
+        assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
+        assertThat(response.getContentType()).isNull();
+        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/test");
+    }
+
+    @Test
+    public void testUrl4_6() {
+        server.enqueue(
+                new MockResponse()
+                        .setHeader("Content-Encoding", "UTF-8")
+                        .setBody(EXPECTED));
+        String url = StrUtil.format("/test#xxx/yyy", server.getPort());
+        ForestRequest<String> request = getClient.testUrl4(url);
+        assertThat(request.ref()).isEqualTo("xxx/yyy");
+        request.port(server.getPort());
+        ForestResponse<String> response = request.execute(new TypeReference<ForestResponse<String>>() {});
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
+        assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
+        assertThat(response.getContentType()).isNull();
+        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/test");
+    }
+
+    @Test
+    public void testRef() {
+        server.enqueue(
+                new MockResponse()
+                        .setHeader("Content-Encoding", "UTF-8")
+                        .setBody(EXPECTED));
+        ForestResponse<String> response = getClient.testRef("xxx/yyy");
+        assertThat(response).isNotNull();
+        assertThat(response.getRequest().getRef()).isEqualTo("xxx/yyy");
+        assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
+        assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
+        assertThat(response.getContentType()).isNull();
+        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/test");
+    }
+
+
+    @Test
+    public void testRef_2() {
+        server.enqueue(
+                new MockResponse()
+                        .setHeader("Content-Encoding", "UTF-8")
+                        .setBody(EXPECTED));
+        ForestResponse<String> response = getClient.testRef("?ref=ok");
+        assertThat(response).isNotNull();
+        assertThat(response.getRequest().getRef()).isEqualTo("?ref=ok");
+        assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
+        assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
+        assertThat(response.getContentType()).isNull();
+        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/test");
+    }
+
+    @Test
+    public void testRef2() {
+        server.enqueue(
+                new MockResponse()
+                        .setHeader("Content-Encoding", "UTF-8")
+                        .setBody(EXPECTED));
+        ForestResponse<String> response = getClient.testRef2("#xxx/yyy");
+        assertThat(response).isNotNull();
+        assertThat(response.getRequest().getRef()).isEqualTo("xxx/yyy");
+        assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
+        assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
+        assertThat(response.getContentType()).isNull();
+        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/test");
+    }
+
+    @Test
+    public void testRef2_2() {
+        server.enqueue(
+                new MockResponse()
+                        .setHeader("Content-Encoding", "UTF-8")
+                        .setBody(EXPECTED));
+        ForestResponse<String> response = getClient.testRef2("#?ref=#abc");
+        assertThat(response).isNotNull();
+        assertThat(response.getRequest().getRef()).isEqualTo("?ref=#abc");
+        assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
+        assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
+        assertThat(response.getContentType()).isNull();
+        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/test");
+    }
+
+
+    @Test
+    public void testRef3() {
+        server.enqueue(
+                new MockResponse()
+                        .setHeader("Content-Encoding", "UTF-8")
+                        .setBody(EXPECTED));
+        ForestResponse<String> response = getClient.testRef3("#?a=1", "&b=2");
+        assertThat(response).isNotNull();
+        assertThat(response.getRequest().getRef()).isEqualTo("?a=1&b=2");
+        assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
+        assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
+        assertThat(response.getContentType()).isNull();
+        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertPathEquals("/test");
     }
 
 

@@ -27,13 +27,13 @@ package com.dtflys.forest.http;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLEncoder;
 
 /**
  * Forest URL
@@ -42,6 +42,8 @@ import java.net.URLEncoder;
  * @since v1.5.2
  */
 public class ForestURL {
+
+    private final static Logger log = LoggerFactory.getLogger(ForestURL.class);
 
     /**
      * 原始URL
@@ -108,12 +110,18 @@ public class ForestURL {
         originalUrl = toURLString();
     }
 
-    public ForestURL(String schema, String userInfo, String host, Integer port, String path) {
-        setScheme(schema);
+    public ForestURL(String scheme, String userInfo, String host, Integer port, String path) {
+        this(scheme, userInfo, host, port, path, null);
+    }
+
+
+    public ForestURL(String scheme, String userInfo, String host, Integer port, String path, String ref) {
+        setScheme(scheme);
         this.userInfo = userInfo;
         this.host = host;
         this.port = port;
         this.path = path;
+        this.ref = ref;
         originalUrl = toURLString();
     }
 
@@ -204,6 +212,9 @@ public class ForestURL {
      * @return URL根路径
      */
     public String getBasePath() {
+        if (StringUtils.isNotEmpty(basePath) && basePath.charAt(0) != '/') {
+            return '/' + basePath;
+        }
         return basePath;
     }
 
@@ -245,6 +256,9 @@ public class ForestURL {
      * @return URL路径
      */
     public String getPath() {
+        if (StringUtils.isNotEmpty(path) && path.charAt(0) != '/') {
+            return '/' + path;
+        }
         return path;
     }
 
@@ -260,9 +274,6 @@ public class ForestURL {
             return this;
         }
         this.path = path.trim();
-        if (!this.path.startsWith("/")) {
-            this.path = "/" + this.path;
-        }
         this.originalUrl = toURLString();
         return this;
     }
@@ -282,7 +293,9 @@ public class ForestURL {
         if (StringUtils.isNotEmpty(userInfo)) {
             builder.append(URLUtils.userInfoEncode(userInfo, "UTF-8")).append("@");
         }
-        builder.append(URLUtils.userInfoEncode(host, "UTF-8"));
+        if (StringUtils.isNotEmpty(host)) {
+            builder.append(URLUtils.userInfoEncode(host, "UTF-8"));
+        }
         if (URLUtils.isNotNonePort(port) &&
                 ((port != 80 && port != 443 && port > -1) ||
                 (port == 80 && !ssl) ||
@@ -298,13 +311,6 @@ public class ForestURL {
 
     public ForestURL setRef(String ref) {
         this.ref = ref;
-        if (StringUtils.isNotBlank(ref)) {
-            try {
-                this.ref = URLEncoder.encode(this.ref.trim(), "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                throw new ForestRuntimeException(e);
-            }
-        }
         return this;
     }
 
@@ -322,13 +328,18 @@ public class ForestURL {
             builder.append(authority);
         }
         if (StringUtils.isNotEmpty(basePath)) {
-            builder.append(URLUtils.pathEncode(basePath, "UTF-8"));
+            String encodedBasePath = URLUtils.pathEncode(basePath, "UTF-8");
+            if (host != null && encodedBasePath.charAt(0) != '/') {
+                builder.append('/');
+            }
+            builder.append(encodedBasePath);
         }
         if (StringUtils.isNotEmpty(path)) {
-            builder.append(URLUtils.pathEncode(path, "UTF-8"));
-        }
-        if (StringUtils.isNotEmpty(ref)) {
-            builder.append("#").append(ref);
+            String encodedPath = URLUtils.pathEncode(path, "UTF-8");
+            if ((host != null || basePath != null) && encodedPath.charAt(0) != '/') {
+                builder.append('/');
+            }
+            builder.append(encodedPath);
         }
         return builder.toString();
     }
@@ -341,13 +352,18 @@ public class ForestURL {
      * @since 1.5.22
      */
     public ForestRoute getRoute() {
-        return ForestRoutes.getRoute(host, port);
+        return ForestRoutes.getRoute(getHost(), getPort());
     }
 
     @Override
     public String toString() {
+        if (StringUtils.isNotEmpty(ref)) {
+            return originalUrl + "#" +originalUrl;
+        }
         return originalUrl;
     }
+
+
 
     public URL toJavaURL() {
         try {
@@ -371,12 +387,16 @@ public class ForestURL {
      * @return 合并完的新URL
      */
     public ForestURL mergeURLWith(ForestURL url) {
+        if (url == null) {
+            return this;
+        }
         String newSchema = this.scheme == null ? url.scheme : this.scheme;
         String newUserInfo = this.userInfo == null ? url.userInfo : this.userInfo;
         String newHost = this.host == null ? url.host : this.host;
-        int newPort = URLUtils.isNonePort(this.port) ? url.port : this.port;
+        Integer newPort = URLUtils.isNonePort(this.port) ? url.port : this.port;
         String newPath = this.path == null ? url.path : this.path;
-        return new ForestURL(newSchema, newUserInfo, newHost, newPort, newPath);
+        String newRef = this.ref == null ? url.ref : this.ref;
+        return new ForestURL(newSchema, newUserInfo, newHost, newPort, newPath, newRef);
     }
 
 
@@ -444,6 +464,22 @@ public class ForestURL {
         }
         this.originalUrl = toURLString();
         return this;
+    }
+
+    public void checkAndComplete() {
+        String oldUrl = originalUrl;
+        if (scheme == null) {
+            setScheme(ssl ? "https" : "http");
+        }
+        if (host == null) {
+            setHost("localhost");
+            if (URLUtils.isNonePort(port)) {
+                log.warn("[Forest] Invalid url '" + oldUrl + "'. But an valid url must start width 'http://' or 'https://'. Convert this url to '" + toURLString() + "' automatically!");
+            } else {
+                log.warn("[Forest] Invalid url '" + oldUrl + "'. Host is empty. Convert this url to '" + toURLString() + "' automatically!");
+            }
+        }
+
     }
 
 }

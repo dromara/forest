@@ -376,6 +376,20 @@ public interface GetClient {
     @Get(url = "${schema}://${host}:${port}/${path}?token=YmZlNDYzYmVkMWZjYzgwNjExZDVhMWM1ODZmMWRhYzg0NTcyMGEwMg==")
     ForestResponse<String> testUrl2(@Var("schema") String schema, @Var("host") String host, @Var("path") String path);
 
+    @Get(url = "${url}")
+    ForestResponse<String> testUrl3(@Var("url") String url);
+
+    @Get(url = "${url}")
+    ForestRequest<String> testUrl4(@Var("url") String url);
+
+    @Get(url = "http://localhost:${port}/test#${ref}")
+    ForestResponse<String> testRef(@Var("ref") String ref);
+
+    @Get(url = "http://localhost:${port}/test{ref}")
+    ForestResponse<String> testRef2(@Var("ref") String ref);
+
+    @Get(url = "http://localhost:${port}/test{ref}{ref2}")
+    ForestResponse<String> testRef3(@Var("ref") String ref, @Var("ref2") String ref2);
 
     @Get(
             url = "http://localhost:${port}/hello/user?{name}",
