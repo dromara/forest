@@ -9,6 +9,7 @@ import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.StringUtils;
+import com.dtflys.forest.utils.URLUtils;
 
 /**
  * 重试注解的生命周期类
@@ -38,26 +39,27 @@ public class AddressLifeCycle implements MethodAnnotationLifeCycle<Address, Obje
         String portStr = annotation.port();
         String basePathStr = annotation.basePath();
         Object addressSource = request.getMethod().getExtensionParameterValue(PARAM_KEY_ADDRESS_SOURCE);
+        String basePath = null;
+        String scheme = null;
+        Integer port = null;
+        String host = null;
 
         // 判断是否有设置 basePath
         if (StringUtils.isNotBlank(basePathStr)) {
             MappingTemplate basePathTemplate = request.getMethod().makeTemplate(Address.class, "basePath", basePathStr.trim());
-            String basePath = basePathTemplate.render(args);
-            request.basePath(basePath);
+            basePath = basePathTemplate.render(args);
         }
 
         // 判断是否有设置 scheme
         if (StringUtils.isNotBlank(schemeStr)) {
             MappingTemplate schemeTemplate = request.getMethod().makeTemplate(Address.class, "schema", schemeStr.trim());
-            String scheme = schemeTemplate.render(args);
-            request.scheme(scheme);
+            scheme = schemeTemplate.render(args);
         }
 
         // 判断是否有设置 host
         if (StringUtils.isNotBlank(hostStr)) {
             MappingTemplate hostTemplate = request.getMethod().makeTemplate(Address.class, "host", hostStr.trim());
-            String host = hostTemplate.render(args);
-            request.host(host);
+            host = hostTemplate.render(args);
         }
 
         // 判断是否有设置 port
@@ -68,18 +70,19 @@ public class AddressLifeCycle implements MethodAnnotationLifeCycle<Address, Obje
                 throw new ForestRuntimeException("[Forest] property 'port' of annotation @Address must be a number!");
             }
             try {
-                Integer port = Integer.parseInt(portRendered);
-                request.port(port);
+                port = Integer.parseInt(portRendered);
             } catch (Throwable th) {
                 throw new ForestRuntimeException("[Forest] property 'port' of annotation @Address must be a number!");
             }
         }
 
-
         // 最后判断有无设置回调函数，此项设置会覆盖 host 和 port 以及 scheme 属性的设置
         if (addressSource != null && addressSource instanceof AddressSource) {
             ForestAddress address = ((AddressSource) addressSource).getAddress(request);
-            request.address(address);
+            request.address(address, false);
+        } else {
+            ForestAddress address = new ForestAddress(scheme, host, port, basePath);
+            request.address(address, false);
         }
 
     }

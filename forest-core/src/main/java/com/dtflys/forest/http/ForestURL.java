@@ -27,6 +27,7 @@ package com.dtflys.forest.http;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
+import org.bouncycastle.crypto.tls.URLAndHash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +51,8 @@ public class ForestURL {
      * <p>即为整个完整的没被拆分的URL字符串
      */
     private String originalUrl;
+
+    private ForestAddress address;
 
     /**
      * HTTP协议
@@ -163,6 +166,12 @@ public class ForestURL {
     }
 
     public String getScheme() {
+        if (StringUtils.isEmpty(scheme) && address != null) {
+            return address.getScheme();
+        }
+        if (StringUtils.isEmpty(scheme)) {
+            return ssl ? "https" : "http";
+        }
         return scheme;
     }
 
@@ -177,6 +186,9 @@ public class ForestURL {
     }
 
     public String getHost() {
+        if (StringUtils.isEmpty(host) && address != null) {
+            return address.getHost();
+        }
         return host;
     }
 
@@ -192,11 +204,18 @@ public class ForestURL {
         return this;
     }
 
-    public int getPort() {
+    private static int normalizePort(Integer port, boolean ssl) {
         if (URLUtils.isNonePort(port)) {
             return ssl ? 443 : 80;
         }
         return port;
+    }
+
+    public int getPort() {
+        if (port == null && address != null) {
+            return normalizePort(address.getPort(), ssl);
+        }
+        return normalizePort(port, ssl);
     }
 
     public ForestURL setPort(int port) {
@@ -218,13 +237,27 @@ public class ForestURL {
         return basePath;
     }
 
+
+    /**
+     * 设置URL根路径 (强制修改)
+     * <p>该路径为整个URL去除前面协议 + Host + Port 后部分
+     *
+     * @param basePath 根路径
+     * @return {@link ForestURL}对象实例
+     */
+    public ForestURL setBasePath(String basePath) {
+        return setBasePath(basePath, true);
+    }
+
     /**
      * 设置URL根路径
      * <p>该路径为整个URL去除前面协议 + Host + Port 后部分
      *
-     * @param basePath
+     * @param basePath 根路径
+     * @param forced 是否强制修改, {@code true}: 强制修改非根路径部分地址信息, {@code false}: 非强制，如果URL已设置host、port等非根路径部分地址信息则不会修改
+     * @return {@link ForestURL}对象实例
      */
-    public ForestURL setBasePath(String basePath) {
+    public ForestURL setBasePath(String basePath, boolean forced) {
         if (basePath == null) {
             return this;
         }
@@ -233,10 +266,18 @@ public class ForestURL {
             if (URLUtils.isURL(this.basePath)) {
                 try {
                     URL url = new URL(this.basePath);
-                    this.scheme = url.getProtocol();
-                    this.userInfo = url.getUserInfo();
-                    this.host = url.getHost();
-                    this.port = url.getPort();
+                    if (forced || StringUtils.isEmpty(this.scheme)) {
+                        this.scheme = url.getProtocol();
+                    }
+                    if (forced || StringUtils.isEmpty(this.userInfo)) {
+                        this.userInfo = url.getUserInfo();
+                    }
+                    if (forced || StringUtils.isEmpty(this.host)) {
+                        this.host = url.getHost();
+                    }
+                    if (forced || this.port == null) {
+                        this.port = url.getPort();
+                    }
                     this.basePath = url.getPath();
                 } catch (MalformedURLException e) {
                     throw new ForestRuntimeException(e);
@@ -382,6 +423,33 @@ public class ForestURL {
     }
 
     /**
+     * 修改地址信息 (强制修改)
+     *
+     * @param address 地址, {@link ForestAddress}对象实例
+     * @return {@link ForestURL}对象实例
+     */
+    public ForestURL setAddress(ForestAddress address) {
+        return setAddress(address, true);
+    }
+
+    /**
+     * 修改地址信息
+     *
+     * @param address 地址, {@link ForestAddress}对象实例
+     * @param forced 是否强制修改, {@code true}: 强制修改, {@code false}: 非强制，如果URL已设置host、port等信息则不会修改
+     * @return {@link ForestURL}对象实例
+     */
+    public ForestURL setAddress(ForestAddress address, boolean forced) {
+        if (forced) {
+            setBaseAddress(address);
+        } else {
+            this.address = address;
+        }
+        return this;
+    }
+
+
+    /**
      * 合并两个URL
      * @param url 被合并的一个URL
      * @return 合并完的新URL
@@ -393,7 +461,7 @@ public class ForestURL {
         String newSchema = this.scheme == null ? url.scheme : this.scheme;
         String newUserInfo = this.userInfo == null ? url.userInfo : this.userInfo;
         String newHost = this.host == null ? url.host : this.host;
-        Integer newPort = URLUtils.isNonePort(this.port) ? url.port : this.port;
+        Integer newPort = this.port == null ? url.port : this.port;
         String newPath = this.path == null ? url.path : this.path;
         String newRef = this.ref == null ? url.ref : this.ref;
         return new ForestURL(newSchema, newUserInfo, newHost, newPort, newPath, newRef);
@@ -466,12 +534,31 @@ public class ForestURL {
         return this;
     }
 
-    public void checkAndComplete() {
+    public ForestURL mergeAddress() {
+        if (address != null) {
+            if (StringUtils.isEmpty(scheme)) {
+                scheme = address.getScheme();
+            }
+            if (StringUtils.isEmpty(host)) {
+                host = address.getHost();
+            }
+            if (URLUtils.isNonePort(port)) {
+                port = address.getPort();
+            }
+            if (StringUtils.isEmpty(basePath)) {
+                setBasePath(address.getBasePath(), false);
+            }
+            originalUrl = toURLString();
+        }
+        return this;
+    }
+
+    public ForestURL checkAndComplete() {
         String oldUrl = originalUrl;
-        if (scheme == null) {
+        if (StringUtils.isEmpty(scheme)) {
             setScheme(ssl ? "https" : "http");
         }
-        if (host == null) {
+        if (StringUtils.isEmpty(host)) {
             setHost("localhost");
             if (URLUtils.isNonePort(port)) {
                 log.warn("[Forest] Invalid url '" + oldUrl + "'. But an valid url must start width 'http://' or 'https://'. Convert this url to '" + toURLString() + "' automatically!");
@@ -479,7 +566,7 @@ public class ForestURL {
                 log.warn("[Forest] Invalid url '" + oldUrl + "'. Host is empty. Convert this url to '" + toURLString() + "' automatically!");
             }
         }
-
+        return this;
     }
 
 }

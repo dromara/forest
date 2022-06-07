@@ -207,6 +207,18 @@ public final class URLUtils {
     }
 
     /**
+     * 进行URI ref的URL Encoding编码
+     *
+     * @param content 需要编码的原字符串
+     * @param encode 编码字符集
+     * @return URL Encoding编码结果字符串
+     */
+    public static String refEncode(String content, String encode) {
+        return URLEncoder.PATH.encode(content, encode);
+    }
+
+
+    /**
      * 进行查询参数值部分的URL Encoding编码
      *
      * @param content 需要编码的原字符串

@@ -62,10 +62,10 @@ public class TestAddressClient extends BaseClientTest {
     public void testAddress_basePath() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         ForestRequest<String> request = addressClient.testBasePath("localhost", server.getPort(), "BASE/1/2");
+        String result = request.execute(String.class);
         assertThat(request.host()).isEqualTo("localhost");
         assertThat(request.port()).isEqualTo(server.getPort());
         assertThat(request.basePath()).isEqualTo("/BASE/1/2");
-        String result = request.execute(String.class);
         assertThat(result).isEqualTo(EXPECTED);
 
         mockRequest(server)
@@ -77,10 +77,10 @@ public class TestAddressClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         ForestRequest<String> request = addressClient.testBasePath(
                 "127.0.0.1", server.getPort(), "http://localhost:" + server.getPort() + "/BASE/1/2");
+        String result = request.execute(String.class);
         assertThat(request.host()).isEqualTo("127.0.0.1");
         assertThat(request.port()).isEqualTo(server.getPort());
         assertThat(request.basePath()).isEqualTo("/BASE/1/2");
-        String result = request.execute(String.class);
         assertThat(result).isEqualTo(EXPECTED);
 
         mockRequest(server)

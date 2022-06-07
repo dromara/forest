@@ -95,7 +95,7 @@ public class TestGenericForestClient extends BaseClientTest {
         ForestRequest<?> request = Forest.request();
         assertThat(request).isNotNull();
         assertThat(request.scheme()).isEqualTo("http");
-        assertThat(request.host()).isEqualTo("localhost");
+        assertThat(request.host()).isNull();
         assertThat(request.path()).isEqualTo("/");
         request.url("http://127.0.0.1:8080/test");
         assertThat(request.urlString()).isEqualTo("http://127.0.0.1:8080/test");

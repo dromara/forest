@@ -12,8 +12,8 @@ public class TestRequest {
     @Test
     public void testUrl() {
         ForestRequest request = Forest.request();
-        assertThat(request.getUrl()).isEqualTo("http://localhost/");
-        assertThat(request.host()).isEqualTo("localhost");
+        assertThat(request.getUrl()).isEqualTo("/");
+        assertThat(request.host()).isNull();
         assertThat(request.port()).isEqualTo(80);
         assertThat(request.getPath()).isEqualTo("/");
         request.url("http://127.0.0.1:8080/xxx/yyy");
