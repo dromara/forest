@@ -15,11 +15,11 @@ public final class StringUtils {
 
     private StringUtils() {}
 
-    public static boolean isEmpty(String text) {
+    public static boolean isEmpty(CharSequence text) {
         return text == null || text.length() == 0;
     }
 
-    public static boolean isNotEmpty(String text) {
+    public static boolean isNotEmpty(CharSequence text) {
         return !isEmpty(text);
     }
 

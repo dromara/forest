@@ -3,6 +3,7 @@ package com.dtflys.forest.backend.url;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.ForestQueryParameter;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestURL;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
@@ -62,7 +63,7 @@ public class QueryableURLBuilder extends URLBuilder {
         }
         String ref = request.getRef();
         if (StringUtils.isNotEmpty(ref)) {
-            urlBuilder.append("#").append(ref);
+            urlBuilder.append("#").append(URLUtils.refEncode(ref, "UTF-8"));
         }
         return urlBuilder.toString();
     }

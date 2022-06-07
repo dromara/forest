@@ -29,6 +29,7 @@ import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestURL;
+import com.dtflys.forest.http.ForestURLBuilder;
 import com.dtflys.forest.http.body.RequestBodyBuilder;
 import com.dtflys.forest.http.body.StringRequestBody;
 import com.dtflys.forest.interceptor.Interceptor;
@@ -871,17 +872,25 @@ public class ForestMethod<T> implements VariableScope {
             // 默认根地址
             address = DEFAULT_ADDRESS;
         }
-        ForestURL addressURL = null;
+
         if (baseURL != null) {
             renderedURL.setBaseURL(baseURL);
-        }
-        try {
-            addressURL = new ForestURL(new URL("http://localhost"));
+            ForestURL addressURL = new ForestURLBuilder()
+                    .setScheme("http")
+                    .setHost("localhost")
+                    .build();
             addressURL.setBaseAddress(address);
             renderedURL = renderedURL.mergeURLWith(addressURL);
-        } catch (MalformedURLException e) {
-            throw new ForestRuntimeException(e);
         }
+
+/*
+        addressURL = new ForestURLBuilder()
+                .setScheme("http")
+                .setHost("localhost")
+                .build();
+*/
+
+
 
         boolean autoRedirection = configuration.isAutoRedirection();
 

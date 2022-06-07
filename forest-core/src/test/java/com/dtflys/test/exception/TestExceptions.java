@@ -1,6 +1,7 @@
 package com.dtflys.test.exception;
 
 import com.dtflys.forest.Forest;
+import com.dtflys.forest.annotation.BaseRequest;
 import com.dtflys.forest.annotation.DataFile;
 import com.dtflys.forest.annotation.Get;
 import com.dtflys.forest.config.ForestConfiguration;
@@ -155,6 +156,7 @@ public class TestExceptions {
         assertThat(exception.getSource()).isEqualTo("foo=${bar}");
     }
 
+    @BaseRequest(baseURL = "http://localhost")
     public interface TestClient {
         @Get("/data/{data}")
         String urlVar();

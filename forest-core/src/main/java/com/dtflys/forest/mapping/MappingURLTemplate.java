@@ -8,6 +8,7 @@ import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
 import com.dtflys.forest.http.ForestQueryMap;
 import com.dtflys.forest.http.ForestQueryParameter;
 import com.dtflys.forest.http.ForestURL;
+import com.dtflys.forest.http.ForestURLBuilder;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.StringUtils;
 
@@ -29,11 +30,12 @@ public class MappingURLTemplate extends MappingTemplate {
     }
 
     public ForestURL render(Object[] args, ForestQueryMap queries) {
-        String schema = null;
+        String scheme = null;
         StringBuilder userInfo = null;
         String host = null;
         Integer port = null;
         StringBuilder path = null;
+        String ref = null;
         StringBuilder urlBuilder = new StringBuilder();
 
         boolean renderedQuery = false;
@@ -98,8 +100,9 @@ public class MappingURLTemplate extends MappingTemplate {
                     }
                 } else {
                     // 查询参数前面部分
+                    int refIndex = exprVal.indexOf('#');
                     int queryIndex = exprVal.indexOf('?');
-                    renderedQuery = queryIndex >= 0;
+                    renderedQuery = ref == null && queryIndex >= 0 && (queryIndex < refIndex || refIndex < 0);
 
                     String baseUrl = exprVal;
                     if (renderedQuery) {
@@ -113,10 +116,10 @@ public class MappingURLTemplate extends MappingTemplate {
                     for (int pathCharIndex = 0 ; pathCharIndex < baseLen; pathCharIndex++) {
                         ch = baseUrlChars[pathCharIndex];
                         if (!renderedPath && ch == ':') {
-                            if (schema == null && pathCharIndex + 1 < baseLen
+                            if (scheme == null && pathCharIndex + 1 < baseLen
                                     && baseUrlChars[pathCharIndex + 1] == '/') {
                                 // 解析协议部分
-                                schema = subBuilder.toString();
+                                scheme = subBuilder.toString();
                                 subBuilder = new StringBuilder();
                                 pathCharIndex++;
                                 ch = baseUrlChars[pathCharIndex];
@@ -131,7 +134,7 @@ public class MappingURLTemplate extends MappingTemplate {
                                 }
                                 continue;
                             }
-                            if (schema != null && host == null) {
+                            if (scheme != null && host == null) {
                                 // 解析地址部分
                                 boolean hasNext = pathCharIndex + 1 < baseLen;
                                 if (!hasNext || (hasNext && Character.isDigit(baseUrlChars[pathCharIndex + 1]))) {
@@ -183,7 +186,7 @@ public class MappingURLTemplate extends MappingTemplate {
                                     renderedPath = true;
                                 }
                                 continue;
-                            } else if (schema != null && host == null) {
+                            } else if (scheme != null && host == null) {
                                 // 解析地址部分
                                 host = subBuilder.toString();
                                 subBuilder = new StringBuilder();
@@ -210,7 +213,11 @@ public class MappingURLTemplate extends MappingTemplate {
                             subBuilder.append(ch);
                         }
                     }
-
+                    if (refIndex > queryIndex) {
+                        String[] group = exprVal.split("#", 2);
+                        exprVal = group[0];
+                        ref = group[1];
+                    }
                     if (renderedQuery) {
                         if (queryIndex + 1 < exprVal.length()) {
                             String queryStr = exprVal.substring(queryIndex + 1);
@@ -229,12 +236,28 @@ public class MappingURLTemplate extends MappingTemplate {
                     }
                 }
             }
-            return new ForestURL(
-                    schema,
-                    userInfo != null ? userInfo.toString() : null,
-                    host,
-                    port,
-                    path != null ? path.toString() : null);
+            if (host == null && StringUtils.isEmpty(path) && StringUtils.isNotEmpty(urlBuilder)) {
+                if (path == null) {
+                    path = new StringBuilder();
+                }
+                path.append(builder);
+            }
+            if (StringUtils.isNotEmpty(path)) {
+                String[] group = path.toString().split("#", 2);
+                if (group.length > 1) {
+                    path = new StringBuilder();
+                    path.append(group[0]);
+                    ref = group[1];
+                }
+            }
+            return new ForestURLBuilder()
+                    .setScheme(scheme)
+                    .setUserInfo(userInfo != null ? userInfo.toString() : null)
+                    .setHost(host)
+                    .setPort(port)
+                    .setPath(path != null ? path.toString() : null)
+                    .setRef(ref)
+                    .build();
         } catch (ForestVariableUndefinedException ex) {
             throw new ForestVariableUndefinedException(annotationType, attributeName, forestMethod, ex.getVariableName(), template);
         }

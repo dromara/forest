@@ -491,7 +491,7 @@ public class ForestRequest<T> {
      * @return URL字符串
      */
     public String getUrl() {
-        return url.toString();
+        return url.getOriginalUrl();
     }
 
     /**
@@ -4101,6 +4101,7 @@ public class ForestRequest<T> {
         processRedirectionRequest();
         // 执行 beforeExecute
         if (interceptorChain.beforeExecute(this)) {
+            this.url.checkAndComplete();
             // 从后端HTTP框架创建HTTP请求执行器
             HttpExecutor executor  = backend.createExecutor(this, lifeCycleHandler);
             if (executor != null) {
