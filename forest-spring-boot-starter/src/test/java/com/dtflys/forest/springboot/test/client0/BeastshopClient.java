@@ -20,8 +20,8 @@ import com.dtflys.forest.springboot.test.moudle.TestUser;
 @BaseRequest(baseURL = "${baseUrl}", sslProtocol = "TLS")
 public interface BeastshopClient {
 
-    @Get("#{my-props.base-urls}?myToken=${token}")
-    @LogEnabled(logResponseContent = true)
+    @Get("#{my-props.base-url}?myToken=${token}")
+    @LogEnabled(logRequest = true, logResponseContent = true)
     ForestResponse<String> shops(@Var("token") String param);
 
     @Request(

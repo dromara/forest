@@ -134,10 +134,10 @@ public class TestPoolClient extends BaseClientTest {
         ForestConfiguration poolConf = ForestConfiguration.createConfiguration()
                 .setVariableValue("port", server.getPort())
                 .setMaxConnections(10)
-                .setMaxAsyncThreadSize(200)
+                .setMaxAsyncThreadSize(300)
                 .setMaxRequestQueueSize(1);
         PoolClient poolClient = poolConf.client(PoolClient.class);
-        int count = 100;
+        int count = 300;
         for (int i = 0; i < count; i++) {
             server.enqueue(new MockResponse().setBody(EXPECTED).setHeadersDelay(1, TimeUnit.SECONDS));
         }
@@ -171,11 +171,11 @@ public class TestPoolClient extends BaseClientTest {
     public void testPoolAsync_asyncPool() throws InterruptedException {
         ForestConfiguration poolConf = ForestConfiguration.createConfiguration()
                 .setVariableValue("port", server.getPort())
-                .setMaxConnections(200)
+                .setMaxConnections(300)
                 .setMaxAsyncThreadSize(10)
                 .setMaxAsyncQueueSize(1);
         PoolClient poolClient = poolConf.client(PoolClient.class);
-        int count = 100;
+        int count = 300;
         for (int i = 0; i < count; i++) {
             server.enqueue(new MockResponse().setBody(EXPECTED).setHeadersDelay(1, TimeUnit.SECONDS));
         }

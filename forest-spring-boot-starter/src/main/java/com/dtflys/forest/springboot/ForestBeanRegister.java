@@ -63,6 +63,7 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
         this.properties = properties;
         this.forestObjectFactory = forestObjectFactory;
         this.forestConfigurationProperties = forestConfigurationProperties;
+        this.forestInterceptorFactory = forestInterceptorFactory;
     }
 
     @Override

@@ -67,7 +67,7 @@ public class TestAddress {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         ForestRequest<String> request = springBaseAddressClient.testBaseAddress(server.getPort());
         assertThat(request.getScheme()).isEqualTo("http");
-        assertThat(request.getHost()).isEqualTo("127.0.0.1");
+        assertThat(request.getHost()).isEqualTo("localhost");
         String result = request
                 .port(server.getPort())
                 .executeAsString();

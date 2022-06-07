@@ -868,20 +868,18 @@ public class ForestMethod<T> implements VariableScope {
 
         AddressSource addressSource = configuration.getBaseAddressSource();
         ForestAddress address = configuration.getBaseAddress();
-        if (address == null) {
-            // 默认根地址
-            address = DEFAULT_ADDRESS;
-        }
 
         if (baseURL != null) {
             renderedURL.setBaseURL(baseURL);
-            ForestURL addressURL = new ForestURLBuilder()
-                    .setScheme("http")
-                    .setHost("localhost")
-                    .build();
-            addressURL.setBaseAddress(address);
-            renderedURL = renderedURL.mergeURLWith(addressURL);
+            if (address == null) {
+                // 默认根地址
+                address = DEFAULT_ADDRESS;
+            }
         }
+        if (address != null) {
+            renderedURL.setAddress(address, false);
+        }
+
 
 /*
         addressURL = new ForestURLBuilder()
