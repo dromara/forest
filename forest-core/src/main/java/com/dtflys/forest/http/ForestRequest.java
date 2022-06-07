@@ -46,6 +46,7 @@ import com.dtflys.forest.http.body.StringRequestBody;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.RequestLogMessage;
+import com.dtflys.forest.mapping.MappingURLTemplate;
 import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.multipart.ByteArrayMultipart;
 import com.dtflys.forest.multipart.FileMultipart;
@@ -83,9 +84,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -100,6 +99,8 @@ import static com.dtflys.forest.mapping.MappingParameter.*;
  * @since 2016-03-24
  */
 public class ForestRequest<T> {
+
+    private final static Object[] EMPTY_RENDER_ARGS = new Object[0];
 
     /**
      * 默认上传/下载进度监听的步长
@@ -541,62 +542,57 @@ public class ForestRequest<T> {
      * <p>每次设置请求的url地址时，都会解析传入的url参数字符串
      * <p>然后从url中解析出Query参数，并将其替换调用原来的Query参数，或新增成新的Query参数
      *
-     * @param url url地址字符串
+     * @param urlTemplate url地址字符串模板
+     * @param args 字符串模板渲染参数数组
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> setUrl(String url) {
-        if (StringUtils.isBlank(url)) {
-            throw new ForestRuntimeException("[Forest] Request url cannot be empty!");
-        }
-        String srcUrl = StringUtils.trimBegin(url);
-        String query = "";
-
+    public ForestRequest<T> setUrl(MappingURLTemplate urlTemplate, Object... args) {
         if (!this.query.isEmpty()) {
             this.query.clearQueriesFromUrl();
         }
 
-        if (!URLUtils.isValidUrl(url)) {
-            String baseUrl = "http://localhost";
-            if (this.url != null) {
-                baseUrl = this.url.getAuthority();
-            }
-            srcUrl = URLUtils.getValidURL(baseUrl, srcUrl);
-        }
-
-        try {
-            URL u = new URL(srcUrl);
-            this.url = new ForestURL(u);
-            query = u.getQuery();
-            if (StringUtils.isNotEmpty(query)) {
-                String[] params = query.split("&");
-                for (int i = 0; i < params.length; i++) {
-                    String p = params[i];
-                    String[] nameValue = p.split("=", 2);
-                    String name = nameValue[0];
-                    RequestNameValue requestNameValue = new RequestNameValue(name, TARGET_QUERY);
-                    if (nameValue.length > 1) {
-                        StringBuilder valueBuilder = new StringBuilder();
-                        valueBuilder.append(nameValue[1]);
-                        if (nameValue.length > 2) {
-                            for (int j = 2; j < nameValue.length; j++) {
-                                valueBuilder.append("=");
-                                valueBuilder.append(nameValue[j]);
-                            }
-                        }
-                        String value = valueBuilder.toString();
-                        requestNameValue.setValue(value);
-                    }
-
-                    addQuery(new ForestQueryParameter(
-                            requestNameValue.getName(), requestNameValue.getValue(), true, false, null));
-                }
-            }
-
-        } catch (MalformedURLException e) {
-            throw new ForestRuntimeException(e);
+        ForestURL newUrl = urlTemplate.render(args, this.query);
+        if (this.url == null) {
+            this.url = newUrl;
+        } else {
+            this.url = newUrl.mergeURLWith(this.url);
         }
         return this;
     }
+
+
+    /**
+     * 设置请求的url地址
+     * <p>每次设置请求的url地址时，都会解析传入的url参数字符串
+     * <p>然后从url中解析出Query参数，并将其替换调用原来的Query参数，或新增成新的Query参数
+     *
+     * @param url url地址字符串
+     * @param args 字符串模板渲染参数数组
+     * @return {@link ForestRequest}对象实例
+     */
+    public ForestRequest<T> setUrl(String url, Object... args) {
+        if (StringUtils.isBlank(url)) {
+            throw new ForestRuntimeException("[Forest] Request url cannot be empty!");
+        }
+        String srcUrl = StringUtils.trimBegin(url);
+
+
+        MappingURLTemplate template = method.makeURLTemplate(null, null, srcUrl);
+        return setUrl(template, args);
+    }
+
+    /**
+     * 设置请求的url地址
+     * <p>每次设置请求的url地址时，都会解析传入的url参数字符串
+     * <p>然后从url中解析出Query参数，并将其替换调用原来的Query参数，或新增成新的Query参数
+     *
+     * @param url url地址字符串
+     * @return {@link ForestRequest}对象实例
+     */
+    public ForestRequest<T> setUrl(String url) {
+        return setUrl(url, EMPTY_RENDER_ARGS);
+    }
+
 
     /**
      * 获取URL用户验证信息
@@ -780,9 +776,22 @@ public class ForestRequest<T> {
      * @return {@link ForestRequest}对象实例
      */
     public ForestRequest<T> setAddress(ForestAddress address) {
-        this.url.setBaseAddress(address);
+        this.url.setAddress(address);
         return this;
     }
+
+    /**
+     * 设置请求的主机地址(主机名/ip地址 + 端口号)
+     *
+     * @param address Forest主机地址信息
+     * @param forced 是否强制修改, {@code true}: 强制修改, {@code false}: 非强制，如果URL已设置host、port等信息则不会修改
+     * @return {@link ForestRequest}对象实例
+     */
+    public ForestRequest<T> setAddress(ForestAddress address, boolean forced) {
+        this.url.setAddress(address, forced);
+        return this;
+    }
+
 
     /**
      * 设置请求的主机地址(主机名/ip地址 + 端口号)
@@ -805,9 +814,24 @@ public class ForestRequest<T> {
      * @see ForestRequest#setAddress(ForestAddress)
      */
     public ForestRequest<T> address(ForestAddress address) {
-        this.url.setBaseAddress(address);
+        this.url.setAddress(address);
         return this;
     }
+
+    /**
+     * 设置请求的主机地址(主机名/ip地址 + 端口号)
+     * <p>同 {@link ForestRequest#setAddress(ForestAddress)} 方法
+     *
+     * @param address Forest主机地址信息
+     * @param forced 是否强制修改, {@code true}: 强制修改, {@code false}: 非强制，如果URL已设置host、port等信息则不会修改
+     * @return {@link ForestRequest}对象实例
+     * @see ForestRequest#setAddress(ForestAddress)
+     */
+    public ForestRequest<T> address(ForestAddress address, boolean forced) {
+        this.url.setAddress(address, forced);
+        return this;
+    }
+
 
     /**
      * 设置请求的主机地址(主机名/ip地址 + 端口号)
@@ -4101,7 +4125,7 @@ public class ForestRequest<T> {
         processRedirectionRequest();
         // 执行 beforeExecute
         if (interceptorChain.beforeExecute(this)) {
-            this.url.checkAndComplete();
+            this.url.mergeAddress().checkAndComplete();
             // 从后端HTTP框架创建HTTP请求执行器
             HttpExecutor executor  = backend.createExecutor(this, lifeCycleHandler);
             if (executor != null) {

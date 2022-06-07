@@ -16,7 +16,7 @@ public interface ForestGenericClient {
      *
      * @return {@link ForestRequest} 实例
      */
-    @Request("http://localhost/")
+    @Request("/")
     ForestRequest<?> request();
 
     /**
@@ -26,6 +26,6 @@ public interface ForestGenericClient {
      * @param <T> 泛型参数
      * @return {@link ForestRequest} 实例
      */
-    @Request("http://localhost/")
+    @Request("/")
     <T> ForestRequest<T> request(Class<T> clazz);
 }

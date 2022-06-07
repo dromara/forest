@@ -4,7 +4,7 @@ import com.dtflys.forest.annotation.Address;
 import com.dtflys.forest.annotation.Get;
 import com.dtflys.forest.http.ForestResponse;
 
-@Address(port = "{port}")
+@Address(host = "localhost", port = "{port}")
 public interface PoolClient {
 
     @Get(url = "/", connectTimeout = 10000)
