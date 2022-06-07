@@ -1,5 +1,6 @@
 package com.dtflys.forest.springboot.test.async;
 
+import ch.qos.logback.core.joran.conditional.ThenOrElseActionBase;
 import com.dtflys.forest.annotation.BindingVar;
 import com.dtflys.forest.backend.AsyncHttpExecutor;
 import com.dtflys.forest.config.ForestConfiguration;
@@ -56,15 +57,18 @@ public class TestAsync {
         server.enqueue(new MockResponse().setBody(EXPECTED).setHeadersDelay(500, TimeUnit.MILLISECONDS));
         server.enqueue(new MockResponse().setBody(EXPECTED).setHeadersDelay(500, TimeUnit.MILLISECONDS));
         server.enqueue(new MockResponse().setBody(EXPECTED).setHeadersDelay(500, TimeUnit.MILLISECONDS));
-        configuration.setMaxAsyncThreadSize(300);
-        configuration.setMaxAsyncQueueSize(100);
+        ForestConfiguration config = ForestConfiguration.createConfiguration();
+        config.setMaxAsyncThreadSize(1);
+        config.setMaxAsyncQueueSize(0);
+        Throwable throwable = null;
         for (int i = 0; i < 3; i++) {
-            asyncClient.postFuture();
+            try {
+                asyncClient.postFuture();
+            } catch (Throwable th) {
+                throwable = th;
+            }
         }
-        System.out.println("max async thread size: " + AsyncHttpExecutor.getMaxAsyncThreadSize());
-        System.out.println("async thread size: " + AsyncHttpExecutor.getAsyncThreadSize());
-        assertThat(AsyncHttpExecutor.getMaxAsyncThreadSize()).isEqualTo(300);
-        assertThat(AsyncHttpExecutor.getAsyncThreadSize()).isEqualTo(3);
+        assertThat(throwable).isNotNull().isInstanceOf(ForestAsyncAbortException.class);
     }
 
     @Test

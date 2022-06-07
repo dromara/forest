@@ -83,7 +83,7 @@ public class Test0 {
         ForestRequest request = response.getRequest();
         assertNotNull(request);
         assertEquals("www.thebeastshop.com", request.getHost());
-        assertEquals("/autopage", request.getPath());
+        assertEquals("/static/stores", request.getPath());
     }
 
     @Test
