@@ -392,18 +392,14 @@ public class MyAuthLifeCycle implements MethodAnnotationLifeCycle<MyAuth, Object
 String send(@DataVariable("username") String username);
 ```
 
-## 详细文档请看：[http://forest.dtflyx.com/](http://forest.dtflyx.com/)
+#### 详细文档请看：[官方文档](http://forest.dtflyx.com/)
+
 
 ## 获得奖项
 
-<img src="doc/images/osc-2021.jpg">
+<img src="doc/images/osc-2021.jpg" style="width: 377px">
 
 > 2021 年度 OSC 中国开源项目评选「最受欢迎项目」
-
-
-## 贡献者列表
-[![Giteye chart](https://chart.giteye.net/gitee/dromara/forest/2E26F7V4.png)](https://giteye.net/chart/2E26F7V4)
-正因为有他们的贡献，Forest才得以走下去
 
 
 ## 联系作者
