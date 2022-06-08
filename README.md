@@ -397,7 +397,7 @@ String send(@DataVariable("username") String username);
 
 ## 获得奖项
 
-<img src="doc/images/osc-2021.jpg" style="width: 377px">
+<img src="doc/images/osc-2021.jpg" width="377px">
 
 > 2021 年度 OSC 中国开源项目评选「最受欢迎项目」
 
