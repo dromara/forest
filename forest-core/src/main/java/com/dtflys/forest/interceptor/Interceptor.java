@@ -81,6 +81,16 @@ public interface Interceptor<T> extends OnSuccess<T>, OnError, OnProgress, OnLoa
     }
 
     /**
+     * 在请求体数据序列化后，发送请求数据前调用该方法
+     * <p>默认为什么都不做
+     *
+     * @param request Forest请求对象
+     * @param data 序列化后的请求体数据
+     */
+    default void onBodyEncode(ForestRequest request, byte[] data) {
+    }
+
+    /**
      * 默认回调函数: 请求成功后调用该方法
      * <p>默认为什么都不做
      *
@@ -103,7 +113,6 @@ public interface Interceptor<T> extends OnSuccess<T>, OnError, OnProgress, OnLoa
     @Override
     default void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
     }
-
 
     /**
      * 默认回调函数: 在触发请求重试时执行
@@ -181,10 +190,26 @@ public interface Interceptor<T> extends OnSuccess<T>, OnError, OnProgress, OnLoa
         request.addInterceptorAttribute(this.getClass(), name, value);
     }
 
+    /**
+     * 获取请求在本拦截器中的 Attribute 属性
+     *
+     * @param request Forest请求对象
+     * @param name 属性名称
+     * @return 属性值
+     */
     default Object getAttribute(ForestRequest request, String name) {
         return request.getInterceptorAttribute(this.getClass(), name);
     }
 
+    /**
+     * 按自义定类型获取请求在本拦截器中的 Attribute 属性
+     *
+     * @param request Forest请求对象
+     * @param name 属性名称
+     * @param clazz 属性值的类型对象
+     * @param <T> 属性值类型的泛型
+     * @return
+     */
     default <T> T getAttribute(ForestRequest request, String name, Class<T> clazz) {
         Object obj = request.getInterceptorAttribute(this.getClass(), name);
         if (obj == null) {
@@ -193,7 +218,13 @@ public interface Interceptor<T> extends OnSuccess<T>, OnError, OnProgress, OnLoa
         return (T) obj;
     }
 
-
+    /**
+     * 按字符串类型获取请求在本拦截器中的 Attribute 属性
+     *
+     * @param request Forest请求对象
+     * @param name 属性名称
+     * @return 字符串类型属性值
+     */
     default String getAttributeAsString(ForestRequest request, String name) {
         Object attr = getAttribute(request, name);
         if (attr == null) {
@@ -202,6 +233,13 @@ public interface Interceptor<T> extends OnSuccess<T>, OnError, OnProgress, OnLoa
         return String.valueOf(attr);
     }
 
+    /**
+     * 按整数类型获取请求在本拦截器中的 Attribute 属性
+     *
+     * @param request Forest请求对象
+     * @param name 属性名称
+     * @return 整数类型属性值
+     */
     default Integer getAttributeAsInteger(ForestRequest request, String name) {
         Object attr = getAttribute(request, name);
         if (attr == null) {
@@ -210,6 +248,13 @@ public interface Interceptor<T> extends OnSuccess<T>, OnError, OnProgress, OnLoa
         return (Integer) attr;
     }
 
+    /**
+     * 按单精度浮点数类型获取请求在本拦截器中的 Attribute 属性
+     *
+     * @param request Forest请求对象
+     * @param name 属性名称
+     * @return 单精度浮点数类型属性值
+     */
     default Float getAttributeAsFloat(ForestRequest request, String name) {
         Object attr = getAttribute(request, name);
         if (attr == null) {
@@ -218,6 +263,13 @@ public interface Interceptor<T> extends OnSuccess<T>, OnError, OnProgress, OnLoa
         return (Float) attr;
     }
 
+    /**
+     * 按双精度浮点数类型获取请求在本拦截器中的 Attribute 属性
+     *
+     * @param request Forest请求对象
+     * @param name 属性名称
+     * @return 双精度浮点数类型属性值
+     */
     default Double getAttributeAsDouble(ForestRequest request, String name) {
         Object attr = getAttribute(request, name);
         if (attr == null) {

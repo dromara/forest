@@ -47,6 +47,8 @@
 Forest是一个高层的、极简的声明式HTTP调用API框架。<br>
 相比于直接使用Httpclient您不再用写一大堆重复的代码了，而是像调用本地方法一样去发送HTTP请求。
 
+荣获 **2021 年度 OSC 中国开源项目评选「最受欢迎项目」**
+
 文档和示例：
 -------------------------------------
 * [项目主页](http://forest.dtflyx.com/) 
@@ -392,11 +394,17 @@ String send(@DataVariable("username") String username);
 
 ## 详细文档请看：[http://forest.dtflyx.com/](http://forest.dtflyx.com/)
 
+## 获得奖项
+
+<img src="doc/images/osc-2021.jpg">
+
+> 2021 年度 OSC 中国开源项目评选「最受欢迎项目」
 
 
 ## 贡献者列表
 [![Giteye chart](https://chart.giteye.net/gitee/dromara/forest/2E26F7V4.png)](https://giteye.net/chart/2E26F7V4)
 正因为有他们的贡献，Forest才得以走下去
+
 
 ## 联系作者
 
@@ -405,9 +413,6 @@ String send(@DataVariable("username") String username);
 扫描二维码关注公众号，点击菜单中的 `进群` 按钮即可进群
 
 ![avatar](doc/images/qr_code.jpg)
-
-## Gitee上的Star趋势图
-[![Giteye chart](https://chart.giteye.net/gitee/dromara/forest/NURRL346.png)](https://giteye.net/chart/NURRL346)
 
 他们在用
 -----------------------------------
@@ -427,6 +432,14 @@ String send(@DataVariable("username") String username);
 <td><img height="60px" src="doc/images/logo/logo_huafangzhilian.png" alt="山东华方智联科技"></td>
 <td><img height="60px" src="doc/images/logo/logo_hzqianqi.png" alt="杭州仟奇"></td>
 </tr>
+<tr>
+<td><img height="60px" src="doc/images/logo/logo_byai.png" alt="浙江百应"></td>
+<td><img height="60px" src="doc/images/logo/logo_datapps.png" alt="北京聚云位智"></td>
+<td><img height="60px" src="doc/images/logo/logo_hibobi.png" alt="杭州嗨宝贝"></td>
+<td><img height="60px" src="doc/images/logo/logo_hyperchain.png" alt="杭州趣链"></td>
+<td><img height="60px" src="doc/images/logo/logo_ue-one.png" alt="重庆源一科技"></td>
+</tr>
+
 
 </table>
 

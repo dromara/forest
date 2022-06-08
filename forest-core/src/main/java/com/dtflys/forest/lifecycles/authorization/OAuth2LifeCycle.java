@@ -209,7 +209,7 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
         body.putAll(kv2map(bodyItems));
 
         Map<String, Object> queryItems = kv2map((String[]) getAttribute(request, "query"));
-        Class<? extends OAuth2DefinitionHandler> handlerClass = request.getMethod().getMethod().getAnnotation(OAuth2.class).OAuth2TokenHandler();
+        Class<? extends OAuth2DefinitionHandler> handlerClass = getAttribute(request, "OAuth2TokenHandler", Class.class);
         ForestResponse<String> response = oAuth2Client.token(getAttributeAsString(request, "tokenUri"), queryItems, body);
         OAuth2Token token;
         try {
