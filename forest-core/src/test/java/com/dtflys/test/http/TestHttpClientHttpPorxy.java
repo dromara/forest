@@ -1,27 +1,29 @@
 package com.dtflys.test.http;
 
-import com.dtflys.forest.annotation.Backend;
 import com.dtflys.forest.annotation.Get;
 import com.dtflys.forest.annotation.HTTPProxy;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.forest.mock.MockServerRequest;
 import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * @author tanglingyan[xiao4852@qq.com]
- * @since 2022-06-04 10:57
+ * @since 2022-06-09 14:29
  */
 public class TestHttpClientHttpPorxy extends BaseClientTest {
+
+    public final static String EXPECTED = "{\"status\":\"ok\"}";
+
 
     private static ForestConfiguration configuration;
     @Rule
     public final MockWebServer server = new MockWebServer();
-    private final TestHttpClientHttpPorxyClient testHttpClientHttpPorxyClient;
+
+    private TestHttpClientHttpPorxyClient testHttpClientHttpPorxyClient;
 
     public TestHttpClientHttpPorxy(HttpBackend backend) {
         super(backend, configuration);
@@ -35,35 +37,21 @@ public class TestHttpClientHttpPorxy extends BaseClientTest {
         configuration = ForestConfiguration.createConfiguration();
     }
 
-    public static MockServerRequest mockRequest(MockWebServer server) {
-        try {
-            RecordedRequest request = server.takeRequest();
-            return new MockServerRequest(request);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @Override
     public void afterRequests() {
     }
 
     /**
-     *
+     * 测试http代理
      */
-    @Test
+    //由于需要代理依赖本地环境这里进行注释
+    //@Test
     public void testHttpClientHttpPorxy() {
-//        server.enqueue(new MockResponse().setBody("{'flag':'ok'}"));
-//        //发送http请求
-//        testHttpClientHttpPorxyClient.testHttpPorxy();
-//        try {
-//            server.takeRequest();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-
+        //模拟https失败
+        //server.enqueue(new MockResponse().setBody(EXPECTED));
         String text = testHttpClientHttpPorxyClient.testHttpPorxy();
-        //System.out.println(text);
+        Assert.assertTrue(text != null && text.indexOf("百度一下，你就知道") != -1);
     }
 
 
@@ -71,14 +59,13 @@ public class TestHttpClientHttpPorxy extends BaseClientTest {
      * http接口
      *
      * @author tanglingyan[xiao4852@qq.com]
-     * @since 2022-06-04 10:57
+     * @since 2022-06-09 14:29
      */
     @HTTPProxy(host = "127.0.0.1", port = "8888")
     public interface TestHttpClientHttpPorxyClient {
-        @Backend("httpclient")
-//        @Get("https://localhost:{port}")
-//        @Get("https:www.baidu.com")
-        @Get(url="https://10.34.1.170/",sslProtocol = "TLS")
+        //@Backend("httpclient")
+        //@Get(url="https://127.0.0.1:{port}")
+        @Get(value = "https://www.baidu.com", sslProtocol = "TLS")
         String testHttpPorxy();
     }
 
