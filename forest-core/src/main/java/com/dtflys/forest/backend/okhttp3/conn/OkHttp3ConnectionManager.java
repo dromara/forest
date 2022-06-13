@@ -106,17 +106,13 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
         return protocols;
     }
 
-    private String getCacheKey(Integer connectTimeout, Integer readTimeout) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("ok;cto=")
-                .append(connectTimeout)
-                .append(",rto=")
-                .append(readTimeout);
-        return builder.toString();
-    }
-
 
     public OkHttpClient getClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
+        String key = "ok;" + request.clientCacheKey();
+        OkHttpClient client = request.getRoute().getBackendClient(key);
+        if (client != null && !request.isDownloadFile()) {
+            return client;
+        }
         Integer timeout = request.getTimeout();
         Integer connectTimeout = request.connectTimeout();
         Integer readTimeout = request.readTimeout();
@@ -132,10 +128,9 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
             writeTimeout = timeout;
         }
 
-        String key = getCacheKey(connectTimeout, readTimeout);
-        OkHttpClient client = request.getRoute().getBackendClient(key);
-        if (client != null && !request.isDownloadFile()) {
-            return client;
+
+        if (request.isSSL()) {
+            request.getKeyStore();
         }
 
         OkHttpClient.Builder builder = new OkHttpClient.Builder()

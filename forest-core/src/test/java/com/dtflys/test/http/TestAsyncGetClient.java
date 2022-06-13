@@ -59,7 +59,6 @@ public class TestAsyncGetClient extends BaseClientTest {
         super(backend, configuration);
         configuration.setVariableValue("port", server.getPort());
         getClient = configuration.createInstance(GetClient.class);
-        AsyncHttpExecutor.restartPool();
     }
 
     @Test
@@ -290,8 +289,8 @@ public class TestAsyncGetClient extends BaseClientTest {
         assertThat(future).isNotNull();
         latch.await(5, TimeUnit.SECONDS);
         assertTrue(success.get());
-        assertTrue(future.isDone());
         assertEquals(EXPECTED, future.get());
+        assertTrue(future.isDone());
     }
 
 

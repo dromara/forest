@@ -8,6 +8,7 @@ import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.TimeUtils;
+import okhttp3.OkHttpClient;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthSchemeProvider;
 import org.apache.http.auth.AuthScope;
@@ -65,6 +66,11 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
     }
 
     public HttpClient getHttpClient(ForestRequest request) {
+        String key = "hc;" + request.clientCacheKey();
+        HttpClient client = request.getRoute().getBackendClient(key);
+        if (client != null && !request.isDownloadFile()) {
+            return client;
+        }
         HttpClientBuilder builder = HttpClients.custom();
         builder.setConnectionManager(tsConnectionManager);
 
@@ -115,6 +121,7 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
                 .setDefaultRequestConfig(requestConfig)
                 .disableContentCompression()
                 .build();
+        request.getRoute().cacheBackendClient(key, httpClient);
         return httpClient;
     }
 

@@ -96,6 +96,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -2355,6 +2356,43 @@ public class ForestRequest<T> implements HasURL {
      */
     public ForestRequest<T> sslSocketFactoryBuilder(SSLSocketFactoryBuilder sslSocketFactoryBuilder) {
         return setSslSocketFactoryBuilder(sslSocketFactoryBuilder);
+    }
+
+    /**
+     * 后端客户端对象缓存 Key
+     *
+     * @return 缓存 Key 字符串
+     */
+    public String clientCacheKey() {
+        Integer timeout = getTimeout();
+        Integer connectTimeout = connectTimeout();
+        Integer readTimeout = readTimeout();
+        if (TimeUtils.isNone(connectTimeout)) {
+            connectTimeout = timeout;
+        }
+        if (TimeUtils.isNone(readTimeout)) {
+            readTimeout = timeout;
+        }
+        StringBuilder builder = new StringBuilder();
+        builder.append("ok;cto=")
+                .append(connectTimeout)
+                .append(",rto=")
+                .append(readTimeout);
+
+        if (isSSL()) {
+            if (sslSocketFactoryBuilder != null) {
+                builder.append(",-").append(Objects.hash(sslSocketFactoryBuilder));
+            }
+            if (keyStore != null) {
+                builder.append(",-ks=").append(keyStore.getId());
+            }
+        }
+
+        if (proxy != null) {
+            builder.append(",-px=").append(proxy.getHost() + ":" + proxy.getPort());
+        }
+
+        return builder.toString();
     }
 
 
