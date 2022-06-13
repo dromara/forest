@@ -5,8 +5,6 @@ import com.dtflys.forest.backend.okhttp3.response.OkHttpResponseBody;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.LifeCycleHandler;
-import com.dtflys.forest.http.ForestCookie;
-import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestProtocol;
 import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
@@ -17,10 +15,7 @@ import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.TimeUtils;
 import okhttp3.Authenticator;
 import okhttp3.ConnectionPool;
-import okhttp3.Cookie;
-import okhttp3.CookieJar;
 import okhttp3.Credentials;
-import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Protocol;
 import okhttp3.Request;
@@ -32,10 +27,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
-import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,7 +100,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
 
 
     public OkHttpClient getClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
-        String key = "ok;" + request.clientCacheKey();
+        String key = "ok;" + request.clientKey();
         OkHttpClient client = request.getRoute().getBackendClient(key);
         if (client != null && !request.isDownloadFile()) {
             return client;
@@ -126,11 +118,6 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
 
         if (TimeUtils.isNone(writeTimeout)) {
             writeTimeout = timeout;
-        }
-
-
-        if (request.isSSL()) {
-            request.getKeyStore();
         }
 
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
@@ -177,9 +164,9 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
                     .build();
         });
 
-        client = builder.build();
-        request.getRoute().cacheBackendClient(key, client);
-        return client;
+        OkHttpClient newClient = builder.build();
+        request.getRoute().cacheBackendClient(key, newClient);
+        return newClient;
     }
 
     @Override

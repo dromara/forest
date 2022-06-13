@@ -46,6 +46,7 @@ public interface GetClient {
             url = "http://localhost:${port}/${path}",
             headers = {"Accept:text/plain"}
     )
+    @LogEnabled(false)
     String testPath(@Var("path") String path);
 
     @Get(

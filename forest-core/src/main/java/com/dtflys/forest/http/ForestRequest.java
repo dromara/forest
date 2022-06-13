@@ -2362,8 +2362,9 @@ public class ForestRequest<T> implements HasURL {
      * 后端客户端对象缓存 Key
      *
      * @return 缓存 Key 字符串
+     * @since 1.5.23
      */
-    public String clientCacheKey() {
+    public String clientKey() {
         Integer timeout = getTimeout();
         Integer connectTimeout = connectTimeout();
         Integer readTimeout = readTimeout();
@@ -2374,22 +2375,24 @@ public class ForestRequest<T> implements HasURL {
             readTimeout = timeout;
         }
         StringBuilder builder = new StringBuilder();
-        builder.append("ok;cto=")
+        builder.append("-t=")
                 .append(connectTimeout)
-                .append(",rto=")
+                .append("-")
                 .append(readTimeout);
 
         if (isSSL()) {
             if (sslSocketFactoryBuilder != null) {
-                builder.append(",-").append(Objects.hash(sslSocketFactoryBuilder));
+                builder.append(",-sf=").append(Objects.hash(sslSocketFactoryBuilder));
             }
             if (keyStore != null) {
                 builder.append(",-ks=").append(keyStore.getId());
+            } else if (sslProtocol != null) {
+                builder.append(",-sp=").append(sslProtocol);
             }
         }
 
         if (proxy != null) {
-            builder.append(",-px=").append(proxy.getHost() + ":" + proxy.getPort());
+            builder.append(",-x=").append(proxy.getHost() + ":" + proxy.getPort());
         }
 
         return builder.toString();

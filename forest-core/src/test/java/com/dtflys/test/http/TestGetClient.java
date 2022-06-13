@@ -1,5 +1,6 @@
 package com.dtflys.test.http;
 
+import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.backend.ContentType;
@@ -96,6 +97,22 @@ public class TestGetClient extends BaseClientTest {
                 .assertPathEquals("/hello/user")
                 .assertQueryEquals("username", "foo");
 */
+    }
+
+
+    @Test
+    public void performance() {
+        int count = 10000;
+        for (int i = 0; i < count; i++) {
+            server.enqueue(new MockResponse().setBody(EXPECTED));
+        }
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        for (int i = 0; i < count; i++) {
+            getClient.testPath("abc");
+        }
+        stopWatch.stop();
+        System.out.println("总耗时: " + stopWatch.getTotalTimeMillis() + "ms");
     }
 
     @Test

@@ -8,17 +8,13 @@ import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.TimeUtils;
-import okhttp3.OkHttpClient;
 import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthSchemeProvider;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CookieStore;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.config.Lookup;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
@@ -27,11 +23,6 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.protocol.HttpContext;
-
-import javax.net.ssl.SSLPeerUnverifiedException;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -60,13 +51,14 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
             tsConnectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
             tsConnectionManager.setMaxTotal(maxConnections);
             tsConnectionManager.setDefaultMaxPerRoute(maxRouteConnections);
+            tsConnectionManager.setValidateAfterInactivity(60);
         } catch (Throwable th) {
             throw new ForestRuntimeException(th);
         }
     }
 
     public HttpClient getHttpClient(ForestRequest request) {
-        String key = "hc;" + request.clientCacheKey();
+        String key = "hc;" + request.clientKey();
         HttpClient client = request.getRoute().getBackendClient(key);
         if (client != null && !request.isDownloadFile()) {
             return client;
@@ -95,11 +87,12 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
         // 设置从连接池获取连接实例的超时
 //        configBuilder.setConnectionRequestTimeout(-1);
         // 在提交请求之前 测试连接是否可用
-        configBuilder.setStaleConnectionCheckEnabled(true);
+//        configBuilder.setStaleConnectionCheckEnabled(true);
         // 设置Cookie策略
-        configBuilder.setCookieSpec(CookieSpecs.STANDARD);
+        configBuilder.setCookieSpec(CookieSpecs.IGNORE_COOKIES);
         // 禁止自动重定向
         configBuilder.setRedirectsEnabled(false);
+
 
         ForestProxy forestProxy = request.getProxy();
         if (forestProxy != null) {
