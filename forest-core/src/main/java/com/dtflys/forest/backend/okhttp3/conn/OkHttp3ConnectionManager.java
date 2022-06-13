@@ -106,20 +106,43 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
         return protocols;
     }
 
+    private String getCacheKey(Integer connectTimeout, Integer readTimeout) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("ok;cto=")
+                .append(connectTimeout)
+                .append(",rto=")
+                .append(readTimeout);
+        return builder.toString();
+    }
+
+
     public OkHttpClient getClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         Integer timeout = request.getTimeout();
         Integer connectTimeout = request.connectTimeout();
         Integer readTimeout = request.readTimeout();
+        Integer writeTimeout = request.readTimeout();
         if (TimeUtils.isNone(connectTimeout)) {
             connectTimeout = timeout;
         }
         if (TimeUtils.isNone(readTimeout)) {
             readTimeout = timeout;
         }
+
+        if (TimeUtils.isNone(writeTimeout)) {
+            writeTimeout = timeout;
+        }
+
+        String key = getCacheKey(connectTimeout, readTimeout);
+        OkHttpClient client = request.getRoute().getBackendClient(key);
+        if (client != null && !request.isDownloadFile()) {
+            return client;
+        }
+
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .connectionPool(pool)
                 .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
                 .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
+                .writeTimeout(writeTimeout, TimeUnit.MILLISECONDS)
                 .protocols(getProtocols(request))
                 .followRedirects(false)
                 .followSslRedirects(false);
@@ -159,7 +182,9 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
                     .build();
         });
 
-        return builder.build();
+        client = builder.build();
+        request.getRoute().cacheBackendClient(key, client);
+        return client;
     }
 
     @Override
