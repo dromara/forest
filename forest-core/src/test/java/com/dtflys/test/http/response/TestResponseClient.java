@@ -2,6 +2,8 @@ package com.dtflys.test.http.response;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.http.ForestCookie;
+import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestHeader;
 import com.dtflys.forest.http.ForestHeaderMap;
 import com.dtflys.forest.http.ForestResponse;
@@ -12,6 +14,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -43,18 +46,24 @@ public class TestResponseClient extends BaseClientTest {
     @Test
     public void testHeaders() {
         server.enqueue(new MockResponse()
-                .addHeader("Set-Cookie", "A=1; path=/; domain=localhost; expires= Wednesday, 19-OCT-05 23:12:40 GMT; [secure]")
-                .addHeader("Set-Cookie", "B=2; path=/; domain=localhost; expires= Wednesday, 19-OCT-05 23:12:40 GMT; [secure]")
+                .addHeader("Set-Cookie", "A=1; path=/; domain=localhost; expires= Wednesday, 19-OCT-2105 23:12:40 GMT; secure")
+                .addHeader("Set-Cookie", "B=2; path=/; domain=localhost; expires= Wednesday, 19-OCT-2105 23:12:40 GMT; secure")
                 .setBody(EXPECTED));
         ForestResponse<String> response = responseClient.getResponseHeaders();
         assertThat(response.isSuccess()).isTrue();
-        ForestHeaderMap headers = response.getHeaders();
-        assertThat(headers).isNotNull();
-        assertThat(headers.size()).isGreaterThan(2);
-        List<String> values = headers.getValues("Set-Cookie");
-        assertThat(values.size()).isEqualTo(2);
-        assertThat(values.get(0)).isEqualTo("A=1; path=/; domain=localhost; expires= Wednesday, 19-OCT-05 23:12:40 GMT; [secure]");
-        assertThat(values.get(1)).isEqualTo("B=2; path=/; domain=localhost; expires= Wednesday, 19-OCT-05 23:12:40 GMT; [secure]");
+        List<ForestCookie> cookies = response.getCookies();
+        assertThat(cookies).isNotNull();
+        assertThat(cookies.size()).isEqualTo(2);
+        assertThat(cookies.get(0).getName()).isEqualTo("A");
+        assertThat(cookies.get(0).getValue()).isEqualTo("1");
+        assertThat(cookies.get(0).getPath()).isEqualTo("/");
+        assertThat(cookies.get(0).isSecure()).isTrue();
+        assertThat(cookies.get(0).isExpired(new Date())).isFalse();
+        assertThat(cookies.get(1).getName()).isEqualTo("B");
+        assertThat(cookies.get(1).getValue()).isEqualTo("2");
+        assertThat(cookies.get(1).getPath()).isEqualTo("/");
+        assertThat(cookies.get(1).isSecure()).isTrue();
+        assertThat(cookies.get(1).isExpired(new Date())).isFalse();
     }
 
 }

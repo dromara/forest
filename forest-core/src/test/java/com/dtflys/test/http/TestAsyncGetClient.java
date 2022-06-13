@@ -1,5 +1,6 @@
 package com.dtflys.test.http;
 
+import com.dtflys.forest.backend.AsyncHttpExecutor;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestNetworkException;
@@ -58,6 +59,7 @@ public class TestAsyncGetClient extends BaseClientTest {
         super(backend, configuration);
         configuration.setVariableValue("port", server.getPort());
         getClient = configuration.createInstance(GetClient.class);
+        AsyncHttpExecutor.restartPool();
     }
 
     @Test

@@ -1,6 +1,5 @@
 package com.dtflys.forest.backend;
 
-import com.dtflys.forest.backend.httpclient.response.HttpclientForestResponseFactory;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
@@ -149,6 +148,30 @@ public class AsyncHttpExecutor implements HttpExecutor {
     @Override
     public void close() {
 
+    }
+
+    /**
+     * 关闭异步请求线程池
+     *
+     * @since 1.5.23
+     */
+    public static synchronized void closePool() {
+        if (pool != null) {
+            pool.shutdown();
+        }
+    }
+
+
+    /**
+     * 重启异步请求线程池
+     *
+     * @since 1.5.23
+     */
+    public static synchronized void restartPool() {
+        if (pool != null) {
+            pool.shutdown();
+            pool = null;
+        }
     }
 }
 

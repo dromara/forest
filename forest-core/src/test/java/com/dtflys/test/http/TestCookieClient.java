@@ -12,6 +12,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
@@ -56,8 +57,12 @@ public class TestCookieClient extends BaseClientTest {
                 .setHeader(HttpHeaders.ACCEPT, "text/plain")
                 .setHeader("Set-Cookie", "cookie_foo=cookie_bar"));
         AtomicReference<ForestCookie> cookieAtomic = new AtomicReference<>(null);
-        ForestResponse response = cookieClient.testLoginWithCallback((request, cookies) ->
-                cookieAtomic.set(cookies.allCookies().get(0)));
+        AtomicInteger saveCount = new AtomicInteger(0);
+        AtomicInteger loadCount = new AtomicInteger(0);
+        ForestResponse response = cookieClient.testLoginWithCallback((request, cookies) -> {
+                cookieAtomic.set(cookies.allCookies().get(0));
+                saveCount.incrementAndGet();
+        });
         assertThat(response).isNotNull();
         assertThat(response.getCookies()).isNotNull();
         assertThat(response.getCookies().size()).isEqualTo(1);
@@ -66,6 +71,7 @@ public class TestCookieClient extends BaseClientTest {
         assertThat(resCookie.getName()).isEqualTo("cookie_foo");
         assertThat(resCookie.getValue()).isEqualTo("cookie_bar");
         assertThat(resCookie.getDomain()).isNotNull().isEqualTo("localhost");
+        assertThat(saveCount.get()).isEqualTo(1);
 
         ForestCookie cookie = cookieAtomic.get();
         assertThat(cookie)
@@ -98,14 +104,19 @@ public class TestCookieClient extends BaseClientTest {
             ForestCookie pathCookie = new ForestCookie("name", "path");
             pathCookie.setPath("/test");
             cookies.addCookie(pathCookie);
+            ForestCookie pathCookie2 = new ForestCookie("name", "path2");
+            pathCookie2.setPath("/test/");
+            cookies.addCookie(pathCookie2);
+            loadCount.incrementAndGet();
         }))
             .isNotNull()
             .extracting(ForestResponse::getStatusCode, ForestResponse::getResult)
             .contains(200, EXPECTED);
+        assertThat(loadCount.get()).isEqualTo(1);
         mockRequest(server)
             .assertMethodEquals("POST")
-            .assertPathEquals("/test")
-            .assertHeaderEquals("Cookie", "cookie_foo=cookie_bar; attr1=foo; attr2=bar; name=path");
+            .assertPathEquals("/test/xxx")
+            .assertHeaderEquals("Cookie", "cookie_foo=cookie_bar; attr1=foo; attr2=bar; name=path; name=path2");
     }
 
     @Test

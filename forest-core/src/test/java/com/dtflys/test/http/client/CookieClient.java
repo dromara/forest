@@ -19,7 +19,7 @@ public interface CookieClient {
     ForestResponse testLoginWithCallback(OnSaveCookie onSaveCookie);
 
     @Post(
-            url = "http://localhost:${port}/test",
+            url = "http://localhost:${port}/test/xxx",
             headers = {"Accept:text/plain"}
     )
     ForestResponse<String> testCookieWithCallback(OnLoadCookie onLoadCookie);

@@ -64,7 +64,7 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
         }
     }
 
-    public HttpClient getHttpClient(ForestRequest request, CookieStore cookieStore) {
+    public HttpClient getHttpClient(ForestRequest request) {
         HttpClientBuilder builder = HttpClients.custom();
         builder.setConnectionManager(tsConnectionManager);
 
@@ -109,13 +109,7 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
                 builder.setDefaultCredentialsProvider(provider);
             }
             configBuilder.setProxy(proxy);
-
         }
-        if (cookieStore != null) {
-            builder.setDefaultCookieStore(cookieStore);
-        }
-
-
         RequestConfig requestConfig = configBuilder.build();
         HttpClient httpClient = builder
                 .setDefaultRequestConfig(requestConfig)

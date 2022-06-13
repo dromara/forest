@@ -21,7 +21,6 @@ public interface HttpclientRequestSender {
                      HttpclientResponseHandler responseHandler,
                      HttpUriRequest httpRequest,
                      LifeCycleHandler lifeCycleHandler,
-                     CookieStore cookieStore,
                      Date startDate) throws IOException;
 
 }

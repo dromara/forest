@@ -42,16 +42,10 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
         super(connectionManager, request);
     }
 
-    protected HttpClient getHttpClient(CookieStore cookieStore) {
-        HttpClient client = connectionManager.getHttpClient(request, cookieStore);
-        setupHttpClient(client);
+    protected HttpClient getHttpClient() {
+        HttpClient client = connectionManager.getHttpClient(request);
         return client;
     }
-
-    protected void setupHttpClient(HttpClient client) {
-    }
-
-
 
     public void logResponse(ForestResponse response) {
         LogConfiguration logConfiguration = request.getLogConfiguration();
@@ -77,13 +71,13 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             ForestRequest request, AbstractHttpExecutor executor,
             HttpclientResponseHandler responseHandler,
             HttpUriRequest httpRequest, LifeCycleHandler lifeCycleHandler,
-            CookieStore cookieStore, Date startDate)  {
+            Date startDate)  {
         HttpResponse httpResponse = null;
         ForestResponse response = null;
         HttpContext httpContext = new BasicHttpContext();
         httpContext.setAttribute("REQUEST", request);
         HttpClientContext httpClientContext = HttpClientContext.adapt(httpContext);
-        client = getHttpClient(cookieStore);
+        client = getHttpClient();
         ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
         try {
             logRequest(request.getCurrentRetryCount(), (HttpRequestBase) httpRequest);
@@ -134,9 +128,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             return;
         }
 
-
         try {
-            lifeCycleHandler.handleSaveCookie(request, getCookiesFromHttpCookieStore(cookieStore));
             responseHandler.handleSync(httpResponse, response);
         } catch (Exception ex) {
             if (ex instanceof ForestRuntimeException) {

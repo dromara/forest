@@ -40,7 +40,6 @@ public class HttpclientExecutor extends AbstractHttpExecutor {
     private final HttpclientResponseHandler httpclientResponseHandler;
     private HttpUriRequest httpRequest;
     private BodyBuilder<HttpUriRequest> bodyBuilder;
-    private CookieStore cookieStore;
 
     protected HttpUriRequest buildRequest() {
         String url = buildUrl();
@@ -62,7 +61,6 @@ public class HttpclientExecutor extends AbstractHttpExecutor {
     protected void prepare(LifeCycleHandler lifeCycleHandler) {
         httpRequest = buildRequest();
         prepareBodyBuilder();
-        prepareCookies(lifeCycleHandler);
         prepareHeaders();
         prepareBody(lifeCycleHandler);
     }
@@ -99,23 +97,6 @@ public class HttpclientExecutor extends AbstractHttpExecutor {
         }
     }
 
-    public void prepareCookies(LifeCycleHandler lifeCycleHandler) {
-        cookieStore = new BasicCookieStore();
-        ForestCookies cookies = new ForestCookies();
-        lifeCycleHandler.handleLoadCookie(request, cookies);
-        for (ForestCookie cookie : cookies) {
-            BasicClientCookie httpCookie = new BasicClientCookie(
-                    cookie.getName(),
-                    cookie.getValue()
-            );
-            httpCookie.setDomain(cookie.getDomain());
-            httpCookie.setPath(cookie.getPath());
-            httpCookie.setSecure(cookie.isSecure());
-            httpCookie.setExpiryDate(new Date(cookie.getExpiresTime()));
-            cookieStore.addCookie(httpCookie);
-        }
-    }
-
     public void prepareBody(LifeCycleHandler lifeCycleHandler) {
         bodyBuilder.buildBody(httpRequest, request, lifeCycleHandler);
     }
@@ -134,7 +115,6 @@ public class HttpclientExecutor extends AbstractHttpExecutor {
                     httpclientResponseHandler,
                     httpRequest,
                     lifeCycleHandler,
-                    cookieStore,
                     startDate);
         } catch (IOException e) {
             httpRequest.abort();
