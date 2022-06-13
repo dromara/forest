@@ -3547,6 +3547,20 @@ public class ForestRequest<T> {
      * 添加拦截器到该请求中
      * <p>拦截器在请求的初始化、发送请求前、发送成功、发送失败等生命周期中都会被调用
      *
+     * @param interceptorClass 拦截器类，{@link Interceptor}接口类
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest<T> addInterceptor(Class<? extends Interceptor> interceptorClass) {
+        Interceptor interceptor = configuration.getInterceptorFactory().getInterceptor(interceptorClass);
+        interceptorChain.addInterceptor(interceptor);
+        return this;
+    }
+
+
+    /**
+     * 添加拦截器到该请求中
+     * <p>拦截器在请求的初始化、发送请求前、发送成功、发送失败等生命周期中都会被调用
+     *
      * @param interceptor 拦截器，{@link Interceptor}接口实例
      * @return {@link ForestRequest}类实例
      */

@@ -4,13 +4,17 @@ import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestAddress;
 import com.dtflys.forest.http.ForestHeader;
 import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.http.ForestRequestType;
+import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestURL;
+import com.dtflys.forest.interceptor.Interceptor;
+import com.dtflys.forest.interceptor.InterceptorChain;
 import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.test.http.BaseClientTest;
+import com.dtflys.test.interceptor.BaseInterceptor;
 import com.dtflys.test.model.Result;
 import com.google.common.collect.Lists;
 import okhttp3.mockwebserver.MockResponse;
@@ -23,10 +27,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,9 +39,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.entry;
-import static org.assertj.core.api.AssertionsForClassTypes.linesOf;
 
 public class TestGenericForestClient extends BaseClientTest {
 
@@ -1109,5 +1110,43 @@ public class TestGenericForestClient extends BaseClientTest {
         assertThat(isError.get()).isTrue();
         assertThat(request.getCurrentRetryCount()).isEqualTo(3);
     }
+
+    @Test
+    public void testRequest_post_add_interceptor() {
+        InterceptorChain interceptorChain = Forest.post("http://localhost:" + server.getPort() + "/post")
+                .addInterceptor(TestInterceptor.class)
+                .getInterceptorChain();
+        assertThat(interceptorChain).isNotNull();
+        assertThat(interceptorChain.getInterceptorSize()).isEqualTo(2);
+        assertFalse(interceptorChain.beforeExecute(null));
+        assertTrue(inter3Before.get());
+    }
+
+   static final AtomicBoolean inter3Before = new AtomicBoolean(false);
+
+   public static class TestInterceptor implements Interceptor {
+
+        public TestInterceptor(){}
+
+        @Override
+        public boolean beforeExecute(ForestRequest request) {
+            inter3Before.set(true);
+            return false;
+        }
+
+        @Override
+        public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
+        }
+
+        @Override
+        public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
+        }
+
+        @Override
+        public void afterExecute(ForestRequest request, ForestResponse response) {
+        }
+    }
+
+
 
 }
