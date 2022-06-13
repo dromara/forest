@@ -1,26 +1,26 @@
 package com.dtflys.forest.lifecycles.file;
 
+import com.dtflys.forest.ForestGenericClient;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.extensions.DownloadFile;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.logging.ForestLogHandler;
-import com.dtflys.forest.logging.ForestLogger;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.reflection.ForestMethod;
-import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
 
 /**
  * 文件下载生命周期
@@ -43,6 +43,33 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
         Type resultType = method.getResultType();
         addAttribute(request, "__resultType", resultType);
         request.setDownloadFile(true);
+    }
+
+
+    @Override
+    public boolean beforeExecute(ForestRequest request) {
+        if (request.getMethod().getMethod().getDeclaringClass() == ForestGenericClient.class) {
+            Type resultType = getResultType(request.getLifeCycleHandler().getResultType());
+            addAttribute(request, "__resultType", resultType);
+            request.setDownloadFile(true);
+        }
+        return true;
+    }
+
+    private Type getResultType(Type type) {
+        if (type == null) {
+            return Void.class;
+        }
+        Class clazz = ReflectUtils.toClass(type);
+        if (ForestResponse.class.isAssignableFrom(clazz)) {
+            if (type instanceof ParameterizedType) {
+                Type[] types = ((ParameterizedType) type).getActualTypeArguments();
+                if (types.length > 0) {
+                    return types[0];
+                }
+            }
+        }
+        return type;
     }
 
     @Override

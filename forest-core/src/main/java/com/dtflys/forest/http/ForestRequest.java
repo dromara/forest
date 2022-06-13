@@ -25,27 +25,36 @@
 package com.dtflys.forest.http;
 
 import com.dtflys.forest.backend.ContentType;
-import com.dtflys.forest.backend.httpclient.response.HttpclientForestResponseFactory;
+import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.forest.backend.HttpExecutor;
+import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.callback.OnRedirection;
 import com.dtflys.forest.callback.OnRetry;
 import com.dtflys.forest.callback.OnSaveCookie;
+import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.callback.RetryWhen;
 import com.dtflys.forest.callback.SuccessWhen;
+import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestAsyncAbortException;
 import com.dtflys.forest.exceptions.ForestRetryException;
+import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
+import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.body.ByteArrayRequestBody;
 import com.dtflys.forest.http.body.FileRequestBody;
 import com.dtflys.forest.http.body.InputStreamRequestBody;
 import com.dtflys.forest.http.body.NameValueRequestBody;
 import com.dtflys.forest.http.body.ObjectRequestBody;
 import com.dtflys.forest.http.body.StringRequestBody;
+import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
+import com.dtflys.forest.interceptor.InterceptorChain;
+import com.dtflys.forest.lifecycles.file.DownloadLifeCycle;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.RequestLogMessage;
 import com.dtflys.forest.mapping.MappingURLTemplate;
@@ -59,15 +68,6 @@ import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
 import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
-import com.dtflys.forest.callback.OnError;
-import com.dtflys.forest.callback.OnSuccess;
-import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.backend.HttpBackend;
-import com.dtflys.forest.backend.HttpExecutor;
-import com.dtflys.forest.handler.LifeCycleHandler;
-import com.dtflys.forest.interceptor.Interceptor;
-import com.dtflys.forest.interceptor.InterceptorChain;
 import com.dtflys.forest.ssl.SSLSocketFactoryBuilder;
 import com.dtflys.forest.ssl.SSLUtils;
 import com.dtflys.forest.ssl.TrustAllHostnameVerifier;
@@ -88,11 +88,20 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-import static com.dtflys.forest.mapping.MappingParameter.*;
+import static com.dtflys.forest.mapping.MappingParameter.TARGET_BODY;
+import static com.dtflys.forest.mapping.MappingParameter.TARGET_HEADER;
+import static com.dtflys.forest.mapping.MappingParameter.TARGET_QUERY;
 
 /**
  * Forest请求对象
@@ -3353,6 +3362,29 @@ public class ForestRequest<T> {
         return this;
     }
 
+
+    /**
+     * 设置该请求是否下载文件
+     *
+     * @param dir      文件下载目录
+     * @param filename 文件名
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest<T> setDownloadFile(String dir, String filename) {
+        if (StringUtils.isNotBlank(dir)) {
+            this.addInterceptor(DownloadLifeCycle.class);
+            // 当map达到当前最大容量的0.75时会扩容,大小设置为4且塞入两个键值对不会进行扩容
+            Map<String, Object> downloadFileMap = new HashMap<>(4);
+            downloadFileMap.put("dir", dir);
+            downloadFileMap.put("filename", filename != null ? filename : "");
+            InterceptorAttributes attributes = new InterceptorAttributes(DownloadLifeCycle.class, downloadFileMap);
+            attributes.render(new Object[0]);
+            this.addInterceptorAttributes(DownloadLifeCycle.class, attributes);
+        }
+        return this;
+    }
+
+
     /**
      * 获取上传/下载进度监听的步长
      * <p>
@@ -3551,6 +3583,10 @@ public class ForestRequest<T> {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> addInterceptor(Class<? extends Interceptor> interceptorClass) {
+        if (!Interceptor.class.isAssignableFrom(interceptorClass) || interceptorClass.isInterface()) {
+            throw new ForestRuntimeException("Class [" + interceptorClass.getName() + "] is not a implement of [" +
+                    Interceptor.class.getName() + "] interface.");
+        }
         Interceptor interceptor = configuration.getInterceptorFactory().getInterceptor(interceptorClass);
         interceptorChain.addInterceptor(interceptor);
         return this;

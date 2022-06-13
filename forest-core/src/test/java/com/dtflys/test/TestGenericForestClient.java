@@ -12,17 +12,25 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestURL;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorChain;
+import com.dtflys.forest.utils.ForestProgress;
 import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.test.http.BaseClientTest;
-import com.dtflys.test.interceptor.BaseInterceptor;
 import com.dtflys.test.model.Result;
 import com.google.common.collect.Lists;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import okio.Buffer;
+import okio.Okio;
+import org.apache.commons.io.IOUtils;
+import org.assertj.core.api.Assertions;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
@@ -37,6 +45,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static junit.framework.Assert.assertFalse;
@@ -1148,5 +1157,68 @@ public class TestGenericForestClient extends BaseClientTest {
     }
 
 
+    public Buffer getImageBuffer() {
+        URL url = this.getClass().getResource("/test-img.jpg");
+        byte[] byteArray = new byte[0];
+        try {
+            byteArray = IOUtils.toByteArray(url);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        Buffer buffer = new Buffer();
+        try {
+            buffer.readFrom(new ByteArrayInputStream(byteArray));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return buffer;
+    }
 
+
+    @Test
+    public void testDownloadFile() throws IOException {
+        Buffer buffer = getImageBuffer();
+        server.enqueue(new MockResponse().setBody(buffer));
+        AtomicReference<ForestProgress> atomicProgress = new AtomicReference<>(null);
+        String dir = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "TestDownload";
+        String filename = "test-img-1.jpg";
+        ForestRequest<?> request = Forest.get("http://localhost:" + server.getPort())
+                .setDownloadFile(dir, "")
+                .setOnProgress(progress -> {
+                    System.out.println("------------------------------------------");
+                    System.out.println("total bytes: " + progress.getTotalBytes());
+                    System.out.println("current bytes: " + progress.getCurrentBytes());
+                    System.out.println("progress: " + Math.round(progress.getRate() * 100) + "%");
+                    if (progress.isDone()) {
+                        atomicProgress.set(progress);
+                    }
+                });
+
+        ForestResponse<File> response = request.execute(new TypeReference<ForestResponse<File>>() {
+        });
+
+        File file = response.getResult();
+        Assertions.assertThat(response)
+                .isNotNull()
+                .extracting(ForestResponse::getStatusCode)
+                .isEqualTo(200);
+
+        Assertions.assertThat(file)
+                .isNotNull()
+                .isFile();
+        ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
+        buffer.readAll(Okio.sink(bytesOut));
+        byte[] out = bytesOut.toByteArray();
+        byte[] fileBytes = IOUtils.toByteArray(new FileInputStream(file));
+        Assertions.assertThat(fileBytes)
+                .hasSize(out.length)
+                .isEqualTo(out);
+        Assertions.assertThat(atomicProgress.get())
+                .isNotNull()
+                .extracting(
+                        ForestProgress::isDone,
+                        ForestProgress::getRate,
+                        ForestProgress::getRequest)
+                .contains(true, 1D, response.getRequest());
+    }
 }
