@@ -33,7 +33,6 @@ import com.dtflys.forest.utils.GzipUtils;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.commons.io.IOUtils;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.SocketTimeoutException;
@@ -46,7 +45,7 @@ import java.util.List;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.1.0
  */
-public abstract class ForestResponse<T> {
+public abstract class ForestResponse<T> implements HasURL {
 
     protected final static int MAX_BYTES_CAPACITY = 1024 * 1024 * 2;
 
@@ -119,7 +118,7 @@ public abstract class ForestResponse<T> {
     /**
      * 请求响应头集合
      */
-    protected volatile ForestHeaderMap headers = new ForestHeaderMap();
+    protected volatile ForestHeaderMap headers = new ForestHeaderMap(this);
 
     /**
      * 请求发送过程中可能产生的异常
@@ -138,6 +137,19 @@ public abstract class ForestResponse<T> {
         this.responseTime = responseTime;
     }
 
+    /**
+     * 获取响应请求的URL
+     *
+     * @return {@link ForestURL}对象实例
+     * @since 1.5.23
+     */
+    @Override
+    public ForestURL url() {
+        if (request == null) {
+            return null;
+        }
+        return request.url();
+    }
 
     /**
      * 获取该响应对象对应的请求对象
@@ -292,6 +304,7 @@ public abstract class ForestResponse<T> {
     public synchronized void setContent(String content) {
         this.content = content;
     }
+
 
     /**
      * 获取反序列化成对象类型的请求响应内容
@@ -600,6 +613,26 @@ public abstract class ForestResponse<T> {
     }
 
     /**
+     * 从响应头中获取Cookie列表
+     *
+     * @return {@link ForestCookie}对象列表
+     */
+    public List<ForestCookie> getCookies() {
+        return headers.getSetCookies();
+    }
+
+    /**
+     * 根据Cookie名称获取Cookie
+     *
+     * @param name Cookie名称
+     * @return {@link ForestCookie}对象实例
+     * @since 1.5.23
+     */
+    public ForestCookie getCookie(String name) {
+        return headers.getSetCookie(name);
+    }
+
+    /**
      * 根据响应头名称获取请求响应头值
      *
      * @param name 响应头名称
@@ -627,6 +660,8 @@ public abstract class ForestResponse<T> {
     public ForestHeaderMap getHeaders() {
         return headers;
     }
+
+
 
     /**
      * 获取请求响应的内容编码字符集

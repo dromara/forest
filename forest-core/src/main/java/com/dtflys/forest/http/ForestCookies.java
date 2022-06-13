@@ -24,6 +24,8 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.utils.StringUtils;
+
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -43,6 +45,10 @@ public class ForestCookies implements Iterable<ForestCookie> {
         this.cookies = new LinkedList<>();
     }
 
+    public ForestCookies(List<ForestCookie> cookies) {
+        this.cookies = cookies;
+    }
+
     /**
      * 获取Cookie集合大小
      *
@@ -50,6 +56,32 @@ public class ForestCookies implements Iterable<ForestCookie> {
      */
     public int size() {
         return cookies.size();
+    }
+
+    /**
+     * 解析请求中的Cookie头信息
+     *
+     * @param content Cookie头信息
+     * @return Cookie集合，{@link ForestCookies}对象实例
+     * @since 1.5.23
+     */
+    public static ForestCookies parse(String content) {
+        ForestCookies cookies = new ForestCookies();
+        if (StringUtils.isBlank(content)) {
+            return cookies;
+        }
+        String[] pairs = content.split(";");
+        for (String pair : pairs) {
+            String[] nameValue = pair.split("=", 2);
+            if (nameValue.length < 2) {
+                continue;
+            }
+            String name = nameValue[0].trim();
+            String value = nameValue[1].trim();
+            ForestCookie cookie = new ForestCookie(name, value);
+            cookies.addCookie(cookie);
+        }
+        return cookies;
     }
 
     /**

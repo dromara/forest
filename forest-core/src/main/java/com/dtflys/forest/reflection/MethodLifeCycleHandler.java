@@ -9,6 +9,7 @@ import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.handler.ResultHandler;
+import com.dtflys.forest.http.ForestCookie;
 import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
@@ -17,6 +18,7 @@ import com.dtflys.forest.utils.ForestProgress;
 import com.dtflys.forest.utils.ReflectUtils;
 
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.concurrent.Future;
 
 /**
@@ -111,10 +113,19 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
         return resultData;
     }
 
+    private void handleSaveCookie(ForestRequest request, ForestResponse response) {
+        List<ForestCookie> cookieList = response.getCookies();
+        if (cookieList != null && cookieList.size() > 0) {
+            ForestCookies cookies = new ForestCookies(response.getCookies());
+            handleSaveCookie(request, cookies);
+        }
+    }
+
 
     @Override
     public Object handleSuccess(Object resultData, ForestRequest request, ForestResponse response) {
         this.response = response;
+        handleSaveCookie(request, response);
         request.getInterceptorChain().onSuccess(resultData, request, response);
         OnSuccess onSuccess = request.getOnSuccess();
         if (onSuccess != null) {
@@ -132,6 +143,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
 
     @Override
     public Object handleError(ForestRequest request, ForestResponse response) {
+        handleSaveCookie(request, response);
         ForestNetworkException networkException = new ForestNetworkException(
                 "", response.getStatusCode(), response);
         return handleError(request, response, networkException);
@@ -140,6 +152,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
     @Override
     public Object handleError(ForestRequest request, ForestResponse response, Throwable ex) {
         this.response = response;
+        handleSaveCookie(request, response);
         ForestRuntimeException e = null;
         if (ex instanceof ForestRuntimeException) {
             e = (ForestRuntimeException) ex;

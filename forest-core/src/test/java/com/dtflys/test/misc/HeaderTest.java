@@ -8,7 +8,7 @@ import java.util.List;
 public class HeaderTest extends TestCase {
 
     public void testHeaders() {
-        ForestHeaderMap headers = new ForestHeaderMap();
+        ForestHeaderMap headers = new ForestHeaderMap(null);
         headers.setHeader("Content-Type", "application/json");
         assertEquals("application/json", headers.getValue("content-type"));
         headers.setHeader("content-type", "application/xml");

@@ -122,51 +122,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
                 .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
                 .protocols(getProtocols(request))
                 .followRedirects(false)
-                .followSslRedirects(false)
-                .cookieJar(new CookieJar() {
-                    @Override
-                    public void saveFromResponse(HttpUrl url, List<Cookie> okCookies) {
-                        ForestCookies cookies = new ForestCookies();
-                        for (Cookie okCookie: okCookies) {
-                            long currentTime = System.currentTimeMillis();
-                            ForestCookie cookie = ForestCookie.createFromOkHttpCookie(currentTime, okCookie);
-                            cookies.addCookie(cookie);
-                        }
-                        lifeCycleHandler.handleSaveCookie(request, cookies);
-                    }
-
-                    @Override
-                    public List<Cookie> loadForRequest(HttpUrl url) {
-                        ForestCookies cookies = new ForestCookies();
-                        lifeCycleHandler.handleLoadCookie(request, cookies);
-                        List<ForestCookie> forestCookies = cookies.allCookies();
-                        List<Cookie> okCookies = new ArrayList<>(forestCookies.size());
-                        for (ForestCookie cookie : forestCookies) {
-                            Duration maxAge = cookie.getMaxAge();
-                            Date createTime = cookie.getCreateTime();
-                            long expiresAt = createTime.getTime() + maxAge.toMillis();
-                            Cookie.Builder cookieBuilder = new Cookie.Builder();
-                            cookieBuilder.name(cookie.getName())
-                                .value(cookie.getValue())
-                                .expiresAt(expiresAt)
-                                .path(cookie.getPath());
-                            if (cookie.isHostOnly()) {
-                                cookieBuilder.hostOnlyDomain(cookie.getDomain());
-                            } else {
-                                cookieBuilder.domain(cookie.getDomain());
-                            }
-                            if (cookie.isHttpOnly()) {
-                                cookieBuilder.httpOnly();
-                            }
-                            if (cookie.isSecure()) {
-                                cookieBuilder.secure();
-                            }
-                            Cookie okCookie = cookieBuilder.build();
-                            okCookies.add(okCookie);
-                        }
-                        return okCookies;
-                    }
-                });
+                .followSslRedirects(false);
 
         // set proxy
         ForestProxy proxy = request.getProxy();

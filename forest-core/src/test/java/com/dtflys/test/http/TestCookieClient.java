@@ -56,7 +56,17 @@ public class TestCookieClient extends BaseClientTest {
                 .setHeader(HttpHeaders.ACCEPT, "text/plain")
                 .setHeader("Set-Cookie", "cookie_foo=cookie_bar"));
         AtomicReference<ForestCookie> cookieAtomic = new AtomicReference<>(null);
-        cookieClient.testLoginWithCallback((request, cookies) -> cookieAtomic.set(cookies.allCookies().get(0)));
+        ForestResponse response = cookieClient.testLoginWithCallback((request, cookies) ->
+                cookieAtomic.set(cookies.allCookies().get(0)));
+        assertThat(response).isNotNull();
+        assertThat(response.getCookies()).isNotNull();
+        assertThat(response.getCookies().size()).isEqualTo(1);
+        ForestCookie resCookie = response.getCookie("cookie_foo");
+        assertThat(resCookie).isNotNull();
+        assertThat(resCookie.getName()).isEqualTo("cookie_foo");
+        assertThat(resCookie.getValue()).isEqualTo("cookie_bar");
+        assertThat(resCookie.getDomain()).isNotNull().isEqualTo("localhost");
+
         ForestCookie cookie = cookieAtomic.get();
         assertThat(cookie)
                 .isNotNull()
@@ -77,6 +87,17 @@ public class TestCookieClient extends BaseClientTest {
 
         assertThat(cookieClient.testCookieWithCallback((request, cookies) -> {
             cookies.addCookie(cookie);
+            cookies.addCookie(new ForestCookie("attr1", "foo"));
+            cookies.addCookie(new ForestCookie("attr2", "bar"));
+            ForestCookie otherDomainCookie = new ForestCookie("name", "otherDomain");
+            otherDomainCookie.setDomain("baidu.com");
+            cookies.addCookie(otherDomainCookie);
+            ForestCookie otherPathCookie = new ForestCookie("name", "otherPath");
+            otherPathCookie.setPath("/xxx/");
+            cookies.addCookie(otherPathCookie);
+            ForestCookie pathCookie = new ForestCookie("name", "path");
+            pathCookie.setPath("/test");
+            cookies.addCookie(pathCookie);
         }))
             .isNotNull()
             .extracting(ForestResponse::getStatusCode, ForestResponse::getResult)
@@ -84,7 +105,7 @@ public class TestCookieClient extends BaseClientTest {
         mockRequest(server)
             .assertMethodEquals("POST")
             .assertPathEquals("/test")
-            .assertHeaderEquals("Cookie", "cookie_foo=cookie_bar");
+            .assertHeaderEquals("Cookie", "cookie_foo=cookie_bar; attr1=foo; attr2=bar; name=path");
     }
 
     @Test

@@ -34,7 +34,7 @@ import java.util.List;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 1.5.0-BETA5
  */
-public class ForestProxy {
+public class ForestProxy implements HasURL {
 
     private final String host;
 
@@ -44,7 +44,7 @@ public class ForestProxy {
 
     private String password;
 
-    private ForestHeaderMap headers = new ForestHeaderMap();
+    private ForestHeaderMap headers = new ForestHeaderMap(this);
 
     public ForestProxy(String ip, int port) {
         this.host = ip;
@@ -178,6 +178,13 @@ public class ForestProxy {
     }
 
 
+    @Override
+    public ForestURL url() {
+        return new ForestURLBuilder()
+                .setHost(host)
+                .setPort(port)
+                .build();
+    }
 }
 
 

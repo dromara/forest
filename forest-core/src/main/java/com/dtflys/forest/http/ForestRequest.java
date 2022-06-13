@@ -109,7 +109,7 @@ import static com.dtflys.forest.mapping.MappingParameter.TARGET_QUERY;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-03-24
  */
-public class ForestRequest<T> {
+public class ForestRequest<T> implements HasURL {
 
     private final static Object[] EMPTY_RENDER_ARGS = new Object[0];
 
@@ -247,7 +247,7 @@ public class ForestRequest<T> {
      * 请求体集合
      * <p>所有本请求对象中的请求头都在由该请求体集合对象管理
      */
-    private ForestHeaderMap headers = new ForestHeaderMap();
+    private ForestHeaderMap headers = new ForestHeaderMap(this);
 
 
     /**
@@ -2968,6 +2968,44 @@ public class ForestRequest<T> {
         return this;
     }
 
+    /**
+     * 添加 Cookie 到请求中
+     *
+     * @param cookie {@link ForestCookie}对象实例
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.23
+     */
+    public ForestRequest<T> addCookie(ForestCookie cookie) {
+        this.headers.addCookie(cookie);
+        return this;
+    }
+
+    /**
+     * 批量添加 Cookie 到请求中
+     *
+     * @param cookies {@link ForestCookie}对象列表
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.23
+     */
+    public ForestRequest<T> addCookies(List<ForestCookie> cookies) {
+        this.headers.addCookies(cookies);
+        return this;
+    }
+
+
+    /**
+     * 批量添加 Cookie 到请求中
+     *
+     * @param cookies {@link ForestCookies}对象实例
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.23
+     */
+    public ForestRequest<T> addCookies(ForestCookies cookies) {
+        this.headers.addCookies(cookies);
+        return this;
+    }
+
+
     public List<ForestMultipart> getMultiparts() {
         return multiparts;
     }
@@ -4178,6 +4216,9 @@ public class ForestRequest<T> {
         // 执行 beforeExecute
         if (interceptorChain.beforeExecute(this)) {
             this.url.mergeAddress().checkAndComplete();
+            ForestCookies cookies = new ForestCookies();
+            lifeCycleHandler.handleLoadCookie(this, cookies);
+            this.addCookies(cookies);
             // 从后端HTTP框架创建HTTP请求执行器
             HttpExecutor executor  = backend.createExecutor(this, lifeCycleHandler);
             if (executor != null) {

@@ -39,12 +39,12 @@ import static okhttp3.internal.Util.verifyAsIpAddress;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.5.0-RC1
  */
-public class ForestCookie implements Serializable {
+public class ForestCookie implements Cloneable, Serializable {
 
     /**
      * Cookie名称
      */
-    private final String name;
+    private String name;
 
     /**
      * Cookie内容
@@ -54,42 +54,54 @@ public class ForestCookie implements Serializable {
     /**
      * 创建时间
      */
-    private final Date createTime;
+    private Date createTime;
 
     /**
      * 最大时长
      */
-    private final Duration maxAge;
+    private Duration maxAge;
 
     /**
      * 域名
      */
-    private final String domain;
+    private String domain;
 
     /**
      * 路径
      */
-    private final String path;
+    private String path;
 
     /**
      * 是否仅限HTTPS
      */
-    private final boolean secure;
+    private boolean secure;
 
     /**
      * 是否仅限HTTP方式读取
      */
-    private final boolean httpOnly;
+    private boolean httpOnly;
 
     /**
      * 是否仅限主机名匹配
      */
-    private final boolean hostOnly;
+    private boolean hostOnly;
 
     /**
      * 是否持久化
      */
-    private final boolean persistent;
+    private boolean persistent;
+
+    /**
+     * Forest Cookie 构造函数
+     *
+     * @param name Cookie名
+     * @param value Cookie值
+     * @author gongjun[dt_flys@hotmail.com]
+     * @since 1.5.23
+     */
+    public ForestCookie(String name, String value) {
+        this(name, value, new Date(), Duration.ofMillis(Long.MAX_VALUE), null, "/", false, false, true, false);
+    }
 
     public ForestCookie(String name, String value, Date createTime, Duration maxAge, String domain, String path, boolean secure, boolean httpOnly, boolean hostOnly, boolean persistent) {
         this.name = name;
@@ -108,43 +120,102 @@ public class ForestCookie implements Serializable {
         return name;
     }
 
+    public ForestCookie setName(String name) {
+        this.name = name;
+        return this;
+    }
+
     public String getValue() {
         return value;
+    }
+
+    public ForestCookie setValue(String value) {
+        this.value = value;
+        return this;
     }
 
     public Date getCreateTime() {
         return createTime;
     }
 
+    public ForestCookie setCreateTime(Date createTime) {
+        this.createTime = createTime;
+        return this;
+    }
+
     public Duration getMaxAge() {
         return maxAge;
+    }
+
+    public ForestCookie setMaxAge(Duration maxAge) {
+        this.maxAge = maxAge;
+        return this;
     }
 
     public String getDomain() {
         return domain;
     }
 
+    public ForestCookie setDomain(String domain) {
+        if (domain == null) {
+            throw new NullPointerException("[Forest] cookie domain is null");
+        }
+        this.domain = domain;
+        return this;
+    }
+
     public String getPath() {
         return path;
+    }
+
+    public ForestCookie setPath(String path) {
+        if (!path.startsWith("/")) {
+            throw new IllegalArgumentException("[Forest] cookie path must start with '/'");
+        }
+        this.path = path;
+        return this;
     }
 
     public boolean isSecure() {
         return secure;
     }
 
+    public ForestCookie setSecure(boolean secure) {
+        this.secure = secure;
+        return this;
+    }
+
     public boolean isHttpOnly() {
         return httpOnly;
+    }
+
+    public ForestCookie setHttpOnly(boolean httpOnly) {
+        this.httpOnly = httpOnly;
+        return this;
     }
 
     public boolean isHostOnly() {
         return hostOnly;
     }
 
+    public ForestCookie setHostOnly(boolean hostOnly) {
+        this.hostOnly = hostOnly;
+        return this;
+    }
+
     public boolean isPersistent() {
         return persistent;
     }
 
+    public ForestCookie setPersistent(boolean persistent) {
+        this.persistent = persistent;
+        return this;
+    }
+
     public static boolean matchDomain(String leftDomain, String rightDomain) {
+        if (leftDomain == null) {
+            return true;
+        }
         if (leftDomain.equals(rightDomain)) {
             return true;
         }
@@ -178,6 +249,18 @@ public class ForestCookie implements Serializable {
             return urlPath.charAt(cookiePath.length()) == '/';
         }
         return false;
+    }
+
+    /**
+     * 匹配URL
+     *
+     * @param url {@link ForestURL}对象实例
+     * @return  {@code true}: 匹配, {@code false}: 不匹配
+     */
+    public boolean matchURL(ForestURL url) {
+        if (!matchDomain(url.getHost())) return false;
+        if (!matchPath(url.getPath())) return false;
+        return true;
     }
 
     /**
@@ -268,6 +351,28 @@ public class ForestCookie implements Serializable {
             return Long.MAX_VALUE;
         }
         return createTime.getTime() + maxAge.toMillis();
+    }
+
+    /**
+     * 克隆Cookie对象
+     *
+     * @return {@link ForestCookie}对象实例
+     * @since 1.5.23
+     */
+    @Override
+    public ForestCookie clone() {
+        return new ForestCookie(
+                name,
+                value,
+                createTime,
+                maxAge,
+                domain,
+                path,
+                secure,
+                httpOnly,
+                hostOnly,
+                persistent
+        );
     }
 
 
