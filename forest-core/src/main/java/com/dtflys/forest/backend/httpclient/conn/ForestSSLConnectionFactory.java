@@ -49,7 +49,12 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
     private SSLConnectionSocketFactory getSslConnectionSocketFactory(ForestRequest request) {
         SSLSocketFactory sslSocketFactory = request.getSSLSocketFactory();
         SSLKeyStore keyStore = request.getKeyStore();
-        SSLConnectionSocketFactory factory = new SSLConnectionSocketFactory(sslSocketFactory, keyStore == null ? null : keyStore.getProtocols(), keyStore == null ? null : keyStore.getCipherSuites(), request.hostnameVerifier());
+        SSLConnectionSocketFactory factory =
+                new SSLConnectionSocketFactory(
+                        sslSocketFactory,
+                        keyStore == null ? null : keyStore.getProtocols(),
+                        keyStore == null ? null : keyStore.getCipherSuites(),
+                        request.hostnameVerifier());
         return factory;
     }
 

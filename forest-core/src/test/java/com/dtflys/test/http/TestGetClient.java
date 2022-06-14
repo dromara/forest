@@ -31,6 +31,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static org.assertj.core.api.Assertions.*;
@@ -100,7 +103,7 @@ public class TestGetClient extends BaseClientTest {
     }
 
 
-    @Test
+//    @Test
     public void performance() {
         int count = 10000;
         for (int i = 0; i < count; i++) {
@@ -114,6 +117,28 @@ public class TestGetClient extends BaseClientTest {
         stopWatch.stop();
         System.out.println("总耗时: " + stopWatch.getTotalTimeMillis() + "ms");
     }
+
+//    @Test
+    public void performance_concurrent() throws InterruptedException {
+        int count = 10000;
+        for (int i = 0; i < count; i++) {
+            server.enqueue(new MockResponse().setBody(EXPECTED));
+        }
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        final CountDownLatch latch = new CountDownLatch(count);
+        ExecutorService service = Executors.newFixedThreadPool(80);
+        for (int i = 0; i < count; i++) {
+            service.submit(() -> {
+                getClient.testPath("abc");
+                latch.countDown();
+            });
+        }
+        latch.await();
+        stopWatch.stop();
+        System.out.println("总耗时: " + stopWatch.getTotalTimeMillis() + "ms");
+    }
+
 
     @Test
     public void testGet3() {
