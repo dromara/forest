@@ -22,4 +22,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 public @interface HttpClient {
+
+    /**
+     * 后端 HttpClient 工厂
+     * @since 1.5.23
+     */
+    Class<? extends HttpClientFactory> factory() default HttpClientFactory.class;
 }
