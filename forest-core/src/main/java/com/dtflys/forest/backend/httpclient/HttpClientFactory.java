@@ -1,5 +1,6 @@
 package com.dtflys.forest.backend.httpclient;
 
+import com.dtflys.forest.backend.BackendClientFactory;
 import org.apache.http.client.HttpClient;
 
 /**
@@ -8,8 +9,6 @@ import org.apache.http.client.HttpClient;
  * @author dt_flys[dt_flys@hotmail.com]
  * @since 1.5.23
  */
-public interface HttpClientFactory {
-
-    HttpClient getClient();
+public interface HttpClientFactory extends BackendClientFactory<HttpClient> {
 
 }

@@ -1,6 +1,6 @@
 package com.dtflys.forest.backend.okhttp3;
 
-import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.backend.BackendClientFactory;
 import okhttp3.OkHttpClient;
 
 /**
@@ -9,13 +9,7 @@ import okhttp3.OkHttpClient;
  * @author dt_flys[dt_flys@hotmail.com]
  * @since 1.5.23
  */
-public interface OkHttpClientFactory {
+public interface OkHttpClientFactory extends BackendClientFactory<OkHttpClient> {
 
-    /**
-     * 获取 OkHttpClient 对象
-     *
-     * @return {@link OkHttpClient}对象实例
-     */
-    OkHttpClient getClient(ForestRequest request);
 
 }

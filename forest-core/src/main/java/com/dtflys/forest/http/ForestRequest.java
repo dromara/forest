@@ -136,6 +136,13 @@ public class ForestRequest<T> implements HasURL {
      */
     private HttpBackend backend;
 
+    /**
+     * HTTP后端Client对象或对象工厂
+     *
+     * @since 1.5.23
+     */
+    private Object backendClient;
+
 
     /**
      * 生命周期处理器
@@ -1081,7 +1088,7 @@ public class ForestRequest<T> implements HasURL {
     }
 
     /**
-     * 设置HTTP后端框架
+     * 设置 HTTP 后端框架
      * <p>同 {@link ForestRequest#setBackend(String)}
      *
      * @param backendName Forest后端框架名称
@@ -1092,6 +1099,21 @@ public class ForestRequest<T> implements HasURL {
         return setBackend(backendName);
     }
 
+
+    /**
+     * 获取 HTTP 后端 Client 对象或对象工厂
+     *
+     * @return Client 对象或对象工厂
+     * @since 1.5.23
+     */
+    public Object getBackendClient() {
+        return backendClient;
+    }
+
+    public ForestRequest<T> setBackendClient(Object backendClient) {
+        this.backendClient = backendClient;
+        return this;
+    }
 
     /**
      * 获取生命周期处理器
