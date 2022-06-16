@@ -2,6 +2,7 @@ package com.dtflys.forest.http.body;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequestBody;
+import com.dtflys.forest.utils.ForestDataType;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -29,5 +30,10 @@ public class MultipartRequestBody extends ForestRequestBody {
         } catch (IOException e) {
             throw new ForestRuntimeException(e);
         }
+    }
+
+    @Override
+    public ForestDataType getDefaultBodyType() {
+        return ForestDataType.MULTIPART;
     }
 }

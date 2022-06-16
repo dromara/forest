@@ -4,6 +4,7 @@ package com.dtflys.forest.http.body;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.mapping.MappingParameter;
+import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 
 import java.util.ArrayList;
@@ -90,6 +91,11 @@ public class NameValueRequestBody extends ForestRequestBody implements SupportFo
     @Override
     public byte[] getByteArray() {
         return new byte[0];
+    }
+
+    @Override
+    public ForestDataType getDefaultBodyType() {
+        return ForestDataType.FORM;
     }
 
     @Override

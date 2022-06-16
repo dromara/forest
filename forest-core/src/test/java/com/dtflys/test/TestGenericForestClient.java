@@ -1,5 +1,6 @@
 package com.dtflys.test;
 
+import cn.hutool.core.io.FileUtil;
 import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.backend.ContentType;
@@ -12,6 +13,7 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestURL;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorChain;
+import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ForestProgress;
 import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.test.http.BaseClientTest;
@@ -672,6 +674,45 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertQueryEquals("a", "1")
                 .assertQueryEquals("b", "2");
     }
+
+
+    @Test
+    public void testRequest_post_text_without_content_type() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String result = Forest.post("http://localhost:" + server.getPort())
+                .addBody("xxxxxxxyyyyyyy")
+                .execute(String.class);
+        assertThat(result).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertBodyEquals("xxxxxxxyyyyyyy");
+    }
+
+    @Test
+    public void testRequest_post_form_without_content_type() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String result = Forest.post("http://localhost:" + server.getPort())
+                .addBody("name", "foo")
+                .addBody("value", "bar")
+                .execute(String.class);
+        assertThat(result).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertBodyEquals("name=foo&value=bar");
+    }
+
+
+
+    @Test
+    public void testRequest_post_invalid_json() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String result = Forest.post("http://localhost:" + server.getPort())
+                .contentTypeJson()
+                .addBody("xxxxxxxyyyyyyy")
+                .execute(String.class);
+        assertThat(result).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertBodyEquals("xxxxxxxyyyyyyy");
+    }
+
 
 
     @Test

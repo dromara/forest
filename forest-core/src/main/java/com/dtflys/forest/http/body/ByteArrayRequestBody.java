@@ -3,6 +3,7 @@ package com.dtflys.forest.http.body;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.mapping.MappingParameter;
+import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 
 import java.util.LinkedList;
@@ -23,6 +24,11 @@ public class ByteArrayRequestBody extends ForestRequestBody implements SupportFo
     @Override
     public byte[] getByteArray() {
         return byteArray;
+    }
+
+    @Override
+    public ForestDataType getDefaultBodyType() {
+        return ForestDataType.BINARY;
     }
 
     @Override

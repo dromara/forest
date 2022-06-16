@@ -25,6 +25,8 @@ public class ForestBody implements List<ForestRequestBody> {
 
     private final ForestConfiguration configuration;
 
+    private ForestDataType defaultBodyType = ForestDataType.BINARY;
+
     /**
      * 请求体类型
      */
@@ -164,6 +166,10 @@ public class ForestBody implements List<ForestRequestBody> {
     }
 
 
+    public ForestDataType getDefaultBodyType() {
+        return defaultBodyType;
+    }
+
     public ForestDataType getBodyType() {
         return bodyType;
     }
@@ -261,6 +267,9 @@ public class ForestBody implements List<ForestRequestBody> {
 
     @Override
     public boolean add(ForestRequestBody forestRequestBody) {
+        if (bodyType == null) {
+            defaultBodyType = forestRequestBody.getDefaultBodyType();
+        }
         return bodyItems.add(forestRequestBody);
     }
 

@@ -80,7 +80,11 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
         if (needRequestBody) {
             ForestDataType bodyType = request.bodyType();
             if (bodyType == null || bodyType == ForestDataType.AUTO) {
-                bodyType = mineContentType.bodyType();
+                if (request.getContentType() == null) {
+                    bodyType = reqBody.getBodyType() == null ? reqBody.getDefaultBodyType() : reqBody.getBodyType();
+                } else {
+                    bodyType = mineContentType.bodyType();
+                }
             }
             if (bodyType == ForestDataType.MULTIPART) {
                 setFileBody(httpRequest, request, charset, ctypeWithoutParams, lifeCycleHandler);

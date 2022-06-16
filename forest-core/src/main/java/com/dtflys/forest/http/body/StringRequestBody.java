@@ -3,6 +3,7 @@ package com.dtflys.forest.http.body;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.mapping.MappingParameter;
+import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 
@@ -40,6 +41,11 @@ public class StringRequestBody extends ForestRequestBody implements SupportFormU
     @Override
     public byte[] getByteArray() {
         return content.getBytes();
+    }
+
+    @Override
+    public ForestDataType getDefaultBodyType() {
+        return ForestDataType.TEXT;
     }
 
     @Override

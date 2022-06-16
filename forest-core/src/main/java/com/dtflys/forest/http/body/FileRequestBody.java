@@ -2,6 +2,7 @@ package com.dtflys.forest.http.body;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequestBody;
+import com.dtflys.forest.utils.ForestDataType;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -30,5 +31,10 @@ public class FileRequestBody extends ForestRequestBody {
         } catch (IOException e) {
             throw new ForestRuntimeException(e);
         }
+    }
+
+    @Override
+    public ForestDataType getDefaultBodyType() {
+        return ForestDataType.BINARY;
     }
 }

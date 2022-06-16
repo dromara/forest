@@ -27,6 +27,7 @@ package com.dtflys.forest.http;
 import com.dtflys.forest.http.body.NameValueRequestBody;
 import com.dtflys.forest.http.body.ObjectRequestBody;
 import com.dtflys.forest.http.body.StringRequestBody;
+import com.dtflys.forest.utils.ForestDataType;
 
 /**
  * Forest请求体
@@ -56,4 +57,6 @@ public abstract class ForestRequestBody {
     }
 
     public abstract byte[] getByteArray();
+
+    public abstract ForestDataType getDefaultBodyType();
 }

@@ -5,6 +5,7 @@ import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.mapping.MappingParameter;
+import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -66,6 +67,11 @@ public class ObjectRequestBody extends ForestRequestBody implements SupportFormU
             throw new ForestRuntimeException(e);
         }
         return toString().getBytes();
+    }
+
+    @Override
+    public ForestDataType getDefaultBodyType() {
+        return ForestDataType.FORM;
     }
 
     @Override
