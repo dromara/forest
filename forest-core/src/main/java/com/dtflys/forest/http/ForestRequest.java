@@ -2733,7 +2733,7 @@ public class ForestRequest<T> implements HasURL {
     @Deprecated
     public ForestRequest<T> addBody(List<RequestNameValue> nameValueList) {
         for (RequestNameValue nameValue : nameValueList) {
-            return addBody(nameValue);
+            addBody(nameValue);
         }
         return this;
     }
