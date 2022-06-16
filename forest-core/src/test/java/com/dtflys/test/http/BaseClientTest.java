@@ -44,6 +44,7 @@ public abstract class BaseClientTest {
 
     @After
     public void afterRequests() {
+
     }
 
 }
