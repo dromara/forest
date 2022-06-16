@@ -154,10 +154,7 @@ public final class URLUtils {
      * @return {@code true}: 空端口, {@code false}: 不为空
      */
     public static boolean isNonePort(Integer port) {
-        if (port == null) {
-            return true;
-        }
-        return port < 0;
+        return port == null || port < 0;
     }
 
     /**

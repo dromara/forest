@@ -83,6 +83,7 @@ import javax.net.ssl.SSLSocketFactory;
 import java.io.File;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
@@ -594,8 +595,6 @@ public class ForestRequest<T> implements HasURL {
             throw new ForestRuntimeException("[Forest] Request url cannot be empty!");
         }
         String srcUrl = StringUtils.trimBegin(url);
-
-
         MappingURLTemplate template = method.makeURLTemplate(null, null, srcUrl);
         return setUrl(template, args);
     }
@@ -673,7 +672,6 @@ public class ForestRequest<T> implements HasURL {
      * @see ForestRequest#setScheme(String)
      */
     public ForestRequest<T> scheme(String scheme) {
-        this.url.setScheme(scheme);
         return setScheme(scheme);
     }
 
