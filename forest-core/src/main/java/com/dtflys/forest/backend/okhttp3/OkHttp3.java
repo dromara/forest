@@ -2,7 +2,7 @@ package com.dtflys.forest.backend.okhttp3;
 
 
 import com.dtflys.forest.annotation.Backend;
-import com.dtflys.forest.backend.httpclient.HttpClientFactory;
+import com.dtflys.forest.annotation.MethodLifeCycle;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -21,12 +21,13 @@ import java.lang.annotation.Target;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
+@MethodLifeCycle(OkHttp3LifeCycle.class)
 public @interface OkHttp3 {
 
     /**
      * 后端 HttpClient 工厂
      * @since 1.5.23
      */
-    Class<? extends OkHttpClientFactory> factory() default OkHttpClientFactory.class;
+    Class<? extends OkHttpClientProvider> client() default OkHttpClientProvider.class;
 
 }

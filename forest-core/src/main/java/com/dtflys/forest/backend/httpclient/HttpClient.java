@@ -2,7 +2,7 @@ package com.dtflys.forest.backend.httpclient;
 
 
 import com.dtflys.forest.annotation.Backend;
-import com.dtflys.forest.backend.httpclient.HttpclientBackend;
+import com.dtflys.forest.annotation.MethodLifeCycle;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -21,11 +21,13 @@ import java.lang.annotation.Target;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
+@MethodLifeCycle(HttpClientLifeCycle.class)
 public @interface HttpClient {
 
     /**
      * 后端 HttpClient 工厂
+     *
      * @since 1.5.23
      */
-    Class<? extends HttpClientFactory> factory() default HttpClientFactory.class;
+    Class<? extends HttpClientProvider> client() default HttpClientProvider.class;
 }

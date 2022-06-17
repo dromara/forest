@@ -1,6 +1,8 @@
 package com.dtflys.forest.backend.okhttp3.conn;
 
 import com.dtflys.forest.backend.ForestConnectionManager;
+import com.dtflys.forest.backend.httpclient.HttpClientProvider;
+import com.dtflys.forest.backend.okhttp3.OkHttpClientProvider;
 import com.dtflys.forest.backend.okhttp3.response.OkHttpResponseBody;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
@@ -21,6 +23,7 @@ import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.Route;
+import org.apache.http.client.HttpClient;
 
 import javax.annotation.Nullable;
 import javax.net.ssl.SSLSocketFactory;
@@ -43,6 +46,8 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
      * connection pool
      */
     private ConnectionPool pool;
+
+    private DefaultOkHttpClientProvider defaultOkHttpClientProvider;
 
     /**
      * 协议版本: http 1.0
@@ -98,80 +103,117 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
         return protocols;
     }
 
+    public static class DefaultOkHttpClientProvider implements OkHttpClientProvider {
+
+        private final OkHttp3ConnectionManager connectionManager;
+
+        public DefaultOkHttpClientProvider(OkHttp3ConnectionManager connectionManager) {
+            this.connectionManager = connectionManager;
+        }
+
+        @Override
+        public OkHttpClient getClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
+            String key = "ok;" + request.clientKey();
+            OkHttpClient client = request.getRoute().getBackendClient(key);
+            if (client != null && !request.isDownloadFile()) {
+                return client;
+            }
+            Integer timeout = request.getTimeout();
+            Integer connectTimeout = request.connectTimeout();
+            Integer readTimeout = request.readTimeout();
+            Integer writeTimeout = request.readTimeout();
+            if (TimeUtils.isNone(connectTimeout)) {
+                connectTimeout = timeout;
+            }
+            if (TimeUtils.isNone(readTimeout)) {
+                readTimeout = timeout;
+            }
+
+            if (TimeUtils.isNone(writeTimeout)) {
+                writeTimeout = timeout;
+            }
+
+            OkHttpClient.Builder builder = new OkHttpClient.Builder()
+                    .connectionPool(connectionManager.pool)
+                    .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
+                    .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
+                    .writeTimeout(writeTimeout, TimeUnit.MILLISECONDS)
+                    .protocols(connectionManager.getProtocols(request))
+                    .followRedirects(false)
+                    .followSslRedirects(false);
+
+            // set proxy
+            ForestProxy proxy = request.getProxy();
+            if (proxy != null) {
+                Proxy okProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxy.getHost(), proxy.getPort()));
+                builder.proxy(okProxy);
+                if (StringUtils.isNotEmpty(proxy.getUsername())) {
+                    builder.proxyAuthenticator(new Authenticator() {
+                        @Nullable
+                        @Override
+                        public Request authenticate(@Nullable Route route, Response response) {
+                            Request.Builder proxyBuilder = response.request().newBuilder();
+                            String credential = Credentials.basic(
+                                    proxy.getUsername(),
+                                    proxy.getPassword());
+                            proxyBuilder.addHeader("Proxy-Authorization", credential);
+                            return proxyBuilder.build();
+                        }
+                    });
+                }
+            }
+
+            if (request.isSSL()) {
+                SSLSocketFactory sslSocketFactory = request.getSSLSocketFactory();
+                builder
+                        .sslSocketFactory(
+                                sslSocketFactory,
+                                connectionManager.getX509TrustManager(request))
+                        .hostnameVerifier(request.hostnameVerifier());
+            }
+
+            // add default interceptor
+            builder.addNetworkInterceptor(chain -> {
+                Response response = chain.proceed(chain.request());
+                return response.newBuilder()
+                        .body(new OkHttpResponseBody(
+                                request,
+                                response.body(),
+                                lifeCycleHandler))
+                        .build();
+            });
+
+            OkHttpClient newClient = builder.build();
+            request.getRoute().cacheBackendClient(key, newClient);
+            return newClient;
+
+        }
+    }
 
     public OkHttpClient getClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
-        String key = "ok;" + request.clientKey();
-        OkHttpClient client = request.getRoute().getBackendClient(key);
-        if (client != null && !request.isDownloadFile()) {
-            return client;
-        }
-        Integer timeout = request.getTimeout();
-        Integer connectTimeout = request.connectTimeout();
-        Integer readTimeout = request.readTimeout();
-        Integer writeTimeout = request.readTimeout();
-        if (TimeUtils.isNone(connectTimeout)) {
-            connectTimeout = timeout;
-        }
-        if (TimeUtils.isNone(readTimeout)) {
-            readTimeout = timeout;
-        }
-
-        if (TimeUtils.isNone(writeTimeout)) {
-            writeTimeout = timeout;
-        }
-
-        OkHttpClient.Builder builder = new OkHttpClient.Builder()
-                .connectionPool(pool)
-                .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
-                .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
-                .writeTimeout(writeTimeout, TimeUnit.MILLISECONDS)
-                .protocols(getProtocols(request))
-                .followRedirects(false)
-                .followSslRedirects(false);
-
-        // set proxy
-        ForestProxy proxy = request.getProxy();
-        if (proxy != null) {
-            Proxy okProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxy.getHost(), proxy.getPort()));
-            builder.proxy(okProxy);
-            if (StringUtils.isNotEmpty(proxy.getUsername())) {
-                builder.proxyAuthenticator(new Authenticator() {
-                    @Nullable
-                    @Override
-                    public Request authenticate(@Nullable Route route, Response response) {
-                        Request.Builder proxyBuilder = response.request().newBuilder();
-                        String credential = Credentials.basic(
-                                proxy.getUsername(),
-                                proxy.getPassword());
-                        proxyBuilder.addHeader("Proxy-Authorization", credential);
-                        return proxyBuilder.build();
-                    }
-                });
+        OkHttpClientProvider provider = defaultOkHttpClientProvider;
+        Object client = request.getBackendClient();
+        if (client != null) {
+            if (client instanceof OkHttpClient) {
+                return (OkHttpClient) client;
+            }
+            if (client instanceof OkHttpClientProvider) {
+                provider = (OkHttpClientProvider) client;
+            } else {
+                throw new ForestRuntimeException("[Forest] Backend '" +
+                        request.getBackend().getName() +
+                        "' does not support client of type '" +
+                        client.getClass().getName() + "'");
             }
         }
+        return provider.getClient(request, lifeCycleHandler);
 
-        if (request.isSSL()) {
-            SSLSocketFactory sslSocketFactory = request.getSSLSocketFactory();
-            builder
-                    .sslSocketFactory(sslSocketFactory, getX509TrustManager(request))
-                    .hostnameVerifier(request.hostnameVerifier());
-        }
-        // add default interceptor
-        builder.addNetworkInterceptor(chain -> {
-            Response response = chain.proceed(chain.request());
-            return response.newBuilder()
-                    .body(new OkHttpResponseBody(request, response.body(), lifeCycleHandler))
-                    .build();
-        });
-
-        OkHttpClient newClient = builder.build();
-        request.getRoute().cacheBackendClient(key, newClient);
-        return newClient;
     }
 
     @Override
     public void init(ForestConfiguration configuration) {
         pool = new ConnectionPool();
+        defaultOkHttpClientProvider = new DefaultOkHttpClientProvider(this);
     }
 
     /**

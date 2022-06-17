@@ -22,14 +22,10 @@ public class TestBackendClient {
 
     private static ForestConfiguration configuration = ForestConfiguration.createConfiguration();
 
-    @BeforeClass
-    public static void prepareClient() {
-        configuration = ForestConfiguration.createConfiguration();
-    }
 
     public TestBackendClient() {
-        backendClient = configuration.createInstance(BackendClient.class);
-        backendClient2 = configuration.createInstance(BackendClient2.class);
+        backendClient = configuration.client(BackendClient.class);
+        backendClient2 = configuration. client(BackendClient2.class);
     }
 
     @Test

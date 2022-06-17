@@ -1108,9 +1108,37 @@ public class ForestRequest<T> implements HasURL {
         return backendClient;
     }
 
+    /**
+     * 设置 HTTP 后端 Client 对象或对象工厂
+     *
+     * @param backendClient 后端 Client 对象或对象工厂
+     * @return {@link ForestRequest}对象实例
+     * @since 1.5.23
+     */
     public ForestRequest<T> setBackendClient(Object backendClient) {
         this.backendClient = backendClient;
         return this;
+    }
+
+    /**
+     * 获取 HTTP 后端 Client 对象或对象工厂
+     *
+     * @return Client 对象或对象工厂
+     * @since 1.5.23
+     */
+    public Object backendClient() {
+        return getBackendClient();
+    }
+
+    /**
+     * 设置 HTTP 后端 Client 对象或对象工厂
+     *
+     * @param backendClient 后端 Client 对象或对象工厂
+     * @return {@link ForestRequest}对象实例
+     * @since 1.5.23
+     */
+    public <C> ForestRequest<T> backendClient(C backendClient) {
+        return setBackendClient(backendClient);
     }
 
     /**

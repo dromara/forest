@@ -42,8 +42,8 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
         super(connectionManager, request);
     }
 
-    protected HttpClient getHttpClient() {
-        HttpClient client = connectionManager.getHttpClient(request);
+    protected HttpClient getHttpClient(LifeCycleHandler lifeCycleHandler) {
+        HttpClient client = connectionManager.getHttpClient(request, lifeCycleHandler);
         return client;
     }
 
@@ -77,7 +77,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
         HttpContext httpContext = new BasicHttpContext();
         httpContext.setAttribute("REQUEST", request);
         HttpClientContext httpClientContext = HttpClientContext.adapt(httpContext);
-        client = getHttpClient();
+        client = getHttpClient(lifeCycleHandler);
         ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
         try {
             logRequest(request.getCurrentRetryCount(), (HttpRequestBase) httpRequest);
