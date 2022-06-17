@@ -47,6 +47,9 @@ class TestKotlinClient(backend: HttpBackend?) : BaseClientTest(backend, configur
         @Get("/")
         fun getText() : String
 
+        @Get("http://baidu.com")
+        fun getBaidu() : String
+
         @Get("/")
         fun getWithQuery(@Query("name") name: String) : String
 
@@ -66,6 +69,12 @@ class TestKotlinClient(backend: HttpBackend?) : BaseClientTest(backend, configur
         server.enqueue(MockResponse().setBody(EXPECTED))
         val result = client?.getText()
         assertThat(result).isNotNull.isEqualTo(EXPECTED)
+    }
+
+    @Test
+    fun testGetBaidu() {
+        val result = client?.getBaidu()
+        assertThat(result).isNotNull
     }
 
     @Test

@@ -87,6 +87,19 @@ public class TestAddressClient extends BaseClientTest {
                 .assertPathEquals("/BASE/1/2/xxx");
     }
 
+    @Test
+    public void testAddress_basePathOnly() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        ForestRequest<String> request = addressClient.testBasePathOnly(server.getPort());
+        String result = request.execute(String.class);
+        assertThat(request.host()).isEqualTo("localhost");
+        assertThat(request.port()).isEqualTo(server.getPort());
+        assertThat(result).isEqualTo(EXPECTED);
+
+        mockRequest(server)
+                .assertPathEquals("/xxx");
+    }
+
 
     @Test
     public void testAddress_base() {

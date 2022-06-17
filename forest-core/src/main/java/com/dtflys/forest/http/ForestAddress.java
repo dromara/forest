@@ -24,6 +24,9 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.utils.StringUtils;
+import com.dtflys.forest.utils.URLUtils;
+
 /**
  * Forest主机地址信息
  * <p>该地址信息为主机名/域名/ip地址 + 端口号的组合

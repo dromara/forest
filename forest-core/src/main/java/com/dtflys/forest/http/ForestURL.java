@@ -212,7 +212,7 @@ public class ForestURL {
     }
 
     public int getPort() {
-        if (port == null && address != null) {
+        if (URLUtils.isNonePort(port) && address != null) {
             return normalizePort(address.getPort(), ssl);
         }
         return normalizePort(port, ssl);
@@ -265,6 +265,7 @@ public class ForestURL {
         if (!this.basePath.startsWith("/")) {
             if (URLUtils.isURL(this.basePath)) {
                 try {
+                    String originHost = this.host;
                     URL url = new URL(this.basePath);
                     if (forced || StringUtils.isEmpty(this.scheme)) {
                         this.scheme = url.getProtocol();
@@ -275,7 +276,7 @@ public class ForestURL {
                     if (forced || StringUtils.isEmpty(this.host)) {
                         this.host = url.getHost();
                     }
-                    if (forced || this.port == null) {
+                    if (forced || (URLUtils.isNonePort(port) && StringUtils.isEmpty(originHost))) {
                         this.port = url.getPort();
                     }
                     this.basePath = url.getPath();
@@ -536,13 +537,14 @@ public class ForestURL {
 
     public ForestURL mergeAddress() {
         if (address != null) {
+            String originHost = host;
             if (StringUtils.isEmpty(scheme)) {
                 scheme = address.getScheme();
             }
             if (StringUtils.isEmpty(host)) {
                 host = address.getHost();
             }
-            if (URLUtils.isNonePort(port)) {
+            if (URLUtils.isNonePort(port) && StringUtils.isEmpty(originHost)) {
                 port = address.getPort();
             }
             if (StringUtils.isEmpty(basePath)) {
