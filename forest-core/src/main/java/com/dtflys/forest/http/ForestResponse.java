@@ -546,7 +546,7 @@ public abstract class ForestResponse<T> implements HasURL {
      * @return {@code true}: 相同, {@code false}: 不同
      */
     public boolean statusIs(int statusCode) {
-        return this.statusCode == statusCode;
+        return getStatusCode() == statusCode;
     }
 
     /**
@@ -556,7 +556,7 @@ public abstract class ForestResponse<T> implements HasURL {
      * @return {@code true}: 不同, {@code false}: 相同
      */
     public boolean statusIsNot(int statusCode) {
-        return this.statusCode != statusCode;
+        return getStatusCode() != statusCode;
     }
 
     /**
@@ -700,4 +700,5 @@ public abstract class ForestResponse<T> implements HasURL {
         }
         return IOUtils.toString(bytes, charset);
     }
+
 }
