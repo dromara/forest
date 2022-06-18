@@ -11,19 +11,22 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MyHttpClientProvider implements HttpClientProvider {
 
-    private final CloseableHttpClient httpClient;
-
-    public MyHttpClientProvider() {
-        httpClient = HttpClients.custom()
-                .setDefaultRequestConfig(RequestConfig.custom().setStaleConnectionCheckEnabled(true).build())
-                .build();
-    }
+    private AtomicInteger count = new AtomicInteger(0);
 
     @Override
     public HttpClient getClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
+        count.incrementAndGet();
+        CloseableHttpClient httpClient = HttpClients.custom()
+                .setDefaultRequestConfig(RequestConfig.custom().setStaleConnectionCheckEnabled(true).build())
+                .build();
         return httpClient;
+    }
+
+    public int getCount() {
+        return count.get();
     }
 }

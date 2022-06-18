@@ -68,11 +68,6 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
 
         @Override
         public HttpClient getClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
-            String key = "hc;" + request.clientKey();
-            HttpClient client = request.getRoute().getBackendClient(key);
-            if (client != null && !request.isDownloadFile()) {
-                return client;
-            }
             HttpClientBuilder builder = HttpClients.custom();
             builder.setConnectionManager(connectionManager.tsConnectionManager);
 
@@ -120,16 +115,23 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
                 configBuilder.setProxy(proxy);
             }
             RequestConfig requestConfig = configBuilder.build();
-            HttpClient httpClient = builder
+            return builder
                     .setDefaultRequestConfig(requestConfig)
                     .disableContentCompression()
                     .build();
-            request.getRoute().cacheBackendClient(key, httpClient);
-            return httpClient;
         }
     }
 
     public HttpClient getHttpClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
+        final String key = "hc;" + request.clientKey();
+        final boolean canCacheClient = request.cacheBackendClient() && !request.isDownloadFile();
+        if (canCacheClient) {
+            final HttpClient cachedClient = request.getRoute().getBackendClient(key);
+            if (cachedClient != null) {
+                return cachedClient;
+            }
+        }
+
         HttpClientProvider provider = defaultHttpClientProvider;
         Object client = request.getBackendClient();
         if (client != null) {
@@ -145,7 +147,11 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
                         client.getClass().getName() + "'");
             }
         }
-        return provider.getClient(request, lifeCycleHandler);
+        final HttpClient httpClient = provider.getClient(request, lifeCycleHandler);
+        if (canCacheClient) {
+            request.getRoute().cacheBackendClient(key, httpClient);
+        }
+        return httpClient;
     }
 
     /**

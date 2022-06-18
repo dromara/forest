@@ -2,6 +2,7 @@ package com.dtflys.forest.http;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Forest路由集合
@@ -13,11 +14,19 @@ public class ForestRoutes {
 
     private final static Map<String, ForestRoute> routes = new HashMap<>();
 
+    /**
+     * 获取或创建路由
+     *
+     * @param host 主机地址
+     * @param port 端口号
+     * @return 路由, {@link ForestRoute}对象实例
+     */
     public static ForestRoute getRoute(String host, int port) {
         String domain = ForestRoute.domain(host, port);
         ForestRoute route = routes.get(domain);
         if (route == null) {
             synchronized (ForestRoutes.class) {
+                route = routes.get(domain);
                 if (route == null) {
                     route = new ForestRoute(host, port);
                     routes.put(domain, route);
@@ -25,6 +34,13 @@ public class ForestRoutes {
             }
         }
         return route;
+    }
+
+    /**
+     * 清空路由对象缓存
+     */
+    public static synchronized void clearCache() {
+        routes.clear();
     }
 
 }

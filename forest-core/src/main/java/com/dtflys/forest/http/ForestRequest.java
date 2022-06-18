@@ -138,11 +138,16 @@ public class ForestRequest<T> implements HasURL {
     private HttpBackend backend;
 
     /**
-     * HTTP后端Client对象或对象工厂
+     * HTTP 后端 Client 对象或对象工厂
      *
      * @since 1.5.23
      */
     private Object backendClient;
+
+    /**
+     * 是否缓存 HTTP 后端 Client 对象
+     */
+    private boolean cacheBackendClient = true;
 
 
     /**
@@ -1137,8 +1142,41 @@ public class ForestRequest<T> implements HasURL {
      * @return {@link ForestRequest}对象实例
      * @since 1.5.23
      */
-    public <C> ForestRequest<T> backendClient(C backendClient) {
+    public ForestRequest<T> backendClient(Object backendClient) {
         return setBackendClient(backendClient);
+    }
+
+    /**
+     * 是否缓存 HTTP 后端 Client 对象
+     *
+     * @return {@code true}: 缓存 Client 对象, {@code false}: 不缓存
+     * @since 1.5.23
+     */
+    public boolean cacheBackendClient() {
+        return cacheBackendClient;
+    }
+
+    /**
+     * 设置是否缓存 HTTP 后端 Client 对象
+     *
+     * @param cacheBackendClient {@code true}: 缓存 Client 对象, {@code false}: 不缓存
+     * @return {@link ForestRequest}对象实例
+     * @since 1.5.23
+     */
+    public ForestRequest<T> setCacheBackendClient(boolean cacheBackendClient) {
+        this.cacheBackendClient = cacheBackendClient;
+        return this;
+    }
+
+    /**
+     * 设置是否缓存 HTTP 后端 Client 对象
+     *
+     * @param cacheBackendClient {@code true}: 缓存 CLient 对象, {@code false}: 不缓存
+     *
+     * @since 1.5.23
+     */
+    public ForestRequest<T> cacheBackendClient(boolean cacheBackendClient) {
+        return setCacheBackendClient(cacheBackendClient);
     }
 
     /**

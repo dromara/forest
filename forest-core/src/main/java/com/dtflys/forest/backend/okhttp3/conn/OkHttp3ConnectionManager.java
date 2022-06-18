@@ -113,11 +113,6 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
 
         @Override
         public OkHttpClient getClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
-            String key = "ok;" + request.clientKey();
-            OkHttpClient client = request.getRoute().getBackendClient(key);
-            if (client != null && !request.isDownloadFile()) {
-                return client;
-            }
             Integer timeout = request.getTimeout();
             Integer connectTimeout = request.connectTimeout();
             Integer readTimeout = request.readTimeout();
@@ -173,24 +168,34 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
             }
 
             // add default interceptor
-            builder.addNetworkInterceptor(chain -> {
-                Response response = chain.proceed(chain.request());
-                return response.newBuilder()
-                        .body(new OkHttpResponseBody(
-                                request,
-                                response.body(),
-                                lifeCycleHandler))
-                        .build();
-            });
+            if (request.isDownloadFile() || request.getOnProgress() != null) {
+                builder.addNetworkInterceptor(chain -> {
+                    Response response = chain.proceed(chain.request());
+                    return response.newBuilder()
+                            .body(new OkHttpResponseBody(
+                                    request,
+                                    response.body(),
+                                    lifeCycleHandler))
+                            .build();
+                });
+            }
 
             OkHttpClient newClient = builder.build();
-            request.getRoute().cacheBackendClient(key, newClient);
             return newClient;
 
         }
     }
 
     public OkHttpClient getClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
+        final String key = "ok;" + request.clientKey();
+        final boolean canCacheClient = request.cacheBackendClient() && !request.isDownloadFile();
+        if (canCacheClient) {
+            OkHttpClient cachedClient = request.getRoute().getBackendClient(key);
+            if (cachedClient != null) {
+                return cachedClient;
+            }
+        }
+
         OkHttpClientProvider provider = defaultOkHttpClientProvider;
         Object client = request.getBackendClient();
         if (client != null) {
@@ -206,8 +211,11 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
                         client.getClass().getName() + "'");
             }
         }
-        return provider.getClient(request, lifeCycleHandler);
-
+        final OkHttpClient newClient = provider.getClient(request, lifeCycleHandler);
+        if (canCacheClient) {
+            request.getRoute().cacheBackendClient(key, newClient);
+        }
+        return newClient;
     }
 
     @Override

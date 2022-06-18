@@ -6,13 +6,16 @@ import com.dtflys.forest.http.ForestRequest;
 import okhttp3.OkHttpClient;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MyOkHttpClientProvider implements OkHttpClientProvider {
 
-    private final OkHttpClient okHttpClient;
+    private AtomicInteger count = new AtomicInteger(0);
 
-    public MyOkHttpClientProvider() {
-        okHttpClient = new OkHttpClient.Builder()
+    @Override
+    public OkHttpClient getClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
+        count.incrementAndGet();
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .connectTimeout(700, TimeUnit.SECONDS)
                 .readTimeout(700, TimeUnit.SECONDS)
                 .writeTimeout(700, TimeUnit.SECONDS)
@@ -21,10 +24,10 @@ public class MyOkHttpClientProvider implements OkHttpClientProvider {
                 .retryOnConnectionFailure(true)
                 .followRedirects(true)
                 .build();
+        return okHttpClient;
     }
 
-    @Override
-    public OkHttpClient getClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
-        return okHttpClient;
+    public int getCount() {
+        return count.get();
     }
 }

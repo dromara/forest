@@ -51,6 +51,9 @@ public class TestBackendClientProviderClient {
         String result = request.execute(String.class);
         assertThat(executed.get()).isTrue();
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
+        MyOkHttpClientProvider myOkHttpClientProvider = configuration.getForestObject(MyOkHttpClientProvider.class);
+        assertThat(myOkHttpClientProvider).isNotNull();
+        assertThat(myOkHttpClientProvider.getCount()).isEqualTo(1);
     }
 
     @Test
@@ -75,6 +78,9 @@ public class TestBackendClientProviderClient {
         String result = request.execute(String.class);
         assertThat(executed.get()).isTrue();
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
+        MyHttpClientProvider httpClientProvider = configuration.getForestObject(MyHttpClientProvider.class);
+        assertThat(httpClientProvider).isNotNull();
+        assertThat(httpClientProvider.getCount()).isEqualTo(1);
     }
 
 

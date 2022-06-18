@@ -20,19 +20,19 @@ import com.dtflys.test.http.ssl.MySSLSocketFactoryBuilder;
 public interface SSLClient {
 
     @Request(
-            url = "https://127.0.0.1:5555/hello/user",
+            url = "https://127.0.0.1:{port}/hello/user",
             keyStore = "ssl_client"
     )
     String truestAllGet();
 
     @Request(
-            url = "https://{0}:5555/hello/user",
+            url = "https://{0}:{port}/hello/user",
             keyStore = "ssl_client2"
     )
     String testHostVerifier(String domain);
 
     @Request(
-            url = "https://{0}:5555/hello/user",
+            url = "https://{0}:{port}/hello/user",
             keyStore = "ssl_client2"
     )
     @SSLHostnameVerifier(MyHostnameVerifier.class)
@@ -40,11 +40,11 @@ public interface SSLClient {
     ForestRequest<String> testHostVerifier2(String domain);
 
     @Request(
-            url = "https://localhost:5555/hello/user",
+            url = "https://localhost:{port}/hello/user",
             sslProtocol = "${sslProtocol}"
     )
     ForestResponse<String> truestSSLGet(@DataVariable("sslProtocol") String sslProtocol);
 
-    @Get(url = "https://localhost:5555/hello/user", keyStore = "ssl_client")
+    @Get(url = "https://localhost:{port}/hello/user", keyStore = "ssl_client")
     ForestResponse<String> testConcurrent(@Query("id") int id);
 }

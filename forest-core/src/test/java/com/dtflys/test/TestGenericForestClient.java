@@ -37,6 +37,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -716,6 +717,21 @@ public class TestGenericForestClient extends BaseClientTest {
 
 
     @Test
+    public void testRequest_post_invalid_json_byte_array() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String body = "xxxxxxxyyyyyyy";
+        byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
+        String result = Forest.post("http://localhost:" + server.getPort())
+                .contentTypeJson()
+                .addBody(bytes)
+                .execute(String.class);
+        assertThat(result).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertBodyEquals("xxxxxxxyyyyyyy");
+    }
+
+
+    @Test
     public void testRequest_post_form_body_keys() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         TypeReference<Result<Integer>> typeReference = new TypeReference<Result<Integer>>() {};
@@ -1196,6 +1212,26 @@ public class TestGenericForestClient extends BaseClientTest {
         public void afterExecute(ForestRequest request, ForestResponse response) {
         }
     }
+
+    @Test
+    public void testRequest_upload() {
+        URL url = this.getClass().getResource("/test-img.jpg");
+        byte[] byteArray = new byte[0];
+        try {
+            byteArray = IOUtils.toByteArray(url);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String result = Forest.put("http://localhost:" + server.getPort() + "/")
+                .contentTypeOctetStream()
+                .addBody(byteArray)
+                .execute(String.class);
+        assertThat(result).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+               .assertBodyEquals(byteArray);
+    }
+
 
 
     public Buffer getImageBuffer() {

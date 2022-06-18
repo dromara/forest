@@ -6,6 +6,7 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.http.ForestRoutes;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.ssl.SSLSocketFactoryBuilder;
 import com.dtflys.test.http.ssl.MyHostnameVerifier;
@@ -14,6 +15,7 @@ import com.github.dreamhead.moco.HttpsCertificate;
 import com.github.dreamhead.moco.HttpsServer;
 import com.github.dreamhead.moco.Runner;
 import com.dtflys.test.http.client.SSLClient;
+import okhttp3.mockwebserver.MockWebServer;
 import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +25,7 @@ import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
@@ -43,12 +46,15 @@ import static org.assertj.core.api.Assertions.*;
  */
 public class TestSSLClient extends BaseClientTest {
 
-
     private final static Logger log = LoggerFactory.getLogger(TestSSLClient.class);
 
-    private static HttpsServer server;
+    @Rule
+    public final MockWebServer webServer = new MockWebServer();
+
+    private final HttpsServer server;
     private final static HttpsCertificate serverCertificate = certificate(
             pathResource("ssl_server.keystore"), "server", "123456");
+
 
 
     public final static String EXPECTED = "{\"status\": \"ok\", \"ssl\": \"true\"}";
@@ -56,18 +62,6 @@ public class TestSSLClient extends BaseClientTest {
     private Runner runner;
 
     static {
-        server = httpsServer(5555, serverCertificate);
-        server
-                .get(by(uri("/hello/user")))
-                .response(
-                        text(request -> {
-                            HttpRequest httpRequest = (HttpRequest) request;
-                            Object id = httpRequest.getQueries().get("id");
-                            if (id == null) {
-                                return EXPECTED;
-                            }
-                            return  "{\"id\": \"" + ((String[]) id)[0] + "\"}";
-                }));
     }
 
 
@@ -134,9 +128,25 @@ public class TestSSLClient extends BaseClientTest {
     }
 
 
-    public TestSSLClient(HttpBackend backend) {
+    public TestSSLClient(HttpBackend backend) throws IOException {
         super(backend, configuration);
         sslClient = configuration.createInstance(SSLClient.class);
+        int port = webServer.getPort();
+        webServer.close();
+        server = httpsServer(port, serverCertificate);
+
+        server
+                .get(by(uri("/hello/user")))
+                .response(
+                        text(request -> {
+                            HttpRequest httpRequest = (HttpRequest) request;
+                            Object id = httpRequest.getQueries().get("id");
+                            if (id == null) {
+                                return EXPECTED;
+                            }
+                            return  "{\"id\": \"" + ((String[]) id)[0] + "\"}";
+                        }));
+        configuration.setVariableValue("port", port);
     }
 
 
