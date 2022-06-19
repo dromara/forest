@@ -61,7 +61,7 @@ public class Test0 {
         assertEquals(Integer.valueOf(1000), config0.getTimeout());
         assertEquals("UTF-8", config0.getCharset());
         assertEquals(Integer.valueOf(5), config0.getMaxRetryCount());
-        assertEquals("okhttp3", config0.getBackend().getName());
+        assertEquals("httpclient", config0.getBackend().getName());
         assertEquals("SSLv3", config0.getSslProtocol());
         assertTrue(config0.getLogHandler() instanceof DefaultLogHandler);
         assertEquals("https://www.thebeastshop.com/autopage", config0.getVariableValue("baseUrl"));

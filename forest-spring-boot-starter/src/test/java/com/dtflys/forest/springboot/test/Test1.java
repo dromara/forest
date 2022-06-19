@@ -1,5 +1,6 @@
 package com.dtflys.forest.springboot.test;
 
+import com.dtflys.forest.Forest;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.logging.LogConfiguration;
@@ -7,6 +8,7 @@ import com.dtflys.forest.springboot.annotation.ForestScan;
 import com.dtflys.forest.springboot.test.logging.TestLogHandler;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.springboot.test.client1.BaiduClient;
+import com.dtflys.forest.utils.ForestDataType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +49,7 @@ public class Test1 {
         assertTrue(forestConfiguration.isLogResponseContent());
         assertTrue(forestConfiguration.getLogHandler() instanceof TestLogHandler);
         assertTrue(forestConfiguration.hasFilter("test"));
+        assertNotNull(forestConfiguration.getConverter(ForestDataType.BINARY));
     }
 
     @Test

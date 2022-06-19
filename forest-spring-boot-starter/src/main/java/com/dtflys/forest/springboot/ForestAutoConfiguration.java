@@ -1,6 +1,7 @@
 package com.dtflys.forest.springboot;
 
 import com.dtflys.forest.config.SpringForestProperties;
+import com.dtflys.forest.converter.auto.DefaultAutoConverter;
 import com.dtflys.forest.interceptor.SpringInterceptorFactory;
 import com.dtflys.forest.reflection.SpringForestObjectFactory;
 import com.dtflys.forest.spring.ForestBeanProcessor;
@@ -41,6 +42,7 @@ public class ForestAutoConfiguration {
     public SpringInterceptorFactory forestInterceptorFactory() {
         return new SpringInterceptorFactory();
     }
+
 
     @Bean
     @DependsOn("forestBeanProcessor")

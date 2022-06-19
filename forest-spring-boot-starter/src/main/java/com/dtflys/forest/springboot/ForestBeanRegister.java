@@ -3,6 +3,7 @@ package com.dtflys.forest.springboot;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.SpringForestProperties;
 import com.dtflys.forest.converter.ForestConverter;
+import com.dtflys.forest.converter.auto.DefaultAutoConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.interceptor.SpringInterceptorFactory;
 import com.dtflys.forest.logging.ForestLogHandler;
@@ -120,7 +121,8 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
                 .addPropertyValue("sslProtocol", forestConfigurationProperties.getSslProtocol())
                 .addPropertyValue("variables", forestConfigurationProperties.getVariables())
                 .setLazyInit(false)
-                .setFactoryMethod("configuration");
+                .setFactoryMethod("configuration")
+                .addConstructorArgValue(id);
 
 
         List<ForestSSLKeyStoreProperties> sslKeyStorePropertiesList = forestConfigurationProperties.getSslKeyStores();
@@ -183,13 +185,20 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
                     if (params.length == 0) {
                         converter = (ForestConverter) constructor.newInstance(new Object[0]);
                         break;
-                    } else if (params.length == 1 &&
-                            ForestConfiguration.class.isAssignableFrom(constructor.getParameterTypes()[0])) {
-                        converter = (ForestConverter) constructor.newInstance(new Object[] {constructor});
-                        break;
+                    } else {
+                        Object[] args = new Object[params.length];
+                        Class[] pTypes = constructor.getParameterTypes();
+                        for (int i = 0; i < params.length; i++) {
+                            Class pType = pTypes[i];
+                            if (ForestConfiguration.class.isAssignableFrom(pType)) {
+                                args[i] = configuration;
+                            } else if (DefaultAutoConverter.class.isAssignableFrom(pType)) {
+                                args[i] = configuration.getConverter(ForestDataType.AUTO);
+                            }
+                        }
+                        converter = (ForestConverter) constructor.newInstance(args);
                     }
                 }
-
 
                 Map<String, Object> parameters = converterItemProperties.getParameters();
                 PropertyDescriptor[] descriptors = ReflectUtils.getBeanSetters(type);
