@@ -51,9 +51,9 @@ public abstract class AbstractHttpBackend implements HttpBackend {
 
     public abstract HttpExecutor createSyncExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler);
 
-    public AsyncHttpExecutor createAsyncExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
+    public HttpExecutor createAsyncExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         HttpExecutor syncHttpExecutor = createSyncExecutor(connectionManager, request, lifeCycleHandler);
-        AsyncHttpExecutor asyncHttpExecutor = new AsyncHttpExecutor(request.getConfiguration(), syncHttpExecutor, syncHttpExecutor.getResponseHandler());
+        HttpExecutor asyncHttpExecutor = new ChannelExecutorService(request.getConfiguration(), syncHttpExecutor, syncHttpExecutor.getResponseHandler());
         return asyncHttpExecutor;
     }
 

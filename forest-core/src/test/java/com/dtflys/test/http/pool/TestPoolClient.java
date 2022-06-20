@@ -1,6 +1,6 @@
 package com.dtflys.test.http.pool;
 
-import com.dtflys.forest.backend.AsyncHttpExecutor;
+import com.dtflys.forest.backend.ChannelExecutorService;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestPoolException;
@@ -84,7 +84,7 @@ public class TestPoolClient extends BaseClientTest {
 
     @Test
     public void testPoolPerRoute() throws InterruptedException {
-        AsyncHttpExecutor.restartPool();
+        ChannelExecutorService.Companion.restartPool();
         ForestConfiguration poolConf = ForestConfiguration.createConfiguration()
                 .setVariableValue("port", server.getPort())
                 .setMaxConnections(100)
@@ -133,7 +133,7 @@ public class TestPoolClient extends BaseClientTest {
 
     @Test
     public void testPoolAsync_globalPool() throws InterruptedException {
-        AsyncHttpExecutor.restartPool();
+        ChannelExecutorService.Companion.restartPool();
         ForestConfiguration poolConf = ForestConfiguration.createConfiguration()
                 .setVariableValue("port", server.getPort())
                 .setMaxConnections(10)
