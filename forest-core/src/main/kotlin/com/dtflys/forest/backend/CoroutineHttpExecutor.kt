@@ -32,6 +32,11 @@ class ChannelExecutorService(
 ) : AbstractExecutorService(), HttpExecutor {
 
     override fun execute(command: Runnable) {
+        if (channel == null) {
+            synchronized(this) {
+                channel = Channel(configuration.maxAsyncQueueSize ?: DEFAULT_MAX_COROUTINE_SIZE)
+            }
+        }
         channel?.runBlock {
             command.run()
         }
@@ -130,8 +135,6 @@ class ChannelExecutorService(
             channel = null
         }
     }
-
-
 }
 
 fun Channel<Any>.runBlock(block: suspend CoroutineScope.() -> Unit) {
