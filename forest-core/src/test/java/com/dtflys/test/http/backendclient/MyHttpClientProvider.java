@@ -29,4 +29,9 @@ public class MyHttpClientProvider implements HttpClientProvider {
     public int getCount() {
         return count.get();
     }
+
+    public void setCount(int count) {
+        this.count.set(count);
+    }
+
 }

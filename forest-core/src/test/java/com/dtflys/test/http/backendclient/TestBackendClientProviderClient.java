@@ -31,56 +31,132 @@ public class TestBackendClientProviderClient {
 
     @Test
     public void testOkHttpClientProvider() {
-        server.enqueue(new MockResponse().setBody(EXPECTED));
-        ForestRequest<String> request = backendClientProviderClient.getOkHttpClientProvider();
-        assertThat(request).isNotNull();
-        assertThat(request.getBackendClient())
-                .isNotNull()
-                .isInstanceOf(MyOkHttpClientProvider.class);
-        AtomicBoolean executed = new AtomicBoolean(false);
-        request.addInterceptor(new TestRetryInterceptor() {
-            @Override
-            public boolean beforeExecute(ForestRequest request) {
-                assertThat(request.getBackendClient())
-                        .isNotNull()
-                        .isInstanceOf(MyOkHttpClientProvider.class);
-                executed.set(true);
-                return true;
-            }
-        });
-        String result = request.execute(String.class);
-        assertThat(executed.get()).isTrue();
-        assertThat(result).isNotNull().isEqualTo(EXPECTED);
+        int count = 3;
+        for (int i = 0; i < count; i++) {
+            server.enqueue(new MockResponse().setBody(EXPECTED));
+        }
         MyOkHttpClientProvider myOkHttpClientProvider = configuration.getForestObject(MyOkHttpClientProvider.class);
-        assertThat(myOkHttpClientProvider).isNotNull();
+        myOkHttpClientProvider.setCount(0);
+        for (int i = 0; i < count; i++) {
+            ForestRequest<String> request = backendClientProviderClient.getOkHttpClientProvider();
+            assertThat(request).isNotNull();
+            assertThat(request.getBackendClient())
+                    .isNotNull()
+                    .isInstanceOf(MyOkHttpClientProvider.class);
+            AtomicBoolean executed = new AtomicBoolean(false);
+            request.addInterceptor(new TestRetryInterceptor() {
+                @Override
+                public boolean beforeExecute(ForestRequest request) {
+                    assertThat(request.getBackendClient())
+                            .isNotNull()
+                            .isInstanceOf(MyOkHttpClientProvider.class);
+                    executed.set(true);
+                    return true;
+                }
+            });
+            String result = request.execute(String.class);
+            assertThat(executed.get()).isTrue();
+            assertThat(result).isNotNull().isEqualTo(EXPECTED);
+        }
         assertThat(myOkHttpClientProvider.getCount()).isEqualTo(1);
     }
 
     @Test
     public void testHttpClientProvider() {
-        server.enqueue(new MockResponse().setBody(EXPECTED));
-        ForestRequest<String> request = backendClientProviderClient.getHttpClientProvider();
-        assertThat(request).isNotNull();
-        assertThat(request.getBackendClient())
-                .isNotNull()
-                .isInstanceOf(MyHttpClientProvider.class);
-        AtomicBoolean executed = new AtomicBoolean(false);
-        request.addInterceptor(new TestRetryInterceptor() {
-            @Override
-            public boolean beforeExecute(ForestRequest request) {
-                assertThat(request.getBackendClient())
-                        .isNotNull()
-                        .isInstanceOf(MyHttpClientProvider.class);
-                executed.set(true);
-                return true;
-            }
-        });
-        String result = request.execute(String.class);
-        assertThat(executed.get()).isTrue();
-        assertThat(result).isNotNull().isEqualTo(EXPECTED);
+        int count = 3;
+        for (int i = 0; i < count; i++) {
+            server.enqueue(new MockResponse().setBody(EXPECTED));
+        }
         MyHttpClientProvider httpClientProvider = configuration.getForestObject(MyHttpClientProvider.class);
-        assertThat(httpClientProvider).isNotNull();
+        httpClientProvider.setCount(0);
+        for (int i = 0; i < count; i++) {
+            ForestRequest<String> request = backendClientProviderClient.getHttpClientProvider();
+            assertThat(request).isNotNull();
+            assertThat(request.getBackendClient())
+                    .isNotNull()
+                    .isInstanceOf(MyHttpClientProvider.class);
+            AtomicBoolean executed = new AtomicBoolean(false);
+            request.addInterceptor(new TestRetryInterceptor() {
+                @Override
+                public boolean beforeExecute(ForestRequest request) {
+                    assertThat(request.getBackendClient())
+                            .isNotNull()
+                            .isInstanceOf(MyHttpClientProvider.class);
+                    executed.set(true);
+                    return true;
+                }
+            });
+            String result = request.execute(String.class);
+            assertThat(executed.get()).isTrue();
+            assertThat(result).isNotNull().isEqualTo(EXPECTED);
+        }
         assertThat(httpClientProvider.getCount()).isEqualTo(1);
+    }
+
+
+    @Test
+    public void testOkHttpClientProvider_without_cache() {
+        int count = 3;
+        for (int i = 0; i < count; i++) {
+            server.enqueue(new MockResponse().setBody(EXPECTED));
+        }
+        MyOkHttpClientProvider myOkHttpClientProvider = configuration.getForestObject(MyOkHttpClientProvider.class);
+        myOkHttpClientProvider.setCount(0);
+        for (int i = 0; i < count; i++) {
+            ForestRequest<String> request = backendClientProviderClient.getOkHttpClientProvider_without_cache();
+            assertThat(request).isNotNull();
+            assertThat(request.getBackendClient())
+                    .isNotNull()
+                    .isInstanceOf(MyOkHttpClientProvider.class);
+            AtomicBoolean executed = new AtomicBoolean(false);
+            request.addInterceptor(new TestRetryInterceptor() {
+                @Override
+                public boolean beforeExecute(ForestRequest request) {
+                    assertThat(request.getBackendClient())
+                            .isNotNull()
+                            .isInstanceOf(MyOkHttpClientProvider.class);
+                    executed.set(true);
+                    return true;
+                }
+            });
+            String result = request.execute(String.class);
+            assertThat(executed.get()).isTrue();
+            assertThat(result).isNotNull().isEqualTo(EXPECTED);
+        }
+        assertThat(myOkHttpClientProvider.getCount()).isEqualTo(count);
+    }
+
+
+    @Test
+    public void testHttpClientProvider_without_cache() {
+        int count = 3;
+        for (int i = 0; i < count; i++) {
+            server.enqueue(new MockResponse().setBody(EXPECTED));
+        }
+        MyHttpClientProvider httpClientProvider = configuration.getForestObject(MyHttpClientProvider.class);
+        httpClientProvider.setCount(0);
+        for (int i = 0; i < count; i++) {
+            ForestRequest<String> request = backendClientProviderClient.getHttpClientProvider_without_cache();
+            assertThat(request).isNotNull();
+            assertThat(request.getBackendClient())
+                    .isNotNull()
+                    .isInstanceOf(MyHttpClientProvider.class);
+            AtomicBoolean executed = new AtomicBoolean(false);
+            request.addInterceptor(new TestRetryInterceptor() {
+                @Override
+                public boolean beforeExecute(ForestRequest request) {
+                    assertThat(request.getBackendClient())
+                            .isNotNull()
+                            .isInstanceOf(MyHttpClientProvider.class);
+                    executed.set(true);
+                    return true;
+                }
+            });
+            String result = request.execute(String.class);
+            assertThat(executed.get()).isTrue();
+            assertThat(result).isNotNull().isEqualTo(EXPECTED);
+        }
+        assertThat(httpClientProvider.getCount()).isEqualTo(count);
     }
 
 
