@@ -5,11 +5,11 @@ import com.dtflys.forest.handler.LifeCycleHandler
 import com.dtflys.forest.http.ForestRequest
 import com.dtflys.forest.http.ForestResponseFactory
 import com.dtflys.forest.reflection.MethodLifeCycleHandler
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
-import java.util.concurrent.AbstractExecutorService
+import kotlinx.coroutines.launch
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.TimeUnit
 
 /**
  * Forest异步携程请求执行器
@@ -29,55 +29,7 @@ class ChannelExecutorService(
      * Forest响应对象处理器
      */
     protected val handler: ResponseHandler<Any>
-) : AbstractExecutorService(), HttpExecutor {
-
-    override fun execute(command: Runnable) {
-        if (channel == null) {
-            synchronized(this) {
-                channel = Channel(configuration.maxAsyncQueueSize ?: DEFAULT_MAX_COROUTINE_SIZE)
-            }
-        }
-        channel?.runBlock {
-            command.run()
-        }
-    }
-
-    fun isEmpty(): Boolean {
-        return channel?.let {
-            return@let it.isEmpty || it.isClosedForReceive
-        } ?: false
-    }
-
-    override fun shutdown() {
-        channel?.close()
-    }
-
-    override fun shutdownNow(): MutableList<Runnable> {
-        shutdown()
-        return mutableListOf()
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override fun isShutdown(): Boolean {
-        return channel?.isClosedForSend ?: true
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override fun isTerminated(): Boolean {
-        return channel?.isClosedForReceive ?: true
-    }
-
-    override fun awaitTermination(timeout: Long, unit: TimeUnit): Boolean {
-        var millis = unit.toMillis(timeout)
-        while (!isTerminated && millis > 0) {
-            try {
-                Thread.sleep(200L)
-                millis -= 200L
-            } catch (ignore: Exception) {
-            }
-        }
-        return isTerminated
-    }
+) : HttpExecutor {
 
     override fun getRequest(): ForestRequest<*> = syncExecutor.request
 
