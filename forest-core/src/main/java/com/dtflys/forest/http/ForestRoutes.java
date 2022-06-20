@@ -1,6 +1,5 @@
 package com.dtflys.forest.http;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
