@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ForestRoutes {
 
-    private final static Map<String, ForestRoute> routes = new HashMap<>();
+    private final static Map<String, ForestRoute> routes = new ConcurrentHashMap<>();
 
     /**
      * 获取或创建路由
@@ -34,13 +34,6 @@ public class ForestRoutes {
             }
         }
         return route;
-    }
-
-    /**
-     * 清空路由对象缓存
-     */
-    public static synchronized void clearCache() {
-        routes.clear();
     }
 
 }
