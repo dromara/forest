@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture
  * @author CHMing
  * @since 1.5.23
  **/
-class ChannelExecutorService(
+class CoroutineHttpExecutor(
 
     protected val configuration: ForestConfiguration,
 
