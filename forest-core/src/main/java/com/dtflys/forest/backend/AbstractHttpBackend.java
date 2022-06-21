@@ -4,6 +4,7 @@ package com.dtflys.forest.backend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.utils.AsyncUtil;
 
 
 /**
@@ -29,13 +30,9 @@ public abstract class AbstractHttpBackend implements HttpBackend {
     private final ForestConnectionManager connectionManager;
 
     static {
-        try {
-            Class.forName("kotlinx.coroutines.CoroutineScope");
-            Class.forName("kotlinx.coroutines.Dispatchers");
-            Class.forName("kotlinx.coroutines.channels.Channel");
-            Class.forName("kotlinx.coroutines.launch");
+        if (AsyncUtil.isEnableCoroutine()) {
             ASYNC_HTTP_EXECUTOR_CREATOR = CoroutineHttpExecutor::new;
-        } catch (ClassNotFoundException e) {
+        } else {
             ASYNC_HTTP_EXECUTOR_CREATOR = AsyncHttpExecutor::new;
         }
     }
