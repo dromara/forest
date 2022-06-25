@@ -119,12 +119,16 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
             header.setValue(value);
         } else if ("Cookie".equalsIgnoreCase(key)) {
             ForestCookie cookie = ForestCookie.parse(hasURL.url().toURLString(), value);
-            ForestSetCookieHeader cookieHeader = ForestSetCookieHeader.fromCookie(hasURL, cookie);
-            addHeader(cookieHeader);
+            if (cookie != null) {
+                ForestSetCookieHeader cookieHeader = ForestSetCookieHeader.fromCookie(hasURL, cookie);
+                addHeader(cookieHeader);
+            }
         } else if ("Set-Cookie".equalsIgnoreCase(key)) {
             ForestCookie cookie = ForestCookie.parse(hasURL.url().toURLString(), value);
-            ForestSetCookieHeader cookieHeader = ForestSetCookieHeader.fromSetCookie(hasURL, cookie);
-            addHeader(cookieHeader);
+            if (cookie != null) {
+                ForestSetCookieHeader cookieHeader = ForestSetCookieHeader.fromSetCookie(hasURL, cookie);
+                addHeader(cookieHeader);
+            }
         } else {
             ForestHeader newHeader = new ForestHeader(key, value);
             addHeader(newHeader);
@@ -364,8 +368,10 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
             }
         } else if ("Set-Cookie".equalsIgnoreCase(name)) {
             ForestCookie cookie = ForestCookie.parse(hasURL.url().toURLString(), value);
-            ForestSetCookieHeader cookieHeader = ForestSetCookieHeader.fromSetCookie(hasURL, cookie);
-            addHeader(cookieHeader);
+            if (cookie != null) {
+                ForestSetCookieHeader cookieHeader = ForestSetCookieHeader.fromSetCookie(hasURL, cookie);
+                addHeader(cookieHeader);
+            }
         } else {
             addHeader(new ForestHeader(name, value));
         }

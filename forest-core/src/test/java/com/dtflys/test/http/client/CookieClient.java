@@ -39,4 +39,8 @@ public interface CookieClient {
     )
     ForestResponse<String> testCookieWithInterceptor();
 
+
+    @Post("http://localhost:${port}/test")
+    ForestResponse<String> testInvalidCookie();
+
 }

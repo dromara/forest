@@ -213,7 +213,52 @@ public class TestDownloadClient extends BaseClientTest {
     public void testDownloadAsInputStream() throws IOException {
         Buffer buffer = getImageBuffer();
         server.enqueue(new MockResponse().setBody(buffer));
+        server.enqueue(new MockResponse().setBody(buffer));
+        server.enqueue(new MockResponse().setBody(buffer));
+
+        buffer = getImageBuffer();
         InputStream in = downloadClient.downloadAsInputStream();
+        ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
+        buffer.readAll(Okio.sink(bytesOut));
+        byte[] out = bytesOut.toByteArray();
+        byte[] fileBytes = IOUtils.toByteArray(in);
+        assertThat(fileBytes)
+                .hasSize(out.length)
+                .isEqualTo(out);
+
+        buffer = getImageBuffer();
+        in = downloadClient.downloadAsInputStream();
+        bytesOut = new ByteArrayOutputStream();
+        buffer.readAll(Okio.sink(bytesOut));
+        out = bytesOut.toByteArray();
+        fileBytes = IOUtils.toByteArray(in);
+        assertThat(fileBytes)
+                .hasSize(out.length)
+                .isEqualTo(out);
+
+        buffer = getImageBuffer();
+        in = downloadClient.downloadAsInputStream();
+        bytesOut = new ByteArrayOutputStream();
+        buffer.readAll(Okio.sink(bytesOut));
+        out = bytesOut.toByteArray();
+        fileBytes = IOUtils.toByteArray(in);
+        assertThat(fileBytes)
+                .hasSize(out.length)
+                .isEqualTo(out);
+
+    }
+
+
+    @Test
+    public void testDownloadAsResponse() throws Exception {
+        Buffer buffer = getImageBuffer();
+        server.enqueue(new MockResponse().setBody(buffer));
+        server.enqueue(new MockResponse().setBody(buffer));
+        server.enqueue(new MockResponse().setBody(buffer));
+
+        buffer = getImageBuffer();
+        ForestResponse response = downloadClient.downloadAsInputResponse();
+        InputStream in = response.getInputStream();
 
         ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
         buffer.readAll(Okio.sink(bytesOut));
@@ -222,20 +267,27 @@ public class TestDownloadClient extends BaseClientTest {
         assertThat(fileBytes)
                 .hasSize(out.length)
                 .isEqualTo(out);
-    }
 
+        buffer = getImageBuffer();
+        response = downloadClient.downloadAsInputResponse();
+        in = response.getInputStream();
 
-    @Test
-    public void testDownloadAsResponse() throws Exception {
-        Buffer buffer = getImageBuffer();
-        server.enqueue(new MockResponse().setBody(buffer));
-        ForestResponse response = downloadClient.downloadAsInputResponse();
-        InputStream in = response.getInputStream();
-
-        ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
+        bytesOut = new ByteArrayOutputStream();
         buffer.readAll(Okio.sink(bytesOut));
-        byte[] out = bytesOut.toByteArray();
-        byte[] fileBytes = IOUtils.toByteArray(in);
+        out = bytesOut.toByteArray();
+        fileBytes = IOUtils.toByteArray(in);
+        assertThat(fileBytes)
+                .hasSize(out.length)
+                .isEqualTo(out);
+
+        buffer = getImageBuffer();
+        response = downloadClient.downloadAsInputResponse();
+        in = response.getInputStream();
+
+        bytesOut = new ByteArrayOutputStream();
+        buffer.readAll(Okio.sink(bytesOut));
+        out = bytesOut.toByteArray();
+        fileBytes = IOUtils.toByteArray(in);
         assertThat(fileBytes)
                 .hasSize(out.length)
                 .isEqualTo(out);

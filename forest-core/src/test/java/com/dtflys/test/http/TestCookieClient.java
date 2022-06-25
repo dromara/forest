@@ -142,4 +142,19 @@ public class TestCookieClient extends BaseClientTest {
     }
 
 
+    @Test
+    public void testInvalidCookie() {
+        server.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody(EXPECTED)
+                .setHeader(HttpHeaders.ACCEPT, "text/plain")
+                .setHeader("Set-Cookie", "xxxx"));
+        cookieClient.testInvalidCookie();
+        mockRequest(server)
+                .assertMethodEquals("POST")
+                .assertPathEquals("/test");
+    }
+
+
+
 }

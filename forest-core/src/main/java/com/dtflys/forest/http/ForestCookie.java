@@ -342,6 +342,9 @@ public class ForestCookie implements Cloneable, Serializable {
         HttpUrl httpUrl = HttpUrl.parse(url);
         long currentTime = System.currentTimeMillis();
         Cookie okCookie = Cookie.parse(httpUrl, setCookie);
+        if (okCookie == null) {
+            return null;
+        }
         return createFromOkHttpCookie(currentTime, okCookie);
     }
 
