@@ -196,7 +196,11 @@ public class OkHttp3ForestResponse extends ForestResponse {
             if (body == null) {
                 return null;
             } else {
-                bytes = body.bytes();
+                try {
+                    bytes = body.bytes();
+                } finally {
+                    body.close();
+                }
             }
         }
         return bytes;

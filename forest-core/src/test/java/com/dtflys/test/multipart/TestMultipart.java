@@ -16,7 +16,7 @@ import java.net.URL;
 
 public class TestMultipart extends TestCase {
 
-    public void testByteArrayMutltipart() {
+    public void testByteArrayMultipart() {
         String text = "{\"id\":1,\"direction\":4,\"type\":\"yyy\",\"body\":\"xxx\",\"crc\":1}";
         byte[] byteArray = text.getBytes();
         ByteArrayMultipart byteArrayMultipart = new ByteArrayMultipart();
