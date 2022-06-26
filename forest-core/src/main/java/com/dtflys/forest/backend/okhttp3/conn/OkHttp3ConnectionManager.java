@@ -168,7 +168,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
             }
 
             // add default interceptor
-            if (request.isDownloadFile() || request.getOnProgress() != null) {
+            if (request.getOnProgress() != null) {
                 builder.addNetworkInterceptor(chain -> {
                     Response response = chain.proceed(chain.request());
                     return response.newBuilder()

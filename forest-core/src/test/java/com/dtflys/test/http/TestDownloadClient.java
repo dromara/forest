@@ -2,6 +2,8 @@ package com.dtflys.test.http;
 
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.forest.backend.httpclient.HttpclientBackend;
+import com.dtflys.forest.backend.okhttp3.OkHttp3Backend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.ForestProgress;

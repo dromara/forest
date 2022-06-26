@@ -124,7 +124,7 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
 
     public HttpClient getHttpClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         final String key = "hc;" + request.clientKey();
-        final boolean canCacheClient = request.cacheBackendClient() && !request.isDownloadFile();
+        final boolean canCacheClient = request.cacheBackendClient();
         if (canCacheClient) {
             final HttpClient cachedClient = request.getRoute().getBackendClient(key);
             if (cachedClient != null) {

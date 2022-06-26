@@ -102,12 +102,12 @@ public class OkHttp3ForestResponse extends ForestResponse {
 
     private String readContentAsString() {
         try {
-            bytes = body.bytes();
+            bytes = getByteArray();
             if (bytes == null) {
                 return null;
             }
             return byteToString(bytes);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new ForestRuntimeException(e);
         }
     }
