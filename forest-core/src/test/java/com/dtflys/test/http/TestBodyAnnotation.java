@@ -87,7 +87,8 @@ public class TestBodyAnnotation extends BaseClientTest {
         for (int i = 0; i < declaredFields.length; i++) {
             Field declaredField = declaredFields[i];
             System.out.println("-------> " + declaredField.getName());
-            if (body.indexOf(declaredField.getName()) == -1) {
+            String fieldName = declaredField.getName();
+            if (!fieldName.startsWith("__") && body.indexOf(declaredField.getName()) == -1) {
                 flag = false;
                 break;
             }
