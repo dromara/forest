@@ -76,7 +76,6 @@ public class TestAsync {
         assertThat(configuration.getMaxAsyncThreadSize()).isEqualTo(300);
         assertThat(configuration.getMaxAsyncQueueSize()).isEqualTo(350);
 
-
         int size = 16;
         int threads = 8;
         boolean threadPoolFull = false;

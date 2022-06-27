@@ -149,12 +149,26 @@ public class TestCookieClient extends BaseClientTest {
                 .setBody(EXPECTED)
                 .setHeader(HttpHeaders.ACCEPT, "text/plain")
                 .setHeader("Set-Cookie", "xxxx"));
-        cookieClient.testInvalidCookie();
+        ForestResponse response = cookieClient.testInvalidCookie();
         mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/test");
+        assertThat(response.getCookies().size()).isEqualTo(0);
     }
 
+    @Test
+    public void testInvalidCookie2() {
+        server.enqueue(new MockResponse()
+                .setResponseCode(200)
+                .setBody(EXPECTED)
+                .setHeader(HttpHeaders.ACCEPT, "text/plain")
+                .setHeader("Set-Cookie", ""));
+        ForestResponse response = cookieClient.testInvalidCookie();
+        mockRequest(server)
+                .assertMethodEquals("POST")
+                .assertPathEquals("/test");
+        assertThat(response.getCookies().size()).isEqualTo(0);
+    }
 
 
 }
