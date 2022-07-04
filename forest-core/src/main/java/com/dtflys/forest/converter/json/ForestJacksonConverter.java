@@ -52,8 +52,10 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     /** 日期格式 */
     private String dateFormat;
 
-    protected ObjectMapper mapper = new ObjectMapper();
-    {
+    protected ObjectMapper mapper;
+
+    public ForestJacksonConverter() {
+        mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
     }

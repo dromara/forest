@@ -18,13 +18,13 @@ import java.util.Arrays;
 public class SSLUtils {
 
     public final static String SSL_3 = "SSLv3";
-    public final static String TLS_1_0 = "TLSv1.0";
+    public final static String TLS_1 = "TLSv1";
     public final static String TLS_1_1 = "TLSv1.1";
     public final static String TLS_1_2 = "TLSv1.2";
     public final static String TLS_1_3 = "TLSv1.3";
 
     public final static String[] DEFAULT_PROTOCOLS = new String[] {
-            SSL_3, TLS_1_0, TLS_1_1, TLS_1_1, TLS_1_3
+            SSL_3, TLS_1, TLS_1_1, TLS_1_2, TLS_1_3
     };
 
 
