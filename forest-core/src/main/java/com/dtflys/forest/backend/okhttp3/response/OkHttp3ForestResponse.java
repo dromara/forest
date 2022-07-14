@@ -206,4 +206,14 @@ public class OkHttp3ForestResponse extends ForestResponse {
         return bytes;
     }
 
+    @Override
+    public void close() {
+        if (body != null) {
+            try {
+                body.close();
+            } catch (Throwable th) {
+                throw new ForestRuntimeException(th);
+            }
+        }
+    }
 }

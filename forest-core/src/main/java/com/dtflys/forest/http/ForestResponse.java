@@ -36,6 +36,7 @@ import org.apache.commons.io.IOUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.SocketTimeoutException;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 
@@ -229,16 +230,20 @@ public abstract class ForestResponse<T> implements HasURL {
      */
     public ForestRequest<T> redirectionRequest() {
         if (isRedirection() && request != null) {
-            String location = getRedirectionLocation();
-            if (StringUtils.isBlank(location)) {
-                return null;
+            try {
+                String location = getRedirectionLocation();
+                if (StringUtils.isBlank(location)) {
+                    return null;
+                }
+                ForestRequest<T> redirectRequest = request.clone();
+                redirectRequest.clearQueries();
+                redirectRequest.setUrl(location);
+                redirectRequest.prevRequest = request;
+                redirectRequest.prevResponse = this;
+                return redirectRequest;
+            } finally {
+                close();
             }
-            ForestRequest<T> redirectRequest = request.clone();
-            redirectRequest.clearQueries();
-            redirectRequest.setUrl(location);
-            redirectRequest.prevRequest = request;
-            redirectRequest.prevResponse = this;
-            return redirectRequest;
         }
         return null;
     }
@@ -700,5 +705,7 @@ public abstract class ForestResponse<T> implements HasURL {
         }
         return IOUtils.toString(bytes, charset);
     }
+
+    public abstract void close();
 
 }

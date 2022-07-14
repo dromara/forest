@@ -178,4 +178,16 @@ public class HttpclientForestResponse extends ForestResponse {
         return bytes;
     }
 
+    @Override
+    public void close() {
+        if (entity != null) {
+            try {
+                if (!entity.isChunked()) {
+                    EntityUtils.consume(entity);
+                }
+            } catch (IOException e) {
+                throw new ForestRuntimeException(e);
+            }
+        }
+    }
 }
