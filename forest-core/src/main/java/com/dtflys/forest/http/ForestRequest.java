@@ -4412,6 +4412,29 @@ public class ForestRequest<T> implements HasURL {
     }
 
     /**
+     * 执行请求发送过程，并获取Forest响应对象
+     *
+     * @return Forest响应对象
+     * @since 1.5.25
+     */
+    public <E> ForestResponse<E> executeAsResponse() {
+        return execute(new TypeReference<ForestResponse<E>>() {});
+    }
+
+    /**
+     * 执行请求发送过程，并获取带泛型参数的Forest响应对象
+     *
+     * @param clazz Forest响应对象的泛型参数类型
+     * @param <R> Forest响应对象的泛型参数类型
+     * @return Forest响应对象
+     * @since 1.5.25
+     */
+    public <R> ForestResponse<R> executeAsResponse(Class<R> clazz) {
+        return execute(new TypeReference<ForestResponse<R>>() {});
+    }
+
+
+    /**
      * 执行请求发送过程，并获取字节数组类型结果
      *
      * @return 请求执行响应后返回的结果, 其为字节数组类型

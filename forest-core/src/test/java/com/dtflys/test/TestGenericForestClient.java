@@ -574,6 +574,33 @@ public class TestGenericForestClient extends BaseClientTest {
     }
 
     @Test
+    public void testRequest_get_return_map_list() {
+        server.enqueue(new MockResponse().setBody("[{\"a\": 1}, {\"b\": 2}, {\"c\": 3}]"));
+        List<Map<String, Object>> result = Forest.get("http://localhost:" + server.getPort()).executeAsList();
+        assertThat(result).isNotNull();
+        assertThat(result.size()).isEqualTo(3);
+        assertThat(result.get(0).get("a")).isEqualTo(1);
+        assertThat(result.get(1).get("b")).isEqualTo(2);
+        assertThat(result.get(2).get("c")).isEqualTo(3);
+    }
+
+    @Test
+    public void testRequest_get_return_response() {
+        server.enqueue(new MockResponse().setBody("{\"a\": 1, \"b\": 2, \"c\": 3}"));
+        ForestResponse<Map<String, Object>> response = Forest.get("http://localhost:" + server.getPort())
+                .execute(new TypeReference<ForestResponse<Map<String, Object>>>() {});
+        assertThat(response).isNotNull();
+        Map<String, Object> result = response.getResult();
+        assertThat(result).isNotNull();
+        assertThat(result.get("a")).isEqualTo(1);
+        assertThat(result.get("b")).isEqualTo(2);
+        assertThat(result.get("c")).isEqualTo(3);
+        assertThat(response.isClosed()).isTrue();
+        assertThat(response.getResult()).isNotNull();
+    }
+
+
+    @Test
     public void testRequest_get_return_list2() {
         server.enqueue(new MockResponse().setBody("[\"1\", \"2\", \"3\"]"));
         List<String> result = Forest.get("/")

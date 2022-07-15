@@ -67,6 +67,11 @@ public abstract class ForestResponse<T> implements HasURL {
     protected Date responseTime;
 
     /**
+     * 响应体是否已关闭
+     */
+    protected volatile boolean closed = false;
+
+    /**
      * 是否为Gzip压缩
      */
     protected boolean isGzip = false;
@@ -704,6 +709,10 @@ public abstract class ForestResponse<T> implements HasURL {
             charset = "GBK";
         }
         return IOUtils.toString(bytes, charset);
+    }
+
+    public boolean isClosed() {
+        return closed;
     }
 
     public abstract void close();

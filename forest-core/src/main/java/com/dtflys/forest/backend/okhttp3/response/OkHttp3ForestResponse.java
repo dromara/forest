@@ -199,7 +199,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
                 try {
                     bytes = body.bytes();
                 } finally {
-                    body.close();
+                    close();
                 }
             }
         }
@@ -208,11 +208,16 @@ public class OkHttp3ForestResponse extends ForestResponse {
 
     @Override
     public void close() {
+        if (closed) {
+            return;
+        }
         if (body != null) {
             try {
                 body.close();
             } catch (Throwable th) {
                 throw new ForestRuntimeException(th);
+            } finally {
+                closed = true;
             }
         }
     }
