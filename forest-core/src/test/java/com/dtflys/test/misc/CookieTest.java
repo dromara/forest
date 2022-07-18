@@ -101,7 +101,7 @@ public class CookieTest {
         String path = "/";
         boolean secure = true;
         boolean httpOnly = false;
-        boolean hostOnly = true;
+        boolean hostOnly = false;
         boolean persistent = false;
         ForestCookie cookie = new ForestCookie(
                 "foo",
@@ -133,6 +133,22 @@ public class CookieTest {
         );
         assertThat(cookie.matchDomain("forest.dtflyx.com")).isTrue();
         assertThat(cookie.matchDomain("dtflyx.com")).isTrue();
+
+        cookie = new ForestCookie(
+                "foo",
+                "bar",
+                date,
+                maxAge,
+                domain,
+                path,
+                secure,
+                httpOnly,
+                true,
+                persistent
+        );
+        assertThat(cookie.matchDomain("forest.dtflyx.com")).isTrue();
+        assertThat(cookie.matchDomain("dtflyx.com")).isFalse();
+
     }
 
 
