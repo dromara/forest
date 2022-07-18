@@ -378,24 +378,36 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
     }
 
     /**
-     * 添加Cookie头
+     * 添加Cookie头 (默认严格匹配)
      *
      * @param cookie {@link ForestCookie}对象实例
      * @since 1.5.23
      */
     public void addCookie(ForestCookie cookie) {
-        if (cookieHeader == null) {
-            cookieHeader = new ForestCookieHeader(hasURL);
-            if (cookieHeader.addCookie(cookie)) {
-                addHeader(cookieHeader);
-            }
-        } else {
-            cookieHeader.addCookie(cookie);
-        }
+        addCookie(cookie, true);
     }
 
     /**
-     * 批量添加Cookie头
+     * 添加Cookie头
+     *
+     * @param cookie {@link ForestCookie}对象实例
+     * @param strict 是否严格匹配（只有匹配域名，以及没过期的 Cookie 才能添加）
+     * @since 1.5.25
+     */
+    public void addCookie(ForestCookie cookie, boolean strict) {
+        if (cookieHeader == null) {
+            cookieHeader = new ForestCookieHeader(hasURL);
+            if (cookieHeader.addCookie(cookie, strict)) {
+                addHeader(cookieHeader);
+            }
+        } else {
+            cookieHeader.addCookie(cookie, strict);
+        }
+    }
+
+
+    /**
+     * 批量添加Cookie头 (默认严格匹配)
      *
      * @param cookies {@link ForestCookie}对象列表
      * @since 1.5.23
@@ -409,11 +421,25 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
     /**
      * 批量添加Cookie头
      *
+     * @param cookies {@link ForestCookie}对象列表
+     * @param strict 是否严格匹配（只有匹配域名，以及没过期的 Cookie 才能添加）
+     * @since 1.5.25
+     */
+    public void addCookies(List<ForestCookie> cookies, boolean strict) {
+        for (ForestCookie cookie : cookies) {
+            addCookie(cookie, strict);
+        }
+    }
+
+
+    /**
+     * 批量添加Cookie头
+     *
      * @param cookies {@link ForestCookies}对象实例
      * @since 1.5.23
      */
     public void addCookies(ForestCookies cookies) {
-        addCookies(cookies.allCookies());
+        addCookies(cookies.allCookies(), cookies.strict());
     }
 
     /**

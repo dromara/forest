@@ -111,14 +111,27 @@ public class ForestCookieHeader extends ForestHeader {
      * @since 1.5.23
      */
     public boolean addCookie(ForestCookie cookie) {
+        return addCookie(cookie, true);
+    }
+
+
+    /**
+     * 添加Cookie头
+     *
+     * @param cookie {@link ForestCookie}对象实例
+     * @param strict 是否严格匹配（只有匹配域名，以及没过期的 Cookie 才能添加）
+     * @return {@code true}: 添加Cookie成功，{@code false}: 添加Cookie失败
+     * @since 1.5.25
+     */
+    public boolean addCookie(ForestCookie cookie, boolean strict) {
         if (cookie == null) {
             return false;
         }
         ForestURL url = hasURL.url();
-        if (!cookie.matchURL(url)) {
+        if (strict && !cookie.matchURL(url)) {
             return false;
         }
-        if (cookie.isExpired(new Date())) {
+        if (strict && cookie.isExpired(new Date())) {
             return false;
         }
         String name = cookie.getName();
@@ -134,6 +147,7 @@ public class ForestCookieHeader extends ForestHeader {
         map.put(name.toLowerCase(), cookie);
         return true;
     }
+
 
     /**
      * 批量添加Cookie头
