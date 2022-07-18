@@ -318,9 +318,24 @@ public class ForestCookie implements Cloneable, Serializable {
      * @return  {@code true}: 匹配, {@code false}: 不匹配
      */
     public boolean matchURL(ForestURL url) {
+        if (!matchSchema(url.getScheme())) return false;
         if (!matchDomain(url.getHost())) return false;
         if (!matchPath(url.getPath())) return false;
         return true;
+    }
+
+    /**
+     * 匹配 HTTP 协议
+     *
+     * @param schema HTTP 协议
+     * @return {@code true}: 匹配, {@code false}: 不匹配
+     * @since 1.5.25
+     */
+    public boolean matchSchema(String schema) {
+        if (!secure) {
+            return true;
+        }
+        return "https".equals(schema);
     }
 
     /**
@@ -351,7 +366,28 @@ public class ForestCookie implements Cloneable, Serializable {
         if (okCookie == null) {
             return null;
         }
-        return new OkHttp3Cookie(currentTime, okCookie);
+        long expiresAt = okCookie.expiresAt();
+        long maxAge;
+        if (expiresAt > currentTime) {
+            maxAge = expiresAt - currentTime;
+        } else {
+            maxAge = 0L;
+        }
+        Date createTime = new Date(currentTime);
+        Duration maxAgeDuration = Duration.ofMillis(maxAge);
+
+        return new ForestCookie(
+                okCookie.name(),
+                okCookie.value(),
+                createTime,
+                maxAgeDuration,
+                okCookie.domain(),
+                okCookie.path(),
+                okCookie.secure(),
+                okCookie.httpOnly(),
+                okCookie.hostOnly(),
+                okCookie.persistent()
+        );
     }
 
     public long getExpiresTime() {
