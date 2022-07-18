@@ -24,6 +24,7 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.backend.okhttp3.OkHttp3Cookie;
 import okhttp3.Cookie;
 import okhttp3.HttpUrl;
 
@@ -100,7 +101,7 @@ public class ForestCookie implements Cloneable, Serializable {
      * @since 1.5.23
      */
     public ForestCookie(String name, String value) {
-        this(name, value, new Date(), Duration.ofMillis(Long.MAX_VALUE), null, "/", false, false, true, false);
+        this(name, value, new Date(), Duration.ofMillis(Long.MAX_VALUE), null, "/", false, false, false, false);
     }
 
     public ForestCookie(String name, String value, Date createTime, Duration maxAge, String domain, String path, boolean secure, boolean httpOnly, boolean hostOnly, boolean persistent) {
@@ -343,60 +344,6 @@ public class ForestCookie implements Cloneable, Serializable {
         return expiredTime <= date.getTime();
     }
 
-    public static ForestCookie createFromHttpclientCookie(org.apache.http.cookie.Cookie httpCookie) {
-        long currentTime = System.currentTimeMillis();
-        Date expiresDate = httpCookie.getExpiryDate();
-        long maxAge;
-        if (expiresDate != null) {
-            long expiresAt = expiresDate.getTime();
-            if (expiresAt > currentTime) {
-                maxAge = expiresAt - currentTime;
-            } else {
-                maxAge = 0L;
-            }
-        } else {
-            maxAge = Long.MAX_VALUE;
-        }
-        Date createTime = new Date(currentTime);
-        Duration maxAgeDuration = Duration.ofMillis(maxAge);
-        return new ForestCookie(
-                httpCookie.getName(),
-                httpCookie.getValue(),
-                createTime,
-                maxAgeDuration,
-                httpCookie.getDomain(),
-                httpCookie.getPath(),
-                httpCookie.isSecure(),
-                false,
-                true,
-                false);
-    }
-
-
-    public static ForestCookie createFromOkHttpCookie(long currentTime, Cookie okCookie) {
-        long expiresAt = okCookie.expiresAt();
-        long maxAge;
-        if (expiresAt > currentTime) {
-            maxAge = expiresAt - currentTime;
-        } else {
-            maxAge = 0L;
-        }
-        Date createTime = new Date(currentTime);
-        Duration maxAgeDuration = Duration.ofMillis(maxAge);
-        return new ForestCookie(
-                okCookie.name(),
-                okCookie.value(),
-                createTime,
-                maxAgeDuration,
-                okCookie.domain(),
-                okCookie.path(),
-                okCookie.secure(),
-                okCookie.httpOnly(),
-                okCookie.hostOnly(),
-                okCookie.persistent());
-    }
-
-
     public static ForestCookie parse(String url, String setCookie) {
         HttpUrl httpUrl = HttpUrl.parse(url);
         long currentTime = System.currentTimeMillis();
@@ -404,7 +351,7 @@ public class ForestCookie implements Cloneable, Serializable {
         if (okCookie == null) {
             return null;
         }
-        return createFromOkHttpCookie(currentTime, okCookie);
+        return new OkHttp3Cookie(currentTime, okCookie);
     }
 
     public long getExpiresTime() {
