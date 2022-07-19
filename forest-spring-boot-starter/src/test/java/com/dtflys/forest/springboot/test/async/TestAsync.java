@@ -76,7 +76,6 @@ public class TestAsync {
         assertThat(configuration.getMaxAsyncThreadSize()).isEqualTo(300);
         assertThat(configuration.getMaxAsyncQueueSize()).isEqualTo(350);
 
-
         int size = 16;
         int threads = 8;
         boolean threadPoolFull = false;
@@ -92,7 +91,7 @@ public class TestAsync {
         } catch (RuntimeException e) {
             if (e instanceof ForestAsyncAbortException) {
                 assertThat(e.getMessage()).isEqualTo("[Forest] Asynchronous thread pool is full! " +
-                        "[Thread name: main, Max pool size: 8, core pool size: 8, Active pool size: 8, Task count: 8]");
+                        "[Thread name: main, Max pool size: 8, Core pool size: 8, Active pool size: 8, Task count: 8]");
                 threadPoolFull = true;
             } else {
                 throw e;

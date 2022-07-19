@@ -41,6 +41,8 @@ public class ForestCookies implements Iterable<ForestCookie> {
 
     private List<ForestCookie> cookies;
 
+    private boolean strict = true;
+
     public ForestCookies() {
         this.cookies = new LinkedList<>();
     }
@@ -57,6 +59,29 @@ public class ForestCookies implements Iterable<ForestCookie> {
     public int size() {
         return cookies.size();
     }
+
+    /**
+     * 是否严格匹配Cookie
+     *
+     * @return {@code true}: 严格匹配, {@code false}: 不严格
+     * @since 1.5.25
+     */
+    public boolean strict() {
+        return strict;
+    }
+
+    /**
+     * 设置是否严格匹配Cookie
+     *
+     * @param strict {@code true}: 严格匹配, {@code false}: 不严格
+     * @return Cookie集合，{@link ForestCookies}类实例
+     * @since 1.5.25
+     */
+    public ForestCookies strict(boolean strict) {
+        this.strict = strict;
+        return this;
+    }
+
 
     /**
      * 解析请求中的Cookie头信息
@@ -142,25 +167,29 @@ public class ForestCookies implements Iterable<ForestCookie> {
      * 添加Cookie
      *
      * @param cookie Cookie对象，{@link ForestCookie}类实例
+     * @return Cookie集合，{@link ForestCookies}类实例
      */
-    public void addCookie(ForestCookie cookie) {
+    public ForestCookies addCookie(ForestCookie cookie) {
         if (cookie != null) {
             this.cookies.add(cookie);
         }
+        return this;
     }
 
     /**
      * 添加Cookie列表
      *
      * @param cookies Cookie列表
+     * @return Cookie集合，{@link ForestCookies}类实例
      */
-    public void addAllCookies(List<ForestCookie> cookies) {
+    public ForestCookies addAllCookies(List<ForestCookie> cookies) {
         if (cookies == null) {
-            return;
+            return this;
         }
         for (ForestCookie cookie : cookies) {
             this.addCookie(cookie);
         }
+        return this;
     }
 
     /**

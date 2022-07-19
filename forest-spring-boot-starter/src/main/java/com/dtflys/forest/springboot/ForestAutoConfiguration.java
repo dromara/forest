@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
 @EnableConfigurationProperties({ForestConfigurationProperties.class})
 @Import({ForestScannerRegister.class})
 public class ForestAutoConfiguration {

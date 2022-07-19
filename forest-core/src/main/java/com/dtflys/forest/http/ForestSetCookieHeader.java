@@ -34,8 +34,10 @@ public class ForestSetCookieHeader extends ForestHeader {
     @Override
     public void setValue(String value) {
         ForestCookie newCookie = ForestCookie.parse(hasURL.url().toURLString(), value);
-        super.setValue(newCookie.toString());
-        this.cookie = newCookie;
+        if (newCookie != null) {
+            super.setValue(newCookie.toString());
+            this.cookie = newCookie;
+        }
     }
 
     public ForestCookie getCookie() {

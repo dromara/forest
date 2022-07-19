@@ -102,12 +102,12 @@ public class OkHttp3ForestResponse extends ForestResponse {
 
     private String readContentAsString() {
         try {
-            bytes = body.bytes();
+            bytes = getByteArray();
             if (bytes == null) {
                 return null;
             }
             return byteToString(bytes);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new ForestRuntimeException(e);
         }
     }
@@ -196,10 +196,29 @@ public class OkHttp3ForestResponse extends ForestResponse {
             if (body == null) {
                 return null;
             } else {
-                bytes = body.bytes();
+                try {
+                    bytes = body.bytes();
+                } finally {
+                    close();
+                }
             }
         }
         return bytes;
     }
 
+    @Override
+    public void close() {
+        if (closed) {
+            return;
+        }
+        if (body != null) {
+            try {
+                body.close();
+            } catch (Throwable th) {
+                throw new ForestRuntimeException(th);
+            } finally {
+                closed = true;
+            }
+        }
+    }
 }

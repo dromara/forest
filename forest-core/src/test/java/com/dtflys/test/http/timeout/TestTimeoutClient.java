@@ -43,14 +43,10 @@ public class TestTimeoutClient extends BaseClientTest {
         ForestRequest request = timeoutClient.testConnectTimeout();
         assertThat(request).isNotNull();
         assertThat(request.getConnectTimeout()).isEqualTo(10);
-        try {
-            request.execute(String.class);
-        } catch (Throwable th) {
-            th.printStackTrace();
-        }
-
-//        assertThat(response).isNotNull();
-//        assertThat(response.isTimeout()).isTrue();
+        ForestResponse response = (ForestResponse) request.execute(ForestResponse.class);
+        assertThat(response).isNotNull();
+        assertThat(response.getException()).isNotNull();
+        assertThat(response.isTimeout()).isTrue();
     }
 
 

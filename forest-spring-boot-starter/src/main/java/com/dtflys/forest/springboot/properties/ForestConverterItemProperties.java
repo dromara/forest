@@ -1,5 +1,6 @@
 package com.dtflys.forest.springboot.properties;
 
+import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 
 import java.util.HashMap;
@@ -7,15 +8,15 @@ import java.util.Map;
 
 public class ForestConverterItemProperties {
 
-    private Class<? extends ForestJsonConverter> type;
+    private Class<? extends ForestConverter> type;
 
     private Map<String, Object> parameters = new HashMap<>();
 
-    public Class<? extends ForestJsonConverter> getType() {
+    public Class<? extends ForestConverter> getType() {
         return type;
     }
 
-    public void setType(Class<? extends ForestJsonConverter> type) {
+    public void setType(Class<? extends ForestConverter> type) {
         this.type = type;
     }
 

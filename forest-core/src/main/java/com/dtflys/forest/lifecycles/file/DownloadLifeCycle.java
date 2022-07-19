@@ -31,7 +31,6 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
 
     public final static String ATTACHMENT_NAME_FILE = "__file";
 
-    private final int FILE_WAIT_SECONDS = 1;
 
     @Override
     public void onMethodInitialized(ForestMethod method, DownloadFile annotation) {
@@ -120,6 +119,12 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
             }
         } catch (IOException e) {
             throw new ForestRuntimeException(e);
+        } finally {
+            try {
+                in.close();
+            } catch (IOException e) {
+                throw new ForestRuntimeException(e);
+            }
         }
     }
 }

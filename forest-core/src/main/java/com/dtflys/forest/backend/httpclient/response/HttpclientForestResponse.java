@@ -146,8 +146,7 @@ public class HttpclientForestResponse extends ForestResponse {
     }
 
     private String readContentAsString() {
-        try {
-            InputStream inputStream = entity.getContent();
+        try (InputStream inputStream = entity.getContent()) {
             if (inputStream == null) {
                 return null;
             }
@@ -155,6 +154,8 @@ public class HttpclientForestResponse extends ForestResponse {
             return byteToString(bytes);
         } catch (IOException e) {
             throw new ForestRuntimeException(e);
+        } finally {
+            closed = true;
         }
     }
 
@@ -172,10 +173,31 @@ public class HttpclientForestResponse extends ForestResponse {
             if (entity == null) {
                 return null;
             } else {
-                bytes = EntityUtils.toByteArray(entity);
+                try {
+                    bytes = EntityUtils.toByteArray(entity);
+                } finally {
+                    closed = true;
+                }
             }
         }
         return bytes;
     }
 
+    @Override
+    public void close() {
+        if (closed) {
+            return;
+        }
+        if (entity != null) {
+            try {
+                if (entity.isStreaming()) {
+                    EntityUtils.consume(entity);
+                }
+            } catch (IOException e) {
+                throw new ForestRuntimeException(e);
+            } finally {
+                closed = true;
+            }
+        }
+    }
 }

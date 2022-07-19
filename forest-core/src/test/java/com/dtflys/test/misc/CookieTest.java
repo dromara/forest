@@ -1,5 +1,7 @@
 package com.dtflys.test.misc;
 
+import com.dtflys.forest.backend.httpclient.HttpclientCookie;
+import com.dtflys.forest.backend.okhttp3.OkHttp3Cookie;
 import com.dtflys.forest.http.ForestCookie;
 import com.dtflys.forest.http.ForestCookies;
 import okhttp3.Cookie;
@@ -101,7 +103,7 @@ public class CookieTest {
         String path = "/";
         boolean secure = true;
         boolean httpOnly = false;
-        boolean hostOnly = true;
+        boolean hostOnly = false;
         boolean persistent = false;
         ForestCookie cookie = new ForestCookie(
                 "foo",
@@ -133,6 +135,22 @@ public class CookieTest {
         );
         assertThat(cookie.matchDomain("forest.dtflyx.com")).isTrue();
         assertThat(cookie.matchDomain("dtflyx.com")).isTrue();
+
+        cookie = new ForestCookie(
+                "foo",
+                "bar",
+                date,
+                maxAge,
+                domain,
+                path,
+                secure,
+                httpOnly,
+                true,
+                persistent
+        );
+        assertThat(cookie.matchDomain("forest.dtflyx.com")).isTrue();
+        assertThat(cookie.matchDomain("dtflyx.com")).isFalse();
+
     }
 
 
@@ -226,7 +244,7 @@ public class CookieTest {
         HttpUrl httpUrl = HttpUrl.parse(url);
         long currentTime = System.currentTimeMillis();
         Cookie okCookie = Cookie.parse(httpUrl, setCookie);
-        ForestCookie cookie = ForestCookie.createFromOkHttpCookie(currentTime, okCookie);
+        ForestCookie cookie = new OkHttp3Cookie(currentTime, okCookie);
         assertThat(cookie).isNotNull();
         assertThat(cookie.getName()).isEqualTo("foo");
         assertThat(cookie.getValue()).isEqualTo("bar");
@@ -253,7 +271,7 @@ public class CookieTest {
         httpCookie.setPath("/");
         httpCookie.setSecure(false);
         httpCookie.setDiscard(true);
-        ForestCookie cookie = ForestCookie.createFromHttpclientCookie(httpCookie);
+        ForestCookie cookie = new HttpclientCookie(httpCookie);
         assertThat(cookie).isNotNull();
         assertThat(cookie.getName()).isEqualTo("foo");
         assertThat(cookie.getValue()).isEqualTo("bar");

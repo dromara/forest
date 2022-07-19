@@ -1,7 +1,6 @@
 package com.dtflys.forest.ssl;
 
 import com.dtflys.forest.utils.StringUtils;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContextBuilder;
 import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
@@ -10,8 +9,7 @@ import com.dtflys.forest.http.ForestRequest;
 
 import javax.net.ssl.*;
 import java.security.*;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Arrays;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -19,13 +17,18 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SSLUtils {
 
-    public final static String SSL_2 = "SSLv2";
     public final static String SSL_3 = "SSLv3";
-    public final static String TLS_1_0 = "TLSv1.0";
+    public final static String TLS_1 = "TLSv1";
     public final static String TLS_1_1 = "TLSv1.1";
     public final static String TLS_1_2 = "TLSv1.2";
     public final static String TLS_1_3 = "TLSv1.3";
 
+    public final static String[] DEFAULT_PROTOCOLS = new String[] {
+            SSL_3, TLS_1, TLS_1_1, TLS_1_2, TLS_1_3
+    };
+
+
+    private static TrustAllManager defaultTrustAllManager;
     /**
      * 自定义SSL证书
      * @param request Forest请求对象，{@link ForestRequest}类实例
@@ -70,6 +73,28 @@ public class SSLUtils {
         return sslContext;
     }
 
+    private static X509TrustManager systemDefaultTrustManager() {
+        if (defaultTrustAllManager == null) {
+            synchronized (SSLUtils.class) {
+                if (defaultTrustAllManager == null) {
+                    try {
+                        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(
+                                TrustManagerFactory.getDefaultAlgorithm());
+                        trustManagerFactory.init((KeyStore) null);
+                        TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
+                        if (trustManagers.length != 1 || !(trustManagers[0] instanceof X509TrustManager)) {
+                            throw new IllegalStateException("Unexpected default trust managers:"
+                                    + Arrays.toString(trustManagers));
+                        }
+                        return (X509TrustManager) trustManagers[0];
+                    } catch (GeneralSecurityException e) {
+                        throw new ForestRuntimeException("[Forest] No System TLS", e);
+                    }
+                }
+            }
+        }
+        return defaultTrustAllManager;
+    }
 
     /**
      * 默认的单向验证HTTPS请求绕过SSL验证，使用默认SSL协议
@@ -80,14 +105,13 @@ public class SSLUtils {
      * @throws KeyManagementException Key管理异常
      */
     public static SSLContext createIgnoreVerifySSL(String sslProtocol) throws NoSuchAlgorithmException, KeyManagementException {
-        SSLContext sc;
+        SSLContext sc = null;
         if (StringUtils.isEmpty(sslProtocol)) {
-            sc = SSLContexts.custom().build();
+            sc = SSLContext.getInstance("TLS");
         } else {
             sc = SSLContext.getInstance(sslProtocol);
-            TrustAllManager trustManager = new TrustAllManager();
-            sc.init(null, new TrustManager[] { trustManager }, null);
         }
+        sc.init(null, new TrustManager[] { systemDefaultTrustManager() }, null);
         return sc;
     }
 

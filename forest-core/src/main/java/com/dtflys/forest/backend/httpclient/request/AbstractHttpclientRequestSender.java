@@ -1,5 +1,6 @@
 package com.dtflys.forest.backend.httpclient.request;
 
+import com.dtflys.forest.backend.httpclient.HttpclientCookie;
 import com.dtflys.forest.backend.httpclient.conn.HttpclientConnectionManager;
 import com.dtflys.forest.backend.httpclient.logging.HttpclientLogBodyMessage;
 import com.dtflys.forest.http.ForestCookie;
@@ -96,7 +97,7 @@ public abstract class AbstractHttpclientRequestSender implements HttpclientReque
     protected ForestCookies getCookiesFromHttpCookieStore(CookieStore cookieStore) {
         ForestCookies cookies = new ForestCookies();
         for (Cookie httpCookie : cookieStore.getCookies()) {
-            ForestCookie cookie = ForestCookie.createFromHttpclientCookie(httpCookie);
+            ForestCookie cookie = new HttpclientCookie(httpCookie);
             cookies.addCookie(cookie);
         }
         return cookies;

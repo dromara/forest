@@ -3,6 +3,7 @@ package com.dtflys.forest.backend.httpclient.conn;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.ssl.SSLKeyStore;
+import com.dtflys.forest.ssl.SSLUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -52,7 +53,7 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
         SSLConnectionSocketFactory factory =
                 new SSLConnectionSocketFactory(
                         sslSocketFactory,
-                        keyStore == null ? null : keyStore.getProtocols(),
+                        keyStore == null ? SSLUtils.DEFAULT_PROTOCOLS : keyStore.getProtocols(),
                         keyStore == null ? null : keyStore.getCipherSuites(),
                         request.hostnameVerifier());
         return factory;

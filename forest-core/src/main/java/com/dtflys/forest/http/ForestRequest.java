@@ -694,7 +694,7 @@ public class ForestRequest<T> implements HasURL {
      * 获取URL地址的HTTP协议头
      * <p>同 {@link ForestRequest#getScheme()}
      *
-     * @return {@link ForestRequest}对象实例
+     * @return HTTP协议头
      * @see ForestRequest#getScheme()
      */
     public String scheme() {
@@ -3096,7 +3096,7 @@ public class ForestRequest<T> implements HasURL {
     }
 
     /**
-     * 添加 Cookie 到请求中
+     * 添加 Cookie 到请求中 (默认严格匹配)
      *
      * @param cookie {@link ForestCookie}对象实例
      * @return {@link ForestRequest}类实例
@@ -3108,7 +3108,21 @@ public class ForestRequest<T> implements HasURL {
     }
 
     /**
-     * 批量添加 Cookie 到请求中
+     * 添加 Cookie 到请求中
+     *
+     * @param cookie {@link ForestCookie}对象实例
+     * @param strict 是否严格匹配（只有匹配域名，以及没过期的 Cookie 才能添加）
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.25
+     */
+    public ForestRequest<T> addCookie(ForestCookie cookie, boolean strict) {
+        this.headers.addCookie(cookie, strict);
+        return this;
+    }
+
+
+    /**
+     * 批量添加 Cookie 到请求中 (默认严格匹配)
      *
      * @param cookies {@link ForestCookie}对象列表
      * @return {@link ForestRequest}类实例
@@ -3116,6 +3130,18 @@ public class ForestRequest<T> implements HasURL {
      */
     public ForestRequest<T> addCookies(List<ForestCookie> cookies) {
         this.headers.addCookies(cookies);
+        return this;
+    }
+
+    /**
+     * 批量添加 Cookie 到请求中
+     *
+     * @param cookies {@link ForestCookie}对象列表
+     * @param strict 是否严格匹配（只有匹配域名，以及没过期的 Cookie 才能添加）
+     * @return 1.5.25
+     */
+    public ForestRequest<T> addCookies(List<ForestCookie> cookies, boolean strict) {
+        this.headers.addCookies(cookies, strict);
         return this;
     }
 

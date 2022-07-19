@@ -3,6 +3,7 @@ package com.dtflys.test;
 import cn.hutool.core.io.FileUtil;
 import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.Forest;
+import com.dtflys.forest.annotation.Retryer;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
@@ -13,6 +14,8 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestURL;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorChain;
+import com.dtflys.forest.retryer.ForestRetryer;
+import com.dtflys.forest.retryer.NoneRetryer;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ForestProgress;
 import com.dtflys.forest.utils.TypeReference;
@@ -25,6 +28,7 @@ import okio.Buffer;
 import okio.Okio;
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
+import org.checkerframework.checker.units.qual.A;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -510,7 +514,6 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertPathEquals("/B");
     }
 
-
     @Test
     public void testRequest_get_return_string() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
@@ -569,6 +572,33 @@ public class TestGenericForestClient extends BaseClientTest {
         assertThat(result).isNotNull();
         assertThat(result).isEqualTo(Lists.newArrayList(1, 2, 3));
     }
+
+    @Test
+    public void testRequest_get_return_map_list() {
+        server.enqueue(new MockResponse().setBody("[{\"a\": 1}, {\"b\": 2}, {\"c\": 3}]"));
+        List<Map<String, Object>> result = Forest.get("http://localhost:" + server.getPort()).executeAsList();
+        assertThat(result).isNotNull();
+        assertThat(result.size()).isEqualTo(3);
+        assertThat(result.get(0).get("a")).isEqualTo(1);
+        assertThat(result.get(1).get("b")).isEqualTo(2);
+        assertThat(result.get(2).get("c")).isEqualTo(3);
+    }
+
+    @Test
+    public void testRequest_get_return_response() {
+        server.enqueue(new MockResponse().setBody("{\"a\": 1, \"b\": 2, \"c\": 3}"));
+        ForestResponse<Map<String, Object>> response = Forest.get("http://localhost:" + server.getPort())
+                .execute(new TypeReference<ForestResponse<Map<String, Object>>>() {});
+        assertThat(response).isNotNull();
+        Map<String, Object> result = response.getResult();
+        assertThat(result).isNotNull();
+        assertThat(result.get("a")).isEqualTo(1);
+        assertThat(result.get("b")).isEqualTo(2);
+        assertThat(result.get("c")).isEqualTo(3);
+        assertThat(response.isClosed()).isTrue();
+        assertThat(response.getResult()).isNotNull();
+    }
+
 
     @Test
     public void testRequest_get_return_list2() {
@@ -1040,19 +1070,40 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertPathEquals("/");
     }
 
+
     @Test
     public void testRequest_sync_retryWhen_success() {
         server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
         server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
         server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
         server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
+        AtomicInteger count = new AtomicInteger(0);
         ForestRequest<?> request = Forest.get("http://localhost:" + server.getPort())
                 .maxRetryCount(3)
                 .maxRetryInterval(2)
-                .retryWhen(((req, res) -> res.statusIs(203)));
+                .retryWhen(((req, res) -> res.statusIs(203)))
+                .onRetry((req, res) -> count.incrementAndGet());
         request.execute();
         assertThat(request.getCurrentRetryCount()).isEqualTo(3);
+        assertThat(count.get()).isEqualTo(3);
     }
+
+    @Test
+    public void testRequest_noneRetryer() {
+        server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(400));
+        AtomicInteger count = new AtomicInteger(0);
+        ForestResponse response = Forest.get("http://localhost:" + server.getPort())
+                .maxRetryCount(3)
+                .maxRetryInterval(0)
+                .retryer(NoneRetryer.class)
+                .onRetry((req, res) -> count.incrementAndGet())
+                .execute(ForestResponse.class);
+        ForestRetryer retryer = response.getRequest().getRetryer();
+        assertThat(retryer).isNotNull().isInstanceOf(NoneRetryer.class);
+        assertThat(response.getRequest().getCurrentRetryCount()).isEqualTo(0);
+        assertThat(count.get()).isEqualTo(0);
+    }
+
 
 
     @Test

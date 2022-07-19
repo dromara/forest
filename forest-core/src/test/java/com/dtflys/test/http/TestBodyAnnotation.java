@@ -4,6 +4,7 @@ import com.dtflys.forest.annotation.BaseRequest;
 import com.dtflys.forest.annotation.Body;
 import com.dtflys.forest.annotation.Post;
 import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.forest.backend.httpclient.HttpclientBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.mock.MockServerRequest;
 import okhttp3.mockwebserver.MockResponse;
@@ -82,9 +83,12 @@ public class TestBodyAnnotation extends BaseClientTest {
         String body = mockRequest(server).bodyAsString();
         Field[] declaredFields = testHttpEntity.getClass().getDeclaredFields();
         boolean flag = true;
+        System.out.println("body ---> " + body);
         for (int i = 0; i < declaredFields.length; i++) {
             Field declaredField = declaredFields[i];
-            if (body.indexOf(declaredField.getName()) == -1) {
+            System.out.println("-------> " + declaredField.getName());
+            String fieldName = declaredField.getName();
+            if (!fieldName.startsWith("__") && body.indexOf(declaredField.getName()) == -1) {
                 flag = false;
                 break;
             }
