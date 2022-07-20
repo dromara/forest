@@ -3,13 +3,13 @@ package com.dtflys.forest.backend.httpclient.conn;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.ssl.SSLKeyStore;
-import com.dtflys.forest.ssl.SSLUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.protocol.HttpContext;
 
 import javax.net.SocketFactory;
+import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -41,6 +41,18 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
         return connectSocket;
     }
 
+    private String[][] getSupportedSSLProtocolsAndCipherSuites(ForestRequest request) {
+        try {
+            SSLSocketFactory sslFactory = request.getSSLSocketFactory();
+            SSLSocket socket = (SSLSocket) sslFactory.createSocket();
+            String[] protocols = socket.getSupportedProtocols();
+            String[] cipherSuites = socket.getSupportedCipherSuites();
+            return new String[][] { protocols, cipherSuites };
+        } catch (IOException e) {
+            throw new ForestRuntimeException(e);
+        }
+    }
+
     /**
      * 根据当前请求构建独立的SSLConnectionSocketFactory
      *
@@ -50,11 +62,12 @@ public class ForestSSLConnectionFactory implements LayeredConnectionSocketFactor
     private SSLConnectionSocketFactory getSslConnectionSocketFactory(ForestRequest request) {
         SSLSocketFactory sslSocketFactory = request.getSSLSocketFactory();
         SSLKeyStore keyStore = request.getKeyStore();
+        String[][] protocolsAndCipherSuites = getSupportedSSLProtocolsAndCipherSuites(request);
         SSLConnectionSocketFactory factory =
                 new SSLConnectionSocketFactory(
                         sslSocketFactory,
-                        keyStore == null ? SSLUtils.DEFAULT_PROTOCOLS : keyStore.getProtocols(),
-                        keyStore == null ? null : keyStore.getCipherSuites(),
+                        keyStore == null ? protocolsAndCipherSuites[0] : keyStore.getProtocols(),
+                        keyStore == null ? protocolsAndCipherSuites[1] : keyStore.getCipherSuites(),
                         request.hostnameVerifier());
         return factory;
     }

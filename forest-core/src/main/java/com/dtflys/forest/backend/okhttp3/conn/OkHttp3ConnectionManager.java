@@ -69,6 +69,10 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
      */
     private final static Map<ForestProtocol, List<Protocol>> PROTOCOL_VERSION_MAP = new HashMap<>();
 
+    /**
+     * 默认信任管理
+     */
+    private final static TrustAllManager DEFAULT_TRUST_MANAGER = new TrustAllManager();
 
 
     static {
@@ -84,8 +88,10 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
     public X509TrustManager getX509TrustManager(ForestRequest request) {
         try {
             SSLKeyStore sslKeyStore = request.getKeyStore();
-            if (sslKeyStore == null) {
-                return new TrustAllManager();
+            if (sslKeyStore == null ||
+                    sslKeyStore.getTrustStore() == null ||
+                    sslKeyStore.getInputStream() == null) {
+                return DEFAULT_TRUST_MANAGER;
             }
             return new ForestX509TrustManager(request.getKeyStore());
         } catch (Exception e) {

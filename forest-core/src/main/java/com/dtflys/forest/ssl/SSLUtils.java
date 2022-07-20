@@ -22,9 +22,14 @@ public class SSLUtils {
     public final static String TLS_1_2 = "TLSv1.2";
     public final static String TLS_1_3 = "TLSv1.3";
 
-    public final static String[] DEFAULT_PROTOCOLS = new String[] {
+    public final static String[] DEFAULT_PROTOCOLS_JDK8 = new String[] {
+            SSL_3, TLS_1, TLS_1_1, TLS_1_2
+    };
+
+    public final static String[] DEFAULT_PROTOCOLS_JDK11 = new String[] {
             SSL_3, TLS_1, TLS_1_1, TLS_1_2, TLS_1_3
     };
+
 
     private final static X509TrustManager[] DEFAULT_TRUST_MANAGERS = new X509TrustManager[] {
             new TrustAllManager()

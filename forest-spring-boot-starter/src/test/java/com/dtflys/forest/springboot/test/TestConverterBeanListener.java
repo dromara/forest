@@ -4,6 +4,7 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.json.ForestFastjsonConverter;
 import com.dtflys.forest.converter.json.ForestGsonConverter;
+import com.dtflys.forest.converter.json.ForestJacksonConverter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.springboot.test.client0.DisturbInterface;
 import com.dtflys.forest.springboot.test.client1.BaiduClient;
@@ -45,7 +46,7 @@ public class TestConverterBeanListener {
     @Test
     public void test1() {
         ForestConverter forestConverter = forestConfiguration.getConverterMap().get(ForestDataType.JSON);
-        assertTrue(forestConverter instanceof ForestFastjsonConverter);
+        assertTrue(forestConverter instanceof ForestJacksonConverter);
         ForestRequest<String> request = giteeClient.index2();
         System.out.println(request.execute());
     }

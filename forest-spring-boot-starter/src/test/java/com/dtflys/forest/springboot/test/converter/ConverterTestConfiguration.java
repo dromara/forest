@@ -21,4 +21,5 @@ public class ConverterTestConfiguration {
         return new ForestFastjsonConverter();
     }
 
+
 }
