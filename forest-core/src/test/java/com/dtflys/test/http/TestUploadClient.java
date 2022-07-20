@@ -27,12 +27,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -161,6 +163,64 @@ public class TestUploadClient extends BaseClientTest {
                     }
                 });
     }
+
+    @Test
+    public void testUploadFile_emptyFile() throws InterruptedException, FileUploadException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        ForestRequest<Map> request = uploadClient.upload((File) null, progress -> {});
+        Map result = (Map) request.execute();
+        assertNotNull(result);
+    }
+
+
+    @Test
+    public void testUploadFile_withParams() throws InterruptedException, FileUploadException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String path = Objects.requireNonNull(this.getClass().getResource("/test-img.jpg")).getPath();
+        if (path.startsWith("/") && isWindows()) {
+            path = path.substring(1);
+        }
+        File file = new File(path);
+        ForestRequest<Map> request = uploadClient.upload_withParams(file, "foo", "bar");
+        assertNotNull(request);
+        List<ForestMultipart> multipartList = request.getMultiparts();
+        assertEquals(1, multipartList.size());
+        assertTrue(StringUtils.isNotBlank(request.getBoundary()));
+        ForestMultipart multipart = multipartList.get(0);
+//        assertTrue(Map.class.isAssignableFrom(request.getMethod().getReturnClass()));
+        assertTrue(multipart instanceof FileMultipart);
+        assertEquals("file", multipart.getName());
+        assertEquals("test-img.jpg", multipart.getOriginalFileName());
+        Map result = (Map) request.execute();
+        assertNotNull(result);
+        MockServerRequest.mockRequest(server)
+                .assertMultipart("file", fileItems -> {
+                    assertEquals(1, fileItems.size());
+                    FileItem fileItem = fileItems.get(0);
+                    assertEquals("test-img.jpg", fileItem.getName());
+                    assertEquals("image/jpeg", fileItem.getContentType());
+                    try {
+                        byte[] bytes = IOUtils.toByteArray(fileItem.getInputStream());
+                        assertArrayEquals(IOUtils.toByteArray(new FileInputStream(file)), bytes);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .assertMultipart("a", "text/plain", "foo")
+                .assertMultipart("b", "text/plain", "bar");
+    }
+
+    @Test
+    public void testUploadFile_emptyFile_withParams() throws FileUploadException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        ForestRequest<Map> request = uploadClient.upload_withParams("foo", "bar");
+        Map result = (Map) request.execute();
+        assertNotNull(result);
+        MockServerRequest.mockRequest(server)
+                .assertMultipart("a", "text/plain", "foo")
+                .assertMultipart("b", "text/plain", "bar");
+    }
+
 
     @Test
     public void testUploadByteArray() throws IOException, InterruptedException, FileUploadException {
