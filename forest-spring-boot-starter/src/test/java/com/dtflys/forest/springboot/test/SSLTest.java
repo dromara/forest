@@ -57,6 +57,7 @@ public class SSLTest {
 
         ForestRequest<String> request = giteeClient.index2();
         assertThat(request).isNotNull();
+        assertThat(request.url().isSSL()).isTrue();
         request.getLogConfiguration().getLogHandler().setLogger(logger);
         String result = (String) request.execute();
         assertThat(result.startsWith("Global: ")).isTrue();

@@ -1,5 +1,6 @@
 package com.dtflys.forest.springboot.test.client2;
 
+import com.dtflys.forest.annotation.BaseRequest;
 import com.dtflys.forest.annotation.DataFile;
 import com.dtflys.forest.annotation.LogEnabled;
 import com.dtflys.forest.annotation.LogHandler;
@@ -14,10 +15,11 @@ import com.dtflys.forest.springboot.test.logging.TestLogHandler2;
  */
 @LogHandler(TestLogHandler2.class)
 @LogEnabled(logResponseStatus = true)
+@BaseRequest(baseURL = "#{my-site.base-url}")
 public interface GiteeClient {
 
     @Request(
-            url = "https://gitee.com/dt_flys/#{test.path}",
+            url = "/dt_flys/#{test.path}",
             timeout = 80000,
             sslProtocol = "SSL"
     )
@@ -26,7 +28,7 @@ public interface GiteeClient {
     ForestRequest<String> index();
 
     @Request(
-            url = "https://gitee.com/dt_flys",
+            url = "/dt_flys",
             timeout = 80000,
             keyStore = "keystore1"
     )

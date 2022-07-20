@@ -2,6 +2,7 @@ package com.dtflys.spring.test;
 
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.spring.test.client2.GithubClient;
 import junit.framework.TestCase;
 import com.dtflys.spring.test.client0.BeastshopClient;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -36,6 +37,16 @@ public class ClientTest extends TestCase {
         assertThat(configuration.getMaxAsyncQueueSize()).isEqualTo(128);
         Object baseUrl = configuration.getVariableValue("baseUrl");
         assertThat(baseUrl).isNotNull().isEqualTo("http://www.thebeastshop.com");
+    }
+
+
+    public void testGithub() {
+        applicationContext = new ClassPathXmlApplicationContext(
+                new String[] { "classpath:client-test.xml" });
+        GithubClient githubClient =
+                (GithubClient) applicationContext.getBean("githubClient");
+        String content = githubClient.index();
+        assertThat(content).isNotNull();
     }
 
 }

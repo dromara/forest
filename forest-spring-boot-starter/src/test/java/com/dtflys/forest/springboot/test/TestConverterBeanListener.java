@@ -17,6 +17,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
@@ -27,6 +28,7 @@ import static org.junit.Assert.assertTrue;
  * @author caihongming
  * @since 2021-03-30
  **/
+@ActiveProfiles("test1")
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestConverterBeanListener.class)
 @ComponentScan(basePackageClasses = ConverterTestConfiguration.class)
