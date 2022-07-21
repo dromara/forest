@@ -210,17 +210,6 @@ public class TestUploadClient extends BaseClientTest {
                 .assertMultipart("b", "text/plain", "bar");
     }
 
-    @Test
-    public void testUploadFile_emptyFile_withParams() throws FileUploadException {
-        server.enqueue(new MockResponse().setBody(EXPECTED));
-        ForestRequest<Map> request = uploadClient.upload_withParams("foo", "bar");
-        Map result = (Map) request.execute();
-        assertNotNull(result);
-        MockServerRequest.mockRequest(server)
-                .assertMultipart("a", "text/plain", "foo")
-                .assertMultipart("b", "text/plain", "bar");
-    }
-
 
     @Test
     public void testUploadByteArray() throws IOException, InterruptedException, FileUploadException {
