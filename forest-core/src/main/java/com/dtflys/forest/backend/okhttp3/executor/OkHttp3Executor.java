@@ -66,7 +66,7 @@ public class OkHttp3Executor implements HttpExecutor {
         RequestLogMessage message = new RequestLogMessage();
         HttpUrl url = okRequest.url();
         String scheme = url.scheme().toUpperCase();
-        String uri = url.uri().toString();
+        String uri = url.toString();
         String method = okRequest.method();
         message.setUri(uri);
         message.setType(method);
@@ -184,7 +184,7 @@ public class OkHttp3Executor implements HttpExecutor {
     public void execute(final LifeCycleHandler lifeCycleHandler, int retryCount) {
         OkHttpClient okHttpClient = getClient(request, lifeCycleHandler);
         URLBuilder urlBuilder = URL_BUILDER;
-        String url = urlBuilder.buildUrl(request);
+        String url = urlBuilder.buildUrl(request, false);
         Request.Builder builder = new Request.Builder().url(url);
         prepareHeaders(builder);
         prepareMethodAndBody(builder, lifeCycleHandler);

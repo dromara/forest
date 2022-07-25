@@ -226,6 +226,18 @@ public final class URLUtils {
         return URLEncoder.QUERY_VALUE.encode(content, encode);
     }
 
+    /**
+     * 进行 (带不转义大括号的) 查询参数值部分的URL Encoding编码
+     *
+     * @param content 需要编码的原字符串
+     * @param encode 编码字符集
+     * @return URL Encoding编码结果字符串
+     */
+    public static String queryValueWithBraceEncode(String content, String encode) {
+        return URLEncoder.QUERY_VALUE_WITH_BRACE.encode(content, encode);
+    }
+
+
 
     /**
      * 进行URL Encoding编码

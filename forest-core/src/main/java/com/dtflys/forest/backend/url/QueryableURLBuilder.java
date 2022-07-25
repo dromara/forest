@@ -19,7 +19,7 @@ import java.util.List;
 public class QueryableURLBuilder extends URLBuilder {
 
     @Override
-    public String buildUrl(ForestRequest request) {
+    public String buildUrl(ForestRequest request, boolean encodeBraceInQueryValue) {
         String url = request.getUrl();
         List<ForestQueryParameter> queryParameters = request.getQueryValues();
         StringBuilder paramBuilder = new StringBuilder();
@@ -45,8 +45,10 @@ public class QueryableURLBuilder extends URLBuilder {
                 String encodedValue = null;
                 if (queryParam.isUrlencoded()) {
                     encodedValue = URLUtils.allEncode(value, charset);
-                } else {
+                } else if (encodeBraceInQueryValue) {
                     encodedValue = URLUtils.queryValueEncode(value, charset);
+                } else {
+                    encodedValue = URLUtils.queryValueWithBraceEncode(value, charset);
                 }
                 if (encodedValue != null) {
                     paramBuilder.append(encodedValue);

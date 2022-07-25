@@ -13,7 +13,7 @@ import java.util.Map;
 public class SimpleURLBuilder extends URLBuilder {
 
     @Override
-    public String buildUrl(ForestRequest request) {
+    public String buildUrl(ForestRequest request, boolean encodeBraceInQueryValue) {
         String url = request.getUrl();
         String queryString = request.getQueryString();
         StringBuilder urlBuilder = new StringBuilder(url);
