@@ -31,7 +31,7 @@
 <a href="https://opensource.org/licenses/mit-license.php">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
 </a>
-<a href="http://forest.dtflyx.com/">
+<a href="https://forest.dtflyx.com/pages/1.5.x/intro/">
     <img src="https://img.shields.io/badge/document-1.x-e96.svg" alt="Documentation">
 </a>
 <a href="https://gitee.com/dromara/forest#%E8%81%94%E7%B3%BB%E4%BD%9C%E8%80%85">
@@ -51,9 +51,9 @@ Forest是一个高层的、极简的声明式HTTP调用API框架<br>
 
 文档和示例：
 -------------------------------------
-* [项目主页](http://forest.dtflyx.com/) 
+* [项目主页](https://forest.dtflyx.com/) 
 
-* [中文文档](http://forest.dtflyx.com/docs/) 
+* [中文文档](https://forest.dtflyx.com/pages/1.5.x/intro/) 
 
 * [JavaDoc](https://apidoc.gitee.com/dt_flys/forest/)
 
