@@ -8,6 +8,7 @@ import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.http.ForestURL;
 import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.test.http.client.UrlEncodedClient;
 import com.dtflys.test.http.model.JsonTestUser;
@@ -533,14 +534,14 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(EXPECTED));
         String token = "YmZlNDYzYmVkMWZjYzgwNjExZDVhMWM1ODZmMWRhYzg0NTcyMGEwMg==";
-        ForestResponse<String> response = getClient.testUrl2("http", "localhost", "xxx");
+        ForestResponse<String> response = getClient.testUrl2("http", "localhost", "xxx$@!");
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
         assertThat(response.getContentType()).isNull();
         assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
-                .assertPathEquals("/xxx")
+                .assertPathEquals("/xxx$@!")
                 .assertEncodedQueryEquals("token=" + token)
                 .assertQueryEquals("token", token);
     }
@@ -769,6 +770,17 @@ public class TestGetClient extends BaseClientTest {
                 .assertPathEquals("/test");
     }
 
+    @Test
+    public void testDomain() {
+        ForestRequest<String> request = getClient.testDomain("dtflys");
+        assertThat(request).isNotNull();
+        ForestURL url = request.url();
+        assertThat(url).isNotNull();
+        assertThat(url.getScheme()).isEqualTo("https");
+        assertThat(url.getHost()).isEqualTo("www.dtflys.com");
+        assertThat(url.getPort()).isEqualTo(443);
+        assertThat(request.getUrl()).isEqualTo("https://www.dtflys.com");
+    }
 
     @Test
     public void testSimpleGetMultiQuery() {

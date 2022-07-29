@@ -392,6 +392,16 @@ public interface GetClient {
     @Get(url = "http://localhost:${port}/test{ref}{ref2}")
     ForestResponse<String> testRef3(@Var("ref") String ref, @Var("ref2") String ref2);
 
+    @Get(url = "https://www.${domain}.com")
+    ForestRequest<String> testDomain(@Var("domain") String domain);
+
+    @Get(url = "https://{domain}/xxx")
+    ForestRequest<String> testDomain2(@Var("domain") String domain);
+
+
+    @Get(url = "https://{version}.dtflys.com")
+    ForestRequest<String> testDomain3(@Var("version") String version);
+
     @Get(
             url = "http://localhost:${port}/hello/user?{name}",
             headers = {"Accept:text/plain"}

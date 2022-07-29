@@ -146,7 +146,7 @@ public class MappingURLTemplate extends MappingTemplate {
                                     if (userInfo == null) {
                                         userInfo = new StringBuilder(subBuilder.toString() + ':');
                                     } else {
-                                        userInfo.append(subBuilder.toString()).append(':');
+                                        userInfo.append(subBuilder).append(':');
                                     }
                                     subBuilder = new StringBuilder();
                                     continue;
