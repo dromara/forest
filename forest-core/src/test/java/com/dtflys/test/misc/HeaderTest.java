@@ -5,7 +5,6 @@ import com.dtflys.forest.http.ForestHeaderMap;
 import com.dtflys.forest.http.ForestURL;
 import com.dtflys.forest.http.HasURL;
 import junit.framework.TestCase;
-import org.junit.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -34,7 +33,6 @@ public class HeaderTest extends TestCase {
      *
      * @author yangle94
      */
-    @Test
     public void testAddCookie() {
         HasURL hasURL = () -> {
             try {
