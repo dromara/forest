@@ -36,7 +36,7 @@ public class HeaderTest extends TestCase {
     public void testAddCookie() {
         HasURL hasURL = () -> {
             try {
-                return new ForestURL(new URL("https://baidu.com"));
+                return new ForestURL(new URL("https://baidu.com/aaa"));
             } catch (MalformedURLException e) {
                 throw new RuntimeException(e);
             }
@@ -53,7 +53,7 @@ public class HeaderTest extends TestCase {
         assertFalse(forestHeaderMap.containsKey("Cookie"));
 
 
-        String url1 = "https://baidu.com";
+        String url1 = "https://baidu.com/test";
         String setCookie1 = "foo=bar; max-age=" + maxAge.getSeconds();
         ForestCookie cookie1 = ForestCookie.parse(url1, setCookie1);
         forestHeaderMap.addCookie(cookie1);
