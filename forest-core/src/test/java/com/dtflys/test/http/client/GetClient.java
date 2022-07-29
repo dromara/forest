@@ -392,7 +392,7 @@ public interface GetClient {
     @Get(url = "http://localhost:${port}/test{ref}{ref2}")
     ForestResponse<String> testRef3(@Var("ref") String ref, @Var("ref2") String ref2);
 
-    @Get(url = "https://www.${domain}.com")
+    @Get(url = "https://www.${domain}.com/xxx")
     ForestRequest<String> testDomain(@Var("domain") String domain);
 
     @Get(url = "https://{domain}/xxx")

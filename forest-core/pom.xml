@@ -24,6 +24,7 @@
         <kotlin.version>1.6.20</kotlin.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <jaxb-impl.version>2.3.0</jaxb-impl.version>
+        <antlr4.version>4.10.1</antlr4.version>
     </properties>
 
     <dependencies>
@@ -88,7 +89,6 @@
             <artifactId>commons-io</artifactId>
             <version>${common-io.version}</version>
         </dependency>
-
 
         <dependency>
             <groupId>com.alibaba</groupId>

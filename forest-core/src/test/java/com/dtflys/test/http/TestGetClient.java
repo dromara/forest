@@ -778,9 +778,36 @@ public class TestGetClient extends BaseClientTest {
         assertThat(url).isNotNull();
         assertThat(url.getScheme()).isEqualTo("https");
         assertThat(url.getHost()).isEqualTo("www.dtflys.com");
+        assertThat(url.getPath()).isEqualTo("/xxx");
         assertThat(url.getPort()).isEqualTo(443);
-        assertThat(request.getUrl()).isEqualTo("https://www.dtflys.com");
+        assertThat(request.getUrl()).isEqualTo("https://www.dtflys.com/xxx");
     }
+
+    @Test
+    public void testDomain2() {
+        ForestRequest<String> request = getClient.testDomain2("www.dtflys.com");
+        assertThat(request).isNotNull();
+        ForestURL url = request.url();
+        assertThat(url).isNotNull();
+        assertThat(url.getScheme()).isEqualTo("https");
+        assertThat(url.getHost()).isEqualTo("www.dtflys.com");
+        assertThat(url.getPath()).isEqualTo("/xxx");
+        assertThat(url.getPort()).isEqualTo(443);
+        assertThat(request.getUrl()).isEqualTo("https://www.dtflys.com/xxx");
+
+
+        request = getClient.testDomain2("www.dtflys.com/yyy");
+        assertThat(request).isNotNull();
+        url = request.url();
+        assertThat(url).isNotNull();
+        assertThat(url.getScheme()).isEqualTo("https");
+        assertThat(url.getHost()).isEqualTo("www.dtflys.com");
+        assertThat(url.getPath()).isEqualTo("/yyy/xxx");
+        assertThat(url.getPort()).isEqualTo(443);
+        assertThat(request.getUrl()).isEqualTo("https://www.dtflys.com/yyy/xxx");
+
+    }
+
 
     @Test
     public void testSimpleGetMultiQuery() {
