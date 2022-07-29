@@ -772,41 +772,55 @@ public class TestGetClient extends BaseClientTest {
 
     @Test
     public void testDomain() {
-        ForestRequest<String> request = getClient.testDomain("dtflys");
+        ForestRequest<String> request = getClient.testDomain("dtflyx");
         assertThat(request).isNotNull();
         ForestURL url = request.url();
         assertThat(url).isNotNull();
         assertThat(url.getScheme()).isEqualTo("https");
-        assertThat(url.getHost()).isEqualTo("www.dtflys.com");
+        assertThat(url.getHost()).isEqualTo("www.dtflyx.com");
         assertThat(url.getPath()).isEqualTo("/xxx");
         assertThat(url.getPort()).isEqualTo(443);
-        assertThat(request.getUrl()).isEqualTo("https://www.dtflys.com/xxx");
+        assertThat(request.getUrl()).isEqualTo("https://www.dtflyx.com/xxx");
     }
 
     @Test
     public void testDomain2() {
-        ForestRequest<String> request = getClient.testDomain2("www.dtflys.com");
+        ForestRequest<String> request = getClient.testDomain2("www.dtflyx.com");
         assertThat(request).isNotNull();
         ForestURL url = request.url();
         assertThat(url).isNotNull();
         assertThat(url.getScheme()).isEqualTo("https");
-        assertThat(url.getHost()).isEqualTo("www.dtflys.com");
+        assertThat(url.getHost()).isEqualTo("www.dtflyx.com");
         assertThat(url.getPath()).isEqualTo("/xxx");
         assertThat(url.getPort()).isEqualTo(443);
-        assertThat(request.getUrl()).isEqualTo("https://www.dtflys.com/xxx");
+        assertThat(request.getUrl()).isEqualTo("https://www.dtflyx.com/xxx");
 
 
-        request = getClient.testDomain2("www.dtflys.com/yyy");
+        request = getClient.testDomain2("www.dtflyx.com/yyy");
         assertThat(request).isNotNull();
         url = request.url();
         assertThat(url).isNotNull();
         assertThat(url.getScheme()).isEqualTo("https");
-        assertThat(url.getHost()).isEqualTo("www.dtflys.com");
+        assertThat(url.getHost()).isEqualTo("www.dtflyx.com");
         assertThat(url.getPath()).isEqualTo("/yyy/xxx");
         assertThat(url.getPort()).isEqualTo(443);
-        assertThat(request.getUrl()).isEqualTo("https://www.dtflys.com/yyy/xxx");
-
+        assertThat(request.getUrl()).isEqualTo("https://www.dtflyx.com/yyy/xxx");
     }
+
+
+    @Test
+    public void testDomain3() {
+        ForestRequest<String> request = getClient.testDomain3("forest");
+        assertThat(request).isNotNull();
+        ForestURL url = request.url();
+        assertThat(url).isNotNull();
+        assertThat(url.getScheme()).isEqualTo("https");
+        assertThat(url.getHost()).isEqualTo("forest.dtflyx.com");
+        assertThat(url.getPath()).isEqualTo("/xxx");
+        assertThat(url.getPort()).isEqualTo(443);
+        assertThat(request.getUrl()).isEqualTo("https://forest.dtflyx.com/xxx");
+    }
+
 
 
     @Test

@@ -398,9 +398,8 @@ public interface GetClient {
     @Get(url = "https://{domain}/xxx")
     ForestRequest<String> testDomain2(@Var("domain") String domain);
 
-
-    @Get(url = "https://{version}.dtflys.com")
-    ForestRequest<String> testDomain3(@Var("version") String version);
+    @Get(url = "https://{domain}.dtflyx.com/xxx")
+    ForestRequest<String> testDomain3(@Var("domain") String domain);
 
     @Get(
             url = "http://localhost:${port}/hello/user?{name}",
