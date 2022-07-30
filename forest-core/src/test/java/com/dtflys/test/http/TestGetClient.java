@@ -3,6 +3,7 @@ package com.dtflys.test.http;
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
@@ -929,7 +930,7 @@ public class TestGetClient extends BaseClientTest {
     @Test
     public void testGetToken() throws InterruptedException {
         String token = "eyJjfeljlOfjelajflaFJLjlaefjl";
-        String str = "{\"TokenTimeout\": 604800, \"URLToken\": \"" + token + "\"}";
+        String str = "{\"URLToken\":\""+token+"\",\"tokenTimeout\":604800}";
         server.enqueue(
                 new MockResponse()
                         .setHeader("Content-Type", "text/plain")

@@ -1311,7 +1311,7 @@ public class TestGenericForestClient extends BaseClientTest {
         String dir = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "TestDownload";
         String filename = "test-img-1.jpg";
         ForestRequest<?> request = Forest.get("http://localhost:" + server.getPort())
-                .setDownloadFile(dir, "")
+                .setDownloadFile(dir, filename)
                 .setOnProgress(progress -> {
                     System.out.println("------------------------------------------");
                     System.out.println("total bytes: " + progress.getTotalBytes());

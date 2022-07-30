@@ -3,6 +3,7 @@ package com.dtflys.test.http.encoder;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestFastjson2Converter;
 import com.dtflys.forest.converter.json.ForestFastjsonConverter;
 import com.dtflys.forest.converter.json.ForestGsonConverter;
 import com.dtflys.forest.converter.json.ForestJacksonConverter;
@@ -144,6 +145,19 @@ public class TestEncoderClient extends BaseClientTest {
         assertThat(request).isNotNull();
         assertThat(request.bodyType()).isNotNull().isEqualTo(ForestDataType.JSON);
         assertThat(request.getEncoder()).isNotNull().isInstanceOf(ForestFastjsonConverter.class);
+        request.execute();
+        mockRequest(server)
+                .assertBodyEquals("{\"name\":\"AAA\",\"value\":\"BBB\"}");
+    }
+
+    @Test
+    public void testFastjson2() {
+        EncoderClient.Entry entry = new EncoderClient.Entry("AAA", "BBB");
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        ForestRequest request = encoderClient.testFastjson2(entry);
+        assertThat(request).isNotNull();
+        assertThat(request.bodyType()).isNotNull().isEqualTo(ForestDataType.JSON);
+        assertThat(request.getEncoder()).isNotNull().isInstanceOf(ForestFastjson2Converter.class);
         request.execute();
         mockRequest(server)
                 .assertBodyEquals("{\"name\":\"AAA\",\"value\":\"BBB\"}");
