@@ -7,6 +7,7 @@ import com.dtflys.test.http.BaseClientTest;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -34,6 +35,18 @@ public class TestBaseErrorClient extends BaseClientTest {
         ForestResponse<String> result = baseErrorInterceptorClient.testError();
         assertNotNull(result);
         assertEquals("Base OnError is OK", result.getResult());
+    }
+
+
+    @Test
+    public void testBaseError2() {
+        String message = "";
+        try {
+            baseErrorInterceptorClient.testError2();
+        } catch (Throwable th) {
+            message = th.getMessage();
+        }
+        assertThat(message).isNotBlank().isEqualTo("xxxx");
     }
 
 }
