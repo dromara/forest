@@ -2,9 +2,13 @@ package com.dtflys.forest.backend;
 
 
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.utils.AsyncUtil;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 
 /**
@@ -31,7 +35,20 @@ public abstract class AbstractHttpBackend implements HttpBackend {
 
     static {
         if (AsyncUtil.isEnableCoroutine()) {
-            ASYNC_HTTP_EXECUTOR_CREATOR = CoroutineHttpExecutor::new;
+
+            ASYNC_HTTP_EXECUTOR_CREATOR = (configuration, syncExecutor, responseHandler) -> {
+                try {
+                    Constructor<?> constructor = Class.forName("com.dtflys.forest.backend.CoroutineHttpExecutor")
+                            .getConstructor(
+                                    ForestConfiguration.class,
+                                    HttpExecutor.class,
+                                    ResponseHandler.class);
+                    return (HttpExecutor) constructor.newInstance(configuration, syncExecutor, responseHandler);
+                } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException |
+                         InstantiationException | IllegalAccessException e) {
+                    throw new ForestRuntimeException(e);
+                }
+            };
         } else {
             ASYNC_HTTP_EXECUTOR_CREATOR = AsyncHttpExecutor::new;
         }
