@@ -1,8 +1,14 @@
 package com.dtflys.test.misc;
 
+import com.dtflys.forest.http.ForestCookie;
 import com.dtflys.forest.http.ForestHeaderMap;
+import com.dtflys.forest.http.ForestURL;
+import com.dtflys.forest.http.HasURL;
 import junit.framework.TestCase;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.time.Duration;
 import java.util.List;
 
 public class HeaderTest extends TestCase {
@@ -22,4 +28,36 @@ public class HeaderTest extends TestCase {
         assertEquals("3", values.get(1));
     }
 
+    /**
+     * 测试添加cookie
+     *
+     * @author yangle94
+     */
+    public void testAddCookie() {
+        HasURL hasURL = () -> {
+            try {
+                return new ForestURL(new URL("https://baidu.com/aaa"));
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            }
+        };
+        ForestHeaderMap forestHeaderMap = new ForestHeaderMap(hasURL);
+
+        Duration maxAge = Duration.ofSeconds(10L);
+        String url = "http://forest.dtflyx.com/docs";
+        String setCookie = "foo=bar; max-age=" + maxAge.getSeconds();
+        ForestCookie cookie = ForestCookie.parse(url, setCookie);
+
+        forestHeaderMap.addCookie(cookie);
+
+        assertFalse(forestHeaderMap.containsKey("Cookie"));
+
+
+        String url1 = "https://baidu.com/test";
+        String setCookie1 = "foo=bar; max-age=" + maxAge.getSeconds();
+        ForestCookie cookie1 = ForestCookie.parse(url1, setCookie1);
+        forestHeaderMap.addCookie(cookie1);
+
+        assertTrue(forestHeaderMap.containsKey("Cookie"));
+    }
 }
