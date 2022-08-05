@@ -38,7 +38,7 @@ public abstract class AbstractHttpBackend implements HttpBackend {
 
             ASYNC_HTTP_EXECUTOR_CREATOR = (configuration, syncExecutor, responseHandler) -> {
                 try {
-                    Constructor<?> constructor = Class.forName("com.dtflys.forest.backend.CoroutineHttpExecutor")
+                    Constructor<?> constructor = Class.forName("com.dtflys.forest.backend.KotlinCoroutineHttpExecutor")
                             .getConstructor(
                                     ForestConfiguration.class,
                                     HttpExecutor.class,

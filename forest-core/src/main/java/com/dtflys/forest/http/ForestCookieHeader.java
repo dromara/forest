@@ -63,7 +63,7 @@ public class ForestCookieHeader extends ForestHeader {
     public ForestCookie getCookie(String name) {
         for (Map.Entry<String, Map<String, ForestCookie>> entry : cookies.entrySet()) {
             Map<String, ForestCookie> map = entry.getValue();
-            ForestCookie  cookie = map.get(name.toLowerCase());
+            ForestCookie cookie = map.get(name.toLowerCase());
             if (cookie != null) {
                 return cookie;
             }

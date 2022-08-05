@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture
  * @author CHMing
  * @since 1.5.23
  **/
-class CoroutineHttpExecutor(
+class KotlinCoroutineHttpExecutor(
 
     protected val configuration: ForestConfiguration,
 
