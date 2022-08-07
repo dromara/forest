@@ -48,7 +48,11 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                 strCharset = typeGroup[1];
                 charset = Charset.forName(strCharset);
             } else {
-                charset = StandardCharsets.UTF_8;
+                strCharset = request.getConfiguration().getCharset();
+                if (StringUtils.isEmpty(strCharset)) {
+                    strCharset = "UTF-8";
+                }
+                charset = Charset.forName(strCharset);
             }
         } else {
             charset = Charset.forName(strCharset);
@@ -67,7 +71,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
         ForestEncoder encoder = request.getEncoder();
         if (encoder != null) {
             byte[] bodyBytes = encoder.encodeRequestBody(request, charset);
-            setBinaryBody(httpRequest, request, charset, ctypeWithoutParams, bodyBytes, mergeCharset);
+            setBinaryBody(httpRequest, request, strCharset, ctypeWithoutParams, bodyBytes, mergeCharset);
             return;
         }
 
@@ -95,13 +99,13 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                 bodyEncoder = (ForestEncoder) request.getConfiguration().getConverterMap().get(ForestDataType.TEXT);
             }
             byte[] bodyBytes = bodyEncoder.encodeRequestBody(request, charset);
-            setBinaryBody(httpRequest, request, charset, ctypeWithoutParams, bodyBytes, mergeCharset);
+            setBinaryBody(httpRequest, request, strCharset, ctypeWithoutParams, bodyBytes, mergeCharset);
         }
     }
 
-    public void setBody(T httpReq, ForestRequest request, byte[] bytes, Charset charset, String contentType, boolean mergeCharset) {
+    public void setBody(T httpReq, ForestRequest request, byte[] bytes, String charset, String contentType, boolean mergeCharset) {
         if (charset != null) {
-            String text = new String(bytes, charset);
+            String text = new String(bytes, Charset.forName(charset));
             setStringBody(httpReq, request, text, charset, contentType, mergeCharset);
         } else {
             setBinaryBody(httpReq, request, charset, contentType, bytes, mergeCharset);
@@ -117,7 +121,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
      * @param contentType 数据类型
      * @param mergeCharset 是否合并字符集
      */
-    protected abstract void setStringBody(T httpReq, ForestRequest request, String text, Charset charset, String contentType, boolean mergeCharset);
+    protected abstract void setStringBody(T httpReq, ForestRequest request, String text, String charset, String contentType, boolean mergeCharset);
 
 
     /**
@@ -140,7 +144,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
      */
     protected abstract void setBinaryBody(T httpReq,
                                  ForestRequest request,
-                                 Charset charset,
+                                 String charset,
                                  String contentType,
                                  byte[] bytes,
                                  boolean mergeCharset);

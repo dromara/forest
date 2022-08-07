@@ -31,7 +31,7 @@ public class QueryableURLBuilder extends URLBuilder {
                 paramBuilder.append(queryParam.getName());
             }
             String value = MappingTemplate.getParameterValue(jsonConverter, queryParam.getValue());
-            if (value != null && request.getCharset() != null) {
+            if (value != null) {
                 if (name != null) {
                     paramBuilder.append('=');
                 }

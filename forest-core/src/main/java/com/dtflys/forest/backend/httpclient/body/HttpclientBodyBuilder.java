@@ -38,16 +38,16 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
 
 
     @Override
-    protected void setStringBody(T httpReq, ForestRequest request, String text, Charset charset, String contentType, boolean mergeCharset) {
+    protected void setStringBody(T httpReq, ForestRequest request, String text, String charset, String contentType, boolean mergeCharset) {
         StringEntity entity = new StringEntity(text, charset);
         if (charset == null && mergeCharset) {
             if (!contentType.contains("charset=")) {
-                contentType = contentType + "; charset=" + charset.name().toLowerCase();
+                contentType = contentType + "; charset=" + charset;
             } else {
                 String[] strs = contentType.split("charset=");
-                contentType = strs[0] + " charset=" + charset.name().toLowerCase();
+                contentType = strs[0] + " charset=" + charset;
             }
-            entity.setContentEncoding(charset.name());
+            entity.setContentEncoding(charset);
         }
         entity.setContentType(contentType);
         httpReq.setEntity(entity);
@@ -147,7 +147,7 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
     @Override
     protected void setBinaryBody(T httpReq,
                                  ForestRequest request,
-                                 Charset charset,
+                                 String charset,
                                  String contentType,
                                  byte[] bytes,
                                  boolean mergeCharset) {
@@ -157,10 +157,10 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
         }
         if (charset == null && mergeCharset) {
             if (!contentType.contains("charset=")) {
-                contentType = contentType + "; charset=" + charset.name().toLowerCase();
+                contentType = contentType + "; charset=" + charset;
             } else {
                 String[] strs = contentType.split("charset=");
-                contentType = strs[0] + " charset=" + charset.name().toLowerCase();
+                contentType = strs[0] + " charset=" + charset;
             }
         }
         ContentType ctype = ContentType.create(contentType, charset);

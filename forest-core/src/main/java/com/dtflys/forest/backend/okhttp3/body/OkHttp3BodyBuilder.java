@@ -31,11 +31,11 @@ import java.util.Map;
 public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
 
     @Override
-    protected void setStringBody(Request.Builder builder, ForestRequest request, String text, Charset charset, String contentType, boolean mergeCharset) {
+    protected void setStringBody(Request.Builder builder, ForestRequest request, String text, String charset, String contentType, boolean mergeCharset) {
         MediaType mediaType = MediaType.parse(contentType);
         Charset cs = StandardCharsets.UTF_8;
         if (charset != null) {
-            cs = charset;
+            cs = Charset.forName(charset);
         }
         if (contentType != null) {
             if (mediaType == null) {
@@ -44,7 +44,7 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
             Charset mtcs = mediaType.charset();
             if (mtcs == null) {
                 if (charset != null && mergeCharset) {
-                    mediaType = MediaType.parse(contentType + "; charset=" + charset.name().toLowerCase());
+                    mediaType = MediaType.parse(contentType + "; charset=" + charset);
                 }
             }
         }
@@ -160,7 +160,7 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
     protected void setBinaryBody(
             Request.Builder builder,
             ForestRequest request,
-            Charset charset,
+            String charset,
             String contentType,
             byte[] bytes,
             boolean mergeCharset) {
@@ -171,7 +171,7 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
         Charset mtcs = mediaType.charset();
         if (mtcs == null) {
             if (charset != null && mergeCharset) {
-                mediaType = MediaType.parse(contentType + "; charset=" + charset.name().toLowerCase());
+                mediaType = MediaType.parse(contentType + "; charset=" + charset);
             }
         }
         RequestBody body = RequestBody.create(mediaType, bytes);
