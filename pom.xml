@@ -85,7 +85,6 @@
 	</modules>
 
 	<dependencies>
-
 		<!-- mockito -->
 		<dependency>
 			<groupId>org.mockito</groupId>
@@ -103,7 +102,6 @@
 			</exclusions>
 			<scope>test</scope>
 		</dependency>
-
 
 		<!-- junit -->
 		<dependency>
