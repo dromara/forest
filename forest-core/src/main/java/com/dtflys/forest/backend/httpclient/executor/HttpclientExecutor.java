@@ -7,14 +7,11 @@ import com.dtflys.forest.backend.httpclient.body.HttpclientBodyBuilder;
 import com.dtflys.forest.backend.httpclient.entity.HttpclientRequestWithBodyEntity;
 import com.dtflys.forest.backend.url.QueryableURLBuilder;
 import com.dtflys.forest.backend.url.URLBuilder;
-import com.dtflys.forest.http.ForestCookie;
-import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestHeader;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponseFactory;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
-import org.apache.http.client.CookieStore;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.backend.httpclient.request.HttpclientRequestSender;
 import com.dtflys.forest.backend.httpclient.response.HttpclientForestResponseFactory;
@@ -24,8 +21,6 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.mapping.MappingTemplate;
 
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.cookie.BasicClientCookie;
 
 import java.io.IOException;
 import java.util.Date;
@@ -51,7 +46,7 @@ public class HttpclientExecutor extends AbstractHttpExecutor {
     }
 
     protected String buildUrl() {
-        return getURLBuilder().buildUrl(request);
+        return getURLBuilder().buildUrl(request, true);
     }
 
     protected void prepareBodyBuilder() {

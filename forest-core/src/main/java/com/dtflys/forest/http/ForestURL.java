@@ -268,7 +268,7 @@ public class ForestURL {
                     String originHost = this.host;
                     URL url = new URL(this.basePath);
                     if (forced || StringUtils.isEmpty(this.scheme)) {
-                        this.scheme = url.getProtocol();
+                        setScheme(url.getProtocol());
                     }
                     if (forced || StringUtils.isEmpty(this.userInfo)) {
                         this.userInfo = url.getUserInfo();
@@ -502,7 +502,7 @@ public class ForestURL {
         }
         boolean needBasePath = false;
         if (this.scheme == null) {
-            this.scheme = baseSchema;
+            setScheme(baseSchema);
             needBasePath = true;
         }
         if (this.userInfo == null) {

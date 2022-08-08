@@ -84,7 +84,7 @@ public @interface BaseRequest {
      * @return 接口级别请求字符集
      * @see Request#charset()
      */
-    String charset() default "UTF-8";
+    String charset() default "";
 
     /**
      * 接口级别请求头列表

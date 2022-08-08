@@ -20,6 +20,7 @@ import java.io.File;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -30,11 +31,11 @@ import java.util.Map;
 public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
 
     @Override
-    protected void setStringBody(Request.Builder builder, ForestRequest request, String text, Charset charset, String contentType, boolean mergeCharset) {
+    protected void setStringBody(Request.Builder builder, ForestRequest request, String text, String charset, String contentType, boolean mergeCharset) {
         MediaType mediaType = MediaType.parse(contentType);
         Charset cs = StandardCharsets.UTF_8;
         if (charset != null) {
-            cs = charset;
+            cs = Charset.forName(charset);
         }
         if (contentType != null) {
             if (mediaType == null) {
@@ -43,7 +44,7 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
             Charset mtcs = mediaType.charset();
             if (mtcs == null) {
                 if (charset != null && mergeCharset) {
-                    mediaType = MediaType.parse(contentType + "; charset=" + charset.name().toLowerCase());
+                    mediaType = MediaType.parse(contentType + "; charset=" + charset);
                 }
             }
         }
@@ -87,12 +88,14 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
         }
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         List<ForestMultipart> multiparts = request.getMultiparts();
+        int partsCount = 0;
         for (ForestRequestBody item : request.body()) {
             if (item instanceof NameValueRequestBody) {
                 NameValueRequestBody nameValueItem = (NameValueRequestBody) item;
                 String name = nameValueItem.getName();
                 Object value = nameValueItem.getValue();
                 String partContentType = nameValueItem.getContentType();
+                partsCount++;
                 addMultipart(bodyBuilder, name, value, partContentType, charset, jsonConverter);
             } else if (item instanceof ObjectRequestBody) {
                 Object obj = ((ObjectRequestBody) item).getObject();
@@ -103,15 +106,21 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
                 for (Map.Entry<String, Object> entry : attrs.entrySet()) {
                     String name = entry.getKey();
                     Object value = entry.getValue();
+                    partsCount++;
                     addMultipart(bodyBuilder, name, value, null, charset, jsonConverter);
                 }
             }
         }
         for (ForestMultipart multipart : multiparts) {
+            partsCount++;
             RequestBody fileBody = createFileBody(request, multipart, charset, lifeCycleHandler);
             bodyBuilder.addFormDataPart(multipart.getName(), multipart.getOriginalFileName(), fileBody);
         }
-
+        // 没有任何 parts 的时候
+        // 绕过 okhttp 的空 multipart 错误
+        if (partsCount == 0) {
+            addMultipart(bodyBuilder, "", "", "text/pain", charset, jsonConverter);
+        }
         MultipartBody body = bodyBuilder.build();
         builder.method(request.getType().getName(), body);
     }
@@ -151,7 +160,7 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
     protected void setBinaryBody(
             Request.Builder builder,
             ForestRequest request,
-            Charset charset,
+            String charset,
             String contentType,
             byte[] bytes,
             boolean mergeCharset) {
@@ -162,7 +171,7 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
         Charset mtcs = mediaType.charset();
         if (mtcs == null) {
             if (charset != null && mergeCharset) {
-                mediaType = MediaType.parse(contentType + "; charset=" + charset.name().toLowerCase());
+                mediaType = MediaType.parse(contentType + "; charset=" + charset);
             }
         }
         RequestBody body = RequestBody.create(mediaType, bytes);

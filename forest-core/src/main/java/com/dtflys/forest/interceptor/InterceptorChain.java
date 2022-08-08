@@ -33,9 +33,7 @@ public class InterceptorChain implements Interceptor {
 
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
-        Iterator<Interceptor> iter = interceptors.iterator();
-        for ( ; iter.hasNext(); ) {
-            Interceptor item = iter.next();
+        for (Interceptor item : interceptors) {
             item.onInvokeMethod(request, method, args);
         }
     }
@@ -43,9 +41,7 @@ public class InterceptorChain implements Interceptor {
 
     @Override
     public boolean beforeExecute(ForestRequest request) {
-        Iterator<Interceptor> iter = interceptors.iterator();
-        for ( ; iter.hasNext(); ) {
-            Interceptor item = iter.next();
+        for (Interceptor item : interceptors) {
             boolean result = item.beforeExecute(request);
             if (!result) {
                 return false;
@@ -56,9 +52,7 @@ public class InterceptorChain implements Interceptor {
 
     @Override
     public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
-        Iterator<Interceptor> iter = interceptors.iterator();
-        for ( ; iter.hasNext(); ) {
-            Interceptor item = iter.next();
+        for (Interceptor item : interceptors) {
             if (response != null) {
                 data = response.getResult();
             }
@@ -68,63 +62,49 @@ public class InterceptorChain implements Interceptor {
 
     @Override
     public void onRetry(ForestRequest request, ForestResponse response) {
-        Iterator<Interceptor> iter = interceptors.iterator();
-        for ( ; iter.hasNext(); ) {
-            Interceptor item = iter.next();
+        for (Interceptor item : interceptors) {
             item.onRetry(request, response);
         }
     }
 
     @Override
     public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
-        Iterator<Interceptor> iter = interceptors.iterator();
-        for ( ; iter.hasNext(); ) {
-            Interceptor item = iter.next();
+        for (Interceptor item : interceptors) {
             item.onError(ex, request, response);
         }
     }
 
     @Override
     public void onRedirection(ForestRequest redirectReq, ForestRequest prevReq, ForestResponse prevRes) {
-        Iterator<Interceptor> iter = interceptors.iterator();
-        for ( ; iter.hasNext(); ) {
-            Interceptor item = iter.next();
+        for (Interceptor item : interceptors) {
             item.onRedirection(redirectReq, prevReq, prevRes);
         }
     }
 
     @Override
     public void onProgress(ForestProgress progress) {
-        Iterator<Interceptor> iter = interceptors.iterator();
-        for (; iter.hasNext(); ) {
-            Interceptor item = iter.next();
+        for (Interceptor item : interceptors) {
             item.onProgress(progress);
         }
     }
 
     @Override
     public void onLoadCookie(ForestRequest request, ForestCookies cookies) {
-        Iterator<Interceptor> iter = interceptors.iterator();
-        for (; iter.hasNext(); ) {
-            Interceptor item = iter.next();
+        for (Interceptor item : interceptors) {
             item.onLoadCookie(request, cookies);
         }
     }
 
     @Override
     public void onSaveCookie(ForestRequest request, ForestCookies cookies) {
-        Iterator<Interceptor> iter = interceptors.iterator();
-        for (; iter.hasNext(); ) {
-            Interceptor item = iter.next();
+        for (Interceptor item : interceptors) {
             item.onSaveCookie(request, cookies);
         }
     }
 
     @Override
     public void afterExecute(ForestRequest request, ForestResponse response) {
-        Iterator<Interceptor> iter = interceptors.iterator();
-        for ( ; iter.hasNext(); ) {
-            Interceptor item = iter.next();
+        for (Interceptor item : interceptors) {
             item.afterExecute(request, response);
         }
     }

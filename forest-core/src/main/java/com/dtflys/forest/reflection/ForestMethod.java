@@ -826,8 +826,6 @@ public class ForestMethod<T> implements VariableScope {
             charset = renderedCharset;
         } else if (baseCharsetTemplate != null) {
             charset = baseCharsetTemplate.render(args);
-        } else if (StringUtils.isNotBlank(configuration.getCharset())) {
-            charset = configuration.getCharset();
         }
 
         String responseEncoding = null;

@@ -26,4 +26,7 @@ forest:
       password: bar
 
 
+my-site:
+  base-url: https://gitee.com
+
 

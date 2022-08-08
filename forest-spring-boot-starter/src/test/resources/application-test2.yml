@@ -13,3 +13,6 @@ forest:
 
 test:
   path: forest
+
+my-site:
+  base-url: https://gitee.com

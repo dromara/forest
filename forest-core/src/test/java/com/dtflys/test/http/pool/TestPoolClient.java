@@ -45,7 +45,7 @@ public class TestPoolClient extends BaseClientTest {
     }
 
     @Test
-    public void testPool() throws InterruptedException {
+    public void testPool_timeout() throws InterruptedException {
         ForestConfiguration poolConf = ForestConfiguration.createConfiguration()
                 .setVariableValue("port", server.getPort())
                 .setMaxConnections(10)
@@ -79,6 +79,44 @@ public class TestPoolClient extends BaseClientTest {
         assertThat(hasOut.get()).isFalse();
         assertThat(exceptionRef.get()).isNotNull();
     }
+
+
+    @Test
+    public void testPool_not_timeout() throws InterruptedException {
+        ForestConfiguration poolConf = ForestConfiguration.createConfiguration()
+                .setVariableValue("port", server.getPort())
+                .setMaxConnections(100)
+                .setMaxRequestQueueSize(100);
+        PoolClient poolClient = poolConf.client(PoolClient.class);
+        int count = 100;
+        for (int i = 0; i < count; i++) {
+            server.enqueue(new MockResponse().setBody(EXPECTED).setHeadersDelay(1, TimeUnit.SECONDS));
+        }
+        ForestRequestPool pool = poolConf.getPool();
+        ExecutorService executorService = Executors.newFixedThreadPool(count);
+        CountDownLatch latch = new CountDownLatch(count);
+        AtomicBoolean hasOut = new AtomicBoolean(false);
+        AtomicReference<ForestAbortException> exceptionRef = new AtomicReference<>(null);
+        for (int i = 0; i < count; i++) {
+            executorService.execute(() -> {
+                ForestResponse<String> response = poolClient.send();
+                if (pool.getRunningPoolSize() > pool.getMaxPoolSize()) {
+                    hasOut.set(true);
+                } else {
+                    System.out.println("pool running size: " + pool.getRunningPoolSize() + ", max size: " + pool.getMaxPoolSize() + ", queue size: " + pool.getQueueSize());
+                }
+                if (response.getException() != null && response.getException() instanceof ForestAbortException) {
+                    response.getException().printStackTrace();
+                    exceptionRef.set((ForestAbortException) response.getException());
+                }
+                latch.countDown();
+            });
+        }
+        latch.await();
+        assertThat(hasOut.get()).isFalse();
+        assertThat(exceptionRef.get()).isNull();
+    }
+
 
 
 

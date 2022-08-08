@@ -14,7 +14,7 @@ public abstract class URLBuilder {
 
     private final static URLBuilder QUERYABLE_URL_BUILDER = new QueryableURLBuilder();
 
-    public abstract String buildUrl(ForestRequest request);
+    public abstract String buildUrl(ForestRequest request, boolean encodeBraceInQueryValue);
 
     public static URLBuilder getSimpleURLBuilder() {
         return SIMPLE_URL_BUILDER;

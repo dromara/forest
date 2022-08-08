@@ -28,12 +28,17 @@ public class URLEncoder {
     /**
      * URI路径中不会被编码的字符集
      */
-    private static final char[] PATH_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '[', ']', '$', '*', '/', ':', '?', '=', '@', '&', '%', '~'};
+    private static final char[] PATH_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '[', ']', '*', '/', ':', '?', '=', '$', '@', '&', '%', '~'};
 
     /**
      * 查询参数值中不会被编码的字符集
      */
     private static final char[] QUERY_VALUE_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '[', ']', ',', '*', '/', ':', '?', '=', '%', '~'};
+
+    /**
+     * (带不转义大括号的) 查询参数值中不会被编码的字符集
+     */
+    private static final char[] QUERY_VALUE_EXCLUDED_CHARACTERS_WITH_BRACE = {'-', '.', '_', '+', '!', '{', '}', '(', ')', '[', ']', ',', '*', '/', ':', '?', '=', '%', '~'};
 
 
     /**
@@ -60,6 +65,12 @@ public class URLEncoder {
      * 用于查询参数值部分的编码{@link URLEncoder}
      */
     public static final URLEncoder QUERY_VALUE = createQueryValueUrlEncoder();
+
+    /**
+     * 用于 (带不转义大括号的) 查询参数值部分的编码{@link URLEncoder}
+     */
+    public static final URLEncoder QUERY_VALUE_WITH_BRACE = createQueryValueWithBraceUrlEncoder();
+
 
     /**
      * 用于表单参数值部分的编码{@link URLEncoder}
@@ -112,6 +123,16 @@ public class URLEncoder {
     public static URLEncoder createQueryValueUrlEncoder() {
         return createURLEncoder(QUERY_VALUE_EXCLUDED_CHARACTERS, false);
     }
+
+    /**
+     * 创建用于 (带不转义大括号的) 查询参数值编码的{@link URLEncoder}
+     *
+     * @return {@link URLEncoder}实例
+     */
+    public static URLEncoder createQueryValueWithBraceUrlEncoder() {
+        return createURLEncoder(QUERY_VALUE_EXCLUDED_CHARACTERS_WITH_BRACE, false);
+    }
+
 
     /**
      * 创建用于表单参数值编码的{@link URLEncoder}

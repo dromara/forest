@@ -34,6 +34,13 @@ public interface UploadClient {
     ForestRequest<Map> upload(@DataFile("file") File file, OnProgress onProgress);
 
     @Post(url = "/upload")
+    ForestRequest<Map> upload_withParams(@DataFile("file") File file, @Body("a") String a, @Body("b") String b);
+
+    @Post(url = "/upload", contentType = ContentType.MULTIPART_FORM_DATA)
+    ForestRequest<Map> upload_withParams(@Body("a") String a, @Body("b") String b);
+
+
+    @Post(url = "/upload")
     ForestRequest<Map> upload(@DataFile(value = "file", fileName = "${1}") byte[] bytes, String filename);
 
     @Post(url = "/upload", contentType = "multipart/form-data")

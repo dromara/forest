@@ -104,19 +104,19 @@ public class ResultHandler {
                     }
                 }
                 response.setContent(responseText);
-                if (CharSequence.class.isAssignableFrom(resultClass)) {
-                    return responseText;
-                }
                 if (InputStream.class.isAssignableFrom(resultClass)) {
                     return response.getInputStream();
                 }
                 ContentType contentType = response.getContentType();
-                if (request.getDecoder() != null) {
+                ForestConverter decoder = request.getDecoder();
+                if (decoder != null) {
                     if (contentType != null && contentType.canReadAsString()) {
-                        return request.getDecoder().convertToJavaObject(responseText, resultType);
+                        return decoder.convertToJavaObject(responseText, resultType);
                     } else {
-                        return request.getDecoder().convertToJavaObject(response.getByteArray(), resultType);
+                        return decoder.convertToJavaObject(response.getByteArray(), resultType);
                     }
+                } else if (CharSequence.class.isAssignableFrom(resultClass)) {
+                    return responseText;
                 }
 
                 ForestDataType dataType = request.getDataType();

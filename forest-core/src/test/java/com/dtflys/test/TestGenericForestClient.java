@@ -736,7 +736,7 @@ public class TestGenericForestClient extends BaseClientTest {
     public void testRequest_post_invalid_json() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         String result = Forest.post("http://localhost:" + server.getPort())
-                .contentTypeJson()
+                .addHeader("Content-Type", "application/json; charset=UTF-8")
                 .addBody("xxxxxxxyyyyyyy")
                 .execute(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
@@ -744,6 +744,20 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertBodyEquals("xxxxxxxyyyyyyy");
     }
 
+    @Test
+    public void testRequest_content_type_with_charset() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        final String s = Forest
+                .post("http://localhost:" + server.getPort() + "/test")
+                .contentTypeJson()
+                .addHeader("Content-Type", "application/json; charset=UTF-8")
+                .addHeader("name", "Forest.backend = okhttp3")
+                .addBody("{\"id\":\"1972664191\", \"name\":\"XieYu20011008\"}")
+                .executeAsString();
+        mockRequest(server)
+                .assertBodyEquals("{\"id\":\"1972664191\", \"name\":\"XieYu20011008\"}")
+                .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
+    }
 
 
     @Test

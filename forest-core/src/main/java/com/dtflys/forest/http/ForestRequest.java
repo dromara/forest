@@ -2451,7 +2451,7 @@ public class ForestRequest<T> implements HasURL {
      * @since 1.5.23
      */
     public String clientKey() {
-        Integer timeout = getTimeout();
+        int timeout = getTimeout();
         Integer connectTimeout = connectTimeout();
         Integer readTimeout = readTimeout();
         if (TimeUtils.isNone(connectTimeout)) {
@@ -2478,7 +2478,10 @@ public class ForestRequest<T> implements HasURL {
         }
 
         if (proxy != null) {
-            builder.append(",-x=").append(proxy.getHost() + ":" + proxy.getPort());
+            builder.append(",-x=")
+                    .append(proxy.getHost())
+                    .append(":")
+                    .append(proxy.getPort());
         }
 
         return builder.toString();

@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -229,6 +230,8 @@ public class MockServerRequest {
         Assert.assertEquals(expected, header(name));
         return this;
     }
+
+
 
     public MockServerRequest assertMultipart(String name, String contentType, Consumer<List<FileItem>> itemConsumer) throws FileUploadException {
         if (itemConsumer != null) {

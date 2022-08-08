@@ -9,7 +9,6 @@ import com.dtflys.forest.http.ForestRequest;
 
 import javax.net.ssl.*;
 import java.security.*;
-import java.util.Arrays;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -23,12 +22,19 @@ public class SSLUtils {
     public final static String TLS_1_2 = "TLSv1.2";
     public final static String TLS_1_3 = "TLSv1.3";
 
-    public final static String[] DEFAULT_PROTOCOLS = new String[] {
+    public final static String[] DEFAULT_PROTOCOLS_JDK8 = new String[] {
+            SSL_3, TLS_1, TLS_1_1, TLS_1_2
+    };
+
+    public final static String[] DEFAULT_PROTOCOLS_JDK11 = new String[] {
             SSL_3, TLS_1, TLS_1_1, TLS_1_2, TLS_1_3
     };
 
 
-    private static TrustAllManager defaultTrustAllManager;
+    private final static X509TrustManager[] DEFAULT_TRUST_MANAGERS = new X509TrustManager[] {
+            new TrustAllManager()
+    };
+
     /**
      * 自定义SSL证书
      * @param request Forest请求对象，{@link ForestRequest}类实例
@@ -73,28 +79,6 @@ public class SSLUtils {
         return sslContext;
     }
 
-    private static X509TrustManager systemDefaultTrustManager() {
-        if (defaultTrustAllManager == null) {
-            synchronized (SSLUtils.class) {
-                if (defaultTrustAllManager == null) {
-                    try {
-                        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(
-                                TrustManagerFactory.getDefaultAlgorithm());
-                        trustManagerFactory.init((KeyStore) null);
-                        TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
-                        if (trustManagers.length != 1 || !(trustManagers[0] instanceof X509TrustManager)) {
-                            throw new IllegalStateException("Unexpected default trust managers:"
-                                    + Arrays.toString(trustManagers));
-                        }
-                        return (X509TrustManager) trustManagers[0];
-                    } catch (GeneralSecurityException e) {
-                        throw new ForestRuntimeException("[Forest] No System TLS", e);
-                    }
-                }
-            }
-        }
-        return defaultTrustAllManager;
-    }
 
     /**
      * 默认的单向验证HTTPS请求绕过SSL验证，使用默认SSL协议
@@ -111,7 +95,7 @@ public class SSLUtils {
         } else {
             sc = SSLContext.getInstance(sslProtocol);
         }
-        sc.init(null, new TrustManager[] { systemDefaultTrustManager() }, null);
+        sc.init(null, DEFAULT_TRUST_MANAGERS, null);
         return sc;
     }
 

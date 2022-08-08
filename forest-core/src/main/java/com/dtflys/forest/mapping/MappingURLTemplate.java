@@ -107,6 +107,10 @@ public class MappingURLTemplate extends MappingTemplate {
                     String baseUrl = exprVal;
                     if (renderedQuery) {
                         baseUrl = exprVal.substring(0, queryIndex);
+                    } else if (host != null && !nextIsPort && port == null && path == null) {
+                        baseUrl = host + baseUrl;
+                        host = null;
+                        urlBuilder = new StringBuilder(scheme).append("//");
                     }
                     urlBuilder.append(baseUrl);
                     char[] baseUrlChars = baseUrl.toCharArray();
@@ -141,15 +145,13 @@ public class MappingURLTemplate extends MappingTemplate {
                                     host = subBuilder.toString();
                                     subBuilder = new StringBuilder();
                                     nextIsPort = true;
-                                    continue;
                                 } else if (hasNext && !Character.isDigit(baseUrlChars[pathCharIndex + 1])) {
                                     if (userInfo == null) {
                                         userInfo = new StringBuilder(subBuilder.toString() + ':');
                                     } else {
-                                        userInfo.append(subBuilder.toString()).append(':');
+                                        userInfo.append(subBuilder).append(':');
                                     }
                                     subBuilder = new StringBuilder();
-                                    continue;
                                 }
                             } else if (host != null && port == null) {
                                 nextIsPort = true;

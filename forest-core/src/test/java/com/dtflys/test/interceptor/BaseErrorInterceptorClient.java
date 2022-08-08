@@ -11,4 +11,6 @@ public interface BaseErrorInterceptorClient {
     @Get(url = "http://this_is_a_error_address", timeout = 5)
     ForestResponse<String> testError();
 
+    @Get(url = "http://this_is_a_error_address", timeout = 5)
+    String testError2();
 }
