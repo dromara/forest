@@ -26,7 +26,6 @@ package com.dtflys.forest.http;
 
 import com.dtflys.forest.utils.StringUtils;
 
-import java.net.CookieHandler;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -44,7 +43,7 @@ import java.util.Set;
  */
 public class ForestQueryMap implements Map<String, Object> {
 
-    private final List<ForestQueryParameter> queries;
+    private final List<SimpleQueryParameter> queries;
 
     public ForestQueryMap() {
         this.queries = new LinkedList<>();
@@ -67,7 +66,7 @@ public class ForestQueryMap implements Map<String, Object> {
             return false;
         }
         String name = key.toString();
-        for (ForestQueryParameter query : queries) {
+        for (SimpleQueryParameter query : queries) {
             if (query.getName().equalsIgnoreCase(name)) {
                 return true;
             }
@@ -77,7 +76,7 @@ public class ForestQueryMap implements Map<String, Object> {
 
     @Override
     public boolean containsValue(Object value) {
-        for (ForestQueryParameter query : queries) {
+        for (SimpleQueryParameter query : queries) {
             Object queryVal = query.getValue();
             if (queryVal == null) {
                 if (value == null) {
@@ -92,11 +91,11 @@ public class ForestQueryMap implements Map<String, Object> {
         return false;
     }
 
-    public ForestQueryParameter getQuery(String name) {
+    public SimpleQueryParameter getQuery(String name) {
         if (StringUtils.isEmpty(name)) {
             return null;
         }
-        for (ForestQueryParameter query : queries) {
+        for (SimpleQueryParameter query : queries) {
             if (query.getName().equalsIgnoreCase(name)) {
                 return query;
             }
@@ -104,12 +103,12 @@ public class ForestQueryMap implements Map<String, Object> {
         return null;
     }
 
-    public List<ForestQueryParameter> getQueries(String name) {
-        List<ForestQueryParameter> list = new LinkedList<>();
+    public List<SimpleQueryParameter> getQueries(String name) {
+        List<SimpleQueryParameter> list = new LinkedList<>();
         if (StringUtils.isEmpty(name)) {
             return list;
         }
-        for (ForestQueryParameter query : queries) {
+        for (SimpleQueryParameter query : queries) {
             if (query.getName().equalsIgnoreCase(name)) {
                 list.add(query);
             }
@@ -123,14 +122,14 @@ public class ForestQueryMap implements Map<String, Object> {
             return null;
         }
         String name = key.toString();
-        ForestQueryParameter query = getQuery(name);
+        SimpleQueryParameter query = getQuery(name);
         if (query == null) {
             return null;
         }
         return query.getValue();
     }
 
-    public void addQuery(ForestQueryParameter query) {
+    public void addQuery(SimpleQueryParameter query) {
         queries.add(query);
     }
 
@@ -156,7 +155,7 @@ public class ForestQueryMap implements Map<String, Object> {
         if (value instanceof Collection) {
             addQuery(name, (Collection) value, isUrlEncode, charset);
         } else {
-            queries.add(new ForestQueryParameter(name, value, isUrlEncode, charset));
+            queries.add(new SimpleQueryParameter(name, value, isUrlEncode, charset));
         }
     }
 
@@ -305,11 +304,11 @@ public class ForestQueryMap implements Map<String, Object> {
 
     @Override
     public Object put(String key, Object value) {
-        ForestQueryParameter query = getQuery(key);
+        SimpleQueryParameter query = getQuery(key);
         if (query != null) {
             query.setValue(value);
         } else {
-            ForestQueryParameter newQuery = new ForestQueryParameter(key, value);
+            SimpleQueryParameter newQuery = new SimpleQueryParameter(key, value);
             addQuery(newQuery);
         }
         return value;
@@ -322,9 +321,9 @@ public class ForestQueryMap implements Map<String, Object> {
         }
         String name = key.toString();
         for (int i = queries.size() - 1; i >= 0; i--) {
-            ForestQueryParameter query = queries.get(i);
+            SimpleQueryParameter query = queries.get(i);
             if (query.getName().equalsIgnoreCase(name)) {
-                ForestQueryParameter removedQuery = queries.remove(i);
+                SimpleQueryParameter removedQuery = queries.remove(i);
                 return removedQuery.getValue();
             }
         }
@@ -337,15 +336,15 @@ public class ForestQueryMap implements Map<String, Object> {
      * @param name 参数名称
      * @return 被删除的参数
      */
-    public List<ForestQueryParameter> removeQueries(String name) {
-        List<ForestQueryParameter> list = new LinkedList<>();
+    public List<SimpleQueryParameter> removeQueries(String name) {
+        List<SimpleQueryParameter> list = new LinkedList<>();
         if (name == null) {
             return list;
         }
         for (int i = queries.size() - 1; i >= 0; i--) {
-            ForestQueryParameter query = queries.get(i);
+            SimpleQueryParameter query = queries.get(i);
             if (query.getName().equalsIgnoreCase(name)) {
-                ForestQueryParameter removedQuery = queries.remove(i);
+                SimpleQueryParameter removedQuery = queries.remove(i);
                 list.add(0, removedQuery);
             }
         }
@@ -375,7 +374,7 @@ public class ForestQueryMap implements Map<String, Object> {
     public void clearQueriesFromUrl() {
         int len = queries.size();
         for (int i = len - 1; i >=0; i--) {
-            ForestQueryParameter query = queries.get(i);
+            SimpleQueryParameter query = queries.get(i);
             if (query.isFromUrl()) {
                 queries.remove(i);
             }
@@ -385,7 +384,7 @@ public class ForestQueryMap implements Map<String, Object> {
     @Override
     public Set<String> keySet() {
         Set<String> set = new HashSet<>();
-        for (ForestQueryParameter query : queries) {
+        for (SimpleQueryParameter query : queries) {
             set.add(query.getName());
         }
         return set;
@@ -394,7 +393,7 @@ public class ForestQueryMap implements Map<String, Object> {
     @Override
     public Collection<Object> values() {
         List<Object> list = new ArrayList<>();
-        for (ForestQueryParameter query : queries) {
+        for (SimpleQueryParameter query : queries) {
             Object val = query.getValue();
             if (val != null) {
                 list.add(val);
@@ -403,14 +402,14 @@ public class ForestQueryMap implements Map<String, Object> {
         return list;
     }
 
-    public List<ForestQueryParameter> queryValues() {
+    public List<SimpleQueryParameter> queryValues() {
         return queries;
     }
 
     @Override
     public Set<Entry<String, Object>> entrySet() {
         Set<Entry<String, Object>> set = new HashSet<>();
-        for (ForestQueryParameter query : queries) {
+        for (SimpleQueryParameter query : queries) {
             Entry<String, Object> entry = new Entry<String, Object>() {
 
                 @Override
@@ -437,7 +436,7 @@ public class ForestQueryMap implements Map<String, Object> {
 
     public ForestQueryMap clone() {
         ForestQueryMap newQueryMap = new ForestQueryMap();
-        for (ForestQueryParameter query : queries) {
+        for (SimpleQueryParameter query : queries) {
             newQueryMap.addQuery(query);
         }
         return newQueryMap;

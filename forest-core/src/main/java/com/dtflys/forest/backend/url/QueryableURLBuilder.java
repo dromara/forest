@@ -1,14 +1,12 @@
 package com.dtflys.forest.backend.url;
 
 import com.dtflys.forest.converter.json.ForestJsonConverter;
-import com.dtflys.forest.http.ForestQueryParameter;
+import com.dtflys.forest.http.SimpleQueryParameter;
 import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.http.ForestURL;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
 
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 /**
@@ -21,11 +19,11 @@ public class QueryableURLBuilder extends URLBuilder {
     @Override
     public String buildUrl(ForestRequest request, boolean encodeBraceInQueryValue) {
         String url = request.getUrl();
-        List<ForestQueryParameter> queryParameters = request.getQueryValues();
+        List<SimpleQueryParameter> queryParameters = request.getQueryValues();
         StringBuilder paramBuilder = new StringBuilder();
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         for (int i = 0; i < queryParameters.size(); i++) {
-            ForestQueryParameter queryParam = queryParameters.get(i);
+            SimpleQueryParameter queryParam = queryParameters.get(i);
             String name = queryParam.getName();
             if (name != null) {
                 paramBuilder.append(queryParam.getName());

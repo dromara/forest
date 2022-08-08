@@ -57,7 +57,7 @@ import java.lang.annotation.Target;
 @Documented
 @ParamLifeCycle(FormBodyLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
+@Target({ElementType.PARAMETER, ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 public @interface FormBody {
 
     /**

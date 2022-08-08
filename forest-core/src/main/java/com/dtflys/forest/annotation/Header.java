@@ -68,7 +68,7 @@ import java.lang.annotation.Target;
 @Documented
 @ParamLifeCycle(HeaderLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
+@Target({ElementType.PARAMETER, ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 public @interface Header {
 
     /**
@@ -90,5 +90,11 @@ public @interface Header {
      * @return 默认值
      */
     String defaultValue() default "";
+
+    /**
+     * 排序序号
+     * @return 排序序号
+     */
+    int order() default -1;
 
 }

@@ -83,7 +83,6 @@ import javax.net.ssl.SSLSocketFactory;
 import java.io.File;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
@@ -1306,9 +1305,9 @@ public class ForestRequest<T> implements HasURL {
      */
     public String getQueryString() {
         StringBuilder builder = new StringBuilder();
-        Iterator<ForestQueryParameter> iterator = query.queryValues().iterator();
+        Iterator<SimpleQueryParameter> iterator = query.queryValues().iterator();
         while (iterator.hasNext()) {
-            ForestQueryParameter query = iterator.next();
+            SimpleQueryParameter query = iterator.next();
             if (query != null) {
                 String name = query.getName();
                 Object value = query.getValue();
@@ -1532,10 +1531,10 @@ public class ForestRequest<T> implements HasURL {
     /**
      * 添加请求中的Query参数
      *
-     * @param queryParameter Query参数，{@link ForestQueryParameter}对象实例
+     * @param queryParameter Query参数，{@link SimpleQueryParameter}对象实例
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> addQuery(ForestQueryParameter queryParameter) {
+    public ForestRequest<T> addQuery(SimpleQueryParameter queryParameter) {
         this.query.addQuery(queryParameter);
         return this;
     }
@@ -1543,11 +1542,11 @@ public class ForestRequest<T> implements HasURL {
     /**
      * 批量添加请求中的Query参数
      *
-     * @param queryParameters Query参数集合，{@link ForestQueryParameter}对象实例集合
+     * @param queryParameters Query参数集合，{@link SimpleQueryParameter}对象实例集合
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> addQuery(Collection<ForestQueryParameter> queryParameters) {
-        for (ForestQueryParameter queryParameter : queryParameters) {
+    public ForestRequest<T> addQuery(Collection<SimpleQueryParameter> queryParameters) {
+        for (SimpleQueryParameter queryParameter : queryParameters) {
             addQuery(queryParameter);
         }
         return this;
@@ -1556,7 +1555,7 @@ public class ForestRequest<T> implements HasURL {
     /**
      * 批量添加请求中的Query参数
      *
-     * @param queries Query参数集合，{@link ForestQueryParameter}对象实例集合
+     * @param queries Query参数集合，{@link SimpleQueryParameter}对象实例集合
      * @return {@link ForestRequest}对象实例
      */
     public ForestRequest<T> addAllQuery(ForestQueryMap queries) {
@@ -1582,11 +1581,11 @@ public class ForestRequest<T> implements HasURL {
     /**
      * 批量添加请求中的Query参数
      *
-     * @param queryParameters Query参数数组，{@link ForestQueryParameter}对象实例数组
+     * @param queryParameters Query参数数组，{@link SimpleQueryParameter}对象实例数组
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> addQuery(ForestQueryParameter[] queryParameters) {
-        for (ForestQueryParameter queryParameter : queryParameters) {
+    public ForestRequest<T> addQuery(SimpleQueryParameter[] queryParameters) {
+        for (SimpleQueryParameter queryParameter : queryParameters) {
             addQuery(queryParameter);
         }
         return this;
@@ -1615,12 +1614,12 @@ public class ForestRequest<T> implements HasURL {
     /**
      * 替换请求中的Query参数值
      *
-     * @param queryParameter Query参数，{@link ForestQueryParameter}对象实例
+     * @param queryParameter Query参数，{@link SimpleQueryParameter}对象实例
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> replaceQuery(ForestQueryParameter queryParameter) {
-        List<ForestQueryParameter> queryParameters = this.query.getQueries(queryParameter.getName());
-        for (ForestQueryParameter parameter : queryParameters) {
+    public ForestRequest<T> replaceQuery(SimpleQueryParameter queryParameter) {
+        List<SimpleQueryParameter> queryParameters = this.query.getQueries(queryParameter.getName());
+        for (SimpleQueryParameter parameter : queryParameters) {
             parameter.setValue(queryParameter.getValue());
         }
         return this;
@@ -1636,8 +1635,8 @@ public class ForestRequest<T> implements HasURL {
      * @return {@link ForestRequest}对象实例
      */
     public ForestRequest<T> replaceQuery(String name, Object value) {
-        List<ForestQueryParameter> queryParameters = this.query.getQueries(name);
-        for (ForestQueryParameter parameter : queryParameters) {
+        List<SimpleQueryParameter> queryParameters = this.query.getQueries(name);
+        for (SimpleQueryParameter parameter : queryParameters) {
             parameter.setValue(value);
         }
         return this;
@@ -1645,18 +1644,18 @@ public class ForestRequest<T> implements HasURL {
 
     /**
      * 替换或添加请求中的Query参数
-     * <p>当请求中不存在与该方法调用时传递过来{@link ForestQueryParameter}对象中同名的Query参数时，会将{@link ForestQueryParameter}对象添加成新的Query参数到请求中，</p>
+     * <p>当请求中不存在与该方法调用时传递过来{@link SimpleQueryParameter}对象中同名的Query参数时，会将{@link SimpleQueryParameter}对象添加成新的Query参数到请求中，</p>
      * <p>若请求中已存在同名Query参数名时，则会替换请求中的所有同名的Query参数值</p>
      *
-     * @param queryParameter Query参数，{@link ForestQueryParameter}对象实例
+     * @param queryParameter Query参数，{@link SimpleQueryParameter}对象实例
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> replaceOrAddQuery(ForestQueryParameter queryParameter) {
-        List<ForestQueryParameter> queryParameters = this.query.getQueries(queryParameter.getName());
+    public ForestRequest<T> replaceOrAddQuery(SimpleQueryParameter queryParameter) {
+        List<SimpleQueryParameter> queryParameters = this.query.getQueries(queryParameter.getName());
         if (queryParameters.isEmpty()) {
             addQuery(queryParameter);
         } else {
-            for (ForestQueryParameter parameter : queryParameters) {
+            for (SimpleQueryParameter parameter : queryParameters) {
                 parameter.setValue(queryParameter.getValue());
             }
         }
@@ -1673,11 +1672,11 @@ public class ForestRequest<T> implements HasURL {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> replaceOrAddQuery(String name, String value) {
-        List<ForestQueryParameter> queryParameters = this.query.getQueries(name);
+        List<SimpleQueryParameter> queryParameters = this.query.getQueries(name);
         if (queryParameters.isEmpty()) {
             addQuery(name, value);
         } else {
-            for (ForestQueryParameter parameter : queryParameters) {
+            for (SimpleQueryParameter parameter : queryParameters) {
                 parameter.setValue(value);
             }
         }
@@ -2906,7 +2905,7 @@ public class ForestRequest<T> implements HasURL {
         return nameValueList;
     }
 
-    public List<ForestQueryParameter> getQueryValues() {
+    public List<SimpleQueryParameter> getQueryValues() {
         return query.queryValues();
     }
 

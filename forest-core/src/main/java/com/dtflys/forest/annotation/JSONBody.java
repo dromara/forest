@@ -58,7 +58,7 @@ import java.lang.annotation.Target;
 @Documented
 @ParamLifeCycle(JSONBodyLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
+@Target({ElementType.PARAMETER, ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 public @interface JSONBody {
 
     /**
@@ -97,5 +97,12 @@ public @interface JSONBody {
      * @return 默认值
      */
     String defaultValue() default "";
+
+    /**
+     * 排序序号
+     * @return 排序序号
+     */
+    int order() default -1;
+
 
 }

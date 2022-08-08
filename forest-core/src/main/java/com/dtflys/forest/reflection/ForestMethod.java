@@ -24,12 +24,12 @@ import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.http.ForestAddress;
 import com.dtflys.forest.http.ForestQueryMap;
 import com.dtflys.forest.http.ForestQueryParameter;
+import com.dtflys.forest.http.SimpleQueryParameter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestURL;
-import com.dtflys.forest.http.ForestURLBuilder;
 import com.dtflys.forest.http.body.RequestBodyBuilder;
 import com.dtflys.forest.http.body.StringRequestBody;
 import com.dtflys.forest.interceptor.Interceptor;
@@ -60,8 +60,6 @@ import com.dtflys.forest.utils.StringUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.*;
 
 import static com.dtflys.forest.mapping.MappingParameter.*;
@@ -272,16 +270,6 @@ public class ForestMethod<T> implements VariableScope {
                 baseInterceptorList.add(interceptor);
             }
         }
-
-/*
-        List<Annotation> baseAnnotationList = interfaceProxyHandler.getBaseAnnotations();
-        List<ForestAnnotation> baseAnns = new LinkedList<>();
-        for (Annotation annotation : baseAnnotationList) {
-            Class interceptorClass = getAnnotationLifeCycleClass(annotation);
-            baseAnns.add(new ForestAnnotation(annotation, interceptorClass));
-        }
-        addMetaRequestAnnotations(baseAnns);
-*/
     }
 
     private <T extends Interceptor> T addInterceptor(Class<T> interceptorClass) {
@@ -1004,15 +992,15 @@ public class ForestMethod<T> implements VariableScope {
                         } else {
                             if (obj instanceof Iterable) {
                                 for (Object subItem : (Iterable) obj) {
-                                    if (subItem instanceof ForestQueryParameter) {
-                                        request.addQuery((ForestQueryParameter) subItem);
+                                    if (subItem instanceof SimpleQueryParameter) {
+                                        request.addQuery((SimpleQueryParameter) subItem);
                                     } else {
                                         request.addQuery(ForestQueryParameter.createSimpleQueryParameter(subItem));
                                     }
                                 }
                             } else if (obj.getClass().isArray()) {
-                                if (obj instanceof ForestQueryParameter[]) {
-                                    request.addQuery((ForestQueryParameter[]) obj);
+                                if (obj instanceof SimpleQueryParameter[]) {
+                                    request.addQuery((SimpleQueryParameter[]) obj);
                                 }
                             }
                         }
@@ -1059,7 +1047,7 @@ public class ForestMethod<T> implements VariableScope {
                         int len = Array.getLength(obj);
                         for (int idx = 0; idx < len; idx++) {
                             Object arrayItem = Array.get(obj, idx);
-                            ForestQueryParameter queryParameter = new ForestQueryParameter(
+                            SimpleQueryParameter queryParameter = new SimpleQueryParameter(
                                     parameter.getName(), arrayItem,
                                     parameter.isUrlEncode(), parameter.getCharset());
                             request.addQuery(queryParameter);
