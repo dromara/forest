@@ -122,10 +122,4 @@ public @interface Body {
      */
     String defaultValue() default "";
 
-    /**
-     * 排序序号
-     * @return 排序序号
-     */
-    int order() default -1;
-
 }

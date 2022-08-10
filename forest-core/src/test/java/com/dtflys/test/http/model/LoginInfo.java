@@ -2,19 +2,20 @@ package com.dtflys.test.http.model;
 
 import com.dtflys.forest.annotation.Body;
 import com.dtflys.forest.annotation.Header;
+import com.dtflys.forest.annotation.Headers;
 import com.dtflys.forest.utils.Base64Utils;
 
+@Headers({"Content-Type: application/json"})
 public class LoginInfo {
 
-    @Body(order = 1)
+    @Body
     private String username;
 
-    @Body(order = 2)
+    @Body
     private String pass;
 
-    @Body(name = "ts", order = 3)
+    @Body("ts")
     private long timestamp;
-
 
     @Header("Token")
     public String getToken() {
