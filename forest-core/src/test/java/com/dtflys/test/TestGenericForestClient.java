@@ -4,8 +4,11 @@ import cn.hutool.core.io.FileUtil;
 import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.annotation.Retryer;
+import com.dtflys.forest.annotation.URLEncode;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.forest.callback.OnError;
+import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestAddress;
 import com.dtflys.forest.http.ForestHeader;
@@ -19,6 +22,7 @@ import com.dtflys.forest.retryer.NoneRetryer;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ForestProgress;
 import com.dtflys.forest.utils.TypeReference;
+import com.dtflys.forest.utils.URLEncoder;
 import com.dtflys.test.http.BaseClientTest;
 import com.dtflys.test.model.Result;
 import com.google.common.collect.Lists;
@@ -181,6 +185,20 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertQueryEquals("a[]=1&a[]=2&a[]=3");
     }
 
+
+    @Test
+    public void testRequest_query_encode() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.post("/")
+                .host("localhost")
+                .port(server.getPort())
+                .addBody("key", "https://www.baidu.com#/?modeversion%3Dminiprogram%26sourceCode%3DGDT-ID-23310731%26mark%3DXZX-WXZF-0805")
+                .execute(String.class);
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertBodyEquals("key=https://www.baidu.com#/?modeversion%3Dminiprogram%26sourceCode%3DGDT-ID-23310731%26mark%3DXZX-WXZF-0805");
+    }
+
     @Test
     public void testRequest_query_array2() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
@@ -250,6 +268,95 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertPathEquals("/")
                 .assertQueryEquals("a=1&b=2&c=3");
     }
+
+    @Test
+    public void testAsyncPool() {
+        Forest.config()
+                .setMaxAsyncThreadSize(100)
+                .setMaxAsyncQueueSize(100);
+
+        int total = 100;
+        for (int i = 0; i < total; i++) {
+            server.enqueue(new MockResponse().setBody(EXPECTED));
+        }
+        final CountDownLatch latch = new CountDownLatch(total);
+        final AtomicInteger count = new AtomicInteger(0);
+        for (int i = 0; i < total; i++) {
+            Forest.head("/")
+                    .host("localhost")
+                    .port(server.getPort())
+                    .async()
+                    .onSuccess((data, req, res) -> {
+                        latch.countDown();
+                        int c = count.incrementAndGet();
+                        if (c == total) {
+                            System.out.println("循环已完成");
+                        } else {
+                            System.out.println("已完成 " + c);
+                        }
+                    })
+                    .onError((ex, req, res) -> {
+                        latch.countDown();
+                        int c = count.incrementAndGet();
+                        if (c == total) {
+                            System.out.println("循环已完成");
+                        } else {
+                            System.out.println("已完成 " + c);
+                        }
+                    })
+                    .execute();
+        }
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+        }
+        System.out.println("全部已完成");
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+        }
+
+        for (int i = 0; i < total; i++) {
+            server.enqueue(new MockResponse().setBody(EXPECTED));
+        }
+        final CountDownLatch latch2 = new CountDownLatch(total);
+        final AtomicInteger count2 = new AtomicInteger(0);
+        for (int i = 0; i < total; i++) {
+            Forest.head("/")
+                    .host("localhost")
+                    .port(server.getPort())
+                    .async()
+                    .onSuccess((data, req, res) -> {
+                        latch2.countDown();
+                        int c = count2.incrementAndGet();
+                        if (c == total) {
+                            System.out.println("循环已完成");
+                        } else {
+                            System.out.println("已完成 " + c);
+                        }
+                    })
+                    .onError((ex, req, res) -> {
+                        latch2.countDown();
+                        int c = count2.incrementAndGet();
+                        if (ex != null) {
+                            System.out.println(ex);
+                        }
+                        if (c == total) {
+                            System.out.println("循环已完成");
+                        } else {
+                            System.out.println("已完成 " + c);
+                        }
+                    })
+                    .execute();
+        }
+        try {
+            latch2.await();
+        } catch (InterruptedException e) {
+        }
+        System.out.println("全部已完成");
+
+    }
+
 
     @Test
     public void testRequest_query_map2() {
