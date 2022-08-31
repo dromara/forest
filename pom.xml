@@ -8,7 +8,7 @@
 	<packaging>pom</packaging>
 	<name>forest</name>
 	<description>A easy HTTP client framework for Java</description>
-	<url>https://github.com/mySingleLive/forest</url>
+	<url>https://github.com/dromara/forest</url>
 
 	<licenses>
 		<license>
@@ -23,14 +23,14 @@
 			<id>gongjun</id>
 			<name>gongjun</name>
 			<email>dt_flys@hotmail.com</email>
-			<url>http://www.dtflys.com</url>
+			<url>https://forest.dtflyx.com</url>
 		</developer>
 	</developers>
 
 	<scm>
-		<url>https://github.com/mySingleLive/forest</url>
-		<connection>scm:git:https://github.com/mySingleLive/forest.git</connection>
-		<developerConnection>http://www.dtflys.com</developerConnection>
+		<url>https://github.com/dromara/forest</url>
+		<connection>scm:git:https://github.com/dromara/forest.git</connection>
+		<developerConnection>https://forest.dtflyx.com</developerConnection>
 		<tag>1.5.26</tag>
 	</scm>
 
