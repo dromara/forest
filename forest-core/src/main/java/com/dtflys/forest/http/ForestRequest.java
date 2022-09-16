@@ -83,7 +83,6 @@ import javax.net.ssl.SSLSocketFactory;
 import java.io.File;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
@@ -481,6 +480,7 @@ public class ForestRequest<T> implements HasURL {
      *
      * @return {@link ForestURL} 对象实例
      */
+    @Override
     public ForestURL url() {
         return this.url;
     }
@@ -900,7 +900,7 @@ public class ForestRequest<T> implements HasURL {
      * @return URL根路径
      */
     public String getBasePath() {
-        return this.url.getBasePath();
+        return this.url.normalizeBasePath();
     }
 
     /**
