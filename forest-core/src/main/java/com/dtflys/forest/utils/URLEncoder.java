@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.BitSet;
 
 public class URLEncoder {
@@ -214,9 +215,15 @@ public class URLEncoder {
         if (path == null) {
             return null;
         }
-        Charset cs = Charset.forName(charset);
-        if (cs == null) {
-            throw new ForestRuntimeException("[Forest] Charset '" + charset + "' cannot be found.");
+        Charset cs = null;
+        if (StringUtils.isEmpty(charset)) {
+            cs = StandardCharsets.UTF_8;
+        } else {
+            try {
+                cs = Charset.forName(charset);
+            } catch (Throwable th) {
+                throw new ForestRuntimeException(th);
+            }
         }
         return encode(path, cs);
     }
