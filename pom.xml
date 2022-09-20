@@ -39,6 +39,7 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+		<solon.version>1.10.2</solon.version>
 		<spring.version>5.3.19</spring.version>
 		<spring-boot.version>2.6.7</spring-boot.version>
 		<common-io.version>2.7</common-io.version>
@@ -82,6 +83,7 @@
 		<module>forest-spring</module>
 		<module>forest-spring-boot-starter</module>
 		<module>forest-mock</module>
+		<module>forest-solon-plugin</module>
 	</modules>
 
 	<dependencies>
