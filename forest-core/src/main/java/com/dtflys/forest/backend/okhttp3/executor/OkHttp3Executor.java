@@ -224,6 +224,7 @@ public class OkHttp3Executor implements HttpExecutor {
         // 是否重试
         ForestRetryException retryEx = request.canRetry(response);
         if (retryEx != null && retryEx.isNeedRetry() && !retryEx.isMaxRetryCountReached()) {
+            response.close();
             execute(lifeCycleHandler, retryCount + 1);
             return;
         }
@@ -256,6 +257,7 @@ public class OkHttp3Executor implements HttpExecutor {
             okHttp3ResponseHandler.handleSync(okResponse, response);
             return;
         }
+        response.close();
         execute(lifeCycleHandler, retryCount + 1);
     }
 
