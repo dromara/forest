@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -275,7 +276,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .setMaxAsyncThreadSize(100)
                 .setMaxAsyncQueueSize(100);
 
-        int total = 100;
+        final int total = 10;
         for (int i = 0; i < total; i++) {
             server.enqueue(new MockResponse().setBody(EXPECTED));
         }
@@ -290,19 +291,20 @@ public class TestGenericForestClient extends BaseClientTest {
                         latch.countDown();
                         int c = count.incrementAndGet();
                         if (c == total) {
-                            System.out.println("循环已完成");
+                            System.out.println("第一阶段: 循环已完成");
                         } else {
-                            System.out.println("已完成 " + c);
+                            System.out.println("已成功 第一阶段: " + c);
                         }
                     })
                     .onError((ex, req, res) -> {
                         latch.countDown();
                         int c = count.incrementAndGet();
                         if (c == total) {
-                            System.out.println("循环已完成");
+                            System.out.println("第一阶段: 循环已完成");
                         } else {
-                            System.out.println("已完成 " + c);
+                            System.out.println("已失败 第一阶段: " + c);
                         }
+                        System.out.println("第一阶段 异常: " + ex);
                     })
                     .execute();
         }
@@ -310,17 +312,14 @@ public class TestGenericForestClient extends BaseClientTest {
             latch.await();
         } catch (InterruptedException e) {
         }
-        System.out.println("全部已完成");
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }
+        System.out.println("第一阶段: 全部已完成");
 
         for (int i = 0; i < total; i++) {
             server.enqueue(new MockResponse().setBody(EXPECTED));
         }
         final CountDownLatch latch2 = new CountDownLatch(total);
         final AtomicInteger count2 = new AtomicInteger(0);
+        final AtomicInteger errorCount = new AtomicInteger(0);
         for (int i = 0; i < total; i++) {
             Forest.head("/")
                     .host("localhost")
@@ -330,21 +329,22 @@ public class TestGenericForestClient extends BaseClientTest {
                         latch2.countDown();
                         int c = count2.incrementAndGet();
                         if (c == total) {
-                            System.out.println("循环已完成");
+                            System.out.println("第二阶段: 循环已完成");
                         } else {
-                            System.out.println("已完成 " + c);
+                            System.out.println("已成功 第二阶段: " + c);
                         }
                     })
                     .onError((ex, req, res) -> {
                         latch2.countDown();
                         int c = count2.incrementAndGet();
                         if (ex != null) {
-                            System.out.println(ex);
+                            System.out.println("第二阶段 异常: " + ex);
+                            errorCount.incrementAndGet();
                         }
                         if (c == total) {
-                            System.out.println("循环已完成");
+                            System.out.println("第二阶段: 循环已失败");
                         } else {
-                            System.out.println("已完成 " + c);
+                            System.out.println("已失败 第二阶段: " + c);
                         }
                     })
                     .execute();
@@ -353,6 +353,7 @@ public class TestGenericForestClient extends BaseClientTest {
             latch2.await();
         } catch (InterruptedException e) {
         }
+        assertThat(errorCount.get()).isEqualTo(0);
         System.out.println("全部已完成");
 
     }
@@ -827,10 +828,12 @@ public class TestGenericForestClient extends BaseClientTest {
 
     @Test
     public void testRequest_post_form_without_content_type() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("value", "bar");
+        map.put("name", "foo");
         server.enqueue(new MockResponse().setBody(EXPECTED));
         String result = Forest.post("http://localhost:" + server.getPort())
-                .addBody("name", "foo")
-                .addBody("value", "bar")
+                .addBody(map)
                 .execute(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
