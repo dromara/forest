@@ -17,6 +17,7 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestURL;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorChain;
+import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.retryer.NoneRetryer;
 import com.dtflys.forest.utils.ForestDataType;
@@ -270,96 +271,101 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertQueryEquals("a=1&b=2&c=3");
     }
 
+
     @Test
     public void testAsyncPool() {
         Forest.config()
                 .setMaxAsyncThreadSize(100)
                 .setMaxAsyncQueueSize(100);
+        LogConfiguration logConfiguration = new LogConfiguration();
+        logConfiguration.setLogEnabled(false);
+        for (int j = 0; j < 20000; j++) {
+            final int total = 100;
+            for (int i = 0; i < total; i++) {
+                server.enqueue(new MockResponse().setBody(EXPECTED));
+            }
+            final CountDownLatch latch = new CountDownLatch(total);
+            final AtomicInteger count = new AtomicInteger(0);
+            final AtomicInteger errorCount = new AtomicInteger(0);
+            for (int i = 0; i < total; i++) {
+                Forest.get("/")
+                        .host("localhost")
+                        .port(server.getPort())
+                        .async()
+                        .setLogConfiguration(logConfiguration)
+                        .onSuccess((data, req, res) -> {
+                            latch.countDown();
+                            int c = count.incrementAndGet();
+                            if (c == total) {
+//                                System.out.println("第一阶段: 循环已完成");
+                            } else {
+//                                System.out.println("已成功 第一阶段: " + c);
+                            }
+                        })
+                        .onError((ex, req, res) -> {
+                            latch.countDown();
+                            int c = count.incrementAndGet();
+                            errorCount.incrementAndGet();
+                            if (c == total) {
+//                                System.out.println("第一阶段: 循环已完成");
+                            } else {
+//                                System.out.println("已失败 第一阶段: " + c);
+                            }
 
-        final int total = 10;
-        for (int i = 0; i < total; i++) {
-            server.enqueue(new MockResponse().setBody(EXPECTED));
-        }
-        final CountDownLatch latch = new CountDownLatch(total);
-        final AtomicInteger count = new AtomicInteger(0);
-        final AtomicInteger errorCount = new AtomicInteger(0);
-        for (int i = 0; i < total; i++) {
-            Forest.get("/")
-                    .host("localhost")
-                    .port(server.getPort())
-                    .async()
-                    .onSuccess((data, req, res) -> {
-                        latch.countDown();
-                        int c = count.incrementAndGet();
-                        if (c == total) {
-                            System.out.println("第一阶段: 循环已完成");
-                        } else {
-                            System.out.println("已成功 第一阶段: " + c);
-                        }
-                    })
-                    .onError((ex, req, res) -> {
-                        latch.countDown();
-                        int c = count.incrementAndGet();
-                        errorCount.incrementAndGet();
-                        if (c == total) {
-                            System.out.println("第一阶段: 循环已完成");
-                        } else {
-                            System.out.println("已失败 第一阶段: " + c);
-                        }
+                            ex.printStackTrace();
+                        })
+                        .execute();
+            }
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+            }
+            assertThat(errorCount.get()).isEqualTo(0);
+//            System.out.println("第一阶段: 全部已完成");
 
-                        System.out.println("第一阶段 异常: " + ex);
-                    })
-                    .execute();
+            for (int i = 0; i < total; i++) {
+                server.enqueue(new MockResponse().setHeader("Status", "Ok"));
+            }
+            final CountDownLatch latch2 = new CountDownLatch(total);
+            final AtomicInteger count2 = new AtomicInteger(0);
+            final AtomicInteger errorCount2 = new AtomicInteger(0);
+            for (int i = 0; i < total; i++) {
+                Forest.head("/")
+                        .host("localhost")
+                        .port(server.getPort())
+                        .async()
+                        .setLogConfiguration(logConfiguration)
+                        .onSuccess((data, req, res) -> {
+                            latch2.countDown();
+                            int c = count2.incrementAndGet();
+                            if (c == total) {
+//                                System.out.println("第二阶段: 循环已完成");
+                            } else {
+//                                System.out.println("已成功 第二阶段: " + c);
+                            }
+                        })
+                        .onError((ex, req, res) -> {
+                            latch2.countDown();
+                            int c = count2.incrementAndGet();
+                            if (ex != null) {
+//                                System.out.println("第二阶段 异常: " + ex);
+                                errorCount2.incrementAndGet();
+                            }
+                            if (c == total) {
+//                                System.out.println("第二阶段: 循环已失败");
+                            } else {
+                                System.out.println("已失败 第二阶段: " + c);
+                            }
+                        })
+                        .execute();
+            }
+            try {
+                latch2.await();
+            } catch (InterruptedException e) {
+            }
+            assertThat(errorCount2.get()).isEqualTo(0);
+//            System.out.println("全部已完成");
         }
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-        }
-        assertThat(errorCount.get()).isEqualTo(0);
-        System.out.println("第一阶段: 全部已完成");
-
-        for (int i = 0; i < total; i++) {
-            server.enqueue(new MockResponse().setHeader("Status", "Ok"));
-        }
-        final CountDownLatch latch2 = new CountDownLatch(total);
-        final AtomicInteger count2 = new AtomicInteger(0);
-        final AtomicInteger errorCount2 = new AtomicInteger(0);
-        for (int i = 0; i < total; i++) {
-            Forest.head("/")
-                    .host("localhost")
-                    .port(server.getPort())
-                    .async()
-                    .onSuccess((data, req, res) -> {
-                        latch2.countDown();
-                        int c = count2.incrementAndGet();
-                        if (c == total) {
-                            System.out.println("第二阶段: 循环已完成");
-                        } else {
-                            System.out.println("已成功 第二阶段: " + c);
-                        }
-                    })
-                    .onError((ex, req, res) -> {
-                        latch2.countDown();
-                        int c = count2.incrementAndGet();
-                        if (ex != null) {
-                            System.out.println("第二阶段 异常: " + ex);
-                            errorCount2.incrementAndGet();
-                        }
-                        if (c == total) {
-                            System.out.println("第二阶段: 循环已失败");
-                        } else {
-                            System.out.println("已失败 第二阶段: " + c);
-                        }
-                    })
-                    .execute();
-        }
-        try {
-            latch2.await();
-        } catch (InterruptedException e) {
-        }
-        assertThat(errorCount2.get()).isEqualTo(0);
-        System.out.println("全部已完成");
-
     }
 
 
