@@ -282,8 +282,9 @@ public class TestGenericForestClient extends BaseClientTest {
         }
         final CountDownLatch latch = new CountDownLatch(total);
         final AtomicInteger count = new AtomicInteger(0);
+        final AtomicInteger errorCount = new AtomicInteger(0);
         for (int i = 0; i < total; i++) {
-            Forest.head("/")
+            Forest.get("/")
                     .host("localhost")
                     .port(server.getPort())
                     .async()
@@ -299,11 +300,13 @@ public class TestGenericForestClient extends BaseClientTest {
                     .onError((ex, req, res) -> {
                         latch.countDown();
                         int c = count.incrementAndGet();
+                        errorCount.incrementAndGet();
                         if (c == total) {
                             System.out.println("第一阶段: 循环已完成");
                         } else {
                             System.out.println("已失败 第一阶段: " + c);
                         }
+
                         System.out.println("第一阶段 异常: " + ex);
                     })
                     .execute();
@@ -312,14 +315,15 @@ public class TestGenericForestClient extends BaseClientTest {
             latch.await();
         } catch (InterruptedException e) {
         }
+        assertThat(errorCount.get()).isEqualTo(0);
         System.out.println("第一阶段: 全部已完成");
 
         for (int i = 0; i < total; i++) {
-            server.enqueue(new MockResponse().setBody(EXPECTED));
+            server.enqueue(new MockResponse().setHeader("Status", "Ok"));
         }
         final CountDownLatch latch2 = new CountDownLatch(total);
         final AtomicInteger count2 = new AtomicInteger(0);
-        final AtomicInteger errorCount = new AtomicInteger(0);
+        final AtomicInteger errorCount2 = new AtomicInteger(0);
         for (int i = 0; i < total; i++) {
             Forest.head("/")
                     .host("localhost")
@@ -339,7 +343,7 @@ public class TestGenericForestClient extends BaseClientTest {
                         int c = count2.incrementAndGet();
                         if (ex != null) {
                             System.out.println("第二阶段 异常: " + ex);
-                            errorCount.incrementAndGet();
+                            errorCount2.incrementAndGet();
                         }
                         if (c == total) {
                             System.out.println("第二阶段: 循环已失败");
@@ -353,7 +357,7 @@ public class TestGenericForestClient extends BaseClientTest {
             latch2.await();
         } catch (InterruptedException e) {
         }
-        assertThat(errorCount.get()).isEqualTo(0);
+        assertThat(errorCount2.get()).isEqualTo(0);
         System.out.println("全部已完成");
 
     }
