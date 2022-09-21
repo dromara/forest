@@ -13,6 +13,8 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.concurrent.TimeUnit;
+
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -117,6 +119,14 @@ public class TestBaseReqClient extends BaseClientTest {
                 .assertHeaderEquals("User-Agent", USER_AGENT);
     }
 
+    @Test
+    public void testBaseTimeout() {
+        server.enqueue(new MockResponse().setBody(EXPECTED).setBodyDelay(3800, TimeUnit.MILLISECONDS));
+        ForestRequest request = baseReqClient.testBaseTimeout("UTF-8");
+        assertThat(request.getReadTimeout()).isEqualTo(4000);
+        assertThat(request.getConnectTimeout()).isEqualTo(3000);
+        request.execute();
+    }
 
     @Test
     public void testBaseURL() {

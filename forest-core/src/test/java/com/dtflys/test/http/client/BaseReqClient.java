@@ -1,9 +1,11 @@
 package com.dtflys.test.http.client;
 
 import com.dtflys.forest.annotation.BaseRequest;
+import com.dtflys.forest.annotation.Get;
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.annotation.Var;
 import com.dtflys.forest.callback.OnSuccess;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 
 /**
@@ -28,6 +30,8 @@ public interface BaseReqClient {
     )
     ForestResponse simpleGetWithEmptyPath(@Var("encoding") String encoding);
 
+    @Get
+    ForestRequest testBaseTimeout(@Var("encoding") String encoding);
 
     @Request(
             url = "/hello/user?username=foo"
