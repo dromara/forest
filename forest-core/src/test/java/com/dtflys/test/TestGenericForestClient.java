@@ -279,8 +279,8 @@ public class TestGenericForestClient extends BaseClientTest {
                 .setMaxAsyncQueueSize(100);
         LogConfiguration logConfiguration = new LogConfiguration();
         logConfiguration.setLogEnabled(false);
-        for (int j = 0; j < 20000; j++) {
-            final int total = 100;
+        for (int j = 0; j < 100; j++) {
+            final int total = 10;
             for (int i = 0; i < total; i++) {
                 server.enqueue(new MockResponse().setBody(EXPECTED));
             }
