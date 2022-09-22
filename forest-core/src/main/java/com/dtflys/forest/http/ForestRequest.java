@@ -148,6 +148,12 @@ public class ForestRequest<T> implements HasURL {
      */
     private boolean cacheBackendClient = true;
 
+    /**
+     * HTTP 执行器
+     *
+     * @since 1.5.27
+     */
+    private HttpExecutor executor;
 
     /**
      * 生命周期处理器
@@ -4272,8 +4278,8 @@ public class ForestRequest<T> implements HasURL {
         if (response == null || !retryEnabled) {
             throw ex.getCause();
         }
-        HttpExecutor executor = backend.createExecutor(this, lifeCycleHandler);
-        if (executor != null) {
+        HttpExecutor retryExecutor = backend.createExecutor(this, lifeCycleHandler);
+        if (retryExecutor != null) {
             if (!doRetryWhen(response)) {
                 throw ex.getCause();
             }
@@ -4305,6 +4311,7 @@ public class ForestRequest<T> implements HasURL {
      *
      * @return 新的Forest请求对象
      */
+    @Override
     public ForestRequest<T> clone() {
         ForestBody newBody = new ForestBody(configuration);
         newBody.setBodyType(body.getBodyType());
@@ -4376,7 +4383,7 @@ public class ForestRequest<T> implements HasURL {
             lifeCycleHandler.handleLoadCookie(this, cookies);
             this.addCookies(cookies);
             // 从后端HTTP框架创建HTTP请求执行器
-            HttpExecutor executor  = backend.createExecutor(this, lifeCycleHandler);
+            executor = backend.createExecutor(this, lifeCycleHandler);
             if (executor != null) {
                 try {
                     // 执行请求，即发生请求到服务端
@@ -4390,13 +4397,22 @@ public class ForestRequest<T> implements HasURL {
                     } else {
                         throw e;
                     }
-                } finally {
-                    executor.close();
                 }
             }
         }
         // 返回结果
         return getMethodReturnValue();
+    }
+
+    /**
+     * 取消请求执行
+     *
+     * @since 1.5.27
+     */
+    public void cancel() {
+        if (executor != null) {
+            executor.close();
+        }
     }
 
 

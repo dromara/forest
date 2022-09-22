@@ -62,6 +62,8 @@ public class OkHttp3Executor implements HttpExecutor {
 
     private final OkHttp3ResponseHandler okHttp3ResponseHandler;
 
+    private Call call;
+
     protected RequestLogMessage buildRequestMessage(int retryCount, Request okRequest) {
         RequestLogMessage message = new RequestLogMessage();
         HttpUrl url = okRequest.url();
@@ -189,7 +191,7 @@ public class OkHttp3Executor implements HttpExecutor {
         prepareHeaders(builder);
         prepareMethodAndBody(builder, lifeCycleHandler);
         final Request okRequest = builder.build();
-        Call call = okHttpClient.newCall(okRequest);
+        call = okHttpClient.newCall(okRequest);
         final OkHttp3ForestResponseFactory factory = new OkHttp3ForestResponseFactory();
         logRequest(retryCount, okRequest, okHttpClient);
         Date startDate = new Date();
@@ -283,6 +285,9 @@ public class OkHttp3Executor implements HttpExecutor {
 
     @Override
     public void close() {
+        if (call != null) {
+            call.cancel();
+        }
     }
 
 
