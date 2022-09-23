@@ -34,12 +34,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 
@@ -127,8 +128,6 @@ public class TestUploadClient extends BaseClientTest {
                     }
                 });
     }
-
-
     @Test
     public void testUploadFile() throws InterruptedException, FileUploadException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
@@ -1030,5 +1029,44 @@ public class TestUploadClient extends BaseClientTest {
                     }
                 });
     }
+
+
+    @Test
+    public void testCancelUploadFile() throws InterruptedException, FileUploadException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String path = Objects.requireNonNull(this.getClass().getResource("/test-img.jpg")).getPath();
+        if (path.startsWith("/") && isWindows()) {
+            path = path.substring(1);
+        }
+        File file = new File(path);
+        ForestRequest<Map> request = uploadClient.upload(file, progress -> {
+            if (progress.getRate() > 0.3F) {
+                progress.getRequest().cancel();
+                System.out.println("Progress: " + progress.getRate());
+            }
+        });
+        AtomicBoolean isCanceled = new AtomicBoolean(false);
+        AtomicBoolean isError = new AtomicBoolean(false);
+        request.onCanceled((req, res) -> {
+            isCanceled.set(true);
+        });
+        request.onError((ex, req, res) -> {
+            isError.set(true);
+        });
+        assertNotNull(request);
+        List<ForestMultipart> multipartList = request.getMultiparts();
+        assertEquals(1, multipartList.size());
+        assertTrue(StringUtils.isNotBlank(request.getBoundary()));
+        ForestMultipart multipart = multipartList.get(0);
+//        assertTrue(Map.class.isAssignableFrom(request.getMethod().getReturnClass()));
+        assertTrue(multipart instanceof FileMultipart);
+        assertEquals("file", multipart.getName());
+        assertEquals("test-img.jpg", multipart.getOriginalFileName());
+        request.execute();
+        assertThat(isCanceled.get()).isTrue();
+        assertThat(isError.get()).isFalse();
+        assertThat(request.isCanceled()).isTrue();
+    }
+
 
 }

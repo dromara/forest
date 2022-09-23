@@ -75,6 +75,13 @@ public class InterceptorChain implements Interceptor {
     }
 
     @Override
+    public void onCanceled(ForestRequest request, ForestResponse response) {
+        for (Interceptor item : interceptors) {
+            item.onCanceled(request, response);
+        }
+    }
+
+    @Override
     public void onRedirection(ForestRequest redirectReq, ForestRequest prevReq, ForestResponse prevRes) {
         for (Interceptor item : interceptors) {
             item.onRedirection(redirectReq, prevReq, prevRes);

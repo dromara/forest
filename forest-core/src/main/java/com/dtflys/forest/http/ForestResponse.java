@@ -194,6 +194,16 @@ public abstract class ForestResponse<T> implements HasURL {
     }
 
     /**
+     * 请求是否以取消
+     *
+     * @return {@code true}: 请求已被取消; {@code false}: 未被取消
+     * @since 1.5.27
+     */
+    public boolean isCanceled() {
+        return request.isCanceled();
+    }
+
+    /**
      * 该响应是否已打过日志
      *
      * @return {@code true}: 已打印过， {@code false}: 没打印过

@@ -27,6 +27,7 @@ package com.dtflys.forest.http;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.backend.HttpExecutor;
+import com.dtflys.forest.callback.OnCanceled;
 import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
@@ -167,6 +168,13 @@ public class ForestRequest<T> implements HasURL {
     private ForestProtocol protocol = ForestProtocol.HTTP_1_1;
 
     /**
+     * 请求是否以取消
+     *
+     * @since 1.5.27
+     */
+    private volatile boolean canceled = false;
+
+    /**
      * URL路径
      */
     private ForestURL url;
@@ -295,6 +303,11 @@ public class ForestRequest<T> implements HasURL {
      * 回调函数：请求失败时调用
      */
     private OnError onError;
+
+    /**
+     * 回调函数: 请求取消后调用
+     */
+    private OnCanceled onCanceled;
 
     /**
      * 回调函数: 请求是否成功
@@ -477,6 +490,15 @@ public class ForestRequest<T> implements HasURL {
     public ForestRequest<T> setProtocol(ForestProtocol protocol) {
         this.protocol = protocol;
         return this;
+    }
+
+    /**
+     * 请求是否以取消
+     *
+     * @return {@code true}: 请求已被取消; {@code false}: 未被取消
+     */
+    public boolean isCanceled() {
+        return canceled;
     }
 
     /**
@@ -3373,6 +3395,41 @@ public class ForestRequest<T> implements HasURL {
     }
 
     /**
+     * 获取OnCanceled回调函数，该回调函数在请求取消后被调用
+     *
+     * @return {@link OnCanceled}接口实例
+     * @since 1.5.27
+     */
+    public OnCanceled getOnCanceled() {
+        return onCanceled;
+    }
+
+    /**
+     * 设置OnCanceled回调函数，该回调函数在请求取消后被调用
+     *
+     * @param onCanceled {@link OnCanceled}接口实例
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.27
+     */
+    public ForestRequest<T> setOnCanceled(OnCanceled onCanceled) {
+        this.onCanceled = onCanceled;
+        return this;
+    }
+
+    /**
+     * 设置OnCanceled回调函数，该回调函数在请求取消后被调用
+     *
+     * @param onCanceled {@link OnCanceled}接口实例
+     * @return {@link ForestRequest}类实例
+     * @see ForestRequest#setOnCanceled(OnCanceled)
+     * @since 1.5.27
+     */
+    public ForestRequest<T> onCanceled(OnCanceled onCanceled) {
+        return setOnCanceled(onCanceled);
+    }
+
+
+    /**
      * 获取SuccessWhen回调函数，该回调函数用于判断请求是否成功
      * <p>如果成功, 执行 onSuccess
      * <p>如果失败, 执行 onError
@@ -4412,6 +4469,7 @@ public class ForestRequest<T> implements HasURL {
     public void cancel() {
         if (executor != null) {
             executor.close();
+            canceled = true;
         }
     }
 

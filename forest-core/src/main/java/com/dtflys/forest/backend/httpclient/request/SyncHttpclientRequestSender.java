@@ -28,6 +28,7 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.util.Date;
 
 /**
@@ -83,8 +84,11 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             logRequest(request.getCurrentRetryCount(), (HttpRequestBase) httpRequest);
             httpResponse = client.execute(httpRequest, httpClientContext);
         } catch (Throwable e) {
-//            httpRequest.abort();
             response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, e, startDate);
+            if (httpRequest.isAborted()) {
+                lifeCycleHandler.handleCanceled(request, response);
+                return;
+            }
             ForestRetryException retryException = new ForestRetryException(
                     e,  request, request.getRetryCount(), request.getCurrentRetryCount());
             try {

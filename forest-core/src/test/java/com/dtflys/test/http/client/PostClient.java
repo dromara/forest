@@ -2,6 +2,7 @@ package com.dtflys.test.http.client;
 
 import com.dtflys.forest.annotation.*;
 import com.dtflys.forest.backend.ContentType;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.model.*;
 import com.dtflys.test.http.model.UserParam;
@@ -327,6 +328,12 @@ public interface PostClient {
 
     @Post("http://localhost:{port}/json")
     String postJsonBodyMap(@JSONBody Map user);
+
+    @Post("http://localhost:{port}/json")
+    ForestRequest<String> postJsonBodyList(@JSONBody List<Map> users);
+
+    @Post("http://localhost:{port}/json")
+    ForestRequest<String> postJsonBodyArray(@JSONBody Map[] users);
 
     @Post("http://localhost:{port}/json")
     String postJsonBodyMapWithDefaultBody(

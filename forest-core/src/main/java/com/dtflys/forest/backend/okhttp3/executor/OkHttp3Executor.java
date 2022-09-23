@@ -39,6 +39,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.SocketAddress;
@@ -202,6 +203,10 @@ public class OkHttp3Executor implements HttpExecutor {
             okResponse = call.execute();
         } catch (Throwable e) {
             response = factory.createResponse(request, null, lifeCycleHandler, e, startDate);
+            if (e instanceof IOException && "Canceled".equals(e.getMessage())) {
+                lifeCycleHandler.handleCanceled(request, response);
+                return;
+            }
             ForestRetryException retryException = new ForestRetryException(
                     e, request, request.getMaxRetryCount(), retryCount);
             try {

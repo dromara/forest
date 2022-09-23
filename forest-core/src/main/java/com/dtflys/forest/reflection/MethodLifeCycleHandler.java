@@ -173,6 +173,15 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
     }
 
     @Override
+    public void handleCanceled(ForestRequest request, ForestResponse response) {
+        this.response = response;
+        request.getInterceptorChain().onCanceled(request, response);
+        if (request.getOnCanceled() != null) {
+            request.getOnCanceled().onCanceled(request, response);
+        }
+    }
+
+    @Override
     public void handleProgress(ForestRequest request, ForestProgress progress) {
         request.getInterceptorChain().onProgress(progress);
         OnProgress onProgress = request.getOnProgress();

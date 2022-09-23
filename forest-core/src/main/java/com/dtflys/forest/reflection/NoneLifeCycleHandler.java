@@ -57,18 +57,19 @@ public class NoneLifeCycleHandler implements LifeCycleHandler {
     }
 
     @Override
-    public void handleProgress(ForestRequest request, ForestProgress progress) {
+    public void handleCanceled(ForestRequest request, ForestResponse response) {
+    }
 
+    @Override
+    public void handleProgress(ForestRequest request, ForestProgress progress) {
     }
 
     @Override
     public void handleLoadCookie(ForestRequest request, ForestCookies cookies) {
-
     }
 
     @Override
     public void handleSaveCookie(ForestRequest request, ForestCookies cookies) {
-
     }
 
     @Override
