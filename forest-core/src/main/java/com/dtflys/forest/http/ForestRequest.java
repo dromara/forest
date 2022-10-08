@@ -81,6 +81,7 @@ import com.dtflys.forest.utils.URLUtils;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
 import java.io.File;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -427,6 +428,11 @@ public class ForestRequest<T> implements HasURL {
      * SSL主机名/域名验证器
      */
     private HostnameVerifier hostnameVerifier;
+
+    /**
+     * SSL 信任管理器
+     */
+    private TrustManager trustManager;
 
     /**
      * SSL Socket 工厂构造器
