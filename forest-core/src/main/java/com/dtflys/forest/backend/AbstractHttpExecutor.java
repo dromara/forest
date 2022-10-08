@@ -23,6 +23,7 @@ public abstract class AbstractHttpExecutor implements HttpExecutor {
         this.requestSender = requestSender;
     }
 
+    @Override
     public ForestRequest getRequest() {
         return request;
     }

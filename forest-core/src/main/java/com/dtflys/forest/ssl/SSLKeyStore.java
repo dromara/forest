@@ -4,6 +4,7 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.StringUtils;
 
 import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.TrustManager;
 import java.io.*;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -37,26 +38,40 @@ public class SSLKeyStore {
 
     protected String[] cipherSuites;
 
+    protected TrustManager trustManager;
+
     protected HostnameVerifier hostnameVerifier;
 
     protected SSLSocketFactoryBuilder sslSocketFactoryBuilder;
 
     public SSLKeyStore(String id, String filePath, String keystorePass, String certPass,
+                       TrustManager trustManager,
                        HostnameVerifier hostnameVerifier,
                        SSLSocketFactoryBuilder sslSocketFactoryBuilder) {
-        this(id, DEFAULT_KEYSTORE_TYPE, filePath, keystorePass, certPass, hostnameVerifier, sslSocketFactoryBuilder);
+        this(
+                id,
+                DEFAULT_KEYSTORE_TYPE,
+                filePath,
+                keystorePass,
+                certPass,
+                trustManager,
+                hostnameVerifier,
+                sslSocketFactoryBuilder);
     }
 
 
 
     public SSLKeyStore(String id, String keystoreType, String filePath,
                        String keystorePass, String certPass,
-                       HostnameVerifier hostnameVerifier, SSLSocketFactoryBuilder sslSocketFactoryBuilder) {
+                       TrustManager trustManager,
+                       HostnameVerifier hostnameVerifier,
+                       SSLSocketFactoryBuilder sslSocketFactoryBuilder) {
         this.id = id;
         this.keystoreType = keystoreType;
         this.filePath = filePath;
         this.keystorePass = keystorePass;
         this.certPass = certPass;
+        this.trustManager = trustManager;
         this.hostnameVerifier = hostnameVerifier;
         this.sslSocketFactoryBuilder = sslSocketFactoryBuilder;
         init();
@@ -95,6 +110,14 @@ public class SSLKeyStore {
 
     public void setCipherSuites(String[] cipherSuites) {
         this.cipherSuites = cipherSuites;
+    }
+
+    public TrustManager getTrustManager() {
+        return trustManager;
+    }
+
+    public void setTrustManager(TrustManager trustManager) {
+        this.trustManager = trustManager;
     }
 
     public HostnameVerifier getHostnameVerifier() {
