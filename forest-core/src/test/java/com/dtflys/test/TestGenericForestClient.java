@@ -33,6 +33,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
@@ -1092,9 +1093,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .port(server.getPort())
                 .maxRetryCount(3)
                 .retryWhen(((req, res) -> res.statusIs(200)))
-                .onError(((ex, req, res) -> {
-                    isError.set(true);
-                }));
+                .onError(((ex, req, res) -> isError.set(true)));
         request.execute();
         assertThat(isError.get()).isTrue();
         assertThat(request.getCurrentRetryCount()).isEqualTo(0);
@@ -1112,9 +1111,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .host("localhost")
                 .port(server.getPort())
                 .maxRetryCount(3)
-                .onError(((ex, req, res) -> {
-                    isError.set(true);
-                }));
+                .onError(((ex, req, res) -> isError.set(true)));
         request.execute();
         assertThat(isError.get()).isTrue();
         assertThat(request.getCurrentRetryCount()).isEqualTo(3);
@@ -1133,7 +1130,7 @@ public class TestGenericForestClient extends BaseClientTest {
                     isError.set(true);
                     latch.countDown();
                 }));
-        request.execute();
+        request.execute(InputStream.class);
         latch.await();
         assertThat(isError.get()).isTrue();
         assertThat(request.getCurrentRetryCount()).isEqualTo(0);
@@ -1222,7 +1219,6 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(buffer));
         AtomicReference<ForestProgress> atomicProgress = new AtomicReference<>(null);
         String dir = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "TestDownload";
-        String filename = "test-img-1.jpg";
         ForestRequest<?> request = Forest.get("http://localhost:" + server.getPort())
                 .setDownloadFile(dir, "")
                 .setOnProgress(progress -> {
