@@ -11,6 +11,7 @@ import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.http.ForestRequest;
+import org.bouncycastle.math.raw.Mod;
 
 import java.io.File;
 import java.io.InputStream;
@@ -95,5 +96,29 @@ public interface UploadClient {
     ForestRequest<Map> imageUploadWithJSONBodyParamsAndWithoutContentType(String fileName, @DataFile(value = "file", fileName = "${0}") File file,
                                                      @JSONBody("params") Map params);
 
+
+    class Model {
+        String id;
+        String filename;
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getFilename() {
+            return filename;
+        }
+
+        public void setFilename(String filename) {
+            this.filename = filename;
+        }
+    }
+
+    @Post(url = "/upload")
+    ForestRequest<Map> uploadWithModel(@DataFile("file") File file, @Body Model model);
 
 }

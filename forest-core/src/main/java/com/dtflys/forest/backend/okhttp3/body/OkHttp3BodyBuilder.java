@@ -56,6 +56,9 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
     private void addMultipart(MultipartBody.Builder bodyBuilder,
                               String name, Object value, String contentType,
                               Charset charset, ForestJsonConverter jsonConverter) {
+        if (value == null) {
+            return;
+        }
         if (StringUtils.isEmpty(contentType)) {
             contentType = "text/plain";
         }

@@ -90,6 +90,7 @@ public class TestSSLClient extends BaseClientTest {
                 "client",
                 "456789",
                 null,
+                null,
                 new MySSLSocketFactoryBuilder());
         configuration.registerKeyStore(sslKeyStore);
 
@@ -98,6 +99,7 @@ public class TestSSLClient extends BaseClientTest {
                 "ssl_client.keystore",
                 "client",
                 "456789",
+                null,
                 new HostnameVerifier() {
                     @Override
                     public boolean verify(String s, SSLSession sslSession) {
@@ -111,6 +113,7 @@ public class TestSSLClient extends BaseClientTest {
         configuration.registerKeyStore(sslKeyStore2);
         configuration.registerKeyStore(new SSLKeyStore(
                 "ssl_client3",
+                null,
                 null,
                 null,
                 null,
