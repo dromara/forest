@@ -197,6 +197,14 @@ public class ForestRequest<T> implements HasURL {
     private boolean async;
 
     /**
+     * 异步请求模式
+     * <p>该字段只有在 async = true 时有效</p>
+     *
+     * @since 1.5.27
+     */
+    private ForestAsyncMode asyncMode = ForestAsyncMode.Platform;
+
+    /**
      * 是否打开自动重定向
      */
     private boolean autoRedirection;
@@ -1877,6 +1885,52 @@ public class ForestRequest<T> implements HasURL {
     public ForestRequest<T> setAsync(boolean async) {
         this.async = async;
         return this;
+    }
+
+    /**
+     * 获取异步请求模式
+     * <p>该字段只有在 async = true 时有效</p>
+     *
+     * @return {@link ForestAsyncMode}枚举实例
+     * @since 1.5.27
+     */
+    public ForestAsyncMode getAsyncMode() {
+        return asyncMode;
+    }
+
+    /**
+     * 设置异步请求模式
+     * <p>该字段只有在 async = true 时有效</p>
+     *
+     * @param asyncMode {@link ForestAsyncMode}枚举实例
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.27
+     */
+    public ForestRequest<T> setAsyncMode(ForestAsyncMode asyncMode) {
+        this.asyncMode = asyncMode;
+        return this;
+    }
+
+    /**
+     * 获取异步请求模式
+     * <p>该字段只有在 async = true 时有效</p>
+     *
+     * @return {@link ForestAsyncMode}枚举实例
+     * @since 1.5.27
+     */
+    public ForestAsyncMode asyncMode() {
+        return getAsyncMode();
+    }
+
+    /**
+     * 设置异步请求模式
+     * <p>该字段只有在 async = true 时有效</p>
+     *
+     * @return {@link ForestAsyncMode}枚举实例
+     * @since 1.5.27
+     */
+    public ForestRequest<T> asyncMode(ForestAsyncMode asyncMode) {
+        return setAsyncMode(asyncMode);
     }
 
     /**

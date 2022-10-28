@@ -27,31 +27,39 @@ public abstract class AbstractHttpBackend implements HttpBackend {
      */
     private HttpExecutorCreator ASYNC_EXECUTOR_CREATOR = this::createAsyncExecutor;
 
+
+    /**
+     * 异步(Kotlin协程)HTTP执行器构造器
+     */
+    private HttpExecutorCreator KOTLIN_COROUTINE_EXECUTOR_CREATOR = this::createKotlinCoroutineExecutor;
+
+
     private static AsyncHttpExecutorCreator ASYNC_HTTP_EXECUTOR_CREATOR;
+
+    private static AsyncHttpExecutorCreator KOTLIN_COROUTINE_HTTP_EXECUTOR_CREATOR;
 
     private volatile boolean initialized = false;
 
     private final ForestConnectionManager connectionManager;
 
     static {
-        if (AsyncUtil.isEnableCoroutine()) {
-
-            ASYNC_HTTP_EXECUTOR_CREATOR = (configuration, syncExecutor, responseHandler) -> {
-                try {
-                    Constructor<?> constructor = Class.forName("com.dtflys.forest.backend.KotlinCoroutineHttpExecutor")
-                            .getConstructor(
-                                    ForestConfiguration.class,
-                                    HttpExecutor.class,
-                                    ResponseHandler.class);
-                    return (HttpExecutor) constructor.newInstance(configuration, syncExecutor, responseHandler);
-                } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException |
-                         InstantiationException | IllegalAccessException e) {
-                    throw new ForestRuntimeException(e);
-                }
-            };
-        } else {
-            ASYNC_HTTP_EXECUTOR_CREATOR = AsyncHttpExecutor::new;
-        }
+        ASYNC_HTTP_EXECUTOR_CREATOR = AsyncHttpExecutor::new;
+        KOTLIN_COROUTINE_HTTP_EXECUTOR_CREATOR = (configuration, syncExecutor, responseHandler) -> {
+            if (!AsyncUtil.isEnableCoroutine()) {
+                return ASYNC_HTTP_EXECUTOR_CREATOR.create(configuration, syncExecutor, responseHandler);
+            }
+            try {
+                Constructor<?> constructor = Class.forName("com.dtflys.forest.backend.KotlinCoroutineHttpExecutor")
+                        .getConstructor(
+                                ForestConfiguration.class,
+                                HttpExecutor.class,
+                                ResponseHandler.class);
+                return (HttpExecutor) constructor.newInstance(configuration, syncExecutor, responseHandler);
+            } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException |
+                     InstantiationException | IllegalAccessException e) {
+                throw new ForestRuntimeException(e);
+            }
+        };
     }
 
     public AbstractHttpBackend(ForestConnectionManager connectionManager) {
@@ -82,12 +90,29 @@ public abstract class AbstractHttpBackend implements HttpBackend {
         return ASYNC_HTTP_EXECUTOR_CREATOR.create(request.getConfiguration(), syncHttpExecutor, syncHttpExecutor.getResponseHandler());
     }
 
-    @Override
-    public HttpExecutor createExecutor(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
+    public HttpExecutor createKotlinCoroutineExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
+        HttpExecutor syncHttpExecutor = createSyncExecutor(connectionManager, request, lifeCycleHandler);
+        return KOTLIN_COROUTINE_HTTP_EXECUTOR_CREATOR.create(request.getConfiguration(), syncHttpExecutor, syncHttpExecutor.getResponseHandler());
+    }
+
+    private HttpExecutorCreator getHttpExecutorCreator(final ForestRequest request) {
         if (request.isAsync()) {
-            return ASYNC_EXECUTOR_CREATOR.createExecutor(connectionManager, request, lifeCycleHandler);
+            switch (request.asyncMode()) {
+                case Platform:
+                    return ASYNC_EXECUTOR_CREATOR;
+                case KotlinCoroutine:
+                    return KOTLIN_COROUTINE_EXECUTOR_CREATOR;
+                default:
+                    throw new ForestRuntimeException("Forest not support async mode '[" + request.asyncMode().name() + "]'");
+            }
         }
-        return SYNC_EXECUTOR_CREATOR.createExecutor(connectionManager, request, lifeCycleHandler);
+        return SYNC_EXECUTOR_CREATOR;
+    }
+
+    @Override
+    public HttpExecutor createExecutor(final ForestRequest request, final LifeCycleHandler lifeCycleHandler) {
+        HttpExecutorCreator httpExecutorCreator = getHttpExecutorCreator(request);
+        return httpExecutorCreator.createExecutor(connectionManager, request, lifeCycleHandler);
     }
 
     @FunctionalInterface
