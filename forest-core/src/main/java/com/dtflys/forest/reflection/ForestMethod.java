@@ -906,6 +906,7 @@ public class ForestMethod<T> implements VariableScope {
                 .autoRedirects(autoRedirection)
                 .setSslProtocol(sslProtocol)
                 .setLogConfiguration(logConfiguration)
+                .setAsyncMode(configuration.getAsyncMode())
                 .setAsync(async);
 
         if (addressSource != null) {

@@ -11,16 +11,13 @@ import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestAddress;
+import com.dtflys.forest.http.ForestAsyncMode;
 import com.dtflys.forest.http.ForestHeader;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestURL;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorChain;
-import com.dtflys.forest.logging.LogConfiguration;
-import com.dtflys.forest.retryer.ForestRetryer;
-import com.dtflys.forest.retryer.NoneRetryer;
-import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ForestProgress;
 import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.forest.utils.URLEncoder;
@@ -42,6 +39,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
@@ -630,6 +628,18 @@ public class TestGenericForestClient extends BaseClientTest {
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/B");
+    }
+
+    @Test
+    public void testRequest_template_in_url() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config().setVariableValue("testVar", "foo");
+        Forest.get("/test/{testVar}")
+                .host("127.0.0.1")
+                .port(server.getPort())
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/test/foo");
     }
 
     @Test
@@ -1239,6 +1249,22 @@ public class TestGenericForestClient extends BaseClientTest {
     }
 
 
+    @Test
+    public void testRequest_async_mode() {
+        assertThat(Forest.get("/").asyncMode())
+                .isNotNull()
+                .isEqualTo(ForestAsyncMode.PLATFORM);
+
+        Forest.config().setAsyncMode(ForestAsyncMode.KOTLIN_COROUTINE);
+        assertThat(Forest.get("/").asyncMode())
+                .isNotNull()
+                .isEqualTo(ForestAsyncMode.KOTLIN_COROUTINE);
+
+        Forest.config().setAsyncMode(ForestAsyncMode.PLATFORM);
+        assertThat(Forest.get("/").asyncMode())
+                .isNotNull()
+                .isEqualTo(ForestAsyncMode.PLATFORM);
+    }
 
     @Test
     public void testRequest_async_future() throws ExecutionException, InterruptedException {
@@ -1293,9 +1319,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .port(server.getPort())
                 .maxRetryCount(3)
                 .retryWhen(((req, res) -> res.statusIs(200)))
-                .onError(((ex, req, res) -> {
-                    isError.set(true);
-                }));
+                .onError(((ex, req, res) -> isError.set(true)));
         request.execute();
         assertThat(isError.get()).isTrue();
         assertThat(request.getCurrentRetryCount()).isEqualTo(0);
@@ -1313,9 +1337,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .host("localhost")
                 .port(server.getPort())
                 .maxRetryCount(3)
-                .onError(((ex, req, res) -> {
-                    isError.set(true);
-                }));
+                .onError(((ex, req, res) -> isError.set(true)));
         request.execute();
         assertThat(isError.get()).isTrue();
         assertThat(request.getCurrentRetryCount()).isEqualTo(3);
@@ -1334,7 +1356,7 @@ public class TestGenericForestClient extends BaseClientTest {
                     isError.set(true);
                     latch.countDown();
                 }));
-        request.execute();
+        request.execute(InputStream.class);
         latch.await();
         assertThat(isError.get()).isTrue();
         assertThat(request.getCurrentRetryCount()).isEqualTo(0);
@@ -1443,7 +1465,6 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(buffer));
         AtomicReference<ForestProgress> atomicProgress = new AtomicReference<>(null);
         String dir = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "TestDownload";
-        String filename = "test-img-1.jpg";
         ForestRequest<?> request = Forest.get("http://localhost:" + server.getPort())
                 .setDownloadFile(dir, "")
                 .setOnProgress(progress -> {

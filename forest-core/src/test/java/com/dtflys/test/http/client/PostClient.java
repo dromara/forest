@@ -102,7 +102,7 @@ public interface PostClient {
             data = "username={username}&password={password}",
             headers = {"Accept:text/plain"}
     )
-    String varParamPost(@DataVariable("username") String username, @DataVariable("password") String password);
+    String varParamPost(@Var("username") String username, @Var("password") String password);
 
     @Post(
             url = "http://localhost:{port}/hello-list",
@@ -118,7 +118,7 @@ public interface PostClient {
             data = "{user.argString}",
             headers = {"Accept:text/plain"}
     )
-    String modelParamPost(@DataVariable("user") UserParam userParam);
+    String modelParamPost(@Var("user") UserParam userParam);
 
 
     @Request(
