@@ -7,6 +7,8 @@ import com.dtflys.forest.utils.ForestDataType;
 import java.nio.charset.Charset;
 
 /**
+ * Forest 编码器
+ *
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2020-08-08 15:12
  */

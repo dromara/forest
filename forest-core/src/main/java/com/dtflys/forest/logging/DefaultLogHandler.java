@@ -1,6 +1,7 @@
 package com.dtflys.forest.logging;
 
 import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.forest.http.ForestAsyncMode;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.StringUtils;
@@ -73,6 +74,19 @@ public class DefaultLogHandler implements ForestLogHandler {
         return builder.toString();
     }
 
+    protected String asyncModeContent(RequestLogMessage requestLogMessage) {
+        ForestRequest request = requestLogMessage.getRequest();
+        if (!request.isAsync()) {
+            return "";
+        }
+        StringBuilder builder = new StringBuilder("[async");
+        if (ForestAsyncMode.KOTLIN_COROUTINE == request.getAsyncMode()) {
+            builder.append(": kotlin");
+        }
+        builder.append("] ");
+        return builder.toString();
+    }
+
     /**
      * 后端框架名称
      * @param requestLogMessage 请求日志消息，{@link RequestLogMessage}类实例
@@ -141,6 +155,7 @@ public class DefaultLogHandler implements ForestLogHandler {
     protected String requestLoggingContent(RequestLogMessage requestLogMessage) {
         StringBuilder builder = new StringBuilder();
         builder.append("Request ");
+        builder.append(asyncModeContent(requestLogMessage));
         builder.append(backendContent(requestLogMessage));
         builder.append(": \n\t");
         builder.append(retryContent(requestLogMessage));

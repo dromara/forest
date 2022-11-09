@@ -1,6 +1,7 @@
 package com.dtflys.forest.springboot.test;
 
 import com.dtflys.forest.Forest;
+import com.dtflys.forest.http.ForestAsyncMode;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.logging.LogConfiguration;
@@ -50,6 +51,7 @@ public class Test1 {
         assertTrue(forestConfiguration.getLogHandler() instanceof TestLogHandler);
         assertTrue(forestConfiguration.hasFilter("test"));
         assertNotNull(forestConfiguration.getConverter(ForestDataType.BINARY));
+        assertEquals(ForestAsyncMode.KOTLIN_COROUTINE, forestConfiguration.getAsyncMode());
     }
 
     @Test
@@ -60,6 +62,7 @@ public class Test1 {
         sw.stop();
         assertNotNull(response);
         ForestRequest request = response.getRequest();
+        assertEquals(ForestAsyncMode.KOTLIN_COROUTINE, request.asyncMode());
         int reqTimeout = request.getTimeout();
         assertEquals(50, reqTimeout);
         long time = sw.getTotalTimeMillis();

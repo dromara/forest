@@ -27,6 +27,7 @@ package com.dtflys.forest.http;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.backend.HttpExecutor;
+import com.dtflys.forest.callback.OnCanceled;
 import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
@@ -80,6 +81,7 @@ import com.dtflys.forest.utils.URLUtils;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
 import java.io.File;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -98,6 +100,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import static com.dtflys.forest.mapping.MappingParameter.TARGET_BODY;
@@ -148,6 +151,12 @@ public class ForestRequest<T> implements HasURL {
      */
     private boolean cacheBackendClient = true;
 
+    /**
+     * HTTP 执行器
+     *
+     * @since 1.5.27
+     */
+    private HttpExecutor executor;
 
     /**
      * 生命周期处理器
@@ -159,6 +168,13 @@ public class ForestRequest<T> implements HasURL {
      * <p>默认为 HTTP 1.1
      */
     private ForestProtocol protocol = ForestProtocol.HTTP_1_1;
+
+    /**
+     * 请求是否以取消
+     *
+     * @since 1.5.27
+     */
+    private volatile boolean canceled = false;
 
     /**
      * URL路径
@@ -199,6 +215,14 @@ public class ForestRequest<T> implements HasURL {
      * 是否异步
      */
     private boolean async;
+
+    /**
+     * 异步请求模式
+     * <p>该字段只有在 async = true 时有效</p>
+     *
+     * @since 1.5.27
+     */
+    private ForestAsyncMode asyncMode = ForestAsyncMode.PLATFORM;
 
     /**
      * 是否打开自动重定向
@@ -289,6 +313,11 @@ public class ForestRequest<T> implements HasURL {
      * 回调函数：请求失败时调用
      */
     private OnError onError;
+
+    /**
+     * 回调函数: 请求取消后调用
+     */
+    private OnCanceled onCanceled;
 
     /**
      * 回调函数: 请求是否成功
@@ -410,6 +439,11 @@ public class ForestRequest<T> implements HasURL {
     private HostnameVerifier hostnameVerifier;
 
     /**
+     * SSL 信任管理器
+     */
+    private TrustManager trustManager;
+
+    /**
      * SSL Socket 工厂构造器
      */
     private SSLSocketFactoryBuilder sslSocketFactoryBuilder;
@@ -474,12 +508,22 @@ public class ForestRequest<T> implements HasURL {
     }
 
     /**
+     * 请求是否以取消
+     *
+     * @return {@code true}: 请求已被取消; {@code false}: 未被取消
+     */
+    public boolean isCanceled() {
+        return canceled;
+    }
+
+    /**
      * 获取请求URL
      * <p>不同于 {@link ForestRequest#getUrl()} 方法,
      * <p>此方法返回的URL为 {@link ForestURL} 对象实例
      *
      * @return {@link ForestURL} 对象实例
      */
+    @Override
     public ForestURL url() {
         return this.url;
     }
@@ -899,7 +943,7 @@ public class ForestRequest<T> implements HasURL {
      * @return URL根路径
      */
     public String getBasePath() {
-        return this.url.getBasePath();
+        return this.url.normalizeBasePath();
     }
 
     /**
@@ -1942,6 +1986,52 @@ public class ForestRequest<T> implements HasURL {
     public ForestRequest<T> setAsync(boolean async) {
         this.async = async;
         return this;
+    }
+
+    /**
+     * 获取异步请求模式
+     * <p>该字段只有在 async = true 时有效</p>
+     *
+     * @return {@link ForestAsyncMode}枚举实例
+     * @since 1.5.27
+     */
+    public ForestAsyncMode getAsyncMode() {
+        return asyncMode;
+    }
+
+    /**
+     * 设置异步请求模式
+     * <p>该字段只有在 async = true 时有效</p>
+     *
+     * @param asyncMode {@link ForestAsyncMode}枚举实例
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.27
+     */
+    public ForestRequest<T> setAsyncMode(ForestAsyncMode asyncMode) {
+        this.asyncMode = asyncMode;
+        return this;
+    }
+
+    /**
+     * 获取异步请求模式
+     * <p>该字段只有在 async = true 时有效</p>
+     *
+     * @return {@link ForestAsyncMode}枚举实例
+     * @since 1.5.27
+     */
+    public ForestAsyncMode asyncMode() {
+        return getAsyncMode();
+    }
+
+    /**
+     * 设置异步请求模式
+     * <p>该字段只有在 async = true 时有效</p>
+     *
+     * @return {@link ForestAsyncMode}枚举实例
+     * @since 1.5.27
+     */
+    public ForestRequest<T> asyncMode(ForestAsyncMode asyncMode) {
+        return setAsyncMode(asyncMode);
     }
 
     /**
@@ -3366,6 +3456,41 @@ public class ForestRequest<T> implements HasURL {
     }
 
     /**
+     * 获取OnCanceled回调函数，该回调函数在请求取消后被调用
+     *
+     * @return {@link OnCanceled}接口实例
+     * @since 1.5.27
+     */
+    public OnCanceled getOnCanceled() {
+        return onCanceled;
+    }
+
+    /**
+     * 设置OnCanceled回调函数，该回调函数在请求取消后被调用
+     *
+     * @param onCanceled {@link OnCanceled}接口实例
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.27
+     */
+    public ForestRequest<T> setOnCanceled(OnCanceled onCanceled) {
+        this.onCanceled = onCanceled;
+        return this;
+    }
+
+    /**
+     * 设置OnCanceled回调函数，该回调函数在请求取消后被调用
+     *
+     * @param onCanceled {@link OnCanceled}接口实例
+     * @return {@link ForestRequest}类实例
+     * @see ForestRequest#setOnCanceled(OnCanceled)
+     * @since 1.5.27
+     */
+    public ForestRequest<T> onCanceled(OnCanceled onCanceled) {
+        return setOnCanceled(onCanceled);
+    }
+
+
+    /**
      * 获取SuccessWhen回调函数，该回调函数用于判断请求是否成功
      * <p>如果成功, 执行 onSuccess
      * <p>如果失败, 执行 onError
@@ -4271,8 +4396,8 @@ public class ForestRequest<T> implements HasURL {
         if (response == null || !retryEnabled) {
             throw ex.getCause();
         }
-        HttpExecutor executor = backend.createExecutor(this, lifeCycleHandler);
-        if (executor != null) {
+        HttpExecutor retryExecutor = backend.createExecutor(this, lifeCycleHandler);
+        if (retryExecutor != null) {
             if (!doRetryWhen(response)) {
                 throw ex.getCause();
             }
@@ -4304,6 +4429,7 @@ public class ForestRequest<T> implements HasURL {
      *
      * @return 新的Forest请求对象
      */
+    @Override
     public ForestRequest<T> clone() {
         ForestBody newBody = new ForestBody(configuration);
         newBody.setBodyType(body.getBodyType());
@@ -4375,7 +4501,7 @@ public class ForestRequest<T> implements HasURL {
             lifeCycleHandler.handleLoadCookie(this, cookies);
             this.addCookies(cookies);
             // 从后端HTTP框架创建HTTP请求执行器
-            HttpExecutor executor  = backend.createExecutor(this, lifeCycleHandler);
+            executor = backend.createExecutor(this, lifeCycleHandler);
             if (executor != null) {
                 try {
                     // 执行请求，即发生请求到服务端
@@ -4389,13 +4515,23 @@ public class ForestRequest<T> implements HasURL {
                     } else {
                         throw e;
                     }
-                } finally {
-                    executor.close();
                 }
             }
         }
         // 返回结果
         return getMethodReturnValue();
+    }
+
+    /**
+     * 取消请求执行
+     *
+     * @since 1.5.27
+     */
+    public void cancel() {
+        if (executor != null) {
+            executor.close();
+            canceled = true;
+        }
     }
 
 
@@ -4505,6 +4641,28 @@ public class ForestRequest<T> implements HasURL {
      */
     public <E> List<E> executeAsList() {
         return execute(new TypeReference<List<E>>() {});
+    }
+
+    /**
+     * 执行请求发送过程，并获取 Future 类型结果
+     *
+     * @return 请求执行响应后返回的结果, 其为 {@link Future} 对象实例
+     * @since 1.5.27
+     */
+    public ForestFuture executeAsFuture() {
+        Future future = execute(new TypeReference<Future<ForestResponse>>() {});
+        return new ForestFuture(this, future);
+    }
+
+
+    /**
+     * 执行请求发送过程，并获取响应类型结果
+     *
+     * @return 请求执行响应后返回的结果, 其为 {@link ForestResponse} 对象实例
+     * @since 1.5.27
+     */
+    public ForestResponse executeAsResponse() {
+        return execute(ForestResponse.class);
     }
 
 

@@ -28,6 +28,7 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.util.Date;
 
 /**
@@ -83,8 +84,11 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             logRequest(request.getCurrentRetryCount(), (HttpRequestBase) httpRequest);
             httpResponse = client.execute(httpRequest, httpClientContext);
         } catch (Throwable e) {
-            httpRequest.abort();
             response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, e, startDate);
+            if (httpRequest.isAborted()) {
+                lifeCycleHandler.handleCanceled(request, response);
+                return;
+            }
             ForestRetryException retryException = new ForestRetryException(
                     e,  request, request.getRetryCount(), request.getCurrentRetryCount());
             try {
@@ -104,10 +108,13 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             }
             logResponse(response);
         }
-        response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, null, startDate);
+        if (response == null) {
+            response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, null, startDate);
+        }
         // 检查是否重试
         ForestRetryException retryEx = request.canRetry(response);
         if (retryEx != null && retryEx.isNeedRetry() && !retryEx.isMaxRetryCountReached()) {
+            response.close();
             executor.execute(lifeCycleHandler);
             return;
         }
@@ -124,6 +131,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
                 responseHandler.handleSync(httpResponse, response);
                 return;
             }
+            response.close();
             executor.execute(lifeCycleHandler);
             return;
         }

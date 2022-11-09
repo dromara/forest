@@ -59,7 +59,6 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
         }
 
 
-
         if (StringUtils.isEmpty(mineType)) {
             mineType = ContentType.APPLICATION_X_WWW_FORM_URLENCODED;
         }

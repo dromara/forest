@@ -1,5 +1,6 @@
 package com.dtflys.forest.interceptor;
 
+import com.dtflys.forest.callback.OnCanceled;
 import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
@@ -44,7 +45,8 @@ import com.dtflys.forest.utils.ForestProgress;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-06-26
  */
-public interface Interceptor<T> extends OnSuccess<T>, OnError, OnProgress, OnLoadCookie, OnSaveCookie, OnRetry, OnRedirection {
+public interface Interceptor<T> extends
+        OnSuccess<T>, OnError, OnCanceled, OnProgress, OnLoadCookie, OnSaveCookie, OnRetry, OnRedirection {
 
 
     /**
@@ -112,6 +114,17 @@ public interface Interceptor<T> extends OnSuccess<T>, OnError, OnProgress, OnLoa
      */
     @Override
     default void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
+    }
+
+    /**
+     * 默认回调函数: 请求取消后调用该方法
+     * <p>默认为什么都不做
+     *
+     * @param req Forest请求对象
+     * @param res Forest响应对象
+     */
+    @Override
+    default void onCanceled(ForestRequest req, ForestResponse res) {
     }
 
     /**

@@ -37,8 +37,7 @@ public class NoneLifeCycleHandler implements LifeCycleHandler {
     }
 
     @Override
-    public Object handleSuccess(Object resultData, ForestRequest request, ForestResponse response) {
-        return null;
+    public void handleSuccess(Object resultData, ForestRequest request, ForestResponse response) {
     }
 
     @Override
@@ -57,18 +56,19 @@ public class NoneLifeCycleHandler implements LifeCycleHandler {
     }
 
     @Override
-    public void handleProgress(ForestRequest request, ForestProgress progress) {
+    public void handleCanceled(ForestRequest request, ForestResponse response) {
+    }
 
+    @Override
+    public void handleProgress(ForestRequest request, ForestProgress progress) {
     }
 
     @Override
     public void handleLoadCookie(ForestRequest request, ForestCookies cookies) {
-
     }
 
     @Override
     public void handleSaveCookie(ForestRequest request, ForestCookies cookies) {
-
     }
 
     @Override
@@ -77,7 +77,7 @@ public class NoneLifeCycleHandler implements LifeCycleHandler {
     }
 
     @Override
-    public Object handleFuture(Future resultData) {
+    public Object handleFuture(ForestRequest request, Future resultData) {
         return null;
     }
 

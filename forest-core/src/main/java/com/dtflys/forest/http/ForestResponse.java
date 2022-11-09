@@ -30,11 +30,13 @@ import com.dtflys.forest.callback.SuccessWhen;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.ByteEncodeUtils;
 import com.dtflys.forest.utils.GzipUtils;
+import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -46,7 +48,7 @@ import java.util.List;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.1.0
  */
-public abstract class ForestResponse<T> implements HasURL {
+public abstract class ForestResponse<T> extends ResultGetter implements HasURL {
 
     protected final static int MAX_BYTES_CAPACITY = 1024 * 1024 * 2;
 
@@ -138,9 +140,15 @@ public abstract class ForestResponse<T> implements HasURL {
 
 
     public ForestResponse(ForestRequest request, Date requestTime, Date responseTime) {
+        super(request);
         this.request = request;
         this.requestTime = requestTime;
         this.responseTime = responseTime;
+    }
+
+    @Override
+    protected ForestResponse getResponse() {
+        return this;
     }
 
     /**
@@ -191,6 +199,16 @@ public abstract class ForestResponse<T> implements HasURL {
      */
     public long getTimeAsMillisecond() {
         return responseTime.getTime() - requestTime.getTime();
+    }
+
+    /**
+     * 请求是否以取消
+     *
+     * @return {@code true}: 请求已被取消; {@code false}: 未被取消
+     * @since 1.5.27
+     */
+    public boolean isCanceled() {
+        return request.isCanceled();
     }
 
     /**
@@ -322,6 +340,29 @@ public abstract class ForestResponse<T> implements HasURL {
      * @return 反序列化成对象类型的请求响应内容
      */
     public T getResult() {
+        if (result == null && isReceivedResponseData()) {
+            Type type = request.getLifeCycleHandler().getResultType();
+            if (type == null) {
+                type = request.getMethod().getReturnType();
+            }
+            if (type == null) {
+                try {
+                    result = (T) get(String.class);
+                } catch (Throwable th) {
+                }
+            } else {
+                Class clazz = ReflectUtils.toClass(type);
+                if (ForestResponse.class.isAssignableFrom(clazz)) {
+                    Type argType = ReflectUtils.getGenericArgument(clazz);
+                    if (argType == null) {
+                        argType = String.class;
+                    }
+                    result = get(argType);
+                } else {
+                    result = get(type);
+                }
+            }
+        }
         return result;
     }
 

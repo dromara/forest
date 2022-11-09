@@ -116,6 +116,9 @@ public class TestAddressClient extends BaseClientTest {
     public void testAddress_base2() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         ForestRequest<String> request = addressClient2.sendAddressSource2(server.getPort());
+        request.addQuery("a", 123);
+        assertThat(request.getQueryString()).isNotBlank();
+        assertThat(request.getBasePath()).isEqualTo("/base/path");
         assertThat(request.getHost()).isEqualTo("localhost");
         assertThat(request.getPort()).isEqualTo(server.getPort());
         String result = request.execute(String.class);

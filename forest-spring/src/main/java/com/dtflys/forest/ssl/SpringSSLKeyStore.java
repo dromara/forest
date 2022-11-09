@@ -6,6 +6,7 @@ import com.dtflys.forest.utils.StringUtils;
 import org.springframework.core.io.ClassPathResource;
 
 import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.TrustManager;
 import java.io.*;
 
 /**
@@ -29,6 +30,20 @@ public class SpringSSLKeyStore extends SSLKeyStore {
         }
     }
 
+    private static TrustManager getTrustManager(String trustManagerClass) {
+        if (StringUtils.isBlank(trustManagerClass)) {
+            return null;
+        }
+        try {
+            Class clazz = Class.forName(trustManagerClass);
+            if (!TrustManager.class.isAssignableFrom(clazz)) {
+                throw new ForestRuntimeException("[Forest] The value of property 'trustManager' must be a class inherited from javax.net.ssl.TrustManager");
+            }
+            return (TrustManager) Forest.config().getForestObjectFactory().getObject(clazz);
+        } catch (ClassNotFoundException e) {
+            throw new ForestRuntimeException(e);
+        }
+    }
 
     private static HostnameVerifier getHostnameVerifier(String hostnameVerifierClass) {
         if (StringUtils.isBlank(hostnameVerifierClass)) {
@@ -62,6 +77,7 @@ public class SpringSSLKeyStore extends SSLKeyStore {
             String filePath,
             String keystorePass,
             String certPass,
+            String trustManagerClass,
             String hostnameVerifierClass,
             String sslSocketFactoryBuilderClass) {
         super(
@@ -70,6 +86,7 @@ public class SpringSSLKeyStore extends SSLKeyStore {
                 filePath,
                 keystorePass,
                 certPass,
+                getTrustManager(trustManagerClass),
                 getHostnameVerifier(hostnameVerifierClass),
                 getSSLSocketFactoryBuilder(sslSocketFactoryBuilderClass));
     }
