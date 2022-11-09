@@ -396,8 +396,9 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
      */
     public void addCookie(ForestCookie cookie, boolean strict) {
         if (cookieHeader == null) {
-            cookieHeader = new ForestCookieHeader(hasURL);
-            if (cookieHeader.addCookie(cookie, strict)) {
+            ForestCookieHeader cookieHeaderTmp = new ForestCookieHeader(hasURL);
+            if (cookieHeaderTmp.addCookie(cookie, strict)) {
+                cookieHeader = cookieHeaderTmp;
                 addHeader(cookieHeader);
             }
         } else {
