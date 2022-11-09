@@ -37,7 +37,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
 
     private final List<ForestHeader> headers;
 
-    private ForestCookieHeader cookieHeader = null;
+    private volatile ForestCookieHeader cookieHeader = null;
 
     private final List<ForestCookie> requestCookies = new LinkedList<>();
 
@@ -396,9 +396,8 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
      */
     public void addCookie(ForestCookie cookie, boolean strict) {
         if (cookieHeader == null) {
-            ForestCookieHeader cookieHeaderTmp = new ForestCookieHeader(hasURL);
-            if (cookieHeaderTmp.addCookie(cookie, strict)) {
-                cookieHeader = cookieHeaderTmp;
+            cookieHeader = new ForestCookieHeader(hasURL);
+            if (cookieHeader.addCookie(cookie, strict)) {
                 addHeader(cookieHeader);
             }
         } else {
