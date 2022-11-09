@@ -1431,7 +1431,7 @@ public class TestGenericForestClient extends BaseClientTest {
     }
 
     @Test
-    public void testRequest_async_await_list3() {
+    public void testRequest_async_await_array() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         server.enqueue(new MockResponse().setBody(EXPECTED));
 
