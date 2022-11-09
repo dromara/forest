@@ -4661,8 +4661,8 @@ public class ForestRequest<T> implements HasURL {
      * @return 请求执行响应后返回的结果, 其为 {@link ForestResponse} 对象实例
      * @since 1.5.27
      */
-    public ForestResponse<T> executeAsResponse() {
-        return execute(new TypeReference<ForestResponse<T>>() {});
+    public ForestResponse executeAsResponse() {
+        return execute(ForestResponse.class);
     }
 
 

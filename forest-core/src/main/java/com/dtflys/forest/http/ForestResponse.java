@@ -30,11 +30,13 @@ import com.dtflys.forest.callback.SuccessWhen;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.ByteEncodeUtils;
 import com.dtflys.forest.utils.GzipUtils;
+import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -338,6 +340,29 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL {
      * @return 反序列化成对象类型的请求响应内容
      */
     public T getResult() {
+        if (result == null && isReceivedResponseData()) {
+            Type type = request.getLifeCycleHandler().getResultType();
+            if (type == null) {
+                type = request.getMethod().getReturnType();
+            }
+            if (type == null) {
+                try {
+                    result = (T) get(String.class);
+                } catch (Throwable th) {
+                }
+            } else {
+                Class clazz = ReflectUtils.toClass(type);
+                if (ForestResponse.class.isAssignableFrom(clazz)) {
+                    Type argType = ReflectUtils.getGenericArgument(clazz);
+                    if (argType == null) {
+                        argType = String.class;
+                    }
+                    result = get(argType);
+                } else {
+                    result = get(type);
+                }
+            }
+        }
         return result;
     }
 

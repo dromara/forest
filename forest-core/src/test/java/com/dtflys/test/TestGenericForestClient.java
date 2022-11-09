@@ -1225,7 +1225,8 @@ public class TestGenericForestClient extends BaseClientTest {
         Result<Integer> result = Forest.post("http://localhost:" + server.getPort())
                 .contentTypeMultipartFormData()
                 .addFile("file", file)
-                .execute(typeReference);
+                .executeAsResponse()
+                .get(new TypeReference<Result<Integer>>() {});
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(1);
         assertThat(result.getData()).isEqualTo(2);

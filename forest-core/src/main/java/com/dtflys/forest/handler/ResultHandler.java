@@ -62,10 +62,6 @@ public class ResultHandler {
         if (request.isDownloadFile()) {
             return null;
         }
-        Object result = response.getResult();
-        if (result != null && resultClass.isAssignableFrom(result.getClass())) {
-            return result;
-        }
         if (isReceivedResponseData(response)) {
             try {
                 if (void.class.isAssignableFrom(resultClass)) {
@@ -86,9 +82,6 @@ public class ResultHandler {
                             Object realResult = getResult(request, response, realType, realClass);
                             response.setResult(realResult);
                         }
-                    } else {
-                        Object realResult = getResult(request, response, Object.class, Object.class);
-                        response.setResult(realResult);
                     }
                     return response;
                 }
@@ -114,10 +107,7 @@ public class ResultHandler {
                     return converter.convertToJavaObject(attFile, resultClass);
                 }
                 String responseText = null;
-                if (result != null && CharSequence.class.isAssignableFrom(result.getClass())) {
-                    responseText = result.toString();
-                }
-                else if (CharSequence.class.isAssignableFrom(resultClass)) {
+                if (CharSequence.class.isAssignableFrom(resultClass)) {
                     try {
                         responseText = response.readAsString();
                     } catch (Throwable th) {
