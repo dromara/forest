@@ -83,7 +83,6 @@ import javax.net.ssl.SSLSocketFactory;
 import java.io.File;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
@@ -202,7 +201,7 @@ public class ForestRequest<T> implements HasURL {
      *
      * @since 1.5.27
      */
-    private ForestAsyncMode asyncMode = ForestAsyncMode.Platform;
+    private ForestAsyncMode asyncMode = ForestAsyncMode.PLATFORM;
 
     /**
      * 是否打开自动重定向
@@ -484,6 +483,7 @@ public class ForestRequest<T> implements HasURL {
      *
      * @return {@link ForestURL} 对象实例
      */
+    @Override
     public ForestURL url() {
         return this.url;
     }
@@ -4264,6 +4264,7 @@ public class ForestRequest<T> implements HasURL {
      *
      * @return 新的Forest请求对象
      */
+    @Override
     public ForestRequest<T> clone() {
         ForestBody newBody = new ForestBody(configuration);
         newBody.setBodyType(body.getBodyType());

@@ -1,19 +1,18 @@
 package com.dtflys.test;
 
-import cn.hutool.core.io.FileUtil;
 import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestAddress;
+import com.dtflys.forest.http.ForestAsyncMode;
 import com.dtflys.forest.http.ForestHeader;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestURL;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorChain;
-import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ForestProgress;
 import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.test.http.BaseClientTest;
@@ -510,6 +509,17 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertPathEquals("/B");
     }
 
+    @Test
+    public void testRequest_template_in_url() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config().setVariableValue("testVar", "foo");
+        Forest.get("/test/{testVar}")
+                .host("127.0.0.1")
+                .port(server.getPort())
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/test/foo");
+    }
 
     @Test
     public void testRequest_get_return_string() {
@@ -1039,6 +1049,22 @@ public class TestGenericForestClient extends BaseClientTest {
         assertThat(request.getCurrentRetryCount()).isEqualTo(3);
     }
 
+    @Test
+    public void testRequest_async_mode() {
+        assertThat(Forest.get("/").asyncMode())
+                .isNotNull()
+                .isEqualTo(ForestAsyncMode.PLATFORM);
+
+        Forest.config().setAsyncMode(ForestAsyncMode.KOTLIN_COROUTINE);
+        assertThat(Forest.get("/").asyncMode())
+                .isNotNull()
+                .isEqualTo(ForestAsyncMode.KOTLIN_COROUTINE);
+
+        Forest.config().setAsyncMode(ForestAsyncMode.PLATFORM);
+        assertThat(Forest.get("/").asyncMode())
+                .isNotNull()
+                .isEqualTo(ForestAsyncMode.PLATFORM);
+    }
 
     @Test
     public void testRequest_async_future() throws ExecutionException, InterruptedException {

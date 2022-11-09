@@ -5,6 +5,7 @@ forest:
   timeout: 50
   charset: GBK
   max-retry-count: 0
+  async-mode: kotlin_coroutine
   log-enabled: true
   log-request: true
   log-response-status: false
@@ -24,6 +25,7 @@ forest:
     user:
       name: foo
       password: bar
+
 
 
 

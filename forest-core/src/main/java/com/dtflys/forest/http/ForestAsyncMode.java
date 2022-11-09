@@ -13,12 +13,12 @@ public enum ForestAsyncMode {
      *
      * @since 1.5.27
      */
-    Platform,
+    PLATFORM,
 
     /**
      * Kotlin协程 - 基于 Kotlin 语言的协程进行并发调用
      *
      * @since 1.5.27
      */
-    KotlinCoroutine,
+    KOTLIN_COROUTINE,
 }

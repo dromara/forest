@@ -2,6 +2,7 @@ package com.dtflys.forest.springboot.test;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.http.ForestAsyncMode;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.logging.DefaultLogHandler;
@@ -61,13 +62,14 @@ public class Test0 {
         assertEquals(Integer.valueOf(1000), config0.getTimeout());
         assertEquals("UTF-8", config0.getCharset());
         assertEquals(Integer.valueOf(5), config0.getMaxRetryCount());
-        assertEquals("okhttp3", config0.getBackend().getName());
+        assertEquals("httpclient", config0.getBackend().getName());
         assertEquals("SSLv3", config0.getSslProtocol());
         assertTrue(config0.getLogHandler() instanceof DefaultLogHandler);
         assertEquals("https://www.thebeastshop.com/autopage", config0.getVariableValue("baseUrl"));
         assertEquals("xxx", config0.getVariableValue("myName"));
         assertNotNull(config0.getVariableValue("user"));
         assertTrue(!config0.isLogEnabled());
+        assertEquals(ForestAsyncMode.PLATFORM, config0.getAsyncMode());
         assertEquals(Integer.valueOf(12), config0.getVariableValue("myCount"));
         assertEquals(BackOffRetryer.class, config0.getRetryer());
         assertEquals(Integer.valueOf(5), config0.getMaxRetryCount());
@@ -82,6 +84,7 @@ public class Test0 {
         assertNotNull(response.getContent());
         ForestRequest request = response.getRequest();
         assertNotNull(request);
+        assertEquals(ForestAsyncMode.PLATFORM, request.asyncMode());
         assertEquals("www.thebeastshop.com", request.getHost());
         assertEquals("/static/stores", request.getPath());
     }
@@ -118,6 +121,7 @@ public class Test0 {
         } catch (Throwable th) {
         }
     }
+
 
 
     @Test

@@ -51,6 +51,7 @@ import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.filter.JSONFilter;
 import com.dtflys.forest.filter.XmlFilter;
 import com.dtflys.forest.http.ForestAddress;
+import com.dtflys.forest.http.ForestAsyncMode;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.interceptor.DefaultInterceptorFactory;
@@ -129,6 +130,11 @@ public class ForestConfiguration implements Serializable {
      * 最大异步线程池大小
      */
     private Integer maxAsyncThreadSize;
+
+    /**
+     * 异步模式
+     */
+    private ForestAsyncMode asyncMode = ForestAsyncMode.PLATFORM;
 
     /**
      * 最大异步线程池队列大小
@@ -684,6 +690,28 @@ public class ForestConfiguration implements Serializable {
      */
     public ForestConfiguration setMaxAsyncThreadSize(Integer maxAsyncThreadSize) {
         this.maxAsyncThreadSize = maxAsyncThreadSize;
+        return this;
+    }
+
+    /**
+     * 获取异步模式
+     *
+     * @return {@link ForestAsyncMode}枚举实例
+     * @since 1.5.27
+     */
+    public ForestAsyncMode getAsyncMode() {
+        return asyncMode;
+    }
+
+    /**
+     * 设置异步模式
+     *
+     * @param asyncMode 异步模式 - {@link ForestAsyncMode}枚举实例
+     * @return 当前ForestConfiguration实例
+     * @since 1.5.27
+     */
+    public ForestConfiguration setAsyncMode(ForestAsyncMode asyncMode) {
+        this.asyncMode = asyncMode;
         return this;
     }
 

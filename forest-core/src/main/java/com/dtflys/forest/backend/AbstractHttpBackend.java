@@ -42,19 +42,20 @@ public abstract class AbstractHttpBackend implements HttpBackend {
 
     private final ForestConnectionManager connectionManager;
 
+    private static Constructor<?> kotlinCoroutineExecutorConstructor = null;
+
     static {
         ASYNC_HTTP_EXECUTOR_CREATOR = AsyncHttpExecutor::new;
         KOTLIN_COROUTINE_HTTP_EXECUTOR_CREATOR = (configuration, syncExecutor, responseHandler) -> {
-            if (!AsyncUtil.isEnableCoroutine()) {
-                return ASYNC_HTTP_EXECUTOR_CREATOR.create(configuration, syncExecutor, responseHandler);
-            }
             try {
-                Constructor<?> constructor = Class.forName("com.dtflys.forest.backend.KotlinCoroutineHttpExecutor")
-                        .getConstructor(
-                                ForestConfiguration.class,
-                                HttpExecutor.class,
-                                ResponseHandler.class);
-                return (HttpExecutor) constructor.newInstance(configuration, syncExecutor, responseHandler);
+                if (kotlinCoroutineExecutorConstructor == null) {
+                    kotlinCoroutineExecutorConstructor = Class.forName("com.dtflys.forest.backend.KotlinCoroutineHttpExecutor")
+                            .getConstructor(
+                                    ForestConfiguration.class,
+                                    HttpExecutor.class,
+                                    ResponseHandler.class);
+                }
+                return (HttpExecutor) kotlinCoroutineExecutorConstructor.newInstance(configuration, syncExecutor, responseHandler);
             } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException |
                      InstantiationException | IllegalAccessException e) {
                 throw new ForestRuntimeException(e);
@@ -98,10 +99,14 @@ public abstract class AbstractHttpBackend implements HttpBackend {
     private HttpExecutorCreator getHttpExecutorCreator(final ForestRequest request) {
         if (request.isAsync()) {
             switch (request.asyncMode()) {
-                case Platform:
+                case PLATFORM:
                     return ASYNC_EXECUTOR_CREATOR;
-                case KotlinCoroutine:
-                    return KOTLIN_COROUTINE_EXECUTOR_CREATOR;
+                case KOTLIN_COROUTINE:
+                    if (AsyncUtil.isEnableCoroutine()) {
+                        return KOTLIN_COROUTINE_EXECUTOR_CREATOR;
+                    } else {
+                        return ASYNC_EXECUTOR_CREATOR;
+                    }
                 default:
                     throw new ForestRuntimeException("Forest not support async mode '[" + request.asyncMode().name() + "]'");
             }
