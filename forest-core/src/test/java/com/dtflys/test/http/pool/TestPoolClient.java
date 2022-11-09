@@ -242,7 +242,7 @@ public class TestPoolClient extends BaseClientTest {
         }
         latch.await();
         assertThat(hasOut.get()).isFalse();
-        assertThat(exceptionRef.get()).isNull();
+        assertThat(exceptionRef.get()).isNotNull();
     }
 
 

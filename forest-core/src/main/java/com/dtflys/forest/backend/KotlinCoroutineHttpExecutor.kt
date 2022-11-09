@@ -40,7 +40,7 @@ class KotlinCoroutineHttpExecutor(
             }
         }
         val future: CompletableFuture<Any> = CompletableFuture()
-        handler.handleFuture(future)
+        handler.handleFuture(request, future)
 
         channel?.runBlock {
             syncExecutor.execute(lifeCycleHandler)

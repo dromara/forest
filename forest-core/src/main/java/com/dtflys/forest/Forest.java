@@ -1,7 +1,17 @@
 package com.dtflys.forest;
 
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.http.ForestFuture;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestResponse;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Forest 快捷接口
@@ -163,6 +173,54 @@ public abstract class Forest {
      */
     public static ForestRequest<?> trace(String url) {
         return config().trace(url);
+    }
+
+    /**
+     * 等待多个请求响应结果，并阻塞当前调用改方法的线程，只有当参数中所有请求结果都返回后才会继续执行
+     *
+     * @param futures 可变参数 - 多个请求的 {@link ForestFuture} 对象
+     * @return 请求返回后的 Forest 响应对象列表
+     * @since 1.5.27
+     */
+    public static List<ForestResponse> await(ForestFuture ...futures) {
+        return Arrays.stream(futures)
+                .map(ForestFuture::await)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 等待多个请求响应结果，并阻塞当前调用改方法的线程，只有当参数中所有请求结果都返回后才会继续执行
+     *
+     * @param futures 多个请求的 {@link ForestFuture} 对象集合
+     * @return 请求返回后的 Forest 响应对象列表
+     * @since 1.5.27
+     */
+    public static List<ForestResponse> await(Collection<ForestFuture> futures) {
+        return futures.stream()
+                .map(ForestFuture::await)
+                .collect(Collectors.toList());
+    }
+
+
+    /**
+     * 等待多个请求响应结果，并阻塞当前调用改方法的线程，当参数中所有请求结果都返回后调用参数中的 callback 回调函数
+     *
+     * @param futures 多个请求的 {@link ForestFuture} 对象集合
+     * @param callback 回调函数，只有当参数中所有请求的响应都返回后才会被调用
+     * @return 请求返回后的 Forest 响应对象列表
+     * @since 1.5.27
+     */
+    public static void await(Collection<ForestFuture> futures, Consumer<ForestResponse> callback) {
+        for (ForestFuture future : futures) {
+            future.await();
+        }
+        for (ForestFuture future : futures) {
+            try {
+                callback.accept(future.get());
+            } catch (InterruptedException | ExecutionException e) {
+                throw new ForestRuntimeException(e);
+            }
+        }
     }
 
 }

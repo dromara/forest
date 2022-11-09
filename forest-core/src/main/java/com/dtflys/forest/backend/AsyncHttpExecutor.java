@@ -132,7 +132,7 @@ public class AsyncHttpExecutor implements HttpExecutor {
         }
         final AsyncTask task = new AsyncTask(syncExecutor, lifeCycleHandler);
         final CompletableFuture<?> future = CompletableFuture.supplyAsync(task, pool);
-        responseHandler.handleFuture(future);
+        responseHandler.handleFuture(getRequest(), future);
     }
 
     @Override

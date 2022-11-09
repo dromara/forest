@@ -46,7 +46,7 @@ import java.util.List;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.1.0
  */
-public abstract class ForestResponse<T> implements HasURL {
+public abstract class ForestResponse<T> extends ResultGetter implements HasURL {
 
     protected final static int MAX_BYTES_CAPACITY = 1024 * 1024 * 2;
 
@@ -138,9 +138,15 @@ public abstract class ForestResponse<T> implements HasURL {
 
 
     public ForestResponse(ForestRequest request, Date requestTime, Date responseTime) {
+        super(request);
         this.request = request;
         this.requestTime = requestTime;
         this.responseTime = responseTime;
+    }
+
+    @Override
+    protected ForestResponse getResponse() {
+        return this;
     }
 
     /**

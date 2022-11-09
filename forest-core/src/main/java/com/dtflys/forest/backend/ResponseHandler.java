@@ -43,31 +43,12 @@ public abstract class ResponseHandler<R> {
         return result;
     }
 
-
-    public Object handleSuccess(ForestResponse response) {
-        if (request.isAutoRedirection() && response.isRedirection()) {
-            // 进行重定向
-            ForestRequest redirectionRequest = response.redirectionRequest();
-            return redirectionRequest.execute();
-        }
-        Type onSuccessGenericType = lifeCycleHandler.getOnSuccessClassGenericType();
-        Object resultData = lifeCycleHandler.handleResultType(request, response, onSuccessGenericType, ReflectUtils.toClass(onSuccessGenericType));
-        return lifeCycleHandler.handleSuccess(resultData, request, response);
-    }
-
-
-
-
-    public void handleError(ForestResponse response) {
-        lifeCycleHandler.handleError(request, response);
-    }
-
     public void handleError(ForestResponse response, Throwable ex) {
         lifeCycleHandler.handleError(request, response, ex);
     }
 
 
-    public abstract void handleFuture(final Future<R> httpResponseFuture);
+    public abstract void handleFuture(final ForestRequest request, final Future<R> httpResponseFuture);
 
 
 

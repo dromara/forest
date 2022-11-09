@@ -37,8 +37,7 @@ public class NoneLifeCycleHandler implements LifeCycleHandler {
     }
 
     @Override
-    public Object handleSuccess(Object resultData, ForestRequest request, ForestResponse response) {
-        return null;
+    public void handleSuccess(Object resultData, ForestRequest request, ForestResponse response) {
     }
 
     @Override
@@ -78,7 +77,7 @@ public class NoneLifeCycleHandler implements LifeCycleHandler {
     }
 
     @Override
-    public Object handleFuture(Future resultData) {
+    public Object handleFuture(ForestRequest request, Future resultData) {
         return null;
     }
 

@@ -29,6 +29,34 @@ public class ResultHandler {
         return response.isReceivedResponseData();
     }
 
+    /**
+     * 进行转换并获取结果
+     *
+     * @param request Forest 请求对象
+     * @param response Forest 响应对象
+     * @param resultType {@link Type} 实例
+     * @return 转换后的对象
+     * @since 1.5.27
+     */
+    public Object getResult(ForestRequest request, ForestResponse response, Type resultType) {
+        Class clazz = ReflectUtils.toClass(resultType);
+        return getResult(request, response, resultType, clazz);
+    }
+
+    /**
+     * 进行转换并获取结果
+     *
+     * @param request Forest 请求对象
+     * @param response Forest 响应对象
+     * @param resultClass {@link Class} 实例
+     * @return 转换后的对象
+     * @since 1.5.27
+     */
+    public Object getResult(ForestRequest request, ForestResponse response, Class resultClass) {
+        Type type = ReflectUtils.toType(resultClass);
+        return getResult(request, response, type, resultClass);
+    }
+
 
     public Object getResult(ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
         if (request.isDownloadFile()) {

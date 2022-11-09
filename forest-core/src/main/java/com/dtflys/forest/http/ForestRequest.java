@@ -100,6 +100,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import static com.dtflys.forest.mapping.MappingParameter.TARGET_BODY;
@@ -4640,6 +4641,28 @@ public class ForestRequest<T> implements HasURL {
      */
     public <E> List<E> executeAsList() {
         return execute(new TypeReference<List<E>>() {});
+    }
+
+    /**
+     * 执行请求发送过程，并获取 Future 类型结果
+     *
+     * @return 请求执行响应后返回的结果, 其为 {@link Future} 对象实例
+     * @since 1.5.27
+     */
+    public ForestFuture executeAsFuture() {
+        Future future = execute(new TypeReference<Future<ForestResponse>>() {});
+        return new ForestFuture(this, future);
+    }
+
+
+    /**
+     * 执行请求发送过程，并获取响应类型结果
+     *
+     * @return 请求执行响应后返回的结果, 其为 {@link ForestResponse} 对象实例
+     * @since 1.5.27
+     */
+    public ForestResponse<T> executeAsResponse() {
+        return execute(new TypeReference<ForestResponse<T>>() {});
     }
 
 
