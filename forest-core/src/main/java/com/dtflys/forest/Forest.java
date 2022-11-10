@@ -207,7 +207,6 @@ public abstract class Forest {
      *
      * @param futures 多个请求的 {@link ForestFuture} 对象集合
      * @param callback 回调函数，只有当参数中所有请求的响应都返回后才会被调用
-     * @return 请求返回后的 Forest 响应对象列表
      * @since 1.5.27
      */
     public static void await(Collection<ForestFuture> futures, Consumer<ForestResponse> callback) {

@@ -26,6 +26,8 @@ public @interface OkHttp3 {
 
     /**
      * 后端 HttpClient 工厂
+     *
+     * @return HttpClient 工厂类
      * @since 1.5.23
      */
     Class<? extends OkHttpClientProvider> client() default OkHttpClientProvider.class;

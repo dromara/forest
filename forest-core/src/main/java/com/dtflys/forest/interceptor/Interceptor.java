@@ -221,7 +221,7 @@ public interface Interceptor<T> extends
      * @param name 属性名称
      * @param clazz 属性值的类型对象
      * @param <T> 属性值类型的泛型
-     * @return
+     * @return Attribute 属性值
      */
     default <T> T getAttribute(ForestRequest request, String name, Class<T> clazz) {
         Object obj = request.getInterceptorAttribute(this.getClass(), name);

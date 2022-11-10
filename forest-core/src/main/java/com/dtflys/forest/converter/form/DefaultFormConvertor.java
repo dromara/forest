@@ -178,7 +178,9 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
 
     /**
      * 处理Form表单中的键值对列表
+     *
      * @param nameValueList 键值对列表
+     * @param configuration Forest 配置对象
      * @return 处理过的新键值对列表
      */
     protected List<RequestNameValue> processFromNameValueList(List<RequestNameValue> nameValueList, ForestConfiguration configuration) {

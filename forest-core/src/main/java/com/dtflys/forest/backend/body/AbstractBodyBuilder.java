@@ -140,6 +140,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
      * @param charset 字符集
      * @param contentType 数据类型
      * @param bytes 字节数组
+     * @param mergeCharset 合并的字符集
      */
     protected abstract void setBinaryBody(T httpReq,
                                  ForestRequest request,

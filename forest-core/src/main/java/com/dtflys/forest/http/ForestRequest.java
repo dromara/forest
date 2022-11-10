@@ -1215,7 +1215,7 @@ public class ForestRequest<T> implements HasURL {
      * 设置是否缓存 HTTP 后端 Client 对象
      *
      * @param cacheBackendClient {@code true}: 缓存 CLient 对象, {@code false}: 不缓存
-     *
+     * @return {@link ForestRequest}对象实例
      * @since 1.5.23
      */
     public ForestRequest<T> cacheBackendClient(boolean cacheBackendClient) {
@@ -2027,6 +2027,7 @@ public class ForestRequest<T> implements HasURL {
      * 设置异步请求模式
      * <p>该字段只有在 async = true 时有效</p>
      *
+     * @param asyncMode 异步模式
      * @return {@link ForestAsyncMode}枚举实例
      * @since 1.5.27
      */

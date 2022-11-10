@@ -71,14 +71,20 @@ public class AsyncHttpExecutor implements HttpExecutor {
     }
 
     /**
+     * 获取最大异步线程数
      *
-     * @return
+     * @return 最大异步线程数
      */
     public static int getMaxAsyncThreadSize() {
         return pool.getMaximumPoolSize();
     }
 
 
+    /**
+     * 获取异步线程池大小
+     *
+     * @return 异步线程池大小
+     */
     public static int getAsyncThreadSize() {
         return pool.getPoolSize();
     }

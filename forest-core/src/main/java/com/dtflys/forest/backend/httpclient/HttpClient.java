@@ -27,6 +27,7 @@ public @interface HttpClient {
     /**
      * 后端 HttpClient 工厂
      *
+     * @return HttpClient 工厂类
      * @since 1.5.23
      */
     Class<? extends HttpClientProvider> client() default HttpClientProvider.class;

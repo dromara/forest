@@ -74,6 +74,7 @@ public class ForestCookieHeader extends ForestHeader {
     /**
      * 根据 Path 和 Cookie 名称获取单个 Cookie
      *
+     * @param path 路径
      * @param name Cookie 名称
      * @return {@link ForestCookie}对象实例
      */

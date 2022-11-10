@@ -115,7 +115,8 @@ public class DefaultLogHandler implements ForestLogHandler {
 
     /**
      * 请求重定向信息
-     * @param requestLogMessage
+     *
+     * @param requestLogMessage 请求日志消息对象
      * @return 请求重定向信息字符串
      */
     protected String redirection(RequestLogMessage requestLogMessage) {

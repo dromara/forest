@@ -48,7 +48,7 @@ public class AsyncUtil {
     /**
      * 执行异步命令
      *
-     * @param command
+     * @param command 异步执行的回调过程
      */
     public static void execute(Runnable command) {
         ASYNC_EXECUTE.accept(command);

@@ -30,7 +30,7 @@ public @interface BackendClient {
 
     /**
      * 后端框架的 Client 对象是否缓存
-     * {@code true}: 缓存, {@code false}: 不缓存
+     * @return {@code true}: 缓存, {@code false}: 不缓存
      */
     boolean cache() default true;
 
