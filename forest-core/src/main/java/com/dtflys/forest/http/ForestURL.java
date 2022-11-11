@@ -328,6 +328,9 @@ public class ForestURL {
     }
 
     public String getUserInfo() {
+        if (StringUtils.isEmpty(userInfo) && address != null) {
+            return address.getUserInfo();
+        }
         return userInfo;
     }
 
@@ -553,6 +556,9 @@ public class ForestURL {
             }
             if (URLUtils.isNonePort(port) && StringUtils.isEmpty(originHost)) {
                 port = address.getPort();
+            }
+            if (StringUtils.isEmpty(userInfo)) {
+                userInfo = address.getUserInfo();
             }
             if (StringUtils.isEmpty(basePath)) {
                 setBasePath(address.getBasePath(), false);

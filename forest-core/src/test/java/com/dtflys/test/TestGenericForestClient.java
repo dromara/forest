@@ -584,9 +584,10 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_change_base_path5() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = Forest.get("/A")
-                .basePath("http://localhost:" + server.getPort() + "/X1/X2")
-                .execute(String.class);
+        ForestRequest request =  Forest.get("/A")
+                .basePath("http://localhost:" + server.getPort() + "/X1/X2");
+        String result = request.executeAsString();
+        assertThat(request.basePath()).isEqualTo("/X1/X2");
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/X1/X2/A");

@@ -1,5 +1,8 @@
 package com.dtflys.test.http;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
+import cn.hutool.core.lang.Editor;
 import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
@@ -12,6 +15,7 @@ import com.dtflys.forest.multipart.FilePathMultipart;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.multipart.InputStreamMultipart;
 import com.dtflys.forest.utils.StringUtils;
+import com.dtflys.test.converter.TestJaxbConverter;
 import com.dtflys.test.http.client.UploadClient;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -1036,6 +1040,7 @@ public class TestUploadClient extends BaseClientTest {
                     }
                 });
     }
+
 
 
     @Test

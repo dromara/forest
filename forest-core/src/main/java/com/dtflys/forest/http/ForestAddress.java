@@ -24,8 +24,12 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Forest主机地址信息
@@ -49,6 +53,13 @@ public class ForestAddress {
     private final int port;
 
     /**
+     * 用户信息
+     *
+     * @since 1.5.28
+     */
+    private final String userInfo;
+
+    /**
      * URL根路径
      */
     private final String basePath;
@@ -61,11 +72,44 @@ public class ForestAddress {
      * @param port 主机端口号，如果为 -1， 代表未设置端口号
      * @param basePath URL根路径
      */
-    public ForestAddress(String scheme, String host, int port, String basePath) {
-        this.scheme = scheme;
-        this.host = host;
-        this.port = port;
-        this.basePath = basePath;
+    public ForestAddress(final String scheme, final String host, final int port, final String basePath) {
+        String schemeStr = scheme;
+        String hostStr = host;
+        int portNum = port;
+        String userinfoStr = null;
+        String basePathStr = basePath;
+        if (basePathStr != null) {
+            basePathStr = basePath.trim();
+            if (!basePathStr.startsWith("/")) {
+                if (URLUtils.isURL(basePathStr)) {
+                    try {
+                        String originHost = host;
+                        URL url = new URL(basePathStr);
+                        if (StringUtils.isEmpty(scheme)) {
+                            schemeStr = url.getProtocol();
+                        }
+                        userinfoStr = url.getUserInfo();
+                        if (StringUtils.isEmpty(host)) {
+                            hostStr = url.getHost();
+                        }
+                        if ((URLUtils.isNonePort(port) && StringUtils.isEmpty(originHost))) {
+                            portNum = url.getPort();
+                        }
+                        basePathStr = url.getPath();
+                    } catch (MalformedURLException e) {
+                        throw new ForestRuntimeException(e);
+                    }
+                } else {
+                    basePathStr = "/" + basePathStr;
+                }
+            }
+        }
+        this.scheme = schemeStr;
+        this.host = hostStr;
+        this.port = portNum;
+        this.userInfo = userinfoStr;
+        this.basePath = basePathStr;
+
     }
 
     /**
@@ -151,6 +195,16 @@ public class ForestAddress {
      */
     public int getPort() {
         return port;
+    }
+
+    /**
+     * 获取用户信息
+     *
+     * @return 用户信息
+     * @since 1.5.28
+     */
+    public String getUserInfo() {
+        return userInfo;
     }
 
     /**

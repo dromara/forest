@@ -19,6 +19,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.StopWatch;
 
+import javax.annotation.Resource;
+
 import static org.junit.Assert.*;
 
 
@@ -28,10 +30,10 @@ import static org.junit.Assert.*;
 @EnableAutoConfiguration
 public class Test1 {
 
-    @Autowired
+    @Resource
     private BaiduClient baiduClient;
 
-    @Autowired
+    @Resource
     private ForestConfiguration forestConfiguration;
 
     @Test

@@ -25,7 +25,7 @@ public interface AddressClient {
     ForestRequest<String> testBasePath(String host, int port, String basePath);
 
     @Post("/xxx")
-    @Address(basePath = "http://localhost:{0}")
+    @Address(basePath = "http://localhost:{0}/aaa")
     ForestRequest<String> testBasePathOnly(int port);
 
 }

@@ -94,10 +94,11 @@ public class TestAddressClient extends BaseClientTest {
         String result = request.execute(String.class);
         assertThat(request.host()).isEqualTo("localhost");
         assertThat(request.port()).isEqualTo(server.getPort());
+        assertThat(request.basePath()).isEqualTo("/aaa");
         assertThat(result).isEqualTo(EXPECTED);
 
         mockRequest(server)
-                .assertPathEquals("/xxx");
+                .assertPathEquals("/aaa/xxx");
     }
 
 
