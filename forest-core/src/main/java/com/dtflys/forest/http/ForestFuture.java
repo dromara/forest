@@ -14,14 +14,14 @@ import java.util.concurrent.TimeoutException;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.5.27
  */
-public class ForestFuture extends ResultGetter implements Future<ForestResponse> {
-    private final ForestRequest request;
+public class ForestFuture<T> extends ResultGetter implements Future<T> {
+    private final ForestRequest<T> request;
 
-    private final Future<ForestResponse> future;
+    private final Future<ForestResponse<T>> future;
 
-    private ForestResponse response;
+    private ForestResponse<T> response;
 
-    public ForestFuture(ForestRequest request, Future<ForestResponse> future) {
+    public ForestFuture(ForestRequest<T> request, Future<ForestResponse<T>> future) {
         super(request);
         this.request = request;
         this.future = future;
@@ -43,10 +43,13 @@ public class ForestFuture extends ResultGetter implements Future<ForestResponse>
         return future.isDone();
     }
 
-    public ForestResponse await() {
+
+
+    public ForestResponse<T> await() {
         if (response == null) {
             try {
-                response = get();
+                Object result = future.get();
+                response = (ForestResponse<T>) result;
             } catch (InterruptedException e) {
                 throw new ForestRuntimeException(e);
             } catch (ExecutionException e) {
@@ -56,10 +59,10 @@ public class ForestFuture extends ResultGetter implements Future<ForestResponse>
         return response;
     }
 
-    public ForestResponse await(long timeout, TimeUnit unit) {
+    public ForestResponse<T> await(long timeout, TimeUnit unit) {
         if (response == null) {
             try {
-                response = get(timeout, unit);
+                response = future.get(timeout, unit);
             } catch (InterruptedException e) {
                 throw new ForestRuntimeException(e);
             } catch (ExecutionException e) {
@@ -73,17 +76,20 @@ public class ForestFuture extends ResultGetter implements Future<ForestResponse>
 
 
     @Override
-    public ForestResponse get() throws InterruptedException, ExecutionException {
-        return future.get();
+    public T get() throws InterruptedException, ExecutionException {
+        ForestResponse<T> res = await();
+        return res.getResult();
     }
 
     @Override
-    public ForestResponse get(long timeout, @NotNull TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        return future.get(timeout, unit);
+    public T get(long timeout, @NotNull TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+        ForestResponse<T> res = await(timeout, unit);
+        return res.getResult();
+
     }
 
     @Override
-    protected ForestResponse getResponse() {
+    public ForestResponse<T> getResponse() {
         return await();
     }
 

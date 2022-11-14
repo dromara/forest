@@ -6,6 +6,7 @@ import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.annotation.DataParam;
 import com.dtflys.forest.annotation.DataVariable;
 import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.http.ForestFuture;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.model.JsonTestUser;
@@ -370,6 +371,15 @@ public interface GetClient {
             data = "username={ username.toString() }"
     )
     Future<String> asyncVarParamGet(@DataVariable("username") String username, OnSuccess<String> onSuccess, OnError onError);
+
+
+    @Get(
+            url = "http://localhost:${port}/hello/user?username=foo",
+            async = true,
+            headers = {"Accept:text/plain"}
+    )
+    ForestFuture asyncSimpleGetWithForestFuture();
+
 
     @Get(url = "http://localhost:${port}?token=YmZlNDYzYmVkMWZjYzgwNjExZDVhMWM1ODZmMWRhYzg0NTcyMGEwMg==")
     ForestResponse<String> testUrl();

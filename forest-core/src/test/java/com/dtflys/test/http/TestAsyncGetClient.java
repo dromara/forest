@@ -6,6 +6,8 @@ import com.dtflys.forest.backend.okhttp3.OkHttp3Backend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestNetworkException;
 import com.dtflys.forest.http.ForestAsyncMode;
+import com.dtflys.forest.http.ForestFuture;
+import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.test.http.client.GetClient;
 import okhttp3.mockwebserver.MockResponse;
@@ -325,6 +327,19 @@ public class TestAsyncGetClient extends BaseClientTest {
         assertEquals(EXPECTED, future.get());
         assertTrue(future.isDone());
     }
+
+    @Test
+    public void testAsyncSimpleGetWithForestFuture() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        ForestFuture future = getClient.asyncSimpleGetWithForestFuture();
+        log.info("send async get request");
+        assertThat(future).isNotNull();
+        ForestResponse response = future.await();
+        assertThat(response).isNotNull();
+        String result = response.get(String.class);
+        assertThat(result).isNotNull().isEqualTo(EXPECTED);
+    }
+
 
 
     @Test

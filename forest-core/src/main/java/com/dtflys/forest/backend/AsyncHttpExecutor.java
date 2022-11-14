@@ -2,12 +2,15 @@ package com.dtflys.forest.backend;
 
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.handler.LifeCycleHandler;
+import com.dtflys.forest.http.ForestFuture;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -21,7 +24,7 @@ import java.util.function.Supplier;
  * @author gongjun [dt_flys@hotmail.com]
  * @since 1.5.12
  */
-public class AsyncHttpExecutor implements HttpExecutor {
+public class AsyncHttpExecutor<T> implements HttpExecutor {
 
     public final static Integer DEFAULT_MAX_THREAD_SIZE = 200;
 
@@ -95,7 +98,7 @@ public class AsyncHttpExecutor implements HttpExecutor {
         this.responseHandler = responseHandler;
     }
 
-    public static class AsyncTask implements Supplier {
+    public static class AsyncTask<T> implements Supplier<ForestResponse<T>> {
 
         private final HttpExecutor executor;
 
@@ -112,11 +115,11 @@ public class AsyncHttpExecutor implements HttpExecutor {
 
 
         @Override
-        public Object get() {
+        public ForestResponse get() {
             executor.execute(lifeCycleHandler);
             if (lifeCycleHandler instanceof MethodLifeCycleHandler) {
-                Object result = ((MethodLifeCycleHandler<?>) lifeCycleHandler).getResultData();
-                return result;
+                Object result = ((MethodLifeCycleHandler<?>) lifeCycleHandler).getResponse();
+                return (ForestResponse) result;
             }
             return null;
         }
@@ -136,9 +139,10 @@ public class AsyncHttpExecutor implements HttpExecutor {
                 }
             }
         }
-        final AsyncTask task = new AsyncTask(syncExecutor, lifeCycleHandler);
-        final CompletableFuture<?> future = CompletableFuture.supplyAsync(task, pool);
-        responseHandler.handleFuture(getRequest(), future);
+        final AsyncTask<T> task = new AsyncTask<>(syncExecutor, lifeCycleHandler);
+        final Future<ForestResponse<T>> future = CompletableFuture.supplyAsync(task, pool);
+        final ForestFuture<T> forestFuture = new ForestFuture<>(getRequest(), future);
+        responseHandler.handleFuture(getRequest(), forestFuture);
     }
 
     @Override

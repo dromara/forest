@@ -2,7 +2,9 @@ package com.dtflys.forest.backend
 
 import com.dtflys.forest.config.ForestConfiguration
 import com.dtflys.forest.handler.LifeCycleHandler
+import com.dtflys.forest.http.ForestFuture
 import com.dtflys.forest.http.ForestRequest
+import com.dtflys.forest.http.ForestResponse
 import com.dtflys.forest.http.ForestResponseFactory
 import com.dtflys.forest.reflection.MethodLifeCycleHandler
 import kotlinx.coroutines.CoroutineScope
@@ -10,13 +12,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Future
 
 /**
  * Forest异步携程请求执行器
  * @author CHMing
  * @since 1.5.23
  **/
-class KotlinCoroutineHttpExecutor(
+class KotlinCoroutineHttpExecutor (
 
     protected val configuration: ForestConfiguration,
 
@@ -31,7 +34,7 @@ class KotlinCoroutineHttpExecutor(
     protected val handler: ResponseHandler<Any>
 ) : HttpExecutor {
 
-    override fun getRequest(): ForestRequest<*> = syncExecutor.request
+    override fun getRequest(): ForestRequest<Any> = syncExecutor.request
 
     override fun execute(lifeCycleHandler: LifeCycleHandler?) {
         if (channel == null) {
@@ -39,15 +42,16 @@ class KotlinCoroutineHttpExecutor(
                 channel = Channel(configuration.maxAsyncQueueSize ?: DEFAULT_MAX_COROUTINE_SIZE)
             }
         }
-        val future: CompletableFuture<Any> = CompletableFuture()
-        handler.handleFuture(request, future)
+        val future: CompletableFuture<ForestResponse<Any>> = CompletableFuture()
+        val forestFuture: ForestFuture<Any> = ForestFuture(request, future)
+        handler.handleFuture(request, forestFuture)
 
         channel?.runBlock {
             syncExecutor.execute(lifeCycleHandler)
-            val result = if (lifeCycleHandler is MethodLifeCycleHandler<*>) {
-                lifeCycleHandler.resultData
+            val res: ForestResponse<Any>? = if (lifeCycleHandler is MethodLifeCycleHandler<*>) {
+                lifeCycleHandler.response as ForestResponse<Any>
             } else null
-            future.complete(result)
+            future.complete(res)
         }
     }
 

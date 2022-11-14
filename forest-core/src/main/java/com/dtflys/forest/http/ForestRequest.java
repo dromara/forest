@@ -4651,8 +4651,8 @@ public class ForestRequest<T> implements HasURL {
      * @since 1.5.27
      */
     public ForestFuture executeAsFuture() {
-        Future future = execute(new TypeReference<Future<ForestResponse>>() {});
-        return new ForestFuture(this, future);
+        ForestFuture future = execute(new TypeReference<ForestFuture<ForestResponse>>() {});
+        return future;
     }
 
 

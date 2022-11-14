@@ -223,11 +223,6 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
         if (resultData == null) {
             return null;
         }
-        if (ForestFuture.class.isAssignableFrom(resultRawClass)) {
-            ForestFuture future = new ForestFuture(request, resultData);
-            this.resultData = (T) future;
-            return resultData;
-        }
         if (Future.class.isAssignableFrom(resultRawClass)) {
             this.resultData = (T) resultData;
             return resultData;

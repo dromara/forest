@@ -210,15 +210,12 @@ public abstract class Forest {
      * @since 1.5.27
      */
     public static void await(Collection<ForestFuture> futures, Consumer<ForestResponse> callback) {
+
         for (ForestFuture future : futures) {
             future.await();
         }
         for (ForestFuture future : futures) {
-            try {
-                callback.accept(future.get());
-            } catch (InterruptedException | ExecutionException e) {
-                throw new ForestRuntimeException(e);
-            }
+            callback.accept(future.getResponse());
         }
     }
 
