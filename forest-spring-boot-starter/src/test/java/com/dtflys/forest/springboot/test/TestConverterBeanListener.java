@@ -45,7 +45,7 @@ public class TestConverterBeanListener {
 
     @Test
     public void test1() {
-        ForestConverter forestConverter = forestConfiguration.getConverterMap().get(ForestDataType.JSON);
+        ForestConverter forestConverter = forestConfiguration.getJsonConverter();
         assertTrue(forestConverter instanceof ForestJacksonConverter);
         ForestRequest<String> request = giteeClient.index2();
         System.out.println(request.execute());
