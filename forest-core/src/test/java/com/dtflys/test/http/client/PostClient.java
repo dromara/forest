@@ -289,9 +289,19 @@ public interface PostClient {
             data = "{\"username\":\"{user.username}\",\"password\":\"{user.password}\",\"cn_name\":\"{user.cnName}\"}",
             headers = {"Content-Type: application/json; charset=utf-8"}
     )
-    String postJsonWithCnCharacters7(@DataVariable("user") JsonTestUser3 user);
+    String postJsonWithCnCharacters7(@Var("user") JsonTestUser3 user);
 
+    @Post(
+            url = "http://localhost:{port}/json",
+            headers = {"Content-Type: application/json; charset=utf-8"}
+    )
+    String postJsonWithNullField(@Body JsonTestUser3 user);
 
+    @Post(
+            url = "http://localhost:{port}/json",
+            headers = {"Content-Type: application/json; charset=utf-8"}
+    )
+    String postJsonWithNullField_NotNull(@Body JsonTestUser4 user);
 
     @Post(
             url = "http://localhost:{port}/json",
