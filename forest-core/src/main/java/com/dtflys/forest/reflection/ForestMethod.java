@@ -14,6 +14,7 @@ import com.dtflys.forest.callback.OnRedirection;
 import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.config.ForestProperties;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.ForestEncoder;
@@ -61,11 +62,13 @@ import com.dtflys.forest.utils.StringUtils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.dtflys.forest.mapping.MappingParameter.*;
 
 /**
  * 通过代理调用的实际执行的方法对象
+ *
  * @author gongjun
  * @since 2016-05-03
  */
@@ -119,7 +122,9 @@ public class ForestMethod<T> implements VariableScope {
     private MappingParameter[] forestParameters;
     private List<MappingParameter> namedParameters = new ArrayList<>();
     private List<ForestMultipartFactory> multipartFactories = new ArrayList<>();
-    private Map<String, MappingVariable> variables = new HashMap<>();
+    private Map<String, MappingVariable> variables = new ConcurrentHashMap<>();
+
+    private Map<String, MappingTemplate> templateCache = new ConcurrentHashMap<>();
     private MappingParameter onSuccessParameter = null;
     private MappingParameter onErrorParameter = null;
     private MappingParameter onRedirectionParameter = null;
@@ -142,7 +147,7 @@ public class ForestMethod<T> implements VariableScope {
     private boolean logResponseContent = false;
     private ForestLogHandler logHandler = null;
     private LogConfiguration logConfiguration = null;
-    private Map<String, Object> extensionParameters = new HashMap<>();
+    private Map<String, Object> extensionParameters = new ConcurrentHashMap<>();
 
     public ForestMethod(InterfaceProxyHandler interfaceProxyHandler, ForestConfiguration configuration, Method method) {
         this.interfaceProxyHandler = interfaceProxyHandler;
@@ -177,17 +182,32 @@ public class ForestMethod<T> implements VariableScope {
     }
 
     public MappingTemplate makeTemplate(MappingParameter parameter) {
-        return new MappingTemplate(null, null, this, parameter.getName(), this, configuration.getProperties(), forestParameters);
+        return getOrCreateTemplate(null, null, parameter.getName());
+//        return new MappingTemplate(null, null, this, parameter.getName(), this, configuration.getProperties(), forestParameters);
     }
 
 
     public MappingTemplate makeTemplate(Class<? extends Annotation> annotationType, String attributeName, String text) {
-        return new MappingTemplate(annotationType, attributeName, this, text, this, configuration.getProperties(), forestParameters);
+        return getOrCreateTemplate(annotationType, attributeName, text);
+//        return new MappingTemplate(annotationType, attributeName, this, text, this, configuration.getProperties(), forestParameters);
     }
 
     public MappingURLTemplate makeURLTemplate(Class<? extends Annotation> annotationType, String attributeName, String text) {
         return new MappingURLTemplate(annotationType, attributeName, this, text, this, configuration.getProperties(), forestParameters);
     }
+
+    private MappingTemplate getOrCreateTemplate(Class<? extends Annotation> annotationType, String attributeName, String text) {
+        String key = (annotationType != null ? annotationType.getName() : "") + "@" + (attributeName != null ? attributeName : "") + "@" + text;
+        MappingTemplate template = templateCache.get(key);
+        if (template == null) {
+            template = new MappingTemplate(annotationType, attributeName, this, text, this, configuration.getProperties(), forestParameters);
+            if (templateCache.size() < 128) {
+                templateCache.put(key, template);
+            }
+        }
+        return template;
+    }
+
 
     /**
      * 获取Forest接口方法的返回类
@@ -290,8 +310,8 @@ public class ForestMethod<T> implements VariableScope {
         Class<? extends Annotation> annType = annotation.annotationType();
         String annName = annType.getPackage().getName();
         if (annName.startsWith("java.")
-            || annName.startsWith("javax.")
-            || annName.startsWith("kotlin")) {
+                || annName.startsWith("javax.")
+                || annName.startsWith("kotlin")) {
             return null;
         }
         Map<Annotation, Class<? extends Interceptor>> resultMap = new LinkedHashMap<>();
@@ -341,7 +361,7 @@ public class ForestMethod<T> implements VariableScope {
     /**
      * 设置扩展参数值
      *
-     * @param name 参数名
+     * @param name  参数名
      * @param value 参数值
      */
     public void setExtensionParameterValue(String name, Object value) {
@@ -360,6 +380,7 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 添加元请求注释表
+     *
      * @param anns 请求注释表
      */
     private void addMetaRequestAnnotations(List<ForestAnnotation> anns) {
@@ -370,7 +391,8 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 添加元请求注释
-     * @param annotation 注解
+     *
+     * @param annotation       注解
      * @param interceptorClass 拦截器类
      */
     private void addMetaRequestAnnotation(Annotation annotation, Class interceptorClass) {
@@ -422,6 +444,7 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 获取Forest方法对应的Java原生方法
+     *
      * @return Java原生方法，{@link java.lang.reflect.Method}类实例
      */
     public Method getMethod() {
@@ -430,6 +453,7 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 获取方法名
+     *
      * @return 方法名字符串
      */
     public String getMethodName() {
@@ -438,6 +462,7 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 获取元请求信息
+     *
      * @return 元请求对象，{@link MetaRequest}类实例
      */
     public MetaRequest getMetaRequest() {
@@ -479,7 +504,7 @@ public class ForestMethod<T> implements VariableScope {
      */
     private void processMethodAnnotations() {
         List<Annotation> annotationList = new LinkedList<>();
-        fetchAnnotationsFromClasses(annotationList, new Class[] {interfaceProxyHandler.getInterfaceClass()});
+        fetchAnnotationsFromClasses(annotationList, new Class[]{interfaceProxyHandler.getInterfaceClass()});
 
         for (Annotation ann : method.getAnnotations()) {
             annotationList.add(ann);
@@ -644,9 +669,10 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 处理参数列表
-     * @param parameters 参数数组，{@link Parameter}类数组实例
+     *
+     * @param parameters        参数数组，{@link Parameter}类数组实例
      * @param genericParamTypes 参数类型数组
-     * @param paramAnns 参数注解的二维数组
+     * @param paramAnns         参数注解的二维数组
      */
     private void processParameters(Parameter[] parameters, Type[] genericParamTypes, Annotation[][] paramAnns) {
         for (int i = 0; i < parameters.length; i++) {
@@ -678,8 +704,9 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 处理参数的注解
+     *
      * @param parameter 方法参数-字符串模板解析对象，{@link MappingParameter}类实例
-     * @param anns 方法参数注解的二维数组
+     * @param anns      方法参数注解的二维数组
      */
     private void processParameterAnnotation(MappingParameter parameter, Annotation[] anns) {
         for (int i = 0; i < anns.length; i++) {
@@ -706,6 +733,7 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 添加命名参数
+     *
      * @param parameter 方法参数-字符串模板解析对象，{@link MappingParameter}类实例
      */
     public void addNamedParameter(MappingParameter parameter) {
@@ -721,7 +749,8 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 添加变量
-     * @param name 变量名
+     *
+     * @param name     变量名
      * @param variable 变量对象，{@link MappingVariable}类实例
      */
     public void addVariable(String name, MappingVariable variable) {
@@ -730,6 +759,7 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 添加Forest文件上传用的Mutlipart工厂
+     *
      * @param multipartFactory Forest文件上传用的Mutlipart工厂，{@link ForestMultipartFactory}类实例
      */
     public void addMultipartFactory(ForestMultipartFactory multipartFactory) {
@@ -738,7 +768,8 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 处理参数的过滤器
-     * @param parameter 方法参数-字符串模板解析对象，{@link MappingParameter}类实例
+     *
+     * @param parameter  方法参数-字符串模板解析对象，{@link MappingParameter}类实例
      * @param filterName 过滤器名称
      */
     public void processParameterFilter(MappingParameter parameter, String filterName) {
@@ -754,6 +785,7 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 获得最终的请求类型
+     *
      * @param args 调用本对象对应方法时传入的参数数组
      * @return 请求类型，{@link ForestRequestType}枚举实例
      */
@@ -776,6 +808,7 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 创建请求
+     *
      * @param args 调用本对象对应方法时传入的参数数组
      * @return Forest请求对象，{@link ForestRequest}类实例
      */
@@ -840,7 +873,7 @@ public class ForestMethod<T> implements VariableScope {
             renderedUserAgent = userAgentTemplate.render(args).trim();
         }
         List<RequestNameValue> nameValueList = new ArrayList<>();
-        String [] headerArray = baseMetaRequest.getHeaders();
+        String[] headerArray = baseMetaRequest.getHeaders();
         MappingTemplate[] baseHeaders = null;
         if (headerArray != null && headerArray.length > 0) {
             baseHeaders = new MappingTemplate[headerArray.length];
@@ -873,7 +906,6 @@ public class ForestMethod<T> implements VariableScope {
                 .setHost("localhost")
                 .build();
 */
-
 
 
         boolean autoRedirection = configuration.isAutoRedirection();
@@ -927,7 +959,7 @@ public class ForestMethod<T> implements VariableScope {
                     obj = parameter.getConvertedDefaultValue(configuration.getJsonConverter());
                 }
                 if (parameter.isJsonParam()) {
-                    String  json = "";
+                    String json = "";
                     if (obj != null) {
                         ForestJsonConverter jsonConverter = configuration.getJsonConverter();
                         obj = parameter.getFilterChain().doFilter(configuration, obj);
@@ -940,8 +972,7 @@ public class ForestMethod<T> implements VariableScope {
                         nameValueList.add(new RequestNameValue(parameter.getJsonParamName(), json, target, parameter.getPartContentType())
                                 .setDefaultValue(parameter.getDefaultValue()));
                     }
-                }
-                else if (!parameter.getFilterChain().isEmpty()) {
+                } else if (!parameter.getFilterChain().isEmpty()) {
                     obj = parameter.getFilterChain().doFilter(configuration, obj);
                     if (obj == null && StringUtils.isNotEmpty(parameter.getDefaultValue())) {
                         obj = parameter.getDefaultValue();
@@ -962,8 +993,7 @@ public class ForestMethod<T> implements VariableScope {
                                     .setDefaultValue(parameter.getDefaultValue()));
                         }
                     }
-                }
-                else if (obj instanceof CharSequence) {
+                } else if (obj instanceof CharSequence) {
                     if (MappingParameter.isQuery(target)) {
                         request.addQuery(ForestQueryParameter.createSimpleQueryParameter(obj)
                                 .setDefaultValue(parameter.getDefaultValue()));
@@ -971,8 +1001,7 @@ public class ForestMethod<T> implements VariableScope {
                         request.addBody(new StringRequestBody(obj.toString())
                                 .setDefaultValue(parameter.getDefaultValue()));
                     }
-                }
-                else if (obj instanceof Map) {
+                } else if (obj instanceof Map) {
                     Map map = (Map) obj;
                     if (MappingParameter.isQuery(target)) {
                         request.addQuery(map, parameter.isUrlEncode(), parameter.getCharset());
@@ -981,8 +1010,7 @@ public class ForestMethod<T> implements VariableScope {
                     } else if (MappingParameter.isHeader(target)) {
                         request.addHeader(map);
                     }
-                }
-                else if (obj instanceof Iterable
+                } else if (obj instanceof Iterable
                         || (obj != null
                         && (obj.getClass().isArray()
                         || ReflectUtils.isPrimaryType(obj.getClass())))) {
@@ -1011,8 +1039,7 @@ public class ForestMethod<T> implements VariableScope {
                                 .build(obj, parameter.getDefaultValue());
                         request.addBody(body);
                     }
-                }
-                else if (MappingParameter.isBody(target)) {
+                } else if (MappingParameter.isBody(target)) {
                     ForestRequestBody body = RequestBodyBuilder
                             .type(obj.getClass())
                             .build(obj, parameter.getDefaultValue());
@@ -1031,8 +1058,7 @@ public class ForestMethod<T> implements VariableScope {
                         throw new ForestRuntimeException(th);
                     }
                 }
-            }
-            else if (parameter.getIndex() != null) {
+            } else if (parameter.getIndex() != null) {
                 int target = parameter.isUnknownTarget() ? type.getDefaultParamTarget() : parameter.getTarget();
                 RequestNameValue nameValue = new RequestNameValue(parameter.getName(), target, parameter.getPartContentType())
                         .setDefaultValue(parameter.getDefaultValue());
@@ -1347,7 +1373,7 @@ public class ForestMethod<T> implements VariableScope {
             String name = entry.getKey();
             Object value = entry.getValue();
             if (value != null) {
-                RequestNameValue nameValue = new RequestNameValue(name ,value,
+                RequestNameValue nameValue = new RequestNameValue(name, value,
                         parameter.isUnknownTarget() ? type.getDefaultParamTarget() : parameter.getTarget(),
                         parameter.getPartContentType());
                 nameValueList.add(nameValue);
@@ -1358,6 +1384,7 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 调用方法
+     *
      * @param args 调用本对象对应方法时传入的参数数组
      * @return 调用本对象对应方法结束后返回的值，任意类型的对象实例
      */
@@ -1414,8 +1441,9 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 获取泛型类型
+     *
      * @param genType 带泛型参数的类型，{@link Type}接口实例
-     * @param index 泛型参数下标
+     * @param index   泛型参数下标
      * @return 泛型参数中的类型，{@link Type}接口实例
      */
     private static Type getGenericClassOrType(Type genType, final int index) {
@@ -1478,6 +1506,7 @@ public class ForestMethod<T> implements VariableScope {
 
     /**
      * 获取请求结果类型
+     *
      * @return 请求结果类型，{@link Type}接口实例
      */
     public Type getResultType() {
