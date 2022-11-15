@@ -823,7 +823,7 @@ public class ForestMethod<T> implements VariableScope {
 
         String sslProtocol = null;
         String renderedSslProtocol = sslProtocolTemplate.render(args);
-        if (StringUtils.isNotBlank(renderedSslProtocol)) {
+        if (StringUtils.isNotBlank(renderedSslProtocol) && !"null".equals(renderedSslProtocol)) {
             sslProtocol = renderedSslProtocol;
         } else if (baseSslProtocolTemplate != null) {
             sslProtocol = baseSslProtocolTemplate.render(args);
