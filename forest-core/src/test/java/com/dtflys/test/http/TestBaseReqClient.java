@@ -4,6 +4,7 @@ import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.test.http.client.BaseReqClient;
 import com.dtflys.test.http.client.BaseURLClient;
 import com.dtflys.test.http.client.BaseURLVarClient;
@@ -108,7 +109,6 @@ public class TestBaseReqClient extends BaseClientTest {
             .extracting(ForestResponse::isSuccess, ForestResponse::getContent)
             .contains(true, EXPECTED);
         ForestRequest request = response.getRequest();
-        assertThat(request.getTimeout()).isEqualTo(2000);
         assertThat(request.getConnectTimeout()).isEqualTo(3000);
         assertThat(request.getReadTimeout()).isEqualTo(4000);
         mockRequest(server)
@@ -125,8 +125,17 @@ public class TestBaseReqClient extends BaseClientTest {
         ForestRequest request = baseReqClient.testBaseTimeout("UTF-8");
         assertThat(request.getReadTimeout()).isEqualTo(4000);
         assertThat(request.getConnectTimeout()).isEqualTo(3000);
-        request.execute();
+        String result = request.executeAsString();
+        assertThat(result).isNotNull().isEqualTo(EXPECTED);
     }
+
+    @Test
+    public void testBaseTimeoutWithInterceptor() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String result = baseReqClient.testBaseTimeoutWithInterceptor("UTF-8");
+        assertThat(result).isNotNull().isEqualTo(EXPECTED);
+    }
+
 
     @Test
     public void testBaseURL() {
