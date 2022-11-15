@@ -343,18 +343,16 @@ public class TestAsyncGetClient extends BaseClientTest {
 
 
     @Test
-    public void testAsyncVarParamGetError_404() throws InterruptedException {
+    public void testAsyncVarParamGetError_404() {
         server.enqueue(new MockResponse().setResponseCode(404).setBody(EXPECTED));
         final AtomicBoolean success = new AtomicBoolean(false);
         final AtomicBoolean error = new AtomicBoolean(false);
-        CountDownLatch latch = new CountDownLatch(1);
         Future<String> future = getClient.asyncVarParamGet(
                 "error param",
                 (data, request, response) -> {
                     error.set(false);
                     success.set(true);
                     assertThat(request.getAsyncMode()).isEqualTo(configuration.getAsyncMode());
-                    latch.countDown();
                 }, (ex, request, response) -> {
                     error.set(true);
                     success.set(false);
@@ -362,12 +360,12 @@ public class TestAsyncGetClient extends BaseClientTest {
                     int statusCode = ((ForestNetworkException) ex).getStatusCode();
                     log.error("status code = " + statusCode);
                     assertEquals(404, statusCode);
-                    latch.countDown();
                 });
         log.info("send async get request");
         assertFalse(error.get());
-        assertThat(future).isNotNull();
-        latch.await(5, TimeUnit.SECONDS);
+        assertThat(future).isNotNull().isInstanceOf(ForestFuture.class);
+        ForestFuture<String> forestFuture = (ForestFuture<String>) future;
+        forestFuture.await(5, TimeUnit.SECONDS);
         assertFalse(success.get());
         assertTrue(error.get());
     }

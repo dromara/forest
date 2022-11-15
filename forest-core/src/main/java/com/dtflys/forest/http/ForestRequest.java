@@ -4650,9 +4650,8 @@ public class ForestRequest<T> implements HasURL {
      * @return 请求执行响应后返回的结果, 其为 {@link Future} 对象实例
      * @since 1.5.27
      */
-    public ForestFuture executeAsFuture() {
-        ForestFuture future = execute(new TypeReference<ForestFuture<ForestResponse>>() {});
-        return future;
+    public ForestFuture<T> executeAsFuture() {
+        return execute(new TypeReference<ForestFuture<T>>() {});
     }
 
 

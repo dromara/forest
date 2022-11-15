@@ -1393,7 +1393,7 @@ public class TestGenericForestClient extends BaseClientTest {
 
     @Test
     public void testRequest_async_await_list() {
-        int count = 10;
+        int count = 10000;
         for (int i = 0; i < count; i++) {
             server.enqueue(new MockResponse().setBody(EXPECTED));
         }

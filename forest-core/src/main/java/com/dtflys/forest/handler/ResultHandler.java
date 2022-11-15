@@ -6,6 +6,7 @@ import com.dtflys.forest.exceptions.ForestHandlerException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.lifecycles.file.DownloadLifeCycle;
+import com.dtflys.forest.reflection.MethodLifeCycleHandler;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
 
@@ -92,6 +93,9 @@ public class ResultHandler {
                         if (Future.class.isAssignableFrom(rowClass)) {
                             Type realType = parameterizedType.getActualTypeArguments()[0];
                             Class realClass = ReflectUtils.toClass(parameterizedType.getActualTypeArguments()[0]);
+                            if (realClass == null) {
+                                return ((MethodLifeCycleHandler<?>) request.getLifeCycleHandler()).getResultData();
+                            }
                             return getResult(request, response, realType, realClass);
                         }
                     }
