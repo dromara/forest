@@ -3,6 +3,7 @@ package com.dtflys.forest.backend.httpclient;
 
 import com.dtflys.forest.annotation.Backend;
 import com.dtflys.forest.annotation.MethodLifeCycle;
+import com.dtflys.forest.backend.httpclient.conn.HttpclientConnectionManager;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -30,5 +31,5 @@ public @interface HttpClient {
      * @return HttpClient 工厂类
      * @since 1.5.23
      */
-    Class<? extends HttpClientProvider> client() default HttpClientProvider.class;
+    Class<? extends HttpClientProvider> client() default HttpclientConnectionManager.DefaultHttpClientProvider.class;
 }

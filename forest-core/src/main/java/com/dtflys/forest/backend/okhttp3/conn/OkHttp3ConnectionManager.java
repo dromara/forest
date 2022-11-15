@@ -2,6 +2,7 @@ package com.dtflys.forest.backend.okhttp3.conn;
 
 import com.dtflys.forest.backend.ForestConnectionManager;
 import com.dtflys.forest.backend.httpclient.HttpClientProvider;
+import com.dtflys.forest.backend.okhttp3.OkHttp3Backend;
 import com.dtflys.forest.backend.okhttp3.OkHttpClientProvider;
 import com.dtflys.forest.backend.okhttp3.response.OkHttpResponseBody;
 import com.dtflys.forest.config.ForestConfiguration;
@@ -48,6 +49,8 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
     private ConnectionPool pool;
 
     private DefaultOkHttpClientProvider defaultOkHttpClientProvider;
+
+    private boolean inited = false;
 
     /**
      * 协议版本: http 1.0
@@ -111,14 +114,24 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
 
     public static class DefaultOkHttpClientProvider implements OkHttpClientProvider {
 
-        private final OkHttp3ConnectionManager connectionManager;
-
-        public DefaultOkHttpClientProvider(OkHttp3ConnectionManager connectionManager) {
-            this.connectionManager = connectionManager;
-        }
+        private OkHttp3ConnectionManager connectionManager;
 
         @Override
         public OkHttpClient getClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
+            if (connectionManager == null) {
+                synchronized (this) {
+                    if (connectionManager == null) {
+                        ForestConfiguration configuration = request.getConfiguration();
+                        connectionManager = (OkHttp3ConnectionManager) configuration
+                                .getBackendSelector()
+                                .select(OkHttp3Backend.NAME)
+                                .getConnectionManager();
+                        if (!connectionManager.isInitialized()) {
+                            connectionManager.init(configuration);
+                        }
+                    }
+                }
+            }
             Integer timeout = request.getTimeout();
             Integer connectTimeout = request.connectTimeout();
             Integer readTimeout = request.readTimeout();
@@ -225,9 +238,17 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
     }
 
     @Override
-    public void init(ForestConfiguration configuration) {
-        pool = new ConnectionPool();
-        defaultOkHttpClientProvider = new DefaultOkHttpClientProvider(this);
+    public boolean isInitialized() {
+        return inited;
+    }
+
+    @Override
+    public synchronized void init(ForestConfiguration configuration) {
+        if (!inited) {
+            pool = new ConnectionPool();
+            defaultOkHttpClientProvider = new DefaultOkHttpClientProvider();
+            inited = true;
+        }
     }
 
     /**

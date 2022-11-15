@@ -3,6 +3,7 @@ package com.dtflys.forest.backend.httpclient.conn;
 import com.dtflys.forest.backend.ForestConnectionManager;
 import com.dtflys.forest.backend.HttpConnectionConstants;
 import com.dtflys.forest.backend.httpclient.HttpClientProvider;
+import com.dtflys.forest.backend.httpclient.HttpclientBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.LifeCycleHandler;
@@ -34,40 +35,60 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
     private DefaultHttpClientProvider defaultHttpClientProvider;
     private PoolingHttpClientConnectionManager tsConnectionManager;
 
+    private boolean inited = false;
+
     public HttpclientConnectionManager() {
     }
 
     @Override
-    public void init(ForestConfiguration configuration) {
-        try {
-            Integer maxConnections = configuration.getMaxConnections() != null ?
-                    configuration.getMaxConnections() : HttpConnectionConstants.DEFAULT_MAX_TOTAL_CONNECTIONS;
-            Registry<ConnectionSocketFactory> socketFactoryRegistry =
-                    RegistryBuilder.<ConnectionSocketFactory>create()
-                            .register("https", new ForestSSLConnectionFactory())
-                            .register("http", new PlainConnectionSocketFactory())
-                            .build();
-            tsConnectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
-            tsConnectionManager.setMaxTotal(maxConnections);
-            tsConnectionManager.setDefaultMaxPerRoute(Integer.MAX_VALUE);
-            tsConnectionManager.setValidateAfterInactivity(60);
-            defaultHttpClientProvider = new DefaultHttpClientProvider(this);
-        } catch (Throwable th) {
-            throw new ForestRuntimeException(th);
+    public boolean isInitialized() {
+        return inited;
+    }
+
+    @Override
+    public synchronized void init(ForestConfiguration configuration) {
+        if (!inited) {
+            try {
+                Integer maxConnections = configuration.getMaxConnections() != null ?
+                        configuration.getMaxConnections() : HttpConnectionConstants.DEFAULT_MAX_TOTAL_CONNECTIONS;
+                Registry<ConnectionSocketFactory> socketFactoryRegistry =
+                        RegistryBuilder.<ConnectionSocketFactory>create()
+                                .register("https", new ForestSSLConnectionFactory())
+                                .register("http", new PlainConnectionSocketFactory())
+                                .build();
+                tsConnectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
+                tsConnectionManager.setMaxTotal(maxConnections);
+                tsConnectionManager.setDefaultMaxPerRoute(Integer.MAX_VALUE);
+                tsConnectionManager.setValidateAfterInactivity(60);
+                defaultHttpClientProvider = new DefaultHttpClientProvider();
+                inited = true;
+            } catch (Throwable th) {
+                throw new ForestRuntimeException(th);
+            }
         }
     }
 
 
     public static class DefaultHttpClientProvider implements HttpClientProvider {
 
-        private final HttpclientConnectionManager connectionManager;
-
-        public DefaultHttpClientProvider(HttpclientConnectionManager connectionManager) {
-            this.connectionManager = connectionManager;
-        }
+        private HttpclientConnectionManager connectionManager;
 
         @Override
         public HttpClient getClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
+            if (connectionManager == null) {
+                synchronized (this) {
+                    if (connectionManager == null) {
+                        ForestConfiguration configuration = request.getConfiguration();
+                        connectionManager = (HttpclientConnectionManager) configuration
+                                .getBackendSelector()
+                                .select(HttpclientBackend.NAME)
+                                .getConnectionManager();
+                        if (!connectionManager.isInitialized()) {
+                            connectionManager.init(configuration);
+                        }
+                    }
+                }
+            }
             HttpClientBuilder builder = HttpClients.custom();
             builder.setConnectionManager(connectionManager.tsConnectionManager);
 
