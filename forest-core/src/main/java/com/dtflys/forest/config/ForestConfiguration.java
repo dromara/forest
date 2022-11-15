@@ -1059,7 +1059,7 @@ public class ForestConfiguration implements Serializable {
         if (baseAddressSourceClass == null) {
             return null;
         }
-        return forestObjectFactory.getObject(baseAddressSourceClass);
+        return getForestObjectFactory().getObject(baseAddressSourceClass);
     }
 
     /**
@@ -1262,7 +1262,7 @@ public class ForestConfiguration implements Serializable {
         if (retryWhenClass == null) {
             return null;
         }
-        return forestObjectFactory.getObject(retryWhenClass);
+        return getForestObjectFactory().getObject(retryWhenClass);
     }
 
     /**
@@ -1285,7 +1285,7 @@ public class ForestConfiguration implements Serializable {
         if (successWhenClass == null) {
             return null;
         }
-        return forestObjectFactory.getObject(successWhenClass);
+        return getForestObjectFactory().getObject(successWhenClass);
     }
 
     /**
