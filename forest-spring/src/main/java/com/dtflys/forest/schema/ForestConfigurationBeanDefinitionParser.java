@@ -154,6 +154,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         String certPass = elem.getAttribute("certPass");
         String protocolsStr = elem.getAttribute("protocols");
         String cipherSuitesStr = elem.getAttribute("cipher-suites");
+        String trustManager = elem.getAttribute("trustManager");
         String hostnameVerifier = elem.getAttribute("hostnameVerifier");
         String sslSocketFactoryBuilder = elem.getAttribute("sslSocketFactoryBuilder");
 
@@ -164,7 +165,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
                 id, keystoreType, filePath,
                 keystorePass, certPass,
                 protocolsStr, cipherSuitesStr,
-                hostnameVerifier, sslSocketFactoryBuilder);
+                trustManager, hostnameVerifier, sslSocketFactoryBuilder);
         sslKeyStoreMap.put(id, beanDefinition);
     }
 
@@ -178,6 +179,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
                                                        String certPass,
                                                        String protocolsStr,
                                                        String cipherSuitesStr,
+                                                       String trustManagerClass,
                                                        String hostnameVerifierClass,
                                                        String sslSocketFactoryBuilder) {
         BeanDefinition beanDefinition = new GenericBeanDefinition();
@@ -188,6 +190,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         beanDefValues.addGenericArgumentValue(filePath);
         beanDefValues.addGenericArgumentValue(keystorePass);
         beanDefValues.addGenericArgumentValue(certPass);
+        beanDefValues.addGenericArgumentValue(trustManagerClass);
         beanDefValues.addGenericArgumentValue(hostnameVerifierClass);
         beanDefValues.addGenericArgumentValue(sslSocketFactoryBuilder);
         if (StringUtils.isNotEmpty(protocolsStr)) {
