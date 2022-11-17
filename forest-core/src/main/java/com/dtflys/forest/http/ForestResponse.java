@@ -38,7 +38,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.SocketTimeoutException;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 
@@ -222,6 +221,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL {
 
     /**
      * 设置该响应是否已打过日志
+     *
      * @param logged {@code true}: 已打印过， {@code false}: 没打印过
      */
     public void setLogged(boolean logged) {
@@ -273,6 +273,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL {
 
     /**
      * 获取下载文件名
+     *
      * @return 文件名
      */
     public String getFilename() {
@@ -281,14 +282,18 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL {
             String dispositionValue = header.getValue();
             if (StringUtils.isNotEmpty(dispositionValue)) {
                 String[] disGroup = dispositionValue.split(";");
-                for (int i = disGroup.length - 1; i >= 0 ; i--) {
+                for (int i = disGroup.length - 1; i >= 0; i--) {
                     /**
                      * content-disposition: attachment; filename="50db602db30cf6df60698510003d2415.jpg"
                      * need replace trim
                      */
                     String disStr = StringUtils.trimBegin(disGroup[i]);
                     if (disStr.startsWith("filename=")) {
-                        return disStr.substring("filename=".length());
+                        String filename = disStr.substring("filename=".length());
+                        if (filename.startsWith("\"") && filename.endsWith("\"")) {
+                            filename = filename.substring(1, filename.length() - 1);
+                        }
+                        return filename;
                     }
                 }
             }
@@ -506,7 +511,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL {
      *     <li>1. 判断请求过程是否有异常</li>
      *     <li>2. 判断HTTP响应状态码是否在正常范围内(100 ~ 399)</li>
      * </ul>
-     *
+     * <p>
      * 以上过程一个响应只会执行一次！执行过后被会缓存到 success 字段中
      * <p>下次再调用 isSuccess() 用是第一次执行的结果
      *
@@ -711,7 +716,6 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL {
     public ForestHeaderMap getHeaders() {
         return headers;
     }
-
 
 
     /**
