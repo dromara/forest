@@ -290,7 +290,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL {
                     String disStr = StringUtils.trimBegin(disGroup[i]);
                     if (disStr.startsWith("filename=")) {
                         String filename = disStr.substring("filename=".length());
-                        if (filename.startsWith("\"") && filename.endsWith("\"")) {
+                        if (filename.length() > 1 && filename.startsWith("\"") && filename.endsWith("\"")) {
                             filename = filename.substring(1, filename.length() - 1);
                         }
                         return filename;
