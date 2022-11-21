@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestAddress;
 import com.dtflys.forest.http.ForestAsyncMode;
@@ -28,6 +29,7 @@ import okio.Buffer;
 import okio.Okio;
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.internal.bytebuddy.asm.Advice;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -1110,6 +1112,68 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertBodyEquals("a=1&b=2");
     }
 
+    @Test
+    public void testRequest_on_body_encode() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        TypeReference<Result<Integer>> typeReference = new TypeReference<Result<Integer>>() {
+        };
+        Result<Integer> result = Forest.post("http://localhost:" + server.getPort() + "/encoded")
+                .contentFormUrlEncoded()
+                .addBody("a", 1)
+                .addBody("b", 2)
+                .addInterceptor(new Interceptor() {
+                    @Override
+                    public byte[] onBodyEncode(ForestRequest request, ForestEncoder encoder, byte[] encodedData) {
+                        String str = new String(encodedData);
+                        byte[] bytes = (str + "&c=3").getBytes();
+                        return bytes;
+                    }
+                })
+                .execute(typeReference);
+        assertThat(result).isNotNull();
+        assertThat(result.getStatus()).isEqualTo(1);
+        assertThat(result.getData()).isEqualTo(2);
+        mockRequest(server)
+                .assertMethodEquals("POST")
+                .assertPathEquals("/encoded")
+                .assertHeaderEquals(ForestHeader.CONTENT_TYPE, ContentType.APPLICATION_X_WWW_FORM_URLENCODED)
+                .assertBodyEquals("a=1&b=2&c=3");
+    }
+
+    @Test
+    public void testRequest_on_body_encode_multi() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        TypeReference<Result<Integer>> typeReference = new TypeReference<Result<Integer>>() {
+        };
+        Result<Integer> result = Forest.post("http://localhost:" + server.getPort() + "/encoded")
+                .contentFormUrlEncoded()
+                .addBody("a", 1)
+                .addBody("b", 2)
+                .addInterceptor(new Interceptor() {
+                    @Override
+                    public byte[] onBodyEncode(ForestRequest request, ForestEncoder encoder, byte[] encodedData) {
+                        String str = new String(encodedData);
+                        return (str + "&c=3").getBytes();
+                    }
+                })
+               .addInterceptor(new Interceptor() {
+                    @Override
+                    public byte[] onBodyEncode(ForestRequest request, ForestEncoder encoder, byte[] encodedData) {
+                        String str = new String(encodedData);
+                        return (str + "&d=4").getBytes();
+                    }
+                })
+                .execute(typeReference);
+        assertThat(result).isNotNull();
+        assertThat(result.getStatus()).isEqualTo(1);
+        assertThat(result.getData()).isEqualTo(2);
+        mockRequest(server)
+                .assertMethodEquals("POST")
+                .assertPathEquals("/encoded")
+                .assertHeaderEquals(ForestHeader.CONTENT_TYPE, ContentType.APPLICATION_X_WWW_FORM_URLENCODED)
+                .assertBodyEquals("a=1&b=2&c=3&d=4");
+    }
+
 
     @Test
     public void testRequest_delete_query_keys() {
@@ -1393,7 +1457,7 @@ public class TestGenericForestClient extends BaseClientTest {
 
     @Test
     public void testRequest_async_await_list() {
-        int count = 10000;
+        int count = 200;
         for (int i = 0; i < count; i++) {
             server.enqueue(new MockResponse().setBody(EXPECTED));
         }

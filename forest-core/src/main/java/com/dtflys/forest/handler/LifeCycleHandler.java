@@ -1,5 +1,6 @@
 package com.dtflys.forest.handler;
 
+import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestRequest;
@@ -34,6 +35,8 @@ public interface LifeCycleHandler {
     Object handleError(ForestRequest request, ForestResponse response);
 
     Object handleError(ForestRequest request, ForestResponse response, Throwable ex);
+
+    byte[] handleBodyEncode(ForestRequest request, ForestEncoder encoder, byte[] encodedData);
 
     void handleCanceled(ForestRequest request, ForestResponse response);
 

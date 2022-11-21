@@ -4,6 +4,7 @@ import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.callback.OnSuccess;
+import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.exceptions.ForestNetworkException;
 import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
@@ -174,6 +175,11 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
         else {
             throw e;
         }
+    }
+
+    @Override
+    public byte[] handleBodyEncode(ForestRequest request, ForestEncoder encoder, byte[] encodedData) {
+        return request.getInterceptorChain().onBodyEncode(request, encoder, encodedData);
     }
 
     @Override

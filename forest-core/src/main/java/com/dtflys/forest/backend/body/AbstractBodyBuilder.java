@@ -70,6 +70,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
         ForestEncoder encoder = request.getEncoder();
         if (encoder != null) {
             byte[] bodyBytes = encoder.encodeRequestBody(request, charset);
+            bodyBytes = lifeCycleHandler.handleBodyEncode(request, encoder, bodyBytes);
             setBinaryBody(httpRequest, request, strCharset, ctypeWithoutParams, bodyBytes, mergeCharset);
             return;
         }
@@ -98,6 +99,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                 bodyEncoder = (ForestEncoder) request.getConfiguration().getConverterMap().get(ForestDataType.TEXT);
             }
             byte[] bodyBytes = bodyEncoder.encodeRequestBody(request, charset);
+            bodyBytes = lifeCycleHandler.handleBodyEncode(request, bodyEncoder, bodyBytes);
             setBinaryBody(httpRequest, request, strCharset, ctypeWithoutParams, bodyBytes, mergeCharset);
         }
     }

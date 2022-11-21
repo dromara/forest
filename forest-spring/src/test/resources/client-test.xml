@@ -15,6 +15,7 @@
             maxConnections="700"
             maxRequestQueueSize="300"
             maxRouteConnections="600"
+            asyncMode="kotlin_coroutine"
             maxAsyncThreadSize="256"
             maxAsyncQueueSize="128">
 

@@ -1047,11 +1047,13 @@ public class ForestMethod<T> implements VariableScope {
                 } else {
                     try {
                         List<RequestNameValue> list = getNameValueListFromObjectWithJSON(parameter, configuration, obj, type);
-                        for (RequestNameValue nameValue : list) {
-                            if (nameValue.isInHeader()) {
-                                request.addHeader(nameValue);
-                            } else {
-                                nameValueList.add(nameValue);
+                        if (list != null) {
+                            for (RequestNameValue nameValue : list) {
+                                if (nameValue.isInHeader()) {
+                                    request.addHeader(nameValue);
+                                } else {
+                                    nameValueList.add(nameValue);
+                                }
                             }
                         }
                     } catch (Throwable th) {
@@ -1367,6 +1369,9 @@ public class ForestMethod<T> implements VariableScope {
 
 
     private List<RequestNameValue> getNameValueListFromObjectWithJSON(MappingParameter parameter, ForestConfiguration configuration, Object obj, ForestRequestType type) {
+        if (obj == null) {
+            return null;
+        }
         Map<String, Object> propMap = ReflectUtils.convertObjectToMap(obj, configuration);
         List<RequestNameValue> nameValueList = new ArrayList<>();
         for (Map.Entry<String, Object> entry : propMap.entrySet()) {

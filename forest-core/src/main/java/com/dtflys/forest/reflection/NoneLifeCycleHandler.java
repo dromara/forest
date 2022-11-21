@@ -1,5 +1,6 @@
 package com.dtflys.forest.reflection;
 
+import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestCookies;
@@ -53,6 +54,11 @@ public class NoneLifeCycleHandler implements LifeCycleHandler {
     @Override
     public Object handleError(ForestRequest request, ForestResponse response, Throwable ex) {
         return null;
+    }
+
+    @Override
+    public byte[] handleBodyEncode(ForestRequest request, ForestEncoder encoder, byte[] encodedData) {
+        return encodedData;
     }
 
     @Override

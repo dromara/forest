@@ -71,6 +71,7 @@ import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
+import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.TimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -712,6 +713,26 @@ public class ForestConfiguration implements Serializable {
      */
     public ForestConfiguration setAsyncMode(ForestAsyncMode asyncMode) {
         this.asyncMode = asyncMode;
+        return this;
+    }
+
+    /**
+     * 设置异步模式
+     *
+     * @param asyncMode 异步模式 - 字符串
+     * @return 当前ForestConfiguration实例
+     * @since 1.5.27
+     */
+    public ForestConfiguration setAsyncMode(String asyncMode) {
+        if (StringUtils.isEmpty(asyncMode)) {
+            throw new ForestRuntimeException("Can not resolve async mode '" + asyncMode + "'");
+        }
+        final String enumName = asyncMode.trim().toUpperCase();
+        ForestAsyncMode mode = ForestAsyncMode.valueOf(enumName);
+        if (mode == null) {
+            throw new ForestRuntimeException("Can not resolve async mode '" + enumName + "'");
+        }
+        this.asyncMode = mode;
         return this;
     }
 

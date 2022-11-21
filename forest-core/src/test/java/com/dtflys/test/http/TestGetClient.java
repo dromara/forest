@@ -104,7 +104,7 @@ public class TestGetClient extends BaseClientTest {
     }
 
 
-//    @Test
+    //    @Test
     public void performance() {
         int count = 10000;
         for (int i = 0; i < count; i++) {
@@ -119,7 +119,7 @@ public class TestGetClient extends BaseClientTest {
         System.out.println("总耗时: " + stopWatch.getTotalTimeMillis() + "ms");
     }
 
-//    @Test
+    //    @Test
     public void performance_concurrent() throws InterruptedException {
         int count = 10000;
         for (int i = 0; i < count; i++) {
@@ -236,8 +236,8 @@ public class TestGetClient extends BaseClientTest {
     public void testJsonMapGetWithUTF8Response() throws InterruptedException {
         server.enqueue(
                 new MockResponse()
-                .setHeader("Content-Encoding", "GBK")
-                .setBody(EXPECTED));
+                        .setHeader("Content-Encoding", "GBK")
+                        .setBody(EXPECTED));
         ForestResponse<Map> response = getClient.jsonMapGet();
         assertThat(response).isNotNull();
         assertThat(response.getContentType()).isNull();
@@ -302,7 +302,6 @@ public class TestGetClient extends BaseClientTest {
     }
 
 
-
     @Test
     public void testTextParamGet() throws InterruptedException {
         server.enqueue(
@@ -334,7 +333,6 @@ public class TestGetClient extends BaseClientTest {
                 .assertPathEquals("/hello/user")
                 .assertQueryEquals("username", "foo");
     }
-
 
 
     @Test
@@ -464,6 +462,42 @@ public class TestGetClient extends BaseClientTest {
                         .setBody(EXPECTED));
         JsonTestUser user = new JsonTestUser();
         user.setUsername("foo");
+        user.setPassword("xxx");
+        assertThat(getClient.queryObjectGet(user))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo")
+                .assertQueryEquals("password", "xxx");
+    }
+
+    @Test
+    public void testQueryObjectGet_with_nullObject() throws InterruptedException {
+        server.enqueue(
+                new MockResponse()
+                        .setHeader("Content-Type", "application/json")
+                        .setHeader("Content-Encoding", "UTF-8")
+                        .setBody(EXPECTED));
+        assertThat(getClient.queryObjectGet((JsonTestUser) null))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertPathEquals("/hello/user");
+    }
+
+    @Test
+    public void testQueryObjectGet_with_nullObjectField() throws InterruptedException {
+        server.enqueue(
+                new MockResponse()
+                        .setHeader("Content-Type", "application/json")
+                        .setHeader("Content-Encoding", "UTF-8")
+                        .setBody(EXPECTED));
+        JsonTestUser user = new JsonTestUser();
+        user.setUsername("foo");
+        user.setPassword(null);
         assertThat(getClient.queryObjectGet(user))
                 .isNotNull()
                 .isEqualTo(EXPECTED);
@@ -572,7 +606,8 @@ public class TestGetClient extends BaseClientTest {
         String url = StrUtil.format("/test", server.getPort());
         ForestRequest<String> request = getClient.testUrl4(url);
         request.port(server.getPort());
-        ForestResponse<String> response = request.execute(new TypeReference<ForestResponse<String>>() {});
+        ForestResponse<String> response = request.execute(new TypeReference<ForestResponse<String>>() {
+        });
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
@@ -591,7 +626,8 @@ public class TestGetClient extends BaseClientTest {
         String url = StrUtil.format("test/xxx", server.getPort());
         ForestRequest<String> request = getClient.testUrl4(url);
         request.port(server.getPort());
-        ForestResponse<String> response = request.execute(new TypeReference<ForestResponse<String>>() {});
+        ForestResponse<String> response = request.execute(new TypeReference<ForestResponse<String>>() {
+        });
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
@@ -610,7 +646,8 @@ public class TestGetClient extends BaseClientTest {
         String url = StrUtil.format("test/xxx", server.getPort());
         ForestRequest<String> request = getClient.testUrl4(url);
         request.setPort(server.getPort());
-        ForestResponse<String> response = request.execute(new TypeReference<ForestResponse<String>>() {});
+        ForestResponse<String> response = request.execute(new TypeReference<ForestResponse<String>>() {
+        });
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
@@ -630,7 +667,8 @@ public class TestGetClient extends BaseClientTest {
         ForestRequest<String> request = getClient.testUrl4(url);
         assertThat(request.ref()).isEqualTo("?ref=ok");
         request.port(server.getPort());
-        ForestResponse<String> response = request.execute(new TypeReference<ForestResponse<String>>() {});
+        ForestResponse<String> response = request.execute(new TypeReference<ForestResponse<String>>() {
+        });
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
@@ -653,7 +691,8 @@ public class TestGetClient extends BaseClientTest {
         ForestRequest<String> request = getClient.testUrl4(url);
         assertThat(request.ref()).isEqualTo("?ref=ok");
         request.port(server.getPort());
-        ForestResponse<String> response = request.execute(new TypeReference<ForestResponse<String>>() {});
+        ForestResponse<String> response = request.execute(new TypeReference<ForestResponse<String>>() {
+        });
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
@@ -673,7 +712,8 @@ public class TestGetClient extends BaseClientTest {
         ForestRequest<String> request = getClient.testUrl4(url);
         assertThat(request.ref()).isEqualTo("xxx/yyy");
         request.port(server.getPort());
-        ForestResponse<String> response = request.execute(new TypeReference<ForestResponse<String>>() {});
+        ForestResponse<String> response = request.execute(new TypeReference<ForestResponse<String>>() {
+        });
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
@@ -820,7 +860,6 @@ public class TestGetClient extends BaseClientTest {
         assertThat(url.getPort()).isEqualTo(443);
         assertThat(request.getUrl()).isEqualTo("https://forest.dtflyx.com/xxx");
     }
-
 
 
     @Test
@@ -1053,7 +1092,7 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Type", "text/plain")
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(EXPECTED));
-        String[] usernames = new String[] {"foo", "bar", "user1", "user2"};
+        String[] usernames = new String[]{"foo", "bar", "user1", "user2"};
         assertThat(getClient.repeatableQuery(usernames, "123456"))
                 .isNotNull()
                 .isEqualTo(EXPECTED);
@@ -1164,8 +1203,8 @@ public class TestGetClient extends BaseClientTest {
         String url1 = "http://www.gitee.com";
         String url2 = "http://search.gitee.com?type=repository&q=forest";
         assertThat(urlEncodedClient.getUrlEncoded(url1, url2, "中文", "AbcD12#$iTXI", "il&felUFO3o=P", "中文内容"))
-            .isNotNull()
-            .isEqualTo(EXPECTED);
+                .isNotNull()
+                .isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertMethodEquals("GET")
                 .assertPathEquals("/encoded/")

@@ -9,6 +9,7 @@ import com.dtflys.forest.callback.OnRetry;
 import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.callback.RetryWhen;
+import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestRequest;
@@ -85,11 +86,14 @@ public interface Interceptor<T> extends
     /**
      * 在请求体数据序列化后，发送请求数据前调用该方法
      * <p>默认为什么都不做
+     * <p>注: mutlipart/data类型的文件上传格式的 Body 数据不会调用该回调函数</>
      *
      * @param request Forest请求对象
-     * @param data 序列化后的请求体数据
+     * @param encoder Forest转换器
+     * @param encodedData 序列化后的请求体数据
      */
-    default void onBodyEncode(ForestRequest request, byte[] data) {
+    default byte[] onBodyEncode(ForestRequest request, ForestEncoder encoder, byte[] encodedData) {
+        return encodedData;
     }
 
     /**
