@@ -12,13 +12,13 @@
     <img src="https://gitee.com/dromara/forest/badge/star.svg" alt="Gitee Stars">
 </a>
 <!--
-<a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.5.27/jar">
+<a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.5.28/jar">
     <img src="https://img.shields.io/badge/maven%20central-1.5.1-brightgreen.svg" alt="Maven Central">
 </a>
 -->
 <!--
-<a href="https://gitee.com/dromara/forest/releases/v1.5.27">
-    <img src="https://img.shields.io/badge/release-v1.5.27" alt="Release">
+<a href="https://gitee.com/dromara/forest/releases/v1.5.28">
+    <img src="https://img.shields.io/badge/release-v1.5.28" alt="Release">
 </a>
 -->
 <a href="https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html">
