@@ -24,6 +24,8 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.auth.BasicAuth;
+import com.dtflys.forest.auth.ForestAuthenticator;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.backend.HttpExecutor;
@@ -223,6 +225,13 @@ public class ForestRequest<T> implements HasURL {
      * @since 1.5.27
      */
     private ForestAsyncMode asyncMode = ForestAsyncMode.PLATFORM;
+
+    /**
+     * 请求认证器
+     *
+     * @since 1.5.28
+     */
+    private ForestAuthenticator authenticator = new BasicAuth();
 
     /**
      * 是否打开自动重定向
@@ -671,6 +680,19 @@ public class ForestRequest<T> implements HasURL {
      */
     public String getUserInfo() {
         return this.url.getUserInfo();
+    }
+
+    /**
+     * 获取URL用户验证信息
+     *
+     * <p>包含在URL中的用户验证信息，比如:
+     * <p>URL http://xxx:yyy@localhost:8080 中 xxx:yyy 的部分为用户信息
+     * <p>其中，xxx为用户名，yyy为用户密码
+     *
+     * @return URL用户验证信息
+     */
+    public String userInfo() {
+        return getUserInfo();
     }
 
     /**
@@ -2028,12 +2050,58 @@ public class ForestRequest<T> implements HasURL {
      * <p>该字段只有在 async = true 时有效</p>
      *
      * @param asyncMode 异步模式
-     * @return {@link ForestAsyncMode}枚举实例
+     * @return {@link ForestRequest}类实例
      * @since 1.5.27
      */
     public ForestRequest<T> asyncMode(ForestAsyncMode asyncMode) {
         return setAsyncMode(asyncMode);
     }
+
+
+    /**
+     * 获取请求认证器
+     *
+     * @return 请求认证器, {@link ForestAuthenticator}接口实例
+     * @since 1.5.28
+     */
+    public ForestAuthenticator getAuthenticator() {
+        return authenticator;
+    }
+
+    /**
+     * 设置请求认证器
+     *
+     * @param authenticator 请求认证器, {@link ForestAuthenticator}接口实例
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.28
+     */
+    public ForestRequest<T> setAuthenticator(ForestAuthenticator authenticator) {
+        this.authenticator = authenticator;
+        return this;
+    }
+
+    /**
+     * 获取请求认证器
+     *
+     * @return 请求认证器, {@link ForestAuthenticator}接口实例
+     * @since 1.5.28
+     */
+    public ForestAuthenticator authenticator() {
+        return authenticator;
+    }
+
+    /**
+     * 设置请求认证器
+     *
+     * @param authenticator 请求认证器, {@link ForestAuthenticator}接口实例
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.28
+     */
+    public ForestRequest<T> authenticator(ForestAuthenticator authenticator) {
+        this.authenticator = authenticator;
+        return this;
+    }
+
 
     /**
      * 是否打开自动重定向
@@ -4497,6 +4565,10 @@ public class ForestRequest<T> implements HasURL {
         processRedirectionRequest();
         // 执行 beforeExecute
         if (interceptorChain.beforeExecute(this)) {
+            // 认证信息增强
+            if (this.authenticator != null) {
+                this.authenticator.enhanceAuthorization(this);
+            }
             this.url.mergeAddress().checkAndComplete();
             ForestCookies cookies = new ForestCookies();
             lifeCycleHandler.handleLoadCookie(this, cookies);

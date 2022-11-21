@@ -2,6 +2,8 @@ package com.dtflys.test;
 
 import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.Forest;
+import com.dtflys.forest.auth.BasicAuth;
+import com.dtflys.forest.auth.ForestAuthenticator;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.converter.ForestEncoder;
@@ -270,6 +272,40 @@ public class TestGenericForestClient extends BaseClientTest {
         mockRequest(server)
                 .assertPathEquals("/")
                 .assertQueryEquals("a=1&b=2&c=3");
+    }
+
+
+    @Test
+    public void testAuth_UsernamePassword() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        ForestRequest request =
+                Forest.get("http://foo:bar@localhost:" + server.getPort() + "/xxx");
+        assertThat(request.userInfo()).isEqualTo("foo:bar");
+        request.execute();
+        mockRequest(server)
+                .assertHeaderEquals("Authorization", "Basic Zm9vOmJhcg==");
+    }
+
+    @Test
+    public void testAuth_BasicAuth() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.get("/")
+                .port(server.getPort())
+                .authenticator(new BasicAuth("foo", "bar"))
+                .execute();
+        mockRequest(server)
+                .assertHeaderEquals("Authorization", "Basic Zm9vOmJhcg==");
+    }
+
+    @Test
+    public void testAuth_BasicAuth2() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.get("/")
+                .port(server.getPort())
+                .authenticator(new BasicAuth("foo:bar"))
+                .execute();
+        mockRequest(server)
+                .assertHeaderEquals("Authorization", "Basic Zm9vOmJhcg==");
     }
 
 
@@ -586,7 +622,7 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_change_base_path5() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        ForestRequest request =  Forest.get("/A")
+        ForestRequest request = Forest.get("/A")
                 .basePath("http://localhost:" + server.getPort() + "/X1/X2");
         String result = request.executeAsString();
         assertThat(request.basePath()).isEqualTo("/X1/X2");
@@ -1156,7 +1192,7 @@ public class TestGenericForestClient extends BaseClientTest {
                         return (str + "&c=3").getBytes();
                     }
                 })
-               .addInterceptor(new Interceptor() {
+                .addInterceptor(new Interceptor() {
                     @Override
                     public byte[] onBodyEncode(ForestRequest request, ForestEncoder encoder, byte[] encodedData) {
                         String str = new String(encodedData);
@@ -1291,7 +1327,8 @@ public class TestGenericForestClient extends BaseClientTest {
                 .contentTypeMultipartFormData()
                 .addFile("file", file)
                 .executeAsResponse()
-                .get(new TypeReference<Result<Integer>>() {});
+                .get(new TypeReference<Result<Integer>>() {
+                });
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(1);
         assertThat(result.getData()).isEqualTo(2);
@@ -1411,7 +1448,8 @@ public class TestGenericForestClient extends BaseClientTest {
                 .addQuery("a", "1")
                 .executeAsFuture()
                 .await()
-                .get(new TypeReference<Map<String, Object>>() {});
+                .get(new TypeReference<Map<String, Object>>() {
+                });
         mockRequest(server)
                 .assertPathEquals("/")
                 .assertQueryEquals("a=1");
