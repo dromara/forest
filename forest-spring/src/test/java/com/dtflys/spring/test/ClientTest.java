@@ -2,6 +2,7 @@ package com.dtflys.spring.test;
 
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.http.ForestAsyncMode;
 import com.dtflys.spring.test.client2.GithubClient;
 import junit.framework.TestCase;
 import com.dtflys.spring.test.client0.BeastshopClient;
@@ -35,6 +36,7 @@ public class ClientTest extends TestCase {
         assertThat(configuration.getMaxRequestQueueSize()).isEqualTo(300);
         assertThat(configuration.getMaxAsyncThreadSize()).isEqualTo(256);
         assertThat(configuration.getMaxAsyncQueueSize()).isEqualTo(128);
+        assertThat(configuration.getAsyncMode()).isEqualTo(ForestAsyncMode.KOTLIN_COROUTINE);
         Object baseUrl = configuration.getVariableValue("baseUrl");
         assertThat(baseUrl).isNotNull().isEqualTo("http://www.thebeastshop.com");
     }
