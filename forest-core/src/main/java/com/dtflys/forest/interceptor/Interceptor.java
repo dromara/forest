@@ -86,7 +86,7 @@ public interface Interceptor<T> extends
     /**
      * 在请求体数据序列化后，发送请求数据前调用该方法
      * <p>默认为什么都不做
-     * <p>注: mutlipart/data类型的文件上传格式的 Body 数据不会调用该回调函数</>
+     * <p>注: mutlipart/data类型的文件上传格式的 Body 数据不会调用该回调函数
      *
      * @param request Forest请求对象
      * @param encoder Forest转换器
