@@ -40,6 +40,8 @@ public class ForestProxy implements HasURL {
 
     private final int port;
 
+    private String charset;
+
     private String username;
 
     private String password;
@@ -87,6 +89,14 @@ public class ForestProxy implements HasURL {
     public ForestProxy setUsername(String username) {
         this.username = username;
         return this;
+    }
+
+    public String getCharset() {
+        return charset;
+    }
+
+    public void setCharset(String charset) {
+        this.charset = charset;
     }
 
     /**

@@ -7,10 +7,12 @@ import com.dtflys.forest.backend.httpclient.HttpclientBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.LifeCycleHandler;
+import com.dtflys.forest.http.ForestHeaderMap;
 import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.TimeUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -26,6 +28,11 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.message.BasicHeader;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -132,6 +139,15 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
                                     forestProxy.getUsername(),
                                     forestProxy.getPassword()));
                     builder.setDefaultCredentialsProvider(provider);
+                    ForestHeaderMap proxyHeaders = forestProxy.getHeaders();
+                    if (!proxyHeaders.isEmpty()) {
+                        List<Header> proxyHeaderList = new LinkedList<>();
+                        for (Map.Entry<String, String> entry : proxyHeaders.entrySet()) {
+                            Header proxyHeader = new BasicHeader(entry.getKey(), entry.getValue());
+                            proxyHeaderList.add(proxyHeader);
+                        }
+                        builder.setDefaultHeaders(proxyHeaderList);
+                    }
                 }
                 configBuilder.setProxy(proxy);
             }

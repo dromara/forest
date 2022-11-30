@@ -1,5 +1,7 @@
 package com.dtflys.test;
 
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.digest.DigestUtil;
 import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.auth.BasicAuth;
@@ -12,6 +14,7 @@ import com.dtflys.forest.http.ForestAddress;
 import com.dtflys.forest.http.ForestAsyncMode;
 import com.dtflys.forest.http.ForestFuture;
 import com.dtflys.forest.http.ForestHeader;
+import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestURL;
@@ -1780,4 +1783,25 @@ public class TestGenericForestClient extends BaseClientTest {
                         ForestProgress::getRequest)
                 .contains(true, 1D, response.getRequest());
     }
+
+    @Test
+    public void testProxy() {
+        String usrename = "ZF202211306639ELHsu8";
+        String password = "737cf5af45df420aaab8165de41fa29d";
+        long times = System.currentTimeMillis() / 1000;
+        String planText = StrUtil.format("orderno={},secret={},timestamp={}", usrename, password, times);
+        String sign = DigestUtil.md5Hex(planText).toUpperCase();
+        String authorization = StrUtil.format("sign={}&orderno={}&timestamp={}", sign, usrename, times);
+        ForestProxy proxy = new ForestProxy("forward.xdaili.cn", 80)
+                .setUsername(usrename)
+                .setPassword(password)
+                .addHeader("Proxy-Authorization", authorization);
+
+        String ret = Forest.get("https://cip.cc")
+                .proxy(proxy)
+                .executeAsString();
+
+        System.out.println(ret);
+    }
+
 }
