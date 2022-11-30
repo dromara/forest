@@ -130,8 +130,7 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
             ForestProxy forestProxy = request.getProxy();
             if (forestProxy != null) {
                 HttpHost proxy = new HttpHost(forestProxy.getHost(), forestProxy.getPort());
-                if (StringUtils.isNotEmpty(forestProxy.getUsername()) &&
-                        StringUtils.isNotEmpty(forestProxy.getPassword())) {
+                if (StringUtils.isNotEmpty(forestProxy.getUsername()) || !forestProxy.getHeaders().isEmpty()) {
                     CredentialsProvider provider = new BasicCredentialsProvider();
                     provider.setCredentials(
                             new AuthScope(proxy),

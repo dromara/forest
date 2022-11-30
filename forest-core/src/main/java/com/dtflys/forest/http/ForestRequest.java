@@ -2636,10 +2636,7 @@ public class ForestRequest<T> implements HasURL {
         }
 
         if (proxy != null) {
-            builder.append(",-x=")
-                    .append(proxy.getHost())
-                    .append(":")
-                    .append(proxy.getPort());
+            builder.append(proxy.cacheKey());
         }
 
         return builder.toString();

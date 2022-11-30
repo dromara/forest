@@ -163,7 +163,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
             if (proxy != null) {
                 Proxy okProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxy.getHost(), proxy.getPort()));
                 builder.proxy(okProxy);
-                if (StringUtils.isNotEmpty(proxy.getUsername())) {
+                if (StringUtils.isNotEmpty(proxy.getUsername()) || !proxy.getHeaders().isEmpty()) {
                     builder.proxyAuthenticator(new Authenticator() {
                         @Nullable
                         @Override
@@ -188,7 +188,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
                             ForestHeaderMap proxyHeaders = proxy.getHeaders();
                             if (!proxyHeaders.isEmpty()) {
                                 for (Map.Entry<String, String> entry : proxyHeaders.entrySet()) {
-                                    proxyHeaders.addHeader(entry.getKey(), entry.getValue());
+                                    proxyBuilder.addHeader(entry.getKey(), entry.getValue());
                                 }
                             }
                             if (!proxyHeaders.containsKey("Proxy-Authorization")) {
