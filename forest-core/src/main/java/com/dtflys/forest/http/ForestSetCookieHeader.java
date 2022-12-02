@@ -6,7 +6,7 @@ package com.dtflys.forest.http;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.5.23
  */
-public class ForestSetCookieHeader extends ForestHeader {
+public class ForestSetCookieHeader extends SimpleHeader {
 
     private ForestCookie cookie;
 
@@ -32,12 +32,13 @@ public class ForestSetCookieHeader extends ForestHeader {
     }
 
     @Override
-    public void setValue(String value) {
+    public ForestSetCookieHeader setValue(String value) {
         ForestCookie newCookie = ForestCookie.parse(hasURL.url().toURLString(), value);
         if (newCookie != null) {
             super.setValue(newCookie.toString());
             this.cookie = newCookie;
         }
+        return this;
     }
 
     public ForestCookie getCookie() {

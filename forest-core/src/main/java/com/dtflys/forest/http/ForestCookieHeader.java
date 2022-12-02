@@ -16,7 +16,7 @@ import java.util.Map;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.5.23
  */
-public class ForestCookieHeader extends ForestHeader {
+public class ForestCookieHeader extends SimpleHeader {
 
     private final Map<String, Map<String, ForestCookie>> cookies = new LinkedHashMap<>();
 
