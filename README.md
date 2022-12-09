@@ -422,7 +422,9 @@ String send(@DataVariable("username") String username);
 <td><img height="60px" src="doc/images/logo/logo_hyperchain.png" alt="杭州趣链"></td>
 <td><img height="60px" src="doc/images/logo/logo_ue-one.png" alt="重庆源一科技"></td>
 </tr>
-
+<tr>
+<td><img height="60px" src="doc/images/logo/logo_manyibar.png" alt="满意吧"></td>
+</tr>
 
 </table>
 
