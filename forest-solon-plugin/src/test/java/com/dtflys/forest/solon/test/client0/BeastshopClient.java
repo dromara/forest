@@ -9,6 +9,7 @@ import com.dtflys.forest.solon.test.moudle.TestUser;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-04-20 19:02
  */
+@ForestClient
 @BaseRequest(baseURL = "${baseUrl}", sslProtocol = "TLS")
 public interface BeastshopClient {
 

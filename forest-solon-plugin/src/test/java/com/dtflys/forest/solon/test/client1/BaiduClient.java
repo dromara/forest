@@ -1,5 +1,6 @@
 package com.dtflys.forest.solon.test.client1;
 
+import com.dtflys.forest.annotation.ForestClient;
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.http.ForestResponse;
 
@@ -7,6 +8,7 @@ import com.dtflys.forest.http.ForestResponse;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2018-09-25 18:29
  */
+@ForestClient
 public interface BaiduClient {
 
     @Request(

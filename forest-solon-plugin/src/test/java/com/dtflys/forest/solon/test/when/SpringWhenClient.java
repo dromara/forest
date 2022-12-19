@@ -1,14 +1,12 @@
 package com.dtflys.forest.solon.test.when;
 
-import com.dtflys.forest.annotation.Get;
-import com.dtflys.forest.annotation.Retry;
-import com.dtflys.forest.annotation.Success;
-import com.dtflys.forest.annotation.Var;
+import com.dtflys.forest.annotation.*;
 import com.dtflys.forest.callback.DefaultRetryWhen;
 import com.dtflys.forest.callback.DefaultSuccessWhen;
 import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnSuccess;
 
+@ForestClient
 public interface SpringWhenClient {
 
     @Get("http://localhost:${port}/")

@@ -1,9 +1,6 @@
 package com.dtflys.forest.solon.test.client2;
 
-import com.dtflys.forest.annotation.BaseRequest;
-import com.dtflys.forest.annotation.LogEnabled;
-import com.dtflys.forest.annotation.LogHandler;
-import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.annotation.*;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.solon.test.logging.TestLogHandler;
 import com.dtflys.forest.solon.test.logging.TestLogHandler2;
@@ -12,6 +9,7 @@ import com.dtflys.forest.solon.test.logging.TestLogHandler2;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2018-09-25 18:30
  */
+@ForestClient
 @LogHandler(TestLogHandler2.class)
 @LogEnabled(logResponseStatus = true)
 @BaseRequest(baseURL = "#{my-site.base-url}")

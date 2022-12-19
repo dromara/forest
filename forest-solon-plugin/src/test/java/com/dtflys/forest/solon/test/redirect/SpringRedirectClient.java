@@ -1,10 +1,12 @@
 package com.dtflys.forest.solon.test.redirect;
 
 import com.dtflys.forest.annotation.Address;
+import com.dtflys.forest.annotation.ForestClient;
 import com.dtflys.forest.annotation.Post;
 import com.dtflys.forest.annotation.Redirection;
 import com.dtflys.forest.http.ForestResponse;
 
+@ForestClient
 @Address(port = "${port}")
 public interface SpringRedirectClient {
 
