@@ -33,7 +33,7 @@ public class TestAddressSource {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         myAddressSource.setPort(server.getPort());
         ForestRequest<String> request = springAddressClient.testHost();
-        assertThat(request.url().getScheme()).isEqualTo("https");
+        assertThat(request.url().getScheme()).isEqualTo("http");
         assertThat(request.getHost()).isEqualTo("127.0.0.1");
         assertThat(request.getPort()).isEqualTo(server.getPort());
         request.url().setScheme("http");

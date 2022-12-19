@@ -1,8 +1,10 @@
 package com.dtflys.forest.solon.test.array;
 
 import com.dtflys.forest.annotation.Address;
+import com.dtflys.forest.annotation.ForestClient;
 import com.dtflys.forest.annotation.Get;
 
+@ForestClient
 @Address(port = "{port}")
 public interface ArrayClient {
 
