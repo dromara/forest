@@ -2,9 +2,11 @@ package com.dtflys.forest.solon.test;
 
 import cn.hutool.core.date.StopWatch;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.http.ForestAsyncMode;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.logging.LogConfiguration;
+
 import com.dtflys.forest.solon.test.client1.BaiduClient;
 import com.dtflys.forest.solon.test.logging.TestLogHandler;
 import com.dtflys.forest.utils.ForestDataType;
@@ -14,11 +16,12 @@ import org.noear.solon.annotation.Inject;
 import org.noear.solon.test.SolonJUnit4ClassRunner;
 import org.noear.solon.test.SolonTest;
 
+
 import static org.junit.Assert.*;
 
 
 @RunWith(SolonJUnit4ClassRunner.class)
-@SolonTest(value = Test1.class, args = "-env=test1")
+@SolonTest(env = "test1")
 public class Test1 {
 
     @Inject
@@ -44,6 +47,7 @@ public class Test1 {
         assertTrue(forestConfiguration.getLogHandler() instanceof TestLogHandler);
         assertTrue(forestConfiguration.hasFilter("test"));
         assertNotNull(forestConfiguration.getConverter(ForestDataType.BINARY));
+        assertEquals(ForestAsyncMode.KOTLIN_COROUTINE, forestConfiguration.getAsyncMode());
     }
 
     @Test
@@ -54,6 +58,7 @@ public class Test1 {
         sw.stop();
         assertNotNull(response);
         ForestRequest request = response.getRequest();
+        assertEquals(ForestAsyncMode.KOTLIN_COROUTINE, request.asyncMode());
         int reqTimeout = request.getTimeout();
         assertEquals(50, reqTimeout);
         long time = sw.getTotalTimeMillis();

@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 
 
 @RunWith(SolonJUnit4ClassRunner.class)
-@SolonTest(value = Test2.class, args = "-env=test2")
+@SolonTest(env = "test2")
 public class Test2 {
 
     @Inject
@@ -36,8 +36,6 @@ public class Test2 {
         assertEquals(Integer.valueOf(6000), forestConfiguration.getReadTimeout());
         assertEquals(Integer.valueOf(0), forestConfiguration.getMaxRetryCount());
         assertThat(forestConfiguration.isLogEnabled()).isTrue();
-        //assertThat(forestConfiguration.getInterceptorFactory()).isInstanceOf(SpringInterceptorFactory.class);
-        //assertThat(forestConfiguration.getForestObjectFactory()).isInstanceOf(SpringForestObjectFactory.class);
         assertEquals(1, forestConfiguration.getInterceptors().size());
         assertEquals(GlobalInterceptor.class, forestConfiguration.getInterceptors().get(0));
     }

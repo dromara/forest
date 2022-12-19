@@ -18,7 +18,7 @@ import static org.junit.Assert.assertEquals;
 
 
 @RunWith(SolonJUnit4ClassRunner.class)
-@SolonTest(value = SSLTest.class, args = "-env=ssl")
+@SolonTest(env = "ssl")
 public class SSLTest {
 
     @Inject

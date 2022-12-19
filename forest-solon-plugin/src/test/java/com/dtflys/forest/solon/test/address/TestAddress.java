@@ -13,7 +13,7 @@ import org.noear.solon.test.SolonTest;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @RunWith(SolonJUnit4ClassRunner.class)
-@SolonTest(value = TestAddress.class, args = "-env=address")
+@SolonTest(env = "address")
 public class TestAddress {
 
     public final static String EXPECTED = "{\"status\": \"ok\"}";
@@ -66,4 +66,6 @@ public class TestAddress {
                 .executeAsString();
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
     }
+
+
 }

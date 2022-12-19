@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 2021-09-24 22:38
  */
 @RunWith(SolonJUnit4ClassRunner.class)
-@SolonTest(value = TestGsonConverter.class, args = "-env=gson")
+@SolonTest(env = "gson")
 public class TestGsonConverter {
 
     @Inject

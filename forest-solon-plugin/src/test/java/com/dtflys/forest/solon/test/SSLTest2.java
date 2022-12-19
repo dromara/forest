@@ -15,12 +15,13 @@ import org.noear.solon.annotation.Inject;
 import org.noear.solon.test.SolonJUnit4ClassRunner;
 import org.noear.solon.test.SolonTest;
 
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 
 
 @RunWith(SolonJUnit4ClassRunner.class)
-@SolonTest(value = SSLTest2.class, args = "-env=ssl2")
+@SolonTest(env = "ssl2")
 public class SSLTest2 {
 
     @Inject

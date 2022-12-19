@@ -3,7 +3,6 @@ package com.dtflys.forest.solon.test.converter;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestFastjsonConverter;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
-import com.dtflys.forest.solon.test.binding.TestBinding;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.noear.solon.annotation.Inject;
@@ -17,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 2021-09-24 22:38
  */
 @RunWith(SolonJUnit4ClassRunner.class)
-@SolonTest(value = TestFastjsonConverter.class, args = "-env=fastjson")
+@SolonTest(env = "fastjson")
 public class TestFastjsonConverter {
 
     @Inject

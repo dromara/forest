@@ -3,11 +3,13 @@ package com.dtflys.forest.solon.test;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.http.ForestAsyncMode;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.ForestLogger;
 import com.dtflys.forest.retryer.BackOffRetryer;
+
 import com.dtflys.forest.solon.test.client0.BeastshopClient;
 import com.dtflys.forest.solon.test.client0.DisturbInterface;
 import com.dtflys.forest.solon.test.moudle.TestUser;
@@ -19,19 +21,20 @@ import org.noear.solon.annotation.Inject;
 import org.noear.solon.test.SolonJUnit4ClassRunner;
 import org.noear.solon.test.SolonTest;
 
+
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SolonJUnit4ClassRunner.class)
-@SolonTest(value = Test0.class, args = "-env=test0")
+@SolonTest(env = "test0")
 public class Test0 {
 
     @Inject
     private BeastshopClient beastshopClient;
 
-    @Inject
+    @Inject(required = false)
     private DisturbInterface disturbInterface;
 
 
@@ -60,6 +63,7 @@ public class Test0 {
         assertEquals("xxx", config0.getVariableValue("myName"));
         assertNotNull(config0.getVariableValue("user"));
         assertTrue(!config0.isLogEnabled());
+        assertEquals(ForestAsyncMode.PLATFORM, config0.getAsyncMode());
         assertEquals(Integer.valueOf(12), config0.getVariableValue("myCount"));
         assertEquals(BackOffRetryer.class, config0.getRetryer());
         assertEquals(Integer.valueOf(5), config0.getMaxRetryCount());
@@ -74,6 +78,7 @@ public class Test0 {
         assertNotNull(response.getContent());
         ForestRequest request = response.getRequest();
         assertNotNull(request);
+        assertEquals(ForestAsyncMode.PLATFORM, request.asyncMode());
         assertEquals("www.thebeastshop.com", request.getHost());
         assertEquals("/static/stores", request.getPath());
     }
@@ -110,6 +115,7 @@ public class Test0 {
         } catch (Throwable th) {
         }
     }
+
 
 
     @Test

@@ -8,12 +8,13 @@ import org.junit.runner.RunWith;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.test.SolonJUnit4ClassRunner;
 import org.noear.solon.test.SolonTest;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @RunWith(SolonJUnit4ClassRunner.class)
-@SolonTest(value = TestWhen.class, args = "-env=when")
+@SolonTest(env = "when")
 public class TestWhen {
 
     public final static String EXPECTED = "{\"status\": \"ok\"}";

@@ -1,6 +1,5 @@
 package com.dtflys.forest.solon.test.override;
 
-
 import org.noear.solon.annotation.Component;
 
 @Component

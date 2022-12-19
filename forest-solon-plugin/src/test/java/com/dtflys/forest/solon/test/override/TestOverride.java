@@ -1,6 +1,6 @@
 package com.dtflys.forest.solon.test.override;
 
-import com.dtflys.forest.solon.test.converter.TestJacksonConverter;
+import com.dtflys.forest.annotation.BindingVar;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.Rule;
@@ -13,7 +13,7 @@ import org.noear.solon.test.SolonTest;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @RunWith(SolonJUnit4ClassRunner.class)
-@SolonTest(value = TestOverride.class, args = "-env=test2")
+@SolonTest(env = "test2")
 public class TestOverride {
 
     public final static String EXPECTED = "{\"status\": \"ok\"}";
@@ -27,7 +27,7 @@ public class TestOverride {
     @Inject
     private MyClientImpl myClientImpl;
 
-    //@BindingVar("port")
+    @BindingVar("port")
     public int getPort() {
         return server.getPort();
     }

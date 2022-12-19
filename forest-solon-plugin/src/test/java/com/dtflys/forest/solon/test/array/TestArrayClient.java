@@ -1,7 +1,6 @@
-package com.dtflys.forest.solon.test.binding;
+package com.dtflys.forest.solon.test.array;
 
 import com.dtflys.forest.annotation.BindingVar;
-import com.dtflys.forest.http.ForestRequest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.Rule;
@@ -14,8 +13,8 @@ import org.noear.solon.test.SolonTest;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @RunWith(SolonJUnit4ClassRunner.class)
-@SolonTest(env = "address")
-public class TestBinding {
+@SolonTest(env = "array")
+public class TestArrayClient {
 
     public final static String EXPECTED = "{\"status\": \"ok\"}";
 
@@ -23,18 +22,25 @@ public class TestBinding {
     public MockWebServer server = new MockWebServer();
 
     @Inject
-    private BindingVarClient bindingVarClient;
+    private ArrayClient arrayClient;
 
     @BindingVar("port")
-    public int getPort() {
+    public int port() {
         return server.getPort();
     }
 
     @Test
-    public void testBindingVar() {
+    public void testArrayFromProperties() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        ForestRequest<String> request = bindingVarClient.testBindingVar();
-        assertThat(request.getPort()).isEqualTo(server.getPort());
+        String result = arrayClient.arrayQueryFromProperties();
+        assertThat(result).isNotNull().isEqualTo(EXPECTED);
+    }
+
+    @Test
+    public void testArrayFromVariables() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String result = arrayClient.arrayQueryFromVariables();
+        assertThat(result).isNotNull().isEqualTo(EXPECTED);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.dtflys.forest.solon.test.redirect;
 
+import com.dtflys.forest.annotation.BindingVar;
 import com.dtflys.forest.http.ForestResponse;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -17,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 2021-09-19 1:23
  */
 @RunWith(SolonJUnit4ClassRunner.class)
-@SolonTest(value = TestNotAutoRedirect.class, args = "-env=notredirect")
+@SolonTest(env = "notredirect")
 public class TestNotAutoRedirect {
 
     public final static String EXPECTED = "{\"status\": \"ok\"}";
@@ -28,7 +29,7 @@ public class TestNotAutoRedirect {
     @Inject
     private SpringRedirectClient springRedirectClient;
 
-    //@BindingVar("port")
+    @BindingVar("port")
     public int getPort() {
         return server.getPort();
     }
