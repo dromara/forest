@@ -1,9 +1,13 @@
 package com.dtflys.test.http;
 
-import com.dtflys.forest.backend.AsyncHttpExecutor;
 import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.forest.backend.httpclient.HttpclientBackend;
+import com.dtflys.forest.backend.okhttp3.OkHttp3Backend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestNetworkException;
+import com.dtflys.forest.http.ForestAsyncMode;
+import com.dtflys.forest.http.ForestFuture;
+import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.test.http.client.GetClient;
 import okhttp3.mockwebserver.MockResponse;
@@ -12,9 +16,12 @@ import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runners.Parameterized;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -55,8 +62,31 @@ public class TestAsyncGetClient extends BaseClientTest {
     public void afterRequests() {
     }
 
-    public TestAsyncGetClient(HttpBackend backend) {
-        super(backend, configuration);
+    private static class AsyncTestParameter {
+        final HttpBackend backend;
+        final ForestAsyncMode asyncMode;
+
+        public AsyncTestParameter(HttpBackend backend, ForestAsyncMode asyncMode) {
+            this.backend = backend;
+            this.asyncMode = asyncMode;
+        }
+    }
+
+    @Parameterized.Parameters
+    public static Collection backendList() {
+        return Arrays.asList(
+                new AsyncTestParameter[][]{
+                        {new AsyncTestParameter(new HttpclientBackend(), ForestAsyncMode.PLATFORM)},
+                        {new AsyncTestParameter(new HttpclientBackend(), ForestAsyncMode.KOTLIN_COROUTINE)},
+                        {new AsyncTestParameter(new OkHttp3Backend(), ForestAsyncMode.PLATFORM)},
+                        {new AsyncTestParameter(new OkHttp3Backend(), ForestAsyncMode.KOTLIN_COROUTINE)},
+                }
+        );
+    }
+
+    public TestAsyncGetClient(AsyncTestParameter parameter) {
+        super(parameter.backend, configuration);
+        configuration.setAsyncMode(parameter.asyncMode);
         configuration.setVariableValue("port", server.getPort());
         getClient = configuration.createInstance(GetClient.class);
     }
@@ -162,6 +192,7 @@ public class TestAsyncGetClient extends BaseClientTest {
         final AtomicBoolean success = new AtomicBoolean(false);
         getClient.asyncSimpleGet(
                 (data, request, response) -> {
+                    assertThat(request.getAsyncMode()).isEqualTo(configuration.getAsyncMode());
                     log.info("data: " + data);
                     success.set(true);
                     assertEquals(EXPECTED, data);
@@ -185,6 +216,7 @@ public class TestAsyncGetClient extends BaseClientTest {
         getClient.asyncSimpleGet(
                 (data, request, response) -> {
                     log.info("data: " + data);
+                    assertThat(request.getAsyncMode()).isEqualTo(configuration.getAsyncMode());
                     success.set(true);
                     assertEquals(EXPECTED, data);
                     latch.countDown();
@@ -207,6 +239,7 @@ public class TestAsyncGetClient extends BaseClientTest {
         getClient.asyncSimpleGet(
                 (data, request, response) -> {
                     log.info("data: " + data);
+                    assertThat(request.getAsyncMode()).isEqualTo(configuration.getAsyncMode());
                     success.set(true);
                     assertThat(response.getContent()).isEqualTo(EXPECTED);
                     latch.countDown();
@@ -227,6 +260,7 @@ public class TestAsyncGetClient extends BaseClientTest {
                 (data, request, response) -> {
                     assertThat(data).isNotNull();
                     assertThat(data.getStatus()).isEqualTo("ok");
+                    assertThat(request.getAsyncMode()).isEqualTo(configuration.getAsyncMode());
                     success.set(true);
                     assertThat(response.getContent()).isEqualTo(EXPECTED);
                     latch.countDown();
@@ -246,6 +280,7 @@ public class TestAsyncGetClient extends BaseClientTest {
         getClient.asyncSimpleGet3(
                 (data, request, response) -> {
                     assertThat(data).isNotNull();
+                    assertThat(request.getAsyncMode()).isEqualTo(configuration.getAsyncMode());
                     assertEquals("ok", data.getStatus());
                     success.set(true);
                     latch.countDown();
@@ -293,19 +328,31 @@ public class TestAsyncGetClient extends BaseClientTest {
         assertTrue(future.isDone());
     }
 
+    @Test
+    public void testAsyncSimpleGetWithForestFuture() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        ForestFuture future = getClient.asyncSimpleGetWithForestFuture();
+        log.info("send async get request");
+        assertThat(future).isNotNull();
+        ForestResponse response = future.await();
+        assertThat(response).isNotNull();
+        String result = response.get(String.class);
+        assertThat(result).isNotNull().isEqualTo(EXPECTED);
+    }
+
+
 
     @Test
-    public void testAsyncVarParamGetError_404() throws InterruptedException {
+    public void testAsyncVarParamGetError_404() {
         server.enqueue(new MockResponse().setResponseCode(404).setBody(EXPECTED));
         final AtomicBoolean success = new AtomicBoolean(false);
         final AtomicBoolean error = new AtomicBoolean(false);
-        CountDownLatch latch = new CountDownLatch(1);
         Future<String> future = getClient.asyncVarParamGet(
                 "error param",
                 (data, request, response) -> {
                     error.set(false);
                     success.set(true);
-                    latch.countDown();
+                    assertThat(request.getAsyncMode()).isEqualTo(configuration.getAsyncMode());
                 }, (ex, request, response) -> {
                     error.set(true);
                     success.set(false);
@@ -313,12 +360,12 @@ public class TestAsyncGetClient extends BaseClientTest {
                     int statusCode = ((ForestNetworkException) ex).getStatusCode();
                     log.error("status code = " + statusCode);
                     assertEquals(404, statusCode);
-                    latch.countDown();
                 });
         log.info("send async get request");
         assertFalse(error.get());
-        assertThat(future).isNotNull();
-        latch.await(5, TimeUnit.SECONDS);
+        assertThat(future).isNotNull().isInstanceOf(ForestFuture.class);
+        ForestFuture<String> forestFuture = (ForestFuture<String>) future;
+        forestFuture.await(5, TimeUnit.SECONDS);
         assertFalse(success.get());
         assertTrue(error.get());
     }
@@ -334,6 +381,7 @@ public class TestAsyncGetClient extends BaseClientTest {
                 (data, request, response) -> {
                     error.set(false);
                     success.set(true);
+                    assertThat(request.getAsyncMode()).isEqualTo(configuration.getAsyncMode());
                     latch.countDown();
                 }, (ex, request, response) -> {
                     error.set(true);

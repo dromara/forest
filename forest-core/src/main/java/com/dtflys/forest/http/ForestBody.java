@@ -103,7 +103,7 @@ public class ForestBody implements List<ForestRequestBody> {
      * 获取请求体中的键值对
      * <p>包含{@link NameValueRequestBody}类型请求体项、以及{@link ObjectRequestBody}类请求体项拆解出来的键值对数据
      *
-     * @return
+     * @return 请求体中的键值对集合 - {@link Map} 对象
      */
     public Map<String, Object> nameValuesMapWithObject() {
         Map<String, Object> map = new LinkedHashMap<>();

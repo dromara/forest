@@ -11,21 +11,8 @@
 <a href="https://gitee.com/dromara/forest">
     <img src="https://gitee.com/dromara/forest/badge/star.svg" alt="Gitee Stars">
 </a>
-<!--
-<a href="https://search.maven.org/artifact/com.dtflys.forest/forest-core/1.5.26/jar">
-    <img src="https://img.shields.io/badge/maven%20central-1.5.1-brightgreen.svg" alt="Maven Central">
-</a>
--->
-<!--
-<a href="https://gitee.com/dromara/forest/releases/v1.5.26">
-    <img src="https://img.shields.io/badge/release-v1.5.26" alt="Release">
-</a>
--->
 <a href="https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html">
     <img src="https://img.shields.io/badge/JDK-1.8+-yellow" alt="JDK">
-</a>
-<a href="https://codecov.io/gh/dromara/forest">
-    <img src="https://codecov.io/gh/dromara/forest/branch/master/graphs/badge.svg?branch=master" alt="Codecov">
 </a>
 
 <a href="https://opensource.org/licenses/mit-license.php">
@@ -53,7 +40,7 @@ Forest是一个高层的、极简的声明式HTTP调用API框架<br>
 -------------------------------------
 * [项目主页](http://forest.dtflyx.com/) 
 
-* [中文文档](http://forest.dtflyx.com/docs/) 
+* [中文文档](https://forest.dtflyx.com/pages/1.5.x/intro/) 
 
 * [JavaDoc](https://apidoc.gitee.com/dt_flys/forest/)
 
@@ -95,7 +82,7 @@ Forest有哪些特性？
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-spring-boot-starter</artifactId>
-    <version>1.5.26</version>
+    <version>1.5.27</version>
 </dependency>
 ```
 
@@ -435,7 +422,9 @@ String send(@DataVariable("username") String username);
 <td><img height="60px" src="doc/images/logo/logo_hyperchain.png" alt="杭州趣链"></td>
 <td><img height="60px" src="doc/images/logo/logo_ue-one.png" alt="重庆源一科技"></td>
 </tr>
-
+<tr>
+<td><img height="60px" src="doc/images/logo/logo_manyibar.png" alt="满意吧"></td>
+</tr>
 
 </table>
 

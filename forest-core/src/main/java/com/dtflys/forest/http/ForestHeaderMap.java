@@ -37,7 +37,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
 
     private final List<ForestHeader> headers;
 
-    private volatile ForestCookieHeader cookieHeader = null;
+    private ForestCookieHeader cookieHeader = null;
 
     private final List<ForestCookie> requestCookies = new LinkedList<>();
 
@@ -116,7 +116,12 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
     public String put(String key, String value) {
         ForestHeader header = getHeader(key);
         if (header != null) {
-            header.setValue(value);
+            if (header instanceof SimpleHeader) {
+                ((SimpleHeader) header).setValue(value);
+            } else {
+                this.remove(header);
+                this.addHeader(key, value);
+            }
         } else if ("Cookie".equalsIgnoreCase(key)) {
             ForestCookie cookie = ForestCookie.parse(hasURL.url().toURLString(), value);
             if (cookie != null) {
@@ -130,7 +135,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
                 addHeader(cookieHeader);
             }
         } else {
-            ForestHeader newHeader = new ForestHeader(key, value);
+            ForestHeader newHeader = new SimpleHeader(key, value);
             addHeader(newHeader);
         }
         return value;
@@ -373,7 +378,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
                 addHeader(cookieHeader);
             }
         } else {
-            addHeader(new ForestHeader(name, value));
+            addHeader(new SimpleHeader(name, value));
         }
     }
 
@@ -396,8 +401,9 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
      */
     public void addCookie(ForestCookie cookie, boolean strict) {
         if (cookieHeader == null) {
-            cookieHeader = new ForestCookieHeader(hasURL);
-            if (cookieHeader.addCookie(cookie, strict)) {
+            ForestCookieHeader cookieHeaderTmp = new ForestCookieHeader(hasURL);
+            if (cookieHeaderTmp.addCookie(cookie, strict)) {
+                cookieHeader = cookieHeaderTmp;
                 addHeader(cookieHeader);
             }
         } else {
@@ -451,7 +457,12 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
     public void setHeader(String name, String value) {
         ForestHeader header = getHeader(name);
         if (header != null) {
-            header.setValue(value);
+            if (header instanceof SimpleHeader) {
+                ((SimpleHeader) header).setValue(value);
+            } else {
+                headers.remove(header);
+                addHeader(name, value);
+            }
         } else {
             addHeader(name, value);
         }

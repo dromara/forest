@@ -59,7 +59,6 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
         }
 
 
-
         if (StringUtils.isEmpty(mineType)) {
             mineType = ContentType.APPLICATION_X_WWW_FORM_URLENCODED;
         }
@@ -71,6 +70,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
         ForestEncoder encoder = request.getEncoder();
         if (encoder != null) {
             byte[] bodyBytes = encoder.encodeRequestBody(request, charset);
+            bodyBytes = lifeCycleHandler.handleBodyEncode(request, encoder, bodyBytes);
             setBinaryBody(httpRequest, request, strCharset, ctypeWithoutParams, bodyBytes, mergeCharset);
             return;
         }
@@ -99,6 +99,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                 bodyEncoder = (ForestEncoder) request.getConfiguration().getConverterMap().get(ForestDataType.TEXT);
             }
             byte[] bodyBytes = bodyEncoder.encodeRequestBody(request, charset);
+            bodyBytes = lifeCycleHandler.handleBodyEncode(request, bodyEncoder, bodyBytes);
             setBinaryBody(httpRequest, request, strCharset, ctypeWithoutParams, bodyBytes, mergeCharset);
         }
     }
@@ -141,6 +142,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
      * @param charset 字符集
      * @param contentType 数据类型
      * @param bytes 字节数组
+     * @param mergeCharset 合并的字符集
      */
     protected abstract void setBinaryBody(T httpReq,
                                  ForestRequest request,

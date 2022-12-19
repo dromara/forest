@@ -27,7 +27,6 @@ package com.dtflys.forest.http;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
-import org.bouncycastle.crypto.tls.URLAndHash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -230,7 +229,15 @@ public class ForestURL {
      *
      * @return URL根路径
      */
-    public String getBasePath() {
+    public String normalizeBasePath() {
+        if (StringUtils.isEmpty(basePath)) {
+            return normalizeBasePath(address.getBasePath());
+        }
+        return normalizeBasePath(basePath);
+    }
+
+
+    private String normalizeBasePath(String basePath) {
         if (StringUtils.isNotEmpty(basePath) && basePath.charAt(0) != '/') {
             return '/' + basePath;
         }
@@ -321,6 +328,9 @@ public class ForestURL {
     }
 
     public String getUserInfo() {
+        if (StringUtils.isEmpty(userInfo) && address != null) {
+            return address.getUserInfo();
+        }
         return userInfo;
     }
 
@@ -546,6 +556,9 @@ public class ForestURL {
             }
             if (URLUtils.isNonePort(port) && StringUtils.isEmpty(originHost)) {
                 port = address.getPort();
+            }
+            if (StringUtils.isEmpty(userInfo)) {
+                userInfo = address.getUserInfo();
             }
             if (StringUtils.isEmpty(basePath)) {
                 setBasePath(address.getBasePath(), false);

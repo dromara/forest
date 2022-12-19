@@ -18,6 +18,7 @@ import com.dtflys.test.http.model.JsonTestList;
 import com.dtflys.test.http.model.JsonTestUser;
 import com.dtflys.test.http.model.JsonTestUser2;
 import com.dtflys.test.http.model.JsonTestUser3;
+import com.dtflys.test.http.model.JsonTestUser4;
 import com.dtflys.test.http.model.UserParam;
 import com.dtflys.test.http.model.XmlTestParam;
 import com.google.common.collect.Lists;
@@ -521,7 +522,60 @@ public class TestPostClient extends BaseClientTest {
     }
 
     @Test
-    public void testPostBodyCnStringWithBodyAnn() throws InterruptedException {
+    public void testPostJsonNullValueFieldInData() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody(CN_EXPECTED));
+        JsonTestUser3 user = new JsonTestUser3();
+        user.setUsername("foo");
+        user.setPassword("123456&&++===");
+        user.setCnName(null);
+        assertThat(postClient.postJsonWithCnCharacters7(user))
+                .isNotNull()
+                .isEqualTo(CN_EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("POST")
+                .assertPathEquals("/json")
+                .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
+                .assertBodyEquals("{\"username\":\"foo\",\"password\":\"123456&&++===\",\"cn_name\":\"null\"}");
+    }
+
+
+    @Test
+    public void testPostJsonWithNullField() {
+        server.enqueue(new MockResponse().setBody(CN_EXPECTED));
+        JsonTestUser3 user = new JsonTestUser3();
+        user.setUsername("foo");
+        user.setPassword("123456&&++===");
+        user.setCnName(null);
+        assertThat(postClient.postJsonWithNullField(user))
+                .isNotNull()
+                .isEqualTo(CN_EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("POST")
+                .assertPathEquals("/json")
+                .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
+                .assertBodyEquals("{\"username\":\"foo\",\"password\":\"123456&&++===\"}");
+    }
+
+    @Test
+    public void testPostJsonWithNullField_NotNull() {
+        server.enqueue(new MockResponse().setBody(CN_EXPECTED));
+        JsonTestUser4 user = new JsonTestUser4();
+        user.setUsername("foo");
+        user.setPassword("123456&&++===");
+        user.setCnName(null);
+        assertThat(postClient.postJsonWithNullField_NotNull(user))
+                .isNotNull()
+                .isEqualTo(CN_EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("POST")
+                .assertPathEquals("/json")
+                .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
+                .assertBodyEquals("{\"username\":\"foo\",\"password\":\"123456&&++===\"}");
+    }
+
+
+    @Test
+    public void testPostBodyCnStringWithBodyAnn() {
         server.enqueue(new MockResponse().setBody(CN_EXPECTED));
         assertThat(postClient.postBodyCnStringWithBodyAnn(
                 "{\"username\":\"foo\",\"password\":\"123456&&++===\",\"cn_name\":\"中文名\"}"))

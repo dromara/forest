@@ -28,6 +28,7 @@ import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Forest请求正向代理
@@ -40,6 +41,8 @@ public class ForestProxy implements HasURL {
 
     private final int port;
 
+    private String charset;
+
     private String username;
 
     private String password;
@@ -49,6 +52,22 @@ public class ForestProxy implements HasURL {
     public ForestProxy(String ip, int port) {
         this.host = ip;
         this.port = port;
+    }
+
+    public String cacheKey() {
+        StringBuilder builder = new StringBuilder(",-x=");
+        if (StringUtils.isNotEmpty(host)) {
+            builder.append(host);
+        }
+        builder.append(":");
+        builder.append(port);
+        if (!headers.isEmpty()) {
+            builder.append(":");
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
+                builder.append("h=").append(entry.getKey()).append(":").append(entry.getValue()).append(";");
+            }
+        }
+        return builder.toString();
     }
 
     /**
@@ -87,6 +106,14 @@ public class ForestProxy implements HasURL {
     public ForestProxy setUsername(String username) {
         this.username = username;
         return this;
+    }
+
+    public String getCharset() {
+        return charset;
+    }
+
+    public void setCharset(String charset) {
+        this.charset = charset;
     }
 
     /**

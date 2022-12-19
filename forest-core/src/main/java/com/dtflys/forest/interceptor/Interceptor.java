@@ -1,5 +1,6 @@
 package com.dtflys.forest.interceptor;
 
+import com.dtflys.forest.callback.OnCanceled;
 import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
@@ -8,6 +9,7 @@ import com.dtflys.forest.callback.OnRetry;
 import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.callback.RetryWhen;
+import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestRequest;
@@ -44,7 +46,8 @@ import com.dtflys.forest.utils.ForestProgress;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-06-26
  */
-public interface Interceptor<T> extends OnSuccess<T>, OnError, OnProgress, OnLoadCookie, OnSaveCookie, OnRetry, OnRedirection {
+public interface Interceptor<T> extends
+        OnSuccess<T>, OnError, OnCanceled, OnProgress, OnLoadCookie, OnSaveCookie, OnRetry, OnRedirection {
 
 
     /**
@@ -83,11 +86,14 @@ public interface Interceptor<T> extends OnSuccess<T>, OnError, OnProgress, OnLoa
     /**
      * 在请求体数据序列化后，发送请求数据前调用该方法
      * <p>默认为什么都不做
+     * <p>注: mutlipart/data类型的文件上传格式的 Body 数据不会调用该回调函数
      *
      * @param request Forest请求对象
-     * @param data 序列化后的请求体数据
+     * @param encoder Forest转换器
+     * @param encodedData 序列化后的请求体数据
      */
-    default void onBodyEncode(ForestRequest request, byte[] data) {
+    default byte[] onBodyEncode(ForestRequest request, ForestEncoder encoder, byte[] encodedData) {
+        return encodedData;
     }
 
     /**
@@ -112,6 +118,17 @@ public interface Interceptor<T> extends OnSuccess<T>, OnError, OnProgress, OnLoa
      */
     @Override
     default void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
+    }
+
+    /**
+     * 默认回调函数: 请求取消后调用该方法
+     * <p>默认为什么都不做
+     *
+     * @param req Forest请求对象
+     * @param res Forest响应对象
+     */
+    @Override
+    default void onCanceled(ForestRequest req, ForestResponse res) {
     }
 
     /**
@@ -208,7 +225,7 @@ public interface Interceptor<T> extends OnSuccess<T>, OnError, OnProgress, OnLoa
      * @param name 属性名称
      * @param clazz 属性值的类型对象
      * @param <T> 属性值类型的泛型
-     * @return
+     * @return Attribute 属性值
      */
     default <T> T getAttribute(ForestRequest request, String name, Class<T> clazz) {
         Object obj = request.getInterceptorAttribute(this.getClass(), name);

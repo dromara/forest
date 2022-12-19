@@ -30,8 +30,8 @@ public class OkHttp3ResponseHandler extends ResponseHandler<Object> {
     }
 
     @Override
-    public void handleFuture(Future<Object> httpResponseFuture) {
-        lifeCycleHandler.handleFuture(httpResponseFuture);
+    public void handleFuture(final ForestRequest request, Future<Object> httpResponseFuture) {
+        lifeCycleHandler.handleFuture(request, httpResponseFuture);
     }
 
 

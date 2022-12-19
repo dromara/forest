@@ -7,6 +7,8 @@ public class JsonTestUser {
     @JSONField(ordinal = 0)
     private String username;
 
+    private String password;
+
     public String getUsername() {
         return username;
     }
@@ -15,4 +17,11 @@ public class JsonTestUser {
         this.username = username;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

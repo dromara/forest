@@ -3,13 +3,16 @@ package com.dtflys.forest.backend.httpclient.conn;
 import com.dtflys.forest.backend.ForestConnectionManager;
 import com.dtflys.forest.backend.HttpConnectionConstants;
 import com.dtflys.forest.backend.httpclient.HttpClientProvider;
+import com.dtflys.forest.backend.httpclient.HttpclientBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.LifeCycleHandler;
+import com.dtflys.forest.http.ForestHeaderMap;
 import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.TimeUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -25,6 +28,11 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.message.BasicHeader;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -34,40 +42,60 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
     private DefaultHttpClientProvider defaultHttpClientProvider;
     private PoolingHttpClientConnectionManager tsConnectionManager;
 
+    private boolean inited = false;
+
     public HttpclientConnectionManager() {
     }
 
     @Override
-    public void init(ForestConfiguration configuration) {
-        try {
-            Integer maxConnections = configuration.getMaxConnections() != null ?
-                    configuration.getMaxConnections() : HttpConnectionConstants.DEFAULT_MAX_TOTAL_CONNECTIONS;
-            Registry<ConnectionSocketFactory> socketFactoryRegistry =
-                    RegistryBuilder.<ConnectionSocketFactory>create()
-                            .register("https", new ForestSSLConnectionFactory())
-                            .register("http", new PlainConnectionSocketFactory())
-                            .build();
-            tsConnectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
-            tsConnectionManager.setMaxTotal(maxConnections);
-            tsConnectionManager.setDefaultMaxPerRoute(Integer.MAX_VALUE);
-            tsConnectionManager.setValidateAfterInactivity(60);
-            defaultHttpClientProvider = new DefaultHttpClientProvider(this);
-        } catch (Throwable th) {
-            throw new ForestRuntimeException(th);
+    public boolean isInitialized() {
+        return inited;
+    }
+
+    @Override
+    public synchronized void init(ForestConfiguration configuration) {
+        if (!inited) {
+            try {
+                Integer maxConnections = configuration.getMaxConnections() != null ?
+                        configuration.getMaxConnections() : HttpConnectionConstants.DEFAULT_MAX_TOTAL_CONNECTIONS;
+                Registry<ConnectionSocketFactory> socketFactoryRegistry =
+                        RegistryBuilder.<ConnectionSocketFactory>create()
+                                .register("https", new ForestSSLConnectionFactory())
+                                .register("http", new PlainConnectionSocketFactory())
+                                .build();
+                tsConnectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
+                tsConnectionManager.setMaxTotal(maxConnections);
+                tsConnectionManager.setDefaultMaxPerRoute(Integer.MAX_VALUE);
+                tsConnectionManager.setValidateAfterInactivity(60);
+                defaultHttpClientProvider = new DefaultHttpClientProvider();
+                inited = true;
+            } catch (Throwable th) {
+                throw new ForestRuntimeException(th);
+            }
         }
     }
 
 
     public static class DefaultHttpClientProvider implements HttpClientProvider {
 
-        private final HttpclientConnectionManager connectionManager;
-
-        public DefaultHttpClientProvider(HttpclientConnectionManager connectionManager) {
-            this.connectionManager = connectionManager;
-        }
+        private HttpclientConnectionManager connectionManager;
 
         @Override
         public HttpClient getClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
+            if (connectionManager == null) {
+                synchronized (this) {
+                    if (connectionManager == null) {
+                        ForestConfiguration configuration = request.getConfiguration();
+                        connectionManager = (HttpclientConnectionManager) configuration
+                                .getBackendSelector()
+                                .select(HttpclientBackend.NAME)
+                                .getConnectionManager();
+                        if (!connectionManager.isInitialized()) {
+                            connectionManager.init(configuration);
+                        }
+                    }
+                }
+            }
             HttpClientBuilder builder = HttpClients.custom();
             builder.setConnectionManager(connectionManager.tsConnectionManager);
 
@@ -102,8 +130,7 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
             ForestProxy forestProxy = request.getProxy();
             if (forestProxy != null) {
                 HttpHost proxy = new HttpHost(forestProxy.getHost(), forestProxy.getPort());
-                if (StringUtils.isNotEmpty(forestProxy.getUsername()) &&
-                        StringUtils.isNotEmpty(forestProxy.getPassword())) {
+                if (StringUtils.isNotEmpty(forestProxy.getUsername()) || !forestProxy.getHeaders().isEmpty()) {
                     CredentialsProvider provider = new BasicCredentialsProvider();
                     provider.setCredentials(
                             new AuthScope(proxy),
@@ -111,6 +138,15 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
                                     forestProxy.getUsername(),
                                     forestProxy.getPassword()));
                     builder.setDefaultCredentialsProvider(provider);
+                    ForestHeaderMap proxyHeaders = forestProxy.getHeaders();
+                    if (!proxyHeaders.isEmpty()) {
+                        List<Header> proxyHeaderList = new LinkedList<>();
+                        for (Map.Entry<String, String> entry : proxyHeaders.entrySet()) {
+                            Header proxyHeader = new BasicHeader(entry.getKey(), entry.getValue());
+                            proxyHeaderList.add(proxyHeader);
+                        }
+                        builder.setDefaultHeaders(proxyHeaderList);
+                    }
                 }
                 configBuilder.setProxy(proxy);
             }
@@ -122,7 +158,7 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
         }
     }
 
-    public HttpClient getHttpClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
+    public HttpClient getHttpClient(final ForestRequest request, final LifeCycleHandler lifeCycleHandler) {
         final String key = "hc;" + request.clientKey();
         final boolean canCacheClient = request.cacheBackendClient();
         if (canCacheClient) {

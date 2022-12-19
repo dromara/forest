@@ -97,6 +97,7 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
                 .addPropertyValue("maxAsyncQueueSize", forestConfigurationProperties.getMaxAsyncQueueSize())
                 .addPropertyValue("maxConnections", forestConfigurationProperties.getMaxConnections())
                 .addPropertyValue("maxRouteConnections", forestConfigurationProperties.getMaxRouteConnections())
+                .addPropertyValue("asyncMode", forestConfigurationProperties.getAsyncMode())
                 .addPropertyValue("timeout", forestConfigurationProperties.getTimeout())
                 .addPropertyValue("connectTimeout", forestConfigurationProperties.getConnectTimeoutMillis())
                 .addPropertyValue("readTimeout", forestConfigurationProperties.getReadTimeoutMillis())
@@ -244,6 +245,7 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
                 sslKeyStoreProperties.getCertPass(),
                 sslKeyStoreProperties.getProtocols(),
                 sslKeyStoreProperties.getCipherSuites(),
+                sslKeyStoreProperties.getTrustManager(),
                 sslKeyStoreProperties.getHostnameVerifier(),
                 sslKeyStoreProperties.getSslSocketFactoryBuilder()
         );

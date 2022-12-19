@@ -16,7 +16,7 @@ import java.util.Map;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.5.23
  */
-public class ForestCookieHeader extends ForestHeader {
+public class ForestCookieHeader extends SimpleHeader {
 
     private final Map<String, Map<String, ForestCookie>> cookies = new LinkedHashMap<>();
 
@@ -63,7 +63,7 @@ public class ForestCookieHeader extends ForestHeader {
     public ForestCookie getCookie(String name) {
         for (Map.Entry<String, Map<String, ForestCookie>> entry : cookies.entrySet()) {
             Map<String, ForestCookie> map = entry.getValue();
-            ForestCookie  cookie = map.get(name.toLowerCase());
+            ForestCookie cookie = map.get(name.toLowerCase());
             if (cookie != null) {
                 return cookie;
             }
@@ -74,6 +74,7 @@ public class ForestCookieHeader extends ForestHeader {
     /**
      * 根据 Path 和 Cookie 名称获取单个 Cookie
      *
+     * @param path 路径
      * @param name Cookie 名称
      * @return {@link ForestCookie}对象实例
      */

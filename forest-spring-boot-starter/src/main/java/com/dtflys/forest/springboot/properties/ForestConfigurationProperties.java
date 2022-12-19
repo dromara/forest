@@ -3,6 +3,7 @@ package com.dtflys.forest.springboot.properties;
 import com.dtflys.forest.callback.AddressSource;
 import com.dtflys.forest.callback.RetryWhen;
 import com.dtflys.forest.callback.SuccessWhen;
+import com.dtflys.forest.http.ForestAsyncMode;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.ForestLogHandler;
@@ -24,35 +25,40 @@ import java.util.Map;
 public class ForestConfigurationProperties {
 
     /**
-     * spring bean id of forest configuration
+     * Spring bean id of forest configuration
      */
     private String beanId;
 
     /**
-     * maximum number of conntections allowed
+     * Maximum number of conntections allowed
      */
     private int maxConnections = 500;
 
     /**
-     * maximum number of connections allowed per route
+     * Maximum number of connections allowed per route
      */
     private int maxRouteConnections = 500;
 
 
     /**
-     * maximum number of requests queue
+     * Maximum number of requests queue
      */
     private int maxRequestQueueSize = 200;
 
     /**
-     * maximum number of async requests threads
+     * Maximum number of async requests threads
      */
     private int maxAsyncThreadSize = 200;
 
     /**
-     * capacity of async requests queue
+     * Capacity of async requests queue
      */
     private int maxAsyncQueueSize = 100;
+
+    /**
+     * Parallel mode of async requests
+     */
+    private ForestAsyncMode asyncMode = ForestAsyncMode.PLATFORM;
 
     /**
      * Timeout in milliseconds
@@ -244,6 +250,14 @@ public class ForestConfigurationProperties {
 
     public void setMaxAsyncQueueSize(int maxAsyncQueueSize) {
         this.maxAsyncQueueSize = maxAsyncQueueSize;
+    }
+
+    public ForestAsyncMode getAsyncMode() {
+        return asyncMode;
+    }
+
+    public void setAsyncMode(ForestAsyncMode asyncMode) {
+        this.asyncMode = asyncMode;
     }
 
     public int getTimeout() {

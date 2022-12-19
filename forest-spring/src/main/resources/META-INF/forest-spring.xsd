@@ -237,7 +237,7 @@
             <xsd:annotation>
                 <xsd:documentation>
                     <![CDATA[
-                           获取全局的请求失败重试策略类
+                           全局的请求失败重试策略类
                         ]]>
                 </xsd:documentation>
             </xsd:annotation>
@@ -251,6 +251,17 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+
+        <xsd:attribute name="asyncMode" type="asyncModeType" default="platform">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           全局异步模式，默认为 platform
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+
         <xsd:attribute name="logEnabled" type="xsd:boolean" use="optional" default="true">
             <xsd:annotation>
                 <xsd:documentation>
@@ -308,6 +319,13 @@
         </xsd:attribute>
 
     </xsd:complexType>
+
+    <xsd:simpleType name="asyncModeType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="platform"></xsd:enumeration>
+            <xsd:enumeration value="kotlin_coroutine"></xsd:enumeration>
+        </xsd:restriction>
+    </xsd:simpleType>
 
 
     <xsd:complexType name="variableType" mixed="true">

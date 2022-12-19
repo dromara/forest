@@ -82,7 +82,7 @@ import java.lang.annotation.Target;
 @Documented
 @ParamLifeCycle(BodyLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
+@Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 public @interface Body {
 
     /**

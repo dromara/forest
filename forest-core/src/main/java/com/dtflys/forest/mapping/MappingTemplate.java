@@ -426,20 +426,20 @@ public class MappingTemplate {
                     } while (Character.isDigit(ch));
                     if (ch == 'f' || ch == 'F') {
                         nextChar();
-                        return new MappingFloat(Float.valueOf(builder.toString()));
+                        return new MappingFloat(Float.parseFloat(builder.toString()));
                     }
                     if (ch == 'd' || ch == 'D') {
                         nextChar();
-                        return new MappingDouble(Double.valueOf(builder.toString()));
+                        return new MappingDouble(Double.parseDouble(builder.toString()));
                     }
-                    return new MappingFloat(Float.valueOf(builder.toString()));
+                    return new MappingFloat(Float.parseFloat(builder.toString()));
                 }
             }
             else if (ch == 'l' || ch == 'L') {
-                return new MappingLong(Long.valueOf(builder.toString()));
+                return new MappingLong(Long.parseLong(builder.toString()));
             }
             else {
-                return new MappingInteger(Integer.valueOf(builder.toString()));
+                return new MappingInteger(Integer.parseInt(builder.toString()));
             }
         }
         else if (Character.isAlphabetic(ch) || ch == '_') {
@@ -475,8 +475,8 @@ public class MappingTemplate {
                 if (param != null && param.isUrlEncode()) {
                     val = URLUtils.pathEncode(String.valueOf(val), param.getCharset());
                 }
-                return String.valueOf(val);
             }
+            return String.valueOf(val);
         }
         return null;
     }

@@ -20,6 +20,9 @@ public class HttpclientBackend extends AbstractHttpBackend {
 
     public final static String NAME = "httpclient";
 
+    private static final String HTTPCLIENT_REQUEST_KEY = "#httpclient_request";
+
+
     @Override
     public String getName() {
         return NAME;

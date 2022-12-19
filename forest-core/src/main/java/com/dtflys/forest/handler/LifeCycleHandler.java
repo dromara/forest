@@ -1,5 +1,6 @@
 package com.dtflys.forest.handler;
 
+import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestRequest;
@@ -27,13 +28,17 @@ public interface LifeCycleHandler {
 
     Object handleResultType(ForestRequest request, ForestResponse response, Type resultType, Class resultClass);
 
-    Object handleSuccess(Object resultData, ForestRequest request, ForestResponse response);
+    void handleSuccess(Object resultData, ForestRequest request, ForestResponse response);
 
     void handleInvokeMethod(ForestRequest request, ForestMethod method, Object[] args);
 
     Object handleError(ForestRequest request, ForestResponse response);
 
     Object handleError(ForestRequest request, ForestResponse response, Throwable ex);
+
+    byte[] handleBodyEncode(ForestRequest request, ForestEncoder encoder, byte[] encodedData);
+
+    void handleCanceled(ForestRequest request, ForestResponse response);
 
     void handleProgress(ForestRequest request, ForestProgress progress);
 
@@ -43,7 +48,7 @@ public interface LifeCycleHandler {
 
     Object handleResult(Object resultData);
 
-    Object handleFuture(Future resultData);
+    Object handleFuture(ForestRequest request, Future resultData);
 
     Type getOnSuccessClassGenericType();
 

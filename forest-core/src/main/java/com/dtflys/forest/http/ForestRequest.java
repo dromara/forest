@@ -24,9 +24,12 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.auth.BasicAuth;
+import com.dtflys.forest.auth.ForestAuthenticator;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.backend.HttpExecutor;
+import com.dtflys.forest.callback.OnCanceled;
 import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
@@ -80,10 +83,10 @@ import com.dtflys.forest.utils.URLUtils;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
 import java.io.File;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
@@ -99,6 +102,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import static com.dtflys.forest.mapping.MappingParameter.TARGET_BODY;
@@ -149,6 +153,12 @@ public class ForestRequest<T> implements HasURL {
      */
     private boolean cacheBackendClient = true;
 
+    /**
+     * HTTP 执行器
+     *
+     * @since 1.5.27
+     */
+    private HttpExecutor executor;
 
     /**
      * 生命周期处理器
@@ -160,6 +170,13 @@ public class ForestRequest<T> implements HasURL {
      * <p>默认为 HTTP 1.1
      */
     private ForestProtocol protocol = ForestProtocol.HTTP_1_1;
+
+    /**
+     * 请求是否以取消
+     *
+     * @since 1.5.27
+     */
+    private volatile boolean canceled = false;
 
     /**
      * URL路径
@@ -200,6 +217,21 @@ public class ForestRequest<T> implements HasURL {
      * 是否异步
      */
     private boolean async;
+
+    /**
+     * 异步请求模式
+     * <p>该字段只有在 async = true 时有效</p>
+     *
+     * @since 1.5.27
+     */
+    private ForestAsyncMode asyncMode = ForestAsyncMode.PLATFORM;
+
+    /**
+     * 请求认证器
+     *
+     * @since 1.5.28
+     */
+    private ForestAuthenticator authenticator = new BasicAuth();
 
     /**
      * 是否打开自动重定向
@@ -290,6 +322,11 @@ public class ForestRequest<T> implements HasURL {
      * 回调函数：请求失败时调用
      */
     private OnError onError;
+
+    /**
+     * 回调函数: 请求取消后调用
+     */
+    private OnCanceled onCanceled;
 
     /**
      * 回调函数: 请求是否成功
@@ -411,6 +448,11 @@ public class ForestRequest<T> implements HasURL {
     private HostnameVerifier hostnameVerifier;
 
     /**
+     * SSL 信任管理器
+     */
+    private TrustManager trustManager;
+
+    /**
      * SSL Socket 工厂构造器
      */
     private SSLSocketFactoryBuilder sslSocketFactoryBuilder;
@@ -475,12 +517,22 @@ public class ForestRequest<T> implements HasURL {
     }
 
     /**
+     * 请求是否以取消
+     *
+     * @return {@code true}: 请求已被取消; {@code false}: 未被取消
+     */
+    public boolean isCanceled() {
+        return canceled;
+    }
+
+    /**
      * 获取请求URL
      * <p>不同于 {@link ForestRequest#getUrl()} 方法,
      * <p>此方法返回的URL为 {@link ForestURL} 对象实例
      *
      * @return {@link ForestURL} 对象实例
      */
+    @Override
     public ForestURL url() {
         return this.url;
     }
@@ -628,6 +680,19 @@ public class ForestRequest<T> implements HasURL {
      */
     public String getUserInfo() {
         return this.url.getUserInfo();
+    }
+
+    /**
+     * 获取URL用户验证信息
+     *
+     * <p>包含在URL中的用户验证信息，比如:
+     * <p>URL http://xxx:yyy@localhost:8080 中 xxx:yyy 的部分为用户信息
+     * <p>其中，xxx为用户名，yyy为用户密码
+     *
+     * @return URL用户验证信息
+     */
+    public String userInfo() {
+        return getUserInfo();
     }
 
     /**
@@ -900,7 +965,7 @@ public class ForestRequest<T> implements HasURL {
      * @return URL根路径
      */
     public String getBasePath() {
-        return this.url.getBasePath();
+        return this.url.normalizeBasePath();
     }
 
     /**
@@ -1172,7 +1237,7 @@ public class ForestRequest<T> implements HasURL {
      * 设置是否缓存 HTTP 后端 Client 对象
      *
      * @param cacheBackendClient {@code true}: 缓存 CLient 对象, {@code false}: 不缓存
-     *
+     * @return {@link ForestRequest}对象实例
      * @since 1.5.23
      */
     public ForestRequest<T> cacheBackendClient(boolean cacheBackendClient) {
@@ -1306,9 +1371,9 @@ public class ForestRequest<T> implements HasURL {
      */
     public String getQueryString() {
         StringBuilder builder = new StringBuilder();
-        Iterator<ForestQueryParameter> iterator = query.queryValues().iterator();
+        Iterator<SimpleQueryParameter> iterator = query.queryValues().iterator();
         while (iterator.hasNext()) {
-            ForestQueryParameter query = iterator.next();
+            SimpleQueryParameter query = iterator.next();
             if (query != null) {
                 String name = query.getName();
                 Object value = query.getValue();
@@ -1532,10 +1597,10 @@ public class ForestRequest<T> implements HasURL {
     /**
      * 添加请求中的Query参数
      *
-     * @param queryParameter Query参数，{@link ForestQueryParameter}对象实例
+     * @param queryParameter Query参数，{@link SimpleQueryParameter}对象实例
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> addQuery(ForestQueryParameter queryParameter) {
+    public ForestRequest<T> addQuery(SimpleQueryParameter queryParameter) {
         this.query.addQuery(queryParameter);
         return this;
     }
@@ -1543,11 +1608,11 @@ public class ForestRequest<T> implements HasURL {
     /**
      * 批量添加请求中的Query参数
      *
-     * @param queryParameters Query参数集合，{@link ForestQueryParameter}对象实例集合
+     * @param queryParameters Query参数集合，{@link SimpleQueryParameter}对象实例集合
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> addQuery(Collection<ForestQueryParameter> queryParameters) {
-        for (ForestQueryParameter queryParameter : queryParameters) {
+    public ForestRequest<T> addQuery(Collection<SimpleQueryParameter> queryParameters) {
+        for (SimpleQueryParameter queryParameter : queryParameters) {
             addQuery(queryParameter);
         }
         return this;
@@ -1556,7 +1621,7 @@ public class ForestRequest<T> implements HasURL {
     /**
      * 批量添加请求中的Query参数
      *
-     * @param queries Query参数集合，{@link ForestQueryParameter}对象实例集合
+     * @param queries Query参数集合，{@link SimpleQueryParameter}对象实例集合
      * @return {@link ForestRequest}对象实例
      */
     public ForestRequest<T> addAllQuery(ForestQueryMap queries) {
@@ -1582,11 +1647,11 @@ public class ForestRequest<T> implements HasURL {
     /**
      * 批量添加请求中的Query参数
      *
-     * @param queryParameters Query参数数组，{@link ForestQueryParameter}对象实例数组
+     * @param queryParameters Query参数数组，{@link SimpleQueryParameter}对象实例数组
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> addQuery(ForestQueryParameter[] queryParameters) {
-        for (ForestQueryParameter queryParameter : queryParameters) {
+    public ForestRequest<T> addQuery(SimpleQueryParameter[] queryParameters) {
+        for (SimpleQueryParameter queryParameter : queryParameters) {
             addQuery(queryParameter);
         }
         return this;
@@ -1615,12 +1680,12 @@ public class ForestRequest<T> implements HasURL {
     /**
      * 替换请求中的Query参数值
      *
-     * @param queryParameter Query参数，{@link ForestQueryParameter}对象实例
+     * @param queryParameter Query参数，{@link SimpleQueryParameter}对象实例
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> replaceQuery(ForestQueryParameter queryParameter) {
-        List<ForestQueryParameter> queryParameters = this.query.getQueries(queryParameter.getName());
-        for (ForestQueryParameter parameter : queryParameters) {
+    public ForestRequest<T> replaceQuery(SimpleQueryParameter queryParameter) {
+        List<SimpleQueryParameter> queryParameters = this.query.getQueries(queryParameter.getName());
+        for (SimpleQueryParameter parameter : queryParameters) {
             parameter.setValue(queryParameter.getValue());
         }
         return this;
@@ -1636,8 +1701,8 @@ public class ForestRequest<T> implements HasURL {
      * @return {@link ForestRequest}对象实例
      */
     public ForestRequest<T> replaceQuery(String name, Object value) {
-        List<ForestQueryParameter> queryParameters = this.query.getQueries(name);
-        for (ForestQueryParameter parameter : queryParameters) {
+        List<SimpleQueryParameter> queryParameters = this.query.getQueries(name);
+        for (SimpleQueryParameter parameter : queryParameters) {
             parameter.setValue(value);
         }
         return this;
@@ -1645,18 +1710,18 @@ public class ForestRequest<T> implements HasURL {
 
     /**
      * 替换或添加请求中的Query参数
-     * <p>当请求中不存在与该方法调用时传递过来{@link ForestQueryParameter}对象中同名的Query参数时，会将{@link ForestQueryParameter}对象添加成新的Query参数到请求中，</p>
+     * <p>当请求中不存在与该方法调用时传递过来{@link SimpleQueryParameter}对象中同名的Query参数时，会将{@link SimpleQueryParameter}对象添加成新的Query参数到请求中，</p>
      * <p>若请求中已存在同名Query参数名时，则会替换请求中的所有同名的Query参数值</p>
      *
-     * @param queryParameter Query参数，{@link ForestQueryParameter}对象实例
+     * @param queryParameter Query参数，{@link SimpleQueryParameter}对象实例
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> replaceOrAddQuery(ForestQueryParameter queryParameter) {
-        List<ForestQueryParameter> queryParameters = this.query.getQueries(queryParameter.getName());
+    public ForestRequest<T> replaceOrAddQuery(SimpleQueryParameter queryParameter) {
+        List<SimpleQueryParameter> queryParameters = this.query.getQueries(queryParameter.getName());
         if (queryParameters.isEmpty()) {
             addQuery(queryParameter);
         } else {
-            for (ForestQueryParameter parameter : queryParameters) {
+            for (SimpleQueryParameter parameter : queryParameters) {
                 parameter.setValue(queryParameter.getValue());
             }
         }
@@ -1673,11 +1738,11 @@ public class ForestRequest<T> implements HasURL {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> replaceOrAddQuery(String name, String value) {
-        List<ForestQueryParameter> queryParameters = this.query.getQueries(name);
+        List<SimpleQueryParameter> queryParameters = this.query.getQueries(name);
         if (queryParameters.isEmpty()) {
             addQuery(name, value);
         } else {
-            for (ForestQueryParameter parameter : queryParameters) {
+            for (SimpleQueryParameter parameter : queryParameters) {
                 parameter.setValue(value);
             }
         }
@@ -1944,6 +2009,99 @@ public class ForestRequest<T> implements HasURL {
         this.async = async;
         return this;
     }
+
+    /**
+     * 获取异步请求模式
+     * <p>该字段只有在 async = true 时有效</p>
+     *
+     * @return {@link ForestAsyncMode}枚举实例
+     * @since 1.5.27
+     */
+    public ForestAsyncMode getAsyncMode() {
+        return asyncMode;
+    }
+
+    /**
+     * 设置异步请求模式
+     * <p>该字段只有在 async = true 时有效</p>
+     *
+     * @param asyncMode {@link ForestAsyncMode}枚举实例
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.27
+     */
+    public ForestRequest<T> setAsyncMode(ForestAsyncMode asyncMode) {
+        this.asyncMode = asyncMode;
+        return this;
+    }
+
+    /**
+     * 获取异步请求模式
+     * <p>该字段只有在 async = true 时有效</p>
+     *
+     * @return {@link ForestAsyncMode}枚举实例
+     * @since 1.5.27
+     */
+    public ForestAsyncMode asyncMode() {
+        return getAsyncMode();
+    }
+
+    /**
+     * 设置异步请求模式
+     * <p>该字段只有在 async = true 时有效</p>
+     *
+     * @param asyncMode 异步模式
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.27
+     */
+    public ForestRequest<T> asyncMode(ForestAsyncMode asyncMode) {
+        return setAsyncMode(asyncMode);
+    }
+
+
+    /**
+     * 获取请求认证器
+     *
+     * @return 请求认证器, {@link ForestAuthenticator}接口实例
+     * @since 1.5.28
+     */
+    public ForestAuthenticator getAuthenticator() {
+        return authenticator;
+    }
+
+    /**
+     * 设置请求认证器
+     *
+     * @param authenticator 请求认证器, {@link ForestAuthenticator}接口实例
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.28
+     */
+    public ForestRequest<T> setAuthenticator(ForestAuthenticator authenticator) {
+        this.authenticator = authenticator;
+        return this;
+    }
+
+    /**
+     * 获取请求认证器
+     *
+     * @return 请求认证器, {@link ForestAuthenticator}接口实例
+     * @since 1.5.28
+     */
+    public ForestAuthenticator authenticator() {
+        return authenticator;
+    }
+
+    /**
+     * 设置请求认证器
+     *
+     * @param authenticator 请求认证器, {@link ForestAuthenticator}接口实例
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.28
+     */
+    public ForestRequest<T> authenticator(ForestAuthenticator authenticator) {
+        this.authenticator = authenticator;
+        return this;
+    }
+
 
     /**
      * 是否打开自动重定向
@@ -2478,10 +2636,7 @@ public class ForestRequest<T> implements HasURL {
         }
 
         if (proxy != null) {
-            builder.append(",-x=")
-                    .append(proxy.getHost())
-                    .append(":")
-                    .append(proxy.getPort());
+            builder.append(proxy.cacheKey());
         }
 
         return builder.toString();
@@ -2906,7 +3061,7 @@ public class ForestRequest<T> implements HasURL {
         return nameValueList;
     }
 
-    public List<ForestQueryParameter> getQueryValues() {
+    public List<SimpleQueryParameter> getQueryValues() {
         return query.queryValues();
     }
 
@@ -3365,6 +3520,41 @@ public class ForestRequest<T> implements HasURL {
     public ForestRequest<T> onError(OnError onError) {
         return setOnError(onError);
     }
+
+    /**
+     * 获取OnCanceled回调函数，该回调函数在请求取消后被调用
+     *
+     * @return {@link OnCanceled}接口实例
+     * @since 1.5.27
+     */
+    public OnCanceled getOnCanceled() {
+        return onCanceled;
+    }
+
+    /**
+     * 设置OnCanceled回调函数，该回调函数在请求取消后被调用
+     *
+     * @param onCanceled {@link OnCanceled}接口实例
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.27
+     */
+    public ForestRequest<T> setOnCanceled(OnCanceled onCanceled) {
+        this.onCanceled = onCanceled;
+        return this;
+    }
+
+    /**
+     * 设置OnCanceled回调函数，该回调函数在请求取消后被调用
+     *
+     * @param onCanceled {@link OnCanceled}接口实例
+     * @return {@link ForestRequest}类实例
+     * @see ForestRequest#setOnCanceled(OnCanceled)
+     * @since 1.5.27
+     */
+    public ForestRequest<T> onCanceled(OnCanceled onCanceled) {
+        return setOnCanceled(onCanceled);
+    }
+
 
     /**
      * 获取SuccessWhen回调函数，该回调函数用于判断请求是否成功
@@ -4272,8 +4462,8 @@ public class ForestRequest<T> implements HasURL {
         if (response == null || !retryEnabled) {
             throw ex.getCause();
         }
-        HttpExecutor executor = backend.createExecutor(this, lifeCycleHandler);
-        if (executor != null) {
+        HttpExecutor retryExecutor = backend.createExecutor(this, lifeCycleHandler);
+        if (retryExecutor != null) {
             if (!doRetryWhen(response)) {
                 throw ex.getCause();
             }
@@ -4305,6 +4495,7 @@ public class ForestRequest<T> implements HasURL {
      *
      * @return 新的Forest请求对象
      */
+    @Override
     public ForestRequest<T> clone() {
         ForestBody newBody = new ForestBody(configuration);
         newBody.setBodyType(body.getBodyType());
@@ -4371,12 +4562,16 @@ public class ForestRequest<T> implements HasURL {
         processRedirectionRequest();
         // 执行 beforeExecute
         if (interceptorChain.beforeExecute(this)) {
+            // 认证信息增强
+            if (this.authenticator != null) {
+                this.authenticator.enhanceAuthorization(this);
+            }
             this.url.mergeAddress().checkAndComplete();
             ForestCookies cookies = new ForestCookies();
             lifeCycleHandler.handleLoadCookie(this, cookies);
             this.addCookies(cookies);
             // 从后端HTTP框架创建HTTP请求执行器
-            HttpExecutor executor  = backend.createExecutor(this, lifeCycleHandler);
+            executor = backend.createExecutor(this, lifeCycleHandler);
             if (executor != null) {
                 try {
                     // 执行请求，即发生请求到服务端
@@ -4390,13 +4585,23 @@ public class ForestRequest<T> implements HasURL {
                     } else {
                         throw e;
                     }
-                } finally {
-                    executor.close();
                 }
             }
         }
         // 返回结果
         return getMethodReturnValue();
+    }
+
+    /**
+     * 取消请求执行
+     *
+     * @since 1.5.27
+     */
+    public void cancel() {
+        if (executor != null) {
+            executor.close();
+            canceled = true;
+        }
     }
 
 
@@ -4506,6 +4711,27 @@ public class ForestRequest<T> implements HasURL {
      */
     public <E> List<E> executeAsList() {
         return execute(new TypeReference<List<E>>() {});
+    }
+
+    /**
+     * 执行请求发送过程，并获取 Future 类型结果
+     *
+     * @return 请求执行响应后返回的结果, 其为 {@link Future} 对象实例
+     * @since 1.5.27
+     */
+    public ForestFuture<T> executeAsFuture() {
+        return execute(new TypeReference<ForestFuture<T>>() {});
+    }
+
+
+    /**
+     * 执行请求发送过程，并获取响应类型结果
+     *
+     * @return 请求执行响应后返回的结果, 其为 {@link ForestResponse} 对象实例
+     * @since 1.5.27
+     */
+    public ForestResponse executeAsResponse() {
+        return execute(ForestResponse.class);
     }
 
 

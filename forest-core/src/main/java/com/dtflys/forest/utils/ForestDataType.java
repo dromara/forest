@@ -80,7 +80,8 @@ public class ForestDataType {
      * 创建新的数据类型
      *
      * @param name Data type name
-     * @return New instance of {@code com.dtflys.forest.utils.ForestDataType}
+     * @param hasNameValue 是否有键值对
+     * @return New instance of {@link  ForestDataType}
      * @since 1.5.0-BETA4
      */
     public static ForestDataType createDataType(String name, Boolean hasNameValue) {

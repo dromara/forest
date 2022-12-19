@@ -68,7 +68,7 @@ import java.lang.annotation.Target;
 @Documented
 @ParamLifeCycle(HeaderLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
+@Target({ElementType.PARAMETER, ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 public @interface Header {
 
     /**

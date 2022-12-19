@@ -1,5 +1,6 @@
 package com.dtflys.forest.reflection;
 
+import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestCookies;
@@ -37,8 +38,7 @@ public class NoneLifeCycleHandler implements LifeCycleHandler {
     }
 
     @Override
-    public Object handleSuccess(Object resultData, ForestRequest request, ForestResponse response) {
-        return null;
+    public void handleSuccess(Object resultData, ForestRequest request, ForestResponse response) {
     }
 
     @Override
@@ -57,18 +57,24 @@ public class NoneLifeCycleHandler implements LifeCycleHandler {
     }
 
     @Override
-    public void handleProgress(ForestRequest request, ForestProgress progress) {
+    public byte[] handleBodyEncode(ForestRequest request, ForestEncoder encoder, byte[] encodedData) {
+        return encodedData;
+    }
 
+    @Override
+    public void handleCanceled(ForestRequest request, ForestResponse response) {
+    }
+
+    @Override
+    public void handleProgress(ForestRequest request, ForestProgress progress) {
     }
 
     @Override
     public void handleLoadCookie(ForestRequest request, ForestCookies cookies) {
-
     }
 
     @Override
     public void handleSaveCookie(ForestRequest request, ForestCookies cookies) {
-
     }
 
     @Override
@@ -77,7 +83,7 @@ public class NoneLifeCycleHandler implements LifeCycleHandler {
     }
 
     @Override
-    public Object handleFuture(Future resultData) {
+    public Object handleFuture(ForestRequest request, Future resultData) {
         return null;
     }
 

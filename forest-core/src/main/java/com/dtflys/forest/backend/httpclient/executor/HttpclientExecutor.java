@@ -20,6 +20,7 @@ import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.mapping.MappingTemplate;
 
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import java.io.IOException;
@@ -136,6 +137,9 @@ public class HttpclientExecutor extends AbstractHttpExecutor {
 
     @Override
     public void close() {
+        if (httpRequest != null && !httpRequest.isAborted()) {
+            httpRequest.abort();
+        }
     }
 
 

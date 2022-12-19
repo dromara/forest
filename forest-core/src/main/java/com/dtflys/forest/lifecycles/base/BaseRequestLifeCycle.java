@@ -61,7 +61,7 @@ public class BaseRequestLifeCycle implements BaseAnnotationLifeCycle<BaseRequest
             baseMetaRequest.setConnectTimeout(baseConnectTimeout);
         }
 
-        if (baseTimeout != null) {
+        if (baseReadTimeout != null) {
             baseMetaRequest.setReadTimeout(baseReadTimeout);
         }
 

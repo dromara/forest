@@ -10,5 +10,6 @@ import com.dtflys.forest.config.ForestConfiguration;
  */
 public interface ForestConnectionManager {
 
+    boolean isInitialized();
     void init(ForestConfiguration configuration);
 }

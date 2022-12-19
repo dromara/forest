@@ -20,6 +20,8 @@ public class ForestSSLKeyStoreProperties {
 
     protected String cipherSuites;
 
+    protected String trustManager;
+
     protected String hostnameVerifier;
 
     protected String sslSocketFactoryBuilder;
@@ -86,6 +88,14 @@ public class ForestSSLKeyStoreProperties {
 
     public void setCipherSuites(String cipherSuites) {
         this.cipherSuites = cipherSuites;
+    }
+
+    public String getTrustManager() {
+        return trustManager;
+    }
+
+    public void setTrustManager(String trustManager) {
+        this.trustManager = trustManager;
     }
 
     public String getHostnameVerifier() {

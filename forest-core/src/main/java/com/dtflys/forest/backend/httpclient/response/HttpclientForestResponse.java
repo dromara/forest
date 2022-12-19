@@ -9,6 +9,7 @@ import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.*;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.util.EntityUtils;
 
 import java.io.ByteArrayInputStream;
@@ -63,7 +64,7 @@ public class HttpclientForestResponse extends ForestResponse {
 
     private void setupContentEncoding() {
         Header contentEncodingHeader = entity.getContentEncoding();
-        if(contentEncodingHeader!= null){
+        if (contentEncodingHeader!= null) {
             this.contentEncoding = contentEncodingHeader.getValue();
         }
     }
@@ -146,11 +147,8 @@ public class HttpclientForestResponse extends ForestResponse {
     }
 
     private String readContentAsString() {
-        try (InputStream inputStream = entity.getContent()) {
-            if (inputStream == null) {
-                return null;
-            }
-            bytes = IOUtils.toByteArray(inputStream);
+        try  {
+            bytes = getByteArray();
             return byteToString(bytes);
         } catch (IOException e) {
             throw new ForestRuntimeException(e);
@@ -176,7 +174,7 @@ public class HttpclientForestResponse extends ForestResponse {
                 try {
                     bytes = EntityUtils.toByteArray(entity);
                 } finally {
-                    closed = true;
+                    close();
                 }
             }
         }
@@ -188,16 +186,14 @@ public class HttpclientForestResponse extends ForestResponse {
         if (closed) {
             return;
         }
-        if (entity != null) {
-            try {
-                if (entity.isStreaming()) {
-                    EntityUtils.consume(entity);
-                }
-            } catch (IOException e) {
-                throw new ForestRuntimeException(e);
-            } finally {
-                closed = true;
+        try {
+            if (httpResponse instanceof CloseableHttpResponse) {
+                ((CloseableHttpResponse) httpResponse).close();
             }
+        } catch (IOException e) {
+            throw new ForestRuntimeException(e);
+        } finally {
+            closed = true;
         }
     }
 }

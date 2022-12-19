@@ -1,5 +1,6 @@
 package com.dtflys.forest.schema;
 
+import com.dtflys.forest.http.ForestAsyncMode;
 import com.dtflys.forest.interceptor.SpringInterceptorFactory;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.reflection.SpringForestObjectFactory;
@@ -83,8 +84,17 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
                 if (StringUtils.isNotEmpty(attributeValue)) {
                     if ("backend".equals(attributeName)) {
                         beanDefinition.getPropertyValues().addPropertyValue("backendName", attributeValue);
-                    }
-                    else if ("logHandler".equals(attributeName)) {
+                    } else if ("asyncMode".equals(attributeName)) {
+                        if (StringUtils.isEmpty(attributeValue)) {
+                            throw new ForestRuntimeException("Can not resolve async mode '" + attributeValue + "'");
+                        }
+                        final String enumName = attributeValue.trim().toUpperCase();
+                        ForestAsyncMode mode = ForestAsyncMode.valueOf(enumName);
+                        if (mode == null) {
+                            throw new ForestRuntimeException("Can not resolve async mode '" + enumName + "'");
+                        }
+                        beanDefinition.getPropertyValues().addPropertyValue("asyncMode", mode);
+                    } else if ("logHandler".equals(attributeName)) {
                         try {
                             Class clazz = Class.forName(attributeValue);
                             if (!ForestLogHandler.class.isAssignableFrom(clazz)) {
@@ -154,6 +164,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         String certPass = elem.getAttribute("certPass");
         String protocolsStr = elem.getAttribute("protocols");
         String cipherSuitesStr = elem.getAttribute("cipher-suites");
+        String trustManager = elem.getAttribute("trustManager");
         String hostnameVerifier = elem.getAttribute("hostnameVerifier");
         String sslSocketFactoryBuilder = elem.getAttribute("sslSocketFactoryBuilder");
 
@@ -164,7 +175,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
                 id, keystoreType, filePath,
                 keystorePass, certPass,
                 protocolsStr, cipherSuitesStr,
-                hostnameVerifier, sslSocketFactoryBuilder);
+                trustManager, hostnameVerifier, sslSocketFactoryBuilder);
         sslKeyStoreMap.put(id, beanDefinition);
     }
 
@@ -178,6 +189,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
                                                        String certPass,
                                                        String protocolsStr,
                                                        String cipherSuitesStr,
+                                                       String trustManagerClass,
                                                        String hostnameVerifierClass,
                                                        String sslSocketFactoryBuilder) {
         BeanDefinition beanDefinition = new GenericBeanDefinition();
@@ -188,6 +200,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         beanDefValues.addGenericArgumentValue(filePath);
         beanDefValues.addGenericArgumentValue(keystorePass);
         beanDefValues.addGenericArgumentValue(certPass);
+        beanDefValues.addGenericArgumentValue(trustManagerClass);
         beanDefValues.addGenericArgumentValue(hostnameVerifierClass);
         beanDefValues.addGenericArgumentValue(sslSocketFactoryBuilder);
         if (StringUtils.isNotEmpty(protocolsStr)) {

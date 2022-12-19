@@ -1,6 +1,6 @@
 package com.dtflys.test.http.pool;
 
-import com.dtflys.forest.backend.AsyncHttpExecutor;
+import com.dtflys.forest.backend.KotlinCoroutineHttpExecutor;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestPoolException;
@@ -122,7 +122,7 @@ public class TestPoolClient extends BaseClientTest {
 
     @Test
     public void testPoolPerRoute() throws InterruptedException {
-        AsyncHttpExecutor.restartPool();
+        KotlinCoroutineHttpExecutor.Companion.restartPool();
         ForestConfiguration poolConf = ForestConfiguration.createConfiguration()
                 .setVariableValue("port", server.getPort())
                 .setMaxConnections(100)
@@ -171,7 +171,7 @@ public class TestPoolClient extends BaseClientTest {
 
     @Test
     public void testPoolAsync_globalPool() throws InterruptedException {
-        AsyncHttpExecutor.restartPool();
+        KotlinCoroutineHttpExecutor.Companion.restartPool();
         ForestConfiguration poolConf = ForestConfiguration.createConfiguration()
                 .setVariableValue("port", server.getPort())
                 .setMaxConnections(10)
@@ -212,13 +212,13 @@ public class TestPoolClient extends BaseClientTest {
     public void testPoolAsync_asyncPool() throws InterruptedException {
         ForestConfiguration poolConf = ForestConfiguration.createConfiguration()
                 .setVariableValue("port", server.getPort())
-                .setMaxConnections(300)
-                .setMaxAsyncThreadSize(10)
-                .setMaxAsyncQueueSize(1);
+                .setMaxConnections(30)
+                .setMaxAsyncThreadSize(30)
+                .setMaxAsyncQueueSize(10);
         PoolClient poolClient = poolConf.client(PoolClient.class);
         int count = 300;
         for (int i = 0; i < count; i++) {
-            server.enqueue(new MockResponse().setBody(EXPECTED).setHeadersDelay(1, TimeUnit.SECONDS));
+            server.enqueue(new MockResponse().setBody(EXPECTED));
         }
         ForestRequestPool pool = poolConf.getPool();
         CountDownLatch latch = new CountDownLatch(count);

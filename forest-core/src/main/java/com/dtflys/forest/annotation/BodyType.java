@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Documented
 @MethodLifeCycle(BodyTypeLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
+@Target({ElementType.METHOD, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 public @interface BodyType {
 
     @AliasFor("type")

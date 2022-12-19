@@ -2,11 +2,13 @@ package com.dtflys.forest.backend.okhttp3.conn;
 
 import com.dtflys.forest.backend.ForestConnectionManager;
 import com.dtflys.forest.backend.httpclient.HttpClientProvider;
+import com.dtflys.forest.backend.okhttp3.OkHttp3Backend;
 import com.dtflys.forest.backend.okhttp3.OkHttpClientProvider;
 import com.dtflys.forest.backend.okhttp3.response.OkHttpResponseBody;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.LifeCycleHandler;
+import com.dtflys.forest.http.ForestHeaderMap;
 import com.dtflys.forest.http.ForestProtocol;
 import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
@@ -30,6 +32,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -48,6 +51,8 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
     private ConnectionPool pool;
 
     private DefaultOkHttpClientProvider defaultOkHttpClientProvider;
+
+    private boolean inited = false;
 
     /**
      * 协议版本: http 1.0
@@ -111,14 +116,24 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
 
     public static class DefaultOkHttpClientProvider implements OkHttpClientProvider {
 
-        private final OkHttp3ConnectionManager connectionManager;
-
-        public DefaultOkHttpClientProvider(OkHttp3ConnectionManager connectionManager) {
-            this.connectionManager = connectionManager;
-        }
+        private OkHttp3ConnectionManager connectionManager;
 
         @Override
         public OkHttpClient getClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
+            if (connectionManager == null) {
+                synchronized (this) {
+                    if (connectionManager == null) {
+                        ForestConfiguration configuration = request.getConfiguration();
+                        connectionManager = (OkHttp3ConnectionManager) configuration
+                                .getBackendSelector()
+                                .select(OkHttp3Backend.NAME)
+                                .getConnectionManager();
+                        if (!connectionManager.isInitialized()) {
+                            connectionManager.init(configuration);
+                        }
+                    }
+                }
+            }
             Integer timeout = request.getTimeout();
             Integer connectTimeout = request.connectTimeout();
             Integer readTimeout = request.readTimeout();
@@ -148,16 +163,37 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
             if (proxy != null) {
                 Proxy okProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxy.getHost(), proxy.getPort()));
                 builder.proxy(okProxy);
-                if (StringUtils.isNotEmpty(proxy.getUsername())) {
+                if (StringUtils.isNotEmpty(proxy.getUsername()) || !proxy.getHeaders().isEmpty()) {
                     builder.proxyAuthenticator(new Authenticator() {
                         @Nullable
                         @Override
                         public Request authenticate(@Nullable Route route, Response response) {
                             Request.Builder proxyBuilder = response.request().newBuilder();
-                            String credential = Credentials.basic(
-                                    proxy.getUsername(),
-                                    proxy.getPassword());
-                            proxyBuilder.addHeader("Proxy-Authorization", credential);
+                            String credential = null;
+                            Charset charset = null;
+                            if (StringUtils.isNotEmpty(proxy.getCharset())) {
+                                charset = Charset.forName(proxy.getCharset());
+                            }
+                            if (charset != null) {
+                                credential = Credentials.basic(
+                                        proxy.getUsername(),
+                                        proxy.getPassword(),
+                                        charset);
+                            } else {
+                                credential = Credentials.basic(
+                                        proxy.getUsername(),
+                                        proxy.getPassword());
+                            }
+
+                            ForestHeaderMap proxyHeaders = proxy.getHeaders();
+                            if (!proxyHeaders.isEmpty()) {
+                                for (Map.Entry<String, String> entry : proxyHeaders.entrySet()) {
+                                    proxyBuilder.addHeader(entry.getKey(), entry.getValue());
+                                }
+                            }
+                            if (!proxyHeaders.containsKey("Proxy-Authorization")) {
+                                proxyBuilder.addHeader("Proxy-Authorization", credential);
+                            }
                             return proxyBuilder.build();
                         }
                     });
@@ -225,9 +261,17 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
     }
 
     @Override
-    public void init(ForestConfiguration configuration) {
-        pool = new ConnectionPool();
-        defaultOkHttpClientProvider = new DefaultOkHttpClientProvider(this);
+    public boolean isInitialized() {
+        return inited;
+    }
+
+    @Override
+    public synchronized void init(ForestConfiguration configuration) {
+        if (!inited) {
+            pool = new ConnectionPool();
+            defaultOkHttpClientProvider = new DefaultOkHttpClientProvider();
+            inited = true;
+        }
     }
 
     /**

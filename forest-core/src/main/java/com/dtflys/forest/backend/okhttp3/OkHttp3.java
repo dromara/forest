@@ -3,6 +3,7 @@ package com.dtflys.forest.backend.okhttp3;
 
 import com.dtflys.forest.annotation.Backend;
 import com.dtflys.forest.annotation.MethodLifeCycle;
+import com.dtflys.forest.backend.okhttp3.conn.OkHttp3ConnectionManager;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -26,8 +27,10 @@ public @interface OkHttp3 {
 
     /**
      * 后端 HttpClient 工厂
+     *
+     * @return HttpClient 工厂类
      * @since 1.5.23
      */
-    Class<? extends OkHttpClientProvider> client() default OkHttpClientProvider.class;
+    Class<? extends OkHttpClientProvider> client() default OkHttp3ConnectionManager.DefaultOkHttpClientProvider.class;
 
 }

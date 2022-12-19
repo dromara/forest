@@ -1,10 +1,15 @@
 package com.dtflys.test.http.client;
 
 import com.dtflys.forest.annotation.BaseRequest;
+import com.dtflys.forest.annotation.Get;
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.annotation.Var;
 import com.dtflys.forest.callback.OnSuccess;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.interceptor.Interceptor;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -17,9 +22,9 @@ import com.dtflys.forest.http.ForestResponse;
                 "Accept: text/plain"
         },
         userAgent = "${userAgent}",
-        timeout = 2000,
         connectTimeout = 3000,
-        readTimeout = 4000
+        readTimeout = 4000,
+        interceptor = BaseReqClient.BaseReqInterceptor.class
 )
 public interface BaseReqClient {
 
@@ -28,7 +33,21 @@ public interface BaseReqClient {
     )
     ForestResponse simpleGetWithEmptyPath(@Var("encoding") String encoding);
 
+    @Get
+    ForestRequest testBaseTimeout(@Var("encoding") String encoding);
 
+
+    class BaseReqInterceptor implements Interceptor<Object> {
+        @Override
+        public boolean beforeExecute(ForestRequest request) {
+            assertThat(request.getConnectTimeout()).isEqualTo(3000);
+            assertThat(request.getReadTimeout()).isEqualTo(4000);
+            return true;
+        }
+    }
+
+    @Get
+    String testBaseTimeoutWithInterceptor(@Var("encoding") String encoding);
     @Request(
             url = "/hello/user?username=foo"
     )

@@ -1,6 +1,7 @@
 package com.dtflys.forest.interceptor;
 
 import com.dtflys.forest.callback.RetryWhen;
+import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestRequest;
@@ -51,6 +52,15 @@ public class InterceptorChain implements Interceptor {
     }
 
     @Override
+    public byte[] onBodyEncode(ForestRequest request, ForestEncoder encoder, byte[] encodedData) {
+        byte[] ret = encodedData;
+        for (Interceptor item : interceptors) {
+            ret = item.onBodyEncode(request, encoder, ret);
+        }
+        return ret;
+    }
+
+    @Override
     public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
         for (Interceptor item : interceptors) {
             if (response != null) {
@@ -71,6 +81,13 @@ public class InterceptorChain implements Interceptor {
     public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
         for (Interceptor item : interceptors) {
             item.onError(ex, request, response);
+        }
+    }
+
+    @Override
+    public void onCanceled(ForestRequest request, ForestResponse response) {
+        for (Interceptor item : interceptors) {
+            item.onCanceled(request, response);
         }
     }
 

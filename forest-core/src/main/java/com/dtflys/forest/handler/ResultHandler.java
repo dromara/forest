@@ -6,6 +6,7 @@ import com.dtflys.forest.exceptions.ForestHandlerException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.lifecycles.file.DownloadLifeCycle;
+import com.dtflys.forest.reflection.MethodLifeCycleHandler;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
 
@@ -29,14 +30,38 @@ public class ResultHandler {
         return response.isReceivedResponseData();
     }
 
+    /**
+     * 进行转换并获取结果
+     *
+     * @param request Forest 请求对象
+     * @param response Forest 响应对象
+     * @param resultType {@link Type} 实例
+     * @return 转换后的对象
+     * @since 1.5.27
+     */
+    public Object getResult(ForestRequest request, ForestResponse response, Type resultType) {
+        Class clazz = ReflectUtils.toClass(resultType);
+        return getResult(request, response, resultType, clazz);
+    }
+
+    /**
+     * 进行转换并获取结果
+     *
+     * @param request Forest 请求对象
+     * @param response Forest 响应对象
+     * @param resultClass {@link Class} 实例
+     * @return 转换后的对象
+     * @since 1.5.27
+     */
+    public Object getResult(ForestRequest request, ForestResponse response, Class resultClass) {
+        Type type = ReflectUtils.toType(resultClass);
+        return getResult(request, response, type, resultClass);
+    }
+
 
     public Object getResult(ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
         if (request.isDownloadFile()) {
             return null;
-        }
-        Object result = response.getResult();
-        if (result != null && resultClass.isAssignableFrom(result.getClass())) {
-            return result;
         }
         if (isReceivedResponseData(response)) {
             try {
@@ -58,9 +83,6 @@ public class ResultHandler {
                             Object realResult = getResult(request, response, realType, realClass);
                             response.setResult(realResult);
                         }
-                    } else {
-                        Object realResult = getResult(request, response, Object.class, Object.class);
-                        response.setResult(realResult);
                     }
                     return response;
                 }
@@ -71,6 +93,9 @@ public class ResultHandler {
                         if (Future.class.isAssignableFrom(rowClass)) {
                             Type realType = parameterizedType.getActualTypeArguments()[0];
                             Class realClass = ReflectUtils.toClass(parameterizedType.getActualTypeArguments()[0]);
+                            if (realClass == null) {
+                                return ((MethodLifeCycleHandler<?>) request.getLifeCycleHandler()).getResultData();
+                            }
                             return getResult(request, response, realType, realClass);
                         }
                     }
@@ -86,10 +111,7 @@ public class ResultHandler {
                     return converter.convertToJavaObject(attFile, resultClass);
                 }
                 String responseText = null;
-                if (result != null && CharSequence.class.isAssignableFrom(result.getClass())) {
-                    responseText = result.toString();
-                }
-                else if (CharSequence.class.isAssignableFrom(resultClass)) {
+                if (CharSequence.class.isAssignableFrom(resultClass)) {
                     try {
                         responseText = response.readAsString();
                     } catch (Throwable th) {

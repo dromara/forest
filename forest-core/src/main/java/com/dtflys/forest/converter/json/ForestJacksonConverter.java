@@ -25,7 +25,6 @@
 package com.dtflys.forest.converter.json;
 
 import com.dtflys.forest.exceptions.ForestConvertException;
-import com.dtflys.forest.http.ForestBody;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -78,7 +77,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         this.dateFormat = dateFormat;
         if (StringUtils.isNotBlank(dateFormat)) {
             DateFormat format = new SimpleDateFormat(dateFormat);
-            mapper.setDateFormat(format);
+            getMapper().setDateFormat(format);
         }
     }
 
@@ -86,7 +85,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     @Override
     public <T> T convertToJavaObject(String source, Type targetType) {
         try {
-            return mapper.readValue(source, mapper.getTypeFactory().constructType(targetType));
+            return getMapper().readValue(source, getMapper().getTypeFactory().constructType(targetType));
         } catch (IOException e) {
             throw new ForestConvertException(this, e);
         }
@@ -97,7 +96,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     public <T> T convertToJavaObject(byte[] source, Class<T> targetType, Charset charset) {
         try {
             String str = StringUtils.fromBytes(source, charset);
-            return mapper.readValue(str, mapper.getTypeFactory().constructType(targetType));
+            return getMapper().readValue(str, getMapper().getTypeFactory().constructType(targetType));
         } catch (IOException e) {
             throw new ForestConvertException(this, e);
         }
@@ -107,7 +106,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     public <T> T convertToJavaObject(byte[] source, Type targetType, Charset charset) {
         try {
             String str = StringUtils.fromBytes(source, charset);
-            return mapper.readValue(str, mapper.getTypeFactory().constructType(targetType));
+            return getMapper().readValue(str, getMapper().getTypeFactory().constructType(targetType));
         } catch (IOException e) {
             throw new ForestConvertException(this, e);
         }
@@ -115,8 +114,8 @@ public class ForestJacksonConverter implements ForestJsonConverter {
 
     public <T> T convertToJavaObject(String source, Class<?> parametrized, Class<?> ...parameterClasses) {
         try {
-            JavaType javaType = mapper.getTypeFactory().constructParametricType(parametrized, parameterClasses);
-            return mapper.readValue(source, javaType);
+            JavaType javaType = getMapper().getTypeFactory().constructParametricType(parametrized, parameterClasses);
+            return getMapper().readValue(source, javaType);
         } catch (IOException e) {
             throw new ForestConvertException(this, e);
         }
@@ -127,7 +126,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
             return null;
         }
         try {
-            return mapper.readValue(source, javaType);
+            return getMapper().readValue(source, javaType);
         } catch (IOException e) {
             throw new ForestConvertException(this, e);
         }
@@ -136,7 +135,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     @Override
     public String encodeToString(Object obj) {
         try {
-            return mapper.writeValueAsString(obj);
+            return getMapper().writeValueAsString(obj);
         } catch (Throwable e) {
             throw new ForestConvertException(this, e);
         }
@@ -162,8 +161,8 @@ public class ForestJacksonConverter implements ForestJsonConverter {
             return convertToJavaObject(obj.toString(), LinkedHashMap.class);
         }
 
-        JavaType javaType = mapper.getTypeFactory().constructMapType(LinkedHashMap.class, String.class, Object.class);
-        return mapper.convertValue(obj, javaType);
+        JavaType javaType = getMapper().getTypeFactory().constructMapType(LinkedHashMap.class, String.class, Object.class);
+        return getMapper().convertValue(obj, javaType);
     }
 
     @Override

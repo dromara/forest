@@ -46,13 +46,15 @@ public @interface DecompressGzip {
 
     /**
      * 否开启解压GZIP响应内容的注解
-     * <p>{@code true}为开启，否则为不开启</p>
+     *
+     * @return {@code true}为开启，否则为不开启
      */
     boolean value() default true;
 
     /**
+     * 压缩格式
      *
-     * @return
+     * @return 压缩格式
      */
     String encoding() default "gzip";
 

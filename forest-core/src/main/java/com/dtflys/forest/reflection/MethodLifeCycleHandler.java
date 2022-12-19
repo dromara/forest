@@ -4,6 +4,7 @@ import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.callback.OnSuccess;
+import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.exceptions.ForestNetworkException;
 import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
@@ -11,6 +12,7 @@ import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.handler.ResultHandler;
 import com.dtflys.forest.http.ForestCookie;
 import com.dtflys.forest.http.ForestCookies;
+import com.dtflys.forest.http.ForestFuture;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.retryer.ForestRetryer;
@@ -60,7 +62,12 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
             Object resultData = null;
             if (response.isSuccess()) {
                 resultData = handleResultType(request, response, resultType, resultRawClass);
-                resultData = handleSuccess(resultData, request, response);
+                handleSuccess(resultData, request, response);
+                if ((!ForestResponse.class.isAssignableFrom(resultRawClass)
+                        && !Future.class.isAssignableFrom(resultRawClass))
+                        || request.isDownloadFile()) {
+                    resultData = response.getResult();
+                }
             } else {
                 if (ex != null) {
                     resultData = handleError(request, response, ex);
@@ -123,17 +130,15 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
 
 
     @Override
-    public Object handleSuccess(Object resultData, ForestRequest request, ForestResponse response) {
+    public void handleSuccess(final Object resultData, ForestRequest request, ForestResponse response) {
         this.response = response;
         handleSaveCookie(request, response);
         request.getInterceptorChain().onSuccess(resultData, request, response);
         OnSuccess onSuccess = request.getOnSuccess();
         if (onSuccess != null) {
-            resultData = RESULT_HANDLER.getResult(request, response, onSuccessClassGenericType, ReflectUtils.toClass(onSuccessClassGenericType));
-            onSuccess.onSuccess(resultData, request, response);
+            Object result = RESULT_HANDLER.getResult(request, response, onSuccessClassGenericType, ReflectUtils.toClass(onSuccessClassGenericType));
+            onSuccess.onSuccess(result, request, response);
         }
-        resultData = response.getResult();
-        return resultData;
     }
 
     @Override
@@ -173,6 +178,20 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
     }
 
     @Override
+    public byte[] handleBodyEncode(ForestRequest request, ForestEncoder encoder, byte[] encodedData) {
+        return request.getInterceptorChain().onBodyEncode(request, encoder, encodedData);
+    }
+
+    @Override
+    public void handleCanceled(ForestRequest request, ForestResponse response) {
+        this.response = response;
+        request.getInterceptorChain().onCanceled(request, response);
+        if (request.getOnCanceled() != null) {
+            request.getOnCanceled().onCanceled(request, response);
+        }
+    }
+
+    @Override
     public void handleProgress(ForestRequest request, ForestProgress progress) {
         request.getInterceptorChain().onProgress(progress);
         OnProgress onProgress = request.getOnProgress();
@@ -206,7 +225,10 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
     }
 
     @Override
-    public Object handleFuture(Future resultData) {
+    public Object handleFuture(ForestRequest request, Future resultData) {
+        if (resultData == null) {
+            return null;
+        }
         if (Future.class.isAssignableFrom(resultRawClass)) {
             this.resultData = (T) resultData;
             return resultData;

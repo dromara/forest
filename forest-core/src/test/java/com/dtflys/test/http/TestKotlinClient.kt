@@ -47,7 +47,7 @@ class TestKotlinClient(backend: HttpBackend?) : BaseClientTest(backend, configur
         @Get("/")
         fun getText() : String
 
-        @Get("http://baidu.com")
+        @Get("https://baidu.com")
         fun getBaidu() : String
 
         @Get("/")

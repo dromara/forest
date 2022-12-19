@@ -56,8 +56,8 @@ public class TimeUtils {
      * 将特定时间单位字段转换为毫秒数
      *
      * @param name 字段名
-     * @param duration 时长, {@link Duration}对象
-     * @return
+     * @param duration 时长 - {@link Duration}对象
+     * @return 毫秒数
      */
     public static Integer toMillis(String name, Duration duration) {
         if (duration != null) {

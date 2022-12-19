@@ -24,15 +24,13 @@
 
 package com.dtflys.forest.config;
 
-
-import com.dtflys.forest.backend.AsyncHttpExecutor;
+import com.dtflys.forest.ForestGenericClient;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.backend.HttpBackendSelector;
 import com.dtflys.forest.callback.AddressSource;
 import com.dtflys.forest.callback.RetryWhen;
 import com.dtflys.forest.callback.SuccessWhen;
 import com.dtflys.forest.converter.ForestConverter;
-import com.dtflys.forest.ForestGenericClient;
 import com.dtflys.forest.converter.auto.DefaultAutoConverter;
 import com.dtflys.forest.converter.binary.DefaultBinaryConverter;
 import com.dtflys.forest.converter.form.DefaultFormConvertor;
@@ -53,6 +51,7 @@ import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.filter.JSONFilter;
 import com.dtflys.forest.filter.XmlFilter;
 import com.dtflys.forest.http.ForestAddress;
+import com.dtflys.forest.http.ForestAsyncMode;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.interceptor.DefaultInterceptorFactory;
@@ -72,6 +71,7 @@ import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
+import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.TimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,6 +131,11 @@ public class ForestConfiguration implements Serializable {
      * 最大异步线程池大小
      */
     private Integer maxAsyncThreadSize;
+
+    /**
+     * 异步模式
+     */
+    private ForestAsyncMode asyncMode = ForestAsyncMode.PLATFORM;
 
     /**
      * 最大异步线程池队列大小
@@ -690,6 +695,28 @@ public class ForestConfiguration implements Serializable {
     }
 
     /**
+     * 获取异步模式
+     *
+     * @return {@link ForestAsyncMode}枚举实例
+     * @since 1.5.27
+     */
+    public ForestAsyncMode getAsyncMode() {
+        return asyncMode;
+    }
+
+    /**
+     * 设置异步模式
+     *
+     * @param asyncMode 异步模式 - {@link ForestAsyncMode}枚举实例
+     * @return 当前ForestConfiguration实例
+     * @since 1.5.27
+     */
+    public ForestConfiguration setAsyncMode(ForestAsyncMode asyncMode) {
+        this.asyncMode = asyncMode;
+        return this;
+    }
+
+    /**
      * 获取最大异步线程池队列大小
      *
      * @return 最大异步线程池队列大小
@@ -800,7 +827,7 @@ public class ForestConfiguration implements Serializable {
      * 设置全局的请求连接超时时间
      *
      * @param connectTimeout 连接超时时间, 整数
-     * @param timeUnit 时间单位
+     * @param timeUnit       时间单位
      * @return 当前ForestConfiguration实例
      * @since 1.5.6
      */
@@ -848,7 +875,7 @@ public class ForestConfiguration implements Serializable {
      * 设置全局的请求读取超时时间
      *
      * @param readTimeout 读取超时时间
-     * @param timeUnit 时间单位
+     * @param timeUnit    时间单位
      * @return 当前ForestConfiguration实例
      * @since 1.5.6
      */
@@ -1033,7 +1060,7 @@ public class ForestConfiguration implements Serializable {
         if (baseAddressSourceClass == null) {
             return null;
         }
-        return forestObjectFactory.getObject(baseAddressSourceClass);
+        return getForestObjectFactory().getObject(baseAddressSourceClass);
     }
 
     /**
@@ -1236,7 +1263,7 @@ public class ForestConfiguration implements Serializable {
         if (retryWhenClass == null) {
             return null;
         }
-        return forestObjectFactory.getObject(retryWhenClass);
+        return getForestObjectFactory().getObject(retryWhenClass);
     }
 
     /**
@@ -1259,7 +1286,7 @@ public class ForestConfiguration implements Serializable {
         if (successWhenClass == null) {
             return null;
         }
-        return forestObjectFactory.getObject(successWhenClass);
+        return getForestObjectFactory().getObject(successWhenClass);
     }
 
     /**
@@ -1354,7 +1381,7 @@ public class ForestConfiguration implements Serializable {
      * @return XML数据转换器
      */
     public ForestProtobufConverter getProtobufConverter() {
-        ForestProtobufConverter converter =  (ForestProtobufConverter) getConverterMap().get(ForestDataType.PROTOBUF);
+        ForestProtobufConverter converter = (ForestProtobufConverter) getConverterMap().get(ForestDataType.PROTOBUF);
         if (converter == null) {
             throw new ForestRuntimeException("Protobuf converter cannot be found. Please check your classpath if there is the Protobuf framework in the dependencies of your project.");
         }
