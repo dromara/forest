@@ -46,7 +46,7 @@ public class TestAsync {
         server.enqueue(new MockResponse().setBody(EXPECTED).setHeadersDelay(500, TimeUnit.MILLISECONDS));
         server.enqueue(new MockResponse().setBody(EXPECTED).setHeadersDelay(500, TimeUnit.MILLISECONDS));
         server.enqueue(new MockResponse().setBody(EXPECTED).setHeadersDelay(500, TimeUnit.MILLISECONDS));
-        ForestConfiguration config = ForestConfiguration.createConfiguration();
+        ForestConfiguration config = ForestConfiguration.configuration();
         config.setMaxAsyncThreadSize(1);
         config.setMaxAsyncQueueSize(0);
         Throwable throwable = null;

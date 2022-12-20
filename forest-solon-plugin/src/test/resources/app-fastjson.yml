@@ -9,7 +9,7 @@ forest:
   log-request: true
   log-response-status: false
   log-response-content: true
-  log-handler: com.dtflys.forest.springboot.test.logging.TestLogHandler
+  log-handler: com.dtflys.forest.solon.test.logging.TestLogHandler
   converters:
     json:
       type: com.dtflys.forest.converter.json.ForestFastjsonConverter
