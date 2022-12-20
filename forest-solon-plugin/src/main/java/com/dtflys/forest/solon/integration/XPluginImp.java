@@ -28,7 +28,6 @@ import java.util.Date;
 public class XPluginImp implements Plugin {
     @Override
     public void start(AopContext context) {
-        System.out.println(":::::::::" + context.hashCode());
         //1.初始 ForestConfiguration
         ForestConfiguration configuration = configBeanInit(context);
 

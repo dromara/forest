@@ -20,8 +20,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 
 
-@RunWith(SolonJUnit4ClassRunner.class)
-@SolonTest(env = "ssl2")
+//@RunWith(SolonJUnit4ClassRunner.class)
+//@SolonTest(env = "ssl2")
+@Deprecated
 public class SSLTest2 {
 
     @Inject
@@ -31,7 +32,7 @@ public class SSLTest2 {
     private GiteeClient giteeClient;
 
 
-    @Test
+//    @Test
     public void testConfiguration() {
         ForestLogger logger = Mockito.mock(ForestLogger.class);
 
