@@ -12,9 +12,11 @@ import com.dtflys.forest.solon.SolonForestVariableValue;
 import com.dtflys.forest.solon.SolonUpstreamInterceptor;
 import com.dtflys.forest.solon.properties.ForestConfigurationProperties;
 import com.dtflys.forest.utils.StringUtils;
+import org.noear.solon.Utils;
 import org.noear.solon.core.AopContext;
 import org.noear.solon.core.BeanWrap;
 import org.noear.solon.core.Plugin;
+import org.noear.solon.core.Props;
 
 import java.util.Arrays;
 
@@ -53,7 +55,9 @@ public class XPluginImp implements Plugin {
     }
 
     private void configBeanInit(AopContext context) {
-        ForestConfigurationProperties configurationProperties = context.beanMake(ForestConfigurationProperties.class).get();
+        Props forestProps = context.getProps().getProp("forest");
+        ForestConfigurationProperties configurationProperties = new ForestConfigurationProperties();
+        Utils.injectProperties(configurationProperties, forestProps);
 
         ForestBeanBuilder forestBeanBuilder = new ForestBeanBuilder(context,
                 configurationProperties,
