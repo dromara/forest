@@ -14,7 +14,6 @@ import org.noear.solon.test.SolonTest;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@Component
 @RunWith(SolonJUnit4ClassRunner.class)
 @SolonTest(env = "address")
 public class TestBinding {

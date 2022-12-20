@@ -6,14 +6,12 @@ import okhttp3.mockwebserver.MockWebServer;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.test.SolonJUnit4ClassRunner;
 import org.noear.solon.test.SolonTest;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@Component
 @RunWith(SolonJUnit4ClassRunner.class)
 @SolonTest(env = "array")
 public class TestArrayClient {
