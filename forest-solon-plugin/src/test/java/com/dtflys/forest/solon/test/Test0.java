@@ -18,6 +18,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.noear.solon.annotation.Inject;
+import org.noear.solon.core.AopContext;
 import org.noear.solon.test.SolonJUnit4ClassRunner;
 import org.noear.solon.test.SolonTest;
 
@@ -30,6 +31,9 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SolonJUnit4ClassRunner.class)
 @SolonTest(env = "test0")
 public class Test0 {
+
+    @Inject
+    AopContext aopContext;
 
     @Inject
     private BeastshopClient beastshopClient;
@@ -64,7 +68,7 @@ public class Test0 {
         assertNotNull(config0.getVariableValue("user"));
         assertTrue(!config0.isLogEnabled());
         assertEquals(ForestAsyncMode.PLATFORM, config0.getAsyncMode());
-        assertEquals(Integer.valueOf(12), config0.getVariableValue("myCount"));
+        assertEquals("12", config0.getVariableValue("myCount"));
         assertEquals(BackOffRetryer.class, config0.getRetryer());
         assertEquals(Integer.valueOf(5), config0.getMaxRetryCount());
         assertEquals(Long.valueOf(2000), Long.valueOf(config0.getMaxRetryInterval()));

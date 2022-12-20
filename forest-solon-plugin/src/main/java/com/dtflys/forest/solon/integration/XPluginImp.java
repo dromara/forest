@@ -19,6 +19,7 @@ import org.noear.solon.core.Plugin;
 import org.noear.solon.core.Props;
 
 import java.util.Arrays;
+import java.util.Date;
 
 /**
  * @author 夜の孤城
@@ -27,39 +28,39 @@ import java.util.Arrays;
 public class XPluginImp implements Plugin {
     @Override
     public void start(AopContext context) {
-
+        System.out.println(":::::::::" + context.hashCode());
         //1.初始 ForestConfiguration
-        configBeanInit(context);
+        ForestConfiguration configuration = configBeanInit(context);
 
         //2.添加 ForestClient 注解支持
         context.beanBuilderAdd(ForestClient.class, (clz, wrap, anno) -> {
-            Object client = Forest.client(clz);
+            Object client = configuration.client(clz);
             wrap.context().wrapAndPut(clz, client);
         });
 
         //3.添加 BindingVar 注解支持
         context.beanExtractorAdd(BindingVar.class, (bw, method, anno) -> {
             String confId = anno.configuration();
-            ForestConfiguration configuration = null;
+            ForestConfiguration config = null;
 
             if (StringUtils.isNotBlank(confId)) {
-                configuration = Forest.config(confId);
+                config = Forest.config(confId);
             } else {
-                configuration = Forest.config();
+                config = configuration;
             }
 
             String varName = anno.value();
             SolonForestVariableValue variableValue = new SolonForestVariableValue(bw.get(), method);
-            configuration.setVariableValue(varName, variableValue);
+            config.setVariableValue(varName, variableValue);
         });
     }
 
-    private void configBeanInit(AopContext context) {
+    private ForestConfiguration configBeanInit(AopContext context) {
         Props forestProps = context.getProps().getProp("forest");
         ForestConfigurationProperties configurationProperties = new ForestConfigurationProperties();
         Utils.injectProperties(configurationProperties, forestProps);
 
-        ForestBeanBuilder forestBeanBuilder = new ForestBeanBuilder(context,
+        ForestBeanBuilder forestBeanBuilder = new ForestBeanBuilder(
                 configurationProperties,
                 new SolonForestProperties(context),
                 new SolonObjectFactory(context),
@@ -76,8 +77,10 @@ public class XPluginImp implements Plugin {
         }
 
         //3.注册到容器
-        BeanWrap beanWrap = context.wrap(config.getId(), config);
+        BeanWrap beanWrap = context.wrap(configurationProperties.getBeanId(), config);
         context.putWrap(ForestConfiguration.class, beanWrap);
-        context.putWrap(config.getId(), beanWrap);
+        context.putWrap(configurationProperties.getBeanId(), beanWrap);
+
+        return config;
     }
 }
