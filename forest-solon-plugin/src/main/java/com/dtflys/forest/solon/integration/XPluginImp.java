@@ -64,6 +64,9 @@ public class XPluginImp implements Plugin {
         ForestConfiguration config = forestBeanBuilder.build();
 
         //2.添加必要拦截器
-        config.setInterceptors(Arrays.asList(SolonUpstreamInterceptor.class));//.add();
+        //config.setInterceptors(Arrays.asList(SolonUpstreamInterceptor.class));//.add();
+
+        //3.注册到容器
+        context.wrapAndPut(ForestConfiguration.class, config);
     }
 }
