@@ -13,6 +13,7 @@ import com.dtflys.forest.solon.SolonUpstreamInterceptor;
 import com.dtflys.forest.solon.properties.ForestConfigurationProperties;
 import com.dtflys.forest.utils.StringUtils;
 import org.noear.solon.core.AopContext;
+import org.noear.solon.core.BeanWrap;
 import org.noear.solon.core.Plugin;
 
 import java.util.Arrays;
@@ -64,13 +65,15 @@ public class XPluginImp implements Plugin {
         ForestConfiguration config = forestBeanBuilder.build();
 
         //2.添加必要拦截器
-        if(config.getInterceptors() != null){
+        if (config.getInterceptors() != null) {
             config.getInterceptors().add(SolonUpstreamInterceptor.class);
-        }else {
+        } else {
             config.setInterceptors(Arrays.asList(SolonUpstreamInterceptor.class));
         }
 
         //3.注册到容器
-        context.wrapAndPut(ForestConfiguration.class, config);
+        BeanWrap beanWrap = context.wrap(config.getId(), config);
+        context.putWrap(ForestConfiguration.class, beanWrap);
+        context.putWrap(config.getId(), beanWrap);
     }
 }
