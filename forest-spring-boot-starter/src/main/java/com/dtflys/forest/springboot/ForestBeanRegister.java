@@ -20,9 +20,7 @@ import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.ManagedMap;
@@ -63,7 +61,6 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
         this.forestConfigurationProperties = forestConfigurationProperties;
         this.properties = properties;
         this.forestObjectFactory = forestObjectFactory;
-        this.forestConfigurationProperties = forestConfigurationProperties;
         this.forestInterceptorFactory = forestInterceptorFactory;
     }
 
