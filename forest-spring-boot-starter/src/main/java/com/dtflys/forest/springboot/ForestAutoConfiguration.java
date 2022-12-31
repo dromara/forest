@@ -1,7 +1,6 @@
 package com.dtflys.forest.springboot;
 
 import com.dtflys.forest.config.SpringForestProperties;
-import com.dtflys.forest.converter.auto.DefaultAutoConverter;
 import com.dtflys.forest.interceptor.SpringInterceptorFactory;
 import com.dtflys.forest.reflection.SpringForestObjectFactory;
 import com.dtflys.forest.spring.ForestBeanProcessor;
@@ -11,13 +10,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Import;
 
 import javax.annotation.Resource;
 
-@Configuration
+@AutoConfiguration
 @EnableConfigurationProperties({ForestConfigurationProperties.class})
 @Import({ForestScannerRegister.class})
 public class ForestAutoConfiguration {
@@ -47,7 +46,7 @@ public class ForestAutoConfiguration {
     @Bean
     @DependsOn("forestBeanProcessor")
     @ConditionalOnMissingBean
-    public ForestBeanRegister forestBeanRegister(SpringForestProperties properties,
+    public ForestBeanRegister forestBeanRegister(ConfigurableApplicationContext applicationContext,SpringForestProperties properties,
                                                     SpringForestObjectFactory forestObjectFactory,
                                                     SpringInterceptorFactory forestInterceptorFactory,
                                                     ForestConfigurationProperties forestConfigurationProperties) {
