@@ -34,7 +34,7 @@ public abstract class ResponseHandler<R> {
         if (request.isAutoRedirection() && response.isRedirection()) {
             // 进行重定向
             ForestRequest redirectionRequest = response.redirectionRequest();
-            return redirectionRequest.execute();
+            return redirectionRequest.execute(request.getBackend(), lifeCycleHandler);
         }
         Object result = lifeCycleHandler.handleSync(request, response);
         if (result instanceof ForestResponse) {

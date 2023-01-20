@@ -79,6 +79,9 @@ public class AsyncHttpExecutor<T> implements HttpExecutor {
      * @return 最大异步线程数
      */
     public static int getMaxAsyncThreadSize() {
+        if (pool == null) {
+            return 0;
+        }
         return pool.getMaximumPoolSize();
     }
 
@@ -89,6 +92,9 @@ public class AsyncHttpExecutor<T> implements HttpExecutor {
      * @return 异步线程池大小
      */
     public static int getAsyncThreadSize() {
+        if (pool == null) {
+            return 0;
+        }
         return pool.getPoolSize();
     }
 

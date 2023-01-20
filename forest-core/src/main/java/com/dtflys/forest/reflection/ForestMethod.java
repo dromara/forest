@@ -1170,7 +1170,6 @@ public class ForestMethod<T> implements VariableScope {
             Object data = args[index];
             factory.addMultipart(nameTemplate, fileNameTemplate, data, multiparts, args);
         }
-
         request.setMultiparts(multiparts);
         // setup ssl keystore
         if (sslKeyStoreId != null) {
@@ -1440,7 +1439,7 @@ public class ForestMethod<T> implements VariableScope {
                 rType, onSuccessClassGenericType);
         request.setLifeCycleHandler(lifeCycleHandler);
         lifeCycleHandler.handleInvokeMethod(request, this, args);
-        return request.execute();
+        return request.execute(this.returnType);
     }
 
 
