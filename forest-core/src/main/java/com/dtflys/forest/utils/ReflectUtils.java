@@ -314,7 +314,7 @@ public class ReflectUtils {
      * @return {@code true}: 是Forest接口注解；{@code false}: 不是Forest接口注解
      */
     public static boolean isForestBaseAnnotation(Annotation annotation) {
-        return isForestBaseAnnotation(annotation);
+        return isForestBaseAnnotation(annotation.annotationType());
     }
 
     /**
