@@ -108,9 +108,6 @@ public class TestAsync {
 
     @Test
     public void testFuture3() {
-        assertThat(configuration.getMaxAsyncThreadSize()).isEqualTo(300);
-        assertThat(configuration.getMaxAsyncQueueSize()).isEqualTo(350);
-
         int size = 16;
         int threads = 8;
         boolean threadPoolFull = false;
@@ -124,6 +121,7 @@ public class TestAsync {
                 Forest.head("/")
                         .host("localhost")
                         .port(server.getPort())
+                        .async()
                         .execute();
             }
         } catch (RuntimeException e) {

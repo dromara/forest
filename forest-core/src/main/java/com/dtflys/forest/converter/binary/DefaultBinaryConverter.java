@@ -136,6 +136,26 @@ public class DefaultBinaryConverter implements ForestConverter<Object>, ForestEn
     }
 
     @Override
+    public byte[] encodeRequestBody(ForestBody reqBody, Charset charset) {
+        List<byte[]> byteList = new LinkedList<>();
+        int size = 0;
+        for (ForestRequestBody body : reqBody) {
+            byte[] byteArray = body.getByteArray();
+            byteList.add(byteArray);
+            size += byteArray.length;
+        }
+        byte[] bytes = new byte[size];
+        int pos = 0;
+        for (byte[] bytesItem : byteList) {
+            for (int i = 0; i < bytesItem.length; i++) {
+                bytes[pos + i] = bytesItem[i];
+            }
+            pos += bytesItem.length;
+        }
+        return bytes;
+    }
+
+    @Override
     public byte[] encodeRequestBody(ForestRequest request, Charset charset) {
         ForestBody reqBody = request.body();
         List<ForestMultipart> multiparts = request.getMultiparts();

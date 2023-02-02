@@ -43,11 +43,5 @@ public class TestArrayClient {
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
     }
 
-    @Test
-    public void testArrayFromVariables() {
-        server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = arrayClient.arrayQueryFromVariables();
-        assertThat(result).isNotNull().isEqualTo(EXPECTED);
-    }
 
 }

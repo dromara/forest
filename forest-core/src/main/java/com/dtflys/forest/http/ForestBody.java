@@ -1,8 +1,9 @@
 package com.dtflys.forest.http;
 
 import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.forest.converter.ForestConverter;
+import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
+import com.dtflys.forest.exceptions.ForestUnsupportException;
 import com.dtflys.forest.http.body.ByteArrayRequestBody;
 import com.dtflys.forest.http.body.FileRequestBody;
 import com.dtflys.forest.http.body.InputStreamRequestBody;
@@ -12,6 +13,8 @@ import com.dtflys.forest.http.body.StringRequestBody;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.Validations;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -33,6 +36,12 @@ public class ForestBody implements List<ForestRequestBody> {
     private ForestDataType bodyType;
 
     /**
+     * 反序列化器
+     */
+    private ForestEncoder encoder;
+
+
+    /**
      * 请求体项列表
      * <p>
      * 该字段为列表类型，列表每一项为请求体项,
@@ -42,6 +51,14 @@ public class ForestBody implements List<ForestRequestBody> {
 
     public ForestBody(ForestConfiguration configuration) {
         this.configuration = configuration;
+    }
+
+    public ForestEncoder getEncoder() {
+        return encoder;
+    }
+
+    public void setEncoder(ForestEncoder encoder) {
+        this.encoder = encoder;
     }
 
     /**
@@ -245,6 +262,55 @@ public class ForestBody implements List<ForestRequestBody> {
         return oldValue;
     }
 
+    public byte[] encode(ForestEncoder encoder, Charset charset) {
+        return encoder.encodeRequestBody(this, charset);
+    }
+
+    public String encodeToString(ForestEncoder encoder, Charset charset) {
+        byte[] bytes = this.encode(encoder, charset);
+        return new String(bytes);
+    }
+
+    public String encodeToString(Charset charset) {
+        if (this.encoder != null) {
+            return encodeToString(this.encoder, charset);
+        }
+        if (ForestDataType.MULTIPART == this.bodyType) {
+            throw new ForestUnsupportException("Forest encoder do not support the body type \"MULTIPART\"");
+        }
+        ForestDataType dataType = this.bodyType == null ? ForestDataType.TEXT : this.bodyType;
+        ForestEncoder forestEncoder = (ForestEncoder) this.configuration.getConverter(dataType);
+        if (forestEncoder == null) {
+            forestEncoder = (ForestEncoder) this.configuration.getConverter(ForestDataType.TEXT);
+        }
+        return encodeToString(forestEncoder, charset);
+    }
+
+    public String encodeToString() {
+        return encodeToString(StandardCharsets.UTF_8);
+    }
+
+
+    public byte[] encode(Charset charset) {
+        if (this.encoder != null) {
+            return encode(this.encoder, charset);
+        }
+        if (ForestDataType.MULTIPART == this.bodyType) {
+            throw new ForestUnsupportException("Forest encoder do not support the body type \"MULTIPART\"");
+        }
+        ForestDataType dataType = this.bodyType == null ? ForestDataType.TEXT : this.bodyType;
+        ForestEncoder forestEncoder = (ForestEncoder) this.configuration.getConverter(dataType);
+        if (forestEncoder == null) {
+            forestEncoder = (ForestEncoder) this.configuration.getConverter(ForestDataType.TEXT);
+        }
+        return encode(forestEncoder, charset);
+    }
+
+    public byte[] encode() {
+        return encode(StandardCharsets.UTF_8);
+    }
+
+
     @Override
     public boolean contains(Object o) {
         return bodyItems.contains(o);
@@ -271,6 +337,19 @@ public class ForestBody implements List<ForestRequestBody> {
             defaultBodyType = forestRequestBody.getDefaultBodyType();
         }
         return bodyItems.add(forestRequestBody);
+    }
+
+    public void replaceNameValue(NameValueRequestBody nameValueRequestBody) {
+        NameValueRequestBody body = getNameValueBody(nameValueRequestBody.getName());
+        if (body != null) {
+            body.setValue(nameValueRequestBody.getValue());
+            body.setValue(nameValueRequestBody.getDefaultValue());
+            body.setContentType(nameValueRequestBody.getContentType());
+        }
+    }
+
+    public void replaceNameValue() {
+
     }
 
     @Override

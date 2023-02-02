@@ -422,12 +422,6 @@ public class ForestRequest<T> implements HasURL {
     /**
      * 反序列化器
      */
-    private ForestEncoder encoder;
-
-
-    /**
-     * 反序列化器
-     */
     private ForestConverter decoder;
 
     /**
@@ -4211,7 +4205,7 @@ public class ForestRequest<T> implements HasURL {
      * @return 序列化器，{@link ForestEncoder}接口实例
      */
     public ForestEncoder getEncoder() {
-        return encoder;
+        return this.body.getEncoder();
     }
 
     /**
@@ -4221,7 +4215,7 @@ public class ForestRequest<T> implements HasURL {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> setEncoder(ForestEncoder encoder) {
-        this.encoder = encoder;
+        this.body.setEncoder(encoder);
         return this;
     }
 
@@ -4520,6 +4514,8 @@ public class ForestRequest<T> implements HasURL {
         newRequest.filename = this.filename;
         newRequest.charset = this.charset;
         newRequest.decoder = this.decoder;
+        newRequest.autoRedirection = this.autoRedirection;
+        newRequest.authenticator = this.authenticator;
         newRequest.decompressResponseGzipEnabled = this.decompressResponseGzipEnabled;
         newRequest.responseEncode = this.responseEncode;
         newRequest.isDownloadFile = this.isDownloadFile;
@@ -4538,6 +4534,7 @@ public class ForestRequest<T> implements HasURL {
         newRequest.onProgress = this.onProgress;
         newRequest.progressStep = this.progressStep;
         newRequest.onRetry = this.onRetry;
+        newRequest.onCanceled = this.onCanceled;
         newRequest.retryWhen = this.retryWhen;
         newRequest.retryEnabled = this.retryEnabled;
         newRequest.type = this.type;

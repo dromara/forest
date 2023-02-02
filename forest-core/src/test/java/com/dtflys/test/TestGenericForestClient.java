@@ -2,6 +2,7 @@ package com.dtflys.test;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
+import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.auth.BasicAuth;
@@ -23,6 +24,8 @@ import com.dtflys.forest.interceptor.InterceptorChain;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.retryer.NoneRetryer;
+import com.dtflys.forest.ssl.SSLSocketFactoryBuilder;
+import com.dtflys.forest.ssl.TrustAllManager;
 import com.dtflys.forest.utils.ForestProgress;
 import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.test.http.BaseClientTest;
@@ -38,6 +41,10 @@ import org.assertj.core.internal.bytebuddy.asm.Advice;
 import org.junit.Rule;
 import org.junit.Test;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -49,6 +56,7 @@ import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -1717,7 +1725,6 @@ public class TestGenericForestClient extends BaseClientTest {
         mockRequest(server)
                 .assertBodyEquals(byteArray);
     }
-
 
     public Buffer getImageBuffer() {
         URL url = this.getClass().getResource("/test-img.jpg");
