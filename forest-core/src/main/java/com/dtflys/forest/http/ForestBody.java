@@ -4,9 +4,11 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestUnsupportException;
+import com.dtflys.forest.http.body.BinaryRequestBody;
 import com.dtflys.forest.http.body.ByteArrayRequestBody;
 import com.dtflys.forest.http.body.FileRequestBody;
 import com.dtflys.forest.http.body.InputStreamRequestBody;
+import com.dtflys.forest.http.body.MultipartRequestBody;
 import com.dtflys.forest.http.body.NameValueRequestBody;
 import com.dtflys.forest.http.body.ObjectRequestBody;
 import com.dtflys.forest.http.body.StringRequestBody;
@@ -158,6 +160,7 @@ public class ForestBody implements List<ForestRequestBody> {
         return items;
     }
 
+
     public List<StringRequestBody> getStringItems() {
         return getItems(StringRequestBody.class);
     }
@@ -178,9 +181,18 @@ public class ForestBody implements List<ForestRequestBody> {
         return getItems(InputStreamRequestBody.class);
     }
 
+    public List<BinaryRequestBody> getBinaryItems() {
+        return getItems(BinaryRequestBody.class);
+    }
+
     public List<FileRequestBody> getFileItems() {
         return getItems(FileRequestBody.class);
     }
+
+    public List<MultipartRequestBody> getMultipartItems() {
+        return getItems(MultipartRequestBody.class);
+    }
+
 
 
     public ForestDataType getDefaultBodyType() {
@@ -357,6 +369,20 @@ public class ForestBody implements List<ForestRequestBody> {
         return bodyItems.remove(o);
     }
 
+    public <T extends ForestRequestBody> boolean remove(Class<T> bodyItemClass) {
+        List<T> items = new LinkedList<>();
+        List<Boolean> rets = new LinkedList<>();
+        for (ForestRequestBody item : bodyItems) {
+            Class itemClass = item.getClass();
+            if (bodyItemClass.isAssignableFrom(itemClass)) {
+                rets.add(bodyItems.remove(item));
+            }
+        }
+        if (rets.isEmpty()) {
+            return false;
+        }
+        return rets.stream().allMatch(ret -> ret);
+    }
 
     @Override
     public boolean containsAll(Collection<?> c) {

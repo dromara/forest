@@ -4,7 +4,9 @@ import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.ForestDataType;
 
-public class MultipartRequestBody extends ForestRequestBody {
+import java.io.InputStream;
+
+public class MultipartRequestBody extends BinaryRequestBody {
 
     private ForestMultipart multipart;
 
@@ -23,6 +25,11 @@ public class MultipartRequestBody extends ForestRequestBody {
     @Override
     public byte[] getByteArray() {
         return multipart.getBytes();
+    }
+
+    @Override
+    InputStream getInputStream() {
+        return multipart.getInputStream();
     }
 
     @Override

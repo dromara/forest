@@ -6,10 +6,12 @@ import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ByteArrayRequestBody extends ForestRequestBody implements SupportFormUrlEncoded {
+public class ByteArrayRequestBody extends BinaryRequestBody implements SupportFormUrlEncoded {
 
     private byte[] byteArray;
 
@@ -24,6 +26,11 @@ public class ByteArrayRequestBody extends ForestRequestBody implements SupportFo
     @Override
     public byte[] getByteArray() {
         return byteArray;
+    }
+
+    @Override
+    InputStream getInputStream() {
+        return new ByteArrayInputStream(byteArray);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.dtflys.forest.lifecycles.parameter;
 
 import com.dtflys.forest.annotation.DataFile;
 import com.dtflys.forest.backend.ContentType;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.multipart.ForestMultipartFactory;
@@ -38,9 +39,17 @@ public class DataFileLifeCycle implements ParameterAnnotationLifeCycle<DataFile,
                 partContentType);
         method.addMultipartFactory(factory);
         String contentType = metaRequest.getContentType();
-        if (metaRequest.getBodyType() == null && !ContentType.APPLICATION_OCTET_STREAM.equals(contentType)) {
-            metaRequest.setBodyType(ForestDataType.MULTIPART);
+        if (metaRequest.getBodyType() == null) {
+            if (ContentType.APPLICATION_OCTET_STREAM.equals(contentType)) {
+                metaRequest.setBodyType(ForestDataType.BINARY);
+            } else {
+                metaRequest.setBodyType(ForestDataType.MULTIPART);
+            }
         }
     }
 
+    @Override
+    public boolean beforeExecute(ForestRequest request) {
+        return ParameterAnnotationLifeCycle.super.beforeExecute(request);
+    }
 }

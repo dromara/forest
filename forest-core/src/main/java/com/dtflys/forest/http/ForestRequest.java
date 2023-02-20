@@ -51,6 +51,7 @@ import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.body.ByteArrayRequestBody;
 import com.dtflys.forest.http.body.FileRequestBody;
 import com.dtflys.forest.http.body.InputStreamRequestBody;
+import com.dtflys.forest.http.body.MultipartRequestBody;
 import com.dtflys.forest.http.body.NameValueRequestBody;
 import com.dtflys.forest.http.body.ObjectRequestBody;
 import com.dtflys.forest.http.body.StringRequestBody;
@@ -104,6 +105,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static com.dtflys.forest.mapping.MappingParameter.TARGET_BODY;
 import static com.dtflys.forest.mapping.MappingParameter.TARGET_HEADER;
@@ -294,12 +296,6 @@ public class ForestRequest<T> implements HasURL {
      * <p>所有本请求对象中的请求头都在由该请求体集合对象管理
      */
     private ForestHeaderMap headers = new ForestHeaderMap(this);
-
-
-    /**
-     * 文件上传项列表
-     */
-    private List<ForestMultipart> multiparts = new LinkedList<>();
 
     /**
      * 文件名
@@ -3312,7 +3308,9 @@ public class ForestRequest<T> implements HasURL {
 
 
     public List<ForestMultipart> getMultiparts() {
-        return multiparts;
+        return this.body.getMultipartItems().stream()
+                .map(body -> body.getMultipart())
+                .collect(Collectors.toList());
     }
 
     /**
@@ -3322,8 +3320,8 @@ public class ForestRequest<T> implements HasURL {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> setMultiparts(List<ForestMultipart> multiparts) {
-        this.multiparts = multiparts;
-        return this;
+        this.body.remove(MultipartRequestBody.class);
+        return addMultipart(multiparts);
     }
 
     /**
@@ -3333,12 +3331,24 @@ public class ForestRequest<T> implements HasURL {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> addMultipart(ForestMultipart multipart) {
-        if (this.multiparts == null) {
-            this.multiparts = new LinkedList<>();
-        }
-        this.multiparts.add(multipart);
+        this.body.add(new MultipartRequestBody(multipart));
         return this;
     }
+
+    /**
+     * 批量添加 Multipart
+     *
+     * @param multiparts {@link ForestMultipart} 对象列表
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.29
+     */
+    public ForestRequest<T> addMultipart(List<ForestMultipart> multiparts) {
+        for (ForestMultipart multipart : multiparts) {
+            this.body.add(new MultipartRequestBody(multipart));
+        }
+        return this;
+    }
+
 
     /**
      * 添加文件 Multipart
@@ -4505,11 +4515,6 @@ public class ForestRequest<T> implements HasURL {
         newRequest.url = this.url;
         newRequest.query = this.query.clone();
         newRequest.headers = this.headers.clone();
-        List<ForestMultipart> newMultiparts = new ArrayList<>(this.multiparts.size());
-        for (ForestMultipart part : this.multiparts) {
-            newMultiparts.add(part);
-        }
-        newRequest.multiparts = newMultiparts;
         newRequest.timeout = this.timeout;
         newRequest.filename = this.filename;
         newRequest.charset = this.charset;
