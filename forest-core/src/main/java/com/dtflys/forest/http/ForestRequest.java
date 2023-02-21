@@ -2294,7 +2294,11 @@ public class ForestRequest<T> implements HasURL {
         } else {
             mineCharset = Charset.forName(strCharset);
         }
-        return new ContentType(mineType, mineCharset).hasDefinedCharset(hasDefinedCharset);
+        ContentType mineContentType = new ContentType(mineType, mineCharset);
+        if (hasDefinedCharset) {
+            mineContentType.definedCharsetName(typeGroup[1]);
+        }
+        return mineContentType;
     }
 
 

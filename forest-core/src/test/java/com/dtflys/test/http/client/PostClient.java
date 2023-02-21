@@ -276,7 +276,7 @@ public interface PostClient {
             url = "http://localhost:{port}/json",
             headers = {"Content-Type: application/json; charset=utf-8"}
     )
-    String postJsonWithCnCharacters5(@Body JsonTestUser3 user);
+    ForestRequest<String> postJsonWithCnCharacters5(@Body JsonTestUser3 user);
 
     @Post(
             url = "http://localhost:{port}/json",

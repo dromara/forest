@@ -1,5 +1,6 @@
 package com.dtflys.test.interceptor;
 
+import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestType;
@@ -30,6 +31,11 @@ public class SimpleInterceptor implements Interceptor<String> {
     public void onSuccess(String data, ForestRequest request, ForestResponse response) {
         log.info("invoke Simple onSuccess");
         response.setResult("XX: " + data);
+    }
+
+    @Override
+    public byte[] onBodyEncode(ForestRequest request, ForestEncoder encoder, byte[] encodedData) {
+        return Interceptor.super.onBodyEncode(request, encoder, encodedData);
     }
 
     @Override

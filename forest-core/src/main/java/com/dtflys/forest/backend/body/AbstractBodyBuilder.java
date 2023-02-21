@@ -34,7 +34,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
     public void buildBody(T httpRequest, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         ContentType mineContentType = request.mineContentType();
         Charset charset = mineContentType.getCharset();
-        String strCharset = charset.name();
+        String charsetName = mineContentType.getCharsetName();
         boolean mergeCharset = mineContentType.isHasDefinedCharset();
         String ctypeWithoutParams = mineContentType.toStringWithoutParameters();
 
@@ -42,7 +42,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
         if (encoder != null) {
             byte[] bodyBytes = request.body().encode(encoder, charset);
             bodyBytes = lifeCycleHandler.handleBodyEncode(request, encoder, bodyBytes);
-            setBinaryBody(httpRequest, request, strCharset, ctypeWithoutParams, bodyBytes, mergeCharset);
+            setBinaryBody(httpRequest, request, charsetName, ctypeWithoutParams, bodyBytes, mergeCharset);
             return;
         }
 
@@ -71,7 +71,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
             }
             byte[] bodyBytes = reqBody.encode(bodyEncoder, charset);
             bodyBytes = lifeCycleHandler.handleBodyEncode(request, bodyEncoder, bodyBytes);
-            setBinaryBody(httpRequest, request, strCharset, ctypeWithoutParams, bodyBytes, mergeCharset);
+            setBinaryBody(httpRequest, request, charsetName, ctypeWithoutParams, bodyBytes, mergeCharset);
         }
     }
 

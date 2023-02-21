@@ -1,6 +1,5 @@
 package com.dtflys.forest.backend;
 
-import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 
@@ -30,6 +29,8 @@ public class ContentType {
     private Charset charset;
 
     private boolean hasDefinedCharset = false;
+
+    private String definedCharsetName;
 
     private final Map<String, String> parameters = new LinkedHashMap<>();
 
@@ -86,6 +87,16 @@ public class ContentType {
 
     public Charset getCharset() {
         return charset;
+    }
+
+    public String getCharsetName() {
+        if (hasDefinedCharset && StringUtils.isNotEmpty(definedCharsetName)) {
+            return definedCharsetName;
+        }
+        if (charset != null) {
+            return charset.name();
+        }
+        return "UTF-8";
     }
 
     public boolean isEmpty() {
@@ -264,8 +275,9 @@ public class ContentType {
         return hasDefinedCharset;
     }
 
-    public ContentType hasDefinedCharset(boolean hasDefinedCharset) {
-        this.hasDefinedCharset = hasDefinedCharset;
+    public ContentType definedCharsetName(String charsetName) {
+        this.hasDefinedCharset = true;
+        this.definedCharsetName = charsetName;
         return this;
     }
 }

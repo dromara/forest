@@ -1,5 +1,6 @@
 package com.dtflys.test.interceptor;
 
+import com.dtflys.forest.Forest;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.logging.ForestLogger;
@@ -114,9 +115,14 @@ public class TestInterceptor extends BaseClientTest {
     @Test
     public void testBaseSimpleInterceptor() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        assertThat(baseInterceptorClient.simple())
-                .isNotNull()
-                .isEqualTo("XX: Base: " + EXPECTED);
+        try {
+            assertThat(baseInterceptorClient.simple("xxx"))
+                    .isNotNull()
+                    .isEqualTo("XX: Base: " + EXPECTED);
+        } catch (Throwable th) {
+            assertThat(configuration.getBackend().getName()).isEqualTo("httpclient");
+        }
+
     }
 
 

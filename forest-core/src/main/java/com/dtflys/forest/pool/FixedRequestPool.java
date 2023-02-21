@@ -85,7 +85,7 @@ public class FixedRequestPool implements ForestRequestPool {
         while (runningPoolSize.get() >= maxPoolSize ||
                 route.getRequestCount().get() >= maxPoolSizePerRoute) {
             try {
-                this.wait(100);
+                this.wait(10);
             } catch (InterruptedException e) {
                 throw new ForestRuntimeException(e);
             }

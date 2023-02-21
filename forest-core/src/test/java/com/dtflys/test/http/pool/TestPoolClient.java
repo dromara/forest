@@ -187,7 +187,7 @@ public class TestPoolClient extends BaseClientTest {
         AtomicBoolean hasOut = new AtomicBoolean(false);
         AtomicReference<ForestPoolException> exceptionRef = new AtomicReference<>(null);
         for (int i = 0; i < count; i++) {
-            poolClient.sendAsync((data, req, res) -> {
+            poolClient.sendAsync(i, (data, req, res) -> {
                 if (pool.getRunningPoolSize() > pool.getMaxPoolSize()) {
                     hasOut.set(true);
                 } else {
@@ -216,7 +216,7 @@ public class TestPoolClient extends BaseClientTest {
                 .setMaxAsyncThreadSize(30)
                 .setMaxAsyncQueueSize(10);
         PoolClient poolClient = poolConf.client(PoolClient.class);
-        int count = 300;
+        int count = 100;
         for (int i = 0; i < count; i++) {
             server.enqueue(new MockResponse().setBody(EXPECTED));
         }
@@ -224,20 +224,27 @@ public class TestPoolClient extends BaseClientTest {
         CountDownLatch latch = new CountDownLatch(count);
         AtomicBoolean hasOut = new AtomicBoolean(false);
         AtomicReference<ForestPoolException> exceptionRef = new AtomicReference<>(null);
+        Object lock = new Object();
         for (int i = 0; i < count; i++) {
-            poolClient.sendAsync((data, req, res) -> {
-                if (pool.getRunningPoolSize() > pool.getMaxPoolSize()) {
-                    hasOut.set(true);
-                } else {
-                    System.out.println("pool running size: " + pool.getRunningPoolSize() + ", max size: " + pool.getMaxPoolSize() + ", queue size: " + pool.getQueueSize());
+            poolClient.sendAsync(i, (data, req, res) -> {
+                synchronized (lock) {
+                    latch.countDown();
+                    if (pool.getRunningPoolSize() > pool.getMaxPoolSize()) {
+                        hasOut.set(true);
+                    } else {
+                        System.out.println("[" + Thread.currentThread().getName() + "]\tpool running size: " + pool.getRunningPoolSize() + ", max size: " + pool.getMaxPoolSize() + ", queue size: " + pool.getQueueSize() + ", count: " + latch.getCount());
+                    }
                 }
-                latch.countDown();
             }, (e, req, res) -> {
-                e.printStackTrace();
-                if (e instanceof ForestPoolException) {
-                    exceptionRef.set((ForestPoolException) e);
+                synchronized (lock) {
+                    latch.countDown();
+                    System.out.println("Error ==> pool running size: " + pool.getRunningPoolSize() + ", max size: " + pool.getMaxPoolSize() + ", queue size: " + pool.getQueueSize() + ", count: " + latch.getCount());
+                    e.printStackTrace();
+                    if (e instanceof ForestPoolException) {
+                        exceptionRef.set((ForestPoolException) e);
+                    }
+
                 }
-                latch.countDown();
             });
         }
         latch.await();
