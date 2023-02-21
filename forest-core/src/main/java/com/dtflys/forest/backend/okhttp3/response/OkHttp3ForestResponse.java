@@ -155,7 +155,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
         if (StringUtils.isNotBlank(request.getResponseEncode())) {
             this.charset = request.getResponseEncode();
         } else if (contentType != null) {
-            this.charset = this.contentType.getCharset();
+            this.charset = this.contentType.getCharset().name();
         } else {
             if (this.contentEncoding != null) {
                 try {

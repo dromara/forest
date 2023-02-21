@@ -1,6 +1,5 @@
 package com.dtflys.forest.http;
 
-import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestUnsupportException;
@@ -13,6 +12,7 @@ import com.dtflys.forest.http.body.NameValueRequestBody;
 import com.dtflys.forest.http.body.ObjectRequestBody;
 import com.dtflys.forest.http.body.StringRequestBody;
 import com.dtflys.forest.utils.ForestDataType;
+import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.Validations;
 
 import java.nio.charset.Charset;
@@ -28,7 +28,8 @@ import java.util.Objects;
 
 public class ForestBody implements List<ForestRequestBody> {
 
-    private final ForestConfiguration configuration;
+    private final ForestRequest request;
+
 
     private ForestDataType defaultBodyType = ForestDataType.BINARY;
 
@@ -51,8 +52,8 @@ public class ForestBody implements List<ForestRequestBody> {
      */
     private List<ForestRequestBody> bodyItems = new LinkedList<>();
 
-    public ForestBody(ForestConfiguration configuration) {
-        this.configuration = configuration;
+    public ForestBody(ForestRequest request) {
+        this.request = request;
     }
 
     public ForestEncoder getEncoder() {
@@ -126,7 +127,7 @@ public class ForestBody implements List<ForestRequestBody> {
      */
     public Map<String, Object> nameValuesMapWithObject() {
         Map<String, Object> map = new LinkedHashMap<>();
-        ForestJsonConverter jsonConverter = configuration.getJsonConverter();
+        ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         for (ForestRequestBody body : bodyItems) {
             if (body instanceof NameValueRequestBody) {
                 NameValueRequestBody nameValueRequestBody = (NameValueRequestBody) body;
@@ -274,6 +275,18 @@ public class ForestBody implements List<ForestRequestBody> {
         return oldValue;
     }
 
+    private ForestEncoder selectEncoder() {
+        if (ForestDataType.MULTIPART == this.bodyType) {
+            throw new ForestUnsupportException("Forest encoder do not support the body type \"MULTIPART\"");
+        }
+        ForestDataType dataType = this.bodyType == null ? this.request.mineContentType().bodyType() : this.bodyType;
+        ForestEncoder forestEncoder = (ForestEncoder) this.request.getConfiguration().getConverter(dataType);
+        if (forestEncoder == null) {
+            forestEncoder = (ForestEncoder) this.request.getConfiguration().getConverter(ForestDataType.TEXT);
+        }
+        return forestEncoder;
+    }
+
     public byte[] encode(ForestEncoder encoder, Charset charset) {
         return encoder.encodeRequestBody(this, charset);
     }
@@ -287,19 +300,19 @@ public class ForestBody implements List<ForestRequestBody> {
         if (this.encoder != null) {
             return encodeToString(this.encoder, charset);
         }
-        if (ForestDataType.MULTIPART == this.bodyType) {
-            throw new ForestUnsupportException("Forest encoder do not support the body type \"MULTIPART\"");
-        }
-        ForestDataType dataType = this.bodyType == null ? ForestDataType.TEXT : this.bodyType;
-        ForestEncoder forestEncoder = (ForestEncoder) this.configuration.getConverter(dataType);
-        if (forestEncoder == null) {
-            forestEncoder = (ForestEncoder) this.configuration.getConverter(ForestDataType.TEXT);
-        }
-        return encodeToString(forestEncoder, charset);
+        return encodeToString(selectEncoder(), charset);
     }
 
+
     public String encodeToString() {
-        return encodeToString(StandardCharsets.UTF_8);
+        String strCharset = request.getCharset();
+        if (StringUtils.isEmpty(strCharset)) {
+            strCharset = request.getConfiguration().getCharset();
+        }
+        if (StringUtils.isEmpty(strCharset)) {
+            strCharset = "UTF-8";
+        }
+        return encodeToString(Charset.forName(strCharset));
     }
 
 
@@ -307,15 +320,7 @@ public class ForestBody implements List<ForestRequestBody> {
         if (this.encoder != null) {
             return encode(this.encoder, charset);
         }
-        if (ForestDataType.MULTIPART == this.bodyType) {
-            throw new ForestUnsupportException("Forest encoder do not support the body type \"MULTIPART\"");
-        }
-        ForestDataType dataType = this.bodyType == null ? ForestDataType.TEXT : this.bodyType;
-        ForestEncoder forestEncoder = (ForestEncoder) this.configuration.getConverter(dataType);
-        if (forestEncoder == null) {
-            forestEncoder = (ForestEncoder) this.configuration.getConverter(ForestDataType.TEXT);
-        }
-        return encode(forestEncoder, charset);
+        return encode(selectEncoder(), charset);
     }
 
     public byte[] encode() {

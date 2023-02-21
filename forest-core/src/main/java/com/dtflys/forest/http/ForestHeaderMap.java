@@ -24,6 +24,8 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.callback.Lazy;
+
 import java.util.*;
 
 /**
@@ -65,6 +67,10 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
     @Override
     public boolean isEmpty() {
         return size() == 0;
+    }
+
+    public HasURL getHasURL() {
+        return hasURL;
     }
 
     @Override
@@ -368,7 +374,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
     public void addHeader(String name, String value) {
         if ("Cookie".equalsIgnoreCase(name)) {
             ForestCookies cookies = ForestCookies.parse(value);
-            if (cookies != null && cookies.size() > 0) {
+            if (cookies.size() > 0) {
                 addCookies(cookies);
             }
         } else if ("Set-Cookie".equalsIgnoreCase(name)) {
@@ -380,6 +386,10 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
         } else {
             addHeader(new SimpleHeader(name, value));
         }
+    }
+
+    public void addHeader(String name, Lazy<Object> value) {
+        addHeader(new LazyHeader(this, name, value));
     }
 
     /**
@@ -468,6 +478,21 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
         }
     }
 
+    public void setHeader(String name, Lazy<Object> lazyValue) {
+        ForestHeader header = getHeader(name);
+        if (header != null) {
+            if (header instanceof LazyHeader) {
+                ((LazyHeader) header).setValue(lazyValue);
+            } else {
+                headers.remove(header);
+                addHeader(name, lazyValue);
+            }
+        } else {
+            addHeader(name, lazyValue);
+        }
+
+    }
+
     /**
      * 通过 Map 批量设置请求头
      *
@@ -498,11 +523,10 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
      *
      * @return 新的Forest请求头Map
      */
-    @Override
-    public ForestHeaderMap clone() {
+    public ForestHeaderMap clone(HasURL hasURL) {
         ForestHeaderMap newHeaderMap = new ForestHeaderMap(hasURL);
         for (ForestHeader header : headers) {
-            newHeaderMap.addHeader(header);
+            newHeaderMap.addHeader(header.clone(newHeaderMap));
         }
         for (ForestCookie cookie : requestCookies) {
             newHeaderMap.requestCookies.add(cookie);

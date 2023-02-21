@@ -16,6 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 /**
@@ -43,7 +44,7 @@ public class HttpclientForestResponse extends ForestResponse {
             if (entity != null) {
                 Header type = entity.getContentType();
                 if (type != null) {
-                    this.contentType = new ContentType(type.getValue());
+                    this.contentType = new ContentType(type.getValue(), StandardCharsets.UTF_8);
                 }
                 //响应消息的编码格式: gzip...
                 setupContentEncoding();
@@ -73,7 +74,7 @@ public class HttpclientForestResponse extends ForestResponse {
         if (StringUtils.isNotBlank(request.getResponseEncode())) {
             this.charset = request.getResponseEncode();
         } else if (contentType != null) {
-            this.charset = this.contentType.getCharset();
+            this.charset = this.contentType.getCharset().name();
         } else {
             if (this.contentEncoding != null) {
                 try {

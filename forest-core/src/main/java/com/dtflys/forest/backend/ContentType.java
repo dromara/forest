@@ -1,8 +1,11 @@
 package com.dtflys.forest.backend;
 
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -24,16 +27,22 @@ public class ContentType {
 
     private final String subType;
 
-    private String charset;
+    private Charset charset;
+
+    private boolean hasDefinedCharset = false;
 
     private final Map<String, String> parameters = new LinkedHashMap<>();
+
+    public ContentType(String type) {
+        this(type, StandardCharsets.UTF_8);
+    }
 
     public ContentType(String type, String subType) {
         this.type = type;
         this.subType = subType;
     }
 
-    public ContentType(String contentType) {
+    public ContentType(String contentType, Charset defaultCharset) {
         String[] group = contentType.split(";");
         String cty = group[0].trim();
         String[] strs = cty.split("/");
@@ -52,12 +61,20 @@ public class ContentType {
                     String charsetLabel = expr[0].trim();
                     if ("charset".equalsIgnoreCase(charsetLabel)) {
                         String charsetValue = expr[1].trim();
-                        this.charset = charsetValue.replace("\"", "");
+                        charsetValue = charsetValue.replace("\"", "");
+                        if (StringUtils.isNotEmpty(charsetValue)) {
+                            this.hasDefinedCharset = true;
+                            this.charset = Charset.forName(charsetValue);
+                        }
                     }
                 }
             }
         }
+        if (this.charset == null) {
+            this.charset = defaultCharset != null ? defaultCharset : StandardCharsets.UTF_8;
+        }
     }
+
 
     public String getType() {
         return type;
@@ -67,7 +84,7 @@ public class ContentType {
         return subType;
     }
 
-    public String getCharset() {
+    public Charset getCharset() {
         return charset;
     }
 
@@ -241,5 +258,9 @@ public class ContentType {
             builder.append("/").append(subType);
         }
         return builder.toString();
+    }
+
+    public boolean isHasDefinedCharset() {
+        return hasDefinedCharset;
     }
 }

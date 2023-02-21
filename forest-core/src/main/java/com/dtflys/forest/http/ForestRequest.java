@@ -29,6 +29,7 @@ import com.dtflys.forest.auth.ForestAuthenticator;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.backend.HttpExecutor;
+import com.dtflys.forest.callback.Lazy;
 import com.dtflys.forest.callback.OnCanceled;
 import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnLoadCookie;
@@ -92,6 +93,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -452,16 +455,13 @@ public class ForestRequest<T> implements HasURL {
      */
     private ForestProxy proxy;
 
+
+
     public ForestRequest(ForestConfiguration configuration, ForestMethod method, Object[] arguments) {
-        this(configuration, method, arguments, new ForestBody(configuration));
-    }
-
-
-    public ForestRequest(ForestConfiguration configuration, ForestMethod method, Object[] arguments, ForestBody body) {
         this.configuration = configuration;
         this.method = method;
         this.arguments = arguments;
-        this.body = body;
+        this.body = new ForestBody(this);
     }
 
     public ForestRequest(ForestConfiguration configuration, ForestMethod method) {
@@ -1933,7 +1933,7 @@ public class ForestRequest<T> implements HasURL {
      * @return 请求参数编码字符集
      */
     public String getCharset() {
-        return charset;
+        return this.charset;
     }
 
     /**
@@ -1945,6 +1945,20 @@ public class ForestRequest<T> implements HasURL {
     public ForestRequest<T> setCharset(String charset) {
         this.charset = charset;
         return this;
+    }
+
+    public Charset mineCharset() {
+        if (StringUtils.isNotEmpty(this.charset)) {
+            return Charset.forName(this.charset);
+        }
+        if (StringUtils.isNotEmpty(this.configuration.getCharset())) {
+            return Charset.forName(this.charset);
+        }
+        ContentType mineType = this.mineContentType();
+        if (mineType != null && mineType.getCharset() != null) {
+            return mineType.getCharset();
+        }
+        return StandardCharsets.UTF_8;
     }
 
     /**
@@ -2246,6 +2260,40 @@ public class ForestRequest<T> implements HasURL {
      */
     public ForestRequest<T> contentType(String contentType) {
         return setContentType(contentType);
+    }
+
+
+    /**
+     * 获取请求头 Content-Type 的 MINE 对象
+     *
+     * @return 请求头 Content-Type 的 MINE 对象
+     * @since 1.5.29
+     */
+    public ContentType mineContentType() {
+        String contentType = getContentType();
+
+        if (StringUtils.isEmpty(contentType)) {
+            contentType = ContentType.APPLICATION_X_WWW_FORM_URLENCODED;
+        }
+
+        String[] typeGroup = contentType.split(";[ ]*charset=");
+        String mineType = typeGroup[0];
+
+        if (StringUtils.isEmpty(mineType)) {
+            mineType = ContentType.APPLICATION_X_WWW_FORM_URLENCODED;
+        }
+
+        Charset mineCharset = null;
+        String strCharset = this.getCharset();
+        if (StringUtils.isEmpty(strCharset)) {
+            strCharset = this.configuration.getCharset();
+        }
+        if (StringUtils.isEmpty(strCharset)) {
+            mineCharset = StandardCharsets.UTF_8;
+        } else {
+            mineCharset = Charset.forName(strCharset);
+        }
+        return new ContentType(mineType, mineCharset);
     }
 
 
@@ -3216,6 +3264,22 @@ public class ForestRequest<T> implements HasURL {
             return this;
         }
         this.headers.setHeader(name, String.valueOf(value));
+        return this;
+    }
+
+    /**
+     * 添加延迟求值的请求头到该请求中
+     *
+     * @param name 请求头名称
+     * @param value 延迟求值的 Lambda
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.29
+     */
+    public ForestRequest<T> addHeader(String name, Lazy<Object> value) {
+        if (value == null) {
+            return this;
+        }
+        this.headers.setHeader(name, value);
         return this;
     }
 
@@ -4501,20 +4565,19 @@ public class ForestRequest<T> implements HasURL {
      */
     @Override
     public ForestRequest<T> clone() {
-        ForestBody newBody = new ForestBody(configuration);
+        ForestRequest<T> newRequest = new ForestRequest<>(this.configuration, this.method, this.arguments);
+        ForestBody newBody = newRequest.body();
         newBody.setBodyType(body.getBodyType());
         for (ForestRequestBody body : this.body) {
             newBody.add(body);
         }
-
-        ForestRequest<T> newRequest = new ForestRequest<>(this.configuration, this.method, this.arguments, body);
         newRequest.backend = this.backend;
         newRequest.lifeCycleHandler = this.lifeCycleHandler;
         newRequest.protocol = this.protocol;
         newRequest.sslProtocol = this.sslProtocol;
         newRequest.url = this.url;
         newRequest.query = this.query.clone();
-        newRequest.headers = this.headers.clone();
+        newRequest.headers = this.headers.clone(newRequest);
         newRequest.timeout = this.timeout;
         newRequest.filename = this.filename;
         newRequest.charset = this.charset;

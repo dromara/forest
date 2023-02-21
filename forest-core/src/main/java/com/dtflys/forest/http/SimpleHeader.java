@@ -33,4 +33,9 @@ public class SimpleHeader implements ForestHeader<SimpleHeader, String> {
         this.value = value;
         return this;
     }
+
+    @Override
+    public SimpleHeader clone(ForestHeaderMap headerMap) {
+        return new SimpleHeader(name, value);
+    }
 }

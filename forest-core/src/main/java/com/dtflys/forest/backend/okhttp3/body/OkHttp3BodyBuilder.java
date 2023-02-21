@@ -84,7 +84,7 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
         } else {
             bodyBuilder = new MultipartBody.Builder();
         }
-        ContentType objContentType = new ContentType(contentType);
+        ContentType objContentType = new ContentType(contentType, request.mineCharset());
         MediaType mediaType = MediaType.parse(objContentType.toStringWithoutParameters());
         if ("multipart".equals(mediaType.type())) {
             bodyBuilder.setType(mediaType);
