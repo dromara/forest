@@ -76,13 +76,7 @@ public class ReflectUtils {
             ParameterizedType pt = (ParameterizedType) genericType;
             return ((Class<?>) pt.getRawType());
         } else if (genericType instanceof TypeVariable) {
-            TypeVariable<?> tType = (TypeVariable<?>) genericType;
-            String className = tType.getGenericDeclaration().toString();
-            try {
-                return Class.forName(className);
-            } catch (ClassNotFoundException ignored) {
-            }
-            return null;
+            return (Class<?>) ((TypeVariable<?>) genericType).getBounds()[0];
         } else if (genericType instanceof WildcardType
                 && "?".equals(genericType.toString())) {
             return Object.class;
