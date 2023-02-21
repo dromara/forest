@@ -331,7 +331,11 @@ public class TestGenericForestClient extends BaseClientTest {
         for (int j = 0; j < 10; j++) {
             final int total = 10;
             for (int i = 0; i < total; i++) {
-                server.enqueue(new MockResponse().setBody(EXPECTED));
+                MockResponse response = new MockResponse().setBody(EXPECTED);
+                if (i == 9) {
+                    response.setHeadersDelay(2, TimeUnit.SECONDS);
+                }
+                server.enqueue(response);
             }
             final CountDownLatch latch = new CountDownLatch(total);
             final AtomicInteger count = new AtomicInteger(0);
@@ -340,11 +344,15 @@ public class TestGenericForestClient extends BaseClientTest {
                 Forest.get("/")
                         .host("localhost")
                         .port(server.getPort())
+                        .addAttachment("num", i + "-" + j)
+                        .connectTimeout(200)
+                        .readTimeout(200)
                         .async()
                         .setLogConfiguration(logConfiguration)
                         .onSuccess((data, req, res) -> {
                             latch.countDown();
                             int c = count.incrementAndGet();
+                            System.out.println(Thread.currentThread().getName() + " 成功: " + req.getAttachment("num"));
                             if (c == total) {
 //                                System.out.println("第一阶段: 循环已完成");
                             } else {
@@ -355,6 +363,7 @@ public class TestGenericForestClient extends BaseClientTest {
                             latch.countDown();
                             int c = count.incrementAndGet();
                             errorCount.incrementAndGet();
+                            System.out.println(Thread.currentThread().getName() +" 失败: " + req.getAttachment("num"));
                             if (c == total) {
 //                                System.out.println("第一阶段: 循环已完成");
                             } else {
@@ -369,7 +378,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 latch.await();
             } catch (InterruptedException e) {
             }
-            assertThat(errorCount.get()).isEqualTo(0);
+            assertThat(errorCount.get()).isGreaterThan(0);
 //            System.out.println("第一阶段: 全部已完成");
 
             for (int i = 0; i < total; i++) {
@@ -955,10 +964,10 @@ public class TestGenericForestClient extends BaseClientTest {
                 .addHeader("name", req -> "Forest.backend = " + req.getBackend().getName())
                 .addBody("{\"id\":\"1972664191\", \"name\":\"XieYu20011008\"}")
                 .execute();
-        mockRequest(server)
-                .assertHeaderEquals("name",  "Forest.backend = " + Forest.config().getBackend().getName())
-                .assertBodyEquals("{\"id\":\"1972664191\", \"name\":\"XieYu20011008\"}")
-                .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
+            mockRequest(server)
+                    .assertHeaderEquals("name",  "Forest.backend = " + Forest.config().getBackend().getName())
+                    .assertBodyEquals("{\"id\":\"1972664191\", \"name\":\"XieYu20011008\"}")
+                    .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
     }
 
     @Test
@@ -1839,5 +1848,6 @@ public class TestGenericForestClient extends BaseClientTest {
                         ForestProgress::getRequest)
                 .contains(true, 1D, response.getRequest());
     }
+
 
 }

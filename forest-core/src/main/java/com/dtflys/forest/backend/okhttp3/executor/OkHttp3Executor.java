@@ -189,8 +189,8 @@ public class OkHttp3Executor implements HttpExecutor {
         URLBuilder urlBuilder = URL_BUILDER;
         String url = urlBuilder.buildUrl(request, false);
         Request.Builder builder = new Request.Builder().url(url);
-        prepareHeaders(builder);
         prepareMethodAndBody(builder, lifeCycleHandler);
+        prepareHeaders(builder);
         final Request okRequest = builder.build();
         call = okHttpClient.newCall(okRequest);
         final OkHttp3ForestResponseFactory factory = new OkHttp3ForestResponseFactory();

@@ -263,4 +263,9 @@ public class ContentType {
     public boolean isHasDefinedCharset() {
         return hasDefinedCharset;
     }
+
+    public ContentType hasDefinedCharset(boolean hasDefinedCharset) {
+        this.hasDefinedCharset = hasDefinedCharset;
+        return this;
+    }
 }

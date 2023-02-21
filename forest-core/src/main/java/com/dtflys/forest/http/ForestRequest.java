@@ -1952,7 +1952,7 @@ public class ForestRequest<T> implements HasURL {
             return Charset.forName(this.charset);
         }
         if (StringUtils.isNotEmpty(this.configuration.getCharset())) {
-            return Charset.forName(this.charset);
+            return Charset.forName(this.configuration.getCharset());
         }
         ContentType mineType = this.mineContentType();
         if (mineType != null && mineType.getCharset() != null) {
@@ -2278,6 +2278,7 @@ public class ForestRequest<T> implements HasURL {
 
         String[] typeGroup = contentType.split(";[ ]*charset=");
         String mineType = typeGroup[0];
+        boolean hasDefinedCharset = typeGroup.length > 1;
 
         if (StringUtils.isEmpty(mineType)) {
             mineType = ContentType.APPLICATION_X_WWW_FORM_URLENCODED;
@@ -2293,7 +2294,7 @@ public class ForestRequest<T> implements HasURL {
         } else {
             mineCharset = Charset.forName(strCharset);
         }
-        return new ContentType(mineType, mineCharset);
+        return new ContentType(mineType, mineCharset).hasDefinedCharset(hasDefinedCharset);
     }
 
 
