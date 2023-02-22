@@ -24,6 +24,7 @@
 
 package com.dtflys.forest.converter.json;
 
+import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.http.ForestBody;
@@ -32,14 +33,17 @@ import com.dtflys.forest.http.body.ByteArrayRequestBody;
 import com.dtflys.forest.http.body.NameValueRequestBody;
 import com.dtflys.forest.http.body.ObjectRequestBody;
 import com.dtflys.forest.http.body.StringRequestBody;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * Forest的JSON数据转换接口
@@ -49,13 +53,26 @@ import java.util.Map;
  */
 public interface ForestJsonConverter extends ForestConverter<String>, ForestEncoder {
 
+
+    /**
+     * 将源对象转换为Map对象
+     *
+     * @param obj 源对象
+     * @param options 转换选项
+     * @return 转换后的Map对象
+     * @since 1.5.29
+     */
+    Map<String, Object> convertObjectToMap(Object obj, ConvertOptions options);
+
     /**
      * 将源对象转换为Map对象
      *
      * @param obj  源对象
      * @return 转换后的Map对象
      */
-    Map<String, Object> convertObjectToMap(Object obj);
+    default Map<String, Object> convertObjectToMap(Object obj) {
+        return convertObjectToMap(obj, ConvertOptions.defaultOptions());
+    }
 
     /**
      * 设置日期格式
@@ -70,10 +87,8 @@ public interface ForestJsonConverter extends ForestConverter<String>, ForestEnco
     String getDateFormat();
 
     @Override
-    default byte[] encodeRequestBody(ForestBody body, Charset charset) {
-        if (charset == null) {
-            charset = StandardCharsets.UTF_8;
-        }
+    default byte[] encodeRequestBody(final ForestBody body, final Charset charset, final ConvertOptions options) {
+        final Charset cs = charset != null ? charset : StandardCharsets.UTF_8;
         List<ForestRequestBody> bodyList = new LinkedList(body);
         if (!bodyList.isEmpty()) {
             Object toJsonObj = bodyList;
@@ -87,7 +102,16 @@ public interface ForestJsonConverter extends ForestConverter<String>, ForestEnco
                         if (jsonMap == null) {
                             jsonMap = new LinkedHashMap<>(bodyList.size());
                         }
-                        jsonMap.put(((NameValueRequestBody) bodyItem).getName(), ((NameValueRequestBody) bodyItem).getValue());
+                        NameValueRequestBody nameValueItem = (NameValueRequestBody) bodyItem;
+                        String name = nameValueItem.getName();
+                        if (options != null && options.shouldExclude(name)) {
+                            continue;
+                        }
+                        Object value = nameValueItem.getValue();
+                        if (options != null && options.shouldIgnore(value)) {
+                            continue;
+                        }
+                        jsonMap.put(name, value);
                     } else if (bodyItem instanceof StringRequestBody) {
                         String content = bodyItem.toString();
                         Map subMap = this.convertObjectToMap(content);
@@ -133,21 +157,21 @@ public interface ForestJsonConverter extends ForestConverter<String>, ForestEnco
             String text = null;
             if (toJsonObj instanceof CharSequence || toJsonObj instanceof StringRequestBody) {
                 text = toJsonObj.toString();
-                return text.getBytes(charset);
+                return text.getBytes(cs);
             } else if (toJsonObj instanceof ObjectRequestBody) {
                 text = this.encodeToString(((ObjectRequestBody) toJsonObj).getObject());
-                return text.getBytes(charset);
+                return text.getBytes(cs);
             } else if (toJsonObj instanceof NameValueRequestBody) {
                 Map<String, Object> subMap = new HashMap<>(1);
                 subMap.put(((NameValueRequestBody) toJsonObj).getName(), ((NameValueRequestBody) toJsonObj).getValue());
                 text = this.encodeToString(subMap);
-                return text.getBytes(charset);
+                return text.getBytes(cs);
             } else if (toJsonObj instanceof ByteArrayRequestBody) {
                 byte[] bytes = ((ByteArrayRequestBody) toJsonObj).getByteArray();
                 return bytes;
             } else {
                 text = this.encodeToString(toJsonObj);
-                return text.getBytes(charset);
+                return text.getBytes(cs);
             }
         }
         return new byte[0];

@@ -1,6 +1,7 @@
 package com.dtflys.forest.http.body;
 
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.utils.RequestNameValue;
 
 import java.util.List;
@@ -16,9 +17,9 @@ public interface SupportFormUrlEncoded {
     /**
      * 获取请求键值对
      *
-     * @param configuration Forest配置对象
+     * @param request Forest请求对象
      * @return 请求键值对
      */
-    List<RequestNameValue> getNameValueList(ForestConfiguration configuration);
+    List<RequestNameValue> getNameValueList(ForestRequest request);
 
 }

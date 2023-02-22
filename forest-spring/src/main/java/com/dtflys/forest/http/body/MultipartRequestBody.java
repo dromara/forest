@@ -12,6 +12,7 @@ public class MultipartRequestBody extends ForestRequestBody {
     private MultipartFile multipartFile;
 
     public MultipartRequestBody(MultipartFile multipartFile) {
+        super(body);
         this.multipartFile = multipartFile;
     }
 

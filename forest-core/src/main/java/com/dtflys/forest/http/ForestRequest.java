@@ -419,6 +419,14 @@ public class ForestRequest<T> implements HasURL {
     private Map<String, Object> attachments = new ConcurrentHashMap<>();
 
     /**
+     * 当前正在读取的延迟求值的请求体字段名
+     *
+     * @since 1.5.29
+     */
+    String currentBodyLazyFieldName;
+
+
+    /**
      * 反序列化器
      */
     private ForestConverter decoder;
@@ -504,6 +512,10 @@ public class ForestRequest<T> implements HasURL {
     public ForestRequest<T> setProtocol(ForestProtocol protocol) {
         this.protocol = protocol;
         return this;
+    }
+
+    public void setCurrentBodyLazyFieldName(String name) {
+        this.currentBodyLazyFieldName = name;
     }
 
     /**
@@ -2938,6 +2950,19 @@ public class ForestRequest<T> implements HasURL {
     public ForestRequest<T> addBody(String name, Object value) {
         return addBody(new NameValueRequestBody(name, value));
     }
+
+    /**
+     * 添加延迟求值的键值对类型Body数据
+     *
+     * @param name 字段名
+     * @param value 延迟求值的字段值
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.29
+     */
+    public ForestRequest<T> addBody(String name, Lazy<Object> value) {
+        return addBody(new NameValueRequestBody(name, value));
+    }
+
 
     /**
      * 添加 Map 类型 Body 数据

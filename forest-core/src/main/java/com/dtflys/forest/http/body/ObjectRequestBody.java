@@ -3,6 +3,7 @@ package com.dtflys.forest.http.body;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.utils.ForestDataType;
@@ -76,9 +77,9 @@ public class ObjectRequestBody extends ForestRequestBody implements SupportFormU
     }
 
     @Override
-    public List<RequestNameValue> getNameValueList(ForestConfiguration configuration) {
+    public List<RequestNameValue> getNameValueList(ForestRequest request) {
         List<RequestNameValue> nameValueList = new LinkedList<>();
-        ForestJsonConverter jsonConverter = configuration.getJsonConverter();
+        ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         Map<String, Object> map = jsonConverter.convertObjectToMap(object);
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             nameValueList.add(new RequestNameValue(entry.getKey(), entry.getValue(), MappingParameter.TARGET_BODY));

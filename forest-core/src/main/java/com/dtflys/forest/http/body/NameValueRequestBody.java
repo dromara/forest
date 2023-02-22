@@ -1,11 +1,14 @@
 package com.dtflys.forest.http.body;
 
 
+import com.dtflys.forest.callback.Lazy;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
+import org.apache.commons.collections4.queue.PredicatedQueue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +58,13 @@ public class NameValueRequestBody extends ForestRequestBody implements SupportFo
     }
 
     public Object getValue() {
+        if (value == null) {
+            return getDefaultValue();
+        }
+        if (body != null && value instanceof Lazy) {
+            body.getRequest().setCurrentBodyLazyFieldName(name);
+            return ((Lazy<?>) value).getValue(body.getRequest());
+        }
         return value;
     }
 
@@ -99,7 +109,7 @@ public class NameValueRequestBody extends ForestRequestBody implements SupportFo
     }
 
     @Override
-    public List<RequestNameValue> getNameValueList(ForestConfiguration configuration) {
+    public List<RequestNameValue> getNameValueList(ForestRequest request) {
         List<RequestNameValue> nameValueList = new ArrayList<>(1);
         nameValueList.add(new RequestNameValue(name, value, MappingParameter.TARGET_BODY));
         return nameValueList;

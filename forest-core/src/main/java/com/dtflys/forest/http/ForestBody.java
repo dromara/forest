@@ -1,5 +1,6 @@
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestUnsupportException;
@@ -52,6 +53,10 @@ public class ForestBody implements List<ForestRequestBody> {
      */
     private List<ForestRequestBody> bodyItems = new LinkedList<>();
 
+    public ForestRequest getRequest() {
+        return request;
+    }
+
     public ForestBody(ForestRequest request) {
         this.request = request;
     }
@@ -80,6 +85,7 @@ public class ForestBody implements List<ForestRequestBody> {
         }
         return null;
     }
+
 
     /**
      * 根据名称获取键值对类型请求体项列表
@@ -275,11 +281,12 @@ public class ForestBody implements List<ForestRequestBody> {
         return oldValue;
     }
 
-    private ForestEncoder selectEncoder() {
-        if (ForestDataType.MULTIPART == this.bodyType) {
+
+    private ForestEncoder selectEncoder(ForestDataType type) {
+        if (ForestDataType.MULTIPART == type) {
             throw new ForestUnsupportException("Forest encoder do not support the body type \"MULTIPART\"");
         }
-        ForestDataType dataType = this.bodyType == null ? this.request.mineContentType().bodyType() : this.bodyType;
+        ForestDataType dataType = type == null ? this.request.mineContentType().bodyType() : type;
         ForestEncoder forestEncoder = (ForestEncoder) this.request.getConfiguration().getConverter(dataType);
         if (forestEncoder == null) {
             forestEncoder = (ForestEncoder) this.request.getConfiguration().getConverter(ForestDataType.TEXT);
@@ -287,24 +294,101 @@ public class ForestBody implements List<ForestRequestBody> {
         return forestEncoder;
     }
 
-    public byte[] encode(ForestEncoder encoder, Charset charset) {
-        return encoder.encodeRequestBody(this, charset);
+
+    private ForestEncoder selectEncoder() {
+        return selectEncoder(this.bodyType);
     }
 
-    public String encodeToString(ForestEncoder encoder, Charset charset) {
-        byte[] bytes = this.encode(encoder, charset);
+    public byte[] encode(ForestEncoder encoder, Charset charset, ConvertOptions options) {
+        ConvertOptions opts = options != null ? options : ConvertOptions.defaultOptions();
+        if (request.currentBodyLazyFieldName != null) {
+            opts.excludedFieldNames().add(request.currentBodyLazyFieldName);
+        }
+        try {
+            return encoder.encodeRequestBody(this, charset, opts);
+        } finally {
+            request.currentBodyLazyFieldName = null;
+        }
+    }
+
+    public byte[] encode(ForestEncoder encoder, Charset charset) {
+        return encode(encoder, charset, ConvertOptions.defaultOptions());
+    }
+
+    public byte[] encode(ForestDataType type, Charset charset, ConvertOptions options) {
+        return encode(selectEncoder(type), charset, options);
+    }
+
+    public byte[] encode(ForestDataType type, Charset charset) {
+        return encode(type, charset, ConvertOptions.defaultOptions());
+    }
+
+    public byte[] encode(ForestDataType type, ConvertOptions options) {
+        return encode(type, StandardCharsets.UTF_8, options);
+    }
+
+    public byte[] encode(ForestDataType type) {
+        return encode(type, StandardCharsets.UTF_8);
+    }
+
+
+    public byte[] encode(Charset charset, ConvertOptions options) {
+        if (this.encoder != null) {
+            return encode(this.encoder, charset, options);
+        }
+        return encode(selectEncoder(), charset, options);
+    }
+
+    public byte[] encode(Charset charset) {
+        return encode(charset, ConvertOptions.defaultOptions());
+    }
+
+    public byte[] encode(ConvertOptions options) {
+        return encode(StandardCharsets.UTF_8, options);
+    }
+
+    public byte[] encode() {
+        return encode(ConvertOptions.defaultOptions());
+    }
+
+
+    public String encodeToString(ForestEncoder encoder, Charset charset, ConvertOptions options) {
+        byte[] bytes = this.encode(encoder, charset, options);
         return new String(bytes);
     }
 
-    public String encodeToString(Charset charset) {
-        if (this.encoder != null) {
-            return encodeToString(this.encoder, charset);
-        }
-        return encodeToString(selectEncoder(), charset);
+    public String encodeToString(ForestEncoder encoder, Charset charset) {
+        return encodeToString(encoder, charset, ConvertOptions.defaultOptions());
+    }
+
+    public String encodeToString(ForestDataType type, Charset charset, ConvertOptions options) {
+        return encodeToString(selectEncoder(type), charset, options);
+    }
+
+    public String encodeToString(ForestDataType type, Charset charset) {
+        return encodeToString(type, charset, ConvertOptions.defaultOptions());
+    }
+
+    public String encodeToString(ForestDataType type, ConvertOptions options) {
+        return encodeToString(type, StandardCharsets.UTF_8, options);
+    }
+    public String encodeToString(ForestDataType type) {
+        return encodeToString(type, ConvertOptions.defaultOptions());
     }
 
 
-    public String encodeToString() {
+    public String encodeToString(Charset charset, ConvertOptions options) {
+        if (this.encoder != null) {
+            return encodeToString(this.encoder, charset, options);
+        }
+        return encodeToString(selectEncoder(), charset, options);
+    }
+
+    public String encodeToString(Charset charset) {
+        return encodeToString(charset, ConvertOptions.defaultOptions());
+    }
+
+    public String encodeToString(ConvertOptions options) {
         String strCharset = request.getCharset();
         if (StringUtils.isEmpty(strCharset)) {
             strCharset = request.getConfiguration().getCharset();
@@ -312,19 +396,11 @@ public class ForestBody implements List<ForestRequestBody> {
         if (StringUtils.isEmpty(strCharset)) {
             strCharset = "UTF-8";
         }
-        return encodeToString(Charset.forName(strCharset));
+        return encodeToString(Charset.forName(strCharset), options);
     }
 
-
-    public byte[] encode(Charset charset) {
-        if (this.encoder != null) {
-            return encode(this.encoder, charset);
-        }
-        return encode(selectEncoder(), charset);
-    }
-
-    public byte[] encode() {
-        return encode(StandardCharsets.UTF_8);
+    public String encodeToString() {
+        return encodeToString(ConvertOptions.defaultOptions());
     }
 
 
@@ -353,6 +429,7 @@ public class ForestBody implements List<ForestRequestBody> {
         if (bodyType == null) {
             defaultBodyType = forestRequestBody.getDefaultBodyType();
         }
+        forestRequestBody.setBody(this);
         return bodyItems.add(forestRequestBody);
     }
 
@@ -365,17 +442,12 @@ public class ForestBody implements List<ForestRequestBody> {
         }
     }
 
-    public void replaceNameValue() {
-
-    }
-
     @Override
     public boolean remove(Object o) {
         return bodyItems.remove(o);
     }
 
     public <T extends ForestRequestBody> boolean remove(Class<T> bodyItemClass) {
-        List<T> items = new LinkedList<>();
         List<Boolean> rets = new LinkedList<>();
         for (ForestRequestBody item : bodyItems) {
             Class itemClass = item.getClass();
@@ -396,11 +468,17 @@ public class ForestBody implements List<ForestRequestBody> {
 
     @Override
     public boolean addAll(Collection<? extends ForestRequestBody> c) {
+        for (ForestRequestBody item : c) {
+            item.setBody(this);
+        }
         return bodyItems.addAll(c);
     }
 
     @Override
     public boolean addAll(int index, Collection<? extends ForestRequestBody> c) {
+        for (ForestRequestBody item : c) {
+            item.setBody(this);
+        }
         return bodyItems.addAll(c);
     }
 
@@ -416,6 +494,9 @@ public class ForestBody implements List<ForestRequestBody> {
 
     @Override
     public void clear() {
+        for (ForestRequestBody item : bodyItems) {
+            item.setBody(null);
+        }
         bodyItems.clear();
     }
 
@@ -433,12 +514,17 @@ public class ForestBody implements List<ForestRequestBody> {
 
     @Override
     public void add(int index, ForestRequestBody element) {
+        element.setBody(this);
         bodyItems.add(index, element);
     }
 
     @Override
     public ForestRequestBody remove(int index) {
-        return bodyItems.remove(index);
+        ForestRequestBody item = bodyItems.remove(index);
+        if (item != null) {
+            item.setBody(null);
+        }
+        return item;
     }
 
     @Override

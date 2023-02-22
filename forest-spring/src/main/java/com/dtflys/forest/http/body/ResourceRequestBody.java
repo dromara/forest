@@ -14,6 +14,7 @@ public class ResourceRequestBody extends ForestRequestBody {
     private Resource resource;
 
     public ResourceRequestBody(Resource resource) {
+        super(body);
         this.resource = resource;
     }
 

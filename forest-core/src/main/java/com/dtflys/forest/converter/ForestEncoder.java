@@ -18,9 +18,18 @@ public interface ForestEncoder {
         return "";
     }
 
-    default byte[] encodeRequestBody(ForestBody body, Charset charset) {
+    default byte[] encodeRequestBody(final ForestBody body, final Charset charset, final ConvertOptions options) {
         return new byte[0];
     }
+
+    default byte[] encodeRequestBody(ForestBody body, Charset charset) {
+        return encodeRequestBody(body, charset, ConvertOptions.defaultOptions());
+    }
+
+    default byte[] encodeRequestBody(ForestRequest request, Charset charset, ConvertOptions options) {
+        return encodeRequestBody(request.body(), charset, options);
+    }
+
 
     default byte[] encodeRequestBody(ForestRequest request, Charset charset) {
         return encodeRequestBody(request.body(), charset);

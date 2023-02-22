@@ -43,9 +43,22 @@ import com.dtflys.forest.utils.ForestDataType;
 public abstract class ForestRequestBody {
 
     /**
+     * 所对应的请求体对象
+     */
+    protected ForestBody body;
+
+    /**
      * 默认值
      */
     private String defaultValue;
+
+    public ForestBody getBody() {
+        return body;
+    }
+
+    void setBody(ForestBody body) {
+        this.body = body;
+    }
 
     public String getDefaultValue() {
         return defaultValue;

@@ -1,6 +1,7 @@
 package com.dtflys.forest.converter.form;
 
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
@@ -64,7 +65,7 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
             nameValue.setValue(entry.getValue());
             nameValueList.add(nameValue);
         }
-        nameValueList = processFromNameValueList(nameValueList, configuration);
+        nameValueList = processFromNameValueList(nameValueList, configuration, ConvertOptions.defaultOptions());
         return formUrlEncodedString(nameValueList, StandardCharsets.UTF_8);
     }
 
@@ -181,13 +182,24 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
      *
      * @param nameValueList 键值对列表
      * @param configuration Forest 配置对象
+     * @param options 转换选项
      * @return 处理过的新键值对列表
      */
-    protected List<RequestNameValue> processFromNameValueList(List<RequestNameValue> nameValueList, ForestConfiguration configuration) {
+    protected List<RequestNameValue> processFromNameValueList(
+            final List<RequestNameValue> nameValueList,
+            final ForestConfiguration configuration,
+            final ConvertOptions options) {
         List<RequestNameValue> newNameValueList = new LinkedList<>();
         for (RequestNameValue nameValue : nameValueList) {
             String name = nameValue.getName();
+            if (options != null && options.shouldExclude(name)) {
+                continue;
+            }
             Object value = nameValue.getValue();
+            if (options != null && options.shouldIgnore(value)) {
+                continue;
+            }
+            value = options.getValue(value);
             int target = nameValue.getTarget();
             processFormItem(newNameValueList, configuration,  name, value, target);
         }
@@ -217,19 +229,18 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
     }
 
     @Override
-    public byte[] encodeRequestBody(ForestBody body, Charset charset) {
-        List<RequestNameValue> nameValueList = new LinkedList<>();
-        if (charset == null) {
-            charset = StandardCharsets.UTF_8;
-        }
+    public byte[] encodeRequestBody(final ForestBody body, final Charset charset, final ConvertOptions options) {
+        final List<RequestNameValue> nameValueList = new LinkedList<>();
+        final Charset cs = charset != null ? charset : StandardCharsets.UTF_8;
         for (ForestRequestBody bodyItem : body) {
             if (bodyItem instanceof SupportFormUrlEncoded) {
-                nameValueList.addAll(((SupportFormUrlEncoded) bodyItem).getNameValueList(configuration));
+                nameValueList.addAll(((SupportFormUrlEncoded) bodyItem).getNameValueList(body.getRequest()));
             }
         }
-        nameValueList = processFromNameValueList(nameValueList, configuration);
-        String strBody = formUrlEncodedString(nameValueList, charset);
-        byte[] bytes = strBody.getBytes(charset);
+        final List<RequestNameValue> newNameValueList =
+                processFromNameValueList(nameValueList, configuration, options);
+        String strBody = formUrlEncodedString(newNameValueList, cs);
+        byte[] bytes = strBody.getBytes(cs);
         return bytes;
     }
 }

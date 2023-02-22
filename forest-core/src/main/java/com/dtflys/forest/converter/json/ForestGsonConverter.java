@@ -24,6 +24,7 @@
 
 package com.dtflys.forest.converter.json;
 
+import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.http.ForestBody;
 import com.dtflys.forest.utils.ForestDataType;
@@ -221,7 +222,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
 
 
     @Override
-    public Map<String, Object> convertObjectToMap(Object obj) {
+    public Map<String, Object> convertObjectToMap(Object obj, ConvertOptions options) {
         if (obj == null) {
             return null;
         }
@@ -229,9 +230,16 @@ public class ForestGsonConverter implements ForestJsonConverter {
             Map objMap = (Map) obj;
             Map<String, Object> newMap = new HashMap<>(objMap.size());
             for (Object key : objMap.keySet()) {
+                final String name = String.valueOf(key);
+                if (options != null && options.shouldExclude(name)) {
+                    continue;
+                }
                 Object val = objMap.get(key);
+                if (options != null && options.shouldIgnore(val)) {
+                    continue;
+                }
                 if (val != null) {
-                    newMap.put(String.valueOf(key), val);
+                    newMap.put(name, val);
                 }
             }
             return newMap;

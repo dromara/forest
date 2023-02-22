@@ -1,6 +1,7 @@
 package com.dtflys.forest.http.body;
 
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.utils.ForestDataType;
@@ -39,7 +40,7 @@ public class ByteArrayRequestBody extends BinaryRequestBody implements SupportFo
     }
 
     @Override
-    public List<RequestNameValue> getNameValueList(ForestConfiguration configuration) {
+    public List<RequestNameValue> getNameValueList(ForestRequest request) {
         String str = new String(byteArray);
         List<RequestNameValue> nameValueList = new LinkedList<>();
         nameValueList.add(new RequestNameValue(str, MappingParameter.TARGET_BODY));

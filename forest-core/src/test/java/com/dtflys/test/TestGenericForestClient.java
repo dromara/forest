@@ -10,6 +10,7 @@ import com.dtflys.forest.auth.BasicAuth;
 import com.dtflys.forest.auth.ForestAuthenticator;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestAddress;
@@ -27,6 +28,7 @@ import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.retryer.NoneRetryer;
 import com.dtflys.forest.ssl.SSLSocketFactoryBuilder;
 import com.dtflys.forest.ssl.TrustAllManager;
+import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ForestProgress;
 import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.test.http.BaseClientTest;
@@ -1002,6 +1004,78 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertHeaderEquals("Content-Type", "application/x-www-form-urlencoded");
     }
 
+
+    @Test
+    public void testRequest_lazy_body() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.post("http://localhost:" + server.getPort() + "/test")
+                .contentTypeJson()
+                .addHeader("Content-Type", "application/json; charset=UTF-8")
+                .addHeader("_id", "20011008")
+                .addBody("id", "1972664191")
+                .addBody("name", req -> "XieYu" + req.headerValue("_id"))
+                .execute();
+        mockRequest(server)
+                .assertBodyEquals("{\"id\":\"1972664191\",\"name\":\"XieYu20011008\"}")
+                .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
+    }
+
+
+    @Test
+    public void testRequest_lazy_body2() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.post("http://localhost:" + server.getPort() + "/test")
+                .contentTypeJson()
+                .addHeader("Content-Type", "application/json; charset=UTF-8")
+                .addHeader("_id", "20011008")
+                .addBody("id", "1972664191")
+                .addBody("name", req -> "XieYu" + req.headerValue("_id"))
+                .addBody("token", req -> Base64.encode(
+                        req.body().encodeToString(
+                                ConvertOptions.defaultOptions().exclude("token"))))
+                .execute();
+        mockRequest(server)
+                .assertBodyEquals("{\"id\":\"1972664191\",\"name\":\"XieYu20011008\",\"token\":\"" +
+                        Base64.encode("{\"id\":\"1972664191\",\"name\":\"XieYu20011008\"}") +
+                        "\"}")
+                .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
+    }
+
+    @Test
+    public void testRequest_lazy_body3() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.post("http://localhost:" + server.getPort() + "/test")
+                .contentTypeJson()
+                .addHeader("Content-Type", "application/json; charset=UTF-8")
+                .addHeader("_id", "20011008")
+                .addBody("id", "1972664191")
+                .addBody("name", req -> "XieYu" + req.headerValue("_id"))
+                .addBody("token", req -> Base64.encode(req.body().encodeToString()))
+                .execute();
+        mockRequest(server)
+                .assertBodyEquals("{\"id\":\"1972664191\",\"name\":\"XieYu20011008\",\"token\":\"" +
+                        Base64.encode("{\"id\":\"1972664191\",\"name\":\"XieYu20011008\"}") +
+                        "\"}")
+                .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
+    }
+
+    @Test
+    public void testRequest_lazy_body4() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.post("http://localhost:" + server.getPort() + "/test")
+                .contentTypeJson()
+                .addHeader("Content-Type", "application/json; charset=UTF-8")
+                .addHeader("_id", "20011008")
+                .addBody("id", "1972664191")
+                .addBody("name", req -> "XieYu" + req.headerValue("_id"))
+                .addBody("token", req -> req.body().encodeToString(ForestDataType.FORM))
+                .execute();
+        mockRequest(server)
+                .assertBodyEquals("{\"id\":\"1972664191\",\"name\":\"XieYu20011008\",\"token\":\"" +
+                        Base64.encode("id=1972664191&name=XieYu20011008") +
+                        "\"}")
+                .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
+    }
 
 
     @Test
