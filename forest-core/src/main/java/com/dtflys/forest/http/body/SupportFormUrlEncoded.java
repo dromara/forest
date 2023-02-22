@@ -1,6 +1,7 @@
 package com.dtflys.forest.http.body;
 
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.utils.RequestNameValue;
 

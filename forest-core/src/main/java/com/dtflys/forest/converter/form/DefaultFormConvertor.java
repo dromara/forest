@@ -1,11 +1,13 @@
 package com.dtflys.forest.converter.form;
 
+import com.dtflys.forest.callback.Lazy;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.ForestBody;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.http.body.SupportFormUrlEncoded;
 import com.dtflys.forest.mapping.MappingParameter;
@@ -232,9 +234,10 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
     public byte[] encodeRequestBody(final ForestBody body, final Charset charset, final ConvertOptions options) {
         final List<RequestNameValue> nameValueList = new LinkedList<>();
         final Charset cs = charset != null ? charset : StandardCharsets.UTF_8;
+        final ForestRequest request = body.getRequest();
         for (ForestRequestBody bodyItem : body) {
             if (bodyItem instanceof SupportFormUrlEncoded) {
-                nameValueList.addAll(((SupportFormUrlEncoded) bodyItem).getNameValueList(body.getRequest()));
+                nameValueList.addAll(((SupportFormUrlEncoded) bodyItem).getNameValueList(request));
             }
         }
         final List<RequestNameValue> newNameValueList =

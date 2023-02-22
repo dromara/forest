@@ -1050,7 +1050,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .addHeader("_id", "20011008")
                 .addBody("id", "1972664191")
                 .addBody("name", req -> "XieYu" + req.headerValue("_id"))
-                .addBody("token", req -> Base64.encode(req.body().encodeToString()))
+                .addBody("token", req -> Base64.encode(req.body().encode()))
                 .execute();
         mockRequest(server)
                 .assertBodyEquals("{\"id\":\"1972664191\",\"name\":\"XieYu20011008\",\"token\":\"" +
@@ -1068,7 +1068,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .addHeader("_id", "20011008")
                 .addBody("id", "1972664191")
                 .addBody("name", req -> "XieYu" + req.headerValue("_id"))
-                .addBody("token", req -> req.body().encodeToString(ForestDataType.FORM))
+                .addBody("token", req -> Base64.encode(req.body().encode(ForestDataType.FORM)))
                 .execute();
         mockRequest(server)
                 .assertBodyEquals("{\"id\":\"1972664191\",\"name\":\"XieYu20011008\",\"token\":\"" +
