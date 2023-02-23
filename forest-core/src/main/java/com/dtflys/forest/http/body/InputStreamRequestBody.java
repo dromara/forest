@@ -37,4 +37,11 @@ public class InputStreamRequestBody extends ForestRequestBody {
     public ForestDataType getDefaultBodyType() {
         return ForestDataType.BINARY;
     }
+
+    @Override
+    public InputStreamRequestBody clone() {
+        InputStreamRequestBody newBody = new InputStreamRequestBody(inputStream);
+        newBody.setDefaultValue(getDefaultValue());
+        return newBody;
+    }
 }

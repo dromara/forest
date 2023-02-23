@@ -1063,7 +1063,6 @@ public class TestGenericForestClient extends BaseClientTest {
     public void testRequest_lazy_body4() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.post("http://localhost:" + server.getPort() + "/test")
-                .contentTypeJson()
                 .addHeader("Content-Type", "application/json; charset=UTF-8")
                 .addHeader("_id", "20011008")
                 .addBody("id", "1972664191")

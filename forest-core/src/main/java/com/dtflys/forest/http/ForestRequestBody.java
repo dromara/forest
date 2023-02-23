@@ -72,4 +72,8 @@ public abstract class ForestRequestBody {
     public abstract byte[] getByteArray();
 
     public abstract ForestDataType getDefaultBodyType();
+
+
+    @Override
+    public abstract ForestRequestBody clone();
 }

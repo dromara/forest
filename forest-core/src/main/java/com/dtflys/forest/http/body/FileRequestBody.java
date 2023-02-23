@@ -47,4 +47,11 @@ public class FileRequestBody extends BinaryRequestBody {
     public ForestDataType getDefaultBodyType() {
         return ForestDataType.BINARY;
     }
+
+    @Override
+    public FileRequestBody clone() {
+        FileRequestBody newBody = new FileRequestBody(file);
+        newBody.setDefaultValue(getDefaultValue());
+        return newBody;
+    }
 }

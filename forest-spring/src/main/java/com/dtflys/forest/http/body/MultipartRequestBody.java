@@ -12,7 +12,6 @@ public class MultipartRequestBody extends ForestRequestBody {
     private MultipartFile multipartFile;
 
     public MultipartRequestBody(MultipartFile multipartFile) {
-        super(body);
         this.multipartFile = multipartFile;
     }
 
@@ -36,5 +35,12 @@ public class MultipartRequestBody extends ForestRequestBody {
     @Override
     public ForestDataType getDefaultBodyType() {
         return ForestDataType.MULTIPART;
+    }
+
+    @Override
+    public MultipartRequestBody clone() {
+        MultipartRequestBody newBody = new MultipartRequestBody(multipartFile);
+        newBody.setDefaultValue(getDefaultValue());
+        return newBody;
     }
 }

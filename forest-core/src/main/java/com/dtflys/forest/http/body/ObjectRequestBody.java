@@ -86,4 +86,11 @@ public class ObjectRequestBody extends ForestRequestBody implements SupportFormU
         }
         return nameValueList;
     }
+
+    @Override
+    public ObjectRequestBody clone() {
+        ObjectRequestBody newBody = new ObjectRequestBody(object);
+        newBody.setDefaultValue(getDefaultValue());
+        return newBody;
+    }
 }

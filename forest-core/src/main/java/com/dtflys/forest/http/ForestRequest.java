@@ -464,6 +464,13 @@ public class ForestRequest<T> implements HasURL {
     private ForestProxy proxy;
 
 
+    public ForestRequest(ForestConfiguration configuration, ForestMethod method, ForestBody body, Object[] arguments) {
+        this.configuration = configuration;
+        this.method = method;
+        this.arguments = arguments;
+        this.body = body;
+    }
+
 
     public ForestRequest(ForestConfiguration configuration, ForestMethod method, Object[] arguments) {
         this.configuration = configuration;
@@ -4595,11 +4602,14 @@ public class ForestRequest<T> implements HasURL {
      */
     @Override
     public ForestRequest<T> clone() {
-        ForestRequest<T> newRequest = new ForestRequest<>(this.configuration, this.method, this.arguments);
+        ForestRequest<T> newRequest = new ForestRequest<>(
+                this.configuration,
+                this.method,
+                this.arguments);
         ForestBody newBody = newRequest.body();
         newBody.setBodyType(body.getBodyType());
-        for (ForestRequestBody body : this.body) {
-            newBody.add(body);
+        for (ForestRequestBody bodyItem : this.body) {
+            newBody.add(bodyItem.clone());
         }
         newRequest.backend = this.backend;
         newRequest.lifeCycleHandler = this.lifeCycleHandler;

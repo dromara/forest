@@ -109,6 +109,7 @@ public class NameValueRequestBody extends ForestRequestBody implements SupportFo
         return ForestDataType.FORM;
     }
 
+
     @Override
     public List<RequestNameValue> getNameValueList(ForestRequest request) {
         List<RequestNameValue> nameValueList = new ArrayList<>(1);
@@ -119,4 +120,12 @@ public class NameValueRequestBody extends ForestRequestBody implements SupportFo
         }
         return nameValueList;
     }
+
+    @Override
+    public NameValueRequestBody clone() {
+        NameValueRequestBody newBody = new NameValueRequestBody(name, contentType, value);
+        newBody.setDefaultValue(getDefaultValue());
+        return newBody;
+    }
+
 }

@@ -551,4 +551,18 @@ public class ForestBody implements List<ForestRequestBody> {
     public List<ForestRequestBody> subList(int fromIndex, int toIndex) {
         return bodyItems.subList(fromIndex, toIndex);
     }
+
+    @Override
+    public ForestBody clone() {
+        return clone(request);
+    }
+
+    public ForestBody clone(ForestRequest request) {
+        ForestBody newBody = new ForestBody(request);
+        for (ForestRequestBody item : bodyItems) {
+            newBody.add(item.clone());
+        }
+        return newBody;
+    }
+
 }
