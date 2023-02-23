@@ -1,6 +1,8 @@
 package com.dtflys.test;
 
 import cn.hutool.core.codec.Base64;
+import cn.hutool.core.lang.Pair;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.http.HttpUtil;
@@ -10,6 +12,7 @@ import com.dtflys.forest.auth.BasicAuth;
 import com.dtflys.forest.auth.ForestAuthenticator;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.forest.callback.Lazy;
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
@@ -61,6 +64,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -926,7 +930,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .execute(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
-                .assertBodyEquals("name=foo&value=bar");
+                .assertBodyEquals("value=bar&name=foo");
     }
 
 
@@ -1075,6 +1079,54 @@ public class TestGenericForestClient extends BaseClientTest {
                         "\"}")
                 .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
     }
+
+
+    @Test
+    public void testRequest_lazy_body5() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("id", "1972664191");
+        data.put("name", "XieYu20011008");
+
+        Forest.post("http://localhost:" + server.getPort() + "/test")
+                .addHeader("Content-Type", "application/json; charset=UTF-8")
+                .addHeader("_id", "20011008")
+                .addBody(data)
+                .addBody("token", req -> Base64.encode(req.body().encode()))
+                .execute();
+
+        mockRequest(server)
+                .assertBodyEquals("{\"id\":\"1972664191\",\"name\":\"XieYu20011008\",\"token\":\"" +
+                        Base64.encode("{\"id\":\"1972664191\",\"name\":\"XieYu20011008\"}") +
+                        "\"}")
+                .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
+    }
+
+
+    @Test
+    public void testRequest_lazy_body6() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("id", "1972664191");
+        data.put("name", "XieYu20011008");
+        data.put("token", (Lazy<Object>) (req -> Base64.encode(req.body().encode())));
+
+        Forest.post("http://localhost:" + server.getPort() + "/test")
+                .addHeader("Content-Type", "application/json; charset=UTF-8")
+                .addHeader("_id", "20011008")
+                .addBody(data)
+                .execute();
+
+        mockRequest(server)
+                .assertBodyEquals("{\"id\":\"1972664191\",\"name\":\"XieYu20011008\",\"token\":\"" +
+                        Base64.encode("{\"id\":\"1972664191\",\"name\":\"XieYu20011008\"}") +
+                        "\"}")
+                .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
+    }
+
+
 
 
     @Test
@@ -1458,8 +1510,6 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_upload_file() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        TypeReference<Result<Integer>> typeReference = new TypeReference<Result<Integer>>() {
-        };
         String path = Objects.requireNonNull(this.getClass().getResource("/test-img.jpg")).getPath();
         if (path.startsWith("/") && isWindows()) {
             path = path.substring(1);

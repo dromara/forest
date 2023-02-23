@@ -300,13 +300,17 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         }
         if (obj instanceof Map) {
             Map objMap = (Map) obj;
-            Map<String, Object> newMap = new HashMap<>(objMap.size());
+            Map<String, Object> newMap = new LinkedHashMap<>(objMap.size());
             for (Object key : objMap.keySet()) {
                 final String name = String.valueOf(key);
                 if (options != null && options.shouldExclude(name)) {
                     continue;
                 }
                 Object val = objMap.get(key);
+                if (options != null && options.shouldIgnore(val)) {
+                    continue;
+                }
+                val = options.getValue(val);
                 if (val != null) {
                     newMap.put(name, val);
                 }
