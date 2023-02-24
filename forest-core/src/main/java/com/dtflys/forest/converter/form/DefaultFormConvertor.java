@@ -1,6 +1,5 @@
 package com.dtflys.forest.converter.form;
 
-import com.dtflys.forest.callback.Lazy;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestConverter;
@@ -9,6 +8,7 @@ import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.ForestBody;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
+import com.dtflys.forest.http.Lazy;
 import com.dtflys.forest.http.body.SupportFormUrlEncoded;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingTemplate;
@@ -67,7 +67,8 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
             nameValue.setValue(entry.getValue());
             nameValueList.add(nameValue);
         }
-        nameValueList = processFromNameValueList(nameValueList, configuration, ConvertOptions.defaultOptions());
+        nameValueList = processFromNameValueList(
+                null, nameValueList, configuration, ConvertOptions.defaultOptions());
         return formUrlEncodedString(nameValueList, StandardCharsets.UTF_8);
     }
 
@@ -182,12 +183,14 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
     /**
      * 处理Form表单中的键值对列表
      *
+     * @param request 请求对象
      * @param nameValueList 键值对列表
      * @param configuration Forest 配置对象
      * @param options 转换选项
      * @return 处理过的新键值对列表
      */
     protected List<RequestNameValue> processFromNameValueList(
+            final ForestRequest request,
             final List<RequestNameValue> nameValueList,
             final ForestConfiguration configuration,
             final ConvertOptions options) {
@@ -198,10 +201,15 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
                 continue;
             }
             Object value = nameValue.getValue();
-            if (options != null && options.shouldIgnore(value)) {
+            if (Lazy.isEvaluatingLazyValue(value, request)) {
                 continue;
             }
-            value = options.getValue(value);
+            if (options != null) {
+                value = options.getValue(value, request);
+                if (options.shouldIgnore(value)) {
+                    continue;
+                }
+            }
             int target = nameValue.getTarget();
             processFormItem(newNameValueList, configuration,  name, value, target);
         }
@@ -241,7 +249,7 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
             }
         }
         final List<RequestNameValue> newNameValueList =
-                processFromNameValueList(nameValueList, configuration, options);
+                processFromNameValueList(request, nameValueList, configuration, options);
         String strBody = formUrlEncodedString(newNameValueList, cs);
         byte[] bytes = strBody.getBytes(cs);
         return bytes;

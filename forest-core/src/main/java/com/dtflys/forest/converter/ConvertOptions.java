@@ -1,14 +1,10 @@
 package com.dtflys.forest.converter;
 
-import com.dtflys.forest.callback.Lazy;
-import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
-import com.sun.org.apache.bcel.internal.generic.ATHROW;
+import com.dtflys.forest.http.Lazy;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -38,7 +34,6 @@ public class ConvertOptions {
          */
         WRITE_EMPTY_STRING
     }
-
 
     private NullValuePolicy nullValuePolicy;
 
@@ -81,10 +76,14 @@ public class ConvertOptions {
         return value == null && NullValuePolicy.IGNORE.equals(nullValuePolicy);
     }
 
-    public Object getValue(Object value) {
+    public Object getValue(Object value, ForestRequest request) {
         if (value != null) {
-            if (value instanceof LazyWrapper) {
-                return ((LazyWrapper<?>) value).getValue();
+            Object result = null;
+            if (request != null && value instanceof Lazy) {
+                result = ((Lazy<?>) value).eval(request);
+            }
+            if (result != null) {
+                return result;
             }
             return value;
         }

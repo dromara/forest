@@ -24,8 +24,6 @@
 
 package com.dtflys.forest.http;
 
-import com.dtflys.forest.callback.Lazy;
-
 import java.util.*;
 
 /**

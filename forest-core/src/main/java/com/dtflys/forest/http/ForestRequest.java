@@ -29,7 +29,6 @@ import com.dtflys.forest.auth.ForestAuthenticator;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.backend.HttpExecutor;
-import com.dtflys.forest.callback.Lazy;
 import com.dtflys.forest.callback.OnCanceled;
 import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnLoadCookie;
@@ -105,6 +104,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -419,11 +419,11 @@ public class ForestRequest<T> implements HasURL {
     private Map<String, Object> attachments = new ConcurrentHashMap<>();
 
     /**
-     * 当前正在读取的延迟求值的请求体字段名
+     * 当前正求值的延迟参数堆栈
      *
      * @since 1.5.29
      */
-    String currentBodyLazyFieldName;
+    Stack<Lazy> evaluatingLazyValueStack = new Stack<>();
 
 
     /**
@@ -519,10 +519,6 @@ public class ForestRequest<T> implements HasURL {
     public ForestRequest<T> setProtocol(ForestProtocol protocol) {
         this.protocol = protocol;
         return this;
-    }
-
-    public void setCurrentBodyLazyFieldName(String name) {
-        this.currentBodyLazyFieldName = name;
     }
 
     /**
@@ -1674,7 +1670,7 @@ public class ForestRequest<T> implements HasURL {
      */
     public ForestRequest<T> addQuery(Object queryParameters) {
         ForestJsonConverter jsonConverter = getConfiguration().getJsonConverter();
-        Map<String, Object> map = jsonConverter.convertObjectToMap(queryParameters);
+        Map<String, Object> map = jsonConverter.convertObjectToMap(queryParameters, this);
         if (map != null && map.size() > 0) {
             map.forEach((key, value) -> {
                 if (value != null) {

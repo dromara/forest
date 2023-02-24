@@ -143,7 +143,8 @@ public class ForestBody implements List<ForestRequestBody> {
                 }
             } else if (body instanceof ObjectRequestBody) {
                 ObjectRequestBody objectRequestBody = (ObjectRequestBody) body;
-                Map<String, Object> keyValueMap = jsonConverter.convertObjectToMap(objectRequestBody.getObject());
+                Map<String, Object> keyValueMap = jsonConverter.convertObjectToMap(
+                        objectRequestBody.getObject(), request);
                 for (Map.Entry<String, Object> entry : keyValueMap.entrySet()) {
                     String name = entry.getKey();
                     Object value = entry.getValue();
@@ -301,14 +302,7 @@ public class ForestBody implements List<ForestRequestBody> {
 
     public byte[] encode(ForestEncoder encoder, Charset charset, ConvertOptions options) {
         ConvertOptions opts = options != null ? options : ConvertOptions.defaultOptions();
-        if (request.currentBodyLazyFieldName != null) {
-            opts.excludedFieldNames().add(request.currentBodyLazyFieldName);
-        }
-        try {
-            return encoder.encodeRequestBody(this, charset, opts);
-        } finally {
-            request.currentBodyLazyFieldName = null;
-        }
+        return encoder.encodeRequestBody(this, charset, opts);
     }
 
     public byte[] encode(ForestEncoder encoder, Charset charset) {

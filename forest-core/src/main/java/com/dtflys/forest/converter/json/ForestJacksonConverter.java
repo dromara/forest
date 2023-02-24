@@ -26,6 +26,8 @@ package com.dtflys.forest.converter.json;
 
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.exceptions.ForestConvertException;
+import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.Lazy;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -143,7 +145,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     }
 
     @Override
-    public Map<String, Object> convertObjectToMap(Object obj, ConvertOptions options) {
+    public Map<String, Object> convertObjectToMap(Object obj, ForestRequest request, ConvertOptions options) {
         if (obj == null) {
             return null;
         }
@@ -156,8 +158,14 @@ public class ForestJacksonConverter implements ForestJsonConverter {
                     continue;
                 }
                 Object val = objMap.get(key);
-                if (options != null && options.shouldIgnore(val)) {
+                if (Lazy.isEvaluatingLazyValue(val, request)) {
                     continue;
+                }
+                if (options != null) {
+                    val = options.getValue(val, request);
+                    if (options.shouldIgnore(val)) {
+                        continue;
+                    }
                 }
                 if (val != null) {
                     newMap.put(name, val);

@@ -27,9 +27,10 @@ package com.dtflys.forest.converter.json;
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.ForestEncoder;
-import com.dtflys.forest.converter.MapWrapper;
 import com.dtflys.forest.http.ForestBody;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
+import com.dtflys.forest.http.Lazy;
 import com.dtflys.forest.http.body.BinaryRequestBody;
 import com.dtflys.forest.http.body.ByteArrayRequestBody;
 import com.dtflys.forest.http.body.NameValueRequestBody;
@@ -62,21 +63,29 @@ public interface ForestJsonConverter extends ForestConverter<String>, ForestEnco
      * 将源对象转换为Map对象
      *
      * @param obj 源对象
+     * @param request 请求对象
      * @param options 转换选项
      * @return 转换后的Map对象
      * @since 1.5.29
      */
-    Map<String, Object> convertObjectToMap(Object obj, ConvertOptions options);
+    Map<String, Object> convertObjectToMap(Object obj, ForestRequest request, ConvertOptions options);
 
     /**
      * 将源对象转换为Map对象
      *
      * @param obj  源对象
+     * @param request 请求对象
      * @return 转换后的Map对象
      */
-    default Map<String, Object> convertObjectToMap(Object obj) {
-        return convertObjectToMap(obj, ConvertOptions.defaultOptions());
+    default Map<String, Object> convertObjectToMap(Object obj, ForestRequest request) {
+        return convertObjectToMap(obj, request, ConvertOptions.defaultOptions());
     }
+
+
+    default Map<String, Object> convertObjectToMap(Object obj) {
+        return convertObjectToMap(obj, null, ConvertOptions.defaultOptions());
+    }
+
 
     /**
      * 设置日期格式
@@ -93,7 +102,8 @@ public interface ForestJsonConverter extends ForestConverter<String>, ForestEnco
     @Override
     default byte[] encodeRequestBody(final ForestBody body, final Charset charset, final ConvertOptions options) {
         final Charset cs = charset != null ? charset : StandardCharsets.UTF_8;
-        List<ForestRequestBody> bodyList = new LinkedList(body);
+        List<ForestRequestBody> bodyList = new LinkedList<>(body);
+        final ForestRequest request = body.getRequest();
         if (!bodyList.isEmpty()) {
             Object toJsonObj = bodyList;
             Map<String, Object> jsonMap = null;
@@ -114,14 +124,20 @@ public interface ForestJsonConverter extends ForestConverter<String>, ForestEnco
                     if (options != null && options.shouldExclude(name)) {
                         continue;
                     }
-                    Object value = nameValueItem.getValue();
-                    if (options != null && options.shouldIgnore(value)) {
+                    Object value = nameValueItem.getOriginalValue();
+                    if (Lazy.isEvaluatingLazyValue(value, request)) {
                         continue;
+                    }
+                    if (options != null) {
+                        value = options.getValue(value, request);
+                        if (options.shouldIgnore(value)) {
+                            continue;
+                        }
                     }
                     jsonMap.put(name, value);
                 } else if (bodyItem instanceof StringRequestBody) {
                     String content = bodyItem.toString();
-                    Map subMap = this.convertObjectToMap(content);
+                    Map subMap = this.convertObjectToMap(content, request);
                     if (subMap != null) {
                         if (jsonMap == null) {
                             jsonMap = new LinkedHashMap<>(bodyList.size());
@@ -144,9 +160,7 @@ public interface ForestJsonConverter extends ForestConverter<String>, ForestEnco
                         }
                         jsonArray.addAll((List) obj);
                     } else {
-                        Map subMap = this.convertObjectToMap(
-                                obj instanceof Map ? new MapWrapper(body.getRequest(), (Map) obj, TARGET_BODY) : obj,
-                                options);
+                        Map subMap = this.convertObjectToMap(obj, request, options);
                         if (subMap == null) {
                             continue;
                         }

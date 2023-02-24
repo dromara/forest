@@ -1,15 +1,12 @@
 package com.dtflys.forest.http.body;
 
 
-import com.dtflys.forest.callback.Lazy;
-import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
+import com.dtflys.forest.http.Lazy;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.utils.ForestDataType;
-import com.dtflys.forest.utils.LazyRequestNameValue;
 import com.dtflys.forest.utils.RequestNameValue;
-import org.apache.commons.collections4.queue.PredicatedQueue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,13 +55,24 @@ public class NameValueRequestBody extends ForestRequestBody implements SupportFo
         this.name = name;
     }
 
+    public Object getOriginalValue() {
+        return value;
+    }
+
     public Object getValue() {
         if (value == null) {
             return getDefaultValue();
         }
         if (body != null && value instanceof Lazy) {
-            body.getRequest().setCurrentBodyLazyFieldName(name);
-            return ((Lazy<?>) value).getValue(body.getRequest());
+            final ForestRequest request = body.getRequest();
+            if (Lazy.isEvaluatingLazyValue(value, request)) {
+                return null;
+            }
+            Object evaluatedValue = ((Lazy<?>) value).eval(request);
+            if (evaluatedValue == null) {
+                return getDefaultValue();
+            }
+            return evaluatedValue;
         }
         return value;
     }
@@ -113,11 +121,7 @@ public class NameValueRequestBody extends ForestRequestBody implements SupportFo
     @Override
     public List<RequestNameValue> getNameValueList(ForestRequest request) {
         List<RequestNameValue> nameValueList = new ArrayList<>(1);
-        if (value instanceof Lazy) {
-            nameValueList.add(new LazyRequestNameValue(request, name, value, MappingParameter.TARGET_BODY));
-        } else {
-            nameValueList.add(new RequestNameValue(name, value, MappingParameter.TARGET_BODY));
-        }
+        nameValueList.add(new RequestNameValue(name, value, MappingParameter.TARGET_BODY));
         return nameValueList;
     }
 

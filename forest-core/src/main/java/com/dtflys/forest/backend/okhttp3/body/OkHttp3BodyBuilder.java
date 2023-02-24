@@ -105,7 +105,7 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
                 if (obj == null) {
                     continue;
                 }
-                Map<String, Object> attrs = jsonConverter.convertObjectToMap(obj);
+                Map<String, Object> attrs = jsonConverter.convertObjectToMap(obj, request);
                 for (Map.Entry<String, Object> entry : attrs.entrySet()) {
                     String name = entry.getKey();
                     Object value = entry.getValue();

@@ -34,6 +34,8 @@ import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestBody;
+import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.Lazy;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 import com.fasterxml.jackson.databind.util.BeanUtil;
@@ -190,12 +192,12 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
     }
 
 
-    private static Object toJSON(Object javaObject, ConvertOptions options) {
+    private static Object toJSON(Object javaObject, ForestRequest request, ConvertOptions options) {
         ParserConfig parserConfig = ParserConfig.getGlobalInstance();
-        return toJSON(javaObject, parserConfig, options);
+        return toJSON(javaObject, parserConfig, request, options);
     }
 
-    private static Object toJSON(Object javaObject, ParserConfig mapping, ConvertOptions options) {
+    private static Object toJSON(Object javaObject, ParserConfig mapping, ForestRequest request, ConvertOptions options) {
         if (javaObject == null) {
             return null;
         }
@@ -215,7 +217,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
                 if (options != null && options.shouldExclude(jsonKey)) {
                     continue;
                 }
-                Object jsonValue = toJSON(entry.getValue(), options);
+                Object jsonValue = toJSON(entry.getValue(), request, options);
                 if (options != null && options.shouldIgnore(jsonValue)) {
                     continue;
                 }
@@ -231,7 +233,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
             JSONArray array = new JSONArray(collection.size());
 
             for (Object item : collection) {
-                Object jsonValue = toJSON(item, options);
+                Object jsonValue = toJSON(item, request, options);
                 array.add(jsonValue);
             }
 
@@ -251,7 +253,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
 
             for (int i = 0; i < len; ++i) {
                 Object item = Array.get(javaObject, i);
-                Object jsonValue = toJSON(item, options);
+                Object jsonValue = toJSON(item, request, options);
                 array.add(jsonValue);
             }
 
@@ -272,8 +274,14 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
                     continue;
                 }
                 Object value = field.get(javaObject);
-                if (options != null && options.shouldIgnore(value)) {
+                if (Lazy.isEvaluatingLazyValue(value, request)) {
                     continue;
+                }
+                if (options != null) {
+                    value = options.getValue(value, request);
+                    if (options.shouldIgnore(value)) {
+                        continue;
+                    }
                 }
                 Object jsonValue = JSON.toJSON(value);
                 if (nameField != null) {
@@ -294,7 +302,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
 
 
     @Override
-    public Map<String, Object> convertObjectToMap(Object obj, ConvertOptions options) {
+    public Map<String, Object> convertObjectToMap(Object obj, ForestRequest request, ConvertOptions options) {
         if (obj == null) {
             return null;
         }
@@ -307,10 +315,15 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
                     continue;
                 }
                 Object val = objMap.get(key);
-                if (options != null && options.shouldIgnore(val)) {
+                if (Lazy.isEvaluatingLazyValue(val, request)) {
                     continue;
                 }
-                val = options.getValue(val);
+                if (options != null) {
+                    val = options.getValue(val, request);
+                    if (options.shouldIgnore(val)) {
+                        continue;
+                    }
+                }
                 if (val != null) {
                     newMap.put(name, val);
                 }
@@ -332,6 +345,15 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
                     continue;
                 }
                 Object value = field.get(obj);
+                if (Lazy.isEvaluatingLazyValue(value, request)) {
+                    continue;
+                }
+                if (options != null) {
+                    value = options.getValue(value, request);
+                    if (options.shouldIgnore(value)) {
+                        continue;
+                    }
+                }
                 if (nameField != null) {
                     json.put((String) nameField.get(field), value);
                 } else if (nameMethod != null) {

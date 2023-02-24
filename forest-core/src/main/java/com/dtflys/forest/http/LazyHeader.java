@@ -1,10 +1,7 @@
 package com.dtflys.forest.http;
 
-import com.dtflys.forest.callback.Lazy;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 
-import java.lang.ref.WeakReference;
-import java.util.function.Function;
 
 public class LazyHeader implements ForestHeader<LazyHeader, Lazy<Object>> {
 
@@ -37,7 +34,7 @@ public class LazyHeader implements ForestHeader<LazyHeader, Lazy<Object>> {
         if (lazyValue == null) {
             throw new ForestRuntimeException("the lazy value of header[name=" + name + "] is null");
         }
-        Object ret = lazyValue.getValue(request);
+        Object ret = lazyValue.eval(request);
         if (ret == null) {
             return null;
         }
