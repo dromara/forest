@@ -2962,7 +2962,7 @@ public class ForestRequest<T> implements HasURL {
      * @return {@link ForestRequest}类实例
      * @since 1.5.29
      */
-    public ForestRequest<T> addBody(String name, Lazy<Object> value) {
+    public ForestRequest<T> addBody(String name, Lazy value) {
         return addBody(new NameValueRequestBody(name, value));
     }
 
@@ -3308,7 +3308,7 @@ public class ForestRequest<T> implements HasURL {
      * @return {@link ForestRequest}类实例
      * @since 1.5.29
      */
-    public ForestRequest<T> addHeader(String name, Lazy<Object> value) {
+    public ForestRequest<T> addHeader(String name, Lazy value) {
         if (value == null) {
             return this;
         }
