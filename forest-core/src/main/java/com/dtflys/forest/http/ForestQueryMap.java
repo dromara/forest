@@ -136,6 +136,7 @@ public class ForestQueryMap implements Map<String, Object> {
     }
 
     public void addQuery(SimpleQueryParameter query) {
+        query.queries = this;
         queries.add(query);
     }
 

@@ -32,7 +32,7 @@ package com.dtflys.forest.http;
  */
 public class SimpleQueryParameter extends AbstractQueryParameter<SimpleQueryParameter> {
 
-    private final ForestQueryMap queries;
+    ForestQueryMap queries;
 
     /**
      * 参数名
