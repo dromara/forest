@@ -43,12 +43,18 @@ import java.util.Set;
  */
 public class ForestQueryMap implements Map<String, Object> {
 
+    final ForestRequest request;
+
     private final List<SimpleQueryParameter> queries;
 
-    public ForestQueryMap() {
+    public ForestQueryMap(ForestRequest request) {
+        this.request = request;
         this.queries = new LinkedList<>();
     }
 
+    public ForestRequest getRequest() {
+        return request;
+    }
 
     @Override
     public int size() {
@@ -143,6 +149,11 @@ public class ForestQueryMap implements Map<String, Object> {
         addQuery(name, value, false, null);
     }
 
+    public void addQuery(String name, Lazy value) {
+        addQuery(name, value, false, null);
+    }
+
+
     /**
      * 添加 Query 参数
      *
@@ -155,7 +166,7 @@ public class ForestQueryMap implements Map<String, Object> {
         if (value instanceof Collection) {
             addQuery(name, (Collection) value, isUrlEncode, charset);
         } else {
-            queries.add(new SimpleQueryParameter(name, value, isUrlEncode, charset));
+            queries.add(new SimpleQueryParameter(this, name, value, isUrlEncode, charset));
         }
     }
 
@@ -308,7 +319,7 @@ public class ForestQueryMap implements Map<String, Object> {
         if (query != null) {
             query.setValue(value);
         } else {
-            SimpleQueryParameter newQuery = new SimpleQueryParameter(key, value);
+            SimpleQueryParameter newQuery = new SimpleQueryParameter(this, key, value);
             addQuery(newQuery);
         }
         return value;
@@ -434,8 +445,8 @@ public class ForestQueryMap implements Map<String, Object> {
         return set;
     }
 
-    public ForestQueryMap clone() {
-        ForestQueryMap newQueryMap = new ForestQueryMap();
+    public ForestQueryMap clone(ForestRequest request) {
+        ForestQueryMap newQueryMap = new ForestQueryMap(request);
         for (SimpleQueryParameter query : queries) {
             newQueryMap.addQuery(query);
         }

@@ -191,7 +191,7 @@ public class ForestRequest<T> implements HasURL {
     /**
      * URL中的Query参数表
      */
-    private ForestQueryMap query = new ForestQueryMap();
+    private ForestQueryMap query = new ForestQueryMap(this);
 
     /**
      * 请求类型
@@ -1377,11 +1377,18 @@ public class ForestRequest<T> implements HasURL {
     public String getQueryString() {
         StringBuilder builder = new StringBuilder();
         Iterator<SimpleQueryParameter> iterator = query.queryValues().iterator();
+        int count = 0;
         while (iterator.hasNext()) {
             SimpleQueryParameter query = iterator.next();
             if (query != null) {
-                String name = query.getName();
-                Object value = query.getValue();
+                final String name = query.getName();
+                final Object value = query.getOriginalValue();
+                if (Lazy.isEvaluatingLazyValue(value, this)) {
+                    continue;
+                }
+                if (count > 0) {
+                    builder.append("&");
+                }
                 if (name != null) {
                     builder.append(name);
                     if (value != null) {
@@ -1389,18 +1396,26 @@ public class ForestRequest<T> implements HasURL {
                     }
                 }
                 if (value != null) {
+                    final Object evaluatedValue = query.getValue();
                     try {
-                        String encodedValue = URLUtils.encode(value.toString(), getCharset());
+                        String encodedValue = URLUtils.encode(evaluatedValue.toString(), getCharset());
                         builder.append(encodedValue);
                     } catch (UnsupportedEncodingException e) {
                     }
                 }
-            }
-            if (iterator.hasNext()) {
-                builder.append("&");
+                count++;
             }
         }
         return builder.toString();
+    }
+
+    /**
+     * 动态获取请求的URL Query参数字符串
+     *
+     * @return Query参数字符串
+     */
+    public String queryString() {
+        return getQueryString();
     }
 
     /**
@@ -1412,6 +1427,18 @@ public class ForestRequest<T> implements HasURL {
      */
     public ForestRequest<T> addQuery(String name, Object value) {
         this.query.addQuery(name, value);
+        return this;
+    }
+
+    /**
+     * 添加请求中延迟求值的Query参数
+     *
+     * @param name Query参数名
+     * @param lazyValue 延迟求值的Query参数值
+     * @return
+     */
+    public ForestRequest<T> addQuery(String name, Lazy lazyValue) {
+        this.query.addQuery(name, lazyValue);
         return this;
     }
 
@@ -4612,7 +4639,7 @@ public class ForestRequest<T> implements HasURL {
         newRequest.protocol = this.protocol;
         newRequest.sslProtocol = this.sslProtocol;
         newRequest.url = this.url;
-        newRequest.query = this.query.clone();
+        newRequest.query = this.query.clone(newRequest);
         newRequest.headers = this.headers.clone(newRequest);
         newRequest.timeout = this.timeout;
         newRequest.filename = this.filename;

@@ -1,15 +1,9 @@
 package com.dtflys.test;
 
 import cn.hutool.core.codec.Base64;
-import cn.hutool.core.lang.Pair;
-import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.crypto.digest.DigestUtil;
-import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.auth.BasicAuth;
-import com.dtflys.forest.auth.ForestAuthenticator;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.converter.ConvertOptions;
@@ -19,7 +13,6 @@ import com.dtflys.forest.http.ForestAddress;
 import com.dtflys.forest.http.ForestAsyncMode;
 import com.dtflys.forest.http.ForestFuture;
 import com.dtflys.forest.http.ForestHeader;
-import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestURL;
@@ -34,6 +27,7 @@ import com.dtflys.forest.ssl.TrustAllManager;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ForestProgress;
 import com.dtflys.forest.utils.TypeReference;
+import com.dtflys.forest.utils.URLUtils;
 import com.dtflys.test.http.BaseClientTest;
 import com.dtflys.test.model.Result;
 import com.google.common.collect.Lists;
@@ -949,8 +943,7 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_content_type_with_charset() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        final String s = Forest
-                .post("http://localhost:" + server.getPort() + "/test")
+        Forest.post("http://localhost:" + server.getPort() + "/test")
                 .contentTypeJson()
                 .addHeader("Content-Type", "application/json; charset=UTF-8")
                 .addHeader("name", "Forest.backend = okhttp3")
@@ -960,6 +953,37 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertBodyEquals("{\"id\":\"1972664191\", \"name\":\"XieYu20011008\"}")
                 .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
     }
+
+    @Test
+    public void testRequest_lazy_query() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.get("/")
+                .port(server.getPort())
+                .addQuery("a", "1")
+                .addQuery("b", "2")
+                .addQuery("c", req -> "3")
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertQueryEquals("a=1&b=2&c=3");
+    }
+
+
+    @Test
+    public void testRequest_lazy_query2() throws UnsupportedEncodingException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.get("/")
+                .port(server.getPort())
+                .addQuery("a", "1")
+                .addQuery("b", "2")
+                .addQuery("c", req -> "3")
+                .addQuery("token", req -> Base64.encode(req.getQueryString()))
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertQueryEquals("a=1&b=2&c=3&token=" + URLUtils.encode(Base64.encode("a=1&b=2&c=3"), "UTF-8"));
+    }
+
 
     @Test
     public void testRequest_lazy_header() {
@@ -1064,6 +1088,7 @@ public class TestGenericForestClient extends BaseClientTest {
     public void testRequest_lazy_body4() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.post("http://localhost:" + server.getPort() + "/test")
+                .addHeader("Content-Type", "application/json; charset=UTF-8")
                 .addHeader("_id", "20011008")
                 .addBody("id", "1972664191")
                 .addBody("name", req -> "XieYu" + req.headerValue("_id"))

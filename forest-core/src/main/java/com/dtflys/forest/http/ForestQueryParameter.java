@@ -1,8 +1,8 @@
 package com.dtflys.forest.http;
 
 public interface ForestQueryParameter<SELF extends ForestQueryParameter> {
-    static SimpleQueryParameter createSimpleQueryParameter(Object value) {
-        return new SimpleQueryParameter(String.valueOf(value), null);
+    static SimpleQueryParameter createSimpleQueryParameter(ForestQueryMap queries, Object value) {
+        return new SimpleQueryParameter(queries, String.valueOf(value), null);
     }
 
     String getName();
