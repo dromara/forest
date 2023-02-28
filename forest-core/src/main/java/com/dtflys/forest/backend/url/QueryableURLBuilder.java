@@ -19,45 +19,8 @@ public class QueryableURLBuilder extends URLBuilder {
     @Override
     public String buildUrl(ForestRequest request, boolean encodeBraceInQueryValue) {
         String url = request.getUrl();
-        List<SimpleQueryParameter> queryParameters = request.getQueryValues();
-        StringBuilder paramBuilder = new StringBuilder();
-        ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
-        for (int i = 0; i < queryParameters.size(); i++) {
-            SimpleQueryParameter queryParam = queryParameters.get(i);
-            String name = queryParam.getName();
-            if (name != null) {
-                paramBuilder.append(queryParam.getName());
-            }
-            String value = MappingTemplate.getParameterValue(jsonConverter, queryParam.getValue());
-            if (value != null) {
-                if (name != null) {
-                    paramBuilder.append('=');
-                }
-                String charset = queryParam.getCharset();
-                if (StringUtils.isBlank(charset)) {
-                    charset = request.getCharset();
-                }
-                if (StringUtils.isBlank(charset)) {
-                    charset = "UTF-8";
-                }
-                String encodedValue = null;
-                if (queryParam.isUrlencoded()) {
-                    encodedValue = URLUtils.allEncode(value, charset);
-                } else if (encodeBraceInQueryValue) {
-                    encodedValue = URLUtils.queryValueEncode(value, charset);
-                } else {
-                    encodedValue = URLUtils.queryValueWithBraceEncode(value, charset);
-                }
-                if (encodedValue != null) {
-                    paramBuilder.append(encodedValue);
-                }
-            }
-            if (i < queryParameters.size() - 1) {
-                paramBuilder.append('&');
-            }
-        }
         StringBuilder urlBuilder = new StringBuilder(url);
-        String query = paramBuilder.toString();
+        String query = request.queryString();
         if (StringUtils.isNotEmpty(query)) {
             urlBuilder.append("?").append(query);
         }

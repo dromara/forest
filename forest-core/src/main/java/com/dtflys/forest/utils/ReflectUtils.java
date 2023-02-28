@@ -8,12 +8,12 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.converter.json.JSONConverterSelector;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -24,10 +24,17 @@ public class ReflectUtils {
     private static ForestJsonConverter FORM_MAP_CONVERTER;
 
     /**
+     * 方法缓存
+     */
+    private static final Map<Class<?>, Method[]> METHOD_CACHE = new ConcurrentHashMap<>();
+
+    /**
      * JSON转换选择器
      * @since 1.5.0-BETA4
      */
     private static JSONConverterSelector jsonConverterSelector = new JSONConverterSelector();
+
+
 
     /**
      * 被排除调注解方法名集合
@@ -451,4 +458,35 @@ public class ReflectUtils {
         }
         return FORM_MAP_CONVERTER.convertObjectToMap(srcObj);
     }
+
+    public static Method[] getMethods(final Class<?> clazz) {
+        Method[] methods = METHOD_CACHE.get(clazz);
+        if (methods == null) {
+            methods = getMethodsWithoutCache(clazz, true);
+            METHOD_CACHE.put(clazz, methods);
+        }
+        return methods;
+    }
+
+
+    public static Method[] getMethodsWithoutCache(final Class<?> clazz, final boolean withSuperClassMethods) {
+        Validations.assertParamNotNull(clazz, "clazz");
+
+        Method[] allMethods = null;
+        Class<?> thisClass = clazz;
+        Method[] declaredMethods;
+        while (thisClass != null && thisClass != Object.class) {
+            declaredMethods = thisClass.getDeclaredMethods();
+            if (null == allMethods) {
+                allMethods = declaredMethods;
+            } else {
+                allMethods = (Method[]) ArrayUtils.add(allMethods, declaredMethods);
+            }
+            thisClass = withSuperClassMethods ? thisClass.getSuperclass() : null;
+        }
+
+        return allMethods;
+    }
+
+
 }

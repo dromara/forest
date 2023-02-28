@@ -1,5 +1,6 @@
 package com.dtflys.test;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.Forest;
@@ -22,8 +23,6 @@ import com.dtflys.forest.interceptor.InterceptorChain;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.retryer.NoneRetryer;
-import com.dtflys.forest.ssl.SSLSocketFactoryBuilder;
-import com.dtflys.forest.ssl.TrustAllManager;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ForestProgress;
 import com.dtflys.forest.utils.TypeReference;
@@ -37,14 +36,9 @@ import okio.Buffer;
 import okio.Okio;
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
-import org.assertj.core.internal.bytebuddy.asm.Advice;
 import org.junit.Rule;
 import org.junit.Test;
 
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -56,15 +50,12 @@ import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.security.SecureRandom;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -72,8 +63,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static junit.framework.Assert.assertFalse;
@@ -983,6 +972,49 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertPathEquals("/")
                 .assertQueryEquals("a=1&b=2&c=3&token=" + URLUtils.encode(Base64.encode("a=1&b=2&c=3"), "UTF-8"));
     }
+
+
+    @Test
+    public void testRequest_lazy_query3() throws UnsupportedEncodingException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        LazyData data = new LazyData();
+        data.setId("foo");
+        data.setName("bar");
+        data.setToken(req -> Base64.encode(req.getQueryString()));
+
+        BeanUtil.beanToMap(data);
+
+        Forest.get("/")
+                .port(server.getPort())
+                .addQuery(data)
+                .execute();
+
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertQueryEquals("id=foo&name=bar&token=" + URLUtils.encode(Base64.encode("id=foo&name=bar"), "UTF-8"));
+    }
+
+    @Test
+    public void testRequest_lazy_query4() throws UnsupportedEncodingException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("a", "1");
+        data.put("b", "2");
+        data.put("c", (Lazy<Object>) (req -> "3"));
+        data.put("token", (Lazy<Object>) (req -> Base64.encode(req.getQueryString())));
+
+        Forest.get("/")
+                .port(server.getPort())
+                .addQuery(data)
+                .execute();
+
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertQueryEquals("a=1&b=2&c=3&token=" + URLUtils.encode(Base64.encode("a=1&b=2&c=3"), "UTF-8"));
+    }
+
 
 
     @Test
