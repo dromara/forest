@@ -1714,9 +1714,6 @@ public class ForestConfiguration implements Serializable {
             throw new ForestRuntimeException("Cannot register class \"" + filterClass.getName()
                     + "\" as a filter, filter class must implement Filter interface!");
         }
-        if (filterRegisterMap.containsKey(name)) {
-            throw new ForestRuntimeException("filter \"" + name + "\" already exists!");
-        }
         filterRegisterMap.put(name, filterClass);
         return this;
     }
