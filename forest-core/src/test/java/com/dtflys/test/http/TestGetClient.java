@@ -934,6 +934,24 @@ public class TestGetClient extends BaseClientTest {
                 .assertQueryEquals("password", "bar");
     }
 
+    @Test
+    public void testSimpleGetMultiQuery3WithLazy() throws InterruptedException {
+        server.enqueue(
+                new MockResponse()
+                        .setHeader("Content-Type", "text/plain")
+                        .setHeader("Content-Encoding", "UTF-8")
+                        .setBody(EXPECTED));
+        assertThat(getClient.simpleGetMultiQuery2WithLazy("foo", req -> "bar"))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertPathEquals("/hello/user")
+                .assertQueryEquals("username", "foo")
+                .assertQueryEquals("password", "bar");
+    }
+
+
 
     @Test
     public void testSimpleGetMultiQuery3() throws InterruptedException {

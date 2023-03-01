@@ -31,9 +31,6 @@ package com.dtflys.forest.http;
  * @since 2020-08-11 12:45
  */
 public class SimpleQueryParameter extends AbstractQueryParameter<SimpleQueryParameter> {
-
-    ForestQueryMap queries;
-
     /**
      * 参数名
      */
@@ -54,8 +51,7 @@ public class SimpleQueryParameter extends AbstractQueryParameter<SimpleQueryPara
     }
 
     public SimpleQueryParameter(ForestQueryMap queries, String name, Object value, boolean fromUrl, Boolean urlencoded, String charset) {
-        super(fromUrl);
-        this.queries = queries;
+        super(queries, fromUrl);
         this.name = name;
         this.value = value;
         if (urlencoded != null) {

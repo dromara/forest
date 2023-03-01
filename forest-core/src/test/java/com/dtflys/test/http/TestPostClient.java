@@ -193,6 +193,7 @@ public class TestPostClient extends BaseClientTest {
                 .assertBodyEquals("username=foo&password=123456");
     }
 
+
     @Test
     public void testModelParamPost() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));

@@ -40,6 +40,7 @@ import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.callback.RetryWhen;
 import com.dtflys.forest.callback.SuccessWhen;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
@@ -1375,38 +1376,7 @@ public class ForestRequest<T> implements HasURL {
      * @return Query参数字符串
      */
     public String getQueryString() {
-        StringBuilder builder = new StringBuilder();
-        Iterator<SimpleQueryParameter> iterator = query.queryValues().iterator();
-        int count = 0;
-        while (iterator.hasNext()) {
-            SimpleQueryParameter query = iterator.next();
-            if (query != null) {
-                final String name = query.getName();
-                final Object value = query.getOriginalValue();
-                if (Lazy.isEvaluatingLazyValue(value, this)) {
-                    continue;
-                }
-                if (count > 0) {
-                    builder.append("&");
-                }
-                if (name != null) {
-                    builder.append(name);
-                    if (value != null) {
-                        builder.append("=");
-                    }
-                }
-                if (value != null) {
-                    final Object evaluatedValue = query.getValue();
-                    try {
-                        String encodedValue = URLUtils.encode(evaluatedValue.toString(), getCharset());
-                        builder.append(encodedValue);
-                    } catch (UnsupportedEncodingException e) {
-                    }
-                }
-                count++;
-            }
-        }
-        return builder.toString();
+        return query.toQueryString();
     }
 
     /**
@@ -1696,8 +1666,9 @@ public class ForestRequest<T> implements HasURL {
      * @return {@link ForestRequest}对象实例
      */
     public ForestRequest<T> addQuery(Object queryParameters) {
-        ForestJsonConverter jsonConverter = getConfiguration().getJsonConverter();
-        Map<String, Object> map = jsonConverter.convertObjectToMap(queryParameters, this);
+        final ForestJsonConverter jsonConverter = getConfiguration().getJsonConverter();
+        final ConvertOptions options = ConvertOptions.defaultOptions().evaluateLazyValue(false);
+        final Map<String, Object> map = jsonConverter.convertObjectToMap(queryParameters, this, options);
         if (map != null && map.size() > 0) {
             map.forEach((key, value) -> {
                 if (value != null) {

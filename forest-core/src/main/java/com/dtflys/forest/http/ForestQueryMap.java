@@ -25,10 +25,13 @@
 package com.dtflys.forest.http;
 
 import com.dtflys.forest.utils.StringUtils;
+import com.dtflys.forest.utils.URLUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +50,7 @@ public class ForestQueryMap implements Map<String, Object> {
 
     private final List<SimpleQueryParameter> queries;
 
-    public ForestQueryMap(ForestRequest request) {
+    public ForestQueryMap(final ForestRequest request) {
         this.request = request;
         this.queries = new LinkedList<>();
     }
@@ -446,8 +449,44 @@ public class ForestQueryMap implements Map<String, Object> {
         return set;
     }
 
-    public ForestQueryMap clone(ForestRequest request) {
-        ForestQueryMap newQueryMap = new ForestQueryMap(request);
+    public String toQueryString() {
+        final StringBuilder builder = new StringBuilder();
+        final Iterator<SimpleQueryParameter> iterator = queries.iterator();
+        int count = 0;
+        while (iterator.hasNext()) {
+            SimpleQueryParameter query = iterator.next();
+            if (query != null) {
+                final String name = query.getName();
+                final Object value = query.getOriginalValue();
+                if (Lazy.isEvaluatingLazyValue(value, request)) {
+                    continue;
+                }
+                if (count > 0) {
+                    builder.append("&");
+                }
+                if (name != null) {
+                    builder.append(name);
+                    if (value != null) {
+                        builder.append("=");
+                    }
+                }
+                if (value != null) {
+                    final Object evaluatedValue = query.getValue();
+                    try {
+                        String encodedValue = URLUtils.encode(evaluatedValue.toString(), request.getCharset());
+                        builder.append(encodedValue);
+                    } catch (UnsupportedEncodingException e) {
+                    }
+                }
+                count++;
+            }
+        }
+        return builder.toString();
+
+    }
+
+    public ForestQueryMap clone(final ForestRequest request) {
+        final ForestQueryMap newQueryMap = new ForestQueryMap(request);
         for (SimpleQueryParameter query : queries) {
             newQueryMap.addQuery(query);
         }

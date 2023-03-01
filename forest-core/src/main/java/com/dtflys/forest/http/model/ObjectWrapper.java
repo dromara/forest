@@ -1,39 +1,36 @@
 package com.dtflys.forest.http.model;
 
-import com.dtflys.forest.utils.NameUtils;
-import com.dtflys.forest.utils.ReflectUtils;
+import com.dtflys.forest.reflection.TypeWrapper;
 
-import java.lang.reflect.Method;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ObjectWrapper {
 
     private final Object instance;
 
-    private final List<ObjectProperty> properties = new LinkedList<>();
+    private final TypeWrapper typeWrapper;
 
+    private final Map<String, ObjectProperty> properties = new HashMap<>();
 
-
-    private ObjectWrapper(Object instance) {
+    public ObjectWrapper(Object instance) {
         this.instance = instance;
-        init();
-    }
-
-    private void init() {
-        Class<?> clazz = this.instance.getClass();
-        Method[] methods = ReflectUtils.getMethods(clazz);
-        for (Method method : methods) {
-
-        }
+        this.typeWrapper = TypeWrapper.get(instance.getClass());
+        this.typeWrapper.getProps().values().forEach(prop ->
+            properties.put(prop.getName(), new JavaObjectProperty(instance, prop.getName(), prop))
+        );
     }
 
     public Object getInstance() {
         return instance;
     }
 
-    public List<ObjectProperty> getProperties() {
+    public Map<String, ObjectProperty> getProperties() {
         return properties;
+    }
+
+    public ObjectProperty getProperty(final String name) {
+        return properties.get(name);
     }
 
 }

@@ -14,7 +14,10 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,6 +25,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ReflectUtils {
 
     private static ForestJsonConverter FORM_MAP_CONVERTER;
+
+    /**
+     * 字段缓存
+     */
+    private static final Map<Class<?>, Field[]> FIELD_CACHE = new ConcurrentHashMap<>();
 
     /**
      * 方法缓存
@@ -459,6 +467,32 @@ public class ReflectUtils {
         return FORM_MAP_CONVERTER.convertObjectToMap(srcObj);
     }
 
+
+    public static Field[] getFields(final Class<?> clazz) {
+        Field[] fields = FIELD_CACHE.get(clazz);
+        if (fields == null) {
+            fields = getFieldsWithoutCache(clazz, true);
+            FIELD_CACHE.put(clazz, fields);
+        }
+        return fields;
+    }
+
+    public static Field[] getFieldsWithoutCache(final Class<?> clazz, final boolean withSuperClassFields) {
+        Validations.assertParamNotNull(clazz, "clazz");
+        final List<Field> allFields = new LinkedList<>();
+        Class<?> thisClass = clazz;
+        while (thisClass != null && thisClass != Object.class) {
+            final Field[] declaredFields = thisClass.getDeclaredFields();
+            for (Field declaredField : declaredFields) {
+                allFields.add(declaredField);
+            }
+            thisClass = withSuperClassFields ? thisClass.getSuperclass() : null;
+        }
+        return allFields.toArray(new Field[allFields.size()]);
+    }
+
+
+
     public static Method[] getMethods(final Class<?> clazz) {
         Method[] methods = METHOD_CACHE.get(clazz);
         if (methods == null) {
@@ -471,21 +505,17 @@ public class ReflectUtils {
 
     public static Method[] getMethodsWithoutCache(final Class<?> clazz, final boolean withSuperClassMethods) {
         Validations.assertParamNotNull(clazz, "clazz");
-
-        Method[] allMethods = null;
+        final List<Method> allMethods = new LinkedList<>();
         Class<?> thisClass = clazz;
-        Method[] declaredMethods;
         while (thisClass != null && thisClass != Object.class) {
-            declaredMethods = thisClass.getDeclaredMethods();
-            if (null == allMethods) {
-                allMethods = declaredMethods;
-            } else {
-                allMethods = (Method[]) ArrayUtils.add(allMethods, declaredMethods);
+            final Method[] declaredMethods = thisClass.getDeclaredMethods();
+            for (Method declaredMethod : declaredMethods) {
+                allMethods.add(declaredMethod);
             }
             thisClass = withSuperClassMethods ? thisClass.getSuperclass() : null;
         }
 
-        return allMethods;
+        return allMethods.toArray(new Method[allMethods.size()]);
     }
 
 

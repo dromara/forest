@@ -4,6 +4,8 @@ public abstract class AbstractQueryParameter<SELF extends AbstractQueryParameter
 
     protected final SELF self = (SELF) this;
 
+    ForestQueryMap queries;
+
     /**
      * 是否做URLEncode
      */
@@ -25,7 +27,8 @@ public abstract class AbstractQueryParameter<SELF extends AbstractQueryParameter
      */
     private final boolean fromUrl;
 
-    protected AbstractQueryParameter(boolean fromUrl) {
+    protected AbstractQueryParameter(ForestQueryMap queries, boolean fromUrl) {
+        this.queries = queries;
         this.fromUrl = fromUrl;
     }
 

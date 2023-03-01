@@ -3,6 +3,7 @@ package com.dtflys.forest.http.model;
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.reflection.PropWrapper;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -12,20 +13,12 @@ public class JavaObjectProperty implements ObjectProperty {
 
     private final Object instance;
 
-    private final String name;
+    private final PropWrapper propWrapper;
 
-    private final Field field;
 
-    private final Method getter;
-
-    private final Method setter;
-
-    public JavaObjectProperty(Object instance, String name, Field field, Method getter, Method setter) {
+    public JavaObjectProperty(Object instance, String name, PropWrapper propWrapper) {
         this.instance = instance;
-        this.name = name;
-        this.field = field;
-        this.getter = getter;
-        this.setter = setter;
+        this.propWrapper = propWrapper;
     }
 
     @Override
@@ -35,58 +28,31 @@ public class JavaObjectProperty implements ObjectProperty {
 
     @Override
     public String getName() {
-        return name;
+        return propWrapper.getName();
     }
 
-    public Field getField() {
-        return field;
-    }
 
     public Method getGetter() {
-        return getter;
+        return propWrapper.getGetter();
     }
 
     public Method getSetter() {
-        return setter;
+        return propWrapper.getSetter();
     }
 
     @Override
     public Object getValue(ForestRequest request, ConvertOptions options) {
-        if (getter != null) {
-            try {
-                return getter.invoke(instance);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                throw new ForestRuntimeException(e);
-            }
+        Object value = this.propWrapper.getValue(this.instance);
+        if (value == null) {
+            return null;
         }
-        if (field != null) {
-            try {
-                return field.get(instance);
-            } catch (IllegalAccessException e) {
-                throw new ForestRuntimeException(e);
-            }
-        }
-        throw new ForestRuntimeException("[Forest] can not get value of field '" + name + "'");
+        return options.getValue(value, request);
     }
 
 
 
 
     public void setValue(Object value) {
-        if (setter != null) {
-            try {
-                setter.invoke(instance, value);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                throw new ForestRuntimeException(e);
-            }
-        }
-        if (field != null) {
-            try {
-                field.set(instance, value);
-            } catch (IllegalAccessException e) {
-                throw new ForestRuntimeException(e);
-            }
-        }
-        throw new ForestRuntimeException("[Forest] can not set value of field '" + name + "'");
+        this.propWrapper.setValue(this.instance, value);
     }
 }

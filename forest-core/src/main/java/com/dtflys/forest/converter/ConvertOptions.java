@@ -39,6 +39,11 @@ public class ConvertOptions {
 
     private Set<String> excludedFieldNames = new HashSet<>();
 
+    /**
+     * 是否立刻求值延迟参数
+     */
+    private boolean evaluateLazyValue = true;
+
     public static ConvertOptions defaultOptions() {
         return new ConvertOptions().nullValuePolicy(NullValuePolicy.IGNORE);
     }
@@ -52,6 +57,15 @@ public class ConvertOptions {
 
     public ConvertOptions exclude(Collection<String> fieldNames) {
         this.excludedFieldNames.addAll(fieldNames);
+        return this;
+    }
+
+    public boolean isEvaluateLazyValue() {
+        return evaluateLazyValue;
+    }
+
+    public ConvertOptions evaluateLazyValue(boolean evaluateLazyValue) {
+        this.evaluateLazyValue = evaluateLazyValue;
         return this;
     }
 
@@ -78,14 +92,19 @@ public class ConvertOptions {
 
     public Object getValue(Object value, ForestRequest request) {
         if (value != null) {
-            Object result = null;
             if (request != null && value instanceof Lazy) {
-                result = ((Lazy<?>) value).eval(request);
+                Object result = null;
+                if (evaluateLazyValue) {
+                    result = ((Lazy<?>) value).eval(request);
+                } else {
+                    return value;
+                }
+                if (result != null) {
+                    return result;
+                }
+            } else {
+                return value;
             }
-            if (result != null) {
-                return result;
-            }
-            return value;
         }
         return NullValuePolicy.WRITE_NULL_STRING.equals(nullValuePolicy) ? "null" :
                 NullValuePolicy.WRITE_EMPTY_STRING.equals(nullValuePolicy) ? "" : null;
