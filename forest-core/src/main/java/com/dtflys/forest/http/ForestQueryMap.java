@@ -24,6 +24,9 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
+import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
 
@@ -452,6 +455,10 @@ public class ForestQueryMap implements Map<String, Object> {
     public String toQueryString() {
         final StringBuilder builder = new StringBuilder();
         final Iterator<SimpleQueryParameter> iterator = queries.iterator();
+        final ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
+        final HttpBackend backend = request.getBackend();
+        final boolean allowEncodeBraceInQueryValue =
+                backend == null ? false : backend.isAllowEncodeBraceInQueryValue();
         int count = 0;
         while (iterator.hasNext()) {
             SimpleQueryParameter query = iterator.next();
@@ -472,10 +479,24 @@ public class ForestQueryMap implements Map<String, Object> {
                 }
                 if (value != null) {
                     final Object evaluatedValue = query.getValue();
-                    try {
-                        String encodedValue = URLUtils.encode(evaluatedValue.toString(), request.getCharset());
+                    String strValue = MappingTemplate.getParameterValue(jsonConverter, evaluatedValue);
+                    if (strValue != null) {
+                        String charset = query.getCharset();
+                        if (StringUtils.isBlank(charset)) {
+                            charset = request.getCharset();
+                        }
+                        if (StringUtils.isBlank(charset)) {
+                            charset = "UTF-8";
+                        }
+                        String encodedValue = null;
+                        if (query.isUrlencoded()) {
+                            encodedValue = URLUtils.allEncode(strValue, charset);
+                        } else if (allowEncodeBraceInQueryValue) {
+                            encodedValue = URLUtils.queryValueEncode(strValue, charset);
+                        } else {
+                            encodedValue = URLUtils.queryValueWithBraceEncode(strValue, charset);
+                        }
                         builder.append(encodedValue);
-                    } catch (UnsupportedEncodingException e) {
                     }
                 }
                 count++;

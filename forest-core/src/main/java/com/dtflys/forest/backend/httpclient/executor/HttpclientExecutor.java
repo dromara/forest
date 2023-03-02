@@ -47,7 +47,7 @@ public class HttpclientExecutor extends AbstractHttpExecutor {
     }
 
     protected String buildUrl() {
-        return getURLBuilder().buildUrl(request, true);
+        return getURLBuilder().buildUrl(request);
     }
 
     protected void prepareBodyBuilder() {

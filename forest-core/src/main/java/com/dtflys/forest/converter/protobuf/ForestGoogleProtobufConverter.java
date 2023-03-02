@@ -24,7 +24,9 @@
 
 package com.dtflys.forest.converter.protobuf;
 
+import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.exceptions.ForestConvertException;
+import com.dtflys.forest.http.ForestBody;
 import com.dtflys.forest.utils.ForestDataType;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;

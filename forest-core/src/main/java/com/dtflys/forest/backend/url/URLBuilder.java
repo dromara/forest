@@ -11,7 +11,7 @@ import com.dtflys.forest.http.ForestRequest;
 public abstract class URLBuilder {
 
 
-    public abstract String buildUrl(ForestRequest request, boolean encodeBraceInQueryValue);
+    public abstract String buildUrl(ForestRequest request);
 
 
 }

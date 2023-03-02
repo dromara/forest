@@ -22,6 +22,11 @@ public class OkHttp3Backend extends AbstractHttpBackend {
         return NAME;
     }
 
+    @Override
+    public boolean isAllowEncodeBraceInQueryValue() {
+        return false;
+    }
+
     public OkHttp3Backend() {
         super(new OkHttp3ConnectionManager());
     }

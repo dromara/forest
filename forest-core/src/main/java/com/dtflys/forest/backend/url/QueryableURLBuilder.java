@@ -1,13 +1,8 @@
 package com.dtflys.forest.backend.url;
 
-import com.dtflys.forest.converter.json.ForestJsonConverter;
-import com.dtflys.forest.http.SimpleQueryParameter;
 import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
-
-import java.util.List;
 
 /**
  * 带查询参数的URL构造器
@@ -17,7 +12,7 @@ import java.util.List;
 public class QueryableURLBuilder extends URLBuilder {
 
     @Override
-    public String buildUrl(ForestRequest request, boolean encodeBraceInQueryValue) {
+    public String buildUrl(ForestRequest request) {
         String url = request.getUrl();
         StringBuilder urlBuilder = new StringBuilder(url);
         String query = request.queryString();
