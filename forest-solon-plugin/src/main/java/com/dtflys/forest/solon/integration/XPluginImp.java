@@ -55,7 +55,7 @@ public class XPluginImp implements Plugin {
     }
 
     private ForestConfiguration configBeanInit(AopContext context) {
-        Props forestProps = context.getProps().getProp("forest");
+        Props forestProps = context.cfg().getProp("forest");
         ForestConfigurationProperties configurationProperties = new ForestConfigurationProperties();
         Utils.injectProperties(configurationProperties, forestProps);
 

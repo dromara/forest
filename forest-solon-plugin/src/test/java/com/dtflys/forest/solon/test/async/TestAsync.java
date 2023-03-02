@@ -30,7 +30,7 @@ public class TestAsync {
     @Inject
     private AsyncClient asyncClient;
 
-    @BindingVar("port") //需要在类上加 @Component
+    @BindingVar("port")
     public int getPort() {
         return server.getPort();
     }
@@ -44,7 +44,7 @@ public class TestAsync {
         server.enqueue(new MockResponse().setBody(EXPECTED).setHeadersDelay(500, TimeUnit.MILLISECONDS));
         server.enqueue(new MockResponse().setBody(EXPECTED).setHeadersDelay(500, TimeUnit.MILLISECONDS));
         server.enqueue(new MockResponse().setBody(EXPECTED).setHeadersDelay(500, TimeUnit.MILLISECONDS));
-        ForestConfiguration config = ForestConfiguration.configuration();
+        ForestConfiguration config = ForestConfiguration.createConfiguration();
         config.setMaxAsyncThreadSize(1);
         config.setMaxAsyncQueueSize(0);
         Throwable throwable = null;
@@ -104,9 +104,11 @@ public class TestAsync {
         }
         try {
             for (int i = 0; i < size; i++) {
+                System.out.println("=====" + i);
                 Forest.head("/")
                         .host("localhost")
                         .port(server.getPort())
+                        .async()
                         .execute();
             }
         } catch (RuntimeException e) {
@@ -124,5 +126,4 @@ public class TestAsync {
         assertThat(AsyncHttpExecutor.getMaxAsyncThreadSize()).isEqualTo(threads);
         assertThat(AsyncHttpExecutor.getAsyncThreadSize()).isEqualTo(threads);
     }
-
 }
