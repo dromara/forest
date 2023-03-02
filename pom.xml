@@ -39,7 +39,7 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<solon.version>2.0.0</solon.version>
+		<solon.version>2.2.0</solon.version>
 		<spring.version>5.3.20</spring.version>
 		<spring-boot.version>2.6.8</spring-boot.version>
 
