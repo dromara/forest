@@ -85,6 +85,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -249,6 +250,11 @@ public class ForestConfiguration implements Serializable {
      * 全局默认请求头信息
      */
     private List<RequestNameValue> defaultHeaders;
+
+    /**
+     * 异步线程池拒绝策略类型
+     */
+    private Class<? extends RejectedExecutionHandler> asyncRejectPolicyClass;
 
 
     /**
@@ -1254,6 +1260,33 @@ public class ForestConfiguration implements Serializable {
         return this;
     }
 
+    public RejectedExecutionHandler getAsyncRejectPolicy() {
+        if (asyncRejectPolicyClass == null) {
+            return getForestObjectFactory().getObject(RejectedExecutionHandler.class);
+        }
+        return getForestObjectFactory().getObject(asyncRejectPolicyClass);
+    }
+
+    /**
+     * 获取异步线程池拒绝策略类型
+     *
+     * @return Class实例
+     */
+    public Class<? extends RejectedExecutionHandler> getAsyncRejectPolicyClass() {
+        return asyncRejectPolicyClass;
+    }
+
+    /**
+     * 设置异步线程池拒绝策略类型
+     *
+     * @param asyncRejectPolicyClass Class实例
+     * @return 当前ForestConfiguration实例
+     */
+    public ForestConfiguration setAsyncRejectPolicyClass(Class<? extends RejectedExecutionHandler> asyncRejectPolicyClass) {
+        this.asyncRejectPolicyClass = asyncRejectPolicyClass;
+        return this;
+    }
+
     /**
      * 获取全局重试条件回调函数
      *
@@ -1680,9 +1713,6 @@ public class ForestConfiguration implements Serializable {
         if (!(Filter.class.isAssignableFrom(filterClass))) {
             throw new ForestRuntimeException("Cannot register class \"" + filterClass.getName()
                     + "\" as a filter, filter class must implement Filter interface!");
-        }
-        if (filterRegisterMap.containsKey(name)) {
-            throw new ForestRuntimeException("filter \"" + name + "\" already exists!");
         }
         filterRegisterMap.put(name, filterClass);
         return this;

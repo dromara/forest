@@ -39,4 +39,11 @@ public class ResourceRequestBody extends ForestRequestBody {
     public ForestDataType getDefaultBodyType() {
         return ForestDataType.BINARY;
     }
+
+    @Override
+    public ResourceRequestBody clone() {
+        ResourceRequestBody newBody = new ResourceRequestBody(resource);
+        newBody.setDefaultValue(getDefaultValue());
+        return newBody;
+    }
 }

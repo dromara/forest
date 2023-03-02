@@ -815,7 +815,12 @@ public class ForestMethod<T> implements VariableScope {
     private ForestRequest makeRequest(Object[] args) {
         MetaRequest baseMetaRequest = interfaceProxyHandler.getBaseMetaRequest();
         ForestURL baseURL = null;
-        ForestQueryMap queries = new ForestQueryMap();
+        ForestRequestType type = type(args);
+
+        // createExecutor and initialize http instance
+        ForestRequest<T> request = new ForestRequest(configuration, this, args);
+
+        ForestQueryMap queries = new ForestQueryMap(request);
         if (baseUrlTemplate != null) {
             baseURL = baseUrlTemplate.render(args, queries);
         }
@@ -823,7 +828,8 @@ public class ForestMethod<T> implements VariableScope {
             throw new ForestRuntimeException("request URL is empty");
         }
         ForestURL renderedURL = urlTemplate.render(args, queries);
-        ForestRequestType type = type(args);
+
+
         String baseContentEncoding = null;
         if (baseEncodeTemplate != null) {
             baseContentEncoding = baseEncodeTemplate.render(args);
@@ -898,15 +904,12 @@ public class ForestMethod<T> implements VariableScope {
         if (address != null) {
             renderedURL.setAddress(address, false);
         }
-
-
 /*
         addressURL = new ForestURLBuilder()
                 .setScheme("http")
                 .setHost("localhost")
                 .build();
 */
-
 
         boolean autoRedirection = configuration.isAutoRedirection();
 
@@ -916,8 +919,7 @@ public class ForestMethod<T> implements VariableScope {
         }
         ForestDataType bodyType = ForestDataType.findByName(bodyTypeName);
 
-        // createExecutor and initialize http instance
-        ForestRequest<T> request = new ForestRequest(configuration, this, args);
+
         request.url(renderedURL)
                 .type(type)
                 .bodyType(bodyType)
@@ -995,7 +997,7 @@ public class ForestMethod<T> implements VariableScope {
                     }
                 } else if (obj instanceof CharSequence) {
                     if (MappingParameter.isQuery(target)) {
-                        request.addQuery(ForestQueryParameter.createSimpleQueryParameter(obj)
+                        request.addQuery(ForestQueryParameter.createSimpleQueryParameter(request.getQuery(), obj)
                                 .setDefaultValue(parameter.getDefaultValue()));
                     } else if (MappingParameter.isBody(target)) {
                         request.addBody(new StringRequestBody(obj.toString())
@@ -1024,7 +1026,8 @@ public class ForestMethod<T> implements VariableScope {
                                     if (subItem instanceof SimpleQueryParameter) {
                                         request.addQuery((SimpleQueryParameter) subItem);
                                     } else {
-                                        request.addQuery(ForestQueryParameter.createSimpleQueryParameter(subItem));
+                                        request.addQuery(ForestQueryParameter.createSimpleQueryParameter(
+                                                request.getQuery(), subItem));
                                     }
                                 }
                             } else if (obj.getClass().isArray()) {
@@ -1077,6 +1080,7 @@ public class ForestMethod<T> implements VariableScope {
                         for (int idx = 0; idx < len; idx++) {
                             Object arrayItem = Array.get(obj, idx);
                             SimpleQueryParameter queryParameter = new SimpleQueryParameter(
+                                    request.getQuery(),
                                     parameter.getName(), arrayItem,
                                     parameter.isUrlEncode(), parameter.getCharset());
                             request.addQuery(queryParameter);
@@ -1439,7 +1443,7 @@ public class ForestMethod<T> implements VariableScope {
                 rType, onSuccessClassGenericType);
         request.setLifeCycleHandler(lifeCycleHandler);
         lifeCycleHandler.handleInvokeMethod(request, this, args);
-        return request.execute(this.returnType);
+        return request.execute(request.getBackend(), lifeCycleHandler);
     }
 
 

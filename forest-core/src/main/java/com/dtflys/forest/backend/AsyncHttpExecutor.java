@@ -1,6 +1,7 @@
 package com.dtflys.forest.backend;
 
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.exceptions.ForestAbortException;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestFuture;
 import com.dtflys.forest.http.ForestRequest;
@@ -12,6 +13,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -56,9 +58,9 @@ public class AsyncHttpExecutor<T> implements HttpExecutor {
      * 初始化异步请求线程池
      *
      * @param maxAsyncThreadSize 最大异步线程数
-     * @param maxQueueSize 最大线程池队列大小
+     * @param maxQueueSize       最大线程池队列大小
      */
-    public static synchronized void initAsyncThreads(Integer maxAsyncThreadSize, Integer maxQueueSize) {
+    public static synchronized void initAsyncThreads(Integer maxAsyncThreadSize, Integer maxQueueSize, RejectedExecutionHandler asyncRejectPolicy) {
         int threadSize = maxAsyncThreadSize != null ? maxAsyncThreadSize : DEFAULT_MAX_THREAD_SIZE;
         int queueSize = maxQueueSize == null ? DEFAULT_MAX_QUEUE_SIZE : maxQueueSize;
         BlockingQueue queue = queueSize > 0 ? new LinkedBlockingQueue<>(queueSize) : new SynchronousQueue<>();
@@ -70,7 +72,7 @@ public class AsyncHttpExecutor<T> implements HttpExecutor {
                     Thread thread = new Thread(tf, "forest-async-" + threadCount.getAndIncrement());
                     thread.setDaemon(true);
                     return thread;
-                }, new AsyncAbortPolicy());
+                }, asyncRejectPolicy != null ? asyncRejectPolicy : new AsyncAbortPolicy());
     }
 
     /**
@@ -141,7 +143,7 @@ public class AsyncHttpExecutor<T> implements HttpExecutor {
         if (pool == null) {
             synchronized (this) {
                 if (pool == null) {
-                    initAsyncThreads(configuration.getMaxAsyncThreadSize(), configuration.getMaxAsyncQueueSize());
+                    initAsyncThreads(configuration.getMaxAsyncThreadSize(), configuration.getMaxAsyncQueueSize(), configuration.getAsyncRejectPolicy());
                 }
             }
         }

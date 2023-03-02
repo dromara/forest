@@ -169,20 +169,9 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
                         @Override
                         public Request authenticate(@Nullable Route route, Response response) {
                             Request.Builder proxyBuilder = response.request().newBuilder();
-                            String credential = null;
                             Charset charset = null;
                             if (StringUtils.isNotEmpty(proxy.getCharset())) {
                                 charset = Charset.forName(proxy.getCharset());
-                            }
-                            if (charset != null) {
-                                credential = Credentials.basic(
-                                        proxy.getUsername(),
-                                        proxy.getPassword(),
-                                        charset);
-                            } else {
-                                credential = Credentials.basic(
-                                        proxy.getUsername(),
-                                        proxy.getPassword());
                             }
 
                             ForestHeaderMap proxyHeaders = proxy.getHeaders();
@@ -192,8 +181,21 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
                                 }
                             }
                             if (!proxyHeaders.containsKey("Proxy-Authorization")) {
+                                String credential = null;
+                                if (charset != null) {
+                                    credential = Credentials.basic(
+                                            proxy.getUsername(),
+                                            proxy.getPassword(),
+                                            charset);
+                                } else {
+                                    credential = Credentials.basic(
+                                            proxy.getUsername(),
+                                            proxy.getPassword());
+                                }
                                 proxyBuilder.addHeader("Proxy-Authorization", credential);
                             }
+                            proxyBuilder.removeHeader("User-Agent");
+                            proxyBuilder.removeHeader("Proxy-Connection");
                             return proxyBuilder.build();
                         }
                     });

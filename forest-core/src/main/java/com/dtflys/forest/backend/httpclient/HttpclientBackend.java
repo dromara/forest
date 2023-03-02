@@ -29,6 +29,11 @@ public class HttpclientBackend extends AbstractHttpBackend {
     }
 
     @Override
+    public boolean isAllowEncodeBraceInQueryValue() {
+        return true;
+    }
+
+    @Override
     public HttpExecutor createSyncExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         return new HttpclientExecutor(request,
                 getHttpclientResponseHandler(request, lifeCycleHandler),

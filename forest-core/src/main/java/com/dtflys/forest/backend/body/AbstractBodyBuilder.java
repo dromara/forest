@@ -32,46 +32,17 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
      */
     @Override
     public void buildBody(T httpRequest, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
-        String contentType = request.getContentType();
-
-        if (StringUtils.isEmpty(contentType)) {
-            contentType = ContentType.APPLICATION_X_WWW_FORM_URLENCODED;
-        }
-
-        String[] typeGroup = contentType.split(";[ ]*charset=");
-        String mineType = typeGroup[0];
-        String strCharset = request.getCharset();
-        Charset charset = null;
-        boolean mergeCharset = typeGroup.length > 1;
-        if (StringUtils.isEmpty(strCharset)) {
-            if (typeGroup.length > 1) {
-                strCharset = typeGroup[1];
-                charset = Charset.forName(strCharset);
-            } else {
-                strCharset = request.getConfiguration().getCharset();
-                if (StringUtils.isEmpty(strCharset)) {
-                    strCharset = "UTF-8";
-                }
-                charset = Charset.forName(strCharset);
-            }
-        } else {
-            charset = Charset.forName(strCharset);
-        }
-
-
-        if (StringUtils.isEmpty(mineType)) {
-            mineType = ContentType.APPLICATION_X_WWW_FORM_URLENCODED;
-        }
-
-
-        ContentType mineContentType = new ContentType(mineType);
+        ContentType mineContentType = request.mineContentType();
+        Charset charset = mineContentType.getCharset();
+        String charsetName = mineContentType.getCharsetName();
+        boolean mergeCharset = mineContentType.isHasDefinedCharset();
         String ctypeWithoutParams = mineContentType.toStringWithoutParameters();
 
         ForestEncoder encoder = request.getEncoder();
         if (encoder != null) {
             byte[] bodyBytes = request.body().encode(encoder, charset);
             bodyBytes = lifeCycleHandler.handleBodyEncode(request, encoder, bodyBytes);
-            setBinaryBody(httpRequest, request, strCharset, ctypeWithoutParams, bodyBytes, mergeCharset);
+            setBinaryBody(httpRequest, request, charsetName, ctypeWithoutParams, bodyBytes, mergeCharset);
             return;
         }
 
@@ -100,7 +71,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
             }
             byte[] bodyBytes = reqBody.encode(bodyEncoder, charset);
             bodyBytes = lifeCycleHandler.handleBodyEncode(request, bodyEncoder, bodyBytes);
-            setBinaryBody(httpRequest, request, strCharset, ctypeWithoutParams, bodyBytes, mergeCharset);
+            setBinaryBody(httpRequest, request, charsetName, ctypeWithoutParams, bodyBytes, mergeCharset);
         }
     }
 

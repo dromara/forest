@@ -1,9 +1,10 @@
 package com.dtflys.forest.http.body;
 
-import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
+import com.dtflys.forest.http.Lazy;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
@@ -14,8 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.nio.charset.StandardCharsets;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -51,17 +50,24 @@ public class ObjectRequestBody extends ForestRequestBody implements SupportFormU
 
     @Override
     public byte[] getByteArray() {
-        if (object instanceof byte[]) {
+        Object obj = object;
+        if (obj == null) {
+            return new byte[0];
+        }
+        if (obj instanceof Lazy) {
+            obj = ((Lazy<?>) obj).eval(body.getRequest());
+        }
+        if (obj instanceof byte[]) {
             return (byte[]) object;
         }
         try {
-            if (object instanceof InputStream) {
+            if (obj instanceof InputStream) {
                 return IOUtils.toByteArray((InputStream) object);
             }
-            if (object instanceof File) {
+            if (obj instanceof File) {
                 return FileUtils.readFileToByteArray((File) object);
             }
-            if (object instanceof Reader) {
+            if (obj instanceof Reader) {
                 return IOUtils.toByteArray((Reader) object);
             }
         } catch (IOException e) {
@@ -76,13 +82,27 @@ public class ObjectRequestBody extends ForestRequestBody implements SupportFormU
     }
 
     @Override
-    public List<RequestNameValue> getNameValueList(ForestConfiguration configuration) {
+    public List<RequestNameValue> getNameValueList(ForestRequest request) {
         List<RequestNameValue> nameValueList = new LinkedList<>();
-        ForestJsonConverter jsonConverter = configuration.getJsonConverter();
-        Map<String, Object> map = jsonConverter.convertObjectToMap(object);
+        if (object == null) {
+            return nameValueList;
+        }
+        ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
+        Object obj = object;
+        if (obj instanceof Lazy) {
+            obj = ((Lazy<?>) obj).eval(body.getRequest());
+        }
+        Map<String, Object> map = jsonConverter.convertObjectToMap(obj, request);
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             nameValueList.add(new RequestNameValue(entry.getKey(), entry.getValue(), MappingParameter.TARGET_BODY));
         }
         return nameValueList;
+    }
+
+    @Override
+    public ObjectRequestBody clone() {
+        ObjectRequestBody newBody = new ObjectRequestBody(object);
+        newBody.setDefaultValue(getDefaultValue());
+        return newBody;
     }
 }

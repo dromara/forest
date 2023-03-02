@@ -30,11 +30,15 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.util.FieldInfo;
 import com.alibaba.fastjson.util.IOUtils;
 import com.alibaba.fastjson.util.TypeUtils;
+import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestBody;
+import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.Lazy;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
+import com.fasterxml.jackson.databind.util.BeanUtil;
 
 import java.lang.reflect.*;
 import java.nio.charset.Charset;
@@ -188,12 +192,12 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
     }
 
 
-    private static final Object toJSON(Object javaObject) {
+    private static Object toJSON(Object javaObject, ForestRequest request, ConvertOptions options) {
         ParserConfig parserConfig = ParserConfig.getGlobalInstance();
-        return toJSON(javaObject, parserConfig);
+        return toJSON(javaObject, parserConfig, request, options);
     }
 
-    private static final Object toJSON(Object javaObject, ParserConfig mapping) {
+    private static Object toJSON(Object javaObject, ParserConfig mapping, ForestRequest request, ConvertOptions options) {
         if (javaObject == null) {
             return null;
         }
@@ -210,7 +214,13 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
             for (Map.Entry<Object, Object> entry : map.entrySet()) {
                 Object key = entry.getKey();
                 String jsonKey = TypeUtils.castToString(key);
-                Object jsonValue = toJSON(entry.getValue());
+                if (options != null && options.shouldExclude(jsonKey)) {
+                    continue;
+                }
+                Object jsonValue = toJSON(entry.getValue(), request, options);
+                if (options != null && options.shouldIgnore(jsonValue)) {
+                    continue;
+                }
                 json.put(jsonKey, jsonValue);
             }
 
@@ -223,7 +233,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
             JSONArray array = new JSONArray(collection.size());
 
             for (Object item : collection) {
-                Object jsonValue = toJSON(item);
+                Object jsonValue = toJSON(item, request, options);
                 array.add(jsonValue);
             }
 
@@ -243,7 +253,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
 
             for (int i = 0; i < len; ++i) {
                 Object item = Array.get(javaObject, i);
-                Object jsonValue = toJSON(item);
+                Object jsonValue = toJSON(item, request, options);
                 array.add(jsonValue);
             }
 
@@ -260,7 +270,19 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
             JSONObject json = new JSONObject(getters.size(), true);
 
             for (FieldInfo field : getters) {
+                if (options != null && options.shouldExclude(field.name)) {
+                    continue;
+                }
                 Object value = field.get(javaObject);
+                if (Lazy.isEvaluatingLazyValue(value, request)) {
+                    continue;
+                }
+                if (options != null) {
+                    value = options.getValue(value, request);
+                    if (options.shouldIgnore(value)) {
+                        continue;
+                    }
+                }
                 Object jsonValue = JSON.toJSON(value);
                 if (nameField != null) {
                     json.put((String) nameField.get(field), jsonValue);
@@ -280,23 +302,36 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
 
 
     @Override
-    public Map<String, Object> convertObjectToMap(Object obj) {
+    public Map<String, Object> convertObjectToMap(Object obj, ForestRequest request, ConvertOptions options) {
         if (obj == null) {
             return null;
         }
         if (obj instanceof Map) {
             Map objMap = (Map) obj;
-            Map<String, Object> newMap = new HashMap<>(objMap.size());
+            Map<String, Object> newMap = new LinkedHashMap<>(objMap.size());
             for (Object key : objMap.keySet()) {
+                final String name = String.valueOf(key);
+                if (options != null && options.shouldExclude(name)) {
+                    continue;
+                }
                 Object val = objMap.get(key);
+                if (Lazy.isEvaluatingLazyValue(val, request)) {
+                    continue;
+                }
+                if (options != null) {
+                    val = options.getValue(val, request);
+                    if (options.shouldIgnore(val)) {
+                        continue;
+                    }
+                }
                 if (val != null) {
-                    newMap.put(String.valueOf(key), val);
+                    newMap.put(name, val);
                 }
             }
             return newMap;
         }
         if (nameField == null && nameMethod == null) {
-            return defaultJsonMap(obj);
+            return defaultJsonMap(obj, options);
         }
         if (obj instanceof CharSequence) {
             return convertToJavaObject(obj.toString(), LinkedHashMap.class);
@@ -306,7 +341,19 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
 
         try {
             for (FieldInfo field : getters) {
+                if (options != null && options.shouldExclude(field.name)) {
+                    continue;
+                }
                 Object value = field.get(obj);
+                if (Lazy.isEvaluatingLazyValue(value, request)) {
+                    continue;
+                }
+                if (options != null) {
+                    value = options.getValue(value, request);
+                    if (options.shouldIgnore(value)) {
+                        continue;
+                    }
+                }
                 if (nameField != null) {
                     json.put((String) nameField.get(field), value);
                 } else if (nameMethod != null) {
@@ -315,9 +362,9 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
             }
             return json;
         } catch (IllegalAccessException e) {
-            return defaultJsonMap(obj);
+            return defaultJsonMap(obj, options);
         } catch (InvocationTargetException e) {
-            return defaultJsonMap(obj);
+            return defaultJsonMap(obj, options);
         }
     }
 
@@ -334,9 +381,18 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         return this.dateFormat;
     }
 
-    public Map<String, Object> defaultJsonMap(Object obj) {
+    public Map<String, Object> defaultJsonMap(Object obj, ConvertOptions options) {
         Object jsonObj = JSON.toJSON(obj);
-        return (Map<String, Object>) jsonObj;
+        Map<String, Object> map = (Map<String, Object>) jsonObj;
+        if (map != null && options != null) {
+            for (Map.Entry<String, Object> entity : map.entrySet()) {
+                String name = entity.getKey();
+                if (options.shouldExclude(name)) {
+                    map.remove(name);
+                }
+            }
+        }
+        return map;
     }
 
     @Override

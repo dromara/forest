@@ -17,6 +17,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -83,7 +84,7 @@ public class OkHttp3LogBodyMessage implements LogBodyMessage {
         if (mediaType == null) {
             return getLogContentForStringBody(this.requestBody);
         }
-        ContentType contentType = new ContentType(mediaType.toString());
+        ContentType contentType = new ContentType(mediaType.toString(), StandardCharsets.UTF_8);
         if (contentType.isMultipart()) {
             MultipartBody multipartBody = (MultipartBody) requestBody;
             String boundary = multipartBody.boundary();

@@ -1,5 +1,6 @@
 package com.dtflys.forest.converter.binary;
 
+import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.converter.auto.DefaultAutoConverter;
@@ -136,7 +137,7 @@ public class DefaultBinaryConverter implements ForestConverter<Object>, ForestEn
     }
 
     @Override
-    public byte[] encodeRequestBody(ForestBody reqBody, Charset charset) {
+    public byte[] encodeRequestBody(ForestBody reqBody, Charset charset, ConvertOptions options) {
         List<byte[]> byteList = new LinkedList<>();
         int size = 0;
         for (ForestRequestBody body : reqBody) {

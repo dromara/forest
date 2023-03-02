@@ -24,11 +24,17 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
+import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.utils.StringUtils;
+import com.dtflys.forest.utils.URLUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -43,12 +49,18 @@ import java.util.Set;
  */
 public class ForestQueryMap implements Map<String, Object> {
 
+    final ForestRequest request;
+
     private final List<SimpleQueryParameter> queries;
 
-    public ForestQueryMap() {
+    public ForestQueryMap(final ForestRequest request) {
+        this.request = request;
         this.queries = new LinkedList<>();
     }
 
+    public ForestRequest getRequest() {
+        return request;
+    }
 
     @Override
     public int size() {
@@ -130,6 +142,7 @@ public class ForestQueryMap implements Map<String, Object> {
     }
 
     public void addQuery(SimpleQueryParameter query) {
+        query.queries = this;
         queries.add(query);
     }
 
@@ -143,6 +156,11 @@ public class ForestQueryMap implements Map<String, Object> {
         addQuery(name, value, false, null);
     }
 
+    public void addQuery(String name, Lazy value) {
+        addQuery(name, value, false, null);
+    }
+
+
     /**
      * 添加 Query 参数
      *
@@ -155,7 +173,7 @@ public class ForestQueryMap implements Map<String, Object> {
         if (value instanceof Collection) {
             addQuery(name, (Collection) value, isUrlEncode, charset);
         } else {
-            queries.add(new SimpleQueryParameter(name, value, isUrlEncode, charset));
+            queries.add(new SimpleQueryParameter(this, name, value, isUrlEncode, charset));
         }
     }
 
@@ -308,7 +326,7 @@ public class ForestQueryMap implements Map<String, Object> {
         if (query != null) {
             query.setValue(value);
         } else {
-            SimpleQueryParameter newQuery = new SimpleQueryParameter(key, value);
+            SimpleQueryParameter newQuery = new SimpleQueryParameter(this, key, value);
             addQuery(newQuery);
         }
         return value;
@@ -434,8 +452,62 @@ public class ForestQueryMap implements Map<String, Object> {
         return set;
     }
 
-    public ForestQueryMap clone() {
-        ForestQueryMap newQueryMap = new ForestQueryMap();
+    public String toQueryString() {
+        final StringBuilder builder = new StringBuilder();
+        final Iterator<SimpleQueryParameter> iterator = queries.iterator();
+        final ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
+        final HttpBackend backend = request.getBackend();
+        final boolean allowEncodeBraceInQueryValue =
+                backend == null ? false : backend.isAllowEncodeBraceInQueryValue();
+        int count = 0;
+        while (iterator.hasNext()) {
+            SimpleQueryParameter query = iterator.next();
+            if (query != null) {
+                final String name = query.getName();
+                final Object value = query.getOriginalValue();
+                if (Lazy.isEvaluatingLazyValue(value, request)) {
+                    continue;
+                }
+                if (count > 0) {
+                    builder.append("&");
+                }
+                if (name != null) {
+                    builder.append(name);
+                    if (value != null) {
+                        builder.append("=");
+                    }
+                }
+                if (value != null) {
+                    final Object evaluatedValue = query.getValue();
+                    String strValue = MappingTemplate.getParameterValue(jsonConverter, evaluatedValue);
+                    if (strValue != null) {
+                        String charset = query.getCharset();
+                        if (StringUtils.isBlank(charset)) {
+                            charset = request.getCharset();
+                        }
+                        if (StringUtils.isBlank(charset)) {
+                            charset = "UTF-8";
+                        }
+                        String encodedValue = null;
+                        if (query.isUrlencoded()) {
+                            encodedValue = URLUtils.allEncode(strValue, charset);
+                        } else if (allowEncodeBraceInQueryValue) {
+                            encodedValue = URLUtils.queryValueEncode(strValue, charset);
+                        } else {
+                            encodedValue = URLUtils.queryValueWithBraceEncode(strValue, charset);
+                        }
+                        builder.append(encodedValue);
+                    }
+                }
+                count++;
+            }
+        }
+        return builder.toString();
+
+    }
+
+    public ForestQueryMap clone(final ForestRequest request) {
+        final ForestQueryMap newQueryMap = new ForestQueryMap(request);
         for (SimpleQueryParameter query : queries) {
             newQueryMap.addQuery(query);
         }

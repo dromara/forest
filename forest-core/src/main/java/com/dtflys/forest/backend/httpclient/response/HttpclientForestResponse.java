@@ -16,6 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 /**
@@ -43,7 +44,7 @@ public class HttpclientForestResponse extends ForestResponse {
             if (entity != null) {
                 Header type = entity.getContentType();
                 if (type != null) {
-                    this.contentType = new ContentType(type.getValue());
+                    this.contentType = new ContentType(type.getValue(), StandardCharsets.UTF_8);
                 }
                 //响应消息的编码格式: gzip...
                 setupContentEncoding();
@@ -73,7 +74,7 @@ public class HttpclientForestResponse extends ForestResponse {
         if (StringUtils.isNotBlank(request.getResponseEncode())) {
             this.charset = request.getResponseEncode();
         } else if (contentType != null) {
-            this.charset = this.contentType.getCharset();
+            this.charset = this.contentType.getCharset().name();
         } else {
             if (this.contentEncoding != null) {
                 try {
@@ -87,9 +88,10 @@ public class HttpclientForestResponse extends ForestResponse {
 
     private void setupContent() {
         if (content == null) {
+            Class resultClass = ReflectUtils.toClass(request.getLifeCycleHandler().getResultType());
             if (request.isDownloadFile()
                     || InputStream.class.isAssignableFrom(request.getMethod().getReturnClass())
-                    || InputStream.class.isAssignableFrom(ReflectUtils.toClass(request.getLifeCycleHandler().getResultType()))
+                    || (resultClass != null && InputStream.class.isAssignableFrom(resultClass))
                     || (contentType != null && contentType.canReadAsBinaryStream())) {
                 StringBuilder builder = new StringBuilder();
                 builder.append("[stream content-type: ")

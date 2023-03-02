@@ -11,6 +11,4 @@ public interface ArrayClient {
     @Get("/test?arr[0]=#{data.array[0]}&arr[1]=#{data.array[1]}")
     String arrayQueryFromProperties();
 
-    @Get("/test?arr[0]={array.get(0)}&arr[1]={array.get(1)}")
-    String arrayQueryFromVariables();
 }

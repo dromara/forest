@@ -1,5 +1,6 @@
 package com.dtflys.test.http.encoder;
 
+import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.converter.json.ForestJacksonConverter;
 import com.dtflys.forest.http.ForestBody;
@@ -11,7 +12,7 @@ import java.nio.charset.Charset;
 public class MyEncoder implements ForestEncoder {
 
     @Override
-    public byte[] encodeRequestBody(ForestBody body, Charset charset) {
+    public byte[] encodeRequestBody(ForestBody body, Charset charset, ConvertOptions options) {
         StringBuilder builder = new StringBuilder();
         for (ForestRequestBody item : body) {
             if (item instanceof ObjectRequestBody) {
@@ -20,5 +21,7 @@ public class MyEncoder implements ForestEncoder {
             }
         }
         return builder.toString().getBytes(charset);
+
     }
+
 }

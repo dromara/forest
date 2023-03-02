@@ -8,13 +8,16 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.converter.json.JSONConverterSelector;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,10 +27,22 @@ public class ReflectUtils {
     private static ForestJsonConverter FORM_MAP_CONVERTER;
 
     /**
+     * 字段缓存
+     */
+    private static final Map<Class<?>, Field[]> FIELD_CACHE = new ConcurrentHashMap<>();
+
+    /**
+     * 方法缓存
+     */
+    private static final Map<Class<?>, Method[]> METHOD_CACHE = new ConcurrentHashMap<>();
+
+    /**
      * JSON转换选择器
      * @since 1.5.0-BETA4
      */
     private static JSONConverterSelector jsonConverterSelector = new JSONConverterSelector();
+
+
 
     /**
      * 被排除调注解方法名集合
@@ -76,13 +91,7 @@ public class ReflectUtils {
             ParameterizedType pt = (ParameterizedType) genericType;
             return ((Class<?>) pt.getRawType());
         } else if (genericType instanceof TypeVariable) {
-            TypeVariable<?> tType = (TypeVariable<?>) genericType;
-            String className = tType.getGenericDeclaration().toString();
-            try {
-                return Class.forName(className);
-            } catch (ClassNotFoundException ignored) {
-            }
-            return null;
+            return (Class<?>) ((TypeVariable<?>) genericType).getBounds()[0];
         } else if (genericType instanceof WildcardType
                 && "?".equals(genericType.toString())) {
             return Object.class;
@@ -457,4 +466,57 @@ public class ReflectUtils {
         }
         return FORM_MAP_CONVERTER.convertObjectToMap(srcObj);
     }
+
+
+    public static Field[] getFields(final Class<?> clazz) {
+        Field[] fields = FIELD_CACHE.get(clazz);
+        if (fields == null) {
+            fields = getFieldsWithoutCache(clazz, true);
+            FIELD_CACHE.put(clazz, fields);
+        }
+        return fields;
+    }
+
+    public static Field[] getFieldsWithoutCache(final Class<?> clazz, final boolean withSuperClassFields) {
+        Validations.assertParamNotNull(clazz, "clazz");
+        final List<Field> allFields = new LinkedList<>();
+        Class<?> thisClass = clazz;
+        while (thisClass != null && thisClass != Object.class) {
+            final Field[] declaredFields = thisClass.getDeclaredFields();
+            for (Field declaredField : declaredFields) {
+                allFields.add(declaredField);
+            }
+            thisClass = withSuperClassFields ? thisClass.getSuperclass() : null;
+        }
+        return allFields.toArray(new Field[allFields.size()]);
+    }
+
+
+
+    public static Method[] getMethods(final Class<?> clazz) {
+        Method[] methods = METHOD_CACHE.get(clazz);
+        if (methods == null) {
+            methods = getMethodsWithoutCache(clazz, true);
+            METHOD_CACHE.put(clazz, methods);
+        }
+        return methods;
+    }
+
+
+    public static Method[] getMethodsWithoutCache(final Class<?> clazz, final boolean withSuperClassMethods) {
+        Validations.assertParamNotNull(clazz, "clazz");
+        final List<Method> allMethods = new LinkedList<>();
+        Class<?> thisClass = clazz;
+        while (thisClass != null && thisClass != Object.class) {
+            final Method[] declaredMethods = thisClass.getDeclaredMethods();
+            for (Method declaredMethod : declaredMethods) {
+                allMethods.add(declaredMethod);
+            }
+            thisClass = withSuperClassMethods ? thisClass.getSuperclass() : null;
+        }
+
+        return allMethods.toArray(new Method[allMethods.size()]);
+    }
+
+
 }

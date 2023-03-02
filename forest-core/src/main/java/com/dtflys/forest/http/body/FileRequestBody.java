@@ -7,8 +7,9 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
-public class FileRequestBody extends ForestRequestBody {
+public class FileRequestBody extends BinaryRequestBody {
 
     private File file;
 
@@ -34,7 +35,23 @@ public class FileRequestBody extends ForestRequestBody {
     }
 
     @Override
+    InputStream getInputStream() {
+        try {
+            return FileUtils.openInputStream(file);
+        } catch (IOException e) {
+            throw new ForestRuntimeException(e);
+        }
+    }
+
+    @Override
     public ForestDataType getDefaultBodyType() {
         return ForestDataType.BINARY;
+    }
+
+    @Override
+    public FileRequestBody clone() {
+        FileRequestBody newBody = new FileRequestBody(file);
+        newBody.setDefaultValue(getDefaultValue());
+        return newBody;
     }
 }

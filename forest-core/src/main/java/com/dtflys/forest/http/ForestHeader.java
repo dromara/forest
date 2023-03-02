@@ -31,7 +31,7 @@ package com.dtflys.forest.http;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2020-08-11 12:45
  */
-public interface ForestHeader<SELF, VALUE> {
+public interface ForestHeader<SELF extends ForestHeader, VALUE> {
 
     /**
      * 标准头字段：接受的内容类型
@@ -221,5 +221,8 @@ public interface ForestHeader<SELF, VALUE> {
      * @return 请求头对象自身
      */
     SELF setValue(VALUE value);
+
+
+    SELF clone(ForestHeaderMap headerMap);
 
 }

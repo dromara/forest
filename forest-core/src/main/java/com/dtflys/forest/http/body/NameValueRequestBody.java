@@ -1,8 +1,9 @@
 package com.dtflys.forest.http.body;
 
 
-import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
+import com.dtflys.forest.http.Lazy;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
@@ -54,7 +55,25 @@ public class NameValueRequestBody extends ForestRequestBody implements SupportFo
         this.name = name;
     }
 
+    public Object getOriginalValue() {
+        return value;
+    }
+
     public Object getValue() {
+        if (value == null) {
+            return getDefaultValue();
+        }
+        if (body != null && value instanceof Lazy) {
+            final ForestRequest request = body.getRequest();
+            if (Lazy.isEvaluatingLazyValue(value, request)) {
+                return null;
+            }
+            Object evaluatedValue = ((Lazy<?>) value).eval(request);
+            if (evaluatedValue == null) {
+                return getDefaultValue();
+            }
+            return evaluatedValue;
+        }
         return value;
     }
 
@@ -98,10 +117,19 @@ public class NameValueRequestBody extends ForestRequestBody implements SupportFo
         return ForestDataType.FORM;
     }
 
+
     @Override
-    public List<RequestNameValue> getNameValueList(ForestConfiguration configuration) {
+    public List<RequestNameValue> getNameValueList(ForestRequest request) {
         List<RequestNameValue> nameValueList = new ArrayList<>(1);
         nameValueList.add(new RequestNameValue(name, value, MappingParameter.TARGET_BODY));
         return nameValueList;
     }
+
+    @Override
+    public NameValueRequestBody clone() {
+        NameValueRequestBody newBody = new NameValueRequestBody(name, contentType, value);
+        newBody.setDefaultValue(getDefaultValue());
+        return newBody;
+    }
+
 }

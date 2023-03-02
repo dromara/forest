@@ -33,8 +33,7 @@ public class ByteArrayMultipart extends ForestMultipart<byte[], ByteArrayMultipa
 
     @Override
     public InputStream getInputStream() {
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
-        return byteArrayInputStream;
+        return new ByteArrayInputStream(bytes);
     }
 
     @Override

@@ -9,6 +9,7 @@ import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.http.ForestFuture;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.http.Lazy;
 import com.dtflys.test.http.model.JsonTestUser;
 import com.dtflys.test.interceptor.AddQueryInterceptor;
 import com.dtflys.test.interceptor.ErrorInterceptor;
@@ -89,6 +90,12 @@ public interface GetClient {
             headers = {"Accept:text/plain"}
     )
     String simpleGetMultiQuery2WithVar(@Var("username") String username, @Var("password") String password);
+
+    @Request(
+            url = "http://localhost:${port}/hello/user",
+            headers = {"Accept:text/plain"}
+    )
+    String simpleGetMultiQuery2WithLazy(@Query("username") String username, @Query("password") Lazy<String> password);
 
     @Request(
             url = "http://localhost:${port}/hello",

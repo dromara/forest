@@ -5,6 +5,8 @@ import com.dtflys.forest.converter.json.ForestFastjsonConverter;
 import com.dtflys.forest.converter.json.ForestGsonConverter;
 import com.dtflys.forest.converter.json.ForestJacksonConverter;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,6 +19,7 @@ public class ConverterTestConfiguration {
 
 
     @Bean
+    @ConditionalOnMissingClass
     public ForestConverter forestFastjsonConverter() {
         return new ForestFastjsonConverter();
     }

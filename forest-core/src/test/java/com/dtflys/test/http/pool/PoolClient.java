@@ -2,6 +2,7 @@ package com.dtflys.test.http.pool;
 
 import com.dtflys.forest.annotation.Address;
 import com.dtflys.forest.annotation.Get;
+import com.dtflys.forest.annotation.Var;
 import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.http.ForestRequest;
@@ -19,6 +20,6 @@ public interface PoolClient {
     ForestRequest send(String host);
 
 
-    @Get(url = "/", connectTimeout = 10000, async = true)
-    ForestResponse<String> sendAsync(OnSuccess<String> onSuccess, OnError onError);
+    @Get(url = "/{count}", connectTimeout = 10000, async = true)
+    ForestResponse<String> sendAsync(@Var("count") int count, OnSuccess<String> onSuccess, OnError onError);
 }

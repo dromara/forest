@@ -19,6 +19,10 @@ public interface HttpBackend {
      */
     String getName();
 
+    default boolean isAllowEncodeBraceInQueryValue() {
+        return false;
+    }
+
     /**
      * 创建HTTP执行器
      *

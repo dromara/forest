@@ -3,6 +3,7 @@ package com.dtflys.forest.multipart;
 import com.dtflys.forest.exceptions.ForestFileNotFoundException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.StringUtils;
+import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -50,12 +51,9 @@ public class FilePathMultipart extends ForestMultipart<String, FilePathMultipart
     @Override
     public InputStream getInputStream() {
         File file = getFile();
-        if (!file.exists()) {
-            throw new ForestFileNotFoundException(filePath);
-        }
         try {
-            return new FileInputStream(file);
-        } catch (FileNotFoundException e) {
+            return FileUtils.openInputStream(file);
+        } catch (IOException e) {
             throw new ForestRuntimeException(e);
         }
     }

@@ -40,6 +40,7 @@ import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.callback.RetryWhen;
 import com.dtflys.forest.callback.SuccessWhen;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
@@ -51,6 +52,7 @@ import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.body.ByteArrayRequestBody;
 import com.dtflys.forest.http.body.FileRequestBody;
 import com.dtflys.forest.http.body.InputStreamRequestBody;
+import com.dtflys.forest.http.body.MultipartRequestBody;
 import com.dtflys.forest.http.body.NameValueRequestBody;
 import com.dtflys.forest.http.body.ObjectRequestBody;
 import com.dtflys.forest.http.body.StringRequestBody;
@@ -91,6 +93,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -101,9 +105,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static com.dtflys.forest.mapping.MappingParameter.TARGET_BODY;
 import static com.dtflys.forest.mapping.MappingParameter.TARGET_HEADER;
@@ -186,7 +192,7 @@ public class ForestRequest<T> implements HasURL {
     /**
      * URL中的Query参数表
      */
-    private ForestQueryMap query = new ForestQueryMap();
+    private ForestQueryMap query = new ForestQueryMap(this);
 
     /**
      * 请求类型
@@ -294,12 +300,6 @@ public class ForestRequest<T> implements HasURL {
      * <p>所有本请求对象中的请求头都在由该请求体集合对象管理
      */
     private ForestHeaderMap headers = new ForestHeaderMap(this);
-
-
-    /**
-     * 文件上传项列表
-     */
-    private List<ForestMultipart> multiparts = new LinkedList<>();
 
     /**
      * 文件名
@@ -420,6 +420,14 @@ public class ForestRequest<T> implements HasURL {
     private Map<String, Object> attachments = new ConcurrentHashMap<>();
 
     /**
+     * 当前正求值的延迟参数堆栈
+     *
+     * @since 1.5.29
+     */
+    Stack<Lazy> evaluatingLazyValueStack = new Stack<>();
+
+
+    /**
      * 反序列化器
      */
     private ForestConverter decoder;
@@ -456,16 +464,20 @@ public class ForestRequest<T> implements HasURL {
      */
     private ForestProxy proxy;
 
-    public ForestRequest(ForestConfiguration configuration, ForestMethod method, Object[] arguments) {
-        this(configuration, method, arguments, new ForestBody(configuration));
-    }
 
-
-    public ForestRequest(ForestConfiguration configuration, ForestMethod method, Object[] arguments, ForestBody body) {
+    public ForestRequest(ForestConfiguration configuration, ForestMethod method, ForestBody body, Object[] arguments) {
         this.configuration = configuration;
         this.method = method;
         this.arguments = arguments;
         this.body = body;
+    }
+
+
+    public ForestRequest(ForestConfiguration configuration, ForestMethod method, Object[] arguments) {
+        this.configuration = configuration;
+        this.method = method;
+        this.arguments = arguments;
+        this.body = new ForestBody(this);
     }
 
     public ForestRequest(ForestConfiguration configuration, ForestMethod method) {
@@ -1364,32 +1376,16 @@ public class ForestRequest<T> implements HasURL {
      * @return Query参数字符串
      */
     public String getQueryString() {
-        StringBuilder builder = new StringBuilder();
-        Iterator<SimpleQueryParameter> iterator = query.queryValues().iterator();
-        while (iterator.hasNext()) {
-            SimpleQueryParameter query = iterator.next();
-            if (query != null) {
-                String name = query.getName();
-                Object value = query.getValue();
-                if (name != null) {
-                    builder.append(name);
-                    if (value != null) {
-                        builder.append("=");
-                    }
-                }
-                if (value != null) {
-                    try {
-                        String encodedValue = URLUtils.encode(value.toString(), getCharset());
-                        builder.append(encodedValue);
-                    } catch (UnsupportedEncodingException e) {
-                    }
-                }
-            }
-            if (iterator.hasNext()) {
-                builder.append("&");
-            }
-        }
-        return builder.toString();
+        return query.toQueryString();
+    }
+
+    /**
+     * 动态获取请求的URL Query参数字符串
+     *
+     * @return Query参数字符串
+     */
+    public String queryString() {
+        return getQueryString();
     }
 
     /**
@@ -1401,6 +1397,18 @@ public class ForestRequest<T> implements HasURL {
      */
     public ForestRequest<T> addQuery(String name, Object value) {
         this.query.addQuery(name, value);
+        return this;
+    }
+
+    /**
+     * 添加请求中延迟求值的Query参数
+     *
+     * @param name Query参数名
+     * @param lazyValue 延迟求值的Query参数值
+     * @return
+     */
+    public ForestRequest<T> addQuery(String name, Lazy lazyValue) {
+        this.query.addQuery(name, lazyValue);
         return this;
     }
 
@@ -1658,8 +1666,9 @@ public class ForestRequest<T> implements HasURL {
      * @return {@link ForestRequest}对象实例
      */
     public ForestRequest<T> addQuery(Object queryParameters) {
-        ForestJsonConverter jsonConverter = getConfiguration().getJsonConverter();
-        Map<String, Object> map = jsonConverter.convertObjectToMap(queryParameters);
+        final ForestJsonConverter jsonConverter = getConfiguration().getJsonConverter();
+        final ConvertOptions options = ConvertOptions.defaultOptions().evaluateLazyValue(false);
+        final Map<String, Object> map = jsonConverter.convertObjectToMap(queryParameters, this, options);
         if (map != null && map.size() > 0) {
             map.forEach((key, value) -> {
                 if (value != null) {
@@ -1937,7 +1946,7 @@ public class ForestRequest<T> implements HasURL {
      * @return 请求参数编码字符集
      */
     public String getCharset() {
-        return charset;
+        return this.charset;
     }
 
     /**
@@ -1949,6 +1958,20 @@ public class ForestRequest<T> implements HasURL {
     public ForestRequest<T> setCharset(String charset) {
         this.charset = charset;
         return this;
+    }
+
+    public Charset mineCharset() {
+        if (StringUtils.isNotEmpty(this.charset)) {
+            return Charset.forName(this.charset);
+        }
+        if (StringUtils.isNotEmpty(this.configuration.getCharset())) {
+            return Charset.forName(this.configuration.getCharset());
+        }
+        ContentType mineType = this.mineContentType();
+        if (mineType != null && mineType.getCharset() != null) {
+            return mineType.getCharset();
+        }
+        return StandardCharsets.UTF_8;
     }
 
     /**
@@ -2250,6 +2273,45 @@ public class ForestRequest<T> implements HasURL {
      */
     public ForestRequest<T> contentType(String contentType) {
         return setContentType(contentType);
+    }
+
+
+    /**
+     * 获取请求头 Content-Type 的 MINE 对象
+     *
+     * @return 请求头 Content-Type 的 MINE 对象
+     * @since 1.5.29
+     */
+    public ContentType mineContentType() {
+        String contentType = getContentType();
+
+        if (StringUtils.isEmpty(contentType)) {
+            contentType = ContentType.APPLICATION_X_WWW_FORM_URLENCODED;
+        }
+
+        String[] typeGroup = contentType.split(";[ ]*charset=");
+        String mineType = typeGroup[0];
+        boolean hasDefinedCharset = typeGroup.length > 1;
+
+        if (StringUtils.isEmpty(mineType)) {
+            mineType = ContentType.APPLICATION_X_WWW_FORM_URLENCODED;
+        }
+
+        Charset mineCharset = null;
+        String strCharset = this.getCharset();
+        if (StringUtils.isEmpty(strCharset)) {
+            strCharset = this.configuration.getCharset();
+        }
+        if (StringUtils.isEmpty(strCharset)) {
+            mineCharset = StandardCharsets.UTF_8;
+        } else {
+            mineCharset = Charset.forName(strCharset);
+        }
+        ContentType mineContentType = new ContentType(mineType, mineCharset);
+        if (hasDefinedCharset) {
+            mineContentType.definedCharsetName(typeGroup[1]);
+        }
+        return mineContentType;
     }
 
 
@@ -2891,6 +2953,19 @@ public class ForestRequest<T> implements HasURL {
     }
 
     /**
+     * 添加延迟求值的键值对类型Body数据
+     *
+     * @param name 字段名
+     * @param value 延迟求值的字段值
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.29
+     */
+    public ForestRequest<T> addBody(String name, Lazy value) {
+        return addBody(new NameValueRequestBody(name, value));
+    }
+
+
+    /**
      * 添加 Map 类型 Body 数据
      * <p>将 Map 的 key 作为键值对的 key
      * <p>Map 的 value 作为键值对的 value
@@ -3224,6 +3299,22 @@ public class ForestRequest<T> implements HasURL {
     }
 
     /**
+     * 添加延迟求值的请求头到该请求中
+     *
+     * @param name 请求头名称
+     * @param value 延迟求值的 Lambda
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.29
+     */
+    public ForestRequest<T> addHeader(String name, Lazy value) {
+        if (value == null) {
+            return this;
+        }
+        this.headers.setHeader(name, value);
+        return this;
+    }
+
+    /**
      * 添加请求头到该请求中
      *
      * @param nameValue 请求头键值对，{@link RequestNameValue}类实例
@@ -3312,7 +3403,9 @@ public class ForestRequest<T> implements HasURL {
 
 
     public List<ForestMultipart> getMultiparts() {
-        return multiparts;
+        return this.body.getMultipartItems().stream()
+                .map(body -> body.getMultipart())
+                .collect(Collectors.toList());
     }
 
     /**
@@ -3322,8 +3415,8 @@ public class ForestRequest<T> implements HasURL {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> setMultiparts(List<ForestMultipart> multiparts) {
-        this.multiparts = multiparts;
-        return this;
+        this.body.remove(MultipartRequestBody.class);
+        return addMultipart(multiparts);
     }
 
     /**
@@ -3333,12 +3426,24 @@ public class ForestRequest<T> implements HasURL {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> addMultipart(ForestMultipart multipart) {
-        if (this.multiparts == null) {
-            this.multiparts = new LinkedList<>();
-        }
-        this.multiparts.add(multipart);
+        this.body.add(new MultipartRequestBody(multipart));
         return this;
     }
+
+    /**
+     * 批量添加 Multipart
+     *
+     * @param multiparts {@link ForestMultipart} 对象列表
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.29
+     */
+    public ForestRequest<T> addMultipart(List<ForestMultipart> multiparts) {
+        for (ForestMultipart multipart : multiparts) {
+            this.body.add(new MultipartRequestBody(multipart));
+        }
+        return this;
+    }
+
 
     /**
      * 添加文件 Multipart
@@ -4491,25 +4596,22 @@ public class ForestRequest<T> implements HasURL {
      */
     @Override
     public ForestRequest<T> clone() {
-        ForestBody newBody = new ForestBody(configuration);
+        ForestRequest<T> newRequest = new ForestRequest<>(
+                this.configuration,
+                this.method,
+                this.arguments);
+        ForestBody newBody = newRequest.body();
         newBody.setBodyType(body.getBodyType());
-        for (ForestRequestBody body : this.body) {
-            newBody.add(body);
+        for (ForestRequestBody bodyItem : this.body) {
+            newBody.add(bodyItem.clone());
         }
-
-        ForestRequest<T> newRequest = new ForestRequest<>(this.configuration, this.method, this.arguments, body);
         newRequest.backend = this.backend;
         newRequest.lifeCycleHandler = this.lifeCycleHandler;
         newRequest.protocol = this.protocol;
         newRequest.sslProtocol = this.sslProtocol;
         newRequest.url = this.url;
-        newRequest.query = this.query.clone();
-        newRequest.headers = this.headers.clone();
-        List<ForestMultipart> newMultiparts = new ArrayList<>(this.multiparts.size());
-        for (ForestMultipart part : this.multiparts) {
-            newMultiparts.add(part);
-        }
-        newRequest.multiparts = newMultiparts;
+        newRequest.query = this.query.clone(newRequest);
+        newRequest.headers = this.headers.clone(newRequest);
         newRequest.timeout = this.timeout;
         newRequest.filename = this.filename;
         newRequest.charset = this.charset;

@@ -1,5 +1,6 @@
 package com.dtflys.forest.converter.text;
 
+import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.exceptions.ForestConvertException;
@@ -8,9 +9,7 @@ import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.http.body.NameValueRequestBody;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
-import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -53,7 +52,7 @@ public class DefaultTextConverter implements ForestConverter<String>, ForestEnco
     }
 
     @Override
-    public byte[] encodeRequestBody(ForestBody body, Charset charset) {
+    public byte[] encodeRequestBody(ForestBody body, Charset charset, ConvertOptions options) {
         if (charset == null) {
             charset = StandardCharsets.UTF_8;
         }

@@ -9,13 +9,13 @@ public class ForestModel {
 
     private final List<Object> models = new LinkedList<>();
 
-    private final Map<String, ForestModelProperty> properties = new HashMap<>();
+    private final Map<String, JavaObjectProperty> properties = new HashMap<>();
 
     public List<Object> getModels() {
         return models;
     }
 
-    public Map<String, ForestModelProperty> getProperties() {
+    public Map<String, JavaObjectProperty> getProperties() {
         return properties;
     }
 }

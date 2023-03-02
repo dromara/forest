@@ -4,6 +4,7 @@ import com.dtflys.forest.annotation.*;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.http.Lazy;
 import com.dtflys.test.http.model.*;
 import com.dtflys.test.http.model.UserParam;
 import com.dtflys.test.http.model.XmlTestParam;
@@ -103,6 +104,7 @@ public interface PostClient {
             headers = {"Accept:text/plain"}
     )
     String varParamPost(@Var("username") String username, @Var("password") String password);
+
 
     @Post(
             url = "http://localhost:{port}/hello-list",
@@ -276,7 +278,7 @@ public interface PostClient {
             url = "http://localhost:{port}/json",
             headers = {"Content-Type: application/json; charset=utf-8"}
     )
-    String postJsonWithCnCharacters5(@Body JsonTestUser3 user);
+    ForestRequest<String> postJsonWithCnCharacters5(@Body JsonTestUser3 user);
 
     @Post(
             url = "http://localhost:{port}/json",

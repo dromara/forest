@@ -31,7 +31,6 @@ package com.dtflys.forest.http;
  * @since 2020-08-11 12:45
  */
 public class SimpleQueryParameter extends AbstractQueryParameter<SimpleQueryParameter> {
-
     /**
      * 参数名
      */
@@ -43,16 +42,16 @@ public class SimpleQueryParameter extends AbstractQueryParameter<SimpleQueryPara
     private Object value;
 
 
-    public SimpleQueryParameter(String name, Object value) {
-        this(name, value, false, null);
+    public SimpleQueryParameter(ForestQueryMap queries, String name, Object value) {
+        this(queries, name, value, false, null);
     }
 
-    public SimpleQueryParameter(String name, Object value, Boolean urlencoded, String charset) {
-        this(name, value, false, urlencoded, charset);
+    public SimpleQueryParameter(ForestQueryMap queries, String name, Object value, Boolean urlencoded, String charset) {
+        this(queries, name, value, false, urlencoded, charset);
     }
 
-    public SimpleQueryParameter(String name, Object value, boolean fromUrl, Boolean urlencoded, String charset) {
-        super(fromUrl);
+    public SimpleQueryParameter(ForestQueryMap queries, String name, Object value, boolean fromUrl, Boolean urlencoded, String charset) {
+        super(queries, fromUrl);
         this.name = name;
         this.value = value;
         if (urlencoded != null) {
@@ -64,8 +63,8 @@ public class SimpleQueryParameter extends AbstractQueryParameter<SimpleQueryPara
     }
 
 
-    public SimpleQueryParameter(String name) {
-        this(name, null, false, null);
+    public SimpleQueryParameter(ForestQueryMap queries, String name) {
+        this(queries, name, null, false, null);
     }
 
 
@@ -74,8 +73,19 @@ public class SimpleQueryParameter extends AbstractQueryParameter<SimpleQueryPara
         return name;
     }
 
+
+    public Object getOriginalValue() {
+        return value;
+    }
+
     @Override
     public Object getValue() {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof Lazy) {
+            return ((Lazy<?>) value).eval(queries.request);
+        }
         return value;
     }
 

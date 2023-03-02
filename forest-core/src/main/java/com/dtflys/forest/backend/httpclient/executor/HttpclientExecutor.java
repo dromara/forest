@@ -47,7 +47,7 @@ public class HttpclientExecutor extends AbstractHttpExecutor {
     }
 
     protected String buildUrl() {
-        return getURLBuilder().buildUrl(request, true);
+        return getURLBuilder().buildUrl(request);
     }
 
     protected void prepareBodyBuilder() {
@@ -57,8 +57,8 @@ public class HttpclientExecutor extends AbstractHttpExecutor {
     protected void prepare(LifeCycleHandler lifeCycleHandler) {
         httpRequest = buildRequest();
         prepareBodyBuilder();
-        prepareHeaders();
         prepareBody(lifeCycleHandler);
+        prepareHeaders();
     }
 
     public HttpclientExecutor(ForestRequest request, HttpclientResponseHandler httpclientResponseHandler, HttpclientRequestSender requestSender) {

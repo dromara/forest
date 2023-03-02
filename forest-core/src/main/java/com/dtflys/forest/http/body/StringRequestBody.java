@@ -1,6 +1,7 @@
 package com.dtflys.forest.http.body;
 
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.utils.ForestDataType;
@@ -49,7 +50,7 @@ public class StringRequestBody extends ForestRequestBody implements SupportFormU
     }
 
     @Override
-    public List<RequestNameValue> getNameValueList(ForestConfiguration configuration) {
+    public List<RequestNameValue> getNameValueList(ForestRequest request) {
         List<RequestNameValue> nameValueList = new LinkedList<>();
         if (StringUtils.isNotBlank(content)) {
             String[] items = content.split("&");
@@ -63,5 +64,12 @@ public class StringRequestBody extends ForestRequestBody implements SupportFormU
             }
         }
         return nameValueList;
+    }
+
+    @Override
+    public StringRequestBody clone() {
+        StringRequestBody newBody = new StringRequestBody(content);
+        newBody.setDefaultValue(getDefaultValue());
+        return newBody;
     }
 }

@@ -24,6 +24,7 @@
 
 package com.dtflys.forest.converter.protobuf;
 
+import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.http.ForestBody;
@@ -42,7 +43,7 @@ public interface ForestProtobufConverter extends ForestConverter<byte[]>, Forest
     }
 
     @Override
-    default byte[] encodeRequestBody(ForestBody body, Charset charset) {
+    default byte[] encodeRequestBody(final ForestBody body, final Charset charset, final ConvertOptions options) {
         ForestProtobufConverterManager protobufConverterManager = ForestProtobufConverterManager.getInstance();
         Object protobufObj = null;
         for (ForestRequestBody bodyItem : body) {

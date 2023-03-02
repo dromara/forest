@@ -84,7 +84,7 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
         } else {
             bodyBuilder = new MultipartBody.Builder();
         }
-        ContentType objContentType = new ContentType(contentType);
+        ContentType objContentType = new ContentType(contentType, request.mineCharset());
         MediaType mediaType = MediaType.parse(objContentType.toStringWithoutParameters());
         if ("multipart".equals(mediaType.type())) {
             bodyBuilder.setType(mediaType);
@@ -105,7 +105,7 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
                 if (obj == null) {
                     continue;
                 }
-                Map<String, Object> attrs = jsonConverter.convertObjectToMap(obj);
+                Map<String, Object> attrs = jsonConverter.convertObjectToMap(obj, request);
                 for (Map.Entry<String, Object> entry : attrs.entrySet()) {
                     String name = entry.getKey();
                     Object value = entry.getValue();

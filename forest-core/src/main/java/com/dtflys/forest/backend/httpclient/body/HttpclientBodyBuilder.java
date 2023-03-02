@@ -102,7 +102,7 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
                     continue;
                 }
                 needSetMode = true;
-                Map<String, Object> attrs = jsonConverter.convertObjectToMap(obj);
+                Map<String, Object> attrs = jsonConverter.convertObjectToMap(obj, request);
                 for (Map.Entry<String, Object> entry : attrs.entrySet()) {
                     String name = entry.getKey();
                     Object value = entry.getValue();

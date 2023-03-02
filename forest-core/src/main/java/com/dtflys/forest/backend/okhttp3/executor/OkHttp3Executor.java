@@ -187,10 +187,10 @@ public class OkHttp3Executor implements HttpExecutor {
     public void execute(final LifeCycleHandler lifeCycleHandler, int retryCount) {
         OkHttpClient okHttpClient = getClient(request, lifeCycleHandler);
         URLBuilder urlBuilder = URL_BUILDER;
-        String url = urlBuilder.buildUrl(request, false);
+        String url = urlBuilder.buildUrl(request);
         Request.Builder builder = new Request.Builder().url(url);
-        prepareHeaders(builder);
         prepareMethodAndBody(builder, lifeCycleHandler);
+        prepareHeaders(builder);
         final Request okRequest = builder.build();
         call = okHttpClient.newCall(okRequest);
         final OkHttp3ForestResponseFactory factory = new OkHttp3ForestResponseFactory();
