@@ -86,6 +86,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -321,6 +322,15 @@ public class ForestConfiguration implements Serializable {
      * Forest请求池
      */
     private ForestRequestPool pool;
+
+
+    /**
+     * Forest异步请求线程池
+     *
+     * @since 1.5.29
+     */
+    ThreadPoolExecutor asyncPool;
+
 
     private ForestConfiguration() {
     }
