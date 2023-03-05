@@ -15,7 +15,6 @@ import com.dtflys.forest.multipart.FilePathMultipart;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.multipart.InputStreamMultipart;
 import com.dtflys.forest.utils.StringUtils;
-import com.dtflys.test.converter.TestJaxbConverter;
 import com.dtflys.test.http.client.UploadClient;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;

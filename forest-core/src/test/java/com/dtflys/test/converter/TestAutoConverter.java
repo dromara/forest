@@ -3,7 +3,6 @@ package com.dtflys.test.converter;
 import com.alibaba.fastjson.TypeReference;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.auto.DefaultAutoConverter;
-import com.dtflys.forest.converter.xml.ForestJaxbConverter;
 import com.dtflys.forest.utils.ForestDataType;
 import org.junit.Test;
 
@@ -50,6 +49,7 @@ public class TestAutoConverter {
     }
 
 
+/*
     @Test
     public void testAutoXml() {
         DefaultAutoConverter autoConverter = getConverter();
@@ -68,6 +68,7 @@ public class TestAutoConverter {
         assertEquals("Peter", user.getName());
         assertEquals(Integer.valueOf(32), user.getAge());
     }
+*/
 
     @Test
     public void testAutoNumber() {

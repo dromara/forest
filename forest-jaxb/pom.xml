@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.dtflys.forest</groupId>
+  <artifactId>forest-jaxb</artifactId>
+  <version>1.5.29</version>
+
+  <name>forest-jaxb</name>
+
+  <properties>
+    <glassfish.jaxb.version>2.3.1</glassfish.jaxb.version>
+  </properties>
+
+  <parent>
+    <groupId>com.dtflys.forest</groupId>
+    <artifactId>forest</artifactId>
+    <version>1.5.29</version>
+  </parent>
+
+
+  <dependencies>
+
+    <dependency>
+      <groupId>com.dtflys.forest</groupId>
+      <artifactId>forest-core</artifactId>
+      <version>${parent.version}</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+      <version>${glassfish.jaxb.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+
+
+</project>

@@ -6,12 +6,12 @@
 
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-core</artifactId>
-    <version>1.5.29-BETA3</version>
+    <version>1.5.29</version>
 
     <parent>
         <groupId>com.dtflys.forest</groupId>
         <artifactId>forest</artifactId>
-        <version>1.5.29-BETA3</version>
+        <version>1.5.29</version>
     </parent>
 
     <properties>
@@ -23,8 +23,6 @@
         <logback.version>1.2.11</logback.version>
         <kotlin.version>1.6.20</kotlin.version>
         <kotlinx.version>1.6.2</kotlinx.version>
-        <jaxb-api.version>2.3.1</jaxb-api.version>
-        <jaxb-impl.version>2.3.0</jaxb-impl.version>
 
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
     </properties>
@@ -79,11 +77,6 @@
             <version>${jsr305.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.glassfish.jaxb</groupId>
-            <artifactId>jaxb-runtime</artifactId>
-            <version>2.3.1</version>
-        </dependency>
 
 
         <dependency>
@@ -142,7 +135,7 @@
         <dependency>
             <groupId>com.dtflys.forest</groupId>
             <artifactId>forest-mock</artifactId>
-            <version>1.5.29-BETA3</version>
+            <version>1.5.29</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -187,6 +180,7 @@
             <version>1.12.3</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test</artifactId>

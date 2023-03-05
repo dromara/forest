@@ -6,12 +6,16 @@
 
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-solon-plugin</artifactId>
-    <version>1.5.29-BETA3</version>
+    <version>1.5.29</version>
+
+    <properties>
+        <solon.version>2.2.1</solon.version>
+    </properties>
 
     <parent>
         <groupId>com.dtflys.forest</groupId>
         <artifactId>forest</artifactId>
-        <version>1.5.29-BETA3</version>
+        <version>1.5.29</version>
     </parent>
 
     <dependencies>

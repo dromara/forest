@@ -39,7 +39,6 @@ import com.dtflys.forest.converter.json.JSONConverterSelector;
 import com.dtflys.forest.converter.protobuf.ForestProtobufConverter;
 import com.dtflys.forest.converter.protobuf.ForestProtobufConverterManager;
 import com.dtflys.forest.converter.text.DefaultTextConverter;
-import com.dtflys.forest.converter.xml.ForestJaxbConverter;
 import com.dtflys.forest.converter.xml.ForestXmlConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.filter.EncodeFilter;
@@ -83,6 +82,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -376,7 +376,10 @@ public class ForestConfiguration implements Serializable {
         configuration.setJsonConverterSelector(new JSONConverterSelector());
         ForestProtobufConverterManager protobufConverterFactory = ForestProtobufConverterManager.getInstance();
         configuration.setProtobufConverter(protobufConverterFactory.getForestProtobufConverter());
-        configuration.setXmlConverter(new ForestJaxbConverter());
+        ServiceLoader<ForestXmlConverter> xmlConverters = ServiceLoader.load(ForestXmlConverter.class);
+        for (ForestXmlConverter xmlConverter : xmlConverters) {
+            configuration.setXmlConverter(xmlConverter);
+        }
         configuration.setTextConverter(new DefaultTextConverter());
         DefaultAutoConverter autoConverter = new DefaultAutoConverter(configuration);
         configuration.getConverterMap().put(ForestDataType.AUTO, autoConverter);

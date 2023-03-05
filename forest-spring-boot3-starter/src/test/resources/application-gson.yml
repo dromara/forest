@@ -1,0 +1,19 @@
+
+forest:
+  max-connections: 5000
+  max-route-connections: 5500
+  timeout: 50
+  connect-timeout: 4000
+  charset: GBK
+  log-enabled: true
+  log-request: true
+  log-response-status: false
+  log-response-content: true
+  log-handler: com.dtflys.forest.springboot.test.logging.TestLogHandler
+  converters:
+    json:
+      type: com.dtflys.forest.converter.json.ForestGsonConverter
+      parameters:
+        dateFormat: yyyy/MM/dd hh:mm:ss
+
+

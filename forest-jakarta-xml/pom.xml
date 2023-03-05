@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.dtflys.forest</groupId>
+  <artifactId>forest-jakarta-xml</artifactId>
+  <version>1.5.29</version>
+
+  <name>forest-jakarta-xml</name>
+
+  <properties>
+    <jakarta.xml.bind.version>4.0.0</jakarta.xml.bind.version>
+    <jakarta.activation.version>2.1.1</jakarta.activation.version>
+    <glassfish.jaxb.version>4.0.2</glassfish.jaxb.version>
+  </properties>
+
+
+  <parent>
+    <groupId>com.dtflys.forest</groupId>
+    <artifactId>forest</artifactId>
+    <version>1.5.29</version>
+  </parent>
+
+
+  <dependencies>
+
+    <dependency>
+      <groupId>com.dtflys.forest</groupId>
+      <artifactId>forest-core</artifactId>
+      <version>${parent.version}</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
+      <version>${jakarta.xml.bind.version}</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>jakarta.activation</groupId>
+      <artifactId>jakarta.activation-api</artifactId>
+      <version>${jakarta.activation.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+      <version>${glassfish.jaxb.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+</project>

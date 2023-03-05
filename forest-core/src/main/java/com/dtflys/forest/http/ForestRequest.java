@@ -3455,6 +3455,18 @@ public class ForestRequest<T> implements HasURL {
         return addMultipart(multipart);
     }
 
+
+    /**
+     * 批量添加文件 Multipart
+     *
+     * @param multiparts {@link ForestMultipart} 对象列表
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.29
+     */
+    public ForestRequest<T> addFile(List<ForestMultipart> multiparts) {
+        return addMultipart(multiparts);
+    }
+
     /**
      * 添加文件 Multipart
      *

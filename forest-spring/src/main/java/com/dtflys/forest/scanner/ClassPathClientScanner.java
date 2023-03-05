@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -170,10 +171,9 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
     @Override
     public Set<BeanDefinitionHolder> doScan(String... basePackages) {
         Set<BeanDefinitionHolder> beanDefinitions = super.doScan(basePackages);
-        if (beanDefinitions.isEmpty()) {
-            logger.warn("[Forest] No Forest client is found in package '" + Arrays.toString(basePackages) + "'.");
+        if (!beanDefinitions.isEmpty()) {
+            processBeanDefinitions(beanDefinitions);
         }
-        processBeanDefinitions(beanDefinitions);
         return beanDefinitions;
     }
 

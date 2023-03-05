@@ -1,13 +1,13 @@
-package com.dtflys.forest.converter.xml;
+package com.dtflys.forest.converter.xml.jaxb;
 
 import com.dtflys.forest.converter.ConvertOptions;
+import com.dtflys.forest.converter.xml.ForestXmlConverter;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestBody;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.http.body.ObjectRequestBody;
 import com.dtflys.forest.http.body.StringRequestBody;
-import com.dtflys.forest.reflection.ForestObjectFactory;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
@@ -22,6 +22,7 @@ import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 基于JAXB实现的XML转换器
@@ -29,6 +30,23 @@ import java.util.Map;
  * @since 2016-07-12
  */
 public class ForestJaxbConverter implements ForestXmlConverter {
+
+
+    private final static Map<Class<?>, JAXBContext> JAXB_CONTEXT_CACHE = new ConcurrentHashMap<>();
+
+    private JAXBContext getJAXBContext(Class<?> clazz) {
+        JAXBContext jaxbContext = JAXB_CONTEXT_CACHE.get(clazz);
+        if (jaxbContext != null) {
+            return jaxbContext;
+        }
+        try {
+            jaxbContext = JAXBContext.newInstance(clazz);
+        } catch (JAXBException e) {
+            throw new ForestConvertException(this, e);
+        }
+        JAXB_CONTEXT_CACHE.put(clazz, jaxbContext);
+        return jaxbContext;
+    }
 
     @Override
     public String encodeToString(Object obj) {
@@ -42,7 +60,7 @@ public class ForestJaxbConverter implements ForestXmlConverter {
             throw new ForestRuntimeException("[Forest] JAXB XML converter dose not support translating instance of java.util.Map or java.util.List");
         }
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(obj.getClass());
+            JAXBContext jaxbContext = getJAXBContext(obj.getClass());
             StringWriter writer = new StringWriter();
             createMarshaller(jaxbContext, "UTF-8").marshal(obj, writer);
             return writer.toString();
@@ -71,7 +89,7 @@ public class ForestJaxbConverter implements ForestXmlConverter {
     public <T> T convertToJavaObject(String source, Class<T> targetType) {
         JAXBContext jaxbContext = null;
         try {
-            jaxbContext = JAXBContext.newInstance(targetType);
+            jaxbContext = getJAXBContext(targetType);
             StringReader reader = new StringReader(source);
             return (T) createUnmarshaller(jaxbContext).unmarshal(reader);
         } catch (JAXBException e) {

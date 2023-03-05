@@ -1,19 +1,22 @@
-package com.dtflys.test.converter;
+package com.dtflys.forest.test.convert.xml.jakartaxml;
 
-import com.alibaba.fastjson.TypeReference;
-import com.dtflys.forest.converter.xml.ForestJaxbConverter;
+
+import com.dtflys.forest.converter.xml.jakartaxml.ForestJakartaXmlConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.utils.TypeReference;
 import org.junit.Test;
 
-import javax.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 
-/**
- * @author gongjun[jun.gong@thebeastshop.com]
- * @since 2017-05-18 15:01
- */
-public class TestJaxbConverter {
+public class TestJakartaXml {
 
     @XmlRootElement
     @XmlType(name = "user")
@@ -39,7 +42,7 @@ public class TestJaxbConverter {
 
     @Test
     public void convertToJavaObject() {
-        ForestJaxbConverter forestJaxbConverter = new ForestJaxbConverter();
+        ForestJakartaXmlConverter forestJaxbConverter = new ForestJakartaXmlConverter();
         String xmlText = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<user>\n" +
                 "<name>Peter</name>\n" +
@@ -58,7 +61,7 @@ public class TestJaxbConverter {
 
     @Test
     public void convertToJavaObjectError() {
-        ForestJaxbConverter forestJaxbConverter = new ForestJaxbConverter();
+        ForestJakartaXmlConverter forestJaxbConverter = new ForestJakartaXmlConverter();
         String xmlText = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<user>\n" +
                 "<name>Peter</name>\n" +
@@ -81,7 +84,7 @@ public class TestJaxbConverter {
         user.setName("Peter");
         user.setAge(32);
 
-        ForestJaxbConverter forestJaxbConverter = new ForestJaxbConverter();
+        ForestJakartaXmlConverter forestJaxbConverter = new ForestJakartaXmlConverter();
         String xml = forestJaxbConverter.encodeToString(user);
         assertNotNull(xml);
         assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
@@ -119,7 +122,7 @@ public class TestJaxbConverter {
         user.setName("Peter");
         user.setAge(32);
 
-        ForestJaxbConverter forestJaxbConverter = new ForestJaxbConverter();
+        ForestJakartaXmlConverter forestJaxbConverter = new ForestJakartaXmlConverter();
         boolean error = false;
         try {
             forestJaxbConverter.encodeToString(user);

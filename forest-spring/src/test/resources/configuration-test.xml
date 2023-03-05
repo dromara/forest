@@ -35,7 +35,7 @@
             <forest:parameter name="dateFormat" value="yyyy/MM/dd hh:mm:ss"/>
         </forest:converter>
 
-        <forest:converter dataType="xml" class="com.dtflys.forest.converter.xml.ForestJaxbConverter">
+        <forest:converter dataType="xml" class="com.dtflys.forest.converter.xml.jakartaxml.ForestJakartaXmlConverter">
         </forest:converter>
 
     </forest:configuration>
