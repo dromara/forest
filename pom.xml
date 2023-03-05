@@ -87,7 +87,8 @@
 		<module>forest-spring-boot3-starter</module>
 		<module>forest-mock</module>
 		<module>forest-solon-plugin</module>
-	</modules>
+        <module>forest-examples</module>
+    </modules>
 
 	<dependencies>
 		<!-- mockito -->

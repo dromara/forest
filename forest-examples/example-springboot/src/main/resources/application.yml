@@ -1,0 +1,38 @@
+
+server:
+  port: 8080
+  tomcat:
+    max-connections: 2000
+    accept-count: 2000
+
+forest:
+  timeout: 3333
+  log-enabled: true
+  log-response-content: true
+  backend: okhttp3
+  variables:
+    giteeUrl: https://gitee.com
+    idServiceUrl: https://www.12306.cn
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 2GB
+      max-request-size: 2GB
+  resources:
+    static-locations:=classpath:/META-INF/resources/,classpath:/resources/,
+    classpath:/static/,classpath:/public/,file:static/
+  thymeleaf:
+    cache: false
+    encoding: utf-8
+    mode: HTML5
+    prefix: classpath:/templates/
+    suffix: .html
+  mvc:
+    async:
+      request-timeout: 2000000
+
+
+
+myfile:
+  uploadPath: D:\TestUpload\target
