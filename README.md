@@ -44,7 +44,7 @@ Forest是一个高层的、极简的声明式HTTP调用API框架<br>
 
 * [JavaDoc](https://apidoc.gitee.com/dt_flys/forest/)
 
-* [Demo工程](https://gitee.com/dt_flys/forest-example)
+* [Demo工程](tree/v1.5.29/forest-examples)
 
 Forest有哪些特性？
 -----
