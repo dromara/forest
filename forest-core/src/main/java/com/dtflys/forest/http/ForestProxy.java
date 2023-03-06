@@ -35,7 +35,7 @@ import java.util.Map;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 1.5.0-BETA5
  */
-public class ForestProxy implements HasURL {
+public class ForestProxy implements HasURL, HasHeaders {
 
     private final String host;
 
@@ -141,6 +141,7 @@ public class ForestProxy implements HasURL {
      *
      * @return 请求头表，{@link ForestHeaderMap}类实例
      */
+    @Override
     public ForestHeaderMap getHeaders() {
         return headers;
     }

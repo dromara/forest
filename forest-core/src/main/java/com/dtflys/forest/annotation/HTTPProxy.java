@@ -47,6 +47,13 @@ public @interface HTTPProxy {
     String password() default "";
 
     /**
+     * http proxy headers
+     *
+     * @return http proxy headers
+     */
+    String[] headers() default {};
+
+    /**
      * 动态构建正向代理信息的回调函数接口类
      * @return 回调函数接口类
      */

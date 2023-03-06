@@ -19,6 +19,8 @@ public class RequestProxyLogMessage {
      */
     private String port;
 
+    private String[] headers;
+
     public String getHost() {
         return host;
     }
@@ -33,5 +35,13 @@ public class RequestProxyLogMessage {
 
     public void setPort(String port) {
         this.port = port;
+    }
+
+    public String[] getHeaders() {
+        return headers;
+    }
+
+    public void setHeaders(String[] headers) {
+        this.headers = headers;
     }
 }

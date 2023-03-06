@@ -5,6 +5,7 @@ import com.dtflys.forest.backend.httpclient.conn.HttpclientConnectionManager;
 import com.dtflys.forest.backend.httpclient.logging.HttpclientLogBodyMessage;
 import com.dtflys.forest.http.ForestCookie;
 import com.dtflys.forest.http.ForestCookies;
+import com.dtflys.forest.http.ForestHeaderMap;
 import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.logging.ForestLogHandler;
@@ -16,11 +17,13 @@ import com.dtflys.forest.logging.RequestProxyLogMessage;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.CookieStore;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.cookie.Cookie;
 
 import java.net.URI;
+import java.util.stream.Collectors;
 
 
 /**
@@ -59,7 +62,7 @@ public abstract class AbstractHttpclientRequestSender implements HttpclientReque
     }
 
 
-    private <T extends  HttpRequestBase> RequestLogMessage getRequestLogMessage(int retryCount, T httpReq) {
+    private <T extends  HttpRequestBase> RequestLogMessage getRequestLogMessage(int retryCount, T httpReq, HttpClient client) {
         RequestLogMessage logMessage = new RequestLogMessage();
         URI uri = httpReq.getURI();
         logMessage.setUri(uri.toASCIIString());
@@ -69,22 +72,31 @@ public abstract class AbstractHttpclientRequestSender implements HttpclientReque
         setLogHeaders(logMessage, httpReq);
         setLogBody(logMessage, httpReq);
         ForestProxy proxy = request.getProxy();
+
         if (proxy != null) {
             RequestProxyLogMessage proxyLogMessage = new RequestProxyLogMessage();
             proxyLogMessage.setHost(proxy.getHost());
             proxyLogMessage.setPort(proxy.getPort() + "");
+            ForestHeaderMap headers = proxy.getHeaders();
+            if (headers != null && !headers.isEmpty()) {
+                proxyLogMessage.setHeaders(
+                        proxy.getHeaders().entrySet().stream()
+                                .map(entry -> entry.getKey() + ": " + entry.getValue())
+                                .toArray(String[]::new));
+            }
             logMessage.setProxy(proxyLogMessage);
         }
         return logMessage;
     }
 
 
-    public <T extends  HttpRequestBase> void logRequest(int retryCount, T httpReq) {
+    public <T extends  HttpRequestBase> void logRequest(int retryCount, T httpReq, HttpClient client) {
+
         LogConfiguration logConfiguration = request.getLogConfiguration();
         if (!logConfiguration.isLogEnabled() || !logConfiguration.isLogRequest()) {
             return;
         }
-        RequestLogMessage logMessage = getRequestLogMessage(retryCount, httpReq);
+        RequestLogMessage logMessage = getRequestLogMessage(retryCount, httpReq, client);
         logMessage.setRequest(request);
         request.setRequestLogMessage(logMessage);
 

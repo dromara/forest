@@ -81,7 +81,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
         client = getHttpClient(lifeCycleHandler);
         ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
         try {
-            logRequest(request.getCurrentRetryCount(), (HttpRequestBase) httpRequest);
+            logRequest(request.getCurrentRetryCount(), (HttpRequestBase) httpRequest, client);
             httpResponse = client.execute(httpRequest, httpClientContext);
         } catch (Throwable e) {
             response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, e, startDate);

@@ -121,7 +121,7 @@ import static com.dtflys.forest.mapping.MappingParameter.TARGET_QUERY;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-03-24
  */
-public class ForestRequest<T> implements HasURL {
+public class ForestRequest<T> implements HasURL, HasHeaders {
 
     private final static Object[] EMPTY_RENDER_ARGS = new Object[0];
 
@@ -3208,6 +3208,7 @@ public class ForestRequest<T> implements HasURL {
      *
      * @return 请求头表，{@link ForestHeaderMap}类实例
      */
+    @Override
     public ForestHeaderMap getHeaders() {
         return headers;
     }

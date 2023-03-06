@@ -8,7 +8,12 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.reflection.ForestMethod;
+import com.dtflys.forest.utils.HeaderUtils;
 import com.dtflys.forest.utils.StringUtils;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * HTTP正向代理生命周期类
@@ -27,6 +32,7 @@ public class HTTPProxyLifeCycle implements MethodAnnotationLifeCycle<HTTPProxy, 
         String portStr = (String) getAttribute(request, "port");
         String usernameStr = (String) getAttribute(request, "username");
         String passwordStr = (String) getAttribute(request, "password");
+        String[] headersStr = (String[]) getAttribute(request, "headers");
 
         MappingTemplate hostTemplate = method.makeTemplate(HTTPProxy.class, "host", hostStr);
         MappingTemplate portTemplate = method.makeTemplate(HTTPProxy.class, "port", portStr);
@@ -37,19 +43,24 @@ public class HTTPProxyLifeCycle implements MethodAnnotationLifeCycle<HTTPProxy, 
         addAttribute(request, "port_temp", portTemplate);
         addAttribute(request, "username_temp", usernameTemplate);
         addAttribute(request, "password_temp", passwordTemplate);
+        addAttribute(request, "headers_temp", Arrays.stream(headersStr)
+                .map(headerStr -> method.makeTemplate(HTTPProxy.class, "headers", headerStr))
+                .toArray(MappingTemplate[]::new));
     }
 
     @Override
     public boolean beforeExecute(ForestRequest request) {
-        MappingTemplate hostTemplate = (MappingTemplate) getAttribute(request, "host_temp");
-        MappingTemplate portTemplate = (MappingTemplate) getAttribute(request, "port_temp");
-        MappingTemplate usernameTemplate = (MappingTemplate) getAttribute(request, "username_temp");
-        MappingTemplate passwordTemplate = (MappingTemplate) getAttribute(request, "password_temp");
-        Object httpProxySource = request.getMethod().getExtensionParameterValue(PARAM_KEY_HTTP_PROXY_SOURCE);
+        final MappingTemplate hostTemplate = (MappingTemplate) getAttribute(request, "host_temp");
+        final MappingTemplate portTemplate = (MappingTemplate) getAttribute(request, "port_temp");
+        final MappingTemplate usernameTemplate = (MappingTemplate) getAttribute(request, "username_temp");
+        final MappingTemplate passwordTemplate = (MappingTemplate) getAttribute(request, "password_temp");
+        final MappingTemplate[] headersTemplates = (MappingTemplate[]) getAttribute(request, "headers_temp");
+        final Object httpProxySource = request.getMethod().getExtensionParameterValue(PARAM_KEY_HTTP_PROXY_SOURCE);
 
-        Object[] args = request.getArguments();
-        String host = hostTemplate.render(args);
-        String portStr = portTemplate.render(args);
+        final Object[] args = request.getArguments();
+        final String host = hostTemplate.render(args);
+        final String portStr = portTemplate.render(args);
+
         String username = null, password = null;
 
         if (usernameTemplate != null) {
@@ -79,6 +90,9 @@ public class HTTPProxyLifeCycle implements MethodAnnotationLifeCycle<HTTPProxy, 
         }
         if (StringUtils.isNotEmpty(password)) {
             proxy.setPassword(password);
+        }
+        if (headersTemplates != null && headersTemplates.length > 0) {
+            HeaderUtils.addHeaders(proxy, headersTemplates, args);
         }
         request.setProxy(proxy);
         return true;

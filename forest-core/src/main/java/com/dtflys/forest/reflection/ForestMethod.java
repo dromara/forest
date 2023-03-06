@@ -54,6 +54,7 @@ import com.dtflys.forest.proxy.InterfaceProxyHandler;
 import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.utils.ForestDataType;
+import com.dtflys.forest.utils.HeaderUtils;
 import com.dtflys.forest.utils.NameUtils;
 import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.RequestNameValue;
@@ -1197,16 +1198,7 @@ public class ForestMethod<T> implements VariableScope {
             request.addNameValue(configuration.getDefaultParameters());
         }
         if (baseHeaders != null && baseHeaders.length > 0) {
-            for (MappingTemplate baseHeader : baseHeaders) {
-                String headerText = baseHeader.render(args);
-                String[] headerNameValue = headerText.split(":", 2);
-                if (headerNameValue.length > 1) {
-                    String name = headerNameValue[0].trim();
-                    if (request.getHeader(name) == null) {
-                        request.addHeader(name, headerNameValue[1].trim());
-                    }
-                }
-            }
+            HeaderUtils.addHeaders(request, baseHeaders, args);
         }
         if (configuration.getDefaultHeaders() != null) {
             request.addHeaders(configuration.getDefaultHeaders());

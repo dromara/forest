@@ -3,9 +3,10 @@ package com.dtflys.test.http;
 import com.dtflys.forest.annotation.Get;
 import com.dtflys.forest.annotation.HTTPProxy;
 import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.forest.backend.okhttp3.OkHttp3;
 import com.dtflys.forest.config.ForestConfiguration;
+import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,12 +24,12 @@ public class TestHttpClientHttpPorxy extends BaseClientTest {
     @Rule
     public final MockWebServer server = new MockWebServer();
 
-    private TestHttpClientHttpPorxyClient testHttpClientHttpPorxyClient;
+    private TestHttpClientHttpProxyClient testHttpClientHttpProxyClient;
 
     public TestHttpClientHttpPorxy(HttpBackend backend) {
         super(backend, configuration);
         configuration.setVariableValue("port", server.getPort());
-        testHttpClientHttpPorxyClient = configuration.createInstance(TestHttpClientHttpPorxyClient.class);
+        testHttpClientHttpProxyClient = configuration.createInstance(TestHttpClientHttpProxyClient.class);
 
     }
 
@@ -47,10 +48,11 @@ public class TestHttpClientHttpPorxy extends BaseClientTest {
      */
     //由于需要代理依赖本地环境这里进行注释
     @Test
-    public void testHttpClientHttpPorxy() {
+    public void testHttpClientHttpProxy() {
         //模拟https失败
-        //server.enqueue(new MockResponse().setBody(EXPECTED));
-//        String text = testHttpClientHttpPorxyClient.testHttpPorxy();
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String text = testHttpClientHttpProxyClient.testHttpProxy();
+        System.out.println(text);
 //        Assert.assertTrue(text != null && text.indexOf("百度一下，你就知道") != -1);
     }
 
@@ -61,12 +63,12 @@ public class TestHttpClientHttpPorxy extends BaseClientTest {
      * @author tanglingyan[xiao4852@qq.com]
      * @since 2022-06-09 14:29
      */
-    @HTTPProxy(host = "127.0.0.1", port = "8888")
-    public interface TestHttpClientHttpPorxyClient {
+    @HTTPProxy(host = "127.0.0.1", port = "10809")
+    public interface TestHttpClientHttpProxyClient {
         //@Backend("httpclient")
         //@Get(url="https://127.0.0.1:{port}")
         @Get(value = "https://www.baidu.com", sslProtocol = "TLS")
-        String testHttpPorxy();
+        String testHttpProxy();
     }
 
 }

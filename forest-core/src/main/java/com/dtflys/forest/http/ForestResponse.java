@@ -47,7 +47,7 @@ import java.util.List;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.1.0
  */
-public abstract class ForestResponse<T> extends ResultGetter implements HasURL {
+public abstract class ForestResponse<T> extends ResultGetter implements HasURL, HasHeaders {
 
     protected final static int MAX_BYTES_CAPACITY = 1024 * 1024 * 2;
 
@@ -713,6 +713,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL {
      *
      * @return 请求响应头表, {@link ForestHeaderMap}类实例
      */
+    @Override
     public ForestHeaderMap getHeaders() {
         return headers;
     }
