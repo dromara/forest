@@ -12,6 +12,10 @@
     <artifactId>forest-examples</artifactId>
     <packaging>pom</packaging>
 
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <modules>
         <module>example-springboot</module>
         <module>example-springboot3</module>
