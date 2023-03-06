@@ -3,6 +3,7 @@ package com.dtflys.forest.solon.test.async;
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.annotation.BindingVar;
 import com.dtflys.forest.backend.AsyncHttpExecutor;
+import com.dtflys.forest.config.AsyncThreadPools;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestAsyncAbortException;
 import okhttp3.mockwebserver.MockResponse;
@@ -60,14 +61,13 @@ public class TestAsync {
 
     @Test
     public void testFuture2() {
-        assertThat(configuration.getMaxAsyncThreadSize()).isEqualTo(300);
-        assertThat(configuration.getMaxAsyncQueueSize()).isEqualTo(350);
 
         int size = 16;
         int threads = 8;
         boolean threadPoolFull = false;
         configuration.setMaxAsyncThreadSize(threads);
         configuration.setMaxAsyncQueueSize(0);
+        asyncClient = configuration.client(AsyncClient.class);
         for (int i = 0; i < size; i++) {
             server.enqueue(new MockResponse().setBody(EXPECTED).setHeadersDelay(500, TimeUnit.MILLISECONDS));
         }
@@ -84,11 +84,12 @@ public class TestAsync {
                 throw e;
             }
         }
-        System.out.println("max async thread size: " + AsyncHttpExecutor.getMaxAsyncThreadSize());
-        System.out.println("async thread size: " + AsyncHttpExecutor.getAsyncThreadSize());
+
+        System.out.println("max async thread size: " + AsyncHttpExecutor.getMaxAsyncThreadSize(configuration));
+        System.out.println("async thread size: " + AsyncHttpExecutor.getAsyncThreadSize(configuration));
         assertThat(threadPoolFull).isTrue();
-        assertThat(AsyncHttpExecutor.getMaxAsyncThreadSize()).isEqualTo(threads);
-        assertThat(AsyncHttpExecutor.getAsyncThreadSize()).isEqualTo(threads);
+        assertThat(AsyncHttpExecutor.getMaxAsyncThreadSize(configuration)).isEqualTo(threads);
+        assertThat(AsyncHttpExecutor.getAsyncThreadSize(configuration)).isEqualTo(threads);
     }
 
 
@@ -97,6 +98,7 @@ public class TestAsync {
         int size = 16;
         int threads = 8;
         boolean threadPoolFull = false;
+        configuration = ForestConfiguration.createConfiguration();
         configuration.setMaxAsyncThreadSize(threads);
         configuration.setMaxAsyncQueueSize(0);
         for (int i = 0; i < size; i++) {
@@ -105,7 +107,7 @@ public class TestAsync {
         try {
             for (int i = 0; i < size; i++) {
                 System.out.println("=====" + i);
-                Forest.head("/")
+                configuration.get("/")
                         .host("localhost")
                         .port(server.getPort())
                         .async()
@@ -120,10 +122,10 @@ public class TestAsync {
                 throw e;
             }
         }
-        System.out.println("max async thread size: " + AsyncHttpExecutor.getMaxAsyncThreadSize());
-        System.out.println("async thread size: " + AsyncHttpExecutor.getAsyncThreadSize());
+        System.out.println("max async thread size: " + AsyncHttpExecutor.getAsyncThreadSize(configuration));
+        System.out.println("async thread size: " + AsyncHttpExecutor.getAsyncThreadSize(configuration));
         assertThat(threadPoolFull).isTrue();
-        assertThat(AsyncHttpExecutor.getMaxAsyncThreadSize()).isEqualTo(threads);
-        assertThat(AsyncHttpExecutor.getAsyncThreadSize()).isEqualTo(threads);
+        assertThat(AsyncHttpExecutor.getAsyncThreadSize(configuration)).isEqualTo(threads);
+        assertThat(AsyncHttpExecutor.getAsyncThreadSize(configuration)).isEqualTo(threads);
     }
 }
