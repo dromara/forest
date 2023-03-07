@@ -34,7 +34,7 @@ public interface UploadClient {
 
 
     @Post(url = "/upload")
-    Map upload(@DataFile(value = "file") URL resource);
+    Map upload(@DataFile(value = "file") UploadedFile multipartFile);
 
     @PostRequest(url = "/upload")
     Map upload(@DataFile(value = "file") UploadedFile multipartFile, @Body("fileName") String fileName, OnProgress onProgress);

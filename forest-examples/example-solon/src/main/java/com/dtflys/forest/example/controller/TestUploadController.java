@@ -10,6 +10,8 @@ import org.noear.solon.core.util.ResourceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.activation.MimeType;
+import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
 import java.net.URL;
 import java.util.LinkedHashMap;
@@ -145,11 +147,13 @@ public class TestUploadController {
         return result;
     }
 
-    @Post
     @Mapping("/do-upload-resource")
-    public Map doUploadResource() {
+    public Map doUploadResource() throws IOException{
         URL resource = ResourceUtil.getResource("test-img.jpg");
-        Map result = uploadClient.upload(resource);
+
+        UploadedFile uploadedFile = new UploadedFile("image/jpg",resource.openStream(),"test-img.jpg");
+
+        Map result = uploadClient.upload(uploadedFile);
         return result;
     }
 
