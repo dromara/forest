@@ -17,6 +17,7 @@
     </properties>
 
     <modules>
+        <module>example-solon</module>
         <module>example-springboot</module>
         <module>example-springboot3</module>
     </modules>
