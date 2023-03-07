@@ -1,9 +1,6 @@
 package com.dtflys.forest.example.client;
 
-import com.dtflys.forest.annotation.BaseRequest;
-import com.dtflys.forest.annotation.Get;
-import com.dtflys.forest.annotation.Query;
-import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.annotation.*;
 import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.example.model.GiteeBranch;
@@ -15,6 +12,7 @@ import java.util.concurrent.Future;
 /**
  * Gitee客户端接口
  */
+@ForestClient
 @BaseRequest(baseURL = "${giteeUrl}", sslProtocol = "TLSv1.3")
 public interface Gitee {
 

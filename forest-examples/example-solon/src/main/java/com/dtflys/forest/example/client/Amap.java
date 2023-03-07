@@ -11,6 +11,7 @@ import java.util.Map;
  * 高德地图服务客户端接口
  * @author gongjun
  */
+@ForestClient
 @BaseRequest(baseURL = "http://ditu.amap.com")
 public interface Amap {
 
