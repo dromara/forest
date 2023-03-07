@@ -6,13 +6,13 @@
 
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-spring-boot3-starter</artifactId>
-    <version>1.5.29</version>
+    <version>1.5.30</version>
     <packaging>jar</packaging>
 
     <parent>
         <groupId>com.dtflys.forest</groupId>
         <artifactId>forest</artifactId>
-        <version>1.5.29</version>
+        <version>1.5.30</version>
     </parent>
 
     <properties>

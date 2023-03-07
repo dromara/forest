@@ -13,14 +13,14 @@ import java.util.concurrent.Future;
  * Gitee客户端接口
  */
 @ForestClient
-@BaseRequest(baseURL = "${giteeUrl}", sslProtocol = "TLSv1.3")
+@BaseRequest(baseURL = "${giteeUrl}")
 public interface Gitee {
 
     /**
      * Gitee主页
      * @return
      */
-    @Get(url = "/", sslProtocol = "TLSv2")
+    @Get(url = "/")
     String index();
 
     /**

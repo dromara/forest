@@ -4,7 +4,7 @@
 
 	<groupId>com.dtflys.forest</groupId>
 	<artifactId>forest</artifactId>
-		<version>1.5.29</version>
+		<version>1.5.30</version>
 	<packaging>pom</packaging>
 	<name>forest</name>
 	<description>A easy HTTP client framework for Java</description>
@@ -31,7 +31,7 @@
 		<url>https://github.com/dromara/forest</url>
 		<connection>scm:git:https://github.com/dromara/forest.git</connection>
 		<developerConnection>https://forest.dtflyx.com</developerConnection>
-		<tag>1.5.29</tag>
+		<tag>1.5.30</tag>
 	</scm>
 
 	<properties>
@@ -87,7 +87,6 @@
 		<module>forest-spring-boot3-starter</module>
 		<module>forest-mock</module>
 		<module>forest-solon-plugin</module>
-        <module>forest-examples</module>
     </modules>
 
 	<dependencies>
