@@ -5,7 +5,11 @@ import com.dtflys.forest.annotation.BindingVar;
 import com.dtflys.forest.annotation.ForestClient;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.SolonForestProperties;
+import com.dtflys.forest.file.SolonMultipartFile;
+import com.dtflys.forest.http.body.MultipartRequestBodyBuilder;
+import com.dtflys.forest.http.body.RequestBodyBuilder;
 import com.dtflys.forest.interceptor.SolonInterceptorFactory;
+import com.dtflys.forest.multipart.ForestMultipartFactory;
 import com.dtflys.forest.reflection.SolonObjectFactory;
 import com.dtflys.forest.solon.ForestBeanBuilder;
 import com.dtflys.forest.solon.SolonForestVariableValue;
@@ -17,6 +21,7 @@ import org.noear.solon.core.AopContext;
 import org.noear.solon.core.BeanWrap;
 import org.noear.solon.core.Plugin;
 import org.noear.solon.core.Props;
+import org.noear.solon.core.handle.UploadedFile;
 
 import java.util.Arrays;
 
@@ -30,13 +35,17 @@ public class XPluginImp implements Plugin {
         //1.初始 ForestConfiguration
         ForestConfiguration configuration = configBeanInit(context);
 
-        //2.添加 ForestClient 注解支持
+        //2.注册上传类型
+        ForestMultipartFactory.registerFactory(UploadedFile.class, SolonMultipartFile.class);
+        RequestBodyBuilder.registerBodyBuilder(UploadedFile.class, new MultipartRequestBodyBuilder());
+
+        //3.添加 ForestClient 注解支持
         context.beanBuilderAdd(ForestClient.class, (clz, wrap, anno) -> {
             Object client = configuration.client(clz);
             wrap.context().wrapAndPut(clz, client);
         });
 
-        //3.添加 BindingVar 注解支持
+        //4.添加 BindingVar 注解支持
         context.beanExtractorAdd(BindingVar.class, (bw, method, anno) -> {
             String confId = anno.configuration();
             ForestConfiguration config = null;
@@ -51,6 +60,8 @@ public class XPluginImp implements Plugin {
             SolonForestVariableValue variableValue = new SolonForestVariableValue(bw.get(), method);
             config.setVariableValue(varName, variableValue);
         });
+
+
     }
 
     private ForestConfiguration configBeanInit(AopContext context) {
