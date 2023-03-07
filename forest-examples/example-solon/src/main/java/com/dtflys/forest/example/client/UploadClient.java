@@ -10,6 +10,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+@ForestClient
 @BaseRequest(baseURL = "localhost:8080")
 public interface UploadClient {
 

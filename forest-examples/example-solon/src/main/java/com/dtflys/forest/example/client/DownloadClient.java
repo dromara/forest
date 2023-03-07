@@ -1,6 +1,7 @@
 package com.dtflys.forest.example.client;
 
 import com.dtflys.forest.annotation.BaseRequest;
+import com.dtflys.forest.annotation.ForestClient;
 import com.dtflys.forest.annotation.GetRequest;
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.callback.OnProgress;
@@ -13,6 +14,7 @@ import java.io.InputStream;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2020-08-04 22:33
  */
+@ForestClient
 @BaseRequest(baseURL = "localhost:8080")
 public interface DownloadClient {
 
