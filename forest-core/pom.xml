@@ -293,8 +293,8 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <source>16</source>
-                    <target>16</target>
+                    <source>8</source>
+                    <target>8</target>
                 </configuration>
             </plugin>
 
