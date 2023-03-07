@@ -6,7 +6,7 @@ import com.dtflys.forest.annotation.ForestClient;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.SolonForestProperties;
 import com.dtflys.forest.file.SolonMultipartFile;
-import com.dtflys.forest.http.body.MultipartRequestBodyBuilder;
+import com.dtflys.forest.http.body.SolonUploadRequestBodyBuilder;
 import com.dtflys.forest.http.body.RequestBodyBuilder;
 import com.dtflys.forest.interceptor.SolonInterceptorFactory;
 import com.dtflys.forest.multipart.ForestMultipartFactory;
@@ -37,7 +37,7 @@ public class XPluginImp implements Plugin {
 
         //2.注册上传类型
         ForestMultipartFactory.registerFactory(UploadedFile.class, SolonMultipartFile.class);
-        RequestBodyBuilder.registerBodyBuilder(UploadedFile.class, new MultipartRequestBodyBuilder());
+        RequestBodyBuilder.registerBodyBuilder(UploadedFile.class, new SolonUploadRequestBodyBuilder());
 
         //3.添加 ForestClient 注解支持
         context.beanBuilderAdd(ForestClient.class, (clz, wrap, anno) -> {
