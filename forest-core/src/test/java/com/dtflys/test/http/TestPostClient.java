@@ -20,7 +20,6 @@ import com.dtflys.test.http.model.JsonTestUser2;
 import com.dtflys.test.http.model.JsonTestUser3;
 import com.dtflys.test.http.model.JsonTestUser4;
 import com.dtflys.test.http.model.UserParam;
-import com.dtflys.test.http.model.XmlTestParam;
 import com.google.common.collect.Lists;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -28,8 +27,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -1132,135 +1129,5 @@ public class TestPostClient extends BaseClientTest {
                         "\",\"password\":\"123456\",\"idList\":[1,2,3],\"cause\":[{\"id\":1,\"score\":87},{\"id\":2,\"score\":73}]}");
     }
 
-
-    @Test
-    public void testPostXml() throws InterruptedException {
-        server.enqueue(new MockResponse().setBody(EXPECTED));
-        XmlTestParam testParam = new XmlTestParam();
-        testParam.setA(1);
-        testParam.setB(2);
-        assertThat(postClient.postXml(testParam))
-                .isNotNull()
-                .isEqualTo(EXPECTED);
-        mockRequest(server)
-                .assertMethodEquals("POST")
-                .assertPathEquals("/xml")
-                .assertHeaderEquals("Content-Type", "application/xml")
-                .assertBodyEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-                        "<misc>\n" +
-                        "    <a>1</a>\n" +
-                        "    <b>2</b>\n" +
-                        "</misc>\n");
-    }
-
-    @Test
-    public void testPostXmlInDataProperty() throws InterruptedException {
-        server.enqueue(new MockResponse().setBody(EXPECTED));
-        XmlTestParam testParam = new XmlTestParam();
-        testParam.setA(1);
-        testParam.setB(2);
-        assertThat(postClient.postXmlInDataProperty(testParam))
-                .isNotNull()
-                .isEqualTo(EXPECTED);
-        mockRequest(server)
-                .assertMethodEquals("POST")
-                .assertPathEquals("/xml")
-                .assertHeaderEquals("Content-Type", "application/xml")
-                .assertBodyEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-                        "<misc>\n" +
-                        "    <a>1</a>\n" +
-                        "    <b>2</b>\n" +
-                        "</misc>\n");
-    }
-
-    @Test
-    public void testPostXmlInDataProperty2() throws InterruptedException {
-        server.enqueue(new MockResponse().setBody(EXPECTED));
-        XmlTestParam testParam = new XmlTestParam();
-        testParam.setA(1);
-        testParam.setB(2);
-        assertThat(postClient.postXmlInDataProperty2(testParam))
-                .isNotNull()
-                .isEqualTo(EXPECTED);
-        mockRequest(server)
-                .assertMethodEquals("POST")
-                .assertPathEquals("/xml")
-                .assertHeaderEquals("Content-Type", "application/xml")
-                .assertBodyEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-                        "<misc>\n" +
-                        "    <a>1</a>\n" +
-                        "    <b>2</b>\n" +
-                        "</misc>\n");
-    }
-
-    @Test
-    public void testPostXmlWithXMLBodyAnn() throws InterruptedException {
-        server.enqueue(new MockResponse().setBody(EXPECTED));
-        XmlTestParam testParam = new XmlTestParam();
-        testParam.setA(1);
-        testParam.setB(2);
-        assertThat(postClient.postXmlWithXMLBodyAnn(testParam))
-                .isNotNull()
-                .isEqualTo(EXPECTED);
-        mockRequest(server)
-                .assertMethodEquals("POST")
-                .assertPathEquals("/xml")
-                .assertHeaderEquals("Content-Type", "application/xml")
-                .assertBodyEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-                        "<misc>\n" +
-                        "    <a>1</a>\n" +
-                        "    <b>2</b>\n" +
-                        "</misc>\n");
-    }
-
-    @Test
-    public void testPostXmlBodyString() throws InterruptedException {
-        server.enqueue(new MockResponse().setBody(EXPECTED));
-        assertThat(postClient.postXmlBodyString(
-                "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-                "<misc>\n" +
-                "    <a>1</a>\n" +
-                "    <b>2</b>\n" +
-                "</misc>\n"))
-                .isNotNull()
-                .isEqualTo(EXPECTED);
-        mockRequest(server)
-                .assertMethodEquals("POST")
-                .assertPathEquals("/xml")
-                .assertHeaderEquals("Content-Type", "application/xml")
-                .assertBodyEquals(
-                        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-                        "<misc>\n" +
-                        "    <a>1</a>\n" +
-                        "    <b>2</b>\n" +
-                        "</misc>\n");
-    }
-
-
-    @Test
-    public void testPostXmlWithXMLBodyAnnAndReturnObj() throws InterruptedException {
-        server.enqueue(new MockResponse()
-                .setBody("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-                "<misc>\n" +
-                "    <a>3</a>\n" +
-                "    <b>4</b>\n" +
-                "</misc>\n"));
-        XmlTestParam testParam = new XmlTestParam();
-        testParam.setA(1);
-        testParam.setB(2);
-        assertThat(postClient.postXmlWithXMLBodyAnnAndReturnObj(testParam))
-                .isNotNull()
-                .extracting(XmlTestParam::getA, XmlTestParam::getB)
-                .contains(10, 20);
-        mockRequest(server)
-                .assertMethodEquals("POST")
-                .assertPathEquals("/xml-response")
-                .assertHeaderEquals("Content-Type", "application/xml")
-                .assertBodyEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-                        "<misc>\n" +
-                        "    <a>1</a>\n" +
-                        "    <b>2</b>\n" +
-                        "</misc>\n");
-    }
 
 }

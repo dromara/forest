@@ -68,20 +68,6 @@ public class TestEncoderClient extends BaseClientTest {
                 .assertBodyEquals("{\"name\":\"AAA\",\"value\":\"BBB\"}");
 
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        request = encoderClient.testEncoder2("xml", entry);
-        assertThat(request).isNotNull();
-        assertThat(request.bodyType()).isNotNull().isEqualTo(ForestDataType.XML);
-        request.execute();
-        mockRequest(server)
-                .assertHeaderEquals("Content-Type", ContentType.APPLICATION_X_WWW_FORM_URLENCODED)
-                .assertBodyEquals(
-                        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-                        "<entry>\n" +
-                        "    <name>AAA</name>\n" +
-                        "    <value>BBB</value>\n" +
-                        "</entry>\n");
-
-        server.enqueue(new MockResponse().setBody(EXPECTED));
         request = encoderClient.testEncoder2("form", entry);
         assertThat(request).isNotNull();
         assertThat(request.bodyType()).isNotNull().isEqualTo(ForestDataType.FORM);

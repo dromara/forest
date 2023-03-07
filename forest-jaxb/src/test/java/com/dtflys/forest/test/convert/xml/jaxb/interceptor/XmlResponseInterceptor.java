@@ -1,11 +1,11 @@
-package com.dtflys.test.interceptor;
+package com.dtflys.forest.test.convert.xml.jaxb.interceptor;
 
 import com.dtflys.forest.converter.xml.ForestXmlConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.interceptor.Interceptor;
-import com.dtflys.test.http.model.XmlTestParam;
+import com.dtflys.forest.test.convert.xml.jaxb.pojo.XmlTestParam;
 
 public class XmlResponseInterceptor implements Interceptor<Object> {
     @Override

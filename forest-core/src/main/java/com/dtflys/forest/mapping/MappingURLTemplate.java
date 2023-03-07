@@ -236,10 +236,36 @@ public class MappingURLTemplate extends MappingTemplate {
                 }
             }
             if (host == null && StringUtils.isEmpty(path) && StringUtils.isNotEmpty(urlBuilder)) {
-                if (path == null) {
-                    path = new StringBuilder();
+                if (scheme == null) {
+                    String urlStr = urlBuilder.toString();
+                    if (!urlStr.startsWith("/")) {
+                        String[] urlStrGroup = urlStr.split(":");
+                        if (urlStrGroup.length > 1) {
+                            String urlGroup0 = urlStrGroup[0];
+                            String urlGroup1 = urlStrGroup[1];
+                            try {
+                                port = Integer.valueOf(urlGroup1);
+                                host = urlGroup0;
+                            } catch (Throwable th) {
+                                if (path == null) {
+                                    path = new StringBuilder();
+                                }
+                                path.append(builder);
+                            }
+                        } else {
+                            String urlGroup0 = urlStrGroup[0];
+                            if (urlGroup0.equals("localhost") ||
+                                    urlGroup0.matches("^(((\\d)|([1-9]\\d)|(1\\d{2})|(2[0-4]\\d)|(25[0-5]))\\.){3}((\\d)|([1-9]\\d)|(1\\d{2})|(2[0-4]\\d)|(25[0-5]))$")) {
+                                host = urlGroup0;
+                            }
+                        }
+                    }
+                } else {
+                    if (path == null) {
+                        path = new StringBuilder();
+                    }
+                    path.append(builder);
                 }
-                path.append(builder);
             }
             if (StringUtils.isNotEmpty(path)) {
                 String[] group = path.toString().split("#", 2);

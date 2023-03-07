@@ -1,10 +1,9 @@
-package com.dtflys.test.http.model;
+package com.dtflys.forest.test.convert.xml.jaxb.pojo;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
- * @since 2017-12-15 15:46
  */
 @XmlRootElement(name = "misc")
 public class XmlTestParam {

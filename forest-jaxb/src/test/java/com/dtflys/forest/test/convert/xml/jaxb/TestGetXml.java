@@ -1,23 +1,25 @@
-package com.dtflys.test.http;
+package com.dtflys.forest.test.convert.xml.jaxb;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.forest.converter.json.ForestFastjsonConverter;
-import com.dtflys.test.converter.entity.XmlEntity;
-import com.dtflys.test.converter.entity.XmlOrder;
-import com.dtflys.test.http.client.XmlClient;
+import com.dtflys.forest.test.convert.xml.jaxb.client.GetXmlClient;
+import com.dtflys.forest.test.convert.xml.jaxb.client.PostXmlClient;
+import com.dtflys.forest.test.convert.xml.jaxb.pojo.XmlEntity;
+import com.dtflys.forest.test.convert.xml.jaxb.pojo.XmlOrder;
+import com.dtflys.forest.test.convert.xml.jaxb.pojo.XmlTestParam;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.List;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestXmlClient extends BaseClientTest {
+public class TestGetXml {
 
     public final static String EXPECTED = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
             "\n" +
@@ -38,44 +40,40 @@ public class TestXmlClient extends BaseClientTest {
             "  </Order>\n" +
             "</Service>\n";
 
-    public MockWebServer server = new MockWebServer();
 
-    private XmlClient xmlClient;
+    @Rule
+    public final MockWebServer server = new MockWebServer();
 
     private static ForestConfiguration configuration;
 
+    private final GetXmlClient getXmlClient;
 
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.createConfiguration();
     }
 
-    public TestXmlClient(HttpBackend backend) {
-        super(backend, configuration);
+    public TestGetXml() {
         configuration.setVariableValue("port", server.getPort());
-        ForestFastjsonConverter fastjsonConverter = new ForestFastjsonConverter();
-        fastjsonConverter.setSerializerFeature(SerializerFeature.SortField);
-        configuration.setJsonConverter(fastjsonConverter);
-        xmlClient = configuration.createInstance(XmlClient.class);
+        getXmlClient = configuration.client(GetXmlClient.class);
     }
 
     @Test
     public void testGetXmlData() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        XmlEntity<XmlOrder> data = xmlClient.getXmlData();
+        XmlEntity<XmlOrder> data = getXmlClient.getXmlData();
         System.out.println(JSON.toJSONString(data));
-        assertThat(data)
+        AssertionsForClassTypes.assertThat(data)
                 .isNotNull()
                 .extracting(XmlEntity::getResultCode, XmlEntity::getResultMsg)
                 .contains(0, "Success");
-        assertThat(data.getOrder())
+        AssertionsForClassTypes.assertThat(data.getOrder())
                 .isNotNull()
                 .extracting(List::isEmpty)
                 .isEqualTo(false);
-        assertThat(data.getOrder().get(0))
+        AssertionsForClassTypes.assertThat(data.getOrder().get(0))
                 .extracting(XmlOrder::getBuyerPaidAmount)
                 .isEqualTo(2199.0);
     }
-
 
 }

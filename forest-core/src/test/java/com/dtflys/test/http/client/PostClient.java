@@ -4,12 +4,9 @@ import com.dtflys.forest.annotation.*;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.http.Lazy;
 import com.dtflys.test.http.model.*;
 import com.dtflys.test.http.model.UserParam;
-import com.dtflys.test.http.model.XmlTestParam;
 import com.dtflys.test.interceptor.PostHeadInterceptor;
-import com.dtflys.test.interceptor.XmlResponseInterceptor;
 
 import java.util.List;
 import java.util.Map;
@@ -499,43 +496,6 @@ public interface PostClient {
             headers = {"Content-Type: application/json"}
     )
     String postJsonDate(@Body JsonTestDate jsonTestDate);
-
-
-    @Request(
-            url = "http://localhost:{port}/xml",
-            type = "post",
-            contentType = "application/xml"
-    )
-    String postXml(@Body(filter = "xml") XmlTestParam testParam);
-
-
-    @Request(
-            url = "http://localhost:{port}/xml",
-            type = "post",
-            contentType = "application/xml",
-            data = "{xml(misc)}"
-    )
-    String postXmlInDataProperty(@DataVariable("misc") XmlTestParam testParam);
-
-
-    @Request(
-            url = "http://localhost:{port}/xml",
-            type = "post",
-            contentType = "application/xml",
-            data = "{xml($0)}"
-    )
-    String postXmlInDataProperty2(XmlTestParam testParam);
-
-
-    @Post("http://localhost:{port}/xml")
-    String postXmlWithXMLBodyAnn(@XMLBody XmlTestParam testParam);
-
-
-    @Post("http://localhost:{port}/xml")
-    String postXmlBodyString(@XMLBody String xml);
-
-    @Post(url = "http://localhost:{port}/xml-response", interceptor = XmlResponseInterceptor.class)
-    XmlTestParam postXmlWithXMLBodyAnnAndReturnObj(@XMLBody XmlTestParam testParam);
 
 
 }
