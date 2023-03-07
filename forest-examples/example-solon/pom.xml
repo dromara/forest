@@ -24,7 +24,7 @@
     <dependencies>
         <dependency>
             <groupId>org.noear</groupId>
-            <artifactId>solon-web</artifactId>
+            <artifactId>solon-api</artifactId>
         </dependency>
 
         <dependency>

@@ -8,11 +8,11 @@ import org.noear.solon.core.handle.UploadedFile;
 
 import java.io.IOException;
 
-public class MultipartRequestBody extends ForestRequestBody {
+public class SolonUploadRequestBody extends ForestRequestBody {
 
     private UploadedFile multipartFile;
 
-    public MultipartRequestBody(UploadedFile multipartFile) {
+    public SolonUploadRequestBody(UploadedFile multipartFile) {
         this.multipartFile = multipartFile;
     }
 
@@ -39,8 +39,8 @@ public class MultipartRequestBody extends ForestRequestBody {
     }
 
     @Override
-    public MultipartRequestBody clone() {
-        MultipartRequestBody newBody = new MultipartRequestBody(multipartFile);
+    public SolonUploadRequestBody clone() {
+        SolonUploadRequestBody newBody = new SolonUploadRequestBody(multipartFile);
         newBody.setDefaultValue(getDefaultValue());
         return newBody;
     }

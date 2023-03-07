@@ -6,7 +6,6 @@ import org.noear.solon.core.handle.UploadedFile;
 
 import java.io.File;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
