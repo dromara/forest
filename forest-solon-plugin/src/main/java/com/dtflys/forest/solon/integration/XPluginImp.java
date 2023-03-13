@@ -86,9 +86,14 @@ public class XPluginImp implements Plugin {
         }
 
         //3.注册到容器
-        BeanWrap beanWrap = context.wrap(configurationProperties.getBeanId(), config);
+        String beanId = configurationProperties.getBeanId();
+        if (Utils.isEmpty(beanId)) {
+            beanId = "forestConfiguration";
+        }
+
+        BeanWrap beanWrap = context.wrap(beanId, config);
         context.putWrap(ForestConfiguration.class, beanWrap);
-        context.putWrap(configurationProperties.getBeanId(), beanWrap);
+        context.putWrap(beanId, beanWrap);
 
         return config;
     }
