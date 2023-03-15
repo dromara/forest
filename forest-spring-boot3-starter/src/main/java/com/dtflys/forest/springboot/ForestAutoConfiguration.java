@@ -13,16 +13,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Import;
-import jakarta.annotation.Resource;
 
 
 @Configuration
 @EnableConfigurationProperties({ForestConfigurationProperties.class})
 @Import({ForestScannerRegister.class})
 public class ForestAutoConfiguration {
-
-    @Resource
-    private ConfigurableApplicationContext applicationContext;
 
     @Bean
     @ConditionalOnMissingBean
@@ -46,10 +42,11 @@ public class ForestAutoConfiguration {
     @Bean
     @DependsOn("forestBeanProcessor")
     @ConditionalOnMissingBean
-    public ForestBeanRegister forestBeanRegister(SpringForestProperties properties,
-                                                    SpringForestObjectFactory forestObjectFactory,
-                                                    SpringInterceptorFactory forestInterceptorFactory,
-                                                    ForestConfigurationProperties forestConfigurationProperties) {
+    public ForestBeanRegister forestBeanRegister(ConfigurableApplicationContext applicationContext,
+                                                 SpringForestProperties properties,
+                                                 SpringForestObjectFactory forestObjectFactory,
+                                                 SpringInterceptorFactory forestInterceptorFactory,
+                                                 ForestConfigurationProperties forestConfigurationProperties) {
         ForestBeanRegister register = new ForestBeanRegister(
                 applicationContext,
                 forestConfigurationProperties,
