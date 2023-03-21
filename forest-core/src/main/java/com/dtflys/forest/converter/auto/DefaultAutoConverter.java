@@ -51,6 +51,9 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
         if (source == null) {
             return null;
         }
+        if (isVoidType(targetType)) {
+            return null;
+        }
         if (source instanceof InputStream
                 || source instanceof byte[]
                 || source instanceof File) {
@@ -128,6 +131,11 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
             return true;
         }
         return false;
+    }
+
+    private boolean isVoidType(Type targetType) {
+        Class type = ReflectUtils.toClass(targetType);
+        return Void.TYPE.isAssignableFrom(type);
     }
 
     private boolean canReadAsBinary(Type targetType) {

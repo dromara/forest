@@ -6,7 +6,7 @@
 
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-solon-plugin</artifactId>
-    <version>1.5.30</version>
+    <version>${revision}</version>
 
     <properties>
         <solon.version>2.2.1</solon.version>

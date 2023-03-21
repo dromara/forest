@@ -312,4 +312,16 @@ public class TestDownloadClient extends BaseClientTest {
     }
 
 
+    @Test
+    public void testDownloadFileReturnNothing() {
+        Buffer buffer = getImageBuffer();
+        server.enqueue(new MockResponse().setBody(buffer));
+        String dir = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "TestDownload";
+        downloadClient.downloadFileReturnNothing(dir, progress ->
+                System.out.println(progress.getRate() * 100.0));
+        File targetFile = new File(dir + File.separator + "test-img-void.jpg");
+        assertThat(targetFile).isNotNull();
+        assertThat(targetFile.exists()).isTrue();
+    }
+
 }

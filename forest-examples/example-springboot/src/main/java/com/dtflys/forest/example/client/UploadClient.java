@@ -39,6 +39,9 @@ public interface UploadClient {
     @PostRequest(url = "/upload")
     Map upload(@DataFile(value = "file") MultipartFile multipartFile, @Body("fileName") String fileName, OnProgress onProgress);
 
+    @PostRequest(url = "/upload")
+    Map uploadList(@DataFile(value = "file") List<MultipartFile> multipartFileList, OnProgress onProgress);
+
 
     @PostRequest(url = "/upload-array")
     Map uploadPathList(@DataFile(value = "files", fileName = "test-img-${_index}.jpg") List<String> pathList);

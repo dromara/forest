@@ -20,7 +20,7 @@
             maxConnections="500"
             maxRouteConnections="500"
             logEnabled="true"
-            logHandler="com.dtflys.spring.test.logging.TestLogHandler"
+            logHandler="com.dtflys.spring.logging.com.dtflys.forest.springboot.test.TestLogHandler"
             logRequest="false"
             logResponseStatus="false"
             logResponseContent="true">

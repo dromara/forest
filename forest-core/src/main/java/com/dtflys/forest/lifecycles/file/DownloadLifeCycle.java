@@ -11,6 +11,7 @@ import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.ForestDataType;
+import com.dtflys.forest.utils.ForestProgress;
 import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.commons.io.FileUtils;
@@ -69,6 +70,14 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
             }
         }
         return type;
+    }
+
+    @Override
+    public void onProgress(ForestProgress progress) {
+        ForestRequest request = progress.getRequest();
+        String dirPath = getAttributeAsString(request, "dir");
+        String filename = getAttributeAsString(request, "filename");
+        System.out.println("------- " + filename);
     }
 
     @Override

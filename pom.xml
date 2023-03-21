@@ -4,7 +4,7 @@
 
 	<groupId>com.dtflys.forest</groupId>
 	<artifactId>forest</artifactId>
-		<version>1.5.30</version>
+		<version>${revision}</version>
 	<packaging>pom</packaging>
 	<name>forest</name>
 	<description>A easy HTTP client framework for Java</description>
@@ -35,6 +35,7 @@
 	</scm>
 
 	<properties>
+		<revision>1.5.31</revision>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -76,6 +77,7 @@
 		<maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
 		<maven-gpg-plugin.version>1.5</maven-gpg-plugin.version>
 		<protobuf.version>3.16.1</protobuf.version>
+		<assertj.version>3.13.2</assertj.version>
 	</properties>
 
 	<modules>
@@ -87,7 +89,8 @@
 		<module>forest-spring-boot3-starter</module>
 		<module>forest-mock</module>
 		<module>forest-solon-plugin</module>
-    </modules>
+        <module>forest-test</module>
+	</modules>
 
 	<dependencies>
 		<!-- mockito -->
@@ -216,7 +219,7 @@
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
-			<version>3.13.2</version>
+			<version>${assertj.version}</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -310,6 +313,18 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.2.2</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+					</archive>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -421,6 +436,32 @@
 								<phase>verify</phase>
 								<goals>
 									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>flatten-maven-plugin</artifactId>
+						<version>1.2.7</version>
+						<configuration>
+							<updatePomFile>true</updatePomFile>
+							<flattenMode>resolveCiFriendliesOnly</flattenMode>
+						</configuration>
+						<executions>
+							<execution>
+								<id>flatten</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>flatten</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>flatten.clean</id>
+								<phase>clean</phase>
+								<goals>
+									<goal>clean</goal>
 								</goals>
 							</execution>
 						</executions>

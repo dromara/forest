@@ -3,6 +3,7 @@ package com.dtflys.forest.example.controller;
 import com.dtflys.forest.example.client.UploadClient;
 import com.dtflys.forest.example.service.FileService;
 import com.dtflys.forest.example.utils.PathUtil;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -177,6 +178,20 @@ public class TestUploadController {
         });
         return result;
     }
+
+    @PostMapping("/do-upload-multipart-file-list")
+    public Map doUploadMultipartFileList(MultipartFile multipartFile1, MultipartFile multipartFile2)  {
+        Map result = uploadClient.uploadList(
+                Lists.newArrayList(multipartFile1, multipartFile2), progress -> {
+            logger.info("-------------------------------------------------------");
+            logger.info("total bytes: " + progress.getTotalBytes());
+            logger.info("current bytes: " + progress.getCurrentBytes());
+            logger.info("percentage: " + (progress.getRate() * 100) + "%");
+            logger.info("is done: " + progress.isDone());
+        });
+        return result;
+    }
+
 
     @PostMapping("/do-upload-path-list")
     public Map doUploadPathList() throws IOException {
