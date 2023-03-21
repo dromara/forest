@@ -11,7 +11,7 @@
     <parent>
         <groupId>com.dtflys.forest</groupId>
         <artifactId>forest</artifactId>
-        <version>1.5.30</version>
+        <version>${revision}</version>
     </parent>
 
     <properties>
@@ -133,7 +133,7 @@
         <dependency>
             <groupId>com.dtflys.forest</groupId>
             <artifactId>forest-mock</artifactId>
-            <version>1.5.30</version>
+            <version>${revision}</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>

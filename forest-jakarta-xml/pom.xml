@@ -11,6 +11,8 @@
   <name>forest-jakarta-xml</name>
 
   <properties>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
     <jakarta.xml.bind.version>4.0.0</jakarta.xml.bind.version>
     <jakarta.activation.version>2.1.1</jakarta.activation.version>
     <glassfish.jaxb.version>4.0.2</glassfish.jaxb.version>
@@ -20,7 +22,7 @@
   <parent>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest</artifactId>
-    <version>1.5.30</version>
+    <version>${revision}</version>
   </parent>
 
 

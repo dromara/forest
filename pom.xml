@@ -31,7 +31,7 @@
 		<url>https://github.com/dromara/forest</url>
 		<connection>scm:git:https://github.com/dromara/forest.git</connection>
 		<developerConnection>https://forest.dtflyx.com</developerConnection>
-		<tag>1.5.30</tag>
+		<tag>${revision}</tag>
 	</scm>
 
 	<properties>
@@ -69,7 +69,7 @@
 		<spring-boot-starter-test.version>2.5.12</spring-boot-starter-test.version>
 
 		<maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
-		<maven-source-plugin.version>2.1.2</maven-source-plugin.version>
+		<maven-source-plugin.version>3.2.0</maven-source-plugin.version>
 		<maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
 		<cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>
 		<nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
@@ -395,11 +395,27 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
 						<version>${maven-source-plugin.version}</version>
+						<configuration>
+							<manifestEntries>
+								<Bundle-ManifestVersion>2</Bundle-ManifestVersion>
+								<Bundle-Name>${project.name}</Bundle-Name>
+								<Bundle-SymbolicName>${project.groupId}.${project.artifactId}.source</Bundle-SymbolicName>
+								<Bundle-Vendor>${project.organization.name}</Bundle-Vendor>
+							</manifestEntries>
+						</configuration>
 						<executions>
 							<execution>
 								<id>attach-sources</id>
+								<phase>prepare-package</phase>
 								<goals>
-									<goal>jar</goal>
+									<goal>jar-no-fork</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>attach-test-sources</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>test-jar-no-fork</goal>
 								</goals>
 							</execution>
 						</executions>

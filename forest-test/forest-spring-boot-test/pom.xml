@@ -8,6 +8,7 @@
     </parent>
 
     <artifactId>forest-spring-boot-test</artifactId>
+    <version>${revision}</version>
     <packaging>jar</packaging>
 
     <name>forest-spring-boot-test</name>
