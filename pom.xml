@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
 	<groupId>com.dtflys.forest</groupId>
 	<artifactId>forest</artifactId>
-		<version>${revision}</version>
+	<version>${revision}</version>
 	<packaging>pom</packaging>
 	<name>forest</name>
 	<description>A easy HTTP client framework for Java</description>
@@ -36,8 +35,7 @@
 
 	<properties>
 		<revision>1.5.31</revision>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
+		<jdk.version>8</jdk.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<spring.version>5.3.20</spring.version>
@@ -68,9 +66,9 @@
 		<moco-core.version>1.2.0</moco-core.version>
 		<spring-boot-starter-test.version>2.5.12</spring-boot-starter-test.version>
 
-		<maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
+		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 		<maven-source-plugin.version>3.2.0</maven-source-plugin.version>
-		<maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
+		<maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
 		<cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>
 		<nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
 		<spring-boot-maven-plugin.version>2.0.1.RELEASE</spring-boot-maven-plugin.version>
@@ -290,26 +288,12 @@
 						<phase>compile</phase>
 						<goals>
 							<goal>compile</goal>
-						</goals>
-						<configuration>
-							<source>${maven.compiler.source}</source>
-							<target>${maven.compiler.target}</target>
-							<encoding>UTF-8</encoding>
-						</configuration>
-					</execution>
-					<execution>
-						<id>test-compile</id>
-						<phase>test-compile</phase>
-						<goals>
 							<goal>testCompile</goal>
 						</goals>
 						<configuration>
-							<fork>true</fork>
-							<compilerArgs>
-								<arg>-parameters</arg>
-							</compilerArgs>
-							<source>${maven.compiler.source}</source>
-							<target>${maven.compiler.target}</target>
+							<source>${jdk.version}</source>
+							<target>${jdk.version}</target>
+							<encoding>UTF-8</encoding>
 						</configuration>
 					</execution>
 				</executions>
@@ -395,14 +379,6 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
 						<version>${maven-source-plugin.version}</version>
-						<configuration>
-							<manifestEntries>
-								<Bundle-ManifestVersion>2</Bundle-ManifestVersion>
-								<Bundle-Name>${project.name}</Bundle-Name>
-								<Bundle-SymbolicName>${project.groupId}.${project.artifactId}.source</Bundle-SymbolicName>
-								<Bundle-Vendor>${project.organization.name}</Bundle-Vendor>
-							</manifestEntries>
-						</configuration>
 						<executions>
 							<execution>
 								<id>attach-sources</id>
