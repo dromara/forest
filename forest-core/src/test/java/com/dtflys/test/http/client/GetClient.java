@@ -95,7 +95,7 @@ public interface GetClient {
             url = "http://localhost:${port}/hello/user",
             headers = {"Accept:text/plain"}
     )
-    String simpleGetMultiQuery2WithLazy(@Query("username") String username, @Query("password") Lazy<String> password);
+String simpleGetMultiQuery2WithLazy(@Query("a") String a, @Query("b") String b, @Query("token") Lazy<String> password);
 
     @Request(
             url = "http://localhost:${port}/hello",

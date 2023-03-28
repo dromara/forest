@@ -963,9 +963,9 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.get("/")
                 .port(server.getPort())
-                .addQuery("a", "1")
-                .addQuery("b", "2")
-                .addQuery("c", req -> "3")
+                .addQuery("a", 1)
+                .addQuery("b", 2)
+                .addQuery("c", req -> 3)
                 .addQuery("token", req -> Base64.encode(req.getQueryString()))
                 .execute();
         mockRequest(server)

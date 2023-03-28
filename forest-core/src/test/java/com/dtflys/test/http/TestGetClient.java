@@ -1,5 +1,6 @@
 package com.dtflys.test.http;
 
+import cn.hutool.core.codec.Base64;
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
@@ -941,14 +942,16 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Type", "text/plain")
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(EXPECTED));
-        assertThat(getClient.simpleGetMultiQuery2WithLazy("foo", req -> "bar"))
+        assertThat(getClient.simpleGetMultiQuery2WithLazy("foo", "bar",
+                req -> Base64.encode(req.queryString().getBytes())))
                 .isNotNull()
                 .isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertHeaderEquals("Accept", "text/plain")
                 .assertPathEquals("/hello/user")
-                .assertQueryEquals("username", "foo")
-                .assertQueryEquals("password", "bar");
+                .assertQueryEquals("a", "foo")
+                .assertQueryEquals("b", "bar")
+                .assertQueryEquals("token", Base64.encode("a=foo&b=bar".getBytes()));
     }
 
 
