@@ -4,7 +4,7 @@ forest:
   read-timeout: 60000
   backend: okhttp3
   variables:
-    apiKey: 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
+    apiKey: YOUR_API_KEY
     model: text-davinci-003
     maxTokens: 50
     temperature: 0.5
