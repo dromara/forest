@@ -1,0 +1,14 @@
+
+forest:
+  connect-timeout: 60000
+  read-timeout: 60000
+  backend: okhttp3
+  variables:
+    apiKey: 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
+    model: text-davinci-003
+    maxTokens: 50
+    temperature: 0.5
+
+
+
+
