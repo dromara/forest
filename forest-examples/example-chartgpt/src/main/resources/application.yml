@@ -2,7 +2,6 @@
 forest:
   connect-timeout: 60000
   read-timeout: 60000
-  backend: okhttp3
   variables:
     apiKey: YOUR_API_KEY
     model: text-davinci-003
