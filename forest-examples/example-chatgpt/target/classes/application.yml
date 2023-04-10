@@ -1,0 +1,13 @@
+
+forest:
+  connect-timeout: 60000
+  read-timeout: 60000
+  variables:
+    apiKey: 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
+    model: text-davinci-003
+    maxTokens: 50
+    temperature: 0.5
+
+
+
+
