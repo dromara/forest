@@ -6,5 +6,5 @@ forest:
   timeout: 3000
   connect-timeout: 3000
   max-retry-count: 0
-  success-when: com.dtflys.forest.springboot.test.when.MyWhenCondition
-  retry-when: com.dtflys.forest.springboot.test.when.MyWhenCondition
+  success-when: com.dtflys.forest.springboot3.test.when.MyWhenCondition
+  retry-when: com.dtflys.forest.springboot3.test.when.MyWhenCondition

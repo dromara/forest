@@ -1,4 +1,4 @@
-package com.dtflys.forest.springboot.test.array;
+package com.dtflys.forest.springboot3.test.array;
 
 import com.dtflys.forest.annotation.Address;
 import com.dtflys.forest.annotation.Get;

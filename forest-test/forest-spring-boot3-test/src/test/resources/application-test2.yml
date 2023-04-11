@@ -8,7 +8,7 @@ forest:
   read-timeout: 6000
   max-retry-count: 0
   interceptors:
-    com.dtflys.forest.springboot.test.interceptor.GlobalInterceptor
+    com.dtflys.forest.springboot3.test.interceptor.GlobalInterceptor
 
 
 test:

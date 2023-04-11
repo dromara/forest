@@ -12,7 +12,7 @@ forest:
       hostname-verifier: com.dtflys.forest.springboot.test.ssl.MyHostnameVerifier
       ssl-socket-factory-builder: com.dtflys.forest.springboot.test.ssl.MySSLSocketFactoryBuilder
   interceptors:
-    - com.dtflys.forest.springboot.test.interceptor.GlobalInterceptor
+    - com.dtflys.forest.springboot3.test.interceptor.GlobalInterceptor
 
 my-site:
   base-url: https://gitee.com

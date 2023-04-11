@@ -1,12 +1,12 @@
-package com.dtflys.forest.springboot.test;
+package com.dtflys.forest.springboot3.test;
 
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.interceptor.SpringInterceptorFactory;
 import com.dtflys.forest.logging.ForestLogger;
 import com.dtflys.forest.reflection.SpringForestObjectFactory;
-import com.dtflys.forest.springboot.test.client2.GiteeClient;
-import com.dtflys.forest.springboot.test.interceptor.GlobalInterceptor;
+import com.dtflys.forest.springboot3.test.client2.GiteeClient;
+import com.dtflys.forest.springboot3.test.interceptor.GlobalInterceptor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -16,7 +16,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -10,9 +10,9 @@ forest:
   log-request: true
   log-response-status: false
   log-response-content: true
-  log-handler: com.dtflys.forest.springboot.test.logging.TestLogHandler
+  log-handler: com.dtflys.forest.springboot3.test.logging.TestLogHandler
   filters:
-    test: com.dtflys.forest.springboot.test.filter.TestFilter
+    test: com.dtflys.forest.springboot3.test.filter.TestFilter
   converters:
     json:
       type: com.dtflys.forest.converter.json.ForestJacksonConverter
