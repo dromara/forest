@@ -12,7 +12,7 @@ forest:
       file: test.keystore
       keystore-pass: 123456
       cert-pass: 123456
-      ssl-socket-factory-builder: com.dtflys.forest.springboot.test.ssl.MySSLSocketFactoryBuilder
+      ssl-socket-factory-builder: com.dtflys.forest.springboot3.test.ssl.MySSLSocketFactoryBuilder
 
   interceptors:
     - com.dtflys.forest.springboot3.test.interceptor.GlobalInterceptor
