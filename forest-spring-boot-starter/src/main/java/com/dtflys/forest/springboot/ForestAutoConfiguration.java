@@ -22,9 +22,6 @@ import javax.annotation.Resource;
 @Import({ForestScannerRegister.class})
 public class ForestAutoConfiguration {
 
-    @Resource
-    private ConfigurableApplicationContext applicationContext;
-
     @Bean
     @ConditionalOnMissingBean
     public SpringForestProperties forestProperties() {
@@ -47,10 +44,11 @@ public class ForestAutoConfiguration {
     @Bean
     @DependsOn("forestBeanProcessor")
     @ConditionalOnMissingBean
-    public ForestBeanRegister forestBeanRegister(SpringForestProperties properties,
-                                                    SpringForestObjectFactory forestObjectFactory,
-                                                    SpringInterceptorFactory forestInterceptorFactory,
-                                                    ForestConfigurationProperties forestConfigurationProperties) {
+    public ForestBeanRegister forestBeanRegister(ConfigurableApplicationContext applicationContext,
+                                                 SpringForestProperties properties,
+                                                 SpringForestObjectFactory forestObjectFactory,
+                                                 SpringInterceptorFactory forestInterceptorFactory,
+                                                 ForestConfigurationProperties forestConfigurationProperties) {
         ForestBeanRegister register = new ForestBeanRegister(
                 applicationContext,
                 forestConfigurationProperties,

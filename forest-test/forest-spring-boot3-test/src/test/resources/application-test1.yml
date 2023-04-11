@@ -1,0 +1,34 @@
+
+forest:
+  max-connections: 5000
+  max-route-connections: 5500
+  timeout: 50
+  charset: GBK
+  max-retry-count: 0
+  async-mode: kotlin_coroutine
+  log-enabled: true
+  log-request: true
+  log-response-status: false
+  log-response-content: true
+  log-handler: com.dtflys.forest.springboot.test.logging.TestLogHandler
+  filters:
+    test: com.dtflys.forest.springboot.test.filter.TestFilter
+  converters:
+    json:
+      type: com.dtflys.forest.converter.json.ForestJacksonConverter
+      parameters:
+        dateFormat: yyyy/MM/dd hh:mm:ss
+    binary:
+      type: com.dtflys.forest.converter.binary.DefaultBinaryConverter
+  variables:
+    baseUrl: http://www.xxxxxx.com
+    user:
+      name: foo
+      password: bar
+
+
+my-site:
+  base-url: https://gitee.com
+
+
+
