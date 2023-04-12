@@ -80,6 +80,7 @@
 
 	<modules>
 		<module>forest-core</module>
+		<module>forest-fastjson</module>
 		<module>forest-jaxb</module>
 		<module>forest-jakarta-xml</module>
 		<module>forest-spring</module>

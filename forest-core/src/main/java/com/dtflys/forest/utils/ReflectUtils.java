@@ -6,9 +6,7 @@ import com.dtflys.forest.annotation.MethodLifeCycle;
 import com.dtflys.forest.annotation.ParamLifeCycle;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
-import com.dtflys.forest.converter.json.JSONConverterSelector;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
@@ -35,13 +33,6 @@ public class ReflectUtils {
      * 方法缓存
      */
     private static final Map<Class<?>, Method[]> METHOD_CACHE = new ConcurrentHashMap<>();
-
-    /**
-     * JSON转换选择器
-     * @since 1.5.0-BETA4
-     */
-    private static JSONConverterSelector jsonConverterSelector = new JSONConverterSelector();
-
 
 
     /**
@@ -460,9 +451,6 @@ public class ReflectUtils {
     public static Map convertObjectToMap(Object srcObj, ForestConfiguration configuration) {
         if (configuration != null) {
             return configuration.getJsonConverter().convertObjectToMap(srcObj);
-        }
-        if (FORM_MAP_CONVERTER == null) {
-            FORM_MAP_CONVERTER = jsonConverterSelector.select();
         }
         return FORM_MAP_CONVERTER.convertObjectToMap(srcObj);
     }

@@ -35,7 +35,6 @@ import com.dtflys.forest.converter.auto.DefaultAutoConverter;
 import com.dtflys.forest.converter.binary.DefaultBinaryConverter;
 import com.dtflys.forest.converter.form.DefaultFormConvertor;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
-import com.dtflys.forest.converter.json.JSONConverterSelector;
 import com.dtflys.forest.converter.protobuf.ForestProtobufConverter;
 import com.dtflys.forest.converter.protobuf.ForestProtobufConverterManager;
 import com.dtflys.forest.converter.text.DefaultTextConverter;
@@ -278,10 +277,6 @@ public class ForestConfiguration implements Serializable {
      */
     private Map<ForestDataType, ForestConverter> converterMap;
 
-    /**
-     * 全局JSON数据转换器选择器
-     */
-    private JSONConverterSelector jsonConverterSelector;
 
     /**
      * Forest对象实例化工厂
@@ -373,19 +368,26 @@ public class ForestConfiguration implements Serializable {
     public static ForestConfiguration createConfiguration() {
         ForestConfiguration configuration = new ForestConfiguration();
         configuration.setId("forestConfiguration" + configuration.hashCode());
-        configuration.setJsonConverterSelector(new JSONConverterSelector());
         ForestProtobufConverterManager protobufConverterFactory = ForestProtobufConverterManager.getInstance();
         configuration.setProtobufConverter(protobufConverterFactory.getForestProtobufConverter());
+
+        // 装配JSON转换器
+        ServiceLoader<ForestJsonConverter> jsonConverters = ServiceLoader.load(ForestJsonConverter.class);
+        for (ForestJsonConverter jsonConverter : jsonConverters) {
+            configuration.setJsonConverter(jsonConverter);
+        }
+
+        // 装配XML转换器
         ServiceLoader<ForestXmlConverter> xmlConverters = ServiceLoader.load(ForestXmlConverter.class);
         for (ForestXmlConverter xmlConverter : xmlConverters) {
             configuration.setXmlConverter(xmlConverter);
         }
+
         configuration.setTextConverter(new DefaultTextConverter());
         DefaultAutoConverter autoConverter = new DefaultAutoConverter(configuration);
         configuration.getConverterMap().put(ForestDataType.AUTO, autoConverter);
         configuration.getConverterMap().put(ForestDataType.BINARY, new DefaultBinaryConverter(autoConverter));
         configuration.getConverterMap().put(ForestDataType.FORM, new DefaultFormConvertor(configuration));
-        setupJSONConverter(configuration);
         configuration.setTimeout(3000);
         configuration.setMaxConnections(500);
         configuration.setMaxRouteConnections(500);
@@ -598,15 +600,6 @@ public class ForestConfiguration implements Serializable {
     public ForestConfiguration setHttpBackendSelector(HttpBackendSelector httpBackendSelector) {
         this.httpBackendSelector = httpBackendSelector;
         return this;
-    }
-
-    /**
-     * 配置JSON数据转换器
-     *
-     * @param configuration 全局配置对象
-     */
-    private static void setupJSONConverter(ForestConfiguration configuration) {
-        configuration.setJsonConverter(configuration.jsonConverterSelector.select());
     }
 
     /**
@@ -1700,18 +1693,6 @@ public class ForestConfiguration implements Serializable {
      */
     public <T> T client(Class<T> clazz) {
         return createInstance(clazz);
-    }
-
-
-    /**
-     * 设置全局JSON数据转换器的选择器
-     *
-     * @param jsonConverterSelector JSON转换器选择策略对象，{@link JSONConverterSelector}类实例
-     * @return 当前ForestConfiguration实例
-     */
-    private ForestConfiguration setJsonConverterSelector(JSONConverterSelector jsonConverterSelector) {
-        this.jsonConverterSelector = jsonConverterSelector;
-        return this;
     }
 
 
