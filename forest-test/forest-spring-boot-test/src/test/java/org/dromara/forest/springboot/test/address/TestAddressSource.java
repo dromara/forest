@@ -19,7 +19,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @RunWith(SpringRunner.class)
 @ActiveProfiles("addresssource")
 @SpringBootTest(classes = TestAddressSource.class)
-@ComponentScan(basePackages = "com.dtflys.forest.springboot.test.address")
+@ComponentScan(basePackages = "org.dromara.forest.springboot.test.address")
 @EnableAutoConfiguration
 public class TestAddressSource {
 

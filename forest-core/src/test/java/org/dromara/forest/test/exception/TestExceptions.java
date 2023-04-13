@@ -7,7 +7,6 @@ import org.dromara.forest.annotation.Get;
 import org.dromara.forest.config.ForestConfiguration;
 import org.dromara.forest.converter.ForestConverter;
 import org.dromara.forest.converter.auto.DefaultAutoConverter;
-import com.dtflys.forest.converter.json.ForestFastjsonConverter;
 import org.dromara.forest.converter.json.ForestJacksonConverter;
 import org.dromara.forest.exceptions.ForestConvertException;
 import org.dromara.forest.exceptions.ForestFileNotFoundException;
@@ -81,10 +80,13 @@ public class TestExceptions {
     public void testInterceptorDefineException() {
         ForestInterceptorDefineException exception = new ForestInterceptorDefineException(TestErrorInterceptor.class);
         assertThat(exception.getMessage())
-                .isEqualTo("[Forest] Interceptor class 'com.dtflys.test.exception.TestExceptions$TestErrorInterceptor' cannot be initialized, because interceptor class must implements com.dtflys.forest.interceptor.Interceptor");
+                .isEqualTo("[Forest] Interceptor class 'org.dromara.forest.test.exception.TestExceptions$TestErrorInterceptor' cannot be initialized, because interceptor class must implements org.dromara.forest.interceptor.Interceptor");
         assertThat(exception.getInterceptorClass()).isEqualTo(TestErrorInterceptor.class);
     }
 
+/**
+ * TODO: 移动到 forest-fastjson 去
+ *
     @Test
     public void testConvertException() {
         Throwable th = new Exception("xxx");
@@ -106,6 +108,7 @@ public class TestExceptions {
                 .isEqualTo("[Forest] auto converter: 'DefaultAutoConverter' error: xxx");
         assertThat(exception.getConverterClass()).isEqualTo(DefaultAutoConverter.class);
     }
+*/
 
     @Test
     public void testRetryException() {
@@ -181,8 +184,8 @@ public class TestExceptions {
         assertThat(exception.getMessage()).isEqualTo("[Forest] Cannot resolve variable 'data'\n" +
                 "\n" +
                 "\t[From Template]\n" +
-                "\tmethod: com.dtflys.test.exception.TestExceptions$TestClient.urlVar()\n" +
-                "\tannotation: com.dtflys.forest.annotation.@Get\n" +
+                "\tmethod: org.dromara.forest.test.exception.TestExceptions$TestClient.urlVar()\n" +
+                "\tannotation: org.dromara.forest.annotation.@Get\n" +
                 "\tattribute: url = \"/data/{data}\"\n");
     }
 
@@ -200,8 +203,8 @@ public class TestExceptions {
         assertThat(exception.getMessage()).isEqualTo("[Forest] Cannot resolve variable 'json'\n" +
                 "\n" +
                 "\t[From Template]\n" +
-                "\tmethod: com.dtflys.test.exception.TestExceptions$TestClient.contentTypeVar()\n" +
-                "\tannotation: com.dtflys.forest.annotation.@Get\n" +
+                "\tmethod: org.dromara.forest.test.exception.TestExceptions$TestClient.contentTypeVar()\n" +
+                "\tannotation: org.dromara.forest.annotation.@Get\n" +
                 "\tattribute: contentType = \"application/{json}\"\n");
     }
 
@@ -218,8 +221,8 @@ public class TestExceptions {
         assertThat(exception.getMessage()).isEqualTo("[Forest] Cannot resolve variable 'filename'\n" +
                 "\n" +
                 "\t[From Template]\n" +
-                "\tmethod: com.dtflys.test.exception.TestExceptions$TestClient.fileVar(java.lang.String)\n" +
-                "\tannotation: com.dtflys.forest.annotation.@DataFile\n" +
+                "\tmethod: org.dromara.forest.test.exception.TestExceptions$TestClient.fileVar(java.lang.String)\n" +
+                "\tannotation: org.dromara.forest.annotation.@DataFile\n" +
                 "\tattribute: fileName = \"{filename}\"\n");
     }
 

@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @ActiveProfiles("address")
 @SpringBootTest(classes = TestAddress.class)
-@ComponentScan(basePackages = "com.dtflys.forest.springboot.test.binding")
+@ComponentScan(basePackages = "org.dromara.forest.springboot.test.binding")
 @EnableAutoConfiguration
 public class TestBinding {
 

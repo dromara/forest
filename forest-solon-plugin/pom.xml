@@ -32,6 +32,13 @@
         </dependency>
 
         <dependency>
+            <groupId>org.dromara.forest</groupId>
+            <artifactId>forest-fastjson</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
             <version>${protobuf.version}</version>

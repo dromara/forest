@@ -6,7 +6,6 @@ import org.dromara.forest.annotation.DataVariable;
 import org.dromara.forest.annotation.Request;
 import org.dromara.forest.converter.json.ForestJacksonConverter;
 import org.dromara.forest.http.ForestResponse;
-import com.dtflys.test.model.*;
 import org.dromara.forest.test.model.Coordinate;
 import org.dromara.forest.test.model.Result;
 import org.dromara.forest.test.model.AmapCross;

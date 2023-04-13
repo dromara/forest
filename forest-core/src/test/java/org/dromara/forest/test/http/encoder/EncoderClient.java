@@ -6,7 +6,6 @@ import org.dromara.forest.annotation.Body;
 import org.dromara.forest.annotation.BodyType;
 import org.dromara.forest.annotation.Post;
 import org.dromara.forest.backend.ContentType;
-import com.dtflys.forest.converter.json.FastjsonEncoder;
 import org.dromara.forest.converter.json.GsonEncoder;
 import org.dromara.forest.converter.json.JacksonEncoder;
 import org.dromara.forest.http.ForestRequest;
@@ -76,9 +75,12 @@ public interface EncoderClient {
     @Post(url = "/", contentType = ContentType.APPLICATION_X_WWW_FORM_URLENCODED)
     ForestRequest testEncoder3(@Body Entry entry);
 
+/**
+ * TODO: 移到 forest-fastjson 去
     @FastjsonEncoder
     @Post(url = "/")
     ForestRequest testFastjson(@Body Entry entry);
+*/
 
     @JacksonEncoder
     @Post(url = "/")

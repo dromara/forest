@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option java_package = "com.dtflys.test.converter.protobuf";
+option java_package = "org.dromara.forest.test.converter.protobuf";
 option java_outer_classname = "ProtobufTestSerializer";
 
 enum Color {

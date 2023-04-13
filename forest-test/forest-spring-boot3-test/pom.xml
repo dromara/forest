@@ -40,6 +40,13 @@
         </dependency>
 
         <dependency>
+            <groupId>org.dromara.forest</groupId>
+            <artifactId>forest-fastjson</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
         </dependency>

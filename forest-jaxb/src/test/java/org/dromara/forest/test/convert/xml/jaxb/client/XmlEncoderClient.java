@@ -6,7 +6,6 @@ import org.dromara.forest.annotation.Body;
 import org.dromara.forest.annotation.BodyType;
 import org.dromara.forest.annotation.Post;
 import org.dromara.forest.backend.ContentType;
-import com.dtflys.forest.converter.json.FastjsonEncoder;
 import org.dromara.forest.http.ForestRequest;
 
 import javax.xml.bind.annotation.XmlAccessType;

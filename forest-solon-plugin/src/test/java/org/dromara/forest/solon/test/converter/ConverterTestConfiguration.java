@@ -1,7 +1,7 @@
 package org.dromara.forest.solon.test.converter;
 
 import org.dromara.forest.converter.ForestConverter;
-import com.dtflys.forest.converter.json.ForestFastjsonConverter;
+import org.dromara.forest.converter.json.ForestFastjsonConverter;
 import org.noear.solon.annotation.Bean;
 import org.noear.solon.annotation.Configuration;
 

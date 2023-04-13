@@ -1,6 +1,5 @@
 package org.dromara.forest.solon.test.when;
 
-import com.dtflys.forest.annotation.*;
 import org.dromara.forest.annotation.ForestClient;
 import org.dromara.forest.annotation.Get;
 import org.dromara.forest.annotation.Retry;

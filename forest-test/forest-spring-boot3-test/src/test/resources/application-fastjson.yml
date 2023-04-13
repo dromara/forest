@@ -12,7 +12,7 @@ forest:
   log-handler: org.dromara.forest.springboot3.test.logging.TestLogHandler
   converters:
     json:
-      type: com.dtflys.forest.converter.json.ForestFastjsonConverter
+      type: org.dromara.forest.converter.json.ForestFastjsonConverter
       parameters:
         dateFormat: yyyy/MM/dd hh:mm:ss
 

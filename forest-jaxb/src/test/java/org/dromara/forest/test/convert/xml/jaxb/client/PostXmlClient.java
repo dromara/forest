@@ -5,8 +5,8 @@ import org.dromara.forest.annotation.DataVariable;
 import org.dromara.forest.annotation.Post;
 import org.dromara.forest.annotation.Request;
 import org.dromara.forest.annotation.XMLBody;
-import org.dromara.forest.test.convert.xml.jaxb.interceptor.XmlResponseInterceptor;
 import org.dromara.forest.test.convert.xml.jaxb.pojo.XmlTestParam;
+import org.dromara.forest.test.convert.xml.jaxb.interceptor.XmlResponseInterceptor;
 
 public interface PostXmlClient {
 

@@ -1,7 +1,7 @@
 package org.dromara.forest.springboot3.test.converter;
 
 import org.dromara.forest.converter.ForestConverter;
-import com.dtflys.forest.converter.json.ForestFastjsonConverter;
+import org.dromara.forest.converter.json.ForestFastjsonConverter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

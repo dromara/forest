@@ -2378,7 +2378,7 @@ public final class ProtobufProto {
       "aseData.MapValEntry\0328\n\013MapValEntry\022\013\n\003ke" +
       "y\030\001 \001(\t\022\030\n\005value\030\002 \001(\0132\t.BaseData:\0028\001*/\n" +
       "\005Color\022\010\n\004NONE\020\000\022\007\n\003RED\020\001\022\t\n\005GREEN\020\002\022\010\n\004" +
-      "BLUE\020\003B<\n\"com.dtflys.test.converter.prot" +
+      "BLUE\020\003B<\n\"org.dromara.forest.test.converter.prot" +
       "obufB\026ProtobufTestSerializerb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor

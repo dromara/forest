@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.reflect.TypeToken;
 import junit.framework.TestCase;
-import com.dtflys.forest.converter.json.ForestFastjsonConverter;
 import org.dromara.forest.converter.json.ForestGsonConverter;
 import org.dromara.forest.converter.json.ForestJacksonConverter;
 import org.dromara.forest.test.model.Contact;
@@ -24,7 +23,9 @@ import java.util.Map;
  */
 public class JsonTest extends TestCase {
 
-    private ForestFastjsonConverter fastjsonConverter = new ForestFastjsonConverter();
+    // TODO: 移到 forest-fastjson 去
+//    private ForestFastjsonConverter fastjsonConverter = new ForestFastjsonConverter();
+
     private ForestJacksonConverter jacksonConverter = new ForestJacksonConverter();
     private ForestGsonConverter gsonConverter = new ForestGsonConverter();
 
@@ -62,6 +63,9 @@ public class JsonTest extends TestCase {
     }
 
 
+/**
+ * TODO: 移到 forest-fastjson 去
+ *
     public void testFastjson() {
         String jsonSource = fastjsonConverter.encodeToString(map);
         assertNotNull(jsonSource);
@@ -85,6 +89,7 @@ public class JsonTest extends TestCase {
         assertNotNull(locationResult);
 
     }
+*/
 
     public void testJackson() {
         String jsonSource = jacksonConverter.encodeToString(map);

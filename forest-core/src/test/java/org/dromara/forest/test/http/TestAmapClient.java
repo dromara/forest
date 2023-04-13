@@ -5,7 +5,6 @@ import org.dromara.forest.Forest;
 import org.dromara.forest.config.ForestConfiguration;
 import org.dromara.forest.converter.json.ForestJacksonConverter;
 import org.dromara.forest.test.http.client.AmapClient;
-import com.dtflys.test.model.*;
 import org.dromara.forest.test.model.Coordinate;
 import org.dromara.forest.test.model.Location;
 import org.dromara.forest.test.model.Result;

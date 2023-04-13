@@ -15,11 +15,11 @@ forest:
     test: org.dromara.forest.springboot.test.filter.TestFilter
   converters:
     json:
-      type: com.dtflys.forest.converter.json.ForestJacksonConverter
+      type: org.dromara.forest.converter.json.ForestJacksonConverter
       parameters:
         dateFormat: yyyy/MM/dd hh:mm:ss
     binary:
-      type: com.dtflys.forest.converter.binary.DefaultBinaryConverter
+      type: org.dromara.forest.converter.binary.DefaultBinaryConverter
   variables:
     baseUrl: http://www.xxxxxx.com
     user:

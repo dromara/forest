@@ -19,7 +19,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @RunWith(SpringRunner.class)
 @ActiveProfiles("array")
 @SpringBootTest(classes = TestArrayClient.class)
-@ComponentScan(basePackages = "com.dtflys.forest.springboot.test.array")
+@ComponentScan(basePackages = "org.dromara.forest.springboot.test.array")
 @EnableAutoConfiguration
 public class TestArrayClient {
 

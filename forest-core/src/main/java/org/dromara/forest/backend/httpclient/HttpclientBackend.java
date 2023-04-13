@@ -4,7 +4,6 @@ import org.dromara.forest.backend.AbstractHttpBackend;
 import org.dromara.forest.backend.ForestConnectionManager;
 import org.dromara.forest.backend.HttpExecutor;
 import org.dromara.forest.backend.httpclient.conn.HttpclientConnectionManager;
-import com.dtflys.forest.backend.httpclient.executor.*;
 import org.dromara.forest.backend.httpclient.request.HttpclientRequestSender;
 import org.dromara.forest.backend.httpclient.request.SyncHttpclientRequestSender;
 import org.dromara.forest.backend.httpclient.response.HttpclientResponseHandler;

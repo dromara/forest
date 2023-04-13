@@ -9,8 +9,8 @@ forest:
   retry-count: 2
   ssl-key-stores:
     - id: keystore1
-      hostname-verifier: com.dtflys.forest.springboot3.test.ssl.MyHostnameVerifier
-      ssl-socket-factory-builder: com.dtflys.forest.springboot3.test.ssl.MySSLSocketFactoryBuilder
+      hostname-verifier: org.dromara.forest.springboot3.test.ssl.MyHostnameVerifier
+      ssl-socket-factory-builder: org.dromara.forest.springboot3.test.ssl.MySSLSocketFactoryBuilder
   interceptors:
     - org.dromara.forest.springboot3.test.interceptor.GlobalInterceptor
 

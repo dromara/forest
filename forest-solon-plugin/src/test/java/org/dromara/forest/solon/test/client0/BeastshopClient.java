@@ -1,7 +1,6 @@
 package org.dromara.forest.solon.test.client0;
 
 
-import com.dtflys.forest.annotation.*;
 import org.dromara.forest.annotation.BaseRequest;
 import org.dromara.forest.annotation.DataParam;
 import org.dromara.forest.annotation.ForestClient;

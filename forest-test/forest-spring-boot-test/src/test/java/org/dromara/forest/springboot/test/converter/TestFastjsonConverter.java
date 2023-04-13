@@ -1,7 +1,7 @@
 package org.dromara.forest.springboot.test.converter;
 
 import org.dromara.forest.config.ForestConfiguration;
-import com.dtflys.forest.converter.json.ForestFastjsonConverter;
+import org.dromara.forest.converter.json.ForestFastjsonConverter;
 import org.dromara.forest.converter.json.ForestJsonConverter;
 import org.junit.Test;
 import org.junit.runner.RunWith;

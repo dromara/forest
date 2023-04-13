@@ -19,7 +19,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @RunWith(SpringRunner.class)
 @ActiveProfiles("when")
 @SpringBootTest(classes = TestWhen.class)
-@ComponentScan(basePackages = "com.dtflys.forest.springboot.test.when")
+@ComponentScan(basePackages = "org.dromara.forest.springboot.test.when")
 @EnableAutoConfiguration
 public class TestWhen {
 

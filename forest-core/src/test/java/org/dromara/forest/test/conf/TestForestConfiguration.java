@@ -9,8 +9,6 @@ import org.dromara.forest.ssl.SSLUtils;
 import org.dromara.forest.utils.ForestDataType;
 import org.dromara.forest.utils.RequestNameValue;
 import junit.framework.Assert;
-import com.dtflys.forest.converter.json.JSONConverterSelector;
-import com.dtflys.forest.converter.json.ForestFastjsonConverter;
 import org.dromara.forest.converter.json.ForestGsonConverter;
 import org.dromara.forest.converter.json.ForestJacksonConverter;
 import org.dromara.forest.converter.json.ForestJsonConverter;
@@ -141,6 +139,8 @@ public class TestForestConfiguration {
         assertEquals(defaultHeaders, configuration.getDefaultHeaders());
     }
 
+/**
+ * TODO: 移动到 forest-fastjson 去
     @Test
     public void testConverterMap() {
         ForestConfiguration configuration = ForestConfiguration.createConfiguration();
@@ -150,58 +150,7 @@ public class TestForestConfiguration {
         configuration.setConverterMap(converterMap);
         assertEquals(converterMap, configuration.getConverterMap());
     }
+*/
 
-    @Test
-    public void testJSONConvertSelectCheck() throws Throwable {
-        JSONConverterSelector jsonConverterSelector = new JSONConverterSelector();
-        try {
-            Class fastJsonClass = jsonConverterSelector.checkFastJSONClass();
-            assertNotNull(fastJsonClass);
-        } catch (Throwable th) {
-        }
-        try {
-            Class gsonClass = jsonConverterSelector.checkGsonClass();
-            assertNotNull(gsonClass);
-        } catch (Throwable th) {
-        }
-        try {
-            Class jacson = jsonConverterSelector.checkJacsonClass();
-            assertNotNull(jacson);
-        } catch (Throwable th) {
-        }
-    }
-
-    @Test
-    public void testJSONConverterSelect() throws Throwable {
-        JSONConverterSelector jsonConverterSelector = new JSONConverterSelector();
-        JSONConverterSelector spy = Mockito.spy(jsonConverterSelector);
-        Mockito.when(spy.checkFastJSONClass())
-                .thenThrow(new ClassNotFoundException("com.alibaba.fastjson.JSON"));
-
-        ForestJsonConverter jsonConverter = spy.select();
-        assertNotNull(jsonConverter);
-        assertTrue(jsonConverter instanceof ForestJacksonConverter);
-
-        jsonConverterSelector = new JSONConverterSelector();
-        spy = Mockito.spy(jsonConverterSelector);
-        Mockito.when(spy.checkFastJSONClass())
-                .thenThrow(new ClassNotFoundException("com.alibaba.fastjson.JSON"));
-        Mockito.when(spy.checkJacsonClass())
-                .thenThrow(new ClassNotFoundException("com.fasterxml.jackson.databind.ObjectMapper"));
-        jsonConverter = spy.select();
-        assertNotNull(jsonConverter);
-        assertTrue(jsonConverter instanceof ForestGsonConverter);
-
-        jsonConverterSelector = new JSONConverterSelector();
-        spy = Mockito.spy(jsonConverterSelector);
-        Mockito.when(spy.checkFastJSONClass())
-                .thenThrow(new ClassNotFoundException("com.alibaba.fastjson.JSON"));
-        Mockito.when(spy.checkJacsonClass())
-                .thenThrow(new ClassNotFoundException("com.fasterxml.jackson.databind.ObjectMapper"));
-        Mockito.when(spy.checkGsonClass())
-                .thenThrow(new ClassNotFoundException("com.google.gson.JsonParser"));
-        jsonConverter = spy.select();
-        assertNull(jsonConverter);
-    }
 
 }

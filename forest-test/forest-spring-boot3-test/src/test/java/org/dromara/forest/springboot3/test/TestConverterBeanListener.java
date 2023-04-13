@@ -2,7 +2,7 @@ package org.dromara.forest.springboot3.test;
 
 import org.dromara.forest.config.ForestConfiguration;
 import org.dromara.forest.converter.ForestConverter;
-import com.dtflys.forest.converter.json.ForestFastjsonConverter;
+import org.dromara.forest.converter.json.ForestFastjsonConverter;
 import org.dromara.forest.http.ForestRequest;
 import org.dromara.forest.springboot3.test.client2.GiteeClient;
 import org.dromara.forest.springboot3.test.converter.ConverterTestConfiguration;

@@ -19,7 +19,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test2")
 @SpringBootTest(classes = TestOverride.class)
-@ComponentScan(basePackages = "com.dtflys.forest.springboot.test.override")
+@ComponentScan(basePackages = "org.dromara.forest.springboot.test.override")
 @EnableAutoConfiguration
 public class TestOverride {
 

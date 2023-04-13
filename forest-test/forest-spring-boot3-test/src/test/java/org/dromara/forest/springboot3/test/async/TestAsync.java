@@ -24,7 +24,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @RunWith(SpringRunner.class)
 @ActiveProfiles("async")
 @SpringBootTest(classes = TestAddress.class)
-@ComponentScan(basePackages = "com.dtflys.forest.springboot.test.async")
+@ComponentScan(basePackages = "org.dromara.forest.springboot3.test.async")
 @EnableAutoConfiguration
 public class TestAsync {
 

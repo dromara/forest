@@ -1,6 +1,5 @@
 package org.dromara.forest.solon.test.client2;
 
-import com.dtflys.forest.annotation.*;
 import org.dromara.forest.annotation.BaseRequest;
 import org.dromara.forest.annotation.ForestClient;
 import org.dromara.forest.annotation.LogEnabled;

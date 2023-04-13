@@ -1,6 +1,5 @@
 package org.dromara.forest.test.converter;
 
-import com.dtflys.forest.converter.json.ForestFastjsonConverter;
 import org.dromara.forest.test.model.Coordinate;
 import org.dromara.forest.test.model.SubCoordinate;
 import com.google.gson.reflect.TypeToken;
