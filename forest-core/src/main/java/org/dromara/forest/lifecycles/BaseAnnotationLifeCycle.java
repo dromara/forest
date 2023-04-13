@@ -1,0 +1,32 @@
+package org.dromara.forest.lifecycles;
+
+import org.dromara.forest.exceptions.ForestRuntimeException;
+import org.dromara.forest.http.ForestRequest;
+import org.dromara.forest.http.ForestResponse;
+import org.dromara.forest.interceptor.Interceptor;
+import org.dromara.forest.proxy.InterfaceProxyHandler;
+
+import java.lang.annotation.Annotation;
+
+/**
+ * @author gongjun[dt_flys@hotmail.com]
+ * @since 2020-08-23 23:04
+ */
+public interface BaseAnnotationLifeCycle <A extends Annotation, I> extends Interceptor<I> {
+
+    /**
+     * 在被注解修饰的接口初始化时被调用
+     * @param interfaceProxyHandler 请求接口动态代理处理器
+     * @param annotation 该生命周期类所绑定的注解
+     */
+    default void onProxyHandlerInitialized(InterfaceProxyHandler interfaceProxyHandler, A annotation) {
+    }
+
+    @Override
+    default void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
+    }
+
+    @Override
+    default void onSuccess(I data, ForestRequest request, ForestResponse response) {
+    }
+}

@@ -15,7 +15,7 @@ forest:
       ssl-socket-factory-builder: com.dtflys.forest.springboot3.test.ssl.MySSLSocketFactoryBuilder
 
   interceptors:
-    - com.dtflys.forest.springboot3.test.interceptor.GlobalInterceptor
+    - org.dromara.forest.springboot3.test.interceptor.GlobalInterceptor
 
 
 my-site:

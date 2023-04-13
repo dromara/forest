@@ -84,7 +84,7 @@ Forest有哪些特性？
 
 ```xml
 <dependency>
-    <groupId>com.dtflys.forest</groupId>
+    <groupId>org.dromara.forest</groupId>
     <artifactId>forest-spring-boot-starter</artifactId>
     <version>1.5.30</version>
 </dependency>
@@ -98,8 +98,8 @@ Forest有哪些特性？
 
 package com.yoursite.client;
 
-import com.dtflys.forest.annotation.Request;
-import com.dtflys.forest.annotation.DataParam;
+import annotation.org.dromara.forest.Request;
+import annotation.org.dromara.forest.DataParam;
 
 public interface AmapClient {
 

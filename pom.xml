@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.dtflys.forest</groupId>
+	<groupId>org.dromara.forest</groupId>
 	<artifactId>forest</artifactId>
 	<version>${revision}</version>
 	<packaging>pom</packaging>
@@ -34,7 +34,7 @@
 	</scm>
 
 	<properties>
-		<revision>1.5.31</revision>
+		<revision>2.0.0-ALPHA</revision>
 		<jdk.version>8</jdk.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 

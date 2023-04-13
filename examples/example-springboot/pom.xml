@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.dtflys.forest</groupId>
+    <groupId>org.dromara.forest</groupId>
     <artifactId>example-springboot</artifactId>
     <version>1.0.0</version>
 
@@ -28,15 +28,15 @@
         </dependency>
 
         <dependency>
-            <groupId>com.dtflys.forest</groupId>
+            <groupId>org.dromara.forest</groupId>
             <artifactId>forest-spring-boot-starter</artifactId>
-            <version>1.5.30</version>
+            <version>2.0.0-ALPHA</version>
         </dependency>
 
         <dependency>
-            <groupId>com.dtflys.forest</groupId>
+            <groupId>org.dromara.forest</groupId>
             <artifactId>forest-jaxb</artifactId>
-            <version>1.5.30</version>
+            <version>2.0.0-ALPHA</version>
         </dependency>
 
         <dependency>

@@ -13,7 +13,7 @@
             backend="httpclient"
             timeout="30000"
             retryCount="3"
-            retryer="com.dtflys.forest.retryer.NoneRetryer"
+            retryer="org.dromara.forest.retryer.NoneRetryer"
             charset="GBK"
             sslProtocol="SSLv3"
             connectTimeout="10000"
@@ -31,11 +31,11 @@
 
         <forest:ssl-keystore id="keystore1" file="test.keystore" keystorePass="123456" certPass="123456"/>
 
-        <forest:converter dataType="json" class="com.dtflys.forest.converter.json.ForestGsonConverter">
+        <forest:converter dataType="json" class="org.dromara.forest.converter.json.ForestGsonConverter">
             <forest:parameter name="dateFormat" value="yyyy/MM/dd hh:mm:ss"/>
         </forest:converter>
 
-        <forest:converter dataType="xml" class="com.dtflys.forest.converter.xml.jakartaxml.ForestJakartaXmlConverter">
+        <forest:converter dataType="xml" class="jakartaxml.xml.converter.org.dromara.forest.ForestJakartaXmlConverter">
         </forest:converter>
 
     </forest:configuration>
