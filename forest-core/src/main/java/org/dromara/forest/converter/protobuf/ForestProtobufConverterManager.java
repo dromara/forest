@@ -39,7 +39,7 @@ import java.lang.reflect.Type;
 public class ForestProtobufConverterManager implements Serializable {
 
     private static ForestProtobufConverterManager instance;
-    private final static String PROTOBUF_CONVERTER_CLASS = "com.dtflys.forest.converter.protobuf.ForestGoogleProtobufConverter";
+    private final static String PROTOBUF_CONVERTER_CLASS = "org.dromara.forest.converter.protobuf.ForestGoogleProtobufConverter";
     private final static String PROTOBUF_MESSAGE_CLASS = "com.google.protobuf.Message";
 
     private ForestProtobufConverter forestProtobufConverter;

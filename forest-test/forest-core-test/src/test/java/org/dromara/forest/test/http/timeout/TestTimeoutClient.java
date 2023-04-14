@@ -1,0 +1,63 @@
+package org.dromara.forest.test.http.timeout;
+
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import org.dromara.forest.backend.HttpBackend;
+import org.dromara.forest.config.ForestConfiguration;
+import org.dromara.forest.http.ForestRequest;
+import org.dromara.forest.http.ForestResponse;
+import org.dromara.forest.test.http.BaseClientTest;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+
+import java.util.concurrent.TimeUnit;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
+public class TestTimeoutClient extends BaseClientTest {
+
+
+    @Rule
+    public MockWebServer server = new MockWebServer();
+
+    private static ForestConfiguration configuration;
+
+    private TimeoutClient timeoutClient;
+
+    @BeforeClass
+    public static void prepareClient() {
+        configuration = ForestConfiguration.createConfiguration();
+    }
+
+    public TestTimeoutClient(HttpBackend backend) {
+        super(backend, configuration);
+        configuration.setVariableValue("port", server.getPort());
+        timeoutClient = configuration.client(TimeoutClient.class);
+    }
+
+
+    @Test
+    public void testConnectTimeout() {
+        ForestRequest request = timeoutClient.testConnectTimeout();
+        assertThat(request).isNotNull();
+        assertThat(request.getConnectTimeout()).isEqualTo(10);
+        ForestResponse response = (ForestResponse) request.execute(ForestResponse.class);
+        assertThat(response).isNotNull();
+        assertThat(response.getException()).isNotNull();
+        assertThat(response.isTimeout()).isTrue();
+    }
+
+
+    @Test
+    public void testReadTimeout() {
+        server.enqueue(new MockResponse().setHeadersDelay(20, TimeUnit.MILLISECONDS));
+        ForestRequest request = timeoutClient.testReadTimeout();
+        assertThat(request).isNotNull();
+        assertThat(request.getReadTimeout()).isEqualTo(10);
+        ForestResponse response = (ForestResponse) request.execute(ForestResponse.class);
+        assertThat(response).isNotNull();
+        assertThat(response.isTimeout()).isTrue();
+    }
+
+}

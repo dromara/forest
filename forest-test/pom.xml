@@ -16,9 +16,15 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-boot3.version>3.1.0-M1</spring-boot3.version>
+        <slf4j.version>1.7.30</slf4j.version>
+        <logback.version>1.2.11</logback.version>
+        <kotlin.version>1.6.20</kotlin.version>
+        <kotlinx.version>1.6.2</kotlinx.version>
+        <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
     </properties>
 
     <modules>
+        <module>forest-core-test</module>
         <module>forest-spring-boot-test</module>
         <module>forest-spring-boot3-test</module>
     </modules>
