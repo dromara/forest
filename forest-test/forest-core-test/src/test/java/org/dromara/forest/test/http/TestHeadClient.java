@@ -58,7 +58,7 @@ public class TestHeadClient extends BaseClientTest {
                 .assertPathEquals("/hello/user")
                 .assertHeaderEquals("Accept", "text/plain")
                 .assertHeaderEquals("accessToken", "11111111")
-                .assertHeaderEquals("org/dromara/forest/test", "testquery:dsds")
+                .assertHeaderEquals("test", "testquery:dsds")
                 .assertHeaderEquals("test2", "testquery2: dsds")
                 .assertQueryEquals("username", "foo");
     }
@@ -72,7 +72,7 @@ public class TestHeadClient extends BaseClientTest {
                 .assertPathEquals("/hello/user")
                 .assertHeaderEquals("Accept", "text/plain")
                 .assertHeaderEquals("accessToken", "11111111")
-                .assertHeaderEquals("org/dromara/forest/test", "testquery:dsds")
+                .assertHeaderEquals("test", "testquery:dsds")
                 .assertHeaderEquals("test2", "testquery2: dsds")
                 .assertQueryEquals("username", "foo");
     }
@@ -86,7 +86,7 @@ public class TestHeadClient extends BaseClientTest {
                 .assertPathEquals("/hello/user")
                 .assertHeaderEquals("Accept", "text/plain")
                 .assertHeaderEquals("accessToken", "11111111")
-                .assertHeaderEquals("org/dromara/forest/test", "testquery:dsds")
+                .assertHeaderEquals("test", "testquery:dsds")
                 .assertHeaderEquals("test2", "testquery2: dsds")
                 .assertQueryEquals("username", "foo");
     }
@@ -103,7 +103,7 @@ public class TestHeadClient extends BaseClientTest {
                 .assertPathEquals("/hello/user")
                 .assertHeaderEquals("Accept", "text/plain")
                 .assertHeaderEquals("accessToken", "11111111")
-                .assertHeaderEquals("org/dromara/forest/test", "testquery:dsds")
+                .assertHeaderEquals("test", "testquery:dsds")
                 .assertHeaderEquals("test2", "testquery2: dsds")
                 .assertQueryEquals("username", "foo");
     }
@@ -117,7 +117,7 @@ public class TestHeadClient extends BaseClientTest {
                 .assertPathEquals("/hello/user")
                 .assertHeaderEquals("Accept", "text/plain")
                 .assertHeaderEquals("accessToken", "11111111")
-                .assertHeaderEquals("org/dromara/forest/test", "testquery:dsds")
+                .assertHeaderEquals("test", "testquery:dsds")
                 .assertHeaderEquals("test2", "testquery2: dsds")
                 .assertQueryEquals("username", "foo");
     }
@@ -131,7 +131,7 @@ public class TestHeadClient extends BaseClientTest {
                 .assertPathEquals("/hello/user")
                 .assertHeaderEquals("Accept", "text/plain")
                 .assertHeaderEquals("accessToken", "11111111")
-                .assertHeaderEquals("org/dromara/forest/test", "testquery:dsds")
+                .assertHeaderEquals("test", "testquery:dsds")
                 .assertHeaderEquals("test2", "testquery2: dsds")
                 .assertQueryEquals("username", "foo");
     }
@@ -152,7 +152,7 @@ public class TestHeadClient extends BaseClientTest {
                 .assertPathEquals("/hello/user")
                 .assertHeaderEquals("Accept", "text/plain")
                 .assertHeaderEquals("accessToken", "11111111")
-                .assertHeaderEquals("org/dromara/forest/test", "testquery:dsds")
+                .assertHeaderEquals("test", "testquery:dsds")
                 .assertHeaderEquals("test2", "testquery2: dsds")
                 .assertQueryEquals("username", "foo");
     }
@@ -171,7 +171,7 @@ public class TestHeadClient extends BaseClientTest {
                 .assertPathEquals("/hello/user")
                 .assertHeaderEquals("Accept", "text/plain")
                 .assertHeaderEquals("accessToken", "11111111")
-                .assertHeaderEquals("org/dromara/forest/test", "testquery:dsds")
+                .assertHeaderEquals("test", "testquery:dsds")
                 .assertHeaderEquals("test2", "testquery2: dsds")
                 .assertQueryEquals("username", "foo");
     }
@@ -197,7 +197,7 @@ public class TestHeadClient extends BaseClientTest {
                 .assertPathEquals("/hello/user")
                 .assertHeaderEquals("Accept", "text/plain")
                 .assertHeaderEquals("accessToken", "11111111")
-                .assertHeaderEquals("org/dromara/forest/test", "testquery:dsds")
+                .assertHeaderEquals("test", "testquery:dsds")
                 .assertHeaderEquals("test2", "testquery2: dsds")
                 .assertQueryEquals("username", "foo");
     }

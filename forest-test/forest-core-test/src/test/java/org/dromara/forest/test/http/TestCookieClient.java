@@ -103,10 +103,10 @@ public class TestCookieClient extends BaseClientTest {
             otherPathCookie.setPath("/xxx/");
             cookies.addCookie(otherPathCookie);
             ForestCookie pathCookie = new ForestCookie("name", "path");
-            pathCookie.setPath("/org/dromara/forest/test");
+            pathCookie.setPath("/test");
             cookies.addCookie(pathCookie);
             ForestCookie pathCookie2 = new ForestCookie("name", "path2");
-            pathCookie2.setPath("/org/dromara/forest/test/");
+            pathCookie2.setPath("/test/");
             cookies.addCookie(pathCookie2);
             loadCount.incrementAndGet();
         }))
@@ -116,7 +116,7 @@ public class TestCookieClient extends BaseClientTest {
         assertThat(loadCount.get()).isEqualTo(1);
         mockRequest(server)
             .assertMethodEquals("POST")
-            .assertPathEquals("/org/dromara/forest/test/xxx")
+            .assertPathEquals("/test/xxx")
             .assertHeaderEquals("Cookie", "cookie_foo=cookie_bar; attr1=foo; attr2=bar; name=path; name=path2");
     }
 
@@ -188,7 +188,7 @@ public class TestCookieClient extends BaseClientTest {
         assertThat(loadCount.get()).isEqualTo(1);
         mockRequest(server)
                 .assertMethodEquals("POST")
-                .assertPathEquals("/org/dromara/forest/test/xxx")
+                .assertPathEquals("/test/xxx")
                 .assertHeaderEquals("Cookie", "cookie_foo=cookie_bar; attr1=foo; attr2=bar; attr3=foobar; name=otherDomain; name=otherPath; name=path; name=path2");
     }
 
@@ -226,7 +226,7 @@ public class TestCookieClient extends BaseClientTest {
         ForestResponse response = cookieClient.testInvalidCookie();
         mockRequest(server)
                 .assertMethodEquals("POST")
-                .assertPathEquals("/org/dromara/forest/test");
+                .assertPathEquals("/test");
         assertThat(response.getCookies().size()).isEqualTo(0);
     }
 
@@ -240,7 +240,7 @@ public class TestCookieClient extends BaseClientTest {
         ForestResponse response = cookieClient.testInvalidCookie();
         mockRequest(server)
                 .assertMethodEquals("POST")
-                .assertPathEquals("/org/dromara/forest/test");
+                .assertPathEquals("/test");
         assertThat(response.getCookies().size()).isEqualTo(0);
     }
 

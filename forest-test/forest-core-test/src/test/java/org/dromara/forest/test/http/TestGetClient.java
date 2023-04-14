@@ -596,7 +596,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response.getContentType()).isNull();
         assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
-                .assertPathEquals("/org/dromara/forest/test");
+                .assertPathEquals("/test");
     }
 
     @Test
@@ -677,7 +677,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response.getContentType()).isNull();
         assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
-                .assertPathEquals("/org/dromara/forest/test")
+                .assertPathEquals("/test")
                 .assertQueryEquals("a", "1")
                 .assertQueryEquals("b", "2");
     }
@@ -701,7 +701,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response.getContentType()).isNull();
         assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
-                .assertPathEquals("/org/dromara/forest/test");
+                .assertPathEquals("/test");
     }
 
     @Test
@@ -722,7 +722,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response.getContentType()).isNull();
         assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
-                .assertPathEquals("/org/dromara/forest/test");
+                .assertPathEquals("/test");
     }
 
     @Test
@@ -739,7 +739,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response.getContentType()).isNull();
         assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
-                .assertPathEquals("/org/dromara/forest/test");
+                .assertPathEquals("/test");
     }
 
 
@@ -757,7 +757,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response.getContentType()).isNull();
         assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
-                .assertPathEquals("/org/dromara/forest/test");
+                .assertPathEquals("/test");
     }
 
     @Test
@@ -774,7 +774,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response.getContentType()).isNull();
         assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
-                .assertPathEquals("/org/dromara/forest/test");
+                .assertPathEquals("/test");
     }
 
     @Test
@@ -791,7 +791,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response.getContentType()).isNull();
         assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
-                .assertPathEquals("/org/dromara/forest/test");
+                .assertPathEquals("/test");
     }
 
 
@@ -809,7 +809,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response.getContentType()).isNull();
         assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
-                .assertPathEquals("/org/dromara/forest/test");
+                .assertPathEquals("/test");
     }
 
     @Test

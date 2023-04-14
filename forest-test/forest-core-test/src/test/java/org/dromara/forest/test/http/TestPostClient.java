@@ -968,7 +968,7 @@ public class TestPostClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Map<String, Object> obj = new LinkedHashMap<>();
         List<String> data = Lists.newArrayList("A", "B", "C");
-        obj.put("name", "org/dromara/forest/test");
+        obj.put("name", "test");
         obj.put("data", data);
         assertThat(postClient.postJsonMapWithBodyAnn(obj))
                 .isNotNull()
@@ -984,7 +984,7 @@ public class TestPostClient extends BaseClientTest {
     public void testPostJsonObjFromMultipleBodyAnnParams() throws InterruptedException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         List<String> data = Lists.newArrayList("A", "B", "C");
-        assertThat(postClient.postJsonObjFromMultipleBodyAnnParams("org/dromara/forest/test", data))
+        assertThat(postClient.postJsonObjFromMultipleBodyAnnParams("test", data))
                 .isNotNull()
                 .isEqualTo(EXPECTED);
         mockRequest(server)

@@ -488,7 +488,7 @@ public interface PostClient {
             headers = {"Content-Type: application/json; charset=utf-8"}
     )
     String postJsonObjFromMultipleBodyAnnParams2(
-            @Body(name = "name", defaultValue = "org/dromara/forest/test") String name,
+            @Body(name = "name", defaultValue = "test") String name,
             @Body(name = "data", defaultValue = "[\"A\",\"B\",\"C\"]") List<String> data);
 
     @Post(
