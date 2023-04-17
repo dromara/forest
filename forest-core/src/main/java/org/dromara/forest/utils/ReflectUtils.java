@@ -458,8 +458,13 @@ public class ReflectUtils {
     public static Field[] getFields(final Class<?> clazz) {
         Field[] fields = FIELD_CACHE.get(clazz);
         if (fields == null) {
-            fields = getFieldsWithoutCache(clazz, true);
-            FIELD_CACHE.put(clazz, fields);
+            synchronized (ReflectUtils.class) {
+                fields = FIELD_CACHE.get(clazz);
+                if (fields == null) {
+                    fields = getFieldsWithoutCache(clazz, true);
+                    FIELD_CACHE.put(clazz, fields);
+                }
+            }
         }
         return fields;
     }
