@@ -169,7 +169,7 @@ public class TestForestJacksonConverter extends JSONConverter {
         List<Cause> causes = Lists.newArrayList(cause1, cause2);
         param.setCause(causes);
 
-        Map map = ReflectUtil.convertObjectToMap(param, ForestConfiguration.configuration());
+        Map map = ReflectUtil.objectToMap(param, ForestConfiguration.configuration());
 
         ObjectMapper objectMapper = new ObjectMapper();
 

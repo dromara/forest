@@ -1,6 +1,6 @@
 package org.dromara.forest.http.body;
 
-import org.dromara.forest.http.ForestRequestBody;
+import org.dromara.forest.http.ForestBodyItem;
 
 import java.io.InputStream;
 
@@ -10,7 +10,7 @@ import java.io.InputStream;
  * @author gongjun
  * @since 1.5.29
  */
-public abstract class BinaryRequestBody extends ForestRequestBody {
+public abstract class BinaryBodyItem extends ForestBodyItem {
 
     abstract InputStream getInputStream();
 

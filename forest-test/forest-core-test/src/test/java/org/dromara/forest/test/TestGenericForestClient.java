@@ -980,8 +980,7 @@ public class TestGenericForestClient extends BaseClientTest {
         LazyData data = new LazyData();
         data.setId("foo");
         data.setName("bar");
-        data.setToken(req ->
-                Base64.encode(req.getQueryString()));
+        data.setToken(req -> Base64.encode(req.getQueryString()));
 
         Forest.get("/")
                 .port(server.getPort())

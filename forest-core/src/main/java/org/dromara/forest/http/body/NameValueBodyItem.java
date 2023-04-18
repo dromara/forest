@@ -2,7 +2,7 @@ package org.dromara.forest.http.body;
 
 
 import org.dromara.forest.http.ForestRequest;
-import org.dromara.forest.http.ForestRequestBody;
+import org.dromara.forest.http.ForestBodyItem;
 import org.dromara.forest.http.Lazy;
 import org.dromara.forest.mapping.MappingParameter;
 import org.dromara.forest.utils.ForestDataType;
@@ -18,7 +18,7 @@ import java.util.List;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2020-09-22 17:30
  */
-public class NameValueRequestBody extends ForestRequestBody implements SupportFormUrlEncoded {
+public class NameValueBodyItem extends ForestBodyItem implements SupportFormUrlEncoded {
 
     /**
      * 键值对名称
@@ -35,12 +35,12 @@ public class NameValueRequestBody extends ForestRequestBody implements SupportFo
      */
     private String contentType;
 
-    public NameValueRequestBody(String name, Object value) {
+    public NameValueBodyItem(String name, Object value) {
         this.name = name;
         this.value = value;
     }
 
-    public NameValueRequestBody(String name, String contentType, Object value) {
+    public NameValueBodyItem(String name, String contentType, Object value) {
         this.name = name;
         this.contentType = contentType;
         this.value = value;
@@ -126,8 +126,8 @@ public class NameValueRequestBody extends ForestRequestBody implements SupportFo
     }
 
     @Override
-    public NameValueRequestBody clone() {
-        NameValueRequestBody newBody = new NameValueRequestBody(name, contentType, value);
+    public NameValueBodyItem clone() {
+        NameValueBodyItem newBody = new NameValueBodyItem(name, contentType, value);
         newBody.setDefaultValue(getDefaultValue());
         return newBody;
     }

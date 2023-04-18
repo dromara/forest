@@ -1,7 +1,7 @@
 package org.dromara.forest.http.body;
 
 import org.dromara.forest.http.ForestRequest;
-import org.dromara.forest.http.ForestRequestBody;
+import org.dromara.forest.http.ForestBodyItem;
 import org.dromara.forest.mapping.MappingParameter;
 import org.dromara.forest.utils.ForestDataType;
 import org.dromara.forest.utils.RequestNameValue;
@@ -17,11 +17,11 @@ import java.util.List;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2020-09-22 17:30
  */
-public class StringRequestBody extends ForestRequestBody implements SupportFormUrlEncoded {
+public class StringBodyItem extends ForestBodyItem implements SupportFormUrlEncoded {
 
     private String content;
 
-    public StringRequestBody(String content) {
+    public StringBodyItem(String content) {
         this.content = content;
     }
 
@@ -66,8 +66,8 @@ public class StringRequestBody extends ForestRequestBody implements SupportFormU
     }
 
     @Override
-    public StringRequestBody clone() {
-        StringRequestBody newBody = new StringRequestBody(content);
+    public StringBodyItem clone() {
+        StringBodyItem newBody = new StringBodyItem(content);
         newBody.setDefaultValue(getDefaultValue());
         return newBody;
     }

@@ -1,34 +1,32 @@
 package org.dromara.forest.http.body;
 
 import org.dromara.forest.exceptions.ForestRuntimeException;
-import org.dromara.forest.http.ForestRequestBody;
+import org.dromara.forest.http.ForestBodyItem;
 import org.dromara.forest.utils.ForestDataType;
 import org.apache.commons.io.IOUtils;
-import org.springframework.core.io.Resource;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-public class ResourceRequestBody extends ForestRequestBody {
+public class InputStreamBodyItem extends ForestBodyItem {
 
-    private Resource resource;
+    private InputStream inputStream;
 
-    public ResourceRequestBody(Resource resource) {
-        this.resource = resource;
+    public InputStreamBodyItem(InputStream inputStream) {
+        this.inputStream = inputStream;
     }
 
-    public Resource getResource() {
-        return resource;
+    public InputStream getInputStream() {
+        return inputStream;
     }
 
-    public void setResource(Resource resource) {
-        this.resource = resource;
+    public void setInputStream(InputStream inputStream) {
+        this.inputStream = inputStream;
     }
 
     @Override
     public byte[] getByteArray() {
         try {
-            InputStream inputStream = resource.getInputStream();
             return IOUtils.toByteArray(inputStream);
         } catch (IOException e) {
             throw new ForestRuntimeException(e);
@@ -41,8 +39,8 @@ public class ResourceRequestBody extends ForestRequestBody {
     }
 
     @Override
-    public ResourceRequestBody clone() {
-        ResourceRequestBody newBody = new ResourceRequestBody(resource);
+    public InputStreamBodyItem clone() {
+        InputStreamBodyItem newBody = new InputStreamBodyItem(inputStream);
         newBody.setDefaultValue(getDefaultValue());
         return newBody;
     }

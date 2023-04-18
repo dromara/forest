@@ -10,11 +10,11 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ByteArrayRequestBody extends BinaryRequestBody implements SupportFormUrlEncoded {
+public class ByteArrayBodyItem extends BinaryBodyItem implements SupportFormUrlEncoded {
 
     private byte[] byteArray;
 
-    public ByteArrayRequestBody(byte[] byteArray) {
+    public ByteArrayBodyItem(byte[] byteArray) {
         this.byteArray = byteArray;
     }
 
@@ -47,8 +47,8 @@ public class ByteArrayRequestBody extends BinaryRequestBody implements SupportFo
     }
 
     @Override
-    public ByteArrayRequestBody clone() {
-        ByteArrayRequestBody newBody = new ByteArrayRequestBody(byteArray);
+    public ByteArrayBodyItem clone() {
+        ByteArrayBodyItem newBody = new ByteArrayBodyItem(byteArray);
         newBody.setDefaultValue(getDefaultValue());
         return newBody;
     }

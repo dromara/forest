@@ -1,18 +1,18 @@
 package org.dromara.forest.http.body;
 
 import org.dromara.forest.exceptions.ForestRuntimeException;
-import org.dromara.forest.http.ForestRequestBody;
+import org.dromara.forest.http.ForestBodyItem;
 import org.dromara.forest.utils.ForestDataType;
 import org.noear.solon.Utils;
 import org.noear.solon.core.handle.UploadedFile;
 
 import java.io.IOException;
 
-public class SolonUploadRequestBody extends ForestRequestBody {
+public class SolonUploadBodyItem extends ForestBodyItem {
 
     private UploadedFile multipartFile;
 
-    public SolonUploadRequestBody(UploadedFile multipartFile) {
+    public SolonUploadBodyItem(UploadedFile multipartFile) {
         this.multipartFile = multipartFile;
     }
 
@@ -39,8 +39,8 @@ public class SolonUploadRequestBody extends ForestRequestBody {
     }
 
     @Override
-    public SolonUploadRequestBody clone() {
-        SolonUploadRequestBody newBody = new SolonUploadRequestBody(multipartFile);
+    public SolonUploadBodyItem clone() {
+        SolonUploadBodyItem newBody = new SolonUploadBodyItem(multipartFile);
         newBody.setDefaultValue(getDefaultValue());
         return newBody;
     }

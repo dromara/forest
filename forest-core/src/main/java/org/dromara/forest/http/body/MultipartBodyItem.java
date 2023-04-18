@@ -5,11 +5,11 @@ import org.dromara.forest.utils.ForestDataType;
 
 import java.io.InputStream;
 
-public class MultipartRequestBody extends BinaryRequestBody {
+public class MultipartBodyItem extends BinaryBodyItem {
 
     private ForestMultipart multipart;
 
-    public MultipartRequestBody(ForestMultipart multipart) {
+    public MultipartBodyItem(ForestMultipart multipart) {
         this.multipart = multipart;
     }
 
@@ -37,8 +37,8 @@ public class MultipartRequestBody extends BinaryRequestBody {
     }
 
     @Override
-    public MultipartRequestBody clone() {
-        MultipartRequestBody newBody = new MultipartRequestBody(multipart);
+    public MultipartBodyItem clone() {
+        MultipartBodyItem newBody = new MultipartBodyItem(multipart);
         newBody.setDefaultValue(getDefaultValue());
         return newBody;
     }

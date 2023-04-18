@@ -8,11 +8,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class FileRequestBody extends BinaryRequestBody {
+public class FileBodyItem extends BinaryBodyItem {
 
     private File file;
 
-    public FileRequestBody(File file) {
+    public FileBodyItem(File file) {
         this.file = file;
     }
 
@@ -48,8 +48,8 @@ public class FileRequestBody extends BinaryRequestBody {
     }
 
     @Override
-    public FileRequestBody clone() {
-        FileRequestBody newBody = new FileRequestBody(file);
+    public FileBodyItem clone() {
+        FileBodyItem newBody = new FileBodyItem(file);
         newBody.setDefaultValue(getDefaultValue());
         return newBody;
     }
