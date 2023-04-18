@@ -15,7 +15,7 @@ import org.dromara.forest.solon.ForestBeanBuilder;
 import org.dromara.forest.solon.SolonForestVariableValue;
 import org.dromara.forest.solon.SolonUpstreamInterceptor;
 import org.dromara.forest.solon.properties.ForestConfigurationProperties;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 import org.noear.solon.Utils;
 import org.noear.solon.core.AopContext;
 import org.noear.solon.core.BeanWrap;
@@ -50,7 +50,7 @@ public class XPluginImp implements Plugin {
             String confId = anno.configuration();
             ForestConfiguration config = null;
 
-            if (StringUtils.isNotBlank(confId)) {
+            if (StringUtil.isNotBlank(confId)) {
                 config = Forest.config(confId);
             } else {
                 config = configuration;

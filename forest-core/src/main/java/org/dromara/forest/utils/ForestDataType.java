@@ -85,7 +85,7 @@ public class ForestDataType {
      * @since 1.5.0-BETA4
      */
     public static ForestDataType createDataType(String name, Boolean hasNameValue) {
-        if (StringUtils.isEmpty(name)) {
+        if (StringUtil.isEmpty(name)) {
             throw new ForestRuntimeException("Data type name cannot be empty!");
         }
         name = name.toLowerCase();
@@ -139,7 +139,7 @@ public class ForestDataType {
      * @since 1.5.0-BETA4
      */
     public static ForestDataType findOrCreateDataType(String name) {
-        if (StringUtils.isEmpty(name)) {
+        if (StringUtil.isEmpty(name)) {
             return null;
         }
         name = name.toLowerCase();

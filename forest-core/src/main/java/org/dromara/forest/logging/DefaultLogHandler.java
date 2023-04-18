@@ -4,7 +4,7 @@ import org.dromara.forest.backend.HttpBackend;
 import org.dromara.forest.http.ForestAsyncMode;
 import org.dromara.forest.http.ForestRequest;
 import org.dromara.forest.http.ForestResponse;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 import java.util.Iterator;
 import java.util.List;
@@ -179,12 +179,12 @@ public class DefaultLogHandler implements ForestLogHandler {
         builder.append(requestTypeChangeHistory(requestLogMessage));
         builder.append(requestLogMessage.getRequestLine());
         String headers = requestLoggingHeaders(requestLogMessage);
-        if (StringUtils.isNotEmpty(headers)) {
+        if (StringUtil.isNotEmpty(headers)) {
             builder.append("\n\tHeaders: \n");
             builder.append(headers);
         }
         String body = requestLoggingBody(requestLogMessage);
-        if (StringUtils.isNotEmpty(body)) {
+        if (StringUtil.isNotEmpty(body)) {
             builder.append("\n\tBody: ");
             builder.append(body);
         }
@@ -258,7 +258,7 @@ public class DefaultLogHandler implements ForestLogHandler {
     public void logResponseContent(ResponseLogMessage responseLogMessage) {
         if (responseLogMessage.getResponse() != null) {
             String content = responseLogMessage.getResponse().getContent();
-            if (StringUtils.isNotEmpty(content)) {
+            if (StringUtil.isNotEmpty(content)) {
                 logContent("Response Content:\n\t" + content);
             }
         }

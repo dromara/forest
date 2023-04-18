@@ -1049,10 +1049,10 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Type", "text/plain")
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(str));
-        assertThat(getClient.getToken())
-                .isNotNull()
-                .extracting(TokenResult::getTokenTimeout, TokenResult::getURLToken)
-                .contains(604800L, token);
+        TokenResult result = getClient.getToken();
+        assertThat(result).isNotNull();
+        assertThat(result.getTokenTimeout()).isEqualTo(604800L);
+        assertThat(result.getUrlToken()).isEqualTo(token);
         mockRequest(server)
                 .assertMethodEquals("GET")
                 .assertPathEquals("/token");

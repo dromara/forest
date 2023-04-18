@@ -9,7 +9,7 @@ import java.util.Base64;
  * @since 2020-08-04 19:05
  */
 
-public class Base64Utils {
+public class Base64Util {
 
 	private final static Base64.Decoder DECODER = Base64.getDecoder();
 	private final static Base64.Encoder ENCODER = Base64.getEncoder();

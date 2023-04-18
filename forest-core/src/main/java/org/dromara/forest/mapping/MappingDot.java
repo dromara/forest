@@ -3,7 +3,7 @@ package org.dromara.forest.mapping;
 import org.dromara.forest.config.VariableScope;
 import org.dromara.forest.exceptions.ForestRuntimeException;
 import org.dromara.forest.reflection.ForestMethod;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -31,7 +31,7 @@ public class MappingDot extends MappingExpr {
 
     public Method getPropMethodFromClass(Class clazz, MappingIdentity right) {
         Method method = null;
-        String getterName = StringUtils.toGetterName(right.getName());
+        String getterName = StringUtil.toGetterName(right.getName());
         Throwable th = null;
         try {
             method = clazz.getDeclaredMethod(getterName);
@@ -85,7 +85,7 @@ public class MappingDot extends MappingExpr {
         if (obj instanceof Map) {
             return ((Map) obj).get(right.getName());
         }
-        String getterName = StringUtils.toGetterName(right.getName());
+        String getterName = StringUtil.toGetterName(right.getName());
         Method method = getPropMethodFromClass(obj.getClass(), right);
         if (method == null) {
             throw new ForestRuntimeException(new NoSuchMethodException(getterName));

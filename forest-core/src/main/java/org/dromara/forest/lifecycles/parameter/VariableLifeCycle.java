@@ -4,8 +4,8 @@ import org.dromara.forest.mapping.MappingParameter;
 import org.dromara.forest.mapping.MappingVariable;
 import org.dromara.forest.reflection.ForestMethod;
 import org.dromara.forest.lifecycles.ParameterAnnotationLifeCycle;
-import org.dromara.forest.utils.ReflectUtils;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.ReflectUtil;
+import org.dromara.forest.utils.StringUtil;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
@@ -19,9 +19,9 @@ public class VariableLifeCycle implements ParameterAnnotationLifeCycle<Annotatio
 
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, Annotation annotation) {
-        Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(annotation);
+        Map<String, Object> attrs = ReflectUtil.getAttributesFromAnnotation(annotation);
         String name = (String) attrs.get("value");
-        if (StringUtils.isEmpty(name)) {
+        if (StringUtil.isEmpty(name)) {
             name = parameter.getName();
         }
         String filterName = (String) attrs.get("filter");

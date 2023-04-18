@@ -1,7 +1,7 @@
 package org.dromara.forest.multipart;
 
 import org.dromara.forest.exceptions.ForestNoFileNameException;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 import java.io.File;
 import java.io.InputStream;
@@ -12,7 +12,7 @@ public class InputStreamMultipart extends ForestMultipart<InputStream, InputStre
 
     @Override
     public String getOriginalFileName() {
-        if (StringUtils.isBlank(fileName)) {
+        if (StringUtil.isBlank(fileName)) {
             throw new ForestNoFileNameException(inputStream.getClass());
         }
         return fileName;

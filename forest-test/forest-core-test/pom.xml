@@ -34,6 +34,12 @@
 
         <dependency>
             <groupId>org.dromara.forest</groupId>
+            <artifactId>forest-jackson</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dromara.forest</groupId>
             <artifactId>forest-jaxb</artifactId>
             <version>${project.parent.version}</version>
         </dependency>

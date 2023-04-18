@@ -53,11 +53,11 @@ import org.dromara.forest.proxy.InterfaceProxyHandler;
 import org.dromara.forest.retryer.ForestRetryer;
 import org.dromara.forest.ssl.SSLKeyStore;
 import org.dromara.forest.utils.ForestDataType;
-import org.dromara.forest.utils.HeaderUtils;
-import org.dromara.forest.utils.NameUtils;
-import org.dromara.forest.utils.ReflectUtils;
+import org.dromara.forest.utils.HeaderUtil;
+import org.dromara.forest.utils.NameUtil;
+import org.dromara.forest.utils.ReflectUtil;
 import org.dromara.forest.utils.RequestNameValue;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
@@ -154,7 +154,7 @@ public class ForestMethod<T> implements VariableScope {
         this.configuration = configuration;
         this.method = method;
         this.interceptorFactory = configuration.getInterceptorFactory();
-        this.methodNameItems = NameUtils.splitCamelName(method.getName());
+        this.methodNameItems = NameUtil.splitCamelName(method.getName());
         this.forestParameters = new MappingParameter[method.getParameterCount()];
         processBaseProperties();
         processMethodAnnotations();
@@ -231,27 +231,27 @@ public class ForestMethod<T> implements VariableScope {
     private void processBaseProperties() {
         MetaRequest baseMetaRequest = interfaceProxyHandler.getBaseMetaRequest();
         String baseUrl = baseMetaRequest.getUrl();
-        if (StringUtils.isNotBlank(baseUrl)) {
+        if (StringUtil.isNotBlank(baseUrl)) {
             baseUrlTemplate = makeURLTemplate(BaseRequest.class, "baseUrl", baseUrl);
         }
         String baseContentEncoding = baseMetaRequest.getContentEncoding();
-        if (StringUtils.isNotBlank(baseContentEncoding)) {
+        if (StringUtil.isNotBlank(baseContentEncoding)) {
             baseEncodeTemplate = makeTemplate(BaseRequest.class, "contentEncoding", baseContentEncoding);
         }
         String baseContentType = baseMetaRequest.getContentType();
-        if (StringUtils.isNotBlank(baseContentType)) {
+        if (StringUtil.isNotBlank(baseContentType)) {
             baseContentTypeTemplate = makeTemplate(BaseRequest.class, "contentType", baseContentType);
         }
         String baseUserAgent = baseMetaRequest.getUserAgent();
-        if (StringUtils.isNotBlank(baseUserAgent)) {
+        if (StringUtil.isNotBlank(baseUserAgent)) {
             baseUserAgentTemplate = makeTemplate(BaseRequest.class, "userAgent", baseUserAgent);
         }
         String baseCharset = baseMetaRequest.getCharset();
-        if (StringUtils.isNotBlank(baseCharset)) {
+        if (StringUtil.isNotBlank(baseCharset)) {
             baseCharsetTemplate = makeTemplate(BaseRequest.class, "charset", baseCharset);
         }
         String baseSslProtocol = baseMetaRequest.getSslProtocol();
-        if (StringUtils.isNotBlank(baseSslProtocol)) {
+        if (StringUtil.isNotBlank(baseSslProtocol)) {
             baseSslProtocolTemplate = makeTemplate(BaseRequest.class, "sslProtocol", baseSslProtocol);
         }
 
@@ -399,7 +399,7 @@ public class ForestMethod<T> implements VariableScope {
         Class<? extends Annotation> annType = annotation.annotationType();
         RequestAttributes requestAttributesAnn = annType.getAnnotation(RequestAttributes.class);
         if (requestAttributesAnn != null) {
-            Map<String, Object> attrTemplates = ReflectUtils.getAttributesFromAnnotation(annotation);
+            Map<String, Object> attrTemplates = ReflectUtil.getAttributesFromAnnotation(annotation);
             for (String key : attrTemplates.keySet()) {
                 Object value = attrTemplates.get(key);
                 if (value instanceof CharSequence) {
@@ -558,14 +558,14 @@ public class ForestMethod<T> implements VariableScope {
         urlTemplate = makeURLTemplate(reqAnnType, "url", metaRequest.getUrl());
         typeTemplate = makeTemplate(reqAnnType, "type", metaRequest.getType());
         dataTypeTemplate = makeTemplate(reqAnnType, "dataType", metaRequest.getDataType());
-        if (StringUtils.isNotEmpty(metaRequest.getContentType())) {
+        if (StringUtil.isNotEmpty(metaRequest.getContentType())) {
             contentTypeTemplate = makeTemplate(reqAnnType, "contentType", metaRequest.getContentType());
         }
-        if (StringUtils.isNotEmpty(metaRequest.getUserAgent())) {
+        if (StringUtil.isNotEmpty(metaRequest.getUserAgent())) {
             userAgentTemplate = makeTemplate(reqAnnType, "userAgent", metaRequest.getUserAgent());
         }
         sslKeyStoreId = makeTemplate(reqAnnType, "keyStore", metaRequest.getKeyStore());
-        if (StringUtils.isNotEmpty(metaRequest.getContentEncoding())) {
+        if (StringUtil.isNotEmpty(metaRequest.getContentEncoding())) {
             encodeTemplate = makeTemplate(reqAnnType, "contentEncoding", metaRequest.getContentEncoding());
         }
         charsetTemplate = makeTemplate(reqAnnType, "charset", metaRequest.getCharset());
@@ -773,7 +773,7 @@ public class ForestMethod<T> implements VariableScope {
      * @param filterName 过滤器名称
      */
     public void processParameterFilter(MappingParameter parameter, String filterName) {
-        if (StringUtils.isNotEmpty(filterName)) {
+        if (StringUtil.isNotEmpty(filterName)) {
             String[] filterNameArray = filterName.split(",");
             for (String name : filterNameArray) {
                 Filter filter = configuration.newFilterInstance(name);
@@ -791,7 +791,7 @@ public class ForestMethod<T> implements VariableScope {
      */
     private ForestRequestType type(Object[] args) {
         String renderedType = typeTemplate.render(args);
-        if (StringUtils.isBlank(renderedType)) {
+        if (StringUtil.isBlank(renderedType)) {
             String typeFromName = methodNameItems[0];
             ForestRequestType type = ForestRequestType.findType(typeFromName);
             if (type != null) {
@@ -849,7 +849,7 @@ public class ForestMethod<T> implements VariableScope {
         }
         String charset = null;
         String renderedCharset = charsetTemplate.render(args);
-        if (StringUtils.isNotBlank(renderedCharset)) {
+        if (StringUtil.isNotBlank(renderedCharset)) {
             charset = renderedCharset;
         } else if (baseCharsetTemplate != null) {
             charset = baseCharsetTemplate.render(args);
@@ -862,7 +862,7 @@ public class ForestMethod<T> implements VariableScope {
 
         String sslProtocol = null;
         String renderedSslProtocol = sslProtocolTemplate.render(args);
-        if (StringUtils.isNotBlank(renderedSslProtocol) && !"null".equals(renderedSslProtocol)) {
+        if (StringUtil.isNotBlank(renderedSslProtocol) && !"null".equals(renderedSslProtocol)) {
             sslProtocol = renderedSslProtocol;
         } else if (baseSslProtocolTemplate != null) {
             sslProtocol = baseSslProtocolTemplate.render(args);
@@ -936,19 +936,19 @@ public class ForestMethod<T> implements VariableScope {
             request.address(address);
         }
 
-        if (StringUtils.isNotEmpty(responseEncoding)) {
+        if (StringUtil.isNotEmpty(responseEncoding)) {
             request.setResponseEncode(responseEncoding);
         }
 
-        if (StringUtils.isNotEmpty(renderedContentType)) {
+        if (StringUtil.isNotEmpty(renderedContentType)) {
             request.setContentType(renderedContentType);
         }
 
-        if (StringUtils.isNotEmpty(contentEncoding)) {
+        if (StringUtil.isNotEmpty(contentEncoding)) {
             request.setContentEncoding(contentEncoding);
         }
 
-        if (StringUtils.isNotEmpty(renderedUserAgent)) {
+        if (StringUtil.isNotEmpty(renderedUserAgent)) {
             request.setUserAgent(renderedUserAgent);
         }
 
@@ -957,7 +957,7 @@ public class ForestMethod<T> implements VariableScope {
             if (parameter.isObjectProperties()) {
                 int target = parameter.isUnknownTarget() ? type.getDefaultParamTarget() : parameter.getTarget();
                 Object obj = args[parameter.getIndex()];
-                if (obj == null && StringUtils.isNotEmpty(parameter.getDefaultValue())) {
+                if (obj == null && StringUtil.isNotEmpty(parameter.getDefaultValue())) {
                     obj = parameter.getConvertedDefaultValue(configuration.getJsonConverter());
                 }
                 if (parameter.isJsonParam()) {
@@ -976,7 +976,7 @@ public class ForestMethod<T> implements VariableScope {
                     }
                 } else if (!parameter.getFilterChain().isEmpty()) {
                     obj = parameter.getFilterChain().doFilter(configuration, obj);
-                    if (obj == null && StringUtils.isNotEmpty(parameter.getDefaultValue())) {
+                    if (obj == null && StringUtil.isNotEmpty(parameter.getDefaultValue())) {
                         obj = parameter.getDefaultValue();
                     }
                     if (obj != null) {
@@ -1015,7 +1015,7 @@ public class ForestMethod<T> implements VariableScope {
                 } else if (obj instanceof Iterable
                         || (obj != null
                         && (obj.getClass().isArray()
-                        || ReflectUtils.isPrimaryType(obj.getClass())))) {
+                        || ReflectUtil.isPrimaryType(obj.getClass())))) {
                     if (MappingParameter.isQuery(target)) {
                         if (parameter.isJsonParam()) {
                             request.addQuery(parameter.getName(), obj,
@@ -1068,7 +1068,7 @@ public class ForestMethod<T> implements VariableScope {
                 RequestNameValue nameValue = new RequestNameValue(parameter.getName(), target, parameter.getPartContentType())
                         .setDefaultValue(parameter.getDefaultValue());
                 Object obj = args[parameter.getIndex()];
-                if (obj == null && StringUtils.isNotEmpty(nameValue.getDefaultValue())) {
+                if (obj == null && StringUtil.isNotEmpty(nameValue.getDefaultValue())) {
                     obj = parameter.getConvertedDefaultValue(configuration.getJsonConverter());
                 }
                 if (obj != null) {
@@ -1136,19 +1136,19 @@ public class ForestMethod<T> implements VariableScope {
         }
 
         if (request.getContentType() == null) {
-            if (StringUtils.isNotEmpty(baseContentType)) {
+            if (StringUtil.isNotEmpty(baseContentType)) {
                 request.setContentType(baseContentType);
             }
         }
 
         if (request.getContentEncoding() == null) {
-            if (StringUtils.isNotEmpty(baseContentEncoding)) {
+            if (StringUtil.isNotEmpty(baseContentEncoding)) {
                 request.setContentEncoding(baseContentEncoding);
             }
         }
 
         if (request.getUserAgent() == null) {
-            if (StringUtils.isNotEmpty(baseUserAgent)) {
+            if (StringUtil.isNotEmpty(baseUserAgent)) {
                 request.setUserAgent(baseUserAgent);
             }
         }
@@ -1157,12 +1157,12 @@ public class ForestMethod<T> implements VariableScope {
         String contentType = request.getContentType();
 
         if (!multipartFactories.isEmpty()) {
-            if (StringUtils.isBlank(contentType)) {
-                String boundary = StringUtils.generateBoundary();
+            if (StringUtil.isBlank(contentType)) {
+                String boundary = StringUtil.generateBoundary();
                 request.setContentType(ContentType.MULTIPART_FORM_DATA + "; boundary=" + boundary);
             } else if (ContentType.MULTIPART_FORM_DATA.equalsIgnoreCase(contentType)
                     && request.getBoundary() == null) {
-                request.setBoundary(StringUtils.generateBoundary());
+                request.setBoundary(StringUtil.generateBoundary());
             }
         }
 
@@ -1179,7 +1179,7 @@ public class ForestMethod<T> implements VariableScope {
         if (sslKeyStoreId != null) {
             SSLKeyStore sslKeyStore = null;
             String keyStoreId = sslKeyStoreId.render(args);
-            if (StringUtils.isNotEmpty(keyStoreId)) {
+            if (StringUtil.isNotEmpty(keyStoreId)) {
                 sslKeyStore = configuration.getKeyStore(keyStoreId);
                 request.setKeyStore(sslKeyStore);
             }
@@ -1197,7 +1197,7 @@ public class ForestMethod<T> implements VariableScope {
             request.addNameValue(configuration.getDefaultParameters());
         }
         if (baseHeaders != null && baseHeaders.length > 0) {
-            HeaderUtils.addHeaders(request, baseHeaders, args);
+            HeaderUtil.addHeaders(request, baseHeaders, args);
         }
         if (configuration.getDefaultHeaders() != null) {
             request.addHeaders(configuration.getDefaultHeaders());
@@ -1325,7 +1325,7 @@ public class ForestMethod<T> implements VariableScope {
         }
 
         String dataType = dataTypeTemplate.render(args);
-        if (StringUtils.isEmpty(dataType)) {
+        if (StringUtil.isEmpty(dataType)) {
             request.setDataType(ForestDataType.TEXT);
         } else {
             dataType = dataType.toUpperCase();
@@ -1366,7 +1366,7 @@ public class ForestMethod<T> implements VariableScope {
         if (obj == null) {
             return null;
         }
-        Map<String, Object> propMap = ReflectUtils.convertObjectToMap(obj, configuration);
+        Map<String, Object> propMap = ReflectUtil.convertObjectToMap(obj, configuration);
         List<RequestNameValue> nameValueList = new ArrayList<>();
         for (Map.Entry<String, Object> entry : propMap.entrySet()) {
             String name = entry.getKey();
@@ -1513,7 +1513,7 @@ public class ForestMethod<T> implements VariableScope {
         if (type == null) {
             return Void.class;
         }
-        Class clazz = ReflectUtils.toClass(type);
+        Class clazz = ReflectUtil.toClass(type);
         if (ForestResponse.class.isAssignableFrom(clazz)) {
             if (type instanceof ParameterizedType) {
                 Type[] types = ((ParameterizedType) type).getActualTypeArguments();

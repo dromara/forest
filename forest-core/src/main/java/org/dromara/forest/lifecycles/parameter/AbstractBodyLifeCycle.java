@@ -4,8 +4,8 @@ import org.dromara.forest.lifecycles.ParameterAnnotationLifeCycle;
 import org.dromara.forest.mapping.MappingParameter;
 import org.dromara.forest.mapping.MappingVariable;
 import org.dromara.forest.reflection.ForestMethod;
-import org.dromara.forest.utils.ReflectUtils;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.ReflectUtil;
+import org.dromara.forest.utils.StringUtil;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
@@ -21,12 +21,12 @@ public abstract class AbstractBodyLifeCycle<A extends Annotation> implements Par
 
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, A annotation) {
-        Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(annotation);
+        Map<String, Object> attrs = ReflectUtil.getAttributesFromAnnotation(annotation);
         String name = (String) attrs.get("name");
         String filterName = (String) attrs.get("filter");
         String partContentType = (String) attrs.get("partContentType");
         String defaultValue = (String) attrs.get("defaultValue");
-        if (StringUtils.isNotEmpty(name)) {
+        if (StringUtil.isNotEmpty(name)) {
             parameter.setName(name);
             MappingVariable variable = new MappingVariable(name, parameter.getType());
             variable.setIndex(parameter.getIndex());
@@ -35,10 +35,10 @@ public abstract class AbstractBodyLifeCycle<A extends Annotation> implements Par
         } else {
             parameter.setObjectProperties(true);
         }
-        if (StringUtils.isNotBlank(partContentType)) {
+        if (StringUtil.isNotBlank(partContentType)) {
             parameter.setPartContentType(partContentType.trim());
         }
-        if (StringUtils.isNotEmpty(defaultValue)) {
+        if (StringUtil.isNotEmpty(defaultValue)) {
             parameter.setDefaultValue(defaultValue);
         }
         method.processParameterFilter(parameter, filterName);

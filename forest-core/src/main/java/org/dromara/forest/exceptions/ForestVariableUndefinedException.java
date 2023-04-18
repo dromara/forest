@@ -1,7 +1,7 @@
 package org.dromara.forest.exceptions;
 
 import org.dromara.forest.reflection.ForestMethod;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -57,7 +57,7 @@ public class ForestVariableUndefinedException extends ForestRuntimeException {
         builder.append("[Forest] Cannot resolve variable '");
         builder.append(variableName);
         builder.append("'");
-        if (StringUtils.isNotBlank(source)) {
+        if (StringUtil.isNotBlank(source)) {
             builder.append("\n\n\t[From Template]\n\t");
             if (forestMethod != null) {
                 Method method = forestMethod.getMethod();

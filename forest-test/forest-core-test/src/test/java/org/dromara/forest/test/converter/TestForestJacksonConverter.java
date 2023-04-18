@@ -11,7 +11,7 @@ import org.dromara.forest.test.http.model.Cause;
 import org.dromara.forest.test.http.model.FormListParam;
 import org.dromara.forest.test.model.Coordinate;
 import org.dromara.forest.test.model.SubCoordinate;
-import org.dromara.forest.utils.ReflectUtils;
+import org.dromara.forest.utils.ReflectUtil;
 import org.junit.Test;
 
 import java.text.DateFormat;
@@ -173,7 +173,7 @@ public class TestForestJacksonConverter extends JSONConverter {
         List<Cause> causes = Lists.newArrayList(cause1, cause2);
         param.setCause(causes);
 
-        Map map = ReflectUtils.convertObjectToMap(param, ForestConfiguration.configuration());
+        Map map = ReflectUtil.convertObjectToMap(param, ForestConfiguration.configuration());
         assertEquals("foo", map.get("username"));
         assertEquals("123456", map.get("password"));
         assertEquals(idList, map.get("idList"));

@@ -21,7 +21,7 @@ public abstract class TypeReference<T> implements Type {
      * {@link Type} 类型引用
      * <p>从泛型参数中获取的 {@link Type} 接口实例
      */
-    private final Type type = ReflectUtils.getGenericArgument(this.getClass());
+    private final Type type = ReflectUtil.getGenericArgument(this.getClass());
 
 
     public Type getType() {

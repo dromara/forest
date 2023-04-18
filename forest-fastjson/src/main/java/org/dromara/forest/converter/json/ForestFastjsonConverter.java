@@ -39,7 +39,7 @@ import org.dromara.forest.exceptions.ForestRuntimeException;
 import org.dromara.forest.http.ForestRequest;
 import org.dromara.forest.http.Lazy;
 import org.dromara.forest.utils.ForestDataType;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -100,7 +100,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
      * @param serializerFeatureName FastJson的序列化特性名字符串
      */
     public void setSerializerFeatureName(String serializerFeatureName) {
-        if (StringUtils.isNotBlank(serializerFeatureName)) {
+        if (StringUtil.isNotBlank(serializerFeatureName)) {
             this.serializerFeatureName = serializerFeatureName;
             SerializerFeature feature = SerializerFeature.valueOf(serializerFeatureName);
             setSerializerFeature(feature);
@@ -375,7 +375,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
     @Override
     public void setDateFormat(String format) {
         this.dateFormat = format;
-        if (StringUtils.isNotBlank(format)) {
+        if (StringUtil.isNotBlank(format)) {
             JSON.DEFFAULT_DATE_FORMAT = format;
         }
     }

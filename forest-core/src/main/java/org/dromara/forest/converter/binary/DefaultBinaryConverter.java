@@ -10,9 +10,9 @@ import org.dromara.forest.http.ForestBody;
 import org.dromara.forest.http.ForestRequest;
 import org.dromara.forest.http.ForestRequestBody;
 import org.dromara.forest.multipart.ForestMultipart;
-import org.dromara.forest.utils.ByteEncodeUtils;
+import org.dromara.forest.utils.ByteEncodeUtil;
 import org.dromara.forest.utils.ForestDataType;
-import org.dromara.forest.utils.ReflectUtils;
+import org.dromara.forest.utils.ReflectUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -55,7 +55,7 @@ public class DefaultBinaryConverter implements ForestConverter<Object>, ForestEn
             try {
                 String encode;
                 if (charset == null) {
-                    encode = ByteEncodeUtils.getCharsetName(tmp);
+                    encode = ByteEncodeUtil.getCharsetName(tmp);
                     if (encode.toUpperCase().startsWith("GB")) {
                         encode = "GBK";
                     }
@@ -116,7 +116,7 @@ public class DefaultBinaryConverter implements ForestConverter<Object>, ForestEn
 
     @Override
     public <T> T convertToJavaObject(Object source, Type targetType) {
-        Class clazz = ReflectUtils.toClass(targetType);
+        Class clazz = ReflectUtil.toClass(targetType);
         return (T) convertToJavaObject(source, clazz);
     }
 
@@ -127,7 +127,7 @@ public class DefaultBinaryConverter implements ForestConverter<Object>, ForestEn
 
     @Override
     public <T> T convertToJavaObject(byte[] source, Type targetType, Charset charset) {
-        Class clazz = ReflectUtils.toClass(targetType);
+        Class clazz = ReflectUtil.toClass(targetType);
         return (T) convertToJavaObject((Object) source, clazz, StandardCharsets.UTF_8);
     }
 

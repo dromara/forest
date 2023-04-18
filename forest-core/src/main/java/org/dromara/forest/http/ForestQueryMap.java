@@ -27,8 +27,8 @@ package org.dromara.forest.http;
 import org.dromara.forest.backend.HttpBackend;
 import org.dromara.forest.converter.json.ForestJsonConverter;
 import org.dromara.forest.mapping.MappingTemplate;
-import org.dromara.forest.utils.StringUtils;
-import org.dromara.forest.utils.URLUtils;
+import org.dromara.forest.utils.StringUtil;
+import org.dromara.forest.utils.URLUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -103,7 +103,7 @@ public class ForestQueryMap implements Map<String, Object> {
     }
 
     public SimpleQueryParameter getQuery(String name) {
-        if (StringUtils.isEmpty(name)) {
+        if (StringUtil.isEmpty(name)) {
             return null;
         }
         for (SimpleQueryParameter query : queries) {
@@ -116,7 +116,7 @@ public class ForestQueryMap implements Map<String, Object> {
 
     public List<SimpleQueryParameter> getQueries(String name) {
         List<SimpleQueryParameter> list = new LinkedList<>();
-        if (StringUtils.isEmpty(name)) {
+        if (StringUtil.isEmpty(name)) {
             return list;
         }
         for (SimpleQueryParameter query : queries) {
@@ -481,19 +481,19 @@ public class ForestQueryMap implements Map<String, Object> {
                     String strValue = MappingTemplate.getParameterValue(jsonConverter, evaluatedValue);
                     if (strValue != null) {
                         String charset = query.getCharset();
-                        if (StringUtils.isBlank(charset)) {
+                        if (StringUtil.isBlank(charset)) {
                             charset = request.getCharset();
                         }
-                        if (StringUtils.isBlank(charset)) {
+                        if (StringUtil.isBlank(charset)) {
                             charset = "UTF-8";
                         }
                         String encodedValue = null;
                         if (query.isUrlencoded()) {
-                            encodedValue = URLUtils.allEncode(strValue, charset);
+                            encodedValue = URLUtil.allEncode(strValue, charset);
                         } else if (allowEncodeBraceInQueryValue) {
-                            encodedValue = URLUtils.queryValueEncode(strValue, charset);
+                            encodedValue = URLUtil.queryValueEncode(strValue, charset);
                         } else {
-                            encodedValue = URLUtils.queryValueWithBraceEncode(strValue, charset);
+                            encodedValue = URLUtil.queryValueWithBraceEncode(strValue, charset);
                         }
                         builder.append(encodedValue);
                     }

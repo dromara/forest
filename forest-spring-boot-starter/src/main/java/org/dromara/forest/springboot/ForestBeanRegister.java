@@ -17,7 +17,7 @@ import org.dromara.forest.springboot.properties.ForestConvertProperties;
 import org.dromara.forest.springboot.properties.ForestConverterItemProperties;
 import org.dromara.forest.springboot.properties.ForestSSLKeyStoreProperties;
 import org.dromara.forest.utils.ForestDataType;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -73,7 +73,7 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
     public ForestConfiguration registerForestConfiguration() {
         BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(ForestConfiguration.class);
         String id = forestConfigurationProperties.getBeanId();
-        if (StringUtils.isBlank(id)) {
+        if (StringUtil.isBlank(id)) {
             id = "forestConfiguration";
         }
 
@@ -227,7 +227,7 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
 
     public BeanDefinition registerSSLKeyStoreBean(ManagedMap<String, BeanDefinition> map, ForestSSLKeyStoreProperties sslKeyStoreProperties) {
         String id = sslKeyStoreProperties.getId();
-        if (StringUtils.isBlank(id)) {
+        if (StringUtil.isBlank(id)) {
             throw new ForestRuntimeException("[Forest] Property 'id' of SSL keystore can not be empty or blank");
         }
         if (map.containsKey(id)) {

@@ -15,7 +15,7 @@ import org.dromara.forest.solon.properties.ForestSSLKeyStoreProperties;
 import org.dromara.forest.ssl.SSLKeyStore;
 import org.dromara.forest.ssl.SSLSocketFactoryBuilder;
 import org.dromara.forest.utils.ForestDataType;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 import org.noear.solon.Utils;
 import org.noear.solon.core.wrap.ClassWrap;
 import org.noear.solon.core.wrap.FieldWrap;
@@ -55,7 +55,7 @@ public class ForestBeanBuilder {
 
     public ForestConfiguration build() {
         String id = forestConfigurationProperties.getBeanId();
-        if (StringUtils.isBlank(id)) {
+        if (StringUtil.isBlank(id)) {
             id = "forestConfiguration";
             forestConfigurationProperties.setBeanId(id);
         }
@@ -211,7 +211,7 @@ public class ForestBeanBuilder {
 
     public void registerSSLKeyStoreBean(Map<String, SSLKeyStore> map, ForestSSLKeyStoreProperties sslKeyStoreProperties) {
         String id = sslKeyStoreProperties.getId();
-        if (StringUtils.isBlank(id)) {
+        if (StringUtil.isBlank(id)) {
             throw new ForestRuntimeException("[Forest] Property 'id' of SSL keystore can not be empty or blank");
         }
         if (map.containsKey(id)) {
@@ -250,7 +250,7 @@ public class ForestBeanBuilder {
 
         SSLKeyStore sslKeyStore = new SSLKeyStore(id, keystoreType, filePath, keystorePass, certPass, trustManager, hostnameVerifier, sslSocketFactoryBuilder);
 
-        if (StringUtils.isNotEmpty(protocolsStr)) {
+        if (StringUtil.isNotEmpty(protocolsStr)) {
             String[] strs = protocolsStr.split("[ /t]*,[ /t]*");
             String[] protocols = new String[strs.length];
             for (int i = 0; i < strs.length; i++) {
@@ -258,7 +258,7 @@ public class ForestBeanBuilder {
             }
             sslKeyStore.setProtocols(protocols);
         }
-        if (StringUtils.isNotEmpty(cipherSuitesStr)) {
+        if (StringUtil.isNotEmpty(cipherSuitesStr)) {
             String[] strs = cipherSuitesStr.split("[ /t]*,[ /t]*");
             String[] cipherSuites = new String[strs.length];
             for (int i = 0; i < strs.length; i++) {

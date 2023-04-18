@@ -2,7 +2,7 @@ package org.dromara.forest.file;
 
 import org.dromara.forest.exceptions.ForestRuntimeException;
 import org.dromara.forest.multipart.ForestMultipart;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 import org.noear.solon.Utils;
 import org.noear.solon.core.handle.UploadedFile;
 
@@ -22,7 +22,7 @@ public class SolonMultipartFile extends ForestMultipart<UploadedFile, SolonMulti
 
     @Override
     public String getOriginalFileName() {
-        if (StringUtils.isNotBlank(fileName)) {
+        if (StringUtil.isNotBlank(fileName)) {
             return fileName;
         }
         return multipartFile.getName();

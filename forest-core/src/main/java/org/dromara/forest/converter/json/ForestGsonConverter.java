@@ -29,8 +29,8 @@ import org.dromara.forest.exceptions.ForestConvertException;
 import org.dromara.forest.http.ForestRequest;
 import org.dromara.forest.http.Lazy;
 import org.dromara.forest.utils.ForestDataType;
-import org.dromara.forest.utils.ReflectUtils;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.ReflectUtil;
+import org.dromara.forest.utils.StringUtil;
 import com.google.gson.*;
 
 import java.lang.reflect.ParameterizedType;
@@ -63,7 +63,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
 
     @Override
     public <T> T convertToJavaObject(String source, Type targetType) {
-        if (StringUtils.isBlank(source)) {
+        if (StringUtil.isBlank(source)) {
             return null;
         }
         try {
@@ -72,7 +72,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
                 Gson gson = createGson();
                 return gson.fromJson(source, targetType);
             }
-            Class clazz = ReflectUtils.toClass(targetType);
+            Class clazz = ReflectUtil.toClass(targetType);
             try {
                 if (Map.class.isAssignableFrom(clazz)) {
                     JsonParser jsonParser = new JsonParser();
@@ -97,13 +97,13 @@ public class ForestGsonConverter implements ForestJsonConverter {
 
     @Override
     public <T> T convertToJavaObject(byte[] source, Class<T> targetType, Charset charset) {
-        String str = StringUtils.fromBytes(source, charset);
+        String str = StringUtil.fromBytes(source, charset);
         return convertToJavaObject(str, targetType);
     }
 
     @Override
     public <T> T convertToJavaObject(byte[] source, Type targetType, Charset charset) {
-        String str = StringUtils.fromBytes(source, charset);
+        String str = StringUtil.fromBytes(source, charset);
         return convertToJavaObject(str, targetType);
     }
 
@@ -207,7 +207,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
      */
     private Gson createGson() {
         GsonBuilder gsonBuilder = new GsonBuilder();
-        if (StringUtils.isNotBlank(dateFormat)) {
+        if (StringUtil.isNotBlank(dateFormat)) {
             gsonBuilder.setDateFormat(dateFormat);
         }
         return gsonBuilder.create();

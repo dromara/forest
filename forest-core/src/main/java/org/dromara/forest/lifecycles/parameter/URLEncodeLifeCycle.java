@@ -4,8 +4,8 @@ import org.dromara.forest.annotation.URLEncode;
 import org.dromara.forest.lifecycles.ParameterAnnotationLifeCycle;
 import org.dromara.forest.mapping.MappingParameter;
 import org.dromara.forest.reflection.ForestMethod;
-import org.dromara.forest.utils.ReflectUtils;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.ReflectUtil;
+import org.dromara.forest.utils.StringUtil;
 
 import java.util.Map;
 
@@ -18,10 +18,10 @@ public class URLEncodeLifeCycle implements ParameterAnnotationLifeCycle<URLEncod
 
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, URLEncode annotation) {
-        Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(annotation);
+        Map<String, Object> attrs = ReflectUtil.getAttributesFromAnnotation(annotation);
         String charset = (String) attrs.get("charset");
         Boolean enabled = (Boolean) attrs.get("enabled");
-        if (StringUtils.isBlank(charset)) {
+        if (StringUtil.isBlank(charset)) {
             charset = "UTF-8";
         }
         parameter.setUrlEncode(enabled);

@@ -25,7 +25,7 @@
 package org.dromara.forest.converter.protobuf;
 
 import org.dromara.forest.exceptions.ForestRuntimeException;
-import org.dromara.forest.utils.ReflectUtils;
+import org.dromara.forest.utils.ReflectUtil;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
@@ -99,7 +99,7 @@ public class ForestProtobufConverterManager implements Serializable {
         if (type == null) {
             return false;
         }
-        Class clazz = ReflectUtils.toClass(type);
+        Class clazz = ReflectUtil.toClass(type);
         return isProtobufMessageClass(clazz);
     }
 

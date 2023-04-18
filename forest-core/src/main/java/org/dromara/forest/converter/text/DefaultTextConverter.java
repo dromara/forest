@@ -8,7 +8,7 @@ import org.dromara.forest.http.ForestBody;
 import org.dromara.forest.http.ForestRequestBody;
 import org.dromara.forest.http.body.NameValueRequestBody;
 import org.dromara.forest.utils.ForestDataType;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
@@ -23,7 +23,7 @@ public class DefaultTextConverter implements ForestConverter<String>, ForestEnco
 
     @Override
     public <T> T convertToJavaObject(byte[] source, Class<T> targetType, Charset charset) {
-        String str = StringUtils.fromBytes(source, charset);
+        String str = StringUtil.fromBytes(source, charset);
         try {
             return (T) str;
         } catch (Throwable th) {
@@ -33,7 +33,7 @@ public class DefaultTextConverter implements ForestConverter<String>, ForestEnco
 
     @Override
     public <T> T convertToJavaObject(byte[] source, Type targetType, Charset charset) {
-        String str = StringUtils.fromBytes(source, charset);
+        String str = StringUtil.fromBytes(source, charset);
         try {
             return (T) str;
         } catch (Throwable th) {

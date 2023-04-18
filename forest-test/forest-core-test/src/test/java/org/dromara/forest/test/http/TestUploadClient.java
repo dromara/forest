@@ -16,7 +16,7 @@ import org.dromara.forest.multipart.FilePathMultipart;
 import org.dromara.forest.multipart.ForestMultipart;
 import org.dromara.forest.multipart.InputStreamMultipart;
 import org.dromara.forest.test.http.client.UploadClient;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -144,7 +144,7 @@ public class TestUploadClient extends BaseClientTest {
         assertNotNull(request);
         List<ForestMultipart> multipartList = request.getMultiparts();
         assertEquals(1, multipartList.size());
-        assertTrue(StringUtils.isNotBlank(request.getBoundary()));
+        assertTrue(StringUtil.isNotBlank(request.getBoundary()));
         ForestMultipart multipart = multipartList.get(0);
 //        assertTrue(Map.class.isAssignableFrom(request.getMethod().getReturnClass()));
         assertTrue(multipart instanceof FileMultipart);
@@ -188,7 +188,7 @@ public class TestUploadClient extends BaseClientTest {
         assertNotNull(request);
         List<ForestMultipart> multipartList = request.getMultiparts();
         assertEquals(1, multipartList.size());
-        assertTrue(StringUtils.isNotBlank(request.getBoundary()));
+        assertTrue(StringUtil.isNotBlank(request.getBoundary()));
         ForestMultipart multipart = multipartList.get(0);
 //        assertTrue(Map.class.isAssignableFrom(request.getMethod().getReturnClass()));
         assertTrue(multipart instanceof FileMultipart);
@@ -223,7 +223,7 @@ public class TestUploadClient extends BaseClientTest {
         assertNotNull(request);
         List<ForestMultipart> multipartList = request.getMultiparts();
         assertEquals(1, multipartList.size());
-        assertTrue(StringUtils.isNotBlank(request.getBoundary()));
+        assertTrue(StringUtil.isNotBlank(request.getBoundary()));
         ForestMultipart multipart = multipartList.get(0);
 //        assertTrue(Map.class.isAssignableFrom(request.getMethod().getReturnClass()));
         assertTrue(multipart instanceof ByteArrayMultipart);
@@ -257,7 +257,7 @@ public class TestUploadClient extends BaseClientTest {
         InputStream in = new FileInputStream(file);
         ForestRequest<Map> request = uploadClient.upload(in, "test-byte-array.jpg");
         assertNotNull(request);
-        assertTrue(StringUtils.isNotEmpty(request.getBoundary()));
+        assertTrue(StringUtil.isNotEmpty(request.getBoundary()));
         List<ForestMultipart> multipartList = request.getMultiparts();
         assertEquals(1, multipartList.size());
         ForestMultipart multipart = multipartList.get(0);
@@ -1061,7 +1061,7 @@ public class TestUploadClient extends BaseClientTest {
         assertNotNull(request);
         List<ForestMultipart> multipartList = request.getMultiparts();
         assertEquals(1, multipartList.size());
-        assertTrue(StringUtils.isNotBlank(request.getBoundary()));
+        assertTrue(StringUtil.isNotBlank(request.getBoundary()));
         ForestMultipart multipart = multipartList.get(0);
 //        assertTrue(Map.class.isAssignableFrom(request.getMethod().getReturnClass()));
         assertTrue(multipart instanceof FileMultipart);

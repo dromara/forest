@@ -1,7 +1,7 @@
 package org.dromara.forest.multipart;
 
 import org.dromara.forest.exceptions.ForestRuntimeException;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
@@ -12,7 +12,7 @@ public class FileMultipart extends ForestMultipart<File, FileMultipart> {
 
     @Override
     public String getOriginalFileName() {
-        if (StringUtils.isNotBlank(fileName)) {
+        if (StringUtil.isNotBlank(fileName)) {
             return fileName;
         }
         return file.getName();

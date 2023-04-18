@@ -1,6 +1,5 @@
 package org.dromara.forest.test;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
@@ -35,7 +34,7 @@ import org.dromara.forest.test.model.Result;
 import org.dromara.forest.utils.ForestDataType;
 import org.dromara.forest.utils.ForestProgress;
 import org.dromara.forest.utils.TypeReference;
-import org.dromara.forest.utils.URLUtils;
+import org.dromara.forest.utils.URLUtil;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -970,7 +969,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .execute();
         mockRequest(server)
                 .assertPathEquals("/")
-                .assertQueryEquals("a=1&b=2&c=3&token=" + URLUtils.encode(Base64.encode("a=1&b=2&c=3"), "UTF-8"));
+                .assertQueryEquals("a=1&b=2&c=3&token=" + URLUtil.encode(Base64.encode("a=1&b=2&c=3"), "UTF-8"));
     }
 
 
@@ -981,9 +980,8 @@ public class TestGenericForestClient extends BaseClientTest {
         LazyData data = new LazyData();
         data.setId("foo");
         data.setName("bar");
-        data.setToken(req -> Base64.encode(req.getQueryString()));
-
-        BeanUtil.beanToMap(data);
+        data.setToken(req ->
+                Base64.encode(req.getQueryString()));
 
         Forest.get("/")
                 .port(server.getPort())
@@ -992,7 +990,7 @@ public class TestGenericForestClient extends BaseClientTest {
 
         mockRequest(server)
                 .assertPathEquals("/")
-                .assertQueryEquals("id=foo&name=bar&token=" + URLUtils.encode(Base64.encode("id=foo&name=bar"), "UTF-8"));
+                .assertQueryEquals("id=foo&name=bar&token=" + URLUtil.encode(Base64.encode("id=foo&name=bar"), "UTF-8"));
     }
 
     @Test
@@ -1012,7 +1010,7 @@ public class TestGenericForestClient extends BaseClientTest {
 
         mockRequest(server)
                 .assertPathEquals("/")
-                .assertQueryEquals("a=1&b=2&c=3&token=" + URLUtils.encode(Base64.encode("a=1&b=2&c=3"), "UTF-8"));
+                .assertQueryEquals("a=1&b=2&c=3&token=" + URLUtil.encode(Base64.encode("a=1&b=2&c=3"), "UTF-8"));
     }
 
 

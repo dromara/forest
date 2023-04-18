@@ -24,15 +24,15 @@
 
 package org.dromara.forest.converter.json;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dromara.forest.converter.ConvertOptions;
 import org.dromara.forest.exceptions.ForestConvertException;
 import org.dromara.forest.http.ForestRequest;
 import org.dromara.forest.http.Lazy;
 import org.dromara.forest.utils.ForestDataType;
-import org.dromara.forest.utils.StringUtils;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dromara.forest.utils.StringUtil;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -78,7 +78,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     @Override
     public void setDateFormat(String dateFormat) {
         this.dateFormat = dateFormat;
-        if (StringUtils.isNotBlank(dateFormat)) {
+        if (StringUtil.isNotBlank(dateFormat)) {
             DateFormat format = new SimpleDateFormat(dateFormat);
             getMapper().setDateFormat(format);
         }
@@ -98,7 +98,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     @Override
     public <T> T convertToJavaObject(byte[] source, Class<T> targetType, Charset charset) {
         try {
-            String str = StringUtils.fromBytes(source, charset);
+            String str = StringUtil.fromBytes(source, charset);
             return getMapper().readValue(str, getMapper().getTypeFactory().constructType(targetType));
         } catch (IOException e) {
             throw new ForestConvertException(this, e);
@@ -108,7 +108,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     @Override
     public <T> T convertToJavaObject(byte[] source, Type targetType, Charset charset) {
         try {
-            String str = StringUtils.fromBytes(source, charset);
+            String str = StringUtil.fromBytes(source, charset);
             return getMapper().readValue(str, getMapper().getTypeFactory().constructType(targetType));
         } catch (IOException e) {
             throw new ForestConvertException(this, e);
@@ -125,7 +125,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     }
 
     public <T> T convertToJavaObject(String source, JavaType javaType) {
-        if (StringUtils.isBlank(source)) {
+        if (StringUtil.isBlank(source)) {
             return null;
         }
         try {

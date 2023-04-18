@@ -1,8 +1,8 @@
 package org.dromara.forest.auth;
 
 import org.dromara.forest.http.ForestRequest;
-import org.dromara.forest.utils.Base64Utils;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.Base64Util;
+import org.dromara.forest.utils.StringUtil;
 
 /**
  * Forest BasicAuth 认证器
@@ -45,11 +45,11 @@ public class BasicAuth implements ForestAuthenticator {
     @Override
     public void enhanceAuthorization(ForestRequest request) {
         String userInfo = this.userInfo;
-        if (StringUtils.isEmpty(userInfo)) {
+        if (StringUtil.isEmpty(userInfo)) {
             userInfo = request.getUserInfo();
         }
-        if (StringUtils.isNotEmpty(userInfo)) {
-            String basic = "Basic " + Base64Utils.encode(userInfo);
+        if (StringUtil.isNotEmpty(userInfo)) {
+            String basic = "Basic " + Base64Util.encode(userInfo);
             request.addHeader("Authorization", basic);
         }
     }

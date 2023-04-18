@@ -78,8 +78,8 @@ import org.dromara.forest.ssl.SSLUtils;
 import org.dromara.forest.ssl.TrustAllHostnameVerifier;
 import org.dromara.forest.utils.ForestDataType;
 import org.dromara.forest.utils.RequestNameValue;
-import org.dromara.forest.utils.StringUtils;
-import org.dromara.forest.utils.TimeUtils;
+import org.dromara.forest.utils.StringUtil;
+import org.dromara.forest.utils.TimeUtil;
 import org.dromara.forest.utils.TypeReference;
 import org.dromara.forest.mapping.MappingParameter;
 
@@ -649,10 +649,10 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return {@link ForestRequest}对象实例
      */
     public ForestRequest<T> setUrl(String url, Object... args) {
-        if (StringUtils.isBlank(url)) {
+        if (StringUtil.isBlank(url)) {
             throw new ForestRuntimeException("[Forest] Request url cannot be empty!");
         }
-        String srcUrl = StringUtils.trimBegin(url);
+        String srcUrl = StringUtil.trimBegin(url);
         MappingURLTemplate template = method.makeURLTemplate(null, null, srcUrl);
         return setUrl(template, args);
     }
@@ -1273,7 +1273,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      */
     public String getBoundary() {
         String contentType = getContentType();
-        if (StringUtils.isEmpty(contentType)) {
+        if (StringUtil.isEmpty(contentType)) {
             return null;
         }
         String[] group = contentType.split(";");
@@ -1285,8 +1285,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
                     String name = nvPair[0].trim();
                     String value = nvPair[1].trim();
                     if ("boundary".equalsIgnoreCase(name)) {
-                        if (StringUtils.isBlank(value)) {
-                            setBoundary(StringUtils.generateBoundary());
+                        if (StringUtil.isBlank(value)) {
+                            setBoundary(StringUtil.generateBoundary());
                             return getBoundary();
                         }
                         return value;
@@ -1305,7 +1305,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      */
     public ForestRequest<T> setBoundary(String boundary) {
         String contentType = getContentType();
-        if (StringUtils.isBlank(contentType)) {
+        if (StringUtil.isBlank(contentType)) {
             throw new ForestRuntimeException(
                     "boundary cannot be add to request, due to the header 'Content-Type' is empty");
         }
@@ -1956,10 +1956,10 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     }
 
     public Charset mineCharset() {
-        if (StringUtils.isNotEmpty(this.charset)) {
+        if (StringUtil.isNotEmpty(this.charset)) {
             return Charset.forName(this.charset);
         }
-        if (StringUtils.isNotEmpty(this.configuration.getCharset())) {
+        if (StringUtil.isNotEmpty(this.configuration.getCharset())) {
             return Charset.forName(this.configuration.getCharset());
         }
         ContentType mineType = this.mineContentType();
@@ -2280,7 +2280,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     public ContentType mineContentType() {
         String contentType = getContentType();
 
-        if (StringUtils.isEmpty(contentType)) {
+        if (StringUtil.isEmpty(contentType)) {
             contentType = ContentType.APPLICATION_X_WWW_FORM_URLENCODED;
         }
 
@@ -2288,16 +2288,16 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         String mineType = typeGroup[0];
         boolean hasDefinedCharset = typeGroup.length > 1;
 
-        if (StringUtils.isEmpty(mineType)) {
+        if (StringUtil.isEmpty(mineType)) {
             mineType = ContentType.APPLICATION_X_WWW_FORM_URLENCODED;
         }
 
         Charset mineCharset = null;
         String strCharset = this.getCharset();
-        if (StringUtils.isEmpty(strCharset)) {
+        if (StringUtil.isEmpty(strCharset)) {
             strCharset = this.configuration.getCharset();
         }
-        if (StringUtils.isEmpty(strCharset)) {
+        if (StringUtil.isEmpty(strCharset)) {
             mineCharset = StandardCharsets.UTF_8;
         } else {
             mineCharset = Charset.forName(strCharset);
@@ -2433,7 +2433,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @since 1.5.6
      */
     public ForestRequest<T> connectTimeout(int connectTimeout, TimeUnit timeUnit) {
-        this.connectTimeout = TimeUtils.toMillis("connect timeout", connectTimeout, timeUnit);
+        this.connectTimeout = TimeUtil.toMillis("connect timeout", connectTimeout, timeUnit);
         return this;
     }
 
@@ -2445,7 +2445,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @since 1.5.6
      */
     public ForestRequest<T> connectTimeout(Duration connectTimeout) {
-        this.connectTimeout = TimeUtils.toMillis("connect timeout", connectTimeout);
+        this.connectTimeout = TimeUtil.toMillis("connect timeout", connectTimeout);
         return this;
     }
 
@@ -2506,7 +2506,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @since 1.5.6
      */
     public ForestRequest<T> readTimeout(int readTimeout, TimeUnit timeUnit) {
-        this.readTimeout = TimeUtils.toMillis("read timeout", readTimeout, timeUnit);
+        this.readTimeout = TimeUtil.toMillis("read timeout", readTimeout, timeUnit);
         return this;
     }
 
@@ -2518,7 +2518,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @since 1.5.6
      */
     public ForestRequest<T> readTimeout(Duration readTimeout) {
-        this.readTimeout = TimeUtils.toMillis("read timeout", readTimeout);
+        this.readTimeout = TimeUtil.toMillis("read timeout", readTimeout);
         return this;
     }
 
@@ -2663,10 +2663,10 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         int timeout = getTimeout();
         Integer connectTimeout = connectTimeout();
         Integer readTimeout = readTimeout();
-        if (TimeUtils.isNone(connectTimeout)) {
+        if (TimeUtil.isNone(connectTimeout)) {
             connectTimeout = timeout;
         }
-        if (TimeUtils.isNone(readTimeout)) {
+        if (TimeUtil.isNone(readTimeout)) {
             readTimeout = timeout;
         }
         StringBuilder builder = new StringBuilder();
@@ -3287,7 +3287,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> addHeader(String name, Object value) {
-        if (StringUtils.isEmpty(name)) {
+        if (StringUtil.isEmpty(name)) {
             return this;
         }
         this.headers.setHeader(name, String.valueOf(value));
@@ -3862,7 +3862,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> setDownloadFile(String dir, String filename) {
-        if (StringUtils.isNotBlank(dir)) {
+        if (StringUtil.isNotBlank(dir)) {
             this.addInterceptor(DownloadLifeCycle.class);
             // 当map达到当前最大容量的0.75时会扩容,大小设置为4且塞入两个键值对不会进行扩容
             Map<String, Object> downloadFileMap = new HashMap<>(4);

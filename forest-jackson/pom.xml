@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.dromara.forest</groupId>
+  <artifactId>forest-jackson</artifactId>
+  <version>${revision}</version>
+
+  <name>forest-jackson</name>
+
+  <properties>
+    <jackson.version>2.13.3</jackson.version>
+    <jackson-databind.version>2.13.3</jackson-databind.version>
+    <jackson-annotations.version>2.13.3</jackson-annotations.version>
+  </properties>
+
+  <parent>
+    <groupId>org.dromara.forest</groupId>
+    <artifactId>forest</artifactId>
+    <version>${revision}</version>
+  </parent>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.dromara.forest</groupId>
+      <artifactId>forest-core</artifactId>
+      <version>${parent.version}</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson-databind.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.dromara.forest</groupId>
+      <artifactId>forest-mock</artifactId>
+      <version>${revision}</version>
+      <scope>test</scope>
+    </dependency>
+
+
+  </dependencies>
+
+
+
+</project>

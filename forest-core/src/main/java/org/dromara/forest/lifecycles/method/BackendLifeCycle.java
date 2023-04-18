@@ -5,7 +5,7 @@ import org.dromara.forest.http.ForestRequest;
 import org.dromara.forest.lifecycles.MethodAnnotationLifeCycle;
 import org.dromara.forest.mapping.MappingTemplate;
 import org.dromara.forest.reflection.ForestMethod;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 /**
  * Forest后端框架注解的生命周期类
@@ -19,7 +19,7 @@ public class BackendLifeCycle implements MethodAnnotationLifeCycle<Backend, Obje
     @Override
     public void onMethodInitialized(ForestMethod method, Backend annotation) {
         String backendName = annotation.value();
-        if (StringUtils.isNotBlank(backendName)) {
+        if (StringUtil.isNotBlank(backendName)) {
             MappingTemplate template = method.makeTemplate(Backend.class, "value", backendName);
             method.setExtensionParameterValue(PARAM_KEY_BACKEND_NAME, template);
         }

@@ -3,7 +3,7 @@ package org.dromara.forest.spring;
 import org.dromara.forest.Forest;
 import org.dromara.forest.annotation.BindingVar;
 import org.dromara.forest.config.ForestConfiguration;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
@@ -25,7 +25,7 @@ public class ForestBeanProcessor implements InstantiationAwareBeanPostProcessor 
             }
             String confId = annotation.configuration();
             ForestConfiguration configuration = null;
-            if (StringUtils.isNotBlank(confId)) {
+            if (StringUtil.isNotBlank(confId)) {
                 configuration = Forest.config(confId);
             } else {
                 configuration = Forest.config();

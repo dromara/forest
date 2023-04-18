@@ -9,7 +9,7 @@ import org.dromara.forest.mapping.MappingParameter;
 import org.dromara.forest.reflection.ForestMethod;
 import org.dromara.forest.reflection.MetaRequest;
 import org.dromara.forest.utils.ForestDataType;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Parameter;
@@ -41,7 +41,7 @@ public class JSONBodyLifeCycle extends AbstractBodyLifeCycle<JSONBody> {
             }
         }
         String contentTypeStr = metaRequest.getContentType();
-        if (StringUtils.isBlank(contentTypeStr) && !hasDataFileAnn) {
+        if (StringUtil.isBlank(contentTypeStr) && !hasDataFileAnn) {
             metaRequest.setContentType(ContentType.APPLICATION_JSON);
         }
         if (metaRequest.getBodyType() == null) {
@@ -57,7 +57,7 @@ public class JSONBodyLifeCycle extends AbstractBodyLifeCycle<JSONBody> {
     @Override
     public boolean beforeExecute(ForestRequest request) {
         String contentType = request.getContentType();
-        if (StringUtils.isBlank(contentType)) {
+        if (StringUtil.isBlank(contentType)) {
             request.setContentType(ContentType.APPLICATION_JSON);
         }
         return true;

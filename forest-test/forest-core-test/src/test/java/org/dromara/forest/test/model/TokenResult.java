@@ -1,24 +1,29 @@
 package org.dromara.forest.test.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class TokenResult {
 
-    private long TokenTimeout;
+    @JsonProperty("TokenTimeout")
+    private long tokenTimeout;
 
-    private String URLToken;
+
+    @JsonProperty("URLToken")
+    private String urlToken;
 
     public long getTokenTimeout() {
-        return TokenTimeout;
+        return tokenTimeout;
     }
 
     public void setTokenTimeout(long tokenTimeout) {
-        TokenTimeout = tokenTimeout;
+        this.tokenTimeout = tokenTimeout;
     }
 
-    public String getURLToken() {
-        return URLToken;
+    public String getUrlToken() {
+        return urlToken;
     }
 
-    public void setURLToken(String URLToken) {
-        this.URLToken = URLToken;
+    public void setUrlToken(String urlToken) {
+        this.urlToken = urlToken;
     }
 }

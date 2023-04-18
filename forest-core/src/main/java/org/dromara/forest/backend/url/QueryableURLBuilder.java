@@ -1,8 +1,8 @@
 package org.dromara.forest.backend.url;
 
 import org.dromara.forest.http.ForestRequest;
-import org.dromara.forest.utils.StringUtils;
-import org.dromara.forest.utils.URLUtils;
+import org.dromara.forest.utils.StringUtil;
+import org.dromara.forest.utils.URLUtil;
 
 /**
  * 带查询参数的URL构造器
@@ -16,12 +16,12 @@ public class QueryableURLBuilder extends URLBuilder {
         String url = request.getUrl();
         StringBuilder urlBuilder = new StringBuilder(url);
         String query = request.queryString();
-        if (StringUtils.isNotEmpty(query)) {
+        if (StringUtil.isNotEmpty(query)) {
             urlBuilder.append("?").append(query);
         }
         String ref = request.getRef();
-        if (StringUtils.isNotEmpty(ref)) {
-            urlBuilder.append("#").append(URLUtils.refEncode(ref, "UTF-8"));
+        if (StringUtil.isNotEmpty(ref)) {
+            urlBuilder.append("#").append(URLUtil.refEncode(ref, "UTF-8"));
         }
         return urlBuilder.toString();
     }

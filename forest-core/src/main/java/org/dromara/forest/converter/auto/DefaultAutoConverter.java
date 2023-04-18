@@ -8,7 +8,7 @@ import org.dromara.forest.exceptions.ForestConvertException;
 import org.dromara.forest.exceptions.ForestRuntimeException;
 import org.dromara.forest.http.ForestRequest;
 import org.dromara.forest.utils.ForestDataType;
-import org.dromara.forest.utils.ReflectUtils;
+import org.dromara.forest.utils.ReflectUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -65,7 +65,7 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
             source = readAsString(source);
         }
         T result = null;
-        Class clazz = ReflectUtils.toClass(targetType);
+        Class clazz = ReflectUtil.toClass(targetType);
         if (source instanceof CharSequence) {
             String str = source.toString();
             if (String.class.isAssignableFrom(clazz)) {
@@ -133,12 +133,12 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
     }
 
     private boolean isVoidType(Type targetType) {
-        Class type = ReflectUtils.toClass(targetType);
+        Class type = ReflectUtil.toClass(targetType);
         return Void.TYPE.isAssignableFrom(type);
     }
 
     private boolean canReadAsBinary(Type targetType) {
-        Class type = ReflectUtils.toClass(targetType);
+        Class type = ReflectUtil.toClass(targetType);
         if (byte[].class.isAssignableFrom(type)
                 || InputStream.class.isAssignableFrom(type)
                 || File.class.isAssignableFrom(type)) {

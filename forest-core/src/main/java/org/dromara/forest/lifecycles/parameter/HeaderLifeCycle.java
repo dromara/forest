@@ -5,8 +5,8 @@ import org.dromara.forest.mapping.MappingParameter;
 import org.dromara.forest.mapping.MappingVariable;
 import org.dromara.forest.reflection.ForestMethod;
 import org.dromara.forest.lifecycles.ParameterAnnotationLifeCycle;
-import org.dromara.forest.utils.ReflectUtils;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.ReflectUtil;
+import org.dromara.forest.utils.StringUtil;
 
 import java.util.Map;
 
@@ -19,10 +19,10 @@ public class HeaderLifeCycle implements ParameterAnnotationLifeCycle<Header, Obj
 
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, Header annotation) {
-        Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(annotation);
+        Map<String, Object> attrs = ReflectUtil.getAttributesFromAnnotation(annotation);
         String defaultValue = (String) attrs.get("defaultValue");
         String name = (String) attrs.get("name");
-        if (StringUtils.isNotEmpty(name)) {
+        if (StringUtil.isNotEmpty(name)) {
             parameter.setName(name);
             MappingVariable variable = new MappingVariable(name, parameter.getType());
             variable.setIndex(parameter.getIndex());
@@ -31,7 +31,7 @@ public class HeaderLifeCycle implements ParameterAnnotationLifeCycle<Header, Obj
         } else {
             parameter.setObjectProperties(true);
         }
-        if (StringUtils.isNotEmpty(defaultValue)) {
+        if (StringUtil.isNotEmpty(defaultValue)) {
             parameter.setDefaultValue(defaultValue);
         }
         parameter.setTarget(MappingParameter.TARGET_HEADER);

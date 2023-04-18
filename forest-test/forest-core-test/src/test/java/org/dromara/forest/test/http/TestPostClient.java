@@ -22,7 +22,7 @@ import org.dromara.forest.test.http.model.JsonTestUser2;
 import org.dromara.forest.test.http.model.JsonTestUser3;
 import org.dromara.forest.test.http.model.JsonTestUser4;
 import org.dromara.forest.test.http.model.UserParam;
-import org.dromara.forest.utils.Base64Utils;
+import org.dromara.forest.utils.Base64Util;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -407,7 +407,7 @@ public class TestPostClient extends BaseClientTest {
     public void testPostJsonByteArray() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         String json = "{\"a\": \"1\", \"b\": \"2\"}";
-        byte[] data = Base64Utils.encodeToByteArray(json);
+        byte[] data = Base64Util.encodeToByteArray(json);
         assertThat(postClient.postJsonByteArray(data))
                 .isNotNull()
                 .isEqualTo(EXPECTED);

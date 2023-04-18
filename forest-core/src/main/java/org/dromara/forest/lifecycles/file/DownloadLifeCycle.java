@@ -12,8 +12,8 @@ import org.dromara.forest.logging.LogConfiguration;
 import org.dromara.forest.reflection.ForestMethod;
 import org.dromara.forest.utils.ForestDataType;
 import org.dromara.forest.utils.ForestProgress;
-import org.dromara.forest.utils.ReflectUtils;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.ReflectUtil;
+import org.dromara.forest.utils.StringUtil;
 import org.apache.commons.io.FileUtils;
 
 import java.io.ByteArrayInputStream;
@@ -60,7 +60,7 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
         if (type == null) {
             return Void.class;
         }
-        Class clazz = ReflectUtils.toClass(type);
+        Class clazz = ReflectUtil.toClass(type);
         if (ForestResponse.class.isAssignableFrom(clazz)) {
             if (type instanceof ParameterizedType) {
                 Type[] types = ((ParameterizedType) type).getActualTypeArguments();
@@ -86,7 +86,7 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
         String filename = getAttributeAsString(request, "filename");
         Type resultType = getAttribute(request, "__resultType", Type.class);
 
-        if (StringUtils.isBlank(filename)) {
+        if (StringUtil.isBlank(filename)) {
             filename = response.getFilename();
         }
         LogConfiguration logConfiguration = request.getLogConfiguration();

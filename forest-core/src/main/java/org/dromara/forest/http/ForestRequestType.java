@@ -1,6 +1,6 @@
 package org.dromara.forest.http;
 
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 import org.dromara.forest.mapping.MappingParameter;
 
 /**
@@ -94,7 +94,7 @@ public enum ForestRequestType {
      * @return {@code true}: 匹配; {@code false}: 不匹配
      */
     public boolean match(String name) {
-        if (StringUtils.isEmpty(name)) {
+        if (StringUtil.isEmpty(name)) {
             return false;
         }
         return this.name.equals(name.toUpperCase());

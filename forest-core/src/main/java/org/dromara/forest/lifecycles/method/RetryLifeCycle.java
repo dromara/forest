@@ -6,7 +6,7 @@ import org.dromara.forest.http.ForestRequest;
 import org.dromara.forest.lifecycles.MethodAnnotationLifeCycle;
 import org.dromara.forest.mapping.MappingTemplate;
 import org.dromara.forest.reflection.ForestMethod;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 /**
  * 重试注解的生命周期类
@@ -34,7 +34,7 @@ public class RetryLifeCycle implements MethodAnnotationLifeCycle<Retry, Object> 
         Object retryWhen = request.getMethod().getExtensionParameterValue(PARAM_KEY_RETRY_WHEN);
         String maxRetryCountStr = annotation.maxRetryCount();
         String maxRetryIntervalStr = annotation.maxRetryInterval();
-        if (StringUtils.isNotBlank(maxRetryCountStr)) {
+        if (StringUtil.isNotBlank(maxRetryCountStr)) {
             MappingTemplate maxRetryCountTemplate = method.makeTemplate(Retry.class, "maxRetryCount", maxRetryCountStr);
             try {
                 Integer maxRetryCount = Integer.parseInt(maxRetryCountTemplate.render(args));
@@ -42,7 +42,7 @@ public class RetryLifeCycle implements MethodAnnotationLifeCycle<Retry, Object> 
             } catch (Throwable ignored) {
             }
         }
-        if (StringUtils.isNotBlank(maxRetryIntervalStr)) {
+        if (StringUtil.isNotBlank(maxRetryIntervalStr)) {
             try {
                 MappingTemplate maxRetryIntervalTemplate = method.makeTemplate(Retry.class, "maxRetryInterval", maxRetryIntervalStr);
                 Long maxRetryInterval = Long.parseLong(maxRetryIntervalTemplate.render(args));

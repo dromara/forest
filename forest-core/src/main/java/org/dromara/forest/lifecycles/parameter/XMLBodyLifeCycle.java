@@ -10,7 +10,7 @@ import org.dromara.forest.mapping.MappingParameter;
 import org.dromara.forest.reflection.ForestMethod;
 import org.dromara.forest.reflection.MetaRequest;
 import org.dromara.forest.utils.ForestDataType;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Parameter;
@@ -32,7 +32,7 @@ public class XMLBodyLifeCycle extends AbstractBodyLifeCycle<XMLBody> {
                     "' has not bind a Forest request annotation. Hence the annotation @XMLBody cannot be bind on a parameter in this method.");
         }
         String contentType = metaRequest.getContentType();
-        if (StringUtils.isNotEmpty(contentType) &&
+        if (StringUtil.isNotEmpty(contentType) &&
                 !ContentType.APPLICATION_XML.equals(contentType) &&
                 contentType.indexOf("$") < 0) {
             throw new ForestRuntimeException("[Forest] the Content-Type of request binding on method '" +
@@ -49,7 +49,7 @@ public class XMLBodyLifeCycle extends AbstractBodyLifeCycle<XMLBody> {
         }
         Filter filter = method.getConfiguration().newFilterInstance("xml");
         parameter.addFilter(filter);
-        if (StringUtils.isBlank(contentType) && !hasDataFileAnn) {
+        if (StringUtil.isBlank(contentType) && !hasDataFileAnn) {
             metaRequest.setContentType(ContentType.APPLICATION_XML);
         }
         if (metaRequest.getBodyType() == null) {
@@ -64,7 +64,7 @@ public class XMLBodyLifeCycle extends AbstractBodyLifeCycle<XMLBody> {
     @Override
     public boolean beforeExecute(ForestRequest request) {
         String contentType = request.getContentType();
-        if (StringUtils.isBlank(contentType)) {
+        if (StringUtil.isBlank(contentType)) {
             request.setContentType(ContentType.APPLICATION_XML);
         }
 

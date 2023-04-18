@@ -13,9 +13,9 @@ import org.dromara.forest.http.body.SupportFormUrlEncoded;
 import org.dromara.forest.mapping.MappingParameter;
 import org.dromara.forest.mapping.MappingTemplate;
 import org.dromara.forest.utils.ForestDataType;
-import org.dromara.forest.utils.ReflectUtils;
+import org.dromara.forest.utils.ReflectUtil;
 import org.dromara.forest.utils.RequestNameValue;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 import org.dromara.forest.utils.URLEncoder;
 
 import java.lang.reflect.Array;
@@ -135,7 +135,7 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
      * @param target 请求目标位置
      */
     protected void processFormItem(List<RequestNameValue> newNameValueList, ForestConfiguration configuration, String name, Object value, int target) {
-        if (StringUtils.isEmpty(name) && value == null) {
+        if (StringUtil.isEmpty(name) && value == null) {
             return;
         }
         if (value != null) {
@@ -145,13 +145,13 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
                 Collection collection = (Collection) value;
                 if (collection.size() <= 8) {
                     for (Object item : collection) {
-                        if (!ReflectUtils.isPrimaryType(item.getClass())) {
+                        if (!ReflectUtil.isPrimaryType(item.getClass())) {
                             needCollapse = true;
                             break;
                         }
                     }
                 }
-            } else if (itemClass.isArray() && !ReflectUtils.isPrimaryArrayType(itemClass)) {
+            } else if (itemClass.isArray() && !ReflectUtil.isPrimaryArrayType(itemClass)) {
                 needCollapse = true;
             }
             if (needCollapse) {
@@ -160,14 +160,14 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
                 } else if (itemClass.isArray()) {
                     processFormArrayItem(newNameValueList, configuration, name, value, target);
                 }
-            } else if (ReflectUtils.isPrimaryType(itemClass)
-                    || ReflectUtils.isPrimaryArrayType(itemClass)
+            } else if (ReflectUtil.isPrimaryType(itemClass)
+                    || ReflectUtil.isPrimaryArrayType(itemClass)
                     || value instanceof Collection) {
                 newNameValueList.add(new RequestNameValue(name, value, target));
             } else if (value instanceof Map) {
                 processFormMapItem(newNameValueList, configuration, name, (Map) value, target);
             } else {
-                Map<String, Object> itemAttrs = ReflectUtils.convertObjectToMap(value, configuration);
+                Map<String, Object> itemAttrs = ReflectUtil.convertObjectToMap(value, configuration);
                 for (Map.Entry<String, Object> entry : itemAttrs.entrySet()) {
                     String subAttrName = entry.getKey();
                     Object subAttrValue = entry.getValue();

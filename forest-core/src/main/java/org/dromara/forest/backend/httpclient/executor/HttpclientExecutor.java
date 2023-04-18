@@ -11,7 +11,7 @@ import org.dromara.forest.http.ForestHeader;
 import org.dromara.forest.http.ForestRequest;
 import org.dromara.forest.http.ForestResponseFactory;
 import org.dromara.forest.utils.RequestNameValue;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 import org.dromara.forest.converter.json.ForestJsonConverter;
 import org.dromara.forest.backend.httpclient.request.HttpclientRequestSender;
 import org.dromara.forest.backend.httpclient.response.HttpclientForestResponseFactory;
@@ -84,10 +84,10 @@ public class HttpclientExecutor extends AbstractHttpExecutor {
                 }
             }
         }
-        if (StringUtils.isNotEmpty(contentType)) {
+        if (StringUtil.isNotEmpty(contentType)) {
             httpRequest.setHeader(contentTypeHeaderName, contentType);
         }
-        if (StringUtils.isNotEmpty(contentEncoding)) {
+        if (StringUtil.isNotEmpty(contentEncoding)) {
             httpRequest.setHeader(contentEncodingHeaderName, contentEncoding);
         }
     }

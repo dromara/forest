@@ -10,7 +10,7 @@ import org.dromara.forest.config.ForestConfiguration;
 import org.dromara.forest.exceptions.ForestRuntimeException;
 import org.dromara.forest.ssl.SSLKeyStore;
 import org.dromara.forest.utils.ForestDataType;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -80,11 +80,11 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
             if (methodName.length() >= 3 && methodName.startsWith("set")) {
                 String attributeName = methodName.substring(3, 4).toLowerCase() + methodName.substring(4);
                 String attributeValue = element.getAttribute(attributeName);
-                if (StringUtils.isNotEmpty(attributeValue)) {
+                if (StringUtil.isNotEmpty(attributeValue)) {
                     if ("backend".equals(attributeName)) {
                         beanDefinition.getPropertyValues().addPropertyValue("backendName", attributeValue);
                     } else if ("asyncMode".equals(attributeName)) {
-                        if (StringUtils.isEmpty(attributeValue)) {
+                        if (StringUtil.isEmpty(attributeValue)) {
                             throw new ForestRuntimeException("Can not resolve async mode '" + attributeValue + "'");
                         }
                         final String enumName = attributeValue.trim().toUpperCase();
@@ -167,7 +167,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         String hostnameVerifier = elem.getAttribute("hostnameVerifier");
         String sslSocketFactoryBuilder = elem.getAttribute("sslSocketFactoryBuilder");
 
-        if (StringUtils.isEmpty(keystoreType)) {
+        if (StringUtil.isEmpty(keystoreType)) {
             keystoreType = SSLKeyStore.DEFAULT_KEYSTORE_TYPE;
         }
         BeanDefinition beanDefinition = createSSLKeyStoreBean(
@@ -202,7 +202,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
         beanDefValues.addGenericArgumentValue(trustManagerClass);
         beanDefValues.addGenericArgumentValue(hostnameVerifierClass);
         beanDefValues.addGenericArgumentValue(sslSocketFactoryBuilder);
-        if (StringUtils.isNotEmpty(protocolsStr)) {
+        if (StringUtil.isNotEmpty(protocolsStr)) {
             String[] strs = protocolsStr.split("[ /t]*,[ /t]*");
             String[] protocols = new String[strs.length];
             for (int i = 0; i < strs.length; i++) {
@@ -210,7 +210,7 @@ public class ForestConfigurationBeanDefinitionParser implements BeanDefinitionPa
             }
             beanDefinition.getPropertyValues().add("protocols", protocols);
         }
-        if (StringUtils.isNotEmpty(cipherSuitesStr)) {
+        if (StringUtil.isNotEmpty(cipherSuitesStr)) {
             String[] strs = cipherSuitesStr.split("[ /t]*,[ /t]*");
             String[] cipherSuites = new String[strs.length];
             for (int i = 0; i < strs.length; i++) {

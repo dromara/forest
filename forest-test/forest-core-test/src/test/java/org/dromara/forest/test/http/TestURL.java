@@ -1,7 +1,7 @@
 package org.dromara.forest.test.http;
 
 import org.dromara.forest.exceptions.ForestRuntimeException;
-import org.dromara.forest.utils.URLUtils;
+import org.dromara.forest.utils.URLUtil;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
@@ -17,11 +17,11 @@ public class TestURL {
     @Test
     public void testNormalURL() {
         String url = "http://www.xxx.com/cc/yy";
-        String newURL = URLUtils.getValidURL(null, url);
+        String newURL = URLUtil.getValidURL(null, url);
         assertEquals(url, newURL);
-        newURL = URLUtils.getValidURL("", url);
+        newURL = URLUtil.getValidURL("", url);
         assertEquals(url, newURL);
-        newURL = URLUtils.getValidURL("  ", url);
+        newURL = URLUtil.getValidURL("  ", url);
         assertEquals(url, newURL);
     }
 
@@ -30,14 +30,14 @@ public class TestURL {
     public void checkBaseURL() {
         boolean exception = false;
         try {
-            URLUtils.checkBaseURL("http://www.xxx.com");
+            URLUtil.checkBaseURL("http://www.xxx.com");
         } catch (ForestRuntimeException e) {
             exception = true;
         }
         assertFalse(exception);
 
         try {
-            URLUtils.checkBaseURL("www.xxx.com");
+            URLUtil.checkBaseURL("www.xxx.com");
         } catch (ForestRuntimeException e) {
             exception = true;
         }
@@ -51,28 +51,28 @@ public class TestURL {
         String baseUrl = "http://www.xxx.com";
         String uri = "/cc/yy";
 
-        String newURL = URLUtils.getValidURL(baseUrl, uri);
+        String newURL = URLUtil.getValidURL(baseUrl, uri);
         assertEquals(expected, newURL);
 
         baseUrl = "http://www.xxx.com";
         uri = "/cc/yy";
 
-        newURL = URLUtils.getValidURL(baseUrl, uri);
+        newURL = URLUtil.getValidURL(baseUrl, uri);
         assertEquals(expected, newURL);
 
         baseUrl = "http://www.xxx.com/";
         uri = "/cc/yy";
 
-        newURL = URLUtils.getValidURL(baseUrl, uri);
+        newURL = URLUtil.getValidURL(baseUrl, uri);
         assertEquals(expected, newURL);
 
         baseUrl = "http://www.xxx.com";
         uri = "cc/yy";
 
-        newURL = URLUtils.getValidURL(baseUrl, uri);
+        newURL = URLUtil.getValidURL(baseUrl, uri);
         assertEquals(expected, newURL);
 
-        newURL = URLUtils.getValidURL("www.xxx.com", uri);
+        newURL = URLUtil.getValidURL("www.xxx.com", uri);
         assertEquals(expected, newURL);
 
     }

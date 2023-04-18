@@ -1,6 +1,6 @@
 package org.dromara.forest.ssl;
 
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 import org.apache.http.conn.ssl.SSLContextBuilder;
 import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
@@ -58,7 +58,7 @@ public class SSLUtils {
 
                 SSLContextBuilder scBuilder = SSLContexts.custom();
                 String protocol = request.getSslProtocol();
-                if (StringUtils.isNotEmpty(protocol)) {
+                if (StringUtil.isNotEmpty(protocol)) {
                     scBuilder.useProtocol(protocol);
                 }
                 scBuilder.loadTrustMaterial(keyStore, new TrustSelfSignedStrategy());
@@ -90,7 +90,7 @@ public class SSLUtils {
      */
     public static SSLContext createIgnoreVerifySSL(String sslProtocol) throws NoSuchAlgorithmException, KeyManagementException {
         SSLContext sc = null;
-        if (StringUtils.isEmpty(sslProtocol)) {
+        if (StringUtil.isEmpty(sslProtocol)) {
             sc = SSLContext.getInstance("TLS");
         } else {
             sc = SSLContext.getInstance(sslProtocol);

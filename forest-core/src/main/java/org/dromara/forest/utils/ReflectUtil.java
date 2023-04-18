@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ReflectUtils {
+public class ReflectUtil {
 
     private static ForestJsonConverter FORM_MAP_CONVERTER;
 
@@ -278,7 +278,7 @@ public class ReflectUtils {
             }
             Object value = invokeAnnotationMethod(ann, clazz, name, args);
             if (value == null ||
-                    (value instanceof CharSequence && StringUtils.isEmpty(String.valueOf(value)))) {
+                    (value instanceof CharSequence && StringUtil.isEmpty(String.valueOf(value)))) {
                 AliasFor aliasFor = method.getAnnotation(AliasFor.class);
                 if (aliasFor != null) {
                     String aliasName = aliasFor.value();
@@ -434,7 +434,7 @@ public class ReflectUtils {
         Map<String, Object> attrs = getAttributesFromAnnotation(source);
         Class targetClass = target.getClass();
         for (String name : attrs.keySet()) {
-            String methodName = NameUtils.setterName(name);
+            String methodName = NameUtil.setterName(name);
             try {
                 Method setterMethod = null;
                 for (Method method : targetClass.getMethods()) {

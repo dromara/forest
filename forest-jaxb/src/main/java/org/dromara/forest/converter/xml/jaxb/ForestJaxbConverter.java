@@ -9,8 +9,8 @@ import org.dromara.forest.http.ForestRequestBody;
 import org.dromara.forest.http.body.ObjectRequestBody;
 import org.dromara.forest.http.body.StringRequestBody;
 import org.dromara.forest.utils.ForestDataType;
-import org.dromara.forest.utils.ReflectUtils;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.ReflectUtil;
+import org.dromara.forest.utils.StringUtil;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -101,20 +101,20 @@ public class ForestJaxbConverter implements ForestXmlConverter {
 
     @Override
     public <T> T convertToJavaObject(String source, Type targetType) {
-        Class clazz = ReflectUtils.toClass(targetType);
+        Class clazz = ReflectUtil.toClass(targetType);
         return (T) convertToJavaObject(source, clazz);
     }
 
     @Override
     public <T> T convertToJavaObject(byte[] source, Class<T> targetType, Charset charset) {
-        String str = StringUtils.fromBytes(source, charset);
+        String str = StringUtil.fromBytes(source, charset);
         return (T) convertToJavaObject(str, targetType);
 
     }
 
     @Override
     public <T> T convertToJavaObject(byte[] source, Type targetType, Charset charset) {
-        Class clazz = ReflectUtils.toClass(targetType);
+        Class clazz = ReflectUtil.toClass(targetType);
         return (T) convertToJavaObject(source, clazz, charset);
     }
 
@@ -124,7 +124,7 @@ public class ForestJaxbConverter implements ForestXmlConverter {
             Marshaller marshaller = jaxbContext.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
-            if (StringUtils.isNotEmpty(encoding)) {
+            if (StringUtil.isNotEmpty(encoding)) {
                 marshaller.setProperty(Marshaller.JAXB_ENCODING, encoding);
             }
             return marshaller;

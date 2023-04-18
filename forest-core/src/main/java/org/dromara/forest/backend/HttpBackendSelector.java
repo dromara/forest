@@ -2,7 +2,7 @@ package org.dromara.forest.backend;
 
 import org.dromara.forest.config.ForestConfiguration;
 import org.dromara.forest.exceptions.ForestRuntimeException;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -65,16 +65,16 @@ public class HttpBackendSelector {
      */
     public HttpBackend select(String backendName) {
         HttpBackend backend = null;
-        if (StringUtils.isNotEmpty(backendName)) {
+        if (StringUtil.isNotEmpty(backendName)) {
             backend = BACKEND_MAP.get(backendName);
         }
         if (backend == null) {
             synchronized (this) {
-                if (StringUtils.isNotEmpty(backendName)) {
+                if (StringUtil.isNotEmpty(backendName)) {
                     backend = BACKEND_MAP.get(backendName);
                 }
                 if (backend == null) {
-                    if (StringUtils.isNotEmpty(backendName)) {
+                    if (StringUtil.isNotEmpty(backendName)) {
                         HttpBackendCreator backendCreator = BACKEND_CREATOR_MAP.get(backendName);
                         if (backendCreator == null) {
                             throw new ForestRuntimeException("Http setBackend \"" + backendName + "\" can not be found.");

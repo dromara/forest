@@ -25,7 +25,7 @@ public class Validations {
     }
 
     public static void assertParamNotEmpty(String str, String paramName) {
-        if (StringUtils.isEmpty(str)) {
+        if (StringUtil.isEmpty(str)) {
             throwParameterEmptyException(paramName);
         }
     }

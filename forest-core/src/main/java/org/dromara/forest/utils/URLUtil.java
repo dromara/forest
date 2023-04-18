@@ -8,9 +8,9 @@ import java.io.UnsupportedEncodingException;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-17 16:35
  */
-public final class URLUtils {
+public final class URLUtil {
 
-    private URLUtils() {
+    private URLUtil() {
     }
 
     /**
@@ -123,13 +123,13 @@ public final class URLUtils {
      * @return 合法的URL字符串
      */
     public static String getValidURL(String baseURL, String uri) {
-        if (StringUtils.isNotEmpty(baseURL) && !URLUtils.hasProtocol(baseURL)) {
+        if (StringUtil.isNotEmpty(baseURL) && !URLUtil.hasProtocol(baseURL)) {
             baseURL = "http://" + baseURL;
         }
 
-        if (!URLUtils.hasProtocol(uri)) {
-            if (StringUtils.isNotEmpty(baseURL)) {
-                if (StringUtils.isBlank(uri)) {
+        if (!URLUtil.hasProtocol(uri)) {
+            if (StringUtil.isNotEmpty(baseURL)) {
+                if (StringUtil.isBlank(uri)) {
                     return baseURL;
                 }
                 if (baseURL.endsWith("/")) {

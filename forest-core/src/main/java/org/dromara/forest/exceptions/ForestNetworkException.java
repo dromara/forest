@@ -25,7 +25,7 @@
 package org.dromara.forest.exceptions;
 
 import org.dromara.forest.http.ForestResponse;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 /**
  * @author gongjun
@@ -54,13 +54,13 @@ public class ForestNetworkException extends ForestRuntimeException {
     private static String errorMessage(String message, Integer statusCode, ForestResponse response) {
         StringBuilder builder = new StringBuilder();
         builder.append("HTTP ").append(statusCode).append(" Error");
-        if (StringUtils.isNotEmpty(message)) {
+        if (StringUtil.isNotEmpty(message)) {
             builder.append(": ").append(message);
         }
         if (response != null) {
             String content = response.getContent();
             if (content != null) {
-                if (StringUtils.isNotEmpty(message)) {
+                if (StringUtil.isNotEmpty(message)) {
                     builder.append("; ");
                 }
                 builder.append("Content=").append(content);

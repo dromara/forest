@@ -10,8 +10,8 @@ import org.dromara.forest.handler.LifeCycleHandler;
 import org.dromara.forest.http.ForestHeaderMap;
 import org.dromara.forest.http.ForestProxy;
 import org.dromara.forest.http.ForestRequest;
-import org.dromara.forest.utils.StringUtils;
-import org.dromara.forest.utils.TimeUtils;
+import org.dromara.forest.utils.StringUtil;
+import org.dromara.forest.utils.TimeUtil;
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -107,10 +107,10 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
             // 读取超时时间
             Integer readTimeout = request.readTimeout();
 
-            if (TimeUtils.isNone(connectTimeout)) {
+            if (TimeUtil.isNone(connectTimeout)) {
                 connectTimeout = timeout;
             }
-            if (TimeUtils.isNone(readTimeout)) {
+            if (TimeUtil.isNone(readTimeout)) {
                 readTimeout = timeout;
             }
             // 设置请求连接超时时间
@@ -130,7 +130,7 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
             ForestProxy forestProxy = request.getProxy();
             if (forestProxy != null) {
                 HttpHost proxy = new HttpHost(forestProxy.getHost(), forestProxy.getPort());
-                if (StringUtils.isNotEmpty(forestProxy.getUsername()) || !forestProxy.getHeaders().isEmpty()) {
+                if (StringUtil.isNotEmpty(forestProxy.getUsername()) || !forestProxy.getHeaders().isEmpty()) {
                     CredentialsProvider provider = new BasicCredentialsProvider();
                     provider.setCredentials(
                             new AuthScope(proxy),

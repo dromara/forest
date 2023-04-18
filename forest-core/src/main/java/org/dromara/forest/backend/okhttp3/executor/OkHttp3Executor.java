@@ -21,7 +21,7 @@ import org.dromara.forest.logging.RequestLogMessage;
 import org.dromara.forest.logging.RequestProxyLogMessage;
 import org.dromara.forest.logging.ResponseLogMessage;
 import org.dromara.forest.utils.RequestNameValue;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 import org.dromara.forest.backend.okhttp3.conn.OkHttp3ConnectionManager;
 import org.dromara.forest.backend.okhttp3.response.OkHttp3ForestResponseFactory;
 import org.dromara.forest.backend.okhttp3.response.OkHttp3ResponseFuture;
@@ -166,10 +166,10 @@ public class OkHttp3Executor implements HttpExecutor {
                 }
             }
         }
-        if (StringUtils.isNotEmpty(contentType)) {
+        if (StringUtil.isNotEmpty(contentType)) {
             builder.addHeader(contentTypeHeaderName, contentType);
         }
-        if (StringUtils.isNotEmpty(contentEncoding)) {
+        if (StringUtil.isNotEmpty(contentEncoding)) {
             builder.addHeader(contentEncodingHeaderName, contentEncoding);
         }
     }

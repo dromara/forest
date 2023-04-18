@@ -2,7 +2,7 @@ package org.dromara.forest.ssl;
 
 import org.dromara.forest.Forest;
 import org.dromara.forest.exceptions.ForestRuntimeException;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 import org.springframework.core.io.ClassPathResource;
 
 import javax.net.ssl.HostnameVerifier;
@@ -16,7 +16,7 @@ import java.io.*;
 public class SpringSSLKeyStore extends SSLKeyStore {
 
     private static SSLSocketFactoryBuilder getSSLSocketFactoryBuilder(String sslSocketFactoryBuilderClass) {
-        if (StringUtils.isBlank(sslSocketFactoryBuilderClass)) {
+        if (StringUtil.isBlank(sslSocketFactoryBuilderClass)) {
             return null;
         }
         try {
@@ -31,7 +31,7 @@ public class SpringSSLKeyStore extends SSLKeyStore {
     }
 
     private static TrustManager getTrustManager(String trustManagerClass) {
-        if (StringUtils.isBlank(trustManagerClass)) {
+        if (StringUtil.isBlank(trustManagerClass)) {
             return null;
         }
         try {
@@ -46,7 +46,7 @@ public class SpringSSLKeyStore extends SSLKeyStore {
     }
 
     private static HostnameVerifier getHostnameVerifier(String hostnameVerifierClass) {
-        if (StringUtils.isBlank(hostnameVerifierClass)) {
+        if (StringUtil.isBlank(hostnameVerifierClass)) {
             return null;
         }
         try {
@@ -93,7 +93,7 @@ public class SpringSSLKeyStore extends SSLKeyStore {
 
     @Override
     public void init() {
-        if (StringUtils.isBlank(filePath)) {
+        if (StringUtil.isBlank(filePath)) {
             return;
         }
         if (filePath.indexOf(":/") == 1

@@ -13,7 +13,7 @@ import java.util.zip.GZIPInputStream;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 1.5.1
  */
-public class GzipUtils {
+public class GzipUtil {
 
     /**
      * 判断是否为gzip

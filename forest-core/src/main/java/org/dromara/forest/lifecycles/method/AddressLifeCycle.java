@@ -8,7 +8,7 @@ import org.dromara.forest.http.ForestRequest;
 import org.dromara.forest.lifecycles.MethodAnnotationLifeCycle;
 import org.dromara.forest.mapping.MappingTemplate;
 import org.dromara.forest.reflection.ForestMethod;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 /**
  * 重试注解的生命周期类
@@ -44,25 +44,25 @@ public class AddressLifeCycle implements MethodAnnotationLifeCycle<Address, Obje
         String host = null;
 
         // 判断是否有设置 basePath
-        if (StringUtils.isNotBlank(basePathStr)) {
+        if (StringUtil.isNotBlank(basePathStr)) {
             MappingTemplate basePathTemplate = request.getMethod().makeTemplate(Address.class, "basePath", basePathStr.trim());
             basePath = basePathTemplate.render(args);
         }
 
         // 判断是否有设置 scheme
-        if (StringUtils.isNotBlank(schemeStr)) {
+        if (StringUtil.isNotBlank(schemeStr)) {
             MappingTemplate schemeTemplate = request.getMethod().makeTemplate(Address.class, "schema", schemeStr.trim());
             scheme = schemeTemplate.render(args);
         }
 
         // 判断是否有设置 host
-        if (StringUtils.isNotBlank(hostStr)) {
+        if (StringUtil.isNotBlank(hostStr)) {
             MappingTemplate hostTemplate = request.getMethod().makeTemplate(Address.class, "host", hostStr.trim());
             host = hostTemplate.render(args);
         }
 
         // 判断是否有设置 port
-        if (StringUtils.isNotBlank(portStr)) {
+        if (StringUtil.isNotBlank(portStr)) {
             MappingTemplate portTemplate = request.getMethod().makeTemplate(Address.class, "port", portStr.trim());
             String portRendered = portTemplate.render(args);
             if (!Character.isDigit(portRendered.charAt(0))) {

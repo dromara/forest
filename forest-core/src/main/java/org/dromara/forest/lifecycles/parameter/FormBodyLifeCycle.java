@@ -7,7 +7,7 @@ import org.dromara.forest.http.ForestRequest;
 import org.dromara.forest.mapping.MappingParameter;
 import org.dromara.forest.reflection.ForestMethod;
 import org.dromara.forest.reflection.MetaRequest;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 /**
  * Forest &#064;FormBody注解的生命周期
@@ -29,7 +29,7 @@ public class FormBodyLifeCycle extends AbstractBodyLifeCycle<FormBody> {
                     "' has not bind a Forest request annotation. Hence the annotation @FormBody cannot be bind on a parameter in this method.");
         }
         String contentType = metaRequest.getContentType();
-        if (StringUtils.isNotEmpty(contentType) &&
+        if (StringUtil.isNotEmpty(contentType) &&
                 !ContentType.APPLICATION_X_WWW_FORM_URLENCODED.equals(contentType) &&
                 !ContentType.MULTIPART_FORM_DATA.equals(contentType) &&
                 contentType.indexOf("$") < 0) {
@@ -37,7 +37,7 @@ public class FormBodyLifeCycle extends AbstractBodyLifeCycle<FormBody> {
                     methodName + "' has already been set value '" + contentType +
                     "', not 'application/x-www-form-urlencoded'. Hence the annotation @FormBody cannot be bind on a parameter in this method.");
         }
-        if (StringUtils.isBlank(contentType)) {
+        if (StringUtil.isBlank(contentType)) {
             metaRequest.setContentType(ContentType.APPLICATION_X_WWW_FORM_URLENCODED);
         }
     }
@@ -49,7 +49,7 @@ public class FormBodyLifeCycle extends AbstractBodyLifeCycle<FormBody> {
     @Override
     public boolean beforeExecute(ForestRequest request) {
         String contentType = request.getContentType();
-        if (StringUtils.isBlank(contentType)) {
+        if (StringUtil.isBlank(contentType)) {
             request.setContentType(ContentType.APPLICATION_X_WWW_FORM_URLENCODED);
         }
 

@@ -3,7 +3,7 @@ package org.dromara.forest.mapping;
 import org.dromara.forest.converter.ForestConverter;
 import org.dromara.forest.filter.Filter;
 import org.dromara.forest.filter.FilterChain;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 /**
  * 字符串模板解析类 方法参数
@@ -152,7 +152,7 @@ public class MappingParameter {
      * @return 转换结果
      */
     public Object getConvertedDefaultValue(ForestConverter converter) {
-        if (StringUtils.isEmpty(defaultValue)) {
+        if (StringUtil.isEmpty(defaultValue)) {
             return null;
         }
         if (CharSequence.class.isAssignableFrom(this.type) && defaultValue instanceof CharSequence) {

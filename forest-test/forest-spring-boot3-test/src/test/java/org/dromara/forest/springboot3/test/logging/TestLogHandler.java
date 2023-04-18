@@ -4,7 +4,7 @@ import org.dromara.forest.http.ForestResponse;
 import org.dromara.forest.logging.DefaultLogHandler;
 import org.dromara.forest.logging.RequestLogMessage;
 import org.dromara.forest.logging.ResponseLogMessage;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 public class TestLogHandler extends DefaultLogHandler {
 
@@ -27,12 +27,12 @@ public class TestLogHandler extends DefaultLogHandler {
         builder.append(requestTypeChangeHistory(requestLogMessage));
         builder.append(requestLogMessage.getRequestLine());
         String headers = requestLoggingHeaders(requestLogMessage);
-        if (StringUtils.isNotEmpty(headers)) {
+        if (StringUtil.isNotEmpty(headers)) {
             builder.append("\n\t请求头: \n");
             builder.append(headers);
         }
         String body = requestLoggingBody(requestLogMessage);
-        if (StringUtils.isNotEmpty(body)) {
+        if (StringUtil.isNotEmpty(body)) {
             builder.append("\n\t请求体: \n");
             builder.append(body);
         }

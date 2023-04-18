@@ -69,7 +69,7 @@ import org.dromara.forest.retryer.BackOffRetryer;
 import org.dromara.forest.ssl.SSLKeyStore;
 import org.dromara.forest.utils.ForestDataType;
 import org.dromara.forest.utils.RequestNameValue;
-import org.dromara.forest.utils.TimeUtils;
+import org.dromara.forest.utils.TimeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -853,7 +853,7 @@ public class ForestConfiguration implements Serializable {
      * @since 1.5.6
      */
     public ForestConfiguration setConnectTimeout(int connectTimeout, TimeUnit timeUnit) {
-        this.connectTimeout = TimeUtils.toMillis("global connect timeout", connectTimeout, timeUnit);
+        this.connectTimeout = TimeUtil.toMillis("global connect timeout", connectTimeout, timeUnit);
         return this;
     }
 
@@ -865,7 +865,7 @@ public class ForestConfiguration implements Serializable {
      * @since 1.5.6
      */
     public ForestConfiguration setConnectTimeout(Duration connectTimeout) {
-        this.connectTimeout = TimeUtils.toMillis("global connect timeout", connectTimeout);
+        this.connectTimeout = TimeUtil.toMillis("global connect timeout", connectTimeout);
         return this;
     }
 
@@ -901,7 +901,7 @@ public class ForestConfiguration implements Serializable {
      * @since 1.5.6
      */
     public ForestConfiguration setReadTimeout(int readTimeout, TimeUnit timeUnit) {
-        this.readTimeout = TimeUtils.toMillis("global read timeout", readTimeout, timeUnit);
+        this.readTimeout = TimeUtil.toMillis("global read timeout", readTimeout, timeUnit);
         return this;
     }
 
@@ -913,7 +913,7 @@ public class ForestConfiguration implements Serializable {
      * @since 1.5.6
      */
     public ForestConfiguration setReadTimeout(Duration readTimeout) {
-        this.readTimeout = TimeUtils.toMillis("global read timeout", readTimeout);
+        this.readTimeout = TimeUtil.toMillis("global read timeout", readTimeout);
         return this;
     }
 

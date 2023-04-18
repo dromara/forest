@@ -25,7 +25,7 @@
 package org.dromara.forest.http;
 
 import org.dromara.forest.utils.RequestNameValue;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -56,7 +56,7 @@ public class ForestProxy implements HasURL, HasHeaders {
 
     public String cacheKey() {
         StringBuilder builder = new StringBuilder(",-x=");
-        if (StringUtils.isNotEmpty(host)) {
+        if (StringUtil.isNotEmpty(host)) {
             builder.append(host);
         }
         builder.append(":");
@@ -174,7 +174,7 @@ public class ForestProxy implements HasURL, HasHeaders {
      * @return {@link ForestProxy}类实例
      */
     public ForestProxy addHeader(String name, Object value) {
-        if (StringUtils.isEmpty(name)) {
+        if (StringUtil.isEmpty(name)) {
             return this;
         }
         this.headers.setHeader(name, String.valueOf(value));

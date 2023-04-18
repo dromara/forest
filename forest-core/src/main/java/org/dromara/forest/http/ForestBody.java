@@ -13,7 +13,7 @@ import org.dromara.forest.http.body.NameValueRequestBody;
 import org.dromara.forest.http.body.ObjectRequestBody;
 import org.dromara.forest.http.body.StringRequestBody;
 import org.dromara.forest.utils.ForestDataType;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 import org.dromara.forest.utils.Validations;
 
 import java.nio.charset.Charset;
@@ -384,10 +384,10 @@ public class ForestBody implements List<ForestRequestBody> {
 
     public String encodeToString(ConvertOptions options) {
         String strCharset = request.getCharset();
-        if (StringUtils.isEmpty(strCharset)) {
+        if (StringUtil.isEmpty(strCharset)) {
             strCharset = request.getConfiguration().getCharset();
         }
-        if (StringUtils.isEmpty(strCharset)) {
+        if (StringUtil.isEmpty(strCharset)) {
             strCharset = "UTF-8";
         }
         return encodeToString(Charset.forName(strCharset), options);

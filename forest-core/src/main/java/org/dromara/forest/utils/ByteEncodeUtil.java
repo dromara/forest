@@ -10,7 +10,7 @@ import org.mozilla.universalchardet.UniversalDetector;
  * @since 2020/9/3 0003 10:21
  * @see <a href="https://blog.csdn.net/qq_31384551/article/details/81627840">参考资料</a>
  */
-public class ByteEncodeUtils {
+public class ByteEncodeUtil {
     /**
      * 默认的编码名称
      */

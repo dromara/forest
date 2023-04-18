@@ -1,7 +1,7 @@
 package org.dromara.forest.ssl;
 
 import org.dromara.forest.exceptions.ForestRuntimeException;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.TrustManager;
@@ -139,7 +139,7 @@ public class SSLKeyStore {
 
 
     public void init() {
-        if (StringUtils.isNotBlank(filePath)) {
+        if (StringUtil.isNotBlank(filePath)) {
             String path = filePath.trim();
             File file = new File(path);
             if (!file.exists()) {

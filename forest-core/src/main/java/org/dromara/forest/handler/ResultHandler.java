@@ -8,7 +8,7 @@ import org.dromara.forest.http.ForestResponse;
 import org.dromara.forest.lifecycles.file.DownloadLifeCycle;
 import org.dromara.forest.reflection.MethodLifeCycleHandler;
 import org.dromara.forest.utils.ForestDataType;
-import org.dromara.forest.utils.ReflectUtils;
+import org.dromara.forest.utils.ReflectUtil;
 
 import java.io.File;
 import java.io.InputStream;
@@ -40,7 +40,7 @@ public class ResultHandler {
      * @since 1.5.27
      */
     public Object getResult(ForestRequest request, ForestResponse response, Type resultType) {
-        Class clazz = ReflectUtils.toClass(resultType);
+        Class clazz = ReflectUtil.toClass(resultType);
         return getResult(request, response, resultType, clazz);
     }
 
@@ -54,7 +54,7 @@ public class ResultHandler {
      * @since 1.5.27
      */
     public Object getResult(ForestRequest request, ForestResponse response, Class resultClass) {
-        Type type = ReflectUtils.toType(resultClass);
+        Type type = ReflectUtil.toType(resultClass);
         return getResult(request, response, type, resultClass);
     }
 
@@ -76,7 +76,7 @@ public class ResultHandler {
                         if (ForestResponse.class.isAssignableFrom(rowClass)
                                 || ForestRequest.class.isAssignableFrom(resultClass)) {
                             Type realType = parameterizedType.getActualTypeArguments()[0];
-                            Class realClass = ReflectUtils.toClass(parameterizedType.getActualTypeArguments()[0]);
+                            Class realClass = ReflectUtil.toClass(parameterizedType.getActualTypeArguments()[0]);
                             if (realClass == null) {
                                 realClass = String.class;
                             }
@@ -92,7 +92,7 @@ public class ResultHandler {
                         Class rowClass = (Class) parameterizedType.getRawType();
                         if (Future.class.isAssignableFrom(rowClass)) {
                             Type realType = parameterizedType.getActualTypeArguments()[0];
-                            Class realClass = ReflectUtils.toClass(parameterizedType.getActualTypeArguments()[0]);
+                            Class realClass = ReflectUtil.toClass(parameterizedType.getActualTypeArguments()[0]);
                             if (realClass == null) {
                                 return ((MethodLifeCycleHandler<?>) request.getLifeCycleHandler()).getResultData();
                             }

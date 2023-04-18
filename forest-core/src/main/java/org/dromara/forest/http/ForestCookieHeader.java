@@ -1,6 +1,6 @@
 package org.dromara.forest.http;
 
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -134,7 +134,7 @@ public class ForestCookieHeader extends SimpleHeader {
             return false;
         }
         String name = cookie.getName();
-        if (StringUtils.isBlank(name)) {
+        if (StringUtil.isBlank(name)) {
             return false;
         }
         final String path = cookie.getPath();

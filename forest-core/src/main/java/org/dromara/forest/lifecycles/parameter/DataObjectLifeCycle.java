@@ -4,7 +4,7 @@ import org.dromara.forest.annotation.DataObject;
 import org.dromara.forest.mapping.MappingParameter;
 import org.dromara.forest.reflection.ForestMethod;
 import org.dromara.forest.lifecycles.ParameterAnnotationLifeCycle;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 /**
  * Forest &#064;DataObject注解的生命周期
@@ -17,7 +17,7 @@ public class DataObjectLifeCycle implements ParameterAnnotationLifeCycle<DataObj
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, DataObject annotation) {
         String jsonParamName = annotation.jsonParam();
         String filterName = annotation.filter();
-        boolean isJsonParam = StringUtils.isNotEmpty(jsonParamName);
+        boolean isJsonParam = StringUtil.isNotEmpty(jsonParamName);
         parameter.setObjectProperties(true);
         parameter.setJsonParam(isJsonParam);
         if (isJsonParam) {

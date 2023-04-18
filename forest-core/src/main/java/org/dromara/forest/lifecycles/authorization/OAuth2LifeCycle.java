@@ -9,7 +9,7 @@ import org.dromara.forest.http.ForestResponse;
 import org.dromara.forest.lifecycles.MethodAnnotationLifeCycle;
 import org.dromara.forest.reflection.ForestMethod;
 import org.dromara.forest.utils.ForestDataType;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 import javax.annotation.Nonnull;
 import java.time.Duration;
@@ -68,7 +68,7 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
      */
     private String getCacheId(ForestRequest request) {
         String cacheId = getAttributeAsString(request, "cacheId");
-        if (StringUtils.isNotBlank(cacheId)) {
+        if (StringUtil.isNotBlank(cacheId)) {
             return cacheId;
         }
         // tokenUri/clientId/grantType/scope/username 任何一个变动都可能是不同的帐号权限
@@ -153,7 +153,7 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
                 // 可能在并发场景下已经执行过一次刷新Token操作
                 return tokenCache;
             }
-            if (StringUtils.isBlank(tokenCache.getRefreshToken())) {
+            if (StringUtil.isBlank(tokenCache.getRefreshToken())) {
                 // 不存在刷新Token令牌（未开启 refresh_token），因此不能直接刷新Token，需要重新获取Token
                 tokenCache = requestToken(request);
             } else {
@@ -236,7 +236,7 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
         Map<String, Object> map = new HashMap<>();
         for (String value : values) {
             int indexOf = value.indexOf(":");
-            map.put(value.substring(0, indexOf), StringUtils.trimBegin(value.substring(indexOf + 1)));
+            map.put(value.substring(0, indexOf), StringUtil.trimBegin(value.substring(indexOf + 1)));
         }
         return map;
     }

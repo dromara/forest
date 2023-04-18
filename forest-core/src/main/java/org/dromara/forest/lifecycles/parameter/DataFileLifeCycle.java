@@ -10,7 +10,7 @@ import org.dromara.forest.reflection.ForestMethod;
 import org.dromara.forest.lifecycles.ParameterAnnotationLifeCycle;
 import org.dromara.forest.reflection.MetaRequest;
 import org.dromara.forest.utils.ForestDataType;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 /**
  * Forest &#064;DataFile注解的生命周期
@@ -27,7 +27,7 @@ public class DataFileLifeCycle implements ParameterAnnotationLifeCycle<DataFile,
         String partContentType = annotation.partContentType();
         MappingTemplate nameTemplate = method.makeTemplate(DataFile.class, "name", name);
         MappingTemplate fileNameTemplate = method.makeTemplate(DataFile.class, "fileName", fileName);
-        if (StringUtils.isNotBlank(partContentType)) {
+        if (StringUtil.isNotBlank(partContentType)) {
             parameter.setPartContentType(partContentType.trim());
         }
         ForestMultipartFactory factory = ForestMultipartFactory.createFactory(

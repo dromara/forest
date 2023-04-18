@@ -1,8 +1,8 @@
 package org.dromara.forest.reflection;
 
-import org.dromara.forest.utils.NameUtils;
-import org.dromara.forest.utils.ReflectUtils;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.NameUtil;
+import org.dromara.forest.utils.ReflectUtil;
+import org.dromara.forest.utils.StringUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -14,6 +14,8 @@ public class TypeWrapper {
 
     private final static Map<Class<?>, TypeWrapper> TYPE_CACHE = new ConcurrentHashMap<>();
 
+    private final static Object TYPE_CACHE_LOCK = new Object();
+
     private final Class<?> clazz;
 
     private final Map<String, PropWrapper> props = new LinkedHashMap<>();
@@ -21,8 +23,13 @@ public class TypeWrapper {
     public static TypeWrapper get(final Class<?> clazz) {
         TypeWrapper typeWrapper = TYPE_CACHE.get(clazz);
         if (typeWrapper == null) {
-            typeWrapper = new TypeWrapper(clazz);
-            TYPE_CACHE.put(clazz, typeWrapper);
+            synchronized (TYPE_CACHE_LOCK) {
+                typeWrapper = TYPE_CACHE.get(clazz);
+                if (typeWrapper == null) {
+                    typeWrapper = new TypeWrapper(clazz);
+                    TYPE_CACHE.put(clazz, typeWrapper);
+                }
+            }
         }
         return typeWrapper;
     }
@@ -34,14 +41,14 @@ public class TypeWrapper {
     }
 
     private void init() {
-        final Method[] methods = ReflectUtils.getMethods(clazz);
+        final Method[] methods = ReflectUtil.getMethods(clazz);
         final Map<String, PropWrapper> newProps = new LinkedHashMap<>();
         for (final Method method : methods) {
             String methodName = method.getName();
             int paramCount = method.getParameterCount();
-            if (paramCount == 0 && NameUtils.isGetter(methodName)) {
-                final String name = NameUtils.propNameFromGetter(methodName);
-                if (StringUtils.isNotEmpty(name)) {
+            if (paramCount == 0 && NameUtil.isGetter(methodName)) {
+                final String name = NameUtil.propNameFromGetter(methodName);
+                if (StringUtil.isNotEmpty(name)) {
                     PropWrapper prop = newProps.get(name);
                     if (prop == null) {
                         prop = new PropWrapper(name);
@@ -49,9 +56,9 @@ public class TypeWrapper {
                     }
                     prop.getter = method;
                 }
-            } else if (paramCount == 1 && NameUtils.isSetter(methodName)) {
-                final String name = NameUtils.propNameFromSetter(methodName);
-                if (StringUtils.isNotEmpty(name)) {
+            } else if (paramCount == 1 && NameUtil.isSetter(methodName)) {
+                final String name = NameUtil.propNameFromSetter(methodName);
+                if (StringUtil.isNotEmpty(name)) {
                     PropWrapper prop = newProps.get(name);
                     if (prop == null) {
                         prop = new PropWrapper(name);
@@ -62,7 +69,7 @@ public class TypeWrapper {
             }
         }
 
-        final Field[] fields = ReflectUtils.getFields(clazz);
+        final Field[] fields = ReflectUtil.getFields(clazz);
         for (final Field field : fields) {
             if (!field.isAccessible()) {
                 continue;

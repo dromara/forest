@@ -5,7 +5,7 @@ import org.dromara.forest.exceptions.ForestRuntimeException;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
-public class TimeUtils {
+public class TimeUtil {
 
     /**
      * 时长是否为空

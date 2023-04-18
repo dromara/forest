@@ -5,7 +5,7 @@ import org.dromara.forest.converter.ForestEncoder;
 import org.dromara.forest.lifecycles.MethodAnnotationLifeCycle;
 import org.dromara.forest.reflection.ForestMethod;
 import org.dromara.forest.reflection.MetaRequest;
-import org.dromara.forest.utils.ReflectUtils;
+import org.dromara.forest.utils.ReflectUtil;
 
 import java.util.Map;
 
@@ -13,7 +13,7 @@ public class BodyTypeLifeCycle implements MethodAnnotationLifeCycle<BodyType, Ob
 
     @Override
     public void onMethodInitialized(ForestMethod method, BodyType annotation) {
-        Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(annotation);
+        Map<String, Object> attrs = ReflectUtil.getAttributesFromAnnotation(annotation);
         String type = (String) attrs.get("type");
         Object encodeClass = attrs.get("encoder");
         MetaRequest metaRequest = method.getMetaRequest();

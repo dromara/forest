@@ -11,7 +11,7 @@ import org.dromara.forest.http.body.NameValueRequestBody;
 import org.dromara.forest.http.body.ObjectRequestBody;
 import org.dromara.forest.mapping.MappingTemplate;
 import org.dromara.forest.multipart.ForestMultipart;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 import okhttp3.*;
 
 import java.net.URLConnection;
@@ -55,7 +55,7 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
         if (value == null) {
             return;
         }
-        if (StringUtils.isEmpty(contentType)) {
+        if (StringUtil.isEmpty(contentType)) {
             contentType = "text/plain";
         }
         MediaType partMediaType = MediaType.parse(contentType);
@@ -75,7 +75,7 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
                                LifeCycleHandler lifeCycleHandler) {
         String boundary = request.getBoundary();
         MultipartBody.Builder bodyBuilder = null;
-        if (StringUtils.isNotEmpty(boundary)) {
+        if (StringUtil.isNotEmpty(boundary)) {
             bodyBuilder = new MultipartBody.Builder(boundary);
         } else {
             bodyBuilder = new MultipartBody.Builder();
@@ -128,7 +128,7 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
         RequestBody wrappedBody, requestBody;
         String partContentType = multipart.getContentType();
         MediaType fileMediaType = null;
-        if (StringUtils.isNotEmpty(partContentType)) {
+        if (StringUtil.isNotEmpty(partContentType)) {
             fileMediaType = MediaType.parse(partContentType);
         }
 
@@ -163,7 +163,7 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
             String contentType,
             byte[] bytes,
             boolean mergeCharset) {
-        if (StringUtils.isBlank(contentType)) {
+        if (StringUtil.isBlank(contentType)) {
             contentType = ContentType.APPLICATION_OCTET_STREAM;
         }
         MediaType mediaType = MediaType.parse(contentType);

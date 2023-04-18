@@ -3,7 +3,7 @@ package org.dromara.forest.test.http.model;
 import org.dromara.forest.annotation.Body;
 import org.dromara.forest.annotation.Header;
 import org.dromara.forest.annotation.Headers;
-import org.dromara.forest.utils.Base64Utils;
+import org.dromara.forest.utils.Base64Util;
 
 @Headers({"Content-Type: application/json"})
 public class LoginInfo {
@@ -19,7 +19,7 @@ public class LoginInfo {
 
     @Header("Token")
     public String getToken() {
-        return Base64Utils.encode(username + "," + pass + "," + timestamp);
+        return Base64Util.encode(username + "," + pass + "," + timestamp);
     }
 
     public long getTimestamp() {

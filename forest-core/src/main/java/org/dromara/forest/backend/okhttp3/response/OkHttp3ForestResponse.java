@@ -4,9 +4,9 @@ import org.dromara.forest.backend.ContentType;
 import org.dromara.forest.exceptions.ForestRuntimeException;
 import org.dromara.forest.http.ForestRequest;
 import org.dromara.forest.http.ForestResponse;
-import org.dromara.forest.utils.GzipUtils;
-import org.dromara.forest.utils.ReflectUtils;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.GzipUtil;
+import org.dromara.forest.utils.ReflectUtil;
+import org.dromara.forest.utils.StringUtil;
 import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.Response;
@@ -65,7 +65,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
     private void setupContent() {
         if (request.isDownloadFile()
                 || InputStream.class.isAssignableFrom(request.getMethod().getReturnClass())
-                || InputStream.class.isAssignableFrom(ReflectUtils.toClass(request.getLifeCycleHandler().getResultType()))
+                || InputStream.class.isAssignableFrom(ReflectUtil.toClass(request.getLifeCycleHandler().getResultType()))
                 || (contentType != null && contentType.canReadAsBinaryStream())) {
             StringBuilder builder = new StringBuilder();
             builder.append("[stream content-type: ")
@@ -93,7 +93,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
      **/
     private void setupGzip() {
         if(this.contentEncoding != null && !request.isDecompressResponseGzipEnabled()){
-            isGzip = GzipUtils.isGzip(contentEncoding);
+            isGzip = GzipUtil.isGzip(contentEncoding);
         } else {
             isGzip = true;
         }
@@ -151,7 +151,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
      * @date 2021/12/8 23:51
      **/
     private void setupResponseCharset() {
-        if (StringUtils.isNotBlank(request.getResponseEncode())) {
+        if (StringUtil.isNotBlank(request.getResponseEncode())) {
             this.charset = request.getResponseEncode();
         } else if (contentType != null) {
             this.charset = this.contentType.getCharsetName();
@@ -171,7 +171,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
      * @date 2021/12/8 23:51
      **/
     private void setupContentEncoding() {
-        if (StringUtils.isEmpty(this.contentEncoding)) {
+        if (StringUtil.isEmpty(this.contentEncoding)) {
             this.contentEncoding = okResponse.header("Content-Encoding");
         }
     }

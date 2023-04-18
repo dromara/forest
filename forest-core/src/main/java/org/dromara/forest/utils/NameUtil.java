@@ -7,7 +7,7 @@ import java.util.List;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2020-08-10 22:48
  */
-public class NameUtils {
+public class NameUtil {
 
     private final static String GETTER_PREFIX = "get";
 
@@ -47,7 +47,7 @@ public class NameUtils {
             char ch = name.charAt(i);
             if (Character.isUpperCase(ch)) {
                 String item = builder.toString();
-                if (StringUtils.isNotBlank(item)) {
+                if (StringUtil.isNotBlank(item)) {
                     names.add(item);
                 }
                 builder = new StringBuilder();
@@ -56,7 +56,7 @@ public class NameUtils {
             builder.append(ch);
         }
         String last = builder.toString();
-        if (StringUtils.isNotBlank(last)) {
+        if (StringUtil.isNotBlank(last)) {
             names.add(last);
         }
         String[] result = new String[names.size()];

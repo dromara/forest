@@ -11,9 +11,9 @@ import java.util.UUID;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-05-17
  */
-public final class StringUtils {
+public final class StringUtil {
 
-    private StringUtils() {}
+    private StringUtil() {}
 
     public static boolean isEmpty(CharSequence text) {
         return text == null || text.length() == 0;
@@ -48,7 +48,7 @@ public final class StringUtils {
     }
 
     /**
-     * 是否为非空白字符串，即 {@link StringUtils#isBlank(String)}的逆否命题
+     * 是否为非空白字符串，即 {@link StringUtil#isBlank(String)}的逆否命题
      * <p>字符串为null，空串，或都是空格的情况为 {@code false}
      *
      * @param text 字符串

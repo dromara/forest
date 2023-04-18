@@ -3,7 +3,7 @@ package org.dromara.forest.mapping;
 import org.dromara.forest.config.VariableScope;
 import org.dromara.forest.exceptions.ForestVariableUndefinedException;
 import org.dromara.forest.reflection.ForestMethod;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -45,7 +45,7 @@ public class MappingReference extends MappingExpr {
 
     @Override
     public boolean isIterateVariable() {
-        if (StringUtils.isEmpty(name)) {
+        if (StringUtil.isEmpty(name)) {
             return false;
         }
         if (ITERATE_VARS.contains(name)) {

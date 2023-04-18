@@ -5,7 +5,7 @@ import org.dromara.forest.annotation.RequestAttributes;
 import org.dromara.forest.handler.AutoOAuth2DefinitionHandler;
 import org.dromara.forest.handler.OAuth2DefinitionHandler;
 import org.dromara.forest.lifecycles.authorization.OAuth2LifeCycle;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 import javax.annotation.Nonnull;
 import java.lang.annotation.*;
@@ -197,7 +197,7 @@ public @interface OAuth2 {
          * @return GrantType 实际请求值
          */
         public String getValue(String defaultValue) {
-            if (StringUtils.isBlank(defaultValue)) {
+            if (StringUtil.isBlank(defaultValue)) {
                 // 当 @OAuth2.grantTypeValue 未设置值时，使用 @OAuth2.grantType 默认值
                 return value;
             }
@@ -249,7 +249,7 @@ public @interface OAuth2 {
          * @return 变量名
          */
         public String getTokenVariable(String defaultTokenVariable) {
-            if (StringUtils.isBlank(defaultTokenVariable)) {
+            if (StringUtil.isBlank(defaultTokenVariable)) {
                 // 当 @OAuth2.tokenVariable 未设置值时，使用 TokenAt 默认值
                 return tokenVariable;
             }
@@ -266,11 +266,11 @@ public @interface OAuth2 {
         public String getTokenValue(String defaultPrefix, String token) {
             // 优先使用 @OAuth2.tokenPrefix 值
             String prefix = defaultPrefix;
-            if (StringUtils.isBlank(prefix)) {
+            if (StringUtil.isBlank(prefix)) {
                 // 当 @OAuth2.tokenPrefix 未设置值时，使用 TokenAt 默认值
                 prefix = tokenPrefix;
             }
-            if (StringUtils.isBlank(prefix)) {
+            if (StringUtil.isBlank(prefix)) {
                 return token;
             }
             return prefix + " " + token;

@@ -5,8 +5,8 @@ import org.dromara.forest.mapping.MappingParameter;
 import org.dromara.forest.mapping.MappingVariable;
 import org.dromara.forest.reflection.ForestMethod;
 import org.dromara.forest.lifecycles.ParameterAnnotationLifeCycle;
-import org.dromara.forest.utils.ReflectUtils;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.ReflectUtil;
+import org.dromara.forest.utils.StringUtil;
 
 import java.util.Map;
 
@@ -19,11 +19,11 @@ public class QueryLifeCycle implements ParameterAnnotationLifeCycle<Query, Objec
 
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, Query annotation) {
-        Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(annotation);
+        Map<String, Object> attrs = ReflectUtil.getAttributesFromAnnotation(annotation);
         String name = (String) attrs.get("name");
         String filterName = (String) attrs.get("filter");
         String defaultValue = (String) attrs.get("defaultValue");
-        if (StringUtils.isNotEmpty(name)) {
+        if (StringUtil.isNotEmpty(name)) {
             parameter.setName(name);
             MappingVariable variable = new MappingVariable(name, parameter.getType());
             method.processParameterFilter(variable, filterName);
@@ -36,7 +36,7 @@ public class QueryLifeCycle implements ParameterAnnotationLifeCycle<Query, Objec
         } else {
             parameter.setObjectProperties(true);
         }
-        if (StringUtils.isNotEmpty(defaultValue)) {
+        if (StringUtil.isNotEmpty(defaultValue)) {
             parameter.setDefaultValue(defaultValue);
         }
         method.processParameterFilter(parameter, filterName);

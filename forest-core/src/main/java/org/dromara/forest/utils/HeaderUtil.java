@@ -4,7 +4,7 @@ import org.dromara.forest.http.ForestHeaderMap;
 import org.dromara.forest.http.HasHeaders;
 import org.dromara.forest.mapping.MappingTemplate;
 
-public class HeaderUtils {
+public class HeaderUtil {
 
     public static String[] splitHeaderNameValue(final String headerText) {
         return headerText.split(":", 2);

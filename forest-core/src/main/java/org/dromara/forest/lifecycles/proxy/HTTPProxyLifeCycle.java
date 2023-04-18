@@ -8,8 +8,8 @@ import org.dromara.forest.http.ForestRequest;
 import org.dromara.forest.lifecycles.MethodAnnotationLifeCycle;
 import org.dromara.forest.mapping.MappingTemplate;
 import org.dromara.forest.reflection.ForestMethod;
-import org.dromara.forest.utils.HeaderUtils;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.HeaderUtil;
+import org.dromara.forest.utils.StringUtil;
 
 import java.util.Arrays;
 
@@ -69,28 +69,28 @@ public class HTTPProxyLifeCycle implements MethodAnnotationLifeCycle<HTTPProxy, 
         }
 
         int port = 80;
-        if (StringUtils.isBlank(host)) {
+        if (StringUtil.isBlank(host)) {
             if (httpProxySource != null && httpProxySource instanceof HTTPProxySource) {
                 request.setProxy(((HTTPProxySource) httpProxySource).getProxy(request));
                 return true;
             }
             throw new ForestRuntimeException("[Forest] Proxy host cannot be empty!");
         }
-        if (StringUtils.isNotBlank(portStr)) {
+        if (StringUtil.isNotBlank(portStr)) {
             try {
                 port = Integer.parseInt(portStr);
             } catch (Throwable th) {
             }
         }
         ForestProxy proxy = new ForestProxy(host, port);
-        if (StringUtils.isNotEmpty(username)) {
+        if (StringUtil.isNotEmpty(username)) {
             proxy.setUsername(username);
         }
-        if (StringUtils.isNotEmpty(password)) {
+        if (StringUtil.isNotEmpty(password)) {
             proxy.setPassword(password);
         }
         if (headersTemplates != null && headersTemplates.length > 0) {
-            HeaderUtils.addHeaders(proxy, headersTemplates, args);
+            HeaderUtil.addHeaders(proxy, headersTemplates, args);
         }
         request.setProxy(proxy);
         return true;

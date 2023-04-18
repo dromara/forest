@@ -1,6 +1,6 @@
 package org.dromara.forest.test.http;
 
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
@@ -13,7 +13,7 @@ import static junit.framework.Assert.assertTrue;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-18 15:48
  */
-public class TestStringUtils {
+public class TestStringUtil {
 
     @Test
     public void testIsEmpty() throws InterruptedException {
@@ -22,15 +22,15 @@ public class TestStringUtils {
         String s3 = "a";
         String s4 = " ";
 
-        assertTrue(StringUtils.isEmpty(s1));
-        assertTrue(StringUtils.isEmpty(s2));
-        assertFalse(StringUtils.isEmpty(s3));
-        assertFalse(StringUtils.isEmpty(s4));
+        assertTrue(StringUtil.isEmpty(s1));
+        assertTrue(StringUtil.isEmpty(s2));
+        assertFalse(StringUtil.isEmpty(s3));
+        assertFalse(StringUtil.isEmpty(s4));
 
-        assertFalse(StringUtils.isNotEmpty(s1));
-        assertFalse(StringUtils.isNotEmpty(s2));
-        assertTrue(StringUtils.isNotEmpty(s3));
-        assertTrue(StringUtils.isNotEmpty(s4));
+        assertFalse(StringUtil.isNotEmpty(s1));
+        assertFalse(StringUtil.isNotEmpty(s2));
+        assertTrue(StringUtil.isNotEmpty(s3));
+        assertTrue(StringUtil.isNotEmpty(s4));
     }
 
     public static class Getter {
@@ -46,9 +46,9 @@ public class TestStringUtils {
     public void testGetGetterName() throws NoSuchMethodException {
         Method method1 = Getter.class.getMethod("getValue");
         Method method2 = Getter.class.getMethod("isExist");
-        assertEquals("value", StringUtils.getGetterName(method1));
-        assertEquals("exist", StringUtils.getGetterName(method2));
-        assertEquals("getValue", StringUtils.toGetterName("value"));
+        assertEquals("value", StringUtil.getGetterName(method1));
+        assertEquals("exist", StringUtil.getGetterName(method2));
+        assertEquals("getValue", StringUtil.toGetterName("value"));
     }
 
 

@@ -5,7 +5,7 @@ import org.dromara.forest.exceptions.ForestRuntimeException;
 import org.dromara.forest.mapping.MappingTemplate;
 import org.dromara.forest.mapping.SubVariableScope;
 import org.dromara.forest.reflection.ForestMethod;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 import java.io.File;
 import java.io.InputStream;
@@ -96,10 +96,10 @@ public class ForestMultipartFactory<T> {
     public <M extends ForestMultipart<T, ?>> M create(Class<T> pType, String name, String fileName, T data, String contentType) {
         if (data instanceof ForestMultipart) {
             ForestMultipart multipart = (ForestMultipart) data;
-            if (StringUtils.isEmpty(multipart.getName()) && StringUtils.isNotEmpty(name)) {
+            if (StringUtil.isEmpty(multipart.getName()) && StringUtil.isNotEmpty(name)) {
                 multipart.setName(name);
             }
-            if (StringUtils.isEmpty(multipart.getOriginalFileName()) && StringUtils.isNotEmpty(fileName)) {
+            if (StringUtil.isEmpty(multipart.getOriginalFileName()) && StringUtil.isNotEmpty(fileName)) {
                 multipart.setFileName(name);
             }
             return (M) multipart;

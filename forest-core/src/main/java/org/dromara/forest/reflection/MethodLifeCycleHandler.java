@@ -14,7 +14,7 @@ import org.dromara.forest.http.ForestCookies;
 import org.dromara.forest.http.ForestRequest;
 import org.dromara.forest.http.ForestResponse;
 import org.dromara.forest.utils.ForestProgress;
-import org.dromara.forest.utils.ReflectUtils;
+import org.dromara.forest.utils.ReflectUtil;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -42,8 +42,8 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
 
     public MethodLifeCycleHandler(Type resultType, Type onSuccessClassGenericType) {
         this.onSuccessClassGenericType = onSuccessClassGenericType;
-        this.resultType = ReflectUtils.toType(resultType);
-        this.resultRawClass = ReflectUtils.toClass(resultType);
+        this.resultType = ReflectUtil.toType(resultType);
+        this.resultRawClass = ReflectUtil.toClass(resultType);
     }
 
 
@@ -133,7 +133,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
         request.getInterceptorChain().onSuccess(resultData, request, response);
         OnSuccess onSuccess = request.getOnSuccess();
         if (onSuccess != null) {
-            Object result = RESULT_HANDLER.getResult(request, response, onSuccessClassGenericType, ReflectUtils.toClass(onSuccessClassGenericType));
+            Object result = RESULT_HANDLER.getResult(request, response, onSuccessClassGenericType, ReflectUtil.toClass(onSuccessClassGenericType));
             onSuccess.onSuccess(result, request, response);
         }
     }
@@ -247,8 +247,8 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
     }
 
     public void setResultType(Type resultType) {
-        this.resultType = ReflectUtils.toType(resultType);
-        this.resultRawClass = ReflectUtils.toClass(resultType);
+        this.resultType = ReflectUtil.toType(resultType);
+        this.resultRawClass = ReflectUtil.toClass(resultType);
     }
 
     public void setResultRawClass(Class resultRawClass) {

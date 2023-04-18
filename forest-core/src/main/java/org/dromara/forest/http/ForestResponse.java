@@ -28,10 +28,10 @@ package org.dromara.forest.http;
 import org.dromara.forest.backend.ContentType;
 import org.dromara.forest.callback.SuccessWhen;
 import org.dromara.forest.exceptions.ForestRuntimeException;
-import org.dromara.forest.utils.ByteEncodeUtils;
-import org.dromara.forest.utils.GzipUtils;
-import org.dromara.forest.utils.ReflectUtils;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.ByteEncodeUtil;
+import org.dromara.forest.utils.GzipUtil;
+import org.dromara.forest.utils.ReflectUtil;
+import org.dromara.forest.utils.StringUtil;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -255,7 +255,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
         if (isRedirection() && request != null) {
             try {
                 String location = getRedirectionLocation();
-                if (StringUtils.isBlank(location)) {
+                if (StringUtil.isBlank(location)) {
                     return null;
                 }
                 ForestRequest<T> redirectRequest = request.clone();
@@ -280,14 +280,14 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
         ForestHeader header = getHeader("Content-Disposition");
         if (header != null) {
             String dispositionValue = header.getValue();
-            if (StringUtils.isNotEmpty(dispositionValue)) {
+            if (StringUtil.isNotEmpty(dispositionValue)) {
                 String[] disGroup = dispositionValue.split(";");
                 for (int i = disGroup.length - 1; i >= 0; i--) {
                     /**
                      * content-disposition: attachment; filename="50db602db30cf6df60698510003d2415.jpg"
                      * need replace trim
                      */
-                    String disStr = StringUtils.trimBegin(disGroup[i]);
+                    String disStr = StringUtil.trimBegin(disGroup[i]);
                     if (disStr.startsWith("filename=")) {
                         String filename = disStr.substring("filename=".length());
                         if (filename.length() > 1 && filename.startsWith("\"") && filename.endsWith("\"")) {
@@ -356,9 +356,9 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
                 } catch (Throwable th) {
                 }
             } else {
-                Class clazz = ReflectUtils.toClass(type);
+                Class clazz = ReflectUtil.toClass(type);
                 if (ForestResponse.class.isAssignableFrom(clazz)) {
-                    Type argType = ReflectUtils.getGenericArgument(clazz);
+                    Type argType = ReflectUtil.getGenericArgument(clazz);
                     if (argType == null) {
                         argType = String.class;
                     }
@@ -736,13 +736,13 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      * @throws IOException 字符串处理异常
      */
     protected String byteToString(byte[] bytes) throws IOException {
-        if (StringUtils.isEmpty(charset)) {
+        if (StringUtil.isEmpty(charset)) {
             // Content-Encoding为空的情况下，自动判断字符编码
-            charset = ByteEncodeUtils.getCharsetName(bytes);
+            charset = ByteEncodeUtil.getCharsetName(bytes);
         }
         if (isGzip) {
             try {
-                return GzipUtils.decompressGzipToString(bytes, charset);
+                return GzipUtil.decompressGzipToString(bytes, charset);
             } catch (Throwable th) {
                 isGzip = false;
             }

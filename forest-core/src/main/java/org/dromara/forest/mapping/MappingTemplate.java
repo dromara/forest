@@ -6,9 +6,9 @@ import org.dromara.forest.config.VariableScope;
 import org.dromara.forest.exceptions.ForestTemplateSyntaxError;
 import org.dromara.forest.exceptions.ForestVariableUndefinedException;
 import org.dromara.forest.reflection.ForestMethod;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 import org.dromara.forest.converter.json.ForestJsonConverter;
-import org.dromara.forest.utils.URLUtils;
+import org.dromara.forest.utils.URLUtil;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
@@ -282,7 +282,7 @@ public class MappingTemplate {
                         methodName = (MappingIdentity) expr;
                         expr = null;
                     }
-                    if (methodName == null || StringUtils.isEmpty(methodName.getName())) {
+                    if (methodName == null || StringUtil.isEmpty(methodName.getName())) {
                         syntaxErrorWatch1(ch);
                     }
                     expr = parseInvokeParams(variableScope, expr, methodName);
@@ -464,7 +464,7 @@ public class MappingTemplate {
             if (val != null) {
                 val = getParameterValue(jsonConverter, val);
                 if (param != null && param.isUrlEncode()) {
-                    val = URLUtils.queryValueEncode(String.valueOf(val), param.getCharset());
+                    val = URLUtil.queryValueEncode(String.valueOf(val), param.getCharset());
                 }
                 return String.valueOf(val);
             }
@@ -473,7 +473,7 @@ public class MappingTemplate {
             if (val != null) {
                 val = getParameterValue(jsonConverter, val);
                 if (param != null && param.isUrlEncode()) {
-                    val = URLUtils.pathEncode(String.valueOf(val), param.getCharset());
+                    val = URLUtil.pathEncode(String.valueOf(val), param.getCharset());
                 }
             }
             return String.valueOf(val);

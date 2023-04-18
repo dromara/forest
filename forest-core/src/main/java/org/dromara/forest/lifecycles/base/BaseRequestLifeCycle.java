@@ -4,7 +4,7 @@ import org.dromara.forest.annotation.BaseRequest;
 import org.dromara.forest.lifecycles.BaseAnnotationLifeCycle;
 import org.dromara.forest.proxy.InterfaceProxyHandler;
 import org.dromara.forest.reflection.MetaRequest;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 /**
  * @author gongjun[dt_flys@hotmail.com]
@@ -16,7 +16,7 @@ public class BaseRequestLifeCycle implements BaseAnnotationLifeCycle<BaseRequest
     public void onProxyHandlerInitialized(InterfaceProxyHandler interfaceProxyHandler, BaseRequest annotation) {
         MetaRequest baseMetaRequest = interfaceProxyHandler.getBaseMetaRequest();
         String baseURLValue = annotation.baseURL();
-        if (StringUtils.isNotBlank(baseURLValue)) {
+        if (StringUtil.isNotBlank(baseURLValue)) {
             String baseURL = baseURLValue.trim();
             baseMetaRequest.setUrl(baseURL);
         }

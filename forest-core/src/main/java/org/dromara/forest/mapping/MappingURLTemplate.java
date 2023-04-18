@@ -10,7 +10,7 @@ import org.dromara.forest.http.SimpleQueryParameter;
 import org.dromara.forest.http.ForestURL;
 import org.dromara.forest.http.ForestURLBuilder;
 import org.dromara.forest.reflection.ForestMethod;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 import java.lang.annotation.Annotation;
 
@@ -88,7 +88,7 @@ public class MappingURLTemplate extends MappingTemplate {
                             } else {
                                 lastQuery = new SimpleQueryParameter(queries, keyValue[0]);
                                 String queryVal = keyValue[1];
-                                if (StringUtils.isNotBlank(queryVal)) {
+                                if (StringUtil.isNotBlank(queryVal)) {
                                     lastQuery.setValue(queryVal);
                                 }
                             }
@@ -226,7 +226,7 @@ public class MappingURLTemplate extends MappingTemplate {
                                     String[] keyValue = queryItem.split("=", 2);
                                     lastQuery = new SimpleQueryParameter(queries, keyValue[0]);
                                     queries.addQuery(lastQuery);
-                                    if (keyValue.length > 1 && StringUtils.isNotBlank(keyValue[1])) {
+                                    if (keyValue.length > 1 && StringUtil.isNotBlank(keyValue[1])) {
                                         lastQuery.setValue(keyValue[1]);
                                     }
                                 }
@@ -235,7 +235,7 @@ public class MappingURLTemplate extends MappingTemplate {
                     }
                 }
             }
-            if (host == null && StringUtils.isEmpty(path) && StringUtils.isNotEmpty(urlBuilder)) {
+            if (host == null && StringUtil.isEmpty(path) && StringUtil.isNotEmpty(urlBuilder)) {
                 if (scheme == null) {
                     String urlStr = urlBuilder.toString();
                     if (!urlStr.startsWith("/")) {
@@ -267,7 +267,7 @@ public class MappingURLTemplate extends MappingTemplate {
                     path.append(builder);
                 }
             }
-            if (StringUtils.isNotEmpty(path)) {
+            if (StringUtil.isNotEmpty(path)) {
                 String[] group = path.toString().split("#", 2);
                 if (group.length > 1) {
                     path = new StringBuilder();

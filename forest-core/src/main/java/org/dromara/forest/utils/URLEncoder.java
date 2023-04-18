@@ -216,7 +216,7 @@ public class URLEncoder {
             return null;
         }
         Charset cs = null;
-        if (StringUtils.isEmpty(charset)) {
+        if (StringUtil.isEmpty(charset)) {
             cs = StandardCharsets.UTF_8;
         } else {
             try {

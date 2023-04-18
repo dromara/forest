@@ -5,7 +5,7 @@ import org.dromara.forest.lifecycles.ParameterAnnotationLifeCycle;
 import org.dromara.forest.mapping.MappingParameter;
 import org.dromara.forest.mapping.MappingVariable;
 import org.dromara.forest.reflection.ForestMethod;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 /**
  * Forest &#064;Query注解的生命周期
@@ -19,7 +19,7 @@ public class JSONQueryLifeCycle implements ParameterAnnotationLifeCycle<JSONQuer
         String name = annotation.value();
         parameter.setTarget(MappingParameter.TARGET_QUERY);
         parameter.setJsonParam(true);
-        if (StringUtils.isNotEmpty(name)) {
+        if (StringUtil.isNotEmpty(name)) {
             parameter.setName(name);
             MappingVariable variable = new MappingVariable(name, parameter.getType());
             variable.setIndex(parameter.getIndex());

@@ -5,7 +5,7 @@ import org.dromara.forest.http.ForestRequestBody;
 import org.dromara.forest.mapping.MappingParameter;
 import org.dromara.forest.utils.ForestDataType;
 import org.dromara.forest.utils.RequestNameValue;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -51,7 +51,7 @@ public class StringRequestBody extends ForestRequestBody implements SupportFormU
     @Override
     public List<RequestNameValue> getNameValueList(ForestRequest request) {
         List<RequestNameValue> nameValueList = new LinkedList<>();
-        if (StringUtils.isNotBlank(content)) {
+        if (StringUtil.isNotBlank(content)) {
             String[] items = content.split("&");
             for (String item : items) {
                 String[] pair = item.split("=", 2);

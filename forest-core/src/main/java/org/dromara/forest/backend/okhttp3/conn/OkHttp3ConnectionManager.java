@@ -14,8 +14,8 @@ import org.dromara.forest.http.ForestRequest;
 import org.dromara.forest.ssl.ForestX509TrustManager;
 import org.dromara.forest.ssl.SSLKeyStore;
 import org.dromara.forest.ssl.TrustAllManager;
-import org.dromara.forest.utils.StringUtils;
-import org.dromara.forest.utils.TimeUtils;
+import org.dromara.forest.utils.StringUtil;
+import org.dromara.forest.utils.TimeUtil;
 import okhttp3.Authenticator;
 import okhttp3.ConnectionPool;
 import okhttp3.Credentials;
@@ -136,14 +136,14 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
             Integer connectTimeout = request.connectTimeout();
             Integer readTimeout = request.readTimeout();
             Integer writeTimeout = request.readTimeout();
-            if (TimeUtils.isNone(connectTimeout)) {
+            if (TimeUtil.isNone(connectTimeout)) {
                 connectTimeout = timeout;
             }
-            if (TimeUtils.isNone(readTimeout)) {
+            if (TimeUtil.isNone(readTimeout)) {
                 readTimeout = timeout;
             }
 
-            if (TimeUtils.isNone(writeTimeout)) {
+            if (TimeUtil.isNone(writeTimeout)) {
                 writeTimeout = timeout;
             }
 
@@ -161,14 +161,14 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
             if (proxy != null) {
                 Proxy okProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxy.getHost(), proxy.getPort()));
                 builder.proxy(okProxy);
-                if (StringUtils.isNotEmpty(proxy.getUsername()) || !proxy.getHeaders().isEmpty()) {
+                if (StringUtil.isNotEmpty(proxy.getUsername()) || !proxy.getHeaders().isEmpty()) {
                     builder.proxyAuthenticator(new Authenticator() {
                         @Nullable
                         @Override
                         public Request authenticate(@Nullable Route route, Response response) {
                             Request.Builder proxyBuilder = response.request().newBuilder();
                             Charset charset = null;
-                            if (StringUtils.isNotEmpty(proxy.getCharset())) {
+                            if (StringUtil.isNotEmpty(proxy.getCharset())) {
                                 charset = Charset.forName(proxy.getCharset());
                             }
 

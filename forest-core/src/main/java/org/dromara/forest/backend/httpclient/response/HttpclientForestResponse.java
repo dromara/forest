@@ -4,9 +4,9 @@ import org.dromara.forest.backend.ContentType;
 import org.dromara.forest.exceptions.ForestRuntimeException;
 import org.dromara.forest.http.ForestRequest;
 import org.dromara.forest.http.ForestResponse;
-import org.dromara.forest.utils.GzipUtils;
-import org.dromara.forest.utils.ReflectUtils;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.GzipUtil;
+import org.dromara.forest.utils.ReflectUtil;
+import org.dromara.forest.utils.StringUtil;
 import org.apache.http.*;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.util.EntityUtils;
@@ -70,7 +70,7 @@ public class HttpclientForestResponse extends ForestResponse {
     }
 
     private void setupResponseCharset() {
-        if (StringUtils.isNotBlank(request.getResponseEncode())) {
+        if (StringUtil.isNotBlank(request.getResponseEncode())) {
             this.charset = request.getResponseEncode();
         } else if (contentType != null) {
             this.charset = this.contentType.getCharset().name();
@@ -87,7 +87,7 @@ public class HttpclientForestResponse extends ForestResponse {
 
     private void setupContent() {
         if (content == null) {
-            Class resultClass = ReflectUtils.toClass(request.getLifeCycleHandler().getResultType());
+            Class resultClass = ReflectUtil.toClass(request.getLifeCycleHandler().getResultType());
             if (request.isDownloadFile()
                     || InputStream.class.isAssignableFrom(request.getMethod().getReturnClass())
                     || (resultClass != null && InputStream.class.isAssignableFrom(resultClass))
@@ -116,7 +116,7 @@ public class HttpclientForestResponse extends ForestResponse {
     private void setupGzip() {
         //响应消息的编码格式: gzip...
         if(this.contentEncoding != null && !request.isDecompressResponseGzipEnabled()){
-            isGzip = GzipUtils.isGzip(contentEncoding);
+            isGzip = GzipUtil.isGzip(contentEncoding);
         } else {
             isGzip = true;
         }

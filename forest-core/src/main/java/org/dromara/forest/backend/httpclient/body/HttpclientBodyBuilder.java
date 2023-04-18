@@ -9,7 +9,7 @@ import org.dromara.forest.http.body.NameValueRequestBody;
 import org.dromara.forest.http.body.ObjectRequestBody;
 import org.dromara.forest.mapping.MappingTemplate;
 import org.dromara.forest.multipart.ForestMultipart;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.entity.ByteArrayEntity;
@@ -55,7 +55,7 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
         if (value == null) {
             return;
         }
-        if (StringUtils.isEmpty(contentType)) {
+        if (StringUtil.isEmpty(contentType)) {
             contentType = "text/plain";
         }
         String text =  MappingTemplate.getParameterValue(jsonConverter, value);
@@ -72,7 +72,7 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
                                LifeCycleHandler lifeCycleHandler) {
         String boundary = request.getBoundary();
         MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
-        if (StringUtils.isNotEmpty(boundary)) {
+        if (StringUtil.isNotEmpty(boundary)) {
             entityBuilder.setBoundary(boundary);
         }
         // 解决文件名乱码问题
@@ -118,7 +118,7 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
 
             ContentType ctype = null;
 
-            if (StringUtils.isNotEmpty(partContentType)) {
+            if (StringUtil.isNotEmpty(partContentType)) {
                 ctype = ContentType.create(partContentType, httpCharset);
             }
             if (ctype == null) {
@@ -151,7 +151,7 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
                                  byte[] bytes,
                                  boolean mergeCharset) {
 
-        if (StringUtils.isBlank(contentType)) {
+        if (StringUtil.isBlank(contentType)) {
             contentType = ContentType.APPLICATION_OCTET_STREAM.toString();
         }
         if (charset == null && mergeCharset) {

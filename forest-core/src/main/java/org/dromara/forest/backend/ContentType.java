@@ -1,7 +1,7 @@
 package org.dromara.forest.backend;
 
 import org.dromara.forest.utils.ForestDataType;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -63,7 +63,7 @@ public class ContentType {
                     if ("charset".equalsIgnoreCase(charsetLabel)) {
                         String charsetValue = expr[1].trim();
                         charsetValue = charsetValue.replace("\"", "");
-                        if (StringUtils.isNotEmpty(charsetValue)) {
+                        if (StringUtil.isNotEmpty(charsetValue)) {
                             this.hasDefinedCharset = true;
                             this.charset = Charset.forName(charsetValue);
                         }
@@ -90,7 +90,7 @@ public class ContentType {
     }
 
     public String getCharsetName() {
-        if (hasDefinedCharset && StringUtils.isNotEmpty(definedCharsetName)) {
+        if (hasDefinedCharset && StringUtil.isNotEmpty(definedCharsetName)) {
             return definedCharsetName;
         }
         if (charset != null) {
@@ -100,7 +100,7 @@ public class ContentType {
     }
 
     public boolean isEmpty() {
-        return StringUtils.isEmpty(type) && StringUtils.isEmpty(subType);
+        return StringUtil.isEmpty(type) && StringUtil.isEmpty(subType);
     }
 
     public boolean isApplication() {
@@ -248,7 +248,7 @@ public class ContentType {
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append(type);
-        if (StringUtils.isNotEmpty(subType)) {
+        if (StringUtil.isNotEmpty(subType)) {
             builder.append("/").append(subType);
         }
         if (!parameters.isEmpty()) {
@@ -265,7 +265,7 @@ public class ContentType {
     public String toStringWithoutParameters() {
         StringBuilder builder = new StringBuilder();
         builder.append(type);
-        if (StringUtils.isNotEmpty(subType)) {
+        if (StringUtil.isNotEmpty(subType)) {
             builder.append("/").append(subType);
         }
         return builder.toString();

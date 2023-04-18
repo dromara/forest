@@ -24,7 +24,7 @@
 
 package org.dromara.forest.http;
 
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -92,7 +92,7 @@ public class ForestCookies implements Iterable<ForestCookie> {
      */
     public static ForestCookies parse(String content) {
         ForestCookies cookies = new ForestCookies();
-        if (StringUtils.isBlank(content)) {
+        if (StringUtil.isBlank(content)) {
             return cookies;
         }
         String[] pairs = content.split(";");

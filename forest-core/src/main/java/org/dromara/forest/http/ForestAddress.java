@@ -25,8 +25,8 @@
 package org.dromara.forest.http;
 
 import org.dromara.forest.exceptions.ForestRuntimeException;
-import org.dromara.forest.utils.StringUtils;
-import org.dromara.forest.utils.URLUtils;
+import org.dromara.forest.utils.StringUtil;
+import org.dromara.forest.utils.URLUtil;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -81,18 +81,18 @@ public class ForestAddress {
         if (basePathStr != null) {
             basePathStr = basePath.trim();
             if (!basePathStr.startsWith("/")) {
-                if (URLUtils.isURL(basePathStr)) {
+                if (URLUtil.isURL(basePathStr)) {
                     try {
                         String originHost = host;
                         URL url = new URL(basePathStr);
-                        if (StringUtils.isEmpty(scheme)) {
+                        if (StringUtil.isEmpty(scheme)) {
                             schemeStr = url.getProtocol();
                         }
                         userinfoStr = url.getUserInfo();
-                        if (StringUtils.isEmpty(host)) {
+                        if (StringUtil.isEmpty(host)) {
                             hostStr = url.getHost();
                         }
-                        if ((URLUtils.isNonePort(port) && StringUtils.isEmpty(originHost))) {
+                        if ((URLUtil.isNonePort(port) && StringUtil.isEmpty(originHost))) {
                             portNum = url.getPort();
                         }
                         basePathStr = url.getPath();

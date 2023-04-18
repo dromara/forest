@@ -25,8 +25,8 @@
 package org.dromara.forest.http;
 
 import org.dromara.forest.exceptions.ForestRuntimeException;
-import org.dromara.forest.utils.StringUtils;
-import org.dromara.forest.utils.URLUtils;
+import org.dromara.forest.utils.StringUtil;
+import org.dromara.forest.utils.URLUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -165,17 +165,17 @@ public class ForestURL {
     }
 
     public String getScheme() {
-        if (StringUtils.isEmpty(scheme) && address != null) {
+        if (StringUtil.isEmpty(scheme) && address != null) {
             return address.getScheme();
         }
-        if (StringUtils.isEmpty(scheme)) {
+        if (StringUtil.isEmpty(scheme)) {
             return ssl ? "https" : "http";
         }
         return scheme;
     }
 
     public ForestURL setScheme(String scheme) {
-        if (StringUtils.isBlank(scheme)) {
+        if (StringUtil.isBlank(scheme)) {
             return this;
         }
         this.scheme = scheme.trim();
@@ -185,14 +185,14 @@ public class ForestURL {
     }
 
     public String getHost() {
-        if (StringUtils.isEmpty(host) && address != null) {
+        if (StringUtil.isEmpty(host) && address != null) {
             return address.getHost();
         }
         return host;
     }
 
     public ForestURL setHost(String host) {
-        if (StringUtils.isBlank(host)) {
+        if (StringUtil.isBlank(host)) {
             return this;
         }
         this.host = host.trim();
@@ -204,14 +204,14 @@ public class ForestURL {
     }
 
     private static int normalizePort(Integer port, boolean ssl) {
-        if (URLUtils.isNonePort(port)) {
+        if (URLUtil.isNonePort(port)) {
             return ssl ? 443 : 80;
         }
         return port;
     }
 
     public int getPort() {
-        if (URLUtils.isNonePort(port) && address != null) {
+        if (URLUtil.isNonePort(port) && address != null) {
             return normalizePort(address.getPort(), ssl);
         }
         return normalizePort(port, ssl);
@@ -230,7 +230,7 @@ public class ForestURL {
      * @return URL根路径
      */
     public String normalizeBasePath() {
-        if (StringUtils.isEmpty(basePath)) {
+        if (StringUtil.isEmpty(basePath)) {
             return normalizeBasePath(address.getBasePath());
         }
         return normalizeBasePath(basePath);
@@ -238,7 +238,7 @@ public class ForestURL {
 
 
     private String normalizeBasePath(String basePath) {
-        if (StringUtils.isNotEmpty(basePath) && basePath.charAt(0) != '/') {
+        if (StringUtil.isNotEmpty(basePath) && basePath.charAt(0) != '/') {
             return '/' + basePath;
         }
         return basePath;
@@ -270,20 +270,20 @@ public class ForestURL {
         }
         this.basePath = basePath.trim();
         if (!this.basePath.startsWith("/")) {
-            if (URLUtils.isURL(this.basePath)) {
+            if (URLUtil.isURL(this.basePath)) {
                 try {
                     String originHost = this.host;
                     URL url = new URL(this.basePath);
-                    if (forced || StringUtils.isEmpty(this.scheme)) {
+                    if (forced || StringUtil.isEmpty(this.scheme)) {
                         setScheme(url.getProtocol());
                     }
-                    if (forced || StringUtils.isEmpty(this.userInfo)) {
+                    if (forced || StringUtil.isEmpty(this.userInfo)) {
                         this.userInfo = url.getUserInfo();
                     }
-                    if (forced || StringUtils.isEmpty(this.host)) {
+                    if (forced || StringUtil.isEmpty(this.host)) {
                         this.host = url.getHost();
                     }
-                    if (forced || (URLUtils.isNonePort(port) && StringUtils.isEmpty(originHost))) {
+                    if (forced || (URLUtil.isNonePort(port) && StringUtil.isEmpty(originHost))) {
                         this.port = url.getPort();
                     }
                     this.basePath = url.getPath();
@@ -305,7 +305,7 @@ public class ForestURL {
      * @return URL路径
      */
     public String getPath() {
-        if (StringUtils.isNotEmpty(path) && path.charAt(0) != '/') {
+        if (StringUtil.isNotEmpty(path) && path.charAt(0) != '/') {
             return '/' + path;
         }
         return path;
@@ -328,7 +328,7 @@ public class ForestURL {
     }
 
     public String getUserInfo() {
-        if (StringUtils.isEmpty(userInfo) && address != null) {
+        if (StringUtil.isEmpty(userInfo) && address != null) {
             return address.getUserInfo();
         }
         return userInfo;
@@ -342,13 +342,13 @@ public class ForestURL {
 
     public String getAuthority() {
         StringBuilder builder = new StringBuilder();
-        if (StringUtils.isNotEmpty(userInfo)) {
-            builder.append(URLUtils.userInfoEncode(userInfo, "UTF-8")).append("@");
+        if (StringUtil.isNotEmpty(userInfo)) {
+            builder.append(URLUtil.userInfoEncode(userInfo, "UTF-8")).append("@");
         }
-        if (StringUtils.isNotEmpty(host)) {
-            builder.append(URLUtils.userInfoEncode(host, "UTF-8"));
+        if (StringUtil.isNotEmpty(host)) {
+            builder.append(URLUtil.userInfoEncode(host, "UTF-8"));
         }
-        if (URLUtils.isNotNonePort(port) &&
+        if (URLUtil.isNotNonePort(port) &&
                 ((port != 80 && port != 443 && port > -1) ||
                 (port == 80 && !ssl) ||
                 (port == 443 && !ssl))) {
@@ -372,22 +372,22 @@ public class ForestURL {
 
     public String toURLString() {
         StringBuilder builder = new StringBuilder();
-        if (StringUtils.isNotEmpty(scheme)) {
+        if (StringUtil.isNotEmpty(scheme)) {
             builder.append(scheme).append("://");
         }
         String authority = getAuthority();
-        if (StringUtils.isNotEmpty(authority)) {
+        if (StringUtil.isNotEmpty(authority)) {
             builder.append(authority);
         }
-        if (StringUtils.isNotEmpty(basePath)) {
-            String encodedBasePath = URLUtils.pathEncode(basePath, "UTF-8");
+        if (StringUtil.isNotEmpty(basePath)) {
+            String encodedBasePath = URLUtil.pathEncode(basePath, "UTF-8");
             if (host != null && encodedBasePath.charAt(0) != '/') {
                 builder.append('/');
             }
             builder.append(encodedBasePath);
         }
-        if (StringUtils.isNotEmpty(path)) {
-            String encodedPath = URLUtils.pathEncode(path, "UTF-8");
+        if (StringUtil.isNotEmpty(path)) {
+            String encodedPath = URLUtil.pathEncode(path, "UTF-8");
             if ((host != null || basePath != null) && encodedPath.charAt(0) != '/') {
                 builder.append('/');
             }
@@ -409,7 +409,7 @@ public class ForestURL {
 
     @Override
     public String toString() {
-        if (StringUtils.isNotEmpty(ref)) {
+        if (StringUtil.isNotEmpty(ref)) {
             return originalUrl + "#" +originalUrl;
         }
         return originalUrl;
@@ -503,7 +503,7 @@ public class ForestURL {
             if (baseURL.host != null) {
                 baseHost = baseURL.host;
             }
-            if (URLUtils.isNotNonePort(baseURL.port)) {
+            if (URLUtil.isNotNonePort(baseURL.port)) {
                 basePort = baseURL.port;
             }
             if (baseURL.path != null) {
@@ -523,19 +523,19 @@ public class ForestURL {
             needBasePath = true;
         }
 
-        if (URLUtils.isNonePort(this.port)) {
+        if (URLUtil.isNonePort(this.port)) {
             this.port = basePort;
         }
-        if (StringUtils.isNotBlank(this.path)) {
+        if (StringUtil.isNotBlank(this.path)) {
             if (this.path.charAt(0) != '/') {
                 this.path = '/' + this.path;
             }
         }
-        if (needBasePath && StringUtils.isNotBlank(basePath)) {
+        if (needBasePath && StringUtil.isNotBlank(basePath)) {
             if (basePath.charAt(basePath.length() - 1) == '/') {
                 basePath = basePath.substring(0, basePath.length() - 1);
             }
-            if (StringUtils.isEmpty(this.path)) {
+            if (StringUtil.isEmpty(this.path)) {
                 this.path = basePath;
             } else {
                 this.path = basePath + this.path;
@@ -548,19 +548,19 @@ public class ForestURL {
     public ForestURL mergeAddress() {
         if (address != null) {
             String originHost = host;
-            if (StringUtils.isEmpty(scheme)) {
+            if (StringUtil.isEmpty(scheme)) {
                 scheme = address.getScheme();
             }
-            if (StringUtils.isEmpty(host)) {
+            if (StringUtil.isEmpty(host)) {
                 host = address.getHost();
             }
-            if (URLUtils.isNonePort(port) && StringUtils.isEmpty(originHost)) {
+            if (URLUtil.isNonePort(port) && StringUtil.isEmpty(originHost)) {
                 port = address.getPort();
             }
-            if (StringUtils.isEmpty(userInfo)) {
+            if (StringUtil.isEmpty(userInfo)) {
                 userInfo = address.getUserInfo();
             }
-            if (StringUtils.isEmpty(basePath)) {
+            if (StringUtil.isEmpty(basePath)) {
                 setBasePath(address.getBasePath(), false);
             }
             originalUrl = toURLString();
@@ -570,12 +570,12 @@ public class ForestURL {
 
     public ForestURL checkAndComplete() {
         String oldUrl = originalUrl;
-        if (StringUtils.isEmpty(scheme)) {
+        if (StringUtil.isEmpty(scheme)) {
             setScheme(ssl ? "https" : "http");
         }
-        if (StringUtils.isEmpty(host)) {
+        if (StringUtil.isEmpty(host)) {
             setHost("localhost");
-            if (URLUtils.isNonePort(port)) {
+            if (URLUtil.isNonePort(port)) {
                 log.warn("[Forest] Invalid url '" + oldUrl + "'. But an valid url must start width 'http://' or 'https://'. Convert this url to '" + toURLString() + "' automatically!");
             } else {
                 log.warn("[Forest] Invalid url '" + oldUrl + "'. Host is empty. Convert this url to '" + toURLString() + "' automatically!");

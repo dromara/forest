@@ -1,7 +1,7 @@
 package org.dromara.forest.multipart;
 
 import org.dromara.forest.exceptions.ForestNoFileNameException;
-import org.dromara.forest.utils.StringUtils;
+import org.dromara.forest.utils.StringUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -13,7 +13,7 @@ public class ByteArrayMultipart extends ForestMultipart<byte[], ByteArrayMultipa
 
     @Override
     public String getOriginalFileName() {
-        if (StringUtils.isBlank(fileName)) {
+        if (StringUtil.isBlank(fileName)) {
             throw new ForestNoFileNameException(byte[].class);
         }
         return fileName;
