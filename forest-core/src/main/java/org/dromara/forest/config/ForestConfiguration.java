@@ -234,6 +234,8 @@ public class ForestConfiguration implements Serializable {
      */
     private volatile HttpBackend backend;
 
+    private final Object backendLock = new Object();
+
     /**
      * HTTP后端名称
      * <p>现有后端包括：okhttp3 和 httpclient 两个</p>
@@ -282,15 +284,21 @@ public class ForestConfiguration implements Serializable {
      */
     private ForestObjectFactory forestObjectFactory;
 
+    private final Object forestObjectFactoryLock = new Object();
+
     /**
      * 拦截器工厂
      */
     private InterceptorFactory interceptorFactory;
 
+    private final Object interceptorFactoryLock = new Object();
+
     /**
      * Properties配置属性
      */
     private ForestProperties properties;
+
+    private final Object propertiesLock = new Object();
 
     /**
      * HTTP后端选择器
@@ -316,6 +324,8 @@ public class ForestConfiguration implements Serializable {
      * Forest请求池
      */
     private ForestRequestPool pool;
+
+    private final Object poolLock = new Object();
 
 
     /**
@@ -477,7 +487,7 @@ public class ForestConfiguration implements Serializable {
      */
     public HttpBackend getBackend() {
         if (backend == null) {
-            synchronized (this) {
+            synchronized (backendLock) {
                 if (backend == null) {
                     setupBackend();
                 }
@@ -502,7 +512,7 @@ public class ForestConfiguration implements Serializable {
      */
     public ForestObjectFactory getForestObjectFactory() {
         if (forestObjectFactory == null) {
-            synchronized (this) {
+            synchronized (forestObjectFactoryLock) {
                 if (forestObjectFactory == null) {
                     forestObjectFactory = new DefaultObjectFactory();
                 }
@@ -543,7 +553,7 @@ public class ForestConfiguration implements Serializable {
      */
     public InterceptorFactory getInterceptorFactory() {
         if (interceptorFactory == null) {
-            synchronized (this) {
+            synchronized (interceptorFactoryLock) {
                 if (interceptorFactory == null) {
                     interceptorFactory = new DefaultInterceptorFactory();
                 }
@@ -570,7 +580,7 @@ public class ForestConfiguration implements Serializable {
      */
     public ForestProperties getProperties() {
         if (properties == null) {
-            synchronized (this) {
+            synchronized (propertiesLock) {
                 if (properties == null) {
                     properties = new ForestProperties();
                 }
@@ -1540,7 +1550,7 @@ public class ForestConfiguration implements Serializable {
      */
     public ForestRequestPool getPool() {
         if (pool == null) {
-            synchronized (this) {
+            synchronized (poolLock) {
                 if (pool == null) {
                     pool = new FixedRequestPool(this);
                 }

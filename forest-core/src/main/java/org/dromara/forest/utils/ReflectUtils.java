@@ -28,6 +28,12 @@ public class ReflectUtils {
      */
     private static final Map<Class<?>, Field[]> FIELD_CACHE = new ConcurrentHashMap<>();
 
+
+    /**
+     * 字段缓存同步锁
+     */
+    private static final Object FIELD_CACHE_LOCK = new Object();
+
     /**
      * 方法缓存
      */
@@ -458,7 +464,7 @@ public class ReflectUtils {
     public static Field[] getFields(final Class<?> clazz) {
         Field[] fields = FIELD_CACHE.get(clazz);
         if (fields == null) {
-            synchronized (ReflectUtils.class) {
+            synchronized (FIELD_CACHE_LOCK) {
                 fields = FIELD_CACHE.get(clazz);
                 if (fields == null) {
                     fields = getFieldsWithoutCache(clazz, true);
