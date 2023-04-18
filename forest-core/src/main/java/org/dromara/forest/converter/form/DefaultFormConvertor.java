@@ -7,7 +7,7 @@ import org.dromara.forest.converter.ForestEncoder;
 import org.dromara.forest.converter.json.ForestJsonConverter;
 import org.dromara.forest.http.ForestBody;
 import org.dromara.forest.http.ForestRequest;
-import org.dromara.forest.http.ForestRequestBody;
+import org.dromara.forest.http.ForestBodyItem;
 import org.dromara.forest.http.Lazy;
 import org.dromara.forest.http.body.SupportFormUrlEncoded;
 import org.dromara.forest.mapping.MappingParameter;
@@ -167,7 +167,7 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
             } else if (value instanceof Map) {
                 processFormMapItem(newNameValueList, configuration, name, (Map) value, target);
             } else {
-                Map<String, Object> itemAttrs = ReflectUtil.convertObjectToMap(value, configuration);
+                Map<String, Object> itemAttrs = ReflectUtil.objectToMap(value, configuration);
                 for (Map.Entry<String, Object> entry : itemAttrs.entrySet()) {
                     String subAttrName = entry.getKey();
                     Object subAttrValue = entry.getValue();
@@ -243,7 +243,7 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
         final List<RequestNameValue> nameValueList = new LinkedList<>();
         final Charset cs = charset != null ? charset : StandardCharsets.UTF_8;
         final ForestRequest request = body.getRequest();
-        for (ForestRequestBody bodyItem : body) {
+        for (ForestBodyItem bodyItem : body) {
             if (bodyItem instanceof SupportFormUrlEncoded) {
                 nameValueList.addAll(((SupportFormUrlEncoded) bodyItem).getNameValueList(request));
             }

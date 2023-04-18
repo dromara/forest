@@ -3,14 +3,14 @@ package org.dromara.forest.http.body;
 
 import org.noear.solon.core.handle.UploadedFile;
 
-public class SolonUploadRequestBodyBuilder extends RequestBodyBuilder<UploadedFile, SolonUploadRequestBody, SolonUploadRequestBodyBuilder> {
+public class SolonUploadRequestBodyBuilder extends RequestBodyBuilder<UploadedFile, SolonUploadBodyItem, SolonUploadRequestBodyBuilder> {
 
     @Override
-    public SolonUploadRequestBody build(UploadedFile data, String defaultValue) {
+    public SolonUploadBodyItem build(UploadedFile data, String defaultValue) {
         if (data == null) {
             return null;
         }
-        SolonUploadRequestBody body = new SolonUploadRequestBody(data);
+        SolonUploadBodyItem body = new SolonUploadBodyItem(data);
         body.setDefaultValue(defaultValue);
         return body;
     }

@@ -4,9 +4,9 @@ import org.dromara.forest.backend.body.AbstractBodyBuilder;
 import org.dromara.forest.converter.json.ForestJsonConverter;
 import org.dromara.forest.handler.LifeCycleHandler;
 import org.dromara.forest.http.ForestRequest;
-import org.dromara.forest.http.ForestRequestBody;
-import org.dromara.forest.http.body.NameValueRequestBody;
-import org.dromara.forest.http.body.ObjectRequestBody;
+import org.dromara.forest.http.ForestBodyItem;
+import org.dromara.forest.http.body.NameValueBodyItem;
+import org.dromara.forest.http.body.ObjectBodyItem;
 import org.dromara.forest.mapping.MappingTemplate;
 import org.dromara.forest.multipart.ForestMultipart;
 import org.dromara.forest.utils.StringUtil;
@@ -83,17 +83,17 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
             itemCharset = charset;
         }
         boolean needSetMode = false;
-        for (ForestRequestBody item : request.body()) {
-            if (item instanceof NameValueRequestBody) {
+        for (ForestBodyItem item : request.body()) {
+            if (item instanceof NameValueBodyItem) {
                 needSetMode = true;
-                NameValueRequestBody nameValueItem = (NameValueRequestBody) item;
+                NameValueBodyItem nameValueItem = (NameValueBodyItem) item;
                 String name = nameValueItem.getName();
                 Object value = nameValueItem.getValue();
                 String partContentType = nameValueItem.getContentType();
                 addMultipart(entityBuilder, name, value, partContentType, itemCharset, jsonConverter);
 
-            } else if (item instanceof ObjectRequestBody) {
-                Object obj = ((ObjectRequestBody) item).getObject();
+            } else if (item instanceof ObjectBodyItem) {
+                Object obj = ((ObjectBodyItem) item).getObject();
                 if (obj == null) {
                     continue;
                 }

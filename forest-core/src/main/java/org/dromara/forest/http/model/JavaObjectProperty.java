@@ -47,8 +47,6 @@ public class JavaObjectProperty implements ObjectProperty {
     }
 
 
-
-
     public void setValue(Object value) {
         this.propWrapper.setValue(this.instance, value);
     }

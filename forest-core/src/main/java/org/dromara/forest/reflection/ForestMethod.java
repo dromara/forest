@@ -26,12 +26,12 @@ import org.dromara.forest.http.ForestQueryMap;
 import org.dromara.forest.http.ForestQueryParameter;
 import org.dromara.forest.http.SimpleQueryParameter;
 import org.dromara.forest.http.ForestRequest;
-import org.dromara.forest.http.ForestRequestBody;
+import org.dromara.forest.http.ForestBodyItem;
 import org.dromara.forest.http.ForestRequestType;
 import org.dromara.forest.http.ForestResponse;
 import org.dromara.forest.http.ForestURL;
 import org.dromara.forest.http.body.RequestBodyBuilder;
-import org.dromara.forest.http.body.StringRequestBody;
+import org.dromara.forest.http.body.StringBodyItem;
 import org.dromara.forest.interceptor.Interceptor;
 import org.dromara.forest.interceptor.InterceptorAttributes;
 import org.dromara.forest.interceptor.InterceptorFactory;
@@ -986,7 +986,7 @@ public class ForestMethod<T> implements VariableScope {
                             request.addQuery(obj.toString(), (Object) null,
                                     parameter.isUrlEncode(), parameter.getCharset());
                         } else if (MappingParameter.isBody(target)) {
-                            ForestRequestBody body = RequestBodyBuilder
+                            ForestBodyItem body = RequestBodyBuilder
                                     .type(obj.getClass())
                                     .build(obj, parameter.getDefaultValue());
                             request.addBody(body);
@@ -1000,7 +1000,7 @@ public class ForestMethod<T> implements VariableScope {
                         request.addQuery(ForestQueryParameter.createSimpleQueryParameter(request.getQuery(), obj)
                                 .setDefaultValue(parameter.getDefaultValue()));
                     } else if (MappingParameter.isBody(target)) {
-                        request.addBody(new StringRequestBody(obj.toString())
+                        request.addBody(new StringBodyItem(obj.toString())
                                 .setDefaultValue(parameter.getDefaultValue()));
                     }
                 } else if (obj instanceof Map) {
@@ -1037,13 +1037,13 @@ public class ForestMethod<T> implements VariableScope {
                             }
                         }
                     } else if (MappingParameter.isBody(target)) {
-                        ForestRequestBody body = RequestBodyBuilder
+                        ForestBodyItem body = RequestBodyBuilder
                                 .type(obj.getClass())
                                 .build(obj, parameter.getDefaultValue());
                         request.addBody(body);
                     }
                 } else if (MappingParameter.isBody(target)) {
-                    ForestRequestBody body = RequestBodyBuilder
+                    ForestBodyItem body = RequestBodyBuilder
                             .type(obj.getClass())
                             .build(obj, parameter.getDefaultValue());
                     request.addBody(body);
@@ -1366,7 +1366,7 @@ public class ForestMethod<T> implements VariableScope {
         if (obj == null) {
             return null;
         }
-        Map<String, Object> propMap = ReflectUtil.convertObjectToMap(obj, configuration);
+        Map<String, Object> propMap = ReflectUtil.objectToMap(obj, configuration);
         List<RequestNameValue> nameValueList = new ArrayList<>();
         for (Map.Entry<String, Object> entry : propMap.entrySet()) {
             String name = entry.getKey();

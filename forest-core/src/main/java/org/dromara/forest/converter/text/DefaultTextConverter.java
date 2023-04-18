@@ -5,8 +5,8 @@ import org.dromara.forest.converter.ForestConverter;
 import org.dromara.forest.converter.ForestEncoder;
 import org.dromara.forest.exceptions.ForestConvertException;
 import org.dromara.forest.http.ForestBody;
-import org.dromara.forest.http.ForestRequestBody;
-import org.dromara.forest.http.body.NameValueRequestBody;
+import org.dromara.forest.http.ForestBodyItem;
+import org.dromara.forest.http.body.NameValueBodyItem;
 import org.dromara.forest.utils.ForestDataType;
 import org.dromara.forest.utils.StringUtil;
 
@@ -57,9 +57,9 @@ public class DefaultTextConverter implements ForestConverter<String>, ForestEnco
             charset = StandardCharsets.UTF_8;
         }
         StringBuilder builder = new StringBuilder();
-        ForestRequestBody lastBodyItem = null;
-        for (ForestRequestBody bodyItem : body) {
-            if (lastBodyItem != null && lastBodyItem instanceof NameValueRequestBody) {
+        ForestBodyItem lastBodyItem = null;
+        for (ForestBodyItem bodyItem : body) {
+            if (lastBodyItem != null && lastBodyItem instanceof NameValueBodyItem) {
                 builder.append("&");
             }
             builder.append(bodyItem.toString());

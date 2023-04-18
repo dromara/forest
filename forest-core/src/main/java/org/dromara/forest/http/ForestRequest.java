@@ -49,13 +49,13 @@ import org.dromara.forest.exceptions.ForestRetryException;
 import org.dromara.forest.exceptions.ForestRuntimeException;
 import org.dromara.forest.exceptions.ForestVariableUndefinedException;
 import org.dromara.forest.handler.LifeCycleHandler;
-import org.dromara.forest.http.body.ByteArrayRequestBody;
-import org.dromara.forest.http.body.FileRequestBody;
-import org.dromara.forest.http.body.InputStreamRequestBody;
-import org.dromara.forest.http.body.MultipartRequestBody;
-import org.dromara.forest.http.body.NameValueRequestBody;
-import org.dromara.forest.http.body.ObjectRequestBody;
-import org.dromara.forest.http.body.StringRequestBody;
+import org.dromara.forest.http.body.ByteArrayBodyItem;
+import org.dromara.forest.http.body.FileBodyItem;
+import org.dromara.forest.http.body.InputStreamBodyItem;
+import org.dromara.forest.http.body.MultipartBodyItem;
+import org.dromara.forest.http.body.NameValueBodyItem;
+import org.dromara.forest.http.body.ObjectBodyItem;
+import org.dromara.forest.http.body.StringBodyItem;
 import org.dromara.forest.interceptor.Interceptor;
 import org.dromara.forest.interceptor.InterceptorAttributes;
 import org.dromara.forest.interceptor.InterceptorChain;
@@ -77,6 +77,7 @@ import org.dromara.forest.ssl.SSLSocketFactoryBuilder;
 import org.dromara.forest.ssl.SSLUtils;
 import org.dromara.forest.ssl.TrustAllHostnameVerifier;
 import org.dromara.forest.utils.ForestDataType;
+import org.dromara.forest.utils.ReflectUtil;
 import org.dromara.forest.utils.RequestNameValue;
 import org.dromara.forest.utils.StringUtil;
 import org.dromara.forest.utils.TimeUtil;
@@ -285,7 +286,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * 请求体
      * <p>
      * 该字段为列表类型，列表每一项为请求体项,
-     * 都为 {@link ForestRequestBody} 子类的对象实例
+     * 都为 {@link ForestBodyItem} 子类的对象实例
      */
     private final ForestBody body;
 
@@ -1661,13 +1662,16 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return {@link ForestRequest}对象实例
      */
     public ForestRequest<T> addQuery(Object queryParameters) {
-        final ForestJsonConverter jsonConverter = getConfiguration().getJsonConverter();
-        final ConvertOptions options = ConvertOptions.defaultOptions().evaluateLazyValue(false);
-        final Map<String, Object> map = jsonConverter.convertObjectToMap(queryParameters, this, options);
-        if (map != null && map.size() > 0) {
+        final Map<String, Object> map = ReflectUtil.objectToMap(
+                queryParameters, this, ConvertOptions.defaultOptions().evaluateLazyValue(false));
+        if (map.size() > 0) {
             map.forEach((key, value) -> {
                 if (value != null) {
-                    addQuery(String.valueOf(key), value);
+                    if (value instanceof Lazy) {
+                        addQuery(String.valueOf(key), (Lazy) value);
+                    } else {
+                        addQuery(String.valueOf(key), value);
+                    }
                 }
             });
         }
@@ -2203,7 +2207,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     /**
      * 获取请求体对象列表
      *
-     * @return 请求体对象列表, 元素为 {@link ForestRequestBody} 其子类实例
+     * @return 请求体对象列表, 元素为 {@link ForestBodyItem} 其子类实例
      */
     public ForestBody getBody() {
         return body;
@@ -2213,7 +2217,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * 获取请求体对象列表
      * <p>同{@link ForestRequest#getBody()}
      *
-     * @return 请求体对象列表, 元素为 {@link ForestRequestBody} 其子类实例
+     * @return 请求体对象列表, 元素为 {@link ForestBodyItem} 其子类实例
      * @see ForestRequest#getBody()
      */
     public ForestBody body() {
@@ -2877,10 +2881,10 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     /**
      * 添加Body数据
      *
-     * @param body Forest请求体，{@link ForestRequestBody}类实例
+     * @param body Forest请求体，{@link ForestBodyItem}类实例
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addBody(ForestRequestBody body) {
+    public ForestRequest<T> addBody(ForestBodyItem body) {
         this.body.add(body);
         return this;
     }
@@ -2893,7 +2897,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> addBody(String stringBody) {
-        return addBody(new StringRequestBody(stringBody));
+        return addBody(new StringBodyItem(stringBody));
     }
 
     /**
@@ -2903,7 +2907,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> addBody(byte[] byteArrayBody) {
-        return addBody(new ByteArrayRequestBody(byteArrayBody));
+        return addBody(new ByteArrayBodyItem(byteArrayBody));
     }
 
     /**
@@ -2913,7 +2917,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> addBody(File fileBody) {
-        return addBody(new FileRequestBody(fileBody));
+        return addBody(new FileBodyItem(fileBody));
     }
 
     /**
@@ -2923,7 +2927,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> addBody(InputStream inputStreamBody) {
-        return addBody(new InputStreamRequestBody(inputStreamBody));
+        return addBody(new InputStreamBodyItem(inputStreamBody));
     }
 
     /**
@@ -2933,7 +2937,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> addBody(Object obj) {
-        return addBody(new ObjectRequestBody(obj));
+        return addBody(new ObjectBodyItem(obj));
     }
 
     /**
@@ -2944,7 +2948,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> addBody(String name, Object value) {
-        return addBody(new NameValueRequestBody(name, value));
+        return addBody(new NameValueBodyItem(name, value));
     }
 
     /**
@@ -2956,7 +2960,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @since 1.5.29
      */
     public ForestRequest<T> addBody(String name, Lazy value) {
-        return addBody(new NameValueRequestBody(name, value));
+        return addBody(new NameValueBodyItem(name, value));
     }
 
 
@@ -2976,7 +2980,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
             return this;
         }
         if (bodyMap.isEmpty()) {
-            addBody(new ObjectRequestBody(bodyMap));
+            addBody(new ObjectBodyItem(bodyMap));
             return this;
         }
         for (Object key : bodyMap.keySet()) {
@@ -2996,7 +3000,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> addBody(String name, String contentType, Object value) {
-        return addBody(new NameValueRequestBody(name, contentType, value));
+        return addBody(new NameValueBodyItem(name, contentType, value));
     }
 
     /**
@@ -3007,7 +3011,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      */
     @Deprecated
     public ForestRequest<T> addBody(RequestNameValue nameValue) {
-        return addBody(new NameValueRequestBody(nameValue.getName(), nameValue.getValue()));
+        return addBody(new NameValueBodyItem(nameValue.getName(), nameValue.getValue()));
     }
 
     /**
@@ -3094,7 +3098,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @param body 请求体对象
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> replaceBody(ForestRequestBody body) {
+    public ForestRequest<T> replaceBody(ForestBodyItem body) {
         this.body.clear();
         this.addBody(body);
         return this;
@@ -3131,9 +3135,9 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
 
     public List<RequestNameValue> getDataNameValueList() {
         List<RequestNameValue> nameValueList = new ArrayList<>();
-        for (ForestRequestBody item : body) {
-            if (item instanceof NameValueRequestBody) {
-                NameValueRequestBody nameValueRequestBody = (NameValueRequestBody) item;
+        for (ForestBodyItem item : body) {
+            if (item instanceof NameValueBodyItem) {
+                NameValueBodyItem nameValueRequestBody = (NameValueBodyItem) item;
                 String name = nameValueRequestBody.getName();
                 Object value = nameValueRequestBody.getValue();
                 RequestNameValue nameValue = new RequestNameValue(name, value, MappingParameter.TARGET_BODY, nameValueRequestBody.getContentType());
@@ -3411,7 +3415,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> setMultiparts(List<ForestMultipart> multiparts) {
-        this.body.remove(MultipartRequestBody.class);
+        this.body.remove(MultipartBodyItem.class);
         return addMultipart(multiparts);
     }
 
@@ -3422,7 +3426,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> addMultipart(ForestMultipart multipart) {
-        this.body.add(new MultipartRequestBody(multipart));
+        this.body.add(new MultipartBodyItem(multipart));
         return this;
     }
 
@@ -3435,7 +3439,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      */
     public ForestRequest<T> addMultipart(List<ForestMultipart> multiparts) {
         for (ForestMultipart multipart : multiparts) {
-            this.body.add(new MultipartRequestBody(multipart));
+            this.body.add(new MultipartBodyItem(multipart));
         }
         return this;
     }
@@ -4610,7 +4614,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
                 this.arguments);
         ForestBody newBody = newRequest.body();
         newBody.setBodyType(body.getBodyType());
-        for (ForestRequestBody bodyItem : this.body) {
+        for (ForestBodyItem bodyItem : this.body) {
             newBody.add(bodyItem.clone());
         }
         newRequest.backend = this.backend;

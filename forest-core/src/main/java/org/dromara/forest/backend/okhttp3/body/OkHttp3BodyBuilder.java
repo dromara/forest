@@ -6,9 +6,9 @@ import org.dromara.forest.converter.json.ForestJsonConverter;
 import org.dromara.forest.exceptions.ForestRuntimeException;
 import org.dromara.forest.handler.LifeCycleHandler;
 import org.dromara.forest.http.ForestRequest;
-import org.dromara.forest.http.ForestRequestBody;
-import org.dromara.forest.http.body.NameValueRequestBody;
-import org.dromara.forest.http.body.ObjectRequestBody;
+import org.dromara.forest.http.ForestBodyItem;
+import org.dromara.forest.http.body.NameValueBodyItem;
+import org.dromara.forest.http.body.ObjectBodyItem;
 import org.dromara.forest.mapping.MappingTemplate;
 import org.dromara.forest.multipart.ForestMultipart;
 import org.dromara.forest.utils.StringUtil;
@@ -88,16 +88,16 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
         ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         List<ForestMultipart> multiparts = request.getMultiparts();
         int partsCount = 0;
-        for (ForestRequestBody item : request.body()) {
-            if (item instanceof NameValueRequestBody) {
-                NameValueRequestBody nameValueItem = (NameValueRequestBody) item;
+        for (ForestBodyItem item : request.body()) {
+            if (item instanceof NameValueBodyItem) {
+                NameValueBodyItem nameValueItem = (NameValueBodyItem) item;
                 String name = nameValueItem.getName();
                 Object value = nameValueItem.getValue();
                 String partContentType = nameValueItem.getContentType();
                 partsCount++;
                 addMultipart(bodyBuilder, name, value, partContentType, charset, jsonConverter);
-            } else if (item instanceof ObjectRequestBody) {
-                Object obj = ((ObjectRequestBody) item).getObject();
+            } else if (item instanceof ObjectBodyItem) {
+                Object obj = ((ObjectBodyItem) item).getObject();
                 if (obj == null) {
                     continue;
                 }

@@ -5,13 +5,18 @@ import org.dromara.forest.annotation.BaseLifeCycle;
 import org.dromara.forest.annotation.MethodLifeCycle;
 import org.dromara.forest.annotation.ParamLifeCycle;
 import org.dromara.forest.config.ForestConfiguration;
+import org.dromara.forest.converter.ConvertOptions;
 import org.dromara.forest.converter.json.ForestJsonConverter;
 import org.dromara.forest.exceptions.ForestRuntimeException;
+import org.dromara.forest.http.ForestRequest;
+import org.dromara.forest.http.model.ObjectProperty;
+import org.dromara.forest.http.model.ObjectWrapper;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,6 +43,11 @@ public class ReflectUtil {
      * 方法缓存
      */
     private static final Map<Class<?>, Method[]> METHOD_CACHE = new ConcurrentHashMap<>();
+
+    /**
+     * 方法缓存同步锁
+     */
+    private static final Object METHOD_CACHE_LOCK = new Object();
 
 
     /**
@@ -453,12 +463,26 @@ public class ReflectUtil {
     }
 
 
-    public static Map convertObjectToMap(Object srcObj, ForestConfiguration configuration) {
+    public static Map<String, Object> objectToMap(Object srcObj, ForestConfiguration configuration) {
         if (configuration != null) {
             return configuration.getJsonConverter().convertObjectToMap(srcObj);
         }
         return FORM_MAP_CONVERTER.convertObjectToMap(srcObj);
     }
+
+
+    public static Map<String, Object> objectToMap(Object srcObj, ForestRequest request, ConvertOptions options) {
+        ObjectWrapper wrapper = new ObjectWrapper(srcObj);
+        Map<String, Object> map = new HashMap<>();
+        for (Map.Entry<String, ObjectProperty> entry : wrapper.getProperties().entrySet()) {
+            ObjectProperty property = entry.getValue();
+            String key = property.getName();
+            Object value = property.getValue(request, options);
+            map.put(key, value);
+        }
+        return map;
+    }
+
 
 
     public static Field[] getFields(final Class<?> clazz) {
@@ -494,8 +518,13 @@ public class ReflectUtil {
     public static Method[] getMethods(final Class<?> clazz) {
         Method[] methods = METHOD_CACHE.get(clazz);
         if (methods == null) {
-            methods = getMethodsWithoutCache(clazz, true);
-            METHOD_CACHE.put(clazz, methods);
+            synchronized (METHOD_CACHE_LOCK) {
+                methods = METHOD_CACHE.get(clazz);
+                if (methods == null) {
+                    methods = getMethodsWithoutCache(clazz, true);
+                    METHOD_CACHE.put(clazz, methods);
+                }
+            }
         }
         return methods;
     }

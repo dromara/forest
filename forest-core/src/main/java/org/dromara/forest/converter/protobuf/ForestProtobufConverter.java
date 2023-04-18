@@ -28,8 +28,8 @@ import org.dromara.forest.converter.ConvertOptions;
 import org.dromara.forest.converter.ForestConverter;
 import org.dromara.forest.converter.ForestEncoder;
 import org.dromara.forest.http.ForestBody;
-import org.dromara.forest.http.ForestRequestBody;
-import org.dromara.forest.http.body.ObjectRequestBody;
+import org.dromara.forest.http.ForestBodyItem;
+import org.dromara.forest.http.body.ObjectBodyItem;
 
 import java.nio.charset.Charset;
 
@@ -46,9 +46,9 @@ public interface ForestProtobufConverter extends ForestConverter<byte[]>, Forest
     default byte[] encodeRequestBody(final ForestBody body, final Charset charset, final ConvertOptions options) {
         ForestProtobufConverterManager protobufConverterManager = ForestProtobufConverterManager.getInstance();
         Object protobufObj = null;
-        for (ForestRequestBody bodyItem : body) {
-            if (bodyItem instanceof ObjectRequestBody) {
-                Object obj = ((ObjectRequestBody) bodyItem).getObject();
+        for (ForestBodyItem bodyItem : body) {
+            if (bodyItem instanceof ObjectBodyItem) {
+                Object obj = ((ObjectBodyItem) bodyItem).getObject();
                 if (protobufConverterManager.isProtobufMessageClass(obj.getClass())) {
                     protobufObj = obj;
                     break;

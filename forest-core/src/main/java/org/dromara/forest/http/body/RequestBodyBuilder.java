@@ -1,13 +1,13 @@
 package org.dromara.forest.http.body;
 
-import org.dromara.forest.http.ForestRequestBody;
+import org.dromara.forest.http.ForestBodyItem;
 
 import java.io.File;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public abstract class RequestBodyBuilder<T, B extends ForestRequestBody, D extends RequestBodyBuilder> {
+public abstract class RequestBodyBuilder<T, B extends ForestBodyItem, D extends RequestBodyBuilder> {
 
     private final static Map<Class, RequestBodyBuilder> bodyBuilderMap = new LinkedHashMap<>();
 
@@ -53,62 +53,62 @@ public abstract class RequestBodyBuilder<T, B extends ForestRequestBody, D exten
     public abstract B build(T data, String defaultValue);
 
 
-    public static class StringRequestBodyBuilder extends RequestBodyBuilder<String, StringRequestBody, StringRequestBodyBuilder> {
+    public static class StringRequestBodyBuilder extends RequestBodyBuilder<String, StringBodyItem, StringRequestBodyBuilder> {
         @Override
-        public StringRequestBody build(String data, String defaultValue) {
+        public StringBodyItem build(String data, String defaultValue) {
             if (data == null) {
                 return null;
             }
-            StringRequestBody body = new StringRequestBody(data);
+            StringBodyItem body = new StringBodyItem(data);
             body.setDefaultValue(defaultValue);
             return body;
         }
     }
 
-    public static class ByteArrayRequestBodyBuilder extends RequestBodyBuilder<byte[], ByteArrayRequestBody, StringRequestBodyBuilder> {
+    public static class ByteArrayRequestBodyBuilder extends RequestBodyBuilder<byte[], ByteArrayBodyItem, StringRequestBodyBuilder> {
         @Override
-        public ByteArrayRequestBody build(byte[] data, String defaultValue) {
+        public ByteArrayBodyItem build(byte[] data, String defaultValue) {
             if (data == null) {
                 return null;
             }
-            ByteArrayRequestBody body = new ByteArrayRequestBody(data);
+            ByteArrayBodyItem body = new ByteArrayBodyItem(data);
             body.setDefaultValue(defaultValue);
             return body;
         }
     }
 
 
-    public static class FileRequestBodyBuilder extends RequestBodyBuilder<File, FileRequestBody, StringRequestBodyBuilder> {
+    public static class FileRequestBodyBuilder extends RequestBodyBuilder<File, FileBodyItem, StringRequestBodyBuilder> {
         @Override
-        public FileRequestBody build(File data, String defaultValue) {
+        public FileBodyItem build(File data, String defaultValue) {
             if (data == null) {
                 return null;
             }
-            FileRequestBody body = new FileRequestBody(data);
+            FileBodyItem body = new FileBodyItem(data);
             body.setDefaultValue(defaultValue);
             return body;
         }
     }
 
-    public static class InputStreamBodyBuilder extends RequestBodyBuilder<InputStream, InputStreamRequestBody, StringRequestBodyBuilder> {
+    public static class InputStreamBodyBuilder extends RequestBodyBuilder<InputStream, InputStreamBodyItem, StringRequestBodyBuilder> {
         @Override
-        public InputStreamRequestBody build(InputStream data, String defaultValue) {
+        public InputStreamBodyItem build(InputStream data, String defaultValue) {
             if (data == null) {
                 return null;
             }
-            InputStreamRequestBody body = new InputStreamRequestBody(data);
+            InputStreamBodyItem body = new InputStreamBodyItem(data);
             body.setDefaultValue(defaultValue);
             return body;
         }
     }
 
-    public static class ObjectRequestBodyBuilder extends RequestBodyBuilder<Object, ObjectRequestBody, StringRequestBodyBuilder> {
+    public static class ObjectRequestBodyBuilder extends RequestBodyBuilder<Object, ObjectBodyItem, StringRequestBodyBuilder> {
         @Override
-        public ObjectRequestBody build(Object data, String defaultValue) {
+        public ObjectBodyItem build(Object data, String defaultValue) {
             if (data == null) {
                 return null;
             }
-            ObjectRequestBody body = new ObjectRequestBody(data);
+            ObjectBodyItem body = new ObjectBodyItem(data);
             body.setDefaultValue(defaultValue);
             return body;
         }

@@ -5,9 +5,9 @@ import org.dromara.forest.converter.xml.ForestXmlConverter;
 import org.dromara.forest.exceptions.ForestConvertException;
 import org.dromara.forest.exceptions.ForestRuntimeException;
 import org.dromara.forest.http.ForestBody;
-import org.dromara.forest.http.ForestRequestBody;
-import org.dromara.forest.http.body.ObjectRequestBody;
-import org.dromara.forest.http.body.StringRequestBody;
+import org.dromara.forest.http.ForestBodyItem;
+import org.dromara.forest.http.body.ObjectBodyItem;
+import org.dromara.forest.http.body.StringBodyItem;
 import org.dromara.forest.utils.ForestDataType;
 import org.dromara.forest.utils.ReflectUtil;
 import org.dromara.forest.utils.StringUtil;
@@ -75,13 +75,13 @@ public class ForestJakartaXmlConverter implements ForestXmlConverter {
     @Override
     public byte[] encodeRequestBody(ForestBody body, Charset charset, ConvertOptions options) {
         StringBuilder builder = new StringBuilder();
-        for (ForestRequestBody item : body) {
-            if (item instanceof ObjectRequestBody) {
-                Object obj = ((ObjectRequestBody) item).getObject();
+        for (ForestBodyItem item : body) {
+            if (item instanceof ObjectBodyItem) {
+                Object obj = ((ObjectBodyItem) item).getObject();
                 String text = encodeToString(obj);
                 builder.append(text);
-            } else if (item instanceof StringRequestBody) {
-                builder.append(((StringRequestBody) item).getContent());
+            } else if (item instanceof StringBodyItem) {
+                builder.append(((StringBodyItem) item).getContent());
             }
         }
         return builder.toString().getBytes(charset);

@@ -8,7 +8,7 @@ import org.dromara.forest.exceptions.ForestConvertException;
 import org.dromara.forest.exceptions.ForestRuntimeException;
 import org.dromara.forest.http.ForestBody;
 import org.dromara.forest.http.ForestRequest;
-import org.dromara.forest.http.ForestRequestBody;
+import org.dromara.forest.http.ForestBodyItem;
 import org.dromara.forest.multipart.ForestMultipart;
 import org.dromara.forest.utils.ByteEncodeUtil;
 import org.dromara.forest.utils.ForestDataType;
@@ -140,7 +140,7 @@ public class DefaultBinaryConverter implements ForestConverter<Object>, ForestEn
     public byte[] encodeRequestBody(ForestBody reqBody, Charset charset, ConvertOptions options) {
         List<byte[]> byteList = new LinkedList<>();
         int size = 0;
-        for (ForestRequestBody body : reqBody) {
+        for (ForestBodyItem body : reqBody) {
             byte[] byteArray = body.getByteArray();
             byteList.add(byteArray);
             size += byteArray.length;
@@ -167,7 +167,7 @@ public class DefaultBinaryConverter implements ForestConverter<Object>, ForestEn
             byteList.add(byteArray);
             size += byteArray.length;
         }
-        for (ForestRequestBody body : reqBody) {
+        for (ForestBodyItem body : reqBody) {
             byte[] byteArray = body.getByteArray();
             byteList.add(byteArray);
             size += byteArray.length;
