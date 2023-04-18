@@ -4,8 +4,11 @@ import junit.framework.Assert;
 import org.dromara.forest.backend.HttpBackend;
 import org.dromara.forest.backend.HttpBackendSelector;
 import org.dromara.forest.config.ForestConfiguration;
+import org.dromara.forest.converter.ForestConverter;
+import org.dromara.forest.converter.json.ForestFastjsonConverter;
 import org.dromara.forest.exceptions.ForestRuntimeException;
 import org.dromara.forest.ssl.SSLUtils;
+import org.dromara.forest.utils.ForestDataType;
 import org.dromara.forest.utils.RequestNameValue;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -133,8 +136,6 @@ public class TestForestConfiguration {
         assertEquals(defaultHeaders, configuration.getDefaultHeaders());
     }
 
-/**
- * TODO: 移动到 forest-fastjson 去
     @Test
     public void testConverterMap() {
         ForestConfiguration configuration = ForestConfiguration.createConfiguration();
@@ -144,7 +145,6 @@ public class TestForestConfiguration {
         configuration.setConverterMap(converterMap);
         assertEquals(converterMap, configuration.getConverterMap());
     }
-*/
 
 
 }

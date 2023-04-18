@@ -20,7 +20,6 @@
     <version>${revision}</version>
   </parent>
 
-
   <dependencies>
 
     <dependency>
@@ -28,6 +27,24 @@
       <artifactId>forest-core</artifactId>
       <version>${parent.version}</version>
       <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson-databind.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+      <version>${jackson.version}</version>
     </dependency>
 
     <dependency>
@@ -43,13 +60,6 @@
       <version>${revision}</version>
       <scope>test</scope>
     </dependency>
-
-    <dependency>
-      <groupId>com.alibaba</groupId>
-      <artifactId>fastjson</artifactId>
-      <version>${fastjson.version}</version>
-    </dependency>
-
 
   </dependencies>
 

@@ -5,6 +5,7 @@ import okhttp3.mockwebserver.MockWebServer;
 import org.dromara.forest.backend.ContentType;
 import org.dromara.forest.backend.HttpBackend;
 import org.dromara.forest.config.ForestConfiguration;
+import org.dromara.forest.converter.json.ForestFastjsonConverter;
 import org.dromara.forest.converter.json.ForestGsonConverter;
 import org.dromara.forest.converter.json.ForestJacksonConverter;
 import org.dromara.forest.http.ForestRequest;
@@ -121,8 +122,6 @@ public class TestEncoderClient extends BaseClientTest {
                 .assertBodyEquals("Data: " + entry);
     }
 
-/**
- * TODO: 移到 forest-fastjson 去
     @Test
     public void testFastjson() {
         EncoderClient.Entry entry = new EncoderClient.Entry("AAA", "BBB");
@@ -135,7 +134,6 @@ public class TestEncoderClient extends BaseClientTest {
         mockRequest(server)
                 .assertBodyEquals("{\"name\":\"AAA\",\"value\":\"BBB\"}");
     }
-*/
 
     @Test
     public void testJackson() {

@@ -1,12 +1,34 @@
-package org.dromara.forest.test.converter;
+package org.dromara.forest.test.convert.json.fastjson;
+
+import cn.hutool.json.JSONConverter;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.google.common.collect.Lists;
+import org.dromara.forest.converter.json.ForestFastjsonConverter;
+import org.dromara.forest.exceptions.ForestRuntimeException;
+import org.junit.Test;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.dromara.forest.test.convert.json.fastjson.JSONConverter.assertDateEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2017-05-08 23:13
  */
 public class TestForestFastjsonConverter extends JSONConverter {
-/**
- * TODO: 移到 forest-fastjson 去
 
     @Test
     public void testSerializerFeature() {
@@ -281,5 +303,4 @@ public class TestForestFastjsonConverter extends JSONConverter {
         assertEquals("foo", testJsonObj.getName());
         assertDateEquals("2020-10-10 10:12:00", testJsonObj.getDate(), "yyyy-MM-dd hh:mm:ss");
     }
-*/
 }

@@ -4,6 +4,12 @@ import org.dromara.forest.Forest;
 import org.dromara.forest.annotation.BaseRequest;
 import org.dromara.forest.annotation.DataFile;
 import org.dromara.forest.annotation.Get;
+import org.dromara.forest.config.ForestConfiguration;
+import org.dromara.forest.converter.ForestConverter;
+import org.dromara.forest.converter.auto.DefaultAutoConverter;
+import org.dromara.forest.converter.json.ForestFastjsonConverter;
+import org.dromara.forest.converter.json.ForestJacksonConverter;
+import org.dromara.forest.exceptions.ForestConvertException;
 import org.dromara.forest.exceptions.ForestFileNotFoundException;
 import org.dromara.forest.exceptions.ForestHandlerException;
 import org.dromara.forest.exceptions.ForestInterceptorDefineException;
@@ -79,9 +85,6 @@ public class TestExceptions {
         assertThat(exception.getInterceptorClass()).isEqualTo(TestErrorInterceptor.class);
     }
 
-/**
- * TODO: 移动到 forest-fastjson 去
- *
     @Test
     public void testConvertException() {
         Throwable th = new Exception("xxx");
@@ -103,7 +106,6 @@ public class TestExceptions {
                 .isEqualTo("[Forest] auto converter: 'DefaultAutoConverter' error: xxx");
         assertThat(exception.getConverterClass()).isEqualTo(DefaultAutoConverter.class);
     }
-*/
 
     @Test
     public void testRetryException() {
