@@ -174,12 +174,16 @@ public class ForestURL {
         return scheme;
     }
 
+    private void refreshSSL() {
+        this.ssl = "https".equals(this.scheme);
+    }
+
     public ForestURL setScheme(String scheme) {
         if (StringUtils.isBlank(scheme)) {
             return this;
         }
         this.scheme = scheme.trim();
-        this.ssl = "https".equals(this.scheme);
+        refreshSSL();
         this.originalUrl = toURLString();
         return this;
     }
@@ -367,6 +371,9 @@ public class ForestURL {
     }
 
     public boolean isSSL() {
+        if (StringUtils.isEmpty(scheme) && address != null) {
+            return "https".equals(address.getScheme());
+        }
         return ssl;
     }
 
@@ -550,6 +557,7 @@ public class ForestURL {
             String originHost = host;
             if (StringUtils.isEmpty(scheme)) {
                 scheme = address.getScheme();
+                refreshSSL();
             }
             if (StringUtils.isEmpty(host)) {
                 host = address.getHost();

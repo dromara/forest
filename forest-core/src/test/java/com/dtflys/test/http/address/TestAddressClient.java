@@ -44,8 +44,18 @@ public class TestAddressClient extends BaseClientTest {
         ForestRequest<String> request = addressClient.testHostPort("localhost", server.getPort());
         assertThat(request.getHost()).isEqualTo("localhost");
         assertThat(request.getPort()).isEqualTo(server.getPort());
+        assertThat(request.isSSL()).isFalse();
         String result = request.execute(String.class);
         assertThat(result).isEqualTo(EXPECTED);
+    }
+
+
+    @Test
+    public void testAddress_https_host_port() {
+        ForestRequest<String> request = addressClient.testHttpsHostPort("127.0.0.1", 333);
+        assertThat(request.host()).isEqualTo("127.0.0.1");
+        assertThat(request.port()).isEqualTo(333);
+        assertThat(request.isSSL()).isTrue();
     }
 
     @Test

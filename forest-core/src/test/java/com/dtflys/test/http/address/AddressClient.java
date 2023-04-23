@@ -1,6 +1,8 @@
 package com.dtflys.test.http.address;
 
+import com.dtflys.forest.Forest;
 import com.dtflys.forest.annotation.Address;
+import com.dtflys.forest.annotation.Get;
 import com.dtflys.forest.annotation.Post;
 import com.dtflys.forest.annotation.Var;
 import com.dtflys.forest.http.ForestRequest;
@@ -14,6 +16,11 @@ public interface AddressClient {
     @Post("/")
     @Address(host = "${0}", port = "${1}")
     ForestRequest<String> testHostPort(String host, int port);
+
+    @Post("/")
+    @Address(host = "${0}", port = "${1}", scheme = "https")
+    ForestRequest<String> testHttpsHostPort(String host, int port);
+
 
 
     @Post("/")
