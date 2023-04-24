@@ -467,11 +467,18 @@ public class ReflectUtils {
         return FORM_MAP_CONVERTER.convertObjectToMap(srcObj);
     }
 
-
+    /**
+     * 获取类中所有的字段 (包括所有父类的)
+     *
+     * @param clazz 类
+     * @return 字段列表
+     * @since 1.5.30
+     */
     public static Field[] getFields(final Class<?> clazz) {
+        Validations.assertParamNotNull(clazz, "clazz");
         Field[] fields = FIELD_CACHE.get(clazz);
         if (fields == null) {
-            synchronized (ReflectUtils.class) {
+            synchronized (FIELD_CACHE) {
                 fields = FIELD_CACHE.get(clazz);
                 if (fields == null) {
                     fields = getFieldsWithoutCache(clazz, true);
@@ -482,8 +489,7 @@ public class ReflectUtils {
         return fields;
     }
 
-    public static Field[] getFieldsWithoutCache(final Class<?> clazz, final boolean withSuperClassFields) {
-        Validations.assertParamNotNull(clazz, "clazz");
+    private static Field[] getFieldsWithoutCache(final Class<?> clazz, final boolean withSuperClassFields) {
         final List<Field> allFields = new LinkedList<>();
         Class<?> thisClass = clazz;
         while (thisClass != null && thisClass != Object.class) {
@@ -497,19 +503,29 @@ public class ReflectUtils {
     }
 
 
-
+    /**
+     * 获取类中所有的方法 (包括所有父类的)
+     *
+     * @param clazz 类
+     * @return 方法列表
+     */
     public static Method[] getMethods(final Class<?> clazz) {
+        Validations.assertParamNotNull(clazz, "clazz");
         Method[] methods = METHOD_CACHE.get(clazz);
         if (methods == null) {
-            methods = getMethodsWithoutCache(clazz, true);
-            METHOD_CACHE.put(clazz, methods);
+            synchronized (METHOD_CACHE) {
+                methods = METHOD_CACHE.get(clazz);
+                if (methods == null) {
+                    methods = getMethodsWithoutCache(clazz, true);
+                    METHOD_CACHE.put(clazz, methods);
+                }
+            }
         }
         return methods;
     }
 
 
-    public static Method[] getMethodsWithoutCache(final Class<?> clazz, final boolean withSuperClassMethods) {
-        Validations.assertParamNotNull(clazz, "clazz");
+    private static Method[] getMethodsWithoutCache(final Class<?> clazz, final boolean withSuperClassMethods) {
         final List<Method> allMethods = new LinkedList<>();
         Class<?> thisClass = clazz;
         while (thisClass != null && thisClass != Object.class) {
