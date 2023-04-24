@@ -70,7 +70,6 @@ import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
-import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.TimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,6 +87,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * global configuration
@@ -101,6 +101,8 @@ public class ForestConfiguration implements Serializable {
     private static Logger log = LoggerFactory.getLogger(ForestConfiguration.class);
 
     private final static Map<String, ForestConfiguration> CONFIGURATION_CACHE = new ConcurrentHashMap<>();
+
+    private final Map<Class<?>, ProxyFactory<?>> CLIENT_PROXY_FACTORY_CACHE = new ConcurrentHashMap<>();
 
     /**
      * 默认配置，再用户没有定义任何全局配置时使用该默认配置
@@ -402,6 +404,16 @@ public class ForestConfiguration implements Serializable {
         configuration.setLogHandler(new DefaultLogHandler());
         return configuration;
     }
+
+    /**
+     * 获取所有定义过的 Forest 配置信息
+     *
+     * @return Forest 配置信息列表
+     */
+    public List<ForestConfiguration> allConfigurations() {
+        return CONFIGURATION_CACHE.values().stream().collect(Collectors.toList());
+    }
+
 
     /**
      * 获取请求接口实例缓存，返回的缓存对象集合用于缓存请求接口的动态代理的实例
@@ -1464,8 +1476,21 @@ public class ForestConfiguration implements Serializable {
      * @return 动态代理工厂
      */
     public <T> ProxyFactory<T> getProxyFactory(Class<T> clazz) {
-        return new ProxyFactory<>(this, clazz);
+        ProxyFactory<?> factory = CLIENT_PROXY_FACTORY_CACHE.get(clazz);
+        if (factory == null) {
+            synchronized (CLIENT_PROXY_FACTORY_CACHE) {
+                factory = CLIENT_PROXY_FACTORY_CACHE.get(clazz);
+                if (factory == null) {
+                    factory = new ProxyFactory<>(this, clazz);
+                    CLIENT_PROXY_FACTORY_CACHE.put(clazz, factory);
+                }
+            }
+        }
+        return (ProxyFactory<T>) factory;
     }
+
+
+
 
     /**
      * 设置全局变量
