@@ -1,5 +1,6 @@
 package com.dtflys.forest.annotation;
 
+import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.lifecycles.base.BaseRequestLifeCycle;
 
 import java.lang.annotation.Documented;
@@ -106,7 +107,7 @@ public @interface BaseRequest {
      * @return 接口级别拦截器表
      * @see Request#interceptor()
      */
-    Class<?>[] interceptor() default {};
+    Class<? extends Interceptor>[] interceptor() default {};
 
     /**
      * 接口级别超时时间 (单位为毫秒)

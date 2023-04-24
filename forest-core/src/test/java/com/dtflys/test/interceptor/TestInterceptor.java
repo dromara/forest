@@ -83,21 +83,6 @@ public class TestInterceptor extends BaseClientTest {
     }
 
     @Test
-    public void testWrongInterceptorClass() {
-        boolean error = false;
-        try {
-            configuration.createInstance(WrongInterceptorClient.class);
-        } catch (ForestRuntimeException e) {
-            error = true;
-            log.error(e.getMessage());
-            assertThat(e.getMessage()).isEqualTo(
-                    "Class [" + DefaultInterceptorFactory.class.getName() + "] is not a implement of [" +
-                    Interceptor.class.getName() + "] interface.");
-        }
-        assertThat(error).isTrue();
-    }
-
-    @Test
     public void testFalseInterceptor() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         assertThat(interceptorClient.beforeFalse("a")).isNull();

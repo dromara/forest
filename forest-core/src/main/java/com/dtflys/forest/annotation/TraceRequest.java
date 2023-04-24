@@ -24,6 +24,7 @@
 
 package com.dtflys.forest.annotation;
 
+import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.lifecycles.method.TraceRequestLifeCycle;
 
 import java.lang.annotation.Documented;
@@ -179,7 +180,7 @@ public @interface TraceRequest {
      * 拦截器类列表
      * @return 拦截器类列表
      */
-    Class<?>[] interceptor() default {};
+    Class<? extends Interceptor>[] interceptor() default {};
 
     /**
      * 请求数据
