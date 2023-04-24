@@ -14,7 +14,6 @@ import com.dtflys.forest.callback.OnRedirection;
 import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.forest.config.ForestProperties;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.ForestEncoder;
@@ -76,9 +75,10 @@ import static com.dtflys.forest.mapping.MappingParameter.*;
 public class ForestMethod<T> implements VariableScope {
     // 默认根地址
     private static final ForestAddress DEFAULT_ADDRESS = new ForestAddress("http", "localhost", -1);
-
     private final InterfaceProxyHandler interfaceProxyHandler;
     private final ForestConfiguration configuration;
+    private volatile boolean initialized = false;
+    private final Object INIT_LOCK = new Object();
     private InterceptorFactory interceptorFactory;
     private final Method method;
     private String[] methodNameItems;
@@ -157,8 +157,18 @@ public class ForestMethod<T> implements VariableScope {
         this.interceptorFactory = configuration.getInterceptorFactory();
         this.methodNameItems = NameUtils.splitCamelName(method.getName());
         this.forestParameters = new MappingParameter[method.getParameterCount()];
-        processBaseProperties();
-        processMethodAnnotations();
+    }
+
+    public void initMethod() {
+        if (!initialized) {
+            synchronized (INIT_LOCK) {
+                if (!initialized) {
+                    processBaseProperties();
+                    processMethodAnnotations();
+                    initialized = true;
+                }
+            }
+        }
     }
 
     @Override
@@ -814,6 +824,7 @@ public class ForestMethod<T> implements VariableScope {
      * @return Forest请求对象，{@link ForestRequest}类实例
      */
     private ForestRequest makeRequest(Object[] args) {
+        initMethod();
         MetaRequest baseMetaRequest = interfaceProxyHandler.getBaseMetaRequest();
         ForestURL baseURL = null;
         ForestRequestType type = type(args);

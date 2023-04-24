@@ -20,6 +20,7 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -110,6 +111,10 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
 
     public Class<T> getInterfaceClass() {
         return this.interfaceClass;
+    }
+
+    public List<ForestMethod> getForestMethods() {
+        return new ArrayList<>(forestMethodMap.values());
     }
 
     @SuppressWarnings("deprecation")
