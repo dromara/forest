@@ -7,14 +7,7 @@
   <groupId>com.dtflys.forest</groupId>
   <artifactId>forest-jaxb</artifactId>
   <version>${revision}</version>
-
   <name>forest-jaxb</name>
-
-  <properties>
-    <maven.compiler.source>8</maven.compiler.source>
-    <maven.compiler.target>8</maven.compiler.target>
-    <glassfish.jaxb.version>2.3.1</glassfish.jaxb.version>
-  </properties>
 
   <parent>
     <groupId>com.dtflys.forest</groupId>
@@ -22,9 +15,14 @@
     <version>${revision}</version>
   </parent>
 
+  <properties>
+    <maven.compiler.source>8</maven.compiler.source>
+    <maven.compiler.target>8</maven.compiler.target>
+    <glassfish.jaxb.version>2.3.1</glassfish.jaxb.version>
+  </properties>
+
 
   <dependencies>
-
     <dependency>
       <groupId>com.dtflys.forest</groupId>
       <artifactId>forest-core</artifactId>

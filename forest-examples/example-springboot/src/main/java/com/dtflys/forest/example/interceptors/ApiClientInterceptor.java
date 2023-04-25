@@ -1,6 +1,7 @@
 package com.dtflys.forest.example.interceptors;
 
 
+import com.dtflys.forest.Forest;
 import com.dtflys.forest.http.ForestHeaderMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,6 +20,7 @@ public class ApiClientInterceptor implements Interceptor {
     public boolean beforeExecute(ForestRequest request) {
         String accessToken = "111111111";
         request.addHeader("accessToken", accessToken);
+        log.info("Forest Version: " + Forest.VERSION);
         log.info("accessToken = " + accessToken);
         return true;
     }

@@ -7,8 +7,14 @@
   <groupId>com.dtflys.forest</groupId>
   <artifactId>forest-jakarta-xml</artifactId>
   <version>${revision}</version>
-
   <name>forest-jakarta-xml</name>
+
+  <parent>
+    <groupId>com.dtflys.forest</groupId>
+    <artifactId>forest</artifactId>
+    <version>${revision}</version>
+  </parent>
+
 
   <properties>
     <maven.compiler.source>17</maven.compiler.source>
@@ -17,13 +23,6 @@
     <jakarta.activation.version>2.1.1</jakarta.activation.version>
     <glassfish.jaxb.version>4.0.2</glassfish.jaxb.version>
   </properties>
-
-
-  <parent>
-    <groupId>com.dtflys.forest</groupId>
-    <artifactId>forest</artifactId>
-    <version>${revision}</version>
-  </parent>
 
 
   <dependencies>

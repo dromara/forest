@@ -17,6 +17,7 @@
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+
         <!-- plugin -->
         <gmaven-plugin.version>1.5</gmaven-plugin.version>
         <jgitflow-plugin.version>1.0-m4.3</jgitflow-plugin.version>

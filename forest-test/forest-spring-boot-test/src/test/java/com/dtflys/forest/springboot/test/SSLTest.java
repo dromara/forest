@@ -1,5 +1,6 @@
 package com.dtflys.forest.springboot.test;
 
+import com.dtflys.forest.Forest;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.logging.ForestLogger;

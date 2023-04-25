@@ -8,17 +8,18 @@
     <artifactId>forest-solon-plugin</artifactId>
     <version>${revision}</version>
 
+    <parent>
+        <groupId>com.dtflys.forest</groupId>
+        <artifactId>forest</artifactId>
+        <version>${revision}</version>
+    </parent>
+
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <solon.version>2.2.1</solon.version>
     </properties>
 
-    <parent>
-        <groupId>com.dtflys.forest</groupId>
-        <artifactId>forest</artifactId>
-        <version>${revision}</version>
-    </parent>
 
     <dependencies>
         <dependency>

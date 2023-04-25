@@ -5,6 +5,8 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestFuture;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.utils.ManifestUtil;
+import com.dtflys.forest.utils.VersionUtil;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -32,6 +34,11 @@ import java.util.stream.Collectors;
  * @since 1.5.2
  */
 public abstract class Forest {
+
+    /**
+     * 当前 Forest 版本号
+     */
+    public final static String VERSION = VersionUtil.getForestVersion();
 
 
     /**
