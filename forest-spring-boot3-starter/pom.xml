@@ -16,6 +16,9 @@
     </parent>
 
     <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+
         <spring-boot3.version>3.1.0-M1</spring-boot3.version>
     </properties>
 
