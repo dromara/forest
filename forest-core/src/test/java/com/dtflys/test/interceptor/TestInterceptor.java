@@ -2,6 +2,7 @@ package com.dtflys.test.interceptor;
 
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.forest.http.ForestHeader;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.logging.ForestLogger;
 import com.dtflys.test.http.BaseClientTest;
@@ -71,6 +72,7 @@ public class TestInterceptor extends BaseClientTest {
                 "\t[Type Change]: POST -> GET\n" +
                 "\tGET http://localhost:" + server.getPort() + "/hello/user?username=foo&username=foo HTTP\n" +
                 "\tHeaders: \n" +
+                "\t\tUser-Agent: " + ForestHeader.DEFAULT_USER_AGENT_VALUE + "\n" +
                 "\t\tAccept: text/plain");
     }
 

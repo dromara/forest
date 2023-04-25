@@ -1,17 +1,14 @@
 package com.dtflys.forest;
 
 import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestFuture;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.utils.ManifestUtil;
 import com.dtflys.forest.utils.VersionUtil;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 

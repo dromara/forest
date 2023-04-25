@@ -3150,11 +3150,23 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
 
 
     public List<RequestNameValue> getHeaderNameValueList() {
-        List<RequestNameValue> nameValueList = new ArrayList<RequestNameValue>();
+        final List<RequestNameValue> nameValueList = new LinkedList<>();
+        boolean hasUserAgent = false;
         for (Iterator<ForestHeader> iterator = headers.headerIterator(); iterator.hasNext(); ) {
-            ForestHeader header = iterator.next();
-            RequestNameValue nameValue = new RequestNameValue(header.getName(), header.getValue(), TARGET_HEADER);
+            final ForestHeader header = iterator.next();
+            final String name = header.getName();
+            final String value = header.getValue();
+            RequestNameValue nameValue = new RequestNameValue(name, value, TARGET_HEADER);
             nameValueList.add(nameValue);
+            if (!hasUserAgent && ForestHeader.USER_AGENT.equalsIgnoreCase(name)) {
+                hasUserAgent = true;
+            }
+        }
+        if (!hasUserAgent) {
+            nameValueList.add(0, new RequestNameValue(
+                    ForestHeader.USER_AGENT,
+                    ForestHeader.DEFAULT_USER_AGENT_VALUE,
+                    TARGET_HEADER));
         }
         return nameValueList;
     }

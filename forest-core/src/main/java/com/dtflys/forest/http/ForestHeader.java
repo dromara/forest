@@ -24,6 +24,8 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.Forest;
+
 /**
  * Forest请求头接口
  * <p>通过该接口可获取单个Forest请求头的信息</p>
@@ -198,6 +200,11 @@ public interface ForestHeader<SELF extends ForestHeader, VALUE> {
      * 标准头字段：重定向地址
      */
     String LOCATION = "Location";
+
+    /**
+     * 默认 Forest 请求的 User-Agent 值
+     */
+    String DEFAULT_USER_AGENT_VALUE = "forest/" + Forest.VERSION;
 
     /**
      * 获取请求头的名称

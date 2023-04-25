@@ -3,6 +3,7 @@ package com.dtflys.test.http;
 import com.alibaba.fastjson.JSONObject;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.http.ForestHeader;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.logging.ForestLogHandler;
@@ -121,6 +122,7 @@ public class TestPostClient extends BaseClientTest {
                 "\t[Proxy]: host: 127.0.0.1, port: " + server.getPort() + "\n" +
                 "\tPOST http://localhost:" + server.getPort() + "/hello HTTP\n" +
                 "\tHeaders: \n" +
+                "\t\tUser-Agent: " + ForestHeader.DEFAULT_USER_AGENT_VALUE + "\n" +
                 "\t\tAccept: text/plain\n" +
                 "\t\tContent-Type: application/json\n" +
                 "\tBody: username=foo&password=123456");
@@ -633,6 +635,7 @@ public class TestPostClient extends BaseClientTest {
         Mockito.verify(logger).info("[Forest] Request (" + configuration.getBackend().getName() + "): \n" +
                 "\tPOST http://localhost:" + server.getPort() + "/json HTTP\n" +
                 "\tHeaders: \n" +
+                "\t\tUser-Agent: " + ForestHeader.DEFAULT_USER_AGENT_VALUE + "\n" +
                 "\t\tAccept: application/json\n" +
                 "\t\tAuthorization: 1111111111111\n" +
                 "\t\tContent-Type: application/json\n" +
@@ -652,6 +655,7 @@ public class TestPostClient extends BaseClientTest {
         Mockito.verify(logger).info("[Forest] Request (" + configuration.getBackend().getName() + "): \n" +
                 "\tPOST http://localhost:" + server.getPort() + "/json HTTP\n" +
                 "\tHeaders: \n" +
+                "\t\tUser-Agent: " + ForestHeader.DEFAULT_USER_AGENT_VALUE + "\n" +
                 "\t\tContent-Type: application/json\n" +
                 "\tBody: {\"username\":\"foo\"}");
     }
@@ -703,6 +707,7 @@ public class TestPostClient extends BaseClientTest {
         Mockito.verify(logger).info("[Forest] Request (" + configuration.getBackend().getName() + "): \n" +
                 "\tPOST http://localhost:" + server.getPort() + "/json HTTP\n" +
                 "\tHeaders: \n" +
+                "\t\tUser-Agent: " + ForestHeader.DEFAULT_USER_AGENT_VALUE + "\n" +
                 "\t\tAccept-Encoding: UTF-8\n" +
                 "\t\tContent-Type: application/json\n" +
                 "\tBody: {\"username\":\"foo\"}");
