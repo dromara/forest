@@ -1,6 +1,5 @@
 package com.dtflys.forest.interceptor;
 
-import org.noear.solon.annotation.Inject;
 import org.noear.solon.core.AopContext;
 
 /**
@@ -15,18 +14,10 @@ public class SolonInterceptorFactory extends DefaultInterceptorFactory {
 
     @Override
     protected <T extends Interceptor> Interceptor createInterceptor(Class<T> clazz) {
-        Interceptor interceptor = null;
         try {
-            interceptor = context.getBeanOrNew(clazz);
+            return context.getBeanOrNew(clazz);
         } catch (Throwable th) {
-        }
-
-        if (interceptor != null) {
-            interceptorMap.put(clazz, interceptor);
-        } else {
             return super.createInterceptor(clazz);
         }
-
-        return interceptor;
     }
 }
