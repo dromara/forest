@@ -40,7 +40,7 @@ public class DefaultInterceptorFactory implements InterceptorFactory {
     /**
      * 拦截器实例缓存
      */
-    protected final Map<Class, Interceptor> interceptorMap = new ConcurrentHashMap<>();
+    protected final Map<Class, Interceptor> INTERCEPTOR_CACHE = new ConcurrentHashMap<>();
 
     /**
      * 拦截器调用链
@@ -54,29 +54,18 @@ public class DefaultInterceptorFactory implements InterceptorFactory {
 
     @Override
     public <T extends Interceptor> T getInterceptor(Class<T> clazz) {
-        Interceptor interceptor = interceptorMap.get(clazz);
-        if (interceptor == null) {
-            synchronized (DefaultInterceptorFactory.class) {
-                interceptor = interceptorMap.get(clazz);
-                if (interceptor == null) {
-                    interceptor = createInterceptor(clazz);
-                }
-            }
-        }
-        return (T) interceptor;
+        return (T) INTERCEPTOR_CACHE.computeIfAbsent(clazz, key ->
+                createInterceptor(key));
     }
 
     protected <T extends Interceptor> Interceptor createInterceptor(Class<T> clazz) {
-        Interceptor interceptor;
         try {
-            interceptor = clazz.newInstance();
-            interceptorMap.put(clazz, interceptor);
+            return clazz.newInstance();
         } catch (InstantiationException e) {
             throw new ForestRuntimeException(e);
         } catch (IllegalAccessException e) {
             throw new ForestRuntimeException(e);
         }
-        return interceptor;
     }
 
 }
