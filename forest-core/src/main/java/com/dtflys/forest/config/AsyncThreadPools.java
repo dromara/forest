@@ -1,17 +1,14 @@
 package com.dtflys.forest.config;
 
 import com.dtflys.forest.backend.AsyncAbortPolicy;
-import com.dtflys.forest.config.ForestConfiguration;
 
-import java.util.Map;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
 
 /**
  * Forest异步请求线程池管理类
@@ -75,7 +72,7 @@ public class AsyncThreadPools {
     public static ThreadPoolExecutor getOrCreate(ForestConfiguration configuration) {
         ThreadPoolExecutor pool = configuration.asyncPool;
         if (pool == null) {
-            synchronized (ThreadPoolExecutor.class) {
+            synchronized (configuration.ASYNC_POOL_LOCK) {
                 pool = configuration.asyncPool;
                 if (pool == null) {
                     pool = createAsyncThreadPool(configuration);

@@ -333,6 +333,11 @@ public class ForestConfiguration implements Serializable {
      */
     ThreadPoolExecutor asyncPool;
 
+    /**
+     * Forest异步请求线程池同步锁
+     */
+    final Object ASYNC_POOL_LOCK = new Object();
+
 
     private ForestConfiguration() {
     }
@@ -357,36 +362,25 @@ public class ForestConfiguration implements Serializable {
      * @param id 配置ID
      * @return 新创建的ForestConfiguration实例
      */
-    public static ForestConfiguration configuration(String id) {
-        ForestConfiguration configuration = ForestConfiguration.CONFIGURATION_CACHE.get(id);
-        if (configuration == null) {
-            synchronized (ForestConfiguration.class) {
-                if (!CONFIGURATION_CACHE.containsKey(id)) {
-                    configuration = createConfiguration();
-                    configuration.setId(id);
-                    CONFIGURATION_CACHE.put(id, configuration);
-                }
-            }
-        }
-        return CONFIGURATION_CACHE.get(id);
+    public static ForestConfiguration configuration(final String id) {
+        return CONFIGURATION_CACHE.computeIfAbsent(id, key ->
+                createConfiguration().setId(key));
     }
 
 
     public static ForestConfiguration createConfiguration() {
-        ForestConfiguration configuration = new ForestConfiguration();
+        final ForestConfiguration configuration = new ForestConfiguration();
         configuration.setId("forestConfiguration" + configuration.hashCode());
         configuration.setJsonConverterSelector(new JSONConverterSelector());
-        ForestProtobufConverterManager protobufConverterFactory = ForestProtobufConverterManager.getInstance();
+        final ForestProtobufConverterManager protobufConverterFactory = ForestProtobufConverterManager.getInstance();
         configuration.setProtobufConverter(protobufConverterFactory.getForestProtobufConverter());
-        ServiceLoader<ForestXmlConverter> xmlConverters = ServiceLoader.load(ForestXmlConverter.class);
-        for (ForestXmlConverter xmlConverter : xmlConverters) {
-            configuration.setXmlConverter(xmlConverter);
-        }
+        ServiceLoader.load(ForestXmlConverter.class).forEach(configuration::setXmlConverter);
         configuration.setTextConverter(new DefaultTextConverter());
         DefaultAutoConverter autoConverter = new DefaultAutoConverter(configuration);
-        configuration.getConverterMap().put(ForestDataType.AUTO, autoConverter);
-        configuration.getConverterMap().put(ForestDataType.BINARY, new DefaultBinaryConverter(autoConverter));
-        configuration.getConverterMap().put(ForestDataType.FORM, new DefaultFormConvertor(configuration));
+        final Map<ForestDataType, ForestConverter> converterMap = configuration.getConverterMap();
+        converterMap.put(ForestDataType.AUTO, autoConverter);
+        converterMap.put(ForestDataType.BINARY, new DefaultBinaryConverter(autoConverter));
+        converterMap.put(ForestDataType.FORM, new DefaultFormConvertor(configuration));
         setupJSONConverter(configuration);
         configuration.setTimeout(3000);
         configuration.setMaxConnections(500);
@@ -1476,17 +1470,8 @@ public class ForestConfiguration implements Serializable {
      * @return 动态代理工厂
      */
     public <T> ProxyFactory<T> getProxyFactory(Class<T> clazz) {
-        ProxyFactory<?> factory = CLIENT_PROXY_FACTORY_CACHE.get(clazz);
-        if (factory == null) {
-            synchronized (CLIENT_PROXY_FACTORY_CACHE) {
-                factory = CLIENT_PROXY_FACTORY_CACHE.get(clazz);
-                if (factory == null) {
-                    factory = new ProxyFactory<>(this, clazz);
-                    CLIENT_PROXY_FACTORY_CACHE.put(clazz, factory);
-                }
-            }
-        }
-        return (ProxyFactory<T>) factory;
+        return (ProxyFactory<T>) CLIENT_PROXY_FACTORY_CACHE
+                .computeIfAbsent(clazz, cls -> new ProxyFactory<T>(this, (Class<T>) cls));
     }
 
 
@@ -1633,7 +1618,7 @@ public class ForestConfiguration implements Serializable {
      */
     public Map<ForestDataType, ForestConverter> getConverterMap() {
         if (converterMap == null) {
-            converterMap = new HashMap<ForestDataType, ForestConverter>();
+            converterMap = new HashMap<>();
         }
         return converterMap;
     }
