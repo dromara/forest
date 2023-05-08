@@ -40,6 +40,8 @@ import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 import com.fasterxml.jackson.databind.util.BeanUtil;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -56,6 +58,8 @@ import java.util.Map;
  * @since 2016-05-30
  */
 public class ForestFastjsonConverter implements ForestJsonConverter {
+
+    private final static int PARSE_LIMIT = 1024 * 1024;
 
     /**
      * Fastjson序列化方式
