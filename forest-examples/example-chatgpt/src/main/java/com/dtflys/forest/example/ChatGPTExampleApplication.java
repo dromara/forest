@@ -1,4 +1,4 @@
-package com.dtflys.forest.example;
+package org.dromara.forest.example;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;

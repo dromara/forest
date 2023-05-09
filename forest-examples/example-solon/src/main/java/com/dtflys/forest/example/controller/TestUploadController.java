@@ -1,8 +1,8 @@
-package com.dtflys.forest.example.controller;
+package org.dromara.forest.example.controller;
 
-import com.dtflys.forest.example.client.UploadClient;
-import com.dtflys.forest.example.service.FileService;
-import com.dtflys.forest.example.utils.PathUtil;
+import org.dromara.forest.example.client.UploadClient;
+import org.dromara.forest.example.service.FileService;
+import org.dromara.forest.example.utils.PathUtil;
 import org.noear.solon.Utils;
 import org.noear.solon.annotation.*;
 import org.noear.solon.core.handle.UploadedFile;

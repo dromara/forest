@@ -1,6 +1,6 @@
-package com.dtflys.forest.forestspringboot3example.controller;
+package org.dromara.forest.forestspringboot3example.controller;
 
-import com.dtflys.forest.forestspringboot3example.client.TestInterceptorClient;
+import org.dromara.forest.forestspringboot3example.client.TestInterceptorClient;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;

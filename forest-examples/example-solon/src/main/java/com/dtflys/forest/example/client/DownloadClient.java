@@ -1,11 +1,11 @@
-package com.dtflys.forest.example.client;
+package org.dromara.forest.example.client;
 
-import com.dtflys.forest.annotation.BaseRequest;
-import com.dtflys.forest.annotation.ForestClient;
-import com.dtflys.forest.annotation.GetRequest;
-import com.dtflys.forest.annotation.Request;
-import com.dtflys.forest.callback.OnProgress;
-import com.dtflys.forest.extensions.DownloadFile;
+import org.dromara.forest.annotation.BaseRequest;
+import org.dromara.forest.annotation.ForestClient;
+import org.dromara.forest.annotation.GetRequest;
+import org.dromara.forest.annotation.Request;
+import org.dromara.forest.callback.OnProgress;
+import org.dromara.forest.extensions.DownloadFile;
 
 import java.io.File;
 import java.io.InputStream;

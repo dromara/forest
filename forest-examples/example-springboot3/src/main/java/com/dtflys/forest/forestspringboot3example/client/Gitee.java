@@ -1,13 +1,13 @@
-package com.dtflys.forest.forestspringboot3example.client;
+package org.dromara.forest.forestspringboot3example.client;
 
-import com.dtflys.forest.annotation.BaseRequest;
-import com.dtflys.forest.annotation.Get;
-import com.dtflys.forest.annotation.Query;
-import com.dtflys.forest.annotation.Request;
-import com.dtflys.forest.callback.OnError;
-import com.dtflys.forest.callback.OnSuccess;
-import com.dtflys.forest.forestspringboot3example.model.GiteeBranch;
-import com.dtflys.forest.forestspringboot3example.model.GiteeReadme;
+import org.dromara.forest.annotation.BaseRequest;
+import org.dromara.forest.annotation.Get;
+import org.dromara.forest.annotation.Query;
+import org.dromara.forest.annotation.Request;
+import org.dromara.forest.callback.OnError;
+import org.dromara.forest.callback.OnSuccess;
+import org.dromara.forest.forestspringboot3example.model.GiteeBranch;
+import org.dromara.forest.forestspringboot3example.model.GiteeReadme;
 
 import java.util.List;
 import java.util.concurrent.Future;

@@ -25,8 +25,8 @@
 
     </forest:configuration>
 
-    <forest:client id="beastshopClient" configuration="forestConfiguration" class="com.dtflys.spring.test.client0.BeastshopClient"/>
+    <forest:client id="beastshopClient" configuration="forestConfiguration" class="org.dromara.spring.test.client0.BeastshopClient"/>
 
-    <forest:client id="githubClient" configuration="forestConfiguration" class="com.dtflys.spring.test.client2.GithubClient"/>
+    <forest:client id="githubClient" configuration="forestConfiguration" class="org.dromara.spring.test.client2.GithubClient"/>
 
 </beans>

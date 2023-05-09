@@ -1,6 +1,6 @@
-package com.dtflys.forest.example.controller;
+package org.dromara.forest.example.controller;
 
-import com.dtflys.forest.example.client.TestInterceptorClient;
+import org.dromara.forest.example.client.TestInterceptorClient;
 import org.noear.solon.annotation.*;
 import org.noear.solon.core.handle.Context;
 import org.slf4j.Logger;

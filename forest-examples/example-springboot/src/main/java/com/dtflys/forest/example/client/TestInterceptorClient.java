@@ -1,9 +1,9 @@
-package com.dtflys.forest.example.client;
+package org.dromara.forest.example.client;
 
-import com.dtflys.forest.annotation.BaseRequest;
-import com.dtflys.forest.annotation.DataParam;
-import com.dtflys.forest.annotation.Request;
-import com.dtflys.forest.example.interceptors.ApiClientInterceptor;
+import org.dromara.forest.annotation.BaseRequest;
+import org.dromara.forest.annotation.DataParam;
+import org.dromara.forest.annotation.Request;
+import org.dromara.forest.example.interceptors.ApiClientInterceptor;
 
 
 @BaseRequest(baseURL = "localhost:8080")

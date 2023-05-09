@@ -6,4 +6,4 @@ forest:
   timeout: 3000
   connect-timeout: 3000
   retry-count: 0
-  base-address-source: com.dtflys.forest.solon.test.address.MyAddressSource
+  base-address-source: org.dromara.forest.solon.test.address.MyAddressSource

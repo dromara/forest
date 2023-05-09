@@ -1,4 +1,4 @@
-package com.dtflys.forest.forestspringboot3example;
+package org.dromara.forest.forestspringboot3example;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

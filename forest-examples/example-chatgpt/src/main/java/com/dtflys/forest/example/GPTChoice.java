@@ -1,4 +1,4 @@
-package com.dtflys.forest.example;
+package org.dromara.forest.example;
 
 import com.alibaba.fastjson.annotation.JSONField;
 

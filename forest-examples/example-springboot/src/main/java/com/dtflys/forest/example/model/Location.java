@@ -1,4 +1,4 @@
-package com.dtflys.forest.example.model;
+package org.dromara.forest.example.model;
 
 import java.util.List;
 

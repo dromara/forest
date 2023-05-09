@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.dtflys.forest.springboot.ForestAutoConfiguration
+  springboot.org.dromara.forest.ForestAutoConfiguration

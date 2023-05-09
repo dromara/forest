@@ -1,14 +1,14 @@
-package com.dtflys.forest.forestspringboot3example.controller;
+package org.dromara.forest.forestspringboot3example.controller;
 
-import com.dtflys.forest.forestspringboot3example.client.Amap;
-import com.dtflys.forest.forestspringboot3example.client.Cn12306;
-import com.dtflys.forest.forestspringboot3example.client.Gitee;
-import com.dtflys.forest.forestspringboot3example.model.Coordinate;
-import com.dtflys.forest.forestspringboot3example.model.GiteeBranch;
-import com.dtflys.forest.forestspringboot3example.model.GiteeReadme;
-import com.dtflys.forest.forestspringboot3example.model.Location;
-import com.dtflys.forest.forestspringboot3example.model.Result;
-import com.dtflys.forest.http.ForestResponse;
+import org.dromara.forest.forestspringboot3example.client.Amap;
+import org.dromara.forest.forestspringboot3example.client.Cn12306;
+import org.dromara.forest.forestspringboot3example.client.Gitee;
+import org.dromara.forest.forestspringboot3example.model.Coordinate;
+import org.dromara.forest.forestspringboot3example.model.GiteeBranch;
+import org.dromara.forest.forestspringboot3example.model.GiteeReadme;
+import org.dromara.forest.forestspringboot3example.model.Location;
+import org.dromara.forest.forestspringboot3example.model.Result;
+import org.dromara.forest.http.ForestResponse;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;

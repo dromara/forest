@@ -6,5 +6,5 @@ forest:
   timeout: 3000
   connect-timeout: 3000
   max-retry-count: 0
-  success-when: com.dtflys.forest.solon.test.when.MyWhenCondition
-  retry-when: com.dtflys.forest.solon.test.when.MyWhenCondition
+  success-when: org.dromara.forest.solon.test.when.MyWhenCondition
+  retry-when: org.dromara.forest.solon.test.when.MyWhenCondition

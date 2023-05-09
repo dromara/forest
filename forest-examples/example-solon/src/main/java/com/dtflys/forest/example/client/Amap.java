@@ -1,9 +1,8 @@
-package com.dtflys.forest.example.client;
+package org.dromara.forest.example.client;
 
-import com.dtflys.forest.annotation.*;
-import com.dtflys.forest.example.model.Coordinate;
-import com.dtflys.forest.example.model.Location;
-import com.dtflys.forest.example.model.Result;
+import org.dromara.forest.example.model.Coordinate;
+import org.dromara.forest.example.model.Location;
+import org.dromara.forest.example.model.Result;
 
 import java.util.Map;
 

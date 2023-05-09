@@ -1,6 +1,6 @@
-package com.dtflys.forest.example.service;
+package org.dromara.forest.example.service;
 
-import com.dtflys.forest.annotation.BindingVar;
+import org.dromara.forest.annotation.BindingVar;
 import org.noear.solon.annotation.Component;
 import org.noear.solon.core.handle.UploadedFile;
 

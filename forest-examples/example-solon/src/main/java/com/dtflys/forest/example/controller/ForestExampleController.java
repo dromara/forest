@@ -1,10 +1,10 @@
-package com.dtflys.forest.example.controller;
+package org.dromara.forest.example.controller;
 
-import com.dtflys.forest.example.client.Amap;
-import com.dtflys.forest.example.client.Cn12306;
-import com.dtflys.forest.example.client.Gitee;
-import com.dtflys.forest.example.model.*;
-import com.dtflys.forest.http.ForestResponse;
+import org.dromara.forest.example.client.Amap;
+import org.dromara.forest.example.client.Cn12306;
+import org.dromara.forest.example.client.Gitee;
+import org.dromara.forest.example.model.*;
+import org.dromara.forest.http.ForestResponse;
 import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Get;
 import org.noear.solon.annotation.Inject;

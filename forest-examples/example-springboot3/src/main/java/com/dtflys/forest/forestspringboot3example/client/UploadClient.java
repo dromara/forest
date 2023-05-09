@@ -1,12 +1,12 @@
-package com.dtflys.forest.forestspringboot3example.client;
+package org.dromara.forest.forestspringboot3example.client;
 
-import com.dtflys.forest.annotation.BaseRequest;
-import com.dtflys.forest.annotation.Body;
-import com.dtflys.forest.annotation.DataFile;
-import com.dtflys.forest.annotation.Post;
-import com.dtflys.forest.annotation.PostRequest;
-import com.dtflys.forest.annotation.Request;
-import com.dtflys.forest.callback.OnProgress;
+import org.dromara.forest.annotation.BaseRequest;
+import org.dromara.forest.annotation.Body;
+import org.dromara.forest.annotation.DataFile;
+import org.dromara.forest.annotation.Post;
+import org.dromara.forest.annotation.PostRequest;
+import org.dromara.forest.annotation.Request;
+import org.dromara.forest.callback.OnProgress;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 

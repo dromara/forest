@@ -1,16 +1,16 @@
-package com.dtflys.forest.example.client;
+package org.dromara.forest.example.client;
 
-import com.dtflys.forest.annotation.BaseRequest;
-import com.dtflys.forest.annotation.DataObject;
-import com.dtflys.forest.annotation.DataParam;
-import com.dtflys.forest.annotation.DataVariable;
-import com.dtflys.forest.annotation.Get;
-import com.dtflys.forest.annotation.Query;
-import com.dtflys.forest.annotation.Request;
-import com.dtflys.forest.annotation.Var;
-import com.dtflys.forest.example.model.Coordinate;
-import com.dtflys.forest.example.model.Location;
-import com.dtflys.forest.example.model.Result;
+import org.dromara.forest.annotation.BaseRequest;
+import org.dromara.forest.annotation.DataObject;
+import org.dromara.forest.annotation.DataParam;
+import org.dromara.forest.annotation.DataVariable;
+import org.dromara.forest.annotation.Get;
+import org.dromara.forest.annotation.Query;
+import org.dromara.forest.annotation.Request;
+import org.dromara.forest.annotation.Var;
+import org.dromara.forest.example.model.Coordinate;
+import org.dromara.forest.example.model.Location;
+import org.dromara.forest.example.model.Result;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 import java.util.Map;

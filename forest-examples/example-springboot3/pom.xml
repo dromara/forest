@@ -8,7 +8,7 @@
         <version>3.1.0-M1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.dtflys.forest</groupId>
+    <groupId>org.dromara.forest</groupId>
     <artifactId>example-springboot3</artifactId>
 
     <name>forest-springboot3-example</name>
@@ -21,13 +21,13 @@
     <dependencies>
 
         <dependency>
-            <groupId>com.dtflys.forest</groupId>
+            <groupId>org.dromara.forest</groupId>
             <artifactId>forest-spring-boot3-starter</artifactId>
             <version>1.5.30</version>
         </dependency>
 
         <dependency>
-            <groupId>com.dtflys.forest</groupId>
+            <groupId>org.dromara.forest</groupId>
             <artifactId>forest-jakarta-xml</artifactId>
             <version>1.5.30</version>
         </dependency>

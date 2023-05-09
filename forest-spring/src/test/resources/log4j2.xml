@@ -5,9 +5,9 @@
 			<PatternLayout pattern="%d{yy-MM-dd HH:mm:ss} [%-5level] %class{3}:%L - %msg%xEx%n"/>
 		</Console>
     </Appenders>
-    
+
     <Loggers>
-        <logger name="com.dtflys.forest" level="info"/>
+        <logger name="org.dromara.forest" level="info"/>
         <Root level="info">
             <AppenderRef ref="Console" />
         </Root>

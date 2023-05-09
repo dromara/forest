@@ -1,4 +1,4 @@
-package com.dtflys.forest.forestspringboot3example.model;
+package org.dromara.forest.forestspringboot3example.model;
 
 import java.util.List;
 

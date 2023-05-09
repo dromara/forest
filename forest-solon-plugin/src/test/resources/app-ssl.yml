@@ -12,10 +12,10 @@ forest:
       file: test.keystore
       keystore-pass: 123456
       cert-pass: 123456
-      ssl-socket-factory-builder: com.dtflys.forest.solon.test.ssl.MySSLSocketFactoryBuilder
+      ssl-socket-factory-builder: org.dromara.forest.solon.test.ssl.MySSLSocketFactoryBuilder
 
   interceptors:
-    - com.dtflys.forest.solon.test.interceptor.GlobalInterceptor
+    - org.dromara.forest.solon.test.interceptor.GlobalInterceptor
 
 
 my-site:

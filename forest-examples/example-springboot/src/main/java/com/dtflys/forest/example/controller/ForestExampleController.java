@@ -1,14 +1,14 @@
-package com.dtflys.forest.example.controller;
+package org.dromara.forest.example.controller;
 
-import com.dtflys.forest.example.client.Amap;
-import com.dtflys.forest.example.client.Cn12306;
-import com.dtflys.forest.example.client.Gitee;
-import com.dtflys.forest.example.model.Coordinate;
-import com.dtflys.forest.example.model.GiteeBranch;
-import com.dtflys.forest.example.model.GiteeReadme;
-import com.dtflys.forest.example.model.Location;
-import com.dtflys.forest.example.model.Result;
-import com.dtflys.forest.http.ForestResponse;
+import org.dromara.forest.example.client.Amap;
+import org.dromara.forest.example.client.Cn12306;
+import org.dromara.forest.example.client.Gitee;
+import org.dromara.forest.example.model.Coordinate;
+import org.dromara.forest.example.model.GiteeBranch;
+import org.dromara.forest.example.model.GiteeReadme;
+import org.dromara.forest.example.model.Location;
+import org.dromara.forest.example.model.Result;
+import org.dromara.forest.http.ForestResponse;
 import javax.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;

@@ -1,6 +1,6 @@
-package com.dtflys.forest.example;
+package org.dromara.forest.example;
 
-import com.dtflys.forest.springboot.annotation.ForestScan;
+import org.dromara.forest.springboot.annotation.ForestScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +15,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
 @EnableSwagger2
-@ForestScan(basePackages = "com.dtflys.forest.example.client")
+@ForestScan(basePackages = "org.dromara.forest.example.client")
 public class ForestExampleApplication {
 
     @Bean
@@ -23,7 +23,7 @@ public class ForestExampleApplication {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.dtflys.forest.example.controller"))
+                .apis(RequestHandlerSelectors.basePackage("org.dromara.forest.example.controller"))
                 .paths(PathSelectors.any())
                 .build();
     }

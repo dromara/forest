@@ -9,10 +9,10 @@ forest:
   log-request: true
   log-response-status: false
   log-response-content: true
-  log-handler: com.dtflys.forest.springboot.test.logging.TestLogHandler
+  log-handler: org.dromara.forest.springboot.test.logging.TestLogHandler
   converters:
     json:
-      type: com.dtflys.forest.converter.json.ForestJacksonConverter
+      type: org.dromara.forest.converter.json.ForestJacksonConverter
       parameters:
         dateFormat: yyyy/MM/dd hh:mm:ss
 

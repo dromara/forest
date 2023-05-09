@@ -21,15 +21,15 @@
                 keystorePass="123456"
                 protocols="TLS"
                 certPass="123456"
-                hostnameVerifier="com.dtflys.spring.ssl.com.dtflys.forest.springboot.test.MyHostnameVerifier"
-                sslSocketFactoryBuilder="com.dtflys.spring.ssl.com.dtflys.forest.springboot.test.MySSLSocketFactoryBuilder"/>
+                hostnameVerifier="org.dromara.spring.ssl.org.dromara.forest.springboot.test.MyHostnameVerifier"
+                sslSocketFactoryBuilder="org.dromara.spring.ssl.org.dromara.forest.springboot.test.MySSLSocketFactoryBuilder"/>
 
         <forest:ssl-keystore
                 id="keystore2"
-                hostnameVerifier="com.dtflys.spring.ssl.com.dtflys.forest.springboot.test.MyHostnameVerifier"/>
+                hostnameVerifier="org.dromara.spring.ssl.org.dromara.forest.springboot.test.MyHostnameVerifier"/>
 
     </forest:configuration>
 
-    <forest:client id="beastshopClient" configuration="forestConfiguration" class="com.dtflys.spring.client0.com.dtflys.forest.springboot.test.BeastshopClient"/>
+    <forest:client id="beastshopClient" configuration="forestConfiguration" class="org.dromara.spring.client0.org.dromara.forest.springboot.test.BeastshopClient"/>
 
 </beans>

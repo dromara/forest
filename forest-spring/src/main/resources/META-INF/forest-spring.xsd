@@ -233,7 +233,7 @@
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="retryer" type="xsd:token" use="optional"
-                       default="com.dtflys.forest.retryer.BackOffRetryer">
+                       default="org.dromara.forest.retryer.BackOffRetryer">
             <xsd:annotation>
                 <xsd:documentation>
                     <![CDATA[
@@ -299,7 +299,7 @@
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="logHandler" type="xsd:token" use="optional"
-                       default="com.dtflys.forest.logging.DefaultLogHandler">
+                       default="org.dromara.forest.logging.DefaultLogHandler">
             <xsd:annotation>
                 <xsd:documentation>
                     <![CDATA[

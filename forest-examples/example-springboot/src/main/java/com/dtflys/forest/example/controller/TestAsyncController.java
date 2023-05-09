@@ -1,7 +1,7 @@
-package com.dtflys.forest.example.controller;
+package org.dromara.forest.example.controller;
 
-import com.dtflys.forest.Forest;
-import com.dtflys.forest.logging.LogConfiguration;
+import org.dromara.forest.Forest;
+import org.dromara.forest.logging.LogConfiguration;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

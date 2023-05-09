@@ -1,6 +1,6 @@
-package com.dtflys.forest.forestspringboot3example.controller;
+package org.dromara.forest.forestspringboot3example.controller;
 
-import com.dtflys.forest.forestspringboot3example.client.DownloadClient;
+import org.dromara.forest.forestspringboot3example.client.DownloadClient;
 import jakarta.annotation.Resource;
 import org.apache.commons.io.FileUtils;
 import org.springframework.web.bind.annotation.GetMapping;

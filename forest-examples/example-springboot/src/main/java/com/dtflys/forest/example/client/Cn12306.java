@@ -1,7 +1,7 @@
-package com.dtflys.forest.example.client;
+package org.dromara.forest.example.client;
 
-import com.dtflys.forest.annotation.Get;
-import com.dtflys.forest.http.ForestResponse;
+import org.dromara.forest.annotation.Get;
+import org.dromara.forest.http.ForestResponse;
 
 public interface Cn12306 {
 

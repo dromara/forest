@@ -1,6 +1,6 @@
-package com.dtflys.forest.example.controller;
+package org.dromara.forest.example.controller;
 
-import com.dtflys.forest.example.client.DownloadClient;
+import org.dromara.forest.example.client.DownloadClient;
 import org.apache.commons.io.FileUtils;
 import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Get;

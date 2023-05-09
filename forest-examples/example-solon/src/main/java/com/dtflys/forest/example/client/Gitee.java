@@ -1,10 +1,9 @@
-package com.dtflys.forest.example.client;
+package org.dromara.forest.example.client;
 
-import com.dtflys.forest.annotation.*;
-import com.dtflys.forest.callback.OnError;
-import com.dtflys.forest.callback.OnSuccess;
-import com.dtflys.forest.example.model.GiteeBranch;
-import com.dtflys.forest.example.model.GiteeReadme;
+import org.dromara.forest.callback.OnError;
+import org.dromara.forest.callback.OnSuccess;
+import org.dromara.forest.example.model.GiteeBranch;
+import org.dromara.forest.example.model.GiteeReadme;
 
 import java.util.List;
 import java.util.concurrent.Future;

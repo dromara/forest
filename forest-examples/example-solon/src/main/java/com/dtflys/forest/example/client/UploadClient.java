@@ -1,7 +1,6 @@
-package com.dtflys.forest.example.client;
+package org.dromara.forest.example.client;
 
-import com.dtflys.forest.annotation.*;
-import com.dtflys.forest.callback.OnProgress;
+import org.dromara.forest.callback.OnProgress;
 import org.noear.solon.core.handle.UploadedFile;
 
 import java.io.File;

@@ -1,6 +1,6 @@
-package com.dtflys.forest.forestspringboot3example.service;
+package org.dromara.forest.forestspringboot3example.service;
 
-import com.dtflys.forest.annotation.BindingVar;
+import org.dromara.forest.annotation.BindingVar;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 

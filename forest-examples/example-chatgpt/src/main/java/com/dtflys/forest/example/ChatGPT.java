@@ -1,7 +1,7 @@
-package com.dtflys.forest.example;
+package org.dromara.forest.example;
 
-import com.dtflys.forest.annotation.Post;
-import com.dtflys.forest.annotation.Var;
+import org.dromara.forest.annotation.Post;
+import org.dromara.forest.annotation.Var;
 
 public interface ChatGPT {
 

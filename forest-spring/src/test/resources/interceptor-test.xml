@@ -19,10 +19,10 @@
     </forest:configuration>
 
     <forest:scan configuration="forestConfiguration"
-                 base-package="com.dtflys.spring.test.interceptor"/>
+                 base-package="org.dromara.spring.test.interceptor"/>
 
-    <context:component-scan base-package="com.dtflys.spring.test.component"/>
-    <context:component-scan base-package="com.dtflys.spring.test.interceptor"/>
+    <context:component-scan base-package="org.dromara.spring.test.component"/>
+    <context:component-scan base-package="org.dromara.spring.test.interceptor"/>
 
 
 </beans>

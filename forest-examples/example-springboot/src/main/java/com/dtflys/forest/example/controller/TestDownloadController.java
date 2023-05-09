@@ -1,6 +1,6 @@
-package com.dtflys.forest.example.controller;
+package org.dromara.forest.example.controller;
 
-import com.dtflys.forest.example.client.DownloadClient;
+import org.dromara.forest.example.client.DownloadClient;
 import javax.annotation.Resource;
 import org.apache.commons.io.FileUtils;
 import org.springframework.web.bind.annotation.GetMapping;

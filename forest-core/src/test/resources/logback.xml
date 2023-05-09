@@ -22,7 +22,7 @@
 
 
     <!-- 日志输出级别 -->
-    <logger name="com.dtflys.forest" level="DEBUG" additivity="false">
+    <logger name="org.dromara.forest" level="DEBUG" additivity="false">
         <appender-ref ref="STDOUT" />
     </logger>
 

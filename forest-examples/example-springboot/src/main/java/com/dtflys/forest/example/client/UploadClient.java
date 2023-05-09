@@ -1,8 +1,7 @@
-package com.dtflys.forest.example.client;
+package org.dromara.forest.example.client;
 
-import com.dtflys.forest.annotation.*;
-import com.dtflys.forest.callback.OnProgress;
-import com.dtflys.forest.http.ForestRequest;
+import org.dromara.forest.callback.OnProgress;
+import org.dromara.forest.http.ForestRequest;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 

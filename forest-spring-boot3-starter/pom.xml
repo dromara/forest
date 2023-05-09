@@ -4,13 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.dtflys.forest</groupId>
+    <groupId>org.dromara.forest</groupId>
     <artifactId>forest-spring-boot3-starter</artifactId>
     <version>${revision}</version>
     <packaging>jar</packaging>
 
     <parent>
-        <groupId>com.dtflys.forest</groupId>
+        <groupId>org.dromara.forest</groupId>
         <artifactId>forest</artifactId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
@@ -60,12 +60,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.dtflys.forest</groupId>
+            <groupId>org.dromara.forest</groupId>
             <artifactId>forest-core</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.dtflys.forest</groupId>
+            <groupId>org.dromara.forest</groupId>
             <artifactId>forest-spring</artifactId>
             <version>${project.parent.version}</version>
         </dependency>

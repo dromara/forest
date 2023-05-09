@@ -1,4 +1,4 @@
-package com.dtflys.forest.forestspringboot3example;
+package org.dromara.forest.forestspringboot3example;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

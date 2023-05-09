@@ -9,10 +9,10 @@ forest:
   retry-count: 2
   ssl-key-stores:
     - id: keystore1
-      hostname-verifier: com.dtflys.forest.springboot.test.ssl.MyHostnameVerifier
-      ssl-socket-factory-builder: com.dtflys.forest.springboot.test.ssl.MySSLSocketFactoryBuilder
+      hostname-verifier: org.dromara.forest.springboot.test.ssl.MyHostnameVerifier
+      ssl-socket-factory-builder: org.dromara.forest.springboot.test.ssl.MySSLSocketFactoryBuilder
   interceptors:
-    - com.dtflys.forest.springboot.test.interceptor.GlobalInterceptor
+    - org.dromara.forest.springboot.test.interceptor.GlobalInterceptor
 
 my-site:
   base-url: https://gitee.com

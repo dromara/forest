@@ -1,4 +1,4 @@
-package com.dtflys.forest.example.model;
+package org.dromara.forest.example.model;
 
 public class GiteeBranch {
     private String name;
