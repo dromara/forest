@@ -18,6 +18,7 @@
     </properties>
 
     <modules>
+        <module>forest-core-test</module>
         <module>forest-spring-boot-test</module>
     </modules>
 
