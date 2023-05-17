@@ -228,6 +228,19 @@ public class URLEncoder {
         return encode(path, cs);
     }
 
+    private boolean isURLEncoded(final char[] charArray, final int index) {
+        if (charArray[index] != '%') {
+            return false;
+        }
+        final int len = charArray.length;
+        if (index + 2 < len) {
+            final char ch1 = charArray[index + 1];
+            final char ch2 = charArray[index + 2];
+            return Character.isDigit(ch1) && Character.isDigit(ch2);
+        }
+        return false;
+    }
+
     /**
      * 将URL中的字符串编码为%形式
      *
@@ -237,21 +250,23 @@ public class URLEncoder {
      */
     public String encode(String path, Charset charset) {
         final StringBuilder builder = new StringBuilder(path.length());
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        OutputStreamWriter writer = new OutputStreamWriter(buf, charset);
-        char[] charArray = path.toCharArray();
-        int len = charArray.length;
-        char ch;
+        final ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        final OutputStreamWriter writer = new OutputStreamWriter(buf, charset);
+        final char[] charArray = path.toCharArray();
+        final int len = charArray.length;
+
         for (int i = 0; i < len; i++) {
-            ch = charArray[i];
-            if (excludedCharacters.get(ch)) {
+            final char ch = charArray[i];
+            if (isURLEncoded(charArray, i)) {
+                builder.append(ch);
+            } else if (excludedCharacters.get(ch)) {
                 builder.append(ch);
             } else if (encodeSpaceAsPlus && ch == SPACE) {
                 // 处理空格为加号+
                 builder.append('+');
             } else {
                 try {
-                    writer.write((char) ch);
+                    writer.write(ch);
                     writer.flush();
                 } catch (IOException e) {
                     buf.reset();
