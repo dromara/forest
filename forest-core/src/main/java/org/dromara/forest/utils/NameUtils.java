@@ -39,27 +39,27 @@ public class NameUtils {
      * @param name 源字符串
      * @return 分割后的字符串数组
      */
-    public static String[] splitCamelName(String name) {
-        int len = name.length();
-        List<String> names = new LinkedList<>();
-        StringBuilder builder = new StringBuilder();
+    public static String[] splitCamelName(final String name) {
+        final int len = name.length();
+        final List<String> names = new LinkedList<>();
+        final StringBuilder builder = new StringBuilder();
         for (int i = 0; i < len; i++) {
             char ch = name.charAt(i);
             if (Character.isUpperCase(ch)) {
-                String item = builder.toString();
+                final String item = builder.toString();
                 if (StringUtils.isNotBlank(item)) {
                     names.add(item);
                 }
-                builder = new StringBuilder();
+                builder.setLength(0);
                 ch = Character.toLowerCase(ch);
             }
             builder.append(ch);
         }
-        String last = builder.toString();
+        final String last = builder.toString();
         if (StringUtils.isNotBlank(last)) {
             names.add(last);
         }
-        String[] result = new String[names.size()];
+        final String[] result = new String[names.size()];
         return names.toArray(result);
     }
 

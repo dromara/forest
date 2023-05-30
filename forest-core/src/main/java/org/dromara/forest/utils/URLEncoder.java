@@ -85,13 +85,12 @@ public class URLEncoder {
     public static final URLEncoder ALL = createAllUrlEncoder();
 
 
-    private static URLEncoder createURLEncoder(char[] excludedCharacters, boolean encodeSpaceAsPlus) {
+    private static URLEncoder createURLEncoder(final char[] excludedCharacters, final boolean encodeSpaceAsPlus) {
         final URLEncoder encoder = new URLEncoder();
         encoder.setEncodeSpaceAsPlus(encodeSpaceAsPlus);
-        int len = excludedCharacters.length;
-        char ch;
+        final int len = excludedCharacters.length;
         for (int i = 0; i < len; i++) {
-            ch = excludedCharacters[i];
+            final char ch = excludedCharacters[i];
             encoder.excludeCharacter(ch);
         }
         return encoder;
@@ -189,7 +188,7 @@ public class URLEncoder {
      *
      * @param excludedCharacters 安全字符，安全字符不被编码
      */
-    private URLEncoder(BitSet excludedCharacters) {
+    private URLEncoder(final BitSet excludedCharacters) {
         this.excludedCharacters = excludedCharacters;
     }
 
@@ -198,7 +197,7 @@ public class URLEncoder {
      *
      * @param c 字符
      */
-    public void excludeCharacter(char c) {
+    public void excludeCharacter(final char c) {
         excludedCharacters.set(c);
     }
 
@@ -211,7 +210,7 @@ public class URLEncoder {
         this.encodeSpaceAsPlus = encodeSpaceAsPlus;
     }
 
-    public String encode(String path, String charset) {
+    public String encode(final String path, final String charset) {
         if (path == null) {
             return null;
         }
@@ -248,7 +247,7 @@ public class URLEncoder {
      * @param charset 编码
      * @return 编码后的字符串
      */
-    public String encode(String path, Charset charset) {
+    public String encode(final String path, final Charset charset) {
         final StringBuilder builder = new StringBuilder(path.length());
         final ByteArrayOutputStream buf = new ByteArrayOutputStream();
         final OutputStreamWriter writer = new OutputStreamWriter(buf, charset);
@@ -273,11 +272,11 @@ public class URLEncoder {
                     continue;
                 }
 
-                byte[] ba = buf.toByteArray();
-                for (byte toEncode : ba) {
+                final byte[] ba = buf.toByteArray();
+                for (final byte toEncode : ba) {
                     builder.append('%');
-                    int high = (toEncode & 0xf0) >>> 4;//高位
-                    int low = toEncode & 0x0f;//低位
+                    final int high = (toEncode & 0xf0) >>> 4;//高位
+                    final int low = toEncode & 0x0f;//低位
                     builder.append(HEX_DIGITS_UPPER[high]);
                     builder.append(HEX_DIGITS_UPPER[low]);
                 }
