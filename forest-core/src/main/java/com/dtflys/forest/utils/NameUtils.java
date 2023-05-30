@@ -19,7 +19,7 @@ public class NameUtils {
      * @param name 名称
      * @return {@code true}: 是 Getter, {@code false}: 不是 Getter
      */
-    public static boolean isGetter(String name) {
+    public static boolean isGetter(final String name) {
         return name != null && name.length() > GETTER_PREFIX.length() && name.startsWith(GETTER_PREFIX);
     }
 
@@ -29,7 +29,7 @@ public class NameUtils {
      * @param name 名称
      * @return {@code true}: 是 Setter, {@code false}: 不是 Setter
      */
-    public static boolean isSetter(String name) {
+    public static boolean isSetter(final String name) {
         return name != null && name.length() > SETTER_PREFIX.length() && name.startsWith(SETTER_PREFIX);
     }
 
@@ -39,27 +39,28 @@ public class NameUtils {
      * @param name 源字符串
      * @return 分割后的字符串数组
      */
-    public static String[] splitCamelName(String name) {
-        int len = name.length();
-        List<String> names = new LinkedList<>();
+    public static String[] splitCamelName(final String name) {
+        final int len = name.length();
+        final List<String> names = new LinkedList<>();
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < len; i++) {
-            char ch = name.charAt(i);
+            final char ch = name.charAt(i);
             if (Character.isUpperCase(ch)) {
                 String item = builder.toString();
                 if (StringUtils.isNotBlank(item)) {
                     names.add(item);
                 }
                 builder = new StringBuilder();
-                ch = Character.toLowerCase(ch);
+                builder.append(Character.toLowerCase(ch));
+            } else {
+                builder.append(ch);
             }
-            builder.append(ch);
         }
-        String last = builder.toString();
+        final String last = builder.toString();
         if (StringUtils.isNotBlank(last)) {
             names.add(last);
         }
-        String[] result = new String[names.size()];
+        final String[] result = new String[names.size()];
         return names.toArray(result);
     }
 

@@ -94,14 +94,14 @@ public final class URLUtils {
         }
     }
 
-    public static String getValidBaseURL(String baseUrl) {
-        char[] chars = baseUrl.toCharArray();
-        int len = chars.length;
-        int lastIndex = len - 1;
+    public static String getValidBaseURL(final String baseUrl) {
+        final char[] chars = baseUrl.toCharArray();
+        final int len = chars.length;
+        final int lastIndex = len - 1;
         if ('/' == chars[lastIndex]) {
             int i = lastIndex;
             do {
-                char ch = chars[i];
+                final char ch = chars[i];
                 if (ch != '/') {
                     break;
                 }

@@ -8,7 +8,6 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.converter.json.JSONConverterSelector;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
@@ -19,6 +18,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -69,7 +69,7 @@ public class ReflectUtils {
      * @param type {@link Type}接口实例
      * @return  {@link Type} 接口实例
      */
-    public static Type toType(Type type) {
+    public static Type toType(final Type type) {
         if (type instanceof TypeReference) {
             return ((TypeReference<?>) type).getType();
         }
@@ -83,12 +83,12 @@ public class ReflectUtils {
      * @param genericType {@link Type}接口实例
      * @return  Java类，{@link Class}类实例
      */
-    public static Class<?> toClass(Type genericType) {
+    public static Class<?> toClass(final Type genericType) {
         if (genericType instanceof TypeReference) {
             return toClass(((TypeReference<?>) genericType).getType());
         }
         if (genericType instanceof ParameterizedType) {
-            ParameterizedType pt = (ParameterizedType) genericType;
+            final ParameterizedType pt = (ParameterizedType) genericType;
             return ((Class<?>) pt.getRawType());
         } else if (genericType instanceof TypeVariable) {
             return (Class<?>) ((TypeVariable<?>) genericType).getBounds()[0];
@@ -112,25 +112,24 @@ public class ReflectUtils {
      * @param type 普通 Java Type 类型, {@link Type} 接口实例
      * @return 带泛型参数的 Type 类型, {@link ParameterizedType} 接口实例
      */
-    public static ParameterizedType toParameterizedType(Type type) {
+    public static ParameterizedType toParameterizedType(final Type type) {
         if (null == type) {
             return null;
         }
-        ParameterizedType pType = null;
         if (type instanceof ParameterizedType) {
-            pType = (ParameterizedType) type;
+            return  (ParameterizedType) type;
         } else if (type instanceof Class) {
-            Class<?> clazz = (Class<?>) type;
+            final Class<?> clazz = (Class<?>) type;
             Type genericSuper = clazz.getGenericSuperclass();
             if (genericSuper == null || Object.class.equals(genericSuper)) {
-                Type[] genericInterfaces = clazz.getGenericInterfaces();
+                final Type[] genericInterfaces = clazz.getGenericInterfaces();
                 if (genericInterfaces.length > 0) {
                     genericSuper = genericInterfaces[0];
                 }
             }
-            pType = toParameterizedType(genericSuper);
+            return toParameterizedType(genericSuper);
         }
-        return pType;
+        return null;
     }
 
     /**
@@ -140,8 +139,8 @@ public class ReflectUtils {
      * @param type {@link Type} 接口实例
      * @return 多个泛型参数类型, {@link Type} 接口数组
      */
-    public static Type[] getGenericTypeArguments(Type type) {
-        ParameterizedType pType = toParameterizedType(type);
+    public static Type[] getGenericTypeArguments(final Type type) {
+        final ParameterizedType pType = toParameterizedType(type);
         if (pType != null) {
             return pType.getActualTypeArguments();
         }
@@ -156,8 +155,8 @@ public class ReflectUtils {
      * @param index 泛型参数类型下标, 表示第几个泛型参数, 从0开始记
      * @return 泛型参数类型, {@link Type} 接口实例
      */
-    public static Type getGenericArgument(Type type, int index) {
-        Type[] arguments = getGenericTypeArguments(type);
+    public static Type getGenericArgument(final Type type, final int index) {
+        final Type[] arguments = getGenericTypeArguments(type);
         if (arguments != null && arguments.length > index) {
             return arguments[index];
         }
@@ -171,7 +170,7 @@ public class ReflectUtils {
      * @param type {@link Type} 接口实例
      * @return 泛型参数类型, {@link Type} 接口实例
      */
-    public static Type getGenericArgument(Type type) {
+    public static Type getGenericArgument(final Type type) {
         return getGenericArgument(type, 0);
     }
 
@@ -181,7 +180,7 @@ public class ReflectUtils {
      * @param type Java类，{@link Class}类实例
      * @return {@code true}：是基本类型，{@code false}：不是基本类型
      */
-    public static boolean isPrimaryType(Class<?> type) {
+    public static boolean isPrimaryType(final Class<?> type) {
         if (byte.class.isAssignableFrom(type) || Byte.class.isAssignableFrom(type)) {
             return true;
         }
@@ -224,7 +223,7 @@ public class ReflectUtils {
      * @param type Java类，{@link Class}类实例
      * @return {@code true}：是基本数组类型，{@code false}：不是基本数组类型
      */
-    public static boolean isPrimaryArrayType(Class type) {
+    public static boolean isPrimaryArrayType(final Class<?> type) {
         if (!type.isArray()) {
             return false;
         }
@@ -262,34 +261,43 @@ public class ReflectUtils {
     }
 
 
+    private static Object invokeAnnotationMethodForAlias(
+            final Annotation ann,
+            final Class<? extends Annotation> clazz,
+            final Method method,
+            final Object[] args) {
+        final AliasFor aliasFor = method.getAnnotation(AliasFor.class);
+        if (aliasFor != null) {
+            final String aliasName = aliasFor.value();
+            return invokeAnnotationMethod(ann, clazz, aliasName, args);
+        }
+        return null;
+    }
+
     /**
      * 从注解对象中获取所有属性
      * @param ann 注解对象，{@link Annotation}接口实例
      * @return 注解对象中有属性 {@link Map}表对象，Key：属性名 Value：属性值
      */
-    public static Map<String, Object> getAttributesFromAnnotation(Annotation ann) {
-        Map<String, Object> results = new ConcurrentHashMap<>();
-        Class clazz = ann.annotationType();
-        Method[] methods = clazz.getMethods();
-        Object[] args = new Object[0];
-        for (Method method : methods) {
-            String name = method.getName();
+    public static Map<String, Object> getAttributesFromAnnotation(final Annotation ann) {
+        final Map<String, Object> results = new ConcurrentHashMap<>();
+        final Class<? extends Annotation> clazz = ann.annotationType();
+        final Method[] methods = clazz.getMethods();
+        final Object[] args = new Object[0];
+        for (final Method method : methods) {
+            final String name = method.getName();
             if (excludedAnntotationMethodNames.contains(name)) {
                 continue;
             }
             if (method.getParameters().length > 0) {
                 continue;
             }
-            Object value = invokeAnnotationMethod(ann, clazz, name, args);
-            if (value == null ||
-                    (value instanceof CharSequence && StringUtils.isEmpty(String.valueOf(value)))) {
-                AliasFor aliasFor = method.getAnnotation(AliasFor.class);
-                if (aliasFor != null) {
-                    String aliasName = aliasFor.value();
-                    value = invokeAnnotationMethod(ann, clazz, aliasName, args);
-                }
+            final Object ret = invokeAnnotationMethod(ann, clazz, name, args);
+            final Object value = ret == null || (ret instanceof CharSequence && StringUtils.isEmpty(String.valueOf(ret))) ?
+                    invokeAnnotationMethodForAlias(ann, clazz, method, args) : ret;
+            if (value != null) {
+                results.put(name, value);
             }
-            results.put(name, value);
         }
         return results;
     }
@@ -300,7 +308,7 @@ public class ReflectUtils {
      * @param annotation 注解对象
      * @return {@code true}: 是Forest注解；{@code false}: 不是Forest注解
      */
-    public static boolean isForestAnnotation(Annotation annotation) {
+    public static boolean isForestAnnotation(final Annotation annotation) {
         return isForestParamAnnotation(annotation.annotationType());
     }
 
@@ -310,21 +318,12 @@ public class ReflectUtils {
      * @param annotationType 注解类
      * @return {@code true}: 是Forest注解；{@code false}: 不是Forest注解
      */
-    public static boolean isForestAnnotation(Class annotationType) {
+    public static boolean isForestAnnotation(final Class<?> annotationType) {
         return isForestBaseAnnotation(annotationType)
                 || isForestMethodAnnotation(annotationType)
                 || isForestParamAnnotation(annotationType);
     }
 
-    /**
-     * 判断是否为Forest接口注解
-     *
-     * @param annotation 注解对象
-     * @return {@code true}: 是Forest接口注解；{@code false}: 不是Forest接口注解
-     */
-    public static boolean isForestBaseAnnotation(Annotation annotation) {
-        return isForestBaseAnnotation(annotation);
-    }
 
     /**
      * 判断是否为Forest接口注解
@@ -332,12 +331,9 @@ public class ReflectUtils {
      * @param annotationType 注解类
      * @return {@code true}: 是Forest接口注解；{@code false}: 不是Forest接口注解
      */
-    public static boolean isForestBaseAnnotation(Class annotationType) {
-        Annotation mlcAnn = annotationType.getAnnotation(BaseLifeCycle.class);
-        if (mlcAnn != null) {
-            return true;
-        }
-        return false;
+    public static boolean isForestBaseAnnotation(final Class<?> annotationType) {
+        final Annotation mlcAnn = annotationType.getAnnotation(BaseLifeCycle.class);
+        return mlcAnn != null;
     }
 
 
@@ -347,7 +343,7 @@ public class ReflectUtils {
      * @param annotation 注解对象
      * @return {@code true}: 是Forest方法注解；{@code false}: 不是Forest方法注解
      */
-    public static boolean isForestMethodAnnotation(Annotation annotation) {
+    public static boolean isForestMethodAnnotation(final Annotation annotation) {
         return isForestMethodAnnotation(annotation.annotationType());
     }
 
@@ -357,12 +353,9 @@ public class ReflectUtils {
      * @param annotationType 注解类
      * @return {@code true}: 是Forest方法注解；{@code false}: 不是Forest方法注解
      */
-    public static boolean isForestMethodAnnotation(Class annotationType) {
-        Annotation mlcAnn = annotationType.getAnnotation(MethodLifeCycle.class);
-        if (mlcAnn != null) {
-            return true;
-        }
-        return false;
+    public static boolean isForestMethodAnnotation(final Class<?> annotationType) {
+        final Annotation mlcAnn = annotationType.getAnnotation(MethodLifeCycle.class);
+        return mlcAnn != null;
     }
 
 
@@ -372,7 +365,7 @@ public class ReflectUtils {
      * @param annotation 注解对象
      * @return {@code true}: 是Forest参数注解；{@code false}: 不是Forest参数注解
      */
-    public static boolean isForestParamAnnotation(Annotation annotation) {
+    public static boolean isForestParamAnnotation(final Annotation annotation) {
         return isForestParamAnnotation(annotation.annotationType());
     }
 
@@ -382,23 +375,20 @@ public class ReflectUtils {
      * @param annotationType 注解类
      * @return {@code true}: 是Forest参数注解；{@code false}: 不是Forest参数注解
      */
-    public static boolean isForestParamAnnotation(Class annotationType) {
-        Annotation mlcAnn = annotationType.getAnnotation(ParamLifeCycle.class);
-        if (mlcAnn != null) {
-            return true;
-        }
-        return false;
+    public static boolean isForestParamAnnotation(final Class<?> annotationType) {
+        final Annotation mlcAnn = annotationType.getAnnotation(ParamLifeCycle.class);
+        return mlcAnn != null;
     }
 
-    public static boolean canAnnotationUseForInterface(Class annotationType) {
+    public static boolean canAnnotationUseForInterface(final Class<?> annotationType) {
         return isForestBaseAnnotation(annotationType);
     }
 
-    public static boolean canAnnotationUseForMethod(Class annotationType) {
+    public static boolean canAnnotationUseForMethod(final Class<?> annotationType) {
         return isForestMethodAnnotation(annotationType);
     }
 
-    public static boolean canAnnotationUseForParam(Class annotationType) {
+    public static boolean canAnnotationUseForParam(final Class<?> annotationType) {
         return isForestParamAnnotation(annotationType);
     }
 
@@ -411,23 +401,13 @@ public class ReflectUtils {
      * @param args 方法调用参数
      * @return 方法调用返回值
      */
-    private static Object invokeAnnotationMethod(Annotation ann, Class clazz, String name, Object[] args) {
-        Method method = null;
+    private static Object invokeAnnotationMethod(final Annotation ann, final Class<?> clazz, final String name, final Object[] args) {
         try {
-            method = clazz.getMethod(name, new Class[0]);
-        } catch (NoSuchMethodException e) {
+            final Method method = clazz.getMethod(name);
+            return method.invoke(ann, args);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             throw new ForestRuntimeException(e);
         }
-        if (method != null) {
-            try {
-                return method.invoke(ann, args);
-            } catch (IllegalAccessException e) {
-                throw new ForestRuntimeException(e);
-            } catch (InvocationTargetException e) {
-                throw new ForestRuntimeException(e);
-            }
-        }
-        return null;
     }
 
 
@@ -435,13 +415,13 @@ public class ReflectUtils {
         if (target == null) {
             return;
         }
-        Map<String, Object> attrs = getAttributesFromAnnotation(source);
-        Class targetClass = target.getClass();
-        for (String name : attrs.keySet()) {
-            String methodName = NameUtils.setterName(name);
+        final Map<String, Object> attrs = getAttributesFromAnnotation(source);
+        final Class targetClass = target.getClass();
+        for (final String name : attrs.keySet()) {
+            final String methodName = NameUtils.setterName(name);
             try {
                 Method setterMethod = null;
-                for (Method method : targetClass.getMethods()) {
+                for (final Method method : targetClass.getMethods()) {
                     if (method.getName().equals(methodName) && method.getParameterTypes().length == 1) {
                         setterMethod = method;
                         break;
@@ -476,17 +456,7 @@ public class ReflectUtils {
      */
     public static Field[] getFields(final Class<?> clazz) {
         Validations.assertParamNotNull(clazz, "clazz");
-        Field[] fields = FIELD_CACHE.get(clazz);
-        if (fields == null) {
-            synchronized (FIELD_CACHE) {
-                fields = FIELD_CACHE.get(clazz);
-                if (fields == null) {
-                    fields = getFieldsWithoutCache(clazz, true);
-                    FIELD_CACHE.put(clazz, fields);
-                }
-            }
-        }
-        return fields;
+        return FIELD_CACHE.computeIfAbsent(clazz, key -> getFieldsWithoutCache(key, true));
     }
 
     private static Field[] getFieldsWithoutCache(final Class<?> clazz, final boolean withSuperClassFields) {
@@ -511,17 +481,7 @@ public class ReflectUtils {
      */
     public static Method[] getMethods(final Class<?> clazz) {
         Validations.assertParamNotNull(clazz, "clazz");
-        Method[] methods = METHOD_CACHE.get(clazz);
-        if (methods == null) {
-            synchronized (METHOD_CACHE) {
-                methods = METHOD_CACHE.get(clazz);
-                if (methods == null) {
-                    methods = getMethodsWithoutCache(clazz, true);
-                    METHOD_CACHE.put(clazz, methods);
-                }
-            }
-        }
-        return methods;
+        return METHOD_CACHE.computeIfAbsent(clazz, key -> getMethodsWithoutCache(key, true));
     }
 
 
@@ -530,7 +490,7 @@ public class ReflectUtils {
         Class<?> thisClass = clazz;
         while (thisClass != null && thisClass != Object.class) {
             final Method[] declaredMethods = thisClass.getDeclaredMethods();
-            for (Method declaredMethod : declaredMethods) {
+            for (final Method declaredMethod : declaredMethods) {
                 allMethods.add(declaredMethod);
             }
             thisClass = withSuperClassMethods ? thisClass.getSuperclass() : null;
