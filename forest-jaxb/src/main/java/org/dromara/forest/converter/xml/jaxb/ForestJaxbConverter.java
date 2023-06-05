@@ -31,25 +31,20 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ForestJaxbConverter implements ForestXmlConverter {
 
-
     private final static Map<Class<?>, JAXBContext> JAXB_CONTEXT_CACHE = new ConcurrentHashMap<>();
 
-    private JAXBContext getJAXBContext(Class<?> clazz) {
-        JAXBContext jaxbContext = JAXB_CONTEXT_CACHE.get(clazz);
-        if (jaxbContext != null) {
-            return jaxbContext;
-        }
-        try {
-            jaxbContext = JAXBContext.newInstance(clazz);
-        } catch (JAXBException e) {
-            throw new ForestConvertException(this, e);
-        }
-        JAXB_CONTEXT_CACHE.put(clazz, jaxbContext);
-        return jaxbContext;
+    private JAXBContext getJAXBContext(final Class<?> clazz) {
+        return JAXB_CONTEXT_CACHE.computeIfAbsent(clazz, key -> {
+            try {
+                return JAXBContext.newInstance(key);
+            } catch (JAXBException e) {
+                throw new ForestRuntimeException(e);
+            }
+        });
     }
 
     @Override
-    public String encodeToString(Object obj) {
+    public String encodeToString(final Object obj) {
         if (obj == null) {
             return null;
         }
@@ -60,8 +55,8 @@ public class ForestJaxbConverter implements ForestXmlConverter {
             throw new ForestRuntimeException("[Forest] JAXB XML converter dose not support translating instance of java.util.Map or java.util.List");
         }
         try {
-            JAXBContext jaxbContext = getJAXBContext(obj.getClass());
-            StringWriter writer = new StringWriter();
+            final JAXBContext jaxbContext = getJAXBContext(obj.getClass());
+            final StringWriter writer = new StringWriter();
             createMarshaller(jaxbContext, "UTF-8").marshal(obj, writer);
             return writer.toString();
         } catch (JAXBException e) {
@@ -71,12 +66,12 @@ public class ForestJaxbConverter implements ForestXmlConverter {
     }
 
     @Override
-    public byte[] encodeRequestBody(ForestBody body, Charset charset, ConvertOptions options) {
-        StringBuilder builder = new StringBuilder();
-        for (ForestRequestBody item : body) {
+    public byte[] encodeRequestBody(final ForestBody body, final Charset charset, final ConvertOptions options) {
+        final StringBuilder builder = new StringBuilder();
+        for (final ForestRequestBody item : body) {
             if (item instanceof ObjectRequestBody) {
-                Object obj = ((ObjectRequestBody) item).getObject();
-                String text = encodeToString(obj);
+                final Object obj = ((ObjectRequestBody) item).getObject();
+                final String text = encodeToString(obj);
                 builder.append(text);
             } else if (item instanceof StringRequestBody) {
                 builder.append(((StringRequestBody) item).getContent());
@@ -86,11 +81,10 @@ public class ForestJaxbConverter implements ForestXmlConverter {
     }
 
     @Override
-    public <T> T convertToJavaObject(String source, Class<T> targetType) {
-        JAXBContext jaxbContext = null;
+    public <T> T convertToJavaObject(final String source, final Class<T> targetType) {
         try {
-            jaxbContext = getJAXBContext(targetType);
-            StringReader reader = new StringReader(source);
+            final JAXBContext jaxbContext = getJAXBContext(targetType);
+            final StringReader reader = new StringReader(source);
             return (T) createUnmarshaller(jaxbContext).unmarshal(reader);
         } catch (JAXBException e) {
             throw new ForestConvertException(this, e);
@@ -100,28 +94,27 @@ public class ForestJaxbConverter implements ForestXmlConverter {
 
 
     @Override
-    public <T> T convertToJavaObject(String source, Type targetType) {
-        Class clazz = ReflectUtils.toClass(targetType);
+    public <T> T convertToJavaObject(final String source, final Type targetType) {
+        final Class clazz = ReflectUtils.toClass(targetType);
         return (T) convertToJavaObject(source, clazz);
     }
 
     @Override
-    public <T> T convertToJavaObject(byte[] source, Class<T> targetType, Charset charset) {
-        String str = StringUtils.fromBytes(source, charset);
+    public <T> T convertToJavaObject(final byte[] source, final Class<T> targetType, final Charset charset) {
+        final String str = StringUtils.fromBytes(source, charset);
         return (T) convertToJavaObject(str, targetType);
-
     }
 
     @Override
-    public <T> T convertToJavaObject(byte[] source, Type targetType, Charset charset) {
-        Class clazz = ReflectUtils.toClass(targetType);
+    public <T> T convertToJavaObject(final byte[] source, final Type targetType, final Charset charset) {
+        final Class clazz = ReflectUtils.toClass(targetType);
         return (T) convertToJavaObject(source, clazz, charset);
     }
 
 
-    public Marshaller createMarshaller(JAXBContext jaxbContext, String encoding) {
+    public Marshaller createMarshaller(final JAXBContext jaxbContext, final String encoding) {
         try {
-            Marshaller marshaller = jaxbContext.createMarshaller();
+            final Marshaller marshaller = jaxbContext.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
             if (StringUtils.isNotEmpty(encoding)) {
@@ -133,7 +126,7 @@ public class ForestJaxbConverter implements ForestXmlConverter {
         }
     }
 
-    public Unmarshaller createUnmarshaller(JAXBContext jaxbContext) {
+    public Unmarshaller createUnmarshaller(final JAXBContext jaxbContext) {
         try {
             return jaxbContext.createUnmarshaller();
         } catch (JAXBException e) {
