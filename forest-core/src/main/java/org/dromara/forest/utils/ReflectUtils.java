@@ -455,7 +455,7 @@ public class ReflectUtils {
     }
 
 
-    public static Map convertObjectToMap(Object srcObj, ForestConfiguration configuration) {
+    public static Map<String, Object> convertObjectToMap(Object srcObj, ForestConfiguration configuration) {
         if (configuration != null) {
             return configuration.getJsonConverter().convertObjectToMap(srcObj);
         }
