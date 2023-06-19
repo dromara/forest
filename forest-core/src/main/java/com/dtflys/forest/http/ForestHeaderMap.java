@@ -386,7 +386,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
         }
     }
 
-    public void addHeader(String name, Lazy<Object> value) {
+    public void addHeader(String name, Lazy<?> value) {
         addHeader(new LazyHeader(this, name, value));
     }
 
@@ -476,7 +476,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
         }
     }
 
-    public void setHeader(String name, Lazy<Object> lazyValue) {
+    public void setHeader(String name, Lazy<?> lazyValue) {
         ForestHeader header = getHeader(name);
         if (header != null) {
             if (header instanceof LazyHeader) {

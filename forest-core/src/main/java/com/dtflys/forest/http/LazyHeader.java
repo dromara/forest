@@ -3,15 +3,15 @@ package com.dtflys.forest.http;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 
 
-public class LazyHeader implements ForestHeader<LazyHeader, Lazy<Object>> {
+public class LazyHeader implements ForestHeader<LazyHeader, Lazy<?>> {
 
     private final ForestHeaderMap headerMap;
 
     private final String name;
 
-    private Lazy<Object> lazyValue;
+    private Lazy<?> lazyValue;
 
-    public LazyHeader(ForestHeaderMap headerMap, String name, Lazy<Object> lazyValue) {
+    public LazyHeader(ForestHeaderMap headerMap, String name, Lazy<?> lazyValue) {
         this.headerMap = headerMap;
         this.name = name;
         this.lazyValue = lazyValue;
@@ -42,7 +42,7 @@ public class LazyHeader implements ForestHeader<LazyHeader, Lazy<Object>> {
     }
 
     @Override
-    public LazyHeader setValue(Lazy<Object> lazyValue) {
+    public LazyHeader setValue(Lazy<?> lazyValue) {
         this.lazyValue = lazyValue;
         return this;
     }

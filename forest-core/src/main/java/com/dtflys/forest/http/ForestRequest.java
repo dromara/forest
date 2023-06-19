@@ -24,6 +24,7 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.auth.BasicAuth;
 import com.dtflys.forest.auth.ForestAuthenticator;
 import com.dtflys.forest.backend.ContentType;
@@ -3322,7 +3323,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return {@link ForestRequest}类实例
      * @since 1.5.29
      */
-    public ForestRequest<T> addHeader(String name, Lazy value) {
+    public ForestRequest<T> addHeader(String name, Lazy<?> value) {
         if (value == null) {
             return this;
         }
