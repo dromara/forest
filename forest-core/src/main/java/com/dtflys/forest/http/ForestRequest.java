@@ -3307,6 +3307,9 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         if (StringUtils.isEmpty(name)) {
             return this;
         }
+        if (value instanceof Lazy) {
+            return addHeader(name, (Lazy) value);
+        }
         this.headers.setHeader(name, String.valueOf(value));
         return this;
     }
