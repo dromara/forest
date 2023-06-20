@@ -10,8 +10,8 @@ import com.dtflys.forest.converter.json.ForestJsonConverter;
 public class JSONFilter implements Filter {
     @Override
     public Object doFilter(ForestConfiguration configuration, Object data) {
-        ForestJsonConverter jsonConverter = configuration.getJsonConverter();
-        String json = jsonConverter.encodeToString(data);
+        final ForestJsonConverter jsonConverter = configuration.getJsonConverter();
+        final String json = jsonConverter.encodeToString(data);
         return json;
     }
 }

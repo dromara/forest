@@ -15,10 +15,10 @@ public class FilterChain implements Filter {
 
     @Override
     public Object doFilter(ForestConfiguration configuration, Object data) {
-        Iterator<Filter> iter = filters.iterator();
+        final Iterator<Filter> iter = filters.iterator();
         Object result = data;
         for ( ; iter.hasNext(); ) {
-            Filter filter = iter.next();
+            final Filter filter = iter.next();
             result = filter.doFilter(configuration, result);
         }
         return result;

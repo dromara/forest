@@ -72,22 +72,22 @@ public class ForestGsonConverter implements ForestJsonConverter {
         try {
             if (targetType instanceof ParameterizedType
                     || targetType.getClass().getName().startsWith("com.google.gson")) {
-                Gson gson = createGson();
+                final Gson gson = createGson();
                 return gson.fromJson(source, targetType);
             }
-            Class clazz = ReflectUtils.toClass(targetType);
+            final Class<?> clazz = ReflectUtils.toClass(targetType);
             try {
                 if (Map.class.isAssignableFrom(clazz)) {
-                    JsonParser jsonParser = new JsonParser();
-                    JsonObject jsonObject = jsonParser.parse(source).getAsJsonObject();
+                    final JsonParser jsonParser = new JsonParser();
+                    final JsonObject jsonObject = jsonParser.parse(source).getAsJsonObject();
                     return (T) toMap(jsonObject, false);
                 }
                 else if (List.class.isAssignableFrom(clazz)) {
-                    JsonParser jsonParser = new JsonParser();
-                    JsonArray jsonArray = jsonParser.parse(source).getAsJsonArray();
+                    final JsonParser jsonParser = new JsonParser();
+                    final JsonArray jsonArray = jsonParser.parse(source).getAsJsonArray();
                     return (T) toList(jsonArray);
                 }
-                Gson gson = createGson();
+                final Gson gson = createGson();
                 return (T) gson.fromJson(source, targetType);
             } catch (Throwable th) {
                 throw new ForestConvertException(this, th);
@@ -100,23 +100,23 @@ public class ForestGsonConverter implements ForestJsonConverter {
 
     @Override
     public <T> T convertToJavaObject(byte[] source, Class<T> targetType, Charset charset) {
-        String str = StringUtils.fromBytes(source, charset);
+        final String str = StringUtils.fromBytes(source, charset);
         return convertToJavaObject(str, targetType);
     }
 
     @Override
     public <T> T convertToJavaObject(byte[] source, Type targetType, Charset charset) {
-        String str = StringUtils.fromBytes(source, charset);
+        final String str = StringUtils.fromBytes(source, charset);
         return convertToJavaObject(str, targetType);
     }
 
     private static Map<String, Object> toMap(JsonObject json, boolean singleLevel){
-        Map<String, Object> map = new HashMap<String, Object>();
-        Set<Map.Entry<String, JsonElement>> entrySet = json.entrySet();
+        final Map<String, Object> map = new HashMap<String, Object>();
+        final Set<Map.Entry<String, JsonElement>> entrySet = json.entrySet();
         for (Iterator<Map.Entry<String, JsonElement>> iter = entrySet.iterator(); iter.hasNext(); ){
-            Map.Entry<String, JsonElement> entry = iter.next();
-            String key = entry.getKey();
-            Object value = entry.getValue();
+            final Map.Entry<String, JsonElement> entry = iter.next();
+            final String key = entry.getKey();
+            final Object value = entry.getValue();
             if (singleLevel) {
                 if(value instanceof JsonArray) {
                     map.put(key, toList((JsonArray) value));
@@ -153,8 +153,8 @@ public class ForestGsonConverter implements ForestJsonConverter {
             return jsonPrimitive.getAsString();
         }
         if (jsonPrimitive.isNumber()) {
-            BigDecimal num = jsonPrimitive.getAsBigDecimal();
-            int index = num.toString().indexOf('.');
+            final BigDecimal num = jsonPrimitive.getAsBigDecimal();
+            final int index = num.toString().indexOf('.');
             if (index == -1) {
                 if (num.compareTo(new BigDecimal(Long.MAX_VALUE)) == 1) {
                     return num;
@@ -168,8 +168,8 @@ public class ForestGsonConverter implements ForestJsonConverter {
                 }
                 return jsonPrimitive.getAsInt();
             }
-            double dvalue = jsonPrimitive.getAsDouble();
-            float fvalue = jsonPrimitive.getAsFloat();
+            final double dvalue = jsonPrimitive.getAsDouble();
+            final float fvalue = jsonPrimitive.getAsFloat();
             if (String.valueOf(dvalue).equals(fvalue)) {
                 return fvalue;
             }
@@ -185,9 +185,9 @@ public class ForestGsonConverter implements ForestJsonConverter {
     }
 
     private static List<Object> toList(JsonArray json){
-        List<Object> list = new ArrayList<Object>();
+        final List<Object> list = new ArrayList<Object>();
         for (int i = 0; i < json.size(); i++){
-            Object value = json.get(i);
+            final Object value = json.get(i);
             if (value instanceof JsonArray){
                 list.add(toList((JsonArray) value));
             }
@@ -209,7 +209,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
      * @return New instance of {@code com.google.gson.Gson}
      */
     private Gson createGson() {
-        GsonBuilder gsonBuilder = new GsonBuilder();
+        final GsonBuilder gsonBuilder = new GsonBuilder();
         if (StringUtils.isNotBlank(dateFormat)) {
             gsonBuilder.setDateFormat(dateFormat);
         }
@@ -218,7 +218,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
 
     @Override
     public String encodeToString(Object obj) {
-        Gson gson = createGson();
+        final Gson gson = createGson();
         return gson.toJson(obj);
     }
 
@@ -229,8 +229,8 @@ public class ForestGsonConverter implements ForestJsonConverter {
             return null;
         }
         if (obj instanceof Map) {
-            Map objMap = (Map) obj;
-            Map<String, Object> newMap = new HashMap<>(objMap.size());
+            final Map objMap = (Map) obj;
+            final Map<String, Object> newMap = new HashMap<>(objMap.size());
             for (Object key : objMap.keySet()) {
                 final String name = String.valueOf(key);
                 if (options != null && options.shouldExclude(name)) {
@@ -255,15 +255,15 @@ public class ForestGsonConverter implements ForestJsonConverter {
         if (obj instanceof CharSequence) {
             return convertToJavaObject(obj.toString(), LinkedHashMap.class);
         }
-        Gson gson = createGson();
-        JsonElement jsonElement = gson.toJsonTree(obj);
+        final Gson gson = createGson();
+        final JsonElement jsonElement = gson.toJsonTree(obj);
         return toMap(jsonElement.getAsJsonObject(), true);
     }
 
 
 
     public String convertToJson(Object obj, Type type) {
-        Gson gson = createGson();
+        final Gson gson = createGson();
         return gson.toJson(obj, type);
     }
 

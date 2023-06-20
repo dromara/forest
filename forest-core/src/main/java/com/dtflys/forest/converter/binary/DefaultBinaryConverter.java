@@ -43,14 +43,14 @@ public class DefaultBinaryConverter implements ForestConverter<Object>, ForestEn
             source = new ByteArrayInputStream((byte[]) source);
         }
         if (source instanceof InputStream) {
-            InputStream in = (InputStream) source;
+            final InputStream in = (InputStream) source;
             if (InputStream.class.isAssignableFrom(targetType)) {
                 return (T) source;
             }
             if (byte[].class.isAssignableFrom(targetType)) {
                 return (T) inputStreamToByteArray(in);
             }
-            byte[] tmp = inputStreamToByteArray(in);
+            final byte[] tmp = inputStreamToByteArray(in);
             String str = null;
             try {
                 String encode;
@@ -71,7 +71,7 @@ public class DefaultBinaryConverter implements ForestConverter<Object>, ForestEn
             }
             return autoConverter.convertToJavaObject(str, targetType);
         } else if (source instanceof File) {
-            File file = (File) source;
+            final File file = (File) source;
             if (File.class.isAssignableFrom(targetType)) {
                 return (T) file;
             }
@@ -82,7 +82,7 @@ public class DefaultBinaryConverter implements ForestConverter<Object>, ForestEn
                 if (byte[].class.isAssignableFrom(targetType)) {
                     return (T) FileUtils.readFileToByteArray(file);
                 }
-                String str = FileUtils.readFileToString(file);
+                final String str = FileUtils.readFileToString(file);
                 if (String.class.isAssignableFrom(targetType)) {
                     return (T) str;
                 }

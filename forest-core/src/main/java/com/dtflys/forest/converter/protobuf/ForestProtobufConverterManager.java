@@ -71,7 +71,7 @@ public class ForestProtobufConverterManager implements Serializable {
         return true;
     }
 
-    private Class getMessageClass() {
+    private Class<?> getMessageClass() {
         if (!checkSupportProtobuf()) {
             return null;
         }
@@ -84,14 +84,14 @@ public class ForestProtobufConverterManager implements Serializable {
         return messageClass;
     }
 
-    public boolean isProtobufMessageClass(Class clazz) {
+    public boolean isProtobufMessageClass(Class<?> clazz) {
         if (clazz == null) {
             return false;
         }
         if (!checkSupportProtobuf()) {
             return false;
         }
-        Class messageClazz = getMessageClass();
+        final Class<?> messageClazz = getMessageClass();
         return messageClazz.isAssignableFrom(clazz);
     }
 
@@ -99,7 +99,7 @@ public class ForestProtobufConverterManager implements Serializable {
         if (type == null) {
             return false;
         }
-        Class clazz = ReflectUtils.toClass(type);
+        Class<?> clazz = ReflectUtils.toClass(type);
         return isProtobufMessageClass(clazz);
     }
 

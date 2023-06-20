@@ -24,8 +24,8 @@ public class OkHttp3ResponseHandler extends ResponseHandler<Object> {
     }
 
     public Object handleSync(Response okResponse, ForestResponse response) {
-        int statusCode = okResponse.code();
-        String msg = okResponse.message();
+        final int statusCode = okResponse.code();
+        final String msg = okResponse.message();
         return handleSync(response, statusCode, msg);
     }
 

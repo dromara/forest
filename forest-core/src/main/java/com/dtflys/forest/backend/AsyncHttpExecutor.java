@@ -54,7 +54,7 @@ public class AsyncHttpExecutor<T> implements HttpExecutor {
      * @return 最大异步线程数
      */
     public static int getMaxAsyncThreadSize(ForestConfiguration configuration) {
-        ThreadPoolExecutor pool = AsyncThreadPools.get(configuration);
+        final ThreadPoolExecutor pool = AsyncThreadPools.get(configuration);
         if (pool == null) {
             return -1;
         }
@@ -80,7 +80,7 @@ public class AsyncHttpExecutor<T> implements HttpExecutor {
      * @since 1.5.29
      */
     public static int getAsyncThreadSize(ForestConfiguration configuration) {
-        ThreadPoolExecutor pool = AsyncThreadPools.get(configuration);
+        final ThreadPoolExecutor pool = AsyncThreadPools.get(configuration);
         if (pool == null) {
             return -1;
         }
@@ -114,7 +114,7 @@ public class AsyncHttpExecutor<T> implements HttpExecutor {
         public ForestResponse get() {
             executor.execute(lifeCycleHandler);
             if (lifeCycleHandler instanceof MethodLifeCycleHandler) {
-                Object result = ((MethodLifeCycleHandler<?>) lifeCycleHandler).getResponse();
+                final Object result = ((MethodLifeCycleHandler<?>) lifeCycleHandler).getResponse();
                 return (ForestResponse) result;
             }
             return null;
@@ -156,7 +156,7 @@ public class AsyncHttpExecutor<T> implements HttpExecutor {
      * @since 1.5.23
      */
     public static synchronized void closePool() {
-        ThreadPoolExecutor pool = AsyncThreadPools.get(ForestConfiguration.configuration());
+        final ThreadPoolExecutor pool = AsyncThreadPools.get(ForestConfiguration.configuration());
         if (pool != null) {
             pool.shutdown();
         }

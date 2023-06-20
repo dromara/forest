@@ -37,6 +37,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -92,7 +93,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
 
     public X509TrustManager getX509TrustManager(ForestRequest request) {
         try {
-            SSLKeyStore sslKeyStore = request.getKeyStore();
+            final SSLKeyStore sslKeyStore = request.getKeyStore();
             if (sslKeyStore == null ||
                     sslKeyStore.getTrustStore() == null ||
                     sslKeyStore.getInputStream() == null) {
@@ -106,12 +107,9 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
 
 
     private List<Protocol> getProtocols(ForestRequest request) {
-        ForestProtocol protocol = request.getProtocol();
-        if (protocol == null) {
-            protocol = ForestProtocol.HTTP_1_0;
-        }
-        List<Protocol> protocols = PROTOCOL_VERSION_MAP.get(protocol);
-        return protocols;
+        final ForestProtocol protocol = Optional.of(request.getProtocol())
+                .orElse(ForestProtocol.HTTP_1_0);
+        return PROTOCOL_VERSION_MAP.get(protocol);
     }
 
     public static class DefaultOkHttpClientProvider implements OkHttpClientProvider {
@@ -123,7 +121,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
             if (connectionManager == null) {
                 synchronized (this) {
                     if (connectionManager == null) {
-                        ForestConfiguration configuration = request.getConfiguration();
+                        final ForestConfiguration configuration = request.getConfiguration();
                         connectionManager = (OkHttp3ConnectionManager) configuration
                                 .getBackendSelector()
                                 .select(OkHttp3Backend.NAME)
@@ -134,22 +132,12 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
                     }
                 }
             }
-            Integer timeout = request.getTimeout();
-            Integer connectTimeout = request.connectTimeout();
-            Integer readTimeout = request.readTimeout();
-            Integer writeTimeout = request.readTimeout();
-            if (TimeUtils.isNone(connectTimeout)) {
-                connectTimeout = timeout;
-            }
-            if (TimeUtils.isNone(readTimeout)) {
-                readTimeout = timeout;
-            }
+            final Integer timeout = request.getTimeout();
+            final Integer connectTimeout = TimeUtils.isNone(request.connectTimeout()) ? timeout : request.connectTimeout();
+            final Integer readTimeout = TimeUtils.isNone(request.readTimeout()) ? timeout : request.readTimeout();
+            final Integer writeTimeout = TimeUtils.isNone(request.readTimeout()) ? timeout : request.readTimeout();
 
-            if (TimeUtils.isNone(writeTimeout)) {
-                writeTimeout = timeout;
-            }
-
-            OkHttpClient.Builder builder = new OkHttpClient.Builder()
+            final OkHttpClient.Builder builder = new OkHttpClient.Builder()
                     .connectionPool(connectionManager.pool)
                     .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
                     .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
@@ -159,39 +147,34 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
                     .followSslRedirects(false);
 
             // set proxy
-            ForestProxy proxy = request.getProxy();
+            final ForestProxy proxy = request.getProxy();
             if (proxy != null) {
-                Proxy okProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxy.getHost(), proxy.getPort()));
+                final Proxy okProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxy.getHost(), proxy.getPort()));
                 builder.proxy(okProxy);
                 if (StringUtils.isNotEmpty(proxy.getUsername()) || !proxy.getHeaders().isEmpty()) {
                     builder.proxyAuthenticator(new Authenticator() {
                         @Nullable
                         @Override
                         public Request authenticate(@Nullable Route route, Response response) {
-                            Request.Builder proxyBuilder = response.request().newBuilder();
-                            Charset charset = null;
-                            if (StringUtils.isNotEmpty(proxy.getCharset())) {
-                                charset = Charset.forName(proxy.getCharset());
-                            }
+                            final Request.Builder proxyBuilder = response.request().newBuilder();
+                            final Charset charset = StringUtils.isNotEmpty(proxy.getCharset()) ?
+                                    Charset.forName(proxy.getCharset()) : null;
 
-                            ForestHeaderMap proxyHeaders = proxy.getHeaders();
+                            final ForestHeaderMap proxyHeaders = proxy.getHeaders();
                             if (!proxyHeaders.isEmpty()) {
                                 for (Map.Entry<String, String> entry : proxyHeaders.entrySet()) {
                                     proxyBuilder.addHeader(entry.getKey(), entry.getValue());
                                 }
                             }
                             if (!proxyHeaders.containsKey("Proxy-Authorization")) {
-                                String credential = null;
-                                if (charset != null) {
-                                    credential = Credentials.basic(
-                                            proxy.getUsername(),
-                                            proxy.getPassword(),
-                                            charset);
-                                } else {
-                                    credential = Credentials.basic(
-                                            proxy.getUsername(),
-                                            proxy.getPassword());
-                                }
+                                final String credential = charset != null ?
+                                        Credentials.basic(
+                                        proxy.getUsername(),
+                                        proxy.getPassword(),
+                                        charset) :
+                                        Credentials.basic(
+                                        proxy.getUsername(),
+                                        proxy.getPassword());
                                 proxyBuilder.addHeader("Proxy-Authorization", credential);
                             }
                             proxyBuilder.removeHeader("User-Agent");
@@ -203,7 +186,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
             }
 
             if (request.isSSL()) {
-                SSLSocketFactory sslSocketFactory = request.getSSLSocketFactory();
+                final SSLSocketFactory sslSocketFactory = request.getSSLSocketFactory();
                 builder
                         .sslSocketFactory(
                                 sslSocketFactory,
@@ -214,7 +197,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
             // add default interceptor
             if (request.getOnProgress() != null) {
                 builder.addNetworkInterceptor(chain -> {
-                    Response response = chain.proceed(chain.request());
+                    final Response response = chain.proceed(chain.request());
                     return response.newBuilder()
                             .body(new OkHttpResponseBody(
                                     request,
@@ -223,8 +206,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
                             .build();
                 });
             }
-
-            OkHttpClient newClient = builder.build();
+            final OkHttpClient newClient = builder.build();
             return newClient;
 
         }
@@ -234,7 +216,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
         final String key = "ok;" + request.clientKey();
         final boolean canCacheClient = request.cacheBackendClient() && !request.isDownloadFile();
         if (canCacheClient) {
-            OkHttpClient cachedClient = request.getRoute().getBackendClient(key);
+            final OkHttpClient cachedClient = request.getRoute().getBackendClient(key);
             if (cachedClient != null) {
                 return cachedClient;
             }
