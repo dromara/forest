@@ -107,7 +107,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
 
 
     private List<Protocol> getProtocols(ForestRequest request) {
-        final ForestProtocol protocol = Optional.of(request.getProtocol())
+        final ForestProtocol protocol = Optional.ofNullable(request.getProtocol())
                 .orElse(ForestProtocol.HTTP_1_0);
         return PROTOCOL_VERSION_MAP.get(protocol);
     }
