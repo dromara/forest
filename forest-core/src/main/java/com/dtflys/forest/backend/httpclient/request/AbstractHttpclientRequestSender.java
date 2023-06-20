@@ -42,39 +42,39 @@ public abstract class AbstractHttpclientRequestSender implements HttpclientReque
     }
 
     protected <T extends  HttpRequestBase> void setLogHeaders(RequestLogMessage logMessage, T httpReq) {
-        Header[] headers = httpReq.getAllHeaders();
+        final Header[] headers = httpReq.getAllHeaders();
         for (int i = 0; i < headers.length; i++) {
-            Header header = headers[i];
-            String name = header.getName();
-            String value = header.getValue();
+            final Header header = headers[i];
+            final String name = header.getName();
+            final String value = header.getValue();
             logMessage.addHeader(new LogHeaderMessage(name, value));
         }
     }
 
     protected <T extends  HttpRequestBase> void setLogBody(RequestLogMessage logMessage, T httpReq) {
-        HttpEntityEnclosingRequestBase entityEnclosingRequest = (HttpEntityEnclosingRequestBase) httpReq;
-        HttpEntity entity = entityEnclosingRequest.getEntity();
+        final HttpEntityEnclosingRequestBase entityEnclosingRequest = (HttpEntityEnclosingRequestBase) httpReq;
+        final HttpEntity entity = entityEnclosingRequest.getEntity();
         if (entity == null) {
             return;
         }
-        LogBodyMessage logBodyMessage = new HttpclientLogBodyMessage(entity);
+        final LogBodyMessage logBodyMessage = new HttpclientLogBodyMessage(entity);
         logMessage.setBody(logBodyMessage);
     }
 
 
     private <T extends  HttpRequestBase> RequestLogMessage getRequestLogMessage(int retryCount, T httpReq, HttpClient client) {
-        RequestLogMessage logMessage = new RequestLogMessage();
-        URI uri = httpReq.getURI();
+        final RequestLogMessage logMessage = new RequestLogMessage();
+        final URI uri = httpReq.getURI();
         logMessage.setUri(uri.toASCIIString());
         logMessage.setType(httpReq.getMethod());
         logMessage.setScheme(uri.getScheme());
         logMessage.setRetryCount(retryCount);
         setLogHeaders(logMessage, httpReq);
         setLogBody(logMessage, httpReq);
-        ForestProxy proxy = request.getProxy();
+        final ForestProxy proxy = request.getProxy();
 
         if (proxy != null) {
-            RequestProxyLogMessage proxyLogMessage = new RequestProxyLogMessage();
+            final RequestProxyLogMessage proxyLogMessage = new RequestProxyLogMessage();
             proxyLogMessage.setHost(proxy.getHost());
             proxyLogMessage.setPort(proxy.getPort() + "");
             ForestHeaderMap headers = proxy.getHeaders();

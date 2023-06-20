@@ -76,12 +76,8 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
                                Charset charset, String contentType,
                                LifeCycleHandler lifeCycleHandler) {
         final String boundary = request.getBoundary();
-        MultipartBody.Builder bodyBuilder = null;
-        if (StringUtils.isNotEmpty(boundary)) {
-            bodyBuilder = new MultipartBody.Builder(boundary);
-        } else {
-            bodyBuilder = new MultipartBody.Builder();
-        }
+        final MultipartBody.Builder bodyBuilder = StringUtils.isNotEmpty(boundary) ?
+                new MultipartBody.Builder(boundary) : new MultipartBody.Builder();
         final ContentType objContentType = new ContentType(contentType, request.mineCharset());
         final MediaType mediaType = MediaType.parse(objContentType.toStringWithoutParameters());
         if ("multipart".equals(mediaType.type())) {
@@ -159,20 +155,18 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
 
     @Override
     protected void setBinaryBody(
-            Request.Builder builder,
-            ForestRequest request,
-            String charset,
-            String contentType,
-            byte[] bytes,
+            final Request.Builder builder,
+            final ForestRequest request,
+            final String charset,
+            final String contentType,
+            final byte[] bytes,
             boolean mergeCharset) {
-        if (StringUtils.isBlank(contentType)) {
-            contentType = ContentType.APPLICATION_OCTET_STREAM;
-        }
-        MediaType mediaType = MediaType.parse(contentType);
+        final String ctype = StringUtils.isBlank(contentType) ? ContentType.APPLICATION_OCTET_STREAM : contentType;
+        MediaType mediaType = MediaType.parse(ctype);
         final Charset mtcs = mediaType.charset();
         if (mtcs == null) {
             if (charset != null && mergeCharset) {
-                mediaType = MediaType.parse(contentType + "; charset=" + charset);
+                mediaType = MediaType.parse(ctype + "; charset=" + charset);
             }
         }
         final RequestBody body = RequestBody.create(mediaType, bytes);

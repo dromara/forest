@@ -60,20 +60,20 @@ public class HttpclientForestFuture<T, R> implements Future<T> {
         if (httpResponse != null && innerType.isAssignableFrom(httpResponse.getClass())) {
             return (T) httpResponse;
         }
-        ForestResponse response = forestResponseFactory.createResponse(request, httpResponse, this.lifeCycleHandler, null, requestTime);
-        Object ret = lifeCycleHandler.handleResultType(request, response, innerType, innerType);
+        final ForestResponse response = forestResponseFactory.createResponse(request, httpResponse, this.lifeCycleHandler, null, requestTime);
+        final Object ret = lifeCycleHandler.handleResultType(request, response, innerType, innerType);
         return (T) ret;
     }
 
     @Override
     public T get() throws InterruptedException, ExecutionException {
-        R httpResponse = httpResponseFuture.get();
+        final R httpResponse = httpResponseFuture.get();
         return getResult(httpResponse);
     }
 
     @Override
     public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        R httpResponse = httpResponseFuture.get(timeout, unit);
+        final R httpResponse = httpResponseFuture.get(timeout, unit);
         return getResult(httpResponse);
     }
 }
