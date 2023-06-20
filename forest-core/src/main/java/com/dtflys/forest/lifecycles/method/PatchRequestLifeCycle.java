@@ -11,7 +11,7 @@ public class PatchRequestLifeCycle extends RequestLifeCycle {
 
     @Override
     public void onMethodInitialized(ForestMethod method, Annotation annotation) {
-        MetaRequest metaRequest = createMetaRequest(annotation);
+        final MetaRequest metaRequest = createMetaRequest(annotation);
         metaRequest.setType(ForestRequestType.PATCH.getName());
         method.setMetaRequest(metaRequest);
     }

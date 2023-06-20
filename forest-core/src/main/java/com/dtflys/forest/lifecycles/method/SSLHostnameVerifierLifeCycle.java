@@ -19,8 +19,8 @@ public class SSLHostnameVerifierLifeCycle implements MethodAnnotationLifeCycle<S
 
     @Override
     public void onMethodInitialized(ForestMethod method, SSLHostnameVerifier annotation) {
-        Class<? extends HostnameVerifier> clazz = annotation.value();
-        HostnameVerifier hostnameVerifier = method.getConfiguration().getForestObjectFactory().getObject(clazz);
+        final Class<? extends HostnameVerifier> clazz = annotation.value();
+        final HostnameVerifier hostnameVerifier = method.getConfiguration().getForestObjectFactory().getObject(clazz);
         if (hostnameVerifier != null) {
             method.setExtensionParameterValue(PARAM_KEY_HOSTNAME_VERIFIER, hostnameVerifier);
         }
@@ -28,7 +28,7 @@ public class SSLHostnameVerifierLifeCycle implements MethodAnnotationLifeCycle<S
 
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
-        Object hostnameVerifier = request.getMethod().getExtensionParameterValue(PARAM_KEY_HOSTNAME_VERIFIER);
+        final Object hostnameVerifier = request.getMethod().getExtensionParameterValue(PARAM_KEY_HOSTNAME_VERIFIER);
         if (hostnameVerifier != null && hostnameVerifier instanceof HostnameVerifier) {
             request.hostnameVerifier((HostnameVerifier) hostnameVerifier);
         }

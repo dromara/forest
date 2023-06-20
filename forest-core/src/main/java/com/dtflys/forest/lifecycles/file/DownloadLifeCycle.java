@@ -40,7 +40,7 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
 
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
-        Type resultType = method.getResultType();
+        final Type resultType = method.getResultType();
         addAttribute(request, "__resultType", resultType);
         request.setDownloadFile(true);
     }
@@ -49,7 +49,7 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
     @Override
     public boolean beforeExecute(ForestRequest request) {
         if (request.getMethod().getMethod().getDeclaringClass() == ForestGenericClient.class) {
-            Type resultType = getResultType(request.getLifeCycleHandler().getResultType());
+            final Type resultType = getResultType(request.getLifeCycleHandler().getResultType());
             addAttribute(request, "__resultType", resultType);
             request.setDownloadFile(true);
         }
@@ -60,10 +60,10 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
         if (type == null) {
             return Void.class;
         }
-        Class clazz = ReflectUtils.toClass(type);
+        final Class<?> clazz = ReflectUtils.toClass(type);
         if (ForestResponse.class.isAssignableFrom(clazz)) {
             if (type instanceof ParameterizedType) {
-                Type[] types = ((ParameterizedType) type).getActualTypeArguments();
+                final Type[] types = ((ParameterizedType) type).getActualTypeArguments();
                 if (types.length > 0) {
                     return types[0];
                 }
@@ -74,24 +74,24 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
 
     @Override
     public void onProgress(ForestProgress progress) {
-        ForestRequest request = progress.getRequest();
-        String dirPath = getAttributeAsString(request, "dir");
-        String filename = getAttributeAsString(request, "filename");
+        final ForestRequest request = progress.getRequest();
+//        String dirPath = getAttributeAsString(request, "dir");
+        final String filename = getAttributeAsString(request, "filename");
         System.out.println("------- " + filename);
     }
 
     @Override
     public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
-        String dirPath = getAttributeAsString(request, "dir");
+        final String dirPath = getAttributeAsString(request, "dir");
         String filename = getAttributeAsString(request, "filename");
-        Type resultType = getAttribute(request, "__resultType", Type.class);
+        final Type resultType = getAttribute(request, "__resultType", Type.class);
 
         if (StringUtils.isBlank(filename)) {
             filename = response.getFilename();
         }
-        LogConfiguration logConfiguration = request.getLogConfiguration();
-        ForestLogHandler logHandler = logConfiguration.getLogHandler();
-        File dir = new File(dirPath);
+        final LogConfiguration logConfiguration = request.getLogConfiguration();
+        final ForestLogHandler logHandler = logConfiguration.getLogHandler();
+        final File dir = new File(dirPath);
         if (!dir.exists()) {
             try {
                 dir.mkdirs();
@@ -112,8 +112,8 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
                 throw new ForestRuntimeException(e);
             }
         }
-        String path = dir.getAbsolutePath() + File.separator + filename;
-        File file = new File(path);
+        final String path = dir.getAbsolutePath() + File.separator + filename;
+        final File file = new File(path);
         try {
             FileUtils.copyInputStreamToFile(in, file);
             FileUtils.waitFor(file, 10);
@@ -122,7 +122,10 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
             }
             request.addAttachment(ATTACHMENT_NAME_FILE, file);
             if (resultType != null) {
-                ForestConverter converter = request.getConfiguration().getConverterMap().get(ForestDataType.AUTO);
+                final ForestConverter converter = request
+                        .getConfiguration()
+                        .getConverterMap()
+                        .get(ForestDataType.AUTO);
                 data = converter.convertToJavaObject(file, resultType);
                 response.setResult(data);
             }
