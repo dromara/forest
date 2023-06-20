@@ -91,19 +91,19 @@ public class ForestCookies implements Iterable<ForestCookie> {
      * @since 1.5.23
      */
     public static ForestCookies parse(String content) {
-        ForestCookies cookies = new ForestCookies();
+        final ForestCookies cookies = new ForestCookies();
         if (StringUtils.isBlank(content)) {
             return cookies;
         }
-        String[] pairs = content.split(";");
+        final String[] pairs = content.split(";");
         for (String pair : pairs) {
-            String[] nameValue = pair.split("=", 2);
+            final String[] nameValue = pair.split("=", 2);
             if (nameValue.length < 2) {
                 continue;
             }
-            String name = nameValue[0].trim();
-            String value = nameValue[1].trim();
-            ForestCookie cookie = new ForestCookie(name, value);
+            final String name = nameValue[0].trim();
+            final String value = nameValue[1].trim();
+            final ForestCookie cookie = new ForestCookie(name, value);
             cookies.addCookie(cookie);
         }
         return cookies;
@@ -116,7 +116,7 @@ public class ForestCookies implements Iterable<ForestCookie> {
      * @return Cookie列表
      */
     public List<ForestCookie> getCookies(String domain) {
-        List<ForestCookie> list = new LinkedList<>();
+        final List<ForestCookie> list = new LinkedList<>();
         for (ForestCookie cookie : cookies) {
             if (cookie.matchDomain(domain)) {
                 list.add(cookie);
@@ -133,7 +133,7 @@ public class ForestCookies implements Iterable<ForestCookie> {
      * @return Cookie列表
      */
     public List<ForestCookie> getCookies(String domain, String path) {
-        List<ForestCookie> list = new LinkedList<>();
+        final List<ForestCookie> list = new LinkedList<>();
         for (ForestCookie cookie : cookies) {
             if (cookie.matchDomain(domain) &&
                 cookie.matchPath(path)) {
@@ -152,7 +152,7 @@ public class ForestCookies implements Iterable<ForestCookie> {
      * @return Cookie列表
      */
     public List<ForestCookie> getCookies(String domain, String path, String name) {
-        List<ForestCookie> list = new LinkedList<>();
+        final List<ForestCookie> list = new LinkedList<>();
         for (ForestCookie cookie : cookies) {
             if (cookie.matchDomain(domain) &&
                     cookie.matchPath(path) &&
@@ -198,7 +198,7 @@ public class ForestCookies implements Iterable<ForestCookie> {
      * @return 域名列表
      */
     public List<String> domains() {
-        List<String> results = new LinkedList<>();
+        final List<String> results = new LinkedList<>();
         for (ForestCookie cookie : cookies) {
             results.add(cookie.getDomain());
         }
@@ -212,7 +212,7 @@ public class ForestCookies implements Iterable<ForestCookie> {
      * @return 路径列表
      */
     public List<String> paths(String domain) {
-        List<String> results = new LinkedList<>();
+        final List<String> results = new LinkedList<>();
         for (ForestCookie cookie : cookies) {
             if (cookie.getDomain().equals(domain)) {
                 results.add(cookie.getPath());
@@ -227,7 +227,7 @@ public class ForestCookies implements Iterable<ForestCookie> {
      * @return 名称列表
      */
     public List<String> names() {
-        List<String> results = new LinkedList<>();
+        final List<String> results = new LinkedList<>();
         for (ForestCookie cookie : cookies) {
             results.add(cookie.getName());
         }

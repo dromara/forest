@@ -17,7 +17,7 @@ public abstract class RequestBodyBuilder<T, B extends ForestRequestBody, D exten
     }
 
     public static boolean canBuild(Class clazz) {
-        RequestBodyBuilder builder = type(clazz);
+        final RequestBodyBuilder builder = type(clazz);
         return builder != null;
     }
 
@@ -29,7 +29,7 @@ public abstract class RequestBodyBuilder<T, B extends ForestRequestBody, D exten
         if (clazz == null) {
             return null;
         }
-        RequestBodyBuilder builder = bodyBuilderMap.get(clazz);
+        final RequestBodyBuilder builder = bodyBuilderMap.get(clazz);
         if (builder == null) {
             for (Class keyClass : bodyBuilderMap.keySet()) {
                 if (keyClass.isAssignableFrom(clazz)) {
@@ -59,7 +59,7 @@ public abstract class RequestBodyBuilder<T, B extends ForestRequestBody, D exten
             if (data == null) {
                 return null;
             }
-            StringRequestBody body = new StringRequestBody(data);
+            final StringRequestBody body = new StringRequestBody(data);
             body.setDefaultValue(defaultValue);
             return body;
         }
@@ -71,7 +71,7 @@ public abstract class RequestBodyBuilder<T, B extends ForestRequestBody, D exten
             if (data == null) {
                 return null;
             }
-            ByteArrayRequestBody body = new ByteArrayRequestBody(data);
+            final ByteArrayRequestBody body = new ByteArrayRequestBody(data);
             body.setDefaultValue(defaultValue);
             return body;
         }
@@ -84,7 +84,7 @@ public abstract class RequestBodyBuilder<T, B extends ForestRequestBody, D exten
             if (data == null) {
                 return null;
             }
-            FileRequestBody body = new FileRequestBody(data);
+            final FileRequestBody body = new FileRequestBody(data);
             body.setDefaultValue(defaultValue);
             return body;
         }
@@ -96,7 +96,7 @@ public abstract class RequestBodyBuilder<T, B extends ForestRequestBody, D exten
             if (data == null) {
                 return null;
             }
-            InputStreamRequestBody body = new InputStreamRequestBody(data);
+            final InputStreamRequestBody body = new InputStreamRequestBody(data);
             body.setDefaultValue(defaultValue);
             return body;
         }
@@ -108,7 +108,7 @@ public abstract class RequestBodyBuilder<T, B extends ForestRequestBody, D exten
             if (data == null) {
                 return null;
             }
-            ObjectRequestBody body = new ObjectRequestBody(data);
+            final ObjectRequestBody body = new ObjectRequestBody(data);
             body.setDefaultValue(defaultValue);
             return body;
         }

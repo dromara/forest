@@ -51,11 +51,11 @@ public class StringRequestBody extends ForestRequestBody implements SupportFormU
 
     @Override
     public List<RequestNameValue> getNameValueList(ForestRequest request) {
-        List<RequestNameValue> nameValueList = new LinkedList<>();
+        final List<RequestNameValue> nameValueList = new LinkedList<>();
         if (StringUtils.isNotBlank(content)) {
-            String[] items = content.split("&");
+            final String[] items = content.split("&");
             for (String item : items) {
-                String[] pair = item.split("=", 2);
+                final String[] pair = item.split("=", 2);
                 if (pair.length == 1) {
                     nameValueList.add(new RequestNameValue(pair[0], MappingParameter.TARGET_BODY));
                 } else if (pair.length == 2) {
@@ -68,7 +68,7 @@ public class StringRequestBody extends ForestRequestBody implements SupportFormU
 
     @Override
     public StringRequestBody clone() {
-        StringRequestBody newBody = new StringRequestBody(content);
+        final StringRequestBody newBody = new StringRequestBody(content);
         newBody.setDefaultValue(getDefaultValue());
         return newBody;
     }
