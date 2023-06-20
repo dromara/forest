@@ -18,12 +18,12 @@ public class JSONQueryLifeCycle implements ParameterAnnotationLifeCycle<JSONQuer
 
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, JSONQuery annotation) {
-        String name = annotation.value();
+        final String name = annotation.value();
         parameter.setTarget(TARGET_QUERY);
         parameter.setJsonParam(true);
         if (StringUtils.isNotEmpty(name)) {
             parameter.setName(name);
-            MappingVariable variable = new MappingVariable(name, parameter.getType());
+            final MappingVariable variable = new MappingVariable(name, parameter.getType());
             variable.setIndex(parameter.getIndex());
             method.addVariable(annotation.value(), variable);
             parameter.setObjectProperties(false);

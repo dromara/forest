@@ -18,9 +18,9 @@ public class URLEncodeLifeCycle implements ParameterAnnotationLifeCycle<URLEncod
 
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, URLEncode annotation) {
-        Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(annotation);
+        final Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(annotation);
         String charset = (String) attrs.get("charset");
-        Boolean enabled = (Boolean) attrs.get("enabled");
+        final Boolean enabled = (Boolean) attrs.get("enabled");
         if (StringUtils.isBlank(charset)) {
             charset = "UTF-8";
         }

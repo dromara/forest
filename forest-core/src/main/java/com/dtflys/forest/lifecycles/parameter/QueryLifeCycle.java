@@ -21,13 +21,13 @@ public class QueryLifeCycle implements ParameterAnnotationLifeCycle<Query, Objec
 
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, Query annotation) {
-        Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(annotation);
-        String name = (String) attrs.get("name");
-        String filterName = (String) attrs.get("filter");
-        String defaultValue = (String) attrs.get("defaultValue");
+        final Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(annotation);
+        final String name = (String) attrs.get("name");
+        final String filterName = (String) attrs.get("filter");
+        final String defaultValue = (String) attrs.get("defaultValue");
         if (StringUtils.isNotEmpty(name)) {
             parameter.setName(name);
-            MappingVariable variable = new MappingVariable(name, parameter.getType());
+            final MappingVariable variable = new MappingVariable(name, parameter.getType());
             method.processParameterFilter(variable, filterName);
             variable.setIndex(parameter.getIndex());
             method.addVariable(annotation.value(), variable);

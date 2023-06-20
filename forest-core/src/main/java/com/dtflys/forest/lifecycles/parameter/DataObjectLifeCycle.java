@@ -15,9 +15,9 @@ public class DataObjectLifeCycle implements ParameterAnnotationLifeCycle<DataObj
 
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, DataObject annotation) {
-        String jsonParamName = annotation.jsonParam();
-        String filterName = annotation.filter();
-        boolean isJsonParam = StringUtils.isNotEmpty(jsonParamName);
+        final String jsonParamName = annotation.jsonParam();
+        final String filterName = annotation.filter();
+        final boolean isJsonParam = StringUtils.isNotEmpty(jsonParamName);
         parameter.setObjectProperties(true);
         parameter.setJsonParam(isJsonParam);
         if (isJsonParam) {
