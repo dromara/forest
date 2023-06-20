@@ -68,7 +68,7 @@ public class ForestRoute {
     }
 
     public static String domain(String host, int port) {
-        StringBuilder builder = new StringBuilder(host);
+        final StringBuilder builder = new StringBuilder(host);
         if (port != 80 && port != -1) {
             builder.append(":").append(port);
         }
@@ -94,7 +94,7 @@ public class ForestRoute {
      * @return 后端客户端对象
      */
     public <T> T getBackendClient(String key) {
-        Object client = backendClientCache.get(key);
+        final Object client = backendClientCache.get(key);
         if (client != null) {
             return (T) client;
         }

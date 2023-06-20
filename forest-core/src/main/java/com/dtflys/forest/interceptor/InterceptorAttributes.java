@@ -24,14 +24,14 @@ public class InterceptorAttributes {
 
     public Map<String, Object> render(Object[] args) {
         for (Map.Entry<String, Object> entry : attributeTemplates.entrySet()) {
-            String name = entry.getKey();
+            final String name = entry.getKey();
             Object value = entry.getValue();
             if (value instanceof MappingTemplate) {
                 value = ((MappingTemplate) value).render(args);
             } else if (value instanceof MappingTemplate[]) {
-                MappingTemplate[] templates = (MappingTemplate[]) value;
-                int len = templates.length;
-                String[] strArray = new String[len];
+                final MappingTemplate[] templates = (MappingTemplate[]) value;
+                final int len = templates.length;
+                final String[] strArray = new String[len];
                 for (int i = 0; i < len; i++) {
                     strArray[i] = templates[i].render(args);
                 }
@@ -63,7 +63,7 @@ public class InterceptorAttributes {
     }
 
     public InterceptorAttributes clone() {
-        InterceptorAttributes newAttrs = new InterceptorAttributes(interceptorClass, attributeTemplates);
+        final InterceptorAttributes newAttrs = new InterceptorAttributes(interceptorClass, attributeTemplates);
         newAttrs.attributes = new ConcurrentHashMap<>();
         return newAttrs;
     }

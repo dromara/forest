@@ -25,16 +25,16 @@ public class LazyHeader implements ForestHeader<LazyHeader, Lazy<?>> {
 
     @Override
     public String getValue() {
-        HasURL hasURL = headerMap.getHasURL();
+        final HasURL hasURL = headerMap.getHasURL();
         if (!(hasURL instanceof ForestRequest)) {
             throw new ForestRuntimeException(
                     "the request of header[name=" + name + "] dose not exist");
         }
-        ForestRequest request = (ForestRequest) hasURL;
+        final ForestRequest request = (ForestRequest) hasURL;
         if (lazyValue == null) {
             throw new ForestRuntimeException("the lazy value of header[name=" + name + "] is null");
         }
-        Object ret = lazyValue.eval(request);
+        final Object ret = lazyValue.eval(request);
         if (ret == null) {
             return null;
         }

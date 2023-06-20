@@ -149,11 +149,11 @@ public class ForestURL {
      */
     public ForestURL setBaseAddress(ForestAddress baseAddress) {
         if (baseAddress != null) {
-            String baseScheme = baseAddress.getScheme();
-            String baseHost = baseAddress.getHost();
-            String bastPath = baseAddress.getBasePath();
+            final String baseScheme = baseAddress.getScheme();
+            final String baseHost = baseAddress.getHost();
+            final String bastPath = baseAddress.getBasePath();
 
-            int basePort = baseAddress.getPort();
+            final int basePort = baseAddress.getPort();
             setBasePath(bastPath);
             setScheme(baseScheme);
             setHost(baseHost);
@@ -276,8 +276,8 @@ public class ForestURL {
         if (!this.basePath.startsWith("/")) {
             if (URLUtils.isURL(this.basePath)) {
                 try {
-                    String originHost = this.host;
-                    URL url = new URL(this.basePath);
+                    final String originHost = this.host;
+                    final URL url = new URL(this.basePath);
                     if (forced || StringUtils.isEmpty(this.scheme)) {
                         setScheme(url.getProtocol());
                     }
@@ -345,7 +345,7 @@ public class ForestURL {
     }
 
     public String getAuthority() {
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         if (StringUtils.isNotEmpty(userInfo)) {
             builder.append(URLUtils.userInfoEncode(userInfo, "UTF-8")).append("@");
         }
@@ -378,11 +378,11 @@ public class ForestURL {
     }
 
     public String toURLString() {
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         if (StringUtils.isNotEmpty(scheme)) {
             builder.append(scheme).append("://");
         }
-        String authority = getAuthority();
+        final String authority = getAuthority();
         if (StringUtils.isNotEmpty(authority)) {
             builder.append(authority);
         }

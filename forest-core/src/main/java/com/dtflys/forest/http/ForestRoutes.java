@@ -21,7 +21,7 @@ public class ForestRoutes {
      * @return 路由, {@link ForestRoute}对象实例
      */
     public static ForestRoute getRoute(String host, int port) {
-        String domain = ForestRoute.domain(host, port);
+        final String domain = ForestRoute.domain(host, port);
         ForestRoute route = routes.get(domain);
         if (route == null) {
             synchronized (ForestRoutes.class) {

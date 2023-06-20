@@ -635,7 +635,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
             this.query.clearQueriesFromUrl();
         }
 
-        ForestURL newUrl = urlTemplate.render(args, this.query);
+        final ForestURL newUrl = urlTemplate.render(args, this.query);
         if (this.url == null) {
             this.url = newUrl;
         } else {
@@ -658,7 +658,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         if (StringUtils.isBlank(url)) {
             throw new ForestRuntimeException("[Forest] Request url cannot be empty!");
         }
-        String srcUrl = StringUtils.trimBegin(url);
+        final String srcUrl = StringUtils.trimBegin(url);
         MappingURLTemplate template = method.makeURLTemplate(null, null, srcUrl);
         return setUrl(template, args);
     }
