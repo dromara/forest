@@ -34,9 +34,9 @@ public class ForestCookieHeader extends SimpleHeader {
      * @return {@link ForestCookie}对象实例
      */
     public List<ForestCookie> getCookies(String name) {
-        List<ForestCookie> results = new LinkedList<>();
+        final List<ForestCookie> results = new LinkedList<>();
         for (Map<String, ForestCookie> map : cookies.values()) {
-            ForestCookie  cookie = map.get(name.toLowerCase());
+            final ForestCookie  cookie = map.get(name.toLowerCase());
             if (cookie != null) {
                 results.add(cookie);
             }
@@ -62,8 +62,8 @@ public class ForestCookieHeader extends SimpleHeader {
      */
     public ForestCookie getCookie(String name) {
         for (Map.Entry<String, Map<String, ForestCookie>> entry : cookies.entrySet()) {
-            Map<String, ForestCookie> map = entry.getValue();
-            ForestCookie cookie = map.get(name.toLowerCase());
+            final Map<String, ForestCookie> map = entry.getValue();
+            final ForestCookie cookie = map.get(name.toLowerCase());
             if (cookie != null) {
                 return cookie;
             }
@@ -79,11 +79,11 @@ public class ForestCookieHeader extends SimpleHeader {
      * @return {@link ForestCookie}对象实例
      */
     public ForestCookie getCookie(String path, String name) {
-        Map<String, ForestCookie> map = getCookieMap(path);
+        final Map<String, ForestCookie> map = getCookieMap(path);
         if (map == null) {
             return null;
         }
-        ForestCookie  cookie = map.get(name.toLowerCase());
+        final ForestCookie  cookie = map.get(name.toLowerCase());
         if (cookie != null) {
             return cookie;
         }
@@ -97,7 +97,7 @@ public class ForestCookieHeader extends SimpleHeader {
      * @return {@link ForestCookie}对象实例
      */
     public ForestCookie removeCookie(ForestCookie cookie) {
-        Map<String, ForestCookie> map = getCookieMap(cookie.getPath());
+        final Map<String, ForestCookie> map = getCookieMap(cookie.getPath());
         if (map == null) {
             return null;
         }
@@ -128,23 +128,19 @@ public class ForestCookieHeader extends SimpleHeader {
         if (cookie == null) {
             return false;
         }
-        ForestURL url = hasURL.url();
+        final ForestURL url = hasURL.url();
         if (strict && !cookie.matchURL(url)) {
             return false;
         }
         if (strict && cookie.isExpired(new Date())) {
             return false;
         }
-        String name = cookie.getName();
+        final String name = cookie.getName();
         if (StringUtils.isBlank(name)) {
             return false;
         }
         final String path = cookie.getPath();
-        Map<String, ForestCookie> map = getCookieMap(path);
-        if (map == null) {
-            map = new LinkedHashMap<>();
-            cookies.put(path, map);
-        }
+        final Map<String, ForestCookie> map = cookies.computeIfAbsent(path, key -> new LinkedHashMap<>());
         map.put(name.toLowerCase(), cookie);
         return true;
     }
@@ -168,7 +164,7 @@ public class ForestCookieHeader extends SimpleHeader {
      * @return {@link ForestCookie}对象列表
      */
     public List<ForestCookie> getCookies() {
-        List<ForestCookie> results = new LinkedList<>();
+        final List<ForestCookie> results = new LinkedList<>();
         for (Map<String, ForestCookie> map : cookies.values()) {
             for (ForestCookie cookie : map.values()) {
                 results.add(cookie);
@@ -180,14 +176,14 @@ public class ForestCookieHeader extends SimpleHeader {
 
     @Override
     public String getValue() {
-        List<ForestCookie> list = getCookies();
-        int len = list.size();
+        final List<ForestCookie> list = getCookies();
+        final int len = list.size();
         if (len == 0) {
             return "";
         }
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         for (int i = 0; i < len; i++) {
-            ForestCookie cookie = list.get(i);
+            final ForestCookie cookie = list.get(i);
             builder.append(cookie.getName())
                     .append("=")
                     .append(cookie.getValue());

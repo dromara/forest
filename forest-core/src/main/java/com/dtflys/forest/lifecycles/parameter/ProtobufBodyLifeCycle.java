@@ -24,9 +24,8 @@ public class ProtobufBodyLifeCycle extends AbstractBodyLifeCycle<ProtobufBody> {
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, ProtobufBody annotation) {
         super.onParameterInitialized(method, parameter, annotation);
-        MetaRequest metaRequest = method.getMetaRequest();
-
-        String methodName = methodName(method);
+        final MetaRequest metaRequest = method.getMetaRequest();
+        final String methodName = methodName(method);
 
         if (metaRequest == null) {
             throw new ForestRuntimeException("[Forest] method '" + methodName +
@@ -34,13 +33,13 @@ public class ProtobufBodyLifeCycle extends AbstractBodyLifeCycle<ProtobufBody> {
         }
         boolean hasDataFileAnn = false;
         for (Parameter param : method.getMethod().getParameters()) {
-            Annotation dataFileAnn = param.getAnnotation(DataFile.class);
+            final Annotation dataFileAnn = param.getAnnotation(DataFile.class);
             if (dataFileAnn != null) {
                 hasDataFileAnn = true;
                 break;
             }
         }
-        String contentTypeStr = metaRequest.getContentType();
+        final String contentTypeStr = metaRequest.getContentType();
         if (StringUtils.isBlank(contentTypeStr) && !hasDataFileAnn) {
             metaRequest.setContentType(ContentType.APPLICATION_X_PROTOBUF);
         }

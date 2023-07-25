@@ -22,8 +22,8 @@ public class RetryerLifeCycle implements MethodAnnotationLifeCycle<Retryer, Obje
 
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
-        Retryer annotation = (Retryer) request.getMethod().getExtensionParameterValue(PARAM_KEY_RETRYER);
-        Class<? extends ForestRetryer> clazz = annotation.value();
+        final Retryer annotation = (Retryer) request.getMethod().getExtensionParameterValue(PARAM_KEY_RETRYER);
+        final Class<? extends ForestRetryer> clazz = annotation.value();
         request.setRetryer(clazz);
     }
 

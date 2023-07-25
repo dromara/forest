@@ -13,7 +13,7 @@ public class TimeUtils {
      * @param duration 时长
      * @return {@code true}: 时长为空, {@code false}: 时长不为空
      */
-    public static boolean isNone(Integer duration) {
+    public static boolean isNone(final Integer duration) {
         if (duration == null) {
             return true;
         }
@@ -26,7 +26,7 @@ public class TimeUtils {
      * @param duration 时长, 整数对象
      * @return {@code true}: 时长不为空, {@code false}: 时长为空
      */
-    public static boolean isNotNone(Integer duration) {
+    public static boolean isNotNone(final Integer duration) {
         return !isNone(duration);
     }
 
@@ -38,12 +38,12 @@ public class TimeUtils {
      * @param timeUnit 时间单位
      * @return 毫秒数
      */
-    public static Integer toMillis(String name, Integer duration, TimeUnit timeUnit) {
+    public static Integer toMillis(final String name, final Integer duration, final TimeUnit timeUnit) {
         if (isNone(duration)) {
             return null;
         }
         if (timeUnit != null) {
-            long millis = timeUnit.toMillis(duration);
+            final long millis = timeUnit.toMillis(duration);
             if (millis > Integer.MAX_VALUE) {
                 throw new ForestRuntimeException(name + " (" + millis + " ms) is too large");
             }
@@ -59,9 +59,9 @@ public class TimeUtils {
      * @param duration 时长 - {@link Duration}对象
      * @return 毫秒数
      */
-    public static Integer toMillis(String name, Duration duration) {
+    public static Integer toMillis(final String name, final Duration duration) {
         if (duration != null) {
-            long millis = duration.toMillis();
+            final long millis = duration.toMillis();
             if (millis > Integer.MAX_VALUE) {
                 throw new ForestRuntimeException(name + " (" + millis + " ms) is too large");
             }

@@ -28,16 +28,16 @@ public class HTTPProxyLifeCycle implements MethodAnnotationLifeCycle<HTTPProxy, 
 
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
-        String hostStr = (String) getAttribute(request, "host");
-        String portStr = (String) getAttribute(request, "port");
-        String usernameStr = (String) getAttribute(request, "username");
-        String passwordStr = (String) getAttribute(request, "password");
-        String[] headersStr = (String[]) getAttribute(request, "headers");
+        final String hostStr = (String) getAttribute(request, "host");
+        final String portStr = (String) getAttribute(request, "port");
+        final String usernameStr = (String) getAttribute(request, "username");
+        final String passwordStr = (String) getAttribute(request, "password");
+        final String[] headersStr = (String[]) getAttribute(request, "headers");
 
-        MappingTemplate hostTemplate = method.makeTemplate(HTTPProxy.class, "host", hostStr);
-        MappingTemplate portTemplate = method.makeTemplate(HTTPProxy.class, "port", portStr);
-        MappingTemplate usernameTemplate = method.makeTemplate(HTTPProxy.class, "username", usernameStr);
-        MappingTemplate passwordTemplate = method.makeTemplate(HTTPProxy.class, "password", passwordStr);
+        final MappingTemplate hostTemplate = method.makeTemplate(HTTPProxy.class, "host", hostStr);
+        final MappingTemplate portTemplate = method.makeTemplate(HTTPProxy.class, "port", portStr);
+        final MappingTemplate usernameTemplate = method.makeTemplate(HTTPProxy.class, "username", usernameStr);
+        final MappingTemplate passwordTemplate = method.makeTemplate(HTTPProxy.class, "password", passwordStr);
 
         addAttribute(request, "host_temp", hostTemplate);
         addAttribute(request, "port_temp", portTemplate);
@@ -84,7 +84,7 @@ public class HTTPProxyLifeCycle implements MethodAnnotationLifeCycle<HTTPProxy, 
             } catch (Throwable th) {
             }
         }
-        ForestProxy proxy = new ForestProxy(host, port);
+        final ForestProxy proxy = new ForestProxy(host, port);
         if (StringUtils.isNotEmpty(username)) {
             proxy.setUsername(username);
         }
@@ -101,7 +101,7 @@ public class HTTPProxyLifeCycle implements MethodAnnotationLifeCycle<HTTPProxy, 
 
     @Override
     public void onMethodInitialized(ForestMethod method, HTTPProxy annotation) {
-        Class<? extends HTTPProxySource> clazz = annotation.source();
+        final Class<? extends HTTPProxySource> clazz = annotation.source();
         if (clazz != null && !clazz.isInterface()) {
             HTTPProxySource proxySource = method.getConfiguration().getForestObject(clazz);
             method.setExtensionParameterValue(PARAM_KEY_HTTP_PROXY_SOURCE, proxySource);

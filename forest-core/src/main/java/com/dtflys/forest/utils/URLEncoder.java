@@ -85,13 +85,12 @@ public class URLEncoder {
     public static final URLEncoder ALL = createAllUrlEncoder();
 
 
-    private static URLEncoder createURLEncoder(char[] excludedCharacters, boolean encodeSpaceAsPlus) {
+    private static URLEncoder createURLEncoder(final char[] excludedCharacters, final boolean encodeSpaceAsPlus) {
         final URLEncoder encoder = new URLEncoder();
         encoder.setEncodeSpaceAsPlus(encodeSpaceAsPlus);
-        int len = excludedCharacters.length;
-        char ch;
+        final int len = excludedCharacters.length;
         for (int i = 0; i < len; i++) {
-            ch = excludedCharacters[i];
+            final char ch = excludedCharacters[i];
             encoder.excludeCharacter(ch);
         }
         return encoder;
@@ -211,22 +210,32 @@ public class URLEncoder {
         this.encodeSpaceAsPlus = encodeSpaceAsPlus;
     }
 
-    public String encode(String path, String charset) {
+    public String encode(final String path, final String charset) {
         if (path == null) {
             return null;
         }
-        Charset cs = null;
-        if (StringUtils.isEmpty(charset)) {
-            cs = StandardCharsets.UTF_8;
-        } else {
-            try {
-                cs = Charset.forName(charset);
-            } catch (Throwable th) {
-                throw new ForestRuntimeException(th);
-            }
+        try {
+            final Charset cs = StringUtils.isEmpty(charset) ?
+                    StandardCharsets.UTF_8 : Charset.forName(charset);
+            return encode(path, cs);
+        } catch (Throwable th) {
+            throw new ForestRuntimeException(th);
         }
-        return encode(path, cs);
     }
+
+    private boolean isURLEncoded(final char[] charArray, final int index) {
+        if (charArray[index] != '%') {
+            return false;
+        }
+        final int len = charArray.length;
+        if (index + 2 < len) {
+            final char ch1 = charArray[index + 1];
+            final char ch2 = charArray[index + 2];
+            return Character.isDigit(ch1) && Character.isDigit(ch2);
+        }
+        return false;
+    }
+
 
     /**
      * 将URL中的字符串编码为%形式
@@ -235,16 +244,17 @@ public class URLEncoder {
      * @param charset 编码
      * @return 编码后的字符串
      */
-    public String encode(String path, Charset charset) {
+    public String encode(final String path, final Charset charset) {
         final StringBuilder builder = new StringBuilder(path.length());
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        OutputStreamWriter writer = new OutputStreamWriter(buf, charset);
-        char[] charArray = path.toCharArray();
-        int len = charArray.length;
-        char ch;
+        final ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        final OutputStreamWriter writer = new OutputStreamWriter(buf, charset);
+        final char[] charArray = path.toCharArray();
+        final int len = charArray.length;
         for (int i = 0; i < len; i++) {
-            ch = charArray[i];
-            if (excludedCharacters.get(ch)) {
+            final char ch = charArray[i];
+            if (isURLEncoded(charArray, i)) {
+                builder.append(ch);
+            } else if (excludedCharacters.get(ch)) {
                 builder.append(ch);
             } else if (encodeSpaceAsPlus && ch == SPACE) {
                 // 处理空格为加号+
@@ -258,11 +268,11 @@ public class URLEncoder {
                     continue;
                 }
 
-                byte[] ba = buf.toByteArray();
+                final byte[] ba = buf.toByteArray();
                 for (byte toEncode : ba) {
                     builder.append('%');
-                    int high = (toEncode & 0xf0) >>> 4;//高位
-                    int low = toEncode & 0x0f;//低位
+                    final int high = (toEncode & 0xf0) >>> 4;//高位
+                    final int low = toEncode & 0x0f;//低位
                     builder.append(HEX_DIGITS_UPPER[high]);
                     builder.append(HEX_DIGITS_UPPER[low]);
                 }

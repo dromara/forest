@@ -13,13 +13,13 @@ public class QueryableURLBuilder extends URLBuilder {
 
     @Override
     public String buildUrl(ForestRequest request) {
-        String url = request.getUrl();
-        StringBuilder urlBuilder = new StringBuilder(url);
-        String query = request.queryString();
+        final String url = request.getUrl();
+        final StringBuilder urlBuilder = new StringBuilder(url);
+        final String query = request.queryString();
         if (StringUtils.isNotEmpty(query)) {
             urlBuilder.append("?").append(query);
         }
-        String ref = request.getRef();
+        final String ref = request.getRef();
         if (StringUtils.isNotEmpty(ref)) {
             urlBuilder.append("#").append(URLUtils.refEncode(ref, "UTF-8"));
         }

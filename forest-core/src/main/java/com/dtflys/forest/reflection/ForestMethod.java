@@ -121,11 +121,10 @@ public class ForestMethod<T> implements VariableScope {
     private MappingTemplate[] headerTemplateArray;
     private MappingParameter[] parameterTemplateArray;
     private MappingParameter[] forestParameters;
-    private List<MappingParameter> namedParameters = new ArrayList<>();
-    private List<ForestMultipartFactory> multipartFactories = new ArrayList<>();
-    private Map<String, MappingVariable> variables = new ConcurrentHashMap<>();
-
-    private Map<String, MappingTemplate> templateCache = new ConcurrentHashMap<>();
+    private final List<MappingParameter> namedParameters = new ArrayList<>();
+    private final List<ForestMultipartFactory> multipartFactories = new ArrayList<>();
+    private final Map<String, MappingVariable> variables = new ConcurrentHashMap<>();
+    private final Map<String, MappingTemplate> templateCache = new ConcurrentHashMap<>();
     private MappingParameter onSuccessParameter = null;
     private MappingParameter onErrorParameter = null;
     private MappingParameter onRedirectionParameter = null;
@@ -198,22 +197,51 @@ public class ForestMethod<T> implements VariableScope {
     }
 
 
-    public MappingTemplate makeTemplate(Class<? extends Annotation> annotationType, String attributeName, String text) {
+    public MappingTemplate makeTemplate(
+            final Class<? extends Annotation> annotationType,
+            final String attributeName,
+            final String text) {
         return getOrCreateTemplate(annotationType, attributeName, text);
 //        return new MappingTemplate(annotationType, attributeName, this, text, this, configuration.getProperties(), forestParameters);
     }
 
-    public MappingURLTemplate makeURLTemplate(Class<? extends Annotation> annotationType, String attributeName, String text) {
-        return new MappingURLTemplate(annotationType, attributeName, this, text, this, configuration.getProperties(), forestParameters);
+    public MappingURLTemplate makeURLTemplate(
+            final Class<? extends Annotation> annotationType,
+            final String attributeName,
+            final String text) {
+        return new MappingURLTemplate(
+                annotationType,
+                attributeName,
+                this,
+                text,
+                this,
+                configuration.getProperties(),
+                forestParameters);
     }
 
-    private MappingTemplate getOrCreateTemplate(Class<? extends Annotation> annotationType, String attributeName, String text) {
-        String key = (annotationType != null ? annotationType.getName() : "") + "@" + (attributeName != null ? attributeName : "") + "@" + text;
-        MappingTemplate template = templateCache.get(key);
+    private MappingTemplate getOrCreateTemplate(
+            final Class<? extends Annotation> annotationType,
+            final String attributeName,
+            final String text) {
+        final String key = (annotationType != null ? annotationType.getName() : "") + "@" + (attributeName != null ? attributeName : "") + "@" + text;
+        final MappingTemplate template = templateCache.get(key);
         if (template == null) {
-            template = new MappingTemplate(annotationType, attributeName, this, text, this, configuration.getProperties(), forestParameters);
-            if (templateCache.size() < 128) {
-                templateCache.put(key, template);
+            synchronized (templateCache) {
+                if (template == null) {
+                    final MappingTemplate newTemplate =
+                            new MappingTemplate(
+                                    annotationType,
+                                    attributeName,
+                                    this,
+                                    text,
+                                    this,
+                                    configuration.getProperties(),
+                                    forestParameters);
+                    if (templateCache.size() < 128) {
+                        templateCache.put(key, newTemplate);
+                    }
+                    return newTemplate;
+                }
             }
         }
         return template;

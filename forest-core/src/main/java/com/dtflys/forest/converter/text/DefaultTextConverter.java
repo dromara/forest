@@ -23,7 +23,7 @@ public class DefaultTextConverter implements ForestConverter<String>, ForestEnco
 
     @Override
     public <T> T convertToJavaObject(byte[] source, Class<T> targetType, Charset charset) {
-        String str = StringUtils.fromBytes(source, charset);
+        final String str = StringUtils.fromBytes(source, charset);
         try {
             return (T) str;
         } catch (Throwable th) {
@@ -33,7 +33,7 @@ public class DefaultTextConverter implements ForestConverter<String>, ForestEnco
 
     @Override
     public <T> T convertToJavaObject(byte[] source, Type targetType, Charset charset) {
-        String str = StringUtils.fromBytes(source, charset);
+        final String str = StringUtils.fromBytes(source, charset);
         try {
             return (T) str;
         } catch (Throwable th) {
@@ -56,7 +56,7 @@ public class DefaultTextConverter implements ForestConverter<String>, ForestEnco
         if (charset == null) {
             charset = StandardCharsets.UTF_8;
         }
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         ForestRequestBody lastBodyItem = null;
         for (ForestRequestBody bodyItem : body) {
             if (lastBodyItem != null && lastBodyItem instanceof NameValueRequestBody) {
@@ -65,8 +65,8 @@ public class DefaultTextConverter implements ForestConverter<String>, ForestEnco
             builder.append(bodyItem.toString());
             lastBodyItem = bodyItem;
         }
-        String strBody = builder.toString();
-        byte[] bytes = strBody.getBytes(charset);
+        final String strBody = builder.toString();
+        final byte[] bytes = strBody.getBytes(charset);
         return bytes;
     }
 }

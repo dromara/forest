@@ -11,8 +11,8 @@ public class XmlFilter implements Filter {
 
     @Override
     public Object doFilter(ForestConfiguration configuration, Object data) {
-        ForestXmlConverter xmlConverter = configuration.getXmlConverter();
-        String xml = xmlConverter.encodeToString(data);
+        final ForestXmlConverter xmlConverter = configuration.getXmlConverter();
+        final String xml = xmlConverter.encodeToString(data);
         return xml;
     }
 

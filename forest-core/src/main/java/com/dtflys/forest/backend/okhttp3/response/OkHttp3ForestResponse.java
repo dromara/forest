@@ -68,7 +68,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
                 || InputStream.class.isAssignableFrom(request.getMethod().getReturnClass())
                 || InputStream.class.isAssignableFrom(ReflectUtils.toClass(request.getLifeCycleHandler().getResultType()))
                 || (contentType != null && contentType.canReadAsBinaryStream())) {
-            StringBuilder builder = new StringBuilder();
+            final StringBuilder builder = new StringBuilder();
             builder.append("[stream content-type: ")
                     .append(contentType == null ? "undefined" : contentType.toString());
             if (contentEncoding != null) {

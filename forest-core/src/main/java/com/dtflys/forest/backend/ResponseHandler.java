@@ -33,10 +33,10 @@ public abstract class ResponseHandler<R> {
     public Object handleSync(ForestResponse response, int statusCode, String msg) {
         if (request.isAutoRedirection() && response.isRedirection()) {
             // 进行重定向
-            ForestRequest redirectionRequest = response.redirectionRequest();
+            final ForestRequest redirectionRequest = response.redirectionRequest();
             return redirectionRequest.execute(request.getBackend(), lifeCycleHandler);
         }
-        Object result = lifeCycleHandler.handleSync(request, response);
+        final Object result = lifeCycleHandler.handleSync(request, response);
         if (result instanceof ForestResponse) {
             return result;
         }

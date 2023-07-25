@@ -83,8 +83,8 @@ public class ForestAddress {
             if (!basePathStr.startsWith("/")) {
                 if (URLUtils.isURL(basePathStr)) {
                     try {
-                        String originHost = host;
-                        URL url = new URL(basePathStr);
+                        final String originHost = host;
+                        final URL url = new URL(basePathStr);
                         if (StringUtils.isEmpty(scheme)) {
                             schemeStr = url.getProtocol();
                         }

@@ -16,7 +16,7 @@ public class OkHttp3ForestResponseFactory implements ForestResponseFactory<Respo
 
     @Override
     public ForestResponse<?> createResponse(ForestRequest<?> request, Response res, LifeCycleHandler lifeCycleHandler, Throwable exception, Date requestTime) {
-        ForestResponse<?> response = new OkHttp3ForestResponse(request, res, requestTime, new Date());
+        final ForestResponse<?> response = new OkHttp3ForestResponse(request, res, requestTime, new Date());
         response.setException(exception);
         return response;
     }

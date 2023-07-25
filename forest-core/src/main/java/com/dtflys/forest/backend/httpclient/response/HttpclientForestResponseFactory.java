@@ -35,7 +35,7 @@ public class HttpclientForestResponseFactory implements ForestResponseFactory<Ht
                 entity = new HttpclientEntity(request, entity, lifeCycleHandler);
             }
         }
-        HttpclientForestResponse response = new HttpclientForestResponse(request, httpResponse, entity, requestTime, new Date());
+        final HttpclientForestResponse response = new HttpclientForestResponse(request, httpResponse, entity, requestTime, new Date());
         this.resultResponse = response;
         response.setException(exception);
         return response;

@@ -34,7 +34,7 @@
 	</scm>
 
 	<properties>
-		<revision>1.5.31</revision>
+		<revision>1.5.32</revision>
 		<maven.compiler.source>8</maven.compiler.source>
 		<maven.compiler.target>8</maven.compiler.target>
 

@@ -15,12 +15,12 @@ public class DataParamLifeCycle implements ParameterAnnotationLifeCycle<DataPara
 
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, DataParam annotation) {
-        String name = annotation.value();
-        String filterName = annotation.filter();
+        final String name = annotation.value();
+        final String filterName = annotation.filter();
         parameter.setName(name);
         method.processParameterFilter(parameter, filterName);
         method.addNamedParameter(parameter);
-        MappingVariable variable = new MappingVariable(name, parameter.getType());
+        final MappingVariable variable = new MappingVariable(name, parameter.getType());
         method.processParameterFilter(variable, filterName);
         variable.setIndex(parameter.getIndex());
         method.addVariable(annotation.value(), variable);

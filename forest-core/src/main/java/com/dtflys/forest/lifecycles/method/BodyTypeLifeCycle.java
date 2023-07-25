@@ -15,10 +15,10 @@ public class BodyTypeLifeCycle implements MethodAnnotationLifeCycle<BodyType, Ob
 
     @Override
     public void onMethodInitialized(ForestMethod method, BodyType annotation) {
-        Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(annotation);
-        String type = (String) attrs.get("type");
-        Object encodeClass = attrs.get("encoder");
-        MetaRequest metaRequest = method.getMetaRequest();
+        final Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(annotation);
+        final String type = (String) attrs.get("type");
+        final Object encodeClass = attrs.get("encoder");
+        final MetaRequest metaRequest = method.getMetaRequest();
         if (metaRequest == null) {
             return;
         }

@@ -37,8 +37,8 @@ public final class StringUtils {
         if (text.length() == 0) {
             return true;
         }
-        char[] chars = text.toCharArray();
-        int len = chars.length;
+        final char[] chars = text.toCharArray();
+        final int len = chars.length;
         for (int i = 0; i < len; ++i) {
             if (!Character.isWhitespace(chars[i])) {
                 return false;
@@ -58,8 +58,8 @@ public final class StringUtils {
         return !isBlank(text);
     }
 
-    public static String getGetterName(Method mtd) {
-        String name = mtd.getName();
+    public static String getGetterName(final Method mtd) {
+        final String name = mtd.getName();
         if (name.startsWith("get")) {
             return Character.toLowerCase(name.charAt(3)) + name.substring(4);
         }
@@ -69,7 +69,7 @@ public final class StringUtils {
         return null;
     }
 
-    public static String toGetterName(String name) {
+    public static String toGetterName(final String name) {
         return "get" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
     }
 
@@ -78,15 +78,16 @@ public final class StringUtils {
      * @param str 源字符串
      * @return 去掉开头空格后的字符串
      */
-    public static String trimBegin(String str) {
+    public static String trimBegin(final String str) {
         if (str == null) {
             return null;
         }
-        StringBuilder builder = new StringBuilder();
-        int len = str.length();
+        final StringBuilder builder = new StringBuilder();
+        final int len = str.length();
+        final char[] chars = str.toCharArray();
         boolean before = true;
         for (int i = 0; i < len; i++) {
-            char ch = str.charAt(i);
+            final char ch = chars[i];
             if (before) {
                 if (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r') {
                     continue;
@@ -115,7 +116,7 @@ public final class StringUtils {
      * @return boundary 字符串
      */
     public static String generateBoundary() {
-        UUID uuid = UUID.randomUUID();
+        final UUID uuid = UUID.randomUUID();
         return ByteString.encodeUtf8(uuid.toString()).utf8();
     }
 }

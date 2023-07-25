@@ -36,9 +36,9 @@ public class OkHttp3LogBodyMessage implements LogBodyMessage {
     }
 
     private String getLogContentForStringBody(RequestBody requestBody) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Sink sink = Okio.sink(out);
-        BufferedSink bufferedSink = Okio.buffer(sink);
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        final Sink sink = Okio.sink(out);
+        final BufferedSink bufferedSink = Okio.buffer(sink);
         try {
             requestBody.writeTo(bufferedSink);
         } catch (IOException e) {
@@ -50,13 +50,12 @@ public class OkHttp3LogBodyMessage implements LogBodyMessage {
                 e.printStackTrace();
             }
         }
-        InputStream inputStream = new ByteArrayInputStream(out.toByteArray());
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-        StringBuilder builder = new StringBuilder();
+        final InputStream inputStream = new ByteArrayInputStream(out.toByteArray());
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        final StringBuilder builder = new StringBuilder();
         String line;
-        String body;
         try {
-            List<String> lines = new LinkedList<>();
+            final List<String> lines = new LinkedList<>();
             while ((line = reader.readLine()) != null) {
                 lines.add(line);
             }
@@ -66,8 +65,7 @@ public class OkHttp3LogBodyMessage implements LogBodyMessage {
                     builder.append("\\n");
                 }
             }
-            body = builder.toString();
-            return body;
+            return builder.toString();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -80,20 +78,20 @@ public class OkHttp3LogBodyMessage implements LogBodyMessage {
         if (requestBody == null) {
             return null;
         }
-        MediaType mediaType = requestBody.contentType();
+        final MediaType mediaType = requestBody.contentType();
         if (mediaType == null) {
             return getLogContentForStringBody(this.requestBody);
         }
-        ContentType contentType = new ContentType(mediaType.toString(), StandardCharsets.UTF_8);
+        final ContentType contentType = new ContentType(mediaType.toString(), StandardCharsets.UTF_8);
         if (contentType.isMultipart()) {
-            MultipartBody multipartBody = (MultipartBody) requestBody;
-            String boundary = multipartBody.boundary();
+            final MultipartBody multipartBody = (MultipartBody) requestBody;
+            final String boundary = multipartBody.boundary();
             Long contentLength = null;
             try {
                 contentLength = multipartBody.contentLength();
             } catch (IOException e) {
             }
-            StringBuilder builder = new StringBuilder();
+            final StringBuilder builder = new StringBuilder();
             builder.append("[")
                     .append("boundary=")
                     .append(boundary);
@@ -101,13 +99,13 @@ public class OkHttp3LogBodyMessage implements LogBodyMessage {
                 builder.append("; length=").append(contentLength);
             }
             builder.append("] parts:");
-            List<MultipartBody.Part> parts = multipartBody.parts();
+            final List<MultipartBody.Part> parts = multipartBody.parts();
             for (MultipartBody.Part part : parts) {
-                RequestBody partBody = part.body();
-                List<String> disposition = part.headers().values("Content-Disposition");
+                final RequestBody partBody = part.body();
+                final List<String> disposition = part.headers().values("Content-Disposition");
                 builder.append("\n             -- [")
                         .append(disposition.get(0));
-                MediaType partMediaType = partBody.contentType();
+                final MediaType partMediaType = partBody.contentType();
                 if (partMediaType == null) {
                     builder.append("; content-type=\"")
                             .append(partBody.contentType())
@@ -130,7 +128,6 @@ public class OkHttp3LogBodyMessage implements LogBodyMessage {
                     builder.append("]");
                 }
             }
-
             return builder.toString();
         } else if (contentType.isBinary()) {
             try {

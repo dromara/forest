@@ -44,18 +44,18 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
     }
 
     protected HttpClient getHttpClient(LifeCycleHandler lifeCycleHandler) {
-        HttpClient client = connectionManager.getHttpClient(request, lifeCycleHandler);
+        final HttpClient client = connectionManager.getHttpClient(request, lifeCycleHandler);
         return client;
     }
 
     public void logResponse(ForestResponse response) {
-        LogConfiguration logConfiguration = request.getLogConfiguration();
+        final LogConfiguration logConfiguration = request.getLogConfiguration();
         if (!logConfiguration.isLogEnabled() || response.isLogged()) {
             return;
         }
         response.setLogged(true);
-        ResponseLogMessage logMessage = new ResponseLogMessage(response, response.getStatusCode());
-        ForestLogHandler logHandler = logConfiguration.getLogHandler();
+        final ResponseLogMessage logMessage = new ResponseLogMessage(response, response.getStatusCode());
+        final ForestLogHandler logHandler = logConfiguration.getLogHandler();
         if (logHandler != null) {
             if (logConfiguration.isLogResponseStatus()) {
                 logHandler.logResponseStatus(logMessage);

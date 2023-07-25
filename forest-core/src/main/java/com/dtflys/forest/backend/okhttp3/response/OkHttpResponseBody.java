@@ -8,6 +8,7 @@ import okhttp3.ResponseBody;
 import okio.*;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class OkHttpResponseBody extends ResponseBody {
@@ -59,7 +60,7 @@ public class OkHttpResponseBody extends ResponseBody {
 
         return new ForwardingSource(source) {
             long readBytes = 0L;
-            AtomicReference<ForestProgress> progressReference = new AtomicReference<>(null);
+            final AtomicReference<ForestProgress> progressReference = new AtomicReference<>(null);
             final Boolean[] isBegin = {null};
 
             @Override
@@ -70,19 +71,20 @@ public class OkHttpResponseBody extends ResponseBody {
                     isBegin[0] = false;
                 }
 
-                long totalLength = contentLength();
-                long bytesRead = super.read(sink, byteCount);
-                ForestProgress progress = progressReference.get();
-                if (progress == null) {
-                    progress = new ForestProgress(request, totalLength);
-                    progressReference.set(progress);
-                }
+                final long totalLength = contentLength();
+                final long bytesRead = super.read(sink, byteCount);
+                final ForestProgress progress = Optional.ofNullable(progressReference.get())
+                        .orElseGet(() -> {
+                            final ForestProgress prg = new ForestProgress(request, totalLength);
+                            progressReference.set(prg);
+                            return prg;
+                        });
                 if (progress.isDone()) {
                     return bytesRead;
                 }
                 progress.setBegin(isBegin[0]);
                 if (totalLength >= 0) {
-                    long currReadBytes = bytesRead != -1 ? bytesRead : 0;
+                    final long currReadBytes = bytesRead != -1 ? bytesRead : 0;
                     readBytes += currReadBytes;
                     progress.setCurrentBytes(readBytes);
                     currentStep += currReadBytes;

@@ -4,6 +4,7 @@ import com.dtflys.forest.annotation.*;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.http.Lazy;
 import com.dtflys.test.model.TestHeaders;
 
 import java.util.Map;
@@ -41,9 +42,19 @@ public interface HeadClient {
                     "test2: testquery2: dsds"
             }
     )
+    void headHelloUser_Lazy(@Header("Accept") String accept, @Header("accessToken") Lazy<String> accessToken);
+
+    @HeadRequest(
+            url = "http://localhost:{port}/hello/user?username=foo",
+            headers = {
+                    "test: testquery:dsds",
+                    "test2: testquery2: dsds"
+            }
+    )
     void headHelloUserWithDefaultHeaders(
             @Header(name = "Accept", defaultValue = "text/plain") String accept,
             @Header(name = "accessToken", defaultValue = "11111111") String accessToken);
+
 
 
     @HeadRequest(

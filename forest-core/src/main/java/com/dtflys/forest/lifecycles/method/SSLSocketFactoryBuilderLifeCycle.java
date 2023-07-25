@@ -19,8 +19,8 @@ public class SSLSocketFactoryBuilderLifeCycle implements MethodAnnotationLifeCyc
 
     @Override
     public void onMethodInitialized(ForestMethod method, SSLSocketFactoryBuilder annotation) {
-        Class<? extends com.dtflys.forest.ssl.SSLSocketFactoryBuilder> clazz = annotation.value();
-        com.dtflys.forest.ssl.SSLSocketFactoryBuilder sslSocketFactoryBuilder =
+        final Class<? extends com.dtflys.forest.ssl.SSLSocketFactoryBuilder> clazz = annotation.value();
+        final com.dtflys.forest.ssl.SSLSocketFactoryBuilder sslSocketFactoryBuilder =
                 method.getConfiguration().getForestObjectFactory().getObject(clazz);
         if (sslSocketFactoryBuilder != null) {
             method.setExtensionParameterValue(PARAM_KEY_SSL_SOCKET_FACTORY_BUILDER, sslSocketFactoryBuilder);
@@ -29,7 +29,7 @@ public class SSLSocketFactoryBuilderLifeCycle implements MethodAnnotationLifeCyc
 
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
-        Object sslSocketFactoryBuilder = request.getMethod().getExtensionParameterValue(PARAM_KEY_SSL_SOCKET_FACTORY_BUILDER);
+        final Object sslSocketFactoryBuilder = request.getMethod().getExtensionParameterValue(PARAM_KEY_SSL_SOCKET_FACTORY_BUILDER);
         if (sslSocketFactoryBuilder != null && sslSocketFactoryBuilder instanceof com.dtflys.forest.ssl.SSLSocketFactoryBuilder) {
             request.sslSocketFactoryBuilder((com.dtflys.forest.ssl.SSLSocketFactoryBuilder) sslSocketFactoryBuilder);
         }

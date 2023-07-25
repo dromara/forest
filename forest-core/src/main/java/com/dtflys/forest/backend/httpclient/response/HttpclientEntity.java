@@ -60,14 +60,14 @@ public class HttpclientEntity implements HttpEntity {
     @Override
     public InputStream getContent() throws IOException, UnsupportedOperationException {
         if (isStreaming()) {
-            InputStream in = entity.getContent();
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            final InputStream in = entity.getContent();
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
             if (contentLength < 0) {
                 contentLength = getContentLength();
             }
-            ForestProgress progress = new ForestProgress(request, contentLength);
+            final ForestProgress progress = new ForestProgress(request, contentLength);
             try {
-                byte[] tmp = new byte[4096];
+                final byte[] tmp = new byte[4096];
                 progress.setBegin(true);
                 int len;
                 while((len = in.read(tmp)) != -1) {
@@ -97,8 +97,7 @@ public class HttpclientEntity implements HttpEntity {
             } finally {
                 in.close();
             }
-            ByteArrayInputStream stream = new ByteArrayInputStream(out.toByteArray());
-            return stream;
+            return new ByteArrayInputStream(out.toByteArray());
         }
         return entity.getContent();
     }

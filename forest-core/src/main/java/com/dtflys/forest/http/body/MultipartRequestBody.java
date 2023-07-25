@@ -39,7 +39,7 @@ public class MultipartRequestBody extends BinaryRequestBody {
 
     @Override
     public MultipartRequestBody clone() {
-        MultipartRequestBody newBody = new MultipartRequestBody(multipart);
+        final MultipartRequestBody newBody = new MultipartRequestBody(multipart);
         newBody.setDefaultValue(getDefaultValue());
         return newBody;
     }

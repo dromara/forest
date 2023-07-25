@@ -33,7 +33,7 @@ public class ForestSetCookieHeader extends SimpleHeader {
 
     @Override
     public ForestSetCookieHeader setValue(String value) {
-        ForestCookie newCookie = ForestCookie.parse(hasURL.url().toURLString(), value);
+        final ForestCookie newCookie = ForestCookie.parse(hasURL.url().toURLString(), value);
         if (newCookie != null) {
             super.setValue(newCookie.toString());
             this.cookie = newCookie;

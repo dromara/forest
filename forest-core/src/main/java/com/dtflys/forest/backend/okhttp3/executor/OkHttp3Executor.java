@@ -66,11 +66,11 @@ public class OkHttp3Executor implements HttpExecutor {
     private Call call;
 
     protected RequestLogMessage buildRequestMessage(int retryCount, Request okRequest) {
-        RequestLogMessage message = new RequestLogMessage();
-        HttpUrl url = okRequest.url();
-        String scheme = url.scheme().toUpperCase();
-        String uri = url.toString();
-        String method = okRequest.method();
+        final RequestLogMessage message = new RequestLogMessage();
+        final HttpUrl url = okRequest.url();
+        final String scheme = url.scheme().toUpperCase();
+        final String uri = url.toString();
+        final String method = okRequest.method();
         message.setUri(uri);
         message.setType(method);
         message.setScheme(scheme);
@@ -81,35 +81,35 @@ public class OkHttp3Executor implements HttpExecutor {
     }
 
     protected void setLogHeaders(RequestLogMessage message, Request okRequest) {
-        Headers headers = okRequest.headers();
+        final Headers headers = okRequest.headers();
         for (int i = 0; i < headers.size(); i++) {
-            String name = headers.name(i);
-            String value = headers.value(i);
+            final String name = headers.name(i);
+            final String value = headers.value(i);
             message.addHeader(new LogHeaderMessage(name, value));
         }
     }
 
     protected void setLogBody(RequestLogMessage message, Request okRequest) {
-        RequestBody requestBody = okRequest.body();
-        LogBodyMessage logBodyMessage = new OkHttp3LogBodyMessage(requestBody);
+        final RequestBody requestBody = okRequest.body();
+        final LogBodyMessage logBodyMessage = new OkHttp3LogBodyMessage(requestBody);
         message.setBody(logBodyMessage);
     }
 
 
     public void logRequest(int retryCount,  Request okRequest, OkHttpClient okHttpClient) {
-        LogConfiguration logConfiguration = request.getLogConfiguration();
+        final LogConfiguration logConfiguration = request.getLogConfiguration();
         if (!logConfiguration.isLogEnabled() || !logConfiguration.isLogRequest()) {
             return;
         }
-        RequestLogMessage logMessage = buildRequestMessage(retryCount, okRequest);
+        final RequestLogMessage logMessage = buildRequestMessage(retryCount, okRequest);
         logMessage.setRequest(request);
         logMessage.setRetryCount(retryCount);
-        Proxy proxy = okHttpClient.proxy();
+        final Proxy proxy = okHttpClient.proxy();
         if (proxy != null) {
-            RequestProxyLogMessage proxyLogMessage = new RequestProxyLogMessage();
-            SocketAddress address = proxy.address();
+            final RequestProxyLogMessage proxyLogMessage = new RequestProxyLogMessage();
+            final SocketAddress address = proxy.address();
             if (address instanceof InetSocketAddress) {
-                InetSocketAddress inetSocketAddress = (InetSocketAddress) address;
+                final InetSocketAddress inetSocketAddress = (InetSocketAddress) address;
                 proxyLogMessage.setHost(inetSocketAddress.getHostString());
                 proxyLogMessage.setPort(inetSocketAddress.getPort() + "");
                 logMessage.setProxy(proxyLogMessage);
@@ -120,13 +120,13 @@ public class OkHttp3Executor implements HttpExecutor {
     }
 
     public void logResponse(ForestResponse response) {
-        LogConfiguration logConfiguration = request.getLogConfiguration();
+        final LogConfiguration logConfiguration = request.getLogConfiguration();
         if (!logConfiguration.isLogEnabled() || response.isLogged()) {
             return;
         }
         response.setLogged(true);
-        ResponseLogMessage logMessage = new ResponseLogMessage(response, response.getStatusCode());
-        ForestLogHandler logHandler = logConfiguration.getLogHandler();
+        final ResponseLogMessage logMessage = new ResponseLogMessage(response, response.getStatusCode());
+        final ForestLogHandler logHandler = logConfiguration.getLogHandler();
         if (logHandler != null) {
             if (logConfiguration.isLogResponseStatus()) {
                 logHandler.logResponseStatus(logMessage);
@@ -157,7 +157,7 @@ public class OkHttp3Executor implements HttpExecutor {
         String contentEncodingHeaderName = ForestHeader.CONTENT_ENCODING;
         if (headerList != null && !headerList.isEmpty()) {
             for (RequestNameValue nameValue : headerList) {
-                String name = nameValue.getName();
+                final String name = nameValue.getName();
                 if (ForestHeader.CONTENT_TYPE.equalsIgnoreCase(name)) {
                     contentTypeHeaderName = name;
                 } else if (ForestHeader.CONTENT_ENCODING.equalsIgnoreCase(name)) {

@@ -40,7 +40,7 @@ public class InputStreamRequestBody extends ForestRequestBody {
 
     @Override
     public InputStreamRequestBody clone() {
-        InputStreamRequestBody newBody = new InputStreamRequestBody(inputStream);
+        final InputStreamRequestBody newBody = new InputStreamRequestBody(inputStream);
         newBody.setDefaultValue(getDefaultValue());
         return newBody;
     }

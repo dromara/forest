@@ -42,7 +42,7 @@ public class HttpclientForestResponse extends ForestResponse {
             this.statusCode = statusLine.getStatusCode();
             this.reasonPhrase = statusLine.getReasonPhrase();
             if (entity != null) {
-                Header type = entity.getContentType();
+                final Header type = entity.getContentType();
                 if (type != null) {
                     this.contentType = new ContentType(type.getValue(), StandardCharsets.UTF_8);
                 }
@@ -64,7 +64,7 @@ public class HttpclientForestResponse extends ForestResponse {
     }
 
     private void setupContentEncoding() {
-        Header contentEncodingHeader = entity.getContentEncoding();
+        final Header contentEncodingHeader = entity.getContentEncoding();
         if (contentEncodingHeader!= null) {
             this.contentEncoding = contentEncodingHeader.getValue();
         }
@@ -88,12 +88,12 @@ public class HttpclientForestResponse extends ForestResponse {
 
     private void setupContent() {
         if (content == null) {
-            Class resultClass = ReflectUtils.toClass(request.getLifeCycleHandler().getResultType());
+            final Class<?> resultClass = ReflectUtils.toClass(request.getLifeCycleHandler().getResultType());
             if (request.isDownloadFile()
                     || InputStream.class.isAssignableFrom(request.getMethod().getReturnClass())
                     || (resultClass != null && InputStream.class.isAssignableFrom(resultClass))
                     || (contentType != null && contentType.canReadAsBinaryStream())) {
-                StringBuilder builder = new StringBuilder();
+                final StringBuilder builder = new StringBuilder();
                 builder.append("[stream content-type: ")
                         .append(contentType == null ? "undefined" : contentType);
                 if (contentEncoding != null) {
