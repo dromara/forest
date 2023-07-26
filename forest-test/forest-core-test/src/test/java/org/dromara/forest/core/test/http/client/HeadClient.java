@@ -7,6 +7,7 @@ import org.dromara.forest.annotation.Query;
 import org.dromara.forest.annotation.Request;
 import org.dromara.forest.core.test.model.TestHeaders;
 import org.dromara.forest.http.ForestResponse;
+import org.dromara.forest.http.Lazy;
 
 import java.util.Map;
 

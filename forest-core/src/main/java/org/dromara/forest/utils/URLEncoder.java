@@ -236,19 +236,6 @@ public class URLEncoder {
         return false;
     }
 
-    private boolean isURLEncoded(final char[] charArray, final int index) {
-        if (charArray[index] != '%') {
-            return false;
-        }
-        final int len = charArray.length;
-        if (index + 2 < len) {
-            final char ch1 = charArray[index + 1];
-            final char ch2 = charArray[index + 2];
-            return Character.isDigit(ch1) && Character.isDigit(ch2);
-        }
-        return false;
-    }
-
     /**
      * 将URL中的字符串编码为%形式
      *
