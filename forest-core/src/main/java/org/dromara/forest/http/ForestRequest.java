@@ -551,6 +551,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      */
     public ForestRequest<T> url(ForestURL url) {
         this.url = url;
+        this.url.bindRequest(this);
         return this;
     }
 
@@ -573,7 +574,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return URL字符串
      */
     public String getUrl() {
-        return url.getOriginalUrl();
+        return url.getGeneratedUrl();
     }
 
     /**
@@ -638,6 +639,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         } else {
             this.url = newUrl.mergeURLWith(this.url);
         }
+        this.url.bindRequest(this);
         return this;
     }
 
@@ -795,6 +797,11 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     }
 
 
+    public ForestRequest<T> host(Lazy<String> lazyValue) {
+        this.url.hostProperty().bind(lazyValue);
+        return this;
+    }
+
     /**
      * 获取URL主机地址
      *
@@ -837,6 +844,11 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      */
     public ForestRequest<T> port(int port) {
         return setPort(port);
+    }
+
+    public ForestRequest<T> port(Lazy<Integer> port) {
+        this.url.portProperty().bind(port);
+        return this;
     }
 
     /**
@@ -1009,6 +1021,10 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         return setPath(path);
     }
 
+    public ForestRequest<T> path(Lazy<String> lazyValue) {
+        this.url.pathProperty().bind(lazyValue);
+        return this;
+    }
 
     /**
      * 获取URL路径
@@ -1405,7 +1421,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @param lazyValue 延迟求值的Query参数值
      * @return
      */
-    public ForestRequest<T> addQuery(String name, Lazy lazyValue) {
+    public ForestRequest<T> addQuery(String name, Lazy<?> lazyValue) {
         this.query.addQuery(name, lazyValue);
         return this;
     }
@@ -4635,7 +4651,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         newRequest.lifeCycleHandler = this.lifeCycleHandler;
         newRequest.protocol = this.protocol;
         newRequest.sslProtocol = this.sslProtocol;
-        newRequest.url = this.url;
+        newRequest.url = this.url.clone();
+        newRequest.url.bindRequest(this);
         newRequest.query = this.query.clone(newRequest);
         newRequest.headers = this.headers.clone(newRequest);
         newRequest.timeout = this.timeout;

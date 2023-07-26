@@ -5,6 +5,6 @@ package org.dromara.forest.reflection;
  */
 public interface ForestVariableValue {
 
-    Object getValue(ForestMethod method);
+    Object getValue(ForestMethod<?> method);
 
 }

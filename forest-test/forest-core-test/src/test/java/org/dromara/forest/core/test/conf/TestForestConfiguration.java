@@ -116,7 +116,7 @@ public class TestForestConfiguration {
         assertThat(configuration.getVariableValue("name")).isEqualTo("Linda");
         assertThat(configuration.getVariableValue("abc")).isEqualTo(123);
         AtomicInteger value = new AtomicInteger(0);
-        configuration.setVariableValue("foo", (method) -> value.getAndIncrement());
+        configuration.setVariableValue("foo", method -> value.getAndIncrement());
         assertThat(configuration.getVariableValue("foo")).isEqualTo(0);
         assertThat(configuration.getVariableValue("foo")).isEqualTo(1);
     }

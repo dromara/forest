@@ -21,7 +21,7 @@ public class SpringVariableValue implements ForestVariableValue {
     }
 
     @Override
-    public Object getValue(ForestMethod forestMethod) {
+    public Object getValue(ForestMethod<?> forestMethod) {
         Class<?>[] paramTypes = method.getParameterTypes();
         try {
             if (paramTypes.length == 0) {
@@ -31,9 +31,7 @@ public class SpringVariableValue implements ForestVariableValue {
                 return method.invoke(bean, forestMethod);
             }
             throw new ForestRuntimeException("[Forest] Method '" + method.getName() + "' can not be binding to a Forest variable");
-        } catch (IllegalAccessException e) {
-            throw new ForestRuntimeException(e);
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             throw new ForestRuntimeException(e);
         }
     }

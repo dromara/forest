@@ -51,6 +51,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -947,6 +948,77 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertBodyEquals("{\"id\":\"1972664191\", \"name\":\"XieYu20011008\"}")
                 .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
     }
+
+    @Test
+    public void testRequest_lazy_host() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        ForestRequest<?> request = Forest.get("/")
+                .host(req -> "abc")
+                .port(server.getPort())
+                .addQuery("a", "1")
+                .addQuery("b", "2");
+        assertThat(request.getHost()).isEqualTo("abc");
+    }
+
+    @Test
+    public void testRequest_lazy_host2() {
+        String ret = Forest.get("/")
+                .scheme("https")
+                .host(req -> "baidu" + ".com")
+                .port(80)
+                .executeAsString();
+        assertThat(ret).isNotNull();
+    }
+
+
+    @Test
+    public void testRequest_lazy_port() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.get("/")
+                .port(req -> server.getPort())
+                .addQuery("a", "1")
+                .addQuery("b", "2")
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertQueryEquals("a=1&b=2");
+    }
+
+    @Test
+    public void testRequest_lazy_path() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.get("/")
+                .port(server.getPort())
+                .path(req -> "xxx")
+                .addQuery("a", "1")
+                .addQuery("b", "2")
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/xxx")
+                .assertQueryEquals("a=1&b=2");
+    }
+
+
+    @Test
+    public void testRequest_lazy_path2() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        Forest.get("/")
+                .port(server.getPort())
+                .path(req -> req.getAttachment("a").toString())
+                .addAttachment("a", "xxx")
+                .execute();
+        mockRequest(server).assertPathEquals("/xxx");
+
+        Forest.get("/")
+                .port(server.getPort())
+                .path(req -> req.getAttachment("a").toString())
+                .addAttachment("a", "yyy")
+                .execute();
+        mockRequest(server).assertPathEquals("/yyy");
+    }
+
 
     @Test
     public void testRequest_lazy_query() {

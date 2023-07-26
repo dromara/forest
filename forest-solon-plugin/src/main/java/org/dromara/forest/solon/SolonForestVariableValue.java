@@ -25,7 +25,7 @@ public class SolonForestVariableValue implements ForestVariableValue {
     }
 
     @Override
-    public Object getValue(ForestMethod forestMethod) {
+    public Object getValue(ForestMethod<?> forestMethod) {
         Class<?>[] paramTypes = method.getParameterTypes();
         try {
             if (paramTypes.length == 0) {

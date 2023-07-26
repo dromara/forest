@@ -155,7 +155,7 @@ public class ForestQueryMap implements Map<String, Object> {
         addQuery(name, value, false, null);
     }
 
-    public void addQuery(String name, Lazy value) {
+    public void addQuery(String name, Lazy<?> value) {
         addQuery(name, value, false, null);
     }
 
@@ -170,7 +170,7 @@ public class ForestQueryMap implements Map<String, Object> {
      */
     public void addQuery(String name, Object value, boolean isUrlEncode, String charset) {
         if (value instanceof Collection) {
-            addQuery(name, (Collection) value, isUrlEncode, charset);
+            addQuery(name, (Collection<?>) value, isUrlEncode, charset);
         } else {
             queries.add(new SimpleQueryParameter(this, name, value, isUrlEncode, charset));
         }
