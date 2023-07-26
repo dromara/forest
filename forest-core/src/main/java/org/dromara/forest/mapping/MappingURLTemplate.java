@@ -22,29 +22,29 @@ public class MappingURLTemplate extends MappingTemplate {
     }
 
     @Override
-    public String render(final Object[] args) {
+    public String render(Object[] args) {
         return super.render(args);
     }
 
-    public ForestURL render(final Object[] args, final ForestQueryMap queries) {
+    public ForestURL render(Object[] args, ForestQueryMap queries) {
         String scheme = null;
         StringBuilder userInfo = null;
         String host = null;
         Integer port = null;
-        final StringBuilder path = new StringBuilder();
+        StringBuilder path = null;
         String ref = null;
-        final StringBuilder urlBuilder = new StringBuilder();
+        StringBuilder urlBuilder = new StringBuilder();
 
         boolean renderedQuery = false;
         boolean nextIsPort = false;
         boolean renderedPath = false;
         try {
-            final ForestJsonConverter jsonConverter = variableScope.getConfiguration().getJsonConverter();
-            final int len = exprList.size();
-            final StringBuilder builder = new StringBuilder();
+            ForestJsonConverter jsonConverter = variableScope.getConfiguration().getJsonConverter();
+            int len = exprList.size();
+            StringBuilder builder = new StringBuilder();
             SimpleQueryParameter lastQuery  = null;
             for (int i = 0; i < len; i++) {
-                final MappingExpr expr = exprList.get(i);
+                MappingExpr expr = exprList.get(i);
                 String exprVal = String.valueOf(renderExpression(jsonConverter, expr, args));
                 builder.append(exprVal);
                 if (renderedQuery) {
@@ -52,25 +52,25 @@ public class MappingURLTemplate extends MappingTemplate {
                     if (lastQuery != null && (
                             expr instanceof MappingUrlEncodedExpr)) {
                         // 在查询参数的位置进行变量引用
-                        final Object lastQueryValue = lastQuery.getValue();
-                        final String queryVal = lastQueryValue == null ? exprVal : lastQueryValue + exprVal;
+                        Object lastQueryValue = lastQuery.getValue();
+                        String queryVal = lastQueryValue == null ? exprVal : lastQueryValue + exprVal;
                         lastQuery.setValue(queryVal);
                     } else {
                         // 非变量引用
-                        final String[] subQueries = exprVal.split("&");
-                        final int subQueryLen = subQueries.length;
+                        String[] subQueries = exprVal.split("&");
+                        int subQueryLen = subQueries.length;
                         int k = 1;
                         if (exprVal.charAt(0) != '&') {
                             // 非连接符 & 开头
-                            final String lastQueryPartVal = subQueries[0];
+                            String lastQueryPartVal = subQueries[0];
                             if (lastQuery != null) {
                                 // 可能要接着上一个查询参数
-                                final Object lastQueryValue = lastQuery.getValue();
-                                final String queryVal = lastQueryValue == null ? lastQueryPartVal : lastQueryValue + lastQueryPartVal;
+                                Object lastQueryValue = lastQuery.getValue();
+                                String queryVal = lastQueryValue == null ? lastQueryPartVal : lastQueryValue + lastQueryPartVal;
                                 lastQuery.setValue(queryVal);
                             } else {
                                 // 可能是第一个查询参数
-                                final String[] keyValue = lastQueryPartVal.split("=", 2);
+                                String[] keyValue = lastQueryPartVal.split("=", 2);
                                 if (keyValue.length == 1) {
                                     lastQuery = new SimpleQueryParameter(queries, lastQueryPartVal);
                                 } else {
@@ -81,13 +81,13 @@ public class MappingURLTemplate extends MappingTemplate {
                         }
                         // 解析查询参数
                         for ( ; k < subQueryLen; k++) {
-                            final String queryItem = subQueries[k];
-                            final String[] keyValue = queryItem.split("=", 2);
+                            String queryItem = subQueries[k];
+                            String[] keyValue = queryItem.split("=", 2);
                             if (keyValue.length == 1) {
                                 lastQuery = new SimpleQueryParameter(queries, queryItem);
                             } else {
                                 lastQuery = new SimpleQueryParameter(queries, keyValue[0]);
-                                final String queryVal = keyValue[1];
+                                String queryVal = keyValue[1];
                                 if (StringUtils.isNotBlank(queryVal)) {
                                     lastQuery.setValue(queryVal);
                                 }
@@ -97,8 +97,8 @@ public class MappingURLTemplate extends MappingTemplate {
                     }
                 } else {
                     // 查询参数前面部分
-                    final int refIndex = exprVal.indexOf('#');
-                    final int queryIndex = exprVal.indexOf('?');
+                    int refIndex = exprVal.indexOf('#');
+                    int queryIndex = exprVal.indexOf('?');
                     renderedQuery = ref == null && queryIndex >= 0 && (queryIndex < refIndex || refIndex < 0);
 
                     String baseUrl = exprVal;
@@ -107,21 +107,21 @@ public class MappingURLTemplate extends MappingTemplate {
                     } else if (host != null && !nextIsPort && port == null && path == null) {
                         baseUrl = host + baseUrl;
                         host = null;
-                        urlBuilder.setLength(0);
-                        urlBuilder.append("//");
+                        urlBuilder = new StringBuilder(scheme).append("//");
                     }
                     urlBuilder.append(baseUrl);
-                    final char[] baseUrlChars = baseUrl.toCharArray();
-                    final int baseLen = baseUrlChars.length;
-                    final StringBuilder subBuilder = new StringBuilder();
+                    char[] baseUrlChars = baseUrl.toCharArray();
+                    int baseLen = baseUrlChars.length;
+                    char ch;
+                    StringBuilder subBuilder = new StringBuilder();
                     for (int pathCharIndex = 0 ; pathCharIndex < baseLen; pathCharIndex++) {
-                        char ch = baseUrlChars[pathCharIndex];
+                        ch = baseUrlChars[pathCharIndex];
                         if (!renderedPath && ch == ':') {
                             if (scheme == null && pathCharIndex + 1 < baseLen
                                     && baseUrlChars[pathCharIndex + 1] == '/') {
                                 // 解析协议部分
                                 scheme = subBuilder.toString();
-                                subBuilder.setLength(0);
+                                subBuilder = new StringBuilder();
                                 pathCharIndex++;
                                 ch = baseUrlChars[pathCharIndex];
                                 if (ch != '/') {
@@ -137,10 +137,10 @@ public class MappingURLTemplate extends MappingTemplate {
                             }
                             if (scheme != null && host == null) {
                                 // 解析地址部分
-                                final boolean hasNext = pathCharIndex + 1 < baseLen;
+                                boolean hasNext = pathCharIndex + 1 < baseLen;
                                 if (!hasNext || (hasNext && Character.isDigit(baseUrlChars[pathCharIndex + 1]))) {
                                     host = subBuilder.toString();
-                                    subBuilder.setLength(0);
+                                    subBuilder = new StringBuilder();
                                     nextIsPort = true;
                                 } else if (hasNext && !Character.isDigit(baseUrlChars[pathCharIndex + 1])) {
                                     if (userInfo == null) {
@@ -148,7 +148,7 @@ public class MappingURLTemplate extends MappingTemplate {
                                     } else {
                                         userInfo.append(subBuilder).append(':');
                                     }
-                                    subBuilder.setLength(0);
+                                    subBuilder = new StringBuilder();
                                 }
                             } else if (host != null && port == null) {
                                 nextIsPort = true;
@@ -168,8 +168,9 @@ public class MappingURLTemplate extends MappingTemplate {
                             if (nextIsPort) {
                                 userInfo.append(':');
                             }
-                            userInfo.append(subBuilder);
-                            subBuilder.setLength(0);
+                            userInfo.append(subBuilder.toString());
+                            subBuilder = new StringBuilder();
+                            continue;
                         } else if (ch == '/' || pathCharIndex + 1 == baseLen) {
                             if (ch != '/') {
                                 subBuilder.append(ch);
@@ -177,50 +178,57 @@ public class MappingURLTemplate extends MappingTemplate {
                             if (!renderedPath && nextIsPort && port == null) {
                                 // 解析端口号
                                 port = Integer.parseInt(subBuilder.toString());
-                                subBuilder.setLength(0);
+                                subBuilder = new StringBuilder();
                                 nextIsPort = false;
                                 if (ch == '/') {
                                     pathCharIndex--;
                                     renderedPath = true;
                                 }
+                                continue;
                             } else if (scheme != null && host == null) {
                                 // 解析地址部分
                                 host = subBuilder.toString();
-                                subBuilder.setLength(0);
+                                subBuilder = new StringBuilder();
                                 if (ch == '/') {
                                     pathCharIndex--;
                                     renderedPath = true;
                                 }
+                                continue;
                             } else {
                                 if (ch == '/') {
                                     subBuilder.append(ch);
                                     renderedPath = true;
                                 }
                                 if (renderedPath) {
-                                    path.append(subBuilder);
-                                    subBuilder.setLength(0);
+                                    if (path == null) {
+                                        path = new StringBuilder(subBuilder.toString());
+                                    } else {
+                                        path.append(subBuilder.toString());
+                                    }
+                                    subBuilder = new StringBuilder();
                                 }
                             }
                         } else {
                             subBuilder.append(ch);
                         }
                     }
-
                     if (refIndex > queryIndex) {
-                        final String[] group = exprVal.split("#", 2);
+                        String[] group = exprVal.split("#", 2);
                         exprVal = group[0];
                         ref = group[1];
                     }
                     if (renderedQuery) {
                         if (queryIndex + 1 < exprVal.length()) {
-                            final String queryStr = exprVal.substring(queryIndex + 1);
-                            final String[] queryItems = queryStr.split("&");
-                            for (String queryItem : queryItems) {
-                                final String[] keyValue = queryItem.split("=", 2);
-                                lastQuery = new SimpleQueryParameter(queries, keyValue[0]);
-                                queries.addQuery(lastQuery);
-                                if (keyValue.length > 1 && StringUtils.isNotBlank(keyValue[1])) {
-                                    lastQuery.setValue(keyValue[1]);
+                            String queryStr = exprVal.substring(queryIndex + 1);
+                            String[] queryItems = queryStr.split("&");
+                            if (queryItems.length > 0) {
+                                for (String queryItem : queryItems) {
+                                    String[] keyValue = queryItem.split("=", 2);
+                                    lastQuery = new SimpleQueryParameter(queries, keyValue[0]);
+                                    queries.addQuery(lastQuery);
+                                    if (keyValue.length > 1 && StringUtils.isNotBlank(keyValue[1])) {
+                                        lastQuery.setValue(keyValue[1]);
+                                    }
                                 }
                             }
                         }
@@ -229,20 +237,23 @@ public class MappingURLTemplate extends MappingTemplate {
             }
             if (host == null && StringUtils.isEmpty(path) && StringUtils.isNotEmpty(urlBuilder)) {
                 if (scheme == null) {
-                    final String urlStr = urlBuilder.toString();
+                    String urlStr = urlBuilder.toString();
                     if (!urlStr.startsWith("/")) {
-                        final String[] urlStrGroup = urlStr.split(":");
+                        String[] urlStrGroup = urlStr.split(":");
                         if (urlStrGroup.length > 1) {
-                            final String urlGroup0 = urlStrGroup[0];
-                            final String urlGroup1 = urlStrGroup[1];
+                            String urlGroup0 = urlStrGroup[0];
+                            String urlGroup1 = urlStrGroup[1];
                             try {
                                 port = Integer.valueOf(urlGroup1);
                                 host = urlGroup0;
                             } catch (Throwable th) {
+                                if (path == null) {
+                                    path = new StringBuilder();
+                                }
                                 path.append(builder);
                             }
                         } else {
-                            final String urlGroup0 = urlStrGroup[0];
+                            String urlGroup0 = urlStrGroup[0];
                             if (urlGroup0.equals("localhost") ||
                                     urlGroup0.matches("^(((\\d)|([1-9]\\d)|(1\\d{2})|(2[0-4]\\d)|(25[0-5]))\\.){3}((\\d)|([1-9]\\d)|(1\\d{2})|(2[0-4]\\d)|(25[0-5]))$")) {
                                 host = urlGroup0;
@@ -250,13 +261,16 @@ public class MappingURLTemplate extends MappingTemplate {
                         }
                     }
                 } else {
+                    if (path == null) {
+                        path = new StringBuilder();
+                    }
                     path.append(builder);
                 }
             }
             if (StringUtils.isNotEmpty(path)) {
-                final String[] group = path.toString().split("#", 2);
+                String[] group = path.toString().split("#", 2);
                 if (group.length > 1) {
-                    path.setLength(0);
+                    path = new StringBuilder();
                     path.append(group[0]);
                     ref = group[1];
                 }
@@ -266,7 +280,7 @@ public class MappingURLTemplate extends MappingTemplate {
                     .setUserInfo(userInfo != null ? userInfo.toString() : null)
                     .setHost(host)
                     .setPort(port != null ? port : (host != null ? -1 : null))
-                    .setPath(path.length() > 0 ? path.toString() : null)
+                    .setPath(path != null ? path.toString() : null)
                     .setRef(ref)
                     .build();
         } catch (ForestVariableUndefinedException ex) {

@@ -484,7 +484,7 @@ public class ForestMethod<T> implements VariableScope {
     /**
      * 获取Forest方法对应的Java原生方法
      *
-     * @return Java原生方法，{@link java.lang.reflect.Method}类实例
+     * @return Java原生方法，{@link Method}类实例
      */
     public Method getMethod() {
         return method;
