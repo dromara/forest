@@ -55,7 +55,7 @@ public class ForestProxy implements HasURL, HasHeaders {
     }
 
     public String cacheKey() {
-        StringBuilder builder = new StringBuilder(",-x=");
+        final StringBuilder builder = new StringBuilder(",-x=");
         if (StringUtils.isNotEmpty(host)) {
             builder.append(host);
         }

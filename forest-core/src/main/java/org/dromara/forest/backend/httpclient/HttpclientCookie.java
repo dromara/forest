@@ -9,11 +9,11 @@ public class HttpclientCookie extends ForestCookie {
 
     public HttpclientCookie(org.apache.http.cookie.Cookie httpCookie) {
         super(httpCookie.getName(), httpCookie.getValue());
-        long currentTime = System.currentTimeMillis();
-        Date expiresDate = httpCookie.getExpiryDate();
+        final long currentTime = System.currentTimeMillis();
+        final Date expiresDate = httpCookie.getExpiryDate();
         long maxAge;
         if (expiresDate != null) {
-            long expiresAt = expiresDate.getTime();
+            final long expiresAt = expiresDate.getTime();
             if (expiresAt > currentTime) {
                 maxAge = expiresAt - currentTime;
             } else {
@@ -22,8 +22,8 @@ public class HttpclientCookie extends ForestCookie {
         } else {
             maxAge = Long.MAX_VALUE;
         }
-        Date createTime = new Date(currentTime);
-        Duration maxAgeDuration = Duration.ofMillis(maxAge);
+        final Date createTime = new Date(currentTime);
+        final Duration maxAgeDuration = Duration.ofMillis(maxAge);
 
         setCreateTime(createTime);
         setMaxAge(maxAgeDuration);

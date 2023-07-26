@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * OAuth2 注解的生命周期.
@@ -39,18 +40,18 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
 
     @Override
     public boolean beforeExecute(ForestRequest request) {
-        TokenCache tokenCache = getTokenCache(request);
+        final TokenCache tokenCache = getTokenCache(request);
 
         // Token 的传输位置：Header、URL
-        OAuth2.TokenAt tokenAt = (OAuth2.TokenAt) getAttribute(request, "tokenAt");
+        final OAuth2.TokenAt tokenAt = (OAuth2.TokenAt) getAttribute(request, "tokenAt");
 
         // 传输 Token 的变量名
-        String defaultTokenVariable = getAttributeAsString(request, "tokenVariable");
-        String tokenVariable = tokenAt.getTokenVariable(defaultTokenVariable);
+        final String defaultTokenVariable = getAttributeAsString(request, "tokenVariable");
+        final String tokenVariable = tokenAt.getTokenVariable(defaultTokenVariable);
 
         // Token 前缀
-        String defaultPrefix = getAttributeAsString(request, "tokenPrefix");
-        String tokenValue = tokenAt.getTokenValue(defaultPrefix, tokenCache.getAccessToken());
+        final String defaultPrefix = getAttributeAsString(request, "tokenPrefix");
+        final String tokenValue = tokenAt.getTokenValue(defaultPrefix, tokenCache.getAccessToken());
 
         if (tokenAt == OAuth2.TokenAt.HEADER) {
             request.addHeader(tokenVariable, tokenValue);
@@ -67,16 +68,16 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
      * @return 缓存ID
      */
     private String getCacheId(ForestRequest request) {
-        String cacheId = getAttributeAsString(request, "cacheId");
+        final String cacheId = getAttributeAsString(request, "cacheId");
         if (StringUtils.isNotBlank(cacheId)) {
             return cacheId;
         }
         // tokenUri/clientId/grantType/scope/username 任何一个变动都可能是不同的帐号权限
-        String tokenUri = getAttributeAsString(request, "tokenUri");
-        String clientId = getAttributeAsString(request, "clientId");
-        Object grantType = getAttribute(request, "grantType");
-        String scope = getAttributeAsString(request, "scope");
-        String username = getAttributeAsString(request, "username");
+        final String tokenUri = getAttributeAsString(request, "tokenUri");
+        final String clientId = getAttributeAsString(request, "clientId");
+        final Object grantType = getAttribute(request, "grantType");
+        final String scope = getAttributeAsString(request, "scope");
+        final String username = getAttributeAsString(request, "username");
 
         return tokenUri + ":"
                 + clientId + ":"
@@ -92,7 +93,7 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
      * @return Token 信息
      */
     private TokenCache getTokenCache(ForestRequest request) {
-        String cacheId = getCacheId(request);
+        final String cacheId = getCacheId(request);
         TokenCache tokenCache = this.cache.get(cacheId);
         if (tokenCache == null) {
             return obtainTokenCache(request, cacheId, null);
@@ -141,7 +142,7 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
      */
     @Nonnull
     private TokenCache obtainRefreshTokenCache(ForestRequest request, String cacheId, @Nonnull TokenCache tokenCache) {
-        int refreshAtExpiresBefore = getAttributeAsInteger(request, "refreshAtExpiresBefore");
+        final int refreshAtExpiresBefore = getAttributeAsInteger(request, "refreshAtExpiresBefore");
         if (tokenCache.getExpiresIn() > refreshAtExpiresBefore) {
             // Token还未到刷新Token的时间，还能继续使用
             return tokenCache;
@@ -172,9 +173,8 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
      */
     @Nonnull
     private TokenCache requestToken(ForestRequest request) {
-        String clientId = getAttributeAsString(request, "clientId");
-        Map<String, Object> body = createRequestBody(clientId, request, true);
-
+        final String clientId = getAttributeAsString(request, "clientId");
+        final Map<String, Object> body = createRequestBody(clientId, request, true);
         return executeRequestToken(request, clientId, body);
     }
 
@@ -186,8 +186,8 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
      * @return 返回新的 Token 信息
      */
     private TokenCache requestRefreshToken(ForestRequest request, TokenCache tokenCache) {
-        String clientId = getAttributeAsString(request, "clientId");
-        Map<String, Object> body = createRequestBody(clientId, request, false);
+        final String clientId = getAttributeAsString(request, "clientId");
+        final Map<String, Object> body = createRequestBody(clientId, request, false);
 
         body.put("grant_type", "refresh_token");
         body.put("refresh_token", tokenCache.getRefreshToken());
@@ -205,17 +205,19 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
      */
     private TokenCache executeRequestToken(ForestRequest request, String clientId, Map<String, Object> body) {
         // 加入扩展参数
-        String[] bodyItems = (String[]) getAttribute(request, "body");
+        final String[] bodyItems = (String[]) getAttribute(request, "body");
         body.putAll(kv2map(bodyItems));
 
-        Map<String, Object> queryItems = kv2map((String[]) getAttribute(request, "query"));
-        Class<? extends OAuth2DefinitionHandler> handlerClass = getAttribute(request, "OAuth2TokenHandler", Class.class);
-        ForestResponse<String> response = oAuth2Client.token(getAttributeAsString(request, "tokenUri"), queryItems, body);
+        final Map<String, Object> queryItems = kv2map((String[]) getAttribute(request, "query"));
+        final Class<? extends OAuth2DefinitionHandler> handlerClass = getAttribute(request, "OAuth2TokenHandler", Class.class);
+        final ForestResponse<String> response = oAuth2Client.token(getAttributeAsString(request, "tokenUri"), queryItems, body);
         OAuth2Token token;
         try {
-            OAuth2DefinitionHandler handler = handlerClass.newInstance();
-            ForestConfiguration configuration = request.getConfiguration();
-            Map map = (Map) configuration.getConverter(ForestDataType.AUTO).convertToJavaObject(response.getContent(), Map.class);
+            final OAuth2DefinitionHandler handler = handlerClass.newInstance();
+            final ForestConfiguration configuration = request.getConfiguration();
+            final Map map = (Map) configuration
+                    .getConverter(ForestDataType.AUTO)
+                    .convertToJavaObject(response.getContent(), Map.class);
             token = handler.getOAuth2Token(response, map);
         } catch (InstantiationException | IllegalAccessException e) {
             throw new ForestRuntimeException("OAuth2 request OAuth2DefinitionHandler error" + e.getMessage());
@@ -233,9 +235,9 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
      * @return Map 对象
      */
     private Map<String, Object> kv2map(String[] values) {
-        Map<String, Object> map = new HashMap<>();
+        final Map<String, Object> map = new HashMap<>();
         for (String value : values) {
-            int indexOf = value.indexOf(":");
+            final int indexOf = value.indexOf(":");
             map.put(value.substring(0, indexOf), StringUtils.trimBegin(value.substring(indexOf + 1)));
         }
         return map;
@@ -250,13 +252,13 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
      * @return 返回请求参数
      */
     private Map<String, Object> createRequestBody(String clientId, ForestRequest request, boolean fillAccount) {
-        Map<String, Object> body = new LinkedHashMap<>();
+        final Map<String, Object> body = new LinkedHashMap<>();
         body.put("client_id", clientId);
         body.put("client_secret", getAttributeAsString(request, "clientSecret"));
         body.put("scope", getAttributeAsString(request, "scope"));
 
-        OAuth2.GrantType grantType = (OAuth2.GrantType) getAttribute(request, "grantType");
-        String grantTypeValue = grantType.getValue(getAttributeAsString(request, "grantTypeValue"));
+        final OAuth2.GrantType grantType = (OAuth2.GrantType) getAttribute(request, "grantType");
+        final String grantTypeValue = grantType.getValue(getAttributeAsString(request, "grantTypeValue"));
         body.put("grant_type", grantTypeValue);
 
         if (fillAccount && grantType == OAuth2.GrantType.PASSWORD) {
@@ -297,10 +299,7 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
             this.accessToken = token.getAccess_token();
             this.refreshToken = token.getRefresh_token();
             this.tokenType = token.getToken_type();
-            Long expires = token.getExpires_in();
-            if (expires == null) {
-                expires = 0L;
-            }
+            final Long expires = Optional.ofNullable(token.getExpires_in()).orElse(0L);
             // 设置 Token 到期时间：当前时间 + Token有效期
             this.expiresAt = LocalDateTime.now().plusSeconds(expires);
         }
@@ -320,7 +319,7 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
          * @return Token有效期剩余时间
          */
         public long getExpiresIn() {
-            Duration between = Duration.between(LocalDateTime.now(), this.expiresAt);
+            final Duration between = Duration.between(LocalDateTime.now(), this.expiresAt);
             return between.getSeconds();
         }
 

@@ -76,7 +76,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
         if (key == null) {
             return false;
         }
-        String name = key.toString();
+        final String name = key.toString();
         for (ForestHeader header : headers) {
             if (header.getName().equalsIgnoreCase(name)) {
                 return true;
@@ -88,7 +88,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
     @Override
     public boolean containsValue(Object value) {
         for (ForestHeader header : headers) {
-            Object headerVal = header.getValue();
+            final Object headerVal = header.getValue();
             if (headerVal == null) {
                 if (value == null) {
                     return true;
@@ -107,8 +107,8 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
         if (key == null) {
             return null;
         }
-        String name = key.toString();
-        ForestHeader header = getHeader(name);
+        final String name = key.toString();
+        final ForestHeader header = getHeader(name);
         if (header == null) {
             return null;
         }
@@ -118,7 +118,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
 
     @Override
     public String put(String key, String value) {
-        ForestHeader header = getHeader(key);
+        final ForestHeader header = getHeader(key);
         if (header != null) {
             if (header instanceof SimpleHeader) {
                 ((SimpleHeader) header).setValue(value);
@@ -127,19 +127,19 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
                 this.addHeader(key, value);
             }
         } else if ("Cookie".equalsIgnoreCase(key)) {
-            ForestCookie cookie = ForestCookie.parse(hasURL.url().toURLString(), value);
+            final ForestCookie cookie = ForestCookie.parse(hasURL.url().toURLString(), value);
             if (cookie != null) {
-                ForestSetCookieHeader cookieHeader = ForestSetCookieHeader.fromCookie(hasURL, cookie);
+                final ForestSetCookieHeader cookieHeader = ForestSetCookieHeader.fromCookie(hasURL, cookie);
                 addHeader(cookieHeader);
             }
         } else if ("Set-Cookie".equalsIgnoreCase(key)) {
-            ForestCookie cookie = ForestCookie.parse(hasURL.url().toURLString(), value);
+            final ForestCookie cookie = ForestCookie.parse(hasURL.url().toURLString(), value);
             if (cookie != null) {
-                ForestSetCookieHeader cookieHeader = ForestSetCookieHeader.fromSetCookie(hasURL, cookie);
+                final ForestSetCookieHeader cookieHeader = ForestSetCookieHeader.fromSetCookie(hasURL, cookie);
                 addHeader(cookieHeader);
             }
         } else {
-            ForestHeader newHeader = new SimpleHeader(key, value);
+            final ForestHeader newHeader = new SimpleHeader(key, value);
             addHeader(newHeader);
         }
         return value;
@@ -156,11 +156,11 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
         if (key == null) {
             return null;
         }
-        String name = key.toString();
+        final String name = key.toString();
         for (int i = headers.size() - 1; i >= 0; i--) {
-            ForestHeader header = headers.get(i);
+            final ForestHeader header = headers.get(i);
             if (header.getName().equalsIgnoreCase(name)) {
-                ForestHeader removedHeader = headers.remove(i);
+                final ForestHeader removedHeader = headers.remove(i);
                 return removedHeader.getValue();
             }
         }
@@ -173,8 +173,8 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
             return;
         }
         for (Entry<? extends String, ? extends String> entry : m.entrySet()) {
-            String name = entry.getKey();
-            String value = entry.getValue();
+            final String name = entry.getKey();
+            final String value = entry.getValue();
             put(name, value);
         }
     }
@@ -186,7 +186,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
 
     @Override
     public Set<String> keySet() {
-        Set<String> set = new HashSet<>();
+        final Set<String> set = new HashSet<>();
         for (ForestHeader header : headers) {
             set.add(header.getName());
         }
@@ -195,9 +195,9 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
 
     @Override
     public Collection<String> values() {
-        List<String> list = new ArrayList<>();
+        final List<String> list = new ArrayList<>();
         for (ForestHeader header : headers) {
-            String val = header.getValue();
+            final String val = header.getValue();
             if (val != null) {
                 list.add(val);
             }
@@ -207,7 +207,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
 
     @Override
     public Set<Entry<String, String>> entrySet() {
-        Set<Entry<String, String>> set = new HashSet<>();
+        final Set<Entry<String, String>> set = new HashSet<>();
         for (ForestHeader header : headers) {
             Entry<String, String> entry = new Entry<String, String>() {
 
@@ -223,7 +223,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
 
                 @Override
                 public String setValue(String value) {
-                    String oldValue = header.getValue();
+                    final String oldValue = header.getValue();
                     header.setValue(value);
                     return oldValue;
                 }
@@ -239,7 +239,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
      * @return 请求头的值
      */
     public String getValue(String name) {
-        ForestHeader header = getHeader(name);
+        final ForestHeader header = getHeader(name);
         if (header != null) {
             return header.getValue();
         }
@@ -252,7 +252,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
      * @return 请求头的值列表
      */
     public List<String> getValues(String name) {
-        List<String> results = new ArrayList<>(2);
+        final List<String> results = new ArrayList<>(2);
         for (ForestHeader header : headers) {
             if (header.getName().equalsIgnoreCase(name)) {
                 results.add(header.getValue());
@@ -284,7 +284,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
      * @since 1.5.23
      */
     public List<ForestCookie> getSetCookies() {
-        List<ForestCookie> list = new ArrayList<>();
+        final List<ForestCookie> list = new ArrayList<>();
         for (ForestHeader header : headers) {
             if (header instanceof ForestSetCookieHeader) {
                 list.add(((ForestSetCookieHeader) header).getCookie());
@@ -307,7 +307,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
         }
         for (ForestHeader header : headers) {
             if (header instanceof ForestSetCookieHeader) {
-                ForestCookie cookie = ((ForestSetCookieHeader) header).getCookie();
+                final ForestCookie cookie = ((ForestSetCookieHeader) header).getCookie();
                 if (cookie != null && name.equals(cookie.getName())) {
                     return cookie;
                 }
@@ -323,7 +323,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
      * @return 请求头对象列表，列表项为{@link ForestHeader}类实例
      */
     public List<ForestHeader> getHeaders(String name) {
-        List<ForestHeader> results = new ArrayList<>(2);
+        final List<ForestHeader> results = new ArrayList<>(2);
         for (ForestHeader header : headers) {
             if (header.getName().equalsIgnoreCase(name)) {
                 results.add(header);
@@ -337,7 +337,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
      * @return 所有请求头的名称列表
      */
     public List<String> names() {
-        List<String> results = new ArrayList<>(headers.size());
+        final List<String> results = new ArrayList<>(headers.size());
         for (ForestHeader header : headers) {
             results.add(header.getName());
         }
@@ -349,7 +349,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
      * @return 所有请求头的值列表
      */
     public List<String> getValues() {
-        List<String> results = new ArrayList<>(headers.size());
+        final List<String> results = new ArrayList<>(headers.size());
         for (ForestHeader header : headers) {
             results.add(header.getValue());
         }
@@ -371,14 +371,14 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
      */
     public void addHeader(String name, String value) {
         if ("Cookie".equalsIgnoreCase(name)) {
-            ForestCookies cookies = ForestCookies.parse(value);
+            final ForestCookies cookies = ForestCookies.parse(value);
             if (cookies.size() > 0) {
                 addCookies(cookies);
             }
         } else if ("Set-Cookie".equalsIgnoreCase(name)) {
-            ForestCookie cookie = ForestCookie.parse(hasURL.url().toURLString(), value);
+            final ForestCookie cookie = ForestCookie.parse(hasURL.url().toURLString(), value);
             if (cookie != null) {
-                ForestSetCookieHeader cookieHeader = ForestSetCookieHeader.fromSetCookie(hasURL, cookie);
+                final ForestSetCookieHeader cookieHeader = ForestSetCookieHeader.fromSetCookie(hasURL, cookie);
                 addHeader(cookieHeader);
             }
         } else {
@@ -386,7 +386,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
         }
     }
 
-    public void addHeader(String name, Lazy<Object> value) {
+    public void addHeader(String name, Lazy<?> value) {
         addHeader(new LazyHeader(this, name, value));
     }
 
@@ -409,7 +409,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
      */
     public void addCookie(ForestCookie cookie, boolean strict) {
         if (cookieHeader == null) {
-            ForestCookieHeader cookieHeaderTmp = new ForestCookieHeader(hasURL);
+            final ForestCookieHeader cookieHeaderTmp = new ForestCookieHeader(hasURL);
             if (cookieHeaderTmp.addCookie(cookie, strict)) {
                 cookieHeader = cookieHeaderTmp;
                 addHeader(cookieHeader);
@@ -463,7 +463,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
      * @param value 请求头的值
      */
     public void setHeader(String name, String value) {
-        ForestHeader header = getHeader(name);
+        final ForestHeader header = getHeader(name);
         if (header != null) {
             if (header instanceof SimpleHeader) {
                 ((SimpleHeader) header).setValue(value);
@@ -476,8 +476,8 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
         }
     }
 
-    public void setHeader(String name, Lazy<Object> lazyValue) {
-        ForestHeader header = getHeader(name);
+    public void setHeader(String name, Lazy<?> lazyValue) {
+        final ForestHeader header = getHeader(name);
         if (header != null) {
             if (header instanceof LazyHeader) {
                 ((LazyHeader) header).setValue(lazyValue);
@@ -501,7 +501,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
             return;
         }
         for (Object key : map.keySet()) {
-            Object value = map.get(key);
+            final Object value = map.get(key);
             setHeader(String.valueOf(key), String.valueOf(value));
         }
     }
@@ -522,7 +522,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
      * @return 新的Forest请求头Map
      */
     public ForestHeaderMap clone(HasURL hasURL) {
-        ForestHeaderMap newHeaderMap = new ForestHeaderMap(hasURL);
+        final ForestHeaderMap newHeaderMap = new ForestHeaderMap(hasURL);
         for (ForestHeader header : headers) {
             newHeaderMap.addHeader(header.clone(newHeaderMap));
         }

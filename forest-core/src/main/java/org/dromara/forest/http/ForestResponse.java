@@ -254,11 +254,11 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
     public ForestRequest<T> redirectionRequest() {
         if (isRedirection() && request != null) {
             try {
-                String location = getRedirectionLocation();
+                final String location = getRedirectionLocation();
                 if (StringUtils.isBlank(location)) {
                     return null;
                 }
-                ForestRequest<T> redirectRequest = request.clone();
+                final ForestRequest<T> redirectRequest = request.clone();
                 redirectRequest.clearQueries();
                 redirectRequest.setUrl(location);
                 redirectRequest.prevRequest = request;
@@ -277,17 +277,17 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      * @return 文件名
      */
     public String getFilename() {
-        ForestHeader header = getHeader("Content-Disposition");
+        final ForestHeader header = getHeader("Content-Disposition");
         if (header != null) {
-            String dispositionValue = header.getValue();
+            final String dispositionValue = header.getValue();
             if (StringUtils.isNotEmpty(dispositionValue)) {
-                String[] disGroup = dispositionValue.split(";");
+                final String[] disGroup = dispositionValue.split(";");
                 for (int i = disGroup.length - 1; i >= 0; i--) {
                     /**
                      * content-disposition: attachment; filename="50db602db30cf6df60698510003d2415.jpg"
                      * need replace trim
                      */
-                    String disStr = StringUtils.trimBegin(disGroup[i]);
+                    final String disStr = StringUtils.trimBegin(disGroup[i]);
                     if (disStr.startsWith("filename=")) {
                         String filename = disStr.substring("filename=".length());
                         if (filename.length() > 1 && filename.startsWith("\"") && filename.endsWith("\"")) {
@@ -324,7 +324,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      */
     public String readAsString() {
         try {
-            byte[] bytes = getByteArray();
+            final byte[] bytes = getByteArray();
             if (bytes == null) {
                 return "";
             }
@@ -356,7 +356,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
                 } catch (Throwable th) {
                 }
             } else {
-                Class clazz = ReflectUtils.toClass(type);
+                final Class<?> clazz = ReflectUtils.toClass(type);
                 if (ForestResponse.class.isAssignableFrom(clazz)) {
                     Type argType = ReflectUtils.getGenericArgument(clazz);
                     if (argType == null) {
@@ -523,7 +523,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
                 if (request.getSuccessWhen() != null) {
                     success = request.getSuccessWhen().successWhen(request, this);
                 } else {
-                    SuccessWhen globalSuccessWhen = request.getConfiguration().getSuccessWhen();
+                    final SuccessWhen globalSuccessWhen = request.getConfiguration().getSuccessWhen();
                     if (globalSuccessWhen != null) {
                         success = globalSuccessWhen.successWhen(request, this);
                     }
@@ -747,7 +747,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
                 isGzip = false;
             }
         }
-        char[] chs = charset.toCharArray();
+        final char[] chs = charset.toCharArray();
         if (chs.length > 2 &&
                 (chs[0] == 'g' || chs[0] == 'G') &&
                 (chs[1] == 'b' || chs[1] == 'B')) {

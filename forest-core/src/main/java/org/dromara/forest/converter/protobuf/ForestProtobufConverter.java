@@ -44,11 +44,11 @@ public interface ForestProtobufConverter extends ForestConverter<byte[]>, Forest
 
     @Override
     default byte[] encodeRequestBody(final ForestBody body, final Charset charset, final ConvertOptions options) {
-        ForestProtobufConverterManager protobufConverterManager = ForestProtobufConverterManager.getInstance();
+        final ForestProtobufConverterManager protobufConverterManager = ForestProtobufConverterManager.getInstance();
         Object protobufObj = null;
         for (ForestRequestBody bodyItem : body) {
             if (bodyItem instanceof ObjectRequestBody) {
-                Object obj = ((ObjectRequestBody) bodyItem).getObject();
+                final Object obj = ((ObjectRequestBody) bodyItem).getObject();
                 if (protobufConverterManager.isProtobufMessageClass(obj.getClass())) {
                     protobufObj = obj;
                     break;

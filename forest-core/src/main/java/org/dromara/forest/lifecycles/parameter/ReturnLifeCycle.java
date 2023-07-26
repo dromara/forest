@@ -19,7 +19,7 @@ public class ReturnLifeCycle implements ParameterAnnotationLifeCycle<Return, Obj
 
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, Return annotation) {
-        Class<?> paramType = parameter.getType();
+        final Class<?> paramType = parameter.getType();
         if (!Class.class.isAssignableFrom(paramType) &&
                 !Type.class.isAssignableFrom(paramType) &&
                 !TypeReference.class.isAssignableFrom(paramType)) {
@@ -30,20 +30,20 @@ public class ReturnLifeCycle implements ParameterAnnotationLifeCycle<Return, Obj
 
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
-        Object ext = method.getExtensionParameterValue(PARAM_KEY_RETURN_TYPE_NAME);
+        final Object ext = method.getExtensionParameterValue(PARAM_KEY_RETURN_TYPE_NAME);
         if (ext != null) {
-            Integer index = (Integer) ext;
-            Object arg = args[index];
+            final Integer index = (Integer) ext;
+            final Object arg = args[index];
             if (arg == null) {
                 return;
             }
             if (!(arg instanceof Type)) {
                 return;
             }
-            Type type = (Type) arg;
-            LifeCycleHandler lifeCycleHandler = request.getLifeCycleHandler();
+            final Type type = (Type) arg;
+            final LifeCycleHandler lifeCycleHandler = request.getLifeCycleHandler();
             if (lifeCycleHandler != null && lifeCycleHandler instanceof MethodLifeCycleHandler) {
-                MethodLifeCycleHandler methodLifeCycleHandler = (MethodLifeCycleHandler) lifeCycleHandler;
+                final MethodLifeCycleHandler methodLifeCycleHandler = (MethodLifeCycleHandler) lifeCycleHandler;
                 methodLifeCycleHandler.setResultType(type);
             }
         }

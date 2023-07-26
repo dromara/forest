@@ -18,14 +18,14 @@ public class RedirectionLifeCycle implements MethodAnnotationLifeCycle<Redirecti
 
     @Override
     public void onMethodInitialized(ForestMethod method, Redirection annotation) {
-        boolean value = annotation.value();
+        final boolean value = annotation.value();
         method.setExtensionParameterValue(PARAM_KEY_AUTO_REDIRECTS, value);
     }
 
 
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
-        Boolean value = (Boolean) method.getExtensionParameterValue(PARAM_KEY_AUTO_REDIRECTS);
+        final Boolean value = (Boolean) method.getExtensionParameterValue(PARAM_KEY_AUTO_REDIRECTS);
         request.setAutoRedirection(value);
     }
 

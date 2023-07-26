@@ -12,14 +12,14 @@ import java.lang.annotation.Annotation;
 public class RequestLifeCycle implements MethodAnnotationLifeCycle<Annotation, Object> {
 
     protected MetaRequest createMetaRequest(Annotation annotation) {
-        MetaRequest metaRequest = new MetaRequest(annotation);
+        final MetaRequest metaRequest = new MetaRequest(annotation);
         ReflectUtils.copyAnnotationAttributes(annotation, metaRequest);
         return metaRequest;
     }
 
     @Override
     public void onMethodInitialized(ForestMethod method, Annotation annotation) {
-        MetaRequest metaRequest = createMetaRequest(annotation);
+        final MetaRequest metaRequest = createMetaRequest(annotation);
         method.setMetaRequest(metaRequest);
     }
 

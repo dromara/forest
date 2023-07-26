@@ -68,7 +68,7 @@ public class NameValueRequestBody extends ForestRequestBody implements SupportFo
             if (Lazy.isEvaluatingLazyValue(value, request)) {
                 return null;
             }
-            Object evaluatedValue = ((Lazy<?>) value).eval(request);
+            final Object evaluatedValue = ((Lazy<?>) value).eval(request);
             if (evaluatedValue == null) {
                 return getDefaultValue();
             }
@@ -120,14 +120,14 @@ public class NameValueRequestBody extends ForestRequestBody implements SupportFo
 
     @Override
     public List<RequestNameValue> getNameValueList(ForestRequest request) {
-        List<RequestNameValue> nameValueList = new ArrayList<>(1);
+        final List<RequestNameValue> nameValueList = new ArrayList<>(1);
         nameValueList.add(new RequestNameValue(name, value, MappingParameter.TARGET_BODY));
         return nameValueList;
     }
 
     @Override
     public NameValueRequestBody clone() {
-        NameValueRequestBody newBody = new NameValueRequestBody(name, contentType, value);
+        final NameValueRequestBody newBody = new NameValueRequestBody(name, contentType, value);
         newBody.setDefaultValue(getDefaultValue());
         return newBody;
     }

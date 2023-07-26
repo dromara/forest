@@ -58,11 +58,11 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
     }
 
     @Override
-    public String encodeToString(final Object obj) {
+    public String encodeToString(Object obj) {
         final ForestJsonConverter jsonConverter = configuration.getJsonConverter();
         final Map<String, Object> map = jsonConverter.convertObjectToMap(obj);
         final List<RequestNameValue> nameValueList = new LinkedList<>();
-        for (final Map.Entry<String, Object> entry : map.entrySet()) {
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
             final RequestNameValue nameValue = new RequestNameValue(entry.getKey(), MappingParameter.TARGET_BODY);
             nameValue.setValue(entry.getValue());
             nameValueList.add(nameValue);
@@ -115,9 +115,14 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
      * @param map Map对象
      * @param target 请求目标位置
      */
-    protected void processFormMapItem(final List<RequestNameValue> newNameValueList, final ForestConfiguration configuration, final String name, final Map<?, ?> map, final int target) {
-        map.forEach((mapKey, mapValue) ->
-                processFormItem(newNameValueList, configuration, name + "[" + mapKey + "]", mapValue, target));
+    protected void processFormMapItem(List<RequestNameValue> newNameValueList, ForestConfiguration configuration, String name, Map map, int target) {
+        for (Iterator<Map.Entry> iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
+            final Map.Entry entry = iterator.next();
+            final Object mapKey = entry.getKey();
+            final Object mapValue = entry.getValue();
+            final String subName = name + "[" + mapKey + "]";
+            processFormItem(newNameValueList, configuration, subName, mapValue, target);
+        }
     }
 
 
@@ -134,10 +139,10 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
             return;
         }
         if (value != null) {
-            final Class itemClass = value.getClass();
+            final Class<?> itemClass = value.getClass();
             boolean needCollapse = false;
             if (value instanceof Collection) {
-                final Collection collection = (Collection) value;
+                final Collection<?> collection = (Collection<?>) value;
                 if (collection.size() <= 8) {
                     for (Object item : collection) {
                         if (!ReflectUtils.isPrimaryType(item.getClass())) {
@@ -189,9 +194,9 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
             final List<RequestNameValue> nameValueList,
             final ForestConfiguration configuration,
             final ConvertOptions options) {
-        List<RequestNameValue> newNameValueList = new LinkedList<>();
+        final List<RequestNameValue> newNameValueList = new LinkedList<>();
         for (RequestNameValue nameValue : nameValueList) {
-            String name = nameValue.getName();
+            final String name = nameValue.getName();
             if (options != null && options.shouldExclude(name)) {
                 continue;
             }
@@ -205,23 +210,23 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
                     continue;
                 }
             }
-            int target = nameValue.getTarget();
+            final int target = nameValue.getTarget();
             processFormItem(newNameValueList, configuration,  name, value, target);
         }
         return newNameValueList;
     }
 
     private String formUrlEncodedString(List<RequestNameValue> nameValueList, Charset charset) {
-        ForestJsonConverter jsonConverter = configuration.getJsonConverter();
-        StringBuilder strBuilder = new StringBuilder();
+        final ForestJsonConverter jsonConverter = configuration.getJsonConverter();
+        final StringBuilder strBuilder = new StringBuilder();
         for (int i = 0; i < nameValueList.size(); i++) {
-            RequestNameValue nameValue = nameValueList.get(i);
+            final RequestNameValue nameValue = nameValueList.get(i);
             if (!nameValue.isInBody()) {
                 continue;
             }
-            String name = nameValue.getName();
-            Object value = nameValue.getValue();
+            final String name = nameValue.getName();
             strBuilder.append(name);
+            Object value = nameValue.getValue();
             if (value != null) {
                 value = MappingTemplate.getFormValueString(jsonConverter, value);
                 strBuilder.append("=").append(URLEncoder.FORM_VALUE.encode(String.valueOf(value), charset));

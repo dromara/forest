@@ -53,7 +53,7 @@ public class HttpBackendSelector {
      * @return Forest后端框架
      */
     public HttpBackend select(ForestConfiguration configuration) {
-        String backendName = configuration.getBackendName();
+        final String backendName = configuration.getBackendName();
         return select(backendName);
     }
 
@@ -64,10 +64,7 @@ public class HttpBackendSelector {
      * @return Forest后端框架
      */
     public HttpBackend select(String backendName) {
-        HttpBackend backend = null;
-        if (StringUtils.isNotEmpty(backendName)) {
-            backend = BACKEND_MAP.get(backendName);
-        }
+        HttpBackend backend = StringUtils.isNotEmpty(backendName) ? BACKEND_MAP.get(backendName) : null;
         if (backend == null) {
             synchronized (this) {
                 if (StringUtils.isNotEmpty(backendName)) {
@@ -75,7 +72,7 @@ public class HttpBackendSelector {
                 }
                 if (backend == null) {
                     if (StringUtils.isNotEmpty(backendName)) {
-                        HttpBackendCreator backendCreator = BACKEND_CREATOR_MAP.get(backendName);
+                        final HttpBackendCreator backendCreator = BACKEND_CREATOR_MAP.get(backendName);
                         if (backendCreator == null) {
                             throw new ForestRuntimeException("Http setBackend \"" + backendName + "\" can not be found.");
                         }
@@ -132,7 +129,7 @@ public class HttpBackendSelector {
 
         public HttpBackend create() {
             try {
-                Class klass = Class.forName(className);
+                final Class klass = Class.forName(className);
                 return (HttpBackend) klass.newInstance();
             } catch (ClassNotFoundException e) {
                 throw new ForestRuntimeException(e);

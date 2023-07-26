@@ -21,14 +21,14 @@ public abstract class AbstractBodyLifeCycle<A extends Annotation> implements Par
 
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, A annotation) {
-        Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(annotation);
-        String name = (String) attrs.get("name");
-        String filterName = (String) attrs.get("filter");
-        String partContentType = (String) attrs.get("partContentType");
-        String defaultValue = (String) attrs.get("defaultValue");
+        final Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(annotation);
+        final String name = (String) attrs.get("name");
+        final String filterName = (String) attrs.get("filter");
+        final String partContentType = (String) attrs.get("partContentType");
+        final String defaultValue = (String) attrs.get("defaultValue");
         if (StringUtils.isNotEmpty(name)) {
             parameter.setName(name);
-            MappingVariable variable = new MappingVariable(name, parameter.getType());
+            final MappingVariable variable = new MappingVariable(name, parameter.getType());
             variable.setIndex(parameter.getIndex());
             method.addVariable(name, variable);
             parameter.setObjectProperties(false);
@@ -44,6 +44,5 @@ public abstract class AbstractBodyLifeCycle<A extends Annotation> implements Par
         method.processParameterFilter(parameter, filterName);
         parameter.setTarget(MappingParameter.TARGET_BODY);
         method.addNamedParameter(parameter);
-
     }
 }

@@ -16,13 +16,13 @@ public class BackendClientLifeCycle implements MethodAnnotationLifeCycle<Backend
 
     @Override
     public void onMethodInitialized(ForestMethod method, BackendClient annotation) {
-        Boolean cache = annotation.cache();
+        final Boolean cache = annotation.cache();
         method.setExtensionParameterValue(PARAM_KEY_BACKEND_CLIENT_CACHE, cache);
     }
 
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
-        Object cache = request.getMethod().getExtensionParameterValue(PARAM_KEY_BACKEND_CLIENT_CACHE);
+        final Object cache = request.getMethod().getExtensionParameterValue(PARAM_KEY_BACKEND_CLIENT_CACHE);
         if (cache != null && cache instanceof Boolean) {
             request.cacheBackendClient((Boolean) cache);
         }

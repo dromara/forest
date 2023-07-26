@@ -48,7 +48,7 @@ public class ForestFuture<T> extends ResultGetter implements Future<T> {
     public ForestResponse<T> await() {
         if (response == null) {
             try {
-                Object result = future.get();
+                final Object result = future.get();
                 response = (ForestResponse<T>) result;
             } catch (InterruptedException e) {
                 throw new ForestRuntimeException(e);
@@ -77,7 +77,7 @@ public class ForestFuture<T> extends ResultGetter implements Future<T> {
 
     @Override
     public T get() throws InterruptedException, ExecutionException {
-        ForestResponse<T> res = await();
+        final ForestResponse<T> res = await();
         return res.getResult();
     }
 

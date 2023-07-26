@@ -14,18 +14,18 @@ public class BaseRequestLifeCycle implements BaseAnnotationLifeCycle<BaseRequest
 
     @Override
     public void onProxyHandlerInitialized(InterfaceProxyHandler interfaceProxyHandler, BaseRequest annotation) {
-        MetaRequest baseMetaRequest = interfaceProxyHandler.getBaseMetaRequest();
-        String baseURLValue = annotation.baseURL();
+        final MetaRequest baseMetaRequest = interfaceProxyHandler.getBaseMetaRequest();
+        final String baseURLValue = annotation.baseURL();
         if (StringUtils.isNotBlank(baseURLValue)) {
-            String baseURL = baseURLValue.trim();
+            final String baseURL = baseURLValue.trim();
             baseMetaRequest.setUrl(baseURL);
         }
 
-        String baseContentType = annotation.contentType();
-        String baseContentEncoding = annotation.contentEncoding();
-        String baseUserAgent = annotation.userAgent();
-        String baseCharset = annotation.charset();
-        String baseSslProtocol = annotation.sslProtocol();
+        final String baseContentType = annotation.contentType();
+        final String baseContentEncoding = annotation.contentEncoding();
+        final String baseUserAgent = annotation.userAgent();
+        final String baseCharset = annotation.charset();
+        final String baseSslProtocol = annotation.sslProtocol();
 
         baseMetaRequest.setContentType(baseContentType);
         baseMetaRequest.setContentEncoding(baseContentEncoding);
@@ -33,20 +33,14 @@ public class BaseRequestLifeCycle implements BaseAnnotationLifeCycle<BaseRequest
         baseMetaRequest.setCharset(baseCharset);
         baseMetaRequest.setSslProtocol(baseSslProtocol);
 
-        String [] headerArray = annotation.headers();
+        final String[] headerArray = annotation.headers();
+        final Integer baseTimeout = annotation.timeout() == -1 ? null : annotation.timeout();
+        final Integer baseConnectTimeout = annotation.connectTimeout() == -1 ? null : annotation.connectTimeout();
+        final Integer baseReadTimeout = annotation.readTimeout() == -1 ? null : annotation.readTimeout();
 
-        Integer baseTimeout = annotation.timeout();
-        Integer baseConnectTimeout = annotation.connectTimeout();
-        Integer baseReadTimeout = annotation.readTimeout();
-
-        baseTimeout = baseTimeout == -1 ? null : baseTimeout;
-        baseConnectTimeout = baseConnectTimeout == -1 ? null : baseConnectTimeout;
-        baseReadTimeout = baseReadTimeout == -1 ? null : baseReadTimeout;
-
-        Class baseRetryerClass = annotation.retryer();
-        Integer baseRetryCount = annotation.retryCount();
-        baseRetryCount = baseRetryCount == -1 ? null : baseRetryCount;
-        Long baseMaxRetryInterval = annotation.maxRetryInterval();
+        final Class<?> baseRetryerClass = annotation.retryer();
+        final Integer baseRetryCount = annotation.retryCount() == -1 ? null : annotation.retryCount();
+        final Long baseMaxRetryInterval = annotation.maxRetryInterval();
 
         if (headerArray != null) {
             baseMetaRequest.setHeaders(headerArray);
@@ -72,7 +66,7 @@ public class BaseRequestLifeCycle implements BaseAnnotationLifeCycle<BaseRequest
             baseMetaRequest.setMaxRetryInterval(baseMaxRetryInterval);
         }
 
-        Class<?>[] baseInterceptorClasses = annotation.interceptor();
+        final Class<?>[] baseInterceptorClasses = annotation.interceptor();
         baseMetaRequest.setInterceptor(baseInterceptorClasses);
 
     }

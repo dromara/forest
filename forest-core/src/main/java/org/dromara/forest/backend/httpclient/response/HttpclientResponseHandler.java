@@ -33,34 +33,11 @@ public class HttpclientResponseHandler extends ResponseHandler<HttpResponse> {
             final ForestRequest request,
             final Future httpResponseFuture) {
         lifeCycleHandler.handleFuture(request, httpResponseFuture);
-/*
-        Type returnType = lifeCycleHandler.getResultType();
-        Type paramType;
-        Class paramClass = null;
-        if (returnType instanceof ParameterizedType) {
-            Type rawType = ((ParameterizedType) returnType).getRawType();
-            if (!Future.class.isAssignableFrom((Class<?>) rawType)) {
-                return;
-            }
-            paramType = ((ParameterizedType) returnType).getActualTypeArguments()[0];
-            if (paramType == null) {
-                paramType = Object.class;
-            }
-            paramClass = (Class) paramType;
-        }
-        else if (returnType instanceof Class) {
-            if (!Future.class.isAssignableFrom((Class<?>) returnType)) {
-                return;
-            }
-            paramClass = Object.class;
-        }
-        handleFutureResult(httpResponseFuture, requestTime, paramClass, forestResponseFactory);
-*/
     }
 
 
     protected void handleFutureResult(Future httpResponseFuture, Date requestTime, Class innerType, ForestResponseFactory forestResponseFactory) {
-        HttpclientForestFuture<HttpResponse, HttpResponse> future = new HttpclientForestFuture<>(
+        final HttpclientForestFuture<HttpResponse, HttpResponse> future = new HttpclientForestFuture<>(
                 request, requestTime, innerType, lifeCycleHandler, httpResponseFuture, forestResponseFactory);
         lifeCycleHandler.handleFuture(request, future);
     }

@@ -18,14 +18,14 @@ public class DecompressGzipLifeCycle implements MethodAnnotationLifeCycle<Decomp
 
     @Override
     public void onMethodInitialized(ForestMethod method, DecompressGzip annotation) {
-        boolean value = annotation.value();
+        final boolean value = annotation.value();
         method.setExtensionParameterValue(PARAM_KEY_DECOMPRESS_GZIP, value);
     }
 
 
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
-        Boolean value = (Boolean) method.getExtensionParameterValue(PARAM_KEY_DECOMPRESS_GZIP);
+        final Boolean value = (Boolean) method.getExtensionParameterValue(PARAM_KEY_DECOMPRESS_GZIP);
         request.setDecompressResponseGzipEnabled(value);
     }
 

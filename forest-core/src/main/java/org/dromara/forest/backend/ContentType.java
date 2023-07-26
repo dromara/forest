@@ -44,9 +44,9 @@ public class ContentType {
     }
 
     public ContentType(String contentType, Charset defaultCharset) {
-        String[] group = contentType.split(";");
-        String cty = group[0].trim();
-        String[] strs = cty.split("/");
+        final String[] group = contentType.split(";");
+        final String cty = group[0].trim();
+        final String[] strs = cty.split("/");
         this.type = strs[0];
         if (strs.length > 1) {
             this.subType = strs[1];
@@ -55,14 +55,13 @@ public class ContentType {
         }
         if (group.length > 1) {
             for (int i = 1; i < group.length; i++) {
-                String chartExpr = group[1];
-                String[] expr = chartExpr.split("=");
+                final String chartExpr = group[1];
+                final String[] expr = chartExpr.split("=");
                 if (expr.length > 1) {
                     parameters.put(expr[0], expr[1]);
-                    String charsetLabel = expr[0].trim();
+                    final String charsetLabel = expr[0].trim();
                     if ("charset".equalsIgnoreCase(charsetLabel)) {
-                        String charsetValue = expr[1].trim();
-                        charsetValue = charsetValue.replace("\"", "");
+                        final String charsetValue = expr[1].trim().replace("\"", "");
                         if (StringUtils.isNotEmpty(charsetValue)) {
                             this.hasDefinedCharset = true;
                             this.charset = Charset.forName(charsetValue);

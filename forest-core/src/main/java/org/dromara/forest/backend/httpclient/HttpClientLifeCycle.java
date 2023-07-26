@@ -10,16 +10,16 @@ public class HttpClientLifeCycle implements MethodAnnotationLifeCycle<HttpClient
 
     @Override
     public void onMethodInitialized(ForestMethod method, HttpClient annotation) {
-        Class<? extends HttpClientProvider> clazz = annotation.client();
+        final Class<? extends HttpClientProvider> clazz = annotation.client();
         if (clazz != null) {
-            HttpClientProvider provider = method.getConfiguration().getForestObject(clazz);
+            final HttpClientProvider provider = method.getConfiguration().getForestObject(clazz);
             method.setExtensionParameterValue(PARAM_KEY_HTTPCLIENT_PROVIDER, provider);
         }
     }
 
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
-        Object provider = method.getExtensionParameterValue(PARAM_KEY_HTTPCLIENT_PROVIDER);
+        final Object provider = method.getExtensionParameterValue(PARAM_KEY_HTTPCLIENT_PROVIDER);
         if (provider != null) {
             request.setBackendClient(provider);
         }

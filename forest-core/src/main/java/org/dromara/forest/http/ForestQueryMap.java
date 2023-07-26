@@ -76,7 +76,7 @@ public class ForestQueryMap implements Map<String, Object> {
         if (key == null) {
             return false;
         }
-        String name = key.toString();
+        final String name = key.toString();
         for (SimpleQueryParameter query : queries) {
             if (query.getName().equalsIgnoreCase(name)) {
                 return true;
@@ -88,7 +88,7 @@ public class ForestQueryMap implements Map<String, Object> {
     @Override
     public boolean containsValue(Object value) {
         for (SimpleQueryParameter query : queries) {
-            Object queryVal = query.getValue();
+            final Object queryVal = query.getValue();
             if (queryVal == null) {
                 if (value == null) {
                     return true;
@@ -115,7 +115,7 @@ public class ForestQueryMap implements Map<String, Object> {
     }
 
     public List<SimpleQueryParameter> getQueries(String name) {
-        List<SimpleQueryParameter> list = new LinkedList<>();
+        final List<SimpleQueryParameter> list = new LinkedList<>();
         if (StringUtils.isEmpty(name)) {
             return list;
         }
@@ -132,8 +132,8 @@ public class ForestQueryMap implements Map<String, Object> {
         if (key == null) {
             return null;
         }
-        String name = key.toString();
-        SimpleQueryParameter query = getQuery(name);
+        final String name = key.toString();
+        final SimpleQueryParameter query = getQuery(name);
         if (query == null) {
             return null;
         }
@@ -258,7 +258,7 @@ public class ForestQueryMap implements Map<String, Object> {
             return;
         }
         for (Object key : map.keySet()) {
-            Object value = map.get(key);
+            final Object value = map.get(key);
             addQuery(String.valueOf(key), value, isUrlEncode, charset);
         }
     }
@@ -336,11 +336,11 @@ public class ForestQueryMap implements Map<String, Object> {
         if (key == null) {
             return null;
         }
-        String name = key.toString();
+        final String name = key.toString();
         for (int i = queries.size() - 1; i >= 0; i--) {
-            SimpleQueryParameter query = queries.get(i);
+            final SimpleQueryParameter query = queries.get(i);
             if (query.getName().equalsIgnoreCase(name)) {
-                SimpleQueryParameter removedQuery = queries.remove(i);
+                final SimpleQueryParameter removedQuery = queries.remove(i);
                 return removedQuery.getValue();
             }
         }
@@ -354,14 +354,14 @@ public class ForestQueryMap implements Map<String, Object> {
      * @return 被删除的参数
      */
     public List<SimpleQueryParameter> removeQueries(String name) {
-        List<SimpleQueryParameter> list = new LinkedList<>();
+        final List<SimpleQueryParameter> list = new LinkedList<>();
         if (name == null) {
             return list;
         }
         for (int i = queries.size() - 1; i >= 0; i--) {
-            SimpleQueryParameter query = queries.get(i);
+            final SimpleQueryParameter query = queries.get(i);
             if (query.getName().equalsIgnoreCase(name)) {
-                SimpleQueryParameter removedQuery = queries.remove(i);
+                final SimpleQueryParameter removedQuery = queries.remove(i);
                 list.add(0, removedQuery);
             }
         }
@@ -374,8 +374,8 @@ public class ForestQueryMap implements Map<String, Object> {
             return;
         }
         for (Entry<? extends String, ?> entry : m.entrySet()) {
-            String name = entry.getKey();
-            Object value = entry.getValue();
+            final String name = entry.getKey();
+            final Object value = entry.getValue();
             put(name, value);
         }
     }
@@ -389,9 +389,9 @@ public class ForestQueryMap implements Map<String, Object> {
      * 清除所有源自URL的Query参数
      */
     public void clearQueriesFromUrl() {
-        int len = queries.size();
+        final int len = queries.size();
         for (int i = len - 1; i >=0; i--) {
-            SimpleQueryParameter query = queries.get(i);
+            final SimpleQueryParameter query = queries.get(i);
             if (query.isFromUrl()) {
                 queries.remove(i);
             }
@@ -400,7 +400,7 @@ public class ForestQueryMap implements Map<String, Object> {
 
     @Override
     public Set<String> keySet() {
-        Set<String> set = new HashSet<>();
+        final Set<String> set = new HashSet<>();
         for (SimpleQueryParameter query : queries) {
             set.add(query.getName());
         }
@@ -409,9 +409,9 @@ public class ForestQueryMap implements Map<String, Object> {
 
     @Override
     public Collection<Object> values() {
-        List<Object> list = new ArrayList<>();
+        final List<Object> list = new ArrayList<>();
         for (SimpleQueryParameter query : queries) {
-            Object val = query.getValue();
+            final Object val = query.getValue();
             if (val != null) {
                 list.add(val);
             }
@@ -425,9 +425,9 @@ public class ForestQueryMap implements Map<String, Object> {
 
     @Override
     public Set<Entry<String, Object>> entrySet() {
-        Set<Entry<String, Object>> set = new HashSet<>();
+        final Set<Entry<String, Object>> set = new HashSet<>();
         for (SimpleQueryParameter query : queries) {
-            Entry<String, Object> entry = new Entry<String, Object>() {
+            final Entry<String, Object> entry = new Entry<String, Object>() {
 
                 @Override
                 public String getKey() {
@@ -441,7 +441,7 @@ public class ForestQueryMap implements Map<String, Object> {
 
                 @Override
                 public Object setValue(Object value) {
-                    Object oldValue = query.getValue();
+                    final Object oldValue = query.getValue();
                     query.setValue(value);
                     return oldValue;
                 }
@@ -460,7 +460,7 @@ public class ForestQueryMap implements Map<String, Object> {
                 backend == null ? false : backend.isAllowEncodeBraceInQueryValue();
         int count = 0;
         while (iterator.hasNext()) {
-            SimpleQueryParameter query = iterator.next();
+            final SimpleQueryParameter query = iterator.next();
             if (query != null) {
                 final String name = query.getName();
                 final Object value = query.getOriginalValue();
@@ -478,7 +478,7 @@ public class ForestQueryMap implements Map<String, Object> {
                 }
                 if (value != null) {
                     final Object evaluatedValue = query.getValue();
-                    String strValue = MappingTemplate.getParameterValue(jsonConverter, evaluatedValue);
+                    final String strValue = MappingTemplate.getParameterValue(jsonConverter, evaluatedValue);
                     if (strValue != null) {
                         String charset = query.getCharset();
                         if (StringUtils.isBlank(charset)) {

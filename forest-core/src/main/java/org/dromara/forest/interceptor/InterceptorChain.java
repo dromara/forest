@@ -40,7 +40,7 @@ public class InterceptorChain implements Interceptor {
     @Override
     public boolean beforeExecute(ForestRequest request) {
         for (Interceptor item : interceptors) {
-            boolean result = item.beforeExecute(request);
+            final boolean result = item.beforeExecute(request);
             if (!result) {
                 return false;
             }

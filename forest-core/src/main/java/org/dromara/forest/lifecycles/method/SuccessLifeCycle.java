@@ -22,8 +22,8 @@ public class SuccessLifeCycle implements MethodAnnotationLifeCycle<Success, Obje
 
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
-        Success annotation = (Success) request.getMethod().getExtensionParameterValue(PARAM_KEY_SUCCESS);
-        Class<? extends SuccessWhen> conditionClass = annotation.condition();
+        final Success annotation = (Success) request.getMethod().getExtensionParameterValue(PARAM_KEY_SUCCESS);
+        final Class<? extends SuccessWhen> conditionClass = annotation.condition();
         if (conditionClass != null && !SuccessWhen.class.equals(conditionClass)) {
             request.successWhen(conditionClass);
         }

@@ -10,15 +10,10 @@ public class OkHttp3Cookie extends ForestCookie {
 
     public OkHttp3Cookie(long currentTime, Cookie okCookie) {
         super(okCookie.name(), okCookie.value());
-        long expiresAt = okCookie.expiresAt();
-        long maxAge;
-        if (expiresAt > currentTime) {
-            maxAge = expiresAt - currentTime;
-        } else {
-            maxAge = 0L;
-        }
-        Date createTime = new Date(currentTime);
-        Duration maxAgeDuration = Duration.ofMillis(maxAge);
+        final long expiresAt = okCookie.expiresAt();
+        final long maxAge = expiresAt > currentTime ? expiresAt - currentTime : 0L;
+        final Date createTime = new Date(currentTime);
+        final Duration maxAgeDuration = Duration.ofMillis(maxAge);
 
         setCreateTime(createTime);
         setMaxAge(maxAgeDuration);

@@ -40,7 +40,7 @@ public class ResultHandler {
      * @since 1.5.27
      */
     public Object getResult(ForestRequest request, ForestResponse response, Type resultType) {
-        Class clazz = ReflectUtils.toClass(resultType);
+        final Class<?> clazz = ReflectUtils.toClass(resultType);
         return getResult(request, response, resultType, clazz);
     }
 
@@ -54,7 +54,7 @@ public class ResultHandler {
      * @since 1.5.27
      */
     public Object getResult(ForestRequest request, ForestResponse response, Class resultClass) {
-        Type type = ReflectUtils.toType(resultClass);
+        final Type type = ReflectUtils.toType(resultClass);
         return getResult(request, response, type, resultClass);
     }
 
@@ -71,16 +71,16 @@ public class ResultHandler {
                 if (ForestResponse.class.isAssignableFrom(resultClass)
                         || ForestRequest.class.isAssignableFrom(resultClass)) {
                     if (resultType instanceof ParameterizedType) {
-                        ParameterizedType parameterizedType = (ParameterizedType) resultType;
-                        Class rowClass = (Class) parameterizedType.getRawType();
+                        final ParameterizedType parameterizedType = (ParameterizedType) resultType;
+                        final Class<?> rowClass = (Class<?>) parameterizedType.getRawType();
                         if (ForestResponse.class.isAssignableFrom(rowClass)
                                 || ForestRequest.class.isAssignableFrom(resultClass)) {
-                            Type realType = parameterizedType.getActualTypeArguments()[0];
-                            Class realClass = ReflectUtils.toClass(parameterizedType.getActualTypeArguments()[0]);
+                            final Type realType = parameterizedType.getActualTypeArguments()[0];
+                            Class<?> realClass = ReflectUtils.toClass(parameterizedType.getActualTypeArguments()[0]);
                             if (realClass == null) {
                                 realClass = String.class;
                             }
-                            Object realResult = getResult(request, response, realType, realClass);
+                            final Object realResult = getResult(request, response, realType, realClass);
                             response.setResult(realResult);
                         }
                     }
@@ -88,11 +88,11 @@ public class ResultHandler {
                 }
                 if (Future.class.isAssignableFrom(resultClass)) {
                     if (resultType instanceof ParameterizedType) {
-                        ParameterizedType parameterizedType = (ParameterizedType) resultType;
-                        Class rowClass = (Class) parameterizedType.getRawType();
+                        final ParameterizedType parameterizedType = (ParameterizedType) resultType;
+                        final Class<?> rowClass = (Class<?>) parameterizedType.getRawType();
                         if (Future.class.isAssignableFrom(rowClass)) {
-                            Type realType = parameterizedType.getActualTypeArguments()[0];
-                            Class realClass = ReflectUtils.toClass(parameterizedType.getActualTypeArguments()[0]);
+                            final Type realType = parameterizedType.getActualTypeArguments()[0];
+                            final Class<?> realClass = ReflectUtils.toClass(parameterizedType.getActualTypeArguments()[0]);
                             if (realClass == null) {
                                 return ((MethodLifeCycleHandler<?>) request.getLifeCycleHandler()).getResultData();
                             }
@@ -105,9 +105,9 @@ public class ResultHandler {
                         return response.getByteArray();
                     }
                 }
-                Object attFile = request.getAttachment(DownloadLifeCycle.ATTACHMENT_NAME_FILE);
+                final Object attFile = request.getAttachment(DownloadLifeCycle.ATTACHMENT_NAME_FILE);
                 if (attFile != null && attFile instanceof File) {
-                    ForestConverter converter = request.getConfiguration().getConverter(ForestDataType.JSON);
+                    final ForestConverter converter = request.getConfiguration().getConverter(ForestDataType.JSON);
                     return converter.convertToJavaObject(attFile, resultClass);
                 }
                 String responseText = null;
@@ -129,8 +129,8 @@ public class ResultHandler {
                 if (InputStream.class.isAssignableFrom(resultClass)) {
                     return response.getInputStream();
                 }
-                ContentType contentType = response.getContentType();
-                ForestConverter decoder = request.getDecoder();
+                final ContentType contentType = response.getContentType();
+                final ForestConverter decoder = request.getDecoder();
                 if (decoder != null) {
                     if (contentType != null && contentType.canReadAsString()) {
                         return decoder.convertToJavaObject(responseText, resultType);
@@ -141,8 +141,8 @@ public class ResultHandler {
                     return responseText;
                 }
 
-                ForestDataType dataType = request.getDataType();
-                ForestConverter converter = request.getConfiguration().getConverter(dataType);
+                final ForestDataType dataType = request.getDataType();
+                final ForestConverter converter = request.getConfiguration().getConverter(dataType);
                 if (contentType != null && contentType.canReadAsString()) {
                     return converter.convertToJavaObject(responseText, resultType);
                 }

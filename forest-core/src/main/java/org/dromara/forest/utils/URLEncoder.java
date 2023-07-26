@@ -214,17 +214,26 @@ public class URLEncoder {
         if (path == null) {
             return null;
         }
-        Charset cs = null;
-        if (StringUtils.isEmpty(charset)) {
-            cs = StandardCharsets.UTF_8;
-        } else {
-            try {
-                cs = Charset.forName(charset);
-            } catch (Throwable th) {
-                throw new ForestRuntimeException(th);
-            }
+        try {
+            final Charset cs = StringUtils.isEmpty(charset) ?
+                    StandardCharsets.UTF_8 : Charset.forName(charset);
+            return encode(path, cs);
+        } catch (Throwable th) {
+            throw new ForestRuntimeException(th);
         }
-        return encode(path, cs);
+    }
+
+    private boolean isURLEncoded(final char[] charArray, final int index) {
+        if (charArray[index] != '%') {
+            return false;
+        }
+        final int len = charArray.length;
+        if (index + 2 < len) {
+            final char ch1 = charArray[index + 1];
+            final char ch2 = charArray[index + 2];
+            return Character.isDigit(ch1) && Character.isDigit(ch2);
+        }
+        return false;
     }
 
     private boolean isURLEncoded(final char[] charArray, final int index) {
@@ -253,7 +262,6 @@ public class URLEncoder {
         final OutputStreamWriter writer = new OutputStreamWriter(buf, charset);
         final char[] charArray = path.toCharArray();
         final int len = charArray.length;
-
         for (int i = 0; i < len; i++) {
             final char ch = charArray[i];
             if (isURLEncoded(charArray, i)) {

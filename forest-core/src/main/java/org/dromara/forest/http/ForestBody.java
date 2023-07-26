@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 public class ForestBody implements List<ForestRequestBody> {
 
@@ -94,7 +95,7 @@ public class ForestBody implements List<ForestRequestBody> {
      * @return 键值对类型请求体项列表，即{@link NameValueRequestBody}对象实例列表
      */
     public List<NameValueRequestBody> getNameValueBodies(String name) {
-        List<NameValueRequestBody> bodies = new LinkedList<>();
+        final List<NameValueRequestBody> bodies = new LinkedList<>();
         Validations.assertParamNotEmpty(name, "name");
         for (ForestRequestBody body : bodyItems) {
             if (body instanceof NameValueRequestBody
@@ -112,11 +113,11 @@ public class ForestBody implements List<ForestRequestBody> {
      * @return 键值对类型请求体项组成的 {@link Map}
      */
     public Map<String, Object> nameValuesMap() {
-        Map<String, Object> map = new LinkedHashMap<>();
+        final Map<String, Object> map = new LinkedHashMap<>();
         for (ForestRequestBody body : bodyItems) {
             if (body instanceof NameValueRequestBody) {
-                NameValueRequestBody nameValueRequestBody = (NameValueRequestBody) body;
-                String name = nameValueRequestBody.getName();
+                final NameValueRequestBody nameValueRequestBody = (NameValueRequestBody) body;
+                final String name = nameValueRequestBody.getName();
                 if (!map.containsKey(name)) {
                     map.put(name, nameValueRequestBody.getValue());
                 }
@@ -132,22 +133,22 @@ public class ForestBody implements List<ForestRequestBody> {
      * @return 请求体中的键值对集合 - {@link Map} 对象
      */
     public Map<String, Object> nameValuesMapWithObject() {
-        Map<String, Object> map = new LinkedHashMap<>();
-        ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
+        final Map<String, Object> map = new LinkedHashMap<>();
+        final ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         for (ForestRequestBody body : bodyItems) {
             if (body instanceof NameValueRequestBody) {
-                NameValueRequestBody nameValueRequestBody = (NameValueRequestBody) body;
-                String name = nameValueRequestBody.getName();
+                final NameValueRequestBody nameValueRequestBody = (NameValueRequestBody) body;
+                final String name = nameValueRequestBody.getName();
                 if (!map.containsKey(name)) {
                     map.put(name, nameValueRequestBody.getValue());
                 }
             } else if (body instanceof ObjectRequestBody) {
-                ObjectRequestBody objectRequestBody = (ObjectRequestBody) body;
-                Map<String, Object> keyValueMap = jsonConverter.convertObjectToMap(
+                final ObjectRequestBody objectRequestBody = (ObjectRequestBody) body;
+                final Map<String, Object> keyValueMap = jsonConverter.convertObjectToMap(
                         objectRequestBody.getObject(), request);
                 for (Map.Entry<String, Object> entry : keyValueMap.entrySet()) {
-                    String name = entry.getKey();
-                    Object value = entry.getValue();
+                    final String name = entry.getKey();
+                    final Object value = entry.getValue();
                     if (!map.containsKey(name)) {
                         map.put(name, value);
                     }
@@ -158,9 +159,9 @@ public class ForestBody implements List<ForestRequestBody> {
     }
 
     public  <T extends ForestRequestBody> List<T> getItems(Class<T> bodyItemClass) {
-        List<T> items = new LinkedList<>();
+        final List<T> items = new LinkedList<>();
         for (ForestRequestBody item : bodyItems) {
-            Class itemClass = item.getClass();
+            final Class itemClass = item.getClass();
             if (bodyItemClass.isAssignableFrom(itemClass)) {
                 items.add((T) item);
             }
@@ -200,7 +201,6 @@ public class ForestBody implements List<ForestRequestBody> {
     public List<MultipartRequestBody> getMultipartItems() {
         return getItems(MultipartRequestBody.class);
     }
-
 
 
     public ForestDataType getDefaultBodyType() {
@@ -260,7 +260,7 @@ public class ForestBody implements List<ForestRequestBody> {
                 }
             }
             if (byte[].class.isAssignableFrom(value.getClass())) {
-                byte[] bytes = body.getByteArray();
+                final byte[] bytes = body.getByteArray();
                 if (Objects.equals(bytes, bytes)) {
                     return true;
                 }
@@ -273,7 +273,7 @@ public class ForestBody implements List<ForestRequestBody> {
         if (key == null) {
             return null;
         }
-        NameValueRequestBody body = getNameValueBody(key);
+        final NameValueRequestBody body = getNameValueBody(key);
         Object oldValue = null;
         if (key != null) {
             oldValue = body.getValue();
@@ -287,11 +287,9 @@ public class ForestBody implements List<ForestRequestBody> {
         if (ForestDataType.MULTIPART == type) {
             throw new ForestUnsupportException("Forest encoder do not support the body type \"MULTIPART\"");
         }
-        ForestDataType dataType = type == null ? this.request.mineContentType().bodyType() : type;
-        ForestEncoder forestEncoder = (ForestEncoder) this.request.getConfiguration().getConverter(dataType);
-        if (forestEncoder == null) {
-            forestEncoder = (ForestEncoder) this.request.getConfiguration().getConverter(ForestDataType.TEXT);
-        }
+        final ForestDataType dataType = type == null ? this.request.mineContentType().bodyType() : type;
+        final ForestEncoder forestEncoder = Optional.ofNullable((ForestEncoder) this.request.getConfiguration().getConverter(dataType))
+                .orElseGet(() -> (ForestEncoder) this.request.getConfiguration().getConverter(ForestDataType.TEXT));
         return forestEncoder;
     }
 
@@ -301,7 +299,7 @@ public class ForestBody implements List<ForestRequestBody> {
     }
 
     public byte[] encode(ForestEncoder encoder, Charset charset, ConvertOptions options) {
-        ConvertOptions opts = options != null ? options : ConvertOptions.defaultOptions();
+        final ConvertOptions opts = options != null ? options : ConvertOptions.defaultOptions();
         return encoder.encodeRequestBody(this, charset, opts);
     }
 
@@ -347,7 +345,7 @@ public class ForestBody implements List<ForestRequestBody> {
 
 
     public String encodeToString(ForestEncoder encoder, Charset charset, ConvertOptions options) {
-        byte[] bytes = this.encode(encoder, charset, options);
+        final byte[] bytes = this.encode(encoder, charset, options);
         return new String(bytes);
     }
 
@@ -428,7 +426,7 @@ public class ForestBody implements List<ForestRequestBody> {
     }
 
     public void replaceNameValue(NameValueRequestBody nameValueRequestBody) {
-        NameValueRequestBody body = getNameValueBody(nameValueRequestBody.getName());
+        final NameValueRequestBody body = getNameValueBody(nameValueRequestBody.getName());
         if (body != null) {
             body.setValue(nameValueRequestBody.getValue());
             body.setValue(nameValueRequestBody.getDefaultValue());
@@ -442,9 +440,9 @@ public class ForestBody implements List<ForestRequestBody> {
     }
 
     public <T extends ForestRequestBody> boolean remove(Class<T> bodyItemClass) {
-        List<Boolean> rets = new LinkedList<>();
+        final List<Boolean> rets = new LinkedList<>();
         for (ForestRequestBody item : bodyItems) {
-            Class itemClass = item.getClass();
+            final Class<?> itemClass = item.getClass();
             if (bodyItemClass.isAssignableFrom(itemClass)) {
                 rets.add(bodyItems.remove(item));
             }
@@ -514,7 +512,7 @@ public class ForestBody implements List<ForestRequestBody> {
 
     @Override
     public ForestRequestBody remove(int index) {
-        ForestRequestBody item = bodyItems.remove(index);
+        final ForestRequestBody item = bodyItems.remove(index);
         if (item != null) {
             item.setBody(null);
         }
@@ -552,7 +550,7 @@ public class ForestBody implements List<ForestRequestBody> {
     }
 
     public ForestBody clone(ForestRequest request) {
-        ForestBody newBody = new ForestBody(request);
+        final ForestBody newBody = new ForestBody(request);
         for (ForestRequestBody item : bodyItems) {
             newBody.add(item.clone());
         }

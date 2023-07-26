@@ -11,6 +11,7 @@ import okio.ForwardingSink;
 import okio.Okio;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class OkHttpMultipartBody extends RequestBody {
@@ -57,9 +58,9 @@ public class OkHttpMultipartBody extends RequestBody {
 
     private ForwardingSink getSink(BufferedSink sink) {
         final OkHttpMultipartBody self = this;
-        AtomicReference<ForestProgress> progressReference = new AtomicReference<>(null);
+        final AtomicReference<ForestProgress> progressReference = new AtomicReference<>(null);
         final Boolean[] isBegin = {null};
-        ForwardingSink forwardingSink = new ForwardingSink(sink) {
+        final ForwardingSink forwardingSink = new ForwardingSink(sink) {
             @Override
             public void write(Buffer source, long byteCount) throws IOException {
                 if (isBegin[0] == null) {
@@ -70,12 +71,13 @@ public class OkHttpMultipartBody extends RequestBody {
 
                 // increment current length of written bytes
                 self.writtenBytes += byteCount;
-                long totalLength = self.contentLength();
-                ForestProgress progress = progressReference.get();
-                if (progress == null) {
-                    progress = new ForestProgress(self.request, totalLength);
-                    progressReference.set(progress);
-                }
+                final long totalLength = self.contentLength();
+                final ForestProgress progress = Optional.ofNullable(progressReference.get())
+                        .orElseGet(() -> {
+                            final ForestProgress prg = new ForestProgress(self.request, totalLength);
+                            progressReference.set(prg);
+                            return prg;
+                        });
                 progress.setBegin(isBegin[0]);
                 progress.setCurrentBytes(self.writtenBytes);
                 if (totalLength >= 0) {
@@ -102,7 +104,7 @@ public class OkHttpMultipartBody extends RequestBody {
     @Override
     public void writeTo(BufferedSink sink) throws IOException {
         if (bufferedSink == null) {
-            ForwardingSink forwardingSink = getSink(sink);
+            final ForwardingSink forwardingSink = getSink(sink);
             // transfer to buffered sink
             bufferedSink = Okio.buffer(forwardingSink);
         }

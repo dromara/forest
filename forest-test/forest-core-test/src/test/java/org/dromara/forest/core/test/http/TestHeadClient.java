@@ -78,6 +78,21 @@ public class TestHeadClient extends BaseClientTest {
     }
 
     @Test
+    public void testHeadHelloUser_lazy() throws InterruptedException {
+        server.enqueue(new MockResponse().setBody("ok"));
+        headClient.headHelloUser_Lazy("text/plain", req -> "11111111");
+        mockRequest(server)
+                .assertMethodEquals("HEAD")
+                .assertPathEquals("/hello/user")
+                .assertHeaderEquals("Accept", "text/plain")
+                .assertHeaderEquals("accessToken", "11111111")
+                .assertHeaderEquals("test", "testquery:dsds")
+                .assertHeaderEquals("test2", "testquery2: dsds")
+                .assertQueryEquals("username", "foo");
+    }
+
+
+    @Test
     public void testHeadHelloUser2WithDefaultHeaders() throws InterruptedException {
         server.enqueue(new MockResponse().setBody("ok"));
         headClient.headHelloUserWithDefaultHeaders(null, null);

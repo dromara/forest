@@ -19,13 +19,13 @@ public class VariableLifeCycle implements ParameterAnnotationLifeCycle<Annotatio
 
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, Annotation annotation) {
-        Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(annotation);
+        final Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(annotation);
         String name = (String) attrs.get("value");
         if (StringUtils.isEmpty(name)) {
             name = parameter.getName();
         }
-        String filterName = (String) attrs.get("filter");
-        MappingVariable variable = new MappingVariable(name, parameter.getType());
+        final String filterName = (String) attrs.get("filter");
+        final MappingVariable variable = new MappingVariable(name, parameter.getType());
         method.processParameterFilter(variable, filterName);
         variable.setIndex(parameter.getIndex());
         method.addVariable(name, variable);

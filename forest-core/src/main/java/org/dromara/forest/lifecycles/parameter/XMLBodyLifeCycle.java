@@ -25,13 +25,13 @@ public class XMLBodyLifeCycle extends AbstractBodyLifeCycle<XMLBody> {
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, XMLBody annotation) {
         super.onParameterInitialized(method, parameter, annotation);
-        MetaRequest metaRequest = method.getMetaRequest();
-        String methodName = methodName(method);
+        final MetaRequest metaRequest = method.getMetaRequest();
+        final String methodName = methodName(method);
         if (metaRequest == null) {
             throw new ForestRuntimeException("[Forest] method '" + methodName +
                     "' has not bind a Forest request annotation. Hence the annotation @XMLBody cannot be bind on a parameter in this method.");
         }
-        String contentType = metaRequest.getContentType();
+        final String contentType = metaRequest.getContentType();
         if (StringUtils.isNotEmpty(contentType) &&
                 !ContentType.APPLICATION_XML.equals(contentType) &&
                 contentType.indexOf("$") < 0) {
@@ -41,13 +41,13 @@ public class XMLBodyLifeCycle extends AbstractBodyLifeCycle<XMLBody> {
         }
         boolean hasDataFileAnn = false;
         for (Parameter param : method.getMethod().getParameters()) {
-            Annotation dataFileAnn = param.getAnnotation(DataFile.class);
+            final Annotation dataFileAnn = param.getAnnotation(DataFile.class);
             if (dataFileAnn != null) {
                 hasDataFileAnn = true;
                 break;
             }
         }
-        Filter filter = method.getConfiguration().newFilterInstance("xml");
+        final Filter filter = method.getConfiguration().newFilterInstance("xml");
         parameter.addFilter(filter);
         if (StringUtils.isBlank(contentType) && !hasDataFileAnn) {
             metaRequest.setContentType(ContentType.APPLICATION_XML);
@@ -63,13 +63,13 @@ public class XMLBodyLifeCycle extends AbstractBodyLifeCycle<XMLBody> {
 
     @Override
     public boolean beforeExecute(ForestRequest request) {
-        String contentType = request.getContentType();
+        final String contentType = request.getContentType();
         if (StringUtils.isBlank(contentType)) {
             request.setContentType(ContentType.APPLICATION_XML);
         }
 
         if (contentType.indexOf(ContentType.APPLICATION_XML) < 0) {
-            String methodName = methodName(request.getMethod());
+            final String methodName = methodName(request.getMethod());
             throw new ForestRuntimeException("[Forest] the Content-Type of request binding on method '" +
                     methodName + "' has already been set value '" + contentType +
                     "', not 'application/xml'. Hence the annotation @XMLBody cannot be bind on a parameter in this method.");

@@ -358,22 +358,17 @@ public class ForestCookie implements Cloneable, Serializable {
         return expiredTime <= date.getTime();
     }
 
-    public static ForestCookie parse(String url, String setCookie) {
-        HttpUrl httpUrl = HttpUrl.parse(url);
-        long currentTime = System.currentTimeMillis();
-        Cookie okCookie = Cookie.parse(httpUrl, setCookie);
+    public static ForestCookie parse(final String url, final String setCookie) {
+        final HttpUrl httpUrl = HttpUrl.parse(url);
+        final long currentTime = System.currentTimeMillis();
+        final Cookie okCookie = Cookie.parse(httpUrl, setCookie);
         if (okCookie == null) {
             return null;
         }
-        long expiresAt = okCookie.expiresAt();
-        long maxAge;
-        if (expiresAt > currentTime) {
-            maxAge = expiresAt - currentTime;
-        } else {
-            maxAge = 0L;
-        }
-        Date createTime = new Date(currentTime);
-        Duration maxAgeDuration = Duration.ofMillis(maxAge);
+        final long expiresAt = okCookie.expiresAt();
+        final long maxAge = expiresAt > currentTime ? expiresAt - currentTime : 0L;
+        final Date createTime = new Date(currentTime);
+        final Duration maxAgeDuration = Duration.ofMillis(maxAge);
 
         return new ForestCookie(
                 okCookie.name(),
@@ -390,7 +385,7 @@ public class ForestCookie implements Cloneable, Serializable {
     }
 
     public long getExpiresTime() {
-        long maxAgeMillis = maxAge.toMillis();
+        final long maxAgeMillis = maxAge.toMillis();
         if (maxAgeMillis == Long.MAX_VALUE) {
             return Long.MAX_VALUE;
         }
@@ -422,7 +417,7 @@ public class ForestCookie implements Cloneable, Serializable {
 
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder();
+        final StringBuilder result = new StringBuilder();
         result.append(name);
         result.append('=');
         result.append(value);

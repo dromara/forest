@@ -20,15 +20,15 @@ public class FormBodyLifeCycle extends AbstractBodyLifeCycle<FormBody> {
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, FormBody annotation) {
         super.onParameterInitialized(method, parameter, annotation);
-        MetaRequest metaRequest = method.getMetaRequest();
+        final MetaRequest metaRequest = method.getMetaRequest();
 
-        String methodName = methodName(method);
+        final String methodName = methodName(method);
 
         if (metaRequest == null) {
             throw new ForestRuntimeException("[Forest] method '" + methodName +
                     "' has not bind a Forest request annotation. Hence the annotation @FormBody cannot be bind on a parameter in this method.");
         }
-        String contentType = metaRequest.getContentType();
+        final String contentType = metaRequest.getContentType();
         if (StringUtils.isNotEmpty(contentType) &&
                 !ContentType.APPLICATION_X_WWW_FORM_URLENCODED.equals(contentType) &&
                 !ContentType.MULTIPART_FORM_DATA.equals(contentType) &&

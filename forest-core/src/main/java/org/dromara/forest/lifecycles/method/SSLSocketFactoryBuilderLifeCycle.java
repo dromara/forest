@@ -16,8 +16,8 @@ public class SSLSocketFactoryBuilderLifeCycle implements MethodAnnotationLifeCyc
 
     @Override
     public void onMethodInitialized(ForestMethod method, SSLSocketFactoryBuilder annotation) {
-        Class<? extends org.dromara.forest.ssl.SSLSocketFactoryBuilder> clazz = annotation.value();
-        org.dromara.forest.ssl.SSLSocketFactoryBuilder sslSocketFactoryBuilder =
+        final Class<? extends org.dromara.forest.ssl.SSLSocketFactoryBuilder> clazz = annotation.value();
+        final org.dromara.forest.ssl.SSLSocketFactoryBuilder sslSocketFactoryBuilder =
                 method.getConfiguration().getForestObjectFactory().getObject(clazz);
         if (sslSocketFactoryBuilder != null) {
             method.setExtensionParameterValue(PARAM_KEY_SSL_SOCKET_FACTORY_BUILDER, sslSocketFactoryBuilder);
@@ -26,7 +26,7 @@ public class SSLSocketFactoryBuilderLifeCycle implements MethodAnnotationLifeCyc
 
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
-        Object sslSocketFactoryBuilder = request.getMethod().getExtensionParameterValue(PARAM_KEY_SSL_SOCKET_FACTORY_BUILDER);
+        final Object sslSocketFactoryBuilder = request.getMethod().getExtensionParameterValue(PARAM_KEY_SSL_SOCKET_FACTORY_BUILDER);
         if (sslSocketFactoryBuilder != null && sslSocketFactoryBuilder instanceof org.dromara.forest.ssl.SSLSocketFactoryBuilder) {
             request.sslSocketFactoryBuilder((org.dromara.forest.ssl.SSLSocketFactoryBuilder) sslSocketFactoryBuilder);
         }

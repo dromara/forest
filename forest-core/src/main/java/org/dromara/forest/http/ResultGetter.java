@@ -19,7 +19,7 @@ public abstract class ResultGetter {
 
 
     public <T> T get(Class<T> clazz) {
-        Object result = HANDLER.getResult(request, getResponse(), clazz);
+        final Object result = HANDLER.getResult(request, getResponse(), clazz);
         if (result == null) {
             return null;
         }
@@ -27,7 +27,7 @@ public abstract class ResultGetter {
     }
 
     public <T> T get(Type type) {
-        Object result = HANDLER.getResult(request, getResponse(), type);
+        final Object result = HANDLER.getResult(request, getResponse(), type);
         if (result == null) {
             return null;
         }
@@ -35,7 +35,7 @@ public abstract class ResultGetter {
     }
 
     public <T> T get(TypeReference<T> typeReference) {
-        Object result = HANDLER.getResult(request, getResponse(), typeReference.getType());
+        final Object result = HANDLER.getResult(request, getResponse(), typeReference.getType());
         if (result == null) {
             return null;
         }

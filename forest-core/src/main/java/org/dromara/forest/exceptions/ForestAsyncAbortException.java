@@ -30,8 +30,8 @@ public class ForestAsyncAbortException extends ForestPoolException {
     }
 
     private static String message(Runnable task, ThreadPoolExecutor pool) {
-        String threadName = Thread.currentThread().getName();
-        String msg = "[Forest] Asynchronous thread pool is full! " +
+        final String threadName = Thread.currentThread().getName();
+        final String msg = "[Forest] Asynchronous thread pool is full! " +
                 "[Thread name: {0}, Max pool size: {1}, Core pool size: {2}, Active pool size: {3}, Task count: {4}]";
         return MessageFormat.format(
                 msg, threadName, pool.getMaximumPoolSize(), pool.getCorePoolSize(), pool.getActiveCount(), pool.getActiveCount());
