@@ -1,4 +1,4 @@
-package org.dromara.forest.test.utils;
+package org.dromara.forest.core.test.utils;
 
 import org.dromara.forest.utils.Base64Utils;
 import org.junit.Test;
