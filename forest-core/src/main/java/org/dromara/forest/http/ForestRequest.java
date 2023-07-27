@@ -798,7 +798,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
 
 
     public ForestRequest<T> host(Lazy<String> lazyValue) {
-        this.url.hostProperty().bind(lazyValue);
+        this.url.hostVariable().bind(lazyValue);
         return this;
     }
 
@@ -847,7 +847,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     }
 
     public ForestRequest<T> port(Lazy<Integer> port) {
-        this.url.portProperty().bind(port);
+        this.url.portVariable().bind(port);
         return this;
     }
 
@@ -974,6 +974,11 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         return setBasePath(path);
     }
 
+    public ForestRequest<T> basePath(Lazy<String> lazyValue) {
+
+        return this;
+    }
+
     /**
      * 获取URL根路径
      * <p>该路径为整个URL去除前面协议 + Host + Port 后部分
@@ -1022,7 +1027,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     }
 
     public ForestRequest<T> path(Lazy<String> lazyValue) {
-        this.url.pathProperty().bind(lazyValue);
+        this.url.pathVariable().bind(lazyValue);
         return this;
     }
 

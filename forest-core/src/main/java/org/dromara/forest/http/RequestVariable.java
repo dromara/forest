@@ -3,7 +3,7 @@ package org.dromara.forest.http;
 
 import java.lang.ref.WeakReference;
 
-public class RequestProperty<T> {
+public class RequestVariable<T> {
 
     private WeakReference<ForestRequest<?>> requestRef;
 
@@ -11,12 +11,12 @@ public class RequestProperty<T> {
 
     private Lazy<T> lazyValue;
 
-    public RequestProperty<T> bindRequest(ForestRequest<?> request) {
+    public RequestVariable<T> bindRequest(ForestRequest<?> request) {
         this.requestRef = new WeakReference<>(request);
         return this;
     }
 
-    public RequestProperty<T> set(T value) {
+    public RequestVariable<T> set(T value) {
         this.value = value;
         return this;
     }
@@ -34,7 +34,7 @@ public class RequestProperty<T> {
         return null;
     }
 
-    public RequestProperty<T> bind(Lazy<T> value) {
+    public RequestVariable<T> bind(Lazy<T> value) {
         this.lazyValue = value;
         this.value = null;
         return this;

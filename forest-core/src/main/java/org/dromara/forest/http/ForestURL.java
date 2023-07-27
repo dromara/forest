@@ -67,23 +67,23 @@ public class ForestURL implements Cloneable {
     /**
      * 主机地址
      */
-    private RequestProperty<String> host = new RequestProperty<>();
+    private RequestVariable<String> host = new RequestVariable<>();
 
     /**
      * 主机端口
      */
-    private RequestProperty<Integer> port = new RequestProperty<>();
+    private RequestVariable<Integer> port = new RequestVariable<>();
 
     /**
      * URL根路径
      */
-    private String basePath;
+    private RequestVariable<String> basePath = new RequestVariable<>();
 
     /**
      * URL路径
      * <p>该路径为整个URL去除前面协议 + Host + Port 后部分
      */
-    private RequestProperty<String> path = new RequestProperty<>();
+    private RequestVariable<String> path = new RequestVariable<>();
 
     /**
      * 用户信息
@@ -210,7 +210,7 @@ public class ForestURL implements Cloneable {
         return host.get();
     }
 
-    public RequestProperty<String> hostProperty() {
+    public RequestVariable<String> hostVariable() {
         return host;
     }
 
@@ -247,7 +247,7 @@ public class ForestURL implements Cloneable {
         return this;
     }
 
-    public RequestProperty<Integer> portProperty() {
+    public RequestVariable<Integer> portVariable() {
         return this.port;
     }
 
@@ -258,10 +258,10 @@ public class ForestURL implements Cloneable {
      * @return URL根路径
      */
     public String normalizeBasePath() {
-        if (StringUtils.isEmpty(basePath)) {
+        if (StringUtils.isEmpty(basePath.get())) {
             return normalizeBasePath(address.getBasePath());
         }
-        return normalizeBasePath(basePath);
+        return normalizeBasePath(basePath.get());
     }
 
 
@@ -296,12 +296,12 @@ public class ForestURL implements Cloneable {
         if (basePath == null) {
             return this;
         }
-        this.basePath = basePath.trim();
-        if (!this.basePath.startsWith("/")) {
-            if (URLUtils.isURL(this.basePath)) {
+        String basePathStr = basePath.trim();
+        if (!basePathStr.startsWith("/")) {
+            if (URLUtils.isURL(basePathStr)) {
                 try {
                     final String originHost = this.host.get();
-                    final URL url = new URL(this.basePath);
+                    final URL url = new URL(basePathStr);
                     if (forced || StringUtils.isEmpty(this.scheme)) {
                         setScheme(url.getProtocol());
                     }
@@ -314,16 +314,20 @@ public class ForestURL implements Cloneable {
                     if (forced || (URLUtils.isNonePort(port.get()) && StringUtils.isEmpty(originHost))) {
                         this.port.set(url.getPort());
                     }
-                    this.basePath = url.getPath();
+                    this.basePath.set(url.getPath());
                 } catch (MalformedURLException e) {
                     throw new ForestRuntimeException(e);
                 }
             } else {
-                this.basePath = "/" + this.basePath;
+                this.basePath.set("/" + this.basePath.get());
             }
         }
         needRegenerateUrl();
         return this;
+    }
+
+    public RequestVariable<String> basePath() {
+        return this.basePath;
     }
 
     /**
@@ -356,7 +360,7 @@ public class ForestURL implements Cloneable {
         return this;
     }
 
-    public RequestProperty<String> pathProperty() {
+    public RequestVariable<String> pathVariable() {
         return this.path;
     }
 
@@ -416,8 +420,8 @@ public class ForestURL implements Cloneable {
         if (StringUtils.isNotEmpty(authority)) {
             builder.append(authority);
         }
-        if (StringUtils.isNotEmpty(basePath)) {
-            String encodedBasePath = URLUtils.pathEncode(basePath, "UTF-8");
+        if (StringUtils.isNotEmpty(basePath.get())) {
+            String encodedBasePath = URLUtils.pathEncode(basePath.get(), "UTF-8");
             if (host.get() != null && encodedBasePath.charAt(0) != '/') {
                 builder.append('/');
             }
@@ -597,7 +601,7 @@ public class ForestURL implements Cloneable {
             if (StringUtils.isEmpty(userInfo)) {
                 userInfo = address.getUserInfo();
             }
-            if (StringUtils.isEmpty(basePath)) {
+            if (StringUtils.isEmpty(basePath.get())) {
                 setBasePath(address.getBasePath(), false);
             }
             needRegenerateUrl();
@@ -626,6 +630,7 @@ public class ForestURL implements Cloneable {
     public ForestURL bindRequest(ForestRequest<?> request) {
         this.host.bindRequest(request);
         this.port.bindRequest(request);
+        this.basePath.bindRequest(request);
         this.path.bindRequest(request);
         needRegenerateUrl();
         return this;

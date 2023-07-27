@@ -989,12 +989,13 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.get("/")
                 .port(server.getPort())
-                .path(req -> "xxx")
+                .path(req -> "xxx" + "/" + req.getAttachment("y"))
                 .addQuery("a", "1")
                 .addQuery("b", "2")
+                .addAttachment("y", "yyy")
                 .execute();
         mockRequest(server)
-                .assertPathEquals("/xxx")
+                .assertPathEquals("/xxx/yyy")
                 .assertQueryEquals("a=1&b=2");
     }
 
