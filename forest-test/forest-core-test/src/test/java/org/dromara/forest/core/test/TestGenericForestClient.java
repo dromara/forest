@@ -123,6 +123,8 @@ public class TestGenericForestClient extends BaseClientTest {
     }
 
 
+
+
     @Test
     public void testRequest_url() throws MalformedURLException {
         ForestRequest<?> request = Forest.request();
@@ -145,6 +147,16 @@ public class TestGenericForestClient extends BaseClientTest {
         request.address("192.168.0.2", 8882);
         assertThat(request.urlString()).isEqualTo("http://192.168.0.2:8882/333");
     }
+
+
+    @Test
+    public void testRequest_url2() throws MalformedURLException {
+        ForestRequest<?> request = Forest.request();
+        assertThat(request).isNotNull();
+        request.url("http://forest.dtflyx.com/111");
+        assertThat(request.urlString()).isEqualTo("http://forest.dtflyx.com/111");
+    }
+
 
     @Test
     public void testRequest_query_repeat() {
@@ -654,9 +666,9 @@ public class TestGenericForestClient extends BaseClientTest {
                 .port(1234)
                 .basePath("http://localhost:8080/X1/X2");
         assertThat(request).isNotNull();
-        assertThat(request.host()).isEqualTo("localhost");
-        assertThat(request.port()).isEqualTo(8080);
-        assertThat(request.urlString()).isEqualTo("http://localhost:8080/X1/X2/A");
+        assertThat(request.host()).isEqualTo("baidu.com");
+        assertThat(request.port()).isEqualTo(1234);
+        assertThat(request.urlString()).isEqualTo("http://baidu.com:1234/X1/X2/A");
     }
 
     @Test
@@ -961,17 +973,6 @@ public class TestGenericForestClient extends BaseClientTest {
     }
 
     @Test
-    public void testRequest_lazy_host2() {
-        String ret = Forest.get("/")
-                .scheme("https")
-                .host(req -> "baidu" + ".com")
-                .port(80)
-                .executeAsString();
-        assertThat(ret).isNotNull();
-    }
-
-
-    @Test
     public void testRequest_lazy_port() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.get("/")
@@ -1019,6 +1020,39 @@ public class TestGenericForestClient extends BaseClientTest {
                 .execute();
         mockRequest(server).assertPathEquals("/yyy");
     }
+
+    @Test
+    public void testRequest_lazy_basePath() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.get("/")
+                .port(server.getPort())
+                .basePath(req -> "/xxx" + "/" + req.getAttachment("y"))
+                .path("zzz")
+                .addQuery("a", "1")
+                .addQuery("b", "2")
+                .addAttachment("y", "yyy")
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/xxx/yyy/zzz")
+                .assertQueryEquals("a=1&b=2");
+    }
+
+    @Test
+    public void testRequest_lazy_basePath2() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.get("/")
+                .port(server.getPort())
+                .basePath(req -> "http://localhost:" + server.getPort() + "/xxx" + "/" + req.getAttachment("y"))
+                .path("zzz")
+                .addQuery("a", "1")
+                .addQuery("b", "2")
+                .addAttachment("y", "yyy")
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/xxx/yyy/zzz")
+                .assertQueryEquals("a=1&b=2");
+    }
+
 
 
     @Test

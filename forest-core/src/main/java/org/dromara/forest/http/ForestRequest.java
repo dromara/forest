@@ -975,7 +975,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     }
 
     public ForestRequest<T> basePath(Lazy<String> lazyValue) {
-
+        this.url.basePathVariable().bind(lazyValue);
         return this;
     }
 
@@ -986,7 +986,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return URL根路径
      */
     public String getBasePath() {
-        return this.url.normalizeBasePath();
+        return this.url.getBasePath();
     }
 
     /**
@@ -2758,6 +2758,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     public boolean isSSL() {
         return url.isSSL();
     }
+
+
 
     /**
      * 获取请求失败后的重试次数

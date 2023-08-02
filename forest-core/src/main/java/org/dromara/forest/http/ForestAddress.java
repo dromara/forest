@@ -64,6 +64,7 @@ public class ForestAddress {
      */
     private final String basePath;
 
+
     /**
      * 实例化Forest主机地址信息
      *

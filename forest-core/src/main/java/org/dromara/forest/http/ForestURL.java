@@ -34,6 +34,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Optional;
 
 /**
  * Forest URL
@@ -59,31 +60,35 @@ public class ForestURL implements Cloneable {
 
     private ForestAddress address;
 
+    private ForestURL urlFromBasePath = null;
+
     /**
      * HTTP协议
      */
-    private String scheme;
+    private final RequestVariable<String> scheme = new RequestVariable<>();
 
     /**
      * 主机地址
      */
-    private RequestVariable<String> host = new RequestVariable<>();
+    private final RequestVariable<String> host = new RequestVariable<>();
 
     /**
      * 主机端口
      */
-    private RequestVariable<Integer> port = new RequestVariable<>();
+    private final RequestVariable<Integer> port = new RequestVariable<>();
+
 
     /**
      * URL根路径
      */
-    private RequestVariable<String> basePath = new RequestVariable<>();
+    private final RequestVariable<String> basePath = new RequestVariable<>();
 
     /**
      * URL路径
      * <p>该路径为整个URL去除前面协议 + Host + Port 后部分
      */
-    private RequestVariable<String> path = new RequestVariable<>();
+    private final RequestVariable<String> path = new RequestVariable<>();
+
 
     /**
      * 用户信息
@@ -99,11 +104,6 @@ public class ForestURL implements Cloneable {
      * <p>URL井号(#)后面的字符串
      */
     private String ref;
-
-    /**
-     * 是否为SSL
-     */
-    private boolean ssl;
 
     /**
      * 是否需要重新生成 URL
@@ -180,34 +180,45 @@ public class ForestURL implements Cloneable {
     }
 
     public String getScheme() {
-        if (StringUtils.isEmpty(scheme) && address != null) {
-            return address.getScheme();
-        }
-        if (StringUtils.isEmpty(scheme)) {
-            return ssl ? "https" : "http";
-        }
-        return scheme;
+        return getScheme(false);
     }
 
-    private void refreshSSL() {
-        this.ssl = "https".equals(this.scheme);
+    private String getScheme(final boolean ssl) {
+        final String schemeStr = scheme.get();
+        if (StringUtils.isEmpty(schemeStr)) {
+            final ForestURL url = getURLFromBasePath();
+            if (url != null && url.scheme.get() != null) {
+                return url.scheme.get();
+            }
+            if (address != null) {
+                return address.getScheme();
+            }
+            return ssl ? "https" : "http";
+        }
+        return schemeStr;
     }
 
     public ForestURL setScheme(String scheme) {
         if (StringUtils.isBlank(scheme)) {
             return this;
         }
-        this.scheme = scheme.trim();
-        refreshSSL();
+        this.scheme.set(scheme.trim());
         needRegenerateUrl();
         return this;
     }
 
     public String getHost() {
-        if (StringUtils.isEmpty(host.get()) && address != null) {
-            return address.getHost();
+        final String hostStr = host.get();
+        if (StringUtils.isEmpty(hostStr)) {
+            ForestURL url = getURLFromBasePath();
+            if (url != null && url.host.get() != null) {
+                return url.host.get();
+            }
+            if (address != null) {
+                return address.getHost();
+            }
         }
-        return host.get();
+        return hostStr;
     }
 
     public RequestVariable<String> hostVariable() {
@@ -235,10 +246,22 @@ public class ForestURL implements Cloneable {
     }
 
     public int getPort() {
-        if (URLUtils.isNonePort(port.get()) && address != null) {
-            return normalizePort(address.getPort(), ssl);
+        return getPort(isSSL(), true);
+    }
+
+    private int getPort(final boolean ssl, final boolean normalize) {
+        final Integer portInt = this.port.get();
+        if (URLUtils.isNonePort(portInt)) {
+            final ForestURL url = getURLFromBasePath();
+            if (url != null && url.port.get() != null) {
+                return !normalize ? url.port.get() : normalizePort(url.port.get(), ssl);
+            }
+            if (address != null) {
+                return !normalize ? address.getPort() : normalizePort(address.getPort(), ssl);
+            }
         }
-        return normalizePort(port.get(), ssl);
+        return !normalize ? portInt : normalizePort(portInt, ssl);
+
     }
 
     public ForestURL setPort(int port) {
@@ -252,28 +275,6 @@ public class ForestURL implements Cloneable {
     }
 
     /**
-     * 获取URL根路径
-     * <p>该路径为整个URL去除前面协议 + Host + Port 后部分
-     *
-     * @return URL根路径
-     */
-    public String normalizeBasePath() {
-        if (StringUtils.isEmpty(basePath.get())) {
-            return normalizeBasePath(address.getBasePath());
-        }
-        return normalizeBasePath(basePath.get());
-    }
-
-
-    private String normalizeBasePath(String basePath) {
-        if (StringUtils.isNotEmpty(basePath) && basePath.charAt(0) != '/') {
-            return '/' + basePath;
-        }
-        return basePath;
-    }
-
-
-    /**
      * 设置URL根路径 (强制修改)
      * <p>该路径为整个URL去除前面协议 + Host + Port 后部分
      *
@@ -282,6 +283,46 @@ public class ForestURL implements Cloneable {
      */
     public ForestURL setBasePath(String basePath) {
         return setBasePath(basePath, true);
+    }
+
+    public ForestURL getURLFromBasePath() {
+        if (urlFromBasePath != null) {
+            return urlFromBasePath;
+        }
+        String basePathStr = basePath.get();
+        if (StringUtils.isEmpty(basePathStr) && address != null) {
+            basePathStr = address.getBasePath();
+        }
+        if (StringUtils.isNotEmpty(basePathStr)) {
+            if (basePathStr.startsWith("/")) {
+                return new ForestURLBuilder().setBasePath(basePathStr).build();
+            }
+            if (URLUtils.isURL(basePathStr)) {
+                try {
+                    final URL url = new URL(basePathStr);
+                    urlFromBasePath = new ForestURLBuilder()
+                            .setScheme(url.getProtocol())
+                            .setHost(url.getHost())
+                            .setUserInfo(url.getUserInfo())
+                            .setPort(url.getPort())
+                            .setBasePath(url.getPath())
+                            .build();
+                    return urlFromBasePath;
+                } catch (Throwable th) {
+                    throw new ForestRuntimeException(th);
+                }
+            }
+            urlFromBasePath = new ForestURLBuilder().setBasePath("/" + basePathStr).build();
+        }
+        return urlFromBasePath;
+    }
+
+    public String getBasePath() {
+        final ForestURL url = getURLFromBasePath();
+        if (url == null) {
+            return null;
+        }
+        return url.basePath.get();
     }
 
     /**
@@ -293,42 +334,14 @@ public class ForestURL implements Cloneable {
      * @return {@link ForestURL}对象实例
      */
     public ForestURL setBasePath(String basePath, boolean forced) {
-        if (basePath == null) {
-            return this;
-        }
-        String basePathStr = basePath.trim();
-        if (!basePathStr.startsWith("/")) {
-            if (URLUtils.isURL(basePathStr)) {
-                try {
-                    final String originHost = this.host.get();
-                    final URL url = new URL(basePathStr);
-                    if (forced || StringUtils.isEmpty(this.scheme)) {
-                        setScheme(url.getProtocol());
-                    }
-                    if (forced || StringUtils.isEmpty(this.userInfo)) {
-                        this.userInfo = url.getUserInfo();
-                    }
-                    if (forced || StringUtils.isEmpty(this.host.get())) {
-                        this.host.set(url.getHost());
-                    }
-                    if (forced || (URLUtils.isNonePort(port.get()) && StringUtils.isEmpty(originHost))) {
-                        this.port.set(url.getPort());
-                    }
-                    this.basePath.set(url.getPath());
-                } catch (MalformedURLException e) {
-                    throw new ForestRuntimeException(e);
-                }
-            } else {
-                this.basePath.set("/" + this.basePath.get());
-            }
-        }
-        needRegenerateUrl();
+        this.basePath.set(basePath);
         return this;
     }
 
-    public RequestVariable<String> basePath() {
+    public RequestVariable<String> basePathVariable() {
         return this.basePath;
     }
+
 
     /**
      * 获取URL路径
@@ -365,8 +378,14 @@ public class ForestURL implements Cloneable {
     }
 
     public String getUserInfo() {
-        if (StringUtils.isEmpty(userInfo) && address != null) {
-            return address.getUserInfo();
+        final ForestURL url = getURLFromBasePath();
+        if (StringUtils.isEmpty(userInfo)) {
+            if (url != null && url.userInfo != null) {
+                return url.userInfo;
+            }
+            if (address != null) {
+                return address.getUserInfo();
+            }
         }
         return userInfo;
     }
@@ -382,10 +401,12 @@ public class ForestURL implements Cloneable {
         if (StringUtils.isNotEmpty(userInfo)) {
             builder.append(URLUtils.userInfoEncode(userInfo, "UTF-8")).append("@");
         }
-        if (StringUtils.isNotEmpty(host.get())) {
-            builder.append(URLUtils.userInfoEncode(host.get(), "UTF-8"));
+        final String hostStr = getHost();
+        if (StringUtils.isNotEmpty(hostStr)) {
+            builder.append(URLUtils.userInfoEncode(hostStr, "UTF-8"));
         }
-        final Integer portInt = port.get();
+        final boolean ssl = isSSL();
+        final Integer portInt = getPort(ssl, false);
         if (URLUtils.isNotNonePort(portInt) &&
                 ((portInt != 80 && portInt != 443 && portInt > -1) ||
                 (portInt == 80 && !ssl) ||
@@ -405,31 +426,36 @@ public class ForestURL implements Cloneable {
     }
 
     public boolean isSSL() {
-        if (StringUtils.isEmpty(scheme) && address != null) {
-            return "https".equals(address.getScheme());
-        }
-        return ssl;
+        final String schemeStr = getScheme(false);
+        return "https".equals(schemeStr);
     }
 
     public String toURLString() {
+        final String hostStr = getHost();
+        final String basePathStr = getBasePath();
+        final String pathStr = getPath();
         final StringBuilder builder = new StringBuilder();
-        if (StringUtils.isNotEmpty(scheme)) {
-            builder.append(scheme).append("://");
-        }
+        final String schemeStr = getScheme();
         final String authority = getAuthority();
+        final boolean onlyPath = StringUtils.isEmpty(authority);
+
+        if (!onlyPath && StringUtils.isNotEmpty(schemeStr)) {
+            builder.append(schemeStr).append("://");
+        }
         if (StringUtils.isNotEmpty(authority)) {
             builder.append(authority);
         }
-        if (StringUtils.isNotEmpty(basePath.get())) {
-            String encodedBasePath = URLUtils.pathEncode(basePath.get(), "UTF-8");
-            if (host.get() != null && encodedBasePath.charAt(0) != '/') {
+
+        if (StringUtils.isNotEmpty(basePathStr)) {
+            final String encodedBasePath = URLUtils.pathEncode(basePathStr, "UTF-8");
+            if (hostStr != null && encodedBasePath.charAt(0) != '/') {
                 builder.append('/');
             }
             builder.append(encodedBasePath);
         }
-        if (StringUtils.isNotEmpty(path.get())) {
-            String encodedPath = URLUtils.pathEncode(path.get(), "UTF-8");
-            if ((host.get() != null || basePath != null) && encodedPath.charAt(0) != '/') {
+        if (StringUtils.isNotEmpty(pathStr)) {
+            final String encodedPath = URLUtils.pathEncode(pathStr, "UTF-8");
+            if ((hostStr != null || basePathStr != null) && encodedPath.charAt(0) != '/') {
                 builder.append('/');
             }
             builder.append(encodedPath);
@@ -510,7 +536,9 @@ public class ForestURL implements Cloneable {
         if (url == null) {
             return this;
         }
-        String newSchema = this.scheme == null ? url.scheme : this.scheme;
+
+
+        String newSchema = this.scheme.isNull() ? url.scheme.get() : this.getScheme();
         String newUserInfo = this.userInfo == null ? url.userInfo : this.userInfo;
         String newHost = this.host.isNull() ? url.host.get() : this.host.get();
         Integer newPort = this.port.isNull() ? url.port.get() : this.port.get();
@@ -535,7 +563,7 @@ public class ForestURL implements Cloneable {
         String basePath = null;
         if (baseURL != null) {
             if (baseURL.scheme != null) {
-                baseSchema = baseURL.scheme;
+                baseSchema = baseURL.scheme.get();
             }
             if (baseURL.userInfo != null) {
                 baseUserInfo = baseURL.userInfo;
@@ -551,7 +579,7 @@ public class ForestURL implements Cloneable {
             }
         }
         boolean needBasePath = false;
-        if (this.scheme == null) {
+        if (this.scheme.isNull()) {
             setScheme(baseSchema);
             needBasePath = true;
         }
@@ -587,23 +615,22 @@ public class ForestURL implements Cloneable {
 
     public ForestURL mergeAddress() {
         if (address != null) {
-            String originHost = host.get();
-            if (StringUtils.isEmpty(scheme)) {
-                scheme = address.getScheme();
-                refreshSSL();
-            }
-            if (StringUtils.isEmpty(host.get())) {
-                host.set(address.getHost());
-            }
-            if (URLUtils.isNonePort(port.get()) && StringUtils.isEmpty(originHost)) {
-                port.set(address.getPort());
-            }
-            if (StringUtils.isEmpty(userInfo)) {
-                userInfo = address.getUserInfo();
-            }
-            if (StringUtils.isEmpty(basePath.get())) {
-                setBasePath(address.getBasePath(), false);
-            }
+//            String originHost = host.get();
+//            if (StringUtils.isEmpty(scheme.get())) {
+//                scheme.set(address.getScheme());
+//            }
+//            if (StringUtils.isEmpty(host.get())) {
+//                host.set(address.getHost());
+//            }
+//            if (URLUtils.isNonePort(port.get()) && StringUtils.isEmpty(originHost)) {
+//                port.set(address.getPort());
+//            }
+//            if (StringUtils.isEmpty(userInfo)) {
+//                userInfo = address.getUserInfo();
+//            }
+//            if (StringUtils.isEmpty(basePath.get())) {
+//                setBasePath(address.getBasePath(), false);
+//            }
             needRegenerateUrl();
         }
         return this;
@@ -612,8 +639,8 @@ public class ForestURL implements Cloneable {
 
     public ForestURL checkAndComplete() {
         String oldUrl = getGeneratedUrl();
-        if (StringUtils.isEmpty(scheme)) {
-            setScheme(ssl ? "https" : "http");
+        if (StringUtils.isEmpty(scheme.get())) {
+            setScheme(isSSL() ? "https" : "http");
         }
         if (StringUtils.isEmpty(host.get())) {
             setHost("localhost");
@@ -638,8 +665,14 @@ public class ForestURL implements Cloneable {
 
     @Override
     protected ForestURL clone() {
-        final ForestURL newUrl = new ForestURL(this.scheme, this.userInfo, this.host.get(), this.port.get(), this.path.get(), this.ref);
-        newUrl.basePath = this.basePath;
+        final ForestURL newUrl = new ForestURL(
+                this.scheme.get(),
+                this.userInfo,
+                this.host.get(),
+                this.port.get(),
+                this.path.get(),
+                this.ref);
+        newUrl.basePath.set(this.basePath.get());
         newUrl.originalUrl = this.originalUrl;
         newUrl.address = this.address;
         return newUrl;
