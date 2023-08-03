@@ -34,7 +34,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Optional;
 
 /**
  * Forest URL
@@ -250,7 +249,8 @@ public class ForestURL implements Cloneable {
     }
 
     private int getPort(final boolean ssl, final boolean normalize) {
-        final Integer portInt = this.port.get();
+        final Integer thisPort = this.port.get();
+        final int portInt = thisPort != null ? thisPort : -1;
         if (URLUtils.isNonePort(portInt)) {
             final ForestURL url = getURLFromBasePath();
             if (url != null && url.port.get() != null) {
