@@ -42,7 +42,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 
 
@@ -150,11 +150,11 @@ public interface ForestJsonConverter extends ForestConverter<String>, ForestEnco
                     if (obj == null) {
                         continue;
                     }
-                    if (obj instanceof List) {
+                    if (obj instanceof Collection) {
                         if (jsonArray == null) {
                             jsonArray = new LinkedList();
                         }
-                        jsonArray.addAll((List) obj);
+                        jsonArray.addAll((Collection) obj);
                     } else {
                         Map subMap = this.convertObjectToMap(obj, request, options);
                         if (subMap == null) {

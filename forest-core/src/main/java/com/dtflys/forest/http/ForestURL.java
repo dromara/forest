@@ -99,6 +99,15 @@ public class ForestURL {
      */
     private boolean ssl;
 
+    /**
+     * 是否需要重新生成 URL
+     */
+    private boolean needRegenerateUrl = false;
+
+    private void needRegenerateUrl() {
+        needRegenerateUrl = true;
+    }
+
     public ForestURL(URL url) {
         if (url == null) {
             throw new ForestRuntimeException("[Forest] Request url cannot be null!");
@@ -109,7 +118,6 @@ public class ForestURL {
         path = url.getPath();
         userInfo = url.getUserInfo();
         setRef(url.getRef());
-        originalUrl = toURLString();
     }
 
     public ForestURL(String scheme, String userInfo, String host, Integer port, String path) {
@@ -124,7 +132,7 @@ public class ForestURL {
         this.port = port;
         this.path = path;
         this.ref = ref;
-        originalUrl = toURLString();
+        needRegenerateUrl();
     }
 
     /**
@@ -133,12 +141,11 @@ public class ForestURL {
      * @return 原始URL字符串
      */
     public String getOriginalUrl() {
+        if (originalUrl == null || needRegenerateUrl) {
+            originalUrl = toURLString();
+            needRegenerateUrl = false;
+        }
         return originalUrl;
-    }
-
-    public ForestURL setOriginalUrl(String originalUrl) {
-        this.originalUrl = originalUrl;
-        return this;
     }
 
     /**
@@ -184,7 +191,7 @@ public class ForestURL {
         }
         this.scheme = scheme.trim();
         refreshSSL();
-        this.originalUrl = toURLString();
+        needRegenerateUrl();
         return this;
     }
 
@@ -203,7 +210,7 @@ public class ForestURL {
         if (this.host.endsWith("/")) {
             this.host = this.host.substring(0, this.host.lastIndexOf("/"));
         }
-        this.originalUrl = toURLString();
+        needRegenerateUrl();
         return this;
     }
 
@@ -223,7 +230,7 @@ public class ForestURL {
 
     public ForestURL setPort(int port) {
         this.port = port;
-        this.originalUrl = toURLString();
+        needRegenerateUrl();
         return this;
     }
 
@@ -298,7 +305,7 @@ public class ForestURL {
                 this.basePath = "/" + this.basePath;
             }
         }
-        this.originalUrl = toURLString();
+        needRegenerateUrl();
         return this;
     }
 
@@ -327,7 +334,7 @@ public class ForestURL {
             return this;
         }
         this.path = path.trim();
-        this.originalUrl = toURLString();
+        needRegenerateUrl();
         return this;
     }
 
@@ -340,7 +347,7 @@ public class ForestURL {
 
     public ForestURL setUserInfo(String userInfo) {
         this.userInfo = userInfo;
-        this.originalUrl = toURLString();
+        needRegenerateUrl();
         return this;
     }
 
@@ -417,16 +424,16 @@ public class ForestURL {
     @Override
     public String toString() {
         if (StringUtils.isNotEmpty(ref)) {
-            return originalUrl + "#" +originalUrl;
+            return getOriginalUrl() + "#" + ref;
         }
-        return originalUrl;
+        return getOriginalUrl();
     }
 
 
 
     public URL toJavaURL() {
         try {
-            return new URL(originalUrl);
+            return new URL(getOriginalUrl());
         } catch (MalformedURLException e) {
             throw new ForestRuntimeException(e);
         }
@@ -434,7 +441,7 @@ public class ForestURL {
 
     public URI toURI() {
         try {
-            return new URI(originalUrl);
+            return new URI(getOriginalUrl());
         } catch (URISyntaxException e) {
             throw new ForestRuntimeException(e);
         }
@@ -484,7 +491,6 @@ public class ForestURL {
         String newRef = this.ref == null ? url.ref : this.ref;
         return new ForestURL(newSchema, newUserInfo, newHost, newPort, newPath, newRef);
     }
-
 
 
 
@@ -548,7 +554,7 @@ public class ForestURL {
                 this.path = basePath + this.path;
             }
         }
-        this.originalUrl = toURLString();
+        needRegenerateUrl();
         return this;
     }
 
@@ -571,13 +577,13 @@ public class ForestURL {
             if (StringUtils.isEmpty(basePath)) {
                 setBasePath(address.getBasePath(), false);
             }
-            originalUrl = toURLString();
+            needRegenerateUrl();
         }
         return this;
     }
 
     public ForestURL checkAndComplete() {
-        String oldUrl = originalUrl;
+        String oldUrl = getOriginalUrl();
         if (StringUtils.isEmpty(scheme)) {
             setScheme(ssl ? "https" : "http");
         }
