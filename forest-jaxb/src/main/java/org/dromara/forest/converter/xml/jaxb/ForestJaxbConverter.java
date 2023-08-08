@@ -16,8 +16,11 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -67,17 +70,22 @@ public class ForestJaxbConverter implements ForestXmlConverter {
 
     @Override
     public byte[] encodeRequestBody(final ForestBody body, final Charset charset, final ConvertOptions options) {
-        final StringBuilder builder = new StringBuilder();
-        for (final ForestRequestBody item : body) {
-            if (item instanceof ObjectRequestBody) {
-                final Object obj = ((ObjectRequestBody) item).getObject();
-                final String text = encodeToString(obj);
-                builder.append(text);
-            } else if (item instanceof StringRequestBody) {
-                builder.append(((StringRequestBody) item).getContent());
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            for (final ForestRequestBody item : body) {
+                if (item instanceof ObjectRequestBody) {
+                    final Object obj = ((ObjectRequestBody) item).getObject();
+                    final String text = encodeToString(obj);
+                    outputStream.write(text.getBytes(charset));
+                } else if (item instanceof StringRequestBody) {
+                    outputStream.write(((StringRequestBody) item).getByteArray(charset));
+                } else {
+                    outputStream.write(item.getByteArray());
+                }
             }
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            throw new ForestRuntimeException(e);
         }
-        return builder.toString().getBytes(charset);
     }
 
     @Override

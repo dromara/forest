@@ -7,6 +7,7 @@ import org.dromara.forest.utils.ForestDataType;
 import org.dromara.forest.utils.RequestNameValue;
 import org.dromara.forest.utils.StringUtils;
 
+import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -41,6 +42,10 @@ public class StringRequestBody extends ForestRequestBody implements SupportFormU
     @Override
     public byte[] getByteArray() {
         return content.getBytes();
+    }
+
+    public byte[] getByteArray(Charset charset) {
+        return content.getBytes(charset);
     }
 
     @Override

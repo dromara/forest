@@ -34,6 +34,7 @@ import org.dromara.forest.core.test.http.BaseClientTest;
 import org.dromara.forest.core.test.model.Result;
 import org.dromara.forest.utils.ForestDataType;
 import org.dromara.forest.utils.ForestProgress;
+import org.dromara.forest.utils.GzipUtils;
 import org.dromara.forest.utils.TypeReference;
 import org.dromara.forest.utils.URLUtils;
 import org.junit.Rule;
@@ -1535,6 +1536,42 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertPathEquals("/post")
                 .assertHeaderEquals(ForestHeader.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .assertBodyEquals("{\"a\":1,\"b\":2,\"c\":3}");
+    }
+
+    @Test
+    public void testRequest_post_xml_body_text() {
+        final String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+                "<misc>\n" +
+                "    <a>1</a>\n" +
+                "    <b>2</b>\n" +
+                "</misc>\n";
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        final String result = Forest.post("http://localhost:" + server.getPort() + "/post")
+                .addHeader("Content-Type", "application/xml")
+                .addBody(xml)
+                .executeAsString();
+        assertThat(result).isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertBodyEquals(xml);
+    }
+
+    @Test
+    public void testRequest_post_xml_body_gzip() {
+        final String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+                "<misc>\n" +
+                "    <a>1</a>\n" +
+                "    <b>2</b>\n" +
+                "</misc>\n";
+        final byte[] compress = GzipUtils.compressGzip(xml);
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        final String result = Forest.post("http://localhost:" + server.getPort() + "/post")
+                .addHeader("Content-Encoding", "gzip")
+                .addHeader("Content-Type", "application/xml")
+                .addBody(compress)
+                .executeAsString();
+        assertThat(result).isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertBodyEquals(compress);
     }
 
     @Test
