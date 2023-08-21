@@ -851,14 +851,14 @@ public class ForestMethod<T> implements VariableScope {
      * @param args 调用本对象对应方法时传入的参数数组
      * @return Forest请求对象，{@link ForestRequest}类实例
      */
-    private ForestRequest makeRequest(Object[] args) {
+    private ForestRequest<?> makeRequest(Object[] args) {
         initMethod();
         MetaRequest baseMetaRequest = interfaceProxyHandler.getBaseMetaRequest();
         ForestURL baseURL = null;
         ForestRequestType type = type(args);
 
         // createExecutor and initialize http instance
-        ForestRequest<T> request = new ForestRequest(configuration, this, args);
+        ForestRequest<T> request = new ForestRequest<>(configuration, this, args);
 
         ForestQueryMap queries = new ForestQueryMap(request);
         if (baseUrlTemplate != null) {
@@ -1429,7 +1429,7 @@ public class ForestMethod<T> implements VariableScope {
      */
     public Object invoke(Object[] args) {
         Type rType = this.getReturnType();
-        ForestRequest request = makeRequest(args);
+        ForestRequest<?> request = makeRequest(args);
         MethodLifeCycleHandler<T> lifeCycleHandler = null;
         request.setBackend(configuration.getBackend());
         // 如果返回类型为ForestRequest，直接返回请求对象
