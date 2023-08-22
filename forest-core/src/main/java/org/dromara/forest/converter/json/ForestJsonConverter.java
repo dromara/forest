@@ -37,6 +37,7 @@ import org.dromara.forest.http.body.NameValueRequestBody;
 import org.dromara.forest.http.body.ObjectRequestBody;
 import org.dromara.forest.http.body.StringRequestBody;
 
+import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -99,11 +100,11 @@ public interface ForestJsonConverter extends ForestConverter<String>, ForestEnco
     default byte[] encodeRequestBody(final ForestBody body, final Charset charset, final ConvertOptions options) {
         final Charset cs = charset != null ? charset : StandardCharsets.UTF_8;
         List<ForestRequestBody> bodyList = new LinkedList<>(body);
-        final ForestRequest request = body.getRequest();
+        final ForestRequest<?> request = body.getRequest();
         if (!bodyList.isEmpty()) {
             Object toJsonObj = bodyList;
             Map<String, Object> jsonMap = null;
-            List jsonArray = null;
+            List<Object> jsonArray = null;
             if (bodyList.size() == 1 && (
                     bodyList.get(0) instanceof StringRequestBody ||
                     bodyList.get(0) instanceof BinaryRequestBody
@@ -133,7 +134,7 @@ public interface ForestJsonConverter extends ForestConverter<String>, ForestEnco
                     jsonMap.put(name, value);
                 } else if (bodyItem instanceof StringRequestBody) {
                     String content = bodyItem.toString();
-                    Map subMap = this.convertObjectToMap(content, request);
+                    Map<String, Object> subMap = this.convertObjectToMap(content, request);
                     if (subMap != null) {
                         if (jsonMap == null) {
                             jsonMap = new LinkedHashMap<>(bodyList.size());
@@ -146,17 +147,23 @@ public interface ForestJsonConverter extends ForestConverter<String>, ForestEnco
                         jsonArray.add(content);
                     }
                 } else if (bodyItem instanceof ObjectRequestBody) {
-                    Object obj = ((ObjectRequestBody) bodyItem).getObject();
+                    final Object obj = ((ObjectRequestBody) bodyItem).getObject();
                     if (obj == null) {
                         continue;
                     }
+                    final Class<?> cls = obj.getClass();
                     if (obj instanceof List) {
-                        if (jsonArray == null) {
-                            jsonArray = new LinkedList();
+                        jsonArray = jsonArray != null ? jsonArray : new LinkedList<>();
+                        jsonArray.addAll((List<?>) obj);
+                    } else if (!(obj instanceof byte[]) && cls.isArray()) {
+                        jsonArray = jsonArray != null ? jsonArray : new LinkedList<>();
+                        final int len = Array.getLength(obj);
+                        for (int i = 0; i < len; i++) {
+                            Object item = Array.get(obj, i);
+                            jsonArray.add(item);
                         }
-                        jsonArray.addAll((List) obj);
                     } else {
-                        Map subMap = this.convertObjectToMap(obj, request, options);
+                        Map<String, Object> subMap = this.convertObjectToMap(obj, request, options);
                         if (subMap == null) {
                             continue;
                         }
