@@ -25,6 +25,7 @@ import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.retryer.NoneRetryer;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ForestProgress;
+import com.dtflys.forest.utils.GzipUtils;
 import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.forest.utils.URLUtils;
 import com.dtflys.test.http.BaseClientTest;
@@ -710,6 +711,8 @@ public class TestGenericForestClient extends BaseClientTest {
         String result = Forest.get("http://localhost:" + server.getPort()).executeAsString();
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
     }
+
+
 
 /*
     @Test
@@ -1429,6 +1432,44 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertHeaderEquals(ForestHeader.CONTENT_TYPE, ContentType.APPLICATION_JSON)
                 .assertBodyEquals("{\"a\":1,\"b\":2,\"c\":3}");
     }
+
+    @Test
+    public void testRequest_post_xml_body_text() {
+        final String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+                "<misc>\n" +
+                "    <a>1</a>\n" +
+                "    <b>2</b>\n" +
+                "</misc>\n";
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        final String result = Forest.post("http://localhost:" + server.getPort() + "/post")
+                .addHeader("Content-Type", "application/xml")
+                .addBody(xml)
+                .executeAsString();
+        assertThat(result).isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertBodyEquals(xml);
+    }
+
+
+    @Test
+    public void testRequest_post_xml_body_gzip() {
+        final String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+                "<misc>\n" +
+                "    <a>1</a>\n" +
+                "    <b>2</b>\n" +
+                "</misc>\n";
+        final byte[] compress = GzipUtils.compressGzip(xml);
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        final String result = Forest.post("http://localhost:" + server.getPort() + "/post")
+                .addHeader("Content-Encoding", "gzip")
+                .addHeader("Content-Type", "application/xml")
+                .addBody(compress)
+                .executeAsString();
+        assertThat(result).isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertBodyEquals(compress);
+    }
+
 
     @Test
     public void testRequest_put_form_body_keys() {

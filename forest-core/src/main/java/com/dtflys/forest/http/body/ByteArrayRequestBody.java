@@ -7,9 +7,12 @@ import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
+import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -56,4 +59,8 @@ public class ByteArrayRequestBody extends BinaryRequestBody implements SupportFo
         return newBody;
     }
 
+    @Override
+    public String toString() {
+        return new String(byteArray, StandardCharsets.UTF_8);
+    }
 }

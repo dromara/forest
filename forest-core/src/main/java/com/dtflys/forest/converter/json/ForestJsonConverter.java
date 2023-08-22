@@ -36,14 +36,20 @@ import com.dtflys.forest.http.body.ByteArrayRequestBody;
 import com.dtflys.forest.http.body.NameValueRequestBody;
 import com.dtflys.forest.http.body.ObjectRequestBody;
 import com.dtflys.forest.http.body.StringRequestBody;
+import org.apache.commons.collections4.IterableUtils;
 
+import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -103,7 +109,7 @@ public interface ForestJsonConverter extends ForestConverter<String>, ForestEnco
         if (!bodyList.isEmpty()) {
             Object toJsonObj = bodyList;
             Map<String, Object> jsonMap = null;
-            List jsonArray = null;
+            List<Object> jsonArray = null;
             if (bodyList.size() == 1 && (
                     bodyList.get(0) instanceof StringRequestBody ||
                     bodyList.get(0) instanceof BinaryRequestBody
@@ -133,16 +139,14 @@ public interface ForestJsonConverter extends ForestConverter<String>, ForestEnco
                     jsonMap.put(name, value);
                 } else if (bodyItem instanceof StringRequestBody) {
                     String content = bodyItem.toString();
-                    Map subMap = this.convertObjectToMap(content, request);
+                    Map<String, Object> subMap = this.convertObjectToMap(content, request);
                     if (subMap != null) {
                         if (jsonMap == null) {
                             jsonMap = new LinkedHashMap<>(bodyList.size());
                         }
                         jsonMap.putAll(subMap);
                     } else {
-                        if (jsonArray == null) {
-                            jsonArray = new LinkedList<>();
-                        }
+                        jsonArray = jsonArray != null ? jsonArray : new LinkedList<>();
                         jsonArray.add(content);
                     }
                 } else if (bodyItem instanceof ObjectRequestBody) {
@@ -150,13 +154,20 @@ public interface ForestJsonConverter extends ForestConverter<String>, ForestEnco
                     if (obj == null) {
                         continue;
                     }
-                    if (obj instanceof List) {
-                        if (jsonArray == null) {
-                            jsonArray = new LinkedList();
+
+                    final Class<?> cls = obj.getClass();
+                    if (obj instanceof Collection) {
+                        jsonArray = jsonArray != null ? jsonArray : new LinkedList<>();
+                        jsonArray.addAll((Collection<?>) obj);
+                    } else if (!(obj instanceof byte[]) && cls.isArray()) {
+                        jsonArray = jsonArray != null ? jsonArray : new LinkedList<>();
+                        final int len = Array.getLength(obj);
+                        for (int i = 0; i < len; i++) {
+                            Object item = Array.get(obj, i);
+                            jsonArray.add(item);
                         }
-                        jsonArray.addAll((List) obj);
                     } else {
-                        Map subMap = this.convertObjectToMap(obj, request, options);
+                        Map<String, Object> subMap = this.convertObjectToMap(obj, request, options);
                         if (subMap == null) {
                             continue;
                         }
