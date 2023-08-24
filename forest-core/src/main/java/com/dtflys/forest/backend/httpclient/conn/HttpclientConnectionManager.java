@@ -2,6 +2,7 @@ package com.dtflys.forest.backend.httpclient.conn;
 
 import com.dtflys.forest.backend.ForestConnectionManager;
 import com.dtflys.forest.backend.HttpConnectionConstants;
+import com.dtflys.forest.backend.httpclient.HttpClientAuthenticator;
 import com.dtflys.forest.backend.httpclient.HttpClientProvider;
 import com.dtflys.forest.backend.httpclient.HttpclientBackend;
 import com.dtflys.forest.config.ForestConfiguration;
@@ -9,6 +10,7 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestHeaderMap;
 import com.dtflys.forest.http.ForestProxy;
+import com.dtflys.forest.http.ForestProxyType;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.TimeUtils;
@@ -27,12 +29,16 @@ import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.ProxyAuthenticationStrategy;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicHeader;
 
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -61,7 +67,7 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
                 Registry<ConnectionSocketFactory> socketFactoryRegistry =
                         RegistryBuilder.<ConnectionSocketFactory>create()
                                 .register("https", new ForestSSLConnectionFactory())
-                                .register("http", new PlainConnectionSocketFactory())
+                                .register("http", new ForestConnectionFactory())
                                 .build();
                 tsConnectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
                 tsConnectionManager.setMaxTotal(maxConnections);
@@ -96,12 +102,12 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
                     }
                 }
             }
-            HttpClientBuilder builder = HttpClients.custom();
+            final HttpClientBuilder builder = HttpClients.custom();
             builder.setConnectionManager(connectionManager.tsConnectionManager);
 
-            RequestConfig.Builder configBuilder = RequestConfig.custom();
+            final RequestConfig.Builder configBuilder = RequestConfig.custom();
             // 超时时间
-            Integer timeout = request.getTimeout();
+            final Integer timeout = request.getTimeout();
             // 连接超时时间
             Integer connectTimeout = request.connectTimeout();
             // 读取超时时间
@@ -126,29 +132,33 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
             // 禁止自动重定向
             configBuilder.setRedirectsEnabled(false);
 
-
-            ForestProxy forestProxy = request.getProxy();
+            final ForestProxy forestProxy = request.getProxy();
             if (forestProxy != null) {
-                HttpHost proxy = new HttpHost(forestProxy.getHost(), forestProxy.getPort());
-                if (StringUtils.isNotEmpty(forestProxy.getUsername()) || !forestProxy.getHeaders().isEmpty()) {
-                    CredentialsProvider provider = new BasicCredentialsProvider();
-                    provider.setCredentials(
-                            new AuthScope(proxy),
-                            new UsernamePasswordCredentials(
-                                    forestProxy.getUsername(),
-                                    forestProxy.getPassword()));
-                    builder.setDefaultCredentialsProvider(provider);
-                    ForestHeaderMap proxyHeaders = forestProxy.getHeaders();
-                    if (!proxyHeaders.isEmpty()) {
-                        List<Header> proxyHeaderList = new LinkedList<>();
-                        for (Map.Entry<String, String> entry : proxyHeaders.entrySet()) {
-                            Header proxyHeader = new BasicHeader(entry.getKey(), entry.getValue());
-                            proxyHeaderList.add(proxyHeader);
+                final String username = forestProxy.getUsername();
+                final String password = forestProxy.getPassword();
+
+                if (forestProxy.getType() == ForestProxyType.HTTP) {
+                    final HttpHost proxy = new HttpHost(forestProxy.getHost(), forestProxy.getPort());
+                    if (StringUtils.isNotEmpty(username) || !forestProxy.getHeaders().isEmpty()) {
+                        final CredentialsProvider provider = new BasicCredentialsProvider();
+                        provider.setCredentials(
+                                new AuthScope(proxy),
+                                new UsernamePasswordCredentials(
+                                        username,
+                                        password));
+                        builder.setDefaultCredentialsProvider(provider);
+                        final ForestHeaderMap proxyHeaders = forestProxy.getHeaders();
+                        if (!proxyHeaders.isEmpty()) {
+                            List<Header> proxyHeaderList = new LinkedList<>();
+                            for (Map.Entry<String, String> entry : proxyHeaders.entrySet()) {
+                                Header proxyHeader = new BasicHeader(entry.getKey(), entry.getValue());
+                                proxyHeaderList.add(proxyHeader);
+                            }
+                            builder.setDefaultHeaders(proxyHeaderList);
                         }
-                        builder.setDefaultHeaders(proxyHeaderList);
                     }
+                    configBuilder.setProxy(proxy);
                 }
-                configBuilder.setProxy(proxy);
             }
             RequestConfig requestConfig = configBuilder.build();
             return builder
@@ -169,7 +179,7 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
         }
 
         HttpClientProvider provider = defaultHttpClientProvider;
-        Object client = request.getBackendClient();
+        final Object client = request.getBackendClient();
         if (client != null) {
             if (client instanceof HttpClient) {
                 return (HttpClient) client;

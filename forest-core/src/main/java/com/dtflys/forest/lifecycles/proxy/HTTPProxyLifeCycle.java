@@ -12,8 +12,6 @@ import com.dtflys.forest.utils.HeaderUtils;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * HTTP正向代理生命周期类
