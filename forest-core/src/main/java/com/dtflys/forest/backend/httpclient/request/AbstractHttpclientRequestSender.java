@@ -75,6 +75,7 @@ public abstract class AbstractHttpclientRequestSender implements HttpclientReque
 
         if (proxy != null) {
             final RequestProxyLogMessage proxyLogMessage = new RequestProxyLogMessage();
+            proxyLogMessage.setType(proxy.getType().name());
             proxyLogMessage.setHost(proxy.getHost());
             proxyLogMessage.setPort(proxy.getPort() + "");
             ForestHeaderMap headers = proxy.getHeaders();

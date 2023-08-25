@@ -2,6 +2,7 @@ package com.dtflys.test.http.proxy;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.http.ForestProxyType;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.test.http.BaseClientTest;
 import okhttp3.mockwebserver.MockResponse;
@@ -48,16 +49,37 @@ public class TestHTTPProxyClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         ForestRequest<String> request = addressClient.sendHostPort("localhost", server.getPort());
         String result = request.execute(String.class);
+        assertThat(request.getProxy().getType()).isEqualTo(ForestProxyType.HTTP);
         assertThat(request.getProxy().getHost()).isEqualTo("localhost");
         assertThat(request.getProxy().getPort()).isEqualTo(server.getPort());
         assertThat(result).isEqualTo(EXPECTED);
     }
 
     @Test
+    public void testHTTPProxy_host_port_socks() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        ForestRequest<String> request = addressClient.sendHostPortSocks("localhost", server.getPort());
+        assertThat(request.getProxy().getType()).isEqualTo(ForestProxyType.SOCKS);
+        assertThat(request.getProxy().getHost()).isEqualTo("localhost");
+        assertThat(request.getProxy().getPort()).isEqualTo(server.getPort());
+    }
+
+    @Test
+    public void testHTTPProxy_host_port_socks2() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        ForestRequest<String> request = addressClient.sendHostPortSocks2("localhost", server.getPort());
+        assertThat(request.getProxy().getType()).isEqualTo(ForestProxyType.SOCKS);
+        assertThat(request.getProxy().getHost()).isEqualTo("localhost");
+        assertThat(request.getProxy().getPort()).isEqualTo(server.getPort());
+    }
+
+
+    @Test
     public void testHTTPProxy_source() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         ForestRequest<String> request = addressClient.sendHTTPProxySource(server.getPort());
         String result = request.execute(String.class);
+        assertThat(request.getProxy().getType()).isEqualTo(ForestProxyType.HTTP);
         assertThat(request.getProxy().getHost()).isEqualTo("127.0.0.1");
         assertThat(request.getProxy().getPort()).isEqualTo(server.getPort());
         assertThat(result).isEqualTo(EXPECTED);

@@ -2123,6 +2123,7 @@ public class TestGenericForestClient extends BaseClientTest {
     }
 
 
+/*
     @Test
     public void testSocksHttpProxy() {
         final String ret = Forest.get("http://www.google.com")
@@ -2142,6 +2143,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .executeAsString();
         System.out.println(ret);
     }
+*/
 
 
 }
