@@ -1,20 +1,20 @@
-package com.dtflys.forest.backend.httpclient;
+package com.dtflys.forest.backend;
 
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.util.Optional;
 
-public class HttpClientAuthenticator extends Authenticator {
+public class SocksAuthenticator extends Authenticator {
 
-    private final static HttpClientAuthenticator instance;
+    private final static SocksAuthenticator instance;
     static {
-        instance = new HttpClientAuthenticator();
+        instance = new SocksAuthenticator();
         Authenticator.setDefault(instance);
     }
 
     private ThreadLocal<PasswordAuthentication> passwordAuthenticationThreadLocal = new ThreadLocal<>();
 
-    public static HttpClientAuthenticator getInstance() {
+    public static SocksAuthenticator getInstance() {
         return instance;
     }
 

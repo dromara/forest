@@ -1,12 +1,10 @@
 package com.dtflys.forest.backend.httpclient.conn;
 
-import com.dtflys.forest.backend.httpclient.HttpClientAuthenticator;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestProxyType;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.ssl.SSLKeyStore;
-import com.dtflys.forest.utils.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;

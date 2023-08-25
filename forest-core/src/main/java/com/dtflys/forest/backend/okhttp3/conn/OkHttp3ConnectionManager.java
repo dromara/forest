@@ -1,6 +1,7 @@
 package com.dtflys.forest.backend.okhttp3.conn;
 
 import com.dtflys.forest.backend.ForestConnectionManager;
+import com.dtflys.forest.backend.SocksAuthenticator;
 import com.dtflys.forest.backend.httpclient.HttpClientProvider;
 import com.dtflys.forest.backend.okhttp3.OkHttp3Backend;
 import com.dtflys.forest.backend.okhttp3.OkHttpClientProvider;
@@ -21,6 +22,7 @@ import com.dtflys.forest.utils.TimeUtils;
 import okhttp3.Authenticator;
 import okhttp3.ConnectionPool;
 import okhttp3.Credentials;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Protocol;
 import okhttp3.Request;
@@ -31,6 +33,7 @@ import org.apache.http.client.HttpClient;
 import javax.annotation.Nullable;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.nio.charset.Charset;
@@ -150,10 +153,13 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
             // set proxy
             final ForestProxy proxy = request.getProxy();
             if (proxy != null) {
+                final String username = proxy.getUsername();
+                final String password = proxy.getPassword();
                 final Proxy.Type type = proxy.getType() == ForestProxyType.SOCKS ? Proxy.Type.SOCKS : Proxy.Type.HTTP;
                 final Proxy okProxy = new Proxy(type, new InetSocketAddress(proxy.getHost(), proxy.getPort()));
                 builder.proxy(okProxy);
-                if (StringUtils.isNotEmpty(proxy.getUsername()) || !proxy.getHeaders().isEmpty()) {
+                if (type == Proxy.Type.HTTP &&
+                        (StringUtils.isNotEmpty(username) || !proxy.getHeaders().isEmpty())) {
                     builder.proxyAuthenticator((route, response) -> {
                         final Request.Builder proxyBuilder = response.request().newBuilder();
                         final Charset charset = StringUtils.isNotEmpty(proxy.getCharset()) ?
@@ -166,19 +172,29 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
                             }
                         }
                         if (!proxyHeaders.containsKey("Proxy-Authorization")) {
-                            final String credential = charset != null ?
-                                    Credentials.basic(
-                                            proxy.getUsername(),
-                                            proxy.getPassword(),
-                                            charset) :
-                                    Credentials.basic(
-                                            proxy.getUsername(),
-                                            proxy.getPassword());
+                            final String credential = charset != null
+                                    ? Credentials.basic(username, password, charset)
+                                    : Credentials.basic(username, password);
                             proxyBuilder.addHeader("Proxy-Authorization", credential);
                         }
                         proxyBuilder.removeHeader("User-Agent");
                         proxyBuilder.removeHeader("Proxy-Connection");
                         return proxyBuilder.build();
+                    });
+                } else if (type == Proxy.Type.SOCKS) {
+                    builder.addInterceptor(chain -> {
+                        boolean hasProxyAuthenticator = false;
+                        if (StringUtils.isNotEmpty(username)) {
+                            SocksAuthenticator.getInstance().setPasswordAuthenticator(username, password);
+                            hasProxyAuthenticator = true;
+                        }
+                        try {
+                            return chain.proceed(chain.request());
+                        } finally {
+                            if (hasProxyAuthenticator) {
+                                SocksAuthenticator.getInstance().removePasswordAuthenticator();
+                            }
+                        }
                     });
                 }
 

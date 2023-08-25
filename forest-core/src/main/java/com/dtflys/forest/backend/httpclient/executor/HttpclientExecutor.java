@@ -3,7 +3,7 @@ package com.dtflys.forest.backend.httpclient.executor;
 import com.dtflys.forest.backend.AbstractHttpExecutor;
 import com.dtflys.forest.backend.BodyBuilder;
 import com.dtflys.forest.backend.ResponseHandler;
-import com.dtflys.forest.backend.httpclient.HttpClientAuthenticator;
+import com.dtflys.forest.backend.SocksAuthenticator;
 import com.dtflys.forest.backend.httpclient.body.HttpclientBodyBuilder;
 import com.dtflys.forest.backend.httpclient.entity.HttpclientRequestWithBodyEntity;
 import com.dtflys.forest.backend.url.QueryableURLBuilder;
@@ -23,7 +23,6 @@ import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.mapping.MappingTemplate;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import java.io.IOException;
@@ -112,7 +111,7 @@ public class HttpclientExecutor extends AbstractHttpExecutor {
             final String username = proxy.getUsername();
             final String password = proxy.getPassword();
             if (StringUtils.isNotEmpty(username)) {
-                HttpClientAuthenticator.getInstance().setPasswordAuthenticator(username, password);
+                SocksAuthenticator.getInstance().setPasswordAuthenticator(username, password);
                 hasProxyAuthenticator = true;
             }
         }
@@ -134,7 +133,7 @@ public class HttpclientExecutor extends AbstractHttpExecutor {
             throw e;
         } finally {
             if (hasProxyAuthenticator) {
-                HttpClientAuthenticator.getInstance().removePasswordAuthenticator();
+                SocksAuthenticator.getInstance().removePasswordAuthenticator();
             }
             request.pool().finish(request);
         }

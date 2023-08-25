@@ -2,7 +2,6 @@ package com.dtflys.forest.backend.httpclient.conn;
 
 import com.dtflys.forest.backend.ForestConnectionManager;
 import com.dtflys.forest.backend.HttpConnectionConstants;
-import com.dtflys.forest.backend.httpclient.HttpClientAuthenticator;
 import com.dtflys.forest.backend.httpclient.HttpClientProvider;
 import com.dtflys.forest.backend.httpclient.HttpclientBackend;
 import com.dtflys.forest.config.ForestConfiguration;
@@ -25,20 +24,15 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.client.ProxyAuthenticationStrategy;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicHeader;
 
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]

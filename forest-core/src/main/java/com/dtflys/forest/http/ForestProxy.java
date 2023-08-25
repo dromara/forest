@@ -143,8 +143,14 @@ public class ForestProxy implements HasURL, HasHeaders {
         return charset;
     }
 
-    public void setCharset(String charset) {
+    public ForestProxy setCharset(String charset) {
         this.charset = charset;
+        return this;
+    }
+
+    public ForestProxy charset(String charset) {
+        this.charset = charset;
+        return this;
     }
 
 
