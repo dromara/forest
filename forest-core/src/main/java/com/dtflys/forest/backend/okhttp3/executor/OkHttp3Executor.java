@@ -110,6 +110,7 @@ public class OkHttp3Executor implements HttpExecutor {
             final SocketAddress address = proxy.address();
             if (address instanceof InetSocketAddress) {
                 final InetSocketAddress inetSocketAddress = (InetSocketAddress) address;
+                proxyLogMessage.setType(request.getProxy().getType().name());
                 proxyLogMessage.setHost(inetSocketAddress.getHostString());
                 proxyLogMessage.setPort(inetSocketAddress.getPort() + "");
                 logMessage.setProxy(proxyLogMessage);

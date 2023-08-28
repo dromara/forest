@@ -10,6 +10,11 @@ package com.dtflys.forest.logging;
 public class RequestProxyLogMessage {
 
     /**
+     * 代理类型
+     */
+    private String type;
+
+    /**
      * 代理主机地址
      */
     private String host;
@@ -20,6 +25,14 @@ public class RequestProxyLogMessage {
     private String port;
 
     private String[] headers;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public String getHost() {
         return host;

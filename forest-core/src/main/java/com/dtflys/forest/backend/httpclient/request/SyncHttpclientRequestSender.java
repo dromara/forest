@@ -1,7 +1,6 @@
 package com.dtflys.forest.backend.httpclient.request;
 
 import com.dtflys.forest.backend.AbstractHttpExecutor;
-import com.dtflys.forest.backend.httpclient.conn.ForestSSLConnectionFactory;
 import com.dtflys.forest.backend.httpclient.conn.HttpclientConnectionManager;
 import com.dtflys.forest.backend.httpclient.response.HttpclientForestResponseFactory;
 import com.dtflys.forest.backend.httpclient.response.HttpclientResponseHandler;
@@ -16,19 +15,13 @@ import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.ResponseLogMessage;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.cookie.*;
-import org.apache.http.impl.cookie.BrowserCompatSpec;
-import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
-import java.io.IOException;
-import java.net.SocketException;
 import java.util.Date;
 
 /**

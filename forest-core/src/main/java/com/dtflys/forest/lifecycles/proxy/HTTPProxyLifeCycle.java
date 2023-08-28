@@ -4,6 +4,7 @@ import com.dtflys.forest.annotation.HTTPProxy;
 import com.dtflys.forest.callback.HTTPProxySource;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestProxy;
+import com.dtflys.forest.http.ForestProxyType;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.mapping.MappingTemplate;
@@ -12,8 +13,6 @@ import com.dtflys.forest.utils.HeaderUtils;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * HTTP正向代理生命周期类
@@ -28,8 +27,9 @@ public class HTTPProxyLifeCycle implements MethodAnnotationLifeCycle<HTTPProxy, 
 
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
+        final ForestProxyType type = (ForestProxyType) getAttribute(request, "type");
         final String hostStr = (String) getAttribute(request, "host");
-        final String portStr = (String) getAttribute(request, "port");
+        String portStr = (String) getAttribute(request, "port");
         final String usernameStr = (String) getAttribute(request, "username");
         final String passwordStr = (String) getAttribute(request, "password");
         final String[] headersStr = (String[]) getAttribute(request, "headers");
@@ -38,28 +38,21 @@ public class HTTPProxyLifeCycle implements MethodAnnotationLifeCycle<HTTPProxy, 
         final MappingTemplate portTemplate = method.makeTemplate(HTTPProxy.class, "port", portStr);
         final MappingTemplate usernameTemplate = method.makeTemplate(HTTPProxy.class, "username", usernameStr);
         final MappingTemplate passwordTemplate = method.makeTemplate(HTTPProxy.class, "password", passwordStr);
-
-        addAttribute(request, "host_temp", hostTemplate);
-        addAttribute(request, "port_temp", portTemplate);
-        addAttribute(request, "username_temp", usernameTemplate);
-        addAttribute(request, "password_temp", passwordTemplate);
-        addAttribute(request, "headers_temp", Arrays.stream(headersStr)
-                .map(headerStr -> method.makeTemplate(HTTPProxy.class, "headers", headerStr))
-                .toArray(MappingTemplate[]::new));
-    }
-
-    @Override
-    public boolean beforeExecute(ForestRequest request) {
-        final MappingTemplate hostTemplate = (MappingTemplate) getAttribute(request, "host_temp");
-        final MappingTemplate portTemplate = (MappingTemplate) getAttribute(request, "port_temp");
-        final MappingTemplate usernameTemplate = (MappingTemplate) getAttribute(request, "username_temp");
-        final MappingTemplate passwordTemplate = (MappingTemplate) getAttribute(request, "password_temp");
-        final MappingTemplate[] headersTemplates = (MappingTemplate[]) getAttribute(request, "headers_temp");
         final Object httpProxySource = request.getMethod().getExtensionParameterValue(PARAM_KEY_HTTP_PROXY_SOURCE);
+        final MappingTemplate[] headersTemplates = Arrays.stream(headersStr)
+                .map(headerStr -> method.makeTemplate(HTTPProxy.class, "headers", headerStr))
+                .toArray(MappingTemplate[]::new);
 
-        final Object[] args = request.getArguments();
+
+//        addAttribute(request, "host_temp", hostTemplate);
+//        addAttribute(request, "port_temp", portTemplate);
+//        addAttribute(request, "username_temp", usernameTemplate);
+//        addAttribute(request, "password_temp", passwordTemplate);
+//        addAttribute(request, "headers_temp", Arrays.stream(headersStr)
+//                .map(headerStr -> method.makeTemplate(HTTPProxy.class, "headers", headerStr))
+//                .toArray(MappingTemplate[]::new));
+
         final String host = hostTemplate.render(args);
-        final String portStr = portTemplate.render(args);
 
         String username = null, password = null;
 
@@ -74,17 +67,18 @@ public class HTTPProxyLifeCycle implements MethodAnnotationLifeCycle<HTTPProxy, 
         if (StringUtils.isBlank(host)) {
             if (httpProxySource != null && httpProxySource instanceof HTTPProxySource) {
                 request.setProxy(((HTTPProxySource) httpProxySource).getProxy(request));
-                return true;
+                return;
             }
             throw new ForestRuntimeException("[Forest] Proxy host cannot be empty!");
         }
         if (StringUtils.isNotBlank(portStr)) {
+            portStr = portTemplate.render(args);
             try {
                 port = Integer.parseInt(portStr);
             } catch (Throwable th) {
             }
         }
-        final ForestProxy proxy = new ForestProxy(host, port);
+        final ForestProxy proxy = new ForestProxy(type, host, port);
         if (StringUtils.isNotEmpty(username)) {
             proxy.setUsername(username);
         }
@@ -95,6 +89,17 @@ public class HTTPProxyLifeCycle implements MethodAnnotationLifeCycle<HTTPProxy, 
             HeaderUtils.addHeaders(proxy, headersTemplates, args);
         }
         request.setProxy(proxy);
+
+    }
+
+    @Override
+    public boolean beforeExecute(ForestRequest request) {
+        final MappingTemplate hostTemplate = (MappingTemplate) getAttribute(request, "host_temp");
+        final MappingTemplate portTemplate = (MappingTemplate) getAttribute(request, "port_temp");
+        final MappingTemplate usernameTemplate = (MappingTemplate) getAttribute(request, "username_temp");
+        final MappingTemplate passwordTemplate = (MappingTemplate) getAttribute(request, "password_temp");
+        final MappingTemplate[] headersTemplates = (MappingTemplate[]) getAttribute(request, "headers_temp");
+
         return true;
     }
 

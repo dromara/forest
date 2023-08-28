@@ -14,6 +14,7 @@ import com.dtflys.forest.http.ForestAddress;
 import com.dtflys.forest.http.ForestAsyncMode;
 import com.dtflys.forest.http.ForestFuture;
 import com.dtflys.forest.http.ForestHeader;
+import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestURL;
@@ -2120,6 +2121,29 @@ public class TestGenericForestClient extends BaseClientTest {
                         ForestProgress::getRequest)
                 .contains(true, 1D, response.getRequest());
     }
+
+
+/*
+    @Test
+    public void testSocksHttpProxy() {
+        final String ret = Forest.get("http://www.google.com")
+                .proxy(ForestProxy.socks("localhost", 1089))
+                .connectTimeout(20000)
+                .executeAsString();
+        System.out.println(ret);
+    }
+
+    @Test
+    public void testSocksHttpsProxy() {
+        final String ret = Forest.get("https://www.google.com")
+                .proxy(ForestProxy.socks("localhost", 1089)
+                        .username("dtflys")
+                        .password("123456"))
+                .connectTimeout(20000)
+                .executeAsString();
+        System.out.println(ret);
+    }
+*/
 
 
 }

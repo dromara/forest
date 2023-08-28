@@ -119,7 +119,7 @@ public class TestPostClient extends BaseClientTest {
                 .assertHeaderEquals("Accept", "text/plain")
                 .assertBodyEquals("username=foo&password=123456");
         Mockito.verify(logger).info("[Forest] Request (" + configuration.getBackendName() + "): \n" +
-                "\t[Proxy]: host: 127.0.0.1, port: " + server.getPort() + "\n" +
+                "\t[Proxy]: type: HTTP, host: 127.0.0.1, port: " + server.getPort() + "\n" +
                 "\tPOST http://localhost:" + server.getPort() + "/hello HTTP\n" +
                 "\tHeaders: \n" +
                 "\t\tUser-Agent: " + ForestHeader.DEFAULT_USER_AGENT_VALUE + "\n" +
@@ -753,7 +753,7 @@ public class TestPostClient extends BaseClientTest {
 
 
     @Test
-    public void testJsonPostBodyMap() throws InterruptedException {
+    public void testJsonPostBodyMap() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Map<String, Object> userMap = new HashMap<>();
         userMap.put("username", "foo");
@@ -767,8 +767,24 @@ public class TestPostClient extends BaseClientTest {
                 .assertBodyEquals("{\"username\":\"foo\"}");
     }
 
+
     @Test
-    public void testJsonPostBodyMapWithDefaultBody() throws InterruptedException {
+    public void testJsonPostBodyArray() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String[] ids = new String[] {"a", "b", "c"};
+        assertThat(postClient.postJsonBodyArray(ids))
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("POST")
+                .assertPathEquals("/json")
+                .assertHeaderEquals("Content-Type", "application/json")
+                .assertBodyEquals("[\"a\",\"b\",\"c\"]");
+    }
+
+
+    @Test
+    public void testJsonPostBodyMapWithDefaultBody() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         assertThat(postClient.postJsonBodyMapWithDefaultBody(null))
                 .isNotNull()

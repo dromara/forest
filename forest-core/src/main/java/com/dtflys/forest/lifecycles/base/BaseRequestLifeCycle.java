@@ -67,7 +67,7 @@ public class BaseRequestLifeCycle implements BaseAnnotationLifeCycle<BaseRequest
             baseMetaRequest.setMaxRetryInterval(baseMaxRetryInterval);
         }
 
-        final Class<?>[] baseInterceptorClasses = annotation.interceptor();
+        final Class<? extends Interceptor>[] baseInterceptorClasses = annotation.interceptor();
         baseMetaRequest.setInterceptor(baseInterceptorClasses);
 
     }
