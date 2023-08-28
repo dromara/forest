@@ -37,6 +37,8 @@ import java.util.Map;
  */
 public class ForestProxy implements HasURL, HasHeaders {
 
+    private final ForestProxyType type;
+
     private final String host;
 
     private final int port;
@@ -49,7 +51,20 @@ public class ForestProxy implements HasURL, HasHeaders {
 
     private ForestHeaderMap headers = new ForestHeaderMap(this);
 
+    public static ForestProxy http(String ip, int port) {
+        return new ForestProxy(ip, port);
+    }
+
+    public static ForestProxy socks(String ip, int port) {
+        return new ForestProxy(ForestProxyType.SOCKS, ip, port);
+    }
+
     public ForestProxy(String ip, int port) {
+        this(ForestProxyType.HTTP, ip, port);
+    }
+
+    public ForestProxy(ForestProxyType type, String ip, int port) {
+        this.type = type;
         this.host = ip;
         this.port = port;
     }
@@ -68,6 +83,10 @@ public class ForestProxy implements HasURL, HasHeaders {
             }
         }
         return builder.toString();
+    }
+
+    public ForestProxyType getType() {
+        return type;
     }
 
     /**
@@ -108,13 +127,32 @@ public class ForestProxy implements HasURL, HasHeaders {
         return this;
     }
 
+    /**
+     * 设置代理用户名
+     *
+     * @param username 代理用户名
+     * @return {@link ForestProxy}对象实例
+     */
+    public ForestProxy username(String username) {
+        this.username = username;
+        return this;
+    }
+
+
     public String getCharset() {
         return charset;
     }
 
-    public void setCharset(String charset) {
+    public ForestProxy setCharset(String charset) {
         this.charset = charset;
+        return this;
     }
+
+    public ForestProxy charset(String charset) {
+        this.charset = charset;
+        return this;
+    }
+
 
     /**
      * 获取代理密码
@@ -135,6 +173,18 @@ public class ForestProxy implements HasURL, HasHeaders {
         this.password = password;
         return this;
     }
+
+    /**
+     * 获取代理密码
+     *
+     * @param password 代理密码
+     * @return
+     */
+    public ForestProxy password(String password) {
+        this.password = password;
+        return this;
+    }
+
 
     /**
      * 获取该代理的所有请求头信息

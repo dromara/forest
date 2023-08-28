@@ -17,7 +17,7 @@
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <solon.version>2.4.0</solon.version>
+        <solon.version>2.4.5</solon.version>
     </properties>
 
 

@@ -144,7 +144,9 @@ public class DefaultLogHandler implements ForestLogHandler {
         final RequestProxyLogMessage proxyLogMessage = requestLogMessage.getProxy();
         final StringBuilder builder = new StringBuilder();
         if (proxyLogMessage != null) {
-            builder.append("[Proxy]: host: ")
+            builder.append("[Proxy]: type: ")
+                    .append(proxyLogMessage.getType())
+                    .append(", host: ")
                     .append(proxyLogMessage.getHost())
                     .append(", port: ")
                     .append(proxyLogMessage.getPort());

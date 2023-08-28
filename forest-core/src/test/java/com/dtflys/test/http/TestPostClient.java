@@ -119,7 +119,7 @@ public class TestPostClient extends BaseClientTest {
                 .assertHeaderEquals("Accept", "text/plain")
                 .assertBodyEquals("username=foo&password=123456");
         Mockito.verify(logger).info("[Forest] Request (" + configuration.getBackendName() + "): \n" +
-                "\t[Proxy]: host: 127.0.0.1, port: " + server.getPort() + "\n" +
+                "\t[Proxy]: type: HTTP, host: 127.0.0.1, port: " + server.getPort() + "\n" +
                 "\tPOST http://localhost:" + server.getPort() + "/hello HTTP\n" +
                 "\tHeaders: \n" +
                 "\t\tUser-Agent: " + ForestHeader.DEFAULT_USER_AGENT_VALUE + "\n" +

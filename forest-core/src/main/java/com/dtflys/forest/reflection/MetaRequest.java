@@ -2,6 +2,7 @@ package com.dtflys.forest.reflection;
 
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.ForestEncoder;
+import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.utils.ForestDataType;
 
@@ -112,7 +113,7 @@ public class MetaRequest {
     /**
      * 拦截器类数组
      */
-    private Class<?>[] interceptor;
+    private Class<? extends Interceptor>[] interceptor;
 
     private String[] data;
 
@@ -305,11 +306,11 @@ public class MetaRequest {
         this.headers = headers;
     }
 
-    public Class<?>[] getInterceptor() {
+    public Class<? extends Interceptor>[] getInterceptor() {
         return interceptor;
     }
 
-    public void setInterceptor(Class<?>[] interceptor) {
+    public void setInterceptor(Class<? extends Interceptor>[] interceptor) {
         this.interceptor = interceptor;
     }
 
