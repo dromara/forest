@@ -1,11 +1,9 @@
 package com.dtflys.forest.scanner;
 
-import com.dtflys.forest.annotation.BaseLifeCycle;
-import com.dtflys.forest.annotation.MethodLifeCycle;
 import com.dtflys.forest.file.SpringResource;
-import com.dtflys.forest.http.body.MultipartRequestBodyBuilder;
+import com.dtflys.forest.http.body.SpringMultipartRequestBodyBuilder;
 import com.dtflys.forest.http.body.RequestBodyBuilder;
-import com.dtflys.forest.http.body.ResourceRequestBodyBuilder;
+import com.dtflys.forest.http.body.SpringResourceRequestBodyBuilder;
 import com.dtflys.forest.multipart.ForestMultipartFactory;
 import com.dtflys.forest.utils.ClientFactoryBeanUtils;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
@@ -20,10 +18,6 @@ import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 
 import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -69,12 +63,12 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
      */
     public void registerMultipartTypes() {
         ForestMultipartFactory.registerFactory(Resource.class, SpringResource.class);
-        RequestBodyBuilder.registerBodyBuilder(Resource.class, new ResourceRequestBodyBuilder());
+        RequestBodyBuilder.registerBodyBuilder(Resource.class, new SpringResourceRequestBodyBuilder());
         try {
             Class multipartFileClass = Class.forName("org.springframework.web.multipart.MultipartFile");
             Class springMultipartFileClass = Class.forName("com.dtflys.forest.file.SpringMultipartFile");
             ForestMultipartFactory.registerFactory(multipartFileClass, springMultipartFileClass);
-            RequestBodyBuilder.registerBodyBuilder(multipartFileClass, new MultipartRequestBodyBuilder());
+            RequestBodyBuilder.registerBodyBuilder(multipartFileClass, new SpringMultipartRequestBodyBuilder());
         } catch (Throwable th) {
         }
     }
