@@ -9,11 +9,11 @@ import org.springframework.core.io.Resource;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class ResourceRequestBody extends ForestRequestBody {
+public class SpringResourceRequestBody extends ForestRequestBody {
 
     private Resource resource;
 
-    public ResourceRequestBody(Resource resource) {
+    public SpringResourceRequestBody(Resource resource) {
         this.resource = resource;
     }
 
@@ -41,8 +41,8 @@ public class ResourceRequestBody extends ForestRequestBody {
     }
 
     @Override
-    public ResourceRequestBody clone() {
-        ResourceRequestBody newBody = new ResourceRequestBody(resource);
+    public SpringResourceRequestBody clone() {
+        SpringResourceRequestBody newBody = new SpringResourceRequestBody(resource);
         newBody.setDefaultValue(getDefaultValue());
         return newBody;
     }

@@ -94,12 +94,6 @@ public class HTTPProxyLifeCycle implements MethodAnnotationLifeCycle<HTTPProxy, 
 
     @Override
     public boolean beforeExecute(ForestRequest request) {
-        final MappingTemplate hostTemplate = (MappingTemplate) getAttribute(request, "host_temp");
-        final MappingTemplate portTemplate = (MappingTemplate) getAttribute(request, "port_temp");
-        final MappingTemplate usernameTemplate = (MappingTemplate) getAttribute(request, "username_temp");
-        final MappingTemplate passwordTemplate = (MappingTemplate) getAttribute(request, "password_temp");
-        final MappingTemplate[] headersTemplates = (MappingTemplate[]) getAttribute(request, "headers_temp");
-
         return true;
     }
 
