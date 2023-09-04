@@ -13,7 +13,7 @@ import com.dtflys.forest.utils.ForestDataType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.noear.solon.annotation.Inject;
-import org.noear.solon.core.AopContext;
+import org.noear.solon.core.AppContext;
 import org.noear.solon.test.SolonJUnit4ClassRunner;
 import org.noear.solon.test.SolonTest;
 
@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
 public class Test1 {
 
     @Inject
-    AopContext aopContext;
+    AppContext aopContext;
 
     @Inject
     private BaiduClient baiduClient;
