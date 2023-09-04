@@ -1,14 +1,14 @@
 package com.dtflys.forest.interceptor;
 
-import org.noear.solon.core.AopContext;
+import org.noear.solon.core.AppContext;
 
 /**
  * @author noear
  * @since 1.11
  */
 public class SolonInterceptorFactory extends DefaultInterceptorFactory {
-    final AopContext context;
-    public SolonInterceptorFactory(AopContext context){
+    final AppContext context;
+    public SolonInterceptorFactory(AppContext context){
         this.context = context;
     }
 
