@@ -3,6 +3,7 @@ package org.dromara.forest.utils;
 import org.dromara.forest.annotation.AliasFor;
 import org.dromara.forest.annotation.BaseLifeCycle;
 import org.dromara.forest.annotation.MethodLifeCycle;
+import org.dromara.forest.annotation.OverrideAttribute;
 import org.dromara.forest.annotation.ParamLifeCycle;
 import org.dromara.forest.config.ForestConfiguration;
 import org.dromara.forest.converter.json.ForestJsonConverter;
@@ -13,6 +14,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -273,13 +276,18 @@ public class ReflectUtils {
         return null;
     }
 
+    public static Map<String, Object> getAttributesFromAnnotation(final Annotation ann) {
+        return getAttributesFromAnnotation(ann, false);
+    }
+
     /**
      * 从注解对象中获取所有属性
      * @param ann 注解对象，{@link Annotation}接口实例
+     * @param checkOverrideAttribute 是否检测属性重写
      * @return 注解对象中有属性 {@link Map}表对象，Key：属性名 Value：属性值
      */
-    public static Map<String, Object> getAttributesFromAnnotation(final Annotation ann) {
-        final Map<String, Object> results = new ConcurrentHashMap<>();
+    public static Map<String, Object> getAttributesFromAnnotation(final Annotation ann, final boolean checkOverrideAttribute) {
+        final Map<String, Object> results = new HashMap<>();
         final Class<? extends Annotation> clazz = ann.annotationType();
         final Method[] methods = clazz.getMethods();
         final Object[] args = new Object[0];
@@ -295,7 +303,14 @@ public class ReflectUtils {
             final Object value = ret == null || (ret instanceof CharSequence && StringUtils.isEmpty(String.valueOf(ret))) ?
                     invokeAnnotationMethodForAlias(ann, clazz, method, args) : ret;
             if (value != null) {
-                results.put(name, value);
+                if (checkOverrideAttribute) {
+                    OverrideAttribute overrideAttribute = method.getAnnotation(OverrideAttribute.class);
+                    if (overrideAttribute != null) {
+                        results.put(name, value);
+                    }
+                } else {
+                    results.put(name, value);
+                }
             }
         }
         return results;

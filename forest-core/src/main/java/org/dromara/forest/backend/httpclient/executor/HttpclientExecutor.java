@@ -3,11 +3,14 @@ package org.dromara.forest.backend.httpclient.executor;
 import org.dromara.forest.backend.AbstractHttpExecutor;
 import org.dromara.forest.backend.BodyBuilder;
 import org.dromara.forest.backend.ResponseHandler;
+import org.dromara.forest.backend.SocksAuthenticator;
 import org.dromara.forest.backend.httpclient.body.HttpclientBodyBuilder;
 import org.dromara.forest.backend.httpclient.entity.HttpclientRequestWithBodyEntity;
 import org.dromara.forest.backend.url.QueryableURLBuilder;
 import org.dromara.forest.backend.url.URLBuilder;
 import org.dromara.forest.http.ForestHeader;
+import org.dromara.forest.http.ForestProxy;
+import org.dromara.forest.http.ForestProxyType;
 import org.dromara.forest.http.ForestRequest;
 import org.dromara.forest.http.ForestResponseFactory;
 import org.dromara.forest.utils.RequestNameValue;
@@ -100,8 +103,18 @@ public class HttpclientExecutor extends AbstractHttpExecutor {
     @Override
     public void execute(LifeCycleHandler lifeCycleHandler) {
         prepare(lifeCycleHandler);
-        Date startDate = new Date();
-        ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
+        final Date startDate = new Date();
+        final ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
+        final ForestProxy proxy = request.getProxy();
+        boolean hasProxyAuthenticator = false;
+        if (proxy != null && proxy.getType() == ForestProxyType.SOCKS) {
+            final String username = proxy.getUsername();
+            final String password = proxy.getPassword();
+            if (StringUtils.isNotEmpty(username)) {
+                SocksAuthenticator.getInstance().setPasswordAuthenticator(username, password);
+                hasProxyAuthenticator = true;
+            }
+        }
         try {
             request.pool().awaitRequest(request);
             requestSender.sendRequest(
@@ -115,11 +128,13 @@ public class HttpclientExecutor extends AbstractHttpExecutor {
             httpRequest.abort();
             response = forestResponseFactory.createResponse(request, null, lifeCycleHandler, e, startDate);
             lifeCycleHandler.handleSyncWithException(request, response, e);
-            return;
         } catch (ForestRuntimeException e) {
             httpRequest.abort();
             throw e;
         } finally {
+            if (hasProxyAuthenticator) {
+                SocksAuthenticator.getInstance().removePasswordAuthenticator();
+            }
             request.pool().finish(request);
         }
     }

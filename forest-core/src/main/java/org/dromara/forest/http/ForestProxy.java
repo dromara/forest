@@ -24,9 +24,12 @@
 
 package org.dromara.forest.http;
 
+import org.dromara.forest.exceptions.ForestRuntimeException;
 import org.dromara.forest.utils.RequestNameValue;
 import org.dromara.forest.utils.StringUtils;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +39,8 @@ import java.util.Map;
  * @since 1.5.0-BETA5
  */
 public class ForestProxy implements HasURL, HasHeaders {
+
+    private final ForestProxyType type;
 
     private final String host;
 
@@ -49,7 +54,48 @@ public class ForestProxy implements HasURL, HasHeaders {
 
     private ForestHeaderMap headers = new ForestHeaderMap(this);
 
+    public static ForestProxy http(String ip, int port) {
+        return new ForestProxy(ip, port);
+    }
+
+    public static ForestProxy socks(String ip, int port) {
+        return new ForestProxy(ForestProxyType.SOCKS, ip, port);
+    }
+
+    public static ForestProxy url(String url) {
+        try {
+            final URL javaUrl = new URL(url);
+            final String protocol = javaUrl.getProtocol();
+            final ForestProxyType type = StringUtils.isNotBlank(protocol) && protocol.startsWith("socks")
+                    ?  ForestProxyType.SOCKS
+                    : ForestProxyType.HTTP;
+            final String userInfo = javaUrl.getUserInfo();
+            String username = null, password = null;
+            if (StringUtils.isNotEmpty(userInfo)) {
+                String[] infos = userInfo.split("\\:");
+                if (infos.length > 0) {
+                    username = infos[0];
+                }
+                if (infos.length > 1) {
+                    password = infos[1];
+                }
+            }
+            final String host = javaUrl.getHost();
+            int port = javaUrl.getPort();
+            return new ForestProxy(type, host, port)
+                    .username(username)
+                    .password(password);
+        } catch (MalformedURLException e) {
+            throw new ForestRuntimeException(e);
+        }
+    }
+
     public ForestProxy(String ip, int port) {
+        this(ForestProxyType.HTTP, ip, port);
+    }
+
+    public ForestProxy(ForestProxyType type, String ip, int port) {
+        this.type = type;
         this.host = ip;
         this.port = port;
     }
@@ -68,6 +114,10 @@ public class ForestProxy implements HasURL, HasHeaders {
             }
         }
         return builder.toString();
+    }
+
+    public ForestProxyType getType() {
+        return type;
     }
 
     /**
@@ -108,13 +158,32 @@ public class ForestProxy implements HasURL, HasHeaders {
         return this;
     }
 
+    /**
+     * 设置代理用户名
+     *
+     * @param username 代理用户名
+     * @return {@link ForestProxy}对象实例
+     */
+    public ForestProxy username(String username) {
+        this.username = username;
+        return this;
+    }
+
+
     public String getCharset() {
         return charset;
     }
 
-    public void setCharset(String charset) {
+    public ForestProxy setCharset(String charset) {
         this.charset = charset;
+        return this;
     }
+
+    public ForestProxy charset(String charset) {
+        this.charset = charset;
+        return this;
+    }
+
 
     /**
      * 获取代理密码
@@ -135,6 +204,18 @@ public class ForestProxy implements HasURL, HasHeaders {
         this.password = password;
         return this;
     }
+
+    /**
+     * 获取代理密码
+     *
+     * @param password 代理密码
+     * @return
+     */
+    public ForestProxy password(String password) {
+        this.password = password;
+        return this;
+    }
+
 
     /**
      * 获取该代理的所有请求头信息

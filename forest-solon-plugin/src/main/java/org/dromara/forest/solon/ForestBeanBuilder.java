@@ -17,6 +17,8 @@ import org.dromara.forest.ssl.SSLSocketFactoryBuilder;
 import org.dromara.forest.utils.ForestDataType;
 import org.dromara.forest.utils.StringUtils;
 import org.noear.solon.Utils;
+import org.noear.solon.core.AppContext;
+import org.noear.solon.core.BeanWrap;
 import org.noear.solon.core.wrap.ClassWrap;
 import org.noear.solon.core.wrap.FieldWrap;
 

@@ -1,6 +1,7 @@
 package org.dromara.forest.lifecycles.base;
 
 import org.dromara.forest.annotation.BaseRequest;
+import org.dromara.forest.interceptor.Interceptor;
 import org.dromara.forest.lifecycles.BaseAnnotationLifeCycle;
 import org.dromara.forest.proxy.InterfaceProxyHandler;
 import org.dromara.forest.reflection.MetaRequest;
@@ -66,7 +67,7 @@ public class BaseRequestLifeCycle implements BaseAnnotationLifeCycle<BaseRequest
             baseMetaRequest.setMaxRetryInterval(baseMaxRetryInterval);
         }
 
-        final Class<?>[] baseInterceptorClasses = annotation.interceptor();
+        final Class<? extends Interceptor>[] baseInterceptorClasses = annotation.interceptor();
         baseMetaRequest.setInterceptor(baseInterceptorClasses);
 
     }

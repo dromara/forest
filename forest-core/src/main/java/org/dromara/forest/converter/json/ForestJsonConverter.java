@@ -40,11 +40,15 @@ import org.dromara.forest.http.body.StringRequestBody;
 import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -141,9 +145,7 @@ public interface ForestJsonConverter extends ForestConverter<String>, ForestEnco
                         }
                         jsonMap.putAll(subMap);
                     } else {
-                        if (jsonArray == null) {
-                            jsonArray = new LinkedList<>();
-                        }
+                        jsonArray = jsonArray != null ? jsonArray : new LinkedList<>();
                         jsonArray.add(content);
                     }
                 } else if (bodyItem instanceof ObjectRequestBody) {

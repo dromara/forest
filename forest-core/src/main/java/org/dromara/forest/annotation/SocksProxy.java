@@ -1,8 +1,8 @@
 package org.dromara.forest.annotation;
 
+
 import org.dromara.forest.callback.HTTPProxySource;
 import org.dromara.forest.http.ForestProxyType;
-import org.dromara.forest.lifecycles.proxy.HTTPProxyLifeCycle;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -10,60 +10,47 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * HTTP正向代理注解
- *
- * @author gongjun [dt_flys@hotmail.com]
- * @since 1.5.0-BETA5
- */
 @Documented
-@MethodLifeCycle(HTTPProxyLifeCycle.class)
+@HTTPProxy(type = ForestProxyType.SOCKS)
 @RequestAttributes
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.ANNOTATION_TYPE})
-public @interface HTTPProxy {
-
-    /**
-     * 代理类型
-     * @return 代理类型
-     */
-    ForestProxyType type() default ForestProxyType.HTTP;
+public @interface SocksProxy {
 
     /**
      * 代理服务主机地址
      * @return 代理服务主机地址
      */
+    @OverrideAttribute
     String host() default "";
 
     /**
      * 代理服务端口号
      * @return 代理服务端口号
      */
+    @OverrideAttribute
     String port() default "80";
 
     /**
      * 代理用户名
      * @return 代理用户名
      */
+    @OverrideAttribute
     String username() default "";
 
     /**
      * 代理密码
      * @return 代理密码
      */
+    @OverrideAttribute
     String password() default "";
 
-    /**
-     * http proxy headers
-     *
-     * @return http proxy headers
-     */
-    String[] headers() default {};
 
     /**
      * 动态构建正向代理信息的回调函数接口类
      * @return 回调函数接口类
      */
+    @OverrideAttribute
     Class<? extends HTTPProxySource> source() default HTTPProxySource.class;
 
 }

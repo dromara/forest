@@ -41,7 +41,6 @@ public class GzipUtils {
         return false;
     }
 
-
     /**
      * 压缩字节数组数据
      *
@@ -59,8 +58,6 @@ public class GzipUtils {
         }
         return byteArrayOutputStream.toByteArray();
     }
-
-
 
     /**
      * 压缩字符串数据

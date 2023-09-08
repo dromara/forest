@@ -3,7 +3,7 @@ package org.dromara.forest.solon;
 import org.dromara.forest.http.ForestRequest;
 import org.dromara.forest.interceptor.Interceptor;
 import org.noear.solon.annotation.Inject;
-import org.noear.solon.core.AopContext;
+import org.noear.solon.core.AppContext;
 import org.noear.solon.core.Bridge;
 import org.noear.solon.core.LoadBalance;
 
@@ -16,7 +16,7 @@ import org.noear.solon.core.LoadBalance;
 public class SolonUpstreamInterceptor implements Interceptor {
 
     @Inject
-    AopContext aopContext;
+    AppContext aopContext;
 
     @Override
     public boolean beforeExecute(ForestRequest request) {

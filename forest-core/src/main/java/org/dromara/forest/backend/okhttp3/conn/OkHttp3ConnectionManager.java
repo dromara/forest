@@ -1,6 +1,7 @@
 package org.dromara.forest.backend.okhttp3.conn;
 
 import org.dromara.forest.backend.ForestConnectionManager;
+import org.dromara.forest.backend.SocksAuthenticator;
 import org.dromara.forest.backend.okhttp3.OkHttp3Backend;
 import org.dromara.forest.backend.okhttp3.OkHttpClientProvider;
 import org.dromara.forest.backend.okhttp3.response.OkHttpResponseBody;
@@ -10,6 +11,7 @@ import org.dromara.forest.handler.LifeCycleHandler;
 import org.dromara.forest.http.ForestHeaderMap;
 import org.dromara.forest.http.ForestProtocol;
 import org.dromara.forest.http.ForestProxy;
+import org.dromara.forest.http.ForestProxyType;
 import org.dromara.forest.http.ForestRequest;
 import org.dromara.forest.ssl.ForestX509TrustManager;
 import org.dromara.forest.ssl.SSLKeyStore;
@@ -19,6 +21,7 @@ import org.dromara.forest.utils.TimeUtils;
 import okhttp3.Authenticator;
 import okhttp3.ConnectionPool;
 import okhttp3.Credentials;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Protocol;
 import okhttp3.Request;
@@ -28,6 +31,7 @@ import okhttp3.Route;
 import javax.annotation.Nullable;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.nio.charset.Charset;
@@ -147,40 +151,51 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
             // set proxy
             final ForestProxy proxy = request.getProxy();
             if (proxy != null) {
-                final Proxy okProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxy.getHost(), proxy.getPort()));
+                final String username = proxy.getUsername();
+                final String password = proxy.getPassword();
+                final Proxy.Type type = proxy.getType() == ForestProxyType.SOCKS ? Proxy.Type.SOCKS : Proxy.Type.HTTP;
+                final Proxy okProxy = new Proxy(type, new InetSocketAddress(proxy.getHost(), proxy.getPort()));
                 builder.proxy(okProxy);
-                if (StringUtils.isNotEmpty(proxy.getUsername()) || !proxy.getHeaders().isEmpty()) {
-                    builder.proxyAuthenticator(new Authenticator() {
-                        @Nullable
-                        @Override
-                        public Request authenticate(@Nullable Route route, Response response) {
-                            final Request.Builder proxyBuilder = response.request().newBuilder();
-                            final Charset charset = StringUtils.isNotEmpty(proxy.getCharset()) ?
-                                    Charset.forName(proxy.getCharset()) : null;
+                if (type == Proxy.Type.HTTP &&
+                        (StringUtils.isNotEmpty(username) || !proxy.getHeaders().isEmpty())) {
+                    builder.proxyAuthenticator((route, response) -> {
+                        final Request.Builder proxyBuilder = response.request().newBuilder();
+                        final Charset charset = StringUtils.isNotEmpty(proxy.getCharset()) ?
+                                Charset.forName(proxy.getCharset()) : null;
 
-                            final ForestHeaderMap proxyHeaders = proxy.getHeaders();
-                            if (!proxyHeaders.isEmpty()) {
-                                for (Map.Entry<String, String> entry : proxyHeaders.entrySet()) {
-                                    proxyBuilder.addHeader(entry.getKey(), entry.getValue());
-                                }
+                        final ForestHeaderMap proxyHeaders = proxy.getHeaders();
+                        if (!proxyHeaders.isEmpty()) {
+                            for (Map.Entry<String, String> entry : proxyHeaders.entrySet()) {
+                                proxyBuilder.addHeader(entry.getKey(), entry.getValue());
                             }
-                            if (!proxyHeaders.containsKey("Proxy-Authorization")) {
-                                final String credential = charset != null ?
-                                        Credentials.basic(
-                                        proxy.getUsername(),
-                                        proxy.getPassword(),
-                                        charset) :
-                                        Credentials.basic(
-                                        proxy.getUsername(),
-                                        proxy.getPassword());
-                                proxyBuilder.addHeader("Proxy-Authorization", credential);
+                        }
+                        if (!proxyHeaders.containsKey("Proxy-Authorization")) {
+                            final String credential = charset != null
+                                    ? Credentials.basic(username, password, charset)
+                                    : Credentials.basic(username, password);
+                            proxyBuilder.addHeader("Proxy-Authorization", credential);
+                        }
+                        proxyBuilder.removeHeader("User-Agent");
+                        proxyBuilder.removeHeader("Proxy-Connection");
+                        return proxyBuilder.build();
+                    });
+                } else if (type == Proxy.Type.SOCKS) {
+                    builder.addInterceptor(chain -> {
+                        boolean hasProxyAuthenticator = false;
+                        if (StringUtils.isNotEmpty(username)) {
+                            SocksAuthenticator.getInstance().setPasswordAuthenticator(username, password);
+                            hasProxyAuthenticator = true;
+                        }
+                        try {
+                            return chain.proceed(chain.request());
+                        } finally {
+                            if (hasProxyAuthenticator) {
+                                SocksAuthenticator.getInstance().removePasswordAuthenticator();
                             }
-                            proxyBuilder.removeHeader("User-Agent");
-                            proxyBuilder.removeHeader("Proxy-Connection");
-                            return proxyBuilder.build();
                         }
                     });
                 }
+
             }
 
             if (request.isSSL()) {

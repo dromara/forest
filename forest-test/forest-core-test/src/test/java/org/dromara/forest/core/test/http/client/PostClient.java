@@ -362,6 +362,9 @@ public interface PostClient {
     String postJsonBodyMap(@JSONBody Map user);
 
     @Post("http://localhost:{port}/json")
+    String postJsonBodyArray(@Body String[] userids);
+
+    @Post("http://localhost:{port}/json")
     ForestRequest<String> postJsonBodyList(@JSONBody List<Map> users);
 
     @Post("http://localhost:{port}/json")

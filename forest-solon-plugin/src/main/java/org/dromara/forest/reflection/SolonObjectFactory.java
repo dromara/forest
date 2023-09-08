@@ -1,14 +1,14 @@
 package org.dromara.forest.reflection;
 
-import org.noear.solon.core.AopContext;
+import org.noear.solon.core.AppContext;
 
 /**
  * @author noear
  * @since 1.11
  */
 public class SolonObjectFactory extends DefaultObjectFactory{
-    final AopContext context;
-    public SolonObjectFactory(AopContext context){
+    final AppContext context;
+    public SolonObjectFactory(AppContext context){
         this.context = context;
     }
 

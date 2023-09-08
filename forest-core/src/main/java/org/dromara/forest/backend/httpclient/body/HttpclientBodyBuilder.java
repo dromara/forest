@@ -71,6 +71,7 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
                                String contentType,
                                LifeCycleHandler lifeCycleHandler) {
         String boundary = request.getBoundary();
+
         MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
         if (StringUtils.isNotEmpty(boundary)) {
             entityBuilder.setBoundary(boundary);

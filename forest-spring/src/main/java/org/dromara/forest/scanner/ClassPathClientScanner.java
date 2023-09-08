@@ -1,9 +1,9 @@
 package org.dromara.forest.scanner;
 
 import org.dromara.forest.file.SpringResource;
-import org.dromara.forest.http.body.MultipartRequestBodyBuilder;
 import org.dromara.forest.http.body.RequestBodyBuilder;
-import org.dromara.forest.http.body.ResourceRequestBodyBuilder;
+import org.dromara.forest.http.body.SpringMultipartRequestBodyBuilder;
+import org.dromara.forest.http.body.SpringResourceRequestBodyBuilder;
 import org.dromara.forest.multipart.ForestMultipartFactory;
 import org.dromara.forest.utils.ClientFactoryBeanUtils;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
@@ -63,12 +63,12 @@ public class ClassPathClientScanner extends ClassPathBeanDefinitionScanner {
      */
     public void registerMultipartTypes() {
         ForestMultipartFactory.registerFactory(Resource.class, SpringResource.class);
-        RequestBodyBuilder.registerBodyBuilder(Resource.class, new ResourceRequestBodyBuilder());
+        RequestBodyBuilder.registerBodyBuilder(Resource.class, new SpringResourceRequestBodyBuilder());
         try {
             Class multipartFileClass = Class.forName("org.springframework.web.multipart.MultipartFile");
             Class springMultipartFileClass = Class.forName("org.dromara.forest.file.SpringMultipartFile");
             ForestMultipartFactory.registerFactory(multipartFileClass, springMultipartFileClass);
-            RequestBodyBuilder.registerBodyBuilder(multipartFileClass, new MultipartRequestBodyBuilder());
+            RequestBodyBuilder.registerBodyBuilder(multipartFileClass, new SpringMultipartRequestBodyBuilder());
         } catch (Throwable th) {
         }
     }

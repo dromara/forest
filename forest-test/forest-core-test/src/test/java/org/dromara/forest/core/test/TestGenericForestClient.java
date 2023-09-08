@@ -21,6 +21,8 @@ import org.dromara.forest.http.ForestAddress;
 import org.dromara.forest.http.ForestAsyncMode;
 import org.dromara.forest.http.ForestFuture;
 import org.dromara.forest.http.ForestHeader;
+import org.dromara.forest.http.ForestProxy;
+import org.dromara.forest.http.ForestProxyType;
 import org.dromara.forest.http.ForestRequest;
 import org.dromara.forest.http.ForestResponse;
 import org.dromara.forest.http.ForestURL;
@@ -725,6 +727,8 @@ public class TestGenericForestClient extends BaseClientTest {
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
     }
 
+
+
 /*
     @Test
     public void testRequest_get_http_1_0() {
@@ -951,7 +955,7 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_content_type_with_charset() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        Forest.post("http://localhost:" + server.getPort() + "/org/dromara/forest/test")
+        Forest.post("http://localhost:" + server.getPort() + "/test")
                 .contentTypeJson()
                 .addHeader("Content-Type", "application/json; charset=UTF-8")
                 .addHeader("name", "Forest.backend = okhttp3")
@@ -1133,7 +1137,7 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_lazy_header() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        Forest.post("http://localhost:" + server.getPort() + "/org/dromara/forest/test")
+        Forest.post("http://localhost:" + server.getPort() + "/test")
                 .contentTypeJson()
                 .addHeader("Content-Type", req -> "application/json; charset=UTF-8")
                 .addHeader("name", req -> "Forest.backend = " + req.getBackend().getName())
@@ -1148,7 +1152,7 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_lazy_header2() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        Forest.post("http://localhost:" + server.getPort() + "/org/dromara/forest/test")
+        Forest.post("http://localhost:" + server.getPort() + "/test")
                 .addHeader("Content-Type", "application/json; charset=UTF-8")
                 .addHeader("Authorization", req -> Base64.encode("Token=" + req.body().encodeToString()))
                 .addBody("id", "1972664191")
@@ -1164,7 +1168,7 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_lazy_header3() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        Forest.post("http://localhost:" + server.getPort() + "/org/dromara/forest/test")
+        Forest.post("http://localhost:" + server.getPort() + "/test")
                 .contentFormUrlEncoded()
                 .addHeader("Authorization", req -> Base64.encode("Token=" + req.body().encodeToString()))
                 .addBody("id", "1972664191")
@@ -1181,7 +1185,7 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_lazy_body() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        Forest.post("http://localhost:" + server.getPort() + "/org/dromara/forest/test")
+        Forest.post("http://localhost:" + server.getPort() + "/test")
                 .addHeader("Content-Type", "application/json; charset=UTF-8")
                 .addHeader("_id", "20011008")
                 .addBody("id", "1972664191")
@@ -1196,7 +1200,7 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_lazy_body2() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        Forest.post("http://localhost:" + server.getPort() + "/org/dromara/forest/test")
+        Forest.post("http://localhost:" + server.getPort() + "/test")
                 .addHeader("Content-Type", "application/json; charset=UTF-8")
                 .addHeader("_id", "20011008")
                 .addBody("id", "1972664191")
@@ -1215,7 +1219,7 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_lazy_body3() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        Forest.post("http://localhost:" + server.getPort() + "/org/dromara/forest/test")
+        Forest.post("http://localhost:" + server.getPort() + "/test")
                 .addHeader("Content-Type", "application/json; charset=UTF-8")
                 .addHeader("_id", "20011008")
                 .addBody("id", "1972664191")
@@ -1232,7 +1236,7 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_lazy_body4() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        Forest.post("http://localhost:" + server.getPort() + "/org/dromara/forest/test")
+        Forest.post("http://localhost:" + server.getPort() + "/test")
                 .addHeader("Content-Type", "application/json; charset=UTF-8")
                 .addHeader("_id", "20011008")
                 .addBody("id", "1972664191")
@@ -1255,7 +1259,7 @@ public class TestGenericForestClient extends BaseClientTest {
         data.put("id", "1972664191");
         data.put("name", "XieYu20011008");
 
-        Forest.post("http://localhost:" + server.getPort() + "/org/dromara/forest/test")
+        Forest.post("http://localhost:" + server.getPort() + "/test")
                 .addHeader("Content-Type", "application/json; charset=UTF-8")
                 .addHeader("_id", "20011008")
                 .addBody(data)
@@ -1279,7 +1283,7 @@ public class TestGenericForestClient extends BaseClientTest {
         data.put("name", "XieYu20011008");
         data.put("token", (Lazy<Object>) (req -> Base64.encode(req.body().encode())));
 
-        Forest.post("http://localhost:" + server.getPort() + "/org/dromara/forest/test")
+        Forest.post("http://localhost:" + server.getPort() + "/test")
                 .addHeader("Content-Type", "application/json; charset=UTF-8")
                 .addHeader("_id", "20011008")
                 .addBody(data)
@@ -1331,7 +1335,7 @@ public class TestGenericForestClient extends BaseClientTest {
         data.setName("XieYu20011008");
         data.setToken(req -> Base64.encode(req.body().encode()));
 
-        Forest.post("http://localhost:" + server.getPort() + "/org/dromara/forest/test")
+        Forest.post("http://localhost:" + server.getPort() + "/test")
                 .addHeader("Content-Type", "application/json; charset=UTF-8")
                 .addHeader("_id", "20011008")
                 .addBody(data)
@@ -1555,6 +1559,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertBodyEquals(xml);
     }
 
+
     @Test
     public void testRequest_post_xml_body_gzip() {
         final String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
@@ -1573,6 +1578,7 @@ public class TestGenericForestClient extends BaseClientTest {
         mockRequest(server)
                 .assertBodyEquals(compress);
     }
+
 
     @Test
     public void testRequest_put_form_body_keys() {
@@ -2223,6 +2229,44 @@ public class TestGenericForestClient extends BaseClientTest {
                         ForestProgress::getRequest)
                 .contains(true, 1D, response.getRequest());
     }
+
+    @Test
+    public void testProxyFromHTTPUrl() {
+        final ForestRequest req = Forest.get("https://www.google.com")
+                .proxy("http://root:123456@localhost:1082")
+                .connectTimeout(20000);
+        final ForestProxy proxy = req.getProxy();
+        assertThat(proxy).isNotNull();
+        assertThat(proxy.getType()).isEqualTo(ForestProxyType.HTTP);
+        assertThat(proxy.getHost()).isEqualTo("localhost");
+        assertThat(proxy.getPort()).isEqualTo(1082);
+        assertThat(proxy.getUsername()).isEqualTo("root");
+        assertThat(proxy.getPassword()).isEqualTo("123456");
+    }
+
+
+
+/*
+    @Test
+    public void testSocksHttpProxy() {
+        final String ret = Forest.get("http://www.google.com")
+                .proxy(ForestProxy.socks("localhost", 1089))
+                .connectTimeout(20000)
+                .executeAsString();
+        System.out.println(ret);
+    }
+
+    @Test
+    public void testSocksHttpsProxy() {
+        final String ret = Forest.get("https://www.google.com")
+                .proxy(ForestProxy.socks("localhost", 1089)
+                        .username("dtflys")
+                        .password("123456"))
+                .connectTimeout(20000)
+                .executeAsString();
+        System.out.println(ret);
+    }
+*/
 
 
 }
