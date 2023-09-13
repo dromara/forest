@@ -173,4 +173,10 @@ public class TestBaseReqClient extends BaseClientTest {
                 .assertHeaderEquals("Accept", "text/plain");
     }
 
+    @Test
+    public void testBaidu() {
+        String ret = baseURLClient.baidu();
+        assertThat(ret).isNotBlank();
+    }
+
 }
