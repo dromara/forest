@@ -46,22 +46,11 @@ public class TestBaseURLPortClient  extends BaseClientTest{
     @Test
     public void testSimpleGet() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        assertThat(baseURLPortClient.getBaidu())
+        assertThat(baseURLPortClient.hello())
                 .isNotNull()
                 .isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertMethodEquals("GET")
-                .assertPathEquals("/getBaidu");
-    }
-
-    @Test
-    public void testSimpleGet2() {
-        server.enqueue(new MockResponse().setBody(EXPECTED));
-        assertThat(baseURLPortClient.testPort("123"))
-                .isNotNull()
-                .isEqualTo(EXPECTED);
-        mockRequest(server)
-                .assertMethodEquals("GET")
-                .assertPathEquals("/testPort");
+                .assertPathEquals("/hello/user");
     }
 }

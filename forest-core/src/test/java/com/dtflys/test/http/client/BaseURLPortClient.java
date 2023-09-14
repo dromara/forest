@@ -13,9 +13,6 @@ import com.dtflys.forest.annotation.Var;
 @BaseRequest(baseURL = "${baseURL}")
 public interface BaseURLPortClient {
 
-    @Get("http://www.baidu.com/a/b/c")
-    String getBaidu();
-
-    @Get("http://www.baidu.com:{port}/a/b/c")
-    String testPort(@Var("port") String port);
+    @Get("hello/user")
+    String hello();
 }
