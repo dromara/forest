@@ -145,7 +145,7 @@ public class TestBaseReqClient extends BaseClientTest {
             .isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertMethodEquals("GET")
-                .assertPathEquals("/xxx/hello/user")
+                .assertPathEquals("/hello/user")
                 .assertHeaderEquals("Accept", "text/plain");
     }
 
@@ -157,7 +157,7 @@ public class TestBaseReqClient extends BaseClientTest {
                 .isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertMethodEquals("GET")
-                .assertPathEquals("/xxx");
+                .assertPathEquals("/");
     }
 
 
