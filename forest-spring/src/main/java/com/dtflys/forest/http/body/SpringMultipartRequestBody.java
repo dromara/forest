@@ -7,11 +7,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-public class MultipartRequestBody extends ForestRequestBody {
+public class SpringMultipartRequestBody extends ForestRequestBody {
 
     private MultipartFile multipartFile;
 
-    public MultipartRequestBody(MultipartFile multipartFile) {
+    public SpringMultipartRequestBody(MultipartFile multipartFile) {
         this.multipartFile = multipartFile;
     }
 
@@ -38,8 +38,8 @@ public class MultipartRequestBody extends ForestRequestBody {
     }
 
     @Override
-    public MultipartRequestBody clone() {
-        MultipartRequestBody newBody = new MultipartRequestBody(multipartFile);
+    public SpringMultipartRequestBody clone() {
+        SpringMultipartRequestBody newBody = new SpringMultipartRequestBody(multipartFile);
         newBody.setDefaultValue(getDefaultValue());
         return newBody;
     }

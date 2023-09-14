@@ -18,7 +18,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.noear.solon.annotation.Inject;
-import org.noear.solon.core.AopContext;
+import org.noear.solon.core.AppContext;
 import org.noear.solon.test.SolonJUnit4ClassRunner;
 import org.noear.solon.test.SolonTest;
 
@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 public class Test0 {
 
     @Inject
-    AopContext aopContext;
+    AppContext aopContext;
 
     @Inject
     private BeastshopClient beastshopClient;

@@ -161,4 +161,14 @@ public class TestEncoderClient extends BaseClientTest {
                 .assertBodyEquals("{\"name\":\"AAA\",\"value\":\"BBB\"}");
     }
 
+    @Test
+    public void testOnBodyEncode() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        EncoderClient.Entry entry = new EncoderClient.Entry("AAA", "BBB");
+        String ret = encoderClient.testOnBodyEncode(entry);
+        assertThat(ret).isNotNull().isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertBodyEquals("{\"name\":\"AAA\",\"value\":\"BBB\"}:encoded");
+    }
+
 }

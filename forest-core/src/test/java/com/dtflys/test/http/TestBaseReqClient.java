@@ -145,7 +145,7 @@ public class TestBaseReqClient extends BaseClientTest {
             .isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertMethodEquals("GET")
-                .assertPathEquals("/xxx/hello/user")
+                .assertPathEquals("/hello/user")
                 .assertHeaderEquals("Accept", "text/plain");
     }
 
@@ -157,7 +157,7 @@ public class TestBaseReqClient extends BaseClientTest {
                 .isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertMethodEquals("GET")
-                .assertPathEquals("/xxx");
+                .assertPathEquals("/");
     }
 
 
@@ -171,6 +171,12 @@ public class TestBaseReqClient extends BaseClientTest {
                 .assertMethodEquals("GET")
                 .assertPathEquals("/hello/user")
                 .assertHeaderEquals("Accept", "text/plain");
+    }
+
+    @Test
+    public void testBaidu() {
+        String ret = baseURLClient.baidu();
+        assertThat(ret).isNotBlank();
     }
 
 }

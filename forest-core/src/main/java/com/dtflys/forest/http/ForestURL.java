@@ -402,7 +402,7 @@ public class ForestURL {
         }
         if (StringUtils.isNotEmpty(path)) {
             String encodedPath = URLUtils.pathEncode(path, "UTF-8");
-            if ((host != null || basePath != null) && encodedPath.charAt(0) != '/') {
+            if ((host != null || basePath != null) && encodedPath.charAt(0) != '/' && builder.charAt(builder.length() - 1) != '/') {
                 builder.append('/');
             }
             builder.append(encodedPath);
@@ -506,6 +506,7 @@ public class ForestURL {
         String baseHost = "localhost";
         int basePort = -1;
         String basePath = null;
+        boolean portChange = false;
         if (baseURL != null) {
             if (baseURL.scheme != null) {
                 baseSchema = baseURL.scheme;
@@ -525,6 +526,7 @@ public class ForestURL {
         }
         boolean needBasePath = false;
         if (this.scheme == null) {
+            portChange = true;
             setScheme(baseSchema);
             needBasePath = true;
         }
@@ -536,7 +538,7 @@ public class ForestURL {
             needBasePath = true;
         }
 
-        if (URLUtils.isNonePort(this.port)) {
+        if (portChange && URLUtils.isNonePort(this.port)) {
             this.port = basePort;
         }
         if (StringUtils.isNotBlank(this.path)) {

@@ -1,9 +1,11 @@
 package com.dtflys.test.http.encoder;
 
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.dtflys.forest.annotation.Address;
 import com.dtflys.forest.annotation.Body;
 import com.dtflys.forest.annotation.BodyType;
+import com.dtflys.forest.annotation.Get;
 import com.dtflys.forest.annotation.Post;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.converter.json.FastjsonEncoder;
@@ -23,8 +25,10 @@ public interface EncoderClient {
     @XmlAccessorType(XmlAccessType.FIELD)
     class Entry {
         @XmlElement
+        @JSONField(ordinal = 0)
         private String name;
         @XmlElement
+        @JSONField(ordinal = 1)
         private String value;
 
         public Entry() {
@@ -87,6 +91,14 @@ public interface EncoderClient {
     @GsonEncoder
     @Post(url = "/")
     ForestRequest testGson(@Body Entry entry);
+
+
+    @Post(
+            url = "/",
+            contentType = ContentType.APPLICATION_JSON,
+            interceptor = EncoderInterceptor.class
+    )
+    String testOnBodyEncode(@Body Entry entry);
 
 
 }
