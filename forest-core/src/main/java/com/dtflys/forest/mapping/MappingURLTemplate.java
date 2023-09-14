@@ -257,6 +257,11 @@ public class MappingURLTemplate extends MappingTemplate {
                             if (urlGroup0.equals("localhost") ||
                                     urlGroup0.matches("^(((\\d)|([1-9]\\d)|(1\\d{2})|(2[0-4]\\d)|(25[0-5]))\\.){3}((\\d)|([1-9]\\d)|(1\\d{2})|(2[0-4]\\d)|(25[0-5]))$")) {
                                 host = urlGroup0;
+                            } else {
+                                if (path == null) {
+                                    path = new StringBuilder();
+                                }
+                                path.append(builder);
                             }
                         }
                     }
