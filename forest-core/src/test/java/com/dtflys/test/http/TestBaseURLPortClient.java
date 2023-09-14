@@ -2,15 +2,13 @@ package com.dtflys.test.http;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.test.http.client.BaseURLPortClient;
-import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import org.assertj.core.api.Assertions;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-
-import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 
 /**
  * @Author Microsiland
@@ -36,7 +34,7 @@ public class TestBaseURLPortClient  extends BaseClientTest{
     public TestBaseURLPortClient(HttpBackend backend) {
         super(backend, configuration);
         configuration.setVariableValue("port", server.getPort());
-        configuration.setVariableValue("baseURL", "http://localhost:" + server.getPort());
+        configuration.setVariableValue("baseURL", "http://localhost:" + server.getPort() +"/user");
         baseURLPortClient = configuration.createInstance(BaseURLPortClient.class);
     }
 
@@ -45,12 +43,9 @@ public class TestBaseURLPortClient  extends BaseClientTest{
      */
     @Test
     public void testSimpleGet() {
-        server.enqueue(new MockResponse().setBody(EXPECTED));
-        assertThat(baseURLPortClient.hello())
-                .isNotNull()
-                .isEqualTo(EXPECTED);
-        mockRequest(server)
-                .assertMethodEquals("GET")
-                .assertPathEquals("/hello/user");
+        ForestRequest baidu = baseURLPortClient.baidu();
+        Assertions.assertThat(baidu).isNotNull();
+        Assertions.assertThat(baidu.getUrl()).isEqualTo("http://www.baidu.com");
+        baidu.execute();
     }
 }
