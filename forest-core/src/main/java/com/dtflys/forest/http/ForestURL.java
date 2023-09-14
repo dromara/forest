@@ -402,7 +402,7 @@ public class ForestURL {
         }
         if (StringUtils.isNotEmpty(path)) {
             String encodedPath = URLUtils.pathEncode(path, "UTF-8");
-            if ((host != null || basePath != null) && encodedPath.charAt(0) != '/') {
+            if ((host != null || basePath != null) && encodedPath.charAt(0) != '/' && builder.charAt(builder.length() - 1) != '/') {
                 builder.append('/');
             }
             builder.append(encodedPath);

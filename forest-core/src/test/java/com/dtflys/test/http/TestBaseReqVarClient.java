@@ -2,6 +2,7 @@ package com.dtflys.test.http;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.test.http.client.BaseReqAddressClient;
 import com.dtflys.test.http.client.BaseReqVarClient;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -29,6 +30,8 @@ public class TestBaseReqVarClient extends BaseClientTest{
 
     private final BaseReqVarClient baseReqVarClient;
 
+    private final BaseReqAddressClient baseReqAddressClient;
+
     private static ForestConfiguration configuration;
     @BeforeClass
     public static void prepareClient() {
@@ -37,12 +40,13 @@ public class TestBaseReqVarClient extends BaseClientTest{
     public TestBaseReqVarClient(HttpBackend backend) {
         super(backend, configuration);
         configuration.setVariableValue("port", server.getPort());
-        configuration.setVariableValue("baseURL", "http://localhost:" + server.getPort());
+        configuration.setVariableValue("baseURL", "http://localhost:" + server.getPort() + "/a/");
         baseReqVarClient = configuration.createInstance(BaseReqVarClient.class);
+        baseReqAddressClient = configuration.createInstance(BaseReqAddressClient.class);
     }
 
     /**
-     * 处理方法URL地址没有一个/的情况下导致和baseUrl的拼接错误
+     * @BaseRequest注解下 方法URL地址没有一个/的情况下导致和baseUrl的拼接错误
      */
     @Test
     public void testSimpleGetWithoutSlash() {
@@ -52,6 +56,35 @@ public class TestBaseReqVarClient extends BaseClientTest{
                 .isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertMethodEquals("GET")
-                .assertPathEquals("/hello");
+                .assertPathEquals("/a/hello");
+    }
+
+    /**
+     * @BaseRequest注解下 方法URL地址没有一个/的情况下导致和baseUrl的拼接错误
+     */
+    @Test
+    public void testSimpleGetWithoutSlash2() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(baseReqVarClient.simpleGetWithoutSlash2())
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("GET")
+                .assertPathEquals("/a/c/hello");
+    }
+
+
+    /**
+     * @Address 注解下 方法URL地址没有一个/的情况下导致和baseUrl的拼接错误
+     */
+    @Test
+    public void testSimpleGetWithoutSlash4Address() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        assertThat(baseReqAddressClient.simpleGetWithoutSlash())
+                .isNotNull()
+                .isEqualTo(EXPECTED);
+        mockRequest(server)
+                .assertMethodEquals("GET")
+                .assertPathEquals("/a/hello");
     }
 }
