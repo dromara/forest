@@ -8,7 +8,7 @@ import com.dtflys.forest.http.ForestRequest;
  * @Date: 2023/9/14 9:59
  * @Version 1.0
  */
-@BaseURL("${baseURL}")
+@BaseRequest(baseURL = "${baseURL}")
 public interface BaseURLPortClient {
 
     @Get("http://www.baidu.com")
