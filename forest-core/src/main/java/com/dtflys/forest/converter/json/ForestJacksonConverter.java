@@ -56,10 +56,14 @@ public class ForestJacksonConverter implements ForestJsonConverter {
 
     protected ObjectMapper mapper;
 
+    public ForestJacksonConverter(ObjectMapper mapper) {
+        this.mapper = mapper.copy();
+    }
+
     public ForestJacksonConverter() {
-        mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        mapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
+        this.mapper = new ObjectMapper();
+        this.mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        this.mapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
     }
 
     /**
