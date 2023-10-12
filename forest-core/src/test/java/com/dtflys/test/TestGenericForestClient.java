@@ -31,6 +31,7 @@ import com.dtflys.forest.utils.GzipUtils;
 import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.forest.utils.URLUtils;
 import com.dtflys.test.http.BaseClientTest;
+import com.dtflys.test.http.model.UserParam;
 import com.dtflys.test.model.Result;
 import com.google.common.collect.Lists;
 import okhttp3.mockwebserver.MockResponse;
@@ -360,7 +361,7 @@ public class TestGenericForestClient extends BaseClientTest {
                             latch.countDown();
                             int c = count.incrementAndGet();
                             errorCount.incrementAndGet();
-                            System.out.println(Thread.currentThread().getName() +" 失败: " + req.getAttachment("num"));
+                            System.out.println(Thread.currentThread().getName() + " 失败: " + req.getAttachment("num"));
                             if (c == total) {
 //                                System.out.println("第一阶段: 循环已完成");
                             } else {
@@ -1026,6 +1027,21 @@ public class TestGenericForestClient extends BaseClientTest {
     }
 
 
+    @Test
+    public void testRequest_body_encode_null_value() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        final UserParam param = new UserParam();
+        param.setUsername("xxx");
+        final ForestRequest request = Forest.post("/")
+                .port(server.getPort())
+                .bodyType(ForestDataType.JSON)
+                .addBody(param);
+        System.out.println(request.body()
+                .encodeToString(
+                        ConvertOptions.defaultOptions()
+                                .nullValuePolicy(ConvertOptions.NullValuePolicy.WRITE_EMPTY_STRING)));
+    }
+
 
     @Test
     public void testRequest_lazy_header() {
@@ -1036,10 +1052,10 @@ public class TestGenericForestClient extends BaseClientTest {
                 .addHeader("name", req -> "Forest.backend = " + req.getBackend().getName())
                 .addBody("{\"id\":\"1972664191\", \"name\":\"XieYu20011008\"}")
                 .execute();
-            mockRequest(server)
-                    .assertHeaderEquals("name",  "Forest.backend = " + Forest.config().getBackend().getName())
-                    .assertBodyEquals("{\"id\":\"1972664191\", \"name\":\"XieYu20011008\"}")
-                    .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
+        mockRequest(server)
+                .assertHeaderEquals("name", "Forest.backend = " + Forest.config().getBackend().getName())
+                .assertBodyEquals("{\"id\":\"1972664191\", \"name\":\"XieYu20011008\"}")
+                .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
     }
 
     @Test
