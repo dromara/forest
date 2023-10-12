@@ -116,7 +116,23 @@ public class ForestProxy implements HasURL, HasHeaders {
         return builder.toString();
     }
 
+    /**
+     * 获取代理的协议类型
+     *
+     * @return 代理的协议类型
+     * @since 1.5.33
+     */
     public ForestProxyType getType() {
+        return type;
+    }
+
+    /**
+     * 获取代理的协议类型
+     *
+     * @return 代理的协议类型
+     * @since 1.5.33
+     */
+    public ForestProxyType type() {
         return type;
     }
 
@@ -130,11 +146,31 @@ public class ForestProxy implements HasURL, HasHeaders {
     }
 
     /**
+     * 获取代理主机地址
+     *
+     * @return 代理主机地址
+     * @since 1.5.33
+     */
+    public String host() {
+        return host;
+    }
+
+    /**
      * 获取代理主机端口
      *
      * @return 代理主机端口
      */
     public int getPort() {
+        return port;
+    }
+
+    /**
+     * 获取代理主机端口
+     *
+     * @return 代理主机端口
+     * @since 1.5.33
+     */
+    public int port() {
         return port;
     }
 
@@ -163,6 +199,7 @@ public class ForestProxy implements HasURL, HasHeaders {
      *
      * @param username 代理用户名
      * @return {@link ForestProxy}对象实例
+     * @since 1.5.33
      */
     public ForestProxy username(String username) {
         this.username = username;
@@ -174,6 +211,7 @@ public class ForestProxy implements HasURL, HasHeaders {
         return charset;
     }
 
+
     public ForestProxy setCharset(String charset) {
         this.charset = charset;
         return this;
@@ -183,6 +221,8 @@ public class ForestProxy implements HasURL, HasHeaders {
         this.charset = charset;
         return this;
     }
+
+
 
 
     /**
@@ -209,7 +249,8 @@ public class ForestProxy implements HasURL, HasHeaders {
      * 获取代理密码
      *
      * @param password 代理密码
-     * @return
+     * @return {@link ForestProxy}类实例
+     * @since 1.5.33
      */
     public ForestProxy password(String password) {
         this.password = password;

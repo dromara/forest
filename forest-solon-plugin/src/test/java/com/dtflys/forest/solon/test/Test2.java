@@ -50,7 +50,9 @@ public class Test2 {
         String result = (String) request.execute();
         assertThat(result.startsWith("Global: ")).isTrue();
         Mockito.verify(logger).info("[Forest] [Test2] 请求: \n" +
-                "\tGET https://gitee.com/dt_flys HTTPS");
+                "\tGET https://gitee.com/dt_flys HTTPS\n" +
+                "\t请求头: \n" +
+                "\t\tUser-Agent: forest/1.5.33");
     }
 
 

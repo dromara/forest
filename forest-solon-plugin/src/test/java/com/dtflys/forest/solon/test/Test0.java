@@ -134,19 +134,29 @@ public class Test0 {
         String backendName = backend.getName();
         Mockito.verify(logger).info("[Forest] Request (" + backendName + "): \n" +
                 "\t[Retry]: 1\n" +
-                "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS");
+                "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS\n" +
+                "\tHeaders: \n" +
+                "\t\tUser-Agent: forest/1.5.33");
         Mockito.verify(logger).info("[Forest] Request (" + backendName + "): \n" +
                 "\t[Retry]: 2\n" +
-                "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS");
+                "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS\n" +
+                "\tHeaders: \n" +
+                "\t\tUser-Agent: forest/1.5.33");
         Mockito.verify(logger).info("[Forest] Request (" + backendName + "): \n" +
                 "\t[Retry]: 3\n" +
-                "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS");
+                "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS\n" +
+                "\tHeaders: \n" +
+                "\t\tUser-Agent: forest/1.5.33");
         Mockito.verify(logger).info("[Forest] Request (" + backendName + "): \n" +
                 "\t[Retry]: 4\n" +
-                "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS");
+                "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS\n" +
+                "\tHeaders: \n" +
+                "\t\tUser-Agent: forest/1.5.33");
         Mockito.verify(logger).info("[Forest] Request (" + backendName + "): \n" +
                 "\t[Retry]: 5\n" +
-                "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS");
+                "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS\n" +
+                "\tHeaders: \n" +
+                "\t\tUser-Agent: forest/1.5.33");
 //        Mockito.verify(logger).info("[Forest] [Network Error]: connect timed out");
 
     }

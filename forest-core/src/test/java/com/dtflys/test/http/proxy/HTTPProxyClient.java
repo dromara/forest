@@ -23,7 +23,7 @@ public interface HTTPProxyClient {
     ForestRequest<String> sendHostPortSocks(String host, int port);
 
     @Post("/")
-    @SocksProxy(host = "${0}", port = "${1}")
+    @SocksProxy(host = "${0}", port = "${1}", username = "", password = "")
     ForestRequest<String> sendHostPortSocks2(String host, int port);
 
 
