@@ -1,0 +1,9 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: example-springcloud
+  cloud:
+    nacos:
+      discovery:
+        server-addr: nuc8i7.wcj.plus:8848
