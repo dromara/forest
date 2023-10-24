@@ -1,14 +1,14 @@
 package com.dtflys.forest.config;
 
-import org.noear.solon.core.AopContext;
+import org.noear.solon.core.AppContext;
 
 /**
  * @author noear
  * @since 1.11
  */
 public class SolonForestProperties extends ForestProperties {
-    final AopContext context;
-    public SolonForestProperties(AopContext context){
+    final AppContext context;
+    public SolonForestProperties(AppContext context){
         this.context = context;
     }
 

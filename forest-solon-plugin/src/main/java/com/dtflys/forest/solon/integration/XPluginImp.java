@@ -6,8 +6,8 @@ import com.dtflys.forest.annotation.ForestClient;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.SolonForestProperties;
 import com.dtflys.forest.file.SolonMultipartFile;
-import com.dtflys.forest.http.body.SolonUploadRequestBodyBuilder;
 import com.dtflys.forest.http.body.RequestBodyBuilder;
+import com.dtflys.forest.http.body.SolonUploadRequestBodyBuilder;
 import com.dtflys.forest.interceptor.SolonInterceptorFactory;
 import com.dtflys.forest.multipart.ForestMultipartFactory;
 import com.dtflys.forest.reflection.SolonObjectFactory;
@@ -17,7 +17,7 @@ import com.dtflys.forest.solon.SolonUpstreamInterceptor;
 import com.dtflys.forest.solon.properties.ForestConfigurationProperties;
 import com.dtflys.forest.utils.StringUtils;
 import org.noear.solon.Utils;
-import org.noear.solon.core.AopContext;
+import org.noear.solon.core.AppContext;
 import org.noear.solon.core.BeanWrap;
 import org.noear.solon.core.Plugin;
 import org.noear.solon.core.Props;
@@ -31,7 +31,7 @@ import java.util.Arrays;
  */
 public class XPluginImp implements Plugin {
     @Override
-    public void start(AopContext context) {
+    public void start(AppContext context) {
         //1.初始 ForestConfiguration
         ForestConfiguration configuration = configBeanInit(context);
 
@@ -64,7 +64,7 @@ public class XPluginImp implements Plugin {
 
     }
 
-    private ForestConfiguration configBeanInit(AopContext context) {
+    private ForestConfiguration configBeanInit(AppContext context) {
         Props forestProps = context.cfg().getProp("forest");
         ForestConfigurationProperties configurationProperties = new ForestConfigurationProperties();
         Utils.injectProperties(configurationProperties, forestProps);
