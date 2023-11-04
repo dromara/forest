@@ -74,7 +74,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
         try {
             if (targetType instanceof ParameterizedType
                     || targetType.getClass().getName().startsWith("com.google.gson")) {
-                final Gson gson = getSingleGson();
+                final Gson gson = getGson();
                 return gson.fromJson(source, targetType);
             }
             final Class<?> clazz = ReflectUtils.toClass(targetType);
@@ -89,7 +89,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
                     final JsonArray jsonArray = jsonParser.parse(source).getAsJsonArray();
                     return (T) toList(jsonArray);
                 }
-                final Gson gson = getSingleGson();
+                final Gson gson = getGson();
                 return (T) gson.fromJson(source, targetType);
             } catch (Throwable th) {
                 throw new ForestConvertException(this, th);
@@ -210,7 +210,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
      * 创建GSON对象
      * @return New instance of {@code com.google.gson.Gson}
      */
-    protected Gson getSingleGson() {
+    protected Gson getGson() {
         if (isChangeGsonProper || singleGson == null) {
             final GsonBuilder gsonBuilder = new GsonBuilder();
             if (StringUtils.isNotBlank(dateFormat)) {
@@ -225,7 +225,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
 
     @Override
     public String encodeToString(Object obj) {
-        final Gson gson = getSingleGson();
+        final Gson gson = getGson();
         return gson.toJson(obj);
     }
 
@@ -262,7 +262,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
         if (obj instanceof CharSequence) {
             return convertToJavaObject(obj.toString(), LinkedHashMap.class);
         }
-        final Gson gson = getSingleGson();
+        final Gson gson = getGson();
         final JsonElement jsonElement = gson.toJsonTree(obj);
         return toMap(jsonElement.getAsJsonObject(), true);
     }
@@ -270,7 +270,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
 
 
     public String convertToJson(Object obj, Type type) {
-        final Gson gson = getSingleGson();
+        final Gson gson = getGson();
         return gson.toJson(obj, type);
     }
 
