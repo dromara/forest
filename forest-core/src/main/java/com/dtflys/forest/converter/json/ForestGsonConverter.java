@@ -53,6 +53,10 @@ public class ForestGsonConverter implements ForestJsonConverter {
     /** 日期格式 */
     private String dateFormat;
 
+    protected boolean isChangeGsonProper = false;
+
+    private Gson singleGson;
+
     @Override
     public String getDateFormat() {
         return dateFormat;
@@ -60,6 +64,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
 
     @Override
     public void setDateFormat(String dateFormat) {
+        isChangeGsonProper = true;
         this.dateFormat = dateFormat;
     }
 
@@ -208,12 +213,17 @@ public class ForestGsonConverter implements ForestJsonConverter {
      * 创建GSON对象
      * @return New instance of {@code com.google.gson.Gson}
      */
-    private Gson createGson() {
-        final GsonBuilder gsonBuilder = new GsonBuilder();
-        if (StringUtils.isNotBlank(dateFormat)) {
-            gsonBuilder.setDateFormat(dateFormat);
+    protected Gson createGson() {
+        if (isChangeGsonProper || singleGson == null) {
+            final GsonBuilder gsonBuilder = new GsonBuilder();
+            if (StringUtils.isNotBlank(dateFormat)) {
+                gsonBuilder.setDateFormat(dateFormat);
+            }
+            singleGson = gsonBuilder.create();
+            isChangeGsonProper = false;
+            return singleGson;
         }
-        return gsonBuilder.create();
+        return singleGson;
     }
 
     @Override
