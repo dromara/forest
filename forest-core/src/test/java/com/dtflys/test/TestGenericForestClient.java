@@ -2099,7 +2099,7 @@ public class TestGenericForestClient extends BaseClientTest {
         AtomicReference<ForestProgress> atomicProgress = new AtomicReference<>(null);
         String dir = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "TestDownload";
         ForestRequest<?> request = Forest.get("http://localhost:" + server.getPort())
-                .setDownloadFile(dir, "")
+                .setDownloadFile(dir, filename)
                 .setOnProgress(progress -> {
                     System.out.println("------------------------------------------");
                     System.out.println("total bytes: " + progress.getTotalBytes());

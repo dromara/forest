@@ -47,6 +47,7 @@
 		<commons-lang3.version>3.9</commons-lang3.version>
 		<juniversalchardet.version>1.0.3</juniversalchardet.version>
 		<jsr305.version>3.0.1</jsr305.version>
+		<fastjson2.version>2.0.10</fastjson2.version>
 		<fastjson.version>1.2.83</fastjson.version>
 		<jackson.version>2.13.3</jackson.version>
 		<jackson-databind.version>2.13.3</jackson-databind.version>

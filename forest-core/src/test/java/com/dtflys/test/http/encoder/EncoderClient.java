@@ -8,6 +8,7 @@ import com.dtflys.forest.annotation.BodyType;
 import com.dtflys.forest.annotation.Get;
 import com.dtflys.forest.annotation.Post;
 import com.dtflys.forest.backend.ContentType;
+import com.dtflys.forest.converter.json.Fastjson2Encoder;
 import com.dtflys.forest.converter.json.FastjsonEncoder;
 import com.dtflys.forest.converter.json.GsonEncoder;
 import com.dtflys.forest.converter.json.JacksonEncoder;
@@ -83,6 +84,10 @@ public interface EncoderClient {
     @FastjsonEncoder
     @Post(url = "/")
     ForestRequest testFastjson(@Body Entry entry);
+
+    @Fastjson2Encoder
+    @Post(url = "/")
+    ForestRequest testFastjson2(@Body Entry entry);
 
     @JacksonEncoder
     @Post(url = "/")

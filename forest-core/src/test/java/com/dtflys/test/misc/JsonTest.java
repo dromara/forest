@@ -1,6 +1,7 @@
 package com.dtflys.test.misc;
 
 import com.alibaba.fastjson.TypeReference;
+import com.dtflys.forest.converter.json.ForestFastjson2Converter;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.reflect.TypeToken;
@@ -25,6 +26,7 @@ import java.util.Map;
 public class JsonTest extends TestCase {
 
     private ForestFastjsonConverter fastjsonConverter = new ForestFastjsonConverter();
+    private ForestFastjson2Converter fastjson2Converter = new ForestFastjson2Converter();
     private ForestJacksonConverter jacksonConverter = new ForestJacksonConverter();
     private ForestGsonConverter gsonConverter = new ForestGsonConverter();
 
@@ -77,6 +79,30 @@ public class JsonTest extends TestCase {
         String jsonSource3 = fastjsonConverter.encodeToString(result);
         assertNotNull(jsonSource3);
         Result<List<Contact>> newResult = fastjsonConverter.convertToJavaObject(jsonSource3, new TypeReference<Result<List<Contact>>>() {});
+        assertNotNull(newResult);
+        assertEquals(newResult.getStatus(), new Integer(1));
+
+        String locationText = "{\"status\":\"1\",\"data\":{\"province\":\"江苏省\",\"cross_list\":[{\"distance\":\"191.482\",\"direction\":\"West\",\"name\":\"联谊路--绿溪路\",\"weight\":\"120\",\"level\":\"45000, 45000\",\"longitude\":\"121.0512567\",\"crossid\":\"021H51F0090093015--021H51F009009851\",\"width\":\"8, 8\",\"latitude\":\"31.31579861\"},{\"distance\":\"233.802\",\"direction\":\"NorthEast\",\"name\":\"陆家浜南路--陆家浜北路\",\"weight\":\"120\",\"level\":\"45000, 45000\",\"longitude\":\"121.0476761\",\"crossid\":\"021H51F00900930--021H51F0090093005\",\"width\":\"8, 8\",\"latitude\":\"31.31397833\"},{\"distance\":\"233.802\",\"direction\":\"NorthEast\",\"name\":\"陆家浜南路--绿溪路\",\"weight\":\"120\",\"level\":\"45000, 45000\",\"longitude\":\"121.0476761\",\"crossid\":\"021H51F00900930--021H51F009009851\",\"width\":\"8, 8\",\"latitude\":\"31.31397833\"}],\"code\":\"1\",\"tel\":\"0512\",\"cityadcode\":\"320500\",\"areacode\":\"0512\",\"timestamp\":\"1466430882.37\",\"pos\":\"在昆山市陆家镇人民政府附近, 在绿溪路旁边, 靠近联谊路--绿溪路路口\",\"road_list\":[{\"distance\":\"79\",\"direction\":\"North\",\"name\":\"绿溪路\",\"level\":\"5\",\"longitude\":\"121.05\",\"width\":\"8\",\"roadid\":\"021H51F009009851\",\"latitude\":\"31.3149\"},{\"distance\":\"152\",\"direction\":\"SouthEast\",\"name\":\"教堂路\",\"level\":\"5\",\"longitude\":\"121.048\",\"width\":\"4\",\"roadid\":\"021H51F0090092871\",\"latitude\":\"31.3163\"},{\"distance\":\"191\",\"direction\":\"West\",\"name\":\"联谊路\",\"level\":\"5\",\"longitude\":\"121.051\",\"width\":\"8\",\"roadid\":\"021H51F0090093015\",\"latitude\":\"31.3158\"}],\"result\":\"true\",\"message\":\"Successful.\",\"desc\":\"江苏省,苏州市,昆山市\",\"city\":\"苏州市\",\"districtadcode\":\"320583\",\"district\":\"昆山市\",\"country\":\"中国\",\"provinceadcode\":\"320000\",\"version\":\"2.0-3.0.6168.2019\",\"adcode\":\"320583\",\"poi_list\":[{\"distance\":\"161\",\"direction\":\"West\",\"tel\":\"0512-57877735;0512-57671209;0512-57879719\",\"name\":\"昆山市陆家人民医院\",\"weight\":\"0.0\",\"typecode\":\"090100\",\"longitude\":\"121.047556\",\"address\":\"陆家镇镇北路21号\",\"latitude\":\"31.315543\",\"type\":\"医疗保健服务;综合医院;综合医院\",\"poiid\":\"B020016BMR\"},{\"distance\":\"146\",\"direction\":\"SouthWest\",\"tel\":\"\",\"name\":\"中共陆家镇委政法委\",\"weight\":\"0.0\",\"typecode\":\"130105\",\"longitude\":\"121.048380\",\"address\":\"菉溪路22号\",\"latitude\":\"31.314508\",\"type\":\"政府机构及社会团体;政府机关;乡镇级政府及事业单位\",\"poiid\":\"B0FFF9XX2W\"},{\"distance\":\"141\",\"direction\":\"SouthWest\",\"tel\":\"0512-57671003\",\"name\":\"昆山市陆家镇人民政府\",\"weight\":\"0.0\",\"typecode\":\"130105\",\"longitude\":\"121.048398\",\"address\":\"菉溪路22号\",\"latitude\":\"31.314555\",\"type\":\"政府机构及社会团体;政府机关;乡镇级政府及事业单位\",\"poiid\":\"B020007YBU\"},{\"distance\":\"141\",\"direction\":\"SouthWest\",\"tel\":\"\",\"name\":\"陆家镇人民代表大会\",\"weight\":\"0.0\",\"typecode\":\"130105\",\"longitude\":\"121.048398\",\"address\":\"菉溪路22号\",\"latitude\":\"31.314555\",\"type\":\"政府机构及社会团体;政府机关;乡镇级政府及事业单位\",\"poiid\":\"B020007YBT\"},{\"distance\":\"141\",\"direction\":\"SouthWest\",\"tel\":\"\",\"name\":\"中共昆山市陆家镇委员会\",\"weight\":\"0.0\",\"typecode\":\"130105\",\"longitude\":\"121.048398\",\"address\":\"菉溪路22号\",\"latitude\":\"31.314555\",\"type\":\"政府机构及社会团体;政府机关;乡镇级政府及事业单位\",\"poiid\":\"B020008HW1\"}]}}";
+        Result<Location> locationResult = fastjsonConverter.convertToJavaObject(locationText, new TypeReference<Result<Location>>() {});
+        assertNotNull(locationResult);
+
+    }
+
+    public void testFastjson2() {
+        String jsonSource = fastjson2Converter.encodeToString(map);
+        assertNotNull(jsonSource);
+        Map newMap = fastjson2Converter.convertToJavaObject(jsonSource, Map.class);
+        assertEquals(map, newMap);
+
+        String jsonSource2 = fastjson2Converter.encodeToString(contacts);
+        assertNotNull(jsonSource2);
+        List<Contact> newList = fastjson2Converter.convertToJavaObject(jsonSource2, new com.alibaba.fastjson2.TypeReference<List<Contact>>() {});
+        assertNotNull(newList);
+        assertEquals(newList.get(0).getAge(), new Integer(20));
+
+        String jsonSource3 = fastjson2Converter.encodeToString(result);
+        assertNotNull(jsonSource3);
+        Result<List<Contact>> newResult = fastjson2Converter.convertToJavaObject(jsonSource3, new com.alibaba.fastjson2.TypeReference<Result<List<Contact>>>() {});
         assertNotNull(newResult);
         assertEquals(newResult.getStatus(), new Integer(1));
 

@@ -7,6 +7,7 @@ import com.dtflys.forest.annotation.Get;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.auto.DefaultAutoConverter;
+import com.dtflys.forest.converter.json.ForestFastjson2Converter;
 import com.dtflys.forest.converter.json.ForestFastjsonConverter;
 import com.dtflys.forest.converter.json.ForestJacksonConverter;
 import com.dtflys.forest.exceptions.ForestConvertException;
@@ -93,6 +94,12 @@ public class TestExceptions {
         assertThat(exception.getMessage())
                 .isEqualTo("[Forest] json converter: 'ForestFastjsonConverter' error: xxx");
         assertThat(exception.getConverterClass()).isEqualTo(ForestFastjsonConverter.class);
+
+        converter = new ForestFastjson2Converter();
+        exception = new ForestConvertException(converter, th);
+        assertThat(exception.getMessage())
+                .isEqualTo("[Forest] json converter: 'ForestFastjson2Converter' error: xxx");
+        assertThat(exception.getConverterClass()).isEqualTo(ForestFastjson2Converter.class);
 
         converter = new ForestJacksonConverter();
         exception = new ForestConvertException(converter, th);
