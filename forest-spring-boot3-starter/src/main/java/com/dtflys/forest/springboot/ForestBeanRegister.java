@@ -109,6 +109,7 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
                 .addPropertyValue("logResponseContent", forestConfigurationProperties.isLogResponseContent())
                 .addPropertyValue("logHandler", logHandler)
                 .addPropertyValue("backendName", forestConfigurationProperties.getBackend())
+                .addPropertyValue("backendClientCacheMaxSize", forestConfigurationProperties.getBackendClientCacheMaxSize())
                 .addPropertyValue("baseAddressScheme", forestConfigurationProperties.getBaseAddressScheme())
                 .addPropertyValue("baseAddressHost", forestConfigurationProperties.getBaseAddressHost())
                 .addPropertyValue("baseAddressPort", forestConfigurationProperties.getBaseAddressPort())

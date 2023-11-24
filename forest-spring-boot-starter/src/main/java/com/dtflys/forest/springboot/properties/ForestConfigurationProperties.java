@@ -166,6 +166,11 @@ public class ForestConfigurationProperties {
     private String backend = "okhttp3";
 
     /**
+     * Max size of backend client cache
+     */
+    private Integer backendClientCacheMaxSize = 128;
+
+    /**
      * global variables
      */
     private Map<String, Object> variables = new HashMap<>();
@@ -184,6 +189,7 @@ public class ForestConfigurationProperties {
      * Retry When callback function: used to determine whether to trigger a retry request
      */
     private Class<? extends RetryWhen> retryWhen;
+
 
     /**
      * SSL Key Stores
@@ -429,6 +435,14 @@ public class ForestConfigurationProperties {
 
     public void setBackend(String backend) {
         this.backend = backend;
+    }
+
+    public Integer getBackendClientCacheMaxSize() {
+        return backendClientCacheMaxSize;
+    }
+
+    public void setBackendClientCacheMaxSize(Integer backendClientCacheMaxSize) {
+        this.backendClientCacheMaxSize = backendClientCacheMaxSize;
     }
 
     public Map<String, Object> getVariables() {
