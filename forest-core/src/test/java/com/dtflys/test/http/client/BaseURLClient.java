@@ -1,5 +1,7 @@
 package com.dtflys.test.http.client;
 
+import com.dtflys.forest.annotation.Address;
+import com.dtflys.forest.annotation.BaseRequest;
 import com.dtflys.forest.annotation.BaseURL;
 import com.dtflys.forest.annotation.Get;
 import com.dtflys.forest.annotation.Request;
@@ -10,7 +12,8 @@ import com.dtflys.forest.annotation.Request;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-17 15:31
  */
-@BaseURL("http://localhost:${port}/xxx")
+//@BaseRequest(baseURL = "http://localhost:${port}")
+@Address(basePath = "http://localhost:${port}")
 public interface BaseURLClient {
 
     @Request(
@@ -21,5 +24,9 @@ public interface BaseURLClient {
 
     @Get
     String emptyPathGet();
+
+
+    @Get("http://www.baidu.com")
+    String baidu();
 
 }

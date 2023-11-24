@@ -15,6 +15,7 @@ import com.dtflys.forest.http.ForestAsyncMode;
 import com.dtflys.forest.http.ForestFuture;
 import com.dtflys.forest.http.ForestHeader;
 import com.dtflys.forest.http.ForestProxy;
+import com.dtflys.forest.http.ForestProxyType;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestURL;
@@ -30,6 +31,7 @@ import com.dtflys.forest.utils.GzipUtils;
 import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.forest.utils.URLUtils;
 import com.dtflys.test.http.BaseClientTest;
+import com.dtflys.test.http.model.UserParam;
 import com.dtflys.test.model.Result;
 import com.google.common.collect.Lists;
 import okhttp3.mockwebserver.MockResponse;
@@ -359,7 +361,7 @@ public class TestGenericForestClient extends BaseClientTest {
                             latch.countDown();
                             int c = count.incrementAndGet();
                             errorCount.incrementAndGet();
-                            System.out.println(Thread.currentThread().getName() +" 失败: " + req.getAttachment("num"));
+                            System.out.println(Thread.currentThread().getName() + " 失败: " + req.getAttachment("num"));
                             if (c == total) {
 //                                System.out.println("第一阶段: 循环已完成");
                             } else {
@@ -1025,6 +1027,21 @@ public class TestGenericForestClient extends BaseClientTest {
     }
 
 
+    @Test
+    public void testRequest_body_encode_null_value() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        final UserParam param = new UserParam();
+        param.setUsername("xxx");
+        final ForestRequest request = Forest.post("/")
+                .port(server.getPort())
+                .bodyType(ForestDataType.JSON)
+                .addBody(param);
+        System.out.println(request.body()
+                .encodeToString(
+                        ConvertOptions.defaultOptions()
+                                .nullValuePolicy(ConvertOptions.NullValuePolicy.WRITE_EMPTY_STRING)));
+    }
+
 
     @Test
     public void testRequest_lazy_header() {
@@ -1035,10 +1052,10 @@ public class TestGenericForestClient extends BaseClientTest {
                 .addHeader("name", req -> "Forest.backend = " + req.getBackend().getName())
                 .addBody("{\"id\":\"1972664191\", \"name\":\"XieYu20011008\"}")
                 .execute();
-            mockRequest(server)
-                    .assertHeaderEquals("name",  "Forest.backend = " + Forest.config().getBackend().getName())
-                    .assertBodyEquals("{\"id\":\"1972664191\", \"name\":\"XieYu20011008\"}")
-                    .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
+        mockRequest(server)
+                .assertHeaderEquals("name", "Forest.backend = " + Forest.config().getBackend().getName())
+                .assertBodyEquals("{\"id\":\"1972664191\", \"name\":\"XieYu20011008\"}")
+                .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
     }
 
     @Test
@@ -2121,6 +2138,21 @@ public class TestGenericForestClient extends BaseClientTest {
                         ForestProgress::getRequest)
                 .contains(true, 1D, response.getRequest());
     }
+
+    @Test
+    public void testProxyFromHTTPUrl() {
+        final ForestRequest req = Forest.get("https://www.google.com")
+                .proxy("http://root:123456@localhost:1082")
+                .connectTimeout(20000);
+        final ForestProxy proxy = req.getProxy();
+        assertThat(proxy).isNotNull();
+        assertThat(proxy.getType()).isEqualTo(ForestProxyType.HTTP);
+        assertThat(proxy.getHost()).isEqualTo("localhost");
+        assertThat(proxy.getPort()).isEqualTo(1082);
+        assertThat(proxy.getUsername()).isEqualTo("root");
+        assertThat(proxy.getPassword()).isEqualTo("123456");
+    }
+
 
 
 /*

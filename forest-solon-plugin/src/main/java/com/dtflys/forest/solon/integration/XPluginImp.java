@@ -42,7 +42,7 @@ public class XPluginImp implements Plugin {
         //3.添加 ForestClient 注解支持
         context.beanBuilderAdd(ForestClient.class, (clz, wrap, anno) -> {
             Object client = configuration.client(clz);
-            wrap.context().wrapAndPut(clz, client);
+            context.wrapAndPut(clz, client);
         });
 
         //4.添加 BindingVar 注解支持

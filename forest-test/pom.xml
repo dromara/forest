@@ -19,6 +19,7 @@
 
     <modules>
         <module>forest-spring-boot-test</module>
+        <module>forest-spring-boot3-test</module>
     </modules>
 
     <dependencies>

@@ -18,7 +18,7 @@ public class ConvertOptions {
     /**
      * Null值策略
      */
-    enum NullValuePolicy {
+    public enum NullValuePolicy {
         /**
          * 忽略为 Null 的值
          */

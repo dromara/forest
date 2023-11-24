@@ -4469,6 +4469,17 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     }
 
     /**
+     * 通过代理 URL 字符串设置正向代理
+     *
+     * @param proxyUrl 代理 URL
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest<T> proxy(String proxyUrl) {
+        this.proxy = ForestProxy.url(proxyUrl);
+        return this;
+    }
+
+    /**
      * 设置正向代理
      * <p>同 {@link ForestRequest#setProxy(ForestProxy)}}
      *

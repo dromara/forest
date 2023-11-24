@@ -24,9 +24,12 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +60,34 @@ public class ForestProxy implements HasURL, HasHeaders {
 
     public static ForestProxy socks(String ip, int port) {
         return new ForestProxy(ForestProxyType.SOCKS, ip, port);
+    }
+
+    public static ForestProxy url(String url) {
+        try {
+            final URL javaUrl = new URL(url);
+            final String protocol = javaUrl.getProtocol();
+            final ForestProxyType type = StringUtils.isNotBlank(protocol) && protocol.startsWith("socks")
+                    ?  ForestProxyType.SOCKS
+                    : ForestProxyType.HTTP;
+            final String userInfo = javaUrl.getUserInfo();
+            String username = null, password = null;
+            if (StringUtils.isNotEmpty(userInfo)) {
+                String[] infos = userInfo.split("\\:");
+                if (infos.length > 0) {
+                    username = infos[0];
+                }
+                if (infos.length > 1) {
+                    password = infos[1];
+                }
+            }
+            final String host = javaUrl.getHost();
+            int port = javaUrl.getPort();
+            return new ForestProxy(type, host, port)
+                    .username(username)
+                    .password(password);
+        } catch (MalformedURLException e) {
+            throw new ForestRuntimeException(e);
+        }
     }
 
     public ForestProxy(String ip, int port) {

@@ -16,7 +16,7 @@ import org.noear.solon.core.LoadBalance;
 public class SolonUpstreamInterceptor implements Interceptor {
 
     @Inject
-    AppContext AppContext;
+    AppContext aopContext;
 
     @Override
     public boolean beforeExecute(ForestRequest request) {
