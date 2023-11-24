@@ -58,11 +58,6 @@ public class ForestConfigurationProperties {
     private ForestAsyncMode asyncMode = ForestAsyncMode.PLATFORM;
 
     /**
-     * Timeout in milliseconds
-     */
-    private int timeout = 3000;
-
-    /**
      * Connect timeout in milliseconds
      */
     private Integer connectTimeout = null;
@@ -255,14 +250,6 @@ public class ForestConfigurationProperties {
 
     public void setAsyncMode(ForestAsyncMode asyncMode) {
         this.asyncMode = asyncMode;
-    }
-
-    public int getTimeout() {
-        return timeout;
-    }
-
-    public void setTimeout(int timeout) {
-        this.timeout = timeout;
     }
 
     public Integer getConnectTimeout() {

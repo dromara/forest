@@ -1,6 +1,5 @@
 package com.dtflys.forest.solon;
 
-import com.dtflys.forest.Forest;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.SolonForestProperties;
 import com.dtflys.forest.converter.ForestConverter;
@@ -18,8 +17,7 @@ import com.dtflys.forest.ssl.SSLSocketFactoryBuilder;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 import org.noear.solon.Utils;
-import org.noear.solon.core.AppContext;
-import org.noear.solon.core.BeanWrap;
+import org.noear.solon.core.util.ClassUtil;
 import org.noear.solon.core.wrap.ClassWrap;
 import org.noear.solon.core.wrap.FieldWrap;
 
@@ -82,7 +80,6 @@ public class ForestBeanBuilder {
         forestConfiguration.setMaxConnections(forestConfigurationProperties.getMaxConnections());
         forestConfiguration.setMaxRouteConnections(forestConfigurationProperties.getMaxRouteConnections());
         forestConfiguration.setAsyncMode(forestConfigurationProperties.getAsyncMode());
-        forestConfiguration.setTimeout(forestConfigurationProperties.getTimeout());
         forestConfiguration.setConnectTimeout(forestConfigurationProperties.getConnectTimeoutMillis());
         forestConfiguration.setReadTimeout(forestConfigurationProperties.getReadTimeoutMillis());
         forestConfiguration.setCharset(forestConfigurationProperties.getCharset());
@@ -247,9 +244,9 @@ public class ForestBeanBuilder {
                                                     String sslSocketFactoryBuilderClass) {
 
 
-        TrustManager trustManager = Utils.newInstance(trustManagerClass);
-        HostnameVerifier hostnameVerifier = Utils.newInstance(hostnameVerifierClass);
-        SSLSocketFactoryBuilder sslSocketFactoryBuilder = Utils.newInstance(sslSocketFactoryBuilderClass);
+        TrustManager trustManager = ClassUtil.tryInstance(trustManagerClass);
+        HostnameVerifier hostnameVerifier = ClassUtil.tryInstance(hostnameVerifierClass);
+        SSLSocketFactoryBuilder sslSocketFactoryBuilder = ClassUtil.tryInstance(sslSocketFactoryBuilderClass);
 
         SSLKeyStore sslKeyStore = new SSLKeyStore(id, keystoreType, filePath, keystorePass, certPass, trustManager, hostnameVerifier, sslSocketFactoryBuilder);
 

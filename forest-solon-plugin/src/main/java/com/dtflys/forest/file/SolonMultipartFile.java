@@ -3,8 +3,8 @@ package com.dtflys.forest.file;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.StringUtils;
-import org.noear.solon.Utils;
 import org.noear.solon.core.handle.UploadedFile;
+import org.noear.solon.core.util.IoUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,7 +51,7 @@ public class SolonMultipartFile extends ForestMultipart<UploadedFile, SolonMulti
     @Override
     public byte[] getBytes() {
         try {
-            return Utils.transferToBytes(multipartFile.getContent());
+            return IoUtil.transferToBytes(multipartFile.getContent());
         } catch (IOException e) {
             throw new ForestRuntimeException(e);
         }

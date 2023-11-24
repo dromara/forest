@@ -3,8 +3,8 @@ package com.dtflys.forest.http.body;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.utils.ForestDataType;
-import org.noear.solon.Utils;
 import org.noear.solon.core.handle.UploadedFile;
+import org.noear.solon.core.util.IoUtil;
 
 import java.io.IOException;
 
@@ -27,7 +27,7 @@ public class SolonUploadRequestBody extends ForestRequestBody {
     @Override
     public byte[] getByteArray() {
         try {
-            return Utils.transferToBytes(multipartFile.getContent());
+            return IoUtil.transferToBytes(multipartFile.getContent());
         } catch (IOException e) {
             throw new ForestRuntimeException(e);
         }
