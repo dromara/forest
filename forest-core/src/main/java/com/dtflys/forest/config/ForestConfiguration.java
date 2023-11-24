@@ -68,6 +68,7 @@ import com.dtflys.forest.reflection.ForestObjectFactory;
 import com.dtflys.forest.reflection.ForestVariableValue;
 import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
+import com.dtflys.forest.utils.ForestCache;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.TimeUtils;
@@ -239,6 +240,17 @@ public class ForestConfiguration implements Serializable {
     private volatile HttpBackend backend;
 
     /**
+     * 后端客户端对象缓存最大空间大小
+     */
+    private Integer backendClientCacheMaxSize;
+
+    /**
+     * 后端客户端对象缓存
+     */
+    private ForestCache<String, Object> backendClientCache;
+
+
+    /**
      * HTTP后端名称
      * <p>现有后端包括：okhttp3 和 httpclient 两个</p>
      */
@@ -333,6 +345,7 @@ public class ForestConfiguration implements Serializable {
      */
     ThreadPoolExecutor asyncPool;
 
+
     /**
      * Forest异步请求线程池同步锁
      */
@@ -382,6 +395,7 @@ public class ForestConfiguration implements Serializable {
         converterMap.put(ForestDataType.BINARY, new DefaultBinaryConverter(autoConverter));
         converterMap.put(ForestDataType.FORM, new DefaultFormConvertor(configuration));
         setupJSONConverter(configuration);
+        configuration.setBackendClientCacheMaxSize(128);
         configuration.setTimeout(3000);
         configuration.setMaxConnections(500);
         configuration.setMaxRouteConnections(500);
@@ -498,6 +512,28 @@ public class ForestConfiguration implements Serializable {
      */
     public Map<String, HttpBackend> getAllCreatedBackends() {
         return httpBackendSelector.getAllCreatedBackends();
+    }
+
+    /**
+     * 获取后端客户端对象缓存最大空间大小
+     *
+     * @return 后端客户端对象缓存最大空间大小
+     * @since 1.5.34
+     */
+    public Integer getBackendClientCacheMaxSize() {
+        return backendClientCacheMaxSize;
+    }
+
+    /**
+     * 设置后端客户端对象缓存最大空间大小
+     *
+     * @param backendClientCacheMaxSize 后端客户端对象缓存最大空间大小
+     * @return 当前ForestConfiguration实例
+     * @since 1.5.34
+     */
+    public ForestConfiguration setBackendClientCacheMaxSize(Integer backendClientCacheMaxSize) {
+        this.backendClientCacheMaxSize = backendClientCacheMaxSize;
+        return this;
     }
 
     /**
@@ -1575,6 +1611,51 @@ public class ForestConfiguration implements Serializable {
     public void setPool(ForestRequestPool pool) {
         this.pool = pool;
     }
+
+    /**
+     * 获取后端客户端对象缓存
+     *
+     * @return 后端客户端对象缓存
+     * @since 1.5.34
+     */
+    public ForestCache<String, Object> getBackendClientCache() {
+        if (backendClientCache == null) {
+            synchronized (this) {
+                if (backendClientCache == null) {
+                    backendClientCache = new ForestCache<>(128, 6, TimeUnit.HOURS);
+                }
+            }
+        }
+        return backendClientCache;
+    }
+
+
+    /**
+     * 从缓存中获取后端客户端对象
+     *
+     * @param key 缓存的Key
+     * @param <T> 后端客户端对象类型
+     * @return 后端客户端对象
+     */
+    public <T> T getBackendClient(String key) {
+        final Object client = getBackendClientCache().get(key);
+        if (client != null) {
+            return (T) client;
+        }
+        return null;
+    }
+
+    /**
+     * 缓存后端客户端对象
+     *
+     * @param key 缓存的Key
+     * @param client 后端客户端对象
+     */
+    public void putBackendClientToCache(String key, Object client) {
+        getBackendClientCache().put(key, client);
+    }
+
+
 
     /**
      * 注册全局SSL的Key Store信息

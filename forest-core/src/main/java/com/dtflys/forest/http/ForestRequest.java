@@ -2676,7 +2676,12 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
             readTimeout = timeout;
         }
         StringBuilder builder = new StringBuilder();
-        builder.append("-t=")
+        builder.append(getProtocol())
+                .append("/")
+                .append(getHost())
+                .append(":")
+                .append(getPort())
+                .append("-t=")
                 .append(connectTimeout)
                 .append("-")
                 .append(readTimeout);
