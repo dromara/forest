@@ -402,10 +402,16 @@ public class ForestURL {
         }
         if (StringUtils.isNotEmpty(path)) {
             String encodedPath = URLUtils.pathEncode(path, "UTF-8");
-            if ((host != null || basePath != null) && encodedPath.charAt(0) != '/' && builder.charAt(builder.length() - 1) != '/') {
+            final int len =  builder.length() - 1;
+            if ((host != null || basePath != null) && encodedPath.charAt(0) != '/' && builder.charAt(len) != '/') {
                 builder.append('/');
+                builder.append(encodedPath);
+            } else if (encodedPath.length() > 1 && encodedPath.charAt(0) == '/' && builder.charAt(len) == '/') {
+                builder.append(encodedPath.substring(1));
+            } else {
+                builder.append(encodedPath);
             }
-            builder.append(encodedPath);
+
         }
         return builder.toString();
     }
