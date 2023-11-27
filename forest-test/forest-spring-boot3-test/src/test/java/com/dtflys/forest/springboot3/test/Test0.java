@@ -27,6 +27,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -68,6 +69,7 @@ public class Test0 {
         assertEquals("https://www.thebeastshop.com/autopage", config0.getVariableValue("baseUrl"));
         assertEquals("xxx", config0.getVariableValue("myName"));
         assertNotNull(config0.getVariableValue("user"));
+        assertEquals(Integer.valueOf(512), config0.getBackendClientCacheMaxSize());
         assertTrue(!config0.isLogEnabled());
         assertEquals(ForestAsyncMode.PLATFORM, config0.getAsyncMode());
         assertEquals(Integer.valueOf(12), config0.getVariableValue("myCount"));

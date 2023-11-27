@@ -9,6 +9,7 @@ forest:
   log-enabled: false                      # 全局日志开关
   max-retry-count: 5                      # 请求失败后重试次数
   max-retry-interval: 2000                # 请求重试之间最大间隔时间
+  backend-client-cache-max-size: 512      # 后端客户端缓存最大空间大小
   #  retry-interval: 500                  # 起始重试之间间隔时间
 #  max-retry-interval: 2000               # 最大重试之间间隔时间
   ssl-protocol: SSLv3                     # 单向验证的HTTPS的默认SSL协议
