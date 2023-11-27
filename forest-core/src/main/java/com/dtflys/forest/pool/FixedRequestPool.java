@@ -108,6 +108,9 @@ public class FixedRequestPool implements ForestRequestPool {
     public synchronized void finish(ForestRequest request) {
         // 减少当前活动请求数
         runningPoolSize.decrementAndGet();
+        if (runningPoolSize.get() == 0) {
+            runningPoolSize.set(0);
+        }
         // 减少当前活动路由请求数
         request.route().getRequestCount().decrementAndGet();
         // 通知其他线程
