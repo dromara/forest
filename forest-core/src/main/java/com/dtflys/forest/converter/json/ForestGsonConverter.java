@@ -26,16 +26,13 @@ package com.dtflys.forest.converter.json;
 
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.exceptions.ForestConvertException;
-import com.dtflys.forest.http.ForestBody;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.Lazy;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
 import com.google.gson.*;
-import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -53,6 +50,10 @@ public class ForestGsonConverter implements ForestJsonConverter {
     /** 日期格式 */
     private String dateFormat;
 
+    protected boolean isChangeGsonProper = false;
+
+    private Gson singleGson;
+
     @Override
     public String getDateFormat() {
         return dateFormat;
@@ -60,6 +61,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
 
     @Override
     public void setDateFormat(String dateFormat) {
+        isChangeGsonProper = true;
         this.dateFormat = dateFormat;
     }
 
@@ -72,7 +74,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
         try {
             if (targetType instanceof ParameterizedType
                     || targetType.getClass().getName().startsWith("com.google.gson")) {
-                final Gson gson = createGson();
+                final Gson gson = getGson();
                 return gson.fromJson(source, targetType);
             }
             final Class<?> clazz = ReflectUtils.toClass(targetType);
@@ -87,7 +89,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
                     final JsonArray jsonArray = jsonParser.parse(source).getAsJsonArray();
                     return (T) toList(jsonArray);
                 }
-                final Gson gson = createGson();
+                final Gson gson = getGson();
                 return (T) gson.fromJson(source, targetType);
             } catch (Throwable th) {
                 throw new ForestConvertException(this, th);
@@ -208,17 +210,22 @@ public class ForestGsonConverter implements ForestJsonConverter {
      * 创建GSON对象
      * @return New instance of {@code com.google.gson.Gson}
      */
-    private Gson createGson() {
-        final GsonBuilder gsonBuilder = new GsonBuilder();
-        if (StringUtils.isNotBlank(dateFormat)) {
-            gsonBuilder.setDateFormat(dateFormat);
+    protected Gson getGson() {
+        if (isChangeGsonProper || singleGson == null) {
+            final GsonBuilder gsonBuilder = new GsonBuilder();
+            if (StringUtils.isNotBlank(dateFormat)) {
+                gsonBuilder.setDateFormat(dateFormat);
+            }
+            singleGson = gsonBuilder.create();
+            isChangeGsonProper = false;
+            return singleGson;
         }
-        return gsonBuilder.create();
+        return singleGson;
     }
 
     @Override
     public String encodeToString(Object obj) {
-        final Gson gson = createGson();
+        final Gson gson = getGson();
         return gson.toJson(obj);
     }
 
@@ -255,7 +262,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
         if (obj instanceof CharSequence) {
             return convertToJavaObject(obj.toString(), LinkedHashMap.class);
         }
-        final Gson gson = createGson();
+        final Gson gson = getGson();
         final JsonElement jsonElement = gson.toJsonTree(obj);
         return toMap(jsonElement.getAsJsonObject(), true);
     }
@@ -263,7 +270,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
 
 
     public String convertToJson(Object obj, Type type) {
-        final Gson gson = createGson();
+        final Gson gson = getGson();
         return gson.toJson(obj, type);
     }
 
