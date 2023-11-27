@@ -74,10 +74,6 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
 
     @Override
     public void onProgress(ForestProgress progress) {
-        final ForestRequest request = progress.getRequest();
-//        String dirPath = getAttributeAsString(request, "dir");
-        final String filename = getAttributeAsString(request, "filename");
-        System.out.println("------- " + filename);
     }
 
     @Override
