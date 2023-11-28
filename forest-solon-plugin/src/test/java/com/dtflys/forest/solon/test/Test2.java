@@ -1,5 +1,6 @@
 package com.dtflys.forest.solon.test;
 
+import com.dtflys.forest.Forest;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.logging.ForestLogger;
@@ -52,7 +53,7 @@ public class Test2 {
         Mockito.verify(logger).info("[Forest] [Test2] 请求: \n" +
                 "\tGET https://gitee.com/dt_flys HTTPS\n" +
                 "\t请求头: \n" +
-                "\t\tUser-Agent: forest/1.5.33");
+                "\t\tUser-Agent: forest/" + Forest.VERSION);
     }
 
 

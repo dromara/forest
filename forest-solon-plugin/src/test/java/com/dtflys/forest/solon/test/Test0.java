@@ -1,5 +1,6 @@
 package com.dtflys.forest.solon.test;
 
+import com.dtflys.forest.Forest;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
@@ -132,31 +133,32 @@ public class Test0 {
         }
         HttpBackend backend = config0.getBackend();
         String backendName = backend.getName();
+        String version = Forest.VERSION;
         Mockito.verify(logger).info("[Forest] Request (" + backendName + "): \n" +
                 "\t[Retry]: 1\n" +
                 "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS\n" +
                 "\tHeaders: \n" +
-                "\t\tUser-Agent: forest/1.5.33");
+                "\t\tUser-Agent: forest/" + version);
         Mockito.verify(logger).info("[Forest] Request (" + backendName + "): \n" +
                 "\t[Retry]: 2\n" +
                 "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS\n" +
                 "\tHeaders: \n" +
-                "\t\tUser-Agent: forest/1.5.33");
+                "\t\tUser-Agent: forest/" + version);
         Mockito.verify(logger).info("[Forest] Request (" + backendName + "): \n" +
                 "\t[Retry]: 3\n" +
                 "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS\n" +
                 "\tHeaders: \n" +
-                "\t\tUser-Agent: forest/1.5.33");
+                "\t\tUser-Agent: forest/" + version);
         Mockito.verify(logger).info("[Forest] Request (" + backendName + "): \n" +
                 "\t[Retry]: 4\n" +
                 "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS\n" +
                 "\tHeaders: \n" +
-                "\t\tUser-Agent: forest/1.5.33");
+                "\t\tUser-Agent: forest/" + version);
         Mockito.verify(logger).info("[Forest] Request (" + backendName + "): \n" +
                 "\t[Retry]: 5\n" +
                 "\tGET https://www.thebeastshop.com/autopage/shops.htm HTTPS\n" +
                 "\tHeaders: \n" +
-                "\t\tUser-Agent: forest/1.5.33");
+                "\t\tUser-Agent: forest/" + version);
 //        Mockito.verify(logger).info("[Forest] [Network Error]: connect timed out");
 
     }
