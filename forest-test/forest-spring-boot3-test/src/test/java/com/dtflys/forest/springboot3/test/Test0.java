@@ -13,6 +13,7 @@ import com.dtflys.forest.springboot3.test.client0.BeastshopClient;
 import com.dtflys.forest.springboot3.test.client0.DisturbInterface;
 import com.dtflys.forest.springboot3.test.moudle.TestUser;
 import com.dtflys.forest.springboot3.test.service.impl.TestServiceImpl;
+import com.dtflys.forest.utils.ForestCache;
 import jakarta.annotation.Resource;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,6 +25,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+
+import java.time.Duration;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -70,13 +73,15 @@ public class Test0 {
         assertEquals("xxx", config0.getVariableValue("myName"));
         assertNotNull(config0.getVariableValue("user"));
         assertEquals(Integer.valueOf(512), config0.getBackendClientCacheMaxSize());
+        assertEquals(Duration.ofHours(3), config0.getBackendClientCacheExpireTime());
+        final ForestCache cache = config0.getBackendClientCache();
+        assertNotNull(cache);
         assertTrue(!config0.isLogEnabled());
         assertEquals(ForestAsyncMode.PLATFORM, config0.getAsyncMode());
         assertEquals(Integer.valueOf(12), config0.getVariableValue("myCount"));
         assertEquals(BackOffRetryer.class, config0.getRetryer());
         assertEquals(Integer.valueOf(5), config0.getMaxRetryCount());
         assertEquals(Long.valueOf(2000), Long.valueOf(config0.getMaxRetryInterval()));
-
     }
 
     @Test

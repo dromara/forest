@@ -244,6 +244,12 @@ public class ForestConfiguration implements Serializable {
      */
     private Integer backendClientCacheMaxSize;
 
+
+    /**
+     * 后端客户端对象缓存过期时间
+     */
+    private Duration backendClientCacheExpireTime;
+
     /**
      * 后端客户端对象缓存
      */
@@ -524,6 +530,7 @@ public class ForestConfiguration implements Serializable {
         return backendClientCacheMaxSize;
     }
 
+
     /**
      * 设置后端客户端对象缓存最大空间大小
      *
@@ -533,6 +540,28 @@ public class ForestConfiguration implements Serializable {
      */
     public ForestConfiguration setBackendClientCacheMaxSize(Integer backendClientCacheMaxSize) {
         this.backendClientCacheMaxSize = backendClientCacheMaxSize;
+        return this;
+    }
+
+    /**
+     * 获取后端客户端对象缓存过期时间
+     *
+     * @return 后端客户端对象缓存过期时间
+     * @since 1.5.35
+     */
+    public Duration getBackendClientCacheExpireTime() {
+        return backendClientCacheExpireTime;
+    }
+
+    /**
+     * 设置获取后端客户端对象缓存过期时间
+     *
+     * @param backendClientCacheExpireTime 后端客户端对象缓存过期时间
+     * @return 当前ForestConfiguration实例
+     * @since 1.5.35
+     */
+    public ForestConfiguration setBackendClientCacheExpireTime(Duration backendClientCacheExpireTime) {
+        this.backendClientCacheExpireTime = backendClientCacheExpireTime;
         return this;
     }
 
@@ -1622,7 +1651,12 @@ public class ForestConfiguration implements Serializable {
         if (backendClientCache == null) {
             synchronized (this) {
                 if (backendClientCache == null) {
-                    backendClientCache = new ForestCache<>(128, 6, TimeUnit.HOURS);
+                    final Duration expireTime = getBackendClientCacheExpireTime();
+                    if (expireTime != null) {
+                        backendClientCache = new ForestCache<>(getBackendClientCacheMaxSize(), expireTime.getNano(), TimeUnit.NANOSECONDS);
+                    } else {
+                        backendClientCache = new ForestCache<>(getBackendClientCacheMaxSize(), 6, TimeUnit.HOURS);
+                    }
                 }
             }
         }

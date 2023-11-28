@@ -3,6 +3,10 @@ package com.dtflys.forest.utils;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalCause;
+import com.github.benmanes.caffeine.cache.RemovalListener;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -38,6 +42,11 @@ public class ForestCache<K, V> {
     public int size() {
         return (int) cache.estimatedSize();
     }
+
+    public long evictionCount() {
+        return cache.stats().evictionCount();
+    }
+
 
     public boolean isEmpty() {
         return cache.estimatedSize() == 0;

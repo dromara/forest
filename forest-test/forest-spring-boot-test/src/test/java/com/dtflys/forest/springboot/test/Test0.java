@@ -25,6 +25,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
 
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -69,6 +72,7 @@ public class Test0 {
         assertEquals("xxx", config0.getVariableValue("myName"));
         assertNotNull(config0.getVariableValue("user"));
         assertEquals(Integer.valueOf(512), config0.getBackendClientCacheMaxSize());
+        assertEquals(Duration.ofHours(3), config0.getBackendClientCacheExpireTime());
         assertTrue(!config0.isLogEnabled());
         assertEquals(ForestAsyncMode.PLATFORM, config0.getAsyncMode());
         assertEquals(Integer.valueOf(12), config0.getVariableValue("myCount"));
