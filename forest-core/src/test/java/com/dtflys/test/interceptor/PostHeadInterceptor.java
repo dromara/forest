@@ -3,13 +3,13 @@ package com.dtflys.test.interceptor;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.interceptor.ForestJoinpoint;
+import com.dtflys.forest.interceptor.ForestJointPoint;
 import com.dtflys.forest.interceptor.Interceptor;
 
 public class PostHeadInterceptor implements Interceptor {
 
     @Override
-    public ForestJoinpoint beforeExecute(ForestRequest request) {
+    public ForestJointPoint beforeExecute(ForestRequest request) {
         request.addHeader("accessToken", "11111111");
         return proceed();
     }

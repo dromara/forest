@@ -5,11 +5,11 @@ package com.dtflys.forest.interceptor;
  *
  * @since 2.0.0_BETA
  */
-public class ForestJoinpoint {
+public class ForestJointPoint {
 
-    public final static ForestJoinpoint PROCEED = new ForestJoinpoint(State.PROCEED);
+    public final static ForestJointPoint PROCEED = new ForestJointPoint(State.PROCEED);
 
-    public final static ForestJoinpoint CUTOFF = new ForestJoinpoint(State.CUTOFF);
+    public final static ForestJointPoint CUTOFF = new ForestJointPoint(State.CUTOFF);
 
     public enum State {
         PROCEED,
@@ -21,12 +21,12 @@ public class ForestJoinpoint {
 
     private final Object result;
 
-    public ForestJoinpoint(State state) {
+    public ForestJointPoint(State state) {
         this(state, null);
     }
 
 
-    public ForestJoinpoint(State state, Object result) {
+    public ForestJointPoint(State state, Object result) {
         this.state = state;
         this.result = result;
     }

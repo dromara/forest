@@ -9,7 +9,6 @@ import com.dtflys.forest.callback.OnRedirection;
 import com.dtflys.forest.callback.OnRetry;
 import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.callback.OnSuccess;
-import com.dtflys.forest.callback.RetryWhen;
 import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestCookies;
@@ -68,9 +67,9 @@ public interface Interceptor<T> extends
      * <p>默认为什么都不做
      *
      * @param request Forest请求对象
-     * @return {@link ForestJoinpoint}: Forest 拦截器插入点
+     * @return {@link ForestJointPoint}: Forest 拦截器插入点
      */
-    default ForestJoinpoint beforeExecute(ForestRequest request) {
+    default ForestJointPoint beforeExecute(ForestRequest request) {
         return proceed();
     }
 

@@ -4,7 +4,7 @@ import com.dtflys.forest.annotation.Return;
 import com.dtflys.forest.exceptions.ForestReturnException;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.interceptor.ForestJoinpoint;
+import com.dtflys.forest.interceptor.ForestJointPoint;
 import com.dtflys.forest.lifecycles.ParameterAnnotationLifeCycle;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.reflection.ForestMethod;
@@ -51,7 +51,7 @@ public class ReturnLifeCycle implements ParameterAnnotationLifeCycle<Return, Obj
     }
 
     @Override
-    public ForestJoinpoint beforeExecute(ForestRequest request) {
+    public ForestJointPoint beforeExecute(ForestRequest request) {
         return proceed();
     }
 }

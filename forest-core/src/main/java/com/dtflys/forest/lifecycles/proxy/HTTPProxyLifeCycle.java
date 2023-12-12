@@ -6,7 +6,7 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestProxyType;
 import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.interceptor.ForestJoinpoint;
+import com.dtflys.forest.interceptor.ForestJointPoint;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.reflection.ForestMethod;
@@ -94,7 +94,7 @@ public class HTTPProxyLifeCycle implements MethodAnnotationLifeCycle<HTTPProxy, 
     }
 
     @Override
-    public ForestJoinpoint beforeExecute(ForestRequest request) {
+    public ForestJointPoint beforeExecute(ForestRequest request) {
         return proceed();
     }
 

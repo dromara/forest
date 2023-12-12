@@ -20,7 +20,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestURL;
 import com.dtflys.forest.http.Lazy;
-import com.dtflys.forest.interceptor.ForestJoinpoint;
+import com.dtflys.forest.interceptor.ForestJointPoint;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorChain;
 import com.dtflys.forest.logging.LogConfiguration;
@@ -2038,7 +2038,7 @@ public class TestGenericForestClient extends BaseClientTest {
         }
 
         @Override
-        public ForestJoinpoint beforeExecute(ForestRequest request) {
+        public ForestJointPoint beforeExecute(ForestRequest request) {
             inter3Before.set(true);
             return cutoff();
         }

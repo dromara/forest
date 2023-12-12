@@ -7,7 +7,7 @@ import com.dtflys.forest.annotation.Var;
 import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.interceptor.ForestJoinpoint;
+import com.dtflys.forest.interceptor.ForestJointPoint;
 import com.dtflys.forest.interceptor.Interceptor;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -40,7 +40,7 @@ public interface BaseReqClient {
 
     class BaseReqInterceptor implements Interceptor<Object> {
         @Override
-        public ForestJoinpoint beforeExecute(ForestRequest request) {
+        public ForestJointPoint beforeExecute(ForestRequest request) {
             assertThat(request.getConnectTimeout()).isEqualTo(3000);
             assertThat(request.getReadTimeout()).isEqualTo(4000);
             return proceed();

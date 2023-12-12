@@ -6,7 +6,7 @@ import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.interceptor.ForestJoinpoint;
+import com.dtflys.forest.interceptor.ForestJointPoint;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MetaRequest;
@@ -63,7 +63,7 @@ public class XMLBodyLifeCycle extends AbstractBodyLifeCycle<XMLBody> {
     }
 
     @Override
-    public ForestJoinpoint beforeExecute(ForestRequest request) {
+    public ForestJointPoint beforeExecute(ForestRequest request) {
         final String contentType = request.getContentType();
         if (StringUtils.isBlank(contentType)) {
             request.setContentType(ContentType.APPLICATION_XML);

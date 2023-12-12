@@ -3,7 +3,7 @@ package com.dtflys.test.interceptor;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.interceptor.ForestJoinpoint;
+import com.dtflys.forest.interceptor.ForestJointPoint;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorChain;
 import org.junit.Test;
@@ -39,7 +39,7 @@ public class TestInterceptorChain {
 
         Interceptor interceptor1 = new Interceptor() {
             @Override
-            public ForestJoinpoint beforeExecute(ForestRequest request) {
+            public ForestJointPoint beforeExecute(ForestRequest request) {
                 inter1Before.set(true);
                 return proceed();
             }
@@ -64,7 +64,7 @@ public class TestInterceptorChain {
 
         Interceptor interceptor2 = new Interceptor() {
             @Override
-            public ForestJoinpoint beforeExecute(ForestRequest request) {
+            public ForestJointPoint beforeExecute(ForestRequest request) {
                 inter2Before.set(true);
                 return proceed();
             }
@@ -90,7 +90,7 @@ public class TestInterceptorChain {
 
         Interceptor interceptor3 = new Interceptor() {
             @Override
-            public ForestJoinpoint beforeExecute(ForestRequest request) {
+            public ForestJointPoint beforeExecute(ForestRequest request) {
                 inter3Before.set(true);
                 return proceed();
             }

@@ -6,7 +6,7 @@ import com.dtflys.forest.extensions.OAuth2;
 import com.dtflys.forest.handler.OAuth2DefinitionHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.interceptor.ForestJoinpoint;
+import com.dtflys.forest.interceptor.ForestJointPoint;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.ForestDataType;
@@ -40,7 +40,7 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object
     }
 
     @Override
-    public ForestJoinpoint beforeExecute(ForestRequest request) {
+    public ForestJointPoint beforeExecute(ForestRequest request) {
         final TokenCache tokenCache = getTokenCache(request);
 
         // Token 的传输位置：Header、URL

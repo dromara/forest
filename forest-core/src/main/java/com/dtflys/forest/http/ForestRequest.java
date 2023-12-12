@@ -24,7 +24,6 @@
 
 package com.dtflys.forest.http;
 
-import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.auth.BasicAuth;
 import com.dtflys.forest.auth.ForestAuthenticator;
 import com.dtflys.forest.backend.ContentType;
@@ -57,7 +56,7 @@ import com.dtflys.forest.http.body.MultipartRequestBody;
 import com.dtflys.forest.http.body.NameValueRequestBody;
 import com.dtflys.forest.http.body.ObjectRequestBody;
 import com.dtflys.forest.http.body.StringRequestBody;
-import com.dtflys.forest.interceptor.ForestJoinpoint;
+import com.dtflys.forest.interceptor.ForestJointPoint;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
 import com.dtflys.forest.interceptor.InterceptorChain;
@@ -83,14 +82,12 @@ import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.TimeUtils;
 import com.dtflys.forest.utils.TypeReference;
-import com.dtflys.forest.utils.URLUtils;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import java.io.File;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
@@ -4705,7 +4702,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     public Object execute(HttpBackend backend, LifeCycleHandler lifeCycleHandler) {
         setLifeCycleHandler(lifeCycleHandler);
         processRedirectionRequest();
-        final ForestJoinpoint joinpoint = interceptorChain.beforeExecute(this);
+        final ForestJointPoint joinpoint = interceptorChain.beforeExecute(this);
         // 执行 beforeExecute
         if (joinpoint.isProceed()) {
             // 认证信息增强
