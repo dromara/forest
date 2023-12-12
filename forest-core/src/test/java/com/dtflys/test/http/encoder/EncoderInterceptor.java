@@ -6,7 +6,7 @@ import com.dtflys.forest.interceptor.Interceptor;
 
 import java.nio.charset.StandardCharsets;
 
-public class EncoderInterceptor implements Interceptor<Object> {
+public class EncoderInterceptor implements Interceptor {
 
     @Override
     public byte[] onBodyEncode(ForestRequest request, ForestEncoder encoder, byte[] encodedData) {

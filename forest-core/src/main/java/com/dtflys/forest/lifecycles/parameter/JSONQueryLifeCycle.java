@@ -14,7 +14,7 @@ import static com.dtflys.forest.mapping.MappingParameter.TARGET_QUERY;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2020-08-21 1:14
  */
-public class JSONQueryLifeCycle implements ParameterAnnotationLifeCycle<JSONQuery, Object> {
+public class JSONQueryLifeCycle implements ParameterAnnotationLifeCycle<JSONQuery> {
 
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, JSONQuery annotation) {

@@ -11,7 +11,7 @@ import com.dtflys.forest.utils.StringUtils;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2020-08-23 23:03
  */
-public class BaseRequestLifeCycle implements BaseAnnotationLifeCycle<BaseRequest, Object> {
+public class BaseRequestLifeCycle implements BaseAnnotationLifeCycle<BaseRequest> {
 
     @Override
     public void onProxyHandlerInitialized(InterfaceProxyHandler interfaceProxyHandler, BaseRequest annotation) {

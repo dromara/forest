@@ -11,7 +11,7 @@ import com.dtflys.forest.retryer.ForestRetryer;
  *
  * @author gongjun [dt_flys@hotmail.com]
  */
-public class RetryerLifeCycle implements MethodAnnotationLifeCycle<Retryer, Object> {
+public class RetryerLifeCycle implements MethodAnnotationLifeCycle<Retryer> {
 
     private final static String PARAM_KEY_RETRYER = "__retryer";
 

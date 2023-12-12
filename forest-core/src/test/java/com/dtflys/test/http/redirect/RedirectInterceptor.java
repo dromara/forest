@@ -8,7 +8,7 @@ import com.dtflys.forest.interceptor.Interceptor;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2021-09-18 23:43
  */
-public class RedirectInterceptor implements Interceptor<Object> {
+public class RedirectInterceptor implements Interceptor {
 
     public final static String BODY = "redirection";
 

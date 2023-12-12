@@ -16,7 +16,7 @@ import com.dtflys.forest.utils.URLUtils;
  *
  * @author gongjun [dt_flys@hotmail.com]
  */
-public class AddressLifeCycle implements MethodAnnotationLifeCycle<Address, Object> {
+public class AddressLifeCycle implements MethodAnnotationLifeCycle<Address> {
 
     private final static String PARAM_KEY_ADDRESS_SOURCE = "__address_source";
     private final static String PARAM_KEY_ADDRESS = "__address";

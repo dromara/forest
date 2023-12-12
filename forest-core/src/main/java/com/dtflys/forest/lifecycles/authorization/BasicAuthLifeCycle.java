@@ -7,7 +7,7 @@ import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.StringUtils;
 
-public class BasicAuthLifeCycle implements MethodAnnotationLifeCycle<BasicAuth, Object> {
+public class BasicAuthLifeCycle implements MethodAnnotationLifeCycle<BasicAuth> {
 
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {

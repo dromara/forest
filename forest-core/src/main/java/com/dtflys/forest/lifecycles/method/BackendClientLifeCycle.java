@@ -13,7 +13,7 @@ import com.dtflys.forest.utils.StringUtils;
  *
  * @author gongjun [dt_flys@hotmail.com]
  */
-public class BackendClientLifeCycle implements MethodAnnotationLifeCycle<BackendClient, Object> {
+public class BackendClientLifeCycle implements MethodAnnotationLifeCycle<BackendClient> {
 
     private final static String PARAM_KEY_BACKEND_CLIENT_CACHE = "__backend_client_cache";
 

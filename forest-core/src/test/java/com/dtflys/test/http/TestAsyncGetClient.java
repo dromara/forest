@@ -9,7 +9,10 @@ import com.dtflys.forest.http.ForestAsyncMode;
 import com.dtflys.forest.http.ForestFuture;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.retryer.BackOffRetryer;
+import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.test.http.client.GetClient;
+import com.dtflys.test.http.model.JsonTestUser;
+import com.dtflys.test.model.TestResult;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.assertj.core.api.Assertions;
@@ -97,7 +100,8 @@ public class TestAsyncGetClient extends BaseClientTest {
         CountDownLatch latch = new CountDownLatch(1);
         final AtomicBoolean success = new AtomicBoolean(false);
         getClient.asyncSimpleGet(
-                (data, request, response) -> {
+                (request, response) -> {
+                    final String data = response.get(String.class);
                     log.info("data: " + data);
                     success.set(true);
                     assertEquals(EXPECTED, data);
@@ -191,8 +195,9 @@ public class TestAsyncGetClient extends BaseClientTest {
         CountDownLatch latch = new CountDownLatch(1);
         final AtomicBoolean success = new AtomicBoolean(false);
         getClient.asyncSimpleGet(
-                (data, request, response) -> {
+                (request, response) -> {
                     assertThat(request.getAsyncMode()).isEqualTo(configuration.getAsyncMode());
+                    final String data = response.get(String.class);
                     log.info("data: " + data);
                     success.set(true);
                     assertEquals(EXPECTED, data);
@@ -214,7 +219,8 @@ public class TestAsyncGetClient extends BaseClientTest {
         CountDownLatch latch = new CountDownLatch(1);
         final AtomicBoolean success = new AtomicBoolean(false);
         getClient.asyncSimpleGet(
-                (data, request, response) -> {
+                (request, response) -> {
+                    final String data = response.get(String.class);
                     log.info("data: " + data);
                     assertThat(request.getAsyncMode()).isEqualTo(configuration.getAsyncMode());
                     success.set(true);
@@ -237,8 +243,8 @@ public class TestAsyncGetClient extends BaseClientTest {
         CountDownLatch latch = new CountDownLatch(1);
         final AtomicBoolean success = new AtomicBoolean(false);
         getClient.asyncSimpleGet(
-                (data, request, response) -> {
-                    log.info("data: " + data);
+                (request, response) -> {
+                    log.info("data: " + response.get(String.class));
                     assertThat(request.getAsyncMode()).isEqualTo(configuration.getAsyncMode());
                     success.set(true);
                     assertThat(response.getContent()).isEqualTo(EXPECTED);
@@ -257,7 +263,8 @@ public class TestAsyncGetClient extends BaseClientTest {
         CountDownLatch latch = new CountDownLatch(1);
         final AtomicBoolean success = new AtomicBoolean(false);
         getClient.asyncSimpleGet2(
-                (data, request, response) -> {
+                (request, response) -> {
+                    final TestResult data = response.get(TestResult.class);
                     assertThat(data).isNotNull();
                     assertThat(data.getStatus()).isEqualTo("ok");
                     assertThat(request.getAsyncMode()).isEqualTo(configuration.getAsyncMode());
@@ -278,7 +285,9 @@ public class TestAsyncGetClient extends BaseClientTest {
         CountDownLatch latch = new CountDownLatch(1);
         final AtomicBoolean success = new AtomicBoolean(false);
         getClient.asyncSimpleGet3(
-                (data, request, response) -> {
+                (request, response) -> {
+                    final TypeReference<TestResult<JsonTestUser>> typeReference = new TypeReference<TestResult<JsonTestUser>>() {};
+                    final TestResult<JsonTestUser> data = response.get(typeReference);
                     assertThat(data).isNotNull();
                     assertThat(request.getAsyncMode()).isEqualTo(configuration.getAsyncMode());
                     assertEquals("ok", data.getStatus());
@@ -311,7 +320,8 @@ public class TestAsyncGetClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         final AtomicBoolean success = new AtomicBoolean(false);
         CountDownLatch latch = new CountDownLatch(1);
-        Future<String> future = getClient.asyncVarParamGet("foo", (data, request, response) -> {
+        Future<String> future = getClient.asyncVarParamGet("foo", (request, response) -> {
+            final String data = response.get(String.class);
             log.info("data: " + data);
             success.set(true);
             assertEquals(EXPECTED, data);
@@ -349,7 +359,7 @@ public class TestAsyncGetClient extends BaseClientTest {
         final AtomicBoolean error = new AtomicBoolean(false);
         Future<String> future = getClient.asyncVarParamGet(
                 "error param",
-                (data, request, response) -> {
+                (request, response) -> {
                     error.set(false);
                     success.set(true);
                     assertThat(request.getAsyncMode()).isEqualTo(configuration.getAsyncMode());
@@ -378,7 +388,7 @@ public class TestAsyncGetClient extends BaseClientTest {
         CountDownLatch latch = new CountDownLatch(1);
         Future<String> future = getClient.asyncVarParamGet(
                 "error param",
-                (data, request, response) -> {
+                (request, response) -> {
                     error.set(false);
                     success.set(true);
                     assertThat(request.getAsyncMode()).isEqualTo(configuration.getAsyncMode());

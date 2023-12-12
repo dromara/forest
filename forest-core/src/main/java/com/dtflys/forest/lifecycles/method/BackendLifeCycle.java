@@ -15,7 +15,7 @@ import com.dtflys.forest.utils.StringUtils;
  *
  * @author gongjun [dt_flys@hotmail.com]
  */
-public class BackendLifeCycle implements MethodAnnotationLifeCycle<Backend, Object> {
+public class BackendLifeCycle implements MethodAnnotationLifeCycle<Backend> {
 
     private final static String PARAM_KEY_BACKEND_NAME = "__backend_name";
 

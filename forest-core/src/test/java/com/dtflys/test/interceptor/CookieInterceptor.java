@@ -38,7 +38,7 @@ public class CookieInterceptor implements Interceptor {
     }
 
     @Override
-    public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
+    public void onSuccess(ForestRequest request, ForestResponse response) {
 
     }
 }

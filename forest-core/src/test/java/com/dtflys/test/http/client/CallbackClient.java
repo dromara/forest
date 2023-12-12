@@ -17,7 +17,7 @@ public interface CallbackClient {
             headers = {"Accept:text/plain"},
             data = "username=${username}"
     )
-    String getOnSuccess(@Var("username") String username, OnSuccess<String> onSuccess);
+    String getOnSuccess(@Var("username") String username, OnSuccess onSuccess);
 
 
     @Request(
@@ -26,7 +26,7 @@ public interface CallbackClient {
             data = "username=${username}",
             dataType = "json"
     )
-    String getOnSuccessMap(@Var("username") String username, OnSuccess<Map> onSuccess);
+    String getOnSuccessMap(@Var("username") String username, OnSuccess onSuccess);
 
 
 }

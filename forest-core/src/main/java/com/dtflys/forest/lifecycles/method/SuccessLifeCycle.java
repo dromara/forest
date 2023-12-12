@@ -11,7 +11,7 @@ import com.dtflys.forest.reflection.ForestMethod;
  *
  * @author gongjun [dt_flys@hotmail.com]
  */
-public class SuccessLifeCycle implements MethodAnnotationLifeCycle<Success, Object> {
+public class SuccessLifeCycle implements MethodAnnotationLifeCycle<Success> {
 
     private final static String PARAM_KEY_SUCCESS = "__success";
 

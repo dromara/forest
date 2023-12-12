@@ -11,7 +11,7 @@ import com.dtflys.forest.lifecycles.ParameterAnnotationLifeCycle;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2020-08-21 0:50
  */
-public class DataParamLifeCycle implements ParameterAnnotationLifeCycle<DataParam, Object> {
+public class DataParamLifeCycle implements ParameterAnnotationLifeCycle<DataParam> {
 
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, DataParam annotation) {

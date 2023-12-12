@@ -4,7 +4,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.reflection.ForestMethod;
 
-public class HttpClientLifeCycle implements MethodAnnotationLifeCycle<HttpClient, Object> {
+public class HttpClientLifeCycle implements MethodAnnotationLifeCycle<HttpClient> {
 
     private final static String PARAM_KEY_HTTPCLIENT_PROVIDER = "__httpclient_provider";
 

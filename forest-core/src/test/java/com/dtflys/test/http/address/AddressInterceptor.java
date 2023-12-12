@@ -4,7 +4,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.interceptor.ForestJointPoint;
 import com.dtflys.forest.interceptor.Interceptor;
 
-public class AddressInterceptor implements Interceptor<Object> {
+public class AddressInterceptor implements Interceptor {
 
     @Override
     public ForestJointPoint beforeExecute(ForestRequest request) {

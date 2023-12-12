@@ -344,7 +344,7 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(EXPECTED));
         assertThat(
-                getClient.textParamInPathGet("foo", (data, request, response) -> {
+                getClient.textParamInPathGet("foo", (request, response) -> {
                     response.setResult("onSuccess is ok");
                 }))
                 .isNotNull()

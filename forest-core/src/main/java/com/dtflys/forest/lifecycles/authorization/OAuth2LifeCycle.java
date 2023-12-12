@@ -26,7 +26,7 @@ import java.util.Optional;
  * @author HouKunLin
  * @since 1.5.0-BETA9
  */
-public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Object> {
+public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2> {
     private final byte[] lock = new byte[0];
     /**
      * Token 缓存

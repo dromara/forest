@@ -348,7 +348,7 @@ public class TestGenericForestClient extends BaseClientTest {
                         .readTimeout(200)
                         .async()
                         .setLogConfiguration(logConfiguration)
-                        .onSuccess((data, req, res) -> {
+                        .onSuccess((req, res) -> {
                             latch.countDown();
                             int c = count.incrementAndGet();
                             System.out.println(Thread.currentThread().getName() + " 成功: " + req.getAttachment("num"));
@@ -392,7 +392,7 @@ public class TestGenericForestClient extends BaseClientTest {
                         .port(server.getPort())
                         .async()
                         .setLogConfiguration(logConfiguration)
-                        .onSuccess((data, req, res) -> {
+                        .onSuccess((req, res) -> {
                             latch2.countDown();
                             int c = count2.incrementAndGet();
                             if (c == total) {
@@ -1935,7 +1935,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .onRetry(((req, res) -> {
                     atomicRetryCount.incrementAndGet();
                 }))
-                .onSuccess(((data, req, res) -> {
+                .onSuccess(((req, res) -> {
                     isSuccess.set(true);
                     latch.countDown();
                 }));
@@ -2044,7 +2044,7 @@ public class TestGenericForestClient extends BaseClientTest {
         }
 
         @Override
-        public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
+        public void onSuccess(ForestRequest request, ForestResponse response) {
         }
 
         @Override

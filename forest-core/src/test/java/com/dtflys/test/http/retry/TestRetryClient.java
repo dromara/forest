@@ -98,7 +98,7 @@ public class TestRetryClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
         server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
         AtomicInteger count = new AtomicInteger(0);
-        String ret = retryClient.testRetry(3, 10, ((data, req, res) -> {
+        String ret = retryClient.testRetry(3, 10, ((req, res) -> {
             count.incrementAndGet();
             assertThat(req.getCurrentRetryCount()).isEqualTo(3);
             assertThat(req.getAttachment("retry-interceptor")).isNotNull().isEqualTo(3);
@@ -117,7 +117,7 @@ public class TestRetryClient extends BaseClientTest {
         String ret = null;
         ForestRuntimeException exception = null;
         try {
-            ret = retryClient.testRetryWhenWithError(3, 10, ((data, req, res) -> {
+            ret = retryClient.testRetryWhenWithError(3, 10, ((req, res) -> {
                 count.incrementAndGet();
             }));
         } catch (ForestRuntimeException ex) {
@@ -136,7 +136,7 @@ public class TestRetryClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
         server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
         AtomicInteger count = new AtomicInteger(0);
-        String ret = retryClient2.testRetry(3, 10, ((data, req, res) -> {
+        String ret = retryClient2.testRetry(3, 10, ((req, res) -> {
             count.incrementAndGet();
             assertThat(req.getCurrentRetryCount()).isEqualTo(3);
             assertThat(req.getRetryWhen()).isInstanceOf(TestRetryWhen.class);
@@ -149,7 +149,7 @@ public class TestRetryClient extends BaseClientTest {
     public void testRetry_base_not_retry() {
         server.enqueue(new MockResponse().setBody(EXPECTED).setResponseCode(203));
         AtomicInteger count = new AtomicInteger(0);
-        String ret = retryClient2.testRetry_not_retry(3, 10, ((data, req, res) -> {
+        String ret = retryClient2.testRetry_not_retry(3, 10, ((req, res) -> {
             count.incrementAndGet();
             assertThat(req.getCurrentRetryCount()).isEqualTo(0);
             assertThat(req.getRetryWhen()).isInstanceOf(TestRetryWhen2.class);

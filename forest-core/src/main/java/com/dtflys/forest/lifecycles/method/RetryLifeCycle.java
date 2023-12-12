@@ -13,7 +13,7 @@ import com.dtflys.forest.utils.StringUtils;
  *
  * @author gongjun [dt_flys@hotmail.com]
  */
-public class RetryLifeCycle implements MethodAnnotationLifeCycle<Retry, Object> {
+public class RetryLifeCycle implements MethodAnnotationLifeCycle<Retry> {
 
     private final static String PARAM_KEY_RETRY_WHEN = "__retry_when";
     private final static String PARAM_KEY_RETRY = "__retry";

@@ -66,7 +66,7 @@ public class TestBaseReqClient extends BaseClientTest {
     @Test
     public void testBaseGet() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        assertThat(baseReqClient.simpleGet((data, request, response) -> {
+        assertThat(baseReqClient.simpleGet((request, response) -> {
             String userAgent = response.getRequest().getHeaderValue("User-Agent");
             assertNotNull(userAgent);
             assertEquals(USER_AGENT, userAgent);
@@ -84,7 +84,7 @@ public class TestBaseReqClient extends BaseClientTest {
     @Test
     public void testBaseGetWithoutBaseUrl() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        assertThat(baseReqClient.simpleGetWithoutBaseUrl((data, request, response) -> {
+        assertThat(baseReqClient.simpleGetWithoutBaseUrl((request, response) -> {
             String userAgent = response.getRequest().getHeaderValue("User-Agent");
             assertNotNull(userAgent);
             assertEquals(USER_AGENT, userAgent);

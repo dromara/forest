@@ -13,7 +13,7 @@ import com.dtflys.forest.utils.TypeReference;
 
 import java.lang.reflect.Type;
 
-public class ReturnLifeCycle implements ParameterAnnotationLifeCycle<Return, Object> {
+public class ReturnLifeCycle implements ParameterAnnotationLifeCycle<Return> {
 
 
     private final static String PARAM_KEY_RETURN_TYPE_NAME = "__return_type";

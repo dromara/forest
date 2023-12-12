@@ -14,7 +14,7 @@ import java.lang.annotation.Annotation;
  * @param <A> 注解类
  * @param <I> 返回类型
  */
-public interface MethodAnnotationLifeCycle<A extends Annotation, I> extends Interceptor<I> {
+public interface MethodAnnotationLifeCycle<A extends Annotation> extends Interceptor {
 
     void onMethodInitialized(ForestMethod method, A annotation);
 
@@ -24,7 +24,7 @@ public interface MethodAnnotationLifeCycle<A extends Annotation, I> extends Inte
     }
 
     @Override
-    default void onSuccess(I data, ForestRequest request, ForestResponse response) {
+    default void onSuccess(ForestRequest request, ForestResponse response) {
 
     }
 }

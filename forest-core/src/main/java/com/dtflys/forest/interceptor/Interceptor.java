@@ -46,8 +46,8 @@ import com.dtflys.forest.utils.ForestProgress;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-06-26
  */
-public interface Interceptor<T> extends
-        BeforeExecute, OnSuccess<T>, OnError, OnCanceled, OnProgress, OnLoadCookie, OnSaveCookie, OnRetry, OnRedirection {
+public interface Interceptor extends
+        BeforeExecute, OnSuccess, OnError, OnCanceled, OnProgress, OnLoadCookie, OnSaveCookie, OnRetry, OnRedirection {
 
 
     /**
@@ -100,12 +100,11 @@ public interface Interceptor<T> extends
      * 默认回调函数: 请求成功后调用该方法
      * <p>默认为什么都不做
      *
-     * @param data 请求响应返回后经过序列化后的数据
      * @param request Forest请求对象
      * @param response Forest响应对象
      */
     @Override
-    default void onSuccess(T data, ForestRequest request, ForestResponse response) {
+    default void onSuccess(ForestRequest request, ForestResponse response) {
     }
 
     /**

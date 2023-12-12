@@ -12,7 +12,7 @@ import java.lang.annotation.Annotation;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2020-08-23 23:04
  */
-public interface BaseAnnotationLifeCycle <A extends Annotation, I> extends Interceptor<I> {
+public interface BaseAnnotationLifeCycle <A extends Annotation> extends Interceptor {
 
     /**
      * 在被注解修饰的接口初始化时被调用
@@ -27,6 +27,6 @@ public interface BaseAnnotationLifeCycle <A extends Annotation, I> extends Inter
     }
 
     @Override
-    default void onSuccess(I data, ForestRequest request, ForestResponse response) {
+    default void onSuccess(ForestRequest request, ForestResponse response) {
     }
 }

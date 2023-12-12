@@ -60,7 +60,7 @@ class TestKotlinClient(backend: HttpBackend?) : BaseClientTest(backend, configur
         fun postJson(@JSONBody text: Map<String, String>) : String
 
         @Get("/")
-        fun callSuccess(onSuccess: OnSuccess<String>)
+        fun callSuccess(onSuccess: OnSuccess)
 
     }
 
@@ -114,8 +114,8 @@ class TestKotlinClient(backend: HttpBackend?) : BaseClientTest(backend, configur
     fun testKotlinOnSuccess() {
         server.enqueue(MockResponse().setBody(EXPECTED))
         var called = false
-        client?.callSuccess { data, req, res ->
-            assertThat(data).isNotNull.isEqualTo(EXPECTED)
+        client?.callSuccess { req, res ->
+            assertThat(res.content).isNotNull.isEqualTo(EXPECTED)
             assertThat(req).isNotNull
             assertThat(res).isNotNull
             called = true

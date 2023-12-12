@@ -27,7 +27,8 @@ public class BaseInterceptor implements Interceptor {
     }
 
     @Override
-    public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
+    public void onSuccess(ForestRequest request, ForestResponse response) {
+        final String data = response.get(String.class);
         log.info("invoke Base onSuccess, data: " + data);
         response.setResult("Base: " + data);
     }

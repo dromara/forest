@@ -8,11 +8,11 @@ import com.dtflys.forest.callback.OnSuccess;
 public interface RetryClient2 {
 
     @Get("http://localhost:${port}/")
-    String testRetry(int retryCount, long retryInterval, OnSuccess<String> onSuccess);
+    String testRetry(int retryCount, long retryInterval, OnSuccess onSuccess);
 
     @Get("http://localhost:${port}/")
     @Retry(maxRetryCount = "${0}", maxRetryInterval = "${1}", condition = TestRetryWhen2.class)
-    String testRetry_not_retry(int retryCount, long retryInterval, OnSuccess<String> onSuccess);
+    String testRetry_not_retry(int retryCount, long retryInterval, OnSuccess onSuccess);
 
 
 }

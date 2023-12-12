@@ -59,7 +59,7 @@ public class TestBaseRedirectClient extends BaseClientTest {
         AtomicReference<ForestResponse> atomicRes = new AtomicReference<>(null);
         redirectClient.testAutoRedirect_async(((redirectReq, prevReq, prevRes) -> {
             atomicReq.set(redirectReq);
-        }), ((data, req, res) -> {
+        }), ((req, res) -> {
             atomicRes.set(res);
             latch.countDown();
         }));

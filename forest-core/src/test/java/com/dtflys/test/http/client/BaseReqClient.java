@@ -38,7 +38,7 @@ public interface BaseReqClient {
     ForestRequest testBaseTimeout(@Var("encoding") String encoding);
 
 
-    class BaseReqInterceptor implements Interceptor<Object> {
+    class BaseReqInterceptor implements Interceptor {
         @Override
         public ForestJointPoint beforeExecute(ForestRequest request) {
             assertThat(request.getConnectTimeout()).isEqualTo(3000);

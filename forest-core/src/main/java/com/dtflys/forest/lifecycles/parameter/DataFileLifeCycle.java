@@ -18,7 +18,7 @@ import com.dtflys.forest.utils.StringUtils;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2020-08-21 2:17
  */
-public class DataFileLifeCycle implements ParameterAnnotationLifeCycle<DataFile, Object> {
+public class DataFileLifeCycle implements ParameterAnnotationLifeCycle<DataFile> {
 
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, DataFile annotation) {

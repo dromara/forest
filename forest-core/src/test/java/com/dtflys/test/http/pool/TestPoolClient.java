@@ -187,7 +187,7 @@ public class TestPoolClient extends BaseClientTest {
         AtomicBoolean hasOut = new AtomicBoolean(false);
         AtomicReference<ForestPoolException> exceptionRef = new AtomicReference<>(null);
         for (int i = 0; i < count; i++) {
-            poolClient.sendAsync(i, (data, req, res) -> {
+            poolClient.sendAsync(i, (req, res) -> {
                 if (pool.getRunningPoolSize() > pool.getMaxPoolSize()) {
                     hasOut.set(true);
                 } else {
@@ -225,7 +225,7 @@ public class TestPoolClient extends BaseClientTest {
         AtomicBoolean hasOut = new AtomicBoolean(false);
         AtomicReference<ForestPoolException> exceptionRef = new AtomicReference<>(null);
         for (int i = 0; i < count; i++) {
-            poolClient.sendAsync(i, (data, req, res) -> {
+            poolClient.sendAsync(i, (req, res) -> {
                 latch.countDown();
                 if (pool.getRunningPoolSize() > pool.getMaxPoolSize()) {
                     hasOut.set(true);

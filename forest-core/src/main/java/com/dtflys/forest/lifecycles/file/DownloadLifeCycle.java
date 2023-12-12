@@ -29,7 +29,7 @@ import java.lang.reflect.Type;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2020-08-04 02:29
  */
-public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile, Object> {
+public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile> {
 
     public final static String ATTACHMENT_NAME_FILE = "__file";
 
@@ -78,7 +78,7 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
     }
 
     @Override
-    public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
+    public void onSuccess(ForestRequest request, ForestResponse response) {
         final String dirPath = getAttributeAsString(request, "dir");
         String filename = getAttributeAsString(request, "filename");
         final Type resultType = getAttribute(request, "__resultType", Type.class);
@@ -100,13 +100,14 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
             }
         }
         InputStream in = null;
-        if (data != null && data instanceof byte[]) {
-            in = new ByteArrayInputStream((byte[]) data);
-        } else {
+        try {
+            in = response.getInputStream();
+        } catch (Exception e) {
             try {
-                in = response.getInputStream();
-            } catch (Exception e) {
-                throw new ForestRuntimeException(e);
+                final byte[] bytes = response.getByteArray();
+                in = new ByteArrayInputStream(bytes);
+            } catch (Exception ex) {
+                throw new ForestRuntimeException(ex);
             }
         }
         final String path = dir.getAbsolutePath() + File.separator + filename;
@@ -123,7 +124,7 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
                         .getConfiguration()
                         .getConverterMap()
                         .get(ForestDataType.AUTO);
-                data = converter.convertToJavaObject(file, resultType);
+                final Object data = converter.convertToJavaObject(file, resultType);
                 response.setResult(data);
             }
         } catch (IOException e) {

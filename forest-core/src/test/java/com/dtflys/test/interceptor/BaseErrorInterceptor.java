@@ -26,7 +26,7 @@ public class BaseErrorInterceptor implements Interceptor {
     }
 
     @Override
-    public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
+    public void onSuccess(ForestRequest req, ForestResponse res) {
     }
 
     @Override

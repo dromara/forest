@@ -5,7 +5,7 @@ import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.interceptor.Interceptor;
 
-public class TestRetryInterceptor implements Interceptor<Object> {
+public class TestRetryInterceptor implements Interceptor {
 
     /**
      * 在请重试前调用 onRetry 回调函数

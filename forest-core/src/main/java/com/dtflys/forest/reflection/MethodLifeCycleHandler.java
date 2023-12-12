@@ -133,11 +133,10 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
     public void handleSuccess(final Object resultData, ForestRequest request, ForestResponse response) {
         this.response = response;
         handleSaveCookie(request, response);
-        request.getInterceptorChain().onSuccess(resultData, request, response);
+        request.getInterceptorChain().onSuccess(request, response);
         OnSuccess onSuccess = request.getOnSuccess();
         if (onSuccess != null) {
-            Object result = RESULT_HANDLER.getResult(request, response, onSuccessClassGenericType, ReflectUtils.toClass(onSuccessClassGenericType));
-            onSuccess.onSuccess(result, request, response);
+            onSuccess.onSuccess(request, response);
         }
     }
 

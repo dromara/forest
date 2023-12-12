@@ -45,7 +45,7 @@ public class TestInterceptorChain {
             }
 
             @Override
-            public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
+            public void onSuccess(ForestRequest request, ForestResponse response) {
                 inter1Success.set(true);
                 count.incrementAndGet();
             }
@@ -70,7 +70,7 @@ public class TestInterceptorChain {
             }
 
             @Override
-            public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
+            public void onSuccess(ForestRequest request, ForestResponse response) {
                 inter2Success.set(true);
                 count.incrementAndGet();
             }
@@ -96,7 +96,7 @@ public class TestInterceptorChain {
             }
 
             @Override
-            public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
+            public void onSuccess(ForestRequest request, ForestResponse response) {
             }
 
             @Override
@@ -122,7 +122,7 @@ public class TestInterceptorChain {
         chain.addInterceptor(interceptor3);
         assertFalse(inter3Before.get());
 
-        chain.onSuccess(null, null, null);
+        chain.onSuccess(null, null);
         assertTrue(inter1Success.get());
         assertTrue(inter2Success.get());
         assertEquals(2, count.get());

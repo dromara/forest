@@ -308,7 +308,7 @@ String simpleGetMultiQuery2WithLazy(@Query("a") String a, @Query("b") String b, 
             async = true,
             headers = {"Accept:text/plain"}
     )
-    void asyncSimpleGet(OnSuccess<String> onSuccess);
+    void asyncSimpleGet(OnSuccess onSuccess);
 
     @Request(
             url = "http://localhost:${port}/hello/user?username=foo",
@@ -353,14 +353,14 @@ String simpleGetMultiQuery2WithLazy(@Query("a") String a, @Query("b") String b, 
             async = true,
             headers = {"Accept:text/plain"}
     )
-    void asyncSimpleGet2(OnSuccess<TestResult> onSuccess);
+    void asyncSimpleGet2(OnSuccess onSuccess);
 
     @Request(
             url = "http://localhost:${port}/hello/user?username=foo",
             async = true,
             headers = {"Accept:text/plain"}
     )
-    void asyncSimpleGet3(OnSuccess<TestResult<JsonTestUser>> onSuccess);
+    void asyncSimpleGet3(OnSuccess onSuccess);
 
     @Request(
             url = "http://localhost:${port}/hello/user?username=foo",
@@ -377,7 +377,7 @@ String simpleGetMultiQuery2WithLazy(@Query("a") String a, @Query("b") String b, 
             timeout = 3000,
             data = "username={ username.toString() }"
     )
-    Future<String> asyncVarParamGet(@DataVariable("username") String username, OnSuccess<String> onSuccess, OnError onError);
+    Future<String> asyncVarParamGet(@DataVariable("username") String username, OnSuccess onSuccess, OnError onError);
 
 
     @Get(

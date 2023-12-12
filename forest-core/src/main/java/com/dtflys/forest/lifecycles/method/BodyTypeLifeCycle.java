@@ -11,7 +11,7 @@ import com.dtflys.forest.utils.ReflectUtils;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-public class BodyTypeLifeCycle implements MethodAnnotationLifeCycle<BodyType, Object> {
+public class BodyTypeLifeCycle implements MethodAnnotationLifeCycle<BodyType> {
 
     @Override
     public void onMethodInitialized(ForestMethod method, BodyType annotation) {

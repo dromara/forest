@@ -21,7 +21,7 @@ import java.util.Arrays;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.5.0-BETA5
  */
-public class HTTPProxyLifeCycle implements MethodAnnotationLifeCycle<HTTPProxy, Object> {
+public class HTTPProxyLifeCycle implements MethodAnnotationLifeCycle<HTTPProxy> {
 
     private final static String PARAM_KEY_HTTP_PROXY_SOURCE = "__http_proxy_source";
     private final static String PARAM_KEY_HTTP_PROXY = "__http_proxy";

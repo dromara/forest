@@ -1364,7 +1364,7 @@ public class ForestMethod<T> implements VariableScope {
         }
 
         if (onSuccessParameter != null) {
-            OnSuccess<?> onSuccessCallback = (OnSuccess<?>) args[onSuccessParameter.getIndex()];
+            OnSuccess onSuccessCallback = (OnSuccess) args[onSuccessParameter.getIndex()];
             request.setOnSuccess(onSuccessCallback);
         }
         if (onErrorParameter != null) {

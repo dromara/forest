@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-15 17:01
  */
-public class SimpleInterceptor implements Interceptor<String> {
+public class SimpleInterceptor implements Interceptor {
 
     private final static Logger log = LoggerFactory.getLogger(SimpleInterceptor.class);
 
@@ -29,9 +29,9 @@ public class SimpleInterceptor implements Interceptor<String> {
     }
 
     @Override
-    public void onSuccess(String data, ForestRequest request, ForestResponse response) {
+    public void onSuccess(ForestRequest request, ForestResponse response) {
         log.info("invoke Simple onSuccess");
-        response.setResult("XX: " + data);
+        response.setResult("XX: " + response.getResult());
     }
 
     @Override

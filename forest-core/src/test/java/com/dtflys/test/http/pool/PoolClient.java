@@ -21,5 +21,5 @@ public interface PoolClient {
 
 
     @Get(url = "/{count}", connectTimeout = 10000, async = true)
-    ForestResponse<String> sendAsync(@Var("count") int count, OnSuccess<String> onSuccess, OnError onError);
+    ForestResponse<String> sendAsync(@Var("count") int count, OnSuccess onSuccess, OnError onError);
 }
