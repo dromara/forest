@@ -1,7 +1,7 @@
 package com.dtflys.forest.interceptor;
 
 /**
- * Forest 拦截器插入点
+ * Forest 拦截器切入点
  *
  * @since 2.0.0_BETA
  */
