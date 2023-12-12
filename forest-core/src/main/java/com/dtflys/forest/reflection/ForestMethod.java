@@ -458,7 +458,7 @@ public class ForestMethod<T> implements VariableScope {
             throw new ForestRuntimeException("[Forest] annotation \""
                     + metaRequest.getRequestAnnotation().annotationType().getName() + "\" can not be added on method \""
                     + method.getName() + "\", because a similar annotation \""
-                    + metaRequest.getRequestAnnotation().annotationType().getName() + "\" has already been attached to this method.");
+                    + this.metaRequest.getRequestAnnotation().annotationType().getName() + "\" has already been attached to this method.");
         }
         this.metaRequest = metaRequest;
     }

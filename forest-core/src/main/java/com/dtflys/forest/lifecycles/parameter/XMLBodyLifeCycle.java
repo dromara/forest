@@ -6,6 +6,7 @@ import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.interceptor.ForestJoinpoint;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MetaRequest;
@@ -62,7 +63,7 @@ public class XMLBodyLifeCycle extends AbstractBodyLifeCycle<XMLBody> {
     }
 
     @Override
-    public boolean beforeExecute(ForestRequest request) {
+    public ForestJoinpoint beforeExecute(ForestRequest request) {
         final String contentType = request.getContentType();
         if (StringUtils.isBlank(contentType)) {
             request.setContentType(ContentType.APPLICATION_XML);
@@ -74,6 +75,6 @@ public class XMLBodyLifeCycle extends AbstractBodyLifeCycle<XMLBody> {
                     methodName + "' has already been set value '" + contentType +
                     "', not 'application/xml'. Hence the annotation @XMLBody cannot be bind on a parameter in this method.");
         }
-        return true;
+        return proceed();
     }
 }

@@ -3,6 +3,7 @@ package com.dtflys.test.interceptor;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.interceptor.ForestJoinpoint;
 import com.dtflys.forest.interceptor.Interceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +17,9 @@ public class Simple2Interceptor implements Interceptor {
     private final static Logger log = LoggerFactory.getLogger(Simple2Interceptor.class);
 
     @Override
-    public boolean beforeExecute(ForestRequest request) {
+    public ForestJoinpoint beforeExecute(ForestRequest request) {
         log.info("invoke Simple2 beforeExecute");
-        return true;
+        return proceed();
     }
 
     @Override

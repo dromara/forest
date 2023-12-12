@@ -3,6 +3,7 @@ package com.dtflys.forest.lifecycles.parameter;
 import com.dtflys.forest.annotation.DataFile;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.interceptor.ForestJoinpoint;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.multipart.ForestMultipartFactory;
@@ -49,7 +50,7 @@ public class DataFileLifeCycle implements ParameterAnnotationLifeCycle<DataFile,
     }
 
     @Override
-    public boolean beforeExecute(ForestRequest request) {
+    public ForestJoinpoint beforeExecute(ForestRequest request) {
         return ParameterAnnotationLifeCycle.super.beforeExecute(request);
     }
 }

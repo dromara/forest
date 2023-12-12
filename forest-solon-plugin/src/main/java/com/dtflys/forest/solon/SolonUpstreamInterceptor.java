@@ -1,6 +1,7 @@
 package com.dtflys.forest.solon;
 
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.interceptor.ForestJoinpoint;
 import com.dtflys.forest.interceptor.Interceptor;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.core.AppContext;
@@ -19,7 +20,7 @@ public class SolonUpstreamInterceptor implements Interceptor {
     AppContext aopContext;
 
     @Override
-    public boolean beforeExecute(ForestRequest request) {
+    public ForestJoinpoint beforeExecute(ForestRequest request) {
         if ("upstream".equals(request.getScheme())) {
             //尝试从工厂获取
             LoadBalance loadBalance = Bridge.upstreamFactory().create("", request.host());
@@ -44,6 +45,6 @@ public class SolonUpstreamInterceptor implements Interceptor {
             request.setHost(server.substring(idx + 3));
         }
 
-        return true;
+        return proceed();
     }
 }

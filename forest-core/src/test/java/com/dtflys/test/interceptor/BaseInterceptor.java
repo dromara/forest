@@ -5,6 +5,7 @@ import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.interceptor.ForestJoinpoint;
 import com.dtflys.forest.interceptor.Interceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,11 +19,11 @@ public class BaseInterceptor implements Interceptor {
     private final static Logger log = LoggerFactory.getLogger(BaseInterceptor.class);
 
     @Override
-    public boolean beforeExecute(ForestRequest request) {
+    public ForestJoinpoint beforeExecute(ForestRequest request) {
         log.info("invoke Base beforeExecute");
         Object[] args = request.getArguments();
         log.info("args: " + JSON.toJSONString(args));
-        return true;
+        return proceed();
     }
 
     @Override

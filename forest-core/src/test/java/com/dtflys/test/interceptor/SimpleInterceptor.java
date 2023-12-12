@@ -5,6 +5,7 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.interceptor.ForestJoinpoint;
 import com.dtflys.forest.interceptor.Interceptor;
 import org.apache.http.HttpHeaders;
 import org.slf4j.Logger;
@@ -19,12 +20,12 @@ public class SimpleInterceptor implements Interceptor<String> {
     private final static Logger log = LoggerFactory.getLogger(SimpleInterceptor.class);
 
     @Override
-    public boolean beforeExecute(ForestRequest request) {
+    public ForestJoinpoint beforeExecute(ForestRequest request) {
         log.info("invoke Simple beforeExecute");
         request.setType(ForestRequestType.GET);
         request.addHeader(HttpHeaders.ACCEPT, "text/plain");
         request.addQuery("username", "foo");
-        return true;
+        return proceed();
     }
 
     @Override

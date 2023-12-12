@@ -4,6 +4,7 @@ import com.dtflys.forest.Forest;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.interceptor.ForestJoinpoint;
 import com.dtflys.test.http.retry.TestRetryInterceptor;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -14,6 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.extractProperty;
 
 public class TestBackendClientProviderClient {
     public final static String EXPECTED = "{\"status\": \"ok\"}";
@@ -46,12 +48,12 @@ public class TestBackendClientProviderClient {
             AtomicBoolean executed = new AtomicBoolean(false);
             request.addInterceptor(new TestRetryInterceptor() {
                 @Override
-                public boolean beforeExecute(ForestRequest request) {
+                public ForestJoinpoint beforeExecute(ForestRequest request) {
                     assertThat(request.getBackendClient())
                             .isNotNull()
                             .isInstanceOf(MyOkHttpClientProvider.class);
                     executed.set(true);
-                    return true;
+                    return proceed();
                 }
             });
             String result = request.execute(String.class);
@@ -78,12 +80,12 @@ public class TestBackendClientProviderClient {
             AtomicBoolean executed = new AtomicBoolean(false);
             request.addInterceptor(new TestRetryInterceptor() {
                 @Override
-                public boolean beforeExecute(ForestRequest request) {
+                public ForestJoinpoint beforeExecute(ForestRequest request) {
                     assertThat(request.getBackendClient())
                             .isNotNull()
                             .isInstanceOf(MyHttpClientProvider.class);
                     executed.set(true);
-                    return true;
+                    return proceed();
                 }
             });
             String result = request.execute(String.class);
@@ -111,12 +113,12 @@ public class TestBackendClientProviderClient {
             AtomicBoolean executed = new AtomicBoolean(false);
             request.addInterceptor(new TestRetryInterceptor() {
                 @Override
-                public boolean beforeExecute(ForestRequest request) {
+                public ForestJoinpoint beforeExecute(ForestRequest request) {
                     assertThat(request.getBackendClient())
                             .isNotNull()
                             .isInstanceOf(MyOkHttpClientProvider.class);
                     executed.set(true);
-                    return true;
+                    return proceed();
                 }
             });
             String result = request.execute(String.class);
@@ -144,12 +146,12 @@ public class TestBackendClientProviderClient {
             AtomicBoolean executed = new AtomicBoolean(false);
             request.addInterceptor(new TestRetryInterceptor() {
                 @Override
-                public boolean beforeExecute(ForestRequest request) {
+                public ForestJoinpoint beforeExecute(ForestRequest request) {
                     assertThat(request.getBackendClient())
                             .isNotNull()
                             .isInstanceOf(MyHttpClientProvider.class);
                     executed.set(true);
-                    return true;
+                    return proceed();
                 }
             });
             String result = request.execute(String.class);

@@ -6,6 +6,7 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.extensions.DownloadFile;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.interceptor.ForestJoinpoint;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.LogConfiguration;
@@ -47,13 +48,13 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
 
 
     @Override
-    public boolean beforeExecute(ForestRequest request) {
+    public ForestJoinpoint beforeExecute(ForestRequest request) {
         if (request.getMethod().getMethod().getDeclaringClass() == ForestGenericClient.class) {
             final Type resultType = getResultType(request.getLifeCycleHandler().getResultType());
             addAttribute(request, "__resultType", resultType);
             request.setDownloadFile(true);
         }
-        return true;
+        return proceed();
     }
 
     private Type getResultType(Type type) {

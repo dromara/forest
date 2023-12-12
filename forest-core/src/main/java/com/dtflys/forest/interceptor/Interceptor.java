@@ -1,5 +1,6 @@
 package com.dtflys.forest.interceptor;
 
+import com.dtflys.forest.callback.BeforeExecute;
 import com.dtflys.forest.callback.OnCanceled;
 import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnLoadCookie;
@@ -47,7 +48,7 @@ import com.dtflys.forest.utils.ForestProgress;
  * @since 2016-06-26
  */
 public interface Interceptor<T> extends
-        OnSuccess<T>, OnError, OnCanceled, OnProgress, OnLoadCookie, OnSaveCookie, OnRetry, OnRedirection {
+        BeforeExecute, OnSuccess<T>, OnError, OnCanceled, OnProgress, OnLoadCookie, OnSaveCookie, OnRetry, OnRedirection {
 
 
     /**
@@ -67,10 +68,10 @@ public interface Interceptor<T> extends
      * <p>默认为什么都不做
      *
      * @param request Forest请求对象
-     * @return {@code true}: 继续执行该请求, 否则中断请求
+     * @return {@link ForestJoinpoint}: Forest 拦截器插入点
      */
-    default boolean beforeExecute(ForestRequest request) {
-        return true;
+    default ForestJoinpoint beforeExecute(ForestRequest request) {
+        return proceed();
     }
 
     /**
@@ -185,6 +186,7 @@ public interface Interceptor<T> extends
     @Override
     default void onSaveCookie(ForestRequest request, ForestCookies cookies) {
     }
+
 
     /**
      * 获取请求在本拦截器中的 Attribute 属性

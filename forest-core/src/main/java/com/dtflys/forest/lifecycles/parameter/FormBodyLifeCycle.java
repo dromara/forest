@@ -4,6 +4,7 @@ import com.dtflys.forest.annotation.FormBody;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.interceptor.ForestJoinpoint;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MetaRequest;
@@ -47,7 +48,7 @@ public class FormBodyLifeCycle extends AbstractBodyLifeCycle<FormBody> {
     }
 
     @Override
-    public boolean beforeExecute(ForestRequest request) {
+    public ForestJoinpoint beforeExecute(ForestRequest request) {
         String contentType = request.getContentType();
         if (StringUtils.isBlank(contentType)) {
             request.setContentType(ContentType.APPLICATION_X_WWW_FORM_URLENCODED);
@@ -59,6 +60,6 @@ public class FormBodyLifeCycle extends AbstractBodyLifeCycle<FormBody> {
                     methodName + "' has already been set value '" + contentType +
                     "', not 'application/x-www-form-urlencoded'. Hence the annotation @FormBody cannot be bind on a parameter in this method.");
         }
-        return true;
+        return proceed();
     }
 }

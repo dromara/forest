@@ -3,6 +3,7 @@ package com.dtflys.test.interceptor;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.interceptor.ForestJoinpoint;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorChain;
 import org.junit.Test;
@@ -38,9 +39,9 @@ public class TestInterceptorChain {
 
         Interceptor interceptor1 = new Interceptor() {
             @Override
-            public boolean beforeExecute(ForestRequest request) {
+            public ForestJoinpoint beforeExecute(ForestRequest request) {
                 inter1Before.set(true);
-                return true;
+                return proceed();
             }
 
             @Override
@@ -63,9 +64,9 @@ public class TestInterceptorChain {
 
         Interceptor interceptor2 = new Interceptor() {
             @Override
-            public boolean beforeExecute(ForestRequest request) {
+            public ForestJoinpoint beforeExecute(ForestRequest request) {
                 inter2Before.set(true);
-                return true;
+                return proceed();
             }
 
             @Override
@@ -89,9 +90,9 @@ public class TestInterceptorChain {
 
         Interceptor interceptor3 = new Interceptor() {
             @Override
-            public boolean beforeExecute(ForestRequest request) {
+            public ForestJoinpoint beforeExecute(ForestRequest request) {
                 inter3Before.set(true);
-                return false;
+                return proceed();
             }
 
             @Override
@@ -114,7 +115,7 @@ public class TestInterceptorChain {
                 .addInterceptor(interceptor2);
         assertEquals(2, chain.getInterceptorSize());
 
-        assertTrue(chain.beforeExecute(null));
+        assertTrue(chain.beforeExecute(null).isProceed());
         assertTrue(inter1Before.get());
         assertTrue(inter2Before.get());
 

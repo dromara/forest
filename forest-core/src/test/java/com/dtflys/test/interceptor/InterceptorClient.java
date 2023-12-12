@@ -30,9 +30,9 @@ public interface InterceptorClient {
     @Request(
             url = "http://localhost:${port}/hello/user?username=foo",
             headers = {"Accept:text/plain"},
-            interceptor = FalseInterceptor.class
+            interceptor = CutoffInterceptor.class
     )
-    String beforeFalse(String arg);
+    String beforeCutoff(String arg);
 
 
 }

@@ -20,6 +20,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestURL;
 import com.dtflys.forest.http.Lazy;
+import com.dtflys.forest.interceptor.ForestJoinpoint;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorChain;
 import com.dtflys.forest.logging.LogConfiguration;
@@ -2025,7 +2026,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .getInterceptorChain();
         assertThat(interceptorChain).isNotNull();
         assertThat(interceptorChain.getInterceptorSize()).isEqualTo(2);
-        assertFalse(interceptorChain.beforeExecute(null));
+        assertFalse(interceptorChain.beforeExecute(null).isProceed());
         assertTrue(inter3Before.get());
     }
 
@@ -2037,9 +2038,9 @@ public class TestGenericForestClient extends BaseClientTest {
         }
 
         @Override
-        public boolean beforeExecute(ForestRequest request) {
+        public ForestJoinpoint beforeExecute(ForestRequest request) {
             inter3Before.set(true);
-            return false;
+            return cutoff();
         }
 
         @Override

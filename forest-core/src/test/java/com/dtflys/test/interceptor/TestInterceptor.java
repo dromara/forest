@@ -1,16 +1,12 @@
 package com.dtflys.test.interceptor;
 
-import com.dtflys.forest.Forest;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.http.ForestHeader;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.logging.ForestLogger;
 import com.dtflys.test.http.BaseClientTest;
-import com.dtflys.forest.interceptor.DefaultInterceptorFactory;
 import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.test.http.TestGetClient;
-import com.dtflys.forest.interceptor.Interceptor;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.BeforeClass;
@@ -20,7 +16,6 @@ import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static junit.framework.Assert.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -85,9 +80,9 @@ public class TestInterceptor extends BaseClientTest {
     }
 
     @Test
-    public void testFalseInterceptor() {
+    public void testCutoffInterceptor() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        assertThat(interceptorClient.beforeFalse("a")).isNull();
+        assertThat(interceptorClient.beforeCutoff("a")).isNull();
     }
 
 

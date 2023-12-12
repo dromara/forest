@@ -1,6 +1,7 @@
 package com.dtflys.spring.test.interceptor;
 
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.interceptor.ForestJoinpoint;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.spring.test.component.ComponentA;
 import com.dtflys.spring.test.component.ComponentB;
@@ -19,8 +20,8 @@ public class TestInterceptorB implements Interceptor<String> {
     private ComponentB componentB;
 
     @Override
-    public boolean beforeExecute(ForestRequest request) {
+    public ForestJoinpoint beforeExecute(ForestRequest request) {
         componentB.setName("bbb");
-        return true;
+        return proceed();
     }
 }

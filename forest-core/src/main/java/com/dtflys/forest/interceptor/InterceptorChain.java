@@ -1,6 +1,5 @@
 package com.dtflys.forest.interceptor;
 
-import com.dtflys.forest.callback.RetryWhen;
 import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestCookies;
@@ -9,8 +8,6 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.ForestProgress;
 
-import java.lang.reflect.Method;
-import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
@@ -41,14 +38,16 @@ public class InterceptorChain implements Interceptor {
 
 
     @Override
-    public boolean beforeExecute(ForestRequest request) {
+    public ForestJoinpoint beforeExecute(ForestRequest request) {
+        ForestJoinpoint joinpoint = null;
         for (Interceptor item : interceptors) {
-            final boolean result = item.beforeExecute(request);
-            if (!result) {
-                return false;
+            final ForestJoinpoint jp = item.beforeExecute(request);
+            joinpoint = jp != null ? jp : ForestJoinpoint.PROCEED;
+            if (!joinpoint.isProceed()) {
+                return joinpoint;
             }
         }
-        return true;
+        return joinpoint;
     }
 
     @Override

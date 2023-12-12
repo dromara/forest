@@ -57,6 +57,7 @@ import com.dtflys.forest.http.body.MultipartRequestBody;
 import com.dtflys.forest.http.body.NameValueRequestBody;
 import com.dtflys.forest.http.body.ObjectRequestBody;
 import com.dtflys.forest.http.body.StringRequestBody;
+import com.dtflys.forest.interceptor.ForestJoinpoint;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
 import com.dtflys.forest.interceptor.InterceptorChain;
@@ -4704,8 +4705,9 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     public Object execute(HttpBackend backend, LifeCycleHandler lifeCycleHandler) {
         setLifeCycleHandler(lifeCycleHandler);
         processRedirectionRequest();
+        final ForestJoinpoint joinpoint = interceptorChain.beforeExecute(this);
         // 执行 beforeExecute
-        if (interceptorChain.beforeExecute(this)) {
+        if (joinpoint.isProceed()) {
             // 认证信息增强
             if (this.authenticator != null) {
                 this.authenticator.enhanceAuthorization(this);
@@ -4731,6 +4733,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
                     }
                 }
             }
+        } else if (joinpoint.isCutoff()) {
+            return joinpoint.getResult();
         }
         // 返回结果
         return getMethodReturnValue();

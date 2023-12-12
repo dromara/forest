@@ -5,6 +5,7 @@ import com.dtflys.forest.annotation.DataFile;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.interceptor.ForestJoinpoint;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MetaRequest;
@@ -55,12 +56,12 @@ public class BinaryBodyLifeCycle extends AbstractBodyLifeCycle<BinaryBody> {
     }
 
     @Override
-    public boolean beforeExecute(ForestRequest request) {
+    public ForestJoinpoint beforeExecute(ForestRequest request) {
         String contentType = request.getContentType();
         if (StringUtils.isBlank(contentType)) {
             request.setContentType(ContentType.APPLICATION_OCTET_STREAM);
         }
-        return true;
+        return proceed();
     }
 
 }

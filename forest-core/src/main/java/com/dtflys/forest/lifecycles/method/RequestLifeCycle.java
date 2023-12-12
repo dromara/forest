@@ -1,6 +1,7 @@
 package com.dtflys.forest.lifecycles.method;
 
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.interceptor.ForestJoinpoint;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MetaRequest;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
@@ -24,7 +25,7 @@ public class RequestLifeCycle implements MethodAnnotationLifeCycle<Annotation, O
     }
 
     @Override
-    public boolean beforeExecute(ForestRequest request) {
+    public ForestJoinpoint beforeExecute(ForestRequest request) {
         return MethodAnnotationLifeCycle.super.beforeExecute(request);
     }
 }
