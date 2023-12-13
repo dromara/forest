@@ -18,7 +18,7 @@ public abstract class ResultGetter {
     protected abstract ForestResponse getResponse();
 
 
-    public <T> T get(Class<T> clazz) {
+    public <T> T result(Class<T> clazz) {
         final Object result = HANDLER.getResult(request, getResponse(), clazz);
         if (result == null) {
             return null;
@@ -26,7 +26,7 @@ public abstract class ResultGetter {
         return (T) result;
     }
 
-    public <T> T get(Type type) {
+    public <T> T result(Type type) {
         final Object result = HANDLER.getResult(request, getResponse(), type);
         if (result == null) {
             return null;
@@ -34,7 +34,7 @@ public abstract class ResultGetter {
         return (T) result;
     }
 
-    public <T> T get(TypeReference<T> typeReference) {
+    public <T> T result(TypeReference<T> typeReference) {
         final Object result = HANDLER.getResult(request, getResponse(), typeReference.getType());
         if (result == null) {
             return null;

@@ -2,8 +2,6 @@ package com.dtflys.test.http;
 
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.backend.HttpBackend;
-import com.dtflys.forest.backend.httpclient.HttpclientBackend;
-import com.dtflys.forest.backend.okhttp3.OkHttp3Backend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.ForestProgress;
@@ -137,7 +135,7 @@ public class TestDownloadClient extends BaseClientTest {
                 atomicProgress.set(progress);
             }
         });
-        File file = response.getResult();
+        File file = response.result();
         assertThat(response)
                 .isNotNull()
                 .extracting(ForestResponse::getStatusCode)
@@ -300,7 +298,7 @@ public class TestDownloadClient extends BaseClientTest {
         Buffer buffer = getImageBuffer();
         server.enqueue(new MockResponse().setBody(buffer));
         InputStream in = Forest.get("http://localhost:" + server.getPort() + "/download/test-img.jpg")
-                .execute(InputStream.class);
+                .as(InputStream.class);
 
         ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
         buffer.readAll(Okio.sink(bytesOut));

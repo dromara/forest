@@ -112,7 +112,7 @@ public class TestCookieClient extends BaseClientTest {
             loadCount.incrementAndGet();
         }))
             .isNotNull()
-            .extracting(ForestResponse::getStatusCode, ForestResponse::getResult)
+            .extracting(ForestResponse::getStatusCode, ForestResponse::result)
             .contains(200, EXPECTED);
         assertThat(loadCount.get()).isEqualTo(1);
         mockRequest(server)
@@ -184,7 +184,7 @@ public class TestCookieClient extends BaseClientTest {
             loadCount.incrementAndGet();
         }))
                 .isNotNull()
-                .extracting(ForestResponse::getStatusCode, ForestResponse::getResult)
+                .extracting(ForestResponse::getStatusCode, ForestResponse::result)
                 .contains(200, EXPECTED);
         assertThat(loadCount.get()).isEqualTo(1);
         mockRequest(server)
@@ -212,7 +212,7 @@ public class TestCookieClient extends BaseClientTest {
                 .setHeader(HttpHeaders.ACCEPT, "text/plain"));
         assertThat(cookieClient.testCookieWithInterceptor())
             .isNotNull()
-            .extracting(ForestResponse::getStatusCode, ForestResponse::getResult)
+            .extracting(ForestResponse::getStatusCode, ForestResponse::result)
             .contains(200, EXPECTED);
     }
 

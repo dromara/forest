@@ -40,7 +40,7 @@ public class TestAddressClient5 extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         ForestRequest request = addressClient5.test();
         assertThat(request.basePath()).isEqualTo("/aaa");
-        String result = request.executeAsString();
+        String result = request.asString();
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
     }
 

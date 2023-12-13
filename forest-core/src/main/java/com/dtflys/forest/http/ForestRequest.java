@@ -360,7 +360,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * 重定向的上一个响应
      * <p>触发重定向时的第一个响应，即带有301、302等状态码的响应
      */
-    ForestResponse<?> prevResponse;
+    ForestResponse prevResponse;
 
     /**
      * 进度回调函数：上传/下载进度监听时调用
@@ -2144,7 +2144,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @return 重定向的上一个响应
      */
-    public ForestResponse<?> getPrevResponse() {
+    public ForestResponse getPrevResponse() {
         return prevResponse;
     }
 
@@ -4528,7 +4528,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @return Forest响应对象, {@link ForestResponse}实例
      */
-    private ForestResponse<T> getResponse() {
+    private ForestResponse getResponse() {
         if (this.lifeCycleHandler != null) {
             if (this.lifeCycleHandler instanceof MethodLifeCycleHandler) {
                 return ((MethodLifeCycleHandler) lifeCycleHandler).getResponse();
@@ -4549,7 +4549,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @param response Forest响应对象
      * @return
      */
-    private boolean doRetryWhen(ForestResponse<?> response) {
+    private boolean doRetryWhen(ForestResponse response) {
         if (this.retryWhen != null) {
              return this.retryWhen.retryWhen(this, response);
         }
@@ -4567,7 +4567,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return 返回 {@code null} 时，不进行重试; 返回 {@link ForestRetryException} 时，进行重试
      * @see ForestRequest#canRetry(ForestResponse, ForestRetryException)
      */
-    public ForestRetryException canRetry(ForestResponse<?> response) {
+    public ForestRetryException canRetry(ForestResponse response) {
         try {
             return canRetry(response, null);
         } catch (ForestRetryException rex) {
@@ -4597,7 +4597,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return 需要重试时，会返回 {@link ForestRetryException} 异常对象
      * @throws Throwable 当重试条件不满足时所抛出的异常类型
      */
-    public final ForestRetryException canRetry(ForestResponse<?> response, ForestRetryException ex) throws Throwable {
+    public final ForestRetryException canRetry(ForestResponse response, ForestRetryException ex) throws Throwable {
         if (ex == null) {
             ex = new ForestRetryException(this, maxRetryCount, getCurrentRetryCount());
         }
@@ -4699,7 +4699,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @param lifeCycleHandler 生命周期处理器，{@link LifeCycleHandler}接口实例
      * @return 接受到请求响应后，其响应内容反序列化成对象的结果
      */
-    public Object execute(HttpBackend backend, LifeCycleHandler lifeCycleHandler) {
+    public Object asObject(HttpBackend backend, LifeCycleHandler lifeCycleHandler) {
         setLifeCycleHandler(lifeCycleHandler);
         processRedirectionRequest();
         final ForestJointPoint joinpoint = interceptorChain.beforeExecute(this);
@@ -4770,23 +4770,23 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @return 接受到请求响应后，其响应内容反序列化成对象的结果
      */
-    public Object execute() {
-        return execute(getBackend(), getLifeCycleHandler());
+    public Object asObject() {
+        return asObject(getBackend(), getLifeCycleHandler());
     }
 
     /**
-     * 执行请求发送过程
+     * 执行请求发送过程，并将结果转换成指定类型
      *
      * @param clazz 结果返回类型, {@link Class} 对象
      * @param <R> 泛型参数: 结果返回类型
      * @return 请求执行响应后返回的结果, 其为 {@code Class<R>} 参数所指定的类型
      */
-    public <R> R execute(Class<R> clazz) {
+    public <R> R as(Class<R> clazz) {
         LifeCycleHandler lifeCycleHandler = getLifeCycleHandler();
         MethodLifeCycleHandler<R> methodLifeCycleHandler = new MethodLifeCycleHandler<>(
                 clazz,
                 lifeCycleHandler.getOnSuccessClassGenericType());
-        Object ret = execute(getBackend(), methodLifeCycleHandler);
+        Object ret = asObject(getBackend(), methodLifeCycleHandler);
         return (R) ret;
     }
 
@@ -4796,7 +4796,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return 请求执行响应后返回的结果, 其为字节数组类型
      */
     public byte[] executeAsByteArray() {
-        return execute(byte[].class);
+        return as(byte[].class);
     }
 
 
@@ -4806,7 +4806,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return 请求执行响应后返回的结果, 其为Boolean类型
      */
     public Boolean executeAsBoolean() {
-        return execute(Boolean.class);
+        return as(Boolean.class);
     }
 
 
@@ -4815,8 +4815,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @return 请求执行响应后返回的结果, 其为整数类型
      */
-    public Integer executeAsInteger() {
-        return execute(Integer.class);
+    public Integer asInteger() {
+        return as(Integer.class);
     }
 
     /**
@@ -4824,8 +4824,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @return 请求执行响应后返回的结果, 其为Long类型
      */
-    public Long executeAsLong() {
-        return execute(Long.class);
+    public Long asLong() {
+        return as(Long.class);
     }
 
     /**
@@ -4833,8 +4833,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @return 请求执行响应后返回的结果, 其为字符串类型
      */
-    public String executeAsString() {
-        return execute(String.class);
+    public String asString() {
+        return as(String.class);
     }
 
     /**
@@ -4844,8 +4844,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @param <VALUE> 泛型参数: 结果表的值类型
      * @return 请求执行响应后返回的结果, 其为Map类型
      */
-    public <KEY, VALUE> Map<KEY, VALUE> executeAsMap() {
-        return execute(new TypeReference<Map<KEY, VALUE>>() {});
+    public <KEY, VALUE> Map<KEY, VALUE> asMap() {
+        return as(new TypeReference<Map<KEY, VALUE>>() {});
     }
 
     /**
@@ -4854,8 +4854,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @param <E> 泛型参数: 结果列表项类型
      * @return 请求执行响应后返回的结果, 其为List类型
      */
-    public <E> List<E> executeAsList() {
-        return execute(new TypeReference<List<E>>() {});
+    public <E> List<E> asList() {
+        return as(new TypeReference<List<E>>() {});
     }
 
     /**
@@ -4864,8 +4864,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return 请求执行响应后返回的结果, 其为 {@link Future} 对象实例
      * @since 1.5.27
      */
-    public ForestFuture<T> executeAsFuture() {
-        return execute(new TypeReference<ForestFuture<T>>() {});
+    public ForestFuture<T> asFuture() {
+        return as(new TypeReference<ForestFuture<T>>() {});
     }
 
 
@@ -4875,36 +4875,37 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return 请求执行响应后返回的结果, 其为 {@link ForestResponse} 对象实例
      * @since 1.5.27
      */
-    public ForestResponse executeAsResponse() {
-        return execute(ForestResponse.class);
+    public ForestResponse<T> execute() {
+        return as(new TypeReference<ForestResponse<T>>() {});
     }
 
 
+
     /**
-     * 执行请求发送过程
+     * 执行请求发送过程，并将结果转换成指定类型
      *
      * @param type 结果返回类型, {@link Type} 接口实例
      * @param <R> 泛型参数: 结果返回类型
      * @return 请求执行响应后返回的结果, 其为 {@link Type} 参数所指定的类型
      */
-    public <R> R execute(Type type) {
+    public <R> R as(Type type) {
         LifeCycleHandler lifeCycleHandler = getLifeCycleHandler();
         MethodLifeCycleHandler<R> methodLifeCycleHandler = new MethodLifeCycleHandler<>(
                 type,
                 lifeCycleHandler.getOnSuccessClassGenericType());
-        Object ret = execute(getBackend(), methodLifeCycleHandler);
+        Object ret = asObject(getBackend(), methodLifeCycleHandler);
         return (R) ret;
     }
 
     /**
-     * 执行请求发送过程
+     * 执行请求发送过程，并将结果转换成指定类型
      *
      * @param typeReference 结果返回类型的引用, {@link TypeReference} 对象
      * @param <R> 泛型参数: 结果返回类型
      * @return 请求执行响应后返回的结果, 其为 {@link TypeReference} 的泛型参数所指定的类型
      */
-    public <R> R execute(TypeReference<R> typeReference) {
-        return execute(typeReference.getType());
+    public <R> R as(TypeReference<R> typeReference) {
+        return as(typeReference.getType());
     }
 
 }

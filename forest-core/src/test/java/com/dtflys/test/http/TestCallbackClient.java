@@ -9,7 +9,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -52,7 +51,7 @@ public class TestCallbackClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         AtomicBoolean atomic = new AtomicBoolean(false);
         assertThat(callbackClient.getOnSuccess("foo", (request, response) -> {
-            assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+            assertThat(response.result()).isNotNull().isEqualTo(EXPECTED);
             atomic.set(true);
         }))
             .isNotNull()
@@ -66,7 +65,7 @@ public class TestCallbackClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         AtomicBoolean atomic = new AtomicBoolean(false);
         assertThat(callbackClient.getOnSuccessMap("foo", (request, response) -> {
-            assertThat(response.get(Map.class))
+            assertThat(response.result(Map.class))
                     .isNotNull()
                     .extracting("status")
                     .isEqualTo("ok");

@@ -6,16 +6,13 @@ import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.exceptions.ForestNetworkException;
-import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.handler.ResultHandler;
 import com.dtflys.forest.http.ForestCookie;
 import com.dtflys.forest.http.ForestCookies;
-import com.dtflys.forest.http.ForestFuture;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.utils.ForestProgress;
 import com.dtflys.forest.utils.ReflectUtils;
 
@@ -66,7 +63,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
                 if ((!ForestResponse.class.isAssignableFrom(resultRawClass)
                         && !Future.class.isAssignableFrom(resultRawClass))
                         || request.isDownloadFile()) {
-                    resultData = response.getResult();
+                    resultData = response.result();
                 }
             } else {
                 if (ex != null) {
@@ -86,7 +83,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
             }
             return resultData;
         } catch (Throwable th) {
-            Object resultData = response.getResult();
+            Object resultData = response.result();
             handleResult(resultData);
             if (ForestResponse.class.isAssignableFrom(resultRawClass)) {
                 if (!(resultData instanceof ForestResponse)) {
@@ -168,7 +165,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
         Object resultData = null;
         if (request.getOnError() != null) {
             request.getOnError().onError(e, request, response);
-            resultData = response.getResult();
+            resultData = response.result();
             return resultData;
         }
         else {

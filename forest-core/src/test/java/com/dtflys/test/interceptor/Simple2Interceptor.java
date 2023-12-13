@@ -24,7 +24,7 @@ public class Simple2Interceptor implements Interceptor {
 
     @Override
     public void onSuccess(ForestRequest request, ForestResponse response) {
-        final Object data = response.getResult();
+        final Object data = response.result();
         log.info("invoke Simple2 onSuccess, data: " + data);
         response.setResult("YY: " + data);
     }

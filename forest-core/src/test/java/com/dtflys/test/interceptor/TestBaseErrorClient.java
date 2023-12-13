@@ -34,7 +34,7 @@ public class TestBaseErrorClient extends BaseClientTest {
     public void testBaseError() {
         ForestResponse<String> result = baseErrorInterceptorClient.testError();
         assertNotNull(result);
-        assertEquals("Base OnError is OK", result.getResult());
+        assertEquals("Base OnError is OK", result.result());
     }
 
 

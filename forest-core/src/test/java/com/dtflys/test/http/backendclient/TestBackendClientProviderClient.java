@@ -53,7 +53,7 @@ public class TestBackendClientProviderClient {
                     return proceed();
                 }
             });
-            String result = request.execute(String.class);
+            String result = request.as(String.class);
             assertThat(executed.get()).isTrue();
             assertThat(result).isNotNull().isEqualTo(EXPECTED);
         }
@@ -85,7 +85,7 @@ public class TestBackendClientProviderClient {
                     return proceed();
                 }
             });
-            String result = request.execute(String.class);
+            String result = request.as(String.class);
             assertThat(executed.get()).isTrue();
             assertThat(result).isNotNull().isEqualTo(EXPECTED);
         }
@@ -118,7 +118,7 @@ public class TestBackendClientProviderClient {
                     return proceed();
                 }
             });
-            String result = request.execute(String.class);
+            String result = request.as(String.class);
             assertThat(executed.get()).isTrue();
             assertThat(result).isNotNull().isEqualTo(EXPECTED);
         }
@@ -151,7 +151,7 @@ public class TestBackendClientProviderClient {
                     return proceed();
                 }
             });
-            String result = request.execute(String.class);
+            String result = request.as(String.class);
             assertThat(executed.get()).isTrue();
             assertThat(result).isNotNull().isEqualTo(EXPECTED);
         }

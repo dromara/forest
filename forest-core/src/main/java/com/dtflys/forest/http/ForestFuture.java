@@ -78,13 +78,13 @@ public class ForestFuture<T> extends ResultGetter implements Future<T> {
     @Override
     public T get() throws InterruptedException, ExecutionException {
         final ForestResponse<T> res = await();
-        return res.getResult();
+        return res.result();
     }
 
     @Override
     public T get(long timeout, @NotNull TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         ForestResponse<T> res = await(timeout, unit);
-        return res.getResult();
+        return res.result();
 
     }
 

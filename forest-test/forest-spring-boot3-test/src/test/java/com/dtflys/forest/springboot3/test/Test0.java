@@ -101,7 +101,7 @@ public class Test0 {
         beastshopClient.shops();
         ForestResponse<String> response = testService.shops();
         assertNotNull(response);
-        assertNotNull(response.getResult());
+        assertNotNull(response.result());
         ForestRequest request = response.getRequest();
         assertNotNull(request);
         String name = request.getHeaderValue("MyName");

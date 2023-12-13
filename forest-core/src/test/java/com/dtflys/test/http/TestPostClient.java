@@ -624,7 +624,7 @@ public class TestPostClient extends BaseClientTest {
         user.setUsername("foo");
         ForestResponse<String> response = postClient.postJsonWithLog("foo", "1111111111111");
         assertThat(response).isNotNull();
-        assertThat(response.getResult())
+        assertThat(response.result())
                 .isNotNull()
                 .isEqualTo(EXPECTED);
         ForestRequest request = response.getRequest();

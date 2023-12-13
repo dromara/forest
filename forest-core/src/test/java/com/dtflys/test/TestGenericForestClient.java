@@ -153,12 +153,13 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_query_repeat() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        Forest.get("/")
+        ForestResponse<?> res = Forest.get("/")
                 .port(server.getPort())
                 .addQuery("a", "1")
                 .addQuery("a", "2")
                 .addQuery("a", "3")
                 .execute();
+        assertThat(res.result()).isNotNull();
         mockRequest(server)
                 .assertPathEquals("/")
                 .assertQueryEquals("a=1&a=2&a=3");
@@ -209,7 +210,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .host("localhost")
                 .port(server.getPort())
                 .addBody("key", "https://www.baidu.com#/?modeversion%3Dminiprogram%26sourceCode%3DGDT-ID-23310731%26mark%3DXZX-WXZF-0805")
-                .execute(String.class);
+                .as(String.class);
         mockRequest(server)
                 .assertPathEquals("/")
                 .assertBodyEquals("key=https://www.baidu.com#/?modeversion%3Dminiprogram%26sourceCode%3DGDT-ID-23310731%26mark%3DXZX-WXZF-0805");
@@ -542,7 +543,7 @@ public class TestGenericForestClient extends BaseClientTest {
         String result = Forest.get("http://xxxxx:444/path")
                 .host("localhost")
                 .port(server.getPort())
-                .execute(String.class);
+                .as(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/path");
@@ -554,7 +555,7 @@ public class TestGenericForestClient extends BaseClientTest {
         ForestRequest<?> request = Forest.get("http://xxxxx:444/path")
                 .address("localhost", server.getPort());
         assertThat(request.host()).isEqualTo("localhost");
-        String result = request.executeAsString();
+        String result = request.asString();
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/path");
@@ -567,7 +568,7 @@ public class TestGenericForestClient extends BaseClientTest {
         String result = Forest.get("/A")
                 .host("localhost")
                 .port(server.getPort())
-                .execute(String.class);
+                .as(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/A");
@@ -580,7 +581,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .host("localhost")
                 .port(server.getPort())
                 .path("/B")
-                .execute(String.class);
+                .as(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/B");
@@ -594,7 +595,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .port(server.getPort())
                 .basePath("1/2/3/a/b/c")
                 .basePath("X/Y/Z")
-                .execute(String.class);
+                .as(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/X/Y/Z/A");
@@ -608,7 +609,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .port(server.getPort())
                 .basePath("X")
                 .path("B")
-                .execute(String.class);
+                .as(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/X/B");
@@ -622,7 +623,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .port(server.getPort())
                 .path("B")
                 .basePath("X")
-                .execute(String.class);
+                .as(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/X/B");
@@ -633,7 +634,7 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         String result = Forest.get("http://localhost:" + server.getPort() + "/abc/A")
                 .basePath("X")
-                .execute(String.class);
+                .as(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/X/abc/A");
@@ -644,7 +645,7 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         ForestRequest request = Forest.get("/A")
                 .basePath("http://localhost:" + server.getPort() + "/X1/X2");
-        String result = request.executeAsString();
+        String result = request.asString();
         assertThat(request.basePath()).isEqualTo("/X1/X2");
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
@@ -684,7 +685,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .port(server.getPort())
                 .url("/B");
         assertThat(request.getHost()).isEqualTo("127.0.0.1");
-        String result = request.executeAsString();
+        String result = request.asString();
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/B");
@@ -705,14 +706,14 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_get_return_string() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = Forest.get("http://localhost:" + server.getPort()).execute(String.class);
+        String result = Forest.get("http://localhost:" + server.getPort()).as(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
     }
 
     @Test
     public void testRequest_get_return_string2() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        String result = Forest.get("http://localhost:" + server.getPort()).executeAsString();
+        String result = Forest.get("http://localhost:" + server.getPort()).asString();
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
     }
 
@@ -737,7 +738,7 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Map<String, String> result = Forest.get("/")
                 .address("localhost", server.getPort())
-                .executeAsMap();
+                .asMap();
         assertThat(result).isNotNull();
         assertThat(result.get("status")).isEqualTo("1");
         assertThat(result.get("data")).isEqualTo("2");
@@ -748,8 +749,7 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Map<String, String> result = Forest.get("/")
                 .address("localhost", server.getPort())
-                .execute(new TypeReference<Map<String, String>>() {
-                }.getType());
+                .as(new TypeReference<Map<String, String>>() {}.getType());
         assertThat(result).isNotNull();
         assertThat(result.get("status")).isEqualTo("1");
         assertThat(result.get("data")).isEqualTo("2");
@@ -759,7 +759,7 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_get_return_list() {
         server.enqueue(new MockResponse().setBody("[1, 2, 3]"));
-        List<Integer> result = Forest.get("http://localhost:" + server.getPort()).executeAsList();
+        List<Integer> result = Forest.get("http://localhost:" + server.getPort()).asList();
         assertThat(result).isNotNull();
         assertThat(result).isEqualTo(Lists.newArrayList(1, 2, 3));
     }
@@ -767,7 +767,7 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_get_return_map_list() {
         server.enqueue(new MockResponse().setBody("[{\"a\": 1}, {\"b\": 2}, {\"c\": 3}]"));
-        List<Map<String, Object>> result = Forest.get("http://localhost:" + server.getPort()).executeAsList();
+        List<Map<String, Object>> result = Forest.get("http://localhost:" + server.getPort()).asList();
         assertThat(result).isNotNull();
         assertThat(result.size()).isEqualTo(3);
         assertThat(result.get(0).get("a")).isEqualTo(1);
@@ -779,16 +779,16 @@ public class TestGenericForestClient extends BaseClientTest {
     public void testRequest_get_return_response() {
         server.enqueue(new MockResponse().setBody("{\"a\": 1, \"b\": 2, \"c\": 3}"));
         ForestResponse<Map<String, Object>> response = Forest.get("http://localhost:" + server.getPort())
-                .execute(new TypeReference<ForestResponse<Map<String, Object>>>() {
+                .as(new TypeReference<ForestResponse<Map<String, Object>>>() {
                 });
         assertThat(response).isNotNull();
-        Map<String, Object> result = response.getResult();
+        Map<String, Object> result = response.result();
         assertThat(result).isNotNull();
         assertThat(result.get("a")).isEqualTo(1);
         assertThat(result.get("b")).isEqualTo(2);
         assertThat(result.get("c")).isEqualTo(3);
         assertThat(response.isClosed()).isTrue();
-        assertThat(response.getResult()).isNotNull();
+        assertThat(response.result()).isNotNull();
     }
 
 
@@ -797,7 +797,7 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody("[\"1\", \"2\", \"3\"]"));
         List<String> result = Forest.get("/")
                 .address("localhost", server.getPort())
-                .executeAsList();
+                .asList();
         assertThat(result).isNotNull();
         assertThat(result).isEqualTo(Lists.newArrayList("1", "2", "3"));
     }
@@ -806,9 +806,8 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_get_return_type() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        Type type = new TypeReference<Map<String, Integer>>() {
-        }.getType();
-        Map<String, Integer> result = Forest.get("http://localhost:" + server.getPort()).execute(type);
+        Type type = new TypeReference<Map<String, Integer>>() {}.getType();
+        Map<String, Integer> result = Forest.get("http://localhost:" + server.getPort()).as(type);
         assertThat(result).isNotNull();
         assertThat(result.get("status")).isEqualTo(1);
         assertThat(result.get("data")).isEqualTo(2);
@@ -818,7 +817,7 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_get_return_JavaObject() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        Result result = Forest.get("http://localhost:" + server.getPort()).execute(Result.class);
+        Result result = Forest.get("http://localhost:" + server.getPort()).as(Result.class);
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(1);
         assertThat(result.getData()).isEqualTo("2");
@@ -829,7 +828,7 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         TypeReference<Result<Integer>> typeReference = new TypeReference<Result<Integer>>() {
         };
-        Result<Integer> result = Forest.get("http://localhost:" + server.getPort()).execute(typeReference);
+        Result<Integer> result = Forest.get("http://localhost:" + server.getPort()).as(typeReference);
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(1);
         assertThat(result.getData()).isEqualTo(2);
@@ -844,7 +843,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .addHeader(ForestHeader.USER_AGENT, "forest")
                 .addQuery("a", 1)
                 .addQuery("b", 2)
-                .execute(typeReference);
+                .as(typeReference);
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(1);
         assertThat(result.getData()).isEqualTo(2);
@@ -867,7 +866,7 @@ public class TestGenericForestClient extends BaseClientTest {
         Result<Integer> result = Forest.get("http://localhost:" + server.getPort())
                 .addHeader(ForestHeader.USER_AGENT, "forest")
                 .addQuery(map)
-                .execute(typeReference);
+                .as(typeReference);
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(1);
         assertThat(result.getData()).isEqualTo(2);
@@ -890,7 +889,7 @@ public class TestGenericForestClient extends BaseClientTest {
         Result<Integer> result = Forest.get("http://localhost:" + server.getPort())
                 .addHeader(ForestHeader.USER_AGENT, "forest")
                 .addQuery(data)
-                .execute(typeReference);
+                .as(typeReference);
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(1);
         assertThat(result.getData()).isEqualTo(2);
@@ -908,7 +907,7 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         String result = Forest.post("http://localhost:" + server.getPort())
                 .addBody("xxxxxxxyyyyyyy")
-                .execute(String.class);
+                .as(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertBodyEquals("xxxxxxxyyyyyyy");
@@ -922,7 +921,7 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         String result = Forest.post("http://localhost:" + server.getPort())
                 .addBody(map)
-                .execute(String.class);
+                .as(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertBodyEquals("value=bar&name=foo");
@@ -935,7 +934,7 @@ public class TestGenericForestClient extends BaseClientTest {
         String result = Forest.post("http://localhost:" + server.getPort())
                 .addHeader("Content-Type", "application/json; charset=UTF-8")
                 .addBody("xxxxxxxyyyyyyy")
-                .execute(String.class);
+                .as(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertBodyEquals("xxxxxxxyyyyyyy");
@@ -949,7 +948,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .addHeader("Content-Type", "application/json; charset=UTF-8")
                 .addHeader("name", "Forest.backend = okhttp3")
                 .addBody("{\"id\":\"1972664191\", \"name\":\"XieYu20011008\"}")
-                .executeAsString();
+                .asString();
         mockRequest(server)
                 .assertBodyEquals("{\"id\":\"1972664191\", \"name\":\"XieYu20011008\"}")
                 .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
@@ -1267,7 +1266,7 @@ public class TestGenericForestClient extends BaseClientTest {
         String result = Forest.post("http://localhost:" + server.getPort())
                 .contentTypeJson()
                 .addBody(bytes)
-                .execute(String.class);
+                .as(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertBodyEquals("xxxxxxxyyyyyyy");
@@ -1284,7 +1283,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .addBody("a", 1)
                 .addBody("b", 2);
         assertThat(request.body().nameValuesMapWithObject()).extracting("a", "b").contains(1, 2);
-        Result<Integer> result = (Result<Integer>) request.execute(typeReference);
+        Result<Integer> result = (Result<Integer>) request.as(typeReference);
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(1);
         assertThat(result.getData()).isEqualTo(2);
@@ -1306,7 +1305,7 @@ public class TestGenericForestClient extends BaseClientTest {
         Result<Integer> result = Forest.post("http://localhost:" + server.getPort() + "/post")
                 .contentFormUrlEncoded()
                 .addBody(map)
-                .execute(typeReference);
+                .as(typeReference);
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(1);
         assertThat(result.getData()).isEqualTo(2);
@@ -1329,7 +1328,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .contentFormUrlEncoded()
                 .addBody(map)
                 .addBody("c", 3)
-                .execute(typeReference);
+                .as(typeReference);
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(1);
         assertThat(result.getData()).isEqualTo(2);
@@ -1350,7 +1349,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .contentTypeJson()
                 .addBody("a", 1)
                 .addBody("b", 2)
-                .execute(typeReference);
+                .as(typeReference);
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(1);
         assertThat(result.getData()).isEqualTo(2);
@@ -1370,7 +1369,7 @@ public class TestGenericForestClient extends BaseClientTest {
         Result<Integer> result = Forest.post("http://localhost:" + server.getPort() + "/post")
                 .contentTypeJson()
                 .addBody("{\"a\":1,\"b\":2}")
-                .execute(typeReference);
+                .as(typeReference);
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(1);
         assertThat(result.getData()).isEqualTo(2);
@@ -1392,7 +1391,7 @@ public class TestGenericForestClient extends BaseClientTest {
         Result<Integer> result = Forest.post("http://localhost:" + server.getPort() + "/post")
                 .contentTypeJson()
                 .addBody(map)
-                .execute(typeReference);
+                .as(typeReference);
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(1);
         assertThat(result.getData()).isEqualTo(2);
@@ -1418,7 +1417,7 @@ public class TestGenericForestClient extends BaseClientTest {
         assertThat(request.body().nameValuesMapWithObject())
                 .extracting("a", "b", "c")
                 .contains(1, 2, 3);
-        Result<Integer> result = (Result<Integer>) request.execute(typeReference);
+        Result<Integer> result = (Result<Integer>) request.as(typeReference);
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(1);
         assertThat(result.getData()).isEqualTo(2);
@@ -1441,7 +1440,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .contentTypeJson()
                 .addBody(data)
                 .addBody("c", 3)
-                .execute(typeReference);
+                .as(typeReference);
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(1);
         assertThat(result.getData()).isEqualTo(2);
@@ -1463,7 +1462,7 @@ public class TestGenericForestClient extends BaseClientTest {
         final String result = Forest.post("http://localhost:" + server.getPort() + "/post")
                 .addHeader("Content-Type", "application/xml")
                 .addBody(xml)
-                .executeAsString();
+                .asString();
         assertThat(result).isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertBodyEquals(xml);
@@ -1483,7 +1482,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .addHeader("Content-Encoding", "gzip")
                 .addHeader("Content-Type", "application/xml")
                 .addBody(compress)
-                .executeAsString();
+                .asString();
         assertThat(result).isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertBodyEquals(compress);
@@ -1499,7 +1498,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .contentFormUrlEncoded()
                 .addBody("a", 1)
                 .addBody("b", 2)
-                .execute(typeReference);
+                .as(typeReference);
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(1);
         assertThat(result.getData()).isEqualTo(2);
@@ -1527,7 +1526,7 @@ public class TestGenericForestClient extends BaseClientTest {
                         return bytes;
                     }
                 })
-                .execute(typeReference);
+                .as(typeReference);
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(1);
         assertThat(result.getData()).isEqualTo(2);
@@ -1561,7 +1560,7 @@ public class TestGenericForestClient extends BaseClientTest {
                         return (str + "&d=4").getBytes();
                     }
                 })
-                .execute(typeReference);
+                .as(typeReference);
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(1);
         assertThat(result.getData()).isEqualTo(2);
@@ -1582,7 +1581,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .addHeader(ForestHeader.USER_AGENT, "forest")
                 .addQuery("a", 1)
                 .addQuery("b", 2)
-                .execute(typeReference);
+                .as(typeReference);
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(1);
         assertThat(result.getData()).isEqualTo(2);
@@ -1620,7 +1619,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .addHeader(ForestHeader.USER_AGENT, "forest")
                 .addQuery("a", 1)
                 .addQuery("b", 2)
-                .execute(typeReference);
+                .as(typeReference);
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(1);
         assertThat(result.getData()).isEqualTo(2);
@@ -1642,7 +1641,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .addHeader(ForestHeader.USER_AGENT, "forest")
                 .addQuery("a", 1)
                 .addQuery("b", 2)
-                .execute(typeReference);
+                .as(typeReference);
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(1);
         assertThat(result.getData()).isEqualTo(2);
@@ -1663,7 +1662,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .addHeader(ForestHeader.USER_AGENT, "forest")
                 .addQuery("a", 1)
                 .addQuery("b", 2)
-                .execute(typeReference);
+                .as(typeReference);
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(1);
         assertThat(result.getData()).isEqualTo(2);
@@ -1686,8 +1685,8 @@ public class TestGenericForestClient extends BaseClientTest {
         Result<Integer> result = Forest.post("http://localhost:" + server.getPort())
                 .contentTypeMultipartFormData()
                 .addFile("file", file)
-                .executeAsResponse()
-                .get(new TypeReference<Result<Integer>>() {
+                .execute()
+                .result(new TypeReference<Result<Integer>>() {
                 });
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(1);
@@ -1724,7 +1723,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .maxRetryInterval(0)
                 .retryer(NoneRetryer.class)
                 .onRetry((req, res) -> count.incrementAndGet())
-                .execute(ForestResponse.class);
+                .as(ForestResponse.class);
         ForestRetryer retryer = response.getRequest().getRetryer();
         assertThat(retryer).isNotNull().isInstanceOf(NoneRetryer.class);
         assertThat(response.getRequest().getCurrentRetryCount()).isEqualTo(0);
@@ -1758,7 +1757,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .addQuery("a", "1")
                 .addQuery("a", "2")
                 .addQuery("a", "3")
-                .execute(new TypeReference<Future<String>>() {
+                .as(new TypeReference<Future<String>>() {
                 });
         mockRequest(server)
                 .assertPathEquals("/")
@@ -1774,8 +1773,8 @@ public class TestGenericForestClient extends BaseClientTest {
                 .port(server.getPort())
                 .async()
                 .addQuery("a", "1")
-                .executeAsFuture()
-                .get(String.class);
+                .asFuture()
+                .result(String.class);
         mockRequest(server)
                 .assertPathEquals("/")
                 .assertQueryEquals("a=1");
@@ -1789,9 +1788,9 @@ public class TestGenericForestClient extends BaseClientTest {
                 .port(server.getPort())
                 .async()
                 .addQuery("a", "1")
-                .executeAsFuture()
+                .asFuture()
                 .await()
-                .get(Map.class);
+                .result(Map.class);
         mockRequest(server)
                 .assertPathEquals("/")
                 .assertQueryEquals("a=1");
@@ -1806,9 +1805,9 @@ public class TestGenericForestClient extends BaseClientTest {
                 .port(server.getPort())
                 .async()
                 .addQuery("a", "1")
-                .executeAsFuture()
+                .asFuture()
                 .await()
-                .get(new TypeReference<Map<String, Object>>() {
+                .result(new TypeReference<Map<String, Object>>() {
                 });
         mockRequest(server)
                 .assertPathEquals("/")
@@ -1825,9 +1824,9 @@ public class TestGenericForestClient extends BaseClientTest {
                 .port(server.getPort())
                 .async()
                 .addQuery("a", "1")
-                .executeAsFuture()
+                .asFuture()
                 .await(1, TimeUnit.SECONDS)
-                .get(Map.class);
+                .result(Map.class);
         mockRequest(server)
                 .assertPathEquals("/")
                 .assertQueryEquals("a=1");
@@ -1845,7 +1844,7 @@ public class TestGenericForestClient extends BaseClientTest {
                     .port(server.getPort())
                     .async()
                     .addQuery("a", "1")
-                    .executeAsFuture()
+                    .asFuture()
                     .await(800, TimeUnit.MILLISECONDS);
         } catch (Throwable th) {
             err = th;
@@ -1865,10 +1864,10 @@ public class TestGenericForestClient extends BaseClientTest {
                     .port(server.getPort())
                     .async()
                     .addQuery("a", i)
-                    .executeAsFuture());
+                    .asFuture());
         }
         Forest.await(futures, res -> {
-            String result = res.get(String.class);
+            String result = res.result(String.class);
             assertThat(result).isNotNull().isEqualTo(EXPECTED);
         });
     }
@@ -1886,10 +1885,10 @@ public class TestGenericForestClient extends BaseClientTest {
                     .port(server.getPort())
                     .async()
                     .addQuery("a", i)
-                    .executeAsFuture());
+                    .asFuture());
         }
         Forest.await(futures).forEach(res -> {
-            String result = res.get(String.class);
+            String result = res.result(String.class);
             assertThat(result).isNotNull().isEqualTo(EXPECTED);
         });
     }
@@ -1903,16 +1902,16 @@ public class TestGenericForestClient extends BaseClientTest {
                 .port(server.getPort())
                 .async()
                 .addQuery("a", 0)
-                .executeAsFuture();
+                .asFuture();
 
         ForestFuture future2 = Forest.get("/")
                 .port(server.getPort())
                 .async()
                 .addQuery("a", 1)
-                .executeAsFuture();
+                .asFuture();
 
         Forest.await(future1, future2).forEach(res -> {
-            String result = res.get(String.class);
+            String result = res.result(String.class);
             assertThat(result).isNotNull().isEqualTo(EXPECTED);
         });
     }
@@ -1991,7 +1990,7 @@ public class TestGenericForestClient extends BaseClientTest {
                     isError.set(true);
                     latch.countDown();
                 }));
-        request.execute(InputStream.class);
+        request.as(InputStream.class);
         latch.await();
         assertThat(isError.get()).isTrue();
         assertThat(request.getCurrentRetryCount()).isEqualTo(0);
@@ -2069,7 +2068,7 @@ public class TestGenericForestClient extends BaseClientTest {
         String result = Forest.put("http://localhost:" + server.getPort() + "/")
                 .contentTypeOctetStream()
                 .addBody(byteArray)
-                .execute(String.class);
+                .as(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertBodyEquals(byteArray);
@@ -2111,7 +2110,7 @@ public class TestGenericForestClient extends BaseClientTest {
                     }
                 });
 
-        ForestResponse<File> response = request.execute(new TypeReference<ForestResponse<File>>() {
+        ForestResponse<File> response = request.as(new TypeReference<ForestResponse<File>>() {
         });
 
         Assertions.assertThat(response)
@@ -2119,7 +2118,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .extracting(ForestResponse::getStatusCode)
                 .isEqualTo(200);
 
-        File file = response.getResult();
+        File file = response.result();
 
         Assertions.assertThat(file)
                 .isNotNull()

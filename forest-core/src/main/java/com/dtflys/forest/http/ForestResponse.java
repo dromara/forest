@@ -344,7 +344,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return 反序列化成对象类型的请求响应内容
      */
-    public T getResult() {
+    public T result() {
         if (result == null && isReceivedResponseData()) {
             Type type = request.getLifeCycleHandler().getResultType();
             if (type == null) {
@@ -352,7 +352,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
             }
             if (type == null) {
                 try {
-                    result = (T) get(String.class);
+                    result = (T) result(String.class);
                 } catch (Throwable th) {
                 }
             } else {
@@ -362,9 +362,9 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
                     if (argType == null) {
                         argType = String.class;
                     }
-                    result = get(argType);
+                    result = result(argType);
                 } else {
-                    result = get(type);
+                    result = result(type);
                 }
             }
         }

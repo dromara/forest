@@ -107,7 +107,7 @@ public class TestErrorClient extends BaseClientTest {
                 .isNotNull()
                 .extracting(
                         ForestResponse::getStatusCode,
-                        ForestResponse::getResult)
+                        ForestResponse::result)
                 .contains(500, "{\"error\": true, \"interceptor\": true}");
     }
 

@@ -207,7 +207,7 @@ public class TestSSLClient extends BaseClientTest {
                 .isNotNull().
                 isInstanceOf(com.dtflys.test.http.ssl.MySSLSocketFactoryBuilder.class);
         try {
-            result = request.executeAsString();
+            result = request.asString();
         } catch (ForestRuntimeException ex) {
             th = ex.getCause();
         }
@@ -226,7 +226,7 @@ public class TestSSLClient extends BaseClientTest {
                 .isNotNull().
                 isInstanceOf(com.dtflys.test.http.ssl.MySSLSocketFactoryBuilder.class);
         try {
-            result = request.executeAsString();
+            result = request.asString();
         } catch (ForestRuntimeException ex) {
             th = ex.getCause();
         }

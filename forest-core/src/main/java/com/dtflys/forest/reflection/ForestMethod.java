@@ -1500,7 +1500,7 @@ public class ForestMethod<T> implements VariableScope {
                 rType, onSuccessClassGenericType);
         request.setLifeCycleHandler(lifeCycleHandler);
         lifeCycleHandler.handleInvokeMethod(request, this, args);
-        return request.execute(request.getBackend(), lifeCycleHandler);
+        return request.asObject(request.getBackend(), lifeCycleHandler);
     }
 
 

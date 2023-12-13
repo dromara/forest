@@ -54,7 +54,7 @@ public class TestRetryClient extends BaseClientTest {
         assertThat(request).isNotNull();
         assertThat(request.getRetryCount()).isEqualTo(3);
         assertThat(request.getMaxRetryInterval()).isEqualTo(10);
-        String ret = request.execute(String.class);
+        String ret = request.as(String.class);
         assertThat(ret).isNotNull().isEqualTo(EXPECTED);
         assertThat(request.getCurrentRetryCount()).isEqualTo(3);
         assertThat(request.getAttachment("retry-interceptor")).isNotNull().isEqualTo(3);
@@ -78,7 +78,7 @@ public class TestRetryClient extends BaseClientTest {
         assertThat(request).isNotNull();
         assertThat(request.getRetryCount()).isEqualTo(3);
         assertThat(request.getMaxRetryInterval()).isEqualTo(10);
-        ForestResponse response = request.execute(ForestResponse.class);
+        ForestResponse response = request.as(ForestResponse.class);
         assertThat(response).isNotNull();
         assertThat(response.isError()).isTrue();
         assertThat(retryWhen404.getDoRetryWhenCount().get()).isEqualTo(4);

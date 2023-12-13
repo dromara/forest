@@ -31,7 +31,7 @@ public class SimpleInterceptor implements Interceptor {
     @Override
     public void onSuccess(ForestRequest request, ForestResponse response) {
         log.info("invoke Simple onSuccess");
-        response.setResult("XX: " + response.getResult());
+        response.setResult("XX: " + response.result());
     }
 
     @Override

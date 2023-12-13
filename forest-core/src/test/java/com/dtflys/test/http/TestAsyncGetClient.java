@@ -101,7 +101,7 @@ public class TestAsyncGetClient extends BaseClientTest {
         final AtomicBoolean success = new AtomicBoolean(false);
         getClient.asyncSimpleGet(
                 (request, response) -> {
-                    final String data = response.get(String.class);
+                    final String data = response.result(String.class);
                     log.info("data: " + data);
                     success.set(true);
                     assertEquals(EXPECTED, data);
@@ -197,7 +197,7 @@ public class TestAsyncGetClient extends BaseClientTest {
         getClient.asyncSimpleGet(
                 (request, response) -> {
                     assertThat(request.getAsyncMode()).isEqualTo(configuration.getAsyncMode());
-                    final String data = response.get(String.class);
+                    final String data = response.result(String.class);
                     log.info("data: " + data);
                     success.set(true);
                     assertEquals(EXPECTED, data);
@@ -220,7 +220,7 @@ public class TestAsyncGetClient extends BaseClientTest {
         final AtomicBoolean success = new AtomicBoolean(false);
         getClient.asyncSimpleGet(
                 (request, response) -> {
-                    final String data = response.get(String.class);
+                    final String data = response.result(String.class);
                     log.info("data: " + data);
                     assertThat(request.getAsyncMode()).isEqualTo(configuration.getAsyncMode());
                     success.set(true);
@@ -244,7 +244,7 @@ public class TestAsyncGetClient extends BaseClientTest {
         final AtomicBoolean success = new AtomicBoolean(false);
         getClient.asyncSimpleGet(
                 (request, response) -> {
-                    log.info("data: " + response.get(String.class));
+                    log.info("data: " + response.result(String.class));
                     assertThat(request.getAsyncMode()).isEqualTo(configuration.getAsyncMode());
                     success.set(true);
                     assertThat(response.getContent()).isEqualTo(EXPECTED);
@@ -264,7 +264,7 @@ public class TestAsyncGetClient extends BaseClientTest {
         final AtomicBoolean success = new AtomicBoolean(false);
         getClient.asyncSimpleGet2(
                 (request, response) -> {
-                    final TestResult data = response.get(TestResult.class);
+                    final TestResult data = response.result(TestResult.class);
                     assertThat(data).isNotNull();
                     assertThat(data.getStatus()).isEqualTo("ok");
                     assertThat(request.getAsyncMode()).isEqualTo(configuration.getAsyncMode());
@@ -287,7 +287,7 @@ public class TestAsyncGetClient extends BaseClientTest {
         getClient.asyncSimpleGet3(
                 (request, response) -> {
                     final TypeReference<TestResult<JsonTestUser>> typeReference = new TypeReference<TestResult<JsonTestUser>>() {};
-                    final TestResult<JsonTestUser> data = response.get(typeReference);
+                    final TestResult<JsonTestUser> data = response.result(typeReference);
                     assertThat(data).isNotNull();
                     assertThat(request.getAsyncMode()).isEqualTo(configuration.getAsyncMode());
                     assertEquals("ok", data.getStatus());
@@ -321,7 +321,7 @@ public class TestAsyncGetClient extends BaseClientTest {
         final AtomicBoolean success = new AtomicBoolean(false);
         CountDownLatch latch = new CountDownLatch(1);
         Future<String> future = getClient.asyncVarParamGet("foo", (request, response) -> {
-            final String data = response.get(String.class);
+            final String data = response.result(String.class);
             log.info("data: " + data);
             success.set(true);
             assertEquals(EXPECTED, data);
@@ -346,7 +346,7 @@ public class TestAsyncGetClient extends BaseClientTest {
         assertThat(future).isNotNull();
         ForestResponse response = future.await();
         assertThat(response).isNotNull();
-        String result = response.get(String.class);
+        String result = response.result(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
     }
 

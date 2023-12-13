@@ -225,7 +225,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response.getStatusCode()).isEqualTo(200);
         assertThat(response.getContentType()).isNull();
         assertThat(response.getCharset()).isEqualTo("UTF-8");
-        assertThat(response.getResult())
+        assertThat(response.result())
                 .isNotNull()
                 .containsOnly(entry("status", "ok"));
         mockRequest(server)
@@ -244,7 +244,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response.getContentType()).isNull();
         assertThat(response.getStatusCode()).isEqualTo(200);
         assertThat(response.getCharset()).isEqualTo("GBK");
-        assertThat(response.getResult())
+        assertThat(response.result())
                 .isNotNull()
                 .containsOnly(entry("status", "ok"));
         mockRequest(server)
@@ -269,7 +269,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response.getContentType()).isNull();
         assertThat(response.getStatusCode()).isEqualTo(200);
         assertThat(response.getCharset()).isEqualTo("GBK");
-        assertThat(response.getResult())
+        assertThat(response.result())
                 .isNotNull()
                 .containsOnly(entry("status", "正常"));
         mockRequest(server)
@@ -293,7 +293,7 @@ public class TestGetClient extends BaseClientTest {
                 .extracting(ContentType::toStringWithoutParameters)
                 .isEqualTo(ContentType.APPLICATION_JSON);
         assertThat(response.getCharset()).isEqualTo("UTF-8");
-        assertThat(response.getResult())
+        assertThat(response.result())
                 .isNotNull()
                 .containsOnly(entry("status", "ok"));
         mockRequest(server)
@@ -555,7 +555,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
         assertThat(response.getContentType()).isNull();
-        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        assertThat(response.result()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/")
                 .assertEncodedQueryEquals("token=" + token)
@@ -574,7 +574,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
         assertThat(response.getContentType()).isNull();
-        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        assertThat(response.result()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/xxx$@!")
                 .assertEncodedQueryEquals("token=" + token)
@@ -593,7 +593,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
         assertThat(response.getContentType()).isNull();
-        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        assertThat(response.result()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/test");
     }
@@ -607,13 +607,12 @@ public class TestGetClient extends BaseClientTest {
         String url = StrUtil.format("/test", server.getPort());
         ForestRequest<String> request = getClient.testUrl4(url);
         request.port(server.getPort());
-        ForestResponse<String> response = request.execute(new TypeReference<ForestResponse<String>>() {
-        });
+        ForestResponse<String> response = request.as(new TypeReference<ForestResponse<String>>() {});
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
         assertThat(response.getContentType()).isNull();
-        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        assertThat(response.result()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/test");
     }
@@ -627,13 +626,12 @@ public class TestGetClient extends BaseClientTest {
         String url = StrUtil.format("test/xxx", server.getPort());
         ForestRequest<String> request = getClient.testUrl4(url);
         request.port(server.getPort());
-        ForestResponse<String> response = request.execute(new TypeReference<ForestResponse<String>>() {
-        });
+        ForestResponse<String> response = request.as(new TypeReference<ForestResponse<String>>() {});
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
         assertThat(response.getContentType()).isNull();
-        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        assertThat(response.result()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/test/xxx");
     }
@@ -647,13 +645,12 @@ public class TestGetClient extends BaseClientTest {
         String url = StrUtil.format("test/xxx", server.getPort());
         ForestRequest<String> request = getClient.testUrl4(url);
         request.setPort(server.getPort());
-        ForestResponse<String> response = request.execute(new TypeReference<ForestResponse<String>>() {
-        });
+        ForestResponse<String> response = request.as(new TypeReference<ForestResponse<String>>() {});
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
         assertThat(response.getContentType()).isNull();
-        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        assertThat(response.result()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/test/xxx");
     }
@@ -668,13 +665,12 @@ public class TestGetClient extends BaseClientTest {
         ForestRequest<String> request = getClient.testUrl4(url);
         assertThat(request.ref()).isEqualTo("?ref=ok");
         request.port(server.getPort());
-        ForestResponse<String> response = request.execute(new TypeReference<ForestResponse<String>>() {
-        });
+        ForestResponse<String> response = request.as(new TypeReference<ForestResponse<String>>() {});
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
         assertThat(response.getContentType()).isNull();
-        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        assertThat(response.result()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/test")
                 .assertQueryEquals("a", "1")
@@ -692,13 +688,12 @@ public class TestGetClient extends BaseClientTest {
         ForestRequest<String> request = getClient.testUrl4(url);
         assertThat(request.ref()).isEqualTo("?ref=ok");
         request.port(server.getPort());
-        ForestResponse<String> response = request.execute(new TypeReference<ForestResponse<String>>() {
-        });
+        ForestResponse<String> response = request.as(new TypeReference<ForestResponse<String>>() {});
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
         assertThat(response.getContentType()).isNull();
-        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        assertThat(response.result()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/test");
     }
@@ -713,13 +708,12 @@ public class TestGetClient extends BaseClientTest {
         ForestRequest<String> request = getClient.testUrl4(url);
         assertThat(request.ref()).isEqualTo("xxx/yyy");
         request.port(server.getPort());
-        ForestResponse<String> response = request.execute(new TypeReference<ForestResponse<String>>() {
-        });
+        ForestResponse<String> response = request.as(new TypeReference<ForestResponse<String>>() {});
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
         assertThat(response.getContentType()).isNull();
-        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        assertThat(response.result()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/test");
     }
@@ -736,7 +730,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
         assertThat(response.getContentType()).isNull();
-        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        assertThat(response.result()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/test");
     }
@@ -754,7 +748,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
         assertThat(response.getContentType()).isNull();
-        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        assertThat(response.result()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/test");
     }
@@ -771,7 +765,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
         assertThat(response.getContentType()).isNull();
-        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        assertThat(response.result()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/test");
     }
@@ -788,7 +782,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
         assertThat(response.getContentType()).isNull();
-        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        assertThat(response.result()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/test");
     }
@@ -806,7 +800,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
         assertThat(response.getContentType()).isNull();
-        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        assertThat(response.result()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertPathEquals("/test");
     }
@@ -989,7 +983,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response.getContentType()).isNotNull()
                 .extracting(ContentType::toString).isEqualTo("text/plain");
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
-        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        assertThat(response.result()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertHeaderEquals("Accept", "text/plain")
                 .assertPathEquals("/hello/user")
@@ -1013,7 +1007,7 @@ public class TestGetClient extends BaseClientTest {
         assertThat(response.getContentType()).isNotNull()
                 .extracting(ContentType::toString).isEqualTo("text/plain");
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
-        assertThat(response.getResult()).isNotNull().isEqualTo(EXPECTED);
+        assertThat(response.result()).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertHeaderEquals("Accept", "text/plain")
                 .assertPathEquals("/hello/user")

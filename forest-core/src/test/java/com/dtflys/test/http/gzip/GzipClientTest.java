@@ -59,21 +59,21 @@ public class GzipClientTest extends BaseClientTest {
     @Test
     public void testTransaction() {
         ForestResponse<String> response = gzipClient.transaction("gzip");
-        assertEquals("测试gzip数据", response.getResult());
+        assertEquals("测试gzip数据", response.result());
     }
 
 
     @Test
     public void testTransaction_without_annotation() {
         ForestResponse<String> response = gzipClient.transaction_without_annotation("gzip");
-        assertEquals("测试gzip数据", response.getResult());
+        assertEquals("测试gzip数据", response.result());
     }
 
 
     @Test
     public void testTransaction2() {
         ForestResponse<String> response = gzipClient2.transaction("gzip");
-        assertEquals("测试gzip数据", response.getResult());
+        assertEquals("测试gzip数据", response.result());
     }
 
 
@@ -83,7 +83,7 @@ public class GzipClientTest extends BaseClientTest {
         assertThat(response).isNotNull();
         assertThat(response.getCharset()).isEqualToIgnoringCase("UTF-8");
         assertThat(response.getContentEncoding()).isNull();
-        assertEquals("测试gzip数据", response.getResult());
+        assertEquals("测试gzip数据", response.result());
     }
 
 

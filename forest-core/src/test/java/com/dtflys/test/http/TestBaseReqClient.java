@@ -125,7 +125,7 @@ public class TestBaseReqClient extends BaseClientTest {
         ForestRequest request = baseReqClient.testBaseTimeout("UTF-8");
         assertThat(request.getReadTimeout()).isEqualTo(4000);
         assertThat(request.getConnectTimeout()).isEqualTo(3000);
-        String result = request.executeAsString();
+        String result = request.asString();
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
     }
 

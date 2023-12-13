@@ -113,7 +113,7 @@ public class TestInterceptor extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         assertThat(baseInterceptorClient.generationType())
                 .isNotNull()
-                .extracting(ForestResponse::getResult)
+                .extracting(ForestResponse::result)
                 .isEqualTo("XX: Base: " + EXPECTED);
     }
 

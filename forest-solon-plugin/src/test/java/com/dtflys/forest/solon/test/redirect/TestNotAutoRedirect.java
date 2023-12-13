@@ -57,7 +57,7 @@ public class TestNotAutoRedirect {
         ForestResponse<String> response = springRedirectClient.testRedirect2();
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(200);
-        String result = response.getResult();
+        String result = response.result();
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
     }
 

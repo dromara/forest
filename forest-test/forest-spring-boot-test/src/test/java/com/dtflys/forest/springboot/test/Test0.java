@@ -26,7 +26,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.annotation.Resource;
 
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -98,7 +97,7 @@ public class Test0 {
         beastshopClient.shops();
         ForestResponse<String> response = testService.shops();
         assertNotNull(response);
-        assertNotNull(response.getResult());
+        assertNotNull(response.result());
         ForestRequest request = response.getRequest();
         assertNotNull(request);
         String name = request.getHeaderValue("MyName");
