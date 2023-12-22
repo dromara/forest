@@ -113,7 +113,7 @@ public class ForestConfiguration implements Serializable {
     /**
      * 请求接口的实例缓存，用于缓存请求接口的动态代理的实例
      */
-    private Map<Class, Object> instanceCache = new ConcurrentHashMap<>();
+    private Map<Class<?>, Object> instanceCache = new ConcurrentHashMap<>();
 
     private String id;
 
@@ -326,7 +326,7 @@ public class ForestConfiguration implements Serializable {
     /**
      * 全局过滤器注册表
      */
-    private Map<String, Class> filterRegisterMap = new HashMap<>();
+    private Map<String, Class<?>> filterRegisterMap = new HashMap<>();
 
     /**
      * 全局变量表
@@ -434,7 +434,7 @@ public class ForestConfiguration implements Serializable {
      *
      * @return 缓存对象集合
      */
-    public Map<Class, Object> getInstanceCache() {
+    public Map<Class<?>, Object> getInstanceCache() {
         return instanceCache;
     }
 
@@ -1888,15 +1888,13 @@ public class ForestConfiguration implements Serializable {
      * @return 新的Filter实例
      */
     public Filter newFilterInstance(String name) {
-        Class filterClass = filterRegisterMap.get(name);
+        final Class<?> filterClass = filterRegisterMap.get(name);
         if (filterClass == null) {
             throw new ForestRuntimeException("filter \"" + name + "\" does not exists!");
         }
         try {
             return (Filter) filterClass.newInstance();
-        } catch (InstantiationException e) {
-            throw new ForestRuntimeException("An error occurred the initialization of filter \"" + name + "\" ! cause: " + e.getMessage(), e);
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new ForestRuntimeException("An error occurred the initialization of filter \"" + name + "\" ! cause: " + e.getMessage(), e);
         }
     }
