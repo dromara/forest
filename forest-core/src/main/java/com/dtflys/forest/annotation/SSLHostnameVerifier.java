@@ -39,7 +39,6 @@ import java.lang.annotation.Target;
  * @since 1.5.16
  */
 @Documented
-@MethodLifeCycle(SSLHostnameVerifierLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 public @interface SSLHostnameVerifier {

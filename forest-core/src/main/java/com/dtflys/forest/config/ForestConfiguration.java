@@ -61,12 +61,21 @@ import com.dtflys.forest.annotation.Put;
 import com.dtflys.forest.annotation.PutRequest;
 import com.dtflys.forest.annotation.Query;
 import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.annotation.Retry;
+import com.dtflys.forest.annotation.Retryer;
+import com.dtflys.forest.annotation.SSLHostnameVerifier;
+import com.dtflys.forest.annotation.SSLSocketFactoryBuilder;
+import com.dtflys.forest.annotation.SocksProxy;
+import com.dtflys.forest.annotation.Success;
 import com.dtflys.forest.annotation.Trace;
 import com.dtflys.forest.annotation.TraceRequest;
+import com.dtflys.forest.annotation.URLEncode;
+import com.dtflys.forest.annotation.Var;
 import com.dtflys.forest.annotation.XMLBody;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.backend.HttpBackendSelector;
 import com.dtflys.forest.callback.AddressSource;
+import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.callback.RetryWhen;
 import com.dtflys.forest.callback.SuccessWhen;
 import com.dtflys.forest.converter.ForestConverter;
@@ -116,6 +125,11 @@ import com.dtflys.forest.lifecycles.method.PatchRequestLifeCycle;
 import com.dtflys.forest.lifecycles.method.PostRequestLifeCycle;
 import com.dtflys.forest.lifecycles.method.PutRequestLifeCycle;
 import com.dtflys.forest.lifecycles.method.RequestLifeCycle;
+import com.dtflys.forest.lifecycles.method.RetryLifeCycle;
+import com.dtflys.forest.lifecycles.method.RetryerLifeCycle;
+import com.dtflys.forest.lifecycles.method.SSLHostnameVerifierLifeCycle;
+import com.dtflys.forest.lifecycles.method.SSLSocketFactoryBuilderLifeCycle;
+import com.dtflys.forest.lifecycles.method.SuccessLifeCycle;
 import com.dtflys.forest.lifecycles.method.TraceRequestLifeCycle;
 import com.dtflys.forest.lifecycles.parameter.BinaryBodyLifeCycle;
 import com.dtflys.forest.lifecycles.parameter.BodyLifeCycle;
@@ -126,6 +140,8 @@ import com.dtflys.forest.lifecycles.parameter.JSONBodyLifeCycle;
 import com.dtflys.forest.lifecycles.parameter.JSONQueryLifeCycle;
 import com.dtflys.forest.lifecycles.parameter.ProtobufBodyLifeCycle;
 import com.dtflys.forest.lifecycles.parameter.QueryLifeCycle;
+import com.dtflys.forest.lifecycles.parameter.URLEncodeLifeCycle;
+import com.dtflys.forest.lifecycles.parameter.VariableLifeCycle;
 import com.dtflys.forest.lifecycles.parameter.XMLBodyLifeCycle;
 import com.dtflys.forest.lifecycles.proxy.HTTPProxyLifeCycle;
 import com.dtflys.forest.logging.DefaultLogHandler;
@@ -525,6 +541,11 @@ public class ForestConfiguration implements Serializable {
         configuration.registerAnnotation(HTTPProxy.class, HTTPProxyLifeCycle.class);
         configuration.registerAnnotation(LogEnabled.class, LogEnabledLifeCycle.class);
         configuration.registerAnnotation(LogHandler.class, LogHandlerLifeCycle.class);
+        configuration.registerAnnotation(SSLHostnameVerifier.class, SSLHostnameVerifierLifeCycle.class);
+        configuration.registerAnnotation(SSLSocketFactoryBuilder.class, SSLSocketFactoryBuilderLifeCycle.class);
+        configuration.registerAnnotation(Retry.class, RetryLifeCycle.class);
+        configuration.registerAnnotation(Retryer.class, RetryerLifeCycle.class);
+        configuration.registerAnnotation(Success.class, SuccessLifeCycle.class);
 
         // 注册参数注解
         configuration.registerAnnotation(Query.class, QueryLifeCycle.class);
@@ -533,11 +554,12 @@ public class ForestConfiguration implements Serializable {
         configuration.registerAnnotation(FormBody.class, FormBodyLifeCycle.class);
         configuration.registerAnnotation(JSONBody.class, JSONBodyLifeCycle.class);
         configuration.registerAnnotation(XMLBody.class, XMLBodyLifeCycle.class);
-        configuration.registerAnnotation(XMLBody.class, XMLBodyLifeCycle.class);
         configuration.registerAnnotation(BinaryBody.class, BinaryBodyLifeCycle.class);
         configuration.registerAnnotation(ProtobufBody.class, ProtobufBodyLifeCycle.class);
         configuration.registerAnnotation(DataFile.class, DataFileLifeCycle.class);
         configuration.registerAnnotation(Header.class, HeaderLifeCycle.class);
+        configuration.registerAnnotation(Var.class, VariableLifeCycle.class);
+        configuration.registerAnnotation(URLEncode.class, URLEncodeLifeCycle.class);
         return configuration;
     }
 
