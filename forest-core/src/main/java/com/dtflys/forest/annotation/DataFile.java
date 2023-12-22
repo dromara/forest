@@ -96,7 +96,6 @@ import java.lang.annotation.Target;
  * @since 2020-07-26 16:40
  */
 @Documented
-@ParamLifeCycle(DataFileLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
 public @interface DataFile {

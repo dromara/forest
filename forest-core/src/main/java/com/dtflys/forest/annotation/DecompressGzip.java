@@ -39,7 +39,6 @@ import java.lang.annotation.Target;
  * @since 1.5.1
  */
 @Documented
-@MethodLifeCycle(DecompressGzipLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 public @interface DecompressGzip {

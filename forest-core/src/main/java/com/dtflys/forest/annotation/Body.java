@@ -80,7 +80,6 @@ import java.lang.annotation.Target;
  * @since 2020-08-10 16:51
  */
 @Documented
-@ParamLifeCycle(BodyLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 public @interface Body {

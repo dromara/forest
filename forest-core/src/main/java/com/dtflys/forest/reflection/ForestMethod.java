@@ -1,5 +1,6 @@
 package com.dtflys.forest.reflection;
 
+import com.dtflys.forest.Forest;
 import com.dtflys.forest.annotation.BaseLifeCycle;
 import com.dtflys.forest.annotation.BaseRequest;
 import com.dtflys.forest.annotation.MethodLifeCycle;
@@ -373,32 +374,7 @@ public class ForestMethod<T> implements VariableScope {
     }
 
     private Class<? extends Interceptor> getAnnotationLifeCycleClass(Annotation annotation) {
-        Class<? extends Annotation> annType = annotation.annotationType();
-        Class<? extends MethodAnnotationLifeCycle> interceptorClass = null;
-        MethodLifeCycle methodLifeCycleAnn = annType.getAnnotation(MethodLifeCycle.class);
-        if (methodLifeCycleAnn == null) {
-            BaseLifeCycle baseLifeCycle = annType.getAnnotation(BaseLifeCycle.class);
-            if (baseLifeCycle != null) {
-                Class<? extends BaseAnnotationLifeCycle> baseAnnLifeCycleClass = baseLifeCycle.value();
-                if (baseAnnLifeCycleClass != null) {
-                    if (MethodAnnotationLifeCycle.class.isAssignableFrom(baseAnnLifeCycleClass)) {
-                        interceptorClass = (Class<? extends MethodAnnotationLifeCycle>) baseAnnLifeCycleClass;
-                    } else {
-                        return baseAnnLifeCycleClass;
-                    }
-                }
-            }
-        }
-        if (methodLifeCycleAnn != null || interceptorClass != null) {
-            if (interceptorClass == null) {
-                interceptorClass = methodLifeCycleAnn.value();
-                if (!Interceptor.class.isAssignableFrom(interceptorClass)) {
-                    throw new ForestInterceptorDefineException(interceptorClass);
-                }
-            }
-        }
-
-        return interceptorClass;
+        return configuration.getInterceptorClassFromAnnotation(annotation.annotationType());
     }
 
     /**
@@ -784,14 +760,13 @@ public class ForestMethod<T> implements VariableScope {
             if (subAnnArray.length > 0) {
                 processParameterAnnotation(parameter, subAnnArray);
             }
-            ParamLifeCycle paramLifeCycleAnn = (ParamLifeCycle) annType.getAnnotation(ParamLifeCycle.class);
-            if (paramLifeCycleAnn != null) {
-                Class<? extends ParameterAnnotationLifeCycle> interceptorClass = paramLifeCycleAnn.value();
-                if (!Interceptor.class.isAssignableFrom(interceptorClass)) {
-                    throw new ForestInterceptorDefineException(interceptorClass);
+            Class<? extends Interceptor> interceptorClass = configuration.getInterceptorClassFromAnnotation(annType);
+            if (interceptorClass != null) {
+                Interceptor lifeCycle = addInterceptor(interceptorClass);
+                if (lifeCycle instanceof ParameterAnnotationLifeCycle) {
+                    final ParameterAnnotationLifeCycle parameterAnnotationLifeCycle = (ParameterAnnotationLifeCycle) lifeCycle;
+                    parameterAnnotationLifeCycle.onParameterInitialized(this, parameter, ann);
                 }
-                ParameterAnnotationLifeCycle lifeCycle = addInterceptor(interceptorClass);
-                lifeCycle.onParameterInitialized(this, parameter, ann);
             }
         }
     }

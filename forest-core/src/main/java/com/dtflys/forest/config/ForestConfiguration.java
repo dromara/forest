@@ -25,6 +25,45 @@
 package com.dtflys.forest.config;
 
 import com.dtflys.forest.ForestGenericClient;
+import com.dtflys.forest.annotation.Address;
+import com.dtflys.forest.annotation.Backend;
+import com.dtflys.forest.annotation.BackendClient;
+import com.dtflys.forest.annotation.BaseLifeCycle;
+import com.dtflys.forest.annotation.BaseRequest;
+import com.dtflys.forest.annotation.BinaryBody;
+import com.dtflys.forest.annotation.Body;
+import com.dtflys.forest.annotation.BodyType;
+import com.dtflys.forest.annotation.DataFile;
+import com.dtflys.forest.annotation.DecompressGzip;
+import com.dtflys.forest.annotation.Delete;
+import com.dtflys.forest.annotation.DeleteRequest;
+import com.dtflys.forest.annotation.FormBody;
+import com.dtflys.forest.annotation.Get;
+import com.dtflys.forest.annotation.GetRequest;
+import com.dtflys.forest.annotation.HTTPProxy;
+import com.dtflys.forest.annotation.HeadRequest;
+import com.dtflys.forest.annotation.Header;
+import com.dtflys.forest.annotation.Headers;
+import com.dtflys.forest.annotation.JSONBody;
+import com.dtflys.forest.annotation.JSONQuery;
+import com.dtflys.forest.annotation.LogEnabled;
+import com.dtflys.forest.annotation.LogHandler;
+import com.dtflys.forest.annotation.MethodLifeCycle;
+import com.dtflys.forest.annotation.Options;
+import com.dtflys.forest.annotation.OptionsRequest;
+import com.dtflys.forest.annotation.ParamLifeCycle;
+import com.dtflys.forest.annotation.Patch;
+import com.dtflys.forest.annotation.PatchRequest;
+import com.dtflys.forest.annotation.Post;
+import com.dtflys.forest.annotation.PostRequest;
+import com.dtflys.forest.annotation.ProtobufBody;
+import com.dtflys.forest.annotation.Put;
+import com.dtflys.forest.annotation.PutRequest;
+import com.dtflys.forest.annotation.Query;
+import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.annotation.Trace;
+import com.dtflys.forest.annotation.TraceRequest;
+import com.dtflys.forest.annotation.XMLBody;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.backend.HttpBackendSelector;
 import com.dtflys.forest.callback.AddressSource;
@@ -40,6 +79,7 @@ import com.dtflys.forest.converter.protobuf.ForestProtobufConverter;
 import com.dtflys.forest.converter.protobuf.ForestProtobufConverterManager;
 import com.dtflys.forest.converter.text.DefaultTextConverter;
 import com.dtflys.forest.converter.xml.ForestXmlConverter;
+import com.dtflys.forest.exceptions.ForestInterceptorDefineException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.filter.EncodeFilter;
 import com.dtflys.forest.filter.EncodeFormFilter;
@@ -56,6 +96,38 @@ import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.interceptor.DefaultInterceptorFactory;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorFactory;
+import com.dtflys.forest.lifecycles.BaseAnnotationLifeCycle;
+import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
+import com.dtflys.forest.lifecycles.ParameterAnnotationLifeCycle;
+import com.dtflys.forest.lifecycles.base.BaseRequestLifeCycle;
+import com.dtflys.forest.lifecycles.logging.LogEnabledLifeCycle;
+import com.dtflys.forest.lifecycles.logging.LogHandlerLifeCycle;
+import com.dtflys.forest.lifecycles.method.AddressLifeCycle;
+import com.dtflys.forest.lifecycles.method.BackendClientLifeCycle;
+import com.dtflys.forest.lifecycles.method.BackendLifeCycle;
+import com.dtflys.forest.lifecycles.method.BodyTypeLifeCycle;
+import com.dtflys.forest.lifecycles.method.DecompressGzipLifeCycle;
+import com.dtflys.forest.lifecycles.method.DeleteRequestLifeCycle;
+import com.dtflys.forest.lifecycles.method.GetRequestLifeCycle;
+import com.dtflys.forest.lifecycles.method.HeadRequestLifeCycle;
+import com.dtflys.forest.lifecycles.method.HeadersLifeCycle;
+import com.dtflys.forest.lifecycles.method.OptionsRequestLifeCycle;
+import com.dtflys.forest.lifecycles.method.PatchRequestLifeCycle;
+import com.dtflys.forest.lifecycles.method.PostRequestLifeCycle;
+import com.dtflys.forest.lifecycles.method.PutRequestLifeCycle;
+import com.dtflys.forest.lifecycles.method.RequestLifeCycle;
+import com.dtflys.forest.lifecycles.method.TraceRequestLifeCycle;
+import com.dtflys.forest.lifecycles.parameter.BinaryBodyLifeCycle;
+import com.dtflys.forest.lifecycles.parameter.BodyLifeCycle;
+import com.dtflys.forest.lifecycles.parameter.DataFileLifeCycle;
+import com.dtflys.forest.lifecycles.parameter.FormBodyLifeCycle;
+import com.dtflys.forest.lifecycles.parameter.HeaderLifeCycle;
+import com.dtflys.forest.lifecycles.parameter.JSONBodyLifeCycle;
+import com.dtflys.forest.lifecycles.parameter.JSONQueryLifeCycle;
+import com.dtflys.forest.lifecycles.parameter.ProtobufBodyLifeCycle;
+import com.dtflys.forest.lifecycles.parameter.QueryLifeCycle;
+import com.dtflys.forest.lifecycles.parameter.XMLBodyLifeCycle;
+import com.dtflys.forest.lifecycles.proxy.HTTPProxyLifeCycle;
 import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.pool.FixedRequestPool;
@@ -76,6 +148,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -114,6 +187,13 @@ public class ForestConfiguration implements Serializable {
      * 请求接口的实例缓存，用于缓存请求接口的动态代理的实例
      */
     private Map<Class<?>, Object> instanceCache = new ConcurrentHashMap<>();
+
+    /**
+     * Forest 注解注册表
+     *
+     * @since 1.6.0
+     */
+    private Map<Class<? extends Annotation>, Class<? extends Interceptor>> annotationRegistration = new ConcurrentHashMap<>();
 
     private String id;
 
@@ -416,6 +496,48 @@ public class ForestConfiguration implements Serializable {
         configuration.registerFilter("encodeQuery", EncodeQueryFilter.class);
         configuration.registerFilter("encodeForm", EncodeFormFilter.class);
         configuration.setLogHandler(new DefaultLogHandler());
+
+        // 注册基本请求注解
+        configuration.registerAnnotation(Request.class, RequestLifeCycle.class);
+        configuration.registerAnnotation(Get.class, GetRequestLifeCycle.class);
+        configuration.registerAnnotation(GetRequest.class, GetRequestLifeCycle.class);
+        configuration.registerAnnotation(Post.class, PostRequestLifeCycle.class);
+        configuration.registerAnnotation(PostRequest.class, PostRequestLifeCycle.class);
+        configuration.registerAnnotation(Put.class, PutRequestLifeCycle.class);
+        configuration.registerAnnotation(PutRequest.class, PutRequestLifeCycle.class);
+        configuration.registerAnnotation(Delete.class, DeleteRequestLifeCycle.class);
+        configuration.registerAnnotation(DeleteRequest.class, DeleteRequestLifeCycle.class);
+        configuration.registerAnnotation(HeadRequest.class, HeadRequestLifeCycle.class);
+        configuration.registerAnnotation(Options.class, OptionsRequestLifeCycle.class);
+        configuration.registerAnnotation(OptionsRequest.class, OptionsRequestLifeCycle.class);
+        configuration.registerAnnotation(Patch.class, PatchRequestLifeCycle.class);
+        configuration.registerAnnotation(PatchRequest.class, PatchRequestLifeCycle.class);
+        configuration.registerAnnotation(Trace.class, TraceRequestLifeCycle.class);
+        configuration.registerAnnotation(TraceRequest.class, TraceRequestLifeCycle.class);
+
+        // 注册方法注解
+        configuration.registerAnnotation(Address.class, AddressLifeCycle.class);
+        configuration.registerAnnotation(Backend.class, BackendLifeCycle.class);
+        configuration.registerAnnotation(BackendClient.class, BackendClientLifeCycle.class);
+        configuration.registerAnnotation(BodyType.class, BodyTypeLifeCycle.class);
+        configuration.registerAnnotation(DecompressGzip.class, DecompressGzipLifeCycle.class);
+        configuration.registerAnnotation(Headers.class, HeadersLifeCycle.class);
+        configuration.registerAnnotation(HTTPProxy.class, HTTPProxyLifeCycle.class);
+        configuration.registerAnnotation(LogEnabled.class, LogEnabledLifeCycle.class);
+        configuration.registerAnnotation(LogHandler.class, LogHandlerLifeCycle.class);
+
+        // 注册参数注解
+        configuration.registerAnnotation(Query.class, QueryLifeCycle.class);
+        configuration.registerAnnotation(JSONQuery.class, JSONQueryLifeCycle.class);
+        configuration.registerAnnotation(Body.class, BodyLifeCycle.class);
+        configuration.registerAnnotation(FormBody.class, FormBodyLifeCycle.class);
+        configuration.registerAnnotation(JSONBody.class, JSONBodyLifeCycle.class);
+        configuration.registerAnnotation(XMLBody.class, XMLBodyLifeCycle.class);
+        configuration.registerAnnotation(XMLBody.class, XMLBodyLifeCycle.class);
+        configuration.registerAnnotation(BinaryBody.class, BinaryBodyLifeCycle.class);
+        configuration.registerAnnotation(ProtobufBody.class, ProtobufBodyLifeCycle.class);
+        configuration.registerAnnotation(DataFile.class, DataFileLifeCycle.class);
+        configuration.registerAnnotation(Header.class, HeaderLifeCycle.class);
         return configuration;
     }
 
@@ -1814,6 +1936,78 @@ public class ForestConfiguration implements Serializable {
     public <T> T createInstance(Class<T> clazz) {
         ProxyFactory<T> proxyFactory = getProxyFactory(clazz);
         return proxyFactory.createInstance();
+    }
+
+    /**
+     * 注册 Forest 注解
+     *
+     * @param annotationClass 注解类
+     * @param interceptorClass 拦截器类
+     * @return {@link ForestConfiguration}实例
+     * @since 1.6.0
+     */
+    public ForestConfiguration registerAnnotation(Class<? extends Annotation> annotationClass, Class<? extends Interceptor> interceptorClass) {
+        if (annotationRegistration.containsKey(annotationClass)) {
+            throw new ForestRuntimeException("Annotation type \"" + annotationClass.getName() + "\" has been already registered");
+        }
+        annotationRegistration.put(annotationClass, interceptorClass);
+        return this;
+    }
+
+    /**
+     * 获取 Forest 注解所注册的拦截器类
+     *
+     * @param annotationClass 注解类
+     * @return 拦截器类
+     * @since 1.6.0
+     */
+    public Class<? extends Interceptor> getInterceptorClassFromAnnotation(Class<? extends Annotation> annotationClass) {
+        final Class<? extends Interceptor> cls = annotationRegistration.get(annotationClass);
+        if (cls != null) {
+            return cls;
+        }
+        Class<? extends MethodAnnotationLifeCycle> interceptorClass = null;
+        final MethodLifeCycle methodLifeCycleAnn = annotationClass.getAnnotation(MethodLifeCycle.class);
+        if (methodLifeCycleAnn == null) {
+            final BaseLifeCycle baseLifeCycle = annotationClass.getAnnotation(BaseLifeCycle.class);
+            if (baseLifeCycle != null) {
+                final Class<? extends BaseAnnotationLifeCycle> baseAnnLifeCycleClass = baseLifeCycle.value();
+                if (baseAnnLifeCycleClass != null) {
+                    if (MethodAnnotationLifeCycle.class.isAssignableFrom(baseAnnLifeCycleClass)) {
+                        interceptorClass = (Class<? extends MethodAnnotationLifeCycle>) baseAnnLifeCycleClass;
+                    } else {
+                        registerAnnotation(annotationClass, baseAnnLifeCycleClass);
+                        return baseAnnLifeCycleClass;
+                    }
+                }
+            }
+
+            final ParamLifeCycle paramLifeCycleAnn = annotationClass.getAnnotation(ParamLifeCycle.class);
+            if (paramLifeCycleAnn != null) {
+                final Class<? extends ParameterAnnotationLifeCycle> paramInterceptorClass = paramLifeCycleAnn.value();
+                if (!Interceptor.class.isAssignableFrom(paramInterceptorClass)) {
+                    throw new ForestInterceptorDefineException(paramInterceptorClass);
+                }
+                if (paramInterceptorClass != null) {
+                    registerAnnotation(annotationClass, paramInterceptorClass);
+                }
+                return paramInterceptorClass;
+            }
+
+        }
+        if (methodLifeCycleAnn != null || interceptorClass != null) {
+            if (interceptorClass == null) {
+                interceptorClass = methodLifeCycleAnn.value();
+                if (!Interceptor.class.isAssignableFrom(interceptorClass)) {
+                    throw new ForestInterceptorDefineException(interceptorClass);
+                }
+            }
+        }
+        if (interceptorClass != null) {
+            registerAnnotation(annotationClass, interceptorClass);
+        }
+        return interceptorClass;
+
     }
 
     /**

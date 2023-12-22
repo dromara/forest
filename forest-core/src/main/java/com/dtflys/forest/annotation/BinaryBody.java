@@ -40,7 +40,6 @@ import java.lang.annotation.Target;
  * @since 1.5.5
  */
 @Documented
-@ParamLifeCycle(BinaryBodyLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
 public @interface BinaryBody {

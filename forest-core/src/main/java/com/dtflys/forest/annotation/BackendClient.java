@@ -23,7 +23,6 @@ import java.lang.annotation.Target;
  */
 
 @Documented
-@MethodLifeCycle(BackendClientLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 public @interface BackendClient {

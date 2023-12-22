@@ -43,7 +43,6 @@ import java.lang.annotation.Target;
  * @since 1.0.0
  */
 @Documented
-@MethodLifeCycle(RequestLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 public @interface Request {
