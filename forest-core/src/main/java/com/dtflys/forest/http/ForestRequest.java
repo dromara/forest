@@ -4414,6 +4414,66 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         return this;
     }
 
+    /**
+     * 设置是否允许打印请求/响应日志
+     *
+     * @param enabled 允许为 {@code true}, 否则为 {@code false}
+     * @return {@link ForestRequest}类实例
+     * @since 2.0.0-BETA
+     */
+    public ForestRequest<T> logEnabled(boolean enabled) {
+        if (this.logConfiguration == null) {
+            this.logConfiguration = new LogConfiguration();
+        }
+        this.logConfiguration.setLogEnabled(enabled);
+        return this;
+    }
+
+    /**
+     * 设置是否允许打印请求日志
+     *
+     * @param logRequest 允许为 {@code true}, 否则为 {@code false}
+     * @return {@link ForestRequest}类实例
+     * @since 2.0.0-BETA
+     */
+    public ForestRequest<T> logRequest(boolean logRequest) {
+        if (this.logConfiguration == null) {
+            this.logConfiguration = new LogConfiguration();
+        }
+        this.logConfiguration.setLogRequest(logRequest);
+        return this;
+    }
+
+    /**
+     * 设置是否允许打印响应状态日志
+     *
+     * @param logResponseStatus 允许为 {@code true}, 否则为 {@code false}
+     * @return {@link ForestRequest}类实例
+     * @since 2.0.0-BETA
+     */
+    public ForestRequest<T> logResponseStatus(boolean logResponseStatus) {
+        if (this.logConfiguration == null) {
+            this.logConfiguration = new LogConfiguration();
+        }
+        this.logConfiguration.setLogResponseStatus(logResponseStatus);
+        return this;
+    }
+
+    /**
+     * 设置是否允许打印响应内容日志
+     *
+     * @param logResponseContent 允许为 {@code true}, 否则为 {@code false}
+     * @return {@link ForestRequest}类实例
+     * @since 2.0.0-BETA
+     */
+    public ForestRequest<T> logResponseContent(boolean logResponseContent) {
+        if (this.logConfiguration == null) {
+            this.logConfiguration = new LogConfiguration();
+        }
+        this.logConfiguration.setLogResponseContent(logResponseContent);
+        return this;
+    }
+
 
     /**
      * 获取SSL KeyStore信息

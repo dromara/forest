@@ -70,7 +70,7 @@ public interface GetClient {
             url = "http://localhost:{port}/hello/user?username=foo",
             headers = {"Accept:text/plain"}
     )
-    String simpleGetMultiQuery(@Query("password") String password);
+    String simpleGetMultiQuery(@Query(name = "password") String password);
 
     @Get(url = "http://localhost:${port}/boolean/true")
     Boolean getBooleanResultTrue();
