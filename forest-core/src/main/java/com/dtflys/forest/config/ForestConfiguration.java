@@ -194,6 +194,8 @@ public class ForestConfiguration implements Serializable {
 
     private final Map<Class<?>, ProxyFactory<?>> CLIENT_PROXY_FACTORY_CACHE = new ConcurrentHashMap<>();
 
+    private final Map<Class<?>, Object> CLIENT_CACHE = new ConcurrentHashMap<>(512);
+
     /**
      * 默认配置，再用户没有定义任何全局配置时使用该默认配置
      */
@@ -209,7 +211,7 @@ public class ForestConfiguration implements Serializable {
      *
      * @since 1.6.0
      */
-    private Map<Class<? extends Annotation>, Class<? extends Interceptor>> annotationRegistration = new ConcurrentHashMap<>();
+    private Map<Class<? extends Annotation>, Class<? extends Interceptor>> annotationRegistration = new HashMap<>();
 
     private String id;
 
@@ -2043,6 +2045,11 @@ public class ForestConfiguration implements Serializable {
         return createInstance(clazz);
     }
 
+    public <T> T clientFromCache(Class<T> clazz) {
+        return (T) CLIENT_CACHE.computeIfAbsent(clazz, key -> createInstance(key));
+    }
+
+
 
     /**
      * 设置全局JSON数据转换器的选择器
@@ -2121,7 +2128,7 @@ public class ForestConfiguration implements Serializable {
      * @return {@link ForestRequest} 对象
      */
     public ForestRequest<?> request() {
-        ForestGenericClient client = client(ForestGenericClient.class);
+        ForestGenericClient client = clientFromCache(ForestGenericClient.class);
         return client.request();
     }
 

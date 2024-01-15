@@ -53,6 +53,7 @@ import com.dtflys.forest.multipart.ForestMultipartFactory;
 import com.dtflys.forest.proxy.InterfaceProxyHandler;
 import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
+import com.dtflys.forest.utils.ForestCache;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.HeaderUtils;
 import com.dtflys.forest.utils.NameUtils;
@@ -76,6 +77,7 @@ import static com.dtflys.forest.mapping.MappingParameter.*;
 public class ForestMethod<T> implements VariableScope {
     // 默认根地址
     private static final ForestAddress DEFAULT_ADDRESS = new ForestAddress("http", "localhost", -1);
+
     private final InterfaceProxyHandler interfaceProxyHandler;
     private final ForestConfiguration configuration;
     private volatile boolean initialized = false;
@@ -125,7 +127,7 @@ public class ForestMethod<T> implements VariableScope {
     private final List<MappingParameter> namedParameters = new ArrayList<>();
     private final List<ForestMultipartFactory> multipartFactories = new ArrayList<>();
     private final Map<String, MappingVariable> variables = new ConcurrentHashMap<>();
-    private final Map<String, MappingTemplate> templateCache = new ConcurrentHashMap<>();
+    private final ForestCache<String, MappingTemplate> templateCache = new ForestCache<>(128);
     private MappingParameter onSuccessParameter = null;
     private MappingParameter onErrorParameter = null;
     private MappingParameter onRedirectionParameter = null;
@@ -225,27 +227,15 @@ public class ForestMethod<T> implements VariableScope {
             final String attributeName,
             final String text) {
         final String key = (annotationType != null ? annotationType.getName() : "") + "@" + (attributeName != null ? attributeName : "") + "@" + text;
-        final MappingTemplate template = templateCache.get(key);
-        if (template == null) {
-            synchronized (templateCache) {
-                if (template == null) {
-                    final MappingTemplate newTemplate =
-                            new MappingTemplate(
-                                    annotationType,
-                                    attributeName,
-                                    this,
-                                    text,
-                                    this,
-                                    configuration.getProperties(),
-                                    forestParameters);
-                    if (templateCache.size() < 128) {
-                        templateCache.put(key, newTemplate);
-                    }
-                    return newTemplate;
-                }
-            }
-        }
-        return template;
+        return templateCache.get(key, k -> new MappingTemplate(
+                annotationType,
+                attributeName,
+                this,
+                text,
+                this,
+                configuration.getProperties(),
+                forestParameters)
+        );
     }
 
 
