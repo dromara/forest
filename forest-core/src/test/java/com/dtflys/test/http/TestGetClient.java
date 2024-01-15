@@ -3,7 +3,9 @@ package com.dtflys.test.http;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
+import com.dtflys.forest.Forest;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
@@ -105,8 +107,27 @@ public class TestGetClient extends BaseClientTest {
     }
 
 
-    //    @Test
+    @Test
     public void performance() {
+        int count = 10000;
+        for (int i = 0; i < count; i++) {
+            server.enqueue(new MockResponse().setBody(EXPECTED));
+        }
+        Forest.config().setLogEnabled(false);
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        for (int i = 0; i < count; i++) {
+            Forest.get("http://localhost:" + server.getPort() + "/abc")
+                    .addHeader("Accept", "text/plain")
+                    .execute();
+        }
+        stopWatch.stop();
+        System.out.println("总耗时: " + stopWatch.getTotalTimeMillis() + "ms");
+    }
+
+
+    @Test
+    public void performance_hutool() {
         int count = 10000;
         for (int i = 0; i < count; i++) {
             server.enqueue(new MockResponse().setBody(EXPECTED));
@@ -114,11 +135,14 @@ public class TestGetClient extends BaseClientTest {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         for (int i = 0; i < count; i++) {
-            getClient.testPath("abc");
+            HttpUtil.createGet("http://localhost:" + server.getPort() + "/abc")
+                    .header("Accept", "text/plain")
+                    .execute();
         }
         stopWatch.stop();
         System.out.println("总耗时: " + stopWatch.getTotalTimeMillis() + "ms");
     }
+
 
     //    @Test
     public void performance_concurrent() throws InterruptedException {

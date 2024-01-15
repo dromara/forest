@@ -13,7 +13,6 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Date;
@@ -65,7 +64,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
      **/
     private void setupContent() {
         if (request.isDownloadFile()
-                || InputStream.class.isAssignableFrom(request.getMethod().getReturnClass())
+                || InputStream.class.isAssignableFrom(request.getResultClass())
                 || InputStream.class.isAssignableFrom(ReflectUtils.toClass(request.getLifeCycleHandler().getResultType()))
                 || (contentType != null && contentType.canReadAsBinaryStream())) {
             final StringBuilder builder = new StringBuilder();

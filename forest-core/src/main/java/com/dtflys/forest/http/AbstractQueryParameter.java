@@ -23,7 +23,7 @@ public abstract class AbstractQueryParameter<SELF extends AbstractQueryParameter
 
     /**
      * 是否源自URL
-     * <p>源自URL的Query参数在每次调用{@link ForestRequest#setUrl(String)}时都会被清理掉</p>
+     * <p>源自URL的Query参数在每次调用{@link ForestRequest#setUrlTemplate(String)}时都会被清理掉</p>
      */
     private final boolean fromUrl;
 
@@ -68,7 +68,7 @@ public abstract class AbstractQueryParameter<SELF extends AbstractQueryParameter
 
     /**
      * 是否源自URL
-     * <p>源自URL的Query参数在每次调用{@link ForestRequest#setUrl(String)}时都会被清理掉</p>
+     * <p>源自URL的Query参数在每次调用{@link ForestRequest#setUrlTemplate(String)}时都会被清理掉</p>
      *
      * @return {@code true}: 源自URL, {@code false}: 否
      * @since 1.5.0-BETA5

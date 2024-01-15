@@ -91,7 +91,9 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -544,7 +546,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
 
     /**
      * 设置请求URL
-     * <p>不同于 {@link ForestRequest#setUrl(String)} 方法,
+     * <p>不同于 {@link ForestRequest#setUrlTemplate(String)} 方法,
      * <p>此方法的输入参数为 {@link ForestURL} 对象实例
      *
      * @param url {@link ForestURL} 对象实例
@@ -557,14 +559,14 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
 
     /**
      * 设置请求URL
-     * <p>同 {@link ForestRequest#setUrl(String)} 方法
+     * <p>同 {@link ForestRequest#setUrlTemplate(String)} 方法
      *
      * @param url URL字符串
      * @return {@link ForestRequest}对象实例
-     * @see ForestRequest#setUrl(String)
+     * @see ForestRequest#setUrlTemplate(String)
      */
     public ForestRequest<T> url(String url) {
-        return setUrl(url);
+        return setUrlTemplate(url);
     }
 
 
@@ -628,7 +630,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @param args 字符串模板渲染参数数组
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> setUrl(MappingURLTemplate urlTemplate, Object... args) {
+    public ForestRequest<T> setUrlTemplate(MappingURLTemplate urlTemplate, Object... args) {
         if (!this.query.isEmpty()) {
             this.query.clearQueriesFromUrl();
         }
@@ -652,13 +654,13 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @param args 字符串模板渲染参数数组
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> setUrl(String url, Object... args) {
+    public ForestRequest<T> setUrlTemplate(String url, Object... args) {
         if (StringUtils.isBlank(url)) {
             throw new ForestRuntimeException("[Forest] Request url cannot be empty!");
         }
         final String srcUrl = StringUtils.trimBegin(url);
         MappingURLTemplate template = method.makeURLTemplate(null, null, srcUrl);
-        return setUrl(template, args);
+        return setUrlTemplate(template, args);
     }
 
     /**
@@ -670,7 +672,34 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return {@link ForestRequest}对象实例
      */
     public ForestRequest<T> setUrl(String url) {
-        return setUrl(url, EMPTY_RENDER_ARGS);
+        if (StringUtils.isBlank(url)) {
+            throw new ForestRuntimeException("[Forest] Request url cannot be empty!");
+        }
+        final String srcUrl = StringUtils.trimBegin(url);
+        try {
+            final URL u = new URL(srcUrl);
+            if (this.url != null) {
+                this.url.mergeURLWith(new ForestURL(u));
+            } else {
+                this.url = new ForestURL(u);
+            }
+        } catch (MalformedURLException e) {
+            throw new ForestRuntimeException(e);
+        }
+        return this;
+    }
+
+
+    /**
+     * 设置请求的url地址
+     * <p>每次设置请求的url地址时，都会解析传入的url参数字符串
+     * <p>然后从url中解析出Query参数，并将其替换调用原来的Query参数，或新增成新的Query参数
+     *
+     * @param url url地址字符串
+     * @return {@link ForestRequest}对象实例
+     */
+    public ForestRequest<T> setUrlTemplate(String url) {
+        return setUrlTemplate(url, EMPTY_RENDER_ARGS);
     }
 
 
@@ -1088,6 +1117,14 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      */
     public String ref() {
         return getRef();
+    }
+
+
+    public Class<?> getResultClass() {
+        if (method == null) {
+            return Object.class;
+        }
+        return method.getReturnClass();
     }
 
 
@@ -4067,6 +4104,9 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return 变量值
      */
     public Object getVariableValue(String name) {
+        if (method == null) {
+            return null;
+        }
         MappingVariable variable = method.getVariable(name);
         if (variable != null) {
             return getArgument(variable.getIndex());

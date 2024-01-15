@@ -39,7 +39,7 @@ public class InterceptorChain implements Interceptor {
 
     @Override
     public ForestJointPoint beforeExecute(ForestRequest request) {
-        ForestJointPoint jointpoint = null;
+        ForestJointPoint jointpoint = ForestJointPoint.PROCEED;
         for (final Interceptor item : interceptors) {
             final ForestJointPoint jp = item.beforeExecute(request);
             jointpoint = jp != null ? jp : ForestJointPoint.PROCEED;

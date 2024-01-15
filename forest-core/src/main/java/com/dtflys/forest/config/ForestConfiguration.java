@@ -29,7 +29,6 @@ import com.dtflys.forest.annotation.Address;
 import com.dtflys.forest.annotation.Backend;
 import com.dtflys.forest.annotation.BackendClient;
 import com.dtflys.forest.annotation.BaseLifeCycle;
-import com.dtflys.forest.annotation.BaseRequest;
 import com.dtflys.forest.annotation.BinaryBody;
 import com.dtflys.forest.annotation.Body;
 import com.dtflys.forest.annotation.BodyType;
@@ -65,7 +64,6 @@ import com.dtflys.forest.annotation.Retry;
 import com.dtflys.forest.annotation.Retryer;
 import com.dtflys.forest.annotation.SSLHostnameVerifier;
 import com.dtflys.forest.annotation.SSLSocketFactoryBuilder;
-import com.dtflys.forest.annotation.SocksProxy;
 import com.dtflys.forest.annotation.Success;
 import com.dtflys.forest.annotation.Trace;
 import com.dtflys.forest.annotation.TraceRequest;
@@ -75,7 +73,6 @@ import com.dtflys.forest.annotation.XMLBody;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.backend.HttpBackendSelector;
 import com.dtflys.forest.callback.AddressSource;
-import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.callback.RetryWhen;
 import com.dtflys.forest.callback.SuccessWhen;
 import com.dtflys.forest.converter.ForestConverter;
@@ -108,7 +105,6 @@ import com.dtflys.forest.interceptor.InterceptorFactory;
 import com.dtflys.forest.lifecycles.BaseAnnotationLifeCycle;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.lifecycles.ParameterAnnotationLifeCycle;
-import com.dtflys.forest.lifecycles.base.BaseRequestLifeCycle;
 import com.dtflys.forest.lifecycles.logging.LogEnabledLifeCycle;
 import com.dtflys.forest.lifecycles.logging.LogHandlerLifeCycle;
 import com.dtflys.forest.lifecycles.method.AddressLifeCycle;
@@ -146,6 +142,7 @@ import com.dtflys.forest.lifecycles.parameter.XMLBodyLifeCycle;
 import com.dtflys.forest.lifecycles.proxy.HTTPProxyLifeCycle;
 import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.ForestLogHandler;
+import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.pool.FixedRequestPool;
 import com.dtflys.forest.pool.ForestRequestPool;
 import com.dtflys.forest.proxy.ProxyFactory;
@@ -154,6 +151,7 @@ import com.dtflys.forest.reflection.DefaultObjectFactory;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.ForestObjectFactory;
 import com.dtflys.forest.reflection.ForestVariableValue;
+import com.dtflys.forest.reflection.MethodLifeCycleHandler;
 import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.utils.ForestCache;
@@ -2128,8 +2126,18 @@ public class ForestConfiguration implements Serializable {
      * @return {@link ForestRequest} 对象
      */
     public ForestRequest<?> request() {
-        ForestGenericClient client = clientFromCache(ForestGenericClient.class);
-        return client.request();
+       MethodLifeCycleHandler<?> lifeCycleHandler = new MethodLifeCycleHandler<>(
+                Object.class, Object.class);
+        ForestRequest<?> request = new ForestRequest<>(this)
+                .backend(getBackend())
+                .setLogConfiguration(new LogConfiguration()
+                        .setLogHandler(getLogHandler())
+                        .setLogEnabled(isLogEnabled())
+                        .setLogResponseStatus(isLogResponseStatus())
+                        .setLogResponseContent(isLogResponseContent()))
+                .setLifeCycleHandler(lifeCycleHandler)
+                .setRetryer(getRetryer());
+        return request;
     }
 
     /**
@@ -2140,7 +2148,7 @@ public class ForestConfiguration implements Serializable {
      * @return {@link ForestRequest} 对象
      */
     public <R> ForestRequest<R> request(Class<R> clazz) {
-        ForestGenericClient client = client(ForestGenericClient.class);
+        ForestGenericClient client = clientFromCache(ForestGenericClient.class);
         return client.request(clazz);
     }
 
@@ -2152,8 +2160,6 @@ public class ForestConfiguration implements Serializable {
      */
     public ForestRequest<?> get(String url) {
         return request()
-                .setType(null)
-                .clearTypeChangeHistory()
                 .setType(ForestRequestType.GET)
                 .setUrl(url);
 
@@ -2170,7 +2176,7 @@ public class ForestConfiguration implements Serializable {
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.POST)
-                .setUrl(url);
+                .setUrlTemplate(url);
     }
 
     /**
@@ -2184,7 +2190,7 @@ public class ForestConfiguration implements Serializable {
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.PUT)
-                .setUrl(url);
+                .setUrlTemplate(url);
 
     }
 
@@ -2199,7 +2205,7 @@ public class ForestConfiguration implements Serializable {
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.DELETE)
-                .setUrl(url);
+                .setUrlTemplate(url);
 
     }
 
@@ -2214,7 +2220,7 @@ public class ForestConfiguration implements Serializable {
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.HEAD)
-                .setUrl(url);
+                .setUrlTemplate(url);
 
     }
 
@@ -2229,7 +2235,7 @@ public class ForestConfiguration implements Serializable {
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.PATCH)
-                .setUrl(url);
+                .setUrlTemplate(url);
     }
 
     /**
@@ -2243,7 +2249,7 @@ public class ForestConfiguration implements Serializable {
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.OPTIONS)
-                .setUrl(url);
+                .setUrlTemplate(url);
 
     }
 
@@ -2258,7 +2264,7 @@ public class ForestConfiguration implements Serializable {
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.TRACE)
-                .setUrl(url);
+                .setUrlTemplate(url);
     }
 
 
