@@ -39,7 +39,6 @@ import java.lang.annotation.Target;
  * @author gongjun [dt_flys@hotmail.com]
  */
 @Documented
-@MethodLifeCycle(RetryerLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 public @interface Retryer {

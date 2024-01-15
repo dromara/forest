@@ -78,7 +78,6 @@ import java.lang.annotation.Target;
  * @since 2020-08-03
  */
 @Documented
-@ParamLifeCycle(QueryLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 public @interface Query {

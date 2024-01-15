@@ -56,7 +56,6 @@ import java.lang.annotation.Target;
  * @since 2020-08-10 16:51
  */
 @Documented
-@ParamLifeCycle(JSONBodyLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.PARAMETER, ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 public @interface JSONBody {

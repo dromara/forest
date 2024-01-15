@@ -17,7 +17,6 @@ import java.lang.annotation.Target;
  * @since 1.5.2
  */
 @Documented
-@MethodLifeCycle(SuccessLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 public @interface Success {

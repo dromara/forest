@@ -55,7 +55,6 @@ import java.lang.annotation.Target;
  * @since 1.5.0-BETA9
  */
 @Documented
-@ParamLifeCycle(FormBodyLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.PARAMETER, ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 public @interface FormBody {

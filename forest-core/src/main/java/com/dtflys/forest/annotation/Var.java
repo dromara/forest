@@ -26,7 +26,6 @@ import java.lang.annotation.Target;
  * @since 2016-05-24
  */
 @Documented
-@ParamLifeCycle(VariableLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.ANNOTATION_TYPE})
 public @interface Var {

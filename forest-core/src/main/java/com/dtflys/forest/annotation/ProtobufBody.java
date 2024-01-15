@@ -16,7 +16,6 @@ import java.lang.annotation.Target;
  * @since 1.5.5
  */
 @Documented
-@ParamLifeCycle(ProtobufBodyLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
 public @interface ProtobufBody {

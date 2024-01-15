@@ -41,7 +41,6 @@ import java.lang.annotation.Target;
  * @since 1.4.0
  */
 @Documented
-@MethodLifeCycle(PostRequestLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 public @interface Post {

@@ -17,7 +17,6 @@ import java.lang.annotation.Target;
  * @since 1.5.0-BETA5
  */
 @Documented
-@MethodLifeCycle(HTTPProxyLifeCycle.class)
 @RequestAttributes
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.ANNOTATION_TYPE})

@@ -41,8 +41,9 @@ public class LogConfiguration {
         return logEnabled;
     }
 
-    public void setLogEnabled(boolean logEnabled) {
+    public LogConfiguration setLogEnabled(boolean logEnabled) {
         this.logEnabled = logEnabled;
+        return this;
     }
 
     /**
@@ -53,8 +54,9 @@ public class LogConfiguration {
         return logRequest;
     }
 
-    public void setLogRequest(boolean logRequest) {
+    public LogConfiguration setLogRequest(boolean logRequest) {
         this.logRequest = logRequest;
+        return this;
     }
 
     /**
@@ -65,8 +67,9 @@ public class LogConfiguration {
         return logResponseStatus;
     }
 
-    public void setLogResponseStatus(boolean logResponseStatus) {
+    public LogConfiguration setLogResponseStatus(boolean logResponseStatus) {
         this.logResponseStatus = logResponseStatus;
+        return this;
     }
 
     /**
@@ -77,8 +80,9 @@ public class LogConfiguration {
         return logResponseContent;
     }
 
-    public void setLogResponseContent(boolean logResponseContent) {
+    public LogConfiguration setLogResponseContent(boolean logResponseContent) {
         this.logResponseContent = logResponseContent;
+        return this;
     }
 
     /**
@@ -89,7 +93,8 @@ public class LogConfiguration {
         return logHandler;
     }
 
-    public void setLogHandler(ForestLogHandler logHandler) {
+    public LogConfiguration setLogHandler(ForestLogHandler logHandler) {
         this.logHandler = logHandler;
+        return this;
     }
 }

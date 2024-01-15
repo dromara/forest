@@ -66,7 +66,6 @@ import java.lang.annotation.Target;
  * @since 2020-08-12 22:26
  */
 @Documented
-@ParamLifeCycle(HeaderLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.PARAMETER, ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 public @interface Header {
