@@ -34,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 public class Test0 {
 
     @Inject
-    AppContext aopContext;
+    AppContext appContext;
 
     @Inject
     private BeastshopClient beastshopClient;
