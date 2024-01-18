@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
 public class Test1 {
 
     @Inject
-    AppContext aopContext;
+    AppContext appContext;
 
     @Inject
     private BaiduClient baiduClient;
