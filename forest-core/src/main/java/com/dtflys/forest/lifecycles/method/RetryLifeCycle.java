@@ -37,7 +37,7 @@ public class RetryLifeCycle implements MethodAnnotationLifeCycle<Retry> {
         if (StringUtils.isNotBlank(maxRetryCountStr)) {
             final MappingTemplate maxRetryCountTemplate = method.makeTemplate(Retry.class, "maxRetryCount", maxRetryCountStr);
             try {
-                final Integer maxRetryCount = Integer.parseInt(maxRetryCountTemplate.render(args));
+                final Integer maxRetryCount = Integer.parseInt(maxRetryCountTemplate.render(request, args));
                 request.maxRetryCount(maxRetryCount);
             } catch (Throwable ignored) {
             }
@@ -45,7 +45,7 @@ public class RetryLifeCycle implements MethodAnnotationLifeCycle<Retry> {
         if (StringUtils.isNotBlank(maxRetryIntervalStr)) {
             try {
                 final MappingTemplate maxRetryIntervalTemplate = method.makeTemplate(Retry.class, "maxRetryInterval", maxRetryIntervalStr);
-                final Long maxRetryInterval = Long.parseLong(maxRetryIntervalTemplate.render(args));
+                final Long maxRetryInterval = Long.parseLong(maxRetryIntervalTemplate.render(request, args));
                 request.setMaxRetryInterval(maxRetryInterval);
             } catch (Throwable ignored) {
             }

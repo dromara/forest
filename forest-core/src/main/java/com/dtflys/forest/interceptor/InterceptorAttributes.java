@@ -1,5 +1,6 @@
 package com.dtflys.forest.interceptor;
 
+import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.mapping.MappingTemplate;
 
 import java.util.HashMap;
@@ -22,18 +23,18 @@ public class InterceptorAttributes {
         this.attributeTemplates = attributeTemplates;
     }
 
-    public Map<String, Object> render(Object[] args) {
+    public Map<String, Object> render(VariableScope variableScope, Object[] args) {
         for (Map.Entry<String, Object> entry : attributeTemplates.entrySet()) {
             final String name = entry.getKey();
             Object value = entry.getValue();
             if (value instanceof MappingTemplate) {
-                value = ((MappingTemplate) value).render(args);
+                value = ((MappingTemplate) value).render(variableScope, args);
             } else if (value instanceof MappingTemplate[]) {
                 final MappingTemplate[] templates = (MappingTemplate[]) value;
                 final int len = templates.length;
                 final String[] strArray = new String[len];
                 for (int i = 0; i < len; i++) {
-                    strArray[i] = templates[i].render(args);
+                    strArray[i] = templates[i].render(variableScope, args);
                 }
                 value = strArray;
             }

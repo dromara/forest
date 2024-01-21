@@ -13,19 +13,19 @@ import java.util.List;
  */
 public class MappingFilterInvoke extends MappingInvoke {
 
-    public MappingFilterInvoke(ForestMethod<?> forestMethod, VariableScope variableScope, MappingIdentity name, List<MappingExpr> argList) {
-        super(forestMethod, Token.FILTER_INVOKE, variableScope, null, name, argList);
+    public MappingFilterInvoke(MappingIdentity name, List<MappingExpr> argList) {
+        super(Token.FILTER_INVOKE, null, name, argList);
     }
 
     @Override
-    public Object render(Object[] args) {
+    public Object render(VariableScope variableScope, Object[] args) {
         ForestConfiguration configuration = variableScope.getConfiguration();
         Filter filter = configuration.newFilterInstance(right.getName());
         List<MappingExpr> exprList = getArgList();
         Object[] invokeArgs = new Object[exprList.size()];
         for (int i = 0; i < exprList.size(); i++) {
             MappingExpr expr = exprList.get(i);
-            Object renderedArg = expr.render(args);
+            Object renderedArg = expr.render(variableScope, args);
             invokeArgs[i] = renderedArg;
         }
         if (invokeArgs.length > 0) {

@@ -1,0 +1,6 @@
+
+### api: testGetBaidu
+GET https://www.baidu.com
+Accept: text/html
+
+

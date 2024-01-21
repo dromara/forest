@@ -4,6 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
+import com.dtflys.forest.mapping.ForestRequestContext;
 import com.dtflys.test.interceptor.BasicAuthClient;
 import org.junit.Test;
 
@@ -23,7 +24,7 @@ public class TestRequest {
     public void testDefaultRequest() {
         ObjectUtil.isBasicType(Object.class);
         ForestConfiguration configuration = ForestConfiguration.createConfiguration();
-        ForestRequest request = new ForestRequest(configuration);
+        ForestRequest request = new ForestRequest(configuration, new ForestRequestContext(configuration.getVariableContext(), null));
         assertEquals(configuration, request.getConfiguration());
         assertEquals(configuration.getTimeout().intValue(),
                 request.getTimeout());
@@ -34,7 +35,7 @@ public class TestRequest {
     @Test
     public void testInterceptorAttribute() {
         ForestConfiguration configuration = ForestConfiguration.createConfiguration();
-        ForestRequest request = new ForestRequest(configuration);
+        ForestRequest request = new ForestRequest(configuration, new ForestRequestContext(configuration.getVariableContext(), null));
         request.addInterceptorAttribute(BasicAuthClient.class, "Xxx", "foo");
         request.addInterceptorAttribute(BasicAuthClient.class, "Yyy", "bar");
         Object xxxValue = request.getInterceptorAttribute(BasicAuthClient.class, "Xxx");
@@ -62,7 +63,7 @@ public class TestRequest {
     @Test
     public void testAttachment() {
         ForestConfiguration configuration = ForestConfiguration.createConfiguration();
-        ForestRequest request = new ForestRequest(configuration);
+        ForestRequest request = new ForestRequest(configuration, new ForestRequestContext(configuration.getVariableContext(), null));
         request.addAttachment("Xxx", "foo");
         request.addAttachment("Yyy", "bar");
         Object xxxValue = request.getAttachment("Xxx");

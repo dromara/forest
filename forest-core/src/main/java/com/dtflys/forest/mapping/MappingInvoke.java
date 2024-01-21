@@ -16,12 +16,12 @@ public class MappingInvoke extends MappingDot {
 
     private List<MappingExpr> argList;
 
-    public MappingInvoke(ForestMethod<?> forestMethod, VariableScope variableScope, MappingExpr left, MappingIdentity name, List<MappingExpr> argList) {
-        this(forestMethod, Token.INVOKE, variableScope, left, name, argList);
+    public MappingInvoke(MappingExpr left, MappingIdentity name, List<MappingExpr> argList) {
+        this(Token.INVOKE, left, name, argList);
     }
 
-    protected MappingInvoke(ForestMethod<?> forestMethod, Token token, VariableScope variableScope, MappingExpr left, MappingIdentity name, List<MappingExpr> argList) {
-        super(forestMethod, token, variableScope, left, name);
+    protected MappingInvoke(Token token, MappingExpr left, MappingIdentity name, List<MappingExpr> argList) {
+        super(token, left, name);
         this.argList = argList;
     }
 
@@ -29,19 +29,10 @@ public class MappingInvoke extends MappingDot {
         return argList;
     }
 
-    @Override
-    public void setVariableScope(VariableScope variableScope) {
-        super.setVariableScope(variableScope);
-        if (argList != null) {
-            for (MappingExpr arg : argList) {
-                arg.setVariableScope(variableScope);
-            }
-        }
-    }
 
     @Override
-    public Object render(Object[] args) {
-        Object obj = left.render(args);
+    public Object render(VariableScope variableScope, Object[] args) {
+        Object obj = left.render(variableScope, args);
         String methodName = right.getName();
         try {
             Method method = obj.getClass().getDeclaredMethod(methodName);
@@ -53,7 +44,7 @@ public class MappingInvoke extends MappingDot {
                 Object[] renderArgs = new Object[argList.size()];
                 for (int i = 0, len = argList.size(); i < len; i++) {
                     MappingExpr expr = argList.get(i);
-                    renderArgs[i] = expr.render(args);
+                    renderArgs[i] = expr.render(variableScope, args);
                 }
                 result = method.invoke(obj, renderArgs);
             }

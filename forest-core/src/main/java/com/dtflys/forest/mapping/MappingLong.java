@@ -1,5 +1,6 @@
 package com.dtflys.forest.mapping;
 
+import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.reflection.ForestMethod;
 
 /**
@@ -11,12 +12,12 @@ public class MappingLong extends MappingExpr {
     private final long number;
 
     public MappingLong(long number) {
-        super(null, Token.LONG);
+        super(Token.LONG);
         this.number = number;
     }
 
     @Override
-    public Object render(Object[] args) {
+    public Object render(VariableScope variableScope, Object[] args) {
         return number;
     }
 

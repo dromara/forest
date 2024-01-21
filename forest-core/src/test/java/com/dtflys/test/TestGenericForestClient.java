@@ -695,7 +695,8 @@ public class TestGenericForestClient extends BaseClientTest {
     public void testRequest_template_in_url() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.config().setVariableValue("testVar", "foo");
-        Forest.get("/test/{testVar}")
+        Forest.get("/")
+                .setUrl("/test/{testVar}")
                 .host("127.0.0.1")
                 .port(server.getPort())
                 .execute();
@@ -1686,8 +1687,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .contentTypeMultipartFormData()
                 .addFile("file", file)
                 .execute()
-                .result(new TypeReference<Result<Integer>>() {
-                });
+                .result(new TypeReference<Result<Integer>>() {});
         assertThat(result).isNotNull();
         assertThat(result.getStatus()).isEqualTo(1);
         assertThat(result.getData()).isEqualTo(2);

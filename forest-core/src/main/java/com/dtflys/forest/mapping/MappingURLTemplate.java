@@ -17,16 +17,19 @@ import java.lang.annotation.Annotation;
 public class MappingURLTemplate extends MappingTemplate {
 
 
-    public MappingURLTemplate(Class<? extends Annotation> annotationType, String attributeName, ForestMethod<?> forestMethod, String template, VariableScope variableScope, ForestProperties properties, MappingParameter[] parameters) {
-        super(annotationType, attributeName, forestMethod, template, variableScope, properties, parameters);
+    public MappingURLTemplate(Class<? extends Annotation> annotationType, String attributeName, String template, ForestProperties properties, MappingParameter[] parameters) {
+        super(annotationType, attributeName, template, properties, parameters);
     }
 
     @Override
-    public String render(Object[] args) {
-        return super.render(args);
+    public String render(VariableScope variableScope, Object[] args) {
+        return super.render(variableScope, args);
     }
 
-    public ForestURL render(Object[] args, ForestQueryMap queries) {
+    public ForestURL render(VariableScope variableScope, Object[] args, ForestQueryMap queries) {
+        if (!compiled) {
+            compile(variableScope);
+        }
         String scheme = null;
         StringBuilder userInfo = null;
         String host = null;
@@ -39,13 +42,13 @@ public class MappingURLTemplate extends MappingTemplate {
         boolean nextIsPort = false;
         boolean renderedPath = false;
         try {
-            ForestJsonConverter jsonConverter = variableScope.getConfiguration().getJsonConverter();
-            int len = exprList.size();
+            final ForestJsonConverter jsonConverter = variableScope.getConfiguration().getJsonConverter();
+            final int len = exprList.size();
             StringBuilder builder = new StringBuilder();
             SimpleQueryParameter lastQuery  = null;
             for (int i = 0; i < len; i++) {
-                MappingExpr expr = exprList.get(i);
-                String exprVal = String.valueOf(renderExpression(jsonConverter, expr, args));
+                final MappingExpr expr = exprList.get(i);
+                String exprVal = String.valueOf(renderExpression(variableScope, jsonConverter, expr, args));
                 builder.append(exprVal);
                 if (renderedQuery) {
                     // 已渲染到查询参数
@@ -97,8 +100,8 @@ public class MappingURLTemplate extends MappingTemplate {
                     }
                 } else {
                     // 查询参数前面部分
-                    int refIndex = exprVal.indexOf('#');
-                    int queryIndex = exprVal.indexOf('?');
+                    final int refIndex = exprVal.indexOf('#');
+                    final int queryIndex = exprVal.indexOf('?');
                     renderedQuery = ref == null && queryIndex >= 0 && (queryIndex < refIndex || refIndex < 0);
 
                     String baseUrl = exprVal;
@@ -110,8 +113,8 @@ public class MappingURLTemplate extends MappingTemplate {
                         urlBuilder = new StringBuilder(scheme).append("//");
                     }
                     urlBuilder.append(baseUrl);
-                    char[] baseUrlChars = baseUrl.toCharArray();
-                    int baseLen = baseUrlChars.length;
+                    final char[] baseUrlChars = baseUrl.toCharArray();
+                    final int baseLen = baseUrlChars.length;
                     char ch;
                     StringBuilder subBuilder = new StringBuilder();
                     for (int pathCharIndex = 0 ; pathCharIndex < baseLen; pathCharIndex++) {
@@ -125,7 +128,7 @@ public class MappingURLTemplate extends MappingTemplate {
                                 pathCharIndex++;
                                 ch = baseUrlChars[pathCharIndex];
                                 if (ch != '/') {
-                                    throw new ForestRuntimeException("URI '" + super.render(args) + "' is invalid.");
+                                    throw new ForestRuntimeException("URI '" + super.render(variableScope, args) + "' is invalid.");
                                 }
                                 pathCharIndex++;
                                 if (pathCharIndex + 1 < baseLen && baseUrlChars[pathCharIndex + 1] == '/') {
@@ -280,7 +283,7 @@ public class MappingURLTemplate extends MappingTemplate {
                     ref = group[1];
                 }
             }
-            return new ForestURLBuilder()
+            return ForestURL.builder()
                     .setScheme(scheme)
                     .setUserInfo(userInfo != null ? userInfo.toString() : null)
                     .setHost(host)
@@ -289,7 +292,7 @@ public class MappingURLTemplate extends MappingTemplate {
                     .setRef(ref)
                     .build();
         } catch (ForestVariableUndefinedException ex) {
-            throw new ForestVariableUndefinedException(annotationType, attributeName, forestMethod, ex.getVariableName(), template);
+            throw new ForestVariableUndefinedException(annotationType, attributeName, variableScope, ex.getVariableName(), template);
         }
     }
 

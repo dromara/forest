@@ -1,5 +1,6 @@
 package com.dtflys.forest.utils;
 
+import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.http.ForestHeaderMap;
 import com.dtflys.forest.http.HasHeaders;
 import com.dtflys.forest.mapping.MappingTemplate;
@@ -11,11 +12,11 @@ public class HeaderUtils {
     }
 
     public static HasHeaders addHeaders(
-            final HasHeaders hasHeaders, final MappingTemplate[] headerTemplates, final Object[] args) {
+            final VariableScope variableScope, final HasHeaders hasHeaders, final MappingTemplate[] headerTemplates, final Object[] args) {
         final ForestHeaderMap headerMap = hasHeaders.getHeaders();
         if (headerTemplates != null && headerTemplates.length > 0) {
             for (MappingTemplate baseHeader : headerTemplates) {
-                String headerText = baseHeader.render(args);
+                String headerText = baseHeader.render(variableScope, args);
                 String[] headerNameValue = headerText.split(":", 2);
                 if (headerNameValue.length > 1) {
                     String name = headerNameValue[0].trim();

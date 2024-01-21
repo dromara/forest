@@ -1,5 +1,6 @@
 package com.dtflys.forest.mapping;
 
+import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.reflection.ForestMethod;
 
 /**
@@ -11,7 +12,7 @@ public class MappingIdentity extends MappingExpr {
     private String name;
 
     public MappingIdentity(String name) {
-        super(null, Token.ID);
+        super(Token.ID);
         this.name = name;
     }
 
@@ -20,7 +21,7 @@ public class MappingIdentity extends MappingExpr {
     }
 
     @Override
-    public Object render(Object[] args) {
+    public Object render(VariableScope variableScope, Object[] args) {
         return name;
     }
 

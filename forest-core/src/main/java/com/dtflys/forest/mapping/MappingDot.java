@@ -18,13 +18,12 @@ public class MappingDot extends MappingExpr {
     protected final MappingExpr left;
     protected final MappingIdentity right;
 
-    public MappingDot(ForestMethod forestMethod, VariableScope variableScope, MappingExpr left, MappingIdentity right) {
-        this(forestMethod, Token.DOT, variableScope, left, right);
+    public MappingDot(MappingExpr left, MappingIdentity right) {
+        this(Token.DOT, left, right);
     }
 
-    protected MappingDot(ForestMethod forestMethod, Token token, VariableScope variableScope, MappingExpr left, MappingIdentity right) {
-        super(forestMethod, token);
-        this.variableScope = variableScope;
+    protected MappingDot(Token token, MappingExpr left, MappingIdentity right) {
+        super(token);
         this.left = left;
         this.right = right;
     }
@@ -53,16 +52,6 @@ public class MappingDot extends MappingExpr {
         return method;
     }
 
-    @Override
-    public void setVariableScope(VariableScope variableScope) {
-        super.setVariableScope(variableScope);
-        if (left != null) {
-            left.setVariableScope(variableScope);
-        }
-        if (right != null) {
-            right.setVariableScope(variableScope);
-        }
-    }
 
     @Override
     public boolean isIterateVariable() {
@@ -77,8 +66,8 @@ public class MappingDot extends MappingExpr {
     }
 
     @Override
-    public Object render(Object[] args) {
-        Object obj = left.render(args);
+    public Object render(VariableScope variableScope, Object[] args) {
+        Object obj = left.render(variableScope, args);
         if (obj == null) {
             throw new ForestRuntimeException(new NullPointerException());
         }

@@ -113,11 +113,16 @@ public class TestGetClient extends BaseClientTest {
         for (int i = 0; i < count; i++) {
             server.enqueue(new MockResponse().setBody(EXPECTED));
         }
-        Forest.config().setLogEnabled(false);
+        ForestConfiguration.createConfiguration();
+        Forest.config()
+                .setLogEnabled(false)
+                .setMaxConnections(10000);
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         for (int i = 0; i < count; i++) {
-            Forest.get("http://localhost:" + server.getPort() + "/abc")
+            Forest.get("/abc")
+                    .host("localhost")
+                    .port(server.getPort())
                     .addHeader("Accept", "text/plain")
                     .execute();
         }

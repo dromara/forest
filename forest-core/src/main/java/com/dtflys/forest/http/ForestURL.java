@@ -24,7 +24,14 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
+import com.dtflys.forest.mapping.MappingExpr;
+import com.dtflys.forest.mapping.MappingString;
+import com.dtflys.forest.mapping.MappingUrlEncodedExpr;
+import com.dtflys.forest.reflection.ForestVariableValue;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
 import org.slf4j.Logger;
@@ -108,7 +115,7 @@ public class ForestURL {
         needRegenerateUrl = true;
     }
 
-    public ForestURL(URL url) {
+    public ForestURL(final URL url) {
         if (url == null) {
             throw new ForestRuntimeException("[Forest] Request url cannot be null!");
         }
@@ -118,6 +125,10 @@ public class ForestURL {
         path = url.getPath();
         userInfo = url.getUserInfo();
         setRef(url.getRef());
+    }
+
+    public static ForestURLBuilder builder() {
+        return new ForestURLBuilder();
     }
 
     public ForestURL(String scheme, String userInfo, String host, Integer port, String path) {

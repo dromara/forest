@@ -149,26 +149,19 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
 
 
     @Override
-    protected void setBinaryBody(T httpReq,
-                                 ForestRequest request,
-                                 String charset,
-                                 String contentType,
-                                 byte[] bytes,
-                                 boolean mergeCharset) {
-
-        if (StringUtils.isBlank(contentType)) {
-            contentType = ContentType.APPLICATION_OCTET_STREAM.toString();
-        }
-        if (charset == null && mergeCharset) {
-            if (!contentType.contains("charset=")) {
-                contentType = contentType + "; charset=" + charset;
-            } else {
-                String[] strs = contentType.split("charset=");
-                contentType = strs[0] + " charset=" + charset;
-            }
-        }
-        ContentType ctype = ContentType.create(contentType, charset);
-        HttpEntity entity = new ByteArrayEntity(bytes, ctype);
+    protected void setBinaryBody(final T httpReq,
+                                 final ForestRequest request,
+                                 final String charset,
+                                 final String contentType,
+                                 final byte[] bytes,
+                                 final boolean mergeCharset) {
+        final String cType = StringUtils.isBlank(contentType) ? ContentType.APPLICATION_OCTET_STREAM.toString() : (
+                charset == null && mergeCharset ? (
+                        !contentType.contains("charset=") ? contentType + "; charset=" + charset : contentType.split("charset=")[0] + " charset=" + charset
+                ) : contentType
+        );
+        final ContentType mediaType = ContentType.create(cType, charset);
+        final HttpEntity entity = new ByteArrayEntity(bytes, mediaType);
         httpReq.setEntity(entity);
     }
 

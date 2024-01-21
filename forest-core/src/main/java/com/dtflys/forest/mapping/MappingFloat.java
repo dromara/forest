@@ -1,5 +1,6 @@
 package com.dtflys.forest.mapping;
 
+import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.reflection.ForestMethod;
 
 /**
@@ -11,12 +12,12 @@ public class MappingFloat extends MappingExpr {
     private final float number;
 
     public MappingFloat(float number) {
-        super(null, Token.FLOAT);
+        super(Token.FLOAT);
         this.number = number;
     }
 
     @Override
-    public Object render(Object[] args) {
+    public Object render(VariableScope variableScope, Object[] args) {
         return number;
     }
 

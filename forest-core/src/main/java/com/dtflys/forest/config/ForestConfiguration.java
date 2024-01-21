@@ -143,6 +143,8 @@ import com.dtflys.forest.lifecycles.proxy.HTTPProxyLifeCycle;
 import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.LogConfiguration;
+import com.dtflys.forest.mapping.ForestRequestContext;
+import com.dtflys.forest.mapping.ForestVariableContext;
 import com.dtflys.forest.pool.FixedRequestPool;
 import com.dtflys.forest.pool.ForestRequestPool;
 import com.dtflys.forest.proxy.ProxyFactory;
@@ -427,7 +429,7 @@ public class ForestConfiguration implements Serializable {
     /**
      * 全局变量表
      */
-    private Map<String, ForestVariableValue> variables = new ConcurrentHashMap<>(64);
+    private ForestVariableContext variableContext = new ForestVariableContext(null, this);
 
     /**
      * SSL的Key Store集合
@@ -1582,6 +1584,21 @@ public class ForestConfiguration implements Serializable {
     }
 
     /**
+     * 添加全局拦截器
+     *
+     * @param interceptorClass 局拦截器类
+     * @return 当前ForestConfiguration实例
+     * @since 2.0.0-BETA
+     */
+    public ForestConfiguration addInterceptor(Class<? extends Interceptor> interceptorClass) {
+        if (this.interceptors == null) {
+            this.interceptors = new ArrayList<>();
+        }
+        this.interceptors.add(interceptorClass);
+        return this;
+    }
+
+    /**
      * 设置全局JSON数据转换器
      *
      * @param converter JSON数据转换器
@@ -1694,7 +1711,7 @@ public class ForestConfiguration implements Serializable {
      * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setVariableValue(String name, Object value) {
-        this.variables.put(name, new BasicVariableValue(value));
+        this.variableContext.setVariableValue(name, new BasicVariableValue(value));
         return this;
     }
 
@@ -1706,7 +1723,7 @@ public class ForestConfiguration implements Serializable {
      * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setVariableValue(String name, ForestVariableValue value) {
-        this.variables.put(name, value);
+        this.variableContext.setVariableValue(name, value);
         return this;
     }
 
@@ -1721,7 +1738,7 @@ public class ForestConfiguration implements Serializable {
     }
 
     public Object getVariableValue(String name, ForestMethod method) {
-        ForestVariableValue variableValue = this.variables.get(name);
+        ForestVariableValue variableValue = this.variableContext.getVariable(name);
         if (variableValue != null) {
             Object value = variableValue.getValue(method);
             return value;
@@ -1737,7 +1754,7 @@ public class ForestConfiguration implements Serializable {
      * @return {@code true}: 已定义, {@code false}: 未定义
      */
     public boolean isVariableDefined(String name) {
-        return getVariables().containsKey(name);
+        return variableContext.isVariableDefined(name);
     }
 
     /**
@@ -1912,40 +1929,11 @@ public class ForestConfiguration implements Serializable {
     }
 
 
-    /**
-     * 获取全局变量表
-     *
-     * @return 全局变量表
-     */
-    public Map<String, ForestVariableValue> getVariables() {
-        return variables;
+
+    public ForestVariableContext getVariableContext() {
+        return variableContext;
     }
 
-
-    /**
-     * 设置全局变量表
-     *
-     * @param variables 变量表
-     * @return 当前ForestConfiguration实例
-     */
-    public ForestConfiguration addAllVariables(Map<String, Object> variables) {
-        for (Map.Entry<String, Object> entry : variables.entrySet()) {
-            setVariableValue(entry.getKey(), entry.getValue());
-        }
-        return this;
-    }
-
-    /**
-     * 替换整个全局变量表
-     *
-     * @param variables 新变量值表
-     * @return {@link ForestConfiguration}实例
-     */
-    public ForestConfiguration setVariables(Map<String, Object> variables) {
-        this.variables.clear();
-        addAllVariables(variables);
-        return this;
-    }
 
     /**
      * 创建请求接口的动态代理实例
@@ -2126,15 +2114,16 @@ public class ForestConfiguration implements Serializable {
      * @return {@link ForestRequest} 对象
      */
     public ForestRequest<?> request() {
-       MethodLifeCycleHandler<?> lifeCycleHandler = new MethodLifeCycleHandler<>(
+       final MethodLifeCycleHandler<?> lifeCycleHandler = new MethodLifeCycleHandler<>(
                 Object.class, Object.class);
-        ForestRequest<?> request = new ForestRequest<>(this)
+       ForestRequest<?> request = new ForestRequest<>(this, new ForestRequestContext(variableContext, null))
                 .backend(getBackend())
                 .setLogConfiguration(new LogConfiguration()
                         .setLogHandler(getLogHandler())
                         .setLogEnabled(isLogEnabled())
                         .setLogResponseStatus(isLogResponseStatus())
                         .setLogResponseContent(isLogResponseContent()))
+                .setType(ForestRequestType.GET)
                 .setLifeCycleHandler(lifeCycleHandler)
                 .setRetryer(getRetryer());
         return request;
@@ -2173,10 +2162,8 @@ public class ForestConfiguration implements Serializable {
      */
     public ForestRequest<?> post(String url) {
         return request()
-                .setType(null)
-                .clearTypeChangeHistory()
                 .setType(ForestRequestType.POST)
-                .setUrlTemplate(url);
+                .setUrl(url);
     }
 
     /**
@@ -2187,10 +2174,8 @@ public class ForestConfiguration implements Serializable {
      */
     public ForestRequest<?> put(String url) {
         return request()
-                .setType(null)
-                .clearTypeChangeHistory()
                 .setType(ForestRequestType.PUT)
-                .setUrlTemplate(url);
+                .setUrl(url);
 
     }
 
@@ -2202,10 +2187,8 @@ public class ForestConfiguration implements Serializable {
      */
     public ForestRequest<?> delete(String url) {
         return request()
-                .setType(null)
-                .clearTypeChangeHistory()
                 .setType(ForestRequestType.DELETE)
-                .setUrlTemplate(url);
+                .setUrl(url);
 
     }
 
@@ -2217,10 +2200,8 @@ public class ForestConfiguration implements Serializable {
      */
     public ForestRequest<?> head(String url) {
         return request()
-                .setType(null)
-                .clearTypeChangeHistory()
                 .setType(ForestRequestType.HEAD)
-                .setUrlTemplate(url);
+                .setUrl(url);
 
     }
 
@@ -2232,10 +2213,8 @@ public class ForestConfiguration implements Serializable {
      */
     public ForestRequest<?> patch(String url) {
         return request()
-                .setType(null)
-                .clearTypeChangeHistory()
                 .setType(ForestRequestType.PATCH)
-                .setUrlTemplate(url);
+                .setUrl(url);
     }
 
     /**
@@ -2246,10 +2225,8 @@ public class ForestConfiguration implements Serializable {
      */
     public ForestRequest<?> options(String url) {
         return request()
-                .setType(null)
-                .clearTypeChangeHistory()
                 .setType(ForestRequestType.OPTIONS)
-                .setUrlTemplate(url);
+                .setUrl(url);
 
     }
 
@@ -2264,7 +2241,7 @@ public class ForestConfiguration implements Serializable {
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.TRACE)
-                .setUrlTemplate(url);
+                .setUrl(url);
     }
 
 

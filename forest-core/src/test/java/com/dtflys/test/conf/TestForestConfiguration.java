@@ -109,10 +109,9 @@ public class TestForestConfiguration {
         assertEquals("Peter", configuration.getVariableValue("name"));
         assertEquals("http://abc.com", configuration.getVariableValue("baseUrl"));
 
-        Map<String, Object> varMap = new HashMap<>();
-        varMap.put("name", "Linda");
-        varMap.put("abc", 123);
-        configuration.setVariables(varMap);
+        configuration = ForestConfiguration.createConfiguration();
+        configuration.setVariableValue("name", "Linda");
+        configuration.setVariableValue("abc", 123);
         assertThat(configuration.getVariableValue("name")).isEqualTo("Linda");
         assertThat(configuration.getVariableValue("abc")).isEqualTo(123);
         AtomicInteger value = new AtomicInteger(0);

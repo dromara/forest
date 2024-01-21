@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
+import java.util.Optional;
 import java.util.concurrent.Future;
 
 /**
@@ -141,7 +142,7 @@ public class ResultHandler {
                     return responseText;
                 }
 
-                final ForestDataType dataType = request.getDataType();
+                final ForestDataType dataType = Optional.ofNullable(request.getDataType()).orElse(ForestDataType.AUTO);
                 final ForestConverter converter = request.getConfiguration().getConverter(dataType);
                 if (contentType != null && contentType.canReadAsString()) {
                     return converter.convertToJavaObject(responseText, resultType);

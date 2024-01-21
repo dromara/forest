@@ -40,6 +40,7 @@ import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.callback.RetryWhen;
 import com.dtflys.forest.callback.SuccessWhen;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.ForestEncoder;
@@ -47,7 +48,6 @@ import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestAsyncAbortException;
 import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.body.ByteArrayRequestBody;
 import com.dtflys.forest.http.body.FileRequestBody;
@@ -63,14 +63,16 @@ import com.dtflys.forest.interceptor.InterceptorChain;
 import com.dtflys.forest.lifecycles.file.DownloadLifeCycle;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.RequestLogMessage;
+import com.dtflys.forest.mapping.ForestRequestContext;
+import com.dtflys.forest.mapping.ForestVariableContext;
 import com.dtflys.forest.mapping.MappingURLTemplate;
-import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.multipart.ByteArrayMultipart;
 import com.dtflys.forest.multipart.FileMultipart;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.multipart.InputStreamMultipart;
 import com.dtflys.forest.pool.ForestRequestPool;
 import com.dtflys.forest.reflection.ForestMethod;
+import com.dtflys.forest.reflection.ForestVariableValue;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
 import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
@@ -88,12 +90,11 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import java.io.File;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -122,7 +123,7 @@ import static com.dtflys.forest.mapping.MappingParameter.TARGET_QUERY;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-03-24
  */
-public class ForestRequest<T> implements HasURL, HasHeaders {
+public class ForestRequest<T> implements HasURL, HasHeaders, VariableScope {
 
     private final static Object[] EMPTY_RENDER_ARGS = new Object[0];
 
@@ -137,6 +138,11 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * Forest配置信息对象
      */
     private final ForestConfiguration configuration;
+
+    /**
+     * Forest请求变量上线文
+     */
+    private final ForestRequestContext context;
 
     /**
      * Forest方法
@@ -309,12 +315,6 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     private String filename;
 
     /**
-     * 参数表
-     * <p>接口方法调用时传入的参数表
-     */
-    private final Object[] arguments;
-
-    /**
      * 回调函数：请求成功时调用
      */
     private OnSuccess onSuccess;
@@ -466,32 +466,24 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     private ForestProxy proxy;
 
 
-    public ForestRequest(ForestConfiguration configuration, ForestMethod method, ForestBody body, Object[] arguments) {
+    public ForestRequest(ForestConfiguration configuration, ForestRequestContext context, ForestMethod method, ForestBody body, Object[] arguments) {
         this.configuration = configuration;
+        this.context = context;
         this.method = method;
-        this.arguments = arguments;
         this.body = body;
     }
 
-
-    public ForestRequest(ForestConfiguration configuration, ForestMethod method, Object[] arguments) {
+    public ForestRequest(ForestConfiguration configuration, ForestRequestContext context, ForestMethod method) {
         this.configuration = configuration;
+        this.context = context;
         this.method = method;
-        this.arguments = arguments;
         this.body = new ForestBody(this);
     }
 
-    public ForestRequest(ForestConfiguration configuration, ForestMethod method) {
-        this(configuration, method, new Object[0]);
+    public ForestRequest(ForestConfiguration configuration, ForestRequestContext context) {
+        this(configuration, context, null);
     }
 
-    public ForestRequest(ForestConfiguration configuration) {
-        this(configuration, null, new Object[0]);
-    }
-
-    public ForestRequest(ForestConfiguration configuration, Object[] arguments) {
-        this(configuration, null, arguments);
-    }
 
     /**
      * 获取该请求的配置对象
@@ -559,14 +551,14 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
 
     /**
      * 设置请求URL
-     * <p>同 {@link ForestRequest#setUrlTemplate(String)} 方法
+     * <p>同 {@link ForestRequest#setUrl(String)} 方法
      *
      * @param url URL字符串
      * @return {@link ForestRequest}对象实例
-     * @see ForestRequest#setUrlTemplate(String)
+     * @see ForestRequest#setUrl(String)
      */
     public ForestRequest<T> url(String url) {
-        return setUrlTemplate(url);
+        return setUrl(url);
     }
 
 
@@ -630,12 +622,12 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @param args 字符串模板渲染参数数组
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> setUrlTemplate(MappingURLTemplate urlTemplate, Object... args) {
+    public ForestRequest<T> setUrl(MappingURLTemplate urlTemplate, Object... args) {
         if (!this.query.isEmpty()) {
             this.query.clearQueriesFromUrl();
         }
 
-        final ForestURL newUrl = urlTemplate.render(args, this.query);
+        final ForestURL newUrl = urlTemplate.render(context, args, this.query);
         if (this.url == null) {
             this.url = newUrl;
         } else {
@@ -654,14 +646,28 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @param args 字符串模板渲染参数数组
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> setUrlTemplate(String url, Object... args) {
+    public ForestRequest<T> setUrl(String url, Object... args) {
         if (StringUtils.isBlank(url)) {
             throw new ForestRuntimeException("[Forest] Request url cannot be empty!");
         }
         final String srcUrl = StringUtils.trimBegin(url);
-        MappingURLTemplate template = method.makeURLTemplate(null, null, srcUrl);
-        return setUrlTemplate(template, args);
+        MappingURLTemplate template = makeURLTemplate(null, null, srcUrl);
+        return setUrl(template, args);
     }
+
+
+    private MappingURLTemplate makeURLTemplate(
+            final Class<? extends Annotation> annotationType,
+            final String attributeName,
+            final String text) {
+        return new MappingURLTemplate(
+                annotationType,
+                attributeName,
+                text,
+                configuration.getProperties(),
+                null);
+    }
+
 
     /**
      * 设置请求的url地址
@@ -672,34 +678,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return {@link ForestRequest}对象实例
      */
     public ForestRequest<T> setUrl(String url) {
-        if (StringUtils.isBlank(url)) {
-            throw new ForestRuntimeException("[Forest] Request url cannot be empty!");
-        }
-        final String srcUrl = StringUtils.trimBegin(url);
-        try {
-            final URL u = new URL(srcUrl);
-            if (this.url != null) {
-                this.url.mergeURLWith(new ForestURL(u));
-            } else {
-                this.url = new ForestURL(u);
-            }
-        } catch (MalformedURLException e) {
-            throw new ForestRuntimeException(e);
-        }
-        return this;
-    }
-
-
-    /**
-     * 设置请求的url地址
-     * <p>每次设置请求的url地址时，都会解析传入的url参数字符串
-     * <p>然后从url中解析出Query参数，并将其替换调用原来的Query参数，或新增成新的Query参数
-     *
-     * @param url url地址字符串
-     * @return {@link ForestRequest}对象实例
-     */
-    public ForestRequest<T> setUrlTemplate(String url) {
-        return setUrlTemplate(url, EMPTY_RENDER_ARGS);
+        return setUrl(url, EMPTY_RENDER_ARGS);
     }
 
 
@@ -3219,7 +3198,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return 参数值
      */
     public Object getArgument(int index) {
-        return arguments[index];
+        return context.getArgument(index);
     }
 
     /**
@@ -3231,7 +3210,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @see ForestRequest#getArgument(int)
      */
     public Object argument(int index) {
-        return arguments[index];
+        return context.getArgument(index);
     }
 
 
@@ -3241,7 +3220,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return 参数值列表
      */
     public Object[] getArguments() {
-        return arguments;
+        return context.getArguments();
     }
 
     /**
@@ -3930,7 +3909,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
             downloadFileMap.put("dir", dir);
             downloadFileMap.put("filename", filename != null ? filename : "");
             InterceptorAttributes attributes = new InterceptorAttributes(DownloadLifeCycle.class, downloadFileMap);
-            attributes.render(new Object[0]);
+            attributes.render(context, new Object[0]);
             this.addInterceptorAttributes(DownloadLifeCycle.class, attributes);
         }
         return this;
@@ -4097,6 +4076,11 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         return setOnSaveCookie(onSaveCookie);
     }
 
+    @Override
+    public boolean isVariableDefined(String name) {
+        return context.isVariableDefined(name);
+    }
+
     /**
      * 获取请求所绑定到的变量值
      *
@@ -4104,17 +4088,17 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return 变量值
      */
     public Object getVariableValue(String name) {
-        if (method == null) {
-            return null;
-        }
-        MappingVariable variable = method.getVariable(name);
-        if (variable != null) {
-            return getArgument(variable.getIndex());
-        }
-        if (!method.isVariableDefined(name)) {
-            throw new ForestVariableUndefinedException(name);
-        }
-        return method.getVariableValue(name, method);
+        return context.getVariableValue(name);
+    }
+
+    @Override
+    public ForestVariableValue getVariable(String name) {
+        return context.getVariable(name);
+    }
+
+    @Override
+    public ForestMethod getForestMethod() {
+        return method;
     }
 
     /**
@@ -4741,8 +4725,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     public ForestRequest<T> clone() {
         ForestRequest<T> newRequest = new ForestRequest<>(
                 this.configuration,
-                this.method,
-                this.arguments);
+                this.context,
+                this.method);
         ForestBody newBody = newRequest.body();
         newBody.setBodyType(body.getBodyType());
         for (ForestRequestBody bodyItem : this.body) {

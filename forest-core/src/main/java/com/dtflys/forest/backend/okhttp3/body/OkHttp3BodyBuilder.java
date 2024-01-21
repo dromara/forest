@@ -122,7 +122,7 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
         builder.method(request.getType().getName(), body);
     }
 
-    private RequestBody createFileBody(ForestRequest request, ForestMultipart multipart, Charset charset, LifeCycleHandler lifeCycleHandler) {
+    private RequestBody createFileBody(final ForestRequest request, final ForestMultipart multipart, final Charset charset, final LifeCycleHandler lifeCycleHandler) {
         RequestBody wrappedBody, requestBody;
         final String partContentType = multipart.getContentType();
         MediaType fileMediaType = null;
@@ -161,12 +161,12 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
             final String contentType,
             final byte[] bytes,
             boolean mergeCharset) {
-        final String ctype = StringUtils.isBlank(contentType) ? ContentType.APPLICATION_OCTET_STREAM : contentType;
-        MediaType mediaType = MediaType.parse(ctype);
+        final String cTypeStr = StringUtils.isBlank(contentType) ? ContentType.APPLICATION_OCTET_STREAM : contentType;
+        MediaType mediaType = MediaType.parse(cTypeStr);
         final Charset mtcs = mediaType.charset();
         if (mtcs == null) {
             if (charset != null && mergeCharset) {
-                mediaType = MediaType.parse(ctype + "; charset=" + charset);
+                mediaType = MediaType.parse(cTypeStr + "; charset=" + charset);
             }
         }
         final RequestBody body = RequestBody.create(mediaType, bytes);

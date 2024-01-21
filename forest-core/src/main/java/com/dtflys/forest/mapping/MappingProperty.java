@@ -2,6 +2,7 @@ package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.ForestProperties;
+import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.reflection.ForestMethod;
 
 public class MappingProperty extends MappingExpr {
@@ -9,8 +10,8 @@ public class MappingProperty extends MappingExpr {
     private final String propertyName;
     private ForestProperties properties;
 
-    protected MappingProperty(ForestMethod<?> forestMethod, String propertyName) {
-        super(forestMethod, Token.PROP);
+    protected MappingProperty(String propertyName) {
+        super(Token.PROP);
         this.propertyName = propertyName;
     }
 
@@ -32,7 +33,7 @@ public class MappingProperty extends MappingExpr {
     }
 
     @Override
-    public Object render(Object[] args) {
-        return forestMethod.getConfiguration().getProperties().getProperty(propertyName, null);
+    public Object render(VariableScope variableScope, Object[] args) {
+        return variableScope.getConfiguration().getProperties().getProperty(propertyName, null);
     }
 }

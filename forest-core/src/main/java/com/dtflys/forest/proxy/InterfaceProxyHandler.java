@@ -11,6 +11,7 @@ import com.dtflys.forest.lifecycles.BaseAnnotationLifeCycle;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.reflection.ForestMethod;
+import com.dtflys.forest.reflection.ForestVariableValue;
 import com.dtflys.forest.reflection.MetaRequest;
 import com.dtflys.forest.utils.MethodHandlesUtil;
 
@@ -254,12 +255,7 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
 
     @Override
     public Object getVariableValue(String name) {
-        return getVariableValue(name, null);
-    }
-
-    @Override
-    public Object getVariableValue(String name, ForestMethod method) {
-        return configuration.getVariableValue(name, method);
+        return configuration.getVariableValue(name);
     }
 
     public List<Annotation> getBaseAnnotations() {
@@ -267,7 +263,12 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
     }
 
     @Override
-    public MappingVariable getVariable(String name) {
+    public ForestVariableValue getVariable(String name) {
+        return configuration.getVariableContext().getVariable(name);
+    }
+
+    @Override
+    public ForestMethod getForestMethod() {
         return null;
     }
 

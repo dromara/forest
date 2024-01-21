@@ -9,23 +9,15 @@ import com.dtflys.forest.reflection.ForestMethod;
  */
 public abstract class MappingExpr {
 
-    protected final ForestMethod<?> forestMethod;
-
     final Token token;
 
-    protected VariableScope variableScope;
 
-    protected MappingExpr(ForestMethod<?> forestMethod, Token token) {
-        this.forestMethod = forestMethod;
+    protected MappingExpr(Token token) {
         this.token = token;
     }
 
-    public Object render(Object[] args) {
+    public Object render(VariableScope variableScope, Object[] args) {
         return null;
-    }
-
-    public void setVariableScope(VariableScope variableScope) {
-        this.variableScope = variableScope;
     }
 
     public abstract boolean isIterateVariable();

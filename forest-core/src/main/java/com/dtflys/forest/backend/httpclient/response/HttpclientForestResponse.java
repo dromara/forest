@@ -90,7 +90,7 @@ public class HttpclientForestResponse extends ForestResponse {
         if (content == null) {
             final Class<?> resultClass = ReflectUtils.toClass(request.getLifeCycleHandler().getResultType());
             if (request.isDownloadFile()
-                    || InputStream.class.isAssignableFrom(request.getMethod().getReturnClass())
+                    || InputStream.class.isAssignableFrom(request.getResultClass())
                     || (resultClass != null && InputStream.class.isAssignableFrom(resultClass))
                     || (contentType != null && contentType.canReadAsBinaryStream())) {
                 final StringBuilder builder = new StringBuilder();

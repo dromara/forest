@@ -3,6 +3,7 @@ package com.dtflys.forest.mapping;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
 import com.dtflys.forest.reflection.ForestMethod;
+import com.dtflys.forest.reflection.ForestVariableValue;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.util.HashSet;
@@ -21,9 +22,8 @@ public class MappingReference extends MappingExpr {
         ITERATE_VARS.add("_key");
     }
 
-    public MappingReference(ForestMethod<?> forestMethod, VariableScope variableScope, String name) {
-        super(forestMethod, Token.REF);
-        this.variableScope = variableScope;
+    public MappingReference(VariableScope variableScope, String name) {
+        super(Token.REF);
         this.name = name;
     }
 
@@ -32,15 +32,18 @@ public class MappingReference extends MappingExpr {
     }
 
     @Override
-    public Object render(Object[] args) {
-        MappingVariable variable = variableScope.getVariable(name);
-        if (variable != null) {
-            return args[variable.getIndex()];
+    public Object render(VariableScope variableScope, Object[] args) {
+        ForestVariableValue variable = variableScope.getVariable(name);
+        if (variable instanceof MappingVariable) {
+            MappingVariable mappingVariable = (MappingVariable) variable;
+            return args[mappingVariable.getIndex()];
+        } else if (variable != null) {
+            return variable.getValue(variableScope);
         }
         if (!variableScope.isVariableDefined(name)) {
             throw new ForestVariableUndefinedException(name);
         }
-        return variableScope.getVariableValue(name, forestMethod);
+        return variableScope.getVariableValue(name);
     }
 
     @Override

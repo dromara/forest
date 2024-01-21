@@ -36,7 +36,7 @@ public class GzipClientTest extends BaseClientTest {
     public static void prepareClient() {
         configuration = ForestConfiguration.createConfiguration();
         configuration.setLogResponseContent(true);
-        configuration.getVariables().put("baseUrl", new BasicVariableValue("http://localhost"));
+        configuration.setVariableValue("baseUrl", new BasicVariableValue("http://localhost"));
     }
 
     @Override

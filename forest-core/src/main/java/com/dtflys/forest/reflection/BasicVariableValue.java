@@ -1,5 +1,7 @@
 package com.dtflys.forest.reflection;
 
+import com.dtflys.forest.config.VariableScope;
+
 public class BasicVariableValue implements ForestVariableValue {
 
     private final Object value;
@@ -10,7 +12,7 @@ public class BasicVariableValue implements ForestVariableValue {
 
 
     @Override
-    public Object getValue(ForestMethod method) {
+    public Object getValue(VariableScope variableScope) {
         return this.value;
     }
 }

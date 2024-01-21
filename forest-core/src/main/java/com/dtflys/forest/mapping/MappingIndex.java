@@ -1,5 +1,6 @@
 package com.dtflys.forest.mapping;
 
+import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.reflection.ForestMethod;
 
@@ -11,12 +12,12 @@ public class MappingIndex extends MappingExpr {
     private final Integer index;
 
     public MappingIndex(Integer index) {
-        super(null, Token.INDEX);
+        super(Token.INDEX);
         this.index = index;
     }
 
     @Override
-    public Object render(Object[] args) {
+    public Object render(VariableScope variableScope, Object[] args) {
         if (index < 0) {
             int argIndex = args.length + index;
             if (argIndex < 0) {

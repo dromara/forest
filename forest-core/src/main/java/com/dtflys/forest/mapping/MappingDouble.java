@@ -1,5 +1,6 @@
 package com.dtflys.forest.mapping;
 
+import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.reflection.ForestMethod;
 
 /**
@@ -11,12 +12,12 @@ public class MappingDouble extends MappingExpr {
     private final double number;
 
     public MappingDouble(double number) {
-        super(null, Token.DOUBLE);
+        super( Token.DOUBLE);
         this.number = number;
     }
 
     @Override
-    public Object render(Object[] args) {
+    public Object render(VariableScope variableScope, Object[] args) {
         return number;
     }
 

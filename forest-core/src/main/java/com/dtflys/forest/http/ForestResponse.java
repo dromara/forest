@@ -260,7 +260,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
                 }
                 final ForestRequest<T> redirectRequest = request.clone();
                 redirectRequest.clearQueries();
-                redirectRequest.setUrlTemplate(location);
+                redirectRequest.setUrl(location);
                 redirectRequest.prevRequest = request;
                 redirectRequest.prevResponse = this;
                 return redirectRequest;

@@ -7,15 +7,9 @@ public class MappingUrlEncodedExpr extends MappingExpr {
 
     private final MappingExpr expr;
 
-    protected MappingUrlEncodedExpr(ForestMethod<?> forestMethod, MappingExpr expr) {
-        super(forestMethod, expr.token);
+    protected MappingUrlEncodedExpr(MappingExpr expr) {
+        super(expr.token);
         this.expr = expr;
-    }
-
-    @Override
-    public void setVariableScope(VariableScope variableScope) {
-        super.setVariableScope(variableScope);
-        expr.setVariableScope(variableScope);
     }
 
     @Override
@@ -28,8 +22,8 @@ public class MappingUrlEncodedExpr extends MappingExpr {
     }
 
     @Override
-    public Object render(Object[] args) {
-        Object ret = expr.render(args);
+    public Object render(VariableScope variableScope, Object[] args) {
+        Object ret = expr.render(variableScope, args);
         if (ret == null) {
             return null;
         }

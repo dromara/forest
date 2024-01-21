@@ -21,6 +21,7 @@ import com.dtflys.forest.logging.LogHeaderMessage;
 import com.dtflys.forest.logging.RequestLogMessage;
 import com.dtflys.forest.logging.RequestProxyLogMessage;
 import com.dtflys.forest.logging.ResponseLogMessage;
+import com.dtflys.forest.pool.ForestRequestPool;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.backend.okhttp3.conn.OkHttp3ConnectionManager;
@@ -176,8 +177,8 @@ public class OkHttp3Executor implements HttpExecutor {
         }
     }
 
-    protected void prepareMethodAndBody(Request.Builder builder, final LifeCycleHandler lifeCycleHandler) {
-        ForestRequestType type = request.getType() == null ? ForestRequestType.GET : request.getType();
+    protected void prepareMethodAndBody(final Request.Builder builder, final LifeCycleHandler lifeCycleHandler) {
+        final ForestRequestType type = request.getType() == null ? ForestRequestType.GET : request.getType();
         if (type.isNeedBody()) {
             BODY_BUILDER.buildBody(builder, request, lifeCycleHandler);
         } else {
@@ -185,22 +186,23 @@ public class OkHttp3Executor implements HttpExecutor {
         }
     }
 
-    public void execute(final LifeCycleHandler lifeCycleHandler, int retryCount) {
-        OkHttpClient okHttpClient = getClient(request, lifeCycleHandler);
-        URLBuilder urlBuilder = URL_BUILDER;
-        String url = urlBuilder.buildUrl(request);
-        Request.Builder builder = new Request.Builder().url(url);
+    public void execute(final LifeCycleHandler lifeCycleHandler, final int retryCount) {
+        final OkHttpClient okHttpClient = getClient(request, lifeCycleHandler);
+        final URLBuilder urlBuilder = URL_BUILDER;
+        final String url = urlBuilder.buildUrl(request);
+        final Request.Builder builder = new Request.Builder().url(url);
         prepareMethodAndBody(builder, lifeCycleHandler);
         prepareHeaders(builder);
         final Request okRequest = builder.build();
         call = okHttpClient.newCall(okRequest);
         final OkHttp3ForestResponseFactory factory = new OkHttp3ForestResponseFactory();
         logRequest(retryCount, okRequest, okHttpClient);
-        Date startDate = new Date();
+        final Date startDate = new Date();
+        final ForestRequestPool pool = request.pool();
         Response okResponse = null;
         ForestResponse response = null;
         try {
-            request.pool().awaitRequest(request);
+            pool.awaitRequest(request);
             okResponse = call.execute();
         } catch (Throwable e) {
             response = factory.createResponse(request, null, lifeCycleHandler, e, startDate);
@@ -208,7 +210,7 @@ public class OkHttp3Executor implements HttpExecutor {
                 lifeCycleHandler.handleCanceled(request, response);
                 return;
             }
-            ForestRetryException retryException = new ForestRetryException(
+            final ForestRetryException retryException = new ForestRetryException(
                     e, request, request.getMaxRetryCount(), retryCount);
             try {
                 request.canRetry(response, retryException);
@@ -223,14 +225,14 @@ public class OkHttp3Executor implements HttpExecutor {
             execute(lifeCycleHandler, retryCount + 1);
             return;
         } finally {
-            request.pool().finish(request);
+            pool.finish(request);
             if (response == null) {
                 response = factory.createResponse(request, okResponse, lifeCycleHandler, null, startDate);
             }
             logResponse(response);
         }
         // 是否重试
-        ForestRetryException retryEx = request.canRetry(response);
+        final ForestRetryException retryEx = request.canRetry(response);
         if (retryEx != null && retryEx.isNeedRetry() && !retryEx.isMaxRetryCountReached()) {
             response.close();
             execute(lifeCycleHandler, retryCount + 1);
@@ -243,7 +245,6 @@ public class OkHttp3Executor implements HttpExecutor {
             return;
         }
         okHttp3ResponseHandler.handleSync(okResponse, response);
-//        }
     }
 
 

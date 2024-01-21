@@ -53,15 +53,15 @@ public class HTTPProxyLifeCycle implements MethodAnnotationLifeCycle<HTTPProxy> 
 //                .map(headerStr -> method.makeTemplate(HTTPProxy.class, "headers", headerStr))
 //                .toArray(MappingTemplate[]::new));
 
-        final String host = hostTemplate.render(args);
+        final String host = hostTemplate.render(request, args);
 
         String username = null, password = null;
 
         if (usernameTemplate != null) {
-            username = usernameTemplate.render(args);
+            username = usernameTemplate.render(request, args);
         }
         if (passwordTemplate != null) {
-            password = passwordTemplate.render(args);
+            password = passwordTemplate.render(request, args);
         }
 
         int port = 80;
@@ -73,7 +73,7 @@ public class HTTPProxyLifeCycle implements MethodAnnotationLifeCycle<HTTPProxy> 
             throw new ForestRuntimeException("[Forest] Proxy host cannot be empty!");
         }
         if (StringUtils.isNotBlank(portStr)) {
-            portStr = portTemplate.render(args);
+            portStr = portTemplate.render(request, args);
             try {
                 port = Integer.parseInt(portStr);
             } catch (Throwable th) {
@@ -87,7 +87,7 @@ public class HTTPProxyLifeCycle implements MethodAnnotationLifeCycle<HTTPProxy> 
             proxy.setPassword(password);
         }
         if (headersTemplates != null && headersTemplates.length > 0) {
-            HeaderUtils.addHeaders(proxy, headersTemplates, args);
+            HeaderUtils.addHeaders(request, proxy, headersTemplates, args);
         }
         request.setProxy(proxy);
 

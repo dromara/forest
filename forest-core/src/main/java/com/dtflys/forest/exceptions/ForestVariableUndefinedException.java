@@ -1,6 +1,8 @@
 package com.dtflys.forest.exceptions;
 
+import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.reflection.ForestMethod;
+import com.dtflys.forest.reflection.ForestVariableValue;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.lang.annotation.Annotation;
@@ -14,11 +16,8 @@ import java.lang.reflect.Method;
  */
 public class ForestVariableUndefinedException extends ForestRuntimeException {
 
-    private final Class<? extends Annotation> annotationType;
 
-    private final String attributeName;
-
-    private final ForestMethod method;
+    private final VariableScope variableScope;
 
     private final String variableName;
 
@@ -32,34 +31,34 @@ public class ForestVariableUndefinedException extends ForestRuntimeException {
         this(null, null, null, variableName, source);
     }
 
-
-    public ForestVariableUndefinedException(String attributeName, ForestMethod method, String variableName) {
-        this(null, attributeName, method, variableName, null);
+    public ForestVariableUndefinedException(String attributeName, VariableScope variableScope, String variableName) {
+        this(null, attributeName, variableScope, variableName, null);
     }
 
-
-    public ForestVariableUndefinedException(Class<? extends Annotation> annotationType, String attributeName, ForestMethod method, String variableName) {
-        this(annotationType, attributeName, method, variableName, null);
+    public ForestVariableUndefinedException(Class<? extends Annotation> annotationType, String attributeName, VariableScope variableScope, String variableName) {
+        this(annotationType, attributeName, variableScope, variableName, null);
     }
 
-
-    public ForestVariableUndefinedException(Class<? extends Annotation> annotationType, String attributeName, ForestMethod method, String variableName, String source) {
-        super(getErrorMessage(annotationType, attributeName, method, variableName, source));
-        this.annotationType = annotationType;
-        this.attributeName = attributeName;
-        this.method = method;
+    public ForestVariableUndefinedException(Class<? extends Annotation> annotationType, String attributeName, VariableScope variableScope, String variableName, String source) {
+        super(getErrorMessage(annotationType, attributeName, variableScope, variableName, source));
+        this.variableScope = variableScope;
         this.variableName = variableName;
         this.source = source;
     }
 
-    private static String getErrorMessage(Class<? extends Annotation> annotationType, String attributeName, ForestMethod forestMethod, String variableName, String source) {
+    public VariableScope getVariableScope() {
+        return variableScope;
+    }
+
+    private static String getErrorMessage(Class<? extends Annotation> annotationType, String attributeName, VariableScope variableScope, String variableName, String source) {
         StringBuilder builder = new StringBuilder();
         builder.append("[Forest] Cannot resolve variable '");
         builder.append(variableName);
         builder.append("'");
         if (StringUtils.isNotBlank(source)) {
             builder.append("\n\n\t[From Template]\n\t");
-            if (forestMethod != null) {
+            if (variableScope instanceof ForestMethod) {
+                ForestMethod forestMethod = (ForestMethod) variableScope;
                 Method method = forestMethod.getMethod();
                 String typeName = method.getDeclaringClass().getTypeName();
                 String methodName = method.getName();

@@ -1,5 +1,6 @@
 package com.dtflys.forest.mapping;
 
+import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.reflection.ForestMethod;
 
 /**
@@ -14,12 +15,12 @@ public class MappingString extends MappingExpr {
     }
 
     public MappingString(String text) {
-        super(null, Token.STRING);
+        super(Token.STRING);
         this.text = text;
     }
 
     @Override
-    public Object render(Object[] args) {
+    public Object render(VariableScope variableScope, Object[] args) {
         return getText();
     }
 
