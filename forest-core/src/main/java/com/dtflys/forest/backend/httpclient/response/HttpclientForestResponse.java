@@ -37,7 +37,7 @@ public class HttpclientForestResponse extends ForestResponse {
         this.httpResponse = httpResponse;
         this.entity = entity;
         if (httpResponse != null) {
-            setupHeaders();
+//            setupHeaders();
             StatusLine statusLine = httpResponse.getStatusLine();
             this.statusCode = statusLine.getStatusCode();
             this.reasonPhrase = statusLine.getReasonPhrase();
@@ -47,13 +47,13 @@ public class HttpclientForestResponse extends ForestResponse {
                     this.contentType = new ContentType(type.getValue(), StandardCharsets.UTF_8);
                 }
                 //响应消息的编码格式: gzip...
-                setupContentEncoding();
+//                setupContentEncoding();
                 //响应文本的字符串编码
-                setupResponseCharset();
+//                setupResponseCharset();
                 //是否将Response数据按GZIP来解压
-                setupGzip();
-                setupContent();
-                this.contentLength = entity.getContentLength();
+//                setupGzip();
+//                setupContent();
+//                this.contentLength = entity.getContentLength();
             } else {
                 this.bytes = new byte[0];
                 this.content = "";

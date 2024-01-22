@@ -46,15 +46,15 @@ public class OkHttp3ForestResponse extends ForestResponse {
         this.body = okResponse.body();
         this.statusCode = okResponse.code();
         this.reasonPhrase = okResponse.message();
-        setupHeaders();
-        setupContentEncoding();
+//        setupHeaders();
+//        setupContentEncoding();
         // 判断是否将Response数据按GZIP来解压
-        setupGzip();
+//        setupGzip();
         if (body == null) {
             return;
         }
-        setupContentTypeAndCharset();
-        setupContent();
+//        setupContentTypeAndCharset();
+//        setupContent();
     }
 
     /**

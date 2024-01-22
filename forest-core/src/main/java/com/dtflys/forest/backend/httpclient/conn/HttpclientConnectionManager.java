@@ -56,15 +56,15 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
     public synchronized void init(ForestConfiguration configuration) {
         if (!inited) {
             try {
-                Integer maxConnections = configuration.getMaxConnections() != null ?
-                        configuration.getMaxConnections() : HttpConnectionConstants.DEFAULT_MAX_TOTAL_CONNECTIONS;
+//                Integer maxConnections = configuration.getMaxConnections() != null ?
+//                        configuration.getMaxConnections() : HttpConnectionConstants.DEFAULT_MAX_TOTAL_CONNECTIONS;
                 Registry<ConnectionSocketFactory> socketFactoryRegistry =
                         RegistryBuilder.<ConnectionSocketFactory>create()
                                 .register("https", new ForestSSLConnectionFactory())
                                 .register("http", new ForestConnectionFactory())
                                 .build();
                 tsConnectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
-                tsConnectionManager.setMaxTotal(maxConnections);
+                tsConnectionManager.setMaxTotal(Integer.MAX_VALUE);
                 tsConnectionManager.setDefaultMaxPerRoute(Integer.MAX_VALUE);
                 tsConnectionManager.setValidateAfterInactivity(60);
                 defaultHttpClientProvider = new DefaultHttpClientProvider();

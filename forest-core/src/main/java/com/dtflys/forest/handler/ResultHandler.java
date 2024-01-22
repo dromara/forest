@@ -66,9 +66,6 @@ public class ResultHandler {
         }
         if (isReceivedResponseData(response)) {
             try {
-                if (void.class.isAssignableFrom(resultClass)) {
-                    return null;
-                }
                 if (ForestResponse.class.isAssignableFrom(resultClass)
                         || ForestRequest.class.isAssignableFrom(resultClass)) {
                     if (resultType instanceof ParameterizedType) {
@@ -86,6 +83,9 @@ public class ResultHandler {
                         }
                     }
                     return response;
+                }
+                if (void.class.isAssignableFrom(resultClass)) {
+                    return null;
                 }
                 if (Future.class.isAssignableFrom(resultClass)) {
                     if (resultType instanceof ParameterizedType) {

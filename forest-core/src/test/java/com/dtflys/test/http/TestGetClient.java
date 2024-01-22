@@ -115,6 +115,7 @@ public class TestGetClient extends BaseClientTest {
         }
         ForestConfiguration.createConfiguration();
         Forest.config()
+                .setMaxRetryCount(0)
                 .setLogEnabled(false)
                 .setMaxConnections(10000);
         StopWatch stopWatch = new StopWatch();

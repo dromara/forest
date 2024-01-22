@@ -72,13 +72,13 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
                     resultData = handleError(request, response);
                 }
             }
-            handleResult(resultData);
+//            handleResult(resultData);
             if (ForestResponse.class.isAssignableFrom(resultRawClass)) {
                 if (!(resultData instanceof ForestResponse)) {
                     response.setResult(resultData);
                     resultData = response;
                 }
-                handleResult(resultData);
+//                handleResult(resultData);
                 return resultData;
             }
             return resultData;
