@@ -1,7 +1,9 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
+import com.dtflys.forest.config.VariableValueContext;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.reflection.ForestMethod;
 
 /**
@@ -17,7 +19,8 @@ public class MappingIndex extends MappingExpr {
     }
 
     @Override
-    public Object render(VariableScope variableScope, Object[] args) {
+    public Object render(VariableValueContext valueContext) {
+        Object[] args = valueContext.getArguments();
         if (index < 0) {
             int argIndex = args.length + index;
             if (argIndex < 0) {

@@ -58,11 +58,13 @@ public class ForestVariableUndefinedException extends ForestRuntimeException {
         builder.append("'");
         if (StringUtils.isNotBlank(source)) {
             builder.append("\n\n\t[From Template]\n\t");
-            if (variableScope instanceof ForestMethod) {
-                ForestMethod forestMethod = (ForestMethod) variableScope;
-                Method method = forestMethod.getMethod();
-                final String methodName = NameUtils.methodAbsoluteName(method);
-                builder.append(methodName).append("\n\t");
+            if (variableScope != null) {
+                ForestMethod forestMethod = variableScope.getForestMethod();
+                if (forestMethod != null) {
+                    Method method = forestMethod.getMethod();
+                    final String methodName = NameUtils.methodAbsoluteName(method);
+                    builder.append(methodName).append("\n\t");
+                }
             }
             if (annotationType != null) {
                 String annTypeName = annotationType.getSimpleName();

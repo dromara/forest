@@ -1,6 +1,5 @@
 package com.dtflys.forest.config;
 
-import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.ForestVariableValue;
 

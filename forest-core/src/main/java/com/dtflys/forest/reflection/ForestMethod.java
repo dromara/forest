@@ -807,20 +807,20 @@ public class ForestMethod<T> implements VariableScope {
     /**
      * 获得最终的请求类型
      *
-     * @param args 调用本对象对应方法时传入的参数数组
+     * @param request Forest 请求
      * @return 请求类型，{@link ForestRequestType}枚举实例
      */
-    private ForestRequestType type(Object[] args) {
-        String renderedType = typeTemplate.render(this, args);
+    private ForestRequestType type(final ForestRequest<?> request) {
+        final String renderedType = typeTemplate.render(request);
         if (StringUtils.isBlank(renderedType)) {
-            String typeFromName = methodNameItems[0];
-            ForestRequestType type = ForestRequestType.findType(typeFromName);
+            final String typeFromName = methodNameItems[0];
+            final ForestRequestType type = ForestRequestType.findType(typeFromName);
             if (type != null) {
                 return type;
             }
             return ForestRequestType.GET;
         }
-        ForestRequestType type = ForestRequestType.findType(renderedType);
+        final ForestRequestType type = ForestRequestType.findType(renderedType);
         if (type != null) {
             return type;
         }
@@ -837,69 +837,69 @@ public class ForestMethod<T> implements VariableScope {
         initMethod();
         MetaRequest baseMetaRequest = interfaceProxyHandler.getBaseMetaRequest();
         ForestURL baseURL = null;
-        ForestRequestType type = type(args);
 
         // createExecutor and initialize http instance
         final ForestRequestContext context = new ForestRequestContext(this, args);
         final ForestRequest<T> request = new ForestRequest<>(configuration, context, this);
         final ForestQueryMap queries = new ForestQueryMap(request);
+        final ForestRequestType type = type(request);
 
         if (baseUrlTemplate != null) {
-            baseURL = baseUrlTemplate.render(context, args, queries);
+            baseURL = baseUrlTemplate.renderURL(request);
         }
         if (urlTemplate == null) {
             throw new ForestRuntimeException("request URL is empty");
         }
-        ForestURL renderedURL = urlTemplate.render(context, args, queries);
+        ForestURL renderedURL = urlTemplate.renderURL(request);
 
 
         String baseContentEncoding = null;
         if (baseEncodeTemplate != null) {
-            baseContentEncoding = baseEncodeTemplate.render(context, args);
+            baseContentEncoding = baseEncodeTemplate.render(request);
         }
         String contentEncoding = null;
         if (encodeTemplate != null) {
-            contentEncoding = encodeTemplate.render(context, args);
+            contentEncoding = encodeTemplate.render(request);
         }
 
         String baseContentType = null;
         if (baseContentTypeTemplate != null) {
-            baseContentType = baseContentTypeTemplate.render(context, args);
+            baseContentType = baseContentTypeTemplate.render(request);
         }
         String baseUserAgent = null;
         if (baseUserAgentTemplate != null) {
-            baseUserAgent = baseUserAgentTemplate.render(context, args);
+            baseUserAgent = baseUserAgentTemplate.render(request);
         }
         String charset = null;
-        String renderedCharset = charsetTemplate.render(context, args);
+        String renderedCharset = charsetTemplate.render(request);
         if (StringUtils.isNotBlank(renderedCharset)) {
             charset = renderedCharset;
         } else if (baseCharsetTemplate != null) {
-            charset = baseCharsetTemplate.render(context, args);
+            charset = baseCharsetTemplate.render(request);
         }
 
         String responseEncoding = null;
         if (responseEncodingTemplate != null) {
-            responseEncoding = responseEncodingTemplate.render(context, args);
+            responseEncoding = responseEncodingTemplate.render(request);
         }
 
         String sslProtocol = null;
-        String renderedSslProtocol = sslProtocolTemplate.render(context, args);
+        String renderedSslProtocol = sslProtocolTemplate.render(request);
         if (StringUtils.isNotBlank(renderedSslProtocol) && !"null".equals(renderedSslProtocol)) {
             sslProtocol = renderedSslProtocol;
         } else if (baseSslProtocolTemplate != null) {
-            sslProtocol = baseSslProtocolTemplate.render(context, args);
+            sslProtocol = baseSslProtocolTemplate.render(request);
         } else {
             sslProtocol = configuration.getSslProtocol();
         }
 
         String renderedContentType = null;
         if (contentTypeTemplate != null) {
-            renderedContentType = contentTypeTemplate.render(context, args).trim();
+            renderedContentType = contentTypeTemplate.render(request).trim();
         }
         String renderedUserAgent = null;
         if (userAgentTemplate != null) {
-            renderedUserAgent = userAgentTemplate.render(context, args).trim();
+            renderedUserAgent = userAgentTemplate.render(request).trim();
         }
         List<RequestNameValue> nameValueList = new ArrayList<>();
         String[] headerArray = baseMetaRequest.getHeaders();
@@ -939,7 +939,7 @@ public class ForestMethod<T> implements VariableScope {
 
         String bodyTypeName = "text";
         if (bodyTypeTemplate != null) {
-            bodyTypeName = bodyTypeTemplate.render(context, args);
+            bodyTypeName = bodyTypeTemplate.render(request);
         }
         ForestDataType bodyType = ForestDataType.findByName(bodyTypeName);
 
@@ -1119,10 +1119,10 @@ public class ForestMethod<T> implements VariableScope {
                                 MappingTemplate template = makeTemplate(parameter);
                                 VariableScope parentScope = request;
                                 for (Object subItem : (Iterable) obj) {
-                                    ForestVariableContext scope = new ForestVariableContext(parentScope);
+                                    ForestRequestContext scope = new ForestRequestContext(parentScope, request.arguments());
                                     scope.setVariableValue("_it", subItem);
                                     scope.setVariableValue("_index", index++);
-                                    String name = template.render(scope, args);
+                                    String name = template.render(scope);
                                     request.addQuery(
                                             name, subItem,
                                             parameter.isUrlEncode(), parameter.getCharset());
@@ -1140,10 +1140,10 @@ public class ForestMethod<T> implements VariableScope {
                                 int index = 0;
                                 VariableScope parentScope = request;
                                 for (Object subItem : (Iterable) obj) {
-                                    ForestVariableContext scope = new ForestVariableContext(parentScope);
+                                    ForestRequestContext scope = new ForestRequestContext(parentScope, request.arguments());
                                     scope.setVariableValue("_it", subItem);
                                     scope.setVariableValue("_index", index++);
-                                    String name = template.render(scope, args);
+                                    String name = template.render(scope);
                                     nameValueList.add(
                                             new RequestNameValue(name, subItem, target, parameter.getPartContentType())
                                                     .setDefaultValue(parameter.getDefaultValue()));
@@ -1200,7 +1200,7 @@ public class ForestMethod<T> implements VariableScope {
         // setup ssl keystore
         if (sslKeyStoreId != null) {
             SSLKeyStore sslKeyStore = null;
-            String keyStoreId = sslKeyStoreId.render(context, args);
+            String keyStoreId = sslKeyStoreId.render(request);
             if (StringUtils.isNotEmpty(keyStoreId)) {
                 sslKeyStore = configuration.getKeyStore(keyStoreId);
                 request.setKeyStore(sslKeyStore);
@@ -1230,7 +1230,7 @@ public class ForestMethod<T> implements VariableScope {
         if (renderedContentType == null || renderedContentType.equalsIgnoreCase(ContentType.APPLICATION_X_WWW_FORM_URLENCODED)) {
             for (int i = 0; i < dataTemplateArray.length; i++) {
                 MappingTemplate dataTemplate = dataTemplateArray[i];
-                String data = dataTemplate.render(context, args);
+                String data = dataTemplate.render(request);
                 String[] paramArray = data.split("&");
                 for (int j = 0; j < paramArray.length; j++) {
                     String dataParam = paramArray[j];
@@ -1249,7 +1249,7 @@ public class ForestMethod<T> implements VariableScope {
         } else {
             for (int i = 0; i < dataTemplateArray.length; i++) {
                 MappingTemplate dataTemplate = dataTemplateArray[i];
-                String data = dataTemplate.render(context, args);
+                String data = dataTemplate.render(request);
                 request.addBody(data);
             }
         }
@@ -1257,7 +1257,7 @@ public class ForestMethod<T> implements VariableScope {
 
         for (int i = 0; i < headerTemplateArray.length; i++) {
             MappingTemplate headerTemplate = headerTemplateArray[i];
-            String header = headerTemplate.render(context, args);
+            String header = headerTemplate.render(request);
             String[] headNameValue = header.split(":", 2);
             if (headNameValue.length > 0) {
                 String name = headNameValue[0].trim();
@@ -1346,7 +1346,7 @@ public class ForestMethod<T> implements VariableScope {
             request.setOnLoadCookie(onLoadCookieCallback);
         }
 
-        String dataType = dataTypeTemplate.render(context, args);
+        String dataType = dataTypeTemplate.render(request);
         if (StringUtils.isEmpty(dataType)) {
             request.setDataType(ForestDataType.TEXT);
         } else {
@@ -1359,7 +1359,7 @@ public class ForestMethod<T> implements VariableScope {
             for (InterceptorAttributes attributes : interceptorAttributesList) {
                 InterceptorAttributes newAttrs = attributes.clone();
                 request.addInterceptorAttributes(newAttrs.getInterceptorClass(), newAttrs);
-                request.getInterceptorAttributes(newAttrs.getInterceptorClass()).render(context, args);
+                request.getInterceptorAttributes(newAttrs.getInterceptorClass()).render(context);
             }
         }
 

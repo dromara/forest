@@ -2,7 +2,9 @@ package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.VariableScope;
+import com.dtflys.forest.config.VariableValueContext;
 import com.dtflys.forest.filter.Filter;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.reflection.ForestMethod;
 
 import java.util.List;
@@ -18,14 +20,14 @@ public class MappingFilterInvoke extends MappingInvoke {
     }
 
     @Override
-    public Object render(VariableScope variableScope, Object[] args) {
-        ForestConfiguration configuration = variableScope.getConfiguration();
+    public Object render(VariableValueContext valueContext) {
+        ForestConfiguration configuration = valueContext.getConfiguration();
         Filter filter = configuration.newFilterInstance(right.getName());
         List<MappingExpr> exprList = getArgList();
         Object[] invokeArgs = new Object[exprList.size()];
         for (int i = 0; i < exprList.size(); i++) {
             MappingExpr expr = exprList.get(i);
-            Object renderedArg = expr.render(variableScope, args);
+            Object renderedArg = expr.render(valueContext);
             invokeArgs[i] = renderedArg;
         }
         if (invokeArgs.length > 0) {

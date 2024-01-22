@@ -1,6 +1,7 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
+import com.dtflys.forest.config.VariableValueContext;
 import com.dtflys.forest.reflection.ForestMethod;
 
 /**
@@ -17,7 +18,7 @@ public class MappingFloat extends MappingExpr {
     }
 
     @Override
-    public Object render(VariableScope variableScope, Object[] args) {
+    public Object render(VariableValueContext valueContext) {
         return number;
     }
 

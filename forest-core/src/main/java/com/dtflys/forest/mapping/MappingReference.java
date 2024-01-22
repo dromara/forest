@@ -1,7 +1,9 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
+import com.dtflys.forest.config.VariableValueContext;
 import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.ForestVariableValue;
 import com.dtflys.forest.utils.StringUtils;
@@ -35,8 +37,8 @@ public class MappingReference extends MappingExpr {
     }
 
     @Override
-    public Object render(VariableScope variableScope, Object[] args) {
-        Object result = variableScope.getVariableValue(name);
+    public Object render(VariableValueContext valueContext) {
+        Object result = valueContext.getVariableValue(name);
         if (result == null) {
             if (nullable) {
                 return null;

@@ -1,7 +1,9 @@
 package com.dtflys.forest.multipart;
 
 import com.dtflys.forest.config.VariableScope;
+import com.dtflys.forest.config.VariableValueContext;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.mapping.ForestRequestContext;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.ForestVariableContext;
 import com.dtflys.forest.reflection.ForestMethod;
@@ -135,11 +137,11 @@ public class ForestMultipartFactory<T> {
             }
             int i = 0;
             for (Object item : dataCollection) {
-                ForestVariableContext scope = new ForestVariableContext(parentScope);
-                scope.setVariableValue("_it", item);
-                scope.setVariableValue("_index", i++);
-                String name = nameTemplate.render(scope, args);
-                String fileName = fileNameTemplate.render(scope, args);
+                ForestRequestContext context = new ForestRequestContext(parentScope, args);
+                context.setVariableValue("_it", item);
+                context.setVariableValue("_index", i++);
+                String name = nameTemplate.render(context);
+                String fileName = fileNameTemplate.render(context);
                 ForestMultipart multipart = create((Class<T>) item.getClass(), name, fileName, (T) item, contentType);
                 multiparts.add(multipart);
             }
@@ -150,21 +152,21 @@ public class ForestMultipartFactory<T> {
             }
             Object firstItem = Array.get(data, 0);
             if (byte.class.isAssignableFrom(firstItem.getClass()) || firstItem instanceof Byte) {
-                ForestVariableContext scope = new ForestVariableContext(parentScope);
-                scope.setVariableValue("_it", data);
-                String name = nameTemplate.render(scope, args);
-                String fileName = fileNameTemplate.render(scope, args);
+                ForestRequestContext context = new ForestRequestContext(parentScope, args);
+                context.setVariableValue("_it", data);
+                String name = nameTemplate.render(context);
+                String fileName = fileNameTemplate.render(context);
                 ForestMultipart multipart = create(name, fileName, (T) data, contentType);
                 multiparts.add(multipart);
                 return;
             }
             for (int j = 0; j < len; j++) {
                 Object item = Array.get(data, j);
-                ForestVariableContext scope = new ForestVariableContext(parentScope);
-                scope.setVariableValue("_it", item);
-                scope.setVariableValue("_index", j);
-                String name = nameTemplate.render(scope, args);
-                String fileName = fileNameTemplate.render(scope, args);
+                ForestRequestContext context = new ForestRequestContext(parentScope, args);
+                context.setVariableValue("_it", item);
+                context.setVariableValue("_index", j);
+                String name = nameTemplate.render(context);
+                String fileName = fileNameTemplate.render(context);
                 ForestMultipart multipart = create((Class<T>) item.getClass(), name, fileName, (T) item, contentType);
                 multiparts.add(multipart);
             }
@@ -173,21 +175,20 @@ public class ForestMultipartFactory<T> {
             int i = 0;
             for (Object key : map.keySet()) {
                 Object item = map.get(key);
-                ForestVariableContext scope = new ForestVariableContext(parentScope);
-                scope.setVariableValue("_it", item);
-                scope.setVariableValue("_key", key);
-                scope.setVariableValue("_index", i++);
-                String itemName = nameTemplate.render(scope, args);
-                String fileName = fileNameTemplate.render(scope, args);
+                ForestRequestContext context = new ForestRequestContext(parentScope, args);
+                context.setVariableValue("_it", item);
+                context.setVariableValue("_key", key);
+                context.setVariableValue("_index", i++);
+                String itemName = nameTemplate.render(context);
+                String fileName = fileNameTemplate.render(context);
                 ForestMultipart multipart = create((Class<T>) item.getClass(), itemName, fileName, (T) item, contentType);
                 multiparts.add(multipart);
             }
         } else {
-            final ForestVariableContext scope = new ForestVariableContext(parentScope);
-            scope.setVariableValue("_it", data);
-
-            String name = nameTemplate.render(scope, args);
-            String fileName = fileNameTemplate.render(scope, args);
+            ForestRequestContext context = new ForestRequestContext(parentScope, args);
+            context.setVariableValue("_it", data);
+            String name = nameTemplate.render(context);
+            String fileName = fileNameTemplate.render(context);
             ForestMultipart multipart = create(name, fileName, (T) data, contentType);
             multiparts.add(multipart);
         }

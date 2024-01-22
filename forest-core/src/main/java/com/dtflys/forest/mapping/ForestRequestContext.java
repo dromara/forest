@@ -1,9 +1,11 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
+import com.dtflys.forest.config.VariableValueContext;
+import com.dtflys.forest.http.ForestQueryMap;
 import com.dtflys.forest.reflection.ForestVariableValue;
 
-public class ForestRequestContext extends ForestVariableContext {
+public class ForestRequestContext extends ForestVariableContext implements VariableValueContext {
 
     private final Object[] arguments;
 
@@ -12,15 +14,22 @@ public class ForestRequestContext extends ForestVariableContext {
         this.arguments = arguments;
     }
 
+    @Override
     public Object[] getArguments() {
         return arguments;
     }
 
+    @Override
     public Object getArgument(int index) {
         if (arguments == null) {
             return null;
         }
         return arguments[index];
+    }
+
+    @Override
+    public ForestQueryMap getQuery() {
+        return null;
     }
 
     @Override
@@ -36,6 +45,5 @@ public class ForestRequestContext extends ForestVariableContext {
             return ((ForestVariableValue) value).getValue(this);
         }
         return value;
-
     }
 }

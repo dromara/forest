@@ -2,10 +2,12 @@ package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.ForestProperties;
 import com.dtflys.forest.config.VariableScope;
+import com.dtflys.forest.config.VariableValueContext;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
 import com.dtflys.forest.http.ForestQueryMap;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.SimpleQueryParameter;
 import com.dtflys.forest.http.ForestURL;
 import com.dtflys.forest.http.ForestURLBuilder;
@@ -22,10 +24,6 @@ public class MappingURLTemplate extends MappingTemplate {
         super(annotationType, attributeName, template, properties);
     }
 
-    @Override
-    public String render(VariableScope variableScope, Object[] args) {
-        return super.render(variableScope, args);
-    }
 
     public static MappingURLTemplate fromAnnotation(
             final VariableScope variableScope,
@@ -42,7 +40,12 @@ public class MappingURLTemplate extends MappingTemplate {
         return this;
     }
 
-    public ForestURL render(VariableScope variableScope, Object[] args, ForestQueryMap queries) {
+    @Override
+    public String render(VariableValueContext valueContext) {
+        return renderURL(valueContext).toURLString();
+    }
+
+    public ForestURL renderURL(VariableValueContext valueContext) {
         String scheme = null;
         StringBuilder userInfo = null;
         String host = null;
@@ -54,14 +57,15 @@ public class MappingURLTemplate extends MappingTemplate {
         boolean renderedQuery = false;
         boolean nextIsPort = false;
         boolean renderedPath = false;
+        final ForestQueryMap queries = valueContext.getQuery();
         try {
-            final ForestJsonConverter jsonConverter = variableScope.getConfiguration().getJsonConverter();
+            final ForestJsonConverter jsonConverter = valueContext.getConfiguration().getJsonConverter();
             final int len = exprList.size();
             StringBuilder builder = new StringBuilder();
             SimpleQueryParameter lastQuery  = null;
             for (int i = 0; i < len; i++) {
                 final MappingExpr expr = exprList.get(i);
-                String exprVal = String.valueOf(renderExpression(variableScope, jsonConverter, expr, args));
+                String exprVal = String.valueOf(renderExpression(valueContext, expr));
                 builder.append(exprVal);
                 if (renderedQuery) {
                     // 已渲染到查询参数
@@ -141,7 +145,7 @@ public class MappingURLTemplate extends MappingTemplate {
                                 pathCharIndex++;
                                 ch = baseUrlChars[pathCharIndex];
                                 if (ch != '/') {
-                                    throw new ForestRuntimeException("URI '" + super.render(variableScope, args) + "' is invalid.");
+                                    throw new ForestRuntimeException("URI '" + super.render(valueContext) + "' is invalid.");
                                 }
                                 pathCharIndex++;
                                 if (pathCharIndex + 1 < baseLen && baseUrlChars[pathCharIndex + 1] == '/') {
@@ -305,7 +309,7 @@ public class MappingURLTemplate extends MappingTemplate {
                     .setRef(ref)
                     .build();
         } catch (ForestVariableUndefinedException ex) {
-            throw new ForestVariableUndefinedException(annotationType, attributeName, variableScope, ex.getVariableName(), template);
+            throw new ForestVariableUndefinedException(annotationType, attributeName, valueContext, ex.getVariableName(), template);
         }
     }
 

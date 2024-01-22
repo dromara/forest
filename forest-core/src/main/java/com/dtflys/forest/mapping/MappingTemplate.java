@@ -4,8 +4,10 @@ package com.dtflys.forest.mapping;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.ForestProperties;
 import com.dtflys.forest.config.VariableScope;
+import com.dtflys.forest.config.VariableValueContext;
 import com.dtflys.forest.exceptions.ForestTemplateSyntaxError;
 import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.ForestCache;
 import com.dtflys.forest.utils.StringUtils;
@@ -455,10 +457,11 @@ public class MappingTemplate {
         return null;
     }
 
-    protected String renderExpression(VariableScope variableScope, ForestJsonConverter jsonConverter, MappingExpr expr, Object[] args) {
+    protected String renderExpression(VariableValueContext valueContext, MappingExpr expr) {
         Object val = null;
         MappingParameter param = null;
-        final ForestMethod method = variableScope.getForestMethod();
+        final ForestJsonConverter jsonConverter = valueContext.getConfiguration().getJsonConverter();
+        final ForestMethod method = valueContext.getForestMethod();
         final MappingParameter[] parameters = method != null ? method.getParameters() : null;
         if (expr instanceof MappingString) {
             return ((MappingString) expr).getText();
@@ -466,7 +469,7 @@ public class MappingTemplate {
             try {
                 Integer index = ((MappingIndex) expr).getIndex();
                 param = parameters[index];
-                val = args[index];
+                val = valueContext.getArgument(index);
             } catch (Exception ex) {
             }
             if (val != null) {
@@ -477,7 +480,7 @@ public class MappingTemplate {
                 return String.valueOf(val);
             }
         } else {
-            val = expr.render(variableScope, args);
+            val = expr.render(valueContext);
             if (val != null) {
                 val = getParameterValue(jsonConverter, val);
                 if (param != null && param.isUrlEncode()) {
@@ -490,23 +493,24 @@ public class MappingTemplate {
     }
 
 
-    public String render(VariableScope variableScope, Object[] args) {
+    public String render(VariableValueContext valueContext) {
         try {
-            ForestJsonConverter jsonConverter = variableScope.getConfiguration().getJsonConverter();
             int len = exprList.size();
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i < len; i++) {
                 MappingExpr expr = exprList.get(i);
-                String val = renderExpression(variableScope, jsonConverter, expr, args);
+                String val = renderExpression(valueContext, expr);
                 if (val != null) {
                     builder.append(val);
                 }
             }
             return builder.toString();
         } catch (ForestVariableUndefinedException ex) {
-            throw new ForestVariableUndefinedException(annotationType, attributeName, variableScope, ex.getVariableName(), template);
+            throw new ForestVariableUndefinedException(annotationType, attributeName, valueContext, ex.getVariableName(), template);
         }
     }
+
+
 
     public static String getParameterValue(ForestJsonConverter jsonConverter, Object obj) {
         if (obj == null) {

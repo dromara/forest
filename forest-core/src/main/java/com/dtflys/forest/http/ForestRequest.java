@@ -41,6 +41,7 @@ import com.dtflys.forest.callback.RetryWhen;
 import com.dtflys.forest.callback.SuccessWhen;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.VariableScope;
+import com.dtflys.forest.config.VariableValueContext;
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.ForestEncoder;
@@ -121,7 +122,7 @@ import static com.dtflys.forest.mapping.MappingParameter.TARGET_QUERY;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-03-24
  */
-public class ForestRequest<T> implements HasURL, HasHeaders, VariableScope {
+public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContext {
 
     private final static Object[] EMPTY_RENDER_ARGS = new Object[0];
 
@@ -625,7 +626,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableScope {
             this.query.clearQueriesFromUrl();
         }
 
-        final ForestURL newUrl = urlTemplate.render(context, args, this.query);
+        final ForestURL newUrl = urlTemplate.renderURL(this);
         if (this.url == null) {
             this.url = newUrl;
         } else {
@@ -1355,6 +1356,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableScope {
      *
      * @return Query参数表
      */
+    @Override
     public ForestQueryMap getQuery() {
         return query;
     }
@@ -3893,7 +3895,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableScope {
             downloadFileMap.put("dir", dir);
             downloadFileMap.put("filename", filename != null ? filename : "");
             InterceptorAttributes attributes = new InterceptorAttributes(DownloadLifeCycle.class, downloadFileMap);
-            attributes.render(context, new Object[0]);
+            attributes.render(this);
             this.addInterceptorAttributes(DownloadLifeCycle.class, attributes);
         }
         return this;
