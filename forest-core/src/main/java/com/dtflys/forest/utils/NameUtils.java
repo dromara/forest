@@ -1,5 +1,6 @@
 package com.dtflys.forest.utils;
 
+import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -100,6 +101,30 @@ public class NameUtils {
             }
             return builder.toString();
         }
+    }
+
+    public static String methodAbsoluteName(final Method method) {
+        final StringBuilder builder = new StringBuilder();
+        final String typeName = method.getDeclaringClass().getTypeName();
+        final String methodName = method.getName();
+        final Class<?>[] paramTypes = method.getParameterTypes();
+        builder.append("method: ")
+                .append(typeName)
+                .append('.')
+                .append(methodName)
+                .append('(');
+        for (int i = 0; i < paramTypes.length; i++) {
+            final Class<?> pType = paramTypes[i];
+            builder.append(pType.getName());
+            if (pType.isArray()) {
+                builder.append("[]");
+            }
+            if (i < paramTypes.length - 1) {
+                builder.append(", ");
+            }
+        }
+        builder.append(")");
+        return builder.toString();
     }
 
 }

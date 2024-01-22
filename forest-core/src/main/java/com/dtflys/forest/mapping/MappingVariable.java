@@ -1,6 +1,7 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.ForestVariableValue;
 
@@ -27,6 +28,10 @@ public class MappingVariable extends MappingParameter implements ForestVariableV
 
     @Override
     public Object getValue(VariableScope variableScope) {
+        if (variableScope instanceof ForestRequest) {
+            ForestRequest request = (ForestRequest) variableScope;
+            return request.getArgument(index);
+        }
         if (variableScope instanceof ForestRequestContext) {
             ForestRequestContext requestContext = (ForestRequestContext) variableScope;
             return requestContext.getArgument(index);

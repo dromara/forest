@@ -1,7 +1,6 @@
 package com.dtflys.forest.proxy;
 
 import com.dtflys.forest.annotation.BaseLifeCycle;
-import com.dtflys.forest.annotation.BaseURL;
 import com.dtflys.forest.annotation.MethodLifeCycle;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.VariableScope;
@@ -9,7 +8,6 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.interceptor.InterceptorFactory;
 import com.dtflys.forest.lifecycles.BaseAnnotationLifeCycle;
 import com.dtflys.forest.logging.LogConfiguration;
-import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.ForestVariableValue;
 import com.dtflys.forest.reflection.MetaRequest;
@@ -131,27 +129,17 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
             if (parentAnnType != null && !annType.equals(parentAnnType)) {
                 processBaseAnnotation(annType, subAnnotations);
             }
-            if (annotation instanceof BaseURL) {
-                BaseURL baseURLAnn = (BaseURL) annotation;
-                String value = baseURLAnn.value();
-                if (value == null || value.trim().length() == 0) {
-                    continue;
-                }
-                String baseURL = value.trim();
-                baseMetaRequest.setUrl(baseURL);
-            } else {
-                BaseLifeCycle baseLifeCycle = annotation.annotationType().getAnnotation(BaseLifeCycle.class);
-                MethodLifeCycle methodLifeCycle = annotation.annotationType().getAnnotation(MethodLifeCycle.class);
-                if (baseLifeCycle != null || methodLifeCycle != null) {
-                    if (baseLifeCycle != null) {
-                        Class<? extends BaseAnnotationLifeCycle> interceptorClass = baseLifeCycle.value();
-                        if (interceptorClass != null) {
-                            BaseAnnotationLifeCycle baseInterceptor = interceptorFactory.getInterceptor(interceptorClass);
-                            baseInterceptor.onProxyHandlerInitialized(this, annotation);
-                        }
+            BaseLifeCycle baseLifeCycle = annotation.annotationType().getAnnotation(BaseLifeCycle.class);
+            MethodLifeCycle methodLifeCycle = annotation.annotationType().getAnnotation(MethodLifeCycle.class);
+            if (baseLifeCycle != null || methodLifeCycle != null) {
+                if (baseLifeCycle != null) {
+                    Class<? extends BaseAnnotationLifeCycle> interceptorClass = baseLifeCycle.value();
+                    if (interceptorClass != null) {
+                        BaseAnnotationLifeCycle baseInterceptor = interceptorFactory.getInterceptor(interceptorClass);
+                        baseInterceptor.onProxyHandlerInitialized(this, annotation);
                     }
-                    baseAnnotations.add(annotation);
                 }
+                baseAnnotations.add(annotation);
             }
         }
     }
@@ -254,8 +242,13 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
     }
 
     @Override
-    public Object getVariableValue(String name) {
+    public Object getVariableValue(String name, VariableScope variableScope) {
         return configuration.getVariableValue(name);
+    }
+
+    @Override
+    public Object getVariableValue(String name) {
+        return getVariableValue(name, this);
     }
 
     public List<Annotation> getBaseAnnotations() {

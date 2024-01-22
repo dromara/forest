@@ -47,25 +47,25 @@ public class AddressLifeCycle implements MethodAnnotationLifeCycle<Address> {
 
         // 判断是否有设置 basePath
         if (StringUtils.isNotBlank(basePathStr)) {
-            final MappingTemplate basePathTemplate = request.getMethod().makeTemplate(Address.class, "basePath", basePathStr.trim());
+            final MappingTemplate basePathTemplate = MappingTemplate.fromAnnotation(method, Address.class, "basePath", basePathStr.trim());
             basePath = basePathTemplate.render(request, args);
         }
 
         // 判断是否有设置 scheme
         if (StringUtils.isNotBlank(schemeStr)) {
-            final MappingTemplate schemeTemplate = request.getMethod().makeTemplate(Address.class, "schema", schemeStr.trim());
+            final MappingTemplate schemeTemplate = MappingTemplate.fromAnnotation(method, Address.class, "schema", schemeStr.trim());
             scheme = schemeTemplate.render(request, args);
         }
 
         // 判断是否有设置 host
         if (StringUtils.isNotBlank(hostStr)) {
-            final MappingTemplate hostTemplate = request.getMethod().makeTemplate(Address.class, "host", hostStr.trim());
+            final MappingTemplate hostTemplate = MappingTemplate.fromAnnotation(method, Address.class, "host", hostStr.trim());
             host = hostTemplate.render(request, args);
         }
 
         // 判断是否有设置 port
         if (StringUtils.isNotBlank(portStr)) {
-            final MappingTemplate portTemplate = request.getMethod().makeTemplate(Address.class, "port", portStr.trim());
+            final MappingTemplate portTemplate = MappingTemplate.fromAnnotation(method, Address.class, "port", portStr.trim());
             final String portRendered = portTemplate.render(request, args);
             if (!Character.isDigit(portRendered.charAt(0))) {
                 throw new ForestRuntimeException("[Forest] property 'port' of annotation @Address must be a number!");

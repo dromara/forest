@@ -13,6 +13,7 @@ import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestProxyType;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponseFactory;
+import com.dtflys.forest.pool.ForestRequestPool;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
@@ -115,8 +116,9 @@ public class HttpclientExecutor extends AbstractHttpExecutor {
                 hasProxyAuthenticator = true;
             }
         }
+        final ForestRequestPool pool = request.pool();
         try {
-            request.pool().awaitRequest(request);
+            pool.awaitRequest(request);
             requestSender.sendRequest(
                     request,
                     this,
@@ -135,7 +137,7 @@ public class HttpclientExecutor extends AbstractHttpExecutor {
             if (hasProxyAuthenticator) {
                 SocksAuthenticator.getInstance().removePasswordAuthenticator();
             }
-            request.pool().finish(request);
+            pool.finish(request);
         }
     }
 

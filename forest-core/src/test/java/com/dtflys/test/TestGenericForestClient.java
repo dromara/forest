@@ -2024,9 +2024,9 @@ public class TestGenericForestClient extends BaseClientTest {
                 .addInterceptor(TestInterceptor.class)
                 .getInterceptorChain();
         assertThat(interceptorChain).isNotNull();
-        assertThat(interceptorChain.getInterceptorSize()).isEqualTo(2);
-        assertFalse(interceptorChain.beforeExecute(null).isProceed());
-        assertTrue(inter3Before.get());
+        assertThat(interceptorChain.getInterceptorSize()).isEqualTo(1);
+        assertThat(interceptorChain.beforeExecute(null).isProceed()).isFalse();
+        assertThat(inter3Before.get()).isTrue();
     }
 
     static final AtomicBoolean inter3Before = new AtomicBoolean(false);
@@ -2099,8 +2099,8 @@ public class TestGenericForestClient extends BaseClientTest {
         AtomicReference<ForestProgress> atomicProgress = new AtomicReference<>(null);
         String dir = Thread.currentThread().getContextClassLoader().getResource("").getPath() + "TestDownload";
         ForestRequest<?> request = Forest.get("http://localhost:" + server.getPort())
-                .setDownloadFile(dir, "")
-                .setOnProgress(progress -> {
+                .downloadFile(dir, "")
+                .onProgress(progress -> {
                     System.out.println("------------------------------------------");
                     System.out.println("total bytes: " + progress.getTotalBytes());
                     System.out.println("current bytes: " + progress.getCurrentBytes());
@@ -2110,8 +2110,7 @@ public class TestGenericForestClient extends BaseClientTest {
                     }
                 });
 
-        ForestResponse<File> response = request.as(new TypeReference<ForestResponse<File>>() {
-        });
+        ForestResponse<File> response = request.as(new TypeReference<ForestResponse<File>>() {});
 
         Assertions.assertThat(response)
                 .isNotNull()

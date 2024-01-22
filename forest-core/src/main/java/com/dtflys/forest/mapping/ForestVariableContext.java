@@ -16,11 +16,11 @@ import java.util.Map;
  */
 public class ForestVariableContext implements VariableScope {
 
-    private final VariableScope parent;
+    protected final VariableScope parent;
 
-    private final ForestConfiguration configuration;
+    protected final ForestConfiguration configuration;
 
-    private final Map<String, ForestVariableValue> variables = new HashMap<>();
+    protected final Map<String, ForestVariableValue> variables = new HashMap<>();
 
     public ForestVariableContext(VariableScope parent, ForestConfiguration configuration) {
         this.parent = parent;
@@ -47,21 +47,33 @@ public class ForestVariableContext implements VariableScope {
     }
 
     @Override
-    public Object getVariableValue(String name) {
+    public Object getVariableValue(String name, VariableScope variableScope) {
         Object value = variables.get(name);
-        if (value == null) {
-            return parent.getVariableValue(name);
+        if (value == null && parent != null) {
+            value = parent.getVariableValue(name, variableScope);
+        }
+        if (value instanceof ForestVariableValue) {
+            return ((ForestVariableValue) value).getValue(variableScope);
         }
         return value;
     }
 
+    @Override
+    public Object getVariableValue(String name) {
+        return getVariableValue(name, this);
+    }
+
     public void setVariableValue(String name, Object value) {
-        variables.put(name, new BasicVariableValue(value));
+        variables.put(name, ForestVariableValue.fromObject(value));
     }
 
     @Override
     public ForestVariableValue getVariable(String name) {
-        return variables.get(name);
+        final ForestVariableValue variableValue = variables.get(name);
+        if (variableValue == null) {
+            return parent.getVariable(name);
+        }
+        return variableValue;
     }
 
     @Override

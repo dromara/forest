@@ -1,6 +1,7 @@
 package com.dtflys.test.proxy;
 
-import com.dtflys.forest.annotation.BaseURL;
+import com.dtflys.forest.annotation.Address;
+import com.dtflys.forest.annotation.BaseRequest;
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.reflection.MetaRequest;
@@ -11,6 +12,7 @@ import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -29,17 +31,17 @@ public class TestInterfaceProxyHandler {
         assertEquals(getClientProxyFactory, interfaceProxyHandler.getProxyFactory());
     }
 
-    @BaseURL("http://localhost")
+    @BaseRequest(baseURL = "http://localhost")
     interface LocalhostBaseURLClient {
     }
 
 
-    @BaseURL("localhost")
+    @BaseRequest(baseURL = "localhost")
     interface NonProtocolBaseURLClient {
     }
 
 
-    @BaseURL("")
+    @BaseRequest(baseURL = "")
     interface EmptyBaseURLClient {
     }
 
@@ -60,8 +62,7 @@ public class TestInterfaceProxyHandler {
         InterfaceProxyHandler<LocalhostBaseURLClient> interfaceProxyHandler =
                 new InterfaceProxyHandler(configuration, getClientProxyFactory, LocalhostBaseURLClient.class);
         MetaRequest metaRequest = interfaceProxyHandler.getBaseMetaRequest();
-        assertEquals("http://localhost", metaRequest.getUrl());
-
+        assertThat(metaRequest.getUrl()).isEqualTo("http://localhost");
     }
 
     @Test
@@ -70,7 +71,7 @@ public class TestInterfaceProxyHandler {
         InterfaceProxyHandler<NonProtocolBaseURLClient> interfaceProxyHandler =
                 new InterfaceProxyHandler(configuration, getClientProxyFactory, NonProtocolBaseURLClient.class);
         MetaRequest metaRequest = interfaceProxyHandler.getBaseMetaRequest();
-        assertEquals("localhost", metaRequest.getUrl());
+        assertThat(metaRequest.getUrl()).isEqualTo("localhost");
     }
 
 

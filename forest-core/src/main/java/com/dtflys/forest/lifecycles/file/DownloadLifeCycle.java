@@ -43,17 +43,15 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
         final Type resultType = method.getResultType();
         addAttribute(request, "__resultType", resultType);
-        request.setDownloadFile(true);
+        request.downloadFile(true);
     }
 
 
     @Override
     public ForestJointPoint beforeExecute(ForestRequest request) {
-        if (request.getMethod().getMethod().getDeclaringClass() == ForestGenericClient.class) {
-            final Type resultType = getResultType(request.getLifeCycleHandler().getResultType());
-            addAttribute(request, "__resultType", resultType);
-            request.setDownloadFile(true);
-        }
+        final Type resultType = getResultType(request.getLifeCycleHandler().getResultType());
+        addAttribute(request, "__resultType", resultType);
+        request.downloadFile(true);
         return proceed();
     }
 

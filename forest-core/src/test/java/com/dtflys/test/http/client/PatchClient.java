@@ -1,7 +1,6 @@
 package com.dtflys.test.http.client;
 
 import com.dtflys.forest.annotation.*;
-import com.dtflys.forest.annotation.DataParam;
 import com.dtflys.forest.annotation.Request;
 
 /**
@@ -52,7 +51,7 @@ public interface PatchClient {
             type = "patch",
             headers = {"Accept:text/plain"}
     )
-    String annParamPatch(@DataParam("username") String username, @DataParam("password") String password);
+    String annParamPatch(@Body("username") String username, @Body("password") String password);
 
 
 

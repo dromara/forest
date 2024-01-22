@@ -12,6 +12,8 @@ public interface VariableScope {
 
     boolean isVariableDefined(String name);
 
+    Object getVariableValue(String name, VariableScope variableScope);
+
     Object getVariableValue(String name);
 
     ForestVariableValue getVariable(String name);
@@ -19,4 +21,6 @@ public interface VariableScope {
     ForestMethod getForestMethod();
 
     ForestConfiguration getConfiguration();
+
+
 }

@@ -4,10 +4,8 @@ import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.test.http.client.BaseReqClient;
 import com.dtflys.test.http.client.BaseURLClient;
-import com.dtflys.test.http.client.BaseURLVarClient;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.BeforeClass;
@@ -40,8 +38,6 @@ public class TestBaseReqClient extends BaseClientTest {
 
     private final BaseURLClient baseURLClient;
 
-    private final BaseURLVarClient baseURLVarClient;
-
     @Override
     public void afterRequests() {
     }
@@ -59,7 +55,6 @@ public class TestBaseReqClient extends BaseClientTest {
         configuration.setVariableValue("baseURL", "http://localhost:" + server.getPort());
         baseReqClient = configuration.createInstance(BaseReqClient.class);
         baseURLClient = configuration.createInstance(BaseURLClient.class);
-        baseURLVarClient = configuration.createInstance(BaseURLVarClient.class);
     }
 
 
@@ -160,18 +155,6 @@ public class TestBaseReqClient extends BaseClientTest {
                 .assertPathEquals("/");
     }
 
-
-    @Test
-    public void testBaseURLVar() {
-        server.enqueue(new MockResponse().setBody(EXPECTED));
-        assertThat(baseURLVarClient.simpleGet())
-                .isNotNull()
-                .isEqualTo(EXPECTED);
-        mockRequest(server)
-                .assertMethodEquals("GET")
-                .assertPathEquals("/hello/user")
-                .assertHeaderEquals("Accept", "text/plain");
-    }
 
     @Test
     public void testBaidu() {

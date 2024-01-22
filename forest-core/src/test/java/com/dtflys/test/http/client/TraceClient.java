@@ -1,6 +1,6 @@
 package com.dtflys.test.http.client;
 
-import com.dtflys.forest.annotation.DataParam;
+import com.dtflys.forest.annotation.Query;
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.annotation.Trace;
 import com.dtflys.forest.annotation.TraceRequest;
@@ -45,7 +45,7 @@ public interface TraceClient {
             type = "trace",
             headers = {"Accept:text/plain"}
     )
-    String annParamTrace(@DataParam("username") String username);
+    String annParamTrace(@Query("username") String username);
 
 
 }

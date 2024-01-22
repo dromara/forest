@@ -16,15 +16,18 @@ public class MappingReference extends MappingExpr {
 
     private String name;
 
+    private boolean nullable;
+
     private final static Set<String> ITERATE_VARS = new HashSet<>();
     static {
         ITERATE_VARS.add("_index");
         ITERATE_VARS.add("_key");
     }
 
-    public MappingReference(VariableScope variableScope, String name) {
+    public MappingReference(String name, boolean nullable) {
         super(Token.REF);
         this.name = name;
+        this.nullable = nullable;
     }
 
     public String getName() {
@@ -33,17 +36,14 @@ public class MappingReference extends MappingExpr {
 
     @Override
     public Object render(VariableScope variableScope, Object[] args) {
-        ForestVariableValue variable = variableScope.getVariable(name);
-        if (variable instanceof MappingVariable) {
-            MappingVariable mappingVariable = (MappingVariable) variable;
-            return args[mappingVariable.getIndex()];
-        } else if (variable != null) {
-            return variable.getValue(variableScope);
+        Object result = variableScope.getVariableValue(name);
+        if (result == null) {
+            if (nullable) {
+                return null;
+            }
+            throw new ForestVariableUndefinedException(getName());
         }
-        if (!variableScope.isVariableDefined(name)) {
-            throw new ForestVariableUndefinedException(name);
-        }
-        return variableScope.getVariableValue(name);
+        return result;
     }
 
     @Override

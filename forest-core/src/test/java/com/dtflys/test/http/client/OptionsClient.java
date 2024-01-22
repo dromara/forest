@@ -44,7 +44,7 @@ public interface OptionsClient {
             type = "options",
             headers = {"Accept:text/plain"}
     )
-    String annParamOptions(@DataParam("username") String username);
+    String annParamOptions(@Query("username") String username);
 
 
 }

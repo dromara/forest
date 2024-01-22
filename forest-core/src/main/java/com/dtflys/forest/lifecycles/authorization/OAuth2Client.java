@@ -1,9 +1,9 @@
 package com.dtflys.forest.lifecycles.authorization;
 
 import com.dtflys.forest.annotation.Body;
-import com.dtflys.forest.annotation.DataVariable;
 import com.dtflys.forest.annotation.PostRequest;
 import com.dtflys.forest.annotation.Query;
+import com.dtflys.forest.annotation.Var;
 import com.dtflys.forest.http.ForestResponse;
 
 import java.util.Map;
@@ -24,7 +24,7 @@ public interface OAuth2Client {
      * @return 返回json信息 {@link OAuth2Token}类实例
      */
     @PostRequest(url = "${tokenUri}")
-    ForestResponse<String> token(@DataVariable("tokenUri") String tokenUri,
+    ForestResponse<String> token(@Var("tokenUri") String tokenUri,
                  @Query Map<String, Object> query,
                  @Body Map<String, Object> body);
 }

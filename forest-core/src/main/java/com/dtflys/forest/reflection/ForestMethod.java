@@ -122,7 +122,6 @@ public class ForestMethod<T> implements VariableScope {
     private final List<MappingParameter> namedParameters = new ArrayList<>();
     private final List<ForestMultipartFactory> multipartFactories = new ArrayList<>();
     private final Map<String, ForestVariableValue> variables = new ConcurrentHashMap<>();
-    private final ForestCache<String, MappingTemplate> templateCache = new ForestCache<>(128);
     private MappingParameter onSuccessParameter = null;
     private MappingParameter onErrorParameter = null;
     private MappingParameter onRedirectionParameter = null;
@@ -182,49 +181,47 @@ public class ForestMethod<T> implements VariableScope {
     }
 
     @Override
+    public Object getVariableValue(String name, VariableScope variableScope) {
+        ForestVariableValue value = variables.get(name);
+        if (value == null) {
+            return configuration.getVariableValue(name, variableScope);
+        }
+        if (value instanceof ForestVariableValue) {
+            return value.getValue(variableScope);
+        }
+        return value;
+    }
+
+    @Override
     public Object getVariableValue(String name) {
-        return configuration.getVariableValue(name);
+        return getVariableValue(name, this);
     }
 
 
-    public MappingTemplate makeTemplate(MappingParameter parameter) {
+    private MappingTemplate makeTemplate(MappingParameter parameter) {
         return getOrCreateTemplate(null, null, parameter.getName());
-//        return new MappingTemplate(null, null, this, parameter.getName(), this, configuration.getProperties(), forestParameters);
     }
 
 
-    public MappingTemplate makeTemplate(
+    private MappingTemplate makeTemplate(
             final Class<? extends Annotation> annotationType,
             final String attributeName,
             final String text) {
         return getOrCreateTemplate(annotationType, attributeName, text);
-//        return new MappingTemplate(annotationType, attributeName, this, text, this, configuration.getProperties(), forestParameters);
     }
 
-    public MappingURLTemplate makeURLTemplate(
+    private MappingURLTemplate makeURLTemplate(
             final Class<? extends Annotation> annotationType,
             final String attributeName,
             final String text) {
-        return new MappingURLTemplate(
-                annotationType,
-                attributeName,
-                text,
-                configuration.getProperties(),
-                forestParameters);
+        return MappingURLTemplate.fromAnnotation(this, annotationType, attributeName, text);
     }
 
     private MappingTemplate getOrCreateTemplate(
             final Class<? extends Annotation> annotationType,
             final String attributeName,
             final String text) {
-        final String key = (annotationType != null ? annotationType.getName() : "") + "@" + (attributeName != null ? attributeName : "") + "@" + text;
-        return templateCache.get(key, k -> new MappingTemplate(
-                annotationType,
-                attributeName,
-                text,
-                configuration.getProperties(),
-                forestParameters)
-        );
+        return MappingTemplate.fromAnnotation(this, annotationType, attributeName, text);
     }
 
 
@@ -843,7 +840,7 @@ public class ForestMethod<T> implements VariableScope {
         ForestRequestType type = type(args);
 
         // createExecutor and initialize http instance
-        final ForestRequestContext context = new ForestRequestContext(configuration.getVariableContext(), args);
+        final ForestRequestContext context = new ForestRequestContext(this, args);
         final ForestRequest<T> request = new ForestRequest<>(configuration, context, this);
         final ForestQueryMap queries = new ForestQueryMap(request);
 
@@ -910,9 +907,10 @@ public class ForestMethod<T> implements VariableScope {
         if (headerArray != null && headerArray.length > 0) {
             baseHeaders = new MappingTemplate[headerArray.length];
             for (int j = 0; j < baseHeaders.length; j++) {
-                MappingTemplate header = new MappingTemplate(
+                MappingTemplate header = MappingTemplate.fromAnnotation(
+                        this,
                         BaseRequest.class, "headers",
-                        headerArray[j], configuration.getProperties(), forestParameters);
+                        headerArray[j]);
                 baseHeaders[j] = header;
             }
         }
@@ -1119,12 +1117,12 @@ public class ForestMethod<T> implements VariableScope {
                             if (!parameter.isJsonParam() && obj instanceof Iterable) {
                                 int index = 0;
                                 MappingTemplate template = makeTemplate(parameter);
-                                VariableScope parentScope = context;
+                                VariableScope parentScope = request;
                                 for (Object subItem : (Iterable) obj) {
                                     ForestVariableContext scope = new ForestVariableContext(parentScope);
                                     scope.setVariableValue("_it", subItem);
                                     scope.setVariableValue("_index", index++);
-                                    String name = template.render(context, args);
+                                    String name = template.render(scope, args);
                                     request.addQuery(
                                             name, subItem,
                                             parameter.isUrlEncode(), parameter.getCharset());
@@ -1140,12 +1138,12 @@ public class ForestMethod<T> implements VariableScope {
                             MappingTemplate template = makeTemplate(parameter);
                             if (obj instanceof Iterable && template.hasIterateVariable()) {
                                 int index = 0;
-                                VariableScope parentScope = context;
+                                VariableScope parentScope = request;
                                 for (Object subItem : (Iterable) obj) {
                                     ForestVariableContext scope = new ForestVariableContext(parentScope);
                                     scope.setVariableValue("_it", subItem);
                                     scope.setVariableValue("_index", index++);
-                                    String name = template.render(context, args);
+                                    String name = template.render(scope, args);
                                     nameValueList.add(
                                             new RequestNameValue(name, subItem, target, parameter.getPartContentType())
                                                     .setDefaultValue(parameter.getDefaultValue()));

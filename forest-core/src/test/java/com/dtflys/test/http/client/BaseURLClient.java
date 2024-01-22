@@ -1,11 +1,7 @@
 package com.dtflys.test.http.client;
 
 import com.dtflys.forest.annotation.Address;
-import com.dtflys.forest.annotation.BaseRequest;
-import com.dtflys.forest.annotation.BaseURL;
 import com.dtflys.forest.annotation.Get;
-import com.dtflys.forest.annotation.Request;
-import com.dtflys.forest.annotation.BaseURL;
 import com.dtflys.forest.annotation.Request;
 
 /**

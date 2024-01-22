@@ -1,11 +1,7 @@
 package com.dtflys.test.http.client;
 
-import com.dtflys.forest.annotation.DataParam;
+import com.dtflys.forest.annotation.Query;
 import com.dtflys.forest.annotation.Request;
-import com.dtflys.forest.annotation.DataParam;
-import com.dtflys.forest.annotation.DataVariable;
-import com.dtflys.forest.annotation.Request;
-import com.dtflys.forest.callback.OnSuccess;
 
 import java.util.Map;
 
@@ -20,6 +16,6 @@ public interface DataClient {
             headers = {"Accept:text/plain"},
             dataType = "json"
     )
-    Map<String, Object> getData(@DataParam("type") String type);
+    Map<String, Object> getData(@Query("type") String type);
 
 }

@@ -81,7 +81,6 @@ public class FixedRequestPool implements ForestRequestPool {
                 notifyAll();
             }
         }
-        // 阻塞同步请求线程，直到当前活动请求大小小于最大请求池大小为止
         while (runningPoolSize.get() >= maxPoolSize ||
                 route.getRequestCount().get() >= maxPoolSizePerRoute) {
             try {
@@ -112,7 +111,8 @@ public class FixedRequestPool implements ForestRequestPool {
             runningPoolSize.set(0);
         }
         // 减少当前活动路由请求数
-        request.route().getRequestCount().decrementAndGet();
+        final ForestRoute route = request.route();
+        route.getRequestCount().decrementAndGet();
         // 通知其他线程
         this.notifyAll();
     }

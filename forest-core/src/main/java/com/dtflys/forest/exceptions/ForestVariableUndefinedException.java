@@ -3,6 +3,7 @@ package com.dtflys.forest.exceptions;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.ForestVariableValue;
+import com.dtflys.forest.utils.NameUtils;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.lang.annotation.Annotation;
@@ -60,25 +61,8 @@ public class ForestVariableUndefinedException extends ForestRuntimeException {
             if (variableScope instanceof ForestMethod) {
                 ForestMethod forestMethod = (ForestMethod) variableScope;
                 Method method = forestMethod.getMethod();
-                String typeName = method.getDeclaringClass().getTypeName();
-                String methodName = method.getName();
-                Class<?>[] paramTypes = method.getParameterTypes();
-                builder.append("method: ")
-                        .append(typeName)
-                        .append('.')
-                        .append(methodName)
-                        .append('(');
-                for (int i = 0; i < paramTypes.length; i++) {
-                    Class<?> pType = paramTypes[i];
-                    builder.append(pType.getName());
-                    if (pType.isArray()) {
-                        builder.append("[]");
-                    }
-                    if (i < paramTypes.length - 1) {
-                        builder.append(", ");
-                    }
-                }
-                builder.append(")\n\t");
+                final String methodName = NameUtils.methodAbsoluteName(method);
+                builder.append(methodName).append("\n\t");
             }
             if (annotationType != null) {
                 String annTypeName = annotationType.getSimpleName();

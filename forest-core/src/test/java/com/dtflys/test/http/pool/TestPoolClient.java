@@ -144,7 +144,10 @@ public class TestPoolClient extends BaseClientTest {
                 try {
                     String host = finalI % 2 == 0 ? "localhost" : "127.0.0.1";
                     ForestRequest request = poolClient.send(host);
-                    request.execute();
+                    ForestResponse response = request.execute();
+                    if (response.getException() != null) {
+                        exceptionRef.set((ForestAbortException) response.getException());
+                    }
                     if (pool.getRunningPoolSize() > pool.getMaxPoolSize()) {
                         hasOut.set(true);
                     } else {
@@ -154,9 +157,6 @@ public class TestPoolClient extends BaseClientTest {
                                 ", max route size: " + pool.getMaxPoolSizePerRoute() +
                                 ", route size: " + request.route().getRequestCount().get());
                     }
-                } catch (ForestAbortException e) {
-                    e.printStackTrace();
-                    exceptionRef.set(e);
                 } finally {
                     latch.countDown();
                 }
@@ -166,7 +166,6 @@ public class TestPoolClient extends BaseClientTest {
         assertThat(hasOut.get()).isFalse();
         assertThat(exceptionRef.get()).isNotNull();
     }
-
 
 
     @Test

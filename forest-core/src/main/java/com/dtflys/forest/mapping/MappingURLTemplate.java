@@ -10,15 +10,16 @@ import com.dtflys.forest.http.SimpleQueryParameter;
 import com.dtflys.forest.http.ForestURL;
 import com.dtflys.forest.http.ForestURLBuilder;
 import com.dtflys.forest.reflection.ForestMethod;
+import com.dtflys.forest.utils.ForestCache;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.lang.annotation.Annotation;
 
 public class MappingURLTemplate extends MappingTemplate {
+    private final static ForestCache<String, MappingURLTemplate> templateCache = new ForestCache<>(512);
 
-
-    public MappingURLTemplate(Class<? extends Annotation> annotationType, String attributeName, String template, ForestProperties properties, MappingParameter[] parameters) {
-        super(annotationType, attributeName, template, properties, parameters);
+    private MappingURLTemplate(Class<? extends Annotation> annotationType, String attributeName, String template, ForestProperties properties) {
+        super(annotationType, attributeName, template, properties);
     }
 
     @Override
@@ -26,10 +27,22 @@ public class MappingURLTemplate extends MappingTemplate {
         return super.render(variableScope, args);
     }
 
+    public static MappingURLTemplate fromAnnotation(
+            final VariableScope variableScope,
+            final Class<? extends Annotation> annotationType,
+            final String attributeName,
+            final String text) {
+        final String key = (annotationType != null ? annotationType.getName() : "") + "@" + (attributeName != null ? attributeName : "") + "@" + text;
+        return templateCache.get(key, k ->
+                new MappingURLTemplate(annotationType, attributeName, text, variableScope.getConfiguration().getProperties()).compile());
+    }
+
+    public MappingURLTemplate compile() {
+        super.compile();
+        return this;
+    }
+
     public ForestURL render(VariableScope variableScope, Object[] args, ForestQueryMap queries) {
-        if (!compiled) {
-            compile(variableScope);
-        }
         String scheme = null;
         StringBuilder userInfo = null;
         String host = null;

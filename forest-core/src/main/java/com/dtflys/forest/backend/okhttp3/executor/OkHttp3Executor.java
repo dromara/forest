@@ -8,6 +8,7 @@ import com.dtflys.forest.backend.okhttp3.body.OkHttp3BodyBuilder;
 import com.dtflys.forest.backend.okhttp3.logging.OkHttp3LogBodyMessage;
 import com.dtflys.forest.backend.url.QueryableURLBuilder;
 import com.dtflys.forest.backend.url.URLBuilder;
+import com.dtflys.forest.exceptions.ForestAbortException;
 import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.http.ForestHeader;
 import com.dtflys.forest.http.ForestRequest;
@@ -203,6 +204,14 @@ public class OkHttp3Executor implements HttpExecutor {
         ForestResponse response = null;
         try {
             pool.awaitRequest(request);
+        } catch (Throwable th) {
+            response = factory.createResponse(request, null, lifeCycleHandler, th, startDate);
+            logResponse(response);
+            lifeCycleHandler.handleSyncWithException(request, response, th);
+            return;
+        }
+
+        try {
             okResponse = call.execute();
         } catch (Throwable e) {
             response = factory.createResponse(request, null, lifeCycleHandler, e, startDate);

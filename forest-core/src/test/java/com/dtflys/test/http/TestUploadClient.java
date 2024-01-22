@@ -116,7 +116,7 @@ public class TestUploadClient extends BaseClientTest {
         assertEquals("test-img.jpg", file.getName());
         assertEquals(path, file.getAbsolutePath().replaceAll("\\\\", "/"));
         assertEquals("test-img.jpg", multipart.getOriginalFileName());
-        Object result = request.execute();
+        Object result = request.asObject();
         assertNotNull(result);
         mockRequest(server)
                 .assertMultipart("file", fileItems -> {
@@ -156,7 +156,7 @@ public class TestUploadClient extends BaseClientTest {
         assertTrue(multipart instanceof FileMultipart);
         assertEquals("file", multipart.getName());
         assertEquals("test-img.jpg", multipart.getOriginalFileName());
-        Map result = (Map) request.execute();
+        Map result = request.asMap();
         assertNotNull(result);
         mockRequest(server)
                 .assertMultipart("file", fileItems -> {
@@ -177,7 +177,7 @@ public class TestUploadClient extends BaseClientTest {
     public void testUploadFile_emptyFile() throws InterruptedException, FileUploadException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         ForestRequest<Map> request = uploadClient.upload((File) null, progress -> {});
-        Map result = (Map) request.execute();
+        Map result = request.asMap();
         assertNotNull(result);
     }
 
@@ -200,7 +200,7 @@ public class TestUploadClient extends BaseClientTest {
         assertTrue(multipart instanceof FileMultipart);
         assertEquals("file", multipart.getName());
         assertEquals("test-img.jpg", multipart.getOriginalFileName());
-        Map result = (Map) request.execute();
+        Map result = request.asMap();
         assertNotNull(result);
         mockRequest(server)
                 .assertMultipart("file", fileItems -> {
@@ -235,7 +235,7 @@ public class TestUploadClient extends BaseClientTest {
         assertTrue(multipart instanceof ByteArrayMultipart);
         assertEquals("file", multipart.getName());
         assertEquals("test-byte-array.jpg", multipart.getOriginalFileName());
-        Map result = (Map) request.execute();
+        Map result = request.asMap();
         assertNotNull(result);
         mockRequest(server)
                 .assertMultipart("file", fileItems -> {
@@ -271,7 +271,7 @@ public class TestUploadClient extends BaseClientTest {
         assertTrue(multipart instanceof InputStreamMultipart);
         assertEquals("file", multipart.getName());
         assertEquals("test-byte-array.jpg", multipart.getOriginalFileName());
-        Map result = (Map) request.execute();
+        Map result = request.asMap();
         assertNotNull(result);
         mockRequest(server)
                 .assertMultipart("file", fileItems -> {
@@ -292,7 +292,7 @@ public class TestUploadClient extends BaseClientTest {
     /** Test Path Collections **/
 
     @Test
-    public void testUploadPathMap() throws InterruptedException, FileUploadException {
+    public void testUploadPathMap() throws FileUploadException {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         String path1 = this.getClass().getResource("/test-img.jpg").getPath();
         String path2 = this.getClass().getResource("/test-img2.jpg").getPath();
@@ -320,7 +320,7 @@ public class TestUploadClient extends BaseClientTest {
             assertEquals("test-map-" + i + ".jpg", multipart.getOriginalFileName());
             i++;
         }
-        Map result = (Map) request.execute();
+        Map result = request.asMap();
         assertNotNull(result);
         mockRequest(server)
                 .assertMultipart("file", fileItems -> {
@@ -377,7 +377,7 @@ public class TestUploadClient extends BaseClientTest {
             assertEquals("test-map-" + (i + 1) + ".jpg", multipart.getOriginalFileName());
             i++;
         }
-        Map result = (Map) request.execute();
+        Map result = request.asMap();
         assertNotNull(result);
 
         mockRequest(server)
@@ -438,7 +438,7 @@ public class TestUploadClient extends BaseClientTest {
             assertEquals("test-img-" + i + ".jpg", multipart.getOriginalFileName());
             i++;
         }
-        Map result = (Map) request.execute();
+        Map result = request.asMap();
         assertNotNull(result);
         mockRequest(server)
                 .assertMultipart("file", fileItems -> {
@@ -500,7 +500,7 @@ public class TestUploadClient extends BaseClientTest {
             assertEquals("test-img-" + i + ".jpg", multipart.getOriginalFileName());
             i++;
         }
-        Map result = (Map) request.execute();
+        Map result = request.asMap();
         assertNotNull(result);
         mockRequest(server)
                 .assertMultipart("file_0", fileItems -> {
@@ -562,7 +562,7 @@ public class TestUploadClient extends BaseClientTest {
             assertEquals("test-img-" + i + ".jpg", multipart.getOriginalFileName());
             i++;
         }
-        Map result = (Map) request.execute();
+        Map result = request.asMap();
         assertNotNull(result);
         mockRequest(server)
                 .assertMultipart("file", fileItems -> {
@@ -622,7 +622,7 @@ public class TestUploadClient extends BaseClientTest {
             assertEquals("test-img-" + i + ".jpg", multipart.getOriginalFileName());
             i++;
         }
-        Map result = (Map) request.execute();
+        Map result = request.asMap();
         assertNotNull(result);
         mockRequest(server)
                 .assertMultipart("file_0", fileItems -> {
@@ -690,7 +690,7 @@ public class TestUploadClient extends BaseClientTest {
             assertEquals(key, multipart.getOriginalFileName());
             i++;
         }
-        Map result = (Map) request.execute();
+        Map result = request.asMap();
         assertNotNull(result);
         mockRequest(server)
                 .assertMultipart("file", fileItems -> {
@@ -753,7 +753,7 @@ public class TestUploadClient extends BaseClientTest {
             assertEquals(key, multipart.getOriginalFileName());
             i++;
         }
-        Map result = (Map) request.execute();
+        Map result = request.asMap();
         assertNotNull(result);
         mockRequest(server)
                 .assertMultipart("file", fileItems -> {
@@ -818,7 +818,7 @@ public class TestUploadClient extends BaseClientTest {
             assertEquals(key, multipart.getOriginalFileName());
             i++;
         }
-        Map result = (Map) request.execute();
+        Map result = request.asMap();
         assertNotNull(result);
         mockRequest(server)
                 .assertMultipart("file", fileItems -> {
@@ -871,7 +871,7 @@ public class TestUploadClient extends BaseClientTest {
         assertTrue(multipart instanceof FileMultipart);
         assertEquals("file", multipart.getName());
         assertEquals("img1.jpg", multipart.getOriginalFileName());
-        Map result = (Map) request.execute();
+        Map result = request.asMap();
         assertNotNull(result);
         mockRequest(server)
                 .assertMultipart("file", multiparts -> {
@@ -922,7 +922,7 @@ public class TestUploadClient extends BaseClientTest {
         assertTrue(multipart instanceof FileMultipart);
         assertEquals("file", multipart.getName());
         assertEquals("img1.jpg", multipart.getOriginalFileName());
-        Map result = (Map) request.execute();
+        Map result = request.asMap();
         assertNotNull(result);
         mockRequest(server)
                 .assertMultipart("file", multiparts -> {
@@ -975,7 +975,7 @@ public class TestUploadClient extends BaseClientTest {
         assertTrue(multipart instanceof FileMultipart);
         assertEquals("file", multipart.getName());
         assertEquals("img1.jpg", multipart.getOriginalFileName());
-        Map result = (Map) request.execute();
+        Map result = request.asMap();
         assertNotNull(result);
         mockRequest(server)
                 .assertMultipart("file", multiparts -> {
@@ -1018,7 +1018,7 @@ public class TestUploadClient extends BaseClientTest {
         assertTrue(multipart instanceof FileMultipart);
         assertEquals("file", multipart.getName());
         assertEquals("img1.jpg", multipart.getOriginalFileName());
-        Map result = (Map) request.execute();
+        Map result = request.asMap();
         assertNotNull(result);
         mockRequest(server)
                 .assertMultipart("file", multiparts -> {
@@ -1088,7 +1088,7 @@ public class TestUploadClient extends BaseClientTest {
         model.setId("111");
         ForestRequest<Map> request = uploadClient.uploadWithModel(file, model);
         request.addBody("key", "value");
-        Map result = (Map) request.execute();
+        Map result = request.asMap();
         assertNotNull(result);
         mockRequest(server)
                 .assertMultipart("id", params -> {

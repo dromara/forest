@@ -1,6 +1,5 @@
 package com.dtflys.forest.lifecycles.parameter;
 
-import com.dtflys.forest.annotation.DataVariable;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.reflection.ForestMethod;

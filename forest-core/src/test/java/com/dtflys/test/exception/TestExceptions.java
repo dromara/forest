@@ -215,7 +215,7 @@ public class TestExceptions {
             exception = th;
         }
         assertThat(exception).isNotNull().isInstanceOf(ForestVariableUndefinedException.class);
-        assertThat(exception.getMessage()).isEqualTo("[Forest] Cannot resolve variable 'filename'\n" +
+        assertThat(exception.getMessage()).isNotNull().isEqualTo("[Forest] Cannot resolve variable 'filename'\n" +
                 "\n" +
                 "\t[From Template]\n" +
                 "\tmethod: com.dtflys.test.exception.TestExceptions$TestClient.fileVar(java.lang.String)\n" +

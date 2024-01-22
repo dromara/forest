@@ -64,7 +64,6 @@ import com.dtflys.forest.lifecycles.file.DownloadLifeCycle;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.RequestLogMessage;
 import com.dtflys.forest.mapping.ForestRequestContext;
-import com.dtflys.forest.mapping.ForestVariableContext;
 import com.dtflys.forest.mapping.MappingURLTemplate;
 import com.dtflys.forest.multipart.ByteArrayMultipart;
 import com.dtflys.forest.multipart.FileMultipart;
@@ -90,7 +89,6 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import java.io.File;
 import java.io.InputStream;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
@@ -538,7 +536,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableScope {
 
     /**
      * 设置请求URL
-     * <p>不同于 {@link ForestRequest#setUrlTemplate(String)} 方法,
+     * <p>不同于 {@link ForestRequest#setUrl(String)} 方法,
      * <p>此方法的输入参数为 {@link ForestURL} 对象实例
      *
      * @param url {@link ForestURL} 对象实例
@@ -651,23 +649,9 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableScope {
             throw new ForestRuntimeException("[Forest] Request url cannot be empty!");
         }
         final String srcUrl = StringUtils.trimBegin(url);
-        MappingURLTemplate template = makeURLTemplate(null, null, srcUrl);
+        MappingURLTemplate template = MappingURLTemplate.fromAnnotation(this, null, null, srcUrl);
         return setUrl(template, args);
     }
-
-
-    private MappingURLTemplate makeURLTemplate(
-            final Class<? extends Annotation> annotationType,
-            final String attributeName,
-            final String text) {
-        return new MappingURLTemplate(
-                annotationType,
-                attributeName,
-                text,
-                configuration.getProperties(),
-                null);
-    }
-
 
     /**
      * 设置请求的url地址
@@ -3888,7 +3872,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableScope {
      * @param downloadFile {@code true}: 下载文件，{@code false}: 不下载文件
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> setDownloadFile(boolean downloadFile) {
+    public ForestRequest<T> downloadFile(boolean downloadFile) {
         isDownloadFile = downloadFile;
         return this;
     }
@@ -3901,7 +3885,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableScope {
      * @param filename 文件名
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> setDownloadFile(String dir, String filename) {
+    public ForestRequest<T> downloadFile(String dir, String filename) {
         if (StringUtils.isNotBlank(dir)) {
             this.addInterceptor(DownloadLifeCycle.class);
             // 当map达到当前最大容量的0.75时会扩容,大小设置为4且塞入两个键值对不会进行扩容
@@ -4081,6 +4065,11 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableScope {
         return context.isVariableDefined(name);
     }
 
+    @Override
+    public Object getVariableValue(String name, VariableScope variableScope) {
+        return context.getVariableValue(name, variableScope);
+    }
+
     /**
      * 获取请求所绑定到的变量值
      *
@@ -4088,7 +4077,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableScope {
      * @return 变量值
      */
     public Object getVariableValue(String name) {
-        return context.getVariableValue(name);
+        return getVariableValue(name, this);
     }
 
     @Override

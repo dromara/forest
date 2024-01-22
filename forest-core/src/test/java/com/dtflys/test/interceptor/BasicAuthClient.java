@@ -1,6 +1,6 @@
 package com.dtflys.test.interceptor;
 
-import com.dtflys.forest.annotation.DataVariable;
+import com.dtflys.forest.annotation.Query;
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.extensions.BasicAuth;
 
@@ -11,6 +11,6 @@ public interface BasicAuthClient {
             headers = {"Accept:text/plain"}
     )
     @BasicAuth(username = "${username}", password = "bar")
-    String send(@DataVariable("username") String username);
+    String send(@Query("username") String username);
 
 }

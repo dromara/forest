@@ -9,4 +9,12 @@ public interface ForestVariableValue {
 
     Object getValue(VariableScope variableScope);
 
+    static ForestVariableValue fromObject(final Object value) {
+        if (value instanceof ForestVariableValue) {
+            return (ForestVariableValue) value;
+        }
+        return new BasicVariableValue(value);
+    }
+
+
 }

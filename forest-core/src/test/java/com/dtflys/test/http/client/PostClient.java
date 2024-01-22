@@ -91,7 +91,7 @@ public interface PostClient {
             headers = {"Accept:text/plain"},
             contentType = "application/x-www-form-urlencoded"
     )
-    String annParamPost(@DataParam("username") String username, @DataParam("password") String password);
+    String annParamPost(@Body("username") String username, @Body("password") String password);
 
 
     @Request(
@@ -135,7 +135,7 @@ public interface PostClient {
             headers = {"Accept:text/plain"},
             contentType = "application/x-www-form-urlencoded"
     )
-    String complexPost2(String param, @DataParam("username") String username, @DataParam("password") String password);
+    String complexPost2(String param, @Body("username") String username, @Body("password") String password);
 
     @Request(
             url = "http://localhost:{port}/complex",
@@ -211,8 +211,8 @@ public interface PostClient {
             contentType = "application/x-www-form-urlencoded"
     )
     String complexPost4(@Query("param") String param,
-                        @DataParam("username") String username,
-                        @DataParam("password") String password);
+                        @Body("username") String username,
+                        @Body("password") String password);
 
     @Request(
             url = "http://localhost:{port}/hello/user",
@@ -262,14 +262,14 @@ public interface PostClient {
             type = "post",
             contentType = "application/json; charset=utf-8"
     )
-    String postJsonWithCnCharacters3(@DataParam("username") String username, @DataParam("password") String password, @DataParam("cn_name") String cnName);
+    String postJsonWithCnCharacters3(@Body("username") String username, @Body("password") String password, @Body("cn_name") String cnName);
 
     @Request(
             url = "http://localhost:{port}/json",
             type = "post",
             headers = {"Content-Type: application/json; charset=utf-8"}
     )
-    String postJsonWithCnCharacters4(@DataParam("username") String username, @DataParam("password") String password, @DataParam("cn_name") String cnName);
+    String postJsonWithCnCharacters4(@Body("username") String username, @Body("password") String password, @Body("cn_name") String cnName);
 
     @Post(
             url = "http://localhost:{port}/json",
@@ -281,7 +281,7 @@ public interface PostClient {
             url = "http://localhost:{port}/json",
             headers = {"Content-Type: application/json; charset=utf-8"}
     )
-    String postJsonWithCnCharacters6(@DataObject JsonTestUser3 user);
+    String postJsonWithCnCharacters6(@Body JsonTestUser3 user);
 
     @Post(
             url = "http://localhost:{port}/json",
@@ -332,7 +332,7 @@ public interface PostClient {
             contentType = "application/json"
     )
     @LogEnabled
-    ForestResponse<String> postJsonWithLog(@DataParam("username") String username, @DataVariable("token") String token);
+    ForestResponse<String> postJsonWithLog(@Body("username") String username, @Var("token") String token);
 
 
     @Post("http://localhost:{port}/json")
@@ -387,7 +387,7 @@ public interface PostClient {
             logEnabled = false
     )
     @LogEnabled
-    String postJsonMapWithLog(@DataObject Map user);
+    String postJsonMapWithLog(@Body Map user);
 
     @Request(
             url = "http://localhost:{port}/json",
@@ -395,14 +395,14 @@ public interface PostClient {
             headers = {"Content-Type: application/json"}
     )
     @LogEnabled(logRequest = false)
-    String postJsonObjectWithoutLog(@DataObject JsonTestUser user);
+    String postJsonObjectWithoutLog(@Body JsonTestUser user);
 
     @Request(
             url = "http://localhost:{port}/json",
             type = "post",
             headers = {"Content-Type: application/json; charset=utf-8"}
     )
-    String postJsonObjListWithDataObjectAnn(@DataObject List<JsonTestList> user);
+    String postJsonObjListWithDataObjectAnn(@Body List<JsonTestList> user);
 
     @Request(
             url = "http://localhost:{port}/json",
@@ -417,7 +417,7 @@ public interface PostClient {
             type = "post",
             headers = {"Content-Type: application/json; charset=utf-8"}
     )
-    String postJsonListInObjWithDataObjectAnn(@DataObject JsonTestList user);
+    String postJsonListInObjWithDataObjectAnn(@Body JsonTestList user);
 
     @Request(
             url = "http://localhost:{port}/json",
@@ -485,14 +485,14 @@ public interface PostClient {
             headers = {"Content-Type: application/json; charset=utf-8"}
     )
     @LogEnabled(logRequest = false, logResponseStatus = false, logResponseContent = true)
-    String postJsonObjectWithLog_content_noStatus(@DataVariable("user") JsonTestUser2 user);
+    String postJsonObjectWithLog_content_noStatus(@Var("user") JsonTestUser2 user);
 
     @Request(
             url = "http://localhost:{port}/json",
             type = "post",
             headers = {"Content-Type: application/json"}
     )
-    String postJsonObjListWithLog_content_noRequest_noStatus(@DataObject JsonTestUser2 user);
+    String postJsonObjListWithLog_content_noRequest_noStatus(@Body JsonTestUser2 user);
 
     @Post(
             url = "http://localhost:{port}/json-date",

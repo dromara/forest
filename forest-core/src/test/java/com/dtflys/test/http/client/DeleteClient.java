@@ -1,7 +1,6 @@
 package com.dtflys.test.http.client;
 
 import com.dtflys.forest.annotation.*;
-import com.dtflys.forest.annotation.DataParam;
 import com.dtflys.forest.annotation.Request;
 
 /**
@@ -49,6 +48,6 @@ public interface DeleteClient {
             type = "delete",
             headers = {"Accept:text/plain"}
     )
-    String annParamDelete(@DataParam("username") String username);
+    String annParamDelete(@Query("username") String username);
 
 }

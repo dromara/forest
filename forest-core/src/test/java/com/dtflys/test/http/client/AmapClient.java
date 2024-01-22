@@ -1,8 +1,6 @@
 package com.dtflys.test.http.client;
 
-import com.dtflys.forest.annotation.DataObject;
-import com.dtflys.forest.annotation.DataParam;
-import com.dtflys.forest.annotation.DataVariable;
+import com.dtflys.forest.annotation.Query;
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.converter.json.ForestJacksonConverter;
 import com.dtflys.forest.http.ForestResponse;
@@ -10,7 +8,6 @@ import com.dtflys.test.model.*;
 import com.dtflys.test.model.Coordinate;
 import com.dtflys.test.model.Result;
 
-import java.math.BigDecimal;
 import java.util.Map;
 
 /**
@@ -25,7 +22,7 @@ public interface AmapClient {
         retryCount = 3,
         dataType = "json"
     )
-    Map getLocation(@DataParam("longitude") String longitude, @DataParam("latitude") String latitude);
+    Map getLocation(@Query("longitude") String longitude, @Query("latitude") String latitude);
 
 
     @Request(
@@ -33,21 +30,21 @@ public interface AmapClient {
         retryCount = 3,
         dataType = "json"
     )
-    Map getLocation(@DataObject Coordinate coordinate);
+    Map getLocation(@Query Coordinate coordinate);
 
     @Request(
             url = "https://ditu.amap.com/service/regeo",
             retryCount = 3,
             dataType = "json"
     )
-    Map getLocation(@DataObject SubCoordinate coordinate);
+    Map getLocation(@Query SubCoordinate coordinate);
 
     @Request(
             url = "https://ditu.amap.com/service/regeo",
             retryCount = 3,
             decoder = ForestJacksonConverter.class
     )
-    Map getLocationWithDecoder(@DataObject SubCoordinate coordinate);
+    Map getLocationWithDecoder(@Query SubCoordinate coordinate);
 
     @Request(
             url = "https://ditu.amap.com/service/regeo",
@@ -55,7 +52,7 @@ public interface AmapClient {
             retryCount = 3,
             decoder = ForestJacksonConverter.class
     )
-    Map getLocationWithDecoder2(@DataObject SubCoordinate coordinate);
+    Map getLocationWithDecoder2(@Query SubCoordinate coordinate);
 
 
     @Request(
@@ -63,14 +60,14 @@ public interface AmapClient {
             dataType = "json",
             retryCount = 3
     )
-    Result<Location> getLocationWithJavaObject(@DataObject Coordinate coordinate);
+    Result<Location> getLocationWithJavaObject(@Query Coordinate coordinate);
 
     @Request(
             url = "https://ditu.amap.com/service/regeo",
             dataType = "json",
             retryCount = 3
     )
-    Result<AmapLocation<AmapCross>> getLocationWithJavaObject2(@DataObject Coordinate coordinate);
+    Result<AmapLocation<AmapCross>> getLocationWithJavaObject2(@Query Coordinate coordinate);
 
 
     @Request(
@@ -78,7 +75,7 @@ public interface AmapClient {
             dataType = "json",
             retryCount = 3
     )
-    ForestResponse<Result<AmapLocation<AmapLocation.AmapCross>>> getLocationWithJavaObject3(@DataObject Coordinate coordinate);
+    ForestResponse<Result<AmapLocation<AmapLocation.AmapCross>>> getLocationWithJavaObject3(@Query Coordinate coordinate);
 
     @Request(
         url = "https://ditu.amap.com/service/regeo",
@@ -89,7 +86,7 @@ public interface AmapClient {
             "latitude=${coord.latitude}"
         }
     )
-    Map getLocationByCoordinate(@DataVariable("coord") Coordinate coordinate);
+    Map getLocationByCoordinate(@Query("coord") Coordinate coordinate);
 
 
 }

@@ -3,8 +3,6 @@ package com.dtflys.test.http.client;
 import com.dtflys.forest.annotation.*;
 import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnSuccess;
-import com.dtflys.forest.annotation.DataParam;
-import com.dtflys.forest.annotation.DataVariable;
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.http.ForestFuture;
 import com.dtflys.forest.http.ForestRequest;
@@ -13,7 +11,6 @@ import com.dtflys.forest.http.Lazy;
 import com.dtflys.test.http.model.JsonTestUser;
 import com.dtflys.test.interceptor.AddQueryInterceptor;
 import com.dtflys.test.interceptor.ErrorInterceptor;
-import com.dtflys.test.model.TestResult;
 import com.dtflys.test.model.TokenResult;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -86,7 +83,7 @@ public interface GetClient {
     String simpleGetMultiQuery2(@Query("username") String username, @Query("password") String password);
 
     @Request(
-            url = "http://localhost:${port}/hello/user?username=${username}&password=${password}",
+            url = "http://localhost:${port}/hello/user?username=${username?}&password=${password?}",
             headers = {"Accept:text/plain"}
     )
     String simpleGetMultiQuery2WithVar(@Var("username") String username, @Var("password") String password);
@@ -220,7 +217,7 @@ String simpleGetMultiQuery2WithLazy(@Query("a") String a, @Query("b") String b, 
             url = "http://localhost:${port}/hello/user",
             headers = {"Accept:text/plain"}
     )
-    String annParamGet(@DataParam("username") String username);
+    String annParamGet(@Query("username") String username);
 
     @Request(
             url = "http://localhost:${port}/hello/user",
@@ -232,7 +229,7 @@ String simpleGetMultiQuery2WithLazy(@Query("a") String a, @Query("b") String b, 
             url = "http://localhost:${port}/hello/user",
             headers = {"Accept:text/plain"}
     )
-    String annObjectGet(@DataObject JsonTestUser user);
+    String annObjectGet(@Query JsonTestUser user);
 
     @Get(
             url = "http://localhost:${port}/hello/user",
@@ -300,7 +297,7 @@ String simpleGetMultiQuery2WithLazy(@Query("a") String a, @Query("b") String b, 
             headers = {"Accept:text/plain"},
             data = "username={username}"
     )
-    String varParamGet(@DataVariable("username") String username);
+    String varParamGet(@Query("username") String username);
 
 
     @Request(
@@ -377,7 +374,7 @@ String simpleGetMultiQuery2WithLazy(@Query("a") String a, @Query("b") String b, 
             timeout = 3000,
             data = "username={ username.toString() }"
     )
-    Future<String> asyncVarParamGet(@DataVariable("username") String username, OnSuccess onSuccess, OnError onError);
+    Future<String> asyncVarParamGet(@Query("username") String username, OnSuccess onSuccess, OnError onError);
 
 
     @Get(
@@ -422,7 +419,7 @@ String simpleGetMultiQuery2WithLazy(@Query("a") String a, @Query("b") String b, 
             url = "http://localhost:${port}/hello/user?{name}",
             headers = {"Accept:text/plain"}
     )
-    String getQueryStringWithoutName(@DataVariable("name") String name);
+    String getQueryStringWithoutName(@Var("name") String name);
 
     @Get(
             url = "http://localhost:${port}/hello/user",

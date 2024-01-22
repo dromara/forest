@@ -160,6 +160,7 @@ import com.dtflys.forest.utils.ForestCache;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.TimeUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -609,7 +610,7 @@ public class ForestConfiguration implements Serializable {
      * @param backend HTTP后端对象
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setBackend(HttpBackend backend) {
+    public ForestConfiguration setBackend(final HttpBackend backend) {
         if (backend != null) {
             backend.init(this);
             log.info("[Forest] Http Backend: " + backend.getName());
@@ -624,7 +625,7 @@ public class ForestConfiguration implements Serializable {
      * @param backendName HTTP后端名称
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setBackendName(String backendName) {
+    public ForestConfiguration setBackendName(final String backendName) {
         this.backendName = backendName;
         return this;
     }
@@ -684,7 +685,7 @@ public class ForestConfiguration implements Serializable {
      * @return 当前ForestConfiguration实例
      * @since 1.5.34
      */
-    public ForestConfiguration setBackendClientCacheMaxSize(Integer backendClientCacheMaxSize) {
+    public ForestConfiguration setBackendClientCacheMaxSize(final Integer backendClientCacheMaxSize) {
         this.backendClientCacheMaxSize = backendClientCacheMaxSize;
         return this;
     }
@@ -706,7 +707,7 @@ public class ForestConfiguration implements Serializable {
      * @return 当前ForestConfiguration实例
      * @since 1.5.35
      */
-    public ForestConfiguration setBackendClientCacheExpireTime(Duration backendClientCacheExpireTime) {
+    public ForestConfiguration setBackendClientCacheExpireTime(final Duration backendClientCacheExpireTime) {
         this.backendClientCacheExpireTime = backendClientCacheExpireTime;
         return this;
     }
@@ -736,7 +737,7 @@ public class ForestConfiguration implements Serializable {
      * @param <T>   Forest对象接口类泛型
      * @return Forest对象实例
      */
-    public <T> T getForestObject(Class<T> clazz) {
+    public <T> T getForestObject(final Class<T> clazz) {
         return getForestObjectFactory().getObject(clazz);
     }
 
@@ -747,7 +748,7 @@ public class ForestConfiguration implements Serializable {
      * @param forestObjectFactory Forest对象实例化工厂对象
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setForestObjectFactory(ForestObjectFactory forestObjectFactory) {
+    public ForestConfiguration setForestObjectFactory(final ForestObjectFactory forestObjectFactory) {
         this.forestObjectFactory = forestObjectFactory;
         return this;
     }
@@ -774,7 +775,7 @@ public class ForestConfiguration implements Serializable {
      * @param interceptorFactory 拦截器工厂
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setInterceptorFactory(InterceptorFactory interceptorFactory) {
+    public ForestConfiguration setInterceptorFactory(final InterceptorFactory interceptorFactory) {
         this.interceptorFactory = interceptorFactory;
         return this;
     }
@@ -801,7 +802,7 @@ public class ForestConfiguration implements Serializable {
      * @param properties {@link ForestProperties}类实例
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setProperties(ForestProperties properties) {
+    public ForestConfiguration setProperties(final ForestProperties properties) {
         this.properties = properties;
         return this;
     }
@@ -812,7 +813,7 @@ public class ForestConfiguration implements Serializable {
      * @param httpBackendSelector HTTP后端选择器
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setHttpBackendSelector(HttpBackendSelector httpBackendSelector) {
+    public ForestConfiguration setHttpBackendSelector(final HttpBackendSelector httpBackendSelector) {
         this.httpBackendSelector = httpBackendSelector;
         return this;
     }
@@ -822,7 +823,7 @@ public class ForestConfiguration implements Serializable {
      *
      * @param configuration 全局配置对象
      */
-    private static void setupJSONConverter(ForestConfiguration configuration) {
+    private static void setupJSONConverter(final ForestConfiguration configuration) {
         configuration.setJsonConverter(configuration.jsonConverterSelector.select());
     }
 
@@ -841,7 +842,7 @@ public class ForestConfiguration implements Serializable {
      * @param id 全局配置ID
      * @return 当前ForestConfiguration实例
      */
-    private ForestConfiguration setId(String id) {
+    private ForestConfiguration setId(final String id) {
         this.id = id;
         return this;
     }
@@ -861,7 +862,7 @@ public class ForestConfiguration implements Serializable {
      * @param maxConnections 全局的最大连接数
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setMaxConnections(Integer maxConnections) {
+    public ForestConfiguration setMaxConnections(final Integer maxConnections) {
         this.maxConnections = maxConnections;
         return this;
     }
@@ -881,7 +882,7 @@ public class ForestConfiguration implements Serializable {
      * @param maxRouteConnections 最大请求路径连接数
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setMaxRouteConnections(Integer maxRouteConnections) {
+    public ForestConfiguration setMaxRouteConnections(final Integer maxRouteConnections) {
         this.maxRouteConnections = maxRouteConnections;
         return this;
     }
@@ -905,7 +906,7 @@ public class ForestConfiguration implements Serializable {
      * @author dt_flys@hotmail.com
      * @since 1.5.22
      */
-    public ForestConfiguration setMaxRequestQueueSize(Integer maxRequestQueueSize) {
+    public ForestConfiguration setMaxRequestQueueSize(final Integer maxRequestQueueSize) {
         this.maxRequestQueueSize = maxRequestQueueSize;
         return this;
     }
@@ -925,7 +926,7 @@ public class ForestConfiguration implements Serializable {
      * @param maxAsyncThreadSize 最大异步线程池大小
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setMaxAsyncThreadSize(Integer maxAsyncThreadSize) {
+    public ForestConfiguration setMaxAsyncThreadSize(final Integer maxAsyncThreadSize) {
         this.maxAsyncThreadSize = maxAsyncThreadSize;
         return this;
     }
@@ -947,7 +948,7 @@ public class ForestConfiguration implements Serializable {
      * @return 当前ForestConfiguration实例
      * @since 1.5.27
      */
-    public ForestConfiguration setAsyncMode(ForestAsyncMode asyncMode) {
+    public ForestConfiguration setAsyncMode(final ForestAsyncMode asyncMode) {
         this.asyncMode = asyncMode;
         return this;
     }
@@ -971,7 +972,7 @@ public class ForestConfiguration implements Serializable {
      * @author dt_flys@hotmail.com
      * @since 1.5.22
      */
-    public ForestConfiguration setMaxAsyncQueueSize(Integer maxAsyncQueueSize) {
+    public ForestConfiguration setMaxAsyncQueueSize(final Integer maxAsyncQueueSize) {
         this.maxAsyncQueueSize = maxAsyncQueueSize;
         return this;
     }
@@ -992,7 +993,7 @@ public class ForestConfiguration implements Serializable {
      * @param autoRedirection {@code true}: 打开, {@code false}: 禁止
      * @return {@link ForestRequest}类实例
      */
-    public ForestConfiguration setAutoRedirection(boolean autoRedirection) {
+    public ForestConfiguration setAutoRedirection(final boolean autoRedirection) {
         this.autoRedirection = autoRedirection;
         return this;
     }
@@ -1014,7 +1015,7 @@ public class ForestConfiguration implements Serializable {
      * @return 当前ForestConfiguration实例
      */
     @Deprecated
-    public ForestConfiguration setTimeout(Integer timeout) {
+    public ForestConfiguration setTimeout(final Integer timeout) {
         this.timeout = timeout;
         return this;
     }
@@ -1034,7 +1035,7 @@ public class ForestConfiguration implements Serializable {
      * @param charset 字符集名称
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setCharset(String charset) {
+    public ForestConfiguration setCharset(final String charset) {
         this.charset = charset;
         return this;
     }
@@ -1054,7 +1055,7 @@ public class ForestConfiguration implements Serializable {
      * @param connectTimeout 连接超时时间，单位为毫秒
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setConnectTimeout(Integer connectTimeout) {
+    public ForestConfiguration setConnectTimeout(final Integer connectTimeout) {
         this.connectTimeout = connectTimeout;
         return this;
     }
@@ -1067,7 +1068,7 @@ public class ForestConfiguration implements Serializable {
      * @return 当前ForestConfiguration实例
      * @since 1.5.6
      */
-    public ForestConfiguration setConnectTimeout(int connectTimeout, TimeUnit timeUnit) {
+    public ForestConfiguration setConnectTimeout(final int connectTimeout, final TimeUnit timeUnit) {
         this.connectTimeout = TimeUtils.toMillis("global connect timeout", connectTimeout, timeUnit);
         return this;
     }
@@ -1079,7 +1080,7 @@ public class ForestConfiguration implements Serializable {
      * @return 当前ForestConfiguration实例
      * @since 1.5.6
      */
-    public ForestConfiguration setConnectTimeout(Duration connectTimeout) {
+    public ForestConfiguration setConnectTimeout(final Duration connectTimeout) {
         this.connectTimeout = TimeUtils.toMillis("global connect timeout", connectTimeout);
         return this;
     }
@@ -1102,7 +1103,7 @@ public class ForestConfiguration implements Serializable {
      * @return 当前ForestConfiguration实例
      * @since 1.5.6
      */
-    public ForestConfiguration setReadTimeout(Integer readTimeout) {
+    public ForestConfiguration setReadTimeout(final Integer readTimeout) {
         this.readTimeout = readTimeout;
         return this;
     }
@@ -1115,7 +1116,7 @@ public class ForestConfiguration implements Serializable {
      * @return 当前ForestConfiguration实例
      * @since 1.5.6
      */
-    public ForestConfiguration setReadTimeout(int readTimeout, TimeUnit timeUnit) {
+    public ForestConfiguration setReadTimeout(final int readTimeout, final TimeUnit timeUnit) {
         this.readTimeout = TimeUtils.toMillis("global read timeout", readTimeout, timeUnit);
         return this;
     }
@@ -1127,7 +1128,7 @@ public class ForestConfiguration implements Serializable {
      * @return 当前ForestConfiguration实例
      * @since 1.5.6
      */
-    public ForestConfiguration setReadTimeout(Duration readTimeout) {
+    public ForestConfiguration setReadTimeout(final Duration readTimeout) {
         this.readTimeout = TimeUtils.toMillis("global read timeout", readTimeout);
         return this;
     }
@@ -1148,7 +1149,7 @@ public class ForestConfiguration implements Serializable {
      * @param retryer 重试策略类
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setRetryer(Class retryer) {
+    public ForestConfiguration setRetryer(final Class retryer) {
         this.retryer = retryer;
         return this;
     }
@@ -1170,7 +1171,7 @@ public class ForestConfiguration implements Serializable {
      * @return 当前ForestConfiguration实例
      */
     @Deprecated
-    public ForestConfiguration setRetryCount(Integer retryCount) {
+    public ForestConfiguration setRetryCount(final Integer retryCount) {
         this.maxRetryCount = retryCount;
         return this;
     }
@@ -1191,7 +1192,7 @@ public class ForestConfiguration implements Serializable {
      * @param maxRetryCount 最大重试次数
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setMaxRetryCount(Integer maxRetryCount) {
+    public ForestConfiguration setMaxRetryCount(final Integer maxRetryCount) {
         this.maxRetryCount = maxRetryCount;
         return this;
     }
@@ -1212,7 +1213,7 @@ public class ForestConfiguration implements Serializable {
      * @param maxRetryInterval 最大请求重试之间的时间间隔
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setMaxRetryInterval(long maxRetryInterval) {
+    public ForestConfiguration setMaxRetryInterval(final long maxRetryInterval) {
         this.maxRetryInterval = maxRetryInterval;
         return this;
     }
@@ -1232,7 +1233,7 @@ public class ForestConfiguration implements Serializable {
      * @param baseAddress 全局默认地址 {@link ForestAddress}对象
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setBaseAddress(ForestAddress baseAddress) {
+    public ForestConfiguration setBaseAddress(final ForestAddress baseAddress) {
         this.baseAddress = baseAddress;
         return this;
     }
@@ -1243,7 +1244,7 @@ public class ForestConfiguration implements Serializable {
      * @param scheme HTTP 协议头
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setBaseAddressScheme(String scheme) {
+    public ForestConfiguration setBaseAddressScheme(final String scheme) {
         if (baseAddress == null) {
             baseAddress = new ForestAddress(scheme, null, null);
         } else {
@@ -1259,7 +1260,7 @@ public class ForestConfiguration implements Serializable {
      * @param host 全局地址的主机名/ip地址
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setBaseAddressHost(String host) {
+    public ForestConfiguration setBaseAddressHost(final String host) {
         if (baseAddress == null) {
             baseAddress = new ForestAddress(host, null);
         } else {
@@ -1274,7 +1275,7 @@ public class ForestConfiguration implements Serializable {
      * @param port 全局地址的端口号
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setBaseAddressPort(Integer port) {
+    public ForestConfiguration setBaseAddressPort(final Integer port) {
         if (port == null) {
             return this;
         }
@@ -1305,7 +1306,7 @@ public class ForestConfiguration implements Serializable {
      * @param baseAddressSourceClass {@link AddressSource}接口实现类
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setBaseAddressSourceClass(Class<? extends AddressSource> baseAddressSourceClass) {
+    public ForestConfiguration setBaseAddressSourceClass(final Class<? extends AddressSource> baseAddressSourceClass) {
         this.baseAddressSourceClass = baseAddressSourceClass;
         return this;
     }
@@ -1325,7 +1326,7 @@ public class ForestConfiguration implements Serializable {
      * @param sslProtocol SSL协议名称
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setSslProtocol(String sslProtocol) {
+    public ForestConfiguration setSslProtocol(final String sslProtocol) {
         this.sslProtocol = sslProtocol;
         return this;
     }
@@ -1345,7 +1346,7 @@ public class ForestConfiguration implements Serializable {
      * @param logEnabled 允许为 {@code true} , 否则为 {@code false}
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setLogEnabled(boolean logEnabled) {
+    public ForestConfiguration setLogEnabled(final boolean logEnabled) {
         this.logEnabled = logEnabled;
         return this;
     }
@@ -1365,7 +1366,7 @@ public class ForestConfiguration implements Serializable {
      * @param logRequest 允许为 {@code true} , 否则为 {@code false}
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setLogRequest(boolean logRequest) {
+    public ForestConfiguration setLogRequest(final boolean logRequest) {
         this.logRequest = logRequest;
         return this;
     }
@@ -1385,7 +1386,7 @@ public class ForestConfiguration implements Serializable {
      * @param logResponseStatus 允许为 {@code true}, 否则为 {@code false}
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setLogResponseStatus(boolean logResponseStatus) {
+    public ForestConfiguration setLogResponseStatus(final boolean logResponseStatus) {
         this.logResponseStatus = logResponseStatus;
         return this;
     }
@@ -1405,7 +1406,7 @@ public class ForestConfiguration implements Serializable {
      * @param logResponseContent 允许为 {@code true}, 否则为 {@code false}
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setLogResponseContent(boolean logResponseContent) {
+    public ForestConfiguration setLogResponseContent(final boolean logResponseContent) {
         this.logResponseContent = logResponseContent;
         return this;
     }
@@ -1425,7 +1426,7 @@ public class ForestConfiguration implements Serializable {
      * @param logHandler 日志处理器接口实例
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setLogHandler(ForestLogHandler logHandler) {
+    public ForestConfiguration setLogHandler(final ForestLogHandler logHandler) {
         this.logHandler = logHandler;
         return this;
     }
@@ -1445,7 +1446,7 @@ public class ForestConfiguration implements Serializable {
      * @param cacheEnabled 如果允许缓存实例为 {@code true}, 否则为 {@code false}
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setCacheEnabled(boolean cacheEnabled) {
+    public ForestConfiguration setCacheEnabled(final boolean cacheEnabled) {
         this.cacheEnabled = cacheEnabled;
         return this;
     }
@@ -1465,7 +1466,7 @@ public class ForestConfiguration implements Serializable {
      * @param defaultParameters 请求参数列表
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setDefaultParameters(List<RequestNameValue> defaultParameters) {
+    public ForestConfiguration setDefaultParameters(final List<RequestNameValue> defaultParameters) {
         this.defaultParameters = defaultParameters;
         return this;
     }
@@ -1485,7 +1486,7 @@ public class ForestConfiguration implements Serializable {
      * @param defaultHeaders 请求头信息列表
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setDefaultHeaders(List<RequestNameValue> defaultHeaders) {
+    public ForestConfiguration setDefaultHeaders(final List<RequestNameValue> defaultHeaders) {
         this.defaultHeaders = defaultHeaders;
         return this;
     }
@@ -1512,7 +1513,7 @@ public class ForestConfiguration implements Serializable {
      * @param asyncRejectPolicyClass Class实例
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setAsyncRejectPolicyClass(Class<? extends RejectedExecutionHandler> asyncRejectPolicyClass) {
+    public ForestConfiguration setAsyncRejectPolicyClass(final Class<? extends RejectedExecutionHandler> asyncRejectPolicyClass) {
         this.asyncRejectPolicyClass = asyncRejectPolicyClass;
         return this;
     }
@@ -1535,7 +1536,7 @@ public class ForestConfiguration implements Serializable {
      * @param retryWhenClass {@link RetryWhen}接口实现类
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setRetryWhenClass(Class<? extends RetryWhen> retryWhenClass) {
+    public ForestConfiguration setRetryWhenClass(final Class<? extends RetryWhen> retryWhenClass) {
         this.retryWhenClass = retryWhenClass;
         return this;
     }
@@ -1558,7 +1559,7 @@ public class ForestConfiguration implements Serializable {
      * @param successWhenClass {@link SuccessWhen}接口实现类
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setSuccessWhenClass(Class<? extends SuccessWhen> successWhenClass) {
+    public ForestConfiguration setSuccessWhenClass(final Class<? extends SuccessWhen> successWhenClass) {
         this.successWhenClass = successWhenClass;
         return this;
     }
@@ -1578,7 +1579,7 @@ public class ForestConfiguration implements Serializable {
      * @param interceptors 全局拦截器列表
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setInterceptors(List<Class<? extends Interceptor>> interceptors) {
+    public ForestConfiguration setInterceptors(final List<Class<? extends Interceptor>> interceptors) {
         this.interceptors = interceptors;
         return this;
     }
@@ -1590,7 +1591,7 @@ public class ForestConfiguration implements Serializable {
      * @return 当前ForestConfiguration实例
      * @since 2.0.0-BETA
      */
-    public ForestConfiguration addInterceptor(Class<? extends Interceptor> interceptorClass) {
+    public ForestConfiguration addInterceptor(final Class<? extends Interceptor> interceptorClass) {
         if (this.interceptors == null) {
             this.interceptors = new ArrayList<>();
         }
@@ -1604,7 +1605,7 @@ public class ForestConfiguration implements Serializable {
      * @param converter JSON数据转换器
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setJsonConverter(ForestJsonConverter converter) {
+    public ForestConfiguration setJsonConverter(final ForestJsonConverter converter) {
         getConverterMap().put(ForestDataType.JSON, converter);
         return this;
     }
@@ -1628,7 +1629,7 @@ public class ForestConfiguration implements Serializable {
      * @param converter XML数据转换器
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setXmlConverter(ForestXmlConverter converter) {
+    public ForestConfiguration setXmlConverter(final ForestXmlConverter converter) {
         getConverterMap().put(ForestDataType.XML, converter);
         return this;
     }
@@ -1648,7 +1649,7 @@ public class ForestConfiguration implements Serializable {
      * @param converter XML数据转换器
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setProtobufConverter(ForestProtobufConverter converter) {
+    public ForestConfiguration setProtobufConverter(final ForestProtobufConverter converter) {
         getConverterMap().put(ForestDataType.PROTOBUF, converter);
         return this;
     }
@@ -1673,7 +1674,7 @@ public class ForestConfiguration implements Serializable {
      *
      * @return 当前ForestConfiguration实例
      */
-    private ForestConfiguration setTextConverter(ForestConverter converter) {
+    private ForestConfiguration setTextConverter(final ForestConverter converter) {
         getConverterMap().put(ForestDataType.TEXT, converter);
         return this;
     }
@@ -1695,7 +1696,7 @@ public class ForestConfiguration implements Serializable {
      * @param <T>   请求接口类泛型
      * @return 动态代理工厂
      */
-    public <T> ProxyFactory<T> getProxyFactory(Class<T> clazz) {
+    public <T> ProxyFactory<T> getProxyFactory(final Class<T> clazz) {
         return (ProxyFactory<T>) CLIENT_PROXY_FACTORY_CACHE
                 .computeIfAbsent(clazz, cls -> new ProxyFactory<T>(this, (Class<T>) cls));
     }
@@ -1710,8 +1711,8 @@ public class ForestConfiguration implements Serializable {
      * @param value 变量值
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setVariableValue(String name, Object value) {
-        this.variableContext.setVariableValue(name, new BasicVariableValue(value));
+    public ForestConfiguration setVariableValue(final String name, final Object value) {
+        this.variableContext.setVariableValue(name, value);
         return this;
     }
 
@@ -1722,7 +1723,7 @@ public class ForestConfiguration implements Serializable {
      * @param value {@link ForestVariableValue}类型变量值
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setVariableValue(String name, ForestVariableValue value) {
+    public ForestConfiguration setVariableValue(final String name, final ForestVariableValue value) {
         this.variableContext.setVariableValue(name, value);
         return this;
     }
@@ -1733,17 +1734,12 @@ public class ForestConfiguration implements Serializable {
      * @param name 变量名
      * @return 变量值
      */
-    public Object getVariableValue(String name) {
-        return getVariableValue(name, null);
+    public Object getVariableValue(final String name) {
+        return getVariableValue(name, this.variableContext);
     }
 
-    public Object getVariableValue(String name, ForestMethod method) {
-        ForestVariableValue variableValue = this.variableContext.getVariable(name);
-        if (variableValue != null) {
-            Object value = variableValue.getValue(method);
-            return value;
-        }
-        return null;
+    public Object getVariableValue(final String name, final VariableScope variableScope) {
+        return this.variableContext.getVariableValue(name, variableScope);
     }
 
 
@@ -1753,7 +1749,7 @@ public class ForestConfiguration implements Serializable {
      * @param name 变量名
      * @return {@code true}: 已定义, {@code false}: 未定义
      */
-    public boolean isVariableDefined(String name) {
+    public boolean isVariableDefined(final String name) {
         return variableContext.isVariableDefined(name);
     }
 
@@ -1772,7 +1768,7 @@ public class ForestConfiguration implements Serializable {
      * @param sslKeyStores SSL的Key Store表
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setSslKeyStores(Map<String, SSLKeyStore> sslKeyStores) {
+    public ForestConfiguration setSslKeyStores(final Map<String, SSLKeyStore> sslKeyStores) {
         this.sslKeyStores = sslKeyStores;
         return this;
     }
@@ -1798,7 +1794,7 @@ public class ForestConfiguration implements Serializable {
      *
      * @param pool Forest请求池
      */
-    public void setPool(ForestRequestPool pool) {
+    public void setPool(final ForestRequestPool pool) {
         this.pool = pool;
     }
 
@@ -1832,7 +1828,7 @@ public class ForestConfiguration implements Serializable {
      * @param <T> 后端客户端对象类型
      * @return 后端客户端对象
      */
-    public <T> T getBackendClient(String key) {
+    public <T> T getBackendClient(final String key) {
         final Object client = getBackendClientCache().get(key);
         if (client != null) {
             return (T) client;
@@ -1846,7 +1842,7 @@ public class ForestConfiguration implements Serializable {
      * @param key 缓存的Key
      * @param client 后端客户端对象
      */
-    public void putBackendClientToCache(String key, Object client) {
+    public void putBackendClientToCache(final String key, final Object client) {
         getBackendClientCache().put(key, client);
     }
 
@@ -1858,7 +1854,7 @@ public class ForestConfiguration implements Serializable {
      * @param keyStore Key Store信息
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration registerKeyStore(SSLKeyStore keyStore) {
+    public ForestConfiguration registerKeyStore(final SSLKeyStore keyStore) {
         sslKeyStores.put(keyStore.getId(), keyStore);
         return this;
     }
@@ -1869,7 +1865,7 @@ public class ForestConfiguration implements Serializable {
      * @param id Key Store的ID
      * @return {@link SSLKeyStore} 实例
      */
-    public SSLKeyStore getKeyStore(String id) {
+    public SSLKeyStore getKeyStore(final String id) {
         return sslKeyStores.get(id);
     }
 
@@ -1879,7 +1875,7 @@ public class ForestConfiguration implements Serializable {
      * @param dataType 请求响应数据类型
      * @return 数据转换器
      */
-    public ForestConverter getConverter(ForestDataType dataType) {
+    public ForestConverter getConverter(final ForestDataType dataType) {
         ForestConverter converter = getConverterMap().get(dataType);
         if (converter == null) {
             throw new ForestRuntimeException("Can not found converter for type " + dataType.getName());
@@ -1905,7 +1901,7 @@ public class ForestConfiguration implements Serializable {
      * @param converterMap 数据转换器表
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setConverterMap(Map<ForestDataType, ForestConverter> converterMap) {
+    public ForestConfiguration setConverterMap(final Map<ForestDataType, ForestConverter> converterMap) {
         this.converterMap = converterMap;
         return this;
     }
@@ -1916,7 +1912,7 @@ public class ForestConfiguration implements Serializable {
      * @param converterMap 数据转换器表
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setToMergeConverterMap(Map<ForestDataType, ForestConverter> converterMap) {
+    public ForestConfiguration setToMergeConverterMap(final Map<ForestDataType, ForestConverter> converterMap) {
         if (converterMap == null) {
             return this;
         }
@@ -1943,7 +1939,7 @@ public class ForestConfiguration implements Serializable {
      * @return 动态代理实例
      * @see ForestConfiguration#client(Class)
      */
-    public <T> T createInstance(Class<T> clazz) {
+    public <T> T createInstance(final Class<T> clazz) {
         ProxyFactory<T> proxyFactory = getProxyFactory(clazz);
         return proxyFactory.createInstance();
     }
@@ -1956,7 +1952,7 @@ public class ForestConfiguration implements Serializable {
      * @return {@link ForestConfiguration}实例
      * @since 1.6.0
      */
-    public ForestConfiguration registerAnnotation(Class<? extends Annotation> annotationClass, Class<? extends Interceptor> interceptorClass) {
+    public ForestConfiguration registerAnnotation(final Class<? extends Annotation> annotationClass, final Class<? extends Interceptor> interceptorClass) {
         if (annotationRegistration.containsKey(annotationClass)) {
             throw new ForestRuntimeException("Annotation type \"" + annotationClass.getName() + "\" has been already registered");
         }
@@ -1971,7 +1967,7 @@ public class ForestConfiguration implements Serializable {
      * @return 拦截器类
      * @since 1.6.0
      */
-    public Class<? extends Interceptor> getInterceptorClassFromAnnotation(Class<? extends Annotation> annotationClass) {
+    public Class<? extends Interceptor> getInterceptorClassFromAnnotation(final Class<? extends Annotation> annotationClass) {
         final Class<? extends Interceptor> cls = annotationRegistration.get(annotationClass);
         if (cls != null) {
             return cls;
@@ -2027,11 +2023,11 @@ public class ForestConfiguration implements Serializable {
      * @param <T>   请求接口类泛型
      * @return 动态代理实例
      */
-    public <T> T client(Class<T> clazz) {
+    public <T> T client(final Class<T> clazz) {
         return createInstance(clazz);
     }
 
-    public <T> T clientFromCache(Class<T> clazz) {
+    public <T> T clientFromCache(final Class<T> clazz) {
         return (T) CLIENT_CACHE.computeIfAbsent(clazz, key -> createInstance(key));
     }
 
@@ -2043,7 +2039,7 @@ public class ForestConfiguration implements Serializable {
      * @param jsonConverterSelector JSON转换器选择策略对象，{@link JSONConverterSelector}类实例
      * @return 当前ForestConfiguration实例
      */
-    private ForestConfiguration setJsonConverterSelector(JSONConverterSelector jsonConverterSelector) {
+    private ForestConfiguration setJsonConverterSelector(final JSONConverterSelector jsonConverterSelector) {
         this.jsonConverterSelector = jsonConverterSelector;
         return this;
     }
@@ -2056,7 +2052,7 @@ public class ForestConfiguration implements Serializable {
      * @param filterClass 过滤器类
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration registerFilter(String name, Class filterClass) {
+    public ForestConfiguration registerFilter(final String name, final Class filterClass) {
         if (!(Filter.class.isAssignableFrom(filterClass))) {
             throw new ForestRuntimeException("Cannot register class \"" + filterClass.getName()
                     + "\" as a filter, filter class must implement Filter interface!");
@@ -2086,7 +2082,7 @@ public class ForestConfiguration implements Serializable {
      * @param name 过滤器名称
      * @return 如果存在为 {@code true}, 否则为 {@code false}
      */
-    public boolean hasFilter(String name) {
+    public boolean hasFilter(final String name) {
         return filterRegisterMap.containsKey(name);
     }
 
@@ -2096,7 +2092,7 @@ public class ForestConfiguration implements Serializable {
      * @param name 过滤器名称
      * @return 新的Filter实例
      */
-    public Filter newFilterInstance(String name) {
+    public Filter newFilterInstance(final String name) {
         final Class<?> filterClass = filterRegisterMap.get(name);
         if (filterClass == null) {
             throw new ForestRuntimeException("filter \"" + name + "\" does not exists!");
@@ -2108,25 +2104,41 @@ public class ForestConfiguration implements Serializable {
         }
     }
 
+
+    public <R> ForestRequest<R> makeRequest(final Class<R> clazz) {
+        final MethodLifeCycleHandler<R> lifeCycleHandler = new MethodLifeCycleHandler<>(clazz, clazz);
+        final ForestRequest<R> request = new ForestRequest<>(this, new ForestRequestContext(variableContext, null))
+                .backend(getBackend())
+                .setLogConfiguration(new LogConfiguration()
+                       .setLogHandler(getLogHandler())
+                       .setLogEnabled(isLogEnabled())
+                       .setLogResponseStatus(isLogResponseStatus())
+                       .setLogResponseContent(isLogResponseContent()))
+                .setType(ForestRequestType.GET)
+                .asyncMode(getAsyncMode())
+                .setLifeCycleHandler(lifeCycleHandler)
+                .setRetryer(getRetryer());
+        if (CollectionUtils.isNotEmpty(interceptors)) {
+            for (Class<? extends Interceptor> interceptorClass : interceptors) {
+                request.addInterceptor(interceptorClass);
+            }
+        }
+        return request;
+    }
+
+    public ForestRequest<?> makeRequest() {
+        return makeRequest(Object.class);
+    }
+
     /**
      * 创建通用 {@link ForestRequest} 对象
      *
      * @return {@link ForestRequest} 对象
      */
     public ForestRequest<?> request() {
-       final MethodLifeCycleHandler<?> lifeCycleHandler = new MethodLifeCycleHandler<>(
-                Object.class, Object.class);
-       ForestRequest<?> request = new ForestRequest<>(this, new ForestRequestContext(variableContext, null))
-                .backend(getBackend())
-                .setLogConfiguration(new LogConfiguration()
-                        .setLogHandler(getLogHandler())
-                        .setLogEnabled(isLogEnabled())
-                        .setLogResponseStatus(isLogResponseStatus())
-                        .setLogResponseContent(isLogResponseContent()))
+        return makeRequest()
                 .setType(ForestRequestType.GET)
-                .setLifeCycleHandler(lifeCycleHandler)
-                .setRetryer(getRetryer());
-        return request;
+                .setUrl("/");
     }
 
     /**
@@ -2136,9 +2148,10 @@ public class ForestConfiguration implements Serializable {
      * @param <R>   返回结果类型泛型参数
      * @return {@link ForestRequest} 对象
      */
-    public <R> ForestRequest<R> request(Class<R> clazz) {
-        ForestGenericClient client = clientFromCache(ForestGenericClient.class);
-        return client.request(clazz);
+    public <R> ForestRequest<R> request(final Class<R> clazz) {
+        return makeRequest(clazz)
+                .setType(ForestRequestType.GET)
+                .setUrl("/");
     }
 
     /**
@@ -2147,11 +2160,10 @@ public class ForestConfiguration implements Serializable {
      * @param url 请求 URL
      * @return {@link ForestRequest} 对象
      */
-    public ForestRequest<?> get(String url) {
-        return request()
+    public ForestRequest<?> get(final String url) {
+        return makeRequest()
                 .setType(ForestRequestType.GET)
                 .setUrl(url);
-
     }
 
     /**
@@ -2160,8 +2172,8 @@ public class ForestConfiguration implements Serializable {
      * @param url 请求 URL
      * @return {@link ForestRequest} 对象
      */
-    public ForestRequest<?> post(String url) {
-        return request()
+    public ForestRequest<?> post(final String url) {
+        return makeRequest()
                 .setType(ForestRequestType.POST)
                 .setUrl(url);
     }
@@ -2172,8 +2184,8 @@ public class ForestConfiguration implements Serializable {
      * @param url 请求 URL
      * @return {@link ForestRequest} 对象
      */
-    public ForestRequest<?> put(String url) {
-        return request()
+    public ForestRequest<?> put(final String url) {
+        return makeRequest()
                 .setType(ForestRequestType.PUT)
                 .setUrl(url);
 
@@ -2185,8 +2197,8 @@ public class ForestConfiguration implements Serializable {
      * @param url 请求 URL
      * @return {@link ForestRequest} 对象
      */
-    public ForestRequest<?> delete(String url) {
-        return request()
+    public ForestRequest<?> delete(final String url) {
+        return makeRequest()
                 .setType(ForestRequestType.DELETE)
                 .setUrl(url);
 
@@ -2198,8 +2210,8 @@ public class ForestConfiguration implements Serializable {
      * @param url 请求 URL
      * @return {@link ForestRequest} 对象
      */
-    public ForestRequest<?> head(String url) {
-        return request()
+    public ForestRequest<?> head(final String url) {
+        return makeRequest()
                 .setType(ForestRequestType.HEAD)
                 .setUrl(url);
 
@@ -2211,8 +2223,8 @@ public class ForestConfiguration implements Serializable {
      * @param url 请求 URL
      * @return {@link ForestRequest} 对象
      */
-    public ForestRequest<?> patch(String url) {
-        return request()
+    public ForestRequest<?> patch(final String url) {
+        return makeRequest()
                 .setType(ForestRequestType.PATCH)
                 .setUrl(url);
     }
@@ -2223,8 +2235,8 @@ public class ForestConfiguration implements Serializable {
      * @param url 请求 URL
      * @return {@link ForestRequest} 对象
      */
-    public ForestRequest<?> options(String url) {
-        return request()
+    public ForestRequest<?> options(final String url) {
+        return makeRequest()
                 .setType(ForestRequestType.OPTIONS)
                 .setUrl(url);
 
@@ -2236,10 +2248,8 @@ public class ForestConfiguration implements Serializable {
      * @param url 请求 URL
      * @return {@link ForestRequest} 对象
      */
-    public ForestRequest<?> trace(String url) {
-        return request()
-                .setType(null)
-                .clearTypeChangeHistory()
+    public ForestRequest<?> trace(final String url) {
+        return makeRequest()
                 .setType(ForestRequestType.TRACE)
                 .setUrl(url);
     }
