@@ -1,10 +1,8 @@
 package com.dtflys.forest.interceptor;
 
-import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.config.VariableValueContext;
 import com.dtflys.forest.mapping.MappingTemplate;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

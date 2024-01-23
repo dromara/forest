@@ -1,14 +1,12 @@
 package com.dtflys.forest.mapping;
 
-import com.dtflys.forest.config.VariableScope;
-import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.reflection.ForestMethod;
-import com.dtflys.forest.reflection.ForestVariableValue;
+import com.dtflys.forest.config.VariableValueContext;
+import com.dtflys.forest.reflection.ForestVariableDef;
 
 /**
  * Created by Administrator on 2016/5/4.
  */
-public class MappingVariable extends MappingParameter implements ForestVariableValue {
+public class MappingVariable extends MappingParameter implements ForestVariableDef {
 
     public MappingVariable(String name, Class type) {
         super(type);
@@ -27,14 +25,9 @@ public class MappingVariable extends MappingParameter implements ForestVariableV
     }
 
     @Override
-    public Object getValue(VariableScope variableScope) {
-        if (variableScope instanceof ForestRequest) {
-            ForestRequest request = (ForestRequest) variableScope;
-            return request.getArgument(index);
-        }
-        if (variableScope instanceof ForestRequestContext) {
-            ForestRequestContext requestContext = (ForestRequestContext) variableScope;
-            return requestContext.getArgument(index);
+    public Object getValue(VariableValueContext valueContext) {
+        if (index != null && index > -1) {
+            return valueContext.getArgument(index);
         }
         return null;
     }

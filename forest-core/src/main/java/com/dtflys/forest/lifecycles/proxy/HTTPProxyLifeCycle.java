@@ -35,13 +35,13 @@ public class HTTPProxyLifeCycle implements MethodAnnotationLifeCycle<HTTPProxy> 
         final String passwordStr = (String) getAttribute(request, "password");
         final String[] headersStr = (String[]) getAttribute(request, "headers");
 
-        final MappingTemplate hostTemplate = MappingTemplate.fromAnnotation(request, HTTPProxy.class, "host", hostStr);
-        final MappingTemplate portTemplate = MappingTemplate.fromAnnotation(request, HTTPProxy.class, "port", portStr);
-        final MappingTemplate usernameTemplate = MappingTemplate.fromAnnotation(request, HTTPProxy.class, "username", usernameStr);
-        final MappingTemplate passwordTemplate = MappingTemplate.fromAnnotation(request, HTTPProxy.class, "password", passwordStr);
+        final MappingTemplate hostTemplate = MappingTemplate.annotation(request, HTTPProxy.class, "host", hostStr);
+        final MappingTemplate portTemplate = MappingTemplate.annotation(request, HTTPProxy.class, "port", portStr);
+        final MappingTemplate usernameTemplate = MappingTemplate.annotation(request, HTTPProxy.class, "username", usernameStr);
+        final MappingTemplate passwordTemplate = MappingTemplate.annotation(request, HTTPProxy.class, "password", passwordStr);
         final Object httpProxySource = request.getMethod().getExtensionParameterValue(PARAM_KEY_HTTP_PROXY_SOURCE);
         final MappingTemplate[] headersTemplates = Arrays.stream(headersStr)
-                .map(headerStr -> MappingTemplate.fromAnnotation(method, HTTPProxy.class, "headers", headerStr))
+                .map(headerStr -> MappingTemplate.annotation(method, HTTPProxy.class, "headers", headerStr))
                 .toArray(MappingTemplate[]::new);
 
         final String host = hostTemplate.render(request);

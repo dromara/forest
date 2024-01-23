@@ -44,7 +44,7 @@ public class TestHeadClient extends BaseClientTest {
 
     public TestHeadClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVariableValue("port", server.getPort());
+        configuration.setVar("port", server.getPort());
         headClient = configuration.createInstance(HeadClient.class);
     }
 

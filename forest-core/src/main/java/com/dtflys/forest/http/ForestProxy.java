@@ -24,7 +24,10 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.Forest;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.mapping.ForestVariableContext;
+import com.dtflys.forest.mapping.MappingURLTemplate;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 

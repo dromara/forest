@@ -38,7 +38,7 @@ public class TestEncoderClient extends BaseClientTest {
 
     public TestEncoderClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVariableValue("port", server.getPort());
+        configuration.setVar("port", server.getPort());
         encoderClient = configuration.client(EncoderClient.class);
     }
 

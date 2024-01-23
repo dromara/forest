@@ -1,7 +1,7 @@
 package com.dtflys.forest.config;
 
 import com.dtflys.forest.reflection.ForestMethod;
-import com.dtflys.forest.reflection.ForestVariableValue;
+import com.dtflys.forest.reflection.ForestVariableDef;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -9,13 +9,11 @@ import com.dtflys.forest.reflection.ForestVariableValue;
  */
 public interface VariableScope {
 
-    boolean isVariableDefined(String name);
+    boolean isVarDefined(String name);
 
-    Object getVariableValue(String name, VariableScope variableScope);
+    Object getVar(String name, VariableValueContext valueContext);
 
-    Object getVariableValue(String name);
-
-    ForestVariableValue getVariable(String name);
+    ForestVariableDef getVarDef(String name);
 
     ForestMethod getForestMethod();
 

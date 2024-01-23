@@ -11,8 +11,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.beans.XMLEncoder;
-
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -34,7 +32,7 @@ public class TestXmlEncoder {
     }
 
     public TestXmlEncoder() {
-        configuration.setVariableValue("port", server.getPort());
+        configuration.setVar("port", server.getPort());
         this.xmlEncoderClient = configuration.client(XmlEncoderClient.class);
     }
 

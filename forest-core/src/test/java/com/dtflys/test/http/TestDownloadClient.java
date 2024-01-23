@@ -54,7 +54,7 @@ public class TestDownloadClient extends BaseClientTest {
 
     public TestDownloadClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVariableValue("port", server.getPort());
+        configuration.setVar("port", server.getPort());
         downloadClient = configuration.createInstance(DownloadClient.class);
     }
 

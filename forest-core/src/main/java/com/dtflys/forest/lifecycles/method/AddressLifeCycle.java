@@ -6,11 +6,9 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestAddress;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
-import com.dtflys.forest.mapping.ForestRequestContext;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.StringUtils;
-import com.dtflys.forest.utils.URLUtils;
 
 /**
  * 重试注解的生命周期类
@@ -47,25 +45,25 @@ public class AddressLifeCycle implements MethodAnnotationLifeCycle<Address> {
 
         // 判断是否有设置 basePath
         if (StringUtils.isNotBlank(basePathStr)) {
-            final MappingTemplate basePathTemplate = MappingTemplate.fromAnnotation(method, Address.class, "basePath", basePathStr.trim());
+            final MappingTemplate basePathTemplate = MappingTemplate.annotation(method, Address.class, "basePath", basePathStr.trim());
             basePath = basePathTemplate.render(request);
         }
 
         // 判断是否有设置 scheme
         if (StringUtils.isNotBlank(schemeStr)) {
-            final MappingTemplate schemeTemplate = MappingTemplate.fromAnnotation(method, Address.class, "schema", schemeStr.trim());
+            final MappingTemplate schemeTemplate = MappingTemplate.annotation(method, Address.class, "schema", schemeStr.trim());
             scheme = schemeTemplate.render(request);
         }
 
         // 判断是否有设置 host
         if (StringUtils.isNotBlank(hostStr)) {
-            final MappingTemplate hostTemplate = MappingTemplate.fromAnnotation(method, Address.class, "host", hostStr.trim());
+            final MappingTemplate hostTemplate = MappingTemplate.annotation(method, Address.class, "host", hostStr.trim());
             host = hostTemplate.render(request);
         }
 
         // 判断是否有设置 port
         if (StringUtils.isNotBlank(portStr)) {
-            final MappingTemplate portTemplate = MappingTemplate.fromAnnotation(method, Address.class, "port", portStr.trim());
+            final MappingTemplate portTemplate = MappingTemplate.annotation(method, Address.class, "port", portStr.trim());
             final String portRendered = portTemplate.render(request);
             if (!Character.isDigit(portRendered.charAt(0))) {
                 throw new ForestRuntimeException("[Forest] property 'port' of annotation @Address must be a number!");

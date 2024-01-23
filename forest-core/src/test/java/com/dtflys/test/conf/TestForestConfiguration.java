@@ -104,20 +104,20 @@ public class TestForestConfiguration {
     @Test
     public void testVars() {
         ForestConfiguration configuration = ForestConfiguration.createConfiguration();
-        configuration.setVariableValue("name", "Peter");
-        configuration.setVariableValue("baseUrl", "http://abc.com");
-        assertEquals("Peter", configuration.getVariableValue("name"));
-        assertEquals("http://abc.com", configuration.getVariableValue("baseUrl"));
+        configuration.setVar("name", "Peter");
+        configuration.setVar("baseUrl", "http://abc.com");
+        assertEquals("Peter", configuration.getVar("name"));
+        assertEquals("http://abc.com", configuration.getVar("baseUrl"));
 
         configuration = ForestConfiguration.createConfiguration();
-        configuration.setVariableValue("name", "Linda");
-        configuration.setVariableValue("abc", 123);
-        assertThat(configuration.getVariableValue("name")).isEqualTo("Linda");
-        assertThat(configuration.getVariableValue("abc")).isEqualTo(123);
+        configuration.setVar("name", "Linda");
+        configuration.setVar("abc", 123);
+        assertThat(configuration.getVar("name")).isEqualTo("Linda");
+        assertThat(configuration.getVar("abc")).isEqualTo(123);
         AtomicInteger value = new AtomicInteger(0);
-        configuration.setVariableValue("foo", (method) -> value.getAndIncrement());
-        assertThat(configuration.getVariableValue("foo")).isEqualTo(0);
-        assertThat(configuration.getVariableValue("foo")).isEqualTo(1);
+        configuration.setVar("foo", (method) -> value.getAndIncrement());
+        assertThat(configuration.getVar("foo")).isEqualTo(0);
+        assertThat(configuration.getVar("foo")).isEqualTo(1);
     }
 
 

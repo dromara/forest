@@ -12,6 +12,7 @@ import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.VariableScope;
+import com.dtflys.forest.config.VariableValueContext;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
@@ -42,13 +43,11 @@ import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingURLTemplate;
 import com.dtflys.forest.mapping.MappingVariable;
-import com.dtflys.forest.mapping.ForestVariableContext;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.multipart.ForestMultipartFactory;
 import com.dtflys.forest.proxy.InterfaceProxyHandler;
 import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
-import com.dtflys.forest.utils.ForestCache;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.HeaderUtils;
 import com.dtflys.forest.utils.NameUtils;
@@ -121,7 +120,7 @@ public class ForestMethod<T> implements VariableScope {
     private MappingParameter[] forestParameters;
     private final List<MappingParameter> namedParameters = new ArrayList<>();
     private final List<ForestMultipartFactory> multipartFactories = new ArrayList<>();
-    private final Map<String, ForestVariableValue> variables = new ConcurrentHashMap<>();
+    private final Map<String, ForestVariableDef> variables = new ConcurrentHashMap<>();
     private MappingParameter onSuccessParameter = null;
     private MappingParameter onErrorParameter = null;
     private MappingParameter onRedirectionParameter = null;
@@ -175,28 +174,26 @@ public class ForestMethod<T> implements VariableScope {
     }
 
 
-    @Override
-    public boolean isVariableDefined(String name) {
-        return configuration.isVariableDefined(name);
+    public void setVar(String name, Object value) {
+        variables.put(name, ForestVariableDef.fromObject(value));
     }
 
     @Override
-    public Object getVariableValue(String name, VariableScope variableScope) {
-        ForestVariableValue value = variables.get(name);
+    public boolean isVarDefined(String name) {
+        return configuration.isVarDefined(name);
+    }
+
+    @Override
+    public Object getVar(String name, VariableValueContext valueContext) {
+        ForestVariableDef value = variables.get(name);
         if (value == null) {
-            return configuration.getVariableValue(name, variableScope);
+            return configuration.getVar(name, valueContext);
         }
-        if (value instanceof ForestVariableValue) {
-            return value.getValue(variableScope);
+        if (value instanceof ForestVariableDef) {
+            return value.getValue(valueContext);
         }
         return value;
     }
-
-    @Override
-    public Object getVariableValue(String name) {
-        return getVariableValue(name, this);
-    }
-
 
     private MappingTemplate makeTemplate(MappingParameter parameter) {
         return getOrCreateTemplate(null, null, parameter.getName());
@@ -214,14 +211,14 @@ public class ForestMethod<T> implements VariableScope {
             final Class<? extends Annotation> annotationType,
             final String attributeName,
             final String text) {
-        return MappingURLTemplate.fromAnnotation(this, annotationType, attributeName, text);
+        return MappingURLTemplate.annotation(this, annotationType, attributeName, text);
     }
 
     private MappingTemplate getOrCreateTemplate(
             final Class<? extends Annotation> annotationType,
             final String attributeName,
             final String text) {
-        return MappingTemplate.fromAnnotation(this, annotationType, attributeName, text);
+        return MappingTemplate.annotation(this, annotationType, attributeName, text);
     }
 
 
@@ -236,7 +233,7 @@ public class ForestMethod<T> implements VariableScope {
 
 
     @Override
-    public ForestVariableValue getVariable(String name) {
+    public ForestVariableDef getVarDef(String name) {
         return variables.get(name);
     }
 
@@ -907,7 +904,7 @@ public class ForestMethod<T> implements VariableScope {
         if (headerArray != null && headerArray.length > 0) {
             baseHeaders = new MappingTemplate[headerArray.length];
             for (int j = 0; j < baseHeaders.length; j++) {
-                MappingTemplate header = MappingTemplate.fromAnnotation(
+                MappingTemplate header = MappingTemplate.annotation(
                         this,
                         BaseRequest.class, "headers",
                         headerArray[j]);
@@ -1120,8 +1117,8 @@ public class ForestMethod<T> implements VariableScope {
                                 VariableScope parentScope = request;
                                 for (Object subItem : (Iterable) obj) {
                                     ForestRequestContext scope = new ForestRequestContext(parentScope, request.arguments());
-                                    scope.setVariableValue("_it", subItem);
-                                    scope.setVariableValue("_index", index++);
+                                    scope.setVar("_it", subItem);
+                                    scope.setVar("_index", index++);
                                     String name = template.render(scope);
                                     request.addQuery(
                                             name, subItem,
@@ -1141,8 +1138,8 @@ public class ForestMethod<T> implements VariableScope {
                                 VariableScope parentScope = request;
                                 for (Object subItem : (Iterable) obj) {
                                     ForestRequestContext scope = new ForestRequestContext(parentScope, request.arguments());
-                                    scope.setVariableValue("_it", subItem);
-                                    scope.setVariableValue("_index", index++);
+                                    scope.setVar("_it", subItem);
+                                    scope.setVar("_index", index++);
                                     String name = template.render(scope);
                                     nameValueList.add(
                                             new RequestNameValue(name, subItem, target, parameter.getPartContentType())

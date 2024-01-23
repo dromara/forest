@@ -49,10 +49,10 @@ public class TestBaseReqClient extends BaseClientTest {
 
     public TestBaseReqClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVariableValue("baseURL", "http://localhost:5000/");
-        configuration.setVariableValue("userAgent", USER_AGENT);
-        configuration.setVariableValue("port", server.getPort());
-        configuration.setVariableValue("baseURL", "http://localhost:" + server.getPort());
+        configuration.setVar("baseURL", "http://localhost:5000/");
+        configuration.setVar("userAgent", USER_AGENT);
+        configuration.setVar("port", server.getPort());
+        configuration.setVar("baseURL", "http://localhost:" + server.getPort());
         baseReqClient = configuration.createInstance(BaseReqClient.class);
         baseURLClient = configuration.createInstance(BaseURLClient.class);
     }

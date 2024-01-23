@@ -1,10 +1,7 @@
 package com.dtflys.forest.mapping;
 
-import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.config.VariableValueContext;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.reflection.ForestMethod;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

@@ -7,11 +7,8 @@ import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
 import com.dtflys.forest.http.ForestQueryMap;
-import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.SimpleQueryParameter;
 import com.dtflys.forest.http.ForestURL;
-import com.dtflys.forest.http.ForestURLBuilder;
-import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.ForestCache;
 import com.dtflys.forest.utils.StringUtils;
 
@@ -24,8 +21,11 @@ public class MappingURLTemplate extends MappingTemplate {
         super(annotationType, attributeName, template, properties);
     }
 
+    public static MappingURLTemplate text(final VariableScope variableScope, final String text) {
+        return annotation(variableScope, null, null, text);
+    }
 
-    public static MappingURLTemplate fromAnnotation(
+    public static MappingURLTemplate annotation(
             final VariableScope variableScope,
             final Class<? extends Annotation> annotationType,
             final String attributeName,

@@ -49,7 +49,7 @@ public class TestInterceptor extends BaseClientTest {
 
     public TestInterceptor(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVariableValue("port", server.getPort());
+        configuration.setVar("port", server.getPort());
         interceptorClient = configuration.createInstance(InterceptorClient.class);
         baseInterceptorClient = configuration.createInstance(BaseInterceptorClient.class);
     }

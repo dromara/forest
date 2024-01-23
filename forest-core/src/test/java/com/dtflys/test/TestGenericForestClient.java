@@ -2,11 +2,14 @@ package com.dtflys.test;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64;
+import cn.hutool.core.date.StopWatch;
+import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.auth.BasicAuth;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
@@ -694,7 +697,7 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_template_in_url() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        Forest.config().setVariableValue("testVar", "foo");
+        Forest.config().setVar("testVar", "foo");
         Forest.get("/")
                 .setUrl("/test/{testVar}")
                 .host("127.0.0.1")
@@ -2150,6 +2153,49 @@ public class TestGenericForestClient extends BaseClientTest {
         assertThat(proxy.getPort()).isEqualTo(1082);
         assertThat(proxy.getUsername()).isEqualTo("root");
         assertThat(proxy.getPassword()).isEqualTo("123456");
+    }
+
+    @Test
+    public void performance() {
+        int count = 10000;
+        for (int i = 0; i < count; i++) {
+            server.enqueue(new MockResponse().setBody(EXPECTED));
+        }
+
+        Forest.config()
+                .setMaxRetryCount(0)
+                .setLogEnabled(false)
+                .setMaxConnections(10000)
+                .setVar("port", server.getPort())
+                .setVar("accept", "text/plain");
+
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        for (int i = 0; i < count; i++) {
+            Forest.get("http://localhost:{port}/abc")
+                    .addHeader("Accept", "{accept?}")
+                    .execute();
+        }
+        stopWatch.stop();
+        System.out.println("总耗时: " + stopWatch.getTotalTimeMillis() + "ms");
+    }
+
+
+    @Test
+    public void performance_hutool() {
+        int count = 10000;
+        for (int i = 0; i < count; i++) {
+            server.enqueue(new MockResponse().setBody(EXPECTED));
+        }
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        for (int i = 0; i < count; i++) {
+            HttpUtil.createGet("http://localhost:" + server.getPort() + "/abc")
+                    .header("Accept", "text/plain")
+                    .execute();
+        }
+        stopWatch.stop();
+        System.out.println("总耗时: " + stopWatch.getTotalTimeMillis() + "ms");
     }
 
 

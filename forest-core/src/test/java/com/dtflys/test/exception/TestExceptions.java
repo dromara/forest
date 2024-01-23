@@ -2,7 +2,7 @@ package com.dtflys.test.exception;
 
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.annotation.BaseRequest;
-import com.dtflys.forest.annotation.DataFile;
+import com.dtflys.forest.annotation.FileBody;
 import com.dtflys.forest.annotation.Get;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ForestConverter;
@@ -165,7 +165,7 @@ public class TestExceptions {
         String contentTypeVar();
 
         @Get(url = "/data/")
-        String fileVar(@DataFile(value = "file", fileName = "{filename}") String h);
+        String fileVar(@FileBody(value = "file", fileName = "{filename}") String h);
     }
 
     @Test

@@ -2,9 +2,9 @@ package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.VariableScope;
-import com.dtflys.forest.reflection.BasicVariableValue;
+import com.dtflys.forest.config.VariableValueContext;
 import com.dtflys.forest.reflection.ForestMethod;
-import com.dtflys.forest.reflection.ForestVariableValue;
+import com.dtflys.forest.reflection.ForestVariableDef;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +20,7 @@ public class ForestVariableContext implements VariableScope {
 
     protected final ForestConfiguration configuration;
 
-    protected final Map<String, ForestVariableValue> variables = new HashMap<>();
+    protected final Map<String, ForestVariableDef> variables = new HashMap<>();
 
     public ForestVariableContext(VariableScope parent, ForestConfiguration configuration) {
         this.parent = parent;
@@ -38,40 +38,35 @@ public class ForestVariableContext implements VariableScope {
 
 
     @Override
-    public boolean isVariableDefined(String name) {
+    public boolean isVarDefined(String name) {
         boolean isDefined = variables.containsKey(name);
         if (!isDefined) {
-            return parent.isVariableDefined(name);
+            return parent.isVarDefined(name);
         }
         return true;
     }
 
     @Override
-    public Object getVariableValue(String name, VariableScope variableScope) {
+    public Object getVar(String name, VariableValueContext valueContext) {
         Object value = variables.get(name);
         if (value == null && parent != null) {
-            value = parent.getVariableValue(name, variableScope);
+            value = parent.getVar(name, valueContext);
         }
-        if (value instanceof ForestVariableValue) {
-            return ((ForestVariableValue) value).getValue(variableScope);
+        if (value instanceof ForestVariableDef) {
+            return ((ForestVariableDef) value).getValue(valueContext);
         }
         return value;
     }
 
-    @Override
-    public Object getVariableValue(String name) {
-        return getVariableValue(name, this);
-    }
-
-    public void setVariableValue(String name, Object value) {
-        variables.put(name, ForestVariableValue.fromObject(value));
+    public void setVar(String name, Object value) {
+        variables.put(name, ForestVariableDef.fromObject(value));
     }
 
     @Override
-    public ForestVariableValue getVariable(String name) {
-        final ForestVariableValue variableValue = variables.get(name);
+    public ForestVariableDef getVarDef(String name) {
+        final ForestVariableDef variableValue = variables.get(name);
         if (variableValue == null) {
-            return parent.getVariable(name);
+            return parent.getVarDef(name);
         }
         return variableValue;
     }

@@ -1,6 +1,6 @@
 package com.dtflys.forest.lifecycles.parameter;
 
-import com.dtflys.forest.annotation.DataFile;
+import com.dtflys.forest.annotation.FileBody;
 import com.dtflys.forest.annotation.ProtobufBody;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
@@ -34,7 +34,7 @@ public class ProtobufBodyLifeCycle extends AbstractBodyLifeCycle<ProtobufBody> {
         }
         boolean hasDataFileAnn = false;
         for (Parameter param : method.getMethod().getParameters()) {
-            final Annotation dataFileAnn = param.getAnnotation(DataFile.class);
+            final Annotation dataFileAnn = param.getAnnotation(FileBody.class);
             if (dataFileAnn != null) {
                 hasDataFileAnn = true;
                 break;

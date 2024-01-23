@@ -26,7 +26,7 @@ public class TestOAuth2Client extends BaseClientTest {
 
     public TestOAuth2Client(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVariableValue("port", server.getPort());
+        configuration.setVar("port", server.getPort());
         oAuth2Client = configuration.createInstance(OAuth2Client.class);
     }
 

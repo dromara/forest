@@ -7,10 +7,8 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.GzipUtils;
 import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.*;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.util.EntityUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -46,8 +44,6 @@ public class HttpclientForestResponse extends ForestResponse {
                 if (type != null) {
                     this.contentType = new ContentType(type.getValue(), StandardCharsets.UTF_8);
                 }
-                //响应消息的编码格式: gzip...
-//                setupContentEncoding();
                 //响应文本的字符串编码
 //                setupResponseCharset();
                 //是否将Response数据按GZIP来解压
@@ -57,6 +53,11 @@ public class HttpclientForestResponse extends ForestResponse {
             } else {
                 this.bytes = new byte[0];
                 this.content = "";
+            }
+            try {
+                this.getRawBytes();
+            } catch (Exception e) {
+                throw new ForestRuntimeException(e);
             }
         } else {
             this.statusCode = -1;
@@ -150,7 +151,7 @@ public class HttpclientForestResponse extends ForestResponse {
 
     private String readContentAsString() {
         try  {
-            bytes = getByteArray();
+            bytes = getRawBytes();
             return byteToString(bytes);
         } catch (IOException e) {
             throw new ForestRuntimeException(e);
@@ -160,27 +161,44 @@ public class HttpclientForestResponse extends ForestResponse {
     }
 
     @Override
+    public String getContentEncoding() {
+        if (this.contentEncoding == null) {
+            final Header contentEncodingHeader = entity.getContentEncoding();
+            if (contentEncodingHeader != null) {
+                this.contentEncoding = contentEncodingHeader.getValue();
+            }
+        }
+        return this.contentEncoding;
+
+    }
+
+    @Override
     public InputStream getInputStream() throws Exception {
         if (bytes != null) {
-            return new ByteArrayInputStream(getByteArray());
+            return new ByteArrayInputStream(getRawBytes());
         }
         return entity.getContent();
     }
 
     @Override
-    public byte[] getByteArray() throws IOException {
+    public byte[] getRawBytes() throws IOException {
         if (bytes == null) {
             if (entity == null) {
                 return null;
             } else {
                 try {
-                    bytes = EntityUtils.toByteArray(entity);
+//                    bytes = EntityUtils.toByteArray(entity);
                 } finally {
                     close();
                 }
             }
         }
         return bytes;
+    }
+
+    @Override
+    public InputStream getRawInputStream() throws Exception {
+        return entity.getContent();
     }
 
     @Override

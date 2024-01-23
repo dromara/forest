@@ -40,7 +40,7 @@ public class TestSuccessWhenClient extends BaseClientTest {
 
     public TestSuccessWhenClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVariableValue("port", server.getPort());
+        configuration.setVar("port", server.getPort());
         successWhenClient = configuration.createInstance(SuccessWhenClient.class);
         successWhenClient2 = configuration.createInstance(SuccessWhenClient2.class);
     }

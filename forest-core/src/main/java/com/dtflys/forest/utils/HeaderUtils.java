@@ -1,6 +1,5 @@
 package com.dtflys.forest.utils;
 
-import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.config.VariableValueContext;
 import com.dtflys.forest.http.ForestHeaderMap;
 import com.dtflys.forest.http.HasHeaders;

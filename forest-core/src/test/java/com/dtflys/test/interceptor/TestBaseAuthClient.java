@@ -29,7 +29,7 @@ public class TestBaseAuthClient extends BaseClientTest {
     public TestBaseAuthClient(HttpBackend backend) {
         super(backend, configuration);
         configuration.setCacheEnabled(false);
-        configuration.setVariableValue("port", server.getPort());
+        configuration.setVar("port", server.getPort());
         baseAuthClient = configuration.createInstance(BaseAuthClient.class);
     }
 

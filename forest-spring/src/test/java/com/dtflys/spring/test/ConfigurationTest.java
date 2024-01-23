@@ -28,9 +28,9 @@ public class ConfigurationTest extends TestCase {
         assertEquals(forestConfiguration.getMaxConnections(), new Integer(500));
         assertEquals(forestConfiguration.getMaxRouteConnections(), new Integer(500));
         assertEquals(forestConfiguration.getSslProtocol(), "SSLv3");
-        assertEquals(forestConfiguration.getVariableValue("baseUrl"), "http://www.thebeastshop.com");
-        assertEquals(forestConfiguration.getVariableValue("x"), "0");
-        assertEquals(forestConfiguration.getVariableValue("y"), "1");
+        assertEquals(forestConfiguration.getVar("baseUrl"), "http://www.thebeastshop.com");
+        assertEquals(forestConfiguration.getVar("x"), "0");
+        assertEquals(forestConfiguration.getVar("y"), "1");
         assertEquals(forestConfiguration.getBackend().getName(), "httpclient");
         assertEquals("GBK", forestConfiguration.getCharset());
         assertEquals(Boolean.TRUE, Boolean.valueOf(forestConfiguration.isLogEnabled()));

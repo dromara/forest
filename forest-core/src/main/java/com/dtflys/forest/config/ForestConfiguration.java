@@ -24,7 +24,6 @@
 
 package com.dtflys.forest.config;
 
-import com.dtflys.forest.ForestGenericClient;
 import com.dtflys.forest.annotation.Address;
 import com.dtflys.forest.annotation.Backend;
 import com.dtflys.forest.annotation.BackendClient;
@@ -32,7 +31,7 @@ import com.dtflys.forest.annotation.BaseLifeCycle;
 import com.dtflys.forest.annotation.BinaryBody;
 import com.dtflys.forest.annotation.Body;
 import com.dtflys.forest.annotation.BodyType;
-import com.dtflys.forest.annotation.DataFile;
+import com.dtflys.forest.annotation.FileBody;
 import com.dtflys.forest.annotation.DecompressGzip;
 import com.dtflys.forest.annotation.Delete;
 import com.dtflys.forest.annotation.DeleteRequest;
@@ -62,6 +61,7 @@ import com.dtflys.forest.annotation.Query;
 import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.annotation.Retry;
 import com.dtflys.forest.annotation.Retryer;
+import com.dtflys.forest.annotation.Return;
 import com.dtflys.forest.annotation.SSLHostnameVerifier;
 import com.dtflys.forest.annotation.SSLSocketFactoryBuilder;
 import com.dtflys.forest.annotation.Success;
@@ -136,6 +136,7 @@ import com.dtflys.forest.lifecycles.parameter.JSONBodyLifeCycle;
 import com.dtflys.forest.lifecycles.parameter.JSONQueryLifeCycle;
 import com.dtflys.forest.lifecycles.parameter.ProtobufBodyLifeCycle;
 import com.dtflys.forest.lifecycles.parameter.QueryLifeCycle;
+import com.dtflys.forest.lifecycles.parameter.ReturnLifeCycle;
 import com.dtflys.forest.lifecycles.parameter.URLEncodeLifeCycle;
 import com.dtflys.forest.lifecycles.parameter.VariableLifeCycle;
 import com.dtflys.forest.lifecycles.parameter.XMLBodyLifeCycle;
@@ -148,11 +149,9 @@ import com.dtflys.forest.mapping.ForestVariableContext;
 import com.dtflys.forest.pool.FixedRequestPool;
 import com.dtflys.forest.pool.ForestRequestPool;
 import com.dtflys.forest.proxy.ProxyFactory;
-import com.dtflys.forest.reflection.BasicVariableValue;
 import com.dtflys.forest.reflection.DefaultObjectFactory;
-import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.ForestObjectFactory;
-import com.dtflys.forest.reflection.ForestVariableValue;
+import com.dtflys.forest.reflection.ForestVariableDef;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
 import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
@@ -549,6 +548,7 @@ public class ForestConfiguration implements Serializable {
         configuration.registerAnnotation(Retry.class, RetryLifeCycle.class);
         configuration.registerAnnotation(Retryer.class, RetryerLifeCycle.class);
         configuration.registerAnnotation(Success.class, SuccessLifeCycle.class);
+        configuration.registerAnnotation(Return.class, ReturnLifeCycle.class);
 
         // 注册参数注解
         configuration.registerAnnotation(Query.class, QueryLifeCycle.class);
@@ -559,7 +559,7 @@ public class ForestConfiguration implements Serializable {
         configuration.registerAnnotation(XMLBody.class, XMLBodyLifeCycle.class);
         configuration.registerAnnotation(BinaryBody.class, BinaryBodyLifeCycle.class);
         configuration.registerAnnotation(ProtobufBody.class, ProtobufBodyLifeCycle.class);
-        configuration.registerAnnotation(DataFile.class, DataFileLifeCycle.class);
+        configuration.registerAnnotation(FileBody.class, DataFileLifeCycle.class);
         configuration.registerAnnotation(Header.class, HeaderLifeCycle.class);
         configuration.registerAnnotation(Var.class, VariableLifeCycle.class);
         configuration.registerAnnotation(URLEncode.class, URLEncodeLifeCycle.class);
@@ -1711,8 +1711,8 @@ public class ForestConfiguration implements Serializable {
      * @param value 变量值
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setVariableValue(final String name, final Object value) {
-        this.variableContext.setVariableValue(name, value);
+    public ForestConfiguration setVar(final String name, final Object value) {
+        this.variableContext.setVar(name, value);
         return this;
     }
 
@@ -1720,11 +1720,11 @@ public class ForestConfiguration implements Serializable {
      * 设置全局变量
      *
      * @param name  变量名
-     * @param value {@link ForestVariableValue}类型变量值
+     * @param value {@link ForestVariableDef}类型变量值
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setVariableValue(final String name, final ForestVariableValue value) {
-        this.variableContext.setVariableValue(name, value);
+    public ForestConfiguration setVar(final String name, final ForestVariableDef value) {
+        this.variableContext.setVar(name, value);
         return this;
     }
 
@@ -1734,12 +1734,12 @@ public class ForestConfiguration implements Serializable {
      * @param name 变量名
      * @return 变量值
      */
-    public Object getVariableValue(final String name) {
-        return getVariableValue(name, this.variableContext);
+    public Object getVar(final String name) {
+        return getVar(name, new ForestRequestContext(null, new Object[0]));
     }
 
-    public Object getVariableValue(final String name, final VariableScope variableScope) {
-        return this.variableContext.getVariableValue(name, variableScope);
+    public Object getVar(final String name, final VariableValueContext valueContext) {
+        return this.variableContext.getVar(name, valueContext);
     }
 
 
@@ -1749,8 +1749,8 @@ public class ForestConfiguration implements Serializable {
      * @param name 变量名
      * @return {@code true}: 已定义, {@code false}: 未定义
      */
-    public boolean isVariableDefined(final String name) {
-        return variableContext.isVariableDefined(name);
+    public boolean isVarDefined(final String name) {
+        return variableContext.isVarDefined(name);
     }
 
     /**

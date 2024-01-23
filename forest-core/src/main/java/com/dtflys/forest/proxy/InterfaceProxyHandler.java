@@ -4,12 +4,13 @@ import com.dtflys.forest.annotation.BaseLifeCycle;
 import com.dtflys.forest.annotation.MethodLifeCycle;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.VariableScope;
+import com.dtflys.forest.config.VariableValueContext;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.interceptor.InterceptorFactory;
 import com.dtflys.forest.lifecycles.BaseAnnotationLifeCycle;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.reflection.ForestMethod;
-import com.dtflys.forest.reflection.ForestVariableValue;
+import com.dtflys.forest.reflection.ForestVariableDef;
 import com.dtflys.forest.reflection.MetaRequest;
 import com.dtflys.forest.utils.MethodHandlesUtil;
 
@@ -236,19 +237,18 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         return baseMetaRequest;
     }
 
-    @Override
-    public boolean isVariableDefined(String name) {
-        return configuration.isVariableDefined(name);
+    public void setVar(String name, Object value) {
+        configuration.setVar(name, value);
     }
 
     @Override
-    public Object getVariableValue(String name, VariableScope variableScope) {
-        return configuration.getVariableValue(name);
+    public boolean isVarDefined(String name) {
+        return configuration.isVarDefined(name);
     }
 
     @Override
-    public Object getVariableValue(String name) {
-        return getVariableValue(name, this);
+    public Object getVar(String name, VariableValueContext valueContext) {
+        return configuration.getVar(name, valueContext);
     }
 
     public List<Annotation> getBaseAnnotations() {
@@ -256,8 +256,8 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
     }
 
     @Override
-    public ForestVariableValue getVariable(String name) {
-        return configuration.getVariableContext().getVariable(name);
+    public ForestVariableDef getVarDef(String name) {
+        return configuration.getVariableContext().getVarDef(name);
     }
 
     @Override

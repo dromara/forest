@@ -35,7 +35,7 @@ public class TestSubClient extends BaseClientTest {
 
     public TestSubClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVariableValue("port", server.getPort());
+        configuration.setVar("port", server.getPort());
         subClient = configuration.createInstance(SubClient.class);
     }
 

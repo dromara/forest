@@ -3,9 +3,6 @@ package com.dtflys.test.http.response;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestCookie;
-import com.dtflys.forest.http.ForestCookies;
-import com.dtflys.forest.http.ForestHeader;
-import com.dtflys.forest.http.ForestHeaderMap;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.BaseClientTest;
 import okhttp3.mockwebserver.MockResponse;
@@ -16,7 +13,6 @@ import org.junit.Test;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -39,7 +35,7 @@ public class TestResponseClient extends BaseClientTest {
 
     public TestResponseClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVariableValue("port", server.getPort());
+        configuration.setVar("port", server.getPort());
         responseClient = configuration.client(ResponseClient.class);
     }
 

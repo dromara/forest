@@ -6,7 +6,6 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.http.ForestRoutes;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.ssl.SSLSocketFactoryBuilder;
 import com.dtflys.test.http.ssl.MyHostnameVerifier;
@@ -149,7 +148,7 @@ public class TestSSLClient extends BaseClientTest {
                             }
                             return  "{\"id\": \"" + ((String[]) id)[0] + "\"}";
                         }));
-        configuration.setVariableValue("port", port);
+        configuration.setVar("port", port);
     }
 
 

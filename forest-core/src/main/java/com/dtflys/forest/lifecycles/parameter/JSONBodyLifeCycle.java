@@ -1,6 +1,6 @@
 package com.dtflys.forest.lifecycles.parameter;
 
-import com.dtflys.forest.annotation.DataFile;
+import com.dtflys.forest.annotation.FileBody;
 import com.dtflys.forest.annotation.JSONBody;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
@@ -35,7 +35,7 @@ public class JSONBodyLifeCycle extends AbstractBodyLifeCycle<JSONBody> {
         }
         boolean hasDataFileAnn = false;
         for (Parameter param : method.getMethod().getParameters()) {
-            final Annotation dataFileAnn = param.getAnnotation(DataFile.class);
+            final Annotation dataFileAnn = param.getAnnotation(FileBody.class);
             if (dataFileAnn != null) {
                 hasDataFileAnn = true;
                 break;

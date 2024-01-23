@@ -68,20 +68,20 @@ public class ResultHandler {
             try {
                 if (ForestResponse.class.isAssignableFrom(resultClass)
                         || ForestRequest.class.isAssignableFrom(resultClass)) {
-                    if (resultType instanceof ParameterizedType) {
-                        final ParameterizedType parameterizedType = (ParameterizedType) resultType;
-                        final Class<?> rowClass = (Class<?>) parameterizedType.getRawType();
-                        if (ForestResponse.class.isAssignableFrom(rowClass)
-                                || ForestRequest.class.isAssignableFrom(resultClass)) {
-                            final Type realType = parameterizedType.getActualTypeArguments()[0];
-                            Class<?> realClass = ReflectUtils.toClass(parameterizedType.getActualTypeArguments()[0]);
-                            if (realClass == null) {
-                                realClass = String.class;
-                            }
-                            final Object realResult = getResult(request, response, realType, realClass);
-                            response.setResult(realResult);
-                        }
-                    }
+//                    if (resultType instanceof ParameterizedType) {
+//                        final ParameterizedType parameterizedType = (ParameterizedType) resultType;
+//                        final Class<?> rowClass = (Class<?>) parameterizedType.getRawType();
+//                        if (ForestResponse.class.isAssignableFrom(rowClass)
+//                                || ForestRequest.class.isAssignableFrom(resultClass)) {
+//                            final Type realType = parameterizedType.getActualTypeArguments()[0];
+//                            Class<?> realClass = ReflectUtils.toClass(parameterizedType.getActualTypeArguments()[0]);
+//                            if (realClass == null) {
+//                                realClass = String.class;
+//                            }
+//                            final Object realResult = getResult(request, response, realType, realClass);
+//                            response.setResult(realResult);
+//                        }
+//                    }
                     return response;
                 }
                 if (void.class.isAssignableFrom(resultClass)) {
@@ -103,7 +103,7 @@ public class ResultHandler {
                 }
                 if (resultClass.isArray()) {
                     if (byte[].class.isAssignableFrom(resultClass)) {
-                        return response.getByteArray();
+                        return response.getRawBytes();
                     }
                 }
                 final Object attFile = request.getAttachment(DownloadLifeCycle.ATTACHMENT_NAME_FILE);
@@ -136,7 +136,7 @@ public class ResultHandler {
                     if (contentType != null && contentType.canReadAsString()) {
                         return decoder.convertToJavaObject(responseText, resultType);
                     } else {
-                        return decoder.convertToJavaObject(response.getByteArray(), resultType);
+                        return decoder.convertToJavaObject(response.getRawBytes(), resultType);
                     }
                 } else if (CharSequence.class.isAssignableFrom(resultClass)) {
                     return responseText;
@@ -152,7 +152,7 @@ public class ResultHandler {
                 if (resCharset != null) {
                     charset = Charset.forName(resCharset);
                 }
-                return converter.convertToJavaObject(response.getByteArray(), resultType, charset);
+                return converter.convertToJavaObject(response.getRawBytes(), resultType, charset);
             } catch (Exception e) {
                 throw new ForestHandlerException(e, request, response);
             }

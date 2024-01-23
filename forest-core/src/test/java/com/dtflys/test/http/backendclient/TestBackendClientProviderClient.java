@@ -25,7 +25,7 @@ public class TestBackendClientProviderClient {
 
     public TestBackendClientProviderClient() {
         backendClientProviderClient = configuration.client(BackendClientProviderClient.class);
-        configuration.setVariableValue("port", server.getPort());
+        configuration.setVar("port", server.getPort());
     }
 
     @Test

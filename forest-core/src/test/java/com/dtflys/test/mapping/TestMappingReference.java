@@ -24,12 +24,10 @@ public class TestMappingReference {
         MappingVariable ageVar = new MappingVariable("age", String.class);
         ageVar.setIndex(1);
         ForestRequestContext context = new ForestRequestContext(forestMethod, new Object[] {"Peter", 15});
-        Mockito.when(context.getVariable("name")).thenReturn(nameVar);
-        Mockito.when(context.getVariable("age")).thenReturn(ageVar);
-        Mockito.when(context.getVariableValue("name")).thenReturn("Marry");
-        Mockito.when(context.getVariableValue("motherName")).thenReturn("Linda");
-        Mockito.when(context.getVariableValue("age")).thenReturn(12);
-        Mockito.when(context.isVariableDefined("motherName")).thenReturn(true);
+        context.setVar("name", "Marry");
+        context.setVar("motherName", "Linda");
+        context.setVar("age", 12);
+
         MappingReference nameRef = new MappingReference("name", false);
         MappingReference ageRef = new MappingReference("age", false);
         MappingReference motherNameRef = new MappingReference("motherName", false);
@@ -40,5 +38,8 @@ public class TestMappingReference {
         Assert.assertEquals("Linda", motherNameRef.render(context));
         Assert.assertEquals("Peter", nameIdx.render(context));
         Assert.assertEquals(15, ageIdx.render(context));
+        Assert.assertEquals("Peter", nameVar.getValue(context));
+        Assert.assertEquals(15, ageVar.getValue(context));
+
     }
 }

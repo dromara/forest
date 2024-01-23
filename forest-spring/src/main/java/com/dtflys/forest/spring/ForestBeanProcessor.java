@@ -7,8 +7,6 @@ import com.dtflys.forest.utils.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.context.annotation.Scope;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
@@ -33,8 +31,8 @@ public class ForestBeanProcessor implements InstantiationAwareBeanPostProcessor 
                 configuration = Forest.config();
             }
             String varName = annotation.value();
-            SpringVariableValue variableValue = new SpringVariableValue(bean, method);
-            configuration.setVariableValue(varName, variableValue);
+            SpringVariableDef variableValue = new SpringVariableDef(bean, method);
+            configuration.setVar(varName, variableValue);
         }
     }
 

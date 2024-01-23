@@ -24,8 +24,6 @@
 
 package com.dtflys.forest.annotation;
 
-import com.dtflys.forest.lifecycles.parameter.DataFileLifeCycle;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -98,7 +96,7 @@ import java.lang.annotation.Target;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
-public @interface DataFile {
+public @interface FileBody {
 
     /**
      * Multipart类型请求体中，要上传的文件所对应的参数名

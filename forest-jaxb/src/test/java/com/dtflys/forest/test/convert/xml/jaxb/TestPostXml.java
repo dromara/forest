@@ -31,7 +31,7 @@ public class TestPostXml {
     }
 
     public TestPostXml() {
-        configuration.setVariableValue("port", server.getPort());
+        configuration.setVar("port", server.getPort());
         postClient = configuration.createInstance(PostXmlClient.class);
     }
 

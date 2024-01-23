@@ -8,8 +8,6 @@ import junit.framework.TestCase;
 import com.dtflys.spring.test.client0.BeastshopClient;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import javax.annotation.Resource;
-
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 /**
@@ -37,7 +35,7 @@ public class ClientTest extends TestCase {
         assertThat(configuration.getMaxAsyncThreadSize()).isEqualTo(256);
         assertThat(configuration.getMaxAsyncQueueSize()).isEqualTo(128);
         assertThat(configuration.getAsyncMode()).isEqualTo(ForestAsyncMode.KOTLIN_COROUTINE);
-        Object baseUrl = configuration.getVariableValue("baseUrl");
+        Object baseUrl = configuration.getVar("baseUrl");
         assertThat(baseUrl).isNotNull().isEqualTo("http://www.thebeastshop.com");
     }
 

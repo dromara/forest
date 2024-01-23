@@ -53,6 +53,11 @@ public class OkHttp3ForestResponse extends ForestResponse {
         if (body == null) {
             return;
         }
+        try {
+            this.getRawBytes();
+        } catch (Exception e) {
+            throw new ForestRuntimeException(e);
+        }
 //        setupContentTypeAndCharset();
 //        setupContent();
     }
@@ -101,7 +106,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
 
     private String readContentAsString() {
         try {
-            bytes = getByteArray();
+            bytes = getRawBytes();
             if (bytes == null) {
                 return null;
             }
@@ -166,20 +171,19 @@ public class OkHttp3ForestResponse extends ForestResponse {
         }
     }
 
-    /**
-     * @author designer[19901753334@163.com]
-     * @date 2021/12/8 23:51
-     **/
-    private void setupContentEncoding() {
-        if (StringUtils.isEmpty(this.contentEncoding)) {
+    @Override
+    public String getContentEncoding() {
+        if (this.contentEncoding == null) {
             this.contentEncoding = okResponse.header("Content-Encoding");
         }
+        return this.contentEncoding;
     }
+
 
     @Override
     public InputStream getInputStream() throws Exception {
         if (bytes != null) {
-            return new ByteArrayInputStream(getByteArray());
+            return new ByteArrayInputStream(getRawBytes());
         }
         return body.byteStream();
     }
@@ -190,7 +194,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
     }
 
     @Override
-    public byte[] getByteArray() throws Exception {
+    public byte[] getRawBytes() throws Exception {
         if (bytes == null) {
             if (body == null) {
                 return null;
@@ -203,6 +207,11 @@ public class OkHttp3ForestResponse extends ForestResponse {
             }
         }
         return bytes;
+    }
+
+    @Override
+    public InputStream getRawInputStream() throws Exception {
+        return body.byteStream();
     }
 
     @Override

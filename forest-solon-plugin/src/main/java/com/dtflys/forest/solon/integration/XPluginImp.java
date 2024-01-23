@@ -12,7 +12,7 @@ import com.dtflys.forest.interceptor.SolonInterceptorFactory;
 import com.dtflys.forest.multipart.ForestMultipartFactory;
 import com.dtflys.forest.reflection.SolonObjectFactory;
 import com.dtflys.forest.solon.ForestBeanBuilder;
-import com.dtflys.forest.solon.SolonForestVariableValue;
+import com.dtflys.forest.solon.SolonForestVariableDef;
 import com.dtflys.forest.solon.SolonUpstreamInterceptor;
 import com.dtflys.forest.solon.properties.ForestConfigurationProperties;
 import com.dtflys.forest.utils.StringUtils;
@@ -57,8 +57,8 @@ public class XPluginImp implements Plugin {
             }
 
             String varName = anno.value();
-            SolonForestVariableValue variableValue = new SolonForestVariableValue(bw.get(), method);
-            config.setVariableValue(varName, variableValue);
+            SolonForestVariableDef variableValue = new SolonForestVariableDef(bw.get(), method);
+            config.setVar(varName, variableValue);
         });
 
 

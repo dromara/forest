@@ -150,6 +150,15 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
         return this;
     }
 
+    public boolean isGzip() {
+        return "gzip".equalsIgnoreCase(getContentEncoding());
+    }
+
+    public boolean isDeflate() {
+        return "deflate".equalsIgnoreCase(getContentEncoding());
+    }
+
+
     /**
      * 获取响应请求的URL
      *
@@ -236,6 +245,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
     public boolean isRedirection() {
         return getStatusCode() > HttpStatus.MULTIPLE_CHOICES && getStatusCode() <= HttpStatus.TEMPORARY_REDIRECT;
     }
+
 
     /**
      * 获取重定向地址
@@ -324,7 +334,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      */
     public String readAsString() {
         try {
-            final byte[] bytes = getByteArray();
+            final byte[] bytes = getRawBytes();
             if (bytes == null) {
                 return "";
             }
@@ -486,10 +496,9 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      * 获取请求响应内容的数据编码
      *
      * @return 请求响应内容的数据编码名称
+     * @since 2.0.0-BETA
      */
-    public String getContentEncoding() {
-        return contentEncoding;
-    }
+    public abstract String getContentEncoding();
 
     /**
      * 获取请求响应内容的数据长度
@@ -637,10 +646,18 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      * @return 字节数组形式的响应内容
      * @throws Exception 读取字节数组过程中可能的异常
      */
-    public abstract byte[] getByteArray() throws Exception;
+    public abstract byte[] getRawBytes() throws Exception;
 
     /**
-     * 以输入流的形式获取请求响应内容
+     * 获取原始响应流
+     *
+     * @return 输入流形式的响应内容, {@link InputStream}实例
+     * @throws Exception 可能抛出的异常类型
+     */
+    public abstract InputStream getRawInputStream() throws Exception;
+
+    /**
+     * 以流的形式获取请求响应内容
      *
      * @return 输入流形式的响应内容, {@link InputStream}实例
      * @throws Exception 可能抛出的异常类型

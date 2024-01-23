@@ -3,10 +3,8 @@ package com.dtflys.forest.test.convert.xml.jaxb;
 import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.test.convert.xml.jaxb.client.GetXmlClient;
-import com.dtflys.forest.test.convert.xml.jaxb.client.PostXmlClient;
 import com.dtflys.forest.test.convert.xml.jaxb.pojo.XmlEntity;
 import com.dtflys.forest.test.convert.xml.jaxb.pojo.XmlOrder;
-import com.dtflys.forest.test.convert.xml.jaxb.pojo.XmlTestParam;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.assertj.core.api.AssertionsForClassTypes;
@@ -16,7 +14,6 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestGetXml {
@@ -54,7 +51,7 @@ public class TestGetXml {
     }
 
     public TestGetXml() {
-        configuration.setVariableValue("port", server.getPort());
+        configuration.setVar("port", server.getPort());
         getXmlClient = configuration.client(GetXmlClient.class);
     }
 

@@ -39,8 +39,8 @@ public class TestBaseReqVarClient extends BaseClientTest{
     }
     public TestBaseReqVarClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVariableValue("port", server.getPort());
-        configuration.setVariableValue("baseURL", "http://localhost:" + server.getPort() + "/a/");
+        configuration.setVar("port", server.getPort());
+        configuration.setVar("baseURL", "http://localhost:" + server.getPort() + "/a/");
         baseReqVarClient = configuration.createInstance(BaseReqVarClient.class);
         baseReqAddressClient = configuration.createInstance(BaseReqAddressClient.class);
     }

@@ -1,6 +1,6 @@
 package com.dtflys.forest.lifecycles.parameter;
 
-import com.dtflys.forest.annotation.DataFile;
+import com.dtflys.forest.annotation.FileBody;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.interceptor.ForestJointPoint;
@@ -18,16 +18,16 @@ import com.dtflys.forest.utils.StringUtils;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2020-08-21 2:17
  */
-public class DataFileLifeCycle implements ParameterAnnotationLifeCycle<DataFile> {
+public class DataFileLifeCycle implements ParameterAnnotationLifeCycle<FileBody> {
 
     @Override
-    public void onParameterInitialized(ForestMethod method, MappingParameter parameter, DataFile annotation) {
+    public void onParameterInitialized(ForestMethod method, MappingParameter parameter, FileBody annotation) {
         final String name = annotation.value();
         final String fileName = annotation.fileName();
         final MetaRequest metaRequest = method.getMetaRequest();
         final String partContentType = annotation.partContentType();
-        final MappingTemplate nameTemplate = MappingTemplate.fromAnnotation(method, DataFile.class, "name", name);
-        final MappingTemplate fileNameTemplate = MappingTemplate.fromAnnotation(method, DataFile.class, "fileName", fileName);
+        final MappingTemplate nameTemplate = MappingTemplate.annotation(method, FileBody.class, "name", name);
+        final MappingTemplate fileNameTemplate = MappingTemplate.annotation(method, FileBody.class, "fileName", fileName);
         if (StringUtils.isNotBlank(partContentType)) {
             parameter.setPartContentType(partContentType.trim());
         }

@@ -1,11 +1,8 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.config.VariableValueContext;
 import com.dtflys.forest.filter.Filter;
-import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.reflection.ForestMethod;
 
 import java.util.List;
 

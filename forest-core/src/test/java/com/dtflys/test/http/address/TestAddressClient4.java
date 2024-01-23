@@ -30,7 +30,7 @@ public class TestAddressClient4 extends BaseClientTest {
 
     public TestAddressClient4(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVariableValue("port", server.getPort());
+        configuration.setVar("port", server.getPort());
         addressClient4 = configuration.createInstance(AddressClient4.class);
     }
 

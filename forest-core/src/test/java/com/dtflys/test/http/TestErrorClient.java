@@ -40,7 +40,7 @@ public class TestErrorClient extends BaseClientTest {
 
     public TestErrorClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVariableValue("port", server.getPort());
+        configuration.setVar("port", server.getPort());
         getClient = configuration.createInstance(GetClient.class);
     }
 

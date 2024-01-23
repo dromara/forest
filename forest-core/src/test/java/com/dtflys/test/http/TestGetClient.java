@@ -73,7 +73,7 @@ public class TestGetClient extends BaseClientTest {
 
     public TestGetClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVariableValue("port", server.getPort());
+        configuration.setVar("port", server.getPort());
         getClient = configuration.createInstance(GetClient.class);
         urlEncodedClient = configuration.createInstance(UrlEncodedClient.class);
     }
@@ -106,48 +106,6 @@ public class TestGetClient extends BaseClientTest {
 */
     }
 
-
-    @Test
-    public void performance() {
-        int count = 10000;
-        for (int i = 0; i < count; i++) {
-            server.enqueue(new MockResponse().setBody(EXPECTED));
-        }
-        ForestConfiguration.createConfiguration();
-        Forest.config()
-                .setMaxRetryCount(0)
-                .setLogEnabled(false)
-                .setMaxConnections(10000);
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        for (int i = 0; i < count; i++) {
-            Forest.get("/abc")
-                    .host("localhost")
-                    .port(server.getPort())
-                    .addHeader("Accept", "text/plain")
-                    .execute();
-        }
-        stopWatch.stop();
-        System.out.println("总耗时: " + stopWatch.getTotalTimeMillis() + "ms");
-    }
-
-
-    @Test
-    public void performance_hutool() {
-        int count = 10000;
-        for (int i = 0; i < count; i++) {
-            server.enqueue(new MockResponse().setBody(EXPECTED));
-        }
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        for (int i = 0; i < count; i++) {
-            HttpUtil.createGet("http://localhost:" + server.getPort() + "/abc")
-                    .header("Accept", "text/plain")
-                    .execute();
-        }
-        stopWatch.stop();
-        System.out.println("总耗时: " + stopWatch.getTotalTimeMillis() + "ms");
-    }
 
 
     //    @Test

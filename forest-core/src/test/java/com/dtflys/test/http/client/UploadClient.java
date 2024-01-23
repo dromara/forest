@@ -2,7 +2,7 @@ package com.dtflys.test.http.client;
 
 import com.dtflys.forest.annotation.BaseRequest;
 import com.dtflys.forest.annotation.Body;
-import com.dtflys.forest.annotation.DataFile;
+import com.dtflys.forest.annotation.FileBody;
 import com.dtflys.forest.annotation.JSONBody;
 import com.dtflys.forest.annotation.LogEnabled;
 import com.dtflys.forest.annotation.Post;
@@ -11,7 +11,6 @@ import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.http.ForestRequest;
-import org.bouncycastle.math.raw.Mod;
 
 import java.io.File;
 import java.io.InputStream;
@@ -28,72 +27,72 @@ public interface UploadClient {
             dataType = "json",
             contentType = "multipart/form-data"
     )
-    ForestRequest<Map> upload(@DataFile("file") String filePath, OnProgress onProgress);
+    ForestRequest<Map> upload(@FileBody("file") String filePath, OnProgress onProgress);
 
 
     @Post(url = "/upload")
-    ForestRequest<Map> upload(@DataFile("file") File file, OnProgress onProgress);
+    ForestRequest<Map> upload(@FileBody("file") File file, OnProgress onProgress);
 
     @Post(url = "/upload")
-    ForestRequest<Map> upload_withParams(@DataFile("file") File file, @Body("a") String a, @Body("b") String b);
+    ForestRequest<Map> upload_withParams(@FileBody("file") File file, @Body("a") String a, @Body("b") String b);
 
     @Post(url = "/upload", contentType = ContentType.MULTIPART_FORM_DATA)
     ForestRequest<Map> upload_withParams(@Body("a") String a, @Body("b") String b);
 
 
     @Post(url = "/upload")
-    ForestRequest<Map> upload(@DataFile(value = "file", fileName = "${1}") byte[] bytes, String filename);
+    ForestRequest<Map> upload(@FileBody(value = "file", fileName = "${1}") byte[] bytes, String filename);
 
     @Post(url = "/upload", contentType = "multipart/form-data")
-    ForestRequest<Map> upload(@DataFile(value = "file", fileName = "${1}") InputStream in, String filename);
+    ForestRequest<Map> upload(@FileBody(value = "file", fileName = "${1}") InputStream in, String filename);
 
     // Path Collection
 
     @PostRequest(url = "/upload")
-    ForestRequest<Map> uploadPathMap(@DataFile(value = "file", fileName = "${_key}") Map<String, String> pathMap);
+    ForestRequest<Map> uploadPathMap(@FileBody(value = "file", fileName = "${_key}") Map<String, String> pathMap);
 
     @PostRequest(url = "/upload")
-    ForestRequest<Map> uploadPathMap2(@DataFile(value = "file_${_index}", fileName = "${_key}") Map<String, String> pathMap);
+    ForestRequest<Map> uploadPathMap2(@FileBody(value = "file_${_index}", fileName = "${_key}") Map<String, String> pathMap);
 
     @PostRequest(url = "/upload")
-    ForestRequest<Map> uploadPathList(@DataFile(value = "file", fileName = "test-img-${_index}.jpg") List<String> pathList);
+    ForestRequest<Map> uploadPathList(@FileBody(value = "file", fileName = "test-img-${_index}.jpg") List<String> pathList);
 
     @PostRequest(url = "/upload")
-    ForestRequest<Map> uploadPathList2(@DataFile(value = "file_${_index}", fileName = "test-img-${_index}.jpg") List<String> pathList);
+    ForestRequest<Map> uploadPathList2(@FileBody(value = "file_${_index}", fileName = "test-img-${_index}.jpg") List<String> pathList);
 
     @PostRequest(url = "/upload")
-    ForestRequest<Map> uploadPathArray(@DataFile(value = "file", fileName = "test-img-${_index}.jpg") String[] pathArray);
+    ForestRequest<Map> uploadPathArray(@FileBody(value = "file", fileName = "test-img-${_index}.jpg") String[] pathArray);
 
     @PostRequest(url = "/upload")
-    ForestRequest<Map> uploadPathArray2(@DataFile(value = "file_${_index}", fileName = "test-img-${_index}.jpg") String[] pathArray);
+    ForestRequest<Map> uploadPathArray2(@FileBody(value = "file_${_index}", fileName = "test-img-${_index}.jpg") String[] pathArray);
 
 
     // Byte Array Collection
 
     @PostRequest(url = "/upload")
-    ForestRequest<Map> uploadByteArrayMap(@DataFile(value = "file", fileName = "${_key}") Map<String, byte[]> byteArrayMap);
+    ForestRequest<Map> uploadByteArrayMap(@FileBody(value = "file", fileName = "${_key}") Map<String, byte[]> byteArrayMap);
 
     @PostRequest(url = "/upload")
-    ForestRequest<Map> uploadByteArrayList(@DataFile(value = "file", fileName = "test-img-${_index}.jpg") List<byte[]> byteArrayList);
+    ForestRequest<Map> uploadByteArrayList(@FileBody(value = "file", fileName = "test-img-${_index}.jpg") List<byte[]> byteArrayList);
 
     @PostRequest(url = "/upload")
-    ForestRequest<Map> uploadByteArrayArray(@DataFile(value = "file", fileName = "test-img-${_index}.jpg") byte[][] byteArrayArray);
+    ForestRequest<Map> uploadByteArrayArray(@FileBody(value = "file", fileName = "test-img-${_index}.jpg") byte[][] byteArrayArray);
 
     // mixture
     @PostRequest(url = "/upload")
-    ForestRequest<Map> imageUploadWithMapParams(String fileName, @DataFile(value = "file", fileName = "${0}") File file,
+    ForestRequest<Map> imageUploadWithMapParams(String fileName, @FileBody(value = "file", fileName = "${0}") File file,
                                                 @Body Map params);
 
     @PostRequest(url = "/upload")
-    ForestRequest<Map> imageUploadWithBodyParams(String fileName, @DataFile(value = "file", fileName = "${0}") File file,
+    ForestRequest<Map> imageUploadWithBodyParams(String fileName, @FileBody(value = "file", fileName = "${0}") File file,
                                                  @Body("a") String a, @Body("b") String b);
 
     @PostRequest(url = "/upload", contentType = ContentType.MULTIPART_FORM_DATA)
-    ForestRequest<Map> imageUploadWithJSONBodyParams(String fileName, @DataFile(value = "file", fileName = "${0}") File file,
+    ForestRequest<Map> imageUploadWithJSONBodyParams(String fileName, @FileBody(value = "file", fileName = "${0}") File file,
                                                  @JSONBody("params") Map params);
 
     @PostRequest(url = "/upload")
-    ForestRequest<Map> imageUploadWithJSONBodyParamsAndWithoutContentType(String fileName, @DataFile(value = "file", fileName = "${0}") File file,
+    ForestRequest<Map> imageUploadWithJSONBodyParamsAndWithoutContentType(String fileName, @FileBody(value = "file", fileName = "${0}") File file,
                                                      @JSONBody("params") Map params);
 
 
@@ -119,6 +118,6 @@ public interface UploadClient {
     }
 
     @Post(url = "/upload")
-    ForestRequest<Map> uploadWithModel(@DataFile("file") File file, @Body Model model);
+    ForestRequest<Map> uploadWithModel(@FileBody("file") File file, @Body Model model);
 
 }

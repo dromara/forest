@@ -3,9 +3,7 @@ package com.dtflys.test.http;
 import com.dtflys.forest.annotation.Get;
 import com.dtflys.forest.annotation.HTTPProxy;
 import com.dtflys.forest.backend.HttpBackend;
-import com.dtflys.forest.backend.okhttp3.OkHttp3;
 import com.dtflys.forest.config.ForestConfiguration;
-import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -28,7 +26,7 @@ public class TestHttpClientHttpPorxy extends BaseClientTest {
 
     public TestHttpClientHttpPorxy(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVariableValue("port", server.getPort());
+        configuration.setVar("port", server.getPort());
         testHttpClientHttpProxyClient = configuration.createInstance(TestHttpClientHttpProxyClient.class);
 
     }

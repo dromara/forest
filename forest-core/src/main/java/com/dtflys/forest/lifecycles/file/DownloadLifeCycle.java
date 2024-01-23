@@ -1,6 +1,5 @@
 package com.dtflys.forest.lifecycles.file;
 
-import com.dtflys.forest.ForestGenericClient;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.extensions.DownloadFile;
@@ -102,7 +101,7 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
             in = response.getInputStream();
         } catch (Exception e) {
             try {
-                final byte[] bytes = response.getByteArray();
+                final byte[] bytes = response.getRawBytes();
                 in = new ByteArrayInputStream(bytes);
             } catch (Exception ex) {
                 throw new ForestRuntimeException(ex);

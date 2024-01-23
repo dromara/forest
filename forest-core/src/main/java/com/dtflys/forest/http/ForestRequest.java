@@ -40,7 +40,6 @@ import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.callback.RetryWhen;
 import com.dtflys.forest.callback.SuccessWhen;
 import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.config.VariableValueContext;
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestConverter;
@@ -65,6 +64,7 @@ import com.dtflys.forest.lifecycles.file.DownloadLifeCycle;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.RequestLogMessage;
 import com.dtflys.forest.mapping.ForestRequestContext;
+import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingURLTemplate;
 import com.dtflys.forest.multipart.ByteArrayMultipart;
 import com.dtflys.forest.multipart.FileMultipart;
@@ -72,7 +72,7 @@ import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.multipart.InputStreamMultipart;
 import com.dtflys.forest.pool.ForestRequestPool;
 import com.dtflys.forest.reflection.ForestMethod;
-import com.dtflys.forest.reflection.ForestVariableValue;
+import com.dtflys.forest.reflection.ForestVariableDef;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
 import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
@@ -650,7 +650,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
             throw new ForestRuntimeException("[Forest] Request url cannot be empty!");
         }
         final String srcUrl = StringUtils.trimBegin(url);
-        MappingURLTemplate template = MappingURLTemplate.fromAnnotation(this, null, null, srcUrl);
+        MappingURLTemplate template = MappingURLTemplate.text(this, srcUrl);
         return setUrl(template, args);
     }
 
@@ -772,7 +772,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestRequest}对象实例
      */
     public ForestRequest<T> setHost(String host) {
-        this.url.setHost(host);
+        final MappingTemplate template = MappingTemplate.text(this, host);
+        this.url.setHost(template.render(this));
         return this;
     }
 
@@ -832,6 +833,12 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
     public ForestRequest<T> port(int port) {
         return setPort(port);
     }
+
+    public ForestRequest<T> port(String text) {
+        int port = Integer.parseInt(MappingTemplate.text(this, text).render(this));
+        return setPort(port);
+    }
+
 
     /**
      * 获取URL主机端口
@@ -3316,7 +3323,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
         if (value instanceof Lazy) {
             return addHeader(name, (Lazy) value);
         }
-        this.headers.setHeader(name, String.valueOf(value));
+        this.headers.setHeader(name, MappingTemplate.text(this, String.valueOf(value)).render(this));
         return this;
     }
 
@@ -4062,14 +4069,19 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
         return setOnSaveCookie(onSaveCookie);
     }
 
-    @Override
-    public boolean isVariableDefined(String name) {
-        return context.isVariableDefined(name);
+    public ForestRequest<T> setVar(String name, Object value) {
+        context.setVar(name, value);
+        return this;
     }
 
     @Override
-    public Object getVariableValue(String name, VariableScope variableScope) {
-        return context.getVariableValue(name, variableScope);
+    public boolean isVarDefined(String name) {
+        return context.isVarDefined(name);
+    }
+
+    @Override
+    public Object getVar(String name, VariableValueContext valueContext) {
+        return context.getVar(name, valueContext);
     }
 
     /**
@@ -4079,12 +4091,12 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return 变量值
      */
     public Object getVariableValue(String name) {
-        return getVariableValue(name, this);
+        return getVar(name, this);
     }
 
     @Override
-    public ForestVariableValue getVariable(String name) {
-        return context.getVariable(name);
+    public ForestVariableDef getVarDef(String name) {
+        return context.getVarDef(name);
     }
 
     @Override

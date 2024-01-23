@@ -8,7 +8,6 @@ public interface VariableValueContext extends VariableScope {
 
     Object getArgument(int index);
 
-
     ForestQueryMap getQuery();
 
 }

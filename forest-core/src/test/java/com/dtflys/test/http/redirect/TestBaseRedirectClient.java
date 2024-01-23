@@ -39,7 +39,7 @@ public class TestBaseRedirectClient extends BaseClientTest {
 
     public TestBaseRedirectClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVariableValue("port", server.getPort());
+        configuration.setVar("port", server.getPort());
         redirectClient = configuration.createInstance(RedirectClient.class);
         baseRedirectClient = configuration.createInstance(BaseRedirectClient.class);
     }

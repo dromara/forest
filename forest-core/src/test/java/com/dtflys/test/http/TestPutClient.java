@@ -36,7 +36,7 @@ public class TestPutClient extends BaseClientTest {
 
     public TestPutClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVariableValue("port", server.getPort());
+        configuration.setVar("port", server.getPort());
         putClient = configuration.createInstance(PutClient.class);
     }
 

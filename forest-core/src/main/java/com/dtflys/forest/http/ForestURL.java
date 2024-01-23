@@ -24,14 +24,7 @@
 
 package com.dtflys.forest.http;
 
-import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
-import com.dtflys.forest.mapping.MappingExpr;
-import com.dtflys.forest.mapping.MappingString;
-import com.dtflys.forest.mapping.MappingUrlEncodedExpr;
-import com.dtflys.forest.reflection.ForestVariableValue;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
 import org.slf4j.Logger;

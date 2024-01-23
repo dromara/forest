@@ -7,7 +7,6 @@ import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.config.VariableValueContext;
 import com.dtflys.forest.exceptions.ForestTemplateSyntaxError;
 import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
-import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.ForestCache;
 import com.dtflys.forest.utils.StringUtils;
@@ -34,7 +33,11 @@ public class MappingTemplate {
 
     protected volatile boolean compiled = false;
 
-    public static MappingTemplate fromAnnotation(
+    public static MappingTemplate text(final VariableScope variableScope, final String text) {
+        return annotation(variableScope, null, null, text);
+    }
+
+    public static MappingTemplate annotation(
             final VariableScope variableScope,
             final Class<? extends Annotation> annotationType,
             final String attributeName,

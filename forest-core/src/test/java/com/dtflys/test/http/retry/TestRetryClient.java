@@ -39,7 +39,7 @@ public class TestRetryClient extends BaseClientTest {
 
     public TestRetryClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVariableValue("port", server.getPort());
+        configuration.setVar("port", server.getPort());
         retryClient = configuration.createInstance(RetryClient.class);
         retryClient2 = configuration.createInstance(RetryClient2.class);
     }

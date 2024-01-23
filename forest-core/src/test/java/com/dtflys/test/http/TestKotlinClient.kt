@@ -36,7 +36,7 @@ class TestKotlinClient(backend: HttpBackend?) : BaseClientTest(backend, configur
     var client : Client?
 
     init {
-        configuration?.setVariableValue("port", server.port)
+        configuration?.setVar("port", server.port)
         client = configuration?.client(Client::class.java)
     }
 
