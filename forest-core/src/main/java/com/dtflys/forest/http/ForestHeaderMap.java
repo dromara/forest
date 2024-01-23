@@ -24,6 +24,8 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.mapping.MappingTemplate;
+
 import java.util.*;
 
 /**
@@ -122,6 +124,8 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
         if (header != null) {
             if (header instanceof SimpleHeader) {
                 ((SimpleHeader) header).setValue(value);
+            } else if (header instanceof MappingHeader) {
+                ((MappingHeader) header).setValue(MappingTemplate.text(value));
             } else {
                 this.remove(header);
                 this.addHeader(key, value);
@@ -139,7 +143,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
                 addHeader(cookieHeader);
             }
         } else {
-            final ForestHeader newHeader = new SimpleHeader(key, value);
+            final MappingHeader newHeader = new MappingHeader(this, key, MappingTemplate.text(value));
             addHeader(newHeader);
         }
         return value;
@@ -382,7 +386,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
                 addHeader(cookieHeader);
             }
         } else {
-            addHeader(new SimpleHeader(name, value));
+            addHeader(new MappingHeader(this, name, MappingTemplate.text(value)));
         }
     }
 
@@ -463,10 +467,12 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
      * @param value 请求头的值
      */
     public void setHeader(String name, String value) {
-        final ForestHeader header = getHeader(name);
+        final ForestHeader<?, ?> header = getHeader(name);
         if (header != null) {
             if (header instanceof SimpleHeader) {
                 ((SimpleHeader) header).setValue(value);
+            } else if (header instanceof MappingHeader) {
+                ((MappingHeader) header).setValue(MappingTemplate.text(value));
             } else {
                 headers.remove(header);
                 addHeader(name, value);
@@ -477,7 +483,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
     }
 
     public void setHeader(String name, Lazy<?> lazyValue) {
-        final ForestHeader header = getHeader(name);
+        final ForestHeader<?, ?> header = getHeader(name);
         if (header != null) {
             if (header instanceof LazyHeader) {
                 ((LazyHeader) header).setValue(lazyValue);

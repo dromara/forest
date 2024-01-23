@@ -54,15 +54,26 @@ public class HttpclientForestResponse extends ForestResponse {
                 this.bytes = new byte[0];
                 this.content = "";
             }
-            try {
-                this.getRawBytes();
-            } catch (Exception e) {
-                throw new ForestRuntimeException(e);
-            }
+            init();
         } else {
             this.statusCode = -1;
         }
     }
+
+    private void init() {
+        if (request.isDownloadFile()
+                || InputStream.class.isAssignableFrom(request.getResultClass())
+                || InputStream.class.isAssignableFrom(ReflectUtils.toClass(request.getLifeCycleHandler().getResultType()))
+                || (contentType != null && contentType.canReadAsBinaryStream())) {
+        } else {
+            try {
+                this.bytes = getRawBytes();
+            } catch (Exception e) {
+                throw new ForestRuntimeException(e);
+            }
+        }
+    }
+
 
     private void setupContentEncoding() {
         final Header contentEncodingHeader = entity.getContentEncoding();
@@ -128,7 +139,8 @@ public class HttpclientForestResponse extends ForestResponse {
      * @author designer[19901753334@163.com]
      * @date 2021/12/8 23:51
      **/
-    private void setupHeaders() {
+    @Override
+    protected void setupHeaders() {
         if (httpResponse != null) {
             HeaderIterator it = httpResponse.headerIterator();
             if (it != null) {

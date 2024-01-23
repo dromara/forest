@@ -650,7 +650,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
             throw new ForestRuntimeException("[Forest] Request url cannot be empty!");
         }
         final String srcUrl = StringUtils.trimBegin(url);
-        MappingURLTemplate template = MappingURLTemplate.text(this, srcUrl);
+        MappingURLTemplate template = MappingURLTemplate.text(srcUrl);
         return setUrl(template, args);
     }
 
@@ -772,7 +772,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestRequest}对象实例
      */
     public ForestRequest<T> setHost(String host) {
-        final MappingTemplate template = MappingTemplate.text(this, host);
+        final MappingTemplate template = MappingTemplate.text(host);
         this.url.setHost(template.render(this));
         return this;
     }
@@ -835,7 +835,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
     }
 
     public ForestRequest<T> port(String text) {
-        int port = Integer.parseInt(MappingTemplate.text(this, text).render(this));
+        int port = Integer.parseInt(MappingTemplate.text(text).render(this));
         return setPort(port);
     }
 
@@ -3323,7 +3323,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
         if (value instanceof Lazy) {
             return addHeader(name, (Lazy) value);
         }
-        this.headers.setHeader(name, MappingTemplate.text(this, String.valueOf(value)).render(this));
+        this.headers.setHeader(name, String.valueOf(value));
         return this;
     }
 

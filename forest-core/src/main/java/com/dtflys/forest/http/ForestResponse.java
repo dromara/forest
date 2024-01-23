@@ -49,6 +49,8 @@ import java.util.List;
  */
 public abstract class ForestResponse<T> extends ResultGetter implements HasURL, HasHeaders {
 
+    protected boolean headerLoaded = false;
+
     protected final static int MAX_BYTES_CAPACITY = 1024 * 1024 * 2;
 
     /**
@@ -157,6 +159,9 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
     public boolean isDeflate() {
         return "deflate".equalsIgnoreCase(getContentEncoding());
     }
+
+
+    protected abstract void setupHeaders();
 
 
     /**
@@ -323,7 +328,28 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
         if (content != null) {
             return content;
         }
-        content = readAsString();
+        if (request.isDownloadFile()
+                || InputStream.class.isAssignableFrom(request.getResultClass())
+                || InputStream.class.isAssignableFrom(ReflectUtils.toClass(request.getLifeCycleHandler().getResultType()))
+                || (contentType != null && contentType.canReadAsBinaryStream())) {
+            final StringBuilder builder = new StringBuilder();
+            builder.append("[stream content-type: ")
+                    .append(contentType == null ? "undefined" : contentType.toString());
+            if (contentEncoding != null) {
+                builder.append("; content-encoding: ")
+                        .append(contentEncoding);
+            }
+            if (charset != null) {
+                builder.append("; charset: ")
+                        .append(charset);
+            }
+            builder.append("; length: ")
+                    .append(contentLength)
+                    .append("]");
+            this.content = builder.toString();
+        } else {
+            this.content = readAsString();
+        }
         return content;
     }
 
@@ -671,6 +697,10 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      * @return 请求响应头, {@link ForestHeader}类实例
      */
     public ForestHeader getHeader(String name) {
+        if (!headerLoaded) {
+            setupHeaders();
+            headerLoaded = true;
+        }
         return headers.getHeader(name);
     }
 
@@ -682,6 +712,10 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      * @see ForestHeader
      */
     public List<ForestHeader> getHeaders(String name) {
+        if (!headerLoaded) {
+            setupHeaders();
+            headerLoaded = true;
+        }
         return headers.getHeaders(name);
     }
 
@@ -691,6 +725,10 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      * @return {@link ForestCookie}对象列表
      */
     public List<ForestCookie> getCookies() {
+        if (!headerLoaded) {
+            setupHeaders();
+            headerLoaded = true;
+        }
         return headers.getSetCookies();
     }
 
@@ -702,6 +740,10 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      * @since 1.5.23
      */
     public ForestCookie getCookie(String name) {
+        if (!headerLoaded) {
+            setupHeaders();
+            headerLoaded = true;
+        }
         return headers.getSetCookie(name);
     }
 
@@ -712,6 +754,10 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      * @return 请求响应头值
      */
     public String getHeaderValue(String name) {
+        if (!headerLoaded) {
+            setupHeaders();
+            headerLoaded = true;
+        }
         return headers.getValue(name);
     }
 
@@ -722,6 +768,10 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      * @return 请求响应头值列表
      */
     public List<String> getHeaderValues(String name) {
+        if (!headerLoaded) {
+            setupHeaders();
+            headerLoaded = true;
+        }
         return headers.getValues(name);
     }
 
@@ -732,6 +782,10 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      */
     @Override
     public ForestHeaderMap getHeaders() {
+        if (!headerLoaded) {
+            setupHeaders();
+            headerLoaded = true;
+        }
         return headers;
     }
 

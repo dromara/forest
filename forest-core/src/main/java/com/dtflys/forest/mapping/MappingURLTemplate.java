@@ -1,7 +1,5 @@
 package com.dtflys.forest.mapping;
 
-import com.dtflys.forest.config.ForestProperties;
-import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.config.VariableValueContext;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
@@ -17,22 +15,21 @@ import java.lang.annotation.Annotation;
 public class MappingURLTemplate extends MappingTemplate {
     private final static ForestCache<String, MappingURLTemplate> templateCache = new ForestCache<>(512);
 
-    private MappingURLTemplate(Class<? extends Annotation> annotationType, String attributeName, String template, ForestProperties properties) {
-        super(annotationType, attributeName, template, properties);
+    private MappingURLTemplate(Class<? extends Annotation> annotationType, String attributeName, String template) {
+        super(annotationType, attributeName, template);
     }
 
-    public static MappingURLTemplate text(final VariableScope variableScope, final String text) {
-        return annotation(variableScope, null, null, text);
+    public static MappingURLTemplate text(final String text) {
+        return annotation(null, null, text);
     }
 
     public static MappingURLTemplate annotation(
-            final VariableScope variableScope,
             final Class<? extends Annotation> annotationType,
             final String attributeName,
             final String text) {
         final String key = (annotationType != null ? annotationType.getName() : "") + "@" + (attributeName != null ? attributeName : "") + "@" + text;
         return templateCache.get(key, k ->
-                new MappingURLTemplate(annotationType, attributeName, text, variableScope.getConfiguration().getProperties()).compile());
+                new MappingURLTemplate(annotationType, attributeName, text).compile());
     }
 
     public MappingURLTemplate compile() {

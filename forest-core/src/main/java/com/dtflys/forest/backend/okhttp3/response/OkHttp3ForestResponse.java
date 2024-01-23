@@ -46,20 +46,29 @@ public class OkHttp3ForestResponse extends ForestResponse {
         this.body = okResponse.body();
         this.statusCode = okResponse.code();
         this.reasonPhrase = okResponse.message();
-//        setupHeaders();
-//        setupContentEncoding();
         // 判断是否将Response数据按GZIP来解压
 //        setupGzip();
         if (body == null) {
             return;
         }
-        try {
-            this.getRawBytes();
-        } catch (Exception e) {
-            throw new ForestRuntimeException(e);
-        }
+        init();
 //        setupContentTypeAndCharset();
 //        setupContent();
+    }
+
+
+    private void init() {
+        if (request.isDownloadFile()
+                || InputStream.class.isAssignableFrom(request.getResultClass())
+                || InputStream.class.isAssignableFrom(ReflectUtils.toClass(request.getLifeCycleHandler().getResultType()))
+                || (contentType != null && contentType.canReadAsBinaryStream())) {
+        } else {
+            try {
+                this.bytes = getRawBytes();
+            } catch (Exception e) {
+                throw new ForestRuntimeException(e);
+            }
+        }
     }
 
     /**
@@ -116,7 +125,8 @@ public class OkHttp3ForestResponse extends ForestResponse {
         }
     }
 
-    private void setupHeaders() {
+    @Override
+    protected void setupHeaders() {
         if (okResponse != null) {
             Headers hs = okResponse.headers();
             Map<String, List<String>> hsMap = hs.toMultimap();

@@ -2,7 +2,6 @@ package com.dtflys.forest.mapping;
 
 
 import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.forest.config.ForestProperties;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.config.VariableValueContext;
 import com.dtflys.forest.exceptions.ForestTemplateSyntaxError;
@@ -25,7 +24,6 @@ public class MappingTemplate {
     private final static ForestCache<String, MappingTemplate> templateCache = new ForestCache<>(512);
     protected final Class<? extends Annotation> annotationType;
     protected final String attributeName;
-    protected final ForestProperties properties;
 
     protected String template;
     protected List<MappingExpr> exprList;
@@ -33,19 +31,17 @@ public class MappingTemplate {
 
     protected volatile boolean compiled = false;
 
-    public static MappingTemplate text(final VariableScope variableScope, final String text) {
-        return annotation(variableScope, null, null, text);
+    public static MappingTemplate text(final String text) {
+        return annotation(null, null, text);
     }
 
     public static MappingTemplate annotation(
-            final VariableScope variableScope,
             final Class<? extends Annotation> annotationType,
             final String attributeName,
             final String text) {
-        final ForestConfiguration configuration = variableScope.getConfiguration();
         final String key = (annotationType != null ? annotationType.getName() : "") + "@" + (attributeName != null ? attributeName : "") + "@" + text;
         return templateCache.get(key, k ->
-                new MappingTemplate(annotationType, attributeName, text, configuration.getProperties()).compile());
+                new MappingTemplate(annotationType, attributeName, text).compile());
     }
 
 
@@ -73,9 +69,6 @@ public class MappingTemplate {
         }
     }
 
-    public ForestProperties getProperties() {
-        return properties;
-    }
 
 
     private void match(char except) {
@@ -101,11 +94,10 @@ public class MappingTemplate {
         return template.charAt(readIndex + i);
     }
 
-    protected MappingTemplate(Class<? extends Annotation> annotationType, String attributeName, String template, ForestProperties properties) {
+    protected MappingTemplate(Class<? extends Annotation> annotationType, String attributeName, String template) {
         this.annotationType = annotationType;
         this.attributeName = attributeName;
         this.template = template;
-        this.properties = properties;
         if (this.template == null) {
             this.template = "";
         }
@@ -585,7 +577,7 @@ public class MappingTemplate {
 
     @Override
     public MappingTemplate clone() {
-        MappingTemplate template = new MappingTemplate(annotationType, attributeName, this.template, this.properties);
+        MappingTemplate template = new MappingTemplate(annotationType, attributeName, this.template);
         template.exprList = this.exprList;
         return template;
     }
@@ -602,7 +594,7 @@ public class MappingTemplate {
 
     public MappingTemplate valueOf(String value) {
         return new MappingTemplate(
-                annotationType, attributeName, value, properties);
+                annotationType, attributeName, value);
     }
 
 

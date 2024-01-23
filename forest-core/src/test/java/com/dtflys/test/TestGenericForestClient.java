@@ -2173,7 +2173,7 @@ public class TestGenericForestClient extends BaseClientTest {
         stopWatch.start();
         for (int i = 0; i < count; i++) {
             Forest.get("http://localhost:{port}/abc")
-                    .addHeader("Accept", "{accept?}")
+                    .addHeader("Accept", "{accept}")
                     .execute();
         }
         stopWatch.stop();
