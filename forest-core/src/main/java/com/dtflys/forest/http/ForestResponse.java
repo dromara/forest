@@ -32,10 +32,14 @@ import com.dtflys.forest.utils.ByteEncodeUtils;
 import com.dtflys.forest.utils.GzipUtils;
 import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
+import com.dtflys.forest.utils.TypeReference;
 import org.apache.commons.io.IOUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
 import java.net.SocketTimeoutException;
 import java.util.Date;
@@ -153,11 +157,19 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
     }
 
     public boolean isGzip() {
-        return "gzip".equalsIgnoreCase(getContentEncoding());
+        final String contentEncoding = getContentEncoding();
+        if (StringUtils.isNotEmpty(contentEncoding)) {
+            return contentEncoding.contains("gzip");
+        }
+        return false;
     }
 
     public boolean isDeflate() {
-        return "deflate".equalsIgnoreCase(getContentEncoding());
+        final String contentEncoding = getContentEncoding();
+        if (StringUtils.isNotEmpty(contentEncoding)) {
+            return contentEncoding.contains("gzip");
+        }
+        return false;
     }
 
 
@@ -360,7 +372,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      */
     public String readAsString() {
         try {
-            final byte[] bytes = getRawBytes();
+            final byte[] bytes = getBytes();
             if (bytes == null) {
                 return "";
             }
@@ -388,7 +400,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
             }
             if (type == null) {
                 try {
-                    result = (T) result(String.class);
+                    result = result(new TypeReference<>() {});
                 } catch (Throwable th) {
                 }
             } else {
@@ -673,6 +685,13 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      * @throws Exception 读取字节数组过程中可能的异常
      */
     public abstract byte[] getRawBytes() throws Exception;
+
+    public byte[] getBytes() throws Exception {
+        InputStream in = getInputStream();
+        byte[] outBytes = IOUtils.toByteArray(in);
+        return outBytes;
+    }
+
 
     /**
      * 获取原始响应流

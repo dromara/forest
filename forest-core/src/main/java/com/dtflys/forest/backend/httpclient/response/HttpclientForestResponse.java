@@ -2,6 +2,7 @@ package com.dtflys.forest.backend.httpclient.response;
 
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.http.ForestHttpInputStream;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.GzipUtils;
@@ -28,7 +29,7 @@ public class HttpclientForestResponse extends ForestResponse {
 
     private final HttpEntity entity;
 
-    private byte[] bytes;
+    private byte[] rawBytes;
 
 
     public HttpclientForestResponse(ForestRequest request, HttpResponse httpResponse, HttpEntity entity, Date requestTime, Date responseTime) {
@@ -52,7 +53,7 @@ public class HttpclientForestResponse extends ForestResponse {
 //                setupContent();
 //                this.contentLength = entity.getContentLength();
             } else {
-                this.bytes = new byte[0];
+                this.rawBytes = new byte[0];
                 this.content = "";
             }
             init();
@@ -69,7 +70,7 @@ public class HttpclientForestResponse extends ForestResponse {
                 || (contentType != null && contentType.canReadAsBinaryStream())) {
         } else {
             try {
-                this.bytes = getRawBytes();
+                this.rawBytes = getRawBytes();
             } catch (Exception e) {
                 throw new ForestRuntimeException(e);
             }
@@ -160,13 +161,13 @@ public class HttpclientForestResponse extends ForestResponse {
 
     @Override
     public boolean isReceivedResponseData() {
-        return entity != null || bytes != null;
+        return entity != null || rawBytes != null;
     }
 
     private String readContentAsString() {
         try  {
-            bytes = getRawBytes();
-            return byteToString(bytes);
+            rawBytes = getRawBytes();
+            return byteToString(rawBytes);
         } catch (IOException e) {
             throw new ForestRuntimeException(e);
         } finally {
@@ -188,30 +189,30 @@ public class HttpclientForestResponse extends ForestResponse {
 
     @Override
     public InputStream getInputStream() throws Exception {
-        if (bytes != null) {
-            return new ByteArrayInputStream(getRawBytes());
-        }
-        return entity.getContent();
+        return new ForestHttpInputStream(this);
     }
 
     @Override
     public byte[] getRawBytes() throws IOException {
-        if (bytes == null) {
+        if (rawBytes == null) {
             if (entity == null) {
                 return null;
             } else {
                 try {
-                    bytes = EntityUtils.toByteArray(entity);
+                    rawBytes = EntityUtils.toByteArray(entity);
                 } finally {
                     close();
                 }
             }
         }
-        return bytes;
+        return rawBytes;
     }
 
     @Override
     public InputStream getRawInputStream() throws Exception {
+        if (rawBytes != null) {
+            return new ByteArrayInputStream(rawBytes);
+        }
         return entity.getContent();
     }
 

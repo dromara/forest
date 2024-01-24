@@ -2,6 +2,7 @@ package com.dtflys.forest.backend.okhttp3.response;
 
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.http.ForestHttpInputStream;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.GzipUtils;
@@ -32,7 +33,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
     /**
      * 内容字节数组
      */
-    private byte[] bytes;
+    private byte[] rawBytes;
 
     public OkHttp3ForestResponse(ForestRequest request, Response okResponse, Date requestTime, Date responseTime) {
         super(request, requestTime, responseTime);
@@ -65,7 +66,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
                 || (contentType != null && contentType.canReadAsBinaryStream())) {
         } else {
             try {
-                this.bytes = getRawBytes();
+                this.rawBytes = getRawBytes();
             } catch (Exception e) {
                 throw new ForestRuntimeException(e);
             }
@@ -116,11 +117,11 @@ public class OkHttp3ForestResponse extends ForestResponse {
 
     private String readContentAsString() {
         try {
-            bytes = getRawBytes();
-            if (bytes == null) {
+            rawBytes = getRawBytes();
+            if (rawBytes == null) {
                 return null;
             }
-            return byteToString(bytes);
+            return byteToString(rawBytes);
         } catch (Exception e) {
             throw new ForestRuntimeException(e);
         }
@@ -193,10 +194,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
 
     @Override
     public InputStream getInputStream() throws Exception {
-        if (bytes != null) {
-            return new ByteArrayInputStream(getRawBytes());
-        }
-        return body.byteStream();
+        return new ForestHttpInputStream(this);
     }
 
     @Override
@@ -206,22 +204,25 @@ public class OkHttp3ForestResponse extends ForestResponse {
 
     @Override
     public byte[] getRawBytes() throws Exception {
-        if (bytes == null) {
+        if (rawBytes == null) {
             if (body == null) {
                 return null;
             } else {
                 try {
-                    bytes = body.bytes();
+                    rawBytes = body.bytes();
                 } finally {
                     close();
                 }
             }
         }
-        return bytes;
+        return rawBytes;
     }
 
     @Override
     public InputStream getRawInputStream() throws Exception {
+        if (rawBytes != null) {
+            return new ByteArrayInputStream(rawBytes);
+        }
         return body.byteStream();
     }
 

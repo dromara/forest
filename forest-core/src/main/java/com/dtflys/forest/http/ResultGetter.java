@@ -44,10 +44,6 @@ public abstract class ResultGetter {
     }
 
     public <T> T result(TypeReference<T> typeReference) {
-        final Object result = HANDLER.getResult(request, getResponse(), typeReference.getType());
-        if (result == null) {
-            return null;
-        }
-        return (T) result;
+        return result(typeReference.getType());
     }
 }
