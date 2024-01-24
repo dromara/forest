@@ -33,7 +33,7 @@ public class TestAnnotationMergeClient extends BaseClientTest {
 
     public TestAnnotationMergeClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
         annotationMergeClient = configuration.createInstance(AnnotationMergeClient.class);
     }
 

@@ -10,7 +10,7 @@ public class RetryInterceptor implements Interceptor {
     @Override
     public void afterExecute(ForestRequest request, ForestResponse response) {
         Integer count = getAttributeAsInteger(request, "retry.count");
-        request.addAttachment("count", 1);
+        request.attachment("count", 1);
         if (count == null) {
             count = 0;
         }

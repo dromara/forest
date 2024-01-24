@@ -10,7 +10,7 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.handler.ResultHandler;
 import com.dtflys.forest.http.ForestCookie;
-import com.dtflys.forest.http.ForestCookies;
+import com.dtflys.forest.http.ForestCookieSet;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.ForestProgress;
@@ -120,7 +120,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
     private void handleSaveCookie(ForestRequest request, ForestResponse response) {
         List<ForestCookie> cookieList = response.getCookies();
         if (cookieList != null && cookieList.size() > 0) {
-            ForestCookies cookies = new ForestCookies(response.getCookies());
+            ForestCookieSet cookies = new ForestCookieSet(response.getCookies());
             handleSaveCookie(request, cookies);
         }
     }
@@ -197,7 +197,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
     }
 
     @Override
-    public void handleLoadCookie(ForestRequest request, ForestCookies cookies) {
+    public void handleLoadCookie(ForestRequest request, ForestCookieSet cookies) {
         request.getInterceptorChain().onLoadCookie(request, cookies);
         OnLoadCookie onLoadCookie = request.getOnLoadCookie();
         if (onLoadCookie != null) {
@@ -206,7 +206,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
     }
 
     @Override
-    public void handleSaveCookie(ForestRequest request, ForestCookies cookies) {
+    public void handleSaveCookie(ForestRequest request, ForestCookieSet cookies) {
         request.getInterceptorChain().onSaveCookie(request, cookies);
         OnSaveCookie onSaveCookie = request.getOnSaveCookie();
         if (onSaveCookie != null) {

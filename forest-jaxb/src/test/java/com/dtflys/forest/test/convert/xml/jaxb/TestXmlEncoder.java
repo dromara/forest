@@ -32,7 +32,7 @@ public class TestXmlEncoder {
     }
 
     public TestXmlEncoder() {
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
         this.xmlEncoderClient = configuration.client(XmlEncoderClient.class);
     }
 

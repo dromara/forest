@@ -383,7 +383,7 @@ public class ForestBody implements List<ForestRequestBody> {
     public String encodeToString(ConvertOptions options) {
         String strCharset = request.getCharset();
         if (StringUtils.isEmpty(strCharset)) {
-            strCharset = request.getConfiguration().getCharset();
+            strCharset = request.getConfiguration().charset();
         }
         if (StringUtils.isEmpty(strCharset)) {
             strCharset = "UTF-8";

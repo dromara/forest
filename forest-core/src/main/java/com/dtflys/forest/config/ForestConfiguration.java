@@ -500,12 +500,12 @@ public class ForestConfiguration implements Serializable {
         converterMap.put(ForestDataType.FORM, new DefaultFormConvertor(configuration));
         setupJSONConverter(configuration);
         configuration.setBackendClientCacheMaxSize(128);
-        configuration.setTimeout(3000);
+        configuration.timeout(3000);
         configuration.setMaxConnections(500);
         configuration.setMaxRouteConnections(500);
-        configuration.setRetryer(BackOffRetryer.class);
-        configuration.setMaxRetryCount(0);
-        configuration.setMaxRetryInterval(0);
+        configuration.retryer(BackOffRetryer.class);
+        configuration.maxRetryCount(0);
+        configuration.maxRetryInterval(0);
         configuration.registerFilter("json", JSONFilter.class);
         configuration.registerFilter("xml", XmlFilter.class);
         configuration.registerFilter("encode", EncodeFilter.class);
@@ -1015,7 +1015,7 @@ public class ForestConfiguration implements Serializable {
      * @return 当前ForestConfiguration实例
      */
     @Deprecated
-    public ForestConfiguration setTimeout(final Integer timeout) {
+    public ForestConfiguration timeout(final Integer timeout) {
         this.timeout = timeout;
         return this;
     }
@@ -1025,7 +1025,7 @@ public class ForestConfiguration implements Serializable {
      *
      * @return 字符集名称
      */
-    public String getCharset() {
+    public String charset() {
         return charset;
     }
 
@@ -1035,7 +1035,7 @@ public class ForestConfiguration implements Serializable {
      * @param charset 字符集名称
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setCharset(final String charset) {
+    public ForestConfiguration charset(final String charset) {
         this.charset = charset;
         return this;
     }
@@ -1045,7 +1045,7 @@ public class ForestConfiguration implements Serializable {
      *
      * @return 连接超时时间，单位为毫秒
      */
-    public Integer getConnectTimeout() {
+    public Integer connectTimeout() {
         return connectTimeout;
     }
 
@@ -1055,7 +1055,7 @@ public class ForestConfiguration implements Serializable {
      * @param connectTimeout 连接超时时间，单位为毫秒
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setConnectTimeout(final Integer connectTimeout) {
+    public ForestConfiguration connectTimeout(final Integer connectTimeout) {
         this.connectTimeout = connectTimeout;
         return this;
     }
@@ -1068,7 +1068,7 @@ public class ForestConfiguration implements Serializable {
      * @return 当前ForestConfiguration实例
      * @since 1.5.6
      */
-    public ForestConfiguration setConnectTimeout(final int connectTimeout, final TimeUnit timeUnit) {
+    public ForestConfiguration connectTimeout(final int connectTimeout, final TimeUnit timeUnit) {
         this.connectTimeout = TimeUtils.toMillis("global connect timeout", connectTimeout, timeUnit);
         return this;
     }
@@ -1080,7 +1080,7 @@ public class ForestConfiguration implements Serializable {
      * @return 当前ForestConfiguration实例
      * @since 1.5.6
      */
-    public ForestConfiguration setConnectTimeout(final Duration connectTimeout) {
+    public ForestConfiguration connectTimeout(final Duration connectTimeout) {
         this.connectTimeout = TimeUtils.toMillis("global connect timeout", connectTimeout);
         return this;
     }
@@ -1092,7 +1092,7 @@ public class ForestConfiguration implements Serializable {
      * @return 读取超时时间
      * @since 1.5.6
      */
-    public Integer getReadTimeout() {
+    public Integer readTimeout() {
         return readTimeout;
     }
 
@@ -1103,7 +1103,7 @@ public class ForestConfiguration implements Serializable {
      * @return 当前ForestConfiguration实例
      * @since 1.5.6
      */
-    public ForestConfiguration setReadTimeout(final Integer readTimeout) {
+    public ForestConfiguration readTimeout(final Integer readTimeout) {
         this.readTimeout = readTimeout;
         return this;
     }
@@ -1116,7 +1116,7 @@ public class ForestConfiguration implements Serializable {
      * @return 当前ForestConfiguration实例
      * @since 1.5.6
      */
-    public ForestConfiguration setReadTimeout(final int readTimeout, final TimeUnit timeUnit) {
+    public ForestConfiguration readTimeout(final int readTimeout, final TimeUnit timeUnit) {
         this.readTimeout = TimeUtils.toMillis("global read timeout", readTimeout, timeUnit);
         return this;
     }
@@ -1128,7 +1128,7 @@ public class ForestConfiguration implements Serializable {
      * @return 当前ForestConfiguration实例
      * @since 1.5.6
      */
-    public ForestConfiguration setReadTimeout(final Duration readTimeout) {
+    public ForestConfiguration readTimeout(final Duration readTimeout) {
         this.readTimeout = TimeUtils.toMillis("global read timeout", readTimeout);
         return this;
     }
@@ -1139,7 +1139,7 @@ public class ForestConfiguration implements Serializable {
      *
      * @return 重试策略类
      */
-    public Class getRetryer() {
+    public Class retryer() {
         return retryer;
     }
 
@@ -1149,7 +1149,7 @@ public class ForestConfiguration implements Serializable {
      * @param retryer 重试策略类
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setRetryer(final Class retryer) {
+    public ForestConfiguration retryer(final Class retryer) {
         this.retryer = retryer;
         return this;
     }
@@ -1160,7 +1160,7 @@ public class ForestConfiguration implements Serializable {
      * @return 重试次数
      */
     @Deprecated
-    public Integer getRetryCount() {
+    public Integer retryCount() {
         return maxRetryCount;
     }
 
@@ -1171,7 +1171,7 @@ public class ForestConfiguration implements Serializable {
      * @return 当前ForestConfiguration实例
      */
     @Deprecated
-    public ForestConfiguration setRetryCount(final Integer retryCount) {
+    public ForestConfiguration retryCount(final Integer retryCount) {
         this.maxRetryCount = retryCount;
         return this;
     }
@@ -1181,7 +1181,7 @@ public class ForestConfiguration implements Serializable {
      *
      * @return 重试次数
      */
-    public Integer getMaxRetryCount() {
+    public Integer maxRetryCount() {
         return maxRetryCount;
     }
 
@@ -1192,7 +1192,7 @@ public class ForestConfiguration implements Serializable {
      * @param maxRetryCount 最大重试次数
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setMaxRetryCount(final Integer maxRetryCount) {
+    public ForestConfiguration maxRetryCount(final Integer maxRetryCount) {
         this.maxRetryCount = maxRetryCount;
         return this;
     }
@@ -1203,7 +1203,7 @@ public class ForestConfiguration implements Serializable {
      *
      * @return 最大请求重试之间的时间间隔
      */
-    public long getMaxRetryInterval() {
+    public long maxRetryInterval() {
         return maxRetryInterval;
     }
 
@@ -1213,7 +1213,7 @@ public class ForestConfiguration implements Serializable {
      * @param maxRetryInterval 最大请求重试之间的时间间隔
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setMaxRetryInterval(final long maxRetryInterval) {
+    public ForestConfiguration maxRetryInterval(final long maxRetryInterval) {
         this.maxRetryInterval = maxRetryInterval;
         return this;
     }
@@ -1591,7 +1591,7 @@ public class ForestConfiguration implements Serializable {
      * @return 当前ForestConfiguration实例
      * @since 2.0.0-BETA
      */
-    public ForestConfiguration addInterceptor(final Class<? extends Interceptor> interceptorClass) {
+    public ForestConfiguration interceptor(final Class<? extends Interceptor> interceptorClass) {
         if (this.interceptors == null) {
             this.interceptors = new ArrayList<>();
         }
@@ -1711,7 +1711,7 @@ public class ForestConfiguration implements Serializable {
      * @param value 变量值
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setVar(final String name, final Object value) {
+    public ForestConfiguration variable(final String name, final Object value) {
         this.variableContext.setVar(name, value);
         return this;
     }
@@ -1723,7 +1723,7 @@ public class ForestConfiguration implements Serializable {
      * @param value {@link ForestVariableDef}类型变量值
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setVar(final String name, final ForestVariableDef value) {
+    public ForestConfiguration variable(final String name, final ForestVariableDef value) {
         this.variableContext.setVar(name, value);
         return this;
     }
@@ -1739,7 +1739,7 @@ public class ForestConfiguration implements Serializable {
     }
 
     public Object getVar(final String name, final VariableValueContext valueContext) {
-        return this.variableContext.getVar(name, valueContext);
+        return this.variableContext.getVariable(name, valueContext);
     }
 
 
@@ -2117,10 +2117,10 @@ public class ForestConfiguration implements Serializable {
                         .setLogResponseContent(isLogResponseContent()))
                 .asyncMode(getAsyncMode())
                 .setLifeCycleHandler(lifeCycleHandler)
-                .setRetryer(getRetryer());
+                .setRetryer(retryer());
         if (CollectionUtils.isNotEmpty(interceptors)) {
             for (Class<? extends Interceptor> interceptorClass : interceptors) {
-                request.addInterceptor(interceptorClass);
+                request.interceptor(interceptorClass);
             }
         }
         return request;

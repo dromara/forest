@@ -375,7 +375,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
      */
     public void addHeader(String name, String value) {
         if ("Cookie".equalsIgnoreCase(name)) {
-            final ForestCookies cookies = ForestCookies.parse(value);
+            final ForestCookieSet cookies = ForestCookieSet.parse(value);
             if (cookies.size() > 0) {
                 addCookies(cookies);
             }
@@ -453,10 +453,10 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
     /**
      * 批量添加Cookie头
      *
-     * @param cookies {@link ForestCookies}对象实例
+     * @param cookies {@link ForestCookieSet}对象实例
      * @since 1.5.23
      */
-    public void addCookies(ForestCookies cookies) {
+    public void addCookies(ForestCookieSet cookies) {
         addCookies(cookies.allCookies(), cookies.strict());
     }
 

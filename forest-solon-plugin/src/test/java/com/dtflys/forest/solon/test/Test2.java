@@ -33,9 +33,9 @@ public class Test2 {
         assertEquals(Integer.valueOf(6000), forestConfiguration.getMaxConnections());
         assertEquals(Integer.valueOf(6600), forestConfiguration.getMaxRouteConnections());
         assertEquals(Integer.valueOf(6000), forestConfiguration.getTimeout());
-        assertEquals(Integer.valueOf(5000), forestConfiguration.getConnectTimeout());
-        assertEquals(Integer.valueOf(6000), forestConfiguration.getReadTimeout());
-        assertEquals(Integer.valueOf(0), forestConfiguration.getMaxRetryCount());
+        assertEquals(Integer.valueOf(5000), forestConfiguration.connectTimeout());
+        assertEquals(Integer.valueOf(6000), forestConfiguration.readTimeout());
+        assertEquals(Integer.valueOf(0), forestConfiguration.maxRetryCount());
         assertThat(forestConfiguration.isLogEnabled()).isTrue();
         assert forestConfiguration.getInterceptors().size() > 1;
         assertEquals(GlobalInterceptor.class, forestConfiguration.getInterceptors().get(0));

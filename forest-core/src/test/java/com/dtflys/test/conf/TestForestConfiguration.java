@@ -76,8 +76,8 @@ public class TestForestConfiguration {
         assertEquals("forestConfiguration" + configuration.hashCode(),
                 configuration.getId());
         assertEquals(Integer.valueOf(3000), configuration.getTimeout());
-        assertEquals(null, configuration.getConnectTimeout());
-        assertEquals(null, configuration.getReadTimeout());
+        assertEquals(null, configuration.connectTimeout());
+        assertEquals(null, configuration.readTimeout());
         assertEquals(Integer.valueOf(500), configuration.getMaxConnections());
         assertEquals(Integer.valueOf(500), configuration.getMaxRouteConnections());
         assertNotNull(configuration.getJsonConverter());
@@ -87,35 +87,35 @@ public class TestForestConfiguration {
     @Test
     public void testCustomized() {
         ForestConfiguration configuration = ForestConfiguration.createConfiguration();
-        configuration.setMaxRetryCount(3);
+        configuration.maxRetryCount(3);
 //        configuration.setId("config_2");
 //        assertEquals("config_2", configuration.getId());
-        assertEquals(Integer.valueOf(3), configuration.getMaxRetryCount());
+        assertEquals(Integer.valueOf(3), configuration.maxRetryCount());
         configuration.setMaxConnections(123);
         assertEquals(Integer.valueOf(123), configuration.getMaxConnections());
         configuration.setMaxRouteConnections(222);
         assertEquals(Integer.valueOf(222), configuration.getMaxRouteConnections());
-        configuration.setTimeout(12000);
+        configuration.timeout(12000);
         assertEquals(Integer.valueOf(12000), configuration.getTimeout());
         configuration.setSslProtocol(SSLUtils.SSL_3);
-        configuration.setConnectTimeout(2000);
+        configuration.connectTimeout(2000);
     }
 
     @Test
     public void testVars() {
         ForestConfiguration configuration = ForestConfiguration.createConfiguration();
-        configuration.setVar("name", "Peter");
-        configuration.setVar("baseUrl", "http://abc.com");
+        configuration.variable("name", "Peter");
+        configuration.variable("baseUrl", "http://abc.com");
         assertEquals("Peter", configuration.getVar("name"));
         assertEquals("http://abc.com", configuration.getVar("baseUrl"));
 
         configuration = ForestConfiguration.createConfiguration();
-        configuration.setVar("name", "Linda");
-        configuration.setVar("abc", 123);
+        configuration.variable("name", "Linda");
+        configuration.variable("abc", 123);
         assertThat(configuration.getVar("name")).isEqualTo("Linda");
         assertThat(configuration.getVar("abc")).isEqualTo(123);
         AtomicInteger value = new AtomicInteger(0);
-        configuration.setVar("foo", (method) -> value.getAndIncrement());
+        configuration.variable("foo", (method) -> value.getAndIncrement());
         assertThat(configuration.getVar("foo")).isEqualTo(0);
         assertThat(configuration.getVar("foo")).isEqualTo(1);
     }

@@ -90,7 +90,7 @@ public class TestAsyncGetClient extends BaseClientTest {
     public TestAsyncGetClient(AsyncTestParameter parameter) {
         super(parameter.backend, configuration);
         configuration.setAsyncMode(parameter.asyncMode);
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
         getClient = configuration.createInstance(GetClient.class);
     }
 

@@ -50,7 +50,7 @@ public class BasicAuth implements ForestAuthenticator {
         }
         if (StringUtils.isNotEmpty(userInfo)) {
             String basic = "Basic " + Base64Utils.encode(userInfo);
-            request.addHeader("Authorization", basic);
+            request.header("Authorization", basic);
         }
     }
 }

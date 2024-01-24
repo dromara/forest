@@ -37,7 +37,7 @@ public class TestGetWithBodyClient extends BaseClientTest {
 
     public TestGetWithBodyClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
         getWithBodyClient = configuration.createInstance(GetWithBodyClient.class);
     }
 

@@ -42,7 +42,7 @@ public class TestCallbackClient extends BaseClientTest {
 
     public TestCallbackClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
         callbackClient = configuration.createInstance(CallbackClient.class);
     }
 

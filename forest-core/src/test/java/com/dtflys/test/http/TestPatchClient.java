@@ -40,7 +40,7 @@ public class TestPatchClient extends BaseClientTest {
 
     public TestPatchClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
         patchClient = configuration.createInstance(PatchClient.class);
     }
 

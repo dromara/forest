@@ -35,7 +35,7 @@ public class TestRetryerClient extends BaseClientTest {
 
     public TestRetryerClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
         retryerClient = configuration.createInstance(RetryerClient.class);
         retryerClient2 = configuration.createInstance(RetryerClient2.class);
     }
@@ -50,7 +50,7 @@ public class TestRetryerClient extends BaseClientTest {
         assertThat(request).isNotNull();
         assertThat(request.getRetryer()).isInstanceOf(TestRetryer.class);
         try {
-            request.as(String.class);
+            request.result(String.class);
         } catch (Throwable ignored) {}
         assertThat(request.getRetryCount()).isEqualTo(3);
     }
@@ -65,7 +65,7 @@ public class TestRetryerClient extends BaseClientTest {
         assertThat(request).isNotNull();
         assertThat(request.getRetryer().getClass()).isEqualTo(TestRetryer.class);
         try {
-            request.as(String.class);
+            request.result(String.class);
         } catch (Throwable ignored) {}
         assertThat(request.getRetryCount()).isEqualTo(3);
     }
@@ -80,7 +80,7 @@ public class TestRetryerClient extends BaseClientTest {
         assertThat(request).isNotNull();
         assertThat(request.getRetryer().getClass()).isEqualTo(BackOffRetryer.class);
         try {
-            request.as(String.class);
+            request.result(String.class);
         } catch (Throwable ignored) {}
         assertThat(request.getRetryCount()).isEqualTo(3);
     }

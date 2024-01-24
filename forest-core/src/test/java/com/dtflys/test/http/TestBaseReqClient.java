@@ -49,10 +49,10 @@ public class TestBaseReqClient extends BaseClientTest {
 
     public TestBaseReqClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVar("baseURL", "http://localhost:5000/");
-        configuration.setVar("userAgent", USER_AGENT);
-        configuration.setVar("port", server.getPort());
-        configuration.setVar("baseURL", "http://localhost:" + server.getPort());
+        configuration.variable("baseURL", "http://localhost:5000/");
+        configuration.variable("userAgent", USER_AGENT);
+        configuration.variable("port", server.getPort());
+        configuration.variable("baseURL", "http://localhost:" + server.getPort());
         baseReqClient = configuration.createInstance(BaseReqClient.class);
         baseURLClient = configuration.createInstance(BaseURLClient.class);
     }
@@ -120,7 +120,7 @@ public class TestBaseReqClient extends BaseClientTest {
         ForestRequest request = baseReqClient.testBaseTimeout("UTF-8");
         assertThat(request.getReadTimeout()).isEqualTo(4000);
         assertThat(request.getConnectTimeout()).isEqualTo(3000);
-        String result = request.asString();
+        String result = request.stringResult();
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
     }
 

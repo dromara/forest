@@ -35,10 +35,10 @@ public class ForestRequestContext extends ForestVariableContext implements Varia
 
 
     @Override
-    public Object getVar(String name, VariableValueContext valueContext) {
+    public Object getVariable(String name, VariableValueContext valueContext) {
         Object value = variables.get(name);
         if (value == null) {
-            value = parent.getVar(name, valueContext);
+            value = parent.getVariable(name, valueContext);
         }
         if (value instanceof MappingVariable) {
             return getArgument(((MappingVariable) value).index);

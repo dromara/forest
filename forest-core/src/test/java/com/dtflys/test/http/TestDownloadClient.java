@@ -54,7 +54,7 @@ public class TestDownloadClient extends BaseClientTest {
 
     public TestDownloadClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
         downloadClient = configuration.createInstance(DownloadClient.class);
     }
 
@@ -298,7 +298,7 @@ public class TestDownloadClient extends BaseClientTest {
         Buffer buffer = getImageBuffer();
         server.enqueue(new MockResponse().setBody(buffer));
         InputStream in = Forest.get("http://localhost:" + server.getPort() + "/download/test-img.jpg")
-                .as(InputStream.class);
+                .result(InputStream.class);
 
         ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
         buffer.readAll(Okio.sink(bytesOut));

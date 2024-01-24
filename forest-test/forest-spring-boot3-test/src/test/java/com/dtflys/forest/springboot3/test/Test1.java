@@ -40,8 +40,8 @@ public class Test1 {
         assertEquals(Integer.valueOf(5000), forestConfiguration.getMaxConnections());
         assertEquals(Integer.valueOf(5500), forestConfiguration.getMaxRouteConnections());
         assertEquals(Integer.valueOf(50), forestConfiguration.getTimeout());
-        assertEquals("GBK", forestConfiguration.getCharset());
-        assertEquals(Integer.valueOf(0), forestConfiguration.getMaxRetryCount());
+        assertEquals("GBK", forestConfiguration.charset());
+        assertEquals(Integer.valueOf(0), forestConfiguration.maxRetryCount());
         assertTrue(forestConfiguration.isLogEnabled());
         assertEquals("okhttp3", forestConfiguration.getBackend().getName());
         assertEquals("TLSv1.2", forestConfiguration.getSslProtocol());

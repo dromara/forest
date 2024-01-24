@@ -31,7 +31,7 @@ public class TestAddressClient5 extends BaseClientTest {
 
     public TestAddressClient5(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
         addressClient5 = configuration.createInstance(AddressClient5.class);
     }
 
@@ -40,7 +40,7 @@ public class TestAddressClient5 extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         ForestRequest request = addressClient5.test();
         assertThat(request.basePath()).isEqualTo("/aaa");
-        String result = request.asString();
+        String result = request.stringResult();
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
     }
 

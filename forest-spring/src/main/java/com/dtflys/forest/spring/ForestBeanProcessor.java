@@ -32,7 +32,7 @@ public class ForestBeanProcessor implements InstantiationAwareBeanPostProcessor 
             }
             String varName = annotation.value();
             SpringVariableDef variableValue = new SpringVariableDef(bean, method);
-            configuration.setVar(varName, variableValue);
+            configuration.variable(varName, variableValue);
         }
     }
 

@@ -148,7 +148,7 @@ public class TestSSLClient extends BaseClientTest {
                             }
                             return  "{\"id\": \"" + ((String[]) id)[0] + "\"}";
                         }));
-        configuration.setVar("port", port);
+        configuration.variable("port", port);
     }
 
 
@@ -206,7 +206,7 @@ public class TestSSLClient extends BaseClientTest {
                 .isNotNull().
                 isInstanceOf(com.dtflys.test.http.ssl.MySSLSocketFactoryBuilder.class);
         try {
-            result = request.asString();
+            result = request.stringResult();
         } catch (ForestRuntimeException ex) {
             th = ex.getCause();
         }
@@ -225,7 +225,7 @@ public class TestSSLClient extends BaseClientTest {
                 .isNotNull().
                 isInstanceOf(com.dtflys.test.http.ssl.MySSLSocketFactoryBuilder.class);
         try {
-            result = request.asString();
+            result = request.stringResult();
         } catch (ForestRuntimeException ex) {
             th = ex.getCause();
         }

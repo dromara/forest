@@ -1,5 +1,6 @@
 package com.dtflys.test.http
 
+import com.dtflys.forest.Forest
 import com.dtflys.forest.annotation.Address
 import com.dtflys.forest.annotation.Body
 import com.dtflys.forest.annotation.Get
@@ -36,7 +37,7 @@ class TestKotlinClient(backend: HttpBackend?) : BaseClientTest(backend, configur
     var client : Client?
 
     init {
-        configuration?.setVar("port", server.port)
+        configuration?.variable("port", server.port)
         client = configuration?.client(Client::class.java)
     }
 

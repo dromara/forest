@@ -11,7 +11,7 @@ import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.http.ForestCookies;
+import com.dtflys.forest.http.ForestCookieSet;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.reflection.ForestMethod;
@@ -171,7 +171,7 @@ public interface Interceptor extends
      * @param cookies Cookie集合, 需要通过请求发送的Cookie都添加到该集合
      */
     @Override
-    default void onLoadCookie(ForestRequest request, ForestCookies cookies) {
+    default void onLoadCookie(ForestRequest request, ForestCookieSet cookies) {
     }
 
     /**
@@ -182,7 +182,7 @@ public interface Interceptor extends
      * @param cookies Cookie集合，通过响应返回的Cookie都从该集合获取
      */
     @Override
-    default void onSaveCookie(ForestRequest request, ForestCookies cookies) {
+    default void onSaveCookie(ForestRequest request, ForestCookieSet cookies) {
     }
 
 
@@ -204,7 +204,7 @@ public interface Interceptor extends
      * @param value 属性值
      */
     default void addAttribute(ForestRequest request, String name, Object value) {
-        request.addInterceptorAttribute(this.getClass(), name, value);
+        request.interceptorAttribute(this.getClass(), name, value);
     }
 
     /**

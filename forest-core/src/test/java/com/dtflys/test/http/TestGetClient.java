@@ -3,9 +3,7 @@ package com.dtflys.test.http;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
-import com.dtflys.forest.Forest;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
@@ -73,7 +71,7 @@ public class TestGetClient extends BaseClientTest {
 
     public TestGetClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
         getClient = configuration.createInstance(GetClient.class);
         urlEncodedClient = configuration.createInstance(UrlEncodedClient.class);
     }
@@ -595,7 +593,7 @@ public class TestGetClient extends BaseClientTest {
         String url = StrUtil.format("/test", server.getPort());
         ForestRequest<String> request = getClient.testUrl4(url);
         request.port(server.getPort());
-        ForestResponse<String> response = request.as(new TypeReference<ForestResponse<String>>() {});
+        ForestResponse<String> response = request.result(new TypeReference<ForestResponse<String>>() {});
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
@@ -614,7 +612,7 @@ public class TestGetClient extends BaseClientTest {
         String url = StrUtil.format("test/xxx", server.getPort());
         ForestRequest<String> request = getClient.testUrl4(url);
         request.port(server.getPort());
-        ForestResponse<String> response = request.as(new TypeReference<ForestResponse<String>>() {});
+        ForestResponse<String> response = request.result(new TypeReference<ForestResponse<String>>() {});
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
@@ -633,7 +631,7 @@ public class TestGetClient extends BaseClientTest {
         String url = StrUtil.format("test/xxx", server.getPort());
         ForestRequest<String> request = getClient.testUrl4(url);
         request.setPort(server.getPort());
-        ForestResponse<String> response = request.as(new TypeReference<ForestResponse<String>>() {});
+        ForestResponse<String> response = request.result(new TypeReference<ForestResponse<String>>() {});
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
@@ -653,7 +651,7 @@ public class TestGetClient extends BaseClientTest {
         ForestRequest<String> request = getClient.testUrl4(url);
         assertThat(request.ref()).isEqualTo("?ref=ok");
         request.port(server.getPort());
-        ForestResponse<String> response = request.as(new TypeReference<ForestResponse<String>>() {});
+        ForestResponse<String> response = request.result(new TypeReference<ForestResponse<String>>() {});
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
@@ -676,7 +674,7 @@ public class TestGetClient extends BaseClientTest {
         ForestRequest<String> request = getClient.testUrl4(url);
         assertThat(request.ref()).isEqualTo("?ref=ok");
         request.port(server.getPort());
-        ForestResponse<String> response = request.as(new TypeReference<ForestResponse<String>>() {});
+        ForestResponse<String> response = request.result(new TypeReference<ForestResponse<String>>() {});
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");
@@ -696,7 +694,7 @@ public class TestGetClient extends BaseClientTest {
         ForestRequest<String> request = getClient.testUrl4(url);
         assertThat(request.ref()).isEqualTo("xxx/yyy");
         request.port(server.getPort());
-        ForestResponse<String> response = request.as(new TypeReference<ForestResponse<String>>() {});
+        ForestResponse<String> response = request.result(new TypeReference<ForestResponse<String>>() {});
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isNotNull().isEqualTo(200);
         assertThat(response.getCharset()).isNotNull().isEqualTo("UTF-8");

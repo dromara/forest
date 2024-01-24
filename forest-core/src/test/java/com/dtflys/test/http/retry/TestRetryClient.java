@@ -39,7 +39,7 @@ public class TestRetryClient extends BaseClientTest {
 
     public TestRetryClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
         retryClient = configuration.createInstance(RetryClient.class);
         retryClient2 = configuration.createInstance(RetryClient2.class);
     }
@@ -54,7 +54,7 @@ public class TestRetryClient extends BaseClientTest {
         assertThat(request).isNotNull();
         assertThat(request.getRetryCount()).isEqualTo(3);
         assertThat(request.getMaxRetryInterval()).isEqualTo(10);
-        String ret = request.as(String.class);
+        String ret = request.result(String.class);
         assertThat(ret).isNotNull().isEqualTo(EXPECTED);
         assertThat(request.getCurrentRetryCount()).isEqualTo(3);
         assertThat(request.getAttachment("retry-interceptor")).isNotNull().isEqualTo(3);
@@ -78,7 +78,7 @@ public class TestRetryClient extends BaseClientTest {
         assertThat(request).isNotNull();
         assertThat(request.getRetryCount()).isEqualTo(3);
         assertThat(request.getMaxRetryInterval()).isEqualTo(10);
-        ForestResponse response = request.as(ForestResponse.class);
+        ForestResponse response = request.result(ForestResponse.class);
         assertThat(response).isNotNull();
         assertThat(response.isError()).isTrue();
         assertThat(retryWhen404.getDoRetryWhenCount().get()).isEqualTo(4);

@@ -14,6 +14,6 @@ public class RedirectInterceptor implements Interceptor {
 
     @Override
     public void onRedirection(ForestRequest<?> redirectReq, ForestRequest<?> prevReq, ForestResponse<?> prevRes) {
-        redirectReq.addBody("body", BODY);
+        redirectReq.body("body", BODY);
     }
 }

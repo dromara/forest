@@ -53,7 +53,7 @@ public class TestAsync {
         ForestConfiguration config = ForestConfiguration.createConfiguration();
         config.setMaxAsyncThreadSize(1);
         config.setMaxAsyncQueueSize(0);
-        config.setVar("port", server.getPort());
+        config.variable("port", server.getPort());
         asyncClient = config.client(AsyncClient.class);
         Throwable throwable = null;
         for (int i = 0; i < 3; i++) {
@@ -77,7 +77,7 @@ public class TestAsync {
         ForestConfiguration config = ForestConfiguration.createConfiguration();
         config.setMaxAsyncThreadSize(threads);
         config.setMaxAsyncQueueSize(0);
-        config.setVar("port", server.getPort());
+        config.variable("port", server.getPort());
         for (int i = 0; i < size; i++) {
             server.enqueue(new MockResponse().setBody(EXPECTED).setHeadersDelay(500, TimeUnit.MILLISECONDS));
         }

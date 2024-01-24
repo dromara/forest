@@ -46,7 +46,7 @@ public class TestCookieClient extends BaseClientTest {
 
     public TestCookieClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
         cookieClient = configuration.createInstance(CookieClient.class);
     }
 

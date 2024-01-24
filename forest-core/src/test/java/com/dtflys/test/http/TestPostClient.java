@@ -71,7 +71,7 @@ public class TestPostClient extends BaseClientTest {
 
     public TestPostClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
         postClient = configuration.createInstance(PostClient.class);
         emptyJsonClient = configuration.createInstance(EmptyJsonClient.class);
     }

@@ -25,7 +25,7 @@ public class TestBackendClientProviderClient {
 
     public TestBackendClientProviderClient() {
         backendClientProviderClient = configuration.client(BackendClientProviderClient.class);
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
     }
 
     @Test
@@ -43,7 +43,7 @@ public class TestBackendClientProviderClient {
                     .isNotNull()
                     .isInstanceOf(MyOkHttpClientProvider.class);
             AtomicBoolean executed = new AtomicBoolean(false);
-            request.addInterceptor(new TestRetryInterceptor() {
+            request.interceptor(new TestRetryInterceptor() {
                 @Override
                 public ForestJointPoint beforeExecute(ForestRequest request) {
                     assertThat(request.getBackendClient())
@@ -53,7 +53,7 @@ public class TestBackendClientProviderClient {
                     return proceed();
                 }
             });
-            String result = request.as(String.class);
+            String result = request.result(String.class);
             assertThat(executed.get()).isTrue();
             assertThat(result).isNotNull().isEqualTo(EXPECTED);
         }
@@ -75,7 +75,7 @@ public class TestBackendClientProviderClient {
                     .isNotNull()
                     .isInstanceOf(MyHttpClientProvider.class);
             AtomicBoolean executed = new AtomicBoolean(false);
-            request.addInterceptor(new TestRetryInterceptor() {
+            request.interceptor(new TestRetryInterceptor() {
                 @Override
                 public ForestJointPoint beforeExecute(ForestRequest request) {
                     assertThat(request.getBackendClient())
@@ -85,7 +85,7 @@ public class TestBackendClientProviderClient {
                     return proceed();
                 }
             });
-            String result = request.as(String.class);
+            String result = request.result(String.class);
             assertThat(executed.get()).isTrue();
             assertThat(result).isNotNull().isEqualTo(EXPECTED);
         }
@@ -108,7 +108,7 @@ public class TestBackendClientProviderClient {
                     .isNotNull()
                     .isInstanceOf(MyOkHttpClientProvider.class);
             AtomicBoolean executed = new AtomicBoolean(false);
-            request.addInterceptor(new TestRetryInterceptor() {
+            request.interceptor(new TestRetryInterceptor() {
                 @Override
                 public ForestJointPoint beforeExecute(ForestRequest request) {
                     assertThat(request.getBackendClient())
@@ -118,7 +118,7 @@ public class TestBackendClientProviderClient {
                     return proceed();
                 }
             });
-            String result = request.as(String.class);
+            String result = request.result(String.class);
             assertThat(executed.get()).isTrue();
             assertThat(result).isNotNull().isEqualTo(EXPECTED);
         }
@@ -141,7 +141,7 @@ public class TestBackendClientProviderClient {
                     .isNotNull()
                     .isInstanceOf(MyHttpClientProvider.class);
             AtomicBoolean executed = new AtomicBoolean(false);
-            request.addInterceptor(new TestRetryInterceptor() {
+            request.interceptor(new TestRetryInterceptor() {
                 @Override
                 public ForestJointPoint beforeExecute(ForestRequest request) {
                     assertThat(request.getBackendClient())
@@ -151,7 +151,7 @@ public class TestBackendClientProviderClient {
                     return proceed();
                 }
             });
-            String result = request.as(String.class);
+            String result = request.result(String.class);
             assertThat(executed.get()).isTrue();
             assertThat(result).isNotNull().isEqualTo(EXPECTED);
         }

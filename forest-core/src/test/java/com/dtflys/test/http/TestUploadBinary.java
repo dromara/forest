@@ -49,7 +49,7 @@ public class TestUploadBinary extends BaseClientTest {
 
     public TestUploadBinary(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
         binaryClient = configuration.createInstance(BinaryClient.class);
     }
 

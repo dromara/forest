@@ -3,7 +3,7 @@ package com.dtflys.test.misc;
 import com.dtflys.forest.backend.httpclient.HttpclientCookie;
 import com.dtflys.forest.backend.okhttp3.OkHttp3Cookie;
 import com.dtflys.forest.http.ForestCookie;
-import com.dtflys.forest.http.ForestCookies;
+import com.dtflys.forest.http.ForestCookieSet;
 import okhttp3.Cookie;
 import okhttp3.HttpUrl;
 import org.apache.http.impl.cookie.BasicClientCookie2;
@@ -284,7 +284,7 @@ public class CookieTest {
 
     @Test
     public void testCookies() {
-        ForestCookies cookies = new ForestCookies();
+        ForestCookieSet cookies = new ForestCookieSet();
     }
 
 }

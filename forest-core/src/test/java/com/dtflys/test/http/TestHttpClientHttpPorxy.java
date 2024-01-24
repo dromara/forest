@@ -26,7 +26,7 @@ public class TestHttpClientHttpPorxy extends BaseClientTest {
 
     public TestHttpClientHttpPorxy(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
         testHttpClientHttpProxyClient = configuration.createInstance(TestHttpClientHttpProxyClient.class);
 
     }

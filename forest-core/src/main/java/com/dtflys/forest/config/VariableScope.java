@@ -11,9 +11,9 @@ public interface VariableScope {
 
     boolean isVarDefined(String name);
 
-    Object getVar(String name, VariableValueContext valueContext);
+    Object getVariable(String name, VariableValueContext valueContext);
 
-    ForestVariableDef getVarDef(String name);
+    ForestVariableDef getVariableDef(String name);
 
     ForestMethod getForestMethod();
 

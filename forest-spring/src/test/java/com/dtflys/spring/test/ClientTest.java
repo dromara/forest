@@ -28,7 +28,7 @@ public class ClientTest extends TestCase {
         String result = beastshopClient.index();
         assertNotNull(result);
         ForestConfiguration configuration = Forest.config();
-        assertThat(configuration.getConnectTimeout()).isEqualTo(10000);
+        assertThat(configuration.connectTimeout()).isEqualTo(10000);
         assertThat(configuration.getMaxConnections()).isEqualTo(700);
         assertThat(configuration.getMaxRouteConnections()).isEqualTo(600);
         assertThat(configuration.getMaxRequestQueueSize()).isEqualTo(300);

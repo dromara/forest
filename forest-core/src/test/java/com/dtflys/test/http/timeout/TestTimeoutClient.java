@@ -32,7 +32,7 @@ public class TestTimeoutClient extends BaseClientTest {
 
     public TestTimeoutClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
         timeoutClient = configuration.client(TimeoutClient.class);
     }
 
@@ -42,7 +42,7 @@ public class TestTimeoutClient extends BaseClientTest {
         ForestRequest request = timeoutClient.testConnectTimeout();
         assertThat(request).isNotNull();
         assertThat(request.getConnectTimeout()).isEqualTo(10);
-        ForestResponse response = (ForestResponse) request.as(ForestResponse.class);
+        ForestResponse response = (ForestResponse) request.result(ForestResponse.class);
         assertThat(response).isNotNull();
         assertThat(response.getException()).isNotNull();
         assertThat(response.isTimeout()).isTrue();
@@ -55,7 +55,7 @@ public class TestTimeoutClient extends BaseClientTest {
         ForestRequest request = timeoutClient.testReadTimeout();
         assertThat(request).isNotNull();
         assertThat(request.getReadTimeout()).isEqualTo(10);
-        ForestResponse response = (ForestResponse) request.as(ForestResponse.class);
+        ForestResponse response = (ForestResponse) request.result(ForestResponse.class);
         assertThat(response).isNotNull();
         assertThat(response.isTimeout()).isTrue();
     }

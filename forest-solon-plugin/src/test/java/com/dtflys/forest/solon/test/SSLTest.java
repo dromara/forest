@@ -6,12 +6,8 @@ import com.dtflys.forest.logging.ForestLogger;
 import com.dtflys.forest.solon.test.client2.GiteeClient;
 import com.dtflys.forest.solon.test.ssl.MySSLSocketFactoryBuilder;
 import com.dtflys.forest.ssl.SSLKeyStore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.noear.solon.annotation.Inject;
-import org.noear.solon.test.SolonJUnit4ClassRunner;
-import org.noear.solon.test.SolonTest;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -36,8 +32,8 @@ public class SSLTest {
         assertEquals(Integer.valueOf(300), sslConfig.getMaxConnections());
         assertEquals(Integer.valueOf(300), sslConfig.getMaxRouteConnections());
         assertEquals(Integer.valueOf(3000), sslConfig.getTimeout());
-        assertEquals(Integer.valueOf(3000), sslConfig.getConnectTimeout());
-        assertEquals(Integer.valueOf(2), sslConfig.getMaxRetryCount());
+        assertEquals(Integer.valueOf(3000), sslConfig.connectTimeout());
+        assertEquals(Integer.valueOf(2), sslConfig.maxRetryCount());
         assertEquals(1, sslConfig.getSslKeyStores().size());
         SSLKeyStore sslKeyStore = sslConfig.getKeyStore("keystore1");
         assertThat(sslKeyStore).isNotNull();

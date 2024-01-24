@@ -41,7 +41,7 @@ public class TestOptionsClient extends BaseClientTest {
 
     public TestOptionsClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
         optionsClient = configuration.createInstance(OptionsClient.class);
     }
 

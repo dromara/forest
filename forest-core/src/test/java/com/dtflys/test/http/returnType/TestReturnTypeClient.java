@@ -31,7 +31,7 @@ public class TestReturnTypeClient extends BaseClientTest {
 
     public TestReturnTypeClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
         returnTypeClient = configuration.client(ReturnTypeClient.class);
     }
 

@@ -23,8 +23,8 @@ public class SimpleInterceptor implements Interceptor {
     public ForestJointPoint beforeExecute(ForestRequest request) {
         log.info("invoke Simple beforeExecute");
         request.setType(ForestRequestType.GET);
-        request.addHeader(HttpHeaders.ACCEPT, "text/plain");
-        request.addQuery("username", "foo");
+        request.header(HttpHeaders.ACCEPT, "text/plain");
+        request.query("username", "foo");
         return proceed();
     }
 

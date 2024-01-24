@@ -4,7 +4,7 @@ import com.dtflys.forest.backend.httpclient.HttpclientCookie;
 import com.dtflys.forest.backend.httpclient.conn.HttpclientConnectionManager;
 import com.dtflys.forest.backend.httpclient.logging.HttpclientLogBodyMessage;
 import com.dtflys.forest.http.ForestCookie;
-import com.dtflys.forest.http.ForestCookies;
+import com.dtflys.forest.http.ForestCookieSet;
 import com.dtflys.forest.http.ForestHeaderMap;
 import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestRequest;
@@ -23,7 +23,6 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.cookie.Cookie;
 
 import java.net.URI;
-import java.util.stream.Collectors;
 
 
 /**
@@ -107,8 +106,8 @@ public abstract class AbstractHttpclientRequestSender implements HttpclientReque
         }
     }
 
-    protected ForestCookies getCookiesFromHttpCookieStore(CookieStore cookieStore) {
-        ForestCookies cookies = new ForestCookies();
+    protected ForestCookieSet getCookiesFromHttpCookieStore(CookieStore cookieStore) {
+        ForestCookieSet cookies = new ForestCookieSet();
         for (Cookie httpCookie : cookieStore.getCookies()) {
             ForestCookie cookie = new HttpclientCookie(httpCookie);
             cookies.addCookie(cookie);

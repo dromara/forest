@@ -35,7 +35,7 @@ public class TestResponseClient extends BaseClientTest {
 
     public TestResponseClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
         responseClient = configuration.client(ResponseClient.class);
     }
 

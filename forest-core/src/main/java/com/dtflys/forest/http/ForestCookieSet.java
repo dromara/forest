@@ -37,17 +37,17 @@ import java.util.List;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.5.0-RC1
  */
-public class ForestCookies implements Iterable<ForestCookie> {
+public class ForestCookieSet implements Iterable<ForestCookie> {
 
     private List<ForestCookie> cookies;
 
     private boolean strict = true;
 
-    public ForestCookies() {
+    public ForestCookieSet() {
         this.cookies = new LinkedList<>();
     }
 
-    public ForestCookies(List<ForestCookie> cookies) {
+    public ForestCookieSet(List<ForestCookie> cookies) {
         this.cookies = cookies;
     }
 
@@ -74,10 +74,10 @@ public class ForestCookies implements Iterable<ForestCookie> {
      * 设置是否严格匹配Cookie
      *
      * @param strict {@code true}: 严格匹配, {@code false}: 不严格
-     * @return Cookie集合，{@link ForestCookies}类实例
+     * @return Cookie集合，{@link ForestCookieSet}类实例
      * @since 1.5.25
      */
-    public ForestCookies strict(boolean strict) {
+    public ForestCookieSet strict(boolean strict) {
         this.strict = strict;
         return this;
     }
@@ -87,11 +87,11 @@ public class ForestCookies implements Iterable<ForestCookie> {
      * 解析请求中的Cookie头信息
      *
      * @param content Cookie头信息
-     * @return Cookie集合，{@link ForestCookies}对象实例
+     * @return Cookie集合，{@link ForestCookieSet}对象实例
      * @since 1.5.23
      */
-    public static ForestCookies parse(String content) {
-        final ForestCookies cookies = new ForestCookies();
+    public static ForestCookieSet parse(String content) {
+        final ForestCookieSet cookies = new ForestCookieSet();
         if (StringUtils.isBlank(content)) {
             return cookies;
         }
@@ -167,9 +167,9 @@ public class ForestCookies implements Iterable<ForestCookie> {
      * 添加Cookie
      *
      * @param cookie Cookie对象，{@link ForestCookie}类实例
-     * @return Cookie集合，{@link ForestCookies}类实例
+     * @return Cookie集合，{@link ForestCookieSet}类实例
      */
-    public ForestCookies addCookie(ForestCookie cookie) {
+    public ForestCookieSet addCookie(ForestCookie cookie) {
         if (cookie != null) {
             this.cookies.add(cookie);
         }
@@ -180,9 +180,9 @@ public class ForestCookies implements Iterable<ForestCookie> {
      * 添加Cookie列表
      *
      * @param cookies Cookie列表
-     * @return Cookie集合，{@link ForestCookies}类实例
+     * @return Cookie集合，{@link ForestCookieSet}类实例
      */
-    public ForestCookies addAllCookies(List<ForestCookie> cookies) {
+    public ForestCookieSet addAllCookies(List<ForestCookie> cookies) {
         if (cookies == null) {
             return this;
         }

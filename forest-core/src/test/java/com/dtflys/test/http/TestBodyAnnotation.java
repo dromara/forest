@@ -29,7 +29,7 @@ public class TestBodyAnnotation extends BaseClientTest {
 
     public TestBodyAnnotation(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
         testBodyAnnotationClient = configuration.createInstance(TestBodyAnnotationClient.class);
     }
 

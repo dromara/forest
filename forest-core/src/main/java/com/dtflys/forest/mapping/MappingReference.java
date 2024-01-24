@@ -34,7 +34,7 @@ public class MappingReference extends MappingExpr {
 
     @Override
     public Object render(VariableValueContext valueContext) {
-        Object result = valueContext.getVar(name, valueContext);
+        Object result = valueContext.getVariable(name, valueContext);
         if (result == null) {
             if (nullable) {
                 return null;

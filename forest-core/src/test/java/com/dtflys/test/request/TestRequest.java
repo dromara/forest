@@ -36,8 +36,8 @@ public class TestRequest {
     public void testInterceptorAttribute() {
         ForestConfiguration configuration = ForestConfiguration.createConfiguration();
         ForestRequest request = new ForestRequest(configuration, new ForestRequestContext(configuration.getVariableContext(), null));
-        request.addInterceptorAttribute(BasicAuthClient.class, "Xxx", "foo");
-        request.addInterceptorAttribute(BasicAuthClient.class, "Yyy", "bar");
+        request.interceptorAttribute(BasicAuthClient.class, "Xxx", "foo");
+        request.interceptorAttribute(BasicAuthClient.class, "Yyy", "bar");
         Object xxxValue = request.getInterceptorAttribute(BasicAuthClient.class, "Xxx");
         assertNotNull(xxxValue);
         assertEquals("foo", xxxValue);
@@ -50,7 +50,7 @@ public class TestRequest {
         attrMap.put("Xxx", "xxxx");
         attrMap.put("Zzz", 1111);
         InterceptorAttributes attributes = new InterceptorAttributes(BasicAuthClient.class, attrMap);
-        request.addInterceptorAttributes(BasicAuthClient.class, attributes);
+        request.interceptorAttributes(BasicAuthClient.class, attributes);
         xxxValue = request.getInterceptorAttribute(BasicAuthClient.class, "Xxx");
         assertNotNull(xxxValue);
         assertEquals("xxxx", xxxValue);
@@ -64,13 +64,13 @@ public class TestRequest {
     public void testAttachment() {
         ForestConfiguration configuration = ForestConfiguration.createConfiguration();
         ForestRequest request = new ForestRequest(configuration, new ForestRequestContext(configuration.getVariableContext(), null));
-        request.addAttachment("Xxx", "foo");
-        request.addAttachment("Yyy", "bar");
+        request.attachment("Xxx", "foo");
+        request.attachment("Yyy", "bar");
         Object xxxValue = request.getAttachment("Xxx");
         Object yyyValue = request.getAttachment("Yyy");
         assertEquals("foo", xxxValue);
         assertEquals("bar", yyyValue);
-        request.addAttachment("Yyy", "1111");
+        request.attachment("Yyy", "1111");
         yyyValue = request.getAttachment("Yyy");
         assertEquals("1111", yyyValue);
     }

@@ -43,7 +43,7 @@ public class TestUrlWithAt extends BaseClientTest {
 
     public TestUrlWithAt(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
         getClient = configuration.createInstance(GetClient.class);
     }
 

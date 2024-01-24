@@ -1,6 +1,5 @@
 package com.dtflys.forest.solon;
 
-import com.dtflys.forest.Forest;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.SolonForestProperties;
 import com.dtflys.forest.converter.ForestConverter;
@@ -18,8 +17,6 @@ import com.dtflys.forest.ssl.SSLSocketFactoryBuilder;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 import org.noear.solon.Utils;
-import org.noear.solon.core.AppContext;
-import org.noear.solon.core.BeanWrap;
 import org.noear.solon.core.wrap.ClassWrap;
 import org.noear.solon.core.wrap.FieldWrap;
 
@@ -82,13 +79,13 @@ public class ForestBeanBuilder {
         forestConfiguration.setMaxConnections(forestConfigurationProperties.getMaxConnections());
         forestConfiguration.setMaxRouteConnections(forestConfigurationProperties.getMaxRouteConnections());
         forestConfiguration.setAsyncMode(forestConfigurationProperties.getAsyncMode());
-        forestConfiguration.setTimeout(forestConfigurationProperties.getTimeout());
-        forestConfiguration.setConnectTimeout(forestConfigurationProperties.getConnectTimeoutMillis());
-        forestConfiguration.setReadTimeout(forestConfigurationProperties.getReadTimeoutMillis());
-        forestConfiguration.setCharset(forestConfigurationProperties.getCharset());
-        forestConfiguration.setRetryer(forestConfigurationProperties.getRetryer());
-        forestConfiguration.setMaxRetryCount(forestConfigurationProperties.getMaxRetryCount());
-        forestConfiguration.setMaxRetryInterval(forestConfigurationProperties.getMaxRetryInterval());
+        forestConfiguration.timeout(forestConfigurationProperties.getTimeout());
+        forestConfiguration.connectTimeout(forestConfigurationProperties.getConnectTimeoutMillis());
+        forestConfiguration.readTimeout(forestConfigurationProperties.getReadTimeoutMillis());
+        forestConfiguration.charset(forestConfigurationProperties.getCharset());
+        forestConfiguration.retryer(forestConfigurationProperties.getRetryer());
+        forestConfiguration.maxRetryCount(forestConfigurationProperties.getMaxRetryCount());
+        forestConfiguration.maxRetryInterval(forestConfigurationProperties.getMaxRetryInterval());
         forestConfiguration.setAutoRedirection(forestConfigurationProperties.isAutoRedirection());
         forestConfiguration.setLogEnabled(forestConfigurationProperties.isLogEnabled());
         forestConfiguration.setLogRequest(forestConfigurationProperties.isLogRequest());

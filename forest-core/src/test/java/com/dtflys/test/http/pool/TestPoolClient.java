@@ -41,13 +41,13 @@ public class TestPoolClient extends BaseClientTest {
 
     public TestPoolClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
     }
 
     @Test
     public void testPool_timeout() throws InterruptedException {
         ForestConfiguration poolConf = ForestConfiguration.createConfiguration()
-                .setVar("port", server.getPort())
+                .variable("port", server.getPort())
                 .setMaxConnections(10)
                 .setMaxRequestQueueSize(1);
         PoolClient poolClient = poolConf.client(PoolClient.class);
@@ -84,7 +84,7 @@ public class TestPoolClient extends BaseClientTest {
     @Test
     public void testPool_not_timeout() throws InterruptedException {
         ForestConfiguration poolConf = ForestConfiguration.createConfiguration()
-                .setVar("port", server.getPort())
+                .variable("port", server.getPort())
                 .setMaxConnections(100)
                 .setMaxRequestQueueSize(100);
         PoolClient poolClient = poolConf.client(PoolClient.class);
@@ -124,7 +124,7 @@ public class TestPoolClient extends BaseClientTest {
     public void testPoolPerRoute() throws InterruptedException {
         KotlinCoroutineHttpExecutor.Companion.restartPool();
         ForestConfiguration poolConf = ForestConfiguration.createConfiguration()
-                .setVar("port", server.getPort())
+                .variable("port", server.getPort())
                 .setMaxConnections(100)
                 .setMaxRouteConnections(10)
                 .setMaxRequestQueueSize(1);
@@ -172,7 +172,7 @@ public class TestPoolClient extends BaseClientTest {
     public void testPoolAsync_globalPool() throws InterruptedException {
         KotlinCoroutineHttpExecutor.Companion.restartPool();
         ForestConfiguration poolConf = ForestConfiguration.createConfiguration()
-                .setVar("port", server.getPort())
+                .variable("port", server.getPort())
                 .setMaxConnections(10)
                 .setMaxAsyncThreadSize(300)
                 .setMaxRequestQueueSize(1);
@@ -210,7 +210,7 @@ public class TestPoolClient extends BaseClientTest {
     @Test
     public void testPoolAsync_asyncPool() throws InterruptedException {
         ForestConfiguration poolConf = ForestConfiguration.createConfiguration()
-                .setVar("port", server.getPort())
+                .variable("port", server.getPort())
                 .setMaxConnections(30)
                 .setMaxAsyncThreadSize(30)
                 .setMaxAsyncQueueSize(10);

@@ -51,7 +51,7 @@ public class TestGetXml {
     }
 
     public TestGetXml() {
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
         getXmlClient = configuration.client(GetXmlClient.class);
     }
 

@@ -1403,7 +1403,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param value Query参数值
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> addQuery(String name, Object value) {
+    public ForestRequest<T> query(String name, Object value) {
         this.query.addQuery(name, value);
         return this;
     }
@@ -1415,7 +1415,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param lazyValue 延迟求值的Query参数值
      * @return
      */
-    public ForestRequest<T> addQuery(String name, Lazy lazyValue) {
+    public ForestRequest<T> query(String name, Lazy lazyValue) {
         this.query.addQuery(name, lazyValue);
         return this;
     }
@@ -1429,7 +1429,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param charset 编码字符集
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> addQuery(String name, Object value, boolean isUrlEncode, String charset) {
+    public ForestRequest<T> query(String name, Object value, boolean isUrlEncode, String charset) {
         this.query.addQuery(name, value, isUrlEncode, charset);
         return this;
     }
@@ -1443,7 +1443,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestRequest}对象实例
      * @since 1.5.4
      */
-    public ForestRequest<T> addQuery(String name, Collection collection) {
+    public ForestRequest<T> query(String name, Collection collection) {
         this.query.addQuery(name, collection);
         return this;
     }
@@ -1459,7 +1459,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestRequest}对象实例
      * @since 1.5.4
      */
-    public ForestRequest<T> addQuery(String name, Collection collection, boolean isUrlEncode, String charset) {
+    public ForestRequest<T> query(String name, Collection collection, boolean isUrlEncode, String charset) {
         this.query.addQuery(name, collection, isUrlEncode, charset);
         return this;
     }
@@ -1472,8 +1472,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestRequest}对象实例
      * @since 1.5.4
      */
-    public ForestRequest<T> addQuery(String name, Object... array) {
-        return addQuery(name, array, false, null);
+    public ForestRequest<T> query(String name, Object... array) {
+        return query(name, array, false, null);
     }
 
 
@@ -1487,7 +1487,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestRequest}对象实例
      * @since 1.5.4
      */
-    public ForestRequest<T> addQuery(String name, Object[] array, boolean isUrlEncode, String charset) {
+    public ForestRequest<T> query(String name, Object[] array, boolean isUrlEncode, String charset) {
         this.query.addQuery(name, array, isUrlEncode, charset);
         return this;
     }
@@ -1503,7 +1503,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestRequest}对象实例
      * @since 1.5.4
      */
-    public ForestRequest<T> addQuery(Map queryMap) {
+    public ForestRequest<T> query(Map queryMap) {
         this.query.addQuery(queryMap);
         return this;
     }
@@ -1521,7 +1521,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestRequest}对象实例
      * @since 1.5.4
      */
-    public ForestRequest<T> addQuery(Map queryMap, boolean isUrlEncode, String charset) {
+    public ForestRequest<T> query(Map queryMap, boolean isUrlEncode, String charset) {
         this.query.addQuery(queryMap, isUrlEncode, charset);
         return this;
     }
@@ -1535,8 +1535,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestRequest}对象实例
      * @since 1.5.4
      */
-    public ForestRequest<T> addArrayQuery(String name, Collection collection) {
-        return addArrayQuery(name, collection, false, null);
+    public ForestRequest<T> arrayQuery(String name, Collection collection) {
+        return arrayQuery(name, collection, false, null);
     }
 
 
@@ -1551,7 +1551,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestRequest}对象实例
      * @since 1.5.4
      */
-    public ForestRequest<T> addArrayQuery(String name, Collection collection, boolean isUrlEncode, String charset) {
+    public ForestRequest<T> arrayQuery(String name, Collection collection, boolean isUrlEncode, String charset) {
         this.query.addArrayQuery(name, collection, isUrlEncode, charset);
         return this;
     }
@@ -1565,8 +1565,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestRequest}对象实例
      * @since 1.5.4
      */
-    public ForestRequest<T> addArrayQuery(String name, Object... array) {
-        return addArrayQuery(name, array, false, null);
+    public ForestRequest<T> arrayQuery(String name, Object... array) {
+        return arrayQuery(name, array, false, null);
     }
 
 
@@ -1581,7 +1581,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestRequest}对象实例
      * @since 1.5.4
      */
-    public ForestRequest<T> addArrayQuery(String name, Object[] array, boolean isUrlEncode, String charset) {
+    public ForestRequest<T> arrayQuery(String name, Object[] array, boolean isUrlEncode, String charset) {
         this.query.addArrayQuery(name, array, isUrlEncode, charset);
         return this;
     }
@@ -1596,7 +1596,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestRequest}对象实例
      * @since 1.5.4
      */
-    public ForestRequest<T> addJSONQuery(String name, Object value) {
+    public ForestRequest<T> jsonQuery(String name, Object value) {
         ForestJsonConverter jsonConverter = configuration.getJsonConverter();
         String json = jsonConverter.encodeToString(value);
         this.query.addQuery(name, json);
@@ -1610,7 +1610,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param queryParameter Query参数，{@link SimpleQueryParameter}对象实例
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> addQuery(SimpleQueryParameter queryParameter) {
+    public ForestRequest<T> query(SimpleQueryParameter queryParameter) {
         this.query.addQuery(queryParameter);
         return this;
     }
@@ -1621,9 +1621,9 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param queryParameters Query参数集合，{@link SimpleQueryParameter}对象实例集合
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> addQuery(Collection<SimpleQueryParameter> queryParameters) {
+    public ForestRequest<T> query(Collection<SimpleQueryParameter> queryParameters) {
         for (SimpleQueryParameter queryParameter : queryParameters) {
-            addQuery(queryParameter);
+            query(queryParameter);
         }
         return this;
     }
@@ -1634,7 +1634,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param queries Query参数集合，{@link SimpleQueryParameter}对象实例集合
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> addAllQuery(ForestQueryMap queries) {
+    public ForestRequest<T> queries(ForestQueryMap queries) {
         this.query.addAllQueries(queries);
         return this;
     }
@@ -1647,9 +1647,9 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param queryValues Query参数值集合
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> addQueryValues(String name, Collection queryValues) {
+    public ForestRequest<T> queryValues(String name, Collection queryValues) {
         for (Object queryValue : queryValues) {
-            addQuery(name, queryValue);
+            query(name, queryValue);
         }
         return this;
     }
@@ -1660,9 +1660,9 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param queryParameters Query参数数组，{@link SimpleQueryParameter}对象实例数组
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> addQuery(SimpleQueryParameter[] queryParameters) {
+    public ForestRequest<T> query(SimpleQueryParameter[] queryParameters) {
         for (SimpleQueryParameter queryParameter : queryParameters) {
-            addQuery(queryParameter);
+            query(queryParameter);
         }
         return this;
     }
@@ -1673,14 +1673,14 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param queryParameters Query参数, 接受所有Java对象类型
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> addQuery(Object queryParameters) {
+    public ForestRequest<T> query(Object queryParameters) {
         final ForestJsonConverter jsonConverter = getConfiguration().getJsonConverter();
         final ConvertOptions options = ConvertOptions.defaultOptions().evaluateLazyValue(false);
         final Map<String, Object> map = jsonConverter.convertObjectToMap(queryParameters, this, options);
         if (map != null && map.size() > 0) {
             map.forEach((key, value) -> {
                 if (value != null) {
-                    addQuery(String.valueOf(key), value);
+                    query(String.valueOf(key), value);
                 }
             });
         }
@@ -1730,7 +1730,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
     public ForestRequest<T> replaceOrAddQuery(SimpleQueryParameter queryParameter) {
         List<SimpleQueryParameter> queryParameters = this.query.getQueries(queryParameter.getName());
         if (queryParameters.isEmpty()) {
-            addQuery(queryParameter);
+            query(queryParameter);
         } else {
             for (SimpleQueryParameter parameter : queryParameters) {
                 parameter.setValue(queryParameter.getValue());
@@ -1751,7 +1751,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
     public ForestRequest<T> replaceOrAddQuery(String name, String value) {
         List<SimpleQueryParameter> queryParameters = this.query.getQueries(name);
         if (queryParameters.isEmpty()) {
-            addQuery(name, value);
+            query(name, value);
         } else {
             for (SimpleQueryParameter parameter : queryParameters) {
                 parameter.setValue(value);
@@ -1935,7 +1935,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
     }
 
     public ForestRequest<T> setContentEncoding(String contentEncoding) {
-        addHeader("Content-Encoding", contentEncoding);
+        header("Content-Encoding", contentEncoding);
         return this;
     }
 
@@ -1944,7 +1944,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
     }
 
     public ForestRequest<T> setUserAgent(String userAgent) {
-        addHeader("User-Agent", userAgent);
+        header("User-Agent", userAgent);
         return this;
     }
 
@@ -1972,8 +1972,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
         if (StringUtils.isNotEmpty(this.charset)) {
             return Charset.forName(this.charset);
         }
-        if (StringUtils.isNotEmpty(this.configuration.getCharset())) {
-            return Charset.forName(this.configuration.getCharset());
+        if (StringUtils.isNotEmpty(this.configuration.charset())) {
+            return Charset.forName(this.configuration.charset());
         }
         ContentType mineType = this.mineContentType();
         if (mineType != null && mineType.getCharset() != null) {
@@ -2267,7 +2267,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> setContentType(String contentType) {
-        addHeader(ForestHeader.CONTENT_TYPE, contentType);
+        header(ForestHeader.CONTENT_TYPE, contentType);
         return this;
     }
 
@@ -2308,7 +2308,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
         Charset mineCharset = null;
         String strCharset = this.getCharset();
         if (StringUtils.isEmpty(strCharset)) {
-            strCharset = this.configuration.getCharset();
+            strCharset = this.configuration.charset();
         }
         if (StringUtils.isEmpty(strCharset)) {
             mineCharset = StandardCharsets.UTF_8;
@@ -2337,7 +2337,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      *
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> contentTypeJson() {
+    public ForestRequest<T> applicationJson() {
         return setContentType(ContentType.APPLICATION_JSON);
     }
 
@@ -2346,7 +2346,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      *
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> contentTypeXml() {
+    public ForestRequest<T> applicationXml() {
         return setContentType(ContentType.APPLICATION_XML);
     }
 
@@ -2355,7 +2355,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      *
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> contentTypeOctetStream() {
+    public ForestRequest<T> applicationOctetStream() {
         return setContentType(ContentType.APPLICATION_OCTET_STREAM);
     }
 
@@ -2364,7 +2364,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      *
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> contentTypeMultipartFormData() {
+    public ForestRequest<T> multipartFormData() {
         return setContentType(ContentType.MULTIPART_FORM_DATA);
     }
 
@@ -2898,7 +2898,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param body Forest请求体，{@link ForestRequestBody}类实例
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addBody(ForestRequestBody body) {
+    public ForestRequest<T> body(ForestRequestBody body) {
         this.body.add(body);
         return this;
     }
@@ -2910,8 +2910,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param stringBody 请求体字符串内容
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addBody(String stringBody) {
-        return addBody(new StringRequestBody(stringBody));
+    public ForestRequest<T> body(String stringBody) {
+        return body(new StringRequestBody(stringBody));
     }
 
     /**
@@ -2920,8 +2920,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param byteArrayBody 请求体字节数组内容
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addBody(byte[] byteArrayBody) {
-        return addBody(new ByteArrayRequestBody(byteArrayBody));
+    public ForestRequest<T> body(byte[] byteArrayBody) {
+        return body(new ByteArrayRequestBody(byteArrayBody));
     }
 
     /**
@@ -2930,8 +2930,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param fileBody 请求体文件内容
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addBody(File fileBody) {
-        return addBody(new FileRequestBody(fileBody));
+    public ForestRequest<T> body(File fileBody) {
+        return body(new FileRequestBody(fileBody));
     }
 
     /**
@@ -2940,8 +2940,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param inputStreamBody 请求体输入流内容
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addBody(InputStream inputStreamBody) {
-        return addBody(new InputStreamRequestBody(inputStreamBody));
+    public ForestRequest<T> body(InputStream inputStreamBody) {
+        return body(new InputStreamRequestBody(inputStreamBody));
     }
 
     /**
@@ -2950,8 +2950,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param obj 请求体对象内容
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addBody(Object obj) {
-        return addBody(new ObjectRequestBody(obj));
+    public ForestRequest<T> body(Object obj) {
+        return body(new ObjectRequestBody(obj));
     }
 
     /**
@@ -2961,8 +2961,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param value 字段值
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addBody(String name, Object value) {
-        return addBody(new NameValueRequestBody(name, value));
+    public ForestRequest<T> body(String name, Object value) {
+        return body(new NameValueRequestBody(name, value));
     }
 
     /**
@@ -2973,8 +2973,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestRequest}类实例
      * @since 1.5.29
      */
-    public ForestRequest<T> addBody(String name, Lazy value) {
-        return addBody(new NameValueRequestBody(name, value));
+    public ForestRequest<T> body(String name, Lazy value) {
+        return body(new NameValueRequestBody(name, value));
     }
 
 
@@ -2989,17 +2989,17 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestRequest}类实例
      * @since 1.5.4
      */
-    public ForestRequest<T> addBody(Map bodyMap, String contentType) {
+    public ForestRequest<T> body(Map bodyMap, String contentType) {
         if (bodyMap == null) {
             return this;
         }
         if (bodyMap.isEmpty()) {
-            addBody(new ObjectRequestBody(bodyMap));
+            body(new ObjectRequestBody(bodyMap));
             return this;
         }
         for (Object key : bodyMap.keySet()) {
             Object value = bodyMap.get(key);
-            addBody(String.valueOf(key), contentType, value);
+            body(String.valueOf(key), contentType, value);
         }
         return this;
     }
@@ -3013,8 +3013,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param value 字段值
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addBody(String name, String contentType, Object value) {
-        return addBody(new NameValueRequestBody(name, contentType, value));
+    public ForestRequest<T> body(String name, String contentType, Object value) {
+        return body(new NameValueRequestBody(name, contentType, value));
     }
 
     /**
@@ -3024,8 +3024,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestRequest}类实例
      */
     @Deprecated
-    public ForestRequest<T> addBody(RequestNameValue nameValue) {
-        return addBody(new NameValueRequestBody(nameValue.getName(), nameValue.getValue()));
+    public ForestRequest<T> body(RequestNameValue nameValue) {
+        return body(new NameValueRequestBody(nameValue.getName(), nameValue.getValue()));
     }
 
     /**
@@ -3035,45 +3035,11 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestRequest}类实例
      */
     @Deprecated
-    public ForestRequest<T> addBody(List<RequestNameValue> nameValueList) {
+    public ForestRequest<T> body(List<RequestNameValue> nameValueList) {
         for (RequestNameValue nameValue : nameValueList) {
-            addBody(nameValue);
+            body(nameValue);
         }
         return this;
-    }
-
-    /**
-     * 添加键值对类型Body数据, 已不再建议使用
-     *
-     * @param name 键值对名称
-     * @param value 键值对的值
-     * @return {@link ForestRequest}类实例
-     */
-    @Deprecated
-    public ForestRequest<T> addData(String name, Object value) {
-        return addBody(name, value);
-    }
-
-    /**
-     * 添加键值对类型Body数据, 已不再建议使用
-     *
-     * @param nameValue 请求键值对对象
-     * @return {@link ForestRequest}类实例
-     */
-    @Deprecated
-    public ForestRequest<T> addData(RequestNameValue nameValue) {
-        return addNameValue(nameValue);
-    }
-
-    /**
-     * 批量添加键值对类型Body数据, 已不再建议使用
-     *
-     * @param data 请求键值对对象列表
-     * @return {@link ForestRequest}类实例
-     */
-    @Deprecated
-    public ForestRequest<T> addData(List<RequestNameValue> data) {
-        return addNameValue(data);
     }
 
     /**
@@ -3082,13 +3048,13 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param nameValue 键值对对象
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addNameValue(RequestNameValue nameValue) {
+    public ForestRequest<T> nameValueList(RequestNameValue nameValue) {
         if (nameValue.isInHeader()) {
-            this.addHeader(nameValue.getName(), nameValue.getValue());
+            this.header(nameValue.getName(), nameValue.getValue());
         } else if (nameValue.isInQuery()) {
-            this.addQuery(nameValue.getName(), nameValue.getValue());
+            this.query(nameValue.getName(), nameValue.getValue());
         } else if (nameValue.isInBody()) {
-            this.addBody(nameValue.getName(), nameValue.getPartContentType(), nameValue.getValue());
+            this.body(nameValue.getName(), nameValue.getPartContentType(), nameValue.getValue());
         }
         return this;
     }
@@ -3099,9 +3065,9 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param nameValueList 键值对列表
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addNameValue(List<RequestNameValue> nameValueList) {
+    public ForestRequest<T> nameValueList(List<RequestNameValue> nameValueList) {
         for (RequestNameValue nameValue : nameValueList) {
-            addNameValue(nameValue);
+            nameValueList(nameValue);
         }
         return this;
     }
@@ -3114,7 +3080,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      */
     public ForestRequest<T> replaceBody(ForestRequestBody body) {
         this.body.clear();
-        this.addBody(body);
+        this.body(body);
         return this;
     }
 
@@ -3126,7 +3092,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      */
     public ForestRequest<T> replaceBody(String stringbody) {
         this.body.clear();
-        this.addBody(stringbody);
+        this.body(stringbody);
         return this;
     }
 
@@ -3302,7 +3268,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestRequest}类实例
      * @since 1.5.4
      */
-    public ForestRequest<T> addHeader(Map headerMap) {
+    public ForestRequest<T> header(Map headerMap) {
         this.headers.setHeader(headerMap);
         return this;
     }
@@ -3316,12 +3282,12 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param value 请求头的值
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addHeader(String name, Object value) {
+    public ForestRequest<T> header(String name, Object value) {
         if (StringUtils.isEmpty(name)) {
             return this;
         }
         if (value instanceof Lazy) {
-            return addHeader(name, (Lazy) value);
+            return header(name, (Lazy) value);
         }
         this.headers.setHeader(name, String.valueOf(value));
         return this;
@@ -3335,7 +3301,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestRequest}类实例
      * @since 1.5.29
      */
-    public ForestRequest<T> addHeader(String name, Lazy<?> value) {
+    public ForestRequest<T> header(String name, Lazy<?> value) {
         if (value == null) {
             return this;
         }
@@ -3349,8 +3315,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param nameValue 请求头键值对，{@link RequestNameValue}类实例
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addHeader(RequestNameValue nameValue) {
-        this.addHeader(nameValue.getName(), nameValue.getValue());
+    public ForestRequest<T> header(RequestNameValue nameValue) {
+        this.header(nameValue.getName(), nameValue.getValue());
         return this;
     }
 
@@ -3360,9 +3326,9 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param nameValues 请求头键值对列表
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addHeaders(List<RequestNameValue> nameValues) {
+    public ForestRequest<T> headers(List<RequestNameValue> nameValues) {
         for (RequestNameValue nameValue : nameValues) {
-            this.addHeader(nameValue.getName(), nameValue.getValue());
+            this.header(nameValue.getName(), nameValue.getValue());
         }
         return this;
     }
@@ -3374,7 +3340,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestRequest}类实例
      * @since 1.5.23
      */
-    public ForestRequest<T> addCookie(ForestCookie cookie) {
+    public ForestRequest<T> cookie(ForestCookie cookie) {
         this.headers.addCookie(cookie);
         return this;
     }
@@ -3387,7 +3353,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestRequest}类实例
      * @since 1.5.25
      */
-    public ForestRequest<T> addCookie(ForestCookie cookie, boolean strict) {
+    public ForestRequest<T> cookie(ForestCookie cookie, boolean strict) {
         this.headers.addCookie(cookie, strict);
         return this;
     }
@@ -3400,7 +3366,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestRequest}类实例
      * @since 1.5.23
      */
-    public ForestRequest<T> addCookies(List<ForestCookie> cookies) {
+    public ForestRequest<T> cookieSet(List<ForestCookie> cookies) {
         this.headers.addCookies(cookies);
         return this;
     }
@@ -3412,7 +3378,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param strict 是否严格匹配（只有匹配域名，以及没过期的 Cookie 才能添加）
      * @return 1.5.25
      */
-    public ForestRequest<T> addCookies(List<ForestCookie> cookies, boolean strict) {
+    public ForestRequest<T> cookieSet(List<ForestCookie> cookies, boolean strict) {
         this.headers.addCookies(cookies, strict);
         return this;
     }
@@ -3421,11 +3387,11 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
     /**
      * 批量添加 Cookie 到请求中
      *
-     * @param cookies {@link ForestCookies}对象实例
+     * @param cookies {@link ForestCookieSet}对象实例
      * @return {@link ForestRequest}类实例
      * @since 1.5.23
      */
-    public ForestRequest<T> addCookies(ForestCookies cookies) {
+    public ForestRequest<T> cookieSet(ForestCookieSet cookies) {
         this.headers.addCookies(cookies);
         return this;
     }
@@ -3438,23 +3404,12 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
     }
 
     /**
-     * 设置 Multiparts 列表
-     *
-     * @param multiparts {@link ForestMultipart} 对象列表
-     * @return {@link ForestRequest}类实例
-     */
-    public ForestRequest<T> setMultiparts(List<ForestMultipart> multiparts) {
-        this.body.remove(MultipartRequestBody.class);
-        return addMultipart(multiparts);
-    }
-
-    /**
      * 添加 Multipart
      *
      * @param multipart {@link ForestMultipart} 对象
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addMultipart(ForestMultipart multipart) {
+    public ForestRequest<T> multipart(ForestMultipart multipart) {
         this.body.add(new MultipartRequestBody(multipart));
         return this;
     }
@@ -3466,7 +3421,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestRequest}类实例
      * @since 1.5.29
      */
-    public ForestRequest<T> addMultipart(List<ForestMultipart> multiparts) {
+    public ForestRequest<T> multipartList(List<ForestMultipart> multiparts) {
         for (ForestMultipart multipart : multiparts) {
             this.body.add(new MultipartRequestBody(multipart));
         }
@@ -3480,8 +3435,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param multipart 文件, {@link FileMultipart} 对象
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addFile(ForestMultipart multipart) {
-        return addMultipart(multipart);
+    public ForestRequest<T> fileBody(ForestMultipart multipart) {
+        return multipart(multipart);
     }
 
 
@@ -3492,8 +3447,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestRequest}类实例
      * @since 1.5.29
      */
-    public ForestRequest<T> addFile(List<ForestMultipart> multiparts) {
-        return addMultipart(multiparts);
+    public ForestRequest<T> fileBody(List<ForestMultipart> multiparts) {
+        return multipartList(multiparts);
     }
 
     /**
@@ -3505,8 +3460,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param contentType 文件内容类型
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addFile(String name, File file, String filename, String contentType) {
-        return addMultipart(new FileMultipart()
+    public ForestRequest<T> fileBody(String name, File file, String filename, String contentType) {
+        return multipart(new FileMultipart()
                 .setName(name)
                 .setContentType(contentType)
                 .setData(file)
@@ -3521,8 +3476,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param filename 文件名
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addFile(String name, File file, String filename) {
-        return addFile(name, file, filename, null);
+    public ForestRequest<T> fileBody(String name, File file, String filename) {
+        return fileBody(name, file, filename, null);
     }
 
     /**
@@ -3532,8 +3487,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param file 文件, {@link FileMultipart} 对象
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addFile(String name, File file) {
-        return addFile(name, file, file.getName(), null);
+    public ForestRequest<T> fileBody(String name, File file) {
+        return fileBody(name, file, file.getName(), null);
     }
 
     /**
@@ -3545,8 +3500,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param contentType 文件内容类型
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addFile(String name, InputStream inputStream, String filename, String contentType) {
-        return addMultipart(new InputStreamMultipart()
+    public ForestRequest<T> fileBody(String name, InputStream inputStream, String filename, String contentType) {
+        return multipart(new InputStreamMultipart()
                 .setName(name)
                 .setData(inputStream)
                 .setFileName(filename)
@@ -3561,8 +3516,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param filename 文件名
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addFile(String name, InputStream inputStream, String filename) {
-        return addFile(name, inputStream, filename, null);
+    public ForestRequest<T> fileBody(String name, InputStream inputStream, String filename) {
+        return fileBody(name, inputStream, filename, null);
     }
 
 
@@ -3575,8 +3530,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param contentType 文件内容类型
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addFile(String name, byte[] bytes, String filename, String contentType) {
-        return addFile(new ByteArrayMultipart()
+    public ForestRequest<T> fileBody(String name, byte[] bytes, String filename, String contentType) {
+        return fileBody(new ByteArrayMultipart()
                 .setName(name)
                 .setData(bytes)
                 .setFileName(filename)
@@ -3591,8 +3546,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param filename 文件名
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addFile(String name, byte[] bytes, String filename) {
-        return addFile(name, bytes, filename, null);
+    public ForestRequest<T> fileBody(String name, byte[] bytes, String filename) {
+        return fileBody(name, bytes, filename, null);
     }
 
 
@@ -3896,14 +3851,14 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      */
     public ForestRequest<T> downloadFile(String dir, String filename) {
         if (StringUtils.isNotBlank(dir)) {
-            this.addInterceptor(DownloadLifeCycle.class);
+            this.interceptor(DownloadLifeCycle.class);
             // 当map达到当前最大容量的0.75时会扩容,大小设置为4且塞入两个键值对不会进行扩容
             Map<String, Object> downloadFileMap = new HashMap<>(4);
             downloadFileMap.put("dir", dir);
             downloadFileMap.put("filename", filename != null ? filename : "");
             InterceptorAttributes attributes = new InterceptorAttributes(DownloadLifeCycle.class, downloadFileMap);
             attributes.render(this);
-            this.addInterceptorAttributes(DownloadLifeCycle.class, attributes);
+            this.interceptorAttributes(DownloadLifeCycle.class, attributes);
         }
         return this;
     }
@@ -4069,7 +4024,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
         return setOnSaveCookie(onSaveCookie);
     }
 
-    public ForestRequest<T> setVar(String name, Object value) {
+    public ForestRequest<T> variable(String name, Object value) {
         context.setVar(name, value);
         return this;
     }
@@ -4080,8 +4035,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
     }
 
     @Override
-    public Object getVar(String name, VariableValueContext valueContext) {
-        return context.getVar(name, valueContext);
+    public Object getVariable(String name, VariableValueContext valueContext) {
+        return context.getVariable(name, valueContext);
     }
 
     /**
@@ -4091,12 +4046,12 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return 变量值
      */
     public Object getVariableValue(String name) {
-        return getVar(name, this);
+        return getVariable(name, this);
     }
 
     @Override
-    public ForestVariableDef getVarDef(String name) {
-        return context.getVarDef(name);
+    public ForestVariableDef getVariableDef(String name) {
+        return context.getVariableDef(name);
     }
 
     @Override
@@ -4124,7 +4079,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param interceptorClass 拦截器类，{@link Interceptor}接口类
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addInterceptor(Class<? extends Interceptor> interceptorClass) {
+    public ForestRequest<T> interceptor(Class<? extends Interceptor> interceptorClass) {
         if (!Interceptor.class.isAssignableFrom(interceptorClass) || interceptorClass.isInterface()) {
             throw new ForestRuntimeException("Class [" + interceptorClass.getName() + "] is not a implement of [" +
                     Interceptor.class.getName() + "] interface.");
@@ -4142,7 +4097,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param interceptor 拦截器，{@link Interceptor}接口实例
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addInterceptor(Interceptor interceptor) {
+    public ForestRequest<T> interceptor(Interceptor interceptor) {
         interceptorChain.addInterceptor(interceptor);
         return this;
     }
@@ -4170,7 +4125,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param attributes 拦截器属性，{@link InterceptorAttributes}类实例
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addInterceptorAttributes(Class interceptorClass, InterceptorAttributes attributes) {
+    public ForestRequest<T> interceptorAttributes(Class interceptorClass, InterceptorAttributes attributes) {
         InterceptorAttributes oldAttributes = interceptorAttributes.get(interceptorClass);
         if (oldAttributes != null) {
             for (Map.Entry<String, Object> entry : attributes.getAttributeTemplates().entrySet()) {
@@ -4202,11 +4157,11 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param attributeValue 拦截器属性值
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addInterceptorAttribute(Class interceptorClass, String attributeName, Object attributeValue) {
+    public ForestRequest<T> interceptorAttribute(Class interceptorClass, String attributeName, Object attributeValue) {
         InterceptorAttributes attributes = getInterceptorAttributes(interceptorClass);
         if (attributes == null) {
             attributes = new InterceptorAttributes(interceptorClass, new ConcurrentHashMap<>());
-            addInterceptorAttributes(interceptorClass, attributes);
+            interceptorAttributes(interceptorClass, attributes);
         }
         attributes.addAttribute(attributeName, attributeValue);
         return this;
@@ -4346,7 +4301,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param value 附件值
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequest<T> addAttachment(String name, Object value) {
+    public ForestRequest<T> attachment(String name, Object value) {
         attachments.put(name, value);
         return this;
     }
@@ -4798,9 +4753,9 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
                 this.authenticator.enhanceAuthorization(this);
             }
             this.url.mergeAddress().checkAndComplete();
-            ForestCookies cookies = new ForestCookies();
-            lifeCycleHandler.handleLoadCookie(this, cookies);
-            this.addCookies(cookies);
+            ForestCookieSet cookieSet = new ForestCookieSet();
+            lifeCycleHandler.handleLoadCookie(this, cookieSet);
+            this.cookieSet(cookieSet);
             // 从后端HTTP框架创建HTTP请求执行器
             executor = backend.createExecutor(this, lifeCycleHandler);
             if (executor != null) {
@@ -4877,7 +4832,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      *
      * @return 接受到请求响应后，其响应内容反序列化成对象的结果
      */
-    public Object asObject() {
+    public Object objectResult() {
         ResultGetter resultGetter = execute(getBackend(), getLifeCycleHandler());
         return resultGetter.result(getResultClass());
     }
@@ -4889,7 +4844,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param <R> 泛型参数: 结果返回类型
      * @return 请求执行响应后返回的结果, 其为 {@code Class<R>} 参数所指定的类型
      */
-    public <R> R as(Class<R> clazz) {
+    public <R> R result(Class<R> clazz) {
         LifeCycleHandler lifeCycleHandler = getLifeCycleHandler();
         MethodLifeCycleHandler<R> methodLifeCycleHandler = new MethodLifeCycleHandler<>(
                 clazz,
@@ -4903,8 +4858,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      *
      * @return 请求执行响应后返回的结果, 其为字节数组类型
      */
-    public byte[] executeAsByteArray() {
-        return as(byte[].class);
+    public byte[] bytesResult() {
+        return result(byte[].class);
     }
 
 
@@ -4913,8 +4868,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      *
      * @return 请求执行响应后返回的结果, 其为Boolean类型
      */
-    public Boolean executeAsBoolean() {
-        return as(Boolean.class);
+    public Boolean booleanResult() {
+        return result(Boolean.class);
     }
 
 
@@ -4923,8 +4878,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      *
      * @return 请求执行响应后返回的结果, 其为整数类型
      */
-    public Integer asInteger() {
-        return as(Integer.class);
+    public Integer intResult() {
+        return result(Integer.class);
     }
 
     /**
@@ -4932,8 +4887,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      *
      * @return 请求执行响应后返回的结果, 其为Long类型
      */
-    public Long asLong() {
-        return as(Long.class);
+    public Long longResult() {
+        return result(Long.class);
     }
 
     /**
@@ -4941,8 +4896,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      *
      * @return 请求执行响应后返回的结果, 其为字符串类型
      */
-    public String asString() {
-        return as(String.class);
+    public String stringResult() {
+        return result(String.class);
     }
 
     /**
@@ -4952,8 +4907,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param <VALUE> 泛型参数: 结果表的值类型
      * @return 请求执行响应后返回的结果, 其为Map类型
      */
-    public <KEY, VALUE> Map<KEY, VALUE> asMap() {
-        return as(new TypeReference<Map<KEY, VALUE>>() {});
+    public <KEY, VALUE> Map<KEY, VALUE> mapResult() {
+        return result(new TypeReference<Map<KEY, VALUE>>() {});
     }
 
     /**
@@ -4962,8 +4917,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param <E> 泛型参数: 结果列表项类型
      * @return 请求执行响应后返回的结果, 其为List类型
      */
-    public <E> List<E> asList() {
-        return as(new TypeReference<List<E>>() {});
+    public <E> List<E> listResult() {
+        return result(new TypeReference<List<E>>() {});
     }
 
     /**
@@ -4972,8 +4927,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return 请求执行响应后返回的结果, 其为 {@link Future} 对象实例
      * @since 1.5.27
      */
-    public ForestFuture<T> asFuture() {
-        return as(new TypeReference<>() {});
+    public ForestFuture<T> futureResult() {
+        return result(new TypeReference<>() {});
     }
 
 
@@ -4984,7 +4939,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @since 1.5.27
      */
     public ForestResponse<T> execute() {
-        return as(new TypeReference<>() {});
+        return result(new TypeReference<>() {});
     }
 
 
@@ -4996,7 +4951,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param <R> 泛型参数: 结果返回类型
      * @return 请求执行响应后返回的结果, 其为 {@link Type} 参数所指定的类型
      */
-    public <R> R as(Type type) {
+    public <R> R result(Type type) {
         LifeCycleHandler lifeCycleHandler = getLifeCycleHandler();
         MethodLifeCycleHandler<R> methodLifeCycleHandler = new MethodLifeCycleHandler<>(
                 type,
@@ -5012,8 +4967,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param <R> 泛型参数: 结果返回类型
      * @return 请求执行响应后返回的结果, 其为 {@link TypeReference} 的泛型参数所指定的类型
      */
-    public <R> R as(TypeReference<R> typeReference) {
-        return as(typeReference.getType());
+    public <R> R result(TypeReference<R> typeReference) {
+        return result(typeReference.getType());
     }
 
 }

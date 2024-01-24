@@ -22,7 +22,7 @@ public class AddQueryInterceptor implements Interceptor {
     public ForestJointPoint beforeExecute(ForestRequest request) {
         Integer port = (Integer) request.getConfiguration().getVar("port");
         request.setUrl("http://localhost:" + port + "/hello/user?username=foo");
-        request.addQuery("password", "bar");
+        request.query("password", "bar");
         return proceed();
     }
 }

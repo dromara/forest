@@ -24,7 +24,7 @@
 
 package com.dtflys.forest.callback;
 
-import com.dtflys.forest.http.ForestCookies;
+import com.dtflys.forest.http.ForestCookieSet;
 import com.dtflys.forest.http.ForestRequest;
 
 /**
@@ -42,6 +42,6 @@ public interface OnLoadCookie {
      * @param req Forest请求对象
      * @param cookies Cookie集合, 需要通过请求发送的Cookie都添加到该集合
      */
-    void onLoadCookie(ForestRequest req, ForestCookies cookies);
+    void onLoadCookie(ForestRequest req, ForestCookieSet cookies);
 
 }

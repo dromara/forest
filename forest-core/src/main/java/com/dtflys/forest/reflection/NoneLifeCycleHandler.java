@@ -1,12 +1,10 @@
 package com.dtflys.forest.reflection;
 
 import com.dtflys.forest.converter.ForestEncoder;
-import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.handler.LifeCycleHandler;
-import com.dtflys.forest.http.ForestCookies;
+import com.dtflys.forest.http.ForestCookieSet;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.utils.ForestProgress;
 
 import java.lang.reflect.Type;
@@ -68,11 +66,11 @@ public class NoneLifeCycleHandler implements LifeCycleHandler {
     }
 
     @Override
-    public void handleLoadCookie(ForestRequest request, ForestCookies cookies) {
+    public void handleLoadCookie(ForestRequest request, ForestCookieSet cookies) {
     }
 
     @Override
-    public void handleSaveCookie(ForestRequest request, ForestCookies cookies) {
+    public void handleSaveCookie(ForestRequest request, ForestCookieSet cookies) {
     }
 
     @Override

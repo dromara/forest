@@ -55,9 +55,9 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2> {
         final String tokenValue = tokenAt.getTokenValue(defaultPrefix, tokenCache.getAccessToken());
 
         if (tokenAt == OAuth2.TokenAt.HEADER) {
-            request.addHeader(tokenVariable, tokenValue);
+            request.header(tokenVariable, tokenValue);
         } else {
-            request.addQuery(tokenVariable, tokenValue);
+            request.query(tokenVariable, tokenValue);
         }
         return proceed();
     }

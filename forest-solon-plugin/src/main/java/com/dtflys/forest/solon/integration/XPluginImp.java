@@ -58,7 +58,7 @@ public class XPluginImp implements Plugin {
 
             String varName = anno.value();
             SolonForestVariableDef variableValue = new SolonForestVariableDef(bw.get(), method);
-            config.setVar(varName, variableValue);
+            config.variable(varName, variableValue);
         });
 
 

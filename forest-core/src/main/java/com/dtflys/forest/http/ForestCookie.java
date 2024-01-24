@@ -24,7 +24,6 @@
 
 package com.dtflys.forest.http;
 
-import com.dtflys.forest.backend.okhttp3.OkHttp3Cookie;
 import okhttp3.Cookie;
 import okhttp3.HttpUrl;
 
@@ -166,7 +165,7 @@ public class ForestCookie implements Cloneable, Serializable {
      * 设置Cookie所在的域名
      *
      * @param domain 域名
-     * @return {@link ForestCookies}类实例
+     * @return {@link ForestCookieSet}类实例
      */
     public ForestCookie setDomain(String domain) {
         if (domain == null) {
@@ -189,7 +188,7 @@ public class ForestCookie implements Cloneable, Serializable {
      * 设置Cookie所在的URL路径
      *
      * @param path URL路径
-     * @return {@link ForestCookies}类实例
+     * @return {@link ForestCookieSet}类实例
      */
     public ForestCookie setPath(String path) {
         if (!path.startsWith("/")) {
@@ -214,7 +213,7 @@ public class ForestCookie implements Cloneable, Serializable {
      * 如果该属性为{@code true}, 只能⽤ HTTPS 协议发送给服务器
      *
      * @param secure {@code true}: 安全, {@code false}: 非安全
-     * @return {@link ForestCookies}类实例
+     * @return {@link ForestCookieSet}类实例
      */
     public ForestCookie setSecure(boolean secure) {
         this.secure = secure;
@@ -236,7 +235,7 @@ public class ForestCookie implements Cloneable, Serializable {
      * 如果该属性为{@code true}, 则 Cookie 不能被js获取到
      *
      * @param httpOnly {@code true}: 不能被js获取到, {@code false}: 能被js获取到
-     * @return {@link ForestCookies}类实例
+     * @return {@link ForestCookieSet}类实例
      */
     public ForestCookie setHttpOnly(boolean httpOnly) {
         this.httpOnly = httpOnly;
@@ -256,7 +255,7 @@ public class ForestCookie implements Cloneable, Serializable {
      * 设置是否为 HostOnly Cookie
      *
      * @param hostOnly {@code true}: 是 HostOnly, {@code false}: 不是 HostOnly
-     * @return {@link ForestCookies}类实例
+     * @return {@link ForestCookieSet}类实例
      */
     public ForestCookie setHostOnly(boolean hostOnly) {
         this.hostOnly = hostOnly;

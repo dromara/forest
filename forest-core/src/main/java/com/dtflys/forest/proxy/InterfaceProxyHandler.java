@@ -238,7 +238,7 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
     }
 
     public void setVar(String name, Object value) {
-        configuration.setVar(name, value);
+        configuration.variable(name, value);
     }
 
     @Override
@@ -247,7 +247,7 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
     }
 
     @Override
-    public Object getVar(String name, VariableValueContext valueContext) {
+    public Object getVariable(String name, VariableValueContext valueContext) {
         return configuration.getVar(name, valueContext);
     }
 
@@ -256,8 +256,8 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
     }
 
     @Override
-    public ForestVariableDef getVarDef(String name) {
-        return configuration.getVariableContext().getVarDef(name);
+    public ForestVariableDef getVariableDef(String name) {
+        return configuration.getVariableContext().getVariableDef(name);
     }
 
     @Override

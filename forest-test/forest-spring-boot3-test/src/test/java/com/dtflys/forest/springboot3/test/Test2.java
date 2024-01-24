@@ -40,9 +40,9 @@ public class Test2 {
         assertThat(forestConfiguration.getMaxConnections()).isEqualTo(6000);
         assertThat(forestConfiguration.getMaxRouteConnections()).isEqualTo(6600);
         assertThat(forestConfiguration.getTimeout()).isEqualTo(6000);
-        assertThat(forestConfiguration.getConnectTimeout()).isEqualTo(5000);
-        assertThat(forestConfiguration.getReadTimeout()).isEqualTo(6000);
-        assertThat(forestConfiguration.getMaxRetryCount()).isEqualTo(0);
+        assertThat(forestConfiguration.connectTimeout()).isEqualTo(5000);
+        assertThat(forestConfiguration.readTimeout()).isEqualTo(6000);
+        assertThat(forestConfiguration.maxRetryCount()).isEqualTo(0);
 
         assertThat(forestConfiguration.isLogEnabled()).isTrue();
         assertThat(forestConfiguration.getInterceptorFactory()).isInstanceOf(SpringInterceptorFactory.class);

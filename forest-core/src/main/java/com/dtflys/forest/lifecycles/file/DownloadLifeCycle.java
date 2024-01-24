@@ -115,7 +115,7 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
             if (logConfiguration.isLogEnabled() || !file.exists()) {
                 logHandler.logContent("Saved file '" + path + "' successful.");
             }
-            request.addAttachment(ATTACHMENT_NAME_FILE, file);
+            request.attachment(ATTACHMENT_NAME_FILE, file);
             if (resultType != null) {
                 final ForestConverter converter = request
                         .getConfiguration()

@@ -10,7 +10,7 @@ public class PostHeadInterceptor implements Interceptor {
 
     @Override
     public ForestJointPoint beforeExecute(ForestRequest request) {
-        request.addHeader("accessToken", "11111111");
+        request.header("accessToken", "11111111");
         return proceed();
     }
 

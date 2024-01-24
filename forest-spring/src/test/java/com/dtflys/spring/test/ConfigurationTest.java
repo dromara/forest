@@ -24,7 +24,7 @@ public class ConfigurationTest extends TestCase {
         assertNotNull(forestConfiguration);
         assertNotNull(forestConfiguration.getBackend());
         assertEquals(forestConfiguration.getTimeout(), new Integer(30000));
-        assertEquals(forestConfiguration.getConnectTimeout(), new Integer(10000));
+        assertEquals(forestConfiguration.connectTimeout(), new Integer(10000));
         assertEquals(forestConfiguration.getMaxConnections(), new Integer(500));
         assertEquals(forestConfiguration.getMaxRouteConnections(), new Integer(500));
         assertEquals(forestConfiguration.getSslProtocol(), "SSLv3");
@@ -32,11 +32,11 @@ public class ConfigurationTest extends TestCase {
         assertEquals(forestConfiguration.getVar("x"), "0");
         assertEquals(forestConfiguration.getVar("y"), "1");
         assertEquals(forestConfiguration.getBackend().getName(), "httpclient");
-        assertEquals("GBK", forestConfiguration.getCharset());
+        assertEquals("GBK", forestConfiguration.charset());
         assertEquals(Boolean.TRUE, Boolean.valueOf(forestConfiguration.isLogEnabled()));
         assertEquals(Boolean.FALSE, Boolean.valueOf(forestConfiguration.isLogResponseStatus()));
         assertEquals(Boolean.TRUE, Boolean.valueOf(forestConfiguration.isLogResponseContent()));
-        assertEquals(NoneRetryer.class, forestConfiguration.getRetryer());
+        assertEquals(NoneRetryer.class, forestConfiguration.retryer());
         assertTrue(forestConfiguration.getLogHandler() instanceof TestLogHandler);
         ForestJsonConverter jsonConverter = forestConfiguration.getJsonConverter();
         assertNotNull(jsonConverter);

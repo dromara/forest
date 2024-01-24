@@ -1,7 +1,6 @@
 package com.dtflys.test.http.retry;
 
 import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.interceptor.Interceptor;
 
@@ -16,7 +15,7 @@ public class TestRetryInterceptor implements Interceptor {
     @Override
     public void onRetry(ForestRequest request, ForestResponse response) {
         // 将当前重试次数添加到 Forest 请求对象的附件中
-        request.addAttachment("retry-interceptor", request.getCurrentRetryCount());
-        request.addQuery("a", request.getCurrentRetryCount());
+        request.attachment("retry-interceptor", request.getCurrentRetryCount());
+        request.query("a", request.getCurrentRetryCount());
     }
 }

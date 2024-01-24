@@ -40,7 +40,7 @@ public class TestTraceClient extends BaseClientTest {
 
     public TestTraceClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
         traceClient = configuration.createInstance(TraceClient.class);
     }
 

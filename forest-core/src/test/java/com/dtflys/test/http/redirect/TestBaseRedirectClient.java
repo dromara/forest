@@ -39,7 +39,7 @@ public class TestBaseRedirectClient extends BaseClientTest {
 
     public TestBaseRedirectClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
         redirectClient = configuration.createInstance(RedirectClient.class);
         baseRedirectClient = configuration.createInstance(BaseRedirectClient.class);
     }
@@ -93,7 +93,7 @@ public class TestBaseRedirectClient extends BaseClientTest {
         assertThat(response.getStatusCode()).isEqualTo(301);
         assertThat(response.isRedirection()).isTrue();
         assertThat(response.getRedirectionLocation()).isEqualTo("http://localhost:" + server.getPort() + "/b");
-        String result = response.redirectionRequest().as(String.class);
+        String result = response.redirectionRequest().result(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         assertThat(atomicReq.get()).isNotNull();
         assertThat(atomicReq.get().getPath()).isEqualTo("/b");
@@ -113,7 +113,7 @@ public class TestBaseRedirectClient extends BaseClientTest {
         assertThat(response.getStatusCode()).isEqualTo(302);
         assertThat(response.isRedirection()).isTrue();
         assertThat(response.getRedirectionLocation()).isEqualTo("http://localhost:" + server.getPort() + "/b");
-        String result = response.redirectionRequest().as(String.class);
+        String result = response.redirectionRequest().result(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         assertThat(atomicReq.get()).isNotNull();
         assertThat(atomicReq.get().getPath()).isEqualTo("/b");
@@ -134,7 +134,7 @@ public class TestBaseRedirectClient extends BaseClientTest {
         assertThat(response.getStatusCode()).isEqualTo(303);
         assertThat(response.isRedirection()).isTrue();
         assertThat(response.getRedirectionLocation()).isEqualTo("http://localhost:" + server.getPort() + "/b");
-        String result = response.redirectionRequest().as(String.class);
+        String result = response.redirectionRequest().result(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         assertThat(atomicReq.get()).isNotNull();
         assertThat(atomicReq.get().getPath()).isEqualTo("/b");
@@ -155,7 +155,7 @@ public class TestBaseRedirectClient extends BaseClientTest {
         assertThat(response.getStatusCode()).isEqualTo(304);
         assertThat(response.isRedirection()).isTrue();
         assertThat(response.getRedirectionLocation()).isEqualTo("http://localhost:" + server.getPort() + "/b");
-        String result = response.redirectionRequest().as(String.class);
+        String result = response.redirectionRequest().result(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         assertThat(atomicReq.get()).isNotNull();
         assertThat(atomicReq.get().getPath()).isEqualTo("/b");
@@ -176,7 +176,7 @@ public class TestBaseRedirectClient extends BaseClientTest {
         assertThat(response.getStatusCode()).isEqualTo(305);
         assertThat(response.isRedirection()).isTrue();
         assertThat(response.getRedirectionLocation()).isEqualTo("http://localhost:" + server.getPort() + "/b");
-        String result = response.redirectionRequest().as(String.class);
+        String result = response.redirectionRequest().result(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         assertThat(atomicReq.get()).isNotNull();
         assertThat(atomicReq.get().getPath()).isEqualTo("/b");
@@ -197,7 +197,7 @@ public class TestBaseRedirectClient extends BaseClientTest {
         assertThat(response.getStatusCode()).isEqualTo(306);
         assertThat(response.isRedirection()).isTrue();
         assertThat(response.getRedirectionLocation()).isEqualTo("http://localhost:" + server.getPort() + "/b");
-        String result = response.redirectionRequest().as(String.class);
+        String result = response.redirectionRequest().result(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         assertThat(atomicReq.get()).isNotNull();
         assertThat(atomicReq.get().path()).isEqualTo("/b");
@@ -218,7 +218,7 @@ public class TestBaseRedirectClient extends BaseClientTest {
         assertThat(response.getStatusCode()).isEqualTo(307);
         assertThat(response.isRedirection()).isTrue();
         assertThat(response.getRedirectionLocation()).isEqualTo("http://localhost:" + server.getPort() + "/b");
-        String result = response.redirectionRequest().as(String.class);
+        String result = response.redirectionRequest().result(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         assertThat(atomicReq.get()).isNotNull();
         assertThat(atomicReq.get().path()).isEqualTo("/b");
@@ -534,7 +534,7 @@ public class TestBaseRedirectClient extends BaseClientTest {
         assertThat(response.getStatusCode()).isEqualTo(301);
         assertThat(response.isRedirection()).isTrue();
         assertThat(response.getRedirectionLocation()).isEqualTo("http://localhost:" + server.getPort() + "/b");
-        String result = response.redirectionRequest().as(String.class);
+        String result = response.redirectionRequest().result(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server).assertPathEquals("/");
         mockRequest(server)
@@ -556,7 +556,7 @@ public class TestBaseRedirectClient extends BaseClientTest {
         assertThat(response.getStatusCode()).isEqualTo(302);
         assertThat(response.isRedirection()).isTrue();
         assertThat(response.getRedirectionLocation()).isEqualTo("http://localhost:" + server.getPort() + "/b");
-        String result = response.redirectionRequest().as(String.class);
+        String result = response.redirectionRequest().result(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server).assertPathEquals("/");
         mockRequest(server)
@@ -578,7 +578,7 @@ public class TestBaseRedirectClient extends BaseClientTest {
         assertThat(response.getStatusCode()).isEqualTo(303);
         assertThat(response.isRedirection()).isTrue();
         assertThat(response.getRedirectionLocation()).isEqualTo("http://localhost:" + server.getPort() + "/b");
-        String result = response.redirectionRequest().as(String.class);
+        String result = response.redirectionRequest().result(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server).assertPathEquals("/");
         mockRequest(server)
@@ -600,7 +600,7 @@ public class TestBaseRedirectClient extends BaseClientTest {
         assertThat(response.getStatusCode()).isEqualTo(304);
         assertThat(response.isRedirection()).isTrue();
         assertThat(response.getRedirectionLocation()).isEqualTo("http://localhost:" + server.getPort() + "/b");
-        String result = response.redirectionRequest().as(String.class);
+        String result = response.redirectionRequest().result(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server).assertPathEquals("/");
         mockRequest(server)
@@ -622,7 +622,7 @@ public class TestBaseRedirectClient extends BaseClientTest {
         assertThat(response.getStatusCode()).isEqualTo(305);
         assertThat(response.isRedirection()).isTrue();
         assertThat(response.getRedirectionLocation()).isEqualTo("http://localhost:" + server.getPort() + "/b");
-        String result = response.redirectionRequest().as(String.class);
+        String result = response.redirectionRequest().result(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server).assertPathEquals("/");
         mockRequest(server)
@@ -644,7 +644,7 @@ public class TestBaseRedirectClient extends BaseClientTest {
         assertThat(response.getStatusCode()).isEqualTo(306);
         assertThat(response.isRedirection()).isTrue();
         assertThat(response.getRedirectionLocation()).isEqualTo("http://localhost:" + server.getPort() + "/b");
-        String result = response.redirectionRequest().as(String.class);
+        String result = response.redirectionRequest().result(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server).assertPathEquals("/");
         mockRequest(server)
@@ -666,7 +666,7 @@ public class TestBaseRedirectClient extends BaseClientTest {
         assertThat(response.getStatusCode()).isEqualTo(307);
         assertThat(response.isRedirection()).isTrue();
         assertThat(response.getRedirectionLocation()).isEqualTo("http://localhost:" + server.getPort() + "/b");
-        String result = response.redirectionRequest().as(String.class);
+        String result = response.redirectionRequest().result(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server).assertPathEquals("/");
         mockRequest(server)

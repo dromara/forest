@@ -47,10 +47,10 @@ public class ForestVariableContext implements VariableScope {
     }
 
     @Override
-    public Object getVar(String name, VariableValueContext valueContext) {
+    public Object getVariable(String name, VariableValueContext valueContext) {
         Object value = variables.get(name);
         if (value == null && parent != null) {
-            value = parent.getVar(name, valueContext);
+            value = parent.getVariable(name, valueContext);
         }
         if (value instanceof ForestVariableDef) {
             return ((ForestVariableDef) value).getValue(valueContext);
@@ -63,10 +63,10 @@ public class ForestVariableContext implements VariableScope {
     }
 
     @Override
-    public ForestVariableDef getVarDef(String name) {
+    public ForestVariableDef getVariableDef(String name) {
         final ForestVariableDef variableValue = variables.get(name);
         if (variableValue == null) {
-            return parent.getVarDef(name);
+            return parent.getVariableDef(name);
         }
         return variableValue;
     }

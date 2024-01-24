@@ -36,7 +36,7 @@ public class TestDeleteClient extends BaseClientTest {
 
     public TestDeleteClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVar("port", server.getPort());
+        configuration.variable("port", server.getPort());
         deleteClient = configuration.createInstance(DeleteClient.class);
     }
 

@@ -33,8 +33,8 @@ public class TestBaseURLPortClient  extends BaseClientTest{
     }
     public TestBaseURLPortClient(HttpBackend backend) {
         super(backend, configuration);
-        configuration.setVar("port", server.getPort());
-        configuration.setVar("baseURL", "http://localhost:" + server.getPort() +"/user");
+        configuration.variable("port", server.getPort());
+        configuration.variable("baseURL", "http://localhost:" + server.getPort() +"/user");
         baseURLPortClient = configuration.createInstance(BaseURLPortClient.class);
     }
 
