@@ -3,12 +3,9 @@ package com.dtflys.forest.backend;
 
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.http.ForestResponseFactory;
 import com.dtflys.forest.handler.LifeCycleHandler;
-import com.dtflys.forest.utils.ReflectUtils;
+import com.dtflys.forest.http.ResultGetter;
 
-import java.lang.reflect.Type;
-import java.util.Date;
 import java.util.concurrent.Future;
 
 
@@ -30,17 +27,14 @@ public abstract class ResponseHandler<R> {
     }
 
 
-    public Object handleSync(ForestResponse response, int statusCode, String msg) {
+    public ResultGetter handleSync(ForestResponse response) {
         if (request.isAutoRedirection() && response.isRedirection()) {
             // 进行重定向
             final ForestRequest redirectionRequest = response.redirectionRequest();
-            return redirectionRequest.asObject(request.getBackend(), lifeCycleHandler);
+            return redirectionRequest.execute(request.getBackend(), lifeCycleHandler);
         }
-        final Object result = lifeCycleHandler.handleSync(request, response);
-        if (result instanceof ForestResponse) {
-            return result;
-        }
-        return result;
+        lifeCycleHandler.handleSync(request, response);
+        return response;
     }
 
     public void handleError(ForestResponse response, Throwable ex) {

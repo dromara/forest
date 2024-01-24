@@ -36,7 +36,7 @@ class KotlinCoroutineHttpExecutor (
 
     override fun getRequest(): ForestRequest<Any> = syncExecutor.request
 
-    override fun execute(lifeCycleHandler: LifeCycleHandler?) {
+    override fun execute(lifeCycleHandler: LifeCycleHandler?): ForestResponse<Any>? {
         if (channel == null) {
             synchronized(this) {
                 channel = Channel(configuration.maxAsyncQueueSize ?: DEFAULT_MAX_COROUTINE_SIZE)
@@ -53,6 +53,7 @@ class KotlinCoroutineHttpExecutor (
             } else null
             future.complete(res)
         }
+        return null;
     }
 
     override fun getResponseHandler(): ResponseHandler<Any> = handler

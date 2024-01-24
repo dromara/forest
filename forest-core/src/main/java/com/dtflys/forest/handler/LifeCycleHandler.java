@@ -32,9 +32,9 @@ public interface LifeCycleHandler {
 
     void handleInvokeMethod(ForestRequest request, ForestMethod method, Object[] args);
 
-    Object handleError(ForestRequest request, ForestResponse response);
+    void handleError(ForestRequest request, ForestResponse response);
 
-    Object handleError(ForestRequest request, ForestResponse response, Throwable ex);
+    void handleError(ForestRequest request, ForestResponse response, Throwable ex);
 
     byte[] handleBodyEncode(ForestRequest request, ForestEncoder encoder, byte[] encodedData);
 

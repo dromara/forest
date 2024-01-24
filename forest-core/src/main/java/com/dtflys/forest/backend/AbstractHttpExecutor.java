@@ -29,7 +29,7 @@ public abstract class AbstractHttpExecutor implements HttpExecutor {
     }
 
     @Override
-    public abstract void execute(LifeCycleHandler lifeCycleHandler);
+    public abstract ForestResponse<?> execute(LifeCycleHandler lifeCycleHandler);
 
     @Override
     public abstract void close();

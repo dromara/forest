@@ -9,6 +9,7 @@ import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.http.*;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.util.EntityUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -61,6 +62,7 @@ public class HttpclientForestResponse extends ForestResponse {
     }
 
     private void init() {
+        setupResponseCharset();
         if (request.isDownloadFile()
                 || InputStream.class.isAssignableFrom(request.getResultClass())
                 || InputStream.class.isAssignableFrom(ReflectUtils.toClass(request.getLifeCycleHandler().getResultType()))
@@ -199,7 +201,7 @@ public class HttpclientForestResponse extends ForestResponse {
                 return null;
             } else {
                 try {
-//                    bytes = EntityUtils.toByteArray(entity);
+                    bytes = EntityUtils.toByteArray(entity);
                 } finally {
                     close();
                 }

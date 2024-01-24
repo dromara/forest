@@ -67,9 +67,9 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
                 }
             } else {
                 if (ex != null) {
-                    resultData = handleError(request, response, ex);
+                    handleError(request, response, ex);
                 } else {
-                    resultData = handleError(request, response);
+                    handleError(request, response);
                 }
             }
 //            handleResult(resultData);
@@ -143,15 +143,15 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
     }
 
     @Override
-    public Object handleError(ForestRequest request, ForestResponse response) {
+    public void handleError(ForestRequest request, ForestResponse response) {
         handleSaveCookie(request, response);
         ForestNetworkException networkException = new ForestNetworkException(
                 "", response.getStatusCode(), response);
-        return handleError(request, response, networkException);
+        handleError(request, response, networkException);
     }
 
     @Override
-    public Object handleError(ForestRequest request, ForestResponse response, Throwable ex) {
+    public void handleError(ForestRequest request, ForestResponse response, Throwable ex) {
         this.response = response;
         handleSaveCookie(request, response);
         ForestRuntimeException e = null;
@@ -165,8 +165,8 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
         Object resultData = null;
         if (request.getOnError() != null) {
             request.getOnError().onError(e, request, response);
-            resultData = response.result();
-            return resultData;
+//            resultData = response.result();
+//            return resultData;
         }
         else {
             throw e;

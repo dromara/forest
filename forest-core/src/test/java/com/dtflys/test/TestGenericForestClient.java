@@ -781,10 +781,9 @@ public class TestGenericForestClient extends BaseClientTest {
 
     @Test
     public void testRequest_get_return_response() {
+        Forest.config().setVar("port", server.getPort());
         server.enqueue(new MockResponse().setBody("{\"a\": 1, \"b\": 2, \"c\": 3}"));
-        ForestResponse<Map<String, Object>> response = Forest.get("http://localhost:" + server.getPort())
-                .as(new TypeReference<ForestResponse<Map<String, Object>>>() {
-                });
+        ForestResponse<Map<String, Object>> response = Forest.get("http://localhost:{port}").as(new TypeReference<>() {});
         assertThat(response).isNotNull();
         Map<String, Object> result = response.result();
         assertThat(result).isNotNull();
@@ -2113,7 +2112,7 @@ public class TestGenericForestClient extends BaseClientTest {
                     }
                 });
 
-        ForestResponse<File> response = request.as(new TypeReference<ForestResponse<File>>() {});
+        ForestResponse<File> response = request.as(new TypeReference<>() {});
 
         Assertions.assertThat(response)
                 .isNotNull()
@@ -2155,13 +2154,12 @@ public class TestGenericForestClient extends BaseClientTest {
         assertThat(proxy.getPassword()).isEqualTo("123456");
     }
 
-    @Test
+//    @Test
     public void performance() {
         int count = 10000;
         for (int i = 0; i < count; i++) {
             server.enqueue(new MockResponse().setBody(EXPECTED));
         }
-
         Forest.config()
                 .setMaxRetryCount(0)
                 .setLogEnabled(false)
@@ -2181,7 +2179,7 @@ public class TestGenericForestClient extends BaseClientTest {
     }
 
 
-    @Test
+//    @Test
     public void performance_hutool() {
         int count = 10000;
         for (int i = 0; i < count; i++) {

@@ -24,9 +24,7 @@ public class HttpclientResponseHandler extends ResponseHandler<HttpResponse> {
     }
 
     public void handleSync(HttpResponse httpResponse, ForestResponse response) {
-        int statusCode = httpResponse.getStatusLine().getStatusCode();
-        String msg = httpResponse.getStatusLine().getReasonPhrase();
-        handleSync(response, statusCode, msg);
+        handleSync(response);
     }
 
 

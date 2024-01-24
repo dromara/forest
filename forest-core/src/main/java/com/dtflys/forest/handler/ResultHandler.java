@@ -61,13 +61,8 @@ public class ResultHandler {
 
 
     public Object getResult(ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
-        if (request.isDownloadFile()) {
-            return null;
-        }
-        if (isReceivedResponseData(response)) {
-            try {
-                if (ForestResponse.class.isAssignableFrom(resultClass)
-                        || ForestRequest.class.isAssignableFrom(resultClass)) {
+        try {
+            if (ForestResponse.class.isAssignableFrom(resultClass)) {
 //                    if (resultType instanceof ParameterizedType) {
 //                        final ParameterizedType parameterizedType = (ParameterizedType) resultType;
 //                        final Class<?> rowClass = (Class<?>) parameterizedType.getRawType();
@@ -82,85 +77,85 @@ public class ResultHandler {
 //                            response.setResult(realResult);
 //                        }
 //                    }
-                    return response;
-                }
-                if (void.class.isAssignableFrom(resultClass)) {
-                    return null;
-                }
-                if (Future.class.isAssignableFrom(resultClass)) {
-                    if (resultType instanceof ParameterizedType) {
-                        final ParameterizedType parameterizedType = (ParameterizedType) resultType;
-                        final Class<?> rowClass = (Class<?>) parameterizedType.getRawType();
-                        if (Future.class.isAssignableFrom(rowClass)) {
-                            final Type realType = parameterizedType.getActualTypeArguments()[0];
-                            final Class<?> realClass = ReflectUtils.toClass(parameterizedType.getActualTypeArguments()[0]);
-                            if (realClass == null) {
-                                return ((MethodLifeCycleHandler<?>) request.getLifeCycleHandler()).getResultData();
-                            }
-                            return getResult(request, response, realType, realClass);
-                        }
-                    }
-                }
-                if (resultClass.isArray()) {
-                    if (byte[].class.isAssignableFrom(resultClass)) {
-                        return response.getRawBytes();
-                    }
-                }
-                final Object attFile = request.getAttachment(DownloadLifeCycle.ATTACHMENT_NAME_FILE);
-                if (attFile != null && attFile instanceof File) {
-                    final ForestConverter converter = request.getConfiguration().getConverter(ForestDataType.JSON);
-                    return converter.convertToJavaObject(attFile, resultClass);
-                }
-                String responseText = null;
-                if (CharSequence.class.isAssignableFrom(resultClass)) {
-                    try {
-                        responseText = response.readAsString();
-                    } catch (Throwable th) {
-                        request.getLifeCycleHandler().handleError(request, response, th);
-                    }
-                }
-                else {
-                    try {
-                        responseText = response.getContent();
-                    } catch (Throwable th) {
-                        request.getLifeCycleHandler().handleError(request, response, th);
-                    }
-                }
-                response.setContent(responseText);
-                if (InputStream.class.isAssignableFrom(resultClass)) {
-                    return response.getInputStream();
-                }
-                final ContentType contentType = response.getContentType();
-                final ForestConverter decoder = request.getDecoder();
-                if (decoder != null) {
-                    if (contentType != null && contentType.canReadAsString()) {
-                        return decoder.convertToJavaObject(responseText, resultType);
-                    } else {
-                        return decoder.convertToJavaObject(response.getRawBytes(), resultType);
-                    }
-                } else if (CharSequence.class.isAssignableFrom(resultClass)) {
-                    return responseText;
-                }
-
-                final ForestDataType dataType = Optional.ofNullable(request.getDataType()).orElse(ForestDataType.AUTO);
-                final ForestConverter converter = request.getConfiguration().getConverter(dataType);
-                if (contentType != null && contentType.canReadAsString()) {
-                    return converter.convertToJavaObject(responseText, resultType);
-                }
-                Charset charset = null;
-                String resCharset  = response.getCharset();
-                if (resCharset != null) {
-                    charset = Charset.forName(resCharset);
-                }
-                return converter.convertToJavaObject(response.getRawBytes(), resultType, charset);
-            } catch (Exception e) {
-                throw new ForestHandlerException(e, request, response);
+                return response;
             }
+            if (ForestRequest.class.isAssignableFrom(resultClass)) {
+                return request;
+            }
+            if (void.class.isAssignableFrom(resultClass)) {
+                return null;
+            }
+            if (Future.class.isAssignableFrom(resultClass)) {
+                if (resultType instanceof ParameterizedType) {
+                    final ParameterizedType parameterizedType = (ParameterizedType) resultType;
+                    final Class<?> rowClass = (Class<?>) parameterizedType.getRawType();
+                    if (Future.class.isAssignableFrom(rowClass)) {
+                        final Type realType = parameterizedType.getActualTypeArguments()[0];
+                        final Class<?> realClass = ReflectUtils.toClass(parameterizedType.getActualTypeArguments()[0]);
+                        if (realClass == null) {
+                            return ((MethodLifeCycleHandler<?>) request.getLifeCycleHandler()).getResultData();
+                        }
+                        return getResult(request, response, realType, realClass);
+                    }
+                }
+            }
+            if (request.isDownloadFile()) {
+                return null;
+            }
+            if (resultClass.isArray()) {
+                if (byte[].class.isAssignableFrom(resultClass)) {
+                    return response.getRawBytes();
+                }
+            }
+            final Object attFile = request.getAttachment(DownloadLifeCycle.ATTACHMENT_NAME_FILE);
+            if (attFile != null && attFile instanceof File) {
+                final ForestConverter converter = request.getConfiguration().getConverter(ForestDataType.JSON);
+                return converter.convertToJavaObject(attFile, resultClass);
+            }
+            String responseText = null;
+            if (CharSequence.class.isAssignableFrom(resultClass)) {
+                try {
+                    responseText = response.readAsString();
+                } catch (Throwable th) {
+                    request.getLifeCycleHandler().handleError(request, response, th);
+                }
+            } else {
+                try {
+                    responseText = response.getContent();
+                } catch (Throwable th) {
+                    request.getLifeCycleHandler().handleError(request, response, th);
+                }
+            }
+            response.setContent(responseText);
+            if (InputStream.class.isAssignableFrom(resultClass)) {
+                return response.getInputStream();
+            }
+            final ContentType contentType = response.getContentType();
+            final ForestConverter decoder = request.getDecoder();
+            if (decoder != null) {
+                if (contentType != null && contentType.canReadAsString()) {
+                    return decoder.convertToJavaObject(responseText, resultType);
+                } else {
+                    return decoder.convertToJavaObject(response.getRawBytes(), resultType);
+                }
+            } else if (CharSequence.class.isAssignableFrom(resultClass)) {
+                return responseText;
+            }
+
+            final ForestDataType dataType = Optional.ofNullable(request.getDataType()).orElse(ForestDataType.AUTO);
+            final ForestConverter converter = request.getConfiguration().getConverter(dataType);
+            if (contentType != null && contentType.canReadAsString()) {
+                return converter.convertToJavaObject(responseText, resultType);
+            }
+            Charset charset = null;
+            String resCharset = response.getCharset();
+            if (resCharset != null) {
+                charset = Charset.forName(resCharset);
+            }
+            return converter.convertToJavaObject(response.getRawBytes(), resultType, charset);
+        } catch (Exception e) {
+            throw new ForestHandlerException(e, request, response);
         }
-        else if (ForestResponse.class.isAssignableFrom(resultClass)) {
-            return response;
-        }
-        return null;
     }
 
 }

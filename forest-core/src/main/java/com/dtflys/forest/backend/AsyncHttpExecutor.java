@@ -7,7 +7,9 @@ import com.dtflys.forest.http.ForestFuture;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
+import com.dtflys.forest.http.ResultGetter;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
+import com.dtflys.forest.utils.TypeReference;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -111,13 +113,16 @@ public class AsyncHttpExecutor<T> implements HttpExecutor {
 
 
         @Override
-        public ForestResponse get() {
-            executor.execute(lifeCycleHandler);
-            if (lifeCycleHandler instanceof MethodLifeCycleHandler) {
-                final Object result = ((MethodLifeCycleHandler<?>) lifeCycleHandler).getResponse();
-                return (ForestResponse) result;
+        public ForestResponse<T> get() {
+            ResultGetter resultGetter = executor.execute(lifeCycleHandler);
+            if (resultGetter instanceof ForestResponse) {
+                return (ForestResponse) resultGetter;
             }
-            return null;
+//            if (lifeCycleHandler instanceof MethodLifeCycleHandler) {
+//                final Object result = ((MethodLifeCycleHandler<?>) lifeCycleHandler).getResponse();
+//                return (ForestResponse) result;
+//            }
+            return resultGetter.result(new TypeReference<>() {});
         }
     }
 
@@ -127,12 +132,13 @@ public class AsyncHttpExecutor<T> implements HttpExecutor {
     }
 
     @Override
-    public void execute(LifeCycleHandler lifeCycleHandler) {
+    public ResultGetter execute(LifeCycleHandler lifeCycleHandler) {
         final ThreadPoolExecutor pool = AsyncThreadPools.getOrCreate(configuration);
         final AsyncTask<T> task = new AsyncTask<>(syncExecutor, lifeCycleHandler);
         final Future<ForestResponse<T>> future = CompletableFuture.supplyAsync(task, pool);
         final ForestFuture<T> forestFuture = new ForestFuture<>(getRequest(), future);
         responseHandler.handleFuture(getRequest(), forestFuture);
+        return forestFuture;
     }
 
     @Override

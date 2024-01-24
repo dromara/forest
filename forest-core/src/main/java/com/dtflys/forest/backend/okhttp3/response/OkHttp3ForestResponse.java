@@ -58,6 +58,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
 
 
     private void init() {
+        setupContentTypeAndCharset();
         if (request.isDownloadFile()
                 || InputStream.class.isAssignableFrom(request.getResultClass())
                 || InputStream.class.isAssignableFrom(ReflectUtils.toClass(request.getLifeCycleHandler().getResultType()))

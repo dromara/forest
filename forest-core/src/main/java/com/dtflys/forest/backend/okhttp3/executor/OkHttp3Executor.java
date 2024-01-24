@@ -187,7 +187,7 @@ public class OkHttp3Executor implements HttpExecutor {
         }
     }
 
-    public void execute(final LifeCycleHandler lifeCycleHandler, final int retryCount) {
+    public ForestResponse<?> execute(final LifeCycleHandler lifeCycleHandler, final int retryCount) {
         final OkHttpClient okHttpClient = getClient(request, lifeCycleHandler);
         final URLBuilder urlBuilder = URL_BUILDER;
         final String url = urlBuilder.buildUrl(request);
@@ -208,7 +208,7 @@ public class OkHttp3Executor implements HttpExecutor {
             response = factory.createResponse(request, null, lifeCycleHandler, th, startDate);
             logResponse(response);
             lifeCycleHandler.handleSyncWithException(request, response, th);
-            return;
+            return response;
         }
 
         try {
@@ -217,7 +217,7 @@ public class OkHttp3Executor implements HttpExecutor {
             response = factory.createResponse(request, null, lifeCycleHandler, e, startDate);
             if (e instanceof IOException && "Canceled".equals(e.getMessage())) {
                 lifeCycleHandler.handleCanceled(request, response);
-                return;
+                return response;
             }
             final ForestRetryException retryException = new ForestRetryException(
                     e, request, request.getMaxRetryCount(), retryCount);
@@ -227,12 +227,12 @@ public class OkHttp3Executor implements HttpExecutor {
                 response = factory.createResponse(request, null, lifeCycleHandler, throwable, startDate);
                 logResponse(response);
                 lifeCycleHandler.handleSyncWithException(request, response, throwable);
-                return;
+                return response;
             }
             response = factory.createResponse(request, null, lifeCycleHandler, e, startDate);
             logResponse(response);
             execute(lifeCycleHandler, retryCount + 1);
-            return;
+            return response;
         } finally {
             pool.finish(request);
             if (response == null) {
@@ -245,15 +245,16 @@ public class OkHttp3Executor implements HttpExecutor {
         if (retryEx != null && retryEx.isNeedRetry() && !retryEx.isMaxRetryCountReached()) {
             response.close();
             execute(lifeCycleHandler, retryCount + 1);
-            return;
+            return response;
         }
 
         // 验证响应
         if (retryEx == null && response.isError()) {
             retryOrDoError(response, okResponse, null, lifeCycleHandler, retryCount);
-            return;
+            return response;
         }
         okHttp3ResponseHandler.handleSync(okResponse, response);
+        return response;
     }
 
 
@@ -285,8 +286,8 @@ public class OkHttp3Executor implements HttpExecutor {
     }
 
     @Override
-    public void execute(final LifeCycleHandler lifeCycleHandler) {
-        execute(lifeCycleHandler, 0);
+    public ForestResponse<?> execute(final LifeCycleHandler lifeCycleHandler) {
+        return execute(lifeCycleHandler, 0);
     }
 
     @Override

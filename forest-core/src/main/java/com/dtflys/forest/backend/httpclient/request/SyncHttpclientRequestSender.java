@@ -61,7 +61,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
 
 
     @Override
-    public void sendRequest(
+    public ForestResponse<?> sendRequest(
             ForestRequest request, AbstractHttpExecutor executor,
             HttpclientResponseHandler responseHandler,
             HttpUriRequest httpRequest, LifeCycleHandler lifeCycleHandler,
@@ -80,7 +80,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, e, startDate);
             if (httpRequest.isAborted()) {
                 lifeCycleHandler.handleCanceled(request, response);
-                return;
+                return response;
             }
             ForestRetryException retryException = new ForestRetryException(
                     e,  request, request.getRetryCount(), request.getCurrentRetryCount());
@@ -89,12 +89,12 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             } catch (Throwable throwable) {
                 response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, throwable, startDate);
                 lifeCycleHandler.handleSyncWithException(request, response, e);
-                return;
+                return response;
             }
             response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, null, startDate);
             logResponse(response);
             executor.execute(lifeCycleHandler);
-            return;
+            return response;
         } finally {
             if (response == null) {
                 response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, null, startDate);
@@ -109,7 +109,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
         if (retryEx != null && retryEx.isNeedRetry() && !retryEx.isMaxRetryCountReached()) {
             response.close();
             executor.execute(lifeCycleHandler);
-            return;
+            return response;
         }
 
         // 检查响应是否失败
@@ -122,11 +122,11 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
                 request.canRetry(response, retryException);
             } catch (Throwable throwable) {
                 responseHandler.handleSync(httpResponse, response);
-                return;
+                return response;
             }
             response.close();
             executor.execute(lifeCycleHandler);
-            return;
+            return response;
         }
 
         try {
@@ -139,6 +139,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
                 throw new ForestRuntimeException(ex);
             }
         }
+        return response;
     }
 
 }

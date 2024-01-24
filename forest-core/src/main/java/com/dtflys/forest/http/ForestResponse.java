@@ -394,7 +394,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
             } else {
                 final Class<?> clazz = ReflectUtils.toClass(type);
                 if (ForestResponse.class.isAssignableFrom(clazz)) {
-                    Type argType = ReflectUtils.getGenericArgument(clazz);
+                    Type argType = ReflectUtils.getGenericArgument(type);
                     if (argType == null) {
                         argType = String.class;
                     }

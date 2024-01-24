@@ -12,6 +12,7 @@ import com.dtflys.forest.http.ForestHeader;
 import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestProxyType;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
 import com.dtflys.forest.pool.ForestRequestPool;
 import com.dtflys.forest.utils.RequestNameValue;
@@ -102,7 +103,7 @@ public class HttpclientExecutor extends AbstractHttpExecutor {
 
 
     @Override
-    public void execute(LifeCycleHandler lifeCycleHandler) {
+    public ForestResponse<?> execute(LifeCycleHandler lifeCycleHandler) {
         prepare(lifeCycleHandler);
         final Date startDate = new Date();
         final ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
@@ -119,7 +120,7 @@ public class HttpclientExecutor extends AbstractHttpExecutor {
         final ForestRequestPool pool = request.pool();
         try {
             pool.awaitRequest(request);
-            requestSender.sendRequest(
+            return requestSender.sendRequest(
                     request,
                     this,
                     httpclientResponseHandler,
@@ -130,6 +131,7 @@ public class HttpclientExecutor extends AbstractHttpExecutor {
             httpRequest.abort();
             response = forestResponseFactory.createResponse(request, null, lifeCycleHandler, e, startDate);
             lifeCycleHandler.handleSyncWithException(request, response, e);
+            return response;
         } catch (ForestRuntimeException e) {
             httpRequest.abort();
             throw e;

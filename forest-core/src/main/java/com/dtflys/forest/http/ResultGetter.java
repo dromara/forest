@@ -1,9 +1,11 @@
 package com.dtflys.forest.http;
 
 import com.dtflys.forest.handler.ResultHandler;
+import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.TypeReference;
 
 import java.lang.reflect.Type;
+import java.util.concurrent.Future;
 
 public abstract class ResultGetter {
 
@@ -27,6 +29,13 @@ public abstract class ResultGetter {
     }
 
     public <T> T result(Type type) {
+        final Class resultClass = ReflectUtils.toClass(type);
+        if (ForestFuture.class.isAssignableFrom(resultClass) && this instanceof ForestFuture) {
+            return (T) this;
+        }
+        if (Future.class.isAssignableFrom(resultClass) && this instanceof Future) {
+            return (T) this;
+        }
         final Object result = HANDLER.getResult(request, getResponse(), type);
         if (result == null) {
             return null;

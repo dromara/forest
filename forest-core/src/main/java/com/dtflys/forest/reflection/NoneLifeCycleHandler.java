@@ -47,13 +47,11 @@ public class NoneLifeCycleHandler implements LifeCycleHandler {
     }
 
     @Override
-    public Object handleError(ForestRequest request, ForestResponse response) {
-        return null;
+    public void handleError(ForestRequest request, ForestResponse response) {
     }
 
     @Override
-    public Object handleError(ForestRequest request, ForestResponse response, Throwable ex) {
-        return null;
+    public void handleError(ForestRequest request, ForestResponse response, Throwable ex) {
     }
 
     @Override

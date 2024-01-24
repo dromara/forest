@@ -21,6 +21,7 @@ import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.http.ForestAddress;
 import com.dtflys.forest.http.ForestQueryMap;
 import com.dtflys.forest.http.ForestQueryParameter;
+import com.dtflys.forest.http.ResultGetter;
 import com.dtflys.forest.http.SimpleQueryParameter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
@@ -1452,7 +1453,8 @@ public class ForestMethod<T> implements VariableScope {
                 rType, onSuccessClassGenericType);
         request.setLifeCycleHandler(lifeCycleHandler);
         lifeCycleHandler.handleInvokeMethod(request, this, args);
-        return request.asObject(request.getBackend(), lifeCycleHandler);
+        ResultGetter resultGetter = request.execute(request.getBackend(), lifeCycleHandler);
+        return resultGetter.result(rType);
     }
 
 

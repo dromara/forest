@@ -4786,10 +4786,11 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param lifeCycleHandler 生命周期处理器，{@link LifeCycleHandler}接口实例
      * @return 接受到请求响应后，其响应内容反序列化成对象的结果
      */
-    public Object asObject(HttpBackend backend, LifeCycleHandler lifeCycleHandler) {
+    public ResultGetter execute(HttpBackend backend, LifeCycleHandler lifeCycleHandler) {
         setLifeCycleHandler(lifeCycleHandler);
         processRedirectionRequest();
         final ForestJointPoint joinpoint = interceptorChain.beforeExecute(this);
+        ResultGetter resultGetter = null;
         // 执行 beforeExecute
         if (joinpoint.isProceed()) {
             // 认证信息增强
@@ -4805,23 +4806,42 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
             if (executor != null) {
                 try {
                     // 执行请求，即发生请求到服务端
-                    executor.execute(lifeCycleHandler);
+                    resultGetter = executor.execute(lifeCycleHandler);
                 } catch (ForestRuntimeException e) {
                     if (e instanceof ForestAsyncAbortException) {
                         ((ForestAsyncAbortException) e).setRequest(this);
-                        ForestResponseFactory forestResponseFactory = executor.getResponseFactory();
-                        ForestResponse response = forestResponseFactory.createResponse(this, null, lifeCycleHandler, e, new Date());
-                        executor.getResponseHandler().handleError(response, e);
+                        ForestResponse res = responseResult(e);
+                        executor.getResponseHandler().handleError(res, e);
                     } else {
                         throw e;
                     }
                 }
             }
         } else if (joinpoint.isCutoff()) {
-            return joinpoint.getResult();
+            if (executor == null) {
+                return null;
+            }
+            return responseResult(joinpoint.getResult());
         }
         // 返回结果
-        return getMethodReturnValue();
+        return resultGetter;
+    }
+
+
+    private ForestResponse responseResult(Object result) {
+        if (executor == null) {
+            return null;
+        }
+        if (result instanceof ForestResponse) {
+            return (ForestResponse) result;
+        }
+        if (result instanceof Throwable) {
+            final ForestResponse response = executor.getResponseFactory().createResponse(this, null, lifeCycleHandler, (Throwable) result, new Date());
+            return response;
+        }
+        final ForestResponse response = executor.getResponseFactory().createResponse(this, null, lifeCycleHandler, null, new Date());
+        response.setResult(result);
+        return response;
     }
 
     /**
@@ -4858,7 +4878,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return 接受到请求响应后，其响应内容反序列化成对象的结果
      */
     public Object asObject() {
-        return asObject(getBackend(), getLifeCycleHandler());
+        ResultGetter resultGetter = execute(getBackend(), getLifeCycleHandler());
+        return resultGetter.result(getResultClass());
     }
 
     /**
@@ -4873,8 +4894,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
         MethodLifeCycleHandler<R> methodLifeCycleHandler = new MethodLifeCycleHandler<>(
                 clazz,
                 lifeCycleHandler.getOnSuccessClassGenericType());
-        Object ret = asObject(getBackend(), methodLifeCycleHandler);
-        return (R) ret;
+        ResultGetter resultGetter = execute(getBackend(), methodLifeCycleHandler);
+        return resultGetter.result(clazz);
     }
 
     /**
@@ -4952,7 +4973,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @since 1.5.27
      */
     public ForestFuture<T> asFuture() {
-        return as(new TypeReference<ForestFuture<T>>() {});
+        return as(new TypeReference<>() {});
     }
 
 
@@ -4963,7 +4984,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @since 1.5.27
      */
     public ForestResponse<T> execute() {
-        return as(new TypeReference<ForestResponse<T>>() {});
+        return as(new TypeReference<>() {});
     }
 
 
@@ -4980,8 +5001,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
         MethodLifeCycleHandler<R> methodLifeCycleHandler = new MethodLifeCycleHandler<>(
                 type,
                 lifeCycleHandler.getOnSuccessClassGenericType());
-        Object ret = asObject(getBackend(), methodLifeCycleHandler);
-        return (R) ret;
+        ResultGetter resultGetter = execute(getBackend(), methodLifeCycleHandler);
+        return resultGetter.result(type);
     }
 
     /**

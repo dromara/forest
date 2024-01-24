@@ -110,7 +110,7 @@ public class TestUploadClient extends BaseClientTest {
         assertEquals("test-img.jpg", file.getName());
         assertEquals(path, file.getAbsolutePath().replaceAll("\\\\", "/"));
         assertEquals("test-img.jpg", multipart.getOriginalFileName());
-        Object result = request.asObject();
+        Object result = request.execute();
         assertNotNull(result);
         mockRequest(server)
                 .assertMultipart("file", fileItems -> {
