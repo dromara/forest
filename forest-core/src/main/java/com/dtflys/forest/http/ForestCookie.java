@@ -313,7 +313,7 @@ public class ForestCookie implements Cloneable, Serializable {
     /**
      * 匹配URL
      *
-     * @param url {@link ForestURL}对象实例
+     * @param url {@link SimpleForestURL}对象实例
      * @return  {@code true}: 匹配, {@code false}: 不匹配
      */
     public boolean matchURL(ForestURL url) {

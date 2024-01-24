@@ -5,8 +5,9 @@ import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
 import com.dtflys.forest.http.ForestQueryMap;
-import com.dtflys.forest.http.SimpleQueryParameter;
 import com.dtflys.forest.http.ForestURL;
+import com.dtflys.forest.http.SimpleQueryParameter;
+import com.dtflys.forest.http.SimpleForestURL;
 import com.dtflys.forest.utils.ForestCache;
 import com.dtflys.forest.utils.StringUtils;
 
@@ -42,7 +43,11 @@ public class MappingURLTemplate extends MappingTemplate {
         return renderURL(valueContext).toURLString();
     }
 
-    public ForestURL renderURL(VariableValueContext valueContext) {
+    public SimpleForestURL renderURL(VariableValueContext valueContext) {
+        return renderURL(valueContext, false);
+    }
+
+    public SimpleForestURL renderURL(VariableValueContext valueContext, boolean allowUndefinedVariable) {
         String scheme = null;
         StringBuilder userInfo = null;
         String host = null;
@@ -56,13 +61,12 @@ public class MappingURLTemplate extends MappingTemplate {
         boolean renderedPath = false;
         final ForestQueryMap queries = valueContext.getQuery();
         try {
-            final ForestJsonConverter jsonConverter = valueContext.getConfiguration().getJsonConverter();
             final int len = exprList.size();
             StringBuilder builder = new StringBuilder();
             SimpleQueryParameter lastQuery  = null;
             for (int i = 0; i < len; i++) {
                 final MappingExpr expr = exprList.get(i);
-                String exprVal = String.valueOf(renderExpression(valueContext, expr));
+                String exprVal = String.valueOf(renderExpression(valueContext, expr, allowUndefinedVariable));
                 builder.append(exprVal);
                 if (renderedQuery) {
                     // 已渲染到查询参数
@@ -194,7 +198,10 @@ public class MappingURLTemplate extends MappingTemplate {
                             }
                             if (!renderedPath && nextIsPort && port == null) {
                                 // 解析端口号
-                                port = Integer.parseInt(subBuilder.toString());
+                                try {
+                                    port = Integer.parseInt(subBuilder.toString());
+                                } catch (Throwable th) {
+                                }
                                 subBuilder = new StringBuilder();
                                 nextIsPort = false;
                                 if (ch == '/') {
@@ -310,7 +317,7 @@ public class MappingURLTemplate extends MappingTemplate {
         }
     }
 
-    public ForestURL getURL() {
+    public SimpleForestURL getURL() {
         return null;
     }
 }

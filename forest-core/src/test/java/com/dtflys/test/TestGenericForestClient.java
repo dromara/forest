@@ -20,7 +20,7 @@ import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestProxyType;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.http.ForestURL;
+import com.dtflys.forest.http.SimpleForestURL;
 import com.dtflys.forest.http.Lazy;
 import com.dtflys.forest.interceptor.ForestJointPoint;
 import com.dtflys.forest.interceptor.Interceptor;
@@ -144,7 +144,7 @@ public class TestGenericForestClient extends BaseClientTest {
         assertThat(request.urlString()).isEqualTo("http://forest.dtflyx.com/111");
         request.path("/222");
         assertThat(request.urlString()).isEqualTo("http://forest.dtflyx.com/222");
-        request.url(new ForestURL(new URL("http://localhost:8080/333")));
+        request.url(new SimpleForestURL(new URL("http://localhost:8080/333")));
         assertThat(request.urlString()).isEqualTo("http://localhost:8080/333");
         request.address(new ForestAddress("192.168.0.1", 8881));
         assertThat(request.urlString()).isEqualTo("http://192.168.0.1:8881/333");
@@ -2163,7 +2163,7 @@ public class TestGenericForestClient extends BaseClientTest {
         }
         Forest.config()
                 .maxRetryCount(0)
-                .setLogEnabled(false)
+                .setLogEnabled(true)
                 .setMaxConnections(10000)
                 .variable("port", server.getPort())
                 .variable("accept", "text/plain");
@@ -2171,8 +2171,9 @@ public class TestGenericForestClient extends BaseClientTest {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         for (int i = 0; i < count; i++) {
-            Forest.get("http://localhost:{port}/abc")
+            Forest.get("http://localhost:{port}/abc/{a}")
                     .header("Accept", "{accept}")
+                    .variable("a", "haha")
                     .execute();
         }
         stopWatch.stop();

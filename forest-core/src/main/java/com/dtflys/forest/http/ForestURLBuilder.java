@@ -129,9 +129,9 @@ public class ForestURLBuilder {
     /**
      * 进行构造，产生Forest URL对象
      *
-     * @return {@link ForestURL}对象实例
+     * @return {@link SimpleForestURL}对象实例
      */
-    public ForestURL build() {
-        return new ForestURL(scheme, userInfo, host, port, path, ref);
+    public SimpleForestURL build() {
+        return new SimpleForestURL(scheme, userInfo, host, port, path, ref);
     }
 }

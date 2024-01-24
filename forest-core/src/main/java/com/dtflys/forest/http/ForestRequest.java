@@ -193,7 +193,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
     /**
      * URL路径
      */
-    private ForestURL url;
+    private ForestURLVariable url = new ForestURLVariable(this);
 
     /**
      * URL中的Query参数表
@@ -531,20 +531,21 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestURL} 对象实例
      */
     @Override
-    public ForestURL url() {
+    public ForestURLVariable url() {
+        this.url.render(true);
         return this.url;
     }
 
     /**
      * 设置请求URL
      * <p>不同于 {@link ForestRequest#setUrl(String)} 方法,
-     * <p>此方法的输入参数为 {@link ForestURL} 对象实例
+     * <p>此方法的输入参数为 {@link SimpleForestURL} 对象实例
      *
-     * @param url {@link ForestURL} 对象实例
+     * @param url {@link SimpleForestURL} 对象实例
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> url(ForestURL url) {
-        this.url = url;
+    public ForestRequest<T> url(SimpleForestURL url) {
+        this.url.copyFromSimpleUrl(url);
         return this;
     }
 
@@ -625,13 +626,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
         if (!this.query.isEmpty()) {
             this.query.clearQueriesFromUrl();
         }
-
-        final ForestURL newUrl = urlTemplate.renderURL(this);
-        if (this.url == null) {
-            this.url = newUrl;
-        } else {
-            this.url = newUrl.mergeURLWith(this.url);
-        }
+        this.url.setUrlTemplate(urlTemplate);
         return this;
     }
 

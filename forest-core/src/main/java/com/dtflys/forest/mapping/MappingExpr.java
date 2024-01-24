@@ -19,6 +19,11 @@ public abstract class MappingExpr {
         return null;
     }
 
+    public Object render(VariableValueContext valueContext, boolean allowUndefinedVariable) {
+        return render(valueContext);
+    }
+
+
     public abstract boolean isIterateVariable();
 
 

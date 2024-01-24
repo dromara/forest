@@ -1,6 +1,6 @@
 package com.dtflys.test.misc;
 
-import com.dtflys.forest.http.ForestURL;
+import com.dtflys.forest.http.SimpleForestURL;
 import com.dtflys.forest.utils.URLUtils;
 import junit.framework.TestCase;
 import org.junit.Test;
@@ -34,7 +34,7 @@ public class URLTest extends TestCase {
 
     @Test
     public void testForestURL() throws MalformedURLException {
-        ForestURL url = new ForestURL(new URL("http://localhost:8080/xxx/yyy"));
+        SimpleForestURL url = new SimpleForestURL(new URL("http://localhost:8080/xxx/yyy"));
         assertThat(url.getScheme()).isEqualTo("http");
         assertThat(url.isSSL()).isFalse();
         assertThat(url.getHost()).isEqualTo("localhost");

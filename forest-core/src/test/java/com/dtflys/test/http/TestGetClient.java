@@ -10,6 +10,7 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestURL;
+import com.dtflys.forest.http.SimpleForestURL;
 import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.test.http.client.UrlEncodedClient;
 import com.dtflys.test.http.model.JsonTestUser;

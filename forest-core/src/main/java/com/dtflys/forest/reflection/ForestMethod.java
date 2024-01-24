@@ -27,7 +27,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.http.ForestURL;
+import com.dtflys.forest.http.SimpleForestURL;
 import com.dtflys.forest.http.body.RequestBodyBuilder;
 import com.dtflys.forest.http.body.StringRequestBody;
 import com.dtflys.forest.interceptor.Interceptor;
@@ -834,7 +834,7 @@ public class ForestMethod<T> implements VariableScope {
     private ForestRequest<?> makeRequest(Object[] args) {
         initMethod();
         MetaRequest baseMetaRequest = interfaceProxyHandler.getBaseMetaRequest();
-        ForestURL baseURL = null;
+        SimpleForestURL baseURL = null;
 
         // createExecutor and initialize http instance
         final ForestRequestContext context = new ForestRequestContext(this, args);
@@ -848,7 +848,7 @@ public class ForestMethod<T> implements VariableScope {
         if (urlTemplate == null) {
             throw new ForestRuntimeException("request URL is empty");
         }
-        ForestURL renderedURL = urlTemplate.renderURL(request);
+        SimpleForestURL renderedURL = urlTemplate.renderURL(request);
 
 
         String baseContentEncoding = null;

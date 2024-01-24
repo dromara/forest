@@ -1,6 +1,7 @@
 package com.dtflys.forest.backend.url;
 
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestURLVariable;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
 

@@ -35,11 +35,8 @@ import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.TypeReference;
 import org.apache.commons.io.IOUtils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.lang.reflect.Type;
 import java.net.SocketTimeoutException;
 import java.util.Date;
@@ -179,7 +176,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
     /**
      * 获取响应请求的URL
      *
-     * @return {@link ForestURL}对象实例
+     * @return {@link SimpleForestURL}对象实例
      * @since 1.5.23
      */
     @Override

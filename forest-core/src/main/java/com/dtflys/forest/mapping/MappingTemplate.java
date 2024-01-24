@@ -452,7 +452,10 @@ public class MappingTemplate {
         return null;
     }
 
-    protected String renderExpression(VariableValueContext valueContext, MappingExpr expr) {
+    protected String renderExpression(
+            VariableValueContext valueContext,
+            MappingExpr expr,
+            boolean allowUndefinedVariable) {
         Object val = null;
         MappingParameter param = null;
         final ForestJsonConverter jsonConverter = valueContext.getConfiguration().getJsonConverter();
@@ -475,7 +478,14 @@ public class MappingTemplate {
                 return String.valueOf(val);
             }
         } else {
-            val = expr.render(valueContext);
+            try {
+                val = expr.render(valueContext);
+            } catch (Throwable th) {
+                if (allowUndefinedVariable) {
+                    return "undefined";
+                }
+                throw th;
+            }
             if (val != null) {
                 val = getParameterValue(jsonConverter, val);
                 if (param != null && param.isUrlEncode()) {
@@ -487,14 +497,17 @@ public class MappingTemplate {
         return null;
     }
 
-
     public String render(VariableValueContext valueContext) {
+        return render(valueContext, false);
+    }
+
+    public String render(VariableValueContext valueContext, boolean allowUndefinedVariable) {
         try {
             int len = exprList.size();
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i < len; i++) {
                 MappingExpr expr = exprList.get(i);
-                String val = renderExpression(valueContext, expr);
+                String val = renderExpression(valueContext, expr, allowUndefinedVariable);
                 if (val != null) {
                     builder.append(val);
                 }

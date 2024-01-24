@@ -32,16 +32,25 @@ public class MappingReference extends MappingExpr {
         return name;
     }
 
+
     @Override
-    public Object render(VariableValueContext valueContext) {
+    public Object render(VariableValueContext valueContext, boolean allowUndefinedVariable) {
         Object result = valueContext.getVariable(name, valueContext);
         if (result == null) {
+            if (allowUndefinedVariable) {
+                return "undefined";
+            }
             if (nullable) {
                 return null;
             }
             throw new ForestVariableUndefinedException(getName());
         }
         return result;
+    }
+
+    @Override
+    public Object render(VariableValueContext valueContext) {
+        return render(valueContext, false);
     }
 
     @Override
