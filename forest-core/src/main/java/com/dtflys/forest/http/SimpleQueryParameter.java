@@ -24,6 +24,8 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.mapping.MappingTemplate;
+
 /**
  * Forest请求URL的Query参数项
  *
@@ -53,7 +55,7 @@ public class SimpleQueryParameter extends AbstractQueryParameter<SimpleQueryPara
     public SimpleQueryParameter(ForestQueryMap queries, String name, Object value, boolean fromUrl, Boolean urlencoded, String charset) {
         super(queries, fromUrl);
         this.name = name;
-        this.value = value;
+        setValue(value);
         if (urlencoded != null) {
             this.urlencoded = urlencoded;
         } else if (fromUrl) {
@@ -83,6 +85,9 @@ public class SimpleQueryParameter extends AbstractQueryParameter<SimpleQueryPara
         if (value == null) {
             return null;
         }
+        if (value instanceof MappingTemplate) {
+            return ((MappingTemplate) value).render(queries.request);
+        }
         if (value instanceof Lazy) {
             return ((Lazy<?>) value).eval(queries.request);
         }
@@ -91,7 +96,13 @@ public class SimpleQueryParameter extends AbstractQueryParameter<SimpleQueryPara
 
     @Override
     public SimpleQueryParameter setValue(Object value) {
-        this.value = value;
+        if (value instanceof CharSequence) {
+            this.value = MappingTemplate.text(String.valueOf(value));
+        } else if (value instanceof MappingTemplate) {
+            this.value = value;
+        } else {
+            this.value = value;
+        }
         return this;
     }
 

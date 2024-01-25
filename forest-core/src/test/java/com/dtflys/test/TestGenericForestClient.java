@@ -2173,6 +2173,8 @@ public class TestGenericForestClient extends BaseClientTest {
                 .execute();
 
         mockRequest(server)
+                .assertQueryEquals("a", "1")
+                .assertQueryEquals("b", "2")
                 .assertPathEquals("/abc/haha")
                 .assertHeaderEquals("Accept", "text/plain");
     }
@@ -2183,16 +2185,23 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.config()
                 .variable("port", server.getPort())
-                .variable("accept", "text/plain");
+                .variable("accept", "text/plain")
+                .variable("a", 1)
+                .variable("b", 2);
 
         Forest.get("http://localhost:{port}/abc/{path}")
                 .header("Accept", "{accept}")
+                .query("a", "{a}")
+                .query("b", "{b}")
                 .variable("path", "haha")
                 .variable("accept", "text/html")
+                .variable("b", 2222)
                 .execute();
 
         mockRequest(server)
                 .assertPathEquals("/abc/haha")
+                .assertQueryEquals("a", "1")
+                .assertQueryEquals("b", "2222")
                 .assertHeaderEquals("Accept", "text/html");
     }
 
