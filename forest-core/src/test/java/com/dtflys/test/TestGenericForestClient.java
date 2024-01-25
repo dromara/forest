@@ -698,7 +698,7 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.config().variable("testVar", "foo");
         Forest.get("/")
-                .setUrl("/test/{testVar}")
+                .url("/test/{testVar}")
                 .host("127.0.0.1")
                 .port(server.getPort())
                 .execute();
@@ -2155,6 +2155,48 @@ public class TestGenericForestClient extends BaseClientTest {
         assertThat(proxy.getPassword()).isEqualTo("123456");
     }
 
+
+    @Test
+    public void testRequestVariables() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config()
+                .variable("port", server.getPort())
+                .variable("accept", "text/plain")
+                .variable("a", 1)
+                .variable("b", 2);
+
+        Forest.get("http://localhost:{port}/abc/{path}")
+                .header("Accept", "{accept}")
+                .query("a", "{a}")
+                .query("b", "{b}")
+                .variable("path", "haha")
+                .execute();
+
+        mockRequest(server)
+                .assertPathEquals("/abc/haha")
+                .assertHeaderEquals("Accept", "text/plain");
+    }
+
+
+    @Test
+    public void testRequestVariables2() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config()
+                .variable("port", server.getPort())
+                .variable("accept", "text/plain");
+
+        Forest.get("http://localhost:{port}/abc/{path}")
+                .header("Accept", "{accept}")
+                .variable("path", "haha")
+                .variable("accept", "text/html")
+                .execute();
+
+        mockRequest(server)
+                .assertPathEquals("/abc/haha")
+                .assertHeaderEquals("Accept", "text/html");
+    }
+
+
     @Test
     public void performance() {
         int count = 10000;
@@ -2163,7 +2205,7 @@ public class TestGenericForestClient extends BaseClientTest {
         }
         Forest.config()
                 .maxRetryCount(0)
-                .setLogEnabled(true)
+                .setLogEnabled(false)
                 .setMaxConnections(10000)
                 .variable("port", server.getPort())
                 .variable("accept", "text/plain");
@@ -2171,9 +2213,9 @@ public class TestGenericForestClient extends BaseClientTest {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         for (int i = 0; i < count; i++) {
-            Forest.get("http://localhost:{port}/abc/{a}")
+            Forest.get("http://localhost:{port}/abc/{path}")
                     .header("Accept", "{accept}")
-                    .variable("a", "haha")
+                    .variable("path", "haha")
                     .execute();
         }
         stopWatch.stop();

@@ -74,10 +74,27 @@ public class ForestURLVariable implements ForestURL {
      */
     boolean ssl;
 
+    boolean changedAddress = false;
+
+    boolean changedSchema = false;
+
+    boolean changedUserInfo = false;
+
+    boolean changedHost = false;
+
+    boolean changedPort = false;
+
+    boolean changedBasePath = false;
+
+    boolean changedPath = false;
+
+    boolean changedRef = false;
+
+
     /**
      * 是否需要重新生成 URL
      */
-    volatile boolean needRegenerateUrl = false;
+    boolean needRegenerateUrl = false;
 
 
     public ForestURLVariable(ForestRequest<?> request) {
@@ -93,12 +110,13 @@ public class ForestURLVariable implements ForestURL {
             String path,
             String ref) {
         this.request = request;
-        setScheme(scheme);
+        this.scheme = scheme;
         this.userInfo = userInfo;
         this.host = host;
         this.port = port;
         this.path = path;
         this.ref = ref;
+        refreshSSL();
         needRegenerateUrl();
     }
 
@@ -109,40 +127,37 @@ public class ForestURLVariable implements ForestURL {
 
     public void setUrlTemplate(MappingURLTemplate urlTemplate) {
         this.urlTemplate = urlTemplate;
-        render(true);
+        render(true, true);
     }
 
-    public void render(boolean allowUndefinedVariable) {
+    public void render(boolean allowUndefinedVariable, boolean forced) {
         if (urlTemplate == null) {
             return;
         }
         SimpleForestURL newUrl = urlTemplate.renderURL(request, allowUndefinedVariable);
-        if (newUrl.address != null) {
+        if (newUrl.address != null && (!changedAddress || forced)) {
             this.address = newUrl.address;
         }
-        if (newUrl.scheme != null) {
+        if (newUrl.scheme != null && (!changedSchema || forced)) {
             setScheme(newUrl.scheme);
         }
-        if (newUrl.userInfo != null) {
+        if (newUrl.userInfo != null && (!changedUserInfo || forced)) {
             this.userInfo = newUrl.userInfo;
         }
-        if (newUrl.host != null) {
+        if (newUrl.host != null && (!changedHost || forced)) {
             this.host = newUrl.host;
         }
-        if (newUrl.port != null) {
+        if (newUrl.port != null && (!changedPort || forced)) {
             this.port = newUrl.port;
         }
-        if (newUrl.basePath != null) {
+        if (newUrl.basePath != null && (!changedBasePath || forced)) {
             this.basePath = newUrl.basePath;
         }
-        if (newUrl.path != null) {
+        if (newUrl.path != null && (!changedPath || forced)) {
             this.path = newUrl.path;
         }
-        if (newUrl.ref != null) {
+        if (newUrl.ref != null && (!changedRef || forced)) {
             this.ref = newUrl.ref;
-        }
-        if (newUrl.ssl != null) {
-            this.ssl = newUrl.ssl;
         }
         needRegenerateUrl();
     }
@@ -160,7 +175,7 @@ public class ForestURLVariable implements ForestURL {
     @Override
     public String getOriginalUrl() {
         if (originalUrl == null || needRegenerateUrl) {
-            render(true);
+            render(true, false);
             originalUrl = toURLString();
             needRegenerateUrl = false;
         }
@@ -208,6 +223,7 @@ public class ForestURLVariable implements ForestURL {
             return this;
         }
         this.scheme = scheme.trim();
+        this.changedSchema = true;
         refreshSSL();
         needRegenerateUrl();
         return this;
@@ -235,6 +251,7 @@ public class ForestURLVariable implements ForestURL {
         if (this.host.endsWith("/")) {
             this.host = this.host.substring(0, this.host.lastIndexOf("/"));
         }
+        this.changedHost = true;
         needRegenerateUrl();
         return this;
     }
@@ -250,6 +267,7 @@ public class ForestURLVariable implements ForestURL {
     @Override
     public ForestURL setPort(int port) {
         this.port = port;
+        this.changedPort = true;
         needRegenerateUrl();
         return this;
     }
@@ -314,19 +332,24 @@ public class ForestURLVariable implements ForestURL {
                     }
                     if (forced || StringUtils.isEmpty(this.userInfo)) {
                         this.userInfo = url.getUserInfo();
+                        this.changedUserInfo = true;
                     }
                     if (forced || StringUtils.isEmpty(this.host)) {
                         this.host = url.getHost();
+                        this.changedHost = true;
                     }
                     if (forced || (URLUtils.isNonePort(port) && StringUtils.isEmpty(originHost))) {
                         this.port = url.getPort();
+                        this.changedPort = true;
                     }
                     this.basePath = url.getPath();
+                    this.changedBasePath = true;
                 } catch (MalformedURLException e) {
                     throw new ForestRuntimeException(e);
                 }
             } else {
                 this.basePath = "/" + this.basePath;
+                this.changedBasePath = true;
             }
         }
         needRegenerateUrl();
@@ -360,6 +383,7 @@ public class ForestURLVariable implements ForestURL {
             return this;
         }
         this.path = path.trim();
+        this.changedPath = true;
         needRegenerateUrl();
         return this;
     }
@@ -375,6 +399,7 @@ public class ForestURLVariable implements ForestURL {
     @Override
     public ForestURL setUserInfo(String userInfo) {
         this.userInfo = userInfo;
+        this.changedUserInfo = true;
         needRegenerateUrl();
         return this;
     }
@@ -405,6 +430,7 @@ public class ForestURLVariable implements ForestURL {
     @Override
     public ForestURL setRef(String ref) {
         this.ref = ref;
+        this.changedRef = true;
         return this;
     }
 
@@ -512,6 +538,7 @@ public class ForestURLVariable implements ForestURL {
             setBaseAddress(address);
         } else {
             this.address = address;
+            this.changedAddress = true;
         }
         return this;
     }
@@ -542,6 +569,7 @@ public class ForestURLVariable implements ForestURL {
         if (url == null) {
             return this;
         }
+        this.urlTemplate = null;
         this.address = url.address;
         this.scheme = url.scheme;
         this.userInfo = url.userInfo;

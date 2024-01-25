@@ -532,7 +532,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      */
     @Override
     public ForestURLVariable url() {
-        this.url.render(true);
+        this.url.render(true, false);
         return this.url;
     }
 
@@ -1629,7 +1629,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param queries Query参数集合，{@link SimpleQueryParameter}对象实例集合
      * @return {@link ForestRequest}对象实例
      */
-    public ForestRequest<T> queries(ForestQueryMap queries) {
+    public ForestRequest<T> queryMap(ForestQueryMap queries) {
         this.query.addAllQueries(queries);
         return this;
     }

@@ -14,7 +14,9 @@ public class QueryableURLBuilder extends URLBuilder {
 
     @Override
     public String buildUrl(ForestRequest request) {
-        final String url = request.getUrl();
+        final ForestURLVariable urlVar = request.url();
+        urlVar.render(false, false);
+        final String url = urlVar.getOriginalUrl();
         final StringBuilder urlBuilder = new StringBuilder(url);
         final String query = request.queryString();
         if (StringUtils.isNotEmpty(query)) {

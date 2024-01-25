@@ -944,7 +944,7 @@ public class ForestMethod<T> implements VariableScope {
         request.url(renderedURL)
                 .type(type)
                 .bodyType(bodyType)
-                .queries(queries)
+                .queryMap(queries)
                 .charset(charset)
                 .autoRedirects(autoRedirection)
                 .setSslProtocol(sslProtocol)
