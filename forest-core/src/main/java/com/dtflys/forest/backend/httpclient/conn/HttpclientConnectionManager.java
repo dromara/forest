@@ -1,7 +1,6 @@
 package com.dtflys.forest.backend.httpclient.conn;
 
 import com.dtflys.forest.backend.ForestConnectionManager;
-import com.dtflys.forest.backend.HttpConnectionConstants;
 import com.dtflys.forest.backend.httpclient.HttpClientProvider;
 import com.dtflys.forest.backend.httpclient.HttpclientBackend;
 import com.dtflys.forest.config.ForestConfiguration;
@@ -85,7 +84,7 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
             if (connectionManager == null) {
                 synchronized (this) {
                     if (connectionManager == null) {
-                        ForestConfiguration configuration = request.getConfiguration();
+                        ForestConfiguration configuration = request.config();
                         connectionManager = (HttpclientConnectionManager) configuration
                                 .getBackendSelector()
                                 .select(HttpclientBackend.NAME)
@@ -163,7 +162,7 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
     }
 
     public HttpClient getHttpClient(final ForestRequest request, final LifeCycleHandler lifeCycleHandler) {
-        final ForestConfiguration configuration = request.getConfiguration();
+        final ForestConfiguration configuration = request.config();
         final String key = "hc;" + request.clientKey();
         final boolean canCacheClient = request.cacheBackendClient();
         if (canCacheClient) {

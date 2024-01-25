@@ -36,7 +36,7 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2> {
 
     @Override
     public void onMethodInitialized(ForestMethod method, OAuth2 annotation) {
-        oAuth2Client = method.getConfiguration().createInstance(OAuth2Client.class);
+        oAuth2Client = method.config().createInstance(OAuth2Client.class);
     }
 
     @Override
@@ -215,7 +215,7 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2> {
         OAuth2Token token;
         try {
             final OAuth2DefinitionHandler handler = handlerClass.newInstance();
-            final ForestConfiguration configuration = request.getConfiguration();
+            final ForestConfiguration configuration = request.config();
             final Map map = (Map) configuration
                     .getConverter(ForestDataType.AUTO)
                     .convertToJavaObject(response.getContent(), Map.class);

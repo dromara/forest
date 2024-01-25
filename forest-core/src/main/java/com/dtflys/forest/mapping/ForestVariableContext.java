@@ -3,8 +3,10 @@ package com.dtflys.forest.mapping;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.config.VariableValueContext;
+import com.dtflys.forest.http.Lazy;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.ForestVariableDef;
+import com.dtflys.forest.reflection.SimpleVariable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -62,6 +64,10 @@ public class ForestVariableContext implements VariableScope {
         variables.put(name, ForestVariableDef.fromObject(value));
     }
 
+    public void setVar(String name, Lazy<?> value) {
+        variables.put(name, new SimpleVariable(value));
+    }
+
     @Override
     public ForestVariableDef getVariableDef(String name) {
         final ForestVariableDef variableValue = variables.get(name);
@@ -80,12 +86,12 @@ public class ForestVariableContext implements VariableScope {
     }
 
     @Override
-    public ForestConfiguration getConfiguration() {
+    public ForestConfiguration config() {
         if (configuration != null) {
             return configuration;
         }
         if (parent != null) {
-            return parent.getConfiguration();
+            return parent.config();
         }
         return null;
     }

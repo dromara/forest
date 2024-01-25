@@ -63,7 +63,6 @@ import com.dtflys.forest.interceptor.InterceptorChain;
 import com.dtflys.forest.lifecycles.file.DownloadLifeCycle;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.RequestLogMessage;
-import com.dtflys.forest.mapping.ForestRequestContext;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingURLTemplate;
 import com.dtflys.forest.multipart.ByteArrayMultipart;
@@ -468,6 +467,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
     public ForestRequest(ForestConfiguration configuration, ForestRequestContext context, ForestMethod method, ForestBody body, Object[] arguments) {
         this.configuration = configuration;
         this.context = context;
+        this.context.request = this;
         this.method = method;
         this.body = body;
     }
@@ -475,6 +475,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
     public ForestRequest(ForestConfiguration configuration, ForestRequestContext context, ForestMethod method) {
         this.configuration = configuration;
         this.context = context;
+        this.context.request = this;
         this.method = method;
         this.body = new ForestBody(this);
     }
@@ -489,7 +490,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      *
      * @return 配置对象
      */
-    public ForestConfiguration getConfiguration() {
+    public ForestConfiguration config() {
         return configuration;
     }
 
@@ -791,6 +792,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return 主机地址
      */
     public String getHost() {
+        this.url.render(true, false);
         return this.url.getHost();
     }
 
@@ -1363,6 +1365,11 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
         return query;
     }
 
+    @Override
+    public ForestRequest<?> getRequest() {
+        return this;
+    }
+
     /**
      * 根据名称获取请求的Query参数值
      *
@@ -1669,7 +1676,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @return {@link ForestRequest}对象实例
      */
     public ForestRequest<T> query(Object queryParameters) {
-        final ForestJsonConverter jsonConverter = getConfiguration().getJsonConverter();
+        final ForestJsonConverter jsonConverter = config().getJsonConverter();
         final ConvertOptions options = ConvertOptions.defaultOptions().evaluateLazyValue(false);
         final Map<String, Object> map = jsonConverter.convertObjectToMap(queryParameters, this, options);
         if (map != null && map.size() > 0) {
@@ -4024,6 +4031,12 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
         return this;
     }
 
+    public ForestRequest<T> variable(String name, Lazy<?> value) {
+        context.setVar(name, value);
+        return this;
+    }
+
+
     @Override
     public boolean isVarDefined(String name) {
         return context.isVarDefined(name);
@@ -4040,7 +4053,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
      * @param name 变量名
      * @return 变量值
      */
-    public Object getVariableValue(String name) {
+    public Object variable(String name) {
         return getVariable(name, this);
     }
 
@@ -4056,14 +4069,14 @@ public class ForestRequest<T> implements HasURL, HasHeaders, VariableValueContex
 
     /**
      * 获取请求所绑定到的变量值
-     * <p>同 {@link ForestRequest#getVariableValue(String)}
+     * <p>同 {@link ForestRequest#variable(String)}
      *
      * @param name 变量名
      * @return 变量值
-     * @see ForestRequest#getVariableValue(String)
+     * @see ForestRequest#variable(String)
      */
     public Object variableValue(String name) {
-        return getVariableValue(name);
+        return variable(name);
     }
 
 

@@ -12,7 +12,7 @@ public class HttpClientLifeCycle implements MethodAnnotationLifeCycle<HttpClient
     public void onMethodInitialized(ForestMethod method, HttpClient annotation) {
         final Class<? extends HttpClientProvider> clazz = annotation.client();
         if (clazz != null) {
-            final HttpClientProvider provider = method.getConfiguration().getForestObject(clazz);
+            final HttpClientProvider provider = method.config().getForestObject(clazz);
             method.setExtensionParameterValue(PARAM_KEY_HTTPCLIENT_PROVIDER, provider);
         }
     }

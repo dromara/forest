@@ -2,7 +2,7 @@ package com.dtflys.forest.multipart;
 
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.mapping.ForestRequestContext;
+import com.dtflys.forest.http.ForestRequestContext;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.StringUtils;

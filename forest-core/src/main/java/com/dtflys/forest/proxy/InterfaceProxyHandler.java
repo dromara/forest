@@ -266,7 +266,7 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
     }
 
     @Override
-    public ForestConfiguration getConfiguration() {
+    public ForestConfiguration config() {
         return configuration;
     }
 

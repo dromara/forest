@@ -22,7 +22,7 @@ public class RetryLifeCycle implements MethodAnnotationLifeCycle<Retry> {
     public void onMethodInitialized(ForestMethod method, Retry annotation) {
         final Class<? extends RetryWhen> conditionClass = annotation.condition();
         if (conditionClass != null && !conditionClass.isInterface()) {
-            final RetryWhen retryWhen = method.getConfiguration().getForestObject(conditionClass);
+            final RetryWhen retryWhen = method.config().getForestObject(conditionClass);
             method.setExtensionParameterValue(PARAM_KEY_RETRY_WHEN, retryWhen);
         }
         method.setExtensionParameterValue(PARAM_KEY_RETRY, annotation);

@@ -3,12 +3,10 @@ package com.dtflys.forest.backend.okhttp3.executor;
 import com.dtflys.forest.backend.BodyBuilder;
 import com.dtflys.forest.backend.HttpExecutor;
 import com.dtflys.forest.backend.ResponseHandler;
-import com.dtflys.forest.backend.httpclient.response.HttpclientForestResponseFactory;
 import com.dtflys.forest.backend.okhttp3.body.OkHttp3BodyBuilder;
 import com.dtflys.forest.backend.okhttp3.logging.OkHttp3LogBodyMessage;
 import com.dtflys.forest.backend.url.QueryableURLBuilder;
 import com.dtflys.forest.backend.url.URLBuilder;
-import com.dtflys.forest.exceptions.ForestAbortException;
 import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.http.ForestHeader;
 import com.dtflys.forest.http.ForestRequest;
@@ -152,7 +150,7 @@ public class OkHttp3Executor implements HttpExecutor {
     }
 
     protected void prepareHeaders(Request.Builder builder) {
-        final ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
+        final ForestJsonConverter jsonConverter = request.config().getJsonConverter();
         final List<RequestNameValue> headerList = request.getHeaderNameValueList();
         final String contentType = request.getContentType();
         final String contentEncoding = request.getContentEncoding();

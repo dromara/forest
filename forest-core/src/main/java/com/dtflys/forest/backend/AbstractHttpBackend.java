@@ -88,12 +88,12 @@ public abstract class AbstractHttpBackend implements HttpBackend {
 
     public HttpExecutor createAsyncExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         final HttpExecutor syncHttpExecutor = createSyncExecutor(connectionManager, request, lifeCycleHandler);
-        return ASYNC_HTTP_EXECUTOR_CREATOR.create(request.getConfiguration(), syncHttpExecutor, syncHttpExecutor.getResponseHandler());
+        return ASYNC_HTTP_EXECUTOR_CREATOR.create(request.config(), syncHttpExecutor, syncHttpExecutor.getResponseHandler());
     }
 
     public HttpExecutor createKotlinCoroutineExecutor(ForestConnectionManager connectionManager, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         final HttpExecutor syncHttpExecutor = createSyncExecutor(connectionManager, request, lifeCycleHandler);
-        return KOTLIN_COROUTINE_HTTP_EXECUTOR_CREATOR.create(request.getConfiguration(), syncHttpExecutor, syncHttpExecutor.getResponseHandler());
+        return KOTLIN_COROUTINE_HTTP_EXECUTOR_CREATOR.create(request.config(), syncHttpExecutor, syncHttpExecutor.getResponseHandler());
     }
 
     private HttpExecutorCreator getHttpExecutorCreator(final ForestRequest request) {

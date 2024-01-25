@@ -99,6 +99,7 @@ import com.dtflys.forest.http.ForestAddress;
 import com.dtflys.forest.http.ForestAsyncMode;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestType;
+import com.dtflys.forest.http.Lazy;
 import com.dtflys.forest.interceptor.DefaultInterceptorFactory;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorFactory;
@@ -144,7 +145,7 @@ import com.dtflys.forest.lifecycles.proxy.HTTPProxyLifeCycle;
 import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.LogConfiguration;
-import com.dtflys.forest.mapping.ForestRequestContext;
+import com.dtflys.forest.http.ForestRequestContext;
 import com.dtflys.forest.mapping.ForestVariableContext;
 import com.dtflys.forest.pool.FixedRequestPool;
 import com.dtflys.forest.pool.ForestRequestPool;
@@ -1720,12 +1721,23 @@ public class ForestConfiguration implements Serializable {
      * 设置全局变量
      *
      * @param name  变量名
-     * @param value {@link ForestVariableDef}类型变量值
+     * @param lazy {@link Lazy}延迟变量
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration variable(final String name, final ForestVariableDef value) {
-        this.variableContext.setVar(name, value);
+    public ForestConfiguration variable(final String name, final Lazy<?> lazy) {
+        this.variableContext.setVar(name, lazy);
         return this;
+    }
+
+    /**
+     * 获取全局变量
+     *
+     * @param name 变量名
+     * @return 全局变量的值
+     */
+    public Object variable(final String name) {
+        final ForestRequestContext context = new ForestRequestContext(this.variableContext, null);
+        return this.variableContext.getVariable(name, context);
     }
 
     /**

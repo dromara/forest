@@ -9,11 +9,7 @@ import com.dtflys.forest.http.body.NameValueRequestBody;
 import com.dtflys.forest.http.body.ObjectRequestBody;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.multipart.ForestMultipart;
-import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.entity.ByteArrayEntity;
@@ -81,7 +77,7 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
             entityBuilder.setBoundary(boundary);
         }
         // 解决文件名乱码问题
-        ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
+        ForestJsonConverter jsonConverter = request.config().getJsonConverter();
         Charset httpCharset = charset;
         Charset itemCharset = StandardCharsets.UTF_8;
         if (charset != null) {

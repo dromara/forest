@@ -2184,26 +2184,46 @@ public class TestGenericForestClient extends BaseClientTest {
     public void testRequestVariables2() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.config()
-                .variable("port", server.getPort())
+                .variable("port", req -> server.getPort())
                 .variable("accept", "text/plain")
                 .variable("a", 1)
                 .variable("b", 2);
 
-        Forest.get("http://localhost:{port}/abc/{path}")
+        ForestRequest<?> request = Forest.get("http://{host}:{port}/abc/{path}")
                 .header("Accept", "{accept}")
                 .query("a", "{a}")
                 .query("b", "{b}")
-                .variable("path", "haha")
+                .variable("host", "localhost")
+                .variable("path", req -> req.variable("val"))
                 .variable("accept", "text/html")
-                .variable("b", 2222)
-                .execute();
+                .variable("val", "haha")
+                .variable("b", 2222);
+
+        assertThat(request.config().variable("a")).isEqualTo(1);
+        assertThat(request.variable("val")).isEqualTo("haha");
+        assertThat(request.scheme()).isEqualTo("http");
+        assertThat(request.isSSL()).isEqualTo(false);
+        assertThat(request.host()).isEqualTo("localhost");
+        request.variable("host", "baidu");
+        assertThat(request.host()).isEqualTo("baidu");
+        request.variable("host", "localhost");
+        assertThat(request.port()).isEqualTo(server.getPort());
+        request.variable("port", 3333);
+        assertThat(request.port()).isEqualTo(3333);
+        request.variable("port", server.getPort());
+        assertThat(request.path()).isEqualTo("/abc/haha");
+        request.variable("path", "ok");
+        assertThat(request.path()).isEqualTo("/abc/ok");
+
+        request.execute();
 
         mockRequest(server)
-                .assertPathEquals("/abc/haha")
+                .assertPathEquals("/abc/ok")
                 .assertQueryEquals("a", "1")
                 .assertQueryEquals("b", "2222")
                 .assertHeaderEquals("Accept", "text/html");
     }
+
 
 
     @Test

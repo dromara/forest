@@ -21,7 +21,7 @@ public class XmlResponseInterceptor implements Interceptor<Object> {
     @Override
     public void afterExecute(ForestRequest request, ForestResponse response) {
         String source = response.getContent();
-        ForestXmlConverter converter = request.getConfiguration().getXmlConverter();
+        ForestXmlConverter converter = request.config().getXmlConverter();
         Object obj = converter.convertToJavaObject(source, request.getMethod().getReturnType());
         if (obj instanceof XmlTestParam) {
             ((XmlTestParam) obj).setA(10);

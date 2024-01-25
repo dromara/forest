@@ -87,7 +87,7 @@ public class ObjectRequestBody extends ForestRequestBody implements SupportFormU
         if (object == null) {
             return nameValueList;
         }
-        ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
+        ForestJsonConverter jsonConverter = request.config().getJsonConverter();
         Object obj = object;
         if (obj instanceof Lazy) {
             obj = ((Lazy<?>) obj).eval(body.getRequest());

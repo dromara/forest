@@ -1,12 +1,9 @@
 package com.dtflys.forest.lifecycles.method;
 
-import com.dtflys.forest.annotation.SSLHostnameVerifier;
 import com.dtflys.forest.annotation.SSLSocketFactoryBuilder;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.reflection.ForestMethod;
-
-import javax.net.ssl.HostnameVerifier;
 
 /**
  * Forest后端框架注解的生命周期类
@@ -21,7 +18,7 @@ public class SSLSocketFactoryBuilderLifeCycle implements MethodAnnotationLifeCyc
     public void onMethodInitialized(ForestMethod method, SSLSocketFactoryBuilder annotation) {
         final Class<? extends com.dtflys.forest.ssl.SSLSocketFactoryBuilder> clazz = annotation.value();
         final com.dtflys.forest.ssl.SSLSocketFactoryBuilder sslSocketFactoryBuilder =
-                method.getConfiguration().getForestObjectFactory().getObject(clazz);
+                method.config().getForestObjectFactory().getObject(clazz);
         if (sslSocketFactoryBuilder != null) {
             method.setExtensionParameterValue(PARAM_KEY_SSL_SOCKET_FACTORY_BUILDER, sslSocketFactoryBuilder);
         }

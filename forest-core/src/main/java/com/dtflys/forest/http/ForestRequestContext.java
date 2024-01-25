@@ -1,13 +1,18 @@
-package com.dtflys.forest.mapping;
+package com.dtflys.forest.http;
 
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.config.VariableValueContext;
 import com.dtflys.forest.http.ForestQueryMap;
+import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.mapping.ForestVariableContext;
+import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.reflection.ForestVariableDef;
 
 public class ForestRequestContext extends ForestVariableContext implements VariableValueContext {
 
     private final Object[] arguments;
+
+    ForestRequest<?> request;
 
     public ForestRequestContext(VariableScope parent, Object[] arguments) {
         super(parent);
@@ -32,7 +37,10 @@ public class ForestRequestContext extends ForestVariableContext implements Varia
         return null;
     }
 
-
+    @Override
+    public ForestRequest<?> getRequest() {
+        return request;
+    }
 
     @Override
     public Object getVariable(String name, VariableValueContext valueContext) {
@@ -41,7 +49,7 @@ public class ForestRequestContext extends ForestVariableContext implements Varia
             value = parent.getVariable(name, valueContext);
         }
         if (value instanceof MappingVariable) {
-            return getArgument(((MappingVariable) value).index);
+            return getArgument(((MappingVariable) value).getIndex());
         }
         if (value instanceof ForestVariableDef) {
             return ((ForestVariableDef) value).getValue(valueContext);

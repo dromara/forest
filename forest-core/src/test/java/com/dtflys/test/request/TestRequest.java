@@ -4,7 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
-import com.dtflys.forest.mapping.ForestRequestContext;
+import com.dtflys.forest.http.ForestRequestContext;
 import com.dtflys.test.interceptor.BasicAuthClient;
 import org.junit.Test;
 
@@ -25,7 +25,7 @@ public class TestRequest {
         ObjectUtil.isBasicType(Object.class);
         ForestConfiguration configuration = ForestConfiguration.createConfiguration();
         ForestRequest request = new ForestRequest(configuration, new ForestRequestContext(configuration.getVariableContext(), null));
-        assertEquals(configuration, request.getConfiguration());
+        assertEquals(configuration, request.config());
         assertEquals(configuration.getTimeout().intValue(),
                 request.getTimeout());
         assertEquals(0, request.getRetryCount());

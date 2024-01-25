@@ -1,8 +1,6 @@
 package com.dtflys.forest.mapping;
 
 
-import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.config.VariableValueContext;
 import com.dtflys.forest.exceptions.ForestTemplateSyntaxError;
 import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
@@ -458,7 +456,7 @@ public class MappingTemplate {
             boolean allowUndefinedVariable) {
         Object val = null;
         MappingParameter param = null;
-        final ForestJsonConverter jsonConverter = valueContext.getConfiguration().getJsonConverter();
+        final ForestJsonConverter jsonConverter = valueContext.config().getJsonConverter();
         final ForestMethod method = valueContext.getForestMethod();
         final MappingParameter[] parameters = method != null ? method.getParameters() : null;
         if (expr instanceof MappingString) {

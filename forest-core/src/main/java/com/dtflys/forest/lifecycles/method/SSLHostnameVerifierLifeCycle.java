@@ -3,7 +3,6 @@ package com.dtflys.forest.lifecycles.method;
 import com.dtflys.forest.annotation.SSLHostnameVerifier;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
-import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.reflection.ForestMethod;
 
 import javax.net.ssl.HostnameVerifier;
@@ -20,7 +19,7 @@ public class SSLHostnameVerifierLifeCycle implements MethodAnnotationLifeCycle<S
     @Override
     public void onMethodInitialized(ForestMethod method, SSLHostnameVerifier annotation) {
         final Class<? extends HostnameVerifier> clazz = annotation.value();
-        final HostnameVerifier hostnameVerifier = method.getConfiguration().getForestObjectFactory().getObject(clazz);
+        final HostnameVerifier hostnameVerifier = method.config().getForestObjectFactory().getObject(clazz);
         if (hostnameVerifier != null) {
             method.setExtensionParameterValue(PARAM_KEY_HOSTNAME_VERIFIER, hostnameVerifier);
         }

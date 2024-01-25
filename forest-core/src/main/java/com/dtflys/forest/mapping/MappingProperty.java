@@ -32,6 +32,6 @@ public class MappingProperty extends MappingExpr {
 
     @Override
     public Object render(VariableValueContext valueContext) {
-        return valueContext.getConfiguration().getProperties().getProperty(propertyName, null);
+        return valueContext.config().getProperties().getProperty(propertyName, null);
     }
 }

@@ -14,7 +14,7 @@ public interface ForestVariableDef {
         if (value instanceof ForestVariableDef) {
             return (ForestVariableDef) value;
         }
-        return new BasicVariableDef(value);
+        return new SimpleVariable(value);
     }
 
 

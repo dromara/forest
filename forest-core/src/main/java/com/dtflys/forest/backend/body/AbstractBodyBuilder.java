@@ -3,17 +3,12 @@ package com.dtflys.forest.backend.body;
 import com.dtflys.forest.backend.BodyBuilder;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.converter.ForestEncoder;
-import com.dtflys.forest.converter.text.DefaultTextConverter;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestBody;
 import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.ForestDataType;
-import com.dtflys.forest.utils.RequestNameValue;
-import com.dtflys.forest.utils.StringUtils;
 
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 
@@ -60,8 +55,8 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                 setFileBody(httpRequest, request, charset, ctypeWithoutParams, lifeCycleHandler);
                 return;
             }
-            final ForestEncoder bodyEncoder = Optional.ofNullable((ForestEncoder) request.getConfiguration().getConverterMap().get(dataType)).orElseGet(() ->
-                    (ForestEncoder) request.getConfiguration().getConverterMap().get(ForestDataType.BINARY)
+            final ForestEncoder bodyEncoder = Optional.ofNullable((ForestEncoder) request.config().getConverterMap().get(dataType)).orElseGet(() ->
+                    (ForestEncoder) request.config().getConverterMap().get(ForestDataType.BINARY)
             );
             final byte[] bodyBytes = reqBody.encode(bodyEncoder, charset);
             final byte[] handledBodyBytes = lifeCycleHandler.handleBodyEncode(request, bodyEncoder, bodyBytes);

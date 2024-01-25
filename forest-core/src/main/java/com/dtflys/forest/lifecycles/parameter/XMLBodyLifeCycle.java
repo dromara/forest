@@ -48,7 +48,7 @@ public class XMLBodyLifeCycle extends AbstractBodyLifeCycle<XMLBody> {
                 break;
             }
         }
-        final Filter filter = method.getConfiguration().newFilterInstance("xml");
+        final Filter filter = method.config().newFilterInstance("xml");
         parameter.addFilter(filter);
         if (StringUtils.isBlank(contentType) && !hasDataFileAnn) {
             metaRequest.setContentType(ContentType.APPLICATION_XML);

@@ -567,7 +567,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
                 if (request.getSuccessWhen() != null) {
                     success = request.getSuccessWhen().successWhen(request, this);
                 } else {
-                    final SuccessWhen globalSuccessWhen = request.getConfiguration().getSuccessWhen();
+                    final SuccessWhen globalSuccessWhen = request.config().getSuccessWhen();
                     if (globalSuccessWhen != null) {
                         success = globalSuccessWhen.successWhen(request, this);
                     }

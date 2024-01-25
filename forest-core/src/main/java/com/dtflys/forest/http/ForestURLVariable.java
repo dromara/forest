@@ -208,8 +208,11 @@ public class ForestURLVariable implements ForestURL {
 
     @Override
     public String getScheme() {
-        if (StringUtils.isEmpty(scheme) && address != null) {
-            return address.getScheme();
+        render(true, false);
+        if (StringUtils.isEmpty(scheme)) {
+            if (address != null) {
+                return address.getScheme();
+            }
         }
         if (StringUtils.isEmpty(scheme)) {
             return ssl ? "https" : "http";
@@ -236,8 +239,11 @@ public class ForestURLVariable implements ForestURL {
 
     @Override
     public String getHost() {
-        if (StringUtils.isEmpty(host) && address != null) {
-            return address.getHost();
+        render(true, false);
+        if (StringUtils.isEmpty(host)) {
+            if (address != null) {
+                return address.getHost();
+            }
         }
         return host;
     }
@@ -258,8 +264,11 @@ public class ForestURLVariable implements ForestURL {
 
     @Override
     public int getPort() {
-        if (URLUtils.isNonePort(port) && address != null) {
-            return ForestURL.normalizePort(address.getPort(), ssl);
+        render(true, false);
+        if (URLUtils.isNonePort(port)) {
+            if (address != null) {
+                return ForestURL.normalizePort(address.getPort(), ssl);
+            }
         }
         return ForestURL.normalizePort(port, ssl);
     }
@@ -364,6 +373,7 @@ public class ForestURLVariable implements ForestURL {
      */
     @Override
     public String getPath() {
+        render(true, false);
         if (StringUtils.isNotEmpty(path) && path.charAt(0) != '/') {
             return '/' + path;
         }
@@ -390,8 +400,11 @@ public class ForestURLVariable implements ForestURL {
 
     @Override
     public String getUserInfo() {
-        if (StringUtils.isEmpty(userInfo) && address != null) {
-            return address.getUserInfo();
+        render(true, false);
+        if (StringUtils.isEmpty(userInfo)) {
+            if (address != null) {
+                return address.getUserInfo();
+            }
         }
         return userInfo;
     }
@@ -406,6 +419,7 @@ public class ForestURLVariable implements ForestURL {
 
     @Override
     public String getAuthority() {
+        render(true, false);
         final StringBuilder builder = new StringBuilder();
         if (StringUtils.isNotEmpty(userInfo)) {
             builder.append(URLUtils.userInfoEncode(userInfo, "UTF-8")).append("@");
@@ -424,6 +438,7 @@ public class ForestURLVariable implements ForestURL {
 
     @Override
     public String getRef() {
+        render(true, false);
         return ref;
     }
 

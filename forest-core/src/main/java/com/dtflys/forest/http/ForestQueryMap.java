@@ -30,7 +30,6 @@ import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -455,7 +454,7 @@ public class ForestQueryMap implements Map<String, Object> {
     public String toQueryString() {
         final StringBuilder builder = new StringBuilder();
         final Iterator<SimpleQueryParameter> iterator = queries.iterator();
-        final ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
+        final ForestJsonConverter jsonConverter = request.config().getJsonConverter();
         final HttpBackend backend = request.getBackend();
         final boolean allowEncodeBraceInQueryValue =
                 backend == null ? false : backend.isAllowEncodeBraceInQueryValue();

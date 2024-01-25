@@ -11,19 +11,14 @@ import com.dtflys.forest.http.body.NameValueRequestBody;
 import com.dtflys.forest.http.body.ObjectRequestBody;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.multipart.ForestMultipart;
-import com.dtflys.forest.utils.ReflectUtils;
-import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import okhttp3.*;
 
-import java.io.File;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -83,7 +78,7 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
         if ("multipart".equals(mediaType.type())) {
             bodyBuilder.setType(mediaType);
         }
-        final ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
+        final ForestJsonConverter jsonConverter = request.config().getJsonConverter();
         final List<ForestMultipart> multiparts = request.getMultiparts();
         int partsCount = 0;
         for (ForestRequestBody item : request.body()) {

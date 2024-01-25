@@ -118,7 +118,7 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
             request.attachment(ATTACHMENT_NAME_FILE, file);
             if (resultType != null) {
                 final ForestConverter converter = request
-                        .getConfiguration()
+                        .config()
                         .getConverterMap()
                         .get(ForestDataType.AUTO);
                 final Object data = converter.convertToJavaObject(file, resultType);

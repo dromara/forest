@@ -18,7 +18,7 @@ public class MappingFilterInvoke extends MappingInvoke {
 
     @Override
     public Object render(VariableValueContext valueContext) {
-        ForestConfiguration configuration = valueContext.getConfiguration();
+        ForestConfiguration configuration = valueContext.config();
         Filter filter = configuration.newFilterInstance(right.getName());
         List<MappingExpr> exprList = getArgList();
         Object[] invokeArgs = new Object[exprList.size()];

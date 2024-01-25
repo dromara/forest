@@ -39,7 +39,7 @@ import com.dtflys.forest.lifecycles.method.RequestLifeCycle;
 import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.ForestLogHandler;
-import com.dtflys.forest.mapping.ForestRequestContext;
+import com.dtflys.forest.http.ForestRequestContext;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingURLTemplate;
@@ -170,7 +170,7 @@ public class ForestMethod<T> implements VariableScope {
 
 
     @Override
-    public ForestConfiguration getConfiguration() {
+    public ForestConfiguration config() {
         return configuration;
     }
 
@@ -183,6 +183,7 @@ public class ForestMethod<T> implements VariableScope {
     public boolean isVarDefined(String name) {
         return configuration.isVarDefined(name);
     }
+
 
     @Override
     public Object getVariable(String name, VariableValueContext valueContext) {

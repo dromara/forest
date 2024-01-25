@@ -1,8 +1,7 @@
 package com.dtflys.test.mapping;
 
-import com.dtflys.forest.mapping.ForestRequestContext;
+import com.dtflys.forest.http.ForestRequestContext;
 import com.dtflys.forest.mapping.MappingIndex;
-import com.dtflys.forest.mapping.MappingParameter;
 import junit.framework.Assert;
 import com.dtflys.forest.mapping.MappingReference;
 import com.dtflys.forest.mapping.MappingVariable;

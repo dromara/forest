@@ -12,7 +12,7 @@ public class OkHttp3LifeCycle implements MethodAnnotationLifeCycle<OkHttp3> {
     public void onMethodInitialized(ForestMethod method, OkHttp3 annotation) {
         final Class<? extends OkHttpClientProvider> clazz = annotation.client();
         if (clazz != null) {
-            final OkHttpClientProvider provider = method.getConfiguration().getForestObject(clazz);
+            final OkHttpClientProvider provider = method.config().getForestObject(clazz);
             method.setExtensionParameterValue(PARAM_KEY_OKHTTP3_PROVIDER, provider);
         }
     }

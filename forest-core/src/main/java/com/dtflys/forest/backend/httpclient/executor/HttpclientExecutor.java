@@ -71,7 +71,7 @@ public class HttpclientExecutor extends AbstractHttpExecutor {
     }
 
     public void prepareHeaders() {
-        final ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
+        final ForestJsonConverter jsonConverter = request.config().getJsonConverter();
         final List<RequestNameValue> headerList = request.getHeaderNameValueList();
         final String contentType = request.getContentType();
         final String contentEncoding = request.getContentEncoding();

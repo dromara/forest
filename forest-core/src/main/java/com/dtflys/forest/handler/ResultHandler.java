@@ -109,7 +109,7 @@ public class ResultHandler {
             }
             final Object attFile = request.getAttachment(DownloadLifeCycle.ATTACHMENT_NAME_FILE);
             if (attFile != null && attFile instanceof File) {
-                final ForestConverter converter = request.getConfiguration().getConverter(ForestDataType.JSON);
+                final ForestConverter converter = request.config().getConverter(ForestDataType.JSON);
                 return converter.convertToJavaObject(attFile, resultClass);
             }
             String responseText = null;
@@ -143,7 +143,7 @@ public class ResultHandler {
             }
 
             final ForestDataType dataType = Optional.ofNullable(request.getDataType()).orElse(ForestDataType.AUTO);
-            final ForestConverter converter = request.getConfiguration().getConverter(dataType);
+            final ForestConverter converter = request.config().getConverter(dataType);
             if (contentType != null && contentType.canReadAsString()) {
                 return converter.convertToJavaObject(responseText, resultType);
             }

@@ -134,7 +134,7 @@ public class ForestBody implements List<ForestRequestBody> {
      */
     public Map<String, Object> nameValuesMapWithObject() {
         final Map<String, Object> map = new LinkedHashMap<>();
-        final ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
+        final ForestJsonConverter jsonConverter = request.config().getJsonConverter();
         for (ForestRequestBody body : bodyItems) {
             if (body instanceof NameValueRequestBody) {
                 final NameValueRequestBody nameValueRequestBody = (NameValueRequestBody) body;
@@ -288,8 +288,8 @@ public class ForestBody implements List<ForestRequestBody> {
             throw new ForestUnsupportException("Forest encoder do not support the body type \"MULTIPART\"");
         }
         final ForestDataType dataType = type == null ? this.request.mineContentType().bodyType() : type;
-        final ForestEncoder forestEncoder = Optional.ofNullable((ForestEncoder) this.request.getConfiguration().getConverter(dataType))
-                .orElseGet(() -> (ForestEncoder) this.request.getConfiguration().getConverter(ForestDataType.TEXT));
+        final ForestEncoder forestEncoder = Optional.ofNullable((ForestEncoder) this.request.config().getConverter(dataType))
+                .orElseGet(() -> (ForestEncoder) this.request.config().getConverter(ForestDataType.TEXT));
         return forestEncoder;
     }
 
@@ -383,7 +383,7 @@ public class ForestBody implements List<ForestRequestBody> {
     public String encodeToString(ConvertOptions options) {
         String strCharset = request.getCharset();
         if (StringUtils.isEmpty(strCharset)) {
-            strCharset = request.getConfiguration().charset();
+            strCharset = request.config().charset();
         }
         if (StringUtils.isEmpty(strCharset)) {
             strCharset = "UTF-8";

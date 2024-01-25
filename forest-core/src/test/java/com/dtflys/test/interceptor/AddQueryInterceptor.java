@@ -20,7 +20,7 @@ public class AddQueryInterceptor implements Interceptor {
 
     @Override
     public ForestJointPoint beforeExecute(ForestRequest request) {
-        Integer port = (Integer) request.getConfiguration().getVar("port");
+        Integer port = (Integer) request.config().getVar("port");
         request.setUrl("http://localhost:" + port + "/hello/user?username=foo");
         request.query("password", "bar");
         return proceed();

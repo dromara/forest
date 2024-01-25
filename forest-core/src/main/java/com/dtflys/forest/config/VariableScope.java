@@ -17,7 +17,7 @@ public interface VariableScope {
 
     ForestMethod getForestMethod();
 
-    ForestConfiguration getConfiguration();
+    ForestConfiguration config();
 
 
 }

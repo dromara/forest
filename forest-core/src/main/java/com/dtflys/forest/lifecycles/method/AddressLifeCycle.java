@@ -24,7 +24,7 @@ public class AddressLifeCycle implements MethodAnnotationLifeCycle<Address> {
     public void onMethodInitialized(ForestMethod method, Address annotation) {
         final Class<? extends AddressSource> clazz = annotation.source();
         if (clazz != null && !clazz.isInterface()) {
-            final AddressSource addressSource = method.getConfiguration().getForestObject(clazz);
+            final AddressSource addressSource = method.config().getForestObject(clazz);
             method.setExtensionParameterValue(PARAM_KEY_ADDRESS_SOURCE, addressSource);
         }
         method.setExtensionParameterValue(PARAM_KEY_ADDRESS, annotation);

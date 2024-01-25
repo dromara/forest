@@ -94,7 +94,7 @@ public class HTTPProxyLifeCycle implements MethodAnnotationLifeCycle<HTTPProxy> 
     public void onMethodInitialized(ForestMethod method, HTTPProxy annotation) {
         final Class<? extends HTTPProxySource> clazz = annotation.source();
         if (clazz != null && !clazz.isInterface()) {
-            HTTPProxySource proxySource = method.getConfiguration().getForestObject(clazz);
+            HTTPProxySource proxySource = method.config().getForestObject(clazz);
             method.setExtensionParameterValue(PARAM_KEY_HTTP_PROXY_SOURCE, proxySource);
         }
         method.setExtensionParameterValue(PARAM_KEY_HTTP_PROXY, annotation);

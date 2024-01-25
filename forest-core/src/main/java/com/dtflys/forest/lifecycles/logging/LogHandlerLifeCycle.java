@@ -18,7 +18,7 @@ public class LogHandlerLifeCycle implements MethodAnnotationLifeCycle<LogHandler
         if (metaRequest == null) {
             return;
         }
-        ForestConfiguration configuration = method.getConfiguration();
+        ForestConfiguration configuration = method.config();
         LogConfiguration logConfiguration = metaRequest.getLogConfiguration();
         if (logConfiguration == null) {
             logConfiguration = new LogConfiguration();
