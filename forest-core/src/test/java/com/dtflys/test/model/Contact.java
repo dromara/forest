@@ -1,14 +1,19 @@
 package com.dtflys.test.model;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 /**
  * Created by Administrator on 2016/6/20.
  */
 public class Contact {
 
+    @JSONField(ordinal = 0)
     private String name;
 
+    @JSONField(ordinal = 2)
     private Integer age;
 
+    @JSONField(ordinal = 1)
     private String phone;
 
     public String getName() {

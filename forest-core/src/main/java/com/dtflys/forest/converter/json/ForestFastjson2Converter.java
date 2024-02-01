@@ -26,10 +26,13 @@ package com.dtflys.forest.converter.json;
 
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONFactory;
+import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.JSONReader;
 import com.alibaba.fastjson2.JSONWriter;
 import com.alibaba.fastjson2.TypeReference;
 import com.alibaba.fastjson2.codec.FieldInfo;
+import com.alibaba.fastjson2.util.BeanUtils;
 import com.alibaba.fastjson2.util.TypeUtils;
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.exceptions.ForestConvertException;
@@ -37,9 +40,12 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.Lazy;
 import com.dtflys.forest.utils.ForestDataType;
+import com.dtflys.forest.utils.NameUtils;
+import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
@@ -48,6 +54,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 
 /**
@@ -208,7 +215,44 @@ public class ForestFastjson2Converter implements ForestJsonConverter {
         if (obj instanceof CharSequence) {
             return convertToJavaObject(obj.toString(), LinkedHashMap.class);
         }
-        return TypeUtils.cast(obj, new TypeReference<LinkedHashMap<String, Object>>() {}.getType());
+        return  (JSONObject) Optional.ofNullable(JSON.toJSON(obj)).orElse(new JSONObject());
+
+
+/*
+        final Map<String, Object> map = new LinkedHashMap<>();
+        final Class<?> objClass = obj.getClass();
+        final Object[] args = new Object[0];
+
+        BeanUtils.getters(objClass, getter -> {
+            final String methodName = getter.getName();
+            final Class<?> propType = getter.getReturnType();
+            final String propName = NameUtils.propNameFromGetter(methodName);
+            if (options != null && options.shouldExclude(propName)) {
+                return;
+            }
+            Object value = null;
+            try {
+                value = getter.invoke(obj, args);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+
+            if (options != null) {
+                value = options.getValue(value, request);
+                if (options.shouldIgnore(value)) {
+                    return;
+                }
+            }
+            if (ReflectUtils.isPrimaryArrayType(propType)) {
+                final Object jsonValue = JSON.toJSON(value);
+                map.put(propName, jsonValue);
+            } else {
+                map.put(propName, value);
+            }
+        });
+        return map;
+*/
+
     }
 
     @Override

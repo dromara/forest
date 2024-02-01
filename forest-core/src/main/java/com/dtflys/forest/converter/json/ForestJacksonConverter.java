@@ -189,4 +189,5 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     public ForestDataType getDataType() {
         return ForestDataType.JSON;
     }
+
 }

@@ -59,6 +59,17 @@ public class JSONConverterSelector implements Serializable {
     }
 
     /**
+     * 检测FastJSON2相关类型
+     *
+     * @return FastJSON2相关类型
+     * @throws Throwable 找不到类型时抛出的异常
+     */
+    public Class checkFastJSON2Class() throws Throwable {
+        return Class.forName("com.alibaba.fastjson2.JSON");
+    }
+
+
+    /**
      * 检测Jaskon相关类型
      *
      * @return Jaskon相关类型
@@ -87,6 +98,12 @@ public class JSONConverterSelector implements Serializable {
     public ForestJsonConverter select() {
         if (cachedJsonConverter != null) {
             return cachedJsonConverter;
+        }
+        try {
+            checkFastJSON2Class();
+            cachedJsonConverter = new ForestFastjson2Converter();
+            return cachedJsonConverter;
+        } catch (Throwable e) {
         }
         try {
             checkFastJSONClass();

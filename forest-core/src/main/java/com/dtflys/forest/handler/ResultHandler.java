@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
+import java.util.Optional;
 import java.util.concurrent.Future;
 
 /**
@@ -135,7 +136,9 @@ public class ResultHandler {
                     if (contentType != null && contentType.canReadAsString()) {
                         return decoder.convertToJavaObject(responseText, resultType);
                     } else {
-                        return decoder.convertToJavaObject(response.getByteArray(), resultType);
+                        final String charset = response.getCharset();
+                        return decoder.convertToJavaObject(
+                                response.getByteArray(), resultType, Charset.forName(Optional.ofNullable(charset).orElse("UTF-8")));
                     }
                 } else if (CharSequence.class.isAssignableFrom(resultClass)) {
                     return responseText;
