@@ -64,18 +64,9 @@ import java.util.Optional;
  */
 public class ForestFastjson2Converter implements ForestJsonConverter {
 
-    private final static int PARSE_LIMIT = 1024 * 1024;
+    private final List<JSONWriter.Feature> writerFeatures = new LinkedList<>();
 
-/**
-     * Fastjson序列化方式
-     */
-
-
-
-
-    private List<JSONWriter.Feature> writerFeatures = new LinkedList<>();
-
-    private List<JSONReader.Feature> readFeatures = new LinkedList<>();
+    private final List<JSONReader.Feature> readFeatures = new LinkedList<>();
 
     /** 日期格式 */
     private String dateFormat;
@@ -86,12 +77,12 @@ public class ForestFastjson2Converter implements ForestJsonConverter {
     private static Method nameMethod;
 
     static {
-        Class<?> clazz = FieldInfo.class;
+        final Class<?> clazz = FieldInfo.class;
         try {
             nameField = clazz.getField("name");
         } catch (NoSuchFieldException e) {
             try {
-                nameMethod = clazz.getMethod("getName", new Class[0]);
+                nameMethod = clazz.getMethod("getName");
             } catch (NoSuchMethodException ex) {
             }
         }
@@ -109,11 +100,11 @@ public class ForestFastjson2Converter implements ForestJsonConverter {
     public ForestFastjson2Converter() {
     }
 
-    public void addWriterFeature(JSONWriter.Feature feature) {
+    public void addWriterFeature(final JSONWriter.Feature feature) {
         this.writerFeatures.add(feature);
     }
 
-    public void addReadFeature(JSONReader.Feature feature) {
+    public void addReadFeature(final JSONReader.Feature feature) {
         this.readFeatures.add(feature);
     }
 
@@ -126,7 +117,7 @@ public class ForestFastjson2Converter implements ForestJsonConverter {
     }
 
     @Override
-    public <T> T convertToJavaObject(String source, Type targetType) {
+    public <T> T convertToJavaObject(final String source, final Type targetType) {
         try {
             return JSON.parseObject(source, targetType, getReadFeatureArray());
         } catch (Throwable th) {
@@ -135,19 +126,22 @@ public class ForestFastjson2Converter implements ForestJsonConverter {
     }
 
     @Override
-    public <T> T convertToJavaObject(byte[] source, Class<T> targetType, Charset charset) {
-        if (charset == null) {
-            charset = StandardCharsets.UTF_8;
-        }
+    public <T> T convertToJavaObject(final byte[] source, final Class<T> targetType, final Charset charset) {
         try {
-            return JSON.parseObject(source, 0, source.length, charset, targetType, readFeatures.toArray(new JSONReader.Feature[0]));
+            return JSON.parseObject(
+                    source,
+                    0,
+                    source.length,
+                    charset != null ? charset : StandardCharsets.UTF_8,
+                    targetType,
+                    readFeatures.toArray(new JSONReader.Feature[0]));
         } catch (Throwable th) {
             throw new ForestConvertException(this, th);
         }
     }
 
     @Override
-    public <T> T convertToJavaObject(byte[] source, Type targetType, Charset charset) {
+    public <T> T convertToJavaObject(final byte[] source, final Type targetType, final Charset charset) {
         try {
             return JSON.parseObject(source, 0, source.length, charset, targetType);
         } catch (Throwable th) {
@@ -155,7 +149,7 @@ public class ForestFastjson2Converter implements ForestJsonConverter {
         }
     }
 
-    public <T> T convertToJavaObject(String source, TypeReference<T> typeReference) {
+    public <T> T convertToJavaObject(final String source, final TypeReference<T> typeReference) {
         try {
             return JSON.parseObject(source, typeReference);
         } catch (Throwable th) {
@@ -163,14 +157,12 @@ public class ForestFastjson2Converter implements ForestJsonConverter {
         }
     }
 
-
-    private String parseToString(Object obj) {
+    private String parseToString(final Object obj) {
         return JSON.toJSONString(obj, dateFormat, getWriterFeatureArray());
-
     }
 
     @Override
-    public String encodeToString(Object obj) {
+    public String encodeToString(final Object obj) {
         if (obj instanceof CharSequence) {
             obj.toString();
         }
@@ -182,16 +174,15 @@ public class ForestFastjson2Converter implements ForestJsonConverter {
     }
 
 
-
     @Override
-    public Map<String, Object> convertObjectToMap(Object obj, ForestRequest request, ConvertOptions options) {
+    public Map<String, Object> convertObjectToMap(final Object obj, final ForestRequest request, final ConvertOptions options) {
         if (obj == null) {
             return null;
         }
         if (obj instanceof Map) {
             final Map objMap = (Map) obj;
             final Map<String, Object> newMap = new LinkedHashMap<>(objMap.size());
-            for (Object key : objMap.keySet()) {
+            for (final Object key : objMap.keySet()) {
                 final String name = String.valueOf(key);
                 if (options != null && options.shouldExclude(name)) {
                     continue;

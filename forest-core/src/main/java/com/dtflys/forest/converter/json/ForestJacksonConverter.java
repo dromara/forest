@@ -56,7 +56,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
 
     protected ObjectMapper mapper;
 
-    public ForestJacksonConverter(ObjectMapper mapper) {
+    public ForestJacksonConverter(final ObjectMapper mapper) {
         this.mapper = mapper.copy();
     }
 
@@ -80,7 +80,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     }
 
     @Override
-    public void setDateFormat(String dateFormat) {
+    public void setDateFormat(final String dateFormat) {
         this.dateFormat = dateFormat;
         if (StringUtils.isNotBlank(dateFormat)) {
             final DateFormat format = new SimpleDateFormat(dateFormat);
@@ -90,7 +90,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
 
 
     @Override
-    public <T> T convertToJavaObject(String source, Type targetType) {
+    public <T> T convertToJavaObject(final String source, final Type targetType) {
         try {
             return getMapper().readValue(source, getMapper().getTypeFactory().constructType(targetType));
         } catch (IOException e) {
@@ -100,7 +100,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     }
 
     @Override
-    public <T> T convertToJavaObject(byte[] source, Class<T> targetType, Charset charset) {
+    public <T> T convertToJavaObject(final byte[] source, final Class<T> targetType, final Charset charset) {
         try {
             final String str = StringUtils.fromBytes(source, charset);
             return getMapper().readValue(str, getMapper().getTypeFactory().constructType(targetType));
@@ -110,7 +110,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     }
 
     @Override
-    public <T> T convertToJavaObject(byte[] source, Type targetType, Charset charset) {
+    public <T> T convertToJavaObject(final byte[] source, final Type targetType, final Charset charset) {
         try {
             final String str = StringUtils.fromBytes(source, charset);
             return getMapper().readValue(str, getMapper().getTypeFactory().constructType(targetType));
@@ -119,7 +119,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         }
     }
 
-    public <T> T convertToJavaObject(String source, Class<?> parametrized, Class<?> ...parameterClasses) {
+    public <T> T convertToJavaObject(final String source, final Class<?> parametrized, Class<?> ...parameterClasses) {
         try {
             final JavaType javaType = getMapper().getTypeFactory().constructParametricType(parametrized, parameterClasses);
             return getMapper().readValue(source, javaType);
@@ -128,7 +128,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         }
     }
 
-    public <T> T convertToJavaObject(String source, JavaType javaType) {
+    public <T> T convertToJavaObject(final String source, final JavaType javaType) {
         if (StringUtils.isBlank(source)) {
             return null;
         }
@@ -140,7 +140,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     }
 
     @Override
-    public String encodeToString(Object obj) {
+    public String encodeToString(final Object obj) {
         try {
             return getMapper().writeValueAsString(obj);
         } catch (Throwable e) {
@@ -149,14 +149,14 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     }
 
     @Override
-    public Map<String, Object> convertObjectToMap(Object obj, ForestRequest request, ConvertOptions options) {
+    public Map<String, Object> convertObjectToMap(final Object obj, final ForestRequest request, final ConvertOptions options) {
         if (obj == null) {
             return null;
         }
         if (obj instanceof Map) {
             final Map objMap = (Map) obj;
             final Map<String, Object> newMap = new HashMap<>(objMap.size());
-            for (Object key : objMap.keySet()) {
+            for (final Object key : objMap.keySet()) {
                 final String name = String.valueOf(key);
                 if (options != null && options.shouldExclude(name)) {
                     continue;

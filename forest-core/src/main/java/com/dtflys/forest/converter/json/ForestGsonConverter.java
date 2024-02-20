@@ -67,7 +67,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
 
 
     @Override
-    public <T> T convertToJavaObject(String source, Type targetType) {
+    public <T> T convertToJavaObject(final String source, final Type targetType) {
         if (StringUtils.isBlank(source)) {
             return null;
         }
@@ -101,21 +101,21 @@ public class ForestGsonConverter implements ForestJsonConverter {
     }
 
     @Override
-    public <T> T convertToJavaObject(byte[] source, Class<T> targetType, Charset charset) {
+    public <T> T convertToJavaObject(final byte[] source, final Class<T> targetType, final Charset charset) {
         final String str = StringUtils.fromBytes(source, charset);
         return convertToJavaObject(str, targetType);
     }
 
     @Override
-    public <T> T convertToJavaObject(byte[] source, Type targetType, Charset charset) {
+    public <T> T convertToJavaObject(final byte[] source, final Type targetType, final Charset charset) {
         final String str = StringUtils.fromBytes(source, charset);
         return convertToJavaObject(str, targetType);
     }
 
-    private static Map<String, Object> toMap(JsonObject json, boolean singleLevel){
+    private static Map<String, Object> toMap(final JsonObject json, final boolean singleLevel){
         final Map<String, Object> map = new HashMap<String, Object>();
         final Set<Map.Entry<String, JsonElement>> entrySet = json.entrySet();
-        for (Iterator<Map.Entry<String, JsonElement>> iter = entrySet.iterator(); iter.hasNext(); ){
+        for (final Iterator<Map.Entry<String, JsonElement>> iter = entrySet.iterator(); iter.hasNext(); ){
             final Map.Entry<String, JsonElement> entry = iter.next();
             final String key = entry.getKey();
             final Object value = entry.getValue();
@@ -147,7 +147,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
         return map;
     }
 
-    private static Object toObject(JsonPrimitive jsonPrimitive) {
+    private static Object toObject(final JsonPrimitive jsonPrimitive) {
         if (jsonPrimitive.isBoolean()) {
             return jsonPrimitive.getAsBoolean();
         }
@@ -186,7 +186,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
         return null;
     }
 
-    private static List<Object> toList(JsonArray json){
+    private static List<Object> toList(final JsonArray json) {
         final List<Object> list = new ArrayList<Object>();
         for (int i = 0; i < json.size(); i++){
             final Object value = json.get(i);
@@ -224,21 +224,21 @@ public class ForestGsonConverter implements ForestJsonConverter {
     }
 
     @Override
-    public String encodeToString(Object obj) {
+    public String encodeToString(final Object obj) {
         final Gson gson = getGson();
         return gson.toJson(obj);
     }
 
 
     @Override
-    public Map<String, Object> convertObjectToMap(Object obj, ForestRequest request, ConvertOptions options) {
+    public Map<String, Object> convertObjectToMap(final Object obj, final ForestRequest request, final ConvertOptions options) {
         if (obj == null) {
             return null;
         }
         if (obj instanceof Map) {
             final Map objMap = (Map) obj;
             final Map<String, Object> newMap = new HashMap<>(objMap.size());
-            for (Object key : objMap.keySet()) {
+            for (final Object key : objMap.keySet()) {
                 final String name = String.valueOf(key);
                 if (options != null && options.shouldExclude(name)) {
                     continue;
@@ -269,7 +269,7 @@ public class ForestGsonConverter implements ForestJsonConverter {
 
 
 
-    public String convertToJson(Object obj, Type type) {
+    public String convertToJson(final Object obj, final Type type) {
         final Gson gson = getGson();
         return gson.toJson(obj, type);
     }

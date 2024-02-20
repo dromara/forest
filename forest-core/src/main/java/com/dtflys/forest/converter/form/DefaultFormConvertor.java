@@ -58,7 +58,7 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
     }
 
     @Override
-    public String encodeToString(Object obj) {
+    public String encodeToString(final Object obj) {
         final ForestJsonConverter jsonConverter = configuration.getJsonConverter();
         final Map<String, Object> map = jsonConverter.convertObjectToMap(obj);
         final List<RequestNameValue> nameValueList = new LinkedList<>();
@@ -80,10 +80,10 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
      * @param collection 集合对象
      * @param target 请求目标位置
      */
-    protected void processFormCollectionItem(List<RequestNameValue> newNameValueList, ForestConfiguration configuration, String name, Collection collection, int target) {
+    protected void processFormCollectionItem(
+            final List<RequestNameValue> newNameValueList, final ForestConfiguration configuration, final String name, final Collection collection, final int target) {
         int index = 0;
-        for (Iterator iterator = collection.iterator(); iterator.hasNext(); ) {
-            final Object item = iterator.next();
+        for (final Object item : collection) {
             final String subName = name + "[" + index + "]";
             processFormItem(newNameValueList, configuration, subName, item, target);
             index++;
@@ -98,7 +98,7 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
      * @param array 数组
      * @param target 请求目标位置
      */
-    protected void processFormArrayItem(List<RequestNameValue> newNameValueList, ForestConfiguration configuration, String name, Object array, int target) {
+    protected void processFormArrayItem(final List<RequestNameValue> newNameValueList, final ForestConfiguration configuration, final String name, final Object array, final int target) {
         final int len = Array.getLength(array);
         for (int i = 0; i < len; i++) {
             final Object item = Array.get(array, i);
@@ -115,8 +115,8 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
      * @param map Map对象
      * @param target 请求目标位置
      */
-    protected void processFormMapItem(List<RequestNameValue> newNameValueList, ForestConfiguration configuration, String name, Map map, int target) {
-        for (Iterator<Map.Entry> iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
+    protected void processFormMapItem(final List<RequestNameValue> newNameValueList, final ForestConfiguration configuration, final String name, final Map map, final int target) {
+        for (final Iterator<Map.Entry> iterator = map.entrySet().iterator(); iterator.hasNext(); ) {
             final Map.Entry entry = iterator.next();
             final Object mapKey = entry.getKey();
             final Object mapValue = entry.getValue();
@@ -124,7 +124,6 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
             processFormItem(newNameValueList, configuration, subName, mapValue, target);
         }
     }
-
 
     /**
      * 处理Form表单中的项
@@ -134,7 +133,7 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
      * @param value 表单项目值
      * @param target 请求目标位置
      */
-    protected void processFormItem(List<RequestNameValue> newNameValueList, ForestConfiguration configuration, String name, Object value, int target) {
+    protected void processFormItem(final List<RequestNameValue> newNameValueList, final ForestConfiguration configuration, final String name, final Object value, final int target) {
         if (StringUtils.isEmpty(name) && value == null) {
             return;
         }
@@ -144,7 +143,7 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
             if (value instanceof Collection) {
                 final Collection<?> collection = (Collection<?>) value;
                 if (collection.size() <= 8) {
-                    for (Object item : collection) {
+                    for (final Object item : collection) {
                         if (!ReflectUtils.isPrimaryType(item.getClass())) {
                             needCollapse = true;
                             break;
@@ -167,11 +166,11 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
             } else if (value instanceof Map) {
                 processFormMapItem(newNameValueList, configuration, name, (Map) value, target);
             } else {
-                Map<String, Object> itemAttrs = ReflectUtils.convertObjectToMap(value, configuration);
-                for (Map.Entry<String, Object> entry : itemAttrs.entrySet()) {
-                    String subAttrName = entry.getKey();
-                    Object subAttrValue = entry.getValue();
-                    String subName = name + "." + subAttrName;
+                final Map<String, Object> itemAttrs = ReflectUtils.convertObjectToMap(value, configuration);
+                for (final Map.Entry<String, Object> entry : itemAttrs.entrySet()) {
+                    final String subAttrName = entry.getKey();
+                    final Object subAttrValue = entry.getValue();
+                    final String subName = name + "." + subAttrName;
                     processFormItem(newNameValueList, configuration, subName, subAttrValue, target);
                 }
             }
@@ -195,7 +194,7 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
             final ForestConfiguration configuration,
             final ConvertOptions options) {
         final List<RequestNameValue> newNameValueList = new LinkedList<>();
-        for (RequestNameValue nameValue : nameValueList) {
+        for (final RequestNameValue nameValue : nameValueList) {
             final String name = nameValue.getName();
             if (options != null && options.shouldExclude(name)) {
                 continue;
@@ -216,7 +215,7 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
         return newNameValueList;
     }
 
-    private String formUrlEncodedString(List<RequestNameValue> nameValueList, Charset charset) {
+    private String formUrlEncodedString(final List<RequestNameValue> nameValueList, final Charset charset) {
         final ForestJsonConverter jsonConverter = configuration.getJsonConverter();
         final StringBuilder strBuilder = new StringBuilder();
         for (int i = 0; i < nameValueList.size(); i++) {
@@ -243,15 +242,14 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
         final List<RequestNameValue> nameValueList = new LinkedList<>();
         final Charset cs = charset != null ? charset : StandardCharsets.UTF_8;
         final ForestRequest request = body.getRequest();
-        for (ForestRequestBody bodyItem : body) {
+        for (final ForestRequestBody bodyItem : body) {
             if (bodyItem instanceof SupportFormUrlEncoded) {
                 nameValueList.addAll(((SupportFormUrlEncoded) bodyItem).getNameValueList(request));
             }
         }
         final List<RequestNameValue> newNameValueList =
                 processFromNameValueList(request, nameValueList, configuration, options);
-        String strBody = formUrlEncodedString(newNameValueList, cs);
-        byte[] bytes = strBody.getBytes(cs);
-        return bytes;
+        final String strBody = formUrlEncodedString(newNameValueList, cs);
+        return strBody.getBytes(cs);
     }
 }
