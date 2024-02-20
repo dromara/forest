@@ -118,6 +118,6 @@ public final class StringUtils {
      */
     public static String generateBoundary() {
         final UUID uuid = UUID.randomUUID();
-        return new String(uuid.toString().getBytes(StandardCharsets.UTF_8));
+        return fromBytes(uuid.toString().getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
     }
 }
