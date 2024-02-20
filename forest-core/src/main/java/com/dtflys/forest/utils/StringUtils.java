@@ -1,7 +1,8 @@
 package com.dtflys.forest.utils;
 
-import okio.ByteString;
+import com.dtflys.forest.exceptions.ForestRuntimeException;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -117,6 +118,6 @@ public final class StringUtils {
      */
     public static String generateBoundary() {
         final UUID uuid = UUID.randomUUID();
-        return ByteString.encodeUtf8(uuid.toString()).utf8();
+        return new String(uuid.toString().getBytes(StandardCharsets.UTF_8));
     }
 }
