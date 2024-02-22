@@ -125,8 +125,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         this.serializerFeature = serializerFeature;
         if (serializerFeature == null) {
             this.serializerFeatureName = null;
-        }
-        else {
+        } else {
             this.serializerFeatureName = serializerFeature.name();
         }
     }

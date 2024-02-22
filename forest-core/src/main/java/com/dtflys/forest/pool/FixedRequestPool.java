@@ -56,8 +56,8 @@ public class FixedRequestPool implements ForestRequestPool {
      * @param request Forest请求对象
      */
     @Override
-    public synchronized void awaitRequest(ForestRequest request) {
-        ForestRoute route = request.route();
+    public synchronized void awaitRequest(final ForestRequest request) {
+        final ForestRoute route = request.route();
         // 判断当前活动请求数是否小于最大请求池大小
         // 并且当前活动的路由请求数是否小于最大每路由请求数
         if (runningPoolSize.get() < maxPoolSize &&
@@ -105,7 +105,7 @@ public class FixedRequestPool implements ForestRequestPool {
      * @param request Forest请求对象
      */
     @Override
-    public synchronized void finish(ForestRequest request) {
+    public synchronized void finish(final ForestRequest request) {
         // 减少当前活动请求数
         runningPoolSize.decrementAndGet();
         if (runningPoolSize.get() < 0) {

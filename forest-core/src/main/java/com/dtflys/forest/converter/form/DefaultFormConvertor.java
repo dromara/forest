@@ -120,7 +120,7 @@ public class DefaultFormConvertor implements ForestConverter<String>, ForestEnco
             final Map.Entry entry = iterator.next();
             final Object mapKey = entry.getKey();
             final Object mapValue = entry.getValue();
-            final String subName = name + "[" + mapKey + "]";
+            final String subName = name + "." + mapKey;
             processFormItem(newNameValueList, configuration, subName, mapValue, target);
         }
     }

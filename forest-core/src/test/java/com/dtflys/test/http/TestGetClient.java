@@ -262,7 +262,6 @@ public class TestGetClient extends BaseClientTest {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
         server.enqueue(new MockResponse().setBody(buffer));
         ForestResponse<Map> response = getClient.jsonMapGetWithResponseEncoding();
         assertThat(response).isNotNull();
@@ -285,7 +284,7 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Type", "application/json")
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(EXPECTED));
-        ForestResponse<Map> response = getClient.jsonMapGet();
+        final ForestResponse<Map> response = getClient.jsonMapGet();
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(200);
         assertThat(response.getContentType())
@@ -387,7 +386,6 @@ public class TestGetClient extends BaseClientTest {
                 .assertPathEquals("/hello/user")
                 .assertQueryEquals("username", "foo");
     }
-
 
     @Test
     public void testAnnObjectGet() throws InterruptedException {

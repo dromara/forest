@@ -3,6 +3,7 @@ package com.dtflys.test;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.auth.BasicAuth;
 import com.dtflys.forest.backend.ContentType;
@@ -444,9 +445,17 @@ public class TestGenericForestClient extends BaseClientTest {
     }
 
     public static class MyQuery {
+
+        @JSONField(ordinal = 0)
         private Integer a;
+
+        @JSONField(ordinal = 1)
         private Integer b;
+
+        @JSONField(ordinal = 2)
         private Integer c;
+
+        @JSONField(ordinal = 3)
         private List<Integer> x;
 
         public Integer getA() {
@@ -994,8 +1003,6 @@ public class TestGenericForestClient extends BaseClientTest {
         data.setName("bar");
         data.setToken(req -> Base64.encode(req.getQueryString()));
 
-        BeanUtil.beanToMap(data);
-
         Forest.get("/")
                 .port(server.getPort())
                 .addQuery(data)
@@ -1206,8 +1213,14 @@ public class TestGenericForestClient extends BaseClientTest {
     }
 
     public static class LazyData {
+
+        @JSONField(ordinal = 0)
         private String id;
+
+        @JSONField(ordinal = 1)
         private String name;
+
+        @JSONField(ordinal = 2)
         private Lazy<Object> token;
 
         public String getId() {
