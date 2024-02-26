@@ -1047,7 +1047,8 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Type", "text/plain")
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(str));
-        assertThat(getClient.getToken())
+        TokenResult result = getClient.getToken();
+        assertThat(result)
                 .isNotNull()
                 .extracting(TokenResult::getTokenTimeout, TokenResult::getURLToken)
                 .contains(604800L, token);

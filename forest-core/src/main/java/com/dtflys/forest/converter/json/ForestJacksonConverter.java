@@ -26,22 +26,34 @@ package com.dtflys.forest.converter.json;
 
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.exceptions.ForestConvertException;
+import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.Lazy;
 import com.dtflys.forest.utils.ForestDataType;
+import com.dtflys.forest.utils.NameUtils;
+import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.SerializationConfig;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.cfg.MapperConfig;
+import com.fasterxml.jackson.databind.introspect.AnnotatedField;
+import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.DefaultSerializerProvider;
 import com.fasterxml.jackson.databind.ser.SerializerFactory;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
@@ -63,6 +75,10 @@ public class ForestJacksonConverter implements ForestJsonConverter {
 
     protected ObjectMapper mapper;
 
+    private final ThreadLocal<ForestRequest> requestThreadLocal = new InheritableThreadLocal<>();
+
+    private final ThreadLocal<ConvertOptions> optionsThreadLocal = new InheritableThreadLocal<>();
+
     public ForestJacksonConverter(final ObjectMapper mapper) {
         this.mapper = mapper.copy();
     }
@@ -72,17 +88,17 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         SimpleModule module = new SimpleModule();
         module.addSerializer(Lazy.class, new LazySerializer());
         this.mapper.registerModule(module);
+        this.mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         this.mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         this.mapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
     }
 
-    private static class LazySerializer extends JsonSerializer<Lazy> {
+    private class LazySerializer extends JsonSerializer<Lazy> {
 
         @Override
         public void serialize(Lazy lazy, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-            jsonGenerator.writeStartObject();
-            jsonGenerator.writeEndObject();
-//            jsonGenerator.writeObject(lazy);
+            jsonGenerator.writeNull();
+//            jsonGenerator.writeEndObject();
             /*ForestRequest request = (ForestRequest) serializerProvider.getAttribute("request");
             ConvertOptions options = (ConvertOptions) serializerProvider.getAttribute("options");
             if (!Lazy.isEvaluatingLazyValue(lazy, request)) {
@@ -185,7 +201,7 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         }
         if (obj instanceof Map) {
             final Map objMap = (Map) obj;
-            final Map<String, Object> newMap = new HashMap<>(objMap.size());
+            final Map<String, Object> newMap = new LinkedHashMap<>(objMap.size());
             for (final Object key : objMap.keySet()) {
                 final String name = String.valueOf(key);
                 if (options != null && options.shouldExclude(name)) {
@@ -213,6 +229,38 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         final ObjectMapper objectMapper = getMapper();
         final JavaType javaType = objectMapper.getTypeFactory().constructMapType(LinkedHashMap.class, String.class, Object.class);
         final Map<String, Object> map = objectMapper.convertValue(obj, javaType);
+        final Method[] methods = ReflectUtils.getMethods(obj.getClass());
+        for (int i = 0; i < methods.length; i++) {
+            final Method method = methods[i];
+            if (Lazy.class.isAssignableFrom(method.getReturnType()) && method.getParameters().length == 0) {
+                final String name = method.getName();
+                if (!NameUtils.isGetter(name)) {
+                    continue;
+                }
+                final String propName = NameUtils.propNameFromGetter(name);
+                if (!map.containsKey(propName)) {
+                    continue;
+                }
+                try {
+                    Object val = method.invoke(obj);
+                    if (val instanceof Lazy) {
+                        if (Lazy.isEvaluatingLazyValue(val, request)) {
+                            continue;
+                        }
+                        if (options != null) {
+                            val = options.getValue(val, request);
+                            if (options.shouldIgnore(val)) {
+                                continue;
+                            }
+                        }
+                        map.put(propName, val);
+                    }
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new ForestRuntimeException(e);
+                }
+            }
+
+        }
         return map;
     }
 

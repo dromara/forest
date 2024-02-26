@@ -1,10 +1,12 @@
 package com.dtflys.test.http.model;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class JsonTestUser {
 
     @JSONField(ordinal = 0)
+    @JsonProperty(index = 0)
     private String username;
 
     private String password;

@@ -1,9 +1,13 @@
 package com.dtflys.test.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class TokenResult {
 
+    @JsonProperty("TokenTimeout")
     private long TokenTimeout;
 
+    @JsonProperty("URLToken")
     private String URLToken;
 
     public long getTokenTimeout() {
