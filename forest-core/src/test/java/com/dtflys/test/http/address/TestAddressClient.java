@@ -2,6 +2,7 @@ package com.dtflys.test.http.address;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.test.http.BaseClientTest;
 import okhttp3.mockwebserver.MockResponse;
@@ -32,8 +33,8 @@ public class TestAddressClient extends BaseClientTest {
     }
 
 
-    public TestAddressClient(HttpBackend backend) {
-        super(backend, configuration);
+    public TestAddressClient(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         addressClient = configuration.createInstance(AddressClient.class);
         addressClient2 = configuration.createInstance(AddressClient2.class);
     }

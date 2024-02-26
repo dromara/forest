@@ -6,6 +6,7 @@ import com.dtflys.forest.annotation.Post;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.backend.httpclient.HttpclientBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.mock.MockServerRequest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -28,8 +29,8 @@ public class TestBodyAnnotation extends BaseClientTest {
     public final MockWebServer server = new MockWebServer();
     private final TestBodyAnnotationClient testBodyAnnotationClient;
 
-    public TestBodyAnnotation(HttpBackend backend) {
-        super(backend, configuration);
+    public TestBodyAnnotation(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setVariableValue("port", server.getPort());
         testBodyAnnotationClient = configuration.createInstance(TestBodyAnnotationClient.class);
     }

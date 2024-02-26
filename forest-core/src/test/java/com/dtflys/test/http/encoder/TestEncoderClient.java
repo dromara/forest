@@ -6,6 +6,7 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestFastjsonConverter;
 import com.dtflys.forest.converter.json.ForestGsonConverter;
 import com.dtflys.forest.converter.json.ForestJacksonConverter;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.test.http.BaseClientTest;
@@ -36,8 +37,8 @@ public class TestEncoderClient extends BaseClientTest {
         configuration = ForestConfiguration.createConfiguration();
     }
 
-    public TestEncoderClient(HttpBackend backend) {
-        super(backend, configuration);
+    public TestEncoderClient(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setVariableValue("port", server.getPort());
         encoderClient = configuration.client(EncoderClient.class);
     }

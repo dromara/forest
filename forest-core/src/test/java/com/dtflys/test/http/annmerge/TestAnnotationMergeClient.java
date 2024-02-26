@@ -2,6 +2,7 @@ package com.dtflys.test.http.annmerge;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.test.http.BaseClientTest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -28,11 +29,10 @@ public class TestAnnotationMergeClient extends BaseClientTest {
     @BeforeClass
     public static void prepareClient() {
         configuration = ForestConfiguration.createConfiguration();
-
     }
 
-    public TestAnnotationMergeClient(HttpBackend backend) {
-        super(backend, configuration);
+    public TestAnnotationMergeClient(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setVariableValue("port", server.getPort());
         annotationMergeClient = configuration.createInstance(AnnotationMergeClient.class);
     }

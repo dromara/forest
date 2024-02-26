@@ -2,6 +2,7 @@ package com.dtflys.test.http;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.client.HeadClient;
 import com.dtflys.test.model.TestHeaders;
@@ -42,8 +43,8 @@ public class TestHeadClient extends BaseClientTest {
     public void afterRequests() {
     }
 
-    public TestHeadClient(HttpBackend backend) {
-        super(backend, configuration);
+    public TestHeadClient(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setVariableValue("port", server.getPort());
         headClient = configuration.createInstance(HeadClient.class);
     }

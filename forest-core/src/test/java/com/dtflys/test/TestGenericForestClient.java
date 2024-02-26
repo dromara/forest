@@ -10,6 +10,7 @@ import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestEncoder;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestAddress;
 import com.dtflys.forest.http.ForestAsyncMode;
@@ -81,8 +82,8 @@ public class TestGenericForestClient extends BaseClientTest {
     @Rule
     public final MockWebServer server = new MockWebServer();
 
-    public TestGenericForestClient(HttpBackend backend) {
-        super(backend, Forest.config());
+    public TestGenericForestClient(String backend, String jsonConverter) {
+        super(backend, jsonConverter, Forest.config());
     }
 
 

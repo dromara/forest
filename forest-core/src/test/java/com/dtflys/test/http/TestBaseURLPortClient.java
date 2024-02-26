@@ -2,6 +2,7 @@ package com.dtflys.test.http;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.test.http.client.BaseURLPortClient;
 import okhttp3.mockwebserver.MockWebServer;
@@ -15,7 +16,7 @@ import org.junit.Test;
  * @Date: 2023/9/14 10:03
  * @Version 1.0
  */
-public class TestBaseURLPortClient  extends BaseClientTest{
+public class TestBaseURLPortClient  extends BaseClientTest {
 
     public final static String EXPECTED = "{\"status\":\"ok\"}";
 
@@ -31,8 +32,8 @@ public class TestBaseURLPortClient  extends BaseClientTest{
     public static void prepareClient() {
         configuration = ForestConfiguration.createConfiguration();
     }
-    public TestBaseURLPortClient(HttpBackend backend) {
-        super(backend, configuration);
+    public TestBaseURLPortClient(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setVariableValue("port", server.getPort());
         configuration.setVariableValue("baseURL", "http://localhost:" + server.getPort() +"/user");
         baseURLPortClient = configuration.createInstance(BaseURLPortClient.class);

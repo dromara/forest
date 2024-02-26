@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.mock.MockServerRequest;
 import com.dtflys.forest.multipart.ByteArrayMultipart;
@@ -69,8 +70,8 @@ public class TestUploadClient extends BaseClientTest {
     public void afterRequests() {
     }
 
-    public TestUploadClient(HttpBackend backend) {
-        super(backend, configuration);
+    public TestUploadClient(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setVariableValue("port", server.getPort());
         uploadClient = configuration.createInstance(UploadClient.class);
     }

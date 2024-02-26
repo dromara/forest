@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestURL;
@@ -69,8 +70,8 @@ public class TestGetClient extends BaseClientTest {
     }
 
 
-    public TestGetClient(HttpBackend backend) {
-        super(backend, configuration);
+    public TestGetClient(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setVariableValue("port", server.getPort());
         getClient = configuration.createInstance(GetClient.class);
         urlEncodedClient = configuration.createInstance(UrlEncodedClient.class);

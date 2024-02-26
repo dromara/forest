@@ -2,6 +2,7 @@ package com.dtflys.test.http;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.test.http.client.PatchClient;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -38,8 +39,8 @@ public class TestPatchClient extends BaseClientTest {
     public void afterRequests() {
     }
 
-    public TestPatchClient(HttpBackend backend) {
-        super(backend, configuration);
+    public TestPatchClient(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setVariableValue("port", server.getPort());
         patchClient = configuration.createInstance(PatchClient.class);
     }

@@ -2,6 +2,7 @@ package com.dtflys.test.interceptor;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.BaseClientTest;
 import org.junit.BeforeClass;
@@ -18,8 +19,8 @@ public class TestBaseErrorClient extends BaseClientTest {
     private static BaseErrorInterceptorClient baseErrorInterceptorClient;
 
 
-    public TestBaseErrorClient(HttpBackend backend) {
-        super(backend, configuration);
+    public TestBaseErrorClient(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         baseErrorInterceptorClient = configuration.createInstance(BaseErrorInterceptorClient.class);
     }
 

@@ -2,6 +2,7 @@ package com.dtflys.test.http.retry;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.test.http.BaseClientTest;
@@ -33,8 +34,8 @@ public class TestRetryerClient extends BaseClientTest {
     }
 
 
-    public TestRetryerClient(HttpBackend backend) {
-        super(backend, configuration);
+    public TestRetryerClient(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setVariableValue("port", server.getPort());
         retryerClient = configuration.createInstance(RetryerClient.class);
         retryerClient2 = configuration.createInstance(RetryerClient2.class);

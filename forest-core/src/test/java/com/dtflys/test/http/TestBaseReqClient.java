@@ -2,6 +2,7 @@ package com.dtflys.test.http;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.interceptor.Interceptor;
@@ -51,8 +52,8 @@ public class TestBaseReqClient extends BaseClientTest {
         configuration = ForestConfiguration.createConfiguration();
     }
 
-    public TestBaseReqClient(HttpBackend backend) {
-        super(backend, configuration);
+    public TestBaseReqClient(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setVariableValue("baseURL", "http://localhost:5000/");
         configuration.setVariableValue("userAgent", USER_AGENT);
         configuration.setVariableValue("port", server.getPort());

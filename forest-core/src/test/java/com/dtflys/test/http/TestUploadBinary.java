@@ -4,6 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.mock.MockServerRequest;
 import com.dtflys.test.http.client.BinaryClient;
 import okhttp3.mockwebserver.MockResponse;
@@ -47,8 +48,8 @@ public class TestUploadBinary extends BaseClientTest {
     public void afterRequests() {
     }
 
-    public TestUploadBinary(HttpBackend backend) {
-        super(backend, configuration);
+    public TestUploadBinary(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setVariableValue("port", server.getPort());
         binaryClient = configuration.createInstance(BinaryClient.class);
     }

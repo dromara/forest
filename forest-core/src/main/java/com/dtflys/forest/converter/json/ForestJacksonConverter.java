@@ -30,9 +30,16 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.Lazy;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationConfig;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.DefaultSerializerProvider;
+import com.fasterxml.jackson.databind.ser.SerializerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -62,8 +69,31 @@ public class ForestJacksonConverter implements ForestJsonConverter {
 
     public ForestJacksonConverter() {
         this.mapper = new ObjectMapper();
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(Lazy.class, new LazySerializer());
+        this.mapper.registerModule(module);
         this.mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         this.mapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
+    }
+
+    private static class LazySerializer extends JsonSerializer<Lazy> {
+
+        @Override
+        public void serialize(Lazy lazy, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+            jsonGenerator.writeStartObject();
+            jsonGenerator.writeEndObject();
+//            jsonGenerator.writeObject(lazy);
+            /*ForestRequest request = (ForestRequest) serializerProvider.getAttribute("request");
+            ConvertOptions options = (ConvertOptions) serializerProvider.getAttribute("options");
+            if (!Lazy.isEvaluatingLazyValue(lazy, request)) {
+                if (options != null) {
+                    final Object evalValue = options.getValue(lazy, request);
+                    if (!options.shouldIgnore(evalValue)) {
+                        jsonGenerator.writeObject(evalValue);
+                    }
+                }
+            }*/
+        }
     }
 
     /**
@@ -180,9 +210,10 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         if (obj instanceof CharSequence) {
             return convertToJavaObject(obj.toString(), LinkedHashMap.class);
         }
-
-        final JavaType javaType = getMapper().getTypeFactory().constructMapType(LinkedHashMap.class, String.class, Object.class);
-        return getMapper().convertValue(obj, javaType);
+        final ObjectMapper objectMapper = getMapper();
+        final JavaType javaType = objectMapper.getTypeFactory().constructMapType(LinkedHashMap.class, String.class, Object.class);
+        final Map<String, Object> map = objectMapper.convertValue(obj, javaType);
+        return map;
     }
 
     @Override

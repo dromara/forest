@@ -2,6 +2,7 @@ package com.dtflys.test.http.variable;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
 import com.dtflys.test.http.BaseClientTest;
 import okhttp3.mockwebserver.MockResponse;
@@ -28,8 +29,8 @@ public class TestVarClient extends BaseClientTest {
         configuration = ForestConfiguration.createConfiguration();
     }
 
-    public TestVarClient(HttpBackend backend) {
-        super(backend, configuration);
+    public TestVarClient(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         varClient = configuration.client(VarClient.class);
     }
 

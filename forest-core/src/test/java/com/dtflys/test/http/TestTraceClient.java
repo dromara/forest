@@ -2,6 +2,7 @@ package com.dtflys.test.http;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.client.TraceClient;
 import okhttp3.mockwebserver.MockResponse;
@@ -38,8 +39,8 @@ public class TestTraceClient extends BaseClientTest {
     public void afterRequests() {
     }
 
-    public TestTraceClient(HttpBackend backend) {
-        super(backend, configuration);
+    public TestTraceClient(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setVariableValue("port", server.getPort());
         traceClient = configuration.createInstance(TraceClient.class);
     }

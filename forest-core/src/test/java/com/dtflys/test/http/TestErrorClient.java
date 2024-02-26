@@ -2,6 +2,7 @@ package com.dtflys.test.http;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestNetworkException;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.retryer.BackOffRetryer;
@@ -38,8 +39,8 @@ public class TestErrorClient extends BaseClientTest {
     }
 
 
-    public TestErrorClient(HttpBackend backend) {
-        super(backend, configuration);
+    public TestErrorClient(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setVariableValue("port", server.getPort());
         getClient = configuration.createInstance(GetClient.class);
     }

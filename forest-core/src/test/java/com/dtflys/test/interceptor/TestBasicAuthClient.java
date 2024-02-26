@@ -2,6 +2,7 @@ package com.dtflys.test.interceptor;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.test.http.BaseClientTest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -26,8 +27,8 @@ public class TestBasicAuthClient extends BaseClientTest {
 
     private static BasicAuthClient basicAuthClient;
 
-    public TestBasicAuthClient(HttpBackend backend) {
-        super(backend, configuration);
+    public TestBasicAuthClient(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setCacheEnabled(false);
         configuration.setVariableValue("port", server.getPort());
         basicAuthClient = configuration.createInstance(BasicAuthClient.class);

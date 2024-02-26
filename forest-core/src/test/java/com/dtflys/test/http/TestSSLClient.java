@@ -3,6 +3,7 @@ package com.dtflys.test.http;
 import cn.hutool.core.map.MapUtil;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
@@ -131,8 +132,8 @@ public class TestSSLClient extends BaseClientTest {
     }
 
 
-    public TestSSLClient(HttpBackend backend) throws IOException {
-        super(backend, configuration);
+    public TestSSLClient(String backend, String jsonConverter) throws IOException {
+        super(backend, jsonConverter, configuration);
         sslClient = configuration.createInstance(SSLClient.class);
         int port = webServer.getPort();
         webServer.close();
