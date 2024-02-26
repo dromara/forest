@@ -7,7 +7,7 @@ public class BaseSpringBootTest {
 
     @AfterClass
     public static void cleanup() {
-        ForestScannerRegister.cleanBackPackages();
+//        ForestScannerRegister.cleanBackPackages();
     }
 
 
