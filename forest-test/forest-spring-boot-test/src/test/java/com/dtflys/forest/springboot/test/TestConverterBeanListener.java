@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 @SpringBootTest(classes = TestConverterBeanListener.class)
 @ComponentScan(basePackageClasses = ConverterTestConfiguration.class)
 @EnableAutoConfiguration
-public class TestConverterBeanListener {
+public class TestConverterBeanListener extends BaseSpringBootTest {
 
     @Resource
     private ForestConfiguration forestConfiguration;

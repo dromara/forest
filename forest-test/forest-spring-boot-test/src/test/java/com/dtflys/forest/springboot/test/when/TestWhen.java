@@ -1,5 +1,6 @@
 package com.dtflys.forest.springboot.test.when;
 
+import com.dtflys.forest.springboot.test.BaseSpringBootTest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.Rule;
@@ -21,7 +22,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest(classes = TestWhen.class)
 @ComponentScan(basePackages = "com.dtflys.forest.springboot.test.when")
 @EnableAutoConfiguration
-public class TestWhen {
+public class TestWhen extends BaseSpringBootTest {
 
     public final static String EXPECTED = "{\"status\": \"ok\"}";
 

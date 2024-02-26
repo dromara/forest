@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
 @ActiveProfiles("test1")
 @SpringBootTest(classes = Test1.class)
 @EnableAutoConfiguration
-public class Test1 {
+public class Test1 extends BaseSpringBootTest {
 
     @Resource
     private BaiduClient baiduClient;

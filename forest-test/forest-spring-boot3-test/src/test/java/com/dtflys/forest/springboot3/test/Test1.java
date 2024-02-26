@@ -14,7 +14,8 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.StopWatch;
 
 
@@ -23,11 +24,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 
-@RunWith(SpringRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("test1")
-@SpringBootTest(classes = Test1.class)
+@SpringBootTest
+@ContextConfiguration(classes = Test1.class)
 @EnableAutoConfiguration
-public class Test1 {
+public class Test1 extends BaseSpringBootTest {
 
     @Resource
     private BaiduClient baiduClient;

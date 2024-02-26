@@ -23,7 +23,8 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 
 import java.time.Duration;
@@ -34,12 +35,13 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(SpringRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("test0")
-@SpringBootTest(classes = Test0.class)
+@SpringBootTest
+@ContextConfiguration(classes = Test0.class)
 @EnableAutoConfiguration
 @ComponentScan(basePackages = "com.dtflys.forest.springboot3.test.service")
-public class Test0 {
+public class Test0 extends BaseSpringBootTest {
 
     @Resource
     private BeastshopClient beastshopClient;

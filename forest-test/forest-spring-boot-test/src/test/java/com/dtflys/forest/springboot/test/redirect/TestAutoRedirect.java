@@ -2,6 +2,7 @@ package com.dtflys.forest.springboot.test.redirect;
 
 import com.dtflys.forest.annotation.BindingVar;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.springboot.test.BaseSpringBootTest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.Rule;
@@ -24,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("redirect")
 @SpringBootTest(classes = TestAutoRedirect.class)
 @EnableAutoConfiguration
-public class TestAutoRedirect {
+public class TestAutoRedirect extends BaseSpringBootTest {
 
     public final static String EXPECTED = "{\"status\": \"ok\"}";
 

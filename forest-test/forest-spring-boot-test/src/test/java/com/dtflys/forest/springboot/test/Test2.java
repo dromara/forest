@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = Test2.class)
 @ComponentScan(basePackageClasses = GlobalInterceptor.class)
 @EnableAutoConfiguration
-public class Test2 {
+public class Test2 extends BaseSpringBootTest {
 
     @Resource
     private GiteeClient giteeClient;
