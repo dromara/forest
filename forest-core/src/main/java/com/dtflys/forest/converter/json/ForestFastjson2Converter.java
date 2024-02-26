@@ -26,6 +26,8 @@ package com.dtflys.forest.converter.json;
 
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONException;
 import com.alibaba.fastjson2.JSONFactory;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.JSONReader;
@@ -33,8 +35,15 @@ import com.alibaba.fastjson2.JSONWriter;
 import com.alibaba.fastjson2.TypeReference;
 import com.alibaba.fastjson2.annotation.JSONField;
 import com.alibaba.fastjson2.codec.FieldInfo;
+import com.alibaba.fastjson2.filter.PropertyFilter;
+import com.alibaba.fastjson2.filter.PropertyPreFilter;
+import com.alibaba.fastjson2.filter.ValueFilter;
 import com.alibaba.fastjson2.util.BeanUtils;
+import com.alibaba.fastjson2.util.DateUtils;
 import com.alibaba.fastjson2.util.TypeUtils;
+import com.alibaba.fastjson2.writer.FieldWriter;
+import com.alibaba.fastjson2.writer.ObjectWriter;
+import com.alibaba.fastjson2.writer.ObjectWriterAdapter;
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
@@ -52,8 +61,12 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -61,6 +74,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import static com.alibaba.fastjson2.JSONObject.parse;
+import static com.alibaba.fastjson2.JSONWriter.Feature.WriteNulls;
 
 
 /**
@@ -72,6 +88,8 @@ public class ForestFastjson2Converter implements ForestJsonConverter {
 
     private static final Set<Charset> SUPPORTED_CHARSETS = new HashSet<>();
 
+    private static Class fastjson1JSONFieldClass;
+
     static {
         SUPPORTED_CHARSETS.add(StandardCharsets.UTF_8);
         SUPPORTED_CHARSETS.add(StandardCharsets.UTF_16);
@@ -79,6 +97,11 @@ public class ForestFastjson2Converter implements ForestJsonConverter {
         SUPPORTED_CHARSETS.add(StandardCharsets.UTF_16LE);
         SUPPORTED_CHARSETS.add(StandardCharsets.US_ASCII);
         SUPPORTED_CHARSETS.add(StandardCharsets.ISO_8859_1);
+
+        try {
+            fastjson1JSONFieldClass = Class.forName("com.alibaba.fastjson.annotation.JSONField");
+        } catch (ClassNotFoundException e) {
+        }
     }
 
 
@@ -235,83 +258,101 @@ public class ForestFastjson2Converter implements ForestJsonConverter {
         if (obj instanceof CharSequence) {
             return convertToJavaObject(obj.toString(), LinkedHashMap.class);
         }
-//        return  (JSONObject) Optional.ofNullable(JSON.toJSON(obj)).orElse(new JSONObject());
 
-
-        final Map<String, Object> map = new LinkedHashMap<>();
-        final Class<?> objClass = obj.getClass();
-        final Object[] args = new Object[0];
-
-        final List<OrdinalProperty> properties = new ArrayList<>();
-
-        BeanUtils.getters(objClass, getter -> {
-            int ordinal = 0;
-            String name = NameUtils.propNameFromGetter(getter.getName());
-            final JSONField jsonField = Optional.ofNullable(getter.getAnnotation(JSONField.class))
-                    .orElseGet(() -> {
-                        final Field field = BeanUtils.getField(objClass, getter);
-                        if (field == null) {
-                            return null;
-                        }
-                        return field.getAnnotation(JSONField.class);
-                    });
-            if (jsonField != null) {
-                ordinal = jsonField.ordinal();
-                name = StringUtils.isEmpty(jsonField.name()) ? name : jsonField.name();
-            } else {
-                final com.alibaba.fastjson.annotation.JSONField fj1jsonField = Optional.ofNullable(getter.getAnnotation(com.alibaba.fastjson.annotation.JSONField.class))
-                        .orElseGet(() -> {
-                            final Field field = BeanUtils.getField(objClass, getter);
-                            if (field == null) {
-                                return null;
-                            }
-                            return field.getAnnotation(com.alibaba.fastjson.annotation.JSONField.class);
-                        });
-                if (fj1jsonField != null) {
-                    ordinal = fj1jsonField.ordinal();
-                    name = StringUtils.isEmpty(fj1jsonField.name()) ? name : fj1jsonField.name();
+        final Map<String, Object> map = (JSONObject) Optional.ofNullable(JSON.toJSON(obj)).orElse(new JSONObject());
+        if (!map.isEmpty()) {
+            for (final Map.Entry<String, Object> entry : map.entrySet()) {
+                String name = entry.getKey();
+                Object value = entry.getValue();
+                if (Lazy.isEvaluatingLazyValue(value, request)) {
+                    map.remove(name);
+                } else if (options != null) {
+                    value = options.getValue(value, request);
+                    if (options.shouldIgnore(value)) {
+                        map.remove(name);
+                    } else {
+                        map.put(name, value);
+                    }
                 }
-            }
-            OrdinalProperty property = new OrdinalProperty();
-            property.name = name;
-            property.getter = getter;
-            property.ordinal = ordinal;
-            properties.add(property);
-        });
-
-        properties.sort(Comparator.comparingInt(o -> o.ordinal));
-
-        for (final OrdinalProperty property : properties) {
-            final Method getter = property.getter;
-            final Class<?> propType = getter.getReturnType();
-            final String propName = property.name;
-            if (options != null && options.shouldExclude(propName)) {
-                continue;
-            }
-            Object value = null;
-            try {
-                getter.setAccessible(true);
-                value = getter.invoke(obj, args);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                throw new RuntimeException(e);
-            }
-            if (Lazy.isEvaluatingLazyValue(value, request)) {
-                continue;
-            }
-            if (options != null) {
-                value = options.getValue(value, request);
-                if (options.shouldIgnore(value)) {
-                    continue;
-                }
-            }
-            if (ReflectUtils.isPrimaryArrayType(propType)) {
-                final Object jsonValue = JSON.toJSON(value);
-                map.put(propName, jsonValue);
-            } else {
-                map.put(propName, value);
             }
         }
         return map;
+
+//        final Map<String, Object> map = new LinkedHashMap<>();
+//        final Class<?> objClass = obj.getClass();
+//        final Object[] args = new Object[0];
+//        final List<OrdinalProperty> properties = new ArrayList<>();
+//        JSON.toJSON(obj);
+//
+//
+//        BeanUtils.getters(objClass, getter -> {
+//            int ordinal = 0;
+//            String name = NameUtils.propNameFromGetter(getter.getName());
+//            final JSONField jsonField = Optional.ofNullable(getter.getAnnotation(JSONField.class))
+//                    .orElseGet(() -> {
+//                        final Field field = BeanUtils.getField(objClass, getter);
+//                        if (field == null) {
+//                            return null;
+//                        }
+//                        return field.getAnnotation(JSONField.class);
+//                    });
+//            if (jsonField != null) {
+//                ordinal = jsonField.ordinal();
+//                name = StringUtils.isEmpty(jsonField.name()) ? name : jsonField.name();
+//            } else {
+//                final com.alibaba.fastjson.annotation.JSONField fj1jsonField = Optional.ofNullable(getter.getAnnotation(com.alibaba.fastjson.annotation.JSONField.class))
+//                        .orElseGet(() -> {
+//                            final Field field = BeanUtils.getField(objClass, getter);
+//                            if (field == null) {
+//                                return null;
+//                            }
+//                            return field.getAnnotation(com.alibaba.fastjson.annotation.JSONField.class);
+//                        });
+//                if (fj1jsonField != null) {
+//                    ordinal = fj1jsonField.ordinal();
+//                    name = StringUtils.isEmpty(fj1jsonField.name()) ? name : fj1jsonField.name();
+//                }
+//            }
+//            OrdinalProperty property = new OrdinalProperty();
+//            property.name = name;
+//            property.getter = getter;
+//            property.ordinal = ordinal;
+//            properties.add(property);
+//        });
+//
+//        properties.sort(Comparator.comparingInt(o -> o.ordinal));
+//
+//        for (final OrdinalProperty property : properties) {
+//            final Method getter = property.getter;
+//            final Class<?> propType = getter.getReturnType();
+//            final String propName = property.name;
+//            if (options != null && options.shouldExclude(propName)) {
+//                continue;
+//            }
+//            Object value = null;
+//            try {
+//                getter.setAccessible(true);
+//                value = getter.invoke(obj, args);
+//            } catch (IllegalAccessException | InvocationTargetException e) {
+//                throw new RuntimeException(e);
+//            }
+//            if (Lazy.isEvaluatingLazyValue(value, request)) {
+//                continue;
+//            }
+//            if (options != null) {
+//                value = options.getValue(value, request);
+//                if (options.shouldIgnore(value)) {
+//                    continue;
+//                }
+//            }
+//            if (ReflectUtils.isPrimaryArrayType(propType)) {
+//                final Object jsonValue = JSON.toJSON(value);
+//                map.put(propName, jsonValue);
+//            } else {
+//                map.put(propName, value);
+//            }
+//        }
+//        return map;
     }
 
     @Override
