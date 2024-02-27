@@ -29,7 +29,6 @@ import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.JSONReader;
 import com.alibaba.fastjson2.JSONWriter;
 import com.alibaba.fastjson2.TypeReference;
-import com.alibaba.fastjson2.codec.FieldInfo;
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
@@ -37,8 +36,6 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.Lazy;
 import com.dtflys.forest.utils.ForestDataType;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
