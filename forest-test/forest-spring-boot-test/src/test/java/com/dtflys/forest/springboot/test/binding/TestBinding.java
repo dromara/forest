@@ -2,6 +2,7 @@ package com.dtflys.forest.springboot.test.binding;
 
 import com.dtflys.forest.annotation.BindingVar;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.springboot.test.BaseSpringBootTest;
 import com.dtflys.forest.springboot.test.address.TestAddress;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -23,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = TestAddress.class)
 @ComponentScan(basePackages = "com.dtflys.forest.springboot.test.binding")
 @EnableAutoConfiguration
-public class TestBinding {
+public class TestBinding extends BaseSpringBootTest {
 
     public final static String EXPECTED = "{\"status\": \"ok\"}";
 

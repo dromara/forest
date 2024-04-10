@@ -2,10 +2,7 @@ package com.dtflys.test.http;
 
 import com.dtflys.forest.annotation.Get;
 import com.dtflys.forest.annotation.HTTPProxy;
-import com.dtflys.forest.backend.HttpBackend;
-import com.dtflys.forest.backend.okhttp3.OkHttp3;
 import com.dtflys.forest.config.ForestConfiguration;
-import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -15,7 +12,7 @@ import org.junit.Test;
  * @author tanglingyan[xiao4852@qq.com]
  * @since 2022-06-09 14:29
  */
-public class TestHttpClientHttpPorxy extends BaseClientTest {
+public class TestHttpClientHttpProxy extends BaseClientTest {
 
     public final static String EXPECTED = "{\"status\":\"ok\"}";
 
@@ -26,8 +23,8 @@ public class TestHttpClientHttpPorxy extends BaseClientTest {
 
     private TestHttpClientHttpProxyClient testHttpClientHttpProxyClient;
 
-    public TestHttpClientHttpPorxy(HttpBackend backend) {
-        super(backend, configuration);
+    public TestHttpClientHttpProxy(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setVariableValue("port", server.getPort());
         testHttpClientHttpProxyClient = configuration.createInstance(TestHttpClientHttpProxyClient.class);
 

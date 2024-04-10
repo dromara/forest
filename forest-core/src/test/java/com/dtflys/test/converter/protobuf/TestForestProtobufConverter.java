@@ -2,6 +2,7 @@ package com.dtflys.test.converter.protobuf;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.test.http.BaseClientTest;
 import com.dtflys.test.http.client.ProtobufClient;
 import com.dtflys.test.mock.ProtobufMockServer;
@@ -35,8 +36,8 @@ public class TestForestProtobufConverter extends BaseClientTest {
 
     private static ProtobufClient protobufClient;
 
-    public TestForestProtobufConverter(HttpBackend backend) {
-        super(backend, configuration);
+    public TestForestProtobufConverter(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setVariableValue("port", server.getPort());
 
     }

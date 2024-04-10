@@ -25,7 +25,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @ActiveProfiles("ssl")
 @SpringBootTest(classes = SSLTest.class)
 @EnableAutoConfiguration
-public class SSLTest {
+public class SSLTest extends BaseSpringBootTest {
 
     @Resource
     private ForestConfiguration sslConfig;

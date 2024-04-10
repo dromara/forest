@@ -4,6 +4,8 @@ import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.backend.httpclient.HttpclientBackend;
 import com.dtflys.forest.backend.okhttp3.OkHttp3Backend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestFastjson2Converter;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestNetworkException;
 import com.dtflys.forest.http.ForestAsyncMode;
 import com.dtflys.forest.http.ForestFuture;
@@ -85,7 +87,7 @@ public class TestAsyncGetClient extends BaseClientTest {
     }
 
     public TestAsyncGetClient(AsyncTestParameter parameter) {
-        super(parameter.backend, configuration);
+        super(parameter.backend.getName(), "fastjson2", configuration);
         configuration.setAsyncMode(parameter.asyncMode);
         configuration.setVariableValue("port", server.getPort());
         getClient = configuration.createInstance(GetClient.class);

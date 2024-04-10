@@ -81,7 +81,17 @@ public class NameUtils {
         StringBuilder builder = new StringBuilder();
         for (int i = 1; i < strs.length; i++) {
             String str = strs[i];
-            builder.append(str);
+            if (i > 1) {
+                final char[] chars = str.toCharArray();
+                builder.append(String.valueOf(chars[0]).toUpperCase());
+                if (chars.length > 1) {
+                    for (int j = 1; j < chars.length; j++) {
+                        builder.append(chars[j]);
+                    }
+                }
+            } else {
+                builder.append(str);
+            }
         }
         return builder.toString();
     }

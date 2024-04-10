@@ -3,12 +3,14 @@ package com.dtflys.test;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.auth.BasicAuth;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestEncoder;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestAddress;
 import com.dtflys.forest.http.ForestAsyncMode;
@@ -80,8 +82,8 @@ public class TestGenericForestClient extends BaseClientTest {
     @Rule
     public final MockWebServer server = new MockWebServer();
 
-    public TestGenericForestClient(HttpBackend backend) {
-        super(backend, Forest.config());
+    public TestGenericForestClient(String backend, String jsonConverter) {
+        super(backend, jsonConverter, Forest.config());
     }
 
 
@@ -444,9 +446,17 @@ public class TestGenericForestClient extends BaseClientTest {
     }
 
     public static class MyQuery {
+
+        @JSONField(ordinal = 0)
         private Integer a;
+
+        @JSONField(ordinal = 1)
         private Integer b;
+
+        @JSONField(ordinal = 2)
         private Integer c;
+
+        @JSONField(ordinal = 3)
         private List<Integer> x;
 
         public Integer getA() {
@@ -994,8 +1004,6 @@ public class TestGenericForestClient extends BaseClientTest {
         data.setName("bar");
         data.setToken(req -> Base64.encode(req.getQueryString()));
 
-        BeanUtil.beanToMap(data);
-
         Forest.get("/")
                 .port(server.getPort())
                 .addQuery(data)
@@ -1206,8 +1214,14 @@ public class TestGenericForestClient extends BaseClientTest {
     }
 
     public static class LazyData {
+
+        @JSONField(ordinal = 0)
         private String id;
+
+        @JSONField(ordinal = 1)
         private String name;
+
+        @JSONField(ordinal = 2)
         private Lazy<Object> token;
 
         public String getId() {

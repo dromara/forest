@@ -26,16 +26,16 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
 
     private final ForestProtobufConverterManager protobufConverterManager = ForestProtobufConverterManager.getInstance();
 
-    public DefaultAutoConverter(ForestConfiguration configuration) {
+    public DefaultAutoConverter(final ForestConfiguration configuration) {
         this.configuration = configuration;
     }
 
 
-    private <T> T tryConvert(Object source, Type targetType, ForestDataType dataType) {
+    private <T> T tryConvert(final Object source, final Type targetType, final ForestDataType dataType) {
         return (T) configuration.getConverterMap().get(dataType).convertToJavaObject(source, targetType);
     }
 
-    private byte[] tryEncodeRequest(ForestRequest request, ForestDataType dataType, Charset charset) {
+    private byte[] tryEncodeRequest(final ForestRequest request, final ForestDataType dataType, final Charset charset) {
         ForestConverter converter = configuration.getConverterMap().get(dataType);
         if (converter == null || !(converter instanceof ForestEncoder)) {
             converter = configuration.getConverterMap().get(ForestDataType.TEXT);
@@ -47,39 +47,40 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
     }
 
     @Override
-    public <T> T convertToJavaObject(Object source, Type targetType) {
+    public <T> T convertToJavaObject(final Object source, final Type targetType) {
         if (source == null) {
             return null;
         }
         if (isVoidType(targetType)) {
             return null;
         }
-        if (source instanceof InputStream
-                || source instanceof byte[]
-                || source instanceof File) {
+        Object src = source;
+        if (src instanceof InputStream
+                || src instanceof byte[]
+                || src instanceof File) {
             if (canReadAsBinary(targetType)) {
-                return tryConvert(source, targetType, ForestDataType.BINARY);
+                return tryConvert(src, targetType, ForestDataType.BINARY);
             }
             if (protobufConverterManager.isProtobufMessageType(targetType)) {
-                return tryConvert(source, targetType, ForestDataType.PROTOBUF);
+                return tryConvert(src, targetType, ForestDataType.PROTOBUF);
             }
-            source = readAsString(source);
+            src = readAsString(src);
         }
         T result = null;
         final Class clazz = ReflectUtils.toClass(targetType);
-        if (source instanceof CharSequence) {
-            String str = source.toString();
+        if (src instanceof CharSequence) {
+            final String str = src.toString();
             if (String.class.isAssignableFrom(clazz)) {
                 return (T) str;
             }
-            String trimmedStr = str.trim();
+            final String trimmedStr = str.trim();
             if (trimmedStr.length() == 0) {
                 if (CharSequence.class.isAssignableFrom(clazz)) {
                     return tryConvert(str, targetType, ForestDataType.TEXT);
                 }
                 return null;
             }
-            char ch = trimmedStr.charAt(0);
+            final char ch = trimmedStr.charAt(0);
             try {
                 if (ch == '{' || ch == '[') {
                     result = tryConvert(trimmedStr, targetType, ForestDataType.JSON);
@@ -89,7 +90,7 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
                     try {
                         result = tryConvert(trimmedStr, targetType, ForestDataType.JSON);
                     } catch (Throwable th) {
-                        result = tryConvert(source, targetType, ForestDataType.TEXT);
+                        result = tryConvert(src, targetType, ForestDataType.TEXT);
                     }
                 } else if ("true".equalsIgnoreCase(trimmedStr)) {
                     if (boolean.class.isAssignableFrom(clazz) || Boolean.class.isAssignableFrom(clazz)) {
@@ -104,7 +105,7 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
                         result = tryConvert(trimmedStr, targetType, ForestDataType.TEXT);
                     }
                 } else {
-                    result = tryConvert(source, targetType, ForestDataType.TEXT);
+                    result = tryConvert(src, targetType, ForestDataType.TEXT);
                 }
             } catch (Throwable th) {
                 throw new ForestConvertException(this, th);
@@ -149,7 +150,7 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
     }
 
 
-    public String readAsString(Object source) {
+    public String readAsString(final Object source) {
         if (source instanceof byte[]) {
             return bytesToString((byte[]) source);
         }

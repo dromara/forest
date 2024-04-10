@@ -9,6 +9,7 @@ import com.dtflys.forest.annotation.Query
 import com.dtflys.forest.backend.HttpBackend
 import com.dtflys.forest.callback.OnSuccess
 import com.dtflys.forest.config.ForestConfiguration
+import com.dtflys.forest.converter.json.ForestJsonConverter
 import com.dtflys.forest.mock.MockServerRequest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -17,7 +18,7 @@ import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 
-class TestKotlinClient(backend: HttpBackend?) : BaseClientTest(backend, configuration) {
+class TestKotlinClient(backend: String?, jsonConverter: String) : BaseClientTest(backend, jsonConverter, configuration) {
     companion object {
         const val EXPECTED = "{\"status\":\"ok\"}"
         @JvmStatic

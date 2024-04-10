@@ -34,7 +34,7 @@
 	</scm>
 
 	<properties>
-		<revision>1.5.33</revision>
+		<revision>1.5.36</revision>
 		<maven.compiler.source>8</maven.compiler.source>
 		<maven.compiler.target>8</maven.compiler.target>
 
@@ -48,6 +48,7 @@
 		<juniversalchardet.version>1.0.3</juniversalchardet.version>
 		<jsr305.version>3.0.1</jsr305.version>
 		<fastjson.version>1.2.83</fastjson.version>
+		<fastjson2.version>2.0.46</fastjson2.version>
 		<jackson.version>2.13.3</jackson.version>
 		<jackson-databind.version>2.13.3</jackson-databind.version>
 		<jackson-annotations.version>2.13.3</jackson-annotations.version>
@@ -58,6 +59,7 @@
 		<okhttp.version>3.14.9</okhttp.version>
 		<httpcore.version>4.4.14</httpcore.version>
 		<httpclient.version>4.5.13</httpclient.version>
+		<caffeine.version>2.9.3</caffeine.version>
 
 		<mockwebserver.version>3.14.9</mockwebserver.version>
 		<mockserver-netty.version>5.4.1</mockserver-netty.version>
@@ -223,8 +225,21 @@
 
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>${okhttp.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>mockwebserver</artifactId>
 			<version>${mockwebserver.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.squareup.okhttp3</groupId>
+					<artifactId>okhttp</artifactId>
+				</exclusion>
+			</exclusions>
 			<scope>test</scope>
 		</dependency>
 

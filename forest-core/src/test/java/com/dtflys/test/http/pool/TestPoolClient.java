@@ -3,6 +3,7 @@ package com.dtflys.test.http.pool;
 import com.dtflys.forest.backend.KotlinCoroutineHttpExecutor;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestPoolException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
@@ -39,8 +40,8 @@ public class TestPoolClient extends BaseClientTest {
         configuration = ForestConfiguration.createConfiguration();
     }
 
-    public TestPoolClient(HttpBackend backend) {
-        super(backend, configuration);
+    public TestPoolClient(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setVariableValue("port", server.getPort());
     }
 

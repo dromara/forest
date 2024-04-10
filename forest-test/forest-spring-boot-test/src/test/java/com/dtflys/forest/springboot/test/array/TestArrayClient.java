@@ -1,6 +1,7 @@
 package com.dtflys.forest.springboot.test.array;
 
 import com.dtflys.forest.annotation.BindingVar;
+import com.dtflys.forest.springboot.test.BaseSpringBootTest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.Rule;
@@ -21,7 +22,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest(classes = TestArrayClient.class)
 @ComponentScan(basePackages = "com.dtflys.forest.springboot.test.array")
 @EnableAutoConfiguration
-public class TestArrayClient {
+public class TestArrayClient extends BaseSpringBootTest {
 
     public final static String EXPECTED = "{\"status\": \"ok\"}";
 

@@ -6,6 +6,8 @@ import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.annotation.DataParam;
 import com.dtflys.forest.annotation.DataVariable;
 import com.dtflys.forest.annotation.Request;
+import com.dtflys.forest.converter.json.FastjsonEncoder;
+import com.dtflys.forest.converter.json.ForestFastjsonConverter;
 import com.dtflys.forest.http.ForestFuture;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
@@ -170,7 +172,8 @@ String simpleGetMultiQuery2WithLazy(@Query("a") String a, @Query("b") String b, 
             url = "http://localhost:${port}/hello/user",
             dataType = "json",
             headers = {"Accept:text/plain"},
-            data = "username=foo"
+            data = "username=foo",
+            decoder = ForestFastjsonConverter.class
     )
     ForestResponse<Map> jsonMapGet();
 
@@ -179,7 +182,8 @@ String simpleGetMultiQuery2WithLazy(@Query("a") String a, @Query("b") String b, 
             dataType = "json",
             headers = {"Accept:text/plain"},
             responseEncoding = "GBK",
-            data = "username=foo"
+            data = "username=foo",
+            decoder = ForestFastjsonConverter.class
     )
     ForestResponse<Map> jsonMapGetWithResponseEncoding();
 

@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestURL;
@@ -69,8 +70,8 @@ public class TestGetClient extends BaseClientTest {
     }
 
 
-    public TestGetClient(HttpBackend backend) {
-        super(backend, configuration);
+    public TestGetClient(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setVariableValue("port", server.getPort());
         getClient = configuration.createInstance(GetClient.class);
         urlEncodedClient = configuration.createInstance(UrlEncodedClient.class);
@@ -262,7 +263,6 @@ public class TestGetClient extends BaseClientTest {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
         server.enqueue(new MockResponse().setBody(buffer));
         ForestResponse<Map> response = getClient.jsonMapGetWithResponseEncoding();
         assertThat(response).isNotNull();
@@ -285,7 +285,7 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Type", "application/json")
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(EXPECTED));
-        ForestResponse<Map> response = getClient.jsonMapGet();
+        final ForestResponse<Map> response = getClient.jsonMapGet();
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(200);
         assertThat(response.getContentType())
@@ -387,7 +387,6 @@ public class TestGetClient extends BaseClientTest {
                 .assertPathEquals("/hello/user")
                 .assertQueryEquals("username", "foo");
     }
-
 
     @Test
     public void testAnnObjectGet() throws InterruptedException {
@@ -1048,7 +1047,8 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Type", "text/plain")
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(str));
-        assertThat(getClient.getToken())
+        TokenResult result = getClient.getToken();
+        assertThat(result)
                 .isNotNull()
                 .extracting(TokenResult::getTokenTimeout, TokenResult::getURLToken)
                 .contains(604800L, token);

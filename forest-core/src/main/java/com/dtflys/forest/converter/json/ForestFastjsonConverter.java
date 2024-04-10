@@ -59,8 +59,6 @@ import java.util.Map;
  */
 public class ForestFastjsonConverter implements ForestJsonConverter {
 
-    private final static int PARSE_LIMIT = 1024 * 1024;
-
     /**
      * Fastjson序列化方式
      */
@@ -99,10 +97,10 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
      * 设置FastJson的序列化特性名
      * @param serializerFeatureName FastJson的序列化特性名字符串
      */
-    public void setSerializerFeatureName(String serializerFeatureName) {
+    public void setSerializerFeatureName(final String serializerFeatureName) {
         if (StringUtils.isNotBlank(serializerFeatureName)) {
             this.serializerFeatureName = serializerFeatureName;
-            SerializerFeature feature = SerializerFeature.valueOf(serializerFeatureName);
+            final SerializerFeature feature = SerializerFeature.valueOf(serializerFeatureName);
             setSerializerFeature(feature);
         }
     }
@@ -123,32 +121,41 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
      * 设置FastJson的序列化特性对象
      * @param serializerFeature FastJson的序列化特性对象，{@link SerializerFeature}枚举实例
      */
-    public void setSerializerFeature(SerializerFeature serializerFeature) {
+    public void setSerializerFeature(final SerializerFeature serializerFeature) {
         this.serializerFeature = serializerFeature;
         if (serializerFeature == null) {
             this.serializerFeatureName = null;
-        }
-        else {
+        } else {
             this.serializerFeatureName = serializerFeature.name();
         }
     }
 
 
     @Override
-    public <T> T convertToJavaObject(String source, Type targetType) {
+    public <T> T convertToJavaObject(final String source, final Type targetType) {
         try {
             return JSON.parseObject(source, targetType);
         } catch (Throwable th) {
             throw new ForestConvertException(this, th);
         }
-
     }
 
     @Override
-    public <T> T convertToJavaObject(byte[] source, Class<T> targetType, Charset charset) {
-        if (charset == null) {
-            charset = StandardCharsets.UTF_8;
+    public <T> T convertToJavaObject(final byte[] source, final Class<T> targetType, final Charset charset) {
+        try {
+            return JSON.parseObject(
+                    source,
+                    0,
+                    source.length,
+                    charset != null ? charset : StandardCharsets.UTF_8,
+                    targetType);
+        } catch (Throwable th) {
+            throw new ForestConvertException(this, th);
         }
+    }
+
+    @Override
+    public <T> T convertToJavaObject(final byte[] source, final Type targetType, final Charset charset) {
         try {
             return JSON.parseObject(source, 0, source.length, charset, targetType);
         } catch (Throwable th) {
@@ -156,35 +163,24 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         }
     }
 
-    @Override
-    public <T> T convertToJavaObject(byte[] source, Type targetType, Charset charset) {
-        try {
-            return JSON.parseObject(source, 0, source.length, charset, targetType);
-        } catch (Throwable th) {
-            throw new ForestConvertException(this, th);
-        }
-    }
-
-    public <T> T convertToJavaObject(String source, TypeReference<T> typeReference) {
+    public <T> T convertToJavaObject(final String source, final TypeReference<T> typeReference) {
         try {
             return JSON.parseObject(source, typeReference);
         } catch (Throwable th) {
             throw new ForestConvertException(this, th);
         }
-
     }
 
 
-    private String parseToString(Object obj) {
+    private String parseToString(final Object obj) {
         if (serializerFeature == null) {
             return JSON.toJSONString(obj, SerializerFeature.WriteDateUseDateFormat);
         }
         return JSON.toJSONString(obj, SerializerFeature.WriteDateUseDateFormat, serializerFeature);
-
     }
 
     @Override
-    public String encodeToString(Object obj) {
+    public String encodeToString(final Object obj) {
         if (obj instanceof CharSequence) {
             obj.toString();
         }
@@ -196,12 +192,12 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
     }
 
 
-    private static Object toJSON(Object javaObject, ForestRequest request, ConvertOptions options) {
+    private static Object toJSON(final Object javaObject, final ForestRequest request, final ConvertOptions options) {
         ParserConfig parserConfig = ParserConfig.getGlobalInstance();
         return toJSON(javaObject, parserConfig, request, options);
     }
 
-    private static Object toJSON(Object javaObject, ParserConfig mapping, ForestRequest request, ConvertOptions options) {
+    private static Object toJSON(final Object javaObject, final ParserConfig mapping, final ForestRequest request, final ConvertOptions options) {
         if (javaObject == null) {
             return null;
         }
@@ -212,10 +208,9 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
 
         if (javaObject instanceof Map) {
             final Map<Object, Object> map = (Map<Object, Object>) javaObject;
-
             final JSONObject json = new JSONObject(map.size());
 
-            for (Map.Entry<Object, Object> entry : map.entrySet()) {
+            for (final Map.Entry<Object, Object> entry : map.entrySet()) {
                 final Object key = entry.getKey();
                 final String jsonKey = TypeUtils.castToString(key);
                 if (options != null && options.shouldExclude(jsonKey)) {
@@ -234,9 +229,9 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         if (javaObject instanceof Collection) {
             final Collection<?> collection = (Collection<?>) javaObject;
 
-            JSONArray array = new JSONArray(collection.size());
+            final JSONArray array = new JSONArray(collection.size());
 
-            for (Object item : collection) {
+            for (final Object item : collection) {
                 final Object jsonValue = toJSON(item, request, options);
                 array.add(jsonValue);
             }
@@ -270,7 +265,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
             final List<FieldInfo> getters = TypeUtils.computeGetters(clazz, null);
             final JSONObject json = new JSONObject(getters.size(), true);
 
-            for (FieldInfo field : getters) {
+            for (final FieldInfo field : getters) {
                 if (options != null && options.shouldExclude(field.name)) {
                     continue;
                 }
@@ -303,7 +298,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
 
 
     @Override
-    public Map<String, Object> convertObjectToMap(Object obj, ForestRequest request, ConvertOptions options) {
+    public Map<String, Object> convertObjectToMap(final Object obj, final ForestRequest request, final ConvertOptions options) {
         if (obj == null) {
             return null;
         }
@@ -341,7 +336,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         final JSONObject json = new JSONObject(getters.size(), true);
 
         try {
-            for (FieldInfo field : getters) {
+            for (final FieldInfo field : getters) {
                 if (options != null && options.shouldExclude(field.name)) {
                     continue;
                 }
@@ -370,7 +365,7 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
     }
 
     @Override
-    public void setDateFormat(String format) {
+    public void setDateFormat(final String format) {
         this.dateFormat = format;
         if (StringUtils.isNotBlank(format)) {
             JSON.DEFFAULT_DATE_FORMAT = format;
@@ -382,12 +377,12 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
         return this.dateFormat;
     }
 
-    public Map<String, Object> defaultJsonMap(Object obj, ConvertOptions options) {
-        Object jsonObj = JSON.toJSON(obj);
-        Map<String, Object> map = (Map<String, Object>) jsonObj;
+    public Map<String, Object> defaultJsonMap(final Object obj, final ConvertOptions options) {
+        final Object jsonObj = JSON.toJSON(obj);
+        final Map<String, Object> map = (Map<String, Object>) jsonObj;
         if (map != null && options != null) {
             for (Map.Entry<String, Object> entity : map.entrySet()) {
-                String name = entity.getKey();
+                final String name = entity.getKey();
                 if (options.shouldExclude(name)) {
                     map.remove(name);
                 }

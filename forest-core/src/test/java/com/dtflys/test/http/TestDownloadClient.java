@@ -5,6 +5,7 @@ import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.backend.httpclient.HttpclientBackend;
 import com.dtflys.forest.backend.okhttp3.OkHttp3Backend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.ForestProgress;
 import com.dtflys.test.http.client.DownloadClient;
@@ -54,8 +55,8 @@ public class TestDownloadClient extends BaseClientTest {
     public void afterRequests() {
     }
 
-    public TestDownloadClient(HttpBackend backend) {
-        super(backend, configuration);
+    public TestDownloadClient(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setVariableValue("port", server.getPort());
         downloadClient = configuration.createInstance(DownloadClient.class);
     }

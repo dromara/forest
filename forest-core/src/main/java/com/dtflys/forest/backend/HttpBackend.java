@@ -3,6 +3,9 @@ package com.dtflys.forest.backend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.utils.ForestCache;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * HTTP后端接口
@@ -11,6 +14,7 @@ import com.dtflys.forest.http.ForestRequest;
  * @since 2017-04-20 18:22
  */
 public interface HttpBackend {
+
 
     /**
      * 获取后端框架名称

@@ -2,6 +2,7 @@ package com.dtflys.test.http.response;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.ForestCookie;
 import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestHeader;
@@ -37,8 +38,8 @@ public class TestResponseClient extends BaseClientTest {
         configuration = ForestConfiguration.createConfiguration();
     }
 
-    public TestResponseClient(HttpBackend backend) {
-        super(backend, configuration);
+    public TestResponseClient(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setVariableValue("port", server.getPort());
         responseClient = configuration.client(ResponseClient.class);
     }

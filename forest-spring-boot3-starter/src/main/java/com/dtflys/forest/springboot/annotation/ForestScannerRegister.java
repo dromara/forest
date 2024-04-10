@@ -80,6 +80,13 @@ public class ForestScannerRegister implements BeanFactoryAware, ImportBeanDefini
     }
 
     /**
+     * 清空扫描的包名
+     */
+    public static void cleanBackPackages() {
+        basePackages.clear();
+    }
+
+    /**
      * 获取Forest全局配置ID
      *
      * @return Forest全局配置ID字符串

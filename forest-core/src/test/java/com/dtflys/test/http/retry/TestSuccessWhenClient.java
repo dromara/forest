@@ -2,6 +2,7 @@ package com.dtflys.test.http.retry;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.test.http.BaseClientTest;
@@ -38,8 +39,8 @@ public class TestSuccessWhenClient extends BaseClientTest {
     }
 
 
-    public TestSuccessWhenClient(HttpBackend backend) {
-        super(backend, configuration);
+    public TestSuccessWhenClient(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setVariableValue("port", server.getPort());
         successWhenClient = configuration.createInstance(SuccessWhenClient.class);
         successWhenClient2 = configuration.createInstance(SuccessWhenClient2.class);

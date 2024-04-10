@@ -163,10 +163,11 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
     }
 
     public HttpClient getHttpClient(final ForestRequest request, final LifeCycleHandler lifeCycleHandler) {
+        final ForestConfiguration configuration = request.getConfiguration();
         final String key = "hc;" + request.clientKey();
         final boolean canCacheClient = request.cacheBackendClient();
         if (canCacheClient) {
-            final HttpClient cachedClient = request.getRoute().getBackendClient(key);
+            final HttpClient cachedClient = configuration.getBackendClient(key);
             if (cachedClient != null) {
                 return cachedClient;
             }
@@ -189,7 +190,7 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
         }
         final HttpClient httpClient = provider.getClient(request, lifeCycleHandler);
         if (canCacheClient) {
-            request.getRoute().cacheBackendClient(key, httpClient);
+            configuration.putBackendClientToCache(key, httpClient);
         }
         return httpClient;
     }

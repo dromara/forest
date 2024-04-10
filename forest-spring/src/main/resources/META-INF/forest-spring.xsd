@@ -85,6 +85,16 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="backendClientCacheMaxSize" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[
+                           后端客户端对象缓存最大空间大小
+                        ]]>
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+
         <xsd:attribute name="timeout" type="xsd:string" use="optional">
             <xsd:annotation>
                 <xsd:documentation>

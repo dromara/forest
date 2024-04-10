@@ -2,6 +2,7 @@ package com.dtflys.test.http.proxy;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.ForestProxyType;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.test.http.BaseClientTest;
@@ -37,8 +38,8 @@ public class TestHTTPProxyClient extends BaseClientTest {
     }
 
 
-    public TestHTTPProxyClient(HttpBackend backend) {
-        super(backend, configuration);
+    public TestHTTPProxyClient(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setLogRequest(true);
         addressClient = configuration.createInstance(HTTPProxyClient.class);
         addressClient2 = configuration.createInstance(HTTPProxyClient2.class);

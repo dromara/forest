@@ -2,6 +2,7 @@ package com.dtflys.test.interceptor;
 
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.ForestHeader;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.logging.ForestLogger;
@@ -52,8 +53,8 @@ public class TestInterceptor extends BaseClientTest {
     public void afterRequests() {
     }
 
-    public TestInterceptor(HttpBackend backend) {
-        super(backend, configuration);
+    public TestInterceptor(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setVariableValue("port", server.getPort());
         interceptorClient = configuration.createInstance(InterceptorClient.class);
         baseInterceptorClient = configuration.createInstance(BaseInterceptorClient.class);

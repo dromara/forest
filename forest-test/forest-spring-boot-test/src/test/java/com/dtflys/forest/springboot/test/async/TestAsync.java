@@ -4,6 +4,7 @@ import com.dtflys.forest.annotation.BindingVar;
 import com.dtflys.forest.backend.AsyncHttpExecutor;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestAsyncAbortException;
+import com.dtflys.forest.springboot.test.BaseSpringBootTest;
 import com.dtflys.forest.springboot.test.address.TestAddress;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -26,7 +27,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest(classes = TestAddress.class)
 @ComponentScan(basePackages = "com.dtflys.forest.springboot.test.async")
 @EnableAutoConfiguration
-public class TestAsync {
+public class TestAsync extends BaseSpringBootTest {
 
     public final static String EXPECTED = "{\"status\": \"ok\"}";
 

@@ -156,6 +156,7 @@ public class TestForestJacksonConverter extends JSONConverter {
 
     @Test
     public void testJavaObjectToMap3() {
+        ForestJacksonConverter forestJacksonConverter = new ForestJacksonConverter();
         FormListParam param = new FormListParam();
         List<Integer> idList = Lists.newArrayList(1, 2, 3);
         param.setUsername("foo");
@@ -170,11 +171,21 @@ public class TestForestJacksonConverter extends JSONConverter {
         List<Cause> causes = Lists.newArrayList(cause1, cause2);
         param.setCause(causes);
 
-        Map map = ReflectUtils.convertObjectToMap(param, ForestConfiguration.configuration());
+        Map map = forestJacksonConverter.convertObjectToMap(param);
         assertEquals("foo", map.get("username"));
         assertEquals("123456", map.get("password"));
         assertEquals(idList, map.get("idList"));
-        assertEquals(causes, map.get("cause"));
+
+        List causesMapList = (List) map.get("cause");
+        assertEquals(2, causesMapList.size());
+
+        Map cause1Map = (Map) causesMapList.get(0);
+        assertEquals(1, cause1Map.get("id"));
+        assertEquals(87, cause1Map.get("score"));
+
+        Map cause2Map = (Map) causesMapList.get(1);
+        assertEquals(2, cause2Map.get("id"));
+        assertEquals(73, cause2Map.get("score"));
     }
 
 

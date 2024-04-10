@@ -1,5 +1,6 @@
 package com.dtflys.test.converter;
 
+import com.dtflys.forest.converter.json.ForestFastjson2Converter;
 import com.dtflys.forest.converter.json.ForestFastjsonConverter;
 import com.dtflys.forest.converter.json.ForestJacksonConverter;
 import com.dtflys.test.http.model.Cause;
@@ -24,6 +25,7 @@ import java.util.Map;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -175,6 +177,32 @@ public class TestGsonConverter extends JSONConverter {
         assertEquals("11.11111", map.get("longitude"));
         assertEquals("22.22222", map.get("latitude"));
     }
+
+    @Test
+    public void testJavaObjectToMap3() {
+        FormListParam param = new FormListParam();
+        List<Integer> idList = Lists.newArrayList(1, 2, 3);
+        param.setUsername("foo");
+        param.setPassword("123456");
+        param.setIdList(idList);
+        Cause cause1 = new Cause();
+        cause1.setId(1);
+        cause1.setScore(87);
+        Cause cause2 = new Cause();
+        cause2.setId(2);
+        cause2.setScore(73);
+        List<Cause> causes = Lists.newArrayList(cause1, cause2);
+        param.setCause(causes);
+
+        ForestGsonConverter gsonConverter = new ForestGsonConverter();
+        Map map = gsonConverter.convertObjectToMap(param);
+        assertEquals("foo", map.get("username"));
+        assertEquals("123456", map.get("password"));
+        assertEquals(idList, map.get("idList"));
+//        assertThat(map.get("cause")).isEqualTo(causes);
+//        assertEquals(causes, map.get("cause"));
+    }
+
 
 
     @Test

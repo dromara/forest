@@ -1,6 +1,7 @@
 package com.dtflys.forest.springboot3.test.address;
 
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.springboot3.test.BaseSpringBootTest;
 import jakarta.annotation.Resource;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -11,17 +12,19 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@RunWith(SpringRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("addresssource")
-@SpringBootTest(classes = TestAddressSource.class)
+@SpringBootTest
+@ContextConfiguration(classes = TestAddressSource.class)
 @ComponentScan(basePackages = "com.dtflys.forest.springboot3.test.address")
 @EnableAutoConfiguration
-public class TestAddressSource {
+public class TestAddressSource extends BaseSpringBootTest {
 
     public final static String EXPECTED = "{\"status\": \"ok\"}";
 

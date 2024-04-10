@@ -13,7 +13,8 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.assertTrue;
 
@@ -22,11 +23,12 @@ import static org.junit.Assert.assertTrue;
  * @since 2021-03-30
  **/
 @ActiveProfiles("test1")
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = TestConverterBeanListener.class)
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest
+@ContextConfiguration(classes = TestConverterBeanListener.class)
 @ComponentScan(basePackageClasses = ConverterTestConfiguration.class)
 @EnableAutoConfiguration
-public class TestConverterBeanListener {
+public class TestConverterBeanListener extends BaseSpringBootTest {
 
     @Resource
     private ForestConfiguration forestConfiguration;

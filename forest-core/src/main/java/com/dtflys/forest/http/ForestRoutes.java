@@ -1,7 +1,10 @@
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.utils.ForestCache;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Forest路由集合
@@ -11,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ForestRoutes {
 
-    private final static Map<String, ForestRoute> routes = new ConcurrentHashMap<>();
+    private final static ForestCache<String, ForestRoute> routes = new ForestCache<>(512);
 
     /**
      * 获取或创建路由

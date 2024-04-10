@@ -19,7 +19,7 @@ public class DefaultObjectFactory implements ForestObjectFactory {
     /**
      * 框架中各种对象的构造方法
      */
-    private Map<Class<?>, ObjectConstructor> constructorMap = new ConcurrentHashMap<>();
+    private final Map<Class<?>, ObjectConstructor> constructorMap = new ConcurrentHashMap<>();
 
     /**
      * 从缓存获取Forest接口对象实例
@@ -44,7 +44,7 @@ public class DefaultObjectFactory implements ForestObjectFactory {
      * @return Forest对象实例
      */
     @Override
-    public <T> T getObject(Class<T> clazz) {
+    public <T> T getObject(final Class<T> clazz) {
         if (clazz == null) {
             return null;
         }
@@ -53,7 +53,7 @@ public class DefaultObjectFactory implements ForestObjectFactory {
             return (T) obj;
         }
 
-        ObjectConstructor<T> constructor = constructorMap.get(clazz);
+        final ObjectConstructor<T> constructor = constructorMap.get(clazz);
         if (constructor != null) {
             obj = constructor.construct();
             if (obj != null) {
@@ -62,14 +62,12 @@ public class DefaultObjectFactory implements ForestObjectFactory {
             }
         }
         try {
-            if(!clazz.isInterface()){
+            if (!clazz.isInterface()) {
                 obj = clazz.newInstance();
                 forestObjectCache.put(clazz, obj);
                 return (T) obj;
             }
-        } catch (InstantiationException e) {
-            throw new ForestRuntimeException(e);
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new ForestRuntimeException(e);
         }
         return null;

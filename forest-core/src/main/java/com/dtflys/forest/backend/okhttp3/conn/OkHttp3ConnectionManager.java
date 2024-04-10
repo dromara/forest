@@ -1,6 +1,7 @@
 package com.dtflys.forest.backend.okhttp3.conn;
 
 import com.dtflys.forest.backend.ForestConnectionManager;
+import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.backend.SocksAuthenticator;
 import com.dtflys.forest.backend.httpclient.HttpClientProvider;
 import com.dtflys.forest.backend.okhttp3.OkHttp3Backend;
@@ -223,11 +224,15 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
         }
     }
 
+
+
+
     public OkHttpClient getClient(ForestRequest request, LifeCycleHandler lifeCycleHandler) {
+        final ForestConfiguration configuration = request.getConfiguration();
         final String key = "ok;" + request.clientKey();
         final boolean canCacheClient = request.cacheBackendClient() && !request.isDownloadFile();
         if (canCacheClient) {
-            final OkHttpClient cachedClient = request.getRoute().getBackendClient(key);
+            final OkHttpClient cachedClient = configuration.getBackendClient(key);
             if (cachedClient != null) {
                 return cachedClient;
             }
@@ -250,7 +255,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
         }
         final OkHttpClient newClient = provider.getClient(request, lifeCycleHandler);
         if (canCacheClient) {
-            request.getRoute().cacheBackendClient(key, newClient);
+            configuration.putBackendClientToCache(key, newClient);
         }
         return newClient;
     }

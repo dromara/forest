@@ -34,8 +34,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcessor {
 
@@ -109,6 +111,8 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
                 .addPropertyValue("logResponseContent", forestConfigurationProperties.isLogResponseContent())
                 .addPropertyValue("logHandler", logHandler)
                 .addPropertyValue("backendName", forestConfigurationProperties.getBackend())
+                .addPropertyValue("backendClientCacheMaxSize", forestConfigurationProperties.getBackendClientCacheMaxSize())
+                .addPropertyValue("backendClientCacheExpireTime", forestConfigurationProperties.getBackendClientCacheExpireTime())
                 .addPropertyValue("baseAddressScheme", forestConfigurationProperties.getBaseAddressScheme())
                 .addPropertyValue("baseAddressHost", forestConfigurationProperties.getBaseAddressHost())
                 .addPropertyValue("baseAddressPort", forestConfigurationProperties.getBaseAddressPort())
@@ -178,7 +182,11 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
             ForestConverter converter = null;
             try {
                 Constructor<?>[] constructors = type.getConstructors();
-                for (Constructor<?> constructor : constructors) {
+                List<Constructor<?>> sortedConstructs = Arrays.stream(constructors)
+                        .sorted((cons1, cons2) -> cons1.getParameterCount() < cons2.getParameterCount() ? 1 : -1)
+                        .collect(Collectors.toList());
+
+                for (Constructor<?> constructor : sortedConstructs) {
                     Parameter[] params = constructor.getParameters();
                     if (params.length == 0) {
                         converter = (ForestConverter) constructor.newInstance(new Object[0]);
@@ -192,6 +200,19 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
                                 args[i] = configuration;
                             } else if (DefaultAutoConverter.class.isAssignableFrom(pType)) {
                                 args[i] = configuration.getConverter(ForestDataType.AUTO);
+                            } else {
+                                Object instance = configuration.getForestObject(pType);
+                                if (instance == null) {
+                                    try {
+                                        Constructor cons = pType.getConstructor();
+                                        if (cons != null) {
+                                            instance = cons.newInstance();
+                                        }
+                                    } catch (NoSuchMethodException e) {
+                                        continue;
+                                    }
+                                }
+                                args[i] = instance;
                             }
                         }
                         converter = (ForestConverter) constructor.newInstance(args);

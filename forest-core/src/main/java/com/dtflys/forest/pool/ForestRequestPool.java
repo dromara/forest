@@ -16,9 +16,9 @@ public interface ForestRequestPool {
 
     int DEFAULT_QUEUE_SIZE = 32;
 
-    void awaitRequest(ForestRequest request);
+    void awaitRequest(final ForestRequest request);
 
-    void finish(ForestRequest request);
+    void finish(final ForestRequest request);
 
     Integer getRunningPoolSize();
 

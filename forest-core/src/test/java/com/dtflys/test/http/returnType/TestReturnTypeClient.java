@@ -2,6 +2,7 @@ package com.dtflys.test.http.returnType;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.test.http.BaseClientTest;
 import okhttp3.mockwebserver.MockResponse;
@@ -29,8 +30,8 @@ public class TestReturnTypeClient extends BaseClientTest {
     }
 
 
-    public TestReturnTypeClient(HttpBackend backend) {
-        super(backend, configuration);
+    public TestReturnTypeClient(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setVariableValue("port", server.getPort());
         returnTypeClient = configuration.client(ReturnTypeClient.class);
     }

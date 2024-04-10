@@ -2,6 +2,7 @@ package com.dtflys.test.http;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.test.http.client.OAuth2Client;
 import com.dtflys.test.mock.OAuth2MockServer;
 import org.junit.Before;
@@ -24,8 +25,8 @@ public class TestOAuth2Client extends BaseClientTest {
 
     private static OAuth2Client oAuth2Client;
 
-    public TestOAuth2Client(HttpBackend backend) {
-        super(backend, configuration);
+    public TestOAuth2Client(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setVariableValue("port", server.getPort());
         oAuth2Client = configuration.createInstance(OAuth2Client.class);
     }

@@ -2,6 +2,7 @@ package com.dtflys.test.http;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.test.http.client.GetWithBodyClient;
 import com.dtflys.test.mock.GetWithBodyMockServer;
 import org.junit.Before;
@@ -35,8 +36,8 @@ public class TestGetWithBodyClient extends BaseClientTest {
     public void afterRequests() {
     }
 
-    public TestGetWithBodyClient(HttpBackend backend) {
-        super(backend, configuration);
+    public TestGetWithBodyClient(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setVariableValue("port", server.getPort());
         getWithBodyClient = configuration.createInstance(GetWithBodyClient.class);
     }

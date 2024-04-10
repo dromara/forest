@@ -2,6 +2,7 @@ package com.dtflys.test.http.gzip;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.reflection.BasicVariableValue;
 import com.dtflys.test.http.BaseClientTest;
@@ -43,8 +44,8 @@ public class GzipClientTest extends BaseClientTest {
     public void afterRequests() {
     }
 
-    public GzipClientTest(HttpBackend backend) {
-        super(backend, configuration);
+    public GzipClientTest(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setVariableValue("port", server.getPort());
         gzipClient = configuration.createInstance(GzipClient.class);
         gzipClient2 = configuration.createInstance(GzipClient2.class);

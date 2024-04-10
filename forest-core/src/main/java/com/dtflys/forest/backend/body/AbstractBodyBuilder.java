@@ -27,7 +27,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
     /**
      * 构建请求体
      * @param httpRequest 后端http请求对象
-     * @param request Forest请求对象
+     * @param request Forest请Cont求对象
      * @param lifeCycleHandler 生命周期处理器
      */
     @Override

@@ -2,6 +2,7 @@ package com.dtflys.test.http;
 
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.ForestCookie;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.test.http.client.CookieClient;
@@ -44,8 +45,8 @@ public class TestCookieClient extends BaseClientTest {
     public void afterRequests() {
     }
 
-    public TestCookieClient(HttpBackend backend) {
-        super(backend, configuration);
+    public TestCookieClient(String backend, String jsonConverter) {
+        super(backend, jsonConverter, configuration);
         configuration.setVariableValue("port", server.getPort());
         cookieClient = configuration.createInstance(CookieClient.class);
     }

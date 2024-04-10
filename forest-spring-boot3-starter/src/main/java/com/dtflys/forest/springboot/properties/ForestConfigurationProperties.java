@@ -14,6 +14,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Role;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -164,6 +165,16 @@ public class ForestConfigurationProperties {
      * </ul>
      */
     private String backend = "okhttp3";
+
+    /**
+     * Max size of backend client cache
+     */
+    private Integer backendClientCacheMaxSize = 128;
+
+        /**
+     * Expire time of backend client cache
+     */
+    private Duration backendClientCacheExpireTime;
 
     /**
      * global variables
@@ -429,6 +440,22 @@ public class ForestConfigurationProperties {
 
     public void setBackend(String backend) {
         this.backend = backend;
+    }
+
+    public Integer getBackendClientCacheMaxSize() {
+        return backendClientCacheMaxSize;
+    }
+
+    public void setBackendClientCacheMaxSize(Integer backendClientCacheMaxSize) {
+        this.backendClientCacheMaxSize = backendClientCacheMaxSize;
+    }
+
+    public Duration getBackendClientCacheExpireTime() {
+        return backendClientCacheExpireTime;
+    }
+
+    public void setBackendClientCacheExpireTime(Duration backendClientCacheExpireTime) {
+        this.backendClientCacheExpireTime = backendClientCacheExpireTime;
     }
 
     public Map<String, Object> getVariables() {

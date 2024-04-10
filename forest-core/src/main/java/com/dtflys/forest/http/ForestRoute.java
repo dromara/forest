@@ -1,10 +1,13 @@
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.backend.HttpBackend;
+import com.dtflys.forest.utils.ForestCache;
 import com.dtflys.forest.utils.TimeUtils;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -25,10 +28,6 @@ public class ForestRoute {
      */
     private final int port;
 
-    /**
-     * 后端客户端对象缓存
-     */
-    private final Map<String, Object> backendClientCache = new ConcurrentHashMap<>();
 
     /**
      * 当前的路由请求数
@@ -86,28 +85,4 @@ public class ForestRoute {
 
 
 
-    /**
-     * 从缓存中获取后端客户端对象
-     *
-     * @param key 缓存的Key
-     * @param <T> 后端客户端对象类型
-     * @return 后端客户端对象
-     */
-    public <T> T getBackendClient(String key) {
-        final Object client = backendClientCache.get(key);
-        if (client != null) {
-            return (T) client;
-        }
-        return null;
-    }
-
-    /**
-     * 缓存后端客户端对象
-     *
-     * @param key 缓存的Key
-     * @param client 后端客户端对象
-     */
-    public void cacheBackendClient(String key, Object client) {
-        backendClientCache.put(key, client);
-    }
 }

@@ -1,9 +1,15 @@
 package com.dtflys.test;
 
+import com.alibaba.fastjson2.TypeReference;
+import com.alibaba.fastjson2.util.TypeUtils;
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.http.ForestAddress;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.test.model.Contact;
 import org.junit.Test;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -21,6 +27,20 @@ public class TestRequest {
         assertThat(request.host()).isEqualTo("127.0.0.1");
         assertThat(request.port()).isEqualTo(8080);
         assertThat(request.getPath()).isEqualTo("/xxx/yyy");
+    }
+
+    @Test
+    public void testJson2() {
+        Contact contact = new Contact();
+        contact.setName("Marry");
+        contact.setAge(20);
+        contact.setPhone("88888888");
+
+        Map<String, Object> map = TypeUtils.cast(contact, new TypeReference<LinkedHashMap<String, Object>>() {}.getType());
+        System.out.println(map);
+
+        map = TypeUtils.cast(map, new TypeReference<LinkedHashMap<String, Object>>() {}.getType());
+        System.out.println(map);
     }
 
     @Test

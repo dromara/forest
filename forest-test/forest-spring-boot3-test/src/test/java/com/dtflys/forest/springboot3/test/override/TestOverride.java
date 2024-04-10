@@ -1,6 +1,7 @@
 package com.dtflys.forest.springboot3.test.override;
 
 import com.dtflys.forest.annotation.BindingVar;
+import com.dtflys.forest.springboot3.test.BaseSpringBootTest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.Rule;
@@ -10,18 +11,20 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import jakarta.annotation.Resource;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@RunWith(SpringRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("test2")
-@SpringBootTest(classes = TestOverride.class)
+@SpringBootTest
+@ContextConfiguration(classes = TestOverride.class)
 @ComponentScan(basePackages = "com.dtflys.forest.springboot3.test.override")
 @EnableAutoConfiguration
-public class TestOverride {
+public class TestOverride extends BaseSpringBootTest {
 
     public final static String EXPECTED = "{\"status\": \"ok\"}";
 
