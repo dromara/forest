@@ -24,8 +24,8 @@
         <versions-plugin.version>2.1</versions-plugin.version>
         <slf4j.version>1.7.30</slf4j.version>
         <logback.version>1.2.11</logback.version>
-        <kotlin.version>1.6.20</kotlin.version>
-        <kotlinx.version>1.6.2</kotlinx.version>
+        <kotlin.version>1.9.23</kotlin.version>
+        <kotlinx.version>1.7.3</kotlinx.version>
 
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
     </properties>
