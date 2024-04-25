@@ -24,7 +24,6 @@
 
 package com.dtflys.forest.http;
 
-import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.auth.BasicAuth;
 import com.dtflys.forest.auth.ForestAuthenticator;
 import com.dtflys.forest.backend.ContentType;
@@ -82,14 +81,13 @@ import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.TimeUtils;
 import com.dtflys.forest.utils.TypeReference;
-import com.dtflys.forest.utils.URLUtils;
+import com.dtflys.forest.utils.Validations;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import java.io.File;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
@@ -110,6 +108,8 @@ import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.dtflys.forest.mapping.MappingParameter.TARGET_BODY;
@@ -493,6 +493,28 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         this(configuration, null, arguments);
     }
 
+
+    public ForestRequest<T> cond(boolean condition, Consumer<ForestRequest<?>> consumer) {
+        if (condition) {
+            consumer.accept(this);
+        }
+        return this;
+    }
+
+
+    public ForestRequestConditionWrapper<T> ifThen(boolean condition, Consumer<ForestRequest<?>> consumer) {
+        if (condition) {
+            consumer.accept(this);
+        }
+        return new ForestRequestConditionWrapper<>(this, condition);
+    }
+
+
+    public ForestRequestConditionWrapper<T> ifThen(Function<ForestRequest<?>, Boolean> conditionFunc, Consumer<ForestRequest<?>> consumer) {
+        Validations.assertParamNotNull(conditionFunc, "conditionFunc");
+        return ifThen(conditionFunc.apply(this), consumer);
+    }
+
     /**
      * 获取该请求的配置对象
      *
@@ -501,6 +523,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     public ForestConfiguration getConfiguration() {
         return configuration;
     }
+
 
     /**
      * 获取请求协议
@@ -861,6 +884,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     public int port() {
         return getPort();
     }
+
+
 
 
     /**
@@ -1388,6 +1413,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     public String queryString() {
         return getQueryString();
     }
+
+
 
     /**
      * 添加请求中的Query参数
@@ -3301,7 +3328,6 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     }
 
 
-
     /**
      * 添加请求头到该请求中
      *
@@ -3334,6 +3360,17 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         }
         this.headers.setHeader(name, value);
         return this;
+    }
+
+
+    /**
+     * 添加请求头到该请求中
+     *
+     * @param nameValue 请求头键值对，{@link RequestNameValue}类实例
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequestConditionWrapper<T> ifThenHeader(boolean condition, RequestNameValue nameValue) {
+        return ifThen(condition, q -> q.addHeader(nameValue));
     }
 
     /**
@@ -4081,6 +4118,22 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
 
     /**
      * 获取请求所绑定到的变量值
+     *
+     * @param name 变量名
+     * @param clazz 返回类型
+     * @return 变量名
+     * @param <R> 返回类型
+     */
+    public <R> R getVariableValue(String name, Class<R> clazz) {
+        final Object result = getVariableValue(name);
+        if (result == null) {
+            return null;
+        }
+        return clazz.cast(result);
+    }
+
+    /**
+     * 获取请求所绑定到的变量值
      * <p>同 {@link ForestRequest#getVariableValue(String)}
      *
      * @param name 变量名
@@ -4335,7 +4388,27 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return 附件值
      */
     public Object getAttachment(String name) {
+        Validations.assertParamNotNull(name, "name");
         return attachments.get(name);
+    }
+
+
+        /**
+     * 根据名称获取该请求中的附件
+     * <p>Attachment 是和请求绑定的附件属性值，这些值不能通过网络请求传递到远端服务器。</p>
+     * <p>不同请求的附件相互独立，即使名称相同，也互不影响。</p>
+     *
+     * @param name 附件名
+     * @return 附件值
+     */
+    public <R> R getAttachment(String name, Class<R> clazz) {
+        Validations.assertParamNotNull(name, "name");
+        Validations.assertParamNotNull(clazz, "clazz");
+        final Object result = attachments.get(name);
+        if (result == null) {
+            return null;
+        }
+        return clazz.cast(result);
     }
 
     /**

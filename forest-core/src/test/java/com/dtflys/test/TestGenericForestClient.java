@@ -1,16 +1,13 @@
 package com.dtflys.test;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.auth.BasicAuth;
 import com.dtflys.forest.backend.ContentType;
-import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestEncoder;
-import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestAddress;
 import com.dtflys.forest.http.ForestAsyncMode;
@@ -36,6 +33,7 @@ import com.dtflys.test.http.BaseClientTest;
 import com.dtflys.test.http.model.UserParam;
 import com.dtflys.test.model.Result;
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okio.Buffer;
@@ -51,6 +49,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
@@ -69,11 +68,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.in;
 
 public class TestGenericForestClient extends BaseClientTest {
 
@@ -2167,6 +2168,115 @@ public class TestGenericForestClient extends BaseClientTest {
         assertThat(proxy.getPassword()).isEqualTo("123456");
     }
 
+
+
+    @Test
+    public void testIfThen() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(EXPECTED));
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(EXPECTED));
+
+        int a = 1;
+        Forest.get("/test")
+                .port(server.getPort())
+                .host("localhost")
+                .addHeader("A", 0)
+                .ifThen(a > 0, q -> q.addHeader("A", a + 1))
+                .endIf()
+                .execute();
+
+        mockRequest(server)
+                .assertHeaderEquals("A", "2");
+
+
+        int b = 0;
+        Forest.get("/test")
+                .port(server.getPort())
+                .host("localhost")
+                .addHeader("B", -1)
+                .ifThen(b > 0, q -> q.addHeader("B", b + 1))
+                .endIf()
+                .execute();
+
+        mockRequest(server)
+                .assertHeaderEquals("B", "-1");
+    }
+
+
+    @Test
+    public void testIfThenElse() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(EXPECTED));
+
+        int a = -1;
+        Forest.get("/test")
+                .port(server.getPort())
+                .host("localhost")
+                .addHeader("A", 0)
+                .ifThen(a > 0, q -> q.addHeader("A", a + 1))
+                .elseThen(q -> q.addHeader("A", 10))
+                .execute();
+
+        mockRequest(server)
+                .assertHeaderEquals("A", "10");
+    }
+
+
+    @Test
+    public void testElseIfThen() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(EXPECTED));
+        int a = -1;
+        int b = 110;
+        int c = 220;
+        Forest.get("/test")
+                .port(server.getPort())
+                .host("localhost")
+                .addHeader("A", 0)
+                .cond(b > 100, q -> q.addHeader("B", 100))
+                .cond(c > 200, q -> q.addHeader("C", 200))
+                .ifThen(a > 0, q -> q.addHeader("A", a + 1))
+                .elseIfThen(a == 0, q -> q.addHeader("A", 0))
+                .elseIfThen(a == -1, q -> q.addHeader("A", -1))
+                .elseIfThen(a == -2, q -> q.addHeader("A", -2))
+                .elseThen(q -> q.addHeader("A", 10))
+                .execute();
+
+        mockRequest(server)
+                .assertHeaderEquals("A", "-1")
+                .assertHeaderEquals("B", "100")
+                .assertHeaderEquals("C", "200");;
+    }
+
+    @Test
+    public void testIfThenLambda() {{
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(EXPECTED));
+        int a = -1;
+        Forest.get("/test")
+                .addAttachment("a", -2)
+                .port(server.getPort())
+                .host("localhost")
+                .addHeader("A", 0)
+                .ifThen(a < 0, q -> q.addHeader("A", q.getAttachment("a", Integer.class)))
+                .elseIfThen(a == -1, q -> q.addHeader("A", a))
+                .endIf()
+                .execute();
+
+        mockRequest(server)
+                .assertHeaderEquals("A", "-2");
+    }
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(EXPECTED));
+        int a = -1;
+        Forest.get("/test")
+                .addAttachment("a", a)
+                .port(server.getPort())
+                .host("localhost")
+                .addHeader("A", 0)
+                .ifThen(q -> q.getAttachment("a", Integer.class) < 0,
+                        q -> q.addHeader("A", a))
+                .endIf()
+                .execute();
+
+        mockRequest(server)
+                .assertHeaderEquals("A", "-1");
+    }
 
 
 /*

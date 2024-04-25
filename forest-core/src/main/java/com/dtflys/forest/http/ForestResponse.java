@@ -40,6 +40,7 @@ import java.lang.reflect.Type;
 import java.net.SocketTimeoutException;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Forest请求响应类
@@ -369,6 +370,16 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
             }
         }
         return result;
+    }
+
+
+    public ForestResponse<T> consumeStream(Consumer<InputStream> consumer) {
+        try (InputStream in = getInputStream()) {
+            consumer.accept(in);
+        } catch (Exception e) {
+            throw new ForestRuntimeException(e);
+        }
+        return this;
     }
 
     /**
