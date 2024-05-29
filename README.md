@@ -404,33 +404,105 @@ String send(@DataVariable("username") String username);
 他们在用
 -----------------------------------
 已在使用Forest的公司列表（排名不分先后）
-<table>
-<tr>
-<td><img height="60px" src="doc/images/logo/logo_thebeastshop.jpg" alt="野兽派花店"></td>
-<td><img height="60px" src="doc/images/logo/logo_geely.png" alt="吉利集团"></td>
-<td><img height="60px" src="doc/images/logo/logo_woshipm.png" alt="人人都是产品经理"></td>
-<td><img height="60px" src="doc/images/logo/logo_gzsunrun.jpg" alt="广州尚融网络科技"></td>
-<td><img height="60px" src="doc/images/logo/logo_tldt.png" alt="神州通立电梯"></td>
-</tr>
-<tr>
-<td><img height="60px" src="doc/images/logo/logo_weidubim.png" alt="成都万智维度"></td>
-<td><img height="60px" src="doc/images/logo/logo_ictbda.jpg" alt="中科院计算所大数据研究院"></td>
-<td><img height="60px" src="doc/images/logo/logo_yiring.png" alt="长沙壹润"></td>
-<td><img height="60px" src="doc/images/logo/logo_huafangzhilian.png" alt="山东华方智联科技"></td>
-<td><img height="60px" src="doc/images/logo/logo_hzqianqi.png" alt="杭州仟奇"></td>
-</tr>
-<tr>
-<td><img height="60px" src="doc/images/logo/logo_byai.png" alt="浙江百应"></td>
-<td><img height="60px" src="doc/images/logo/logo_datapps.png" alt="北京聚云位智"></td>
-<td><img height="60px" src="doc/images/logo/logo_hibobi.png" alt="杭州嗨宝贝"></td>
-<td><img height="60px" src="doc/images/logo/logo_hyperchain.png" alt="杭州趣链"></td>
-<td><img height="60px" src="doc/images/logo/logo_ue-one.png" alt="重庆源一科技"></td>
-</tr>
-<tr>
-<td><img height="60px" src="doc/images/logo/logo_manyibar.png" alt="满意吧"></td>
-</tr>
+<div>
+    <table class="user_logo">
+        <tr>
+            <td><a href="https://www.huawei.com/cn/" target="_blank"><div class="logo_box" style="background-color: #ffffff"><img height="50px" src="/doc/images/logo/logo_huawei.png" class="no-zoom" alt="华为"></div></a></td>
+            <td><a href="https://www.thebeastshop.com/" target="_blank"><div class="logo_box" style="background-color: #ffffff"><img height="50px" src="/doc/images/logo/logo_thebeastshop.jpg" class="no-zoom" alt="野兽派花店"></div></a></td>
+            <td><a href="https://zgh.com/" target="_blank"><div class="logo_box" style="background-color: #ffffff"><img height="50px" src="/doc/images/logo/logo_geely.png" class="no-zoom" alt="吉利集团"></div></a></td>
+        </tr>
+        <tr>
+            <td><a href="https://www.ictbda.com/" target="_blank"><div class="logo_box" style="background-color: #ffffff"><img src="/doc/images/logo/logo_ictbda.png" class="no-zoom" alt="中科院计算所大数据研究院"></div></a></td>
+            <td><a href="https://www.woshipm.com/" target="_blank"><div class="logo_box1" style="background-color: #4470f5"><img src="/doc/images/logo/logo_woshipm.webp" class="no-zoom" alt="人人都是产品经理"></div></a></td>
+            <td><a href="http://tldt.net/" target="_blank"><div class="logo_box" style="background-color: #1590d6;"><img src="/doc/images/logo/logo_tldt.png" class="no-zoom" alt="神州通立电梯"></div></a></td>
+        </tr>
+        <tr>
+            <td><a href="https://weidubim.com/" target="_blank"><div class="logo_box" style="background-color: #222222;"><img height="50px" src="/doc/images/logo/logo_weidubim.png" class="no-zoom" alt="万智维度"></div></a></td>
+            <td><a href="https://www.yiring.com/" target="_blank"><div class="logo_box0" style="background-color: #ffffff"><img src="/doc/images/logo/logo_yiring.png" class="no-zoom" alt="壹润"></div></a></td>
+            <td><a href="http://gzsunrun.cn/" target="_blank"><div class="logo_box" style="background-color: #ffffff"><img height="50px" src="/doc/images/logo/logo_gzsunrun.jpg" class="no-zoom" alt="尚融网络科技"></div></a></td>
+        </tr>
+        <tr>
+            <td><a href="https://www.huafang-aiot.com/" target="_blank"><div class="logo_box" style="background-color: #ffffff"><img src="/doc/images/logo/logo_huafangzhilian.png" class="no-zoom" alt="华方智联"></div></a></td>
+            <td><a href="https://www.hyperchain.cn/" target="_blank"><div class="logo_box" style="background-color: #ffffff"><img src="/doc/images/logo/logo_hyperchain.png" class="no-zoom" alt="趣链科技"></div></a></td>
+            <td><a href="https://www.byai.com/" target="_blank"><div class="logo_box" style="background-color: #2b58fa;"><img src="/doc/images/logo/logo_byai.png" class="no-zoom" alt="百应"></div></a></td>
+        </tr>
+        <tr>
+            <td><a href="http://www.datapps.cn/" target="_blank"><div class="logo_box0"><img src="/doc/images/logo/logo_datapps.png" class="no-zoom" alt="聚云位智"></div></a></td>
+            <td><a href="https://m.hibobi.com/" target="_blank"><div class="logo_box" style="background-color: #ffffff"><img src="/doc/images/logo/logo_hibobi.png" class="no-zoom" alt="嗨宝贝"></div></a></td>
+            <td><a href="https://hzqianqi.com/" target="_blank"><div class="logo_box" style="background-color: #ffffff"><img src="/doc/images/logo/logo_hzqianqi.png" class="no-zoom" alt="仟奇"></div></a></td>
+        </tr>
+        <tr>
+            <td><a href="https://www.swifthealth.cn/" target="_blank"><div class="logo_box" style="background-color: #ffffff;"><img src="/doc/images/logo/logo_swifthealth.png" class="no-zoom" alt="朝前智能"></div></a></td>
+            <td><a href="https://www.manyibar.com/" target="_blank"><div class="logo_box" style="background-color: #ffffff"><img src="/doc/images/logo/logo_manyibar.png" class="no-zoom" alt="满意吧"></div></a></td>
+            <td><a href="http://www.ue-one.com/" target="_blank"><div class="logo_box0"><img src="/doc/images/logo/logo_ue-one.png" class="no-zoom" alt="源一科技"></div></a></td>
+        </tr>
+        <tr>
+            <td><a href="https://www.xwsoft.com.cn/" target="_blank"><div class="logo_box" style="background-color: #333333;"><img src="/doc/images/logo/logo_xwsoft.png" class="no-zoom" alt="欣网视讯"></div></a></td>
+            <td><a href="http://www.ynjzh.com/" target="_blank"><div class="logo_box" style="background-color: #ffffff"><img src="/doc/images/logo/logo_ynjzh.png" class="no-zoom" alt="嘉之会科技"></div></a></td>
+            <td><a href="http://www.xingsnb.cn/" target="_blank"><div class="logo_box" style="background-color: #ffffff"><img height="50px" src="/doc/images/logo/logo_xingsnb.jpg" class="no-zoom" alt="星晟工程"></div></a></td>
+        </tr>
+    </table>
+</div>
 
-</table>
+
+<style>
+.user_logo {
+}
+
+.user_logo td {
+    width: 500px;
+}
+
+.user_logo a {
+    cursor: pointer;
+}
+
+.logo_box0 {
+    height: 60px;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+}
+
+.logo_box0 img {
+    height: 60px;
+}
+
+
+.logo_box1 {
+    height: 58px;
+    padding: 1px;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+}
+
+.logo_box1 img {
+    height: 56px;
+}
+
+
+
+.logo_box {
+    height: 50px;
+    padding: 5px;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+}
+
+.logo_box img {
+    height: 40px;
+}
+
+</style>
+
 
 参与贡献
 -----------------------------------
