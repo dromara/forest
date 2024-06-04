@@ -238,7 +238,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @since 1.5.28
      */
-    private ForestAuthenticator authenticator = new BasicAuth();
+    private ForestAuthenticator authenticator;
 
     /**
      * 是否打开自动重定向
@@ -312,7 +312,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * 参数表
      * <p>接口方法调用时传入的参数表
      */
-    private final Object[] arguments;
+    private Object[] arguments;
 
     /**
      * 回调函数：请求成功时调用
@@ -501,6 +501,23 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         return this;
     }
 
+    public ForestRequest<T> condNull(Object value, Consumer<ForestRequest<?>> consumer) {
+        return cond(value == null, consumer);
+    }
+
+    public ForestRequest<T> condEmpty(CharSequence value, Consumer<ForestRequest<?>> consumer) {
+        return cond(StringUtils.isEmpty(value), consumer);
+    }
+
+
+    public ForestRequest<T> condNotNull(Object value, Consumer<ForestRequest<?>> consumer) {
+        return cond(value != null, consumer);
+    }
+
+    public ForestRequest<T> condNotEmpty(CharSequence value, Consumer<ForestRequest<?>> consumer) {
+        return cond(StringUtils.isNotEmpty(value), consumer);
+    }
+
 
     public ForestRequestConditionWrapper<T> ifThen(boolean condition, Consumer<ForestRequest<?>> consumer) {
         if (condition) {
@@ -509,11 +526,30 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         return new ForestRequestConditionWrapper<>(this, condition);
     }
 
-
     public ForestRequestConditionWrapper<T> ifThen(Function<ForestRequest<?>, Boolean> conditionFunc, Consumer<ForestRequest<?>> consumer) {
         Validations.assertParamNotNull(conditionFunc, "conditionFunc");
         return ifThen(conditionFunc.apply(this), consumer);
     }
+
+
+    public ForestRequestConditionWrapper<T> ifNullThen(Object value, Consumer<ForestRequest<?>> consumer) {
+        return ifThen(value == null, consumer);
+    }
+
+    public ForestRequestConditionWrapper<T> ifNotNullThen(Object value, Consumer<ForestRequest<?>> consumer) {
+        return ifThen(value != null, consumer);
+    }
+
+
+    public ForestRequestConditionWrapper<T> ifEmptyThen(CharSequence value, Consumer<ForestRequest<?>> consumer) {
+        return ifThen(StringUtils.isEmpty(value), consumer);
+    }
+
+    public ForestRequestConditionWrapper<T> ifNotEmptyThen(CharSequence value, Consumer<ForestRequest<?>> consumer) {
+        return ifThen(StringUtils.isNotEmpty(value), consumer);
+    }
+
+
 
     /**
      * 获取该请求的配置对象
@@ -681,6 +717,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         if (StringUtils.isBlank(url)) {
             throw new ForestRuntimeException("[Forest] Request url cannot be empty!");
         }
+        arguments(args);
         final String srcUrl = StringUtils.trimBegin(url);
         MappingURLTemplate template = method.makeURLTemplate(null, null, srcUrl);
         return setUrl(template, args);
@@ -695,7 +732,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return {@link ForestRequest}对象实例
      */
     public ForestRequest<T> setUrl(String url) {
-        return setUrl(url, EMPTY_RENDER_ARGS);
+        return setUrl(url, arguments == null ? EMPTY_RENDER_ARGS : arguments);
     }
 
 
@@ -3204,6 +3241,14 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         return nameValueList;
     }
 
+    private ForestRequest<T> arguments(Object... args) {
+        this.arguments = new Object[args.length];
+        for (int i = 0; i < this.arguments.length; i++) {
+            this.arguments[i] = args[i];
+        }
+        return this;
+    }
+
     /**
      * 根据参数下标获取该请求对应方法的参数值
      *
@@ -4781,8 +4826,15 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         if (interceptorChain.beforeExecute(this)) {
             // 认证信息增强
             if (this.authenticator != null) {
-                this.authenticator.enhanceAuthorization(this);
+                for (ForestAuthenticator auth = this.authenticator; auth != null; auth = auth.next()) {
+                    auth.enhanceAuthorization(this);
+                }
             }
+            final String userInfo = getUserInfo();
+            if (StringUtils.isNotEmpty(userInfo) && getHeader("Authorization") == null) {
+                new BasicAuth(userInfo).enhanceAuthorization(this);
+            }
+
             this.url.mergeAddress().checkAndComplete();
             ForestCookies cookies = new ForestCookies();
             lifeCycleHandler.handleLoadCookie(this, cookies);
