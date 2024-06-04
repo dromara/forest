@@ -98,6 +98,7 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
             }
             final HttpClientBuilder builder = HttpClients.custom();
             builder.setConnectionManager(connectionManager.tsConnectionManager);
+            builder.setConnectionManagerShared(true);
 
             final RequestConfig.Builder configBuilder = RequestConfig.custom();
             // 超时时间
@@ -117,6 +118,8 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
             configBuilder.setConnectTimeout(connectTimeout);
             // 设置请求数据传输超时时间
             configBuilder.setSocketTimeout(readTimeout);
+
+            configBuilder.setConnectionRequestTimeout(connectTimeout);
             // 设置从连接池获取连接实例的超时
 //        configBuilder.setConnectionRequestTimeout(-1);
             // 在提交请求之前 测试连接是否可用

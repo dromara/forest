@@ -1017,6 +1017,70 @@ public class ForestMethod<T> implements VariableScope {
             request.setUserAgent(renderedUserAgent);
         }
 
+
+        for (final MappingTemplate headerTemplate : headerTemplateArray) {
+            final String header = headerTemplate.render(args);
+            final String[] headNameValue = header.split(":", 2);
+            if (headNameValue.length > 0) {
+                final String name = headNameValue[0].trim();
+                final RequestNameValue nameValue = new RequestNameValue(name, TARGET_HEADER);
+                if (headNameValue.length == 2) {
+                    nameValue.setValue(headNameValue[1].trim());
+                }
+                request.addHeader(nameValue);
+            }
+        }
+
+        if (timeout != null) {
+            request.setTimeout(timeout);
+        } else if (baseTimeout != null) {
+            request.setTimeout(baseTimeout);
+        } else if (configuration.getTimeout() != null) {
+            request.setTimeout(configuration.getTimeout());
+        }
+
+        if (connectTimeout != null) {
+            request.setConnectTimeout(connectTimeout);
+        } else if (baseConnectTimeout != null) {
+            request.setConnectTimeout(baseConnectTimeout);
+        } else if (configuration.getConnectTimeout() != null) {
+            request.setConnectTimeout(configuration.getConnectTimeout());
+        }
+
+        if (readTimeout != null) {
+            request.setReadTimeout(readTimeout);
+        } else if (baseReadTimeout != null) {
+            request.setReadTimeout(baseReadTimeout);
+        } else if (configuration.getReadTimeout() != null) {
+            request.setReadTimeout(configuration.getReadTimeout());
+        }
+
+        if (retryCount != null) {
+            request.setMaxRetryCount(retryCount);
+        } else if (baseRetryCount != null) {
+            request.setMaxRetryCount(baseRetryCount);
+        } else if (configuration.getMaxRetryCount() != null) {
+            request.setMaxRetryCount(configuration.getMaxRetryCount());
+        }
+
+        if (maxRetryInterval >= 0) {
+            request.setMaxRetryInterval(maxRetryInterval);
+        } else if (baseMaxRetryInterval != null) {
+            request.setMaxRetryInterval(baseMaxRetryInterval);
+        } else if (configuration.getMaxRetryInterval() >= 0) {
+            request.setMaxRetryInterval(configuration.getMaxRetryInterval());
+        }
+
+        final Class globalRetryerClass = configuration.getRetryer();
+
+        if (retryerClass != null && ForestRetryer.class.isAssignableFrom(retryerClass)) {
+            request.setRetryer(retryerClass);
+        } else if (baseRetryerClass != null && ForestRetryer.class.isAssignableFrom(baseRetryerClass)) {
+            request.setRetryer(baseRetryerClass);
+        } else if (globalRetryerClass != null && ForestRetryer.class.isAssignableFrom(globalRetryerClass)) {
+            request.setRetryer(globalRetryerClass);
+        }
+
         for (int i = 0; i < namedParameters.size(); i++) {
             final MappingParameter parameter = namedParameters.get(i);
             if (parameter.isObjectProperties()) {
@@ -1294,68 +1358,6 @@ public class ForestMethod<T> implements VariableScope {
         }
         request.addNameValue(nameValueList);
 
-        for (final MappingTemplate headerTemplate : headerTemplateArray) {
-            final String header = headerTemplate.render(args);
-            final String[] headNameValue = header.split(":", 2);
-            if (headNameValue.length > 0) {
-                final String name = headNameValue[0].trim();
-                final RequestNameValue nameValue = new RequestNameValue(name, TARGET_HEADER);
-                if (headNameValue.length == 2) {
-                    nameValue.setValue(headNameValue[1].trim());
-                }
-                request.addHeader(nameValue);
-            }
-        }
-
-        if (timeout != null) {
-            request.setTimeout(timeout);
-        } else if (baseTimeout != null) {
-            request.setTimeout(baseTimeout);
-        } else if (configuration.getTimeout() != null) {
-            request.setTimeout(configuration.getTimeout());
-        }
-
-        if (connectTimeout != null) {
-            request.setConnectTimeout(connectTimeout);
-        } else if (baseConnectTimeout != null) {
-            request.setConnectTimeout(baseConnectTimeout);
-        } else if (configuration.getConnectTimeout() != null) {
-            request.setConnectTimeout(configuration.getConnectTimeout());
-        }
-
-        if (readTimeout != null) {
-            request.setReadTimeout(readTimeout);
-        } else if (baseReadTimeout != null) {
-            request.setReadTimeout(baseReadTimeout);
-        } else if (configuration.getReadTimeout() != null) {
-            request.setReadTimeout(configuration.getReadTimeout());
-        }
-
-        if (retryCount != null) {
-            request.setMaxRetryCount(retryCount);
-        } else if (baseRetryCount != null) {
-            request.setMaxRetryCount(baseRetryCount);
-        } else if (configuration.getMaxRetryCount() != null) {
-            request.setMaxRetryCount(configuration.getMaxRetryCount());
-        }
-
-        if (maxRetryInterval >= 0) {
-            request.setMaxRetryInterval(maxRetryInterval);
-        } else if (baseMaxRetryInterval != null) {
-            request.setMaxRetryInterval(baseMaxRetryInterval);
-        } else if (configuration.getMaxRetryInterval() >= 0) {
-            request.setMaxRetryInterval(configuration.getMaxRetryInterval());
-        }
-
-        final Class globalRetryerClass = configuration.getRetryer();
-
-        if (retryerClass != null && ForestRetryer.class.isAssignableFrom(retryerClass)) {
-            request.setRetryer(retryerClass);
-        } else if (baseRetryerClass != null && ForestRetryer.class.isAssignableFrom(baseRetryerClass)) {
-            request.setRetryer(baseRetryerClass);
-        } else if (globalRetryerClass != null && ForestRetryer.class.isAssignableFrom(globalRetryerClass)) {
-            request.setRetryer(globalRetryerClass);
-        }
 
         if (onSuccessParameter != null) {
             OnSuccess<?> onSuccessCallback = (OnSuccess<?>) args[onSuccessParameter.getIndex()];

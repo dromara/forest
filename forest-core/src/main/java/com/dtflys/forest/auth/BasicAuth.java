@@ -11,7 +11,7 @@ import com.dtflys.forest.utils.StringUtils;
  * @author gongjun
  * @since 1.5.28
  */
-public class BasicAuth implements ForestAuthenticator {
+public class BasicAuth extends ForestAuthenticator {
 
     private String userInfo;
 
@@ -26,21 +26,32 @@ public class BasicAuth implements ForestAuthenticator {
         this.userInfo = username + ":" + password;
     }
 
+    public static BasicAuth user(final String username, final String password) {
+        return new BasicAuth(username, password);
+    }
 
-    public String userInfo() {
+    public static BasicAuth userInfo(final String userInfo) {
+        return new BasicAuth(userInfo);
+    }
+
+
+    public String setUserInfo() {
         return userInfo;
     }
 
-    public BasicAuth userInfo(final String userInfo) {
+    public BasicAuth setUserInfo(final String userInfo) {
         this.userInfo = userInfo;
         return this;
     }
 
-    public BasicAuth userInfo(final String username, final String password) {
+    public BasicAuth setUserInfo(final String username, final String password) {
         this.userInfo = username + ":" + password;
         return this;
     }
 
+    public String getUserInfo() {
+        return userInfo;
+    }
 
     @Override
     public void enhanceAuthorization(ForestRequest request) {
@@ -53,4 +64,5 @@ public class BasicAuth implements ForestAuthenticator {
             request.addHeader("Authorization", basic);
         }
     }
+
 }
