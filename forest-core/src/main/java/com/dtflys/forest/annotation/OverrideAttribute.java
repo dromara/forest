@@ -15,4 +15,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
 public @interface OverrideAttribute {
+
+    @AliasFor("name")
+    String value() default "";
+
+    @AliasFor("value")
+    String name() default "";
 }
