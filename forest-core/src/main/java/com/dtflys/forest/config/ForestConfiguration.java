@@ -1929,12 +1929,12 @@ public class ForestConfiguration implements Serializable {
      * @param url 请求 URL
      * @return {@link ForestRequest} 对象
      */
-    public ForestRequest<?> get(String url) {
+    public ForestRequest<?> get(String url, Object ...args) {
         return request()
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.GET)
-                .setUrl(url);
+                .setUrl(url, args);
 
     }
 
@@ -1944,12 +1944,12 @@ public class ForestConfiguration implements Serializable {
      * @param url 请求 URL
      * @return {@link ForestRequest} 对象
      */
-    public ForestRequest<?> post(String url) {
+    public ForestRequest<?> post(String url, Object ...args) {
         return request()
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.POST)
-                .setUrl(url);
+                .setUrl(url, args);
     }
 
     /**
@@ -1958,12 +1958,12 @@ public class ForestConfiguration implements Serializable {
      * @param url 请求 URL
      * @return {@link ForestRequest} 对象
      */
-    public ForestRequest<?> put(String url) {
+    public ForestRequest<?> put(String url, Object ...args) {
         return request()
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.PUT)
-                .setUrl(url);
+                .setUrl(url, args);
 
     }
 
@@ -1973,12 +1973,12 @@ public class ForestConfiguration implements Serializable {
      * @param url 请求 URL
      * @return {@link ForestRequest} 对象
      */
-    public ForestRequest<?> delete(String url) {
+    public ForestRequest<?> delete(String url, Object ...args) {
         return request()
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.DELETE)
-                .setUrl(url);
+                .setUrl(url, args);
 
     }
 
@@ -1988,12 +1988,12 @@ public class ForestConfiguration implements Serializable {
      * @param url 请求 URL
      * @return {@link ForestRequest} 对象
      */
-    public ForestRequest<?> head(String url) {
+    public ForestRequest<?> head(String url, Object ...args) {
         return request()
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.HEAD)
-                .setUrl(url);
+                .setUrl(url, args);
 
     }
 
@@ -2003,12 +2003,12 @@ public class ForestConfiguration implements Serializable {
      * @param url 请求 URL
      * @return {@link ForestRequest} 对象
      */
-    public ForestRequest<?> patch(String url) {
+    public ForestRequest<?> patch(String url, Object ...args) {
         return request()
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.PATCH)
-                .setUrl(url);
+                .setUrl(url, args);
     }
 
     /**
@@ -2017,12 +2017,12 @@ public class ForestConfiguration implements Serializable {
      * @param url 请求 URL
      * @return {@link ForestRequest} 对象
      */
-    public ForestRequest<?> options(String url) {
+    public ForestRequest<?> options(String url, Object ...args) {
         return request()
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.OPTIONS)
-                .setUrl(url);
+                .setUrl(url, args);
 
     }
 
@@ -2032,12 +2032,12 @@ public class ForestConfiguration implements Serializable {
      * @param url 请求 URL
      * @return {@link ForestRequest} 对象
      */
-    public ForestRequest<?> trace(String url) {
+    public ForestRequest<?> trace(String url, Object ...args) {
         return request()
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.TRACE)
-                .setUrl(url);
+                .setUrl(url, args);
     }
 
 
