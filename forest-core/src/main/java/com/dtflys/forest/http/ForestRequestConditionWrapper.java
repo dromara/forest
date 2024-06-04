@@ -1,5 +1,6 @@
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.Validations;
 
 import java.util.function.Consumer;
@@ -11,7 +12,7 @@ public class ForestRequestConditionWrapper<T> {
 
     private boolean endIf = false;
 
-    private Boolean condition;
+    private boolean condition;
 
 
     public ForestRequestConditionWrapper(ForestRequest<T> request, boolean condition) {
@@ -36,7 +37,7 @@ public class ForestRequestConditionWrapper<T> {
 
 
     public ForestRequestConditionWrapper<T> elseIfThen(boolean condition, Consumer<ForestRequest<?>> consumer) {
-        if (!endIf && this.condition != null && !this.condition && condition) {
+        if (!endIf && !this.condition && condition) {
             consumer.accept(request);
             endIf = true;
         }
@@ -50,9 +51,24 @@ public class ForestRequestConditionWrapper<T> {
         return elseIfThen(conditionFunc.apply(request), consumer);
     }
 
+    public ForestRequestConditionWrapper<T> elseIfNullThen(Object value, Consumer<ForestRequest<?>> consumer) {
+        return elseIfThen(value == null, consumer);
+    }
+
+    public ForestRequestConditionWrapper<T> elseIfNotNullThen(Object value, Consumer<ForestRequest<?>> consumer) {
+        return elseIfThen(value != null, consumer);
+    }
+
+    public ForestRequestConditionWrapper<T> elseIfEmptyThen(CharSequence value, Consumer<ForestRequest<?>> consumer) {
+        return elseIfThen(StringUtils.isEmpty(value), consumer);
+    }
+
+    public ForestRequestConditionWrapper<T> elseIfNotEmptyThen(CharSequence value, Consumer<ForestRequest<?>> consumer) {
+        return elseIfThen(StringUtils.isNotEmpty(value), consumer);
+    }
 
     public ForestRequest<T> elseThen(Consumer<ForestRequest<?>> consumer) {
-        if (!endIf && condition != null && !this.condition) {
+        if (!endIf && !this.condition) {
             consumer.accept(request);
         }
         return request;
