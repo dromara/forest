@@ -9,6 +9,7 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.converter.json.JSONConverterSelector;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import org.apache.commons.collections4.MapUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
@@ -306,7 +307,10 @@ public class ReflectUtils {
                 if (checkOverrideAttribute) {
                     OverrideAttribute overrideAttribute = method.getAnnotation(OverrideAttribute.class);
                     if (overrideAttribute != null) {
-                        results.put(name, value);
+                        final Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(overrideAttribute);
+                        final String attrNameFromMap = MapUtils.getString(attrs, "name");
+                        final String attrValue = StringUtils.isEmpty(attrNameFromMap) ? name : attrNameFromMap;
+                        results.put(attrValue, value);
                     }
                 } else {
                     results.put(name, value);
