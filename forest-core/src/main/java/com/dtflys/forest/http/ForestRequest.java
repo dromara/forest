@@ -3414,16 +3414,6 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @param nameValue 请求头键值对，{@link RequestNameValue}类实例
      * @return {@link ForestRequest}类实例
      */
-    public ForestRequestConditionWrapper<T> ifThenHeader(boolean condition, RequestNameValue nameValue) {
-        return ifThen(condition, q -> q.addHeader(nameValue));
-    }
-
-    /**
-     * 添加请求头到该请求中
-     *
-     * @param nameValue 请求头键值对，{@link RequestNameValue}类实例
-     * @return {@link ForestRequest}类实例
-     */
     public ForestRequest<T> addHeader(RequestNameValue nameValue) {
         this.addHeader(nameValue.getName(), nameValue.getValue());
         return this;
