@@ -28,6 +28,7 @@ public class MappingTemplate {
     protected List<MappingExpr> exprList;
     protected VariableScope variableScope;
     int readIndex = -1;
+    int argumentIndex = -1;
 
     private boolean isEnd(int index) {
         return index >= template.length() - 1;
@@ -237,10 +238,12 @@ public class MappingTemplate {
                 case ')':
                 case '}':
                     if (expr == null) {
-                        syntaxErrorWatch1(ch);
+                        return new MappingIndex(++argumentIndex);
                     }
                     if (expr instanceof MappingInteger) {
-                        return new MappingIndex(((MappingInteger) expr).getNumber());
+                        final int idx = ((MappingInteger) expr).getNumber();
+                        argumentIndex = idx;
+                        return new MappingIndex(argumentIndex);
                     }
                     if (expr instanceof MappingIdentity) {
                         return new MappingReference(forestMethod, variableScope, ((MappingIdentity) expr).getName());
