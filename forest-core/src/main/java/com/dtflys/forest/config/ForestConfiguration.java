@@ -66,6 +66,10 @@ import com.dtflys.forest.reflection.DefaultObjectFactory;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.ForestObjectFactory;
 import com.dtflys.forest.reflection.ForestVariableValue;
+import com.dtflys.forest.result.AfterExecuteResultTypeHandler;
+import com.dtflys.forest.result.ForestRequestResultHandler;
+import com.dtflys.forest.result.ResultTypeHandler;
+import com.dtflys.forest.result.ReturnOnInvokeMethodTypeHandler;
 import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.utils.ForestCache;
@@ -80,6 +84,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -339,6 +344,16 @@ public class ForestConfiguration implements Serializable {
     private Map<String, SSLKeyStore> sslKeyStores = new HashMap<>();
 
     /**
+     * 返回类型处理器列表: 调用接口方法时返回
+     */
+    private List<ReturnOnInvokeMethodTypeHandler<?>> returnOnInvokeMethodTypeHandlers = new LinkedList<>();
+
+    /**
+     * 返回类型处理器列表: 请求执行后返回
+     */
+    private List<AfterExecuteResultTypeHandler<?>> afterExecuteResultTypeHandlers = new LinkedList<>();
+
+    /**
      * Forest请求池
      */
     private ForestRequestPool pool;
@@ -415,6 +430,9 @@ public class ForestConfiguration implements Serializable {
         configuration.registerFilter("encodePath", EncodePathFilter.class);
         configuration.registerFilter("encodeQuery", EncodeQueryFilter.class);
         configuration.registerFilter("encodeForm", EncodeFormFilter.class);
+
+        configuration.registerResultTypeHandler(ForestRequestResultHandler.class);
+
         configuration.setLogHandler(new DefaultLogHandler());
         return configuration;
     }
@@ -1899,6 +1917,43 @@ public class ForestConfiguration implements Serializable {
         } catch (IllegalAccessException e) {
             throw new ForestRuntimeException("An error occurred the initialization of filter \"" + name + "\" ! cause: " + e.getMessage(), e);
         }
+    }
+
+
+    /**
+     * 注册返回类型处理器
+     *
+     * @param handler {@link ResultTypeHandler}实例
+     * @return 当前ForestConfiguration实例
+     * @since 1.6.0
+     */
+    public ForestConfiguration registerResultTypeHandler(ResultTypeHandler<?> handler) {
+        if (handler instanceof ReturnOnInvokeMethodTypeHandler) {
+            this.returnOnInvokeMethodTypeHandlers.add((ReturnOnInvokeMethodTypeHandler<?>) handler);
+        }
+        return this;
+    }
+
+    /**
+     * 注册返回类型处理器
+     *
+     * @param handlerClass 返回类型处理器类
+     * @return 当前ForestConfiguration实例
+     * @since 1.6.0
+     */
+    public ForestConfiguration registerResultTypeHandler(Class<? extends ResultTypeHandler<?>> handlerClass) {
+        final ResultTypeHandler<?> handlerInstance = this.getForestObjectFactory().getObject(handlerClass);
+        return registerResultTypeHandler(handlerInstance);
+    }
+
+    /**
+     * 获取返回类型处理器列表: 调用接口方法时返回
+     *
+     * @return 返回类型处理器列表 (调用接口方法时返回结果的处理器)
+     * @since 1.6.0
+     */
+    public List<ReturnOnInvokeMethodTypeHandler<?>> getReturnOnInvokeMethodTypeHandlers() {
+        return returnOnInvokeMethodTypeHandlers;
     }
 
     /**
