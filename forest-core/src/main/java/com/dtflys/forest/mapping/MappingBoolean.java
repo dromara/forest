@@ -10,9 +10,10 @@ public class MappingBoolean extends MappingExpr {
 
     private boolean value;
 
-    protected MappingBoolean(boolean value) {
+    protected MappingBoolean(boolean value, int startIndex, int endIndex) {
         super(null, Token.BOOLEAN);
         this.value = value;
+        setIndexRange(startIndex, endIndex);
     }
 
     public boolean isValue() {

@@ -21,10 +21,12 @@ public class MappingReference extends MappingExpr {
         ITERATE_VARS.add("_key");
     }
 
-    public MappingReference(ForestMethod<?> forestMethod, VariableScope variableScope, String name) {
+
+    public MappingReference(ForestMethod<?> forestMethod, VariableScope variableScope, String name, int startIndex, int endIndex) {
         super(forestMethod, Token.REF);
         this.variableScope = variableScope;
         this.name = name;
+        setIndexRange(startIndex, endIndex);
     }
 
     public String getName() {
@@ -38,7 +40,7 @@ public class MappingReference extends MappingExpr {
             return args[variable.getIndex()];
         }
         if (!variableScope.isVariableDefined(name)) {
-            throw new ForestVariableUndefinedException(name);
+            throw new ForestVariableUndefinedException(name, startIndex, endIndex);
         }
         return variableScope.getVariableValue(name, forestMethod);
     }

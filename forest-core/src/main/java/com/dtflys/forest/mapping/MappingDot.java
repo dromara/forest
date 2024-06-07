@@ -1,6 +1,7 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
+import com.dtflys.forest.exceptions.ForestNoSuchMethodException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.StringUtils;
@@ -18,15 +19,16 @@ public class MappingDot extends MappingExpr {
     protected final MappingExpr left;
     protected final MappingIdentity right;
 
-    public MappingDot(ForestMethod forestMethod, VariableScope variableScope, MappingExpr left, MappingIdentity right) {
-        this(forestMethod, Token.DOT, variableScope, left, right);
+    public MappingDot(ForestMethod forestMethod, VariableScope variableScope, MappingExpr left, MappingIdentity right, int startIndex, int endIndex) {
+        this(forestMethod, Token.DOT, variableScope, left, right, startIndex, endIndex);
     }
 
-    protected MappingDot(ForestMethod forestMethod, Token token, VariableScope variableScope, MappingExpr left, MappingIdentity right) {
+    protected MappingDot(ForestMethod forestMethod, Token token, VariableScope variableScope, MappingExpr left, MappingIdentity right, int startIndex, int endIndex) {
         super(forestMethod, token);
         this.variableScope = variableScope;
         this.left = left;
         this.right = right;
+        setIndexRange(startIndex, endIndex);
     }
 
     public Method getPropMethodFromClass(Class clazz, MappingIdentity right) {

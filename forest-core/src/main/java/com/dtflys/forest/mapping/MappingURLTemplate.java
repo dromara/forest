@@ -289,7 +289,7 @@ public class MappingURLTemplate extends MappingTemplate {
                     .setRef(ref)
                     .build();
         } catch (ForestVariableUndefinedException ex) {
-            throw new ForestVariableUndefinedException(annotationType, attributeName, forestMethod, ex.getVariableName(), template);
+            throw new ForestVariableUndefinedException(annotationType, attributeName, forestMethod, ex.getVariableName(), template, ex.getStartIndex(), ex.getEndIndex());
         }
     }
 

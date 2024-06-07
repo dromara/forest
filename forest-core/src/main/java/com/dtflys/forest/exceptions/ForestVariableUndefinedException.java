@@ -12,103 +12,53 @@ import java.lang.reflect.Method;
  * @author gongjun[dt_flys@hotmail.com]
  * @since v1.5.0
  */
-public class ForestVariableUndefinedException extends ForestRuntimeException {
+public class ForestVariableUndefinedException extends MappingExpressionException {
 
-    private final Class<? extends Annotation> annotationType;
-
-    private final String attributeName;
-
-    private final ForestMethod method;
 
     private final String variableName;
 
-    private final String source;
 
     public ForestVariableUndefinedException(String variableName) {
-        this(null, null, null, variableName, null);
+        this(null, null, null, variableName, null, -1, -1);
     }
 
-    public ForestVariableUndefinedException(String variableName, String source) {
-        this(null, null, null, variableName, source);
+
+    public ForestVariableUndefinedException(String variableName, int startIndex, int endIndex) {
+        this(null, null, null, variableName, null, startIndex, endIndex);
     }
 
+        public ForestVariableUndefinedException(String variableName, String source) {
+        this(null, null, null, variableName, source, -1, -1);
+    }
+
+
+    public ForestVariableUndefinedException(String variableName, String source, int startIndex, int endIndex) {
+        this(null, null, null, variableName, source, startIndex, endIndex);
+    }
 
     public ForestVariableUndefinedException(String attributeName, ForestMethod method, String variableName) {
-        this(null, attributeName, method, variableName, null);
+        this(null, attributeName, method, variableName, null, -1, -1);
     }
 
 
-    public ForestVariableUndefinedException(Class<? extends Annotation> annotationType, String attributeName, ForestMethod method, String variableName) {
-        this(annotationType, attributeName, method, variableName, null);
+    public ForestVariableUndefinedException(String attributeName, ForestMethod method, String variableName, int startIndex, Integer endIndex) {
+        this(null, attributeName, method, variableName, null, startIndex, endIndex);
     }
 
 
-    public ForestVariableUndefinedException(Class<? extends Annotation> annotationType, String attributeName, ForestMethod method, String variableName, String source) {
-        super(getErrorMessage(annotationType, attributeName, method, variableName, source));
-        this.annotationType = annotationType;
-        this.attributeName = attributeName;
-        this.method = method;
+    public ForestVariableUndefinedException(Class<? extends Annotation> annotationType, String attributeName, ForestMethod method, String variableName, int startIndex, int endIndex) {
+        this(annotationType, attributeName, method, variableName, null, startIndex, endIndex);
+    }
+
+
+    public ForestVariableUndefinedException(Class<? extends Annotation> annotationType, String attributeName, ForestMethod method, String variableName, String source, int startIndex, int endIndex) {
+        super("Cannot resolve variable '" + variableName + "'", annotationType, attributeName, method, source, startIndex, endIndex);
         this.variableName = variableName;
-        this.source = source;
     }
 
-    private static String getErrorMessage(Class<? extends Annotation> annotationType, String attributeName, ForestMethod forestMethod, String variableName, String source) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("[Forest] Cannot resolve variable '");
-        builder.append(variableName);
-        builder.append("'");
-        if (StringUtils.isNotBlank(source)) {
-            builder.append("\n\n\t[From Template]\n\t");
-            if (forestMethod != null) {
-                Method method = forestMethod.getMethod();
-                String typeName = method.getDeclaringClass().getTypeName();
-                String methodName = method.getName();
-                Class<?>[] paramTypes = method.getParameterTypes();
-                builder.append("method: ")
-                        .append(typeName)
-                        .append('.')
-                        .append(methodName)
-                        .append('(');
-                for (int i = 0; i < paramTypes.length; i++) {
-                    Class<?> pType = paramTypes[i];
-                    builder.append(pType.getName());
-                    if (pType.isArray()) {
-                        builder.append("[]");
-                    }
-                    if (i < paramTypes.length - 1) {
-                        builder.append(", ");
-                    }
-                }
-                builder.append(")\n\t");
-            }
-            if (annotationType != null) {
-                String annTypeName = annotationType.getSimpleName();
-                builder.append("annotation: ")
-                        .append(annotationType.getPackage().getName())
-                        .append(".@").append(annTypeName)
-                        .append("\n\t");
-            }
-            if (attributeName != null) {
-                builder.append("attribute: ")
-                        .append(attributeName)
-                        .append(" = ")
-                        .append("\"")
-                        .append(source)
-                        .append("\"\n");
-            } else {
-                builder.append("template: ");
-                builder.append(source);
-                builder.append("\n");
-            }
-        }
-        return builder.toString();
-    }
 
     public String getVariableName() {
         return variableName;
     }
 
-    public String getSource() {
-        return source;
-    }
 }

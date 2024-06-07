@@ -15,6 +15,10 @@ public abstract class MappingExpr {
 
     protected VariableScope variableScope;
 
+    int startIndex = -1;
+
+    int endIndex = -1;
+
     protected MappingExpr(ForestMethod<?> forestMethod, Token token) {
         this.forestMethod = forestMethod;
         this.token = token;
@@ -29,6 +33,11 @@ public abstract class MappingExpr {
     }
 
     public abstract boolean isIterateVariable();
+
+    public void setIndexRange(int startIndex, int endIndex) {
+        this.startIndex = startIndex;
+        this.endIndex = endIndex;
+    }
 
 
 }

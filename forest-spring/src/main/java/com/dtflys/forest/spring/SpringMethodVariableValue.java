@@ -7,7 +7,7 @@ import com.dtflys.forest.reflection.ForestVariableValue;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class SpringVariableValue implements ForestVariableValue {
+public class SpringMethodVariableValue implements ForestVariableValue {
 
     private final static Object[] DEFAULT_ARGUMENTS = new Object[0];
 
@@ -15,7 +15,7 @@ public class SpringVariableValue implements ForestVariableValue {
 
     private final Method method;
 
-    public SpringVariableValue(Object bean, Method method) {
+    public SpringMethodVariableValue(Object bean, Method method) {
         this.bean = bean;
         this.method = method;
     }

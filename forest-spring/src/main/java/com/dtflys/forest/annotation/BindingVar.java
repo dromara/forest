@@ -14,14 +14,14 @@ import java.lang.annotation.Target;
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target({ElementType.TYPE, ElementType.METHOD})
 public @interface BindingVar {
 
     /**
      * 绑定的变量名
      * @return 绑定的变量名
      */
-    String value();
+    String value() default "";
 
     /**
      * 所绑定的 ForestConfiguration Bean Id

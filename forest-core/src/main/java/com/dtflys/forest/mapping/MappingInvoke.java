@@ -16,12 +16,12 @@ public class MappingInvoke extends MappingDot {
 
     private List<MappingExpr> argList;
 
-    public MappingInvoke(ForestMethod<?> forestMethod, VariableScope variableScope, MappingExpr left, MappingIdentity name, List<MappingExpr> argList) {
-        this(forestMethod, Token.INVOKE, variableScope, left, name, argList);
+    public MappingInvoke(ForestMethod<?> forestMethod, VariableScope variableScope, MappingExpr left, MappingIdentity name, List<MappingExpr> argList, int startIndex, int endIndex) {
+        this(forestMethod, Token.INVOKE, variableScope, left, name, argList, startIndex, endIndex);
     }
 
-    protected MappingInvoke(ForestMethod<?> forestMethod, Token token, VariableScope variableScope, MappingExpr left, MappingIdentity name, List<MappingExpr> argList) {
-        super(forestMethod, token, variableScope, left, name);
+    protected MappingInvoke(ForestMethod<?> forestMethod, Token token, VariableScope variableScope, MappingExpr left, MappingIdentity name, List<MappingExpr> argList, int startIndex, int endIndex) {
+        super(forestMethod, token, variableScope, left, name, startIndex, endIndex);
         this.argList = argList;
     }
 
