@@ -19,6 +19,10 @@
     </forest:configuration>
 
     <forest:scan configuration="forestConfiguration"
+             base-package="com.dtflys.spring.test.client2"/>
+
+
+    <forest:scan configuration="forestConfiguration"
                  base-package="com.dtflys.spring.test.interceptor"/>
 
     <context:component-scan base-package="com.dtflys.spring.test.component"/>

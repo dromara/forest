@@ -20,7 +20,7 @@
             maxConnections="500"
             maxRouteConnections="500"
             logEnabled="true"
-            logHandler="com.dtflys.spring.logging.com.dtflys.forest.springboot.test.TestLogHandler"
+            logHandler="com.dtflys.spring.test.logging.TestLogHandler"
             logRequest="false"
             logResponseStatus="false"
             logResponseContent="true">
@@ -33,9 +33,6 @@
 
         <forest:converter dataType="json" class="com.dtflys.forest.converter.json.ForestGsonConverter">
             <forest:parameter name="dateFormat" value="yyyy/MM/dd hh:mm:ss"/>
-        </forest:converter>
-
-        <forest:converter dataType="xml" class="com.dtflys.forest.converter.xml.jakartaxml.ForestJakartaXmlConverter">
         </forest:converter>
 
     </forest:configuration>

@@ -21,15 +21,15 @@
                 keystorePass="123456"
                 protocols="TLS"
                 certPass="123456"
-                hostnameVerifier="com.dtflys.spring.ssl.com.dtflys.forest.springboot.test.MyHostnameVerifier"
-                sslSocketFactoryBuilder="com.dtflys.spring.ssl.com.dtflys.forest.springboot.test.MySSLSocketFactoryBuilder"/>
+                hostnameVerifier="com.dtflys.spring.test.ssl.MyHostnameVerifier"
+                sslSocketFactoryBuilder="com.dtflys.spring.test.ssl.MySSLSocketFactoryBuilder"/>
 
         <forest:ssl-keystore
                 id="keystore2"
-                hostnameVerifier="com.dtflys.spring.ssl.com.dtflys.forest.springboot.test.MyHostnameVerifier"/>
+                hostnameVerifier="com.dtflys.spring.test.ssl.MyHostnameVerifier"/>
 
     </forest:configuration>
 
-    <forest:client id="beastshopClient" configuration="forestConfiguration" class="com.dtflys.spring.client0.com.dtflys.forest.springboot.test.BeastshopClient"/>
+    <forest:client id="beastshopClient" configuration="forestConfiguration" class="com.dtflys.spring.test.client0.BeastshopClient"/>
 
 </beans>
