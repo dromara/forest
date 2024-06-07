@@ -2299,9 +2299,7 @@ public class TestGenericForestClient extends BaseClientTest {
         int a = -1;
         int b = 110;
         int c = 220;
-        Forest.get("/test")
-                .port(server.getPort())
-                .host("localhost")
+        Forest.get("http://localhost:{}/test", server.getPort())
                 .addHeader("A", 0)
                 .cond(b > 100, q -> q.addHeader("B", 100))
                 .cond(c > 200, q -> q.addHeader("C", 200))
@@ -2319,7 +2317,7 @@ public class TestGenericForestClient extends BaseClientTest {
     }
 
     @Test
-    public void testIfThenLambda() {{
+    public void testIfThenLambda() {
         server.enqueue(new MockResponse().setResponseCode(200).setBody(EXPECTED));
         int a = -1;
         Forest.get("/test")
@@ -2335,6 +2333,9 @@ public class TestGenericForestClient extends BaseClientTest {
         mockRequest(server)
                 .assertHeaderEquals("A", "-2");
     }
+
+    @Test
+    public void testIfThenLambdaCondition() {
         server.enqueue(new MockResponse().setResponseCode(200).setBody(EXPECTED));
         int a = -1;
         Forest.get("/test")

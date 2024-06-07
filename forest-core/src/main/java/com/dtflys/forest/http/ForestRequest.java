@@ -3242,10 +3242,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     }
 
     private ForestRequest<T> arguments(Object... args) {
-        this.arguments = new Object[args.length];
-        for (int i = 0; i < this.arguments.length; i++) {
-            this.arguments[i] = args[i];
-        }
+        this.arguments = args;
         return this;
     }
 
