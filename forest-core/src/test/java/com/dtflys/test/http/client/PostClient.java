@@ -53,7 +53,7 @@ public interface PostClient {
     )
     @HTTPProxy(
             host = "127.0.0.1",
-            port = "{0}",
+            port = "{}",
             username = "foo",
             password = "{2}"
     )
@@ -243,7 +243,7 @@ public interface PostClient {
     @Request(
             url = "http://localhost:{port}/json",
             type = "post",
-            data = "{\"username\":\"{0}\",\"password\":\"{1}\",\"cn_name\":\"{2}\"}",
+            data = "{\"username\":\"{}\",\"password\":\"{}\",\"cn_name\":\"{}\"}",
             contentType = "application/json; charset=utf-8"
     )
     @BodyType("binary")

@@ -23,11 +23,11 @@ public interface GzipClient {
      * @param infno
      * @return
      */
-    @Get("/${0}")
+    @Get("/${}")
     @DecompressGzip
     ForestResponse<String> transaction(String infno);
 
-    @Get("/${0}")
+    @Get("/${}")
     @DecompressGzip(false)
     ForestResponse<String> transaction_gzip_false(String infno);
 
@@ -37,7 +37,7 @@ public interface GzipClient {
      * @param infno
      * @return
      */
-    @Get("/${0}")
+    @Get("/${}")
     ForestResponse<String> transaction_without_annotation(String infno);
 
 }

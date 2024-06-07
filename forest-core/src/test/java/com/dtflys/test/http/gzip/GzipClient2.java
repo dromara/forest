@@ -20,7 +20,7 @@ import com.dtflys.forest.http.ForestResponse;
 @DecompressGzip
 public interface GzipClient2 {
 
-    @Get("/${0}")
+    @Get("/${}")
     ForestResponse<String> transaction(String infno);
 
 

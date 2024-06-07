@@ -9,13 +9,13 @@ import com.dtflys.forest.annotation.URLEncode;
 @BaseRequest(baseURL = "http://localhost:${port}")
 public interface UrlEncodedClient {
 
-    @Get("/encoded/?a=${0}&b=${1}")
+    @Get("/encoded/?a=${}&b=${}")
     String getEncodedArgs(String a, String b);
 
-    @Get("/encoded/?a={0}&b={1}")
+    @Get("/encoded/?a={}&b={}")
     String getEncodedArgs2(String a, String b);
 
-    @Get("/encoded/?url1={0}&url2={1}&lang={2}&code={3}&data={4}&content={5}")
+    @Get("/encoded/?url1={}&url2={}&lang={}&code={}&data={}&content={}")
     String getUrlEncoded(String url1, String url2, String lang, String code, String data, String content);
 
     @Get("/encoded")
