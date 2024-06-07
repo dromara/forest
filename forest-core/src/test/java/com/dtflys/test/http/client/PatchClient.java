@@ -42,7 +42,7 @@ public interface PatchClient {
     @Request(
             url = "http://localhost:${port}/hello",
             type = "patch",
-            data = "username=${}&password=${}",
+            data = "username={}&password={}",
             headers = {"Accept:text/plain"}
     )
     String textParamPatch(String username, String password);
