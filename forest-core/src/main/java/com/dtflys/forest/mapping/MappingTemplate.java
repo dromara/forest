@@ -393,7 +393,7 @@ public class MappingTemplate {
         switch (ch) {
             case ')':
                 if (left == null) {
-                    return new MappingFilterInvoke(forestMethod, variableScope, name, argExprList, left.startIndex, context.readIndex);
+                    return new MappingFilterInvoke(forestMethod, variableScope, name, argExprList, !argExprList.isEmpty() ? argExprList.get(0).startIndex : context.readIndex, context.readIndex);
                 }
                 return new MappingInvoke(forestMethod, variableScope, left, name, argExprList, left.startIndex, context.readIndex);
             case ',':
