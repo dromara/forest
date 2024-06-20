@@ -35,12 +35,14 @@ public class TestAddressClient6 extends BaseClientTest {
     }
 
 
+
     @Test
     public void testLocalHost() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        ForestRequest request = addressClient6.testLocalHost();
+        ForestRequest request = addressClient6.testLocalHost(server.getPort());
         assertThat(request.getPath()).isEqualTo("/aaa");
         assertThat(request.getHost()).isEqualTo("127.0.0.1");
+        assertThat(request.getPort()).isEqualTo(server.getPort());
         String result = request.executeAsString();
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
     }

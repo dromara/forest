@@ -43,6 +43,7 @@ import java.lang.annotation.Target;
 @MethodLifeCycle(AddressLifeCycle.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
+@RequestAttributes
 public @interface Address {
 
     /**

@@ -1399,7 +1399,9 @@ public class ForestMethod<T> implements VariableScope {
             for (final InterceptorAttributes attributes : interceptorAttributesList) {
                 final InterceptorAttributes newAttrs = attributes.clone();
                 request.addInterceptorAttributes(newAttrs.getInterceptorClass(), newAttrs);
-                request.getInterceptorAttributes(newAttrs.getInterceptorClass()).render(args);
+            }
+            for (final InterceptorAttributes attributes : request.getInterceptorAttributes().values()) {
+                request.getInterceptorAttributes(attributes.getInterceptorClass()).render(args);
             }
         }
 

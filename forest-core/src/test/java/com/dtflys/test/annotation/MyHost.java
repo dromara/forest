@@ -22,5 +22,5 @@ public @interface MyHost {
     String value();
 
     @OverrideAttribute
-    String port() default "80";
+    String port() default "{port}";
 }

@@ -4234,7 +4234,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         InterceptorAttributes oldAttributes = interceptorAttributes.get(interceptorClass);
         if (oldAttributes != null) {
             for (Map.Entry<String, Object> entry : attributes.getAttributeTemplates().entrySet()) {
-                oldAttributes.addAttribute(entry.getKey(), entry.getValue());
+                oldAttributes.getAttributeTemplates().put(entry.getKey(), entry.getValue());
             }
 
             for (Map.Entry<String, Object> entry : attributes.getAttributes().entrySet()) {
