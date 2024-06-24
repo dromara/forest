@@ -8,9 +8,6 @@
 
 
 <p align="center">
-<a href="https://gitee.com/dromara/forest">
-    <img src="https://gitee.com/dromara/forest/badge/star.svg" alt="Gitee Stars">
-</a>
 <a href="https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html">
     <img src="https://img.shields.io/badge/JDK-1.8+-yellow" alt="JDK">
 </a>
@@ -21,7 +18,7 @@
 <a href="http://forest.dtflyx.com/">
     <img src="https://img.shields.io/badge/document-1.x-e96.svg" alt="Documentation">
 </a>
-<a href="https://gitee.com/dromara/forest#%E8%81%94%E7%B3%BB%E4%BD%9C%E8%80%85">
+<a href="https://forest.dtflyx.com/pages/author/">
     <img src="https://img.shields.io/badge/author-%E5%85%AC%E5%AD%90%E9%AA%8F-7af" alt="Author">
 </a>
 </p>
@@ -45,8 +42,6 @@ Forest是一个高层的、极简的声明式HTTP调用API框架<br>
 * [项目主页](http://forest.dtflyx.com/) 
 
 * [中文文档](https://forest.dtflyx.com/pages/1.5.36/install_guide/) 
-
-* [JavaDoc](https://apidoc.gitee.com/dt_flys/forest/)
 
 * [示例工程](forest-examples)
 
@@ -466,7 +461,7 @@ String result = Forest.post("/user/register")
 -----------------------------------
 
 1. 进群讨论，可以在群里抛出您遇到的问题，或许已经有人解决了您的问题。
-2. 提issue，如果在gitee的issue中已经有您想解决的问题，可以直接将该issue分配给您自己。如若没有，可以自己在gitee上创建一个issue。
+2. 提issue，如果在issue中已经有您想解决的问题，可以直接将该issue分配给您自己。如若没有，可以自己创建一个issue。
 3. Fork 本项目的仓库
 4. 新建分支，如果是加新特性，分支名格式为`feat_${issue的ID号}`，如果是修改bug，则命名为`fix_${issue的ID号}`。
 5. 本地自测，提交前请通过所有的已经单元测试，以及为您要解决的问题新增单元测试。
