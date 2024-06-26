@@ -202,7 +202,7 @@ public class DefaultLogHandler implements ForestLogHandler {
         final ForestResponse response = responseLogMessage.getResponse();
         final int status = responseLogMessage.getStatus();
         if (response != null && response.getException() != null) {
-            return "Response: [Network Error]: " + response.getException().getMessage() + (status > 0 ? ", status = " + status : "");
+            return "Response: " + (status > 0 ? ", status = " + status + ", " : " ") + "[Network Error]: " + response.getException().getMessage();
         }
         if (status > 0) {
             return "Response: Status = " + responseLogMessage.getStatus() + ", Time = " + responseLogMessage.getTime() + "ms";
