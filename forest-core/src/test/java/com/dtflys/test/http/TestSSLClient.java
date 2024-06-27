@@ -263,7 +263,7 @@ public class TestSSLClient extends BaseClientTest {
     public void testConcurrent() throws InterruptedException {
         int len = 100;
         CountDownLatch latch = new CountDownLatch(len);
-        ExecutorService executor = Executors.newFixedThreadPool(len);
+        ExecutorService executor = Executors.newFixedThreadPool(10);
         for (int i = 0; i < len / 2; i++) {
             int finalI = i;
             executor.execute(() -> {

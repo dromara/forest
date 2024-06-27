@@ -6,7 +6,6 @@ import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.converter.protobuf.ForestProtobufConverterManager;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.http.ForestBody;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
@@ -32,7 +31,13 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
 
 
     private <T> T tryConvert(final Object source, final Type targetType, final ForestDataType dataType) {
-        return (T) configuration.getConverterMap().get(dataType).convertToJavaObject(source, targetType);
+        ForestConverter converter = configuration.getConverterMap().get(dataType);
+        return (T) converter.convertToJavaObject(source, targetType);
+    }
+
+    private <T> T tryConvert(final InputStream source, final Type targetType, final ForestDataType dataType) {
+        ForestConverter converter = configuration.getConverterMap().get(dataType);
+        return (T) converter.convertToJavaObject(source, targetType);
     }
 
     private byte[] tryEncodeRequest(final ForestRequest request, final ForestDataType dataType, final Charset charset) {
@@ -63,6 +68,50 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
             }
             if (protobufConverterManager.isProtobufMessageType(targetType)) {
                 return tryConvert(src, targetType, ForestDataType.PROTOBUF);
+            }
+            if (src instanceof InputStream) {
+                try (InputStream in = (InputStream) src) {
+                    char ch = (char) in.read();
+                    while (ch == '\n' || ch == '\r' || ch == '\t' || ch == ' ') {
+                        ch = (char) in.read();
+                    }
+                    final AutoConverterSourceInputStream autoConverterSourceInputStream = new AutoConverterSourceInputStream((byte) ch, in);
+                    T result = null;
+                    if (ch == '{' || ch == '[') {
+                        result = tryConvert(autoConverterSourceInputStream, targetType, ForestDataType.JSON);
+                    } else if (ch == '<') {
+                        result = tryConvert(autoConverterSourceInputStream, targetType, ForestDataType.XML);
+                    } else if (Character.isDigit(ch)) {
+                        try {
+                            result = tryConvert(autoConverterSourceInputStream, targetType, ForestDataType.JSON);
+                        } catch (Throwable th) {
+                            result = tryConvert(src, targetType, ForestDataType.TEXT);
+                        }
+                    } else {
+                        final Object ret = tryConvert(src, targetType, ForestDataType.TEXT);
+                        final String str = String.valueOf(ret);
+                        final String trimmedStr = str.trim();
+                        final Class clazz = ReflectUtils.toClass(targetType);
+                        if ("true".equalsIgnoreCase(trimmedStr)) {
+                            if (boolean.class.isAssignableFrom(clazz) || Boolean.class.isAssignableFrom(clazz)) {
+                                result = (T) Boolean.TRUE;
+                            } else {
+                                result = tryConvert(trimmedStr, targetType, ForestDataType.TEXT);
+                            }
+                        } else if ("false".equalsIgnoreCase(trimmedStr)) {
+                            if (boolean.class.isAssignableFrom(clazz) || Boolean.class.isAssignableFrom(clazz)) {
+                                result = (T) Boolean.FALSE;
+                            } else {
+                                result = tryConvert(trimmedStr, targetType, ForestDataType.TEXT);
+                            }
+                        } else if (clazz.isAssignableFrom(ret.getClass())) {
+                            result = (T) ret;
+                        }
+                    }
+                    return result;
+                } catch (IOException e) {
+                    throw new ForestRuntimeException(e);
+                }
             }
             src = readAsString(src);
         }

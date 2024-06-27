@@ -154,7 +154,7 @@ public class ResultHandler {
                 if (resCharset != null) {
                     charset = Charset.forName(resCharset);
                 }
-                return converter.convertToJavaObject(response.getByteArray(), resultType, charset);
+                return converter.convertToJavaObject(response.getInputStream(), resultType, charset);
             } catch (Exception e) {
                 throw new ForestHandlerException(e, request, response);
             }

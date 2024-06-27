@@ -26,6 +26,8 @@ package com.dtflys.forest.http;
 
 
 import com.dtflys.forest.backend.ContentType;
+import com.dtflys.forest.callback.OnAcceptStream;
+import com.dtflys.forest.callback.OnAcceptStreamFunction;
 import com.dtflys.forest.callback.SuccessWhen;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.ByteEncodeUtils;
@@ -40,7 +42,6 @@ import java.lang.reflect.Type;
 import java.net.SocketTimeoutException;
 import java.util.Date;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * Forest请求响应类
@@ -370,16 +371,6 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
             }
         }
         return result;
-    }
-
-
-    public ForestResponse<T> consumeStream(Consumer<InputStream> consumer) {
-        try (InputStream in = getInputStream()) {
-            consumer.accept(in);
-        } catch (Exception e) {
-            throw new ForestRuntimeException(e);
-        }
-        return this;
     }
 
     /**
@@ -738,6 +729,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
     public String getCharset() {
         return charset;
     }
+
 
     /**
      * 把字节数组转换成字符串（自动根据字符串编码转换）

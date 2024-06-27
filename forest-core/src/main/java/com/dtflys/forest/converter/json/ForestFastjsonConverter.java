@@ -41,6 +41,7 @@ import com.dtflys.forest.utils.StringUtils;
 import com.fasterxml.jackson.databind.util.BeanUtil;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.*;
 import java.nio.charset.Charset;
@@ -131,6 +132,9 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
     }
 
 
+
+
+
     @Override
     public <T> T convertToJavaObject(final String source, final Type targetType) {
         try {
@@ -155,6 +159,27 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
     }
 
     @Override
+    public <T> T convertToJavaObject(InputStream source, Class<T> targetType, Charset charset) {
+        try {
+            return JSON.parseObject(source, charset, targetType);
+        } catch (Throwable th) {
+            throw new ForestConvertException(this, th);
+        }
+
+    }
+
+
+    @Override
+    public <T> T convertToJavaObject(InputStream source, Type targetType, Charset charset) {
+        try {
+            return JSON.parseObject(source, charset, targetType);
+        } catch (Throwable th) {
+            throw new ForestConvertException(this, th);
+        }
+    }
+
+
+    @Override
     public <T> T convertToJavaObject(final byte[] source, final Type targetType, final Charset charset) {
         try {
             return JSON.parseObject(source, 0, source.length, charset, targetType);
@@ -162,6 +187,8 @@ public class ForestFastjsonConverter implements ForestJsonConverter {
             throw new ForestConvertException(this, th);
         }
     }
+
+
 
     public <T> T convertToJavaObject(final String source, final TypeReference<T> typeReference) {
         try {

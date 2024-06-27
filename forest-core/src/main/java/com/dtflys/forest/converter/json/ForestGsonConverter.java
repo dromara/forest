@@ -33,6 +33,8 @@ import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
 import com.google.gson.*;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -98,6 +100,19 @@ public class ForestGsonConverter implements ForestJsonConverter {
         } catch (Exception ex) {
             throw new ForestConvertException(this, ex);
         }
+    }
+
+
+    @Override
+    public <T> T convertToJavaObject(InputStream source, Class<T> targetType, Charset charset) {
+        final Gson gson = getGson();
+        return gson.fromJson(new InputStreamReader(source, charset), targetType);
+    }
+
+    @Override
+    public <T> T convertToJavaObject(InputStream source, Type targetType, Charset charset) {
+        final Gson gson = getGson();
+        return gson.fromJson(new InputStreamReader(source, charset), targetType);
     }
 
     @Override

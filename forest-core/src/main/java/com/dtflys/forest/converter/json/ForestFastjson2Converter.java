@@ -36,6 +36,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.Lazy;
 import com.dtflys.forest.utils.ForestDataType;
 
+import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -101,6 +102,25 @@ public class ForestFastjson2Converter implements ForestJsonConverter {
 
     private JSONWriter.Feature[] getWriterFeatureArray() {
         return writerFeatures.toArray(new JSONWriter.Feature[0]);
+    }
+
+    @Override
+    public <T> T convertToJavaObject(InputStream source, Class<T> targetType, Charset charset) {
+        try {
+            return JSON.parseObject(source, charset, targetType);
+        } catch (Throwable th) {
+            throw new ForestConvertException(this, th);
+        }
+    }
+
+
+    @Override
+    public <T> T convertToJavaObject(InputStream source, Type targetType, Charset charset) {
+        try {
+            return JSON.parseObject(source, charset, targetType);
+        } catch (Throwable th) {
+            throw new ForestConvertException(this, th);
+        }
     }
 
     @Override

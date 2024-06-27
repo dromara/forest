@@ -52,6 +52,7 @@ import com.fasterxml.jackson.databind.ser.DefaultSerializerProvider;
 import com.fasterxml.jackson.databind.ser.SerializerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -134,6 +135,24 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         }
     }
 
+    @Override
+    public <T> T convertToJavaObject(InputStream source, Class<T> targetType, Charset charset) {
+        try {
+            return getMapper().readValue(source, getMapper().getTypeFactory().constructType(targetType));
+        } catch (IOException e) {
+            throw new ForestConvertException(this, e);
+        }
+    }
+
+
+    @Override
+    public <T> T convertToJavaObject(InputStream source, Type targetType, Charset charset) {
+        try {
+            return getMapper().readValue(source, getMapper().getTypeFactory().constructType(targetType));
+        } catch (IOException e) {
+            throw new ForestConvertException(this, e);
+        }
+    }
 
     @Override
     public <T> T convertToJavaObject(final String source, final Type targetType) {
@@ -142,7 +161,6 @@ public class ForestJacksonConverter implements ForestJsonConverter {
         } catch (IOException e) {
             throw new ForestConvertException(this, e);
         }
-
     }
 
     @Override
