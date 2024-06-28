@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class DefaultLogHandler implements ForestLogHandler {
 
-    private ForestLogger logger = new ForestLogger();
+    private ForestLogger logger = ForestLogger.getLogger(DefaultLogHandler.class);
 
     /**
      * 获取请求头日志内容
