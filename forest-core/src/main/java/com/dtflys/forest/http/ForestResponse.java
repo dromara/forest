@@ -26,8 +26,6 @@ package com.dtflys.forest.http;
 
 
 import com.dtflys.forest.backend.ContentType;
-import com.dtflys.forest.callback.OnAcceptStream;
-import com.dtflys.forest.callback.OnAcceptStreamFunction;
 import com.dtflys.forest.callback.SuccessWhen;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.ByteEncodeUtils;
