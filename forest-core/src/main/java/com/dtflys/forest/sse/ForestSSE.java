@@ -20,6 +20,11 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * Forest SSE
+ *
+ * @since v1.6.0
+ */
 public class ForestSSE implements ForestSSEListener {
 
     private final ForestRequest request;
@@ -102,7 +107,6 @@ public class ForestSSE implements ForestSSEListener {
         if (onOpenConsumer != null) {
             onOpenConsumer.accept(eventSource);
         }
-        onMessage(eventSource, "", "");
     }
 
     private void onClose(ForestRequest request, ForestResponse response) {
@@ -114,7 +118,7 @@ public class ForestSSE implements ForestSSEListener {
     @Override
     public void onMessage(EventSource eventSource, String name, String value) {
         final List<SSEMessageConsumer> consumers = consumerMap.get(name);
-        if (CollectionUtils.isNotEmpty(consumers)) {
+        if (CollectionUtils.isEmpty(consumers)) {
             return;
         }
         for (final SSEMessageConsumer consumer : consumers) {
@@ -169,7 +173,7 @@ public class ForestSSE implements ForestSSEListener {
             final String charset = Optional.ofNullable(response.getCharset()).orElse("UTF-8");
             final InputStream in = response.getInputStream();
             final InputStreamReader isr = new InputStreamReader(in, charset);
-            try (BufferedReader reader = new BufferedReader(isr)) {
+            try (final BufferedReader reader = new BufferedReader(isr)) {
                 String line = null;
                 while ((line = reader.readLine()) != null) {
                     if (StringUtils.isEmpty(line)) {

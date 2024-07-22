@@ -1,8 +1,11 @@
 package com.dtflys.test;
 
 import cn.hutool.core.codec.Base64;
+import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson2.JSONPath;
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.annotation.Body;
 import com.dtflys.forest.annotation.Post;
@@ -35,9 +38,11 @@ import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.forest.utils.URLUtils;
 import com.dtflys.test.http.BaseClientTest;
 import com.dtflys.test.http.model.UserParam;
+import com.dtflys.test.model.Contact;
 import com.dtflys.test.model.Result;
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.JsonPath;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okio.Buffer;
@@ -318,6 +323,7 @@ public class TestGenericForestClient extends BaseClientTest {
 
     @Test
     public void testRequest_query_replace_add2() throws UnsupportedEncodingException {
+
         server.enqueue(new MockResponse().setBody(EXPECTED));
         ForestRequest<?> request = Forest.get("/")
                 .port(server.getPort())
@@ -325,6 +331,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .replaceOrAddQuery("a", "2")
                 .addQuery("url", "http://localhost/test", true, "UTF-8");
         request.execute();
+
         mockRequest(server)
                 .assertPathEquals("/")
                 .assertQueryEquals("a=2&url=http://localhost/test");
@@ -344,6 +351,18 @@ public class TestGenericForestClient extends BaseClientTest {
         mockRequest(server)
                 .assertPathEquals("/")
                 .assertQueryEquals("a=1&b=2&c=3");
+    }
+
+    @Test
+    public void testRequest_json_path() {
+        server.enqueue(new MockResponse().setBody("{\"status\":\"1\", \"data\":[{\"name\": \"foo\", \"age\": \"18\", \"phone\": \"12345678\"}]}"));
+        ForestResponse response = Forest.get("http://localhost:{}/", server.getPort()).executeAsResponse();
+        String result = response.get(String.class);
+        final Object document = Configuration.defaultConfiguration().jsonProvider().parse(result);
+        Object data = JsonPath.read(document, "$.data");
+        Type type = new TypeReference<List<Contact>>() {}.getType();
+        List<Contact> contact = JSON.parseObject(JSON.toJSONString(data), type);
+        System.out.println(contact);
     }
 
 
@@ -2350,6 +2369,43 @@ public class TestGenericForestClient extends BaseClientTest {
 
         mockRequest(server)
                 .assertHeaderEquals("A", "-1");
+    }
+
+
+    @Test
+    public void testSSE() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(
+                "data:start\n" +
+                "data:hello\n" +
+                "close:good bye\n" +
+                "data:dont show"
+        ));
+        StringBuffer buffer = new StringBuffer();
+
+        Forest.get("http://localhost:{}/sse", server.getPort())
+                .sse()
+                .onOpen(eventSource -> {
+                    buffer.append("SSE Open\n");
+                })
+                .onClose((req, res) -> {
+                    buffer.append("SSE Close");
+                })
+                .addConsumer("data", (eventSource, name, value) -> {
+                    buffer.append("Receive data: " + value + "\n");
+                })
+                .addConsumer("close", (eventSource, name, value) -> {
+                    buffer.append("Will Close: " + value + "\n");
+                    eventSource.close();
+                })
+                .listen();
+
+        assertThat(buffer.toString()).isEqualTo(
+                "SSE Open\n" +
+                "Receive data: start\n" +
+                "Receive data: hello\n" +
+                "Will Close: good bye\n" +
+                "SSE Close"
+        );
     }
 
 

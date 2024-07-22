@@ -15,6 +15,7 @@ import com.dtflys.forest.utils.TypeReference;
 import com.dtflys.test.http.client.UrlEncodedClient;
 import com.dtflys.test.http.model.JsonTestUser;
 import com.dtflys.test.http.client.GetClient;
+import com.dtflys.test.model.Contact;
 import com.dtflys.test.model.TokenResult;
 import com.google.common.collect.Lists;
 import okhttp3.mockwebserver.MockResponse;
@@ -929,7 +930,7 @@ public class TestGetClient extends BaseClientTest {
                 .isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertHeaderEquals("Accept", "text/plain")
-                .assertPathEquals("/hello/user")
+                .assertPathEquals("/user")
                 .assertQueryEquals("username", "null")
                 .assertQueryEquals("password", "bar");
     }
@@ -1055,6 +1056,14 @@ public class TestGetClient extends BaseClientTest {
         mockRequest(server)
                 .assertMethodEquals("GET")
                 .assertPathEquals("/token");
+    }
+
+    @Test
+    public void testJsonPath() {
+        server.enqueue(new MockResponse().setBody("{\"status\":\"1\", \"data\":[{\"name\": \"foo\", \"age\": \"18\", \"phone\": \"12345678\"}]}"));
+        List<Contact> contacts = getClient.getContacts();
+        Contact contact = contacts.get(0);
+        System.out.println(JSON.toJSONString(contact));
     }
 
     @Test

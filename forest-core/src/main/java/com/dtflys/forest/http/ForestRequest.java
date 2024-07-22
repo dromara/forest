@@ -72,6 +72,7 @@ import com.dtflys.forest.pool.ForestRequestPool;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
 import com.dtflys.forest.retryer.ForestRetryer;
+import com.dtflys.forest.sse.ForestSSE;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.ssl.SSLSocketFactoryBuilder;
 import com.dtflys.forest.ssl.SSLUtils;
@@ -4063,6 +4064,16 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      */
     public ForestRequest<T> onProgress(OnProgress onProgress) {
         return setOnProgress(onProgress);
+    }
+
+    /**
+     * 创建 SSE 监听接口
+     *
+     * @return {@link ForestSSE}实例
+     * @since v1.6.0
+     */
+    public ForestSSE sse() {
+        return new ForestSSE(this);
     }
 
 

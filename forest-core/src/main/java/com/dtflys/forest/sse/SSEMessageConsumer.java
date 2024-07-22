@@ -9,12 +9,4 @@ public interface SSEMessageConsumer {
         return true;
     }
 
-    default SSEMessageResult proceed() {
-        return SSEMessageResult.PROCEED;
-    }
-
-    default SSEMessageResult close() {
-        return SSEMessageResult.CLOSE;
-    }
-
 }
