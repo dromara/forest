@@ -11,4 +11,7 @@ public enum ResponseResultStatus {
     // 继续执行
     PROCEED,
 
+    // 结束执行
+    STOP,
+
 }

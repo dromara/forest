@@ -6,7 +6,6 @@ import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.annotation.DataParam;
 import com.dtflys.forest.annotation.DataVariable;
 import com.dtflys.forest.annotation.Request;
-import com.dtflys.forest.converter.json.FastjsonEncoder;
 import com.dtflys.forest.converter.json.ForestFastjsonConverter;
 import com.dtflys.forest.http.ForestFuture;
 import com.dtflys.forest.http.ForestRequest;
@@ -14,6 +13,7 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.Lazy;
 import com.dtflys.test.http.model.JsonTestUser;
 import com.dtflys.test.interceptor.AddQueryInterceptor;
+import com.dtflys.test.interceptor.EmptyResultInterceptor;
 import com.dtflys.test.interceptor.ErrorInterceptor;
 import com.dtflys.test.interceptor.JsonPathInterceptor;
 import com.dtflys.test.model.Contact;
@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Future;
 
 /**
@@ -460,6 +461,15 @@ String simpleGetMultiQuery2WithLazy(@Query("a") String a, @Query("b") String b, 
     TokenResult getToken();
 
     @Get(url = "http://localhost:{port}/token", interceptor = JsonPathInterceptor.class)
-    List<Contact> getContacts();
+    List<Contact> testJsonPathResponse();
+
+    @Get(url = "http://localhost:{port}/empty", interceptor = EmptyResultInterceptor.class)
+    Object testEmptyResultObject();
+
+    @Get(url = "http://localhost:{port}/empty", interceptor = EmptyResultInterceptor.class)
+    Optional<?> testEmptyResultOptional();
+
+    @Get(url = "http://localhost:{port}/not_empty")
+    Optional<String> testNotEmptyResultOptional();
 
 }

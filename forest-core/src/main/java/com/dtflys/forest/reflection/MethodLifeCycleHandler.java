@@ -15,12 +15,16 @@ import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestFuture;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.interceptor.ResponseResult;
+import com.dtflys.forest.interceptor.ResponseResultStatus;
+import com.dtflys.forest.interceptor.ResponseSuccess;
 import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.utils.ForestProgress;
 import com.dtflys.forest.utils.ReflectUtils;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Future;
 
 /**
@@ -60,15 +64,22 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
         this.response = response;
         try {
             Object resultData = null;
-            if (response.isSuccess()) {
-                resultData = handleResultType(request, response, resultType, resultRawClass);
-                handleSuccess(resultData, request, response);
+            final ResponseResult responseResult = handleResponse(request, response);
+            final ResponseSuccess responseSuccess = responseResult instanceof ResponseSuccess ? (ResponseSuccess) responseResult : null;
+            ResponseResultStatus status = responseResult.getStatus();
+            if (ResponseResultStatus.PROCEED == status) {
+                status = response.isSuccess() ? ResponseResultStatus.SUCCESS : ResponseResultStatus.ERROR;
+            }
+            if (ResponseResultStatus.SUCCESS == status) {
+                final Optional<?> resultOpt = responseSuccess != null ? responseSuccess.getResult() : null;
+                resultData = handleResultType(resultOpt, request, response, resultType, resultRawClass);
+                handleSuccess(resultData, resultOpt, request, response);
                 if ((!ForestResponse.class.isAssignableFrom(resultRawClass)
                         && !Future.class.isAssignableFrom(resultRawClass))
                         || request.isDownloadFile()) {
                     resultData = response.getResult();
                 }
-            } else {
+            } else if (ResponseResultStatus.ERROR == status) {
                 if (ex != null) {
                     resultData = handleError(request, response, ex);
                 } else {
@@ -108,11 +119,22 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
         return handleResultType(request, response, resultType, resultRawClass);
     }
 
+    @Override
+    public Object handleResultType(Optional<?> resultOpt, ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
+        this.response = response;
+        final Object resultData = RESULT_HANDLER.getResult(resultOpt, request, response, resultType, resultClass);
+        if (!(resultData instanceof ForestResponse)) {
+            response.setResult(resultData);
+        }
+        this.resultData = (T) resultData;
+        return resultData;
+    }
+
 
     @Override
     public synchronized Object handleResultType(final ForestRequest request, final ForestResponse response, final Type resultType, final Class resultClass) {
         this.response = response;
-        final Object resultData = RESULT_HANDLER.getResult(request, response, resultType, resultClass);
+        final Object resultData = RESULT_HANDLER.getResult(null, request, response, resultType, resultClass);
         if (!(resultData instanceof ForestResponse)) {
             response.setResult(resultData);
         }
@@ -128,16 +150,21 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
         }
     }
 
-
     @Override
-    public void handleSuccess(final Object resultData, final ForestRequest request, final ForestResponse response) {
+    public ResponseResult handleResponse(ForestRequest request, ForestResponse response) {
         this.response = response;
         handleSaveCookie(request, response);
+        return request.getInterceptorChain().onResponse(request, response);
+    }
+
+
+    @Override
+    public void handleSuccess(final Object resultData, final Optional<?> resultOpt, final ForestRequest request, final ForestResponse response) {
         request.getInterceptorChain().onSuccess(resultData, request, response);
         final OnSuccess onSuccess = request.getOnSuccess();
         if (onSuccess != null) {
             final Object result = RESULT_HANDLER.getResult(
-                    request, response, onSuccessClassGenericType, ReflectUtils.toClass(onSuccessClassGenericType));
+                    resultOpt, request, response, onSuccessClassGenericType, ReflectUtils.toClass(onSuccessClassGenericType));
             onSuccess.onSuccess(result, request, response);
         }
     }

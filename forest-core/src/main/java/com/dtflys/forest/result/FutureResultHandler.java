@@ -34,6 +34,6 @@ public class FutureResultHandler extends AfterExecuteResultTypeHandler<Future> {
         if (realClass == null) {
             return ((MethodLifeCycleHandler<?>) request.getLifeCycleHandler()).getResultData();
         }
-        return resultHandler.getResult(request, response, realType, realClass);
+        return resultHandler.getResult(null, request, response, realType, realClass);
     }
 }

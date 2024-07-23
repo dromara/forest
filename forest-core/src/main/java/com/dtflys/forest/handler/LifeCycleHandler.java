@@ -5,11 +5,13 @@ import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.interceptor.ResponseResult;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.utils.ForestProgress;
 
 import java.lang.reflect.Type;
+import java.util.Optional;
 import java.util.concurrent.Future;
 
 
@@ -26,9 +28,13 @@ public interface LifeCycleHandler {
 
     Object handleResultType(ForestRequest request, ForestResponse response);
 
+    Object handleResultType(Optional<?> resultOpt, ForestRequest request, ForestResponse response, Type resultType, Class resultClass);
+
     Object handleResultType(ForestRequest request, ForestResponse response, Type resultType, Class resultClass);
 
-    void handleSuccess(Object resultData, ForestRequest request, ForestResponse response);
+    ResponseResult handleResponse(ForestRequest request, ForestResponse response);
+
+    void handleSuccess(Object resultData, final Optional<?> resultOpt, ForestRequest request, ForestResponse response);
 
     void handleInvokeMethod(ForestRequest request, ForestMethod method, Object[] args);
 

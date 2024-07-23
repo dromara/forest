@@ -1,13 +1,15 @@
 package com.dtflys.forest.interceptor;
 
+import java.util.Optional;
+
 public class ResponseSuccess implements ResponseResult {
 
-    private final Object result;
+    private final Optional<?> result;
 
     private final boolean useRequestResult;
 
     public ResponseSuccess(Object result) {
-        this.result = result;
+        this.result = Optional.ofNullable(result);
         this.useRequestResult = false;
     }
 
@@ -21,7 +23,7 @@ public class ResponseSuccess implements ResponseResult {
         return ResponseResultStatus.SUCCESS;
     }
 
-    public Object getResult() {
+    public Optional<?> getResult() {
         return result;
     }
 

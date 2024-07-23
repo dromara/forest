@@ -5,9 +5,7 @@ import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.backend.ContentType;
-import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestURL;
@@ -35,6 +33,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -925,6 +924,7 @@ public class TestGetClient extends BaseClientTest {
                         .setHeader("Content-Type", "text/plain")
                         .setHeader("Content-Encoding", "UTF-8")
                         .setBody(EXPECTED));
+
         assertThat(getClient.simpleGetMultiQuery2WithVar(null, "bar"))
                 .isNotNull()
                 .isEqualTo(EXPECTED);
@@ -1061,10 +1061,38 @@ public class TestGetClient extends BaseClientTest {
     @Test
     public void testJsonPath() {
         server.enqueue(new MockResponse().setBody("{\"status\":\"1\", \"data\":[{\"name\": \"foo\", \"age\": \"18\", \"phone\": \"12345678\"}]}"));
-        List<Contact> contacts = getClient.getContacts();
-        Contact contact = contacts.get(0);
-        System.out.println(JSON.toJSONString(contact));
+        List<Contact> contacts = getClient.testJsonPathResponse();
+        assertThat(contacts).isNotNull();
+        assertThat(contacts.get(0).getName()).isNotEmpty().isEqualTo("foo");
+        assertThat(contacts.get(0).getAge()).isEqualTo(18);
+        assertThat(contacts.get(0).getPhone()).isNotEmpty().isEqualTo("12345678");
     }
+
+    @Test
+    public void testEmptyResultObject() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Object result = getClient.testEmptyResultObject();
+        assertThat(result).isNull();
+    }
+
+    @Test
+    public void testEmptyResultOptional() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Optional<?> opt = getClient.testEmptyResultOptional();
+        assertThat(opt).isNotNull();
+        assertThat(opt.isPresent()).isFalse();
+    }
+
+    @Test
+    public void testNotEmptyResultOptional() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Optional<String> opt = getClient.testNotEmptyResultOptional();
+        assertThat(opt).isNotNull();
+        assertThat(opt.isPresent()).isTrue();
+        String result = opt.orElse("");
+        assertThat(result).isEqualTo(EXPECTED);
+    }
+
 
     @Test
     public void testRepeatableQuery1() throws InterruptedException {
