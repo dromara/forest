@@ -2456,19 +2456,19 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setResponseCode(200).setBody(
                 "data:start\n" +
                 "data:hello\n" +
-                "close:good bye\n" +
+                "event:close\n" +
                 "data:dont show"
         ));
 
         MySSEHandler sse = Forest.get("http://localhost:{}/sse", server.getPort())
                 .sse(MySSEHandler.class)
                 .listen();
-
+        System.out.println(sse.getStringBuffer());
         assertThat(sse.getStringBuffer().toString()).isEqualTo(
                 "SSE Open\n" +
                 "start ---- start\n" +
                 "hello ---- hello\n" +
-                "receive close --- good bye\n" +
+                "receive close --- close\n" +
                 "SSE Close"
         );
     }
@@ -2478,7 +2478,7 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setResponseCode(200).setBody(
                 "data:start\n" +
                 "data:hello\n" +
-                "close:good bye\n" +
+                "event:close\n" +
                 "data:dont show"
         ));
 
@@ -2495,7 +2495,7 @@ public class TestGenericForestClient extends BaseClientTest {
             "SSE Open\n" +
             "start ---- start\n" +
             "hello ---- hello\n" +
-            "receive close --- good bye\n" +
+            "receive close --- close\n" +
             "SSE Close"
         );
 
