@@ -72,7 +72,6 @@ import com.dtflys.forest.pool.ForestRequestPool;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
 import com.dtflys.forest.retryer.ForestRetryer;
-import com.dtflys.forest.sse.ForestSSE;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.ssl.SSLSocketFactoryBuilder;
 import com.dtflys.forest.ssl.SSLUtils;
@@ -465,6 +464,11 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * 正向代理
      */
     private ForestProxy proxy;
+
+    /**
+     * 是否为SSE请求
+     */
+    boolean isSSE = false;
 
 
     public ForestRequest(ForestConfiguration configuration, ForestMethod method, ForestBody body, Object[] arguments) {
@@ -2812,6 +2816,15 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     }
 
     /**
+     * 是否为SSE请求
+     * @return {@code true}: 是SSE请求，{@code false}: 不是
+     * @since v1.6.0
+     */
+    public boolean isSSE() {
+        return isSSE;
+    }
+
+    /**
      * 获取请求失败后的重试次数
      *
      * @return 重试次数
@@ -4073,7 +4086,19 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @since v1.6.0
      */
     public ForestSSE sse() {
-        return new ForestSSE(this);
+        return ForestSSE.fromRequest(this);
+    }
+
+    /**
+     * 创建自定义类型的 SSE 监听接口
+     *
+     * @param sseClass SSE 自定义实现类
+     * @return 自定义类型 SSE 监听接口实例
+     * @param <SSE> 自定义 SSE 监听类
+     * @since v1.6.0
+     */
+    public <SSE extends ForestSSE> SSE sse(Class<? extends SSE> sseClass) {
+        return ForestSSE.fromClass(this, sseClass);
     }
 
 

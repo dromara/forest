@@ -3,6 +3,11 @@ package com.dtflys.forest.sse;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 
+/**
+ * Forest SSE Event Source
+ *
+ * @since v1.6.0
+ */
 public class EventSource {
 
     private final String name;

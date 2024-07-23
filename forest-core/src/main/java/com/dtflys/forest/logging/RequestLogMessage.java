@@ -103,7 +103,15 @@ public class RequestLogMessage {
      * @return 请求行字符串
      */
     public String getRequestLine() {
-        return getType() + " " + getUri() + " " + getScheme();
+        StringBuilder builder = new StringBuilder(getType());
+        builder.append(" ");
+        builder.append(getUri());
+        builder.append(" ");
+        builder.append(getScheme());
+        if (request.isSSE()) {
+            builder.append(" [SSE]");
+        }
+        return builder.toString();
     }
 
     public List<LogHeaderMessage> getHeaders() {

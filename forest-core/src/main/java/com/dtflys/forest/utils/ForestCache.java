@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 public class ForestCache<K, V> {
 
@@ -62,6 +63,10 @@ public class ForestCache<K, V> {
 
     public V get(K key) {
         return cache.getIfPresent(key);
+    }
+
+    public V get(K key, Function<K, ? extends V> function) {
+        return cache.get(key, function);
     }
 
     public void put(K key, V value) {

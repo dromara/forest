@@ -5,10 +5,10 @@ import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.callback.OnRedirection;
+import com.dtflys.forest.callback.OnResponse;
 import com.dtflys.forest.callback.OnRetry;
 import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.callback.OnSuccess;
-import com.dtflys.forest.callback.RetryWhen;
 import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestCookies;
@@ -47,7 +47,7 @@ import com.dtflys.forest.utils.ForestProgress;
  * @since 2016-06-26
  */
 public interface Interceptor<T> extends
-        OnSuccess<T>, OnError, OnCanceled, OnProgress, OnLoadCookie, OnSaveCookie, OnRetry, OnRedirection {
+        OnResponse, OnSuccess<T>, OnError, OnCanceled, OnProgress, OnLoadCookie, OnSaveCookie, OnRetry, OnRedirection {
 
 
     /**
@@ -94,6 +94,20 @@ public interface Interceptor<T> extends
      */
     default byte[] onBodyEncode(ForestRequest request, ForestEncoder encoder, byte[] encodedData) {
         return encodedData;
+    }
+
+    /**
+     * 默认回调函数: 接受到请求响应时调用该方法
+     * <p>默认返回未知状态，继续执行后续逻辑
+     *
+     * @param request Forest请求对象
+     * @param response Forest响应对象
+     * @return 请求响应结果: {@link ResponseSuccess} 或 {@link ResponseSuccess} 实例
+     * @since v1.6.0
+     */
+    @Override
+    default ResponseResult onResponse(ForestRequest request, ForestResponse response) {
+        return ResponseResult.PROCEED;
     }
 
     /**

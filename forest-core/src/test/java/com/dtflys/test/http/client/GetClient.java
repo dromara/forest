@@ -15,6 +15,8 @@ import com.dtflys.forest.http.Lazy;
 import com.dtflys.test.http.model.JsonTestUser;
 import com.dtflys.test.interceptor.AddQueryInterceptor;
 import com.dtflys.test.interceptor.ErrorInterceptor;
+import com.dtflys.test.interceptor.JsonPathInterceptor;
+import com.dtflys.test.model.Contact;
 import com.dtflys.test.model.TestResult;
 import com.dtflys.test.model.TokenResult;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -456,5 +458,8 @@ String simpleGetMultiQuery2WithLazy(@Query("a") String a, @Query("b") String b, 
 
     @Get("http://localhost:{port}/token")
     TokenResult getToken();
+
+    @Get(url = "http://localhost:{port}/token", interceptor = JsonPathInterceptor.class)
+    List<Contact> getContacts();
 
 }

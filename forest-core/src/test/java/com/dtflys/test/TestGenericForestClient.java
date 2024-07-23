@@ -1,11 +1,8 @@
 package com.dtflys.test;
 
 import cn.hutool.core.codec.Base64;
-import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
-import com.alibaba.fastjson2.JSONPath;
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.annotation.Body;
 import com.dtflys.forest.annotation.Post;
@@ -24,6 +21,7 @@ import com.dtflys.forest.http.ForestProxy;
 import com.dtflys.forest.http.ForestProxyType;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.http.ForestSSE;
 import com.dtflys.forest.http.ForestURL;
 import com.dtflys.forest.http.Lazy;
 import com.dtflys.forest.interceptor.Interceptor;
@@ -40,6 +38,7 @@ import com.dtflys.test.http.BaseClientTest;
 import com.dtflys.test.http.model.UserParam;
 import com.dtflys.test.model.Contact;
 import com.dtflys.test.model.Result;
+import com.dtflys.test.sse.MySSEHandler;
 import com.google.common.collect.Lists;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
@@ -69,6 +68,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -2377,35 +2377,128 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setResponseCode(200).setBody(
                 "data:start\n" +
                 "data:hello\n" +
-                "close:good bye\n" +
+                "event:ignore\n" +
+                "event:close\n" +
                 "data:dont show"
         ));
         StringBuffer buffer = new StringBuffer();
 
         Forest.get("http://localhost:{}/sse", server.getPort())
                 .sse()
-                .onOpen(eventSource -> {
+                .setOnOpen(eventSource -> {
                     buffer.append("SSE Open\n");
                 })
-                .onClose((req, res) -> {
+                .setOnClose((req, res) -> {
                     buffer.append("SSE Close");
                 })
-                .addConsumer("data", (eventSource, name, value) -> {
-                    buffer.append("Receive data: " + value + "\n");
+                .addOnData((eventSource, name, value) -> {
+                    buffer.append("Receive data: ").append(value).append("\n");
                 })
-                .addConsumer("close", (eventSource, name, value) -> {
-                    buffer.append("Will Close: " + value + "\n");
+                .addOnEventMatchesPrefix("close", (eventSource, name, value) -> {
+                    buffer.append("Receive event: ").append(value).append("\n");
                     eventSource.close();
                 })
                 .listen();
+        System.out.println(buffer);
 
         assertThat(buffer.toString()).isEqualTo(
                 "SSE Open\n" +
                 "Receive data: start\n" +
                 "Receive data: hello\n" +
-                "Will Close: good bye\n" +
+                "Receive event: close\n" +
                 "SSE Close"
         );
+    }
+
+    @Test
+    public void testAsyncSSE() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(
+                "data:start\n" +
+                "data:hello\n" +
+                "event:ignore\n" +
+                "event:close\n" +
+                "data:dont show"
+        ));
+        StringBuffer buffer = new StringBuffer();
+
+        CompletableFuture<ForestSSE> future = Forest.get("http://localhost:{}/sse", server.getPort())
+                .sse()
+                .setOnOpen(eventSource -> {
+                    buffer.append("SSE Open\n");
+                })
+                .setOnClose((req, res) -> {
+                    buffer.append("SSE Close");
+                })
+                .addOnData((eventSource, name, value) -> {
+                    buffer.append("Receive data: ").append(value).append("\n");
+                })
+                .addOnEventMatchesPrefix("close", (eventSource, name, value) -> {
+                    buffer.append("Receive event: ").append(value).append("\n");
+                    eventSource.close();
+                })
+                .asyncListen();
+
+        future.join();
+        System.out.println(buffer);
+        assertThat(buffer.toString()).isEqualTo(
+                "SSE Open\n" +
+                "Receive data: start\n" +
+                "Receive data: hello\n" +
+                "Receive event: close\n" +
+                "SSE Close"
+        );
+    }
+
+
+
+    @Test
+    public void testSSE_withCustomClass() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(
+                "data:start\n" +
+                "data:hello\n" +
+                "close:good bye\n" +
+                "data:dont show"
+        ));
+
+        MySSEHandler sse = Forest.get("http://localhost:{}/sse", server.getPort())
+                .sse(MySSEHandler.class)
+                .listen();
+
+        assertThat(sse.getStringBuffer().toString()).isEqualTo(
+                "SSE Open\n" +
+                "start ---- start\n" +
+                "hello ---- hello\n" +
+                "receive close --- good bye\n" +
+                "SSE Close"
+        );
+    }
+
+    @Test
+    public void testAsyncSSE_withCustomClass() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(
+                "data:start\n" +
+                "data:hello\n" +
+                "close:good bye\n" +
+                "data:dont show"
+        ));
+
+        CompletableFuture<MySSEHandler> future = Forest.get("http://localhost:{}/sse", server.getPort())
+                .sse(MySSEHandler.class)
+                .asyncListen();
+
+        future.thenAccept(sse -> {
+            System.out.println(sse.getStringBuffer());
+        });
+
+        MySSEHandler sse = future.join();
+        assertThat(sse.getStringBuffer().toString()).isEqualTo(
+            "SSE Open\n" +
+            "start ---- start\n" +
+            "hello ---- hello\n" +
+            "receive close --- good bye\n" +
+            "SSE Close"
+        );
+
     }
 
 

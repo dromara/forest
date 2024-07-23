@@ -24,6 +24,7 @@ import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.http.ForestAddress;
 import com.dtflys.forest.http.ForestQueryMap;
 import com.dtflys.forest.http.ForestQueryParameter;
+import com.dtflys.forest.http.ForestSSE;
 import com.dtflys.forest.http.SimpleQueryParameter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
@@ -51,6 +52,7 @@ import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.multipart.ForestMultipartFactory;
 import com.dtflys.forest.proxy.InterfaceProxyHandler;
 import com.dtflys.forest.retryer.ForestRetryer;
+import com.dtflys.forest.sse.ForestSSEListener;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.HeaderUtils;
@@ -1459,7 +1461,8 @@ public class ForestMethod<T> implements VariableScope {
         MethodLifeCycleHandler<T> lifeCycleHandler = null;
         request.setBackend(configuration.getBackend());
         // 如果返回类型为ForestRequest，直接返回请求对象
-        if (ForestRequest.class.isAssignableFrom(returnClass)) {
+        if (ForestRequest.class.isAssignableFrom(returnClass)
+                || ForestSSEListener.class.isAssignableFrom(returnClass)) {
             final Type retType = getReturnType();
             if (retType instanceof ParameterizedType) {
                 final ParameterizedType parameterizedType = (ParameterizedType) retType;
@@ -1494,8 +1497,17 @@ public class ForestMethod<T> implements VariableScope {
             }
             request.setLifeCycleHandler(lifeCycleHandler);
             lifeCycleHandler.handleInvokeMethod(request, this, args);
+
+            if (ForestSSEListener.class.isAssignableFrom(returnClass)) {
+                if (ForestSSE.class.equals(returnClass)) {
+                    return request.sse();
+                }
+                return request.sse(returnClass);
+            }
+
             return request;
         }
+
         lifeCycleHandler = new MethodLifeCycleHandler<>(
                 rType, onSuccessClassGenericType);
         request.setLifeCycleHandler(lifeCycleHandler);

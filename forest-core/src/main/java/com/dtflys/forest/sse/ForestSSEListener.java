@@ -1,20 +1,19 @@
 package com.dtflys.forest.sse;
 
 import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.http.ForestResponse;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
-public interface ForestSSEListener extends SSEMessageConsumer {
+public interface ForestSSEListener<T extends ForestSSEListener<T>> extends SSEStringMessageConsumer {
 
 
     ForestRequest getRequest();
 
-    ForestResponse listen();
+    <R extends T> R listen();
 
-    CompletableFuture<ForestResponse> asyncListen();
+    <R extends T> CompletableFuture<R> asyncListen();
 
-    CompletableFuture<ForestResponse> asyncListen(ExecutorService pool);
+    <R extends T> CompletableFuture<R> asyncListen(ExecutorService pool);
 
 }

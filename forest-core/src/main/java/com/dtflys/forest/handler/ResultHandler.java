@@ -5,8 +5,10 @@ import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestHandlerException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.http.ForestSSE;
 import com.dtflys.forest.lifecycles.file.DownloadLifeCycle;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
+import com.dtflys.forest.sse.ForestSSEListener;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
 
@@ -100,6 +102,12 @@ public class ResultHandler {
                             return getResult(request, response, realType, realClass);
                         }
                     }
+                }
+                if (ForestSSEListener.class.isAssignableFrom(resultClass)) {
+                    if (ForestSSE.class.equals(resultClass)) {
+                        return request.sse();
+                    }
+                    return request.sse(resultClass);
                 }
                 if (resultClass.isArray()) {
                     if (byte[].class.isAssignableFrom(resultClass)) {

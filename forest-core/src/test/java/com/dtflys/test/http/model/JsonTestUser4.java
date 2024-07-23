@@ -1,6 +1,6 @@
 package com.dtflys.test.http.model;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson2.annotation.JSONField;
 import com.dtflys.forest.annotation.NotNull;
 
 public class JsonTestUser4 extends JsonTestUser {
@@ -9,8 +9,7 @@ public class JsonTestUser4 extends JsonTestUser {
     private String password;
 
 
-    @JSONField(name = "cn_name", ordinal = 2)
-    @NotNull
+    @JSONField(name = "CnName")
     private String cnName;
 
     public String getPassword() {
