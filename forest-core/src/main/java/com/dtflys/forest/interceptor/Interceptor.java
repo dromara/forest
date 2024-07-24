@@ -103,7 +103,7 @@ public interface Interceptor<T> extends
      * @param request Forest请求对象
      * @param response Forest响应对象
      * @return 请求响应结果: {@link ResponseSuccess} 或 {@link ResponseSuccess} 实例
-     * @since v1.6.0
+     * @since 1.6.0
      */
     @Override
     default ResponseResult onResponse(ForestRequest request, ForestResponse response) {

@@ -896,8 +896,12 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody("[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"));
         List<Integer> result = Forest.get("http://localhost:{}", server.getPort())
                 .onResponse((req, res) -> {
+                    if (res.isError()) {
+                        return ResponseResult.error();
+                    }
                     try (JSONReader jsonReader = new JSONReader(new InputStreamReader(res.getInputStream()))) {
                         List<Integer> list = new ArrayList<>();
+                        list.add(0);
                         jsonReader.startArray();
                         while (jsonReader.hasNext()) {
                             list.add(jsonReader.readInteger());
@@ -908,13 +912,11 @@ public class TestGenericForestClient extends BaseClientTest {
                         return ResponseResult.error(e);
                     }
                 })
+                .setOnSuccess(((data, req, res) -> {}))
                 .executeAsList();
         assertThat(result).isNotNull();
-        assertThat(result).isEqualTo(Lists.newArrayList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+        assertThat(result).isEqualTo(Lists.newArrayList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
     }
-
-
-
 
     @Test
     public void testRequest_get_return_map_list() {

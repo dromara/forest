@@ -11,7 +11,7 @@ import java.util.List;
  * 支持x-www-form-urlencoded的请求体接口
  *
  * @author gongjun[dt_flys@hotmail.com]
- * @since v1.5.0
+ * @since 1.5.0
  */
 public interface SupportFormUrlEncoded {
 

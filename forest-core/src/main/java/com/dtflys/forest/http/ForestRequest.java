@@ -933,9 +933,6 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         return getPort();
     }
 
-
-
-
     /**
      * 设置请求的主机地址(主机名/ip地址 + 端口号)
      *
@@ -959,7 +956,6 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         return this;
     }
 
-
     /**
      * 设置请求的主机地址(主机名/ip地址 + 端口号)
      *
@@ -970,7 +966,6 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     public ForestRequest<T> setAddress(String host, int port) {
         return setAddress(new ForestAddress(host, port));
     }
-
 
     /**
      * 设置请求的主机地址(主机名/ip地址 + 端口号)
@@ -2824,7 +2819,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     /**
      * 是否为SSE请求
      * @return {@code true}: 是SSE请求，{@code false}: 不是
-     * @since v1.6.0
+     * @since 1.6.0
      */
     public boolean isSSE() {
         return isSSE;
@@ -3681,7 +3676,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * 获取OnResponse回调函数，该回调函数在接收到请求响应时调用
      *
      * @return {@link OnResponse}接口实例
-     * @since v1.6.0
+     * @since 1.6.0
      */
     public OnResponse getOnResponse() {
         return onResponse;
@@ -3692,7 +3687,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param onResponse {@link OnResponse}接口实例
      * @return {@link ForestRequest}类实例
-     * @since v1.6.0
+     * @deprecated 请使用 {@link ForestRequest#onResponse} 方法
+     * @since 1.6.0
      */
     public ForestRequest<T> setOnResponse(OnResponse onResponse) {
         this.onResponse = onResponse;
@@ -3706,7 +3702,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @param onResponse {@link OnResponse}接口实例
      * @return {@link ForestRequest}类实例
      * @see ForestRequest#setOnResponse(OnResponse)
-     * @since v1.6.0
+     * @since 1.6.0
      */
     public ForestRequest<T> onResponse(OnResponse onResponse) {
         return setOnResponse(onResponse);
@@ -3727,6 +3723,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param onSuccess {@link OnSuccess}接口实例
      * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#onSuccess} 方法
      */
     public ForestRequest<T> setOnSuccess(OnSuccess onSuccess) {
         this.onSuccess = onSuccess;
@@ -3759,6 +3756,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param onError {@link OnError}接口实例
      * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#onError(OnError)} 方法
      */
     public ForestRequest<T> setOnError(OnError onError) {
         this.onError = onError;
@@ -3792,6 +3790,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param onCanceled {@link OnCanceled}接口实例
      * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#onCanceled(OnCanceled)} 方法
      * @since 1.5.27
      */
     public ForestRequest<T> setOnCanceled(OnCanceled onCanceled) {
@@ -3830,6 +3829,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param successWhen {@link SuccessWhen}接口实例
      * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#successWhen(SuccessWhen)} 方法
      */
     public ForestRequest<T> setSuccessWhen(SuccessWhen successWhen) {
         this.successWhen = successWhen;
@@ -3845,6 +3845,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param conditionClass  {@link SuccessWhen} 实现类的 {@link Class} 对象
      * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#successWhen(Class)} 方法
      */
     public ForestRequest<T> setSuccessWhen(Class<? extends SuccessWhen> conditionClass) {
         if (conditionClass != null && !conditionClass.isInterface()) {
@@ -3900,6 +3901,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param onRetry {@link OnRetry}接口实例
      * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#onRetry(OnRetry)} 方法
      */
     public ForestRequest<T> setOnRetry(OnRetry onRetry) {
         this.onRetry = onRetry;
@@ -3933,6 +3935,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param retryWhen {@link RetryWhen}接口实例
      * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#retryWhen(RetryWhen)} 方法
      */
     public ForestRequest<T> setRetryWhen(RetryWhen retryWhen) {
         this.retryWhen = retryWhen;
@@ -3959,6 +3962,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param conditionClass  {@link RetryWhen} 实现类的 {@link Class} 对象
      * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#retryWhen(Class)} 方法
      */
     public ForestRequest<T> setRetryWhen(Class<? extends RetryWhen> conditionClass) {
         if (conditionClass != null && !conditionClass.isInterface()) {
@@ -4043,11 +4047,27 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param progressStep 进度监听的步长，{@code long}类型数值
      * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#progressStep(long)} 方法
      */
     public ForestRequest<T> setProgressStep(long progressStep) {
         this.progressStep = progressStep;
         return this;
     }
+
+
+    /**
+     * 设置获取上传/下载进度监听的步长
+     * <p>
+     * 每上传/下载一定的比特数，执行一次监听回调函数
+     *
+     * @param progressStep 进度监听的步长，{@code long}类型数值
+     * @return {@link ForestRequest}类实例
+     * @since 1.6.0
+     */
+    public ForestRequest<T> progressStep(long progressStep) {
+        return setProgressStep(progressStep);
+    }
+
 
     /**
      * 获取重定向回调函数: 在请求重定向时触发
@@ -4063,6 +4083,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param onRedirection 重定向回调函数， {@link OnRedirection}接口实例
      * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#onRedirection(OnRedirection)} 方法
      */
     public ForestRequest<T> setOnRedirection(OnRedirection onRedirection) {
         this.onRedirection = onRedirection;
@@ -4100,6 +4121,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param onProgress 进度回调函数，{@link OnProgress}接口实例
      * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#onProgress(OnProgress)} 方法
      */
     public ForestRequest<T> setOnProgress(OnProgress onProgress) {
         this.onProgress = onProgress;
@@ -4123,7 +4145,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * 创建 SSE 监听接口
      *
      * @return {@link ForestSSE}实例
-     * @since v1.6.0
+     * @since 1.6.0
      */
     public ForestSSE sse() {
         return ForestSSE.fromRequest(this);
@@ -4135,7 +4157,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @param sseClass SSE 自定义实现类
      * @return 自定义类型 SSE 监听接口实例
      * @param <SSE> 自定义 SSE 监听类
-     * @since v1.6.0
+     * @since 1.6.0
      */
     public <SSE extends ForestSSE> SSE sse(Class<? extends SSE> sseClass) {
         return ForestSSE.fromClass(this, sseClass);
@@ -4156,6 +4178,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param onLoadCookie {@link OnLoadCookie}接口实例
      * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#onLoadCookie(OnLoadCookie)} 方法
      */
     public ForestRequest<T> setOnLoadCookie(OnLoadCookie onLoadCookie) {
         this.onLoadCookie = onLoadCookie;
@@ -4189,6 +4212,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param onSaveCookie {@link OnSaveCookie}接口实例
      * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#onSaveCookie(OnSaveCookie)} 方法
      */
     public ForestRequest<T> setOnSaveCookie(OnSaveCookie onSaveCookie) {
         this.onSaveCookie = onSaveCookie;

@@ -10,7 +10,7 @@ import java.lang.reflect.Method;
  * Forest变量未定义异常
  *
  * @author gongjun[dt_flys@hotmail.com]
- * @since v1.5.0
+ * @since 1.5.0
  */
 public class ForestVariableUndefinedException extends MappingExpressionException {
 

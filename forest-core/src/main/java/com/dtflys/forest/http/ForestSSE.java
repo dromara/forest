@@ -43,7 +43,7 @@ import java.util.function.Function;
 /**
  * Forest SSE
  *
- * @since v1.6.0
+ * @since 1.6.0
  */
 public class ForestSSE implements ForestSSEListener<ForestSSE> {
 
