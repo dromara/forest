@@ -930,7 +930,7 @@ public class TestGetClient extends BaseClientTest {
                 .isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertHeaderEquals("Accept", "text/plain")
-                .assertPathEquals("/user")
+                .assertPathEquals("/hello/user")
                 .assertQueryEquals("username", "null")
                 .assertQueryEquals("password", "bar");
     }

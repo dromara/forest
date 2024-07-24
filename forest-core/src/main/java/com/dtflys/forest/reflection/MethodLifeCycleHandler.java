@@ -97,6 +97,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
             }
             return resultData;
         } catch (Throwable th) {
+            th.printStackTrace();
             Object resultData = response.getResult();
             handleResult(resultData);
             if (ForestResponse.class.isAssignableFrom(resultRawClass)) {

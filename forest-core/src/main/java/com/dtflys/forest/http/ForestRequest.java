@@ -4272,7 +4272,9 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
             for (Map.Entry<String, Object> entry : attributes.getAttributeTemplates().entrySet()) {
                 oldAttributes.getAttributeTemplates().put(entry.getKey(), entry.getValue());
             }
-
+            if (!attributes.getAttributeTemplates().isEmpty()) {
+                oldAttributes.render(arguments);
+            }
             for (Map.Entry<String, Object> entry : attributes.getAttributes().entrySet()) {
                 oldAttributes.addAttribute(entry.getKey(), entry.getValue());
             }

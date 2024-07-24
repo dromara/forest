@@ -70,7 +70,7 @@ public interface ForestConverter<S> {
     }
 
     default  <T> T convertToJavaObject(InputStream source, Class<T> targetType, Charset charset) {
-        return convertToJavaObject(source, targetType, charset);
+        return convertToJavaObject(source, (Type) targetType, charset);
     }
 
     default  <T> T convertToJavaObject(InputStream source, Type targetType, Charset charset) {

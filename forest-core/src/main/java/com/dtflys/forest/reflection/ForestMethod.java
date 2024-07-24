@@ -728,7 +728,7 @@ public class ForestMethod<T> implements VariableScope {
             this.encoder = configuration.getForestObjectFactory().getObject(encoderClass);
         }
 
-        if (decoderClass != null && !encoderClass.isInterface()
+        if (decoderClass != null && !decoderClass.isInterface()
                 && ForestConverter.class.isAssignableFrom(decoderClass)) {
             this.decoder = configuration.getForestObjectFactory().getObject(decoderClass);
         }

@@ -174,7 +174,7 @@ public class ResultHandler {
                 }
 
                 final ForestDataType dataType = request.getDataType();
-                final ForestConverter converter = request.getConfiguration().getConverter(dataType);
+                final ForestConverter converter = decoder != null ? decoder : request.getConfiguration().getConverter(dataType);
                 if (contentType != null && contentType.canReadAsString()) {
                     return converter.convertToJavaObject(responseText, resultType);
                 }

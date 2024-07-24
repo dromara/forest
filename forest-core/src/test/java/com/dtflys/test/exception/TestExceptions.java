@@ -21,6 +21,7 @@ import com.dtflys.forest.exceptions.ForestUnsupportException;
 import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.utils.ANSIUtil;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
@@ -143,15 +144,18 @@ public class TestExceptions {
     @Test
     public void testVariableUndefinedException() {
         ForestVariableUndefinedException exception = new ForestVariableUndefinedException("foo");
-        assertThat(exception.getMessage()).isEqualTo("[Forest] Cannot resolve variable 'foo'");
+        assertThat(exception.getMessage()).isEqualTo("Cannot resolve variable 'foo'");
         assertThat(exception.getVariableName()).isEqualTo("foo");
         assertThat(exception.getSource()).isNull();
 
         exception = new ForestVariableUndefinedException("bar", "foo=${bar}");
-        assertThat(exception.getMessage())
-                .isEqualTo("[Forest] Cannot resolve variable 'bar'" +
-                        "\n\n\t[From Template]" +
-                        "\n\ttemplate: foo=${bar}\n");
+        exception.printStackTrace();
+        assertThat(exception.getMessage().replaceAll("\\[\\d(\\d)?m", ""))
+                .isEqualTo("Cannot resolve variable 'bar'\n" +
+                        "\n" +
+                        "\t[From Template]\n" +
+                        "\n" +
+                        "\ttemplate: foo=${bar}\n");
         assertThat(exception.getVariableName()).isEqualTo("bar");
         assertThat(exception.getSource()).isEqualTo("foo=${bar}");
     }
@@ -165,7 +169,7 @@ public class TestExceptions {
         String contentTypeVar();
 
         @Get(url = "/data/")
-        String fileVar(@DataFile(value = "file", fileName = "{filename}") String h);
+        String fileVar(@DataFile(value = "file", fileName = "dir/{filename}") String h);
     }
 
     @Test
@@ -178,12 +182,15 @@ public class TestExceptions {
             exception = th;
         }
         assertThat(exception).isNotNull().isInstanceOf(ForestVariableUndefinedException.class);
-        assertThat(exception.getMessage()).isEqualTo("[Forest] Cannot resolve variable 'data'\n" +
+        exception.printStackTrace();
+        assertThat(exception.getMessage().replaceAll("\\[\\d(\\d)?m", "")).isEqualTo("Cannot resolve variable 'data'\n" +
                 "\n" +
                 "\t[From Template]\n" +
-                "\tmethod: com.dtflys.test.exception.TestExceptions$TestClient.urlVar()\n" +
+                "\n" +
+                "\tmethod: com.dtflys.test.exception.TestExceptions$TestClient#urlVar()\n" +
                 "\tannotation: com.dtflys.forest.annotation.@Get\n" +
-                "\tattribute: url = \"/data/{data}\"\n");
+                "\tattribute: url = \"/data/{data}\"\n" +
+                "\t                         ^^^^ Cannot resolve variable 'data'\n");
     }
 
     @Test
@@ -197,12 +204,14 @@ public class TestExceptions {
         }
         exception.printStackTrace();
         assertThat(exception).isNotNull().isInstanceOf(ForestVariableUndefinedException.class);
-        assertThat(exception.getMessage()).isEqualTo("[Forest] Cannot resolve variable 'json'\n" +
+        assertThat(exception.getMessage().replaceAll("\\[\\d(\\d)?m", "")).isEqualTo("Cannot resolve variable 'json'\n" +
                 "\n" +
                 "\t[From Template]\n" +
-                "\tmethod: com.dtflys.test.exception.TestExceptions$TestClient.contentTypeVar()\n" +
+                "\n" +
+                "\tmethod: com.dtflys.test.exception.TestExceptions$TestClient#contentTypeVar()\n" +
                 "\tannotation: com.dtflys.forest.annotation.@Get\n" +
-                "\tattribute: contentType = \"application/{json}\"\n");
+                "\tattribute: contentType = \"application/{json}\"\n" +
+                "\t                                       ^^^^ Cannot resolve variable 'json'\n");
     }
 
     @Test
@@ -215,12 +224,15 @@ public class TestExceptions {
             exception = th;
         }
         assertThat(exception).isNotNull().isInstanceOf(ForestVariableUndefinedException.class);
-        assertThat(exception.getMessage()).isEqualTo("[Forest] Cannot resolve variable 'filename'\n" +
+        exception.printStackTrace();
+        assertThat(exception.getMessage().replaceAll("\\[\\d(\\d)?m", "")).isEqualTo("Cannot resolve variable 'filename'\n" +
                 "\n" +
                 "\t[From Template]\n" +
-                "\tmethod: com.dtflys.test.exception.TestExceptions$TestClient.fileVar(java.lang.String)\n" +
+                "\n" +
+                "\tmethod: com.dtflys.test.exception.TestExceptions$TestClient#fileVar(java.lang.String)\n" +
                 "\tannotation: com.dtflys.forest.annotation.@DataFile\n" +
-                "\tattribute: fileName = \"{filename}\"\n");
+                "\tattribute: fileName = \"dir/{filename}\"\n" +
+                "\t                            ^^^^^^^^ Cannot resolve variable 'filename'\n");
     }
 
 

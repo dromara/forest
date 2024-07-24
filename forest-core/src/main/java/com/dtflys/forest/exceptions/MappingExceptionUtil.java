@@ -1,6 +1,7 @@
 package com.dtflys.forest.exceptions;
 
 import com.dtflys.forest.reflection.ForestMethod;
+import com.dtflys.forest.utils.ANSIUtil;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.lang.annotation.Annotation;
@@ -12,15 +13,17 @@ public abstract class MappingExceptionUtil {
         StringBuilder builder = new StringBuilder();
         builder.append(message);
         if (StringUtils.isNotBlank(source)) {
-            builder.append("\n\n\t[From Template]\n\n\t");
+            builder.append("\n\n\t").append(ANSIUtil.colorPurple("[From Template]")).append("\n\n\t");
             if (forestMethod != null) {
                 Method method = forestMethod.getMethod();
                 String typeName = method.getDeclaringClass().getTypeName();
                 String methodName = method.getName();
                 Class<?>[] paramTypes = method.getParameterTypes();
-                builder.append("method: ")
+                builder.append(ANSIUtil.colorPurple("method:"))
+                        .append(' ')
+                        .append(ANSIUtil.COLOR_BLUE)
                         .append(typeName)
-                        .append('.')
+                        .append('#')
                         .append(methodName)
                         .append('(');
                 for (int i = 0; i < paramTypes.length; i++) {
@@ -33,30 +36,37 @@ public abstract class MappingExceptionUtil {
                         builder.append(", ");
                     }
                 }
-                builder.append(")\n\t");
+                builder.append(")")
+                        .append(ANSIUtil.COLOR_END)
+                        .append("\n\t");
             }
             if (annotationType != null) {
                 String annTypeName = annotationType.getSimpleName();
-                builder.append("annotation: ")
+                builder.append(ANSIUtil.colorPurple("annotation:"))
+                        .append(' ')
+                        .append(ANSIUtil.COLOR_BLUE)
                         .append(annotationType.getPackage().getName())
-                        .append(".@").append(annTypeName)
+                        .append('.')
+                        .append(ANSIUtil.COLOR_END)
+                        .append(ANSIUtil.colorYellow("@" + annTypeName))
                         .append("\n\t");
             }
             if (attributeName != null) {
                 StringBuilder attrBuilder = new StringBuilder();
-                attrBuilder.append("attribute: ")
+                attrBuilder.append(ANSIUtil.colorPurple("attribute:"))
+                        .append(' ')
+                        .append(ANSIUtil.COLOR_BLUE)
                         .append(attributeName)
                         .append(" = ")
-                        .append("\"");
-                int spaceCount = attrBuilder.toString().length() + 1;
-                attrBuilder.append(source)
-                        .append("\"\n");
+                        .append(ANSIUtil.COLOR_END);
+                int spaceCount = attrBuilder.toString().length() - ANSIUtil.COLOR_CHARS_LENGTH * 2;
+                attrBuilder.append(ANSIUtil.colorGreen("\"" + source + "\"")).append("\n");
                 if (startIndex != -1 && endIndex != -1) {
-                    attrBuilder.append(errorLine(spaceCount, startIndex, endIndex));
+                    attrBuilder.append(errorLine(message, spaceCount, startIndex, endIndex));
                 }
                 builder.append(attrBuilder);
             } else {
-                builder.append("template: ");
+                builder.append(ANSIUtil.colorPurple("template:")).append(' ');
                 builder.append(source);
                 builder.append("\n");
             }
@@ -64,21 +74,22 @@ public abstract class MappingExceptionUtil {
         return builder.toString();
     }
 
-    private static String errorLine(int spaceCount, int startIndex, int endIndex) {
+    private static String errorLine(String message, int spaceCount, int startIndex, int endIndex) {
         char errChar = '^';
         StringBuilder builder = new StringBuilder();
-        builder.append("\t");
+        StringBuilder spaceBuilder = new StringBuilder();
         for (int i = 0; i < spaceCount; i++) {
-            builder.append(' ');
+            spaceBuilder.append(' ');
         }
         for (int i = 0; i < startIndex; i++) {
-            builder.append(' ');
+            spaceBuilder.append(' ');
         }
         for (int i = startIndex; i < endIndex; i++) {
             builder.append(errChar);
         }
-        builder.append("\n");
-        return builder.toString();
+        builder.append(" ");
+        builder.append( message);
+        return "\t" + spaceBuilder + ANSIUtil.colorRed(builder.toString()) + "\n";
     }
 
 
