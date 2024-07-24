@@ -504,7 +504,14 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         this(configuration, null, arguments);
     }
 
-
+    /**
+     * 链式条件函数: 如果条件为真，则执行 Lambda 函数，否则不执行
+     *
+     * @param condition 判断条件，布尔值
+     * @param consumer Lambda 函数
+     * @return {@link ForestRequest}对象实例
+     * @since 1.6.0
+     */
     public ForestRequest<T> cond(boolean condition, Consumer<ForestRequest<?>> consumer) {
         if (condition) {
             consumer.accept(this);
@@ -512,24 +519,63 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         return this;
     }
 
+    /**
+     * 链式条件函数: 如果对象为空，则执行 Lambda 函数，否则不执行
+     *
+     * @param value 被判断的对象
+     * @param consumer Lambda 函数
+     * @return {@link ForestRequest}对象实例
+     * @since 1.6.0
+     */
     public ForestRequest<T> condNull(Object value, Consumer<ForestRequest<?>> consumer) {
         return cond(value == null, consumer);
     }
 
+    /**
+     * 链式条件函数: 如果字符串为空，则执行 Lambda 函数，否则不执行
+     *
+     * @param value 被判断的字符串
+     * @param consumer Lambda 函数
+     * @return {@link ForestRequest}对象实例
+     * @since 1.6.0
+     */
     public ForestRequest<T> condEmpty(CharSequence value, Consumer<ForestRequest<?>> consumer) {
         return cond(StringUtils.isEmpty(value), consumer);
     }
 
-
+    /**
+     * 链式条件函数: 如果对象不为空，则执行 Lambda 函数，否则不执行
+     *
+     * @param value 被判断的对象
+     * @param consumer Lambda 函数
+     * @return {@link ForestRequest}对象实例
+     * @since 1.6.0
+     */
     public ForestRequest<T> condNotNull(Object value, Consumer<ForestRequest<?>> consumer) {
         return cond(value != null, consumer);
     }
 
+    /**
+     * 链式条件函数: 如果字符串不为空，则执行 Lambda 函数，否则不执行
+     *
+     * @param value 被判断的字符串
+     * @param consumer Lambda 函数
+     * @return {@link ForestRequest}对象实例
+     * @since 1.6.0
+     */
     public ForestRequest<T> condNotEmpty(CharSequence value, Consumer<ForestRequest<?>> consumer) {
         return cond(StringUtils.isNotEmpty(value), consumer);
     }
 
-
+    /**
+     * 链式条件函数: 如果条件为真，则执行 Lambda 函数，否则可能执行 {@code elseIfThen}、{@code elseThen} 等其他链式提交方法，也可能什么都不执行
+     * <p>并返回一个 Forest 请求提交包装对象</p>
+     *
+     * @param condition 判断条件，布尔值
+     * @param consumer Lambda 函数
+     * @return {@link ForestRequestConditionWrapper} Forest 请求提交包装对象
+     * @since 1.6.0
+     */
     public ForestRequestConditionWrapper<T> ifThen(boolean condition, Consumer<ForestRequest<?>> consumer) {
         if (condition) {
             consumer.accept(this);
@@ -537,30 +583,71 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         return new ForestRequestConditionWrapper<>(this, condition);
     }
 
+    /**
+     * 链式条件函数: 如果条件 Lambda 执行结果为真，则执行 Lambda 函数，否则可能执行 {@code elseIfThen}、{@code elseThen} 等其他链式提交方法，也可能什么都不执行
+     * <p>并返回一个 Forest 请求提交包装对象</p>
+     *
+     * @param conditionFunc 条件 Lambda 函数
+     * @param consumer Lambda 函数
+     * @return {@link ForestRequestConditionWrapper} Forest 请求提交包装对象
+     * @since 1.6.0
+     */
     public ForestRequestConditionWrapper<T> ifThen(Function<ForestRequest<?>, Boolean> conditionFunc, Consumer<ForestRequest<?>> consumer) {
         Validations.assertParamNotNull(conditionFunc, "conditionFunc");
         return ifThen(conditionFunc.apply(this), consumer);
     }
 
-
+    /**
+     * 链式条件函数: 如果对象为空，则执行 Lambda 函数，否则可能执行 {@code elseIfThen}、{@code elseThen} 等其他链式提交方法，也可能什么都不执行
+     * <p>并返回一个 Forest 请求提交包装对象</p>
+     *
+     * @param value 被判断对象
+     * @param consumer Lambda 函数
+     * @return {@link ForestRequestConditionWrapper} Forest 请求提交包装对象
+     * @since 1.6.0
+     */
     public ForestRequestConditionWrapper<T> ifNullThen(Object value, Consumer<ForestRequest<?>> consumer) {
         return ifThen(value == null, consumer);
     }
 
+    /**
+     * 链式条件函数: 如果对象不为空，则执行 Lambda 函数，否则可能执行 {@code elseIfThen}、{@code elseThen} 等其他链式提交方法，也可能什么都不执行
+     * <p>并返回一个 Forest 请求提交包装对象</p>
+     *
+     * @param value 被判断对象
+     * @param consumer Lambda 函数
+     * @return {@link ForestRequestConditionWrapper} Forest 请求提交包装对象
+     * @since 1.6.0
+     */
     public ForestRequestConditionWrapper<T> ifNotNullThen(Object value, Consumer<ForestRequest<?>> consumer) {
         return ifThen(value != null, consumer);
     }
 
-
+    /**
+     * 链式条件函数: 如果字符串为空，则执行 Lambda 函数，否则可能执行 {@code elseIfThen}、{@code elseThen} 等其他链式提交方法，也可能什么都不执行
+     * <p>并返回一个 Forest 请求提交包装对象</p>
+     *
+     * @param value 被判断字符串
+     * @param consumer Lambda 函数
+     * @return {@link ForestRequestConditionWrapper} Forest 请求提交包装对象
+     * @since 1.6.0
+     */
     public ForestRequestConditionWrapper<T> ifEmptyThen(CharSequence value, Consumer<ForestRequest<?>> consumer) {
         return ifThen(StringUtils.isEmpty(value), consumer);
     }
 
+    /**
+     * 链式条件函数: 如果字符串不为空，则执行 Lambda 函数，否则可能执行 {@code elseIfThen}、{@code elseThen} 等其他链式提交方法，也可能什么都不执行
+     * <p>并返回一个 Forest 请求提交包装对象</p>
+     *
+     * @param value 被判断字符串
+     * @param consumer Lambda 函数
+     * @return {@link ForestRequestConditionWrapper} Forest 请求提交包装对象
+     * @since 1.6.0
+     */
     public ForestRequestConditionWrapper<T> ifNotEmptyThen(CharSequence value, Consumer<ForestRequest<?>> consumer) {
         return ifThen(StringUtils.isNotEmpty(value), consumer);
     }
-
-
 
     /**
      * 获取该请求的配置对象
@@ -571,7 +658,6 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         return configuration;
     }
 
-
     /**
      * 获取请求协议
      *
@@ -580,7 +666,6 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     public ForestProtocol getProtocol() {
         return protocol;
     }
-
 
     /**
      * 设置请求协议

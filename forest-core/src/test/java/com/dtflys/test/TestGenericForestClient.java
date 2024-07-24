@@ -2402,7 +2402,7 @@ public class TestGenericForestClient extends BaseClientTest {
         mockRequest(server)
                 .assertHeaderEquals("A", "-1")
                 .assertHeaderEquals("B", "100")
-                .assertHeaderEquals("C", "200");;
+                .assertHeaderEquals("C", "200");
     }
 
     @Test
