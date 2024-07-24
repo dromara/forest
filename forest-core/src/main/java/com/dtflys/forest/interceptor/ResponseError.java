@@ -2,9 +2,9 @@ package com.dtflys.forest.interceptor;
 
 public class ResponseError implements ResponseResult {
 
-    private final Exception exception;
+    private final Throwable exception;
 
-    public ResponseError(Exception exception) {
+    public ResponseError(Throwable exception) {
         this.exception = exception;
     }
 
@@ -13,7 +13,7 @@ public class ResponseError implements ResponseResult {
         return ResponseResultStatus.ERROR;
     }
 
-    public Exception getException() {
+    public Throwable getException() {
         return exception;
     }
 }

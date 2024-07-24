@@ -34,6 +34,7 @@ import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.callback.OnRedirection;
+import com.dtflys.forest.callback.OnResponse;
 import com.dtflys.forest.callback.OnRetry;
 import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.callback.OnSuccess;
@@ -313,6 +314,11 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * <p>接口方法调用时传入的参数表
      */
     private Object[] arguments;
+
+    /**
+     * 回调函数：接收到请求响应时调用
+     */
+    private OnResponse onResponse;
 
     /**
      * 回调函数：请求成功时调用
@@ -3671,6 +3677,41 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         return addFile(name, bytes, filename, null);
     }
 
+    /**
+     * 获取OnResponse回调函数，该回调函数在接收到请求响应时调用
+     *
+     * @return {@link OnResponse}接口实例
+     * @since v1.6.0
+     */
+    public OnResponse getOnResponse() {
+        return onResponse;
+    }
+
+    /**
+     * 设置OnResponse回调函数，该回调函数在接收到请求响应时调用
+     *
+     * @param onResponse {@link OnResponse}接口实例
+     * @return {@link ForestRequest}类实例
+     * @since v1.6.0
+     */
+    public ForestRequest<T> setOnResponse(OnResponse onResponse) {
+        this.onResponse = onResponse;
+        return this;
+    }
+
+    /**
+     * 设置OnResponse回调函数，该回调函数在接收到请求响应时调用
+     * <p>同 {@link ForestRequest#setOnResponse(OnResponse)}
+     *
+     * @param onResponse {@link OnResponse}接口实例
+     * @return {@link ForestRequest}类实例
+     * @see ForestRequest#setOnResponse(OnResponse)
+     * @since v1.6.0
+     */
+    public ForestRequest<T> onResponse(OnResponse onResponse) {
+        return setOnResponse(onResponse);
+    }
+
 
     /**
      * 获取OnSuccess回调函数，该回调函数在请求成功时被调用
@@ -3703,7 +3744,6 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     public ForestRequest<T> onSuccess(OnSuccess onSuccess) {
         return setOnSuccess(onSuccess);
     }
-
 
     /**
      * 获取OnError回调函数，该回调函数在请求失败时被调用
@@ -4815,6 +4855,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         newRequest.retryer = this.retryer;
         newRequest.maxRetryCount = this.maxRetryCount;
         newRequest.maxRetryInterval = this.maxRetryInterval;
+        newRequest.onResponse = this.onResponse;
         newRequest.onSuccess = this.onSuccess;
         newRequest.successWhen = this.successWhen;
         newRequest.onError = this.onError;

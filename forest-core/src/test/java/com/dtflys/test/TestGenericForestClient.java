@@ -2,6 +2,7 @@ package com.dtflys.test;
 
 import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONReader;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.annotation.Body;
@@ -9,6 +10,7 @@ import com.dtflys.forest.annotation.Post;
 import com.dtflys.forest.annotation.Var;
 import com.dtflys.forest.auth.BasicAuth;
 import com.dtflys.forest.backend.ContentType;
+import com.dtflys.forest.callback.OnResponse;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestEncoder;
@@ -26,6 +28,7 @@ import com.dtflys.forest.http.ForestURL;
 import com.dtflys.forest.http.Lazy;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorChain;
+import com.dtflys.forest.interceptor.ResponseResult;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.retryer.NoneRetryer;
@@ -40,29 +43,36 @@ import com.dtflys.test.model.Contact;
 import com.dtflys.test.model.Result;
 import com.dtflys.test.sse.MySSEHandler;
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okio.Buffer;
 import okio.Okio;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -831,6 +841,25 @@ public class TestGenericForestClient extends BaseClientTest {
         assertThat(result.get("data")).isEqualTo("2");
     }
 
+
+    @Test
+    public void testRequest_get_return_map_onResponse() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Map<String, String> result = Forest.get("/")
+                .address("localhost", server.getPort())
+                .onResponse((req, res) -> {
+                    Map<String, String> map = new HashMap<>();
+                    map.put("a", "1");
+                    map.put("b", "2");
+                    return ResponseResult.success(map);
+                })
+                .executeAsMap();
+        assertThat(result).isNotNull();
+        assertThat(result.get("a")).isEqualTo("1");
+        assertThat(result.get("b")).isEqualTo("2");
+    }
+
+
     @Test
     public void testRequest_get_return_map2() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
@@ -851,6 +880,41 @@ public class TestGenericForestClient extends BaseClientTest {
         assertThat(result).isNotNull();
         assertThat(result).isEqualTo(Lists.newArrayList(1, 2, 3));
     }
+
+    @Test
+    public void testRequest_get_return_list_onResponse() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        List<Integer> result = Forest.get("http://localhost:{}", server.getPort())
+                .onResponse((req, res) -> ResponseResult.success(Lists.newArrayList(1, 2, 3)))
+                .executeAsList();
+        assertThat(result).isNotNull();
+        assertThat(result).isEqualTo(Lists.newArrayList(1, 2, 3));
+    }
+
+    @Test
+    public void testRequest_get_return_stream_onResponse() {
+        server.enqueue(new MockResponse().setBody("[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"));
+        List<Integer> result = Forest.get("http://localhost:{}", server.getPort())
+                .onResponse((req, res) -> {
+                    try (JSONReader jsonReader = new JSONReader(new InputStreamReader(res.getInputStream()))) {
+                        List<Integer> list = new ArrayList<>();
+                        jsonReader.startArray();
+                        while (jsonReader.hasNext()) {
+                            list.add(jsonReader.readInteger());
+                        }
+                        jsonReader.endArray();
+                        return ResponseResult.success(list);
+                    } catch (Exception e) {
+                        return ResponseResult.error(e);
+                    }
+                })
+                .executeAsList();
+        assertThat(result).isNotNull();
+        assertThat(result).isEqualTo(Lists.newArrayList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+    }
+
+
+
 
     @Test
     public void testRequest_get_return_map_list() {
@@ -922,6 +986,10 @@ public class TestGenericForestClient extends BaseClientTest {
         assertThat(result.getStatus()).isEqualTo(1);
         assertThat(result.getData()).isEqualTo(2);
     }
+
+
+
+
 
     @Test
     public void testRequest_get_query_keys() {

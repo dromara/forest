@@ -2,6 +2,7 @@ package com.dtflys.forest.reflection;
 
 import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
+import com.dtflys.forest.callback.OnResponse;
 import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.converter.ForestEncoder;
@@ -155,7 +156,17 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
     public ResponseResult handleResponse(ForestRequest request, ForestResponse response) {
         this.response = response;
         handleSaveCookie(request, response);
-        return request.getInterceptorChain().onResponse(request, response);
+        ResponseResult result = request.getInterceptorChain().onResponse(request, response);
+        if (result != null
+                && (ResponseResultStatus.ERROR.equals(result.getStatus())
+                || ResponseResultStatus.SUCCESS.equals(result.getStatus()))) {
+            return result;
+        }
+        final OnResponse onResponse = request.getOnResponse();
+        if (onResponse != null) {
+            result = onResponse.onResponse(request, response);
+        }
+        return result;
     }
 
 
