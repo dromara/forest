@@ -1,5 +1,6 @@
 package com.dtflys.forest.reflection;
 
+import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.interceptor.Interceptor;
@@ -7,6 +8,7 @@ import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.utils.ForestDataType;
 
 import java.lang.annotation.Annotation;
+import java.util.Map;
 
 public class MetaRequest {
 
@@ -40,6 +42,11 @@ public class MetaRequest {
      * whether can use async http request or not
      */
     private boolean async;
+
+    /**
+     * 指定异步线程池名称
+     */
+    private String asyncPoolName;
 
     /**
      * timeout
@@ -138,9 +145,12 @@ public class MetaRequest {
      */
     private LogConfiguration logConfiguration;
 
+
     public MetaRequest(Annotation requestAnnotation) {
         this.requestAnnotation = requestAnnotation;
     }
+
+
 
     public MetaRequest() {
     }
@@ -196,6 +206,14 @@ public class MetaRequest {
 
     public void setAsync(boolean async) {
         this.async = async;
+    }
+
+    public void setAsyncPoolName(String asyncPoolName) {
+        this.asyncPoolName = asyncPoolName;
+    }
+
+    public String getAsyncPoolName() {
+        return asyncPoolName;
     }
 
     public Integer getTimeout() {

@@ -75,6 +75,12 @@ public @interface Put {
     boolean async() default false;
 
     /**
+     * 异步请求时，指定线程池的名称
+     * @return asyncPoolName
+     */
+    String asyncPoolName() default "";
+
+    /**
      * 请求超时时间, 单位为毫秒
      * @return 请求超时时间
      * @deprecated 请使用 {@link #connectTimeout()} 和 {@link #readTimeout()}

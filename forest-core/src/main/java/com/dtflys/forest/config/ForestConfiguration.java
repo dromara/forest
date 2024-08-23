@@ -138,6 +138,12 @@ public class ForestConfiguration implements Serializable {
     private Integer maxRequestQueueSize;
 
     /**
+     * 多异步线程池配置
+     * Configuring multiple asynchronous thread pools
+     */
+    private Map<String,MultiAsyncPoolConfig> multiAsyncPoolConfig = new HashMap<>();
+
+    /**
      * 最大异步线程池大小
      */
     private Integer maxAsyncThreadSize;
@@ -364,7 +370,7 @@ public class ForestConfiguration implements Serializable {
      *
      * @since 1.5.29
      */
-    ThreadPoolExecutor asyncPool;
+    Map<String,ThreadPoolExecutor>  asyncPools = new HashMap<>();
 
 
     /**
@@ -454,6 +460,14 @@ public class ForestConfiguration implements Serializable {
      */
     public Map<Class, Object> getInstanceCache() {
         return instanceCache;
+    }
+
+    public Map<String, MultiAsyncPoolConfig> getMultiAsyncPoolConfig() {
+        return multiAsyncPoolConfig;
+    }
+
+    public void setMultiAsyncPoolConfig(Map<String, MultiAsyncPoolConfig> multiAsyncPoolConfig) {
+        this.multiAsyncPoolConfig = multiAsyncPoolConfig;
     }
 
     /**
@@ -2095,5 +2109,34 @@ public class ForestConfiguration implements Serializable {
                 .setUrl(url, args);
     }
 
+    /**
+     * 多异步线程池配置
+     */
+    public static class MultiAsyncPoolConfig {
+        /**
+         * Maximum number of async requests threads
+         */
+        private int maxAsyncThreadSize = 200;
 
+        /**
+         * Capacity of async requests queue
+         */
+        private int maxAsyncQueueSize = 100;
+
+        public int getMaxAsyncThreadSize() {
+            return maxAsyncThreadSize;
+        }
+
+        public void setMaxAsyncThreadSize(int maxAsyncThreadSize) {
+            this.maxAsyncThreadSize = maxAsyncThreadSize;
+        }
+
+        public int getMaxAsyncQueueSize() {
+            return maxAsyncQueueSize;
+        }
+
+        public void setMaxAsyncQueueSize(int maxAsyncQueueSize) {
+            this.maxAsyncQueueSize = maxAsyncQueueSize;
+        }
+    }
 }

@@ -1,0 +1,11 @@
+forest:
+  multi-async-pool-config:
+    high:
+      max-async-queue-size: 5
+      max-async-thread-size: 10
+    normal:
+      max-async-queue-size: 5
+      max-async-thread-size: 5
+    fullTest:
+      max-async-queue-size: 5
+      max-async-thread-size: 3
