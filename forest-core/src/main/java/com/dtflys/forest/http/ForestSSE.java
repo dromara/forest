@@ -47,8 +47,6 @@ import java.util.function.Function;
  */
 public class ForestSSE implements ForestSSEListener<ForestSSE> {
 
-    private final static ForestCache<Type, ForestSSE> SSE_CACHE = new ForestCache<>(128);
-
     private ForestRequest request;
 
     private Consumer<EventSource> onOpenConsumer;
