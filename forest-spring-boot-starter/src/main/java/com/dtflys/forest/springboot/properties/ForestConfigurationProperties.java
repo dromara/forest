@@ -3,6 +3,7 @@ package com.dtflys.forest.springboot.properties;
 import com.dtflys.forest.callback.AddressSource;
 import com.dtflys.forest.callback.RetryWhen;
 import com.dtflys.forest.callback.SuccessWhen;
+import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestAsyncMode;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.logging.DefaultLogHandler;
@@ -55,6 +56,12 @@ public class ForestConfigurationProperties {
      * Capacity of async requests queue
      */
     private int maxAsyncQueueSize = 100;
+
+    /**
+     * 多异步线程池配置
+     * Configuring multiple asynchronous thread pools
+     */
+    private Map<String, ForestConfiguration.MultiAsyncPoolConfig> multiAsyncPoolConfig = new HashMap<>();
 
     /**
      * Parallel mode of async requests
@@ -206,6 +213,37 @@ public class ForestConfigurationProperties {
 
     private Map<String, Class> filters = new HashMap<>();
 
+    /**
+     * 多异步线程池配置
+     */
+    public static class MultiAsyncPoolConfig {
+        /**
+         * Maximum number of async requests threads
+         */
+        private int maxAsyncThreadSize = 200;
+
+        /**
+         * Capacity of async requests queue
+         */
+        private int maxAsyncQueueSize = 100;
+
+        public int getMaxAsyncThreadSize() {
+            return maxAsyncThreadSize;
+        }
+
+        public void setMaxAsyncThreadSize(int maxAsyncThreadSize) {
+            this.maxAsyncThreadSize = maxAsyncThreadSize;
+        }
+
+        public int getMaxAsyncQueueSize() {
+            return maxAsyncQueueSize;
+        }
+
+        public void setMaxAsyncQueueSize(int maxAsyncQueueSize) {
+            this.maxAsyncQueueSize = maxAsyncQueueSize;
+        }
+    }
+
 /*
     public boolean isEnabled() {
         return enabled;
@@ -215,6 +253,13 @@ public class ForestConfigurationProperties {
         this.enabled = enabled;
     }
 */
+    public Map<String, ForestConfiguration.MultiAsyncPoolConfig> getMultiAsyncPoolConfig() {
+        return multiAsyncPoolConfig;
+    }
+
+    public void setMultiAsyncPoolConfig(Map<String, ForestConfiguration.MultiAsyncPoolConfig> multiAsyncPoolConfig) {
+        this.multiAsyncPoolConfig = multiAsyncPoolConfig;
+    }
 
     public String getBeanId() {
         return beanId;

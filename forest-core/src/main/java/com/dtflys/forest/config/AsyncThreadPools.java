@@ -1,12 +1,10 @@
 package com.dtflys.forest.config;
 
 import com.dtflys.forest.backend.AsyncAbortPolicy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -39,6 +37,7 @@ public class AsyncThreadPools {
      * @since 1.5.29
      */
     private final static AsyncAbortPolicy DEFAULT_ASYNC_REQUEST_REJECT_POLICY = new AsyncAbortPolicy();
+    private static final Logger log = LoggerFactory.getLogger(AsyncThreadPools.class);
 
     /**
      * 创建Forest异步请求线程池
@@ -47,36 +46,40 @@ public class AsyncThreadPools {
      * @return {@code ThreadPoolExecutor}对象实例
      * @since 1.5.29
      */
-    private static ThreadPoolExecutor createAsyncThreadPool(final ForestConfiguration configuration) {
-        final Integer maxAsyncThreadSize = configuration.getMaxAsyncThreadSize();
-        final Integer maxQueueSize = configuration.getMaxAsyncQueueSize();
+    private static ThreadPoolExecutor createAsyncThreadPool(final ForestConfiguration configuration, String asyncPoolName) {
+        ForestConfiguration.MultiAsyncPoolConfig multiAsyncPoolConfig = configuration.getMultiAsyncPoolConfig().get(asyncPoolName);
+        if (multiAsyncPoolConfig == null) {
+            return createPool(configuration.getMaxAsyncThreadSize(), configuration.getMaxAsyncQueueSize(), asyncPoolName, configuration.getAsyncRejectPolicy());
+        }
+        return createPool(multiAsyncPoolConfig.getMaxAsyncThreadSize(), multiAsyncPoolConfig.getMaxAsyncQueueSize(), asyncPoolName, configuration.getAsyncRejectPolicy());
+    }
+
+    private static ThreadPoolExecutor createPool(Integer maxAsyncThreadSize, Integer maxQueueSize, String asyncPoolName, RejectedExecutionHandler rejectedExecutionHandler) {
         final int threadSize = maxAsyncThreadSize != null ? maxAsyncThreadSize : DEFAULT_MAX_THREAD_SIZE;
         final int queueSize = maxQueueSize == null ? DEFAULT_MAX_QUEUE_SIZE : maxQueueSize;
-        final BlockingQueue queue = queueSize > 0 ? new LinkedBlockingQueue<>(queueSize) : new SynchronousQueue<>();
-        final ThreadPoolExecutor pool = new ThreadPoolExecutor(
+        final BlockingQueue<Runnable> queue = queueSize > 0 ? new LinkedBlockingQueue<>(queueSize) : new SynchronousQueue<>();
+        log.info("[Forest] create async thread pool, poolName:{} maxThreadSize:{} maxQueueSize:{}", asyncPoolName, threadSize, queueSize);
+        return new ThreadPoolExecutor(
                 threadSize, threadSize,
                 0, TimeUnit.MINUTES,
                 queue,
                 tf -> {
-                    Thread thread = new Thread(tf, "forest-async-" + threadCount.getAndIncrement());
+                    Thread thread = new Thread(tf, "forest-async-" + asyncPoolName + "-" + threadCount.getAndIncrement());
                     thread.setDaemon(true);
                     return thread;
                 },
-                (r, executor) -> (configuration.getAsyncRejectPolicy() != null ?
-                        configuration.getAsyncRejectPolicy() : DEFAULT_ASYNC_REQUEST_REJECT_POLICY)
-                        .rejectedExecution(r, executor)
+                (rejectedExecutionHandler != null ? rejectedExecutionHandler : DEFAULT_ASYNC_REQUEST_REJECT_POLICY)::rejectedExecution
         );
-        return pool;
     }
 
-    public static ThreadPoolExecutor getOrCreate(ForestConfiguration configuration) {
-        ThreadPoolExecutor pool = configuration.asyncPool;
+    public static ThreadPoolExecutor getOrCreate(ForestConfiguration configuration, String asyncPoolName) {
+        ThreadPoolExecutor pool = configuration.asyncPools.get(asyncPoolName);
         if (pool == null) {
             synchronized (configuration.ASYNC_POOL_LOCK) {
-                pool = configuration.asyncPool;
+                pool = configuration.asyncPools.get(asyncPoolName);
                 if (pool == null) {
-                    pool = createAsyncThreadPool(configuration);
-                    configuration.asyncPool = pool;
+                    pool = createAsyncThreadPool(configuration, asyncPoolName);
+                    configuration.asyncPools.put(asyncPoolName, pool);
                 }
             }
         }
@@ -84,7 +87,7 @@ public class AsyncThreadPools {
     }
 
 
-    public static ThreadPoolExecutor get(ForestConfiguration configuration) {
-        return configuration.asyncPool;
+    public static ThreadPoolExecutor get(ForestConfiguration configuration, String asyncPoolName) {
+        return configuration.asyncPools.get(asyncPoolName);
     }
 }

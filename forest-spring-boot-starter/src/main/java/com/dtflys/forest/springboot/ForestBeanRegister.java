@@ -92,6 +92,7 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
         }
 
         beanDefinitionBuilder
+                .addPropertyValue("multiAsyncPoolConfig",forestConfigurationProperties.getMultiAsyncPoolConfig())
                 .addPropertyValue("maxAsyncThreadSize", forestConfigurationProperties.getMaxAsyncThreadSize())
                 .addPropertyValue("maxAsyncQueueSize", forestConfigurationProperties.getMaxAsyncQueueSize())
                 .addPropertyValue("maxConnections", forestConfigurationProperties.getMaxConnections())
