@@ -1456,10 +1456,10 @@ public class ForestMethod<T> implements VariableScope {
      * @return 调用本对象对应方法结束后返回的值，任意类型的对象实例
      */
     public Object invoke(final Object[] args) {
-        Type rType = this.getReturnType();
         final ForestRequest<?> request = makeRequest(args);
         MethodLifeCycleHandler<T> lifeCycleHandler = null;
         request.setBackend(configuration.getBackend());
+        Type rType = this.getReturnType();
         // 如果返回类型为ForestRequest，直接返回请求对象
         if (ForestRequest.class.isAssignableFrom(returnClass)
                 || ForestSSEListener.class.isAssignableFrom(returnClass)) {
