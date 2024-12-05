@@ -61,7 +61,7 @@ public class DefaultBinaryConverter implements ForestConverter<Object>, ForestEn
                     encode = charset.name();
                 }
                 str = IOUtils.toString(tmp, encode);
-            } catch (IOException e) {
+            } catch (Throwable e) {
                 throw new ForestRuntimeException(e);
             }
             if (String.class.isAssignableFrom(targetType)) {

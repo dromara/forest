@@ -85,12 +85,20 @@ public abstract class MappingExceptionUtil {
         for (int i = 0; i < spaceCount; i++) {
             spaceBuilder.append(' ');
         }
-        for (int i = 0; i < startIndex; i++) {
+        for (int i = 0; i < startIndex - 1; i++) {
             spaceBuilder.append(' ');
         }
-        for (int i = startIndex; i < endIndex; i++) {
-            builder.append(errChar);
+        if (startIndex == endIndex) {
+            for (int i = startIndex - 1; i < endIndex + 1; i++) {
+                builder.append(errChar);
+            }
+        } else {
+            spaceBuilder.append(' ');
+            for (int i = startIndex; i < endIndex; i++) {
+                builder.append(errChar);
+            }            
         }
+
         builder.append(' ');
         builder.append(message);
         return "\t" + spaceBuilder + ANSIUtil.colorRed(builder.toString()) + "\n";

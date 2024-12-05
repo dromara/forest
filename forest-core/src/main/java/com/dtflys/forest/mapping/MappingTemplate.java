@@ -3,6 +3,7 @@ package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.ForestProperties;
 import com.dtflys.forest.config.VariableScope;
+import com.dtflys.forest.exceptions.ForestIndexReferenceException;
 import com.dtflys.forest.exceptions.ForestTemplateSyntaxError;
 import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
 import com.dtflys.forest.reflection.ForestMethod;
@@ -230,7 +231,7 @@ public class MappingTemplate {
 
     public MappingExpr parseExpression() {
         MappingExpr expr = null;
-        int startIndex = context.readIndex;
+        int startIndex = context.readIndex + 1;
         while (!isEnd()) {
             char ch = watch(1);
             switch (ch) {
@@ -243,12 +244,12 @@ public class MappingTemplate {
                 case ')':
                 case '}':
                     if (expr == null) {
-                        return new MappingIndex(++context.argumentIndex, startIndex, context.readIndex - 1);
+                        return new MappingIndex(++context.argumentIndex, startIndex, context.readIndex + 1);
                     }
                     if (expr instanceof MappingInteger) {
                         final int idx = ((MappingInteger) expr).getNumber();
                         context.argumentIndex = idx;
-                        return new MappingIndex(context.argumentIndex, startIndex, context.readIndex - 1);
+                        return new MappingIndex(context.argumentIndex, startIndex, context.readIndex + 1);
                     }
                     if (expr instanceof MappingIdentity) {
                         return new MappingReference(forestMethod, variableScope, ((MappingIdentity) expr).getName(), expr.startIndex, expr.endIndex);
@@ -512,6 +513,8 @@ public class MappingTemplate {
             return builder.toString();
         } catch (ForestVariableUndefinedException ex) {
             throw new ForestVariableUndefinedException(annotationType, attributeName, forestMethod, ex.getVariableName(), template, ex.getStartIndex(), ex.getEndIndex());
+        } catch (ForestIndexReferenceException ex) {
+            throw new ForestIndexReferenceException(annotationType, attributeName, forestMethod, ex.getIndex(), ex.getArgumentsLength(), template, ex.getStartIndex(), ex.getEndIndex());
         }
     }
 

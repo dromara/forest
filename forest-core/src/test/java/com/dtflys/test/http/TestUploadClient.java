@@ -1093,18 +1093,10 @@ public class TestUploadClient extends BaseClientTest {
         assertNotNull(result);
         mockRequest(server)
                 .assertMultipart("id", params -> {
-                    try {
-                        assertThat(IOUtils.toString(params.get(0).get(), "UTF-8")).isEqualTo("111");
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    assertThat(IOUtils.toString(params.get(0).get(), "UTF-8")).isEqualTo("111");
                 })
                 .assertMultipart("key", params -> {
-                    try {
-                        assertThat(IOUtils.toString(params.get(0).get(), "UTF-8")).isEqualTo("value");
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    assertThat(IOUtils.toString(params.get(0).get(), "UTF-8")).isEqualTo("value");
                 });
     }
 

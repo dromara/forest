@@ -1,5 +1,6 @@
 package com.dtflys.forest.mapping;
 
+import com.dtflys.forest.exceptions.ForestIndexReferenceException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.reflection.ForestMethod;
 
@@ -19,14 +20,15 @@ public class MappingIndex extends MappingExpr {
 
     @Override
     public Object render(Object[] args) {
-        if (index < 0) {
-            int argIndex = args.length + index;
-            if (argIndex < 0) {
-                throw new ForestRuntimeException(new IndexOutOfBoundsException(index + " is a invalid index"));
+        try {
+            if (index < 0) {
+                int argIndex = args.length + index;
+                return args[argIndex];
             }
-            return args[argIndex];
+            return args[index];
+        } catch (Throwable t) {
+            throw new ForestIndexReferenceException(index, args.length, startIndex, endIndex);
         }
-        return args[index];
     }
 
     @Override

@@ -2071,7 +2071,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
             synchronized (this) {
                 if (filename == null) {
                     String[] strs = getUrl().split("/");
-                    filename = strs[strs.length - 1];
+                    filename = strs[strs.length - 1].replaceAll(":", "_");
                 }
             }
         }
