@@ -64,16 +64,8 @@ public class ForestBeanBuilder {
         ForestConfiguration forestConfiguration = ForestConfiguration.createConfiguration();
 
         Class<? extends ForestLogHandler> logHandlerClass = forestConfigurationProperties.getLogHandler();
-        ForestLogHandler logHandler = null;
-        if (logHandlerClass != null) {
-            try {
-                logHandler = logHandlerClass.newInstance();
-            } catch (InstantiationException e) {
-                throw new ForestRuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new ForestRuntimeException(e);
-            }
-        }
+        ForestLogHandler logHandler = logHandlerClass != null ?
+                forestConfiguration.getForestObject(logHandlerClass) : forestConfiguration.getLogHandler();
 
         forestConfiguration.setMaxAsyncThreadSize(forestConfigurationProperties.getMaxAsyncThreadSize());
         forestConfiguration.setMaxAsyncQueueSize(forestConfigurationProperties.getMaxAsyncQueueSize());
@@ -114,28 +106,27 @@ public class ForestBeanBuilder {
 
 
 
-        ForestConfiguration configuration = forestConfiguration;
-        configuration.setProperties(properties);
-        configuration.setForestObjectFactory(forestObjectFactory);
-        configuration.setInterceptorFactory(forestInterceptorFactory);
+        forestConfiguration.setProperties(properties);
+        forestConfiguration.setForestObjectFactory(forestObjectFactory);
+        forestConfiguration.setInterceptorFactory(forestInterceptorFactory);
 
         Map<String, Class> filters = forestConfigurationProperties.getFilters();
         for (Map.Entry<String, Class> entry : filters.entrySet()) {
             String filterName = entry.getKey();
             Class filterClass = entry.getValue();
-            configuration.registerFilter(filterName, filterClass);
+            forestConfiguration.registerFilter(filterName, filterClass);
         }
 
         ForestConvertProperties convertProperties = forestConfigurationProperties.getConverters();
         if (convertProperties != null) {
-            registerConverter(configuration, ForestDataType.TEXT, convertProperties.getText());
-            registerConverter(configuration, ForestDataType.JSON, convertProperties.getJson());
-            registerConverter(configuration, ForestDataType.XML, convertProperties.getXml());
-            registerConverter(configuration, ForestDataType.BINARY, convertProperties.getBinary());
-            registerConverter(configuration, ForestDataType.PROTOBUF, convertProperties.getProtobuf());
+            registerConverter(forestConfiguration, ForestDataType.TEXT, convertProperties.getText());
+            registerConverter(forestConfiguration, ForestDataType.JSON, convertProperties.getJson());
+            registerConverter(forestConfiguration, ForestDataType.XML, convertProperties.getXml());
+            registerConverter(forestConfiguration, ForestDataType.BINARY, convertProperties.getBinary());
+            registerConverter(forestConfiguration, ForestDataType.PROTOBUF, convertProperties.getProtobuf());
         }
 
-        return configuration;
+        return forestConfiguration;
     }
 
 

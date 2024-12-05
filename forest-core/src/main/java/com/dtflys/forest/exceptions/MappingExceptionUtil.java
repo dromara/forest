@@ -59,7 +59,7 @@ public abstract class MappingExceptionUtil {
                         .append(attributeName)
                         .append(" = ")
                         .append(ANSIUtil.COLOR_END);
-                int spaceCount = attrBuilder.toString().length() - ANSIUtil.COLOR_CHARS_LENGTH * 2;
+                int spaceCount = ("attribute: " + attributeName + " = \"").length();
                 attrBuilder.append(ANSIUtil.colorGreen("\"" + source + "\"")).append("\n");
                 if (startIndex != -1 && endIndex != -1) {
                     attrBuilder.append(errorLine(message, spaceCount, startIndex, endIndex));
@@ -91,8 +91,8 @@ public abstract class MappingExceptionUtil {
         for (int i = startIndex; i < endIndex; i++) {
             builder.append(errChar);
         }
-        builder.append(" ");
-        builder.append( message);
+        builder.append(' ');
+        builder.append(message);
         return "\t" + spaceBuilder + ANSIUtil.colorRed(builder.toString()) + "\n";
     }
 

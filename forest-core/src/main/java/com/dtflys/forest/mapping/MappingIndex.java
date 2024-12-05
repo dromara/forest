@@ -10,9 +10,11 @@ public class MappingIndex extends MappingExpr {
 
     private final Integer index;
 
-    public MappingIndex(Integer index) {
+    public MappingIndex(Integer index, int startIndex, int endIndex) {
         super(null, Token.INDEX);
         this.index = index;
+        this.startIndex = startIndex;
+        this.endIndex = endIndex;
     }
 
     @Override

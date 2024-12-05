@@ -112,6 +112,7 @@ public class MappingTemplate {
         context.readIndex = -1;
         exprList = new ArrayList<>();
         StringBuffer buffer = new StringBuffer();
+        int startIndex = context.readIndex;
 
         while (!isEnd()) {
             char ch = nextChar();
@@ -120,7 +121,8 @@ public class MappingTemplate {
                 if (ch1 == '{') {
                     nextChar();
                     if (buffer.length() > 0) {
-                        MappingString str = new MappingString(buffer.toString());
+                        MappingString str = new MappingString(buffer.toString(), startIndex, startIndex + buffer.length());
+                        startIndex = context.readIndex;
                         exprList.add(str);
                     }
 
@@ -135,7 +137,8 @@ public class MappingTemplate {
             }
             else if (ch == '{') {
                 if (buffer.length() > 0) {
-                    MappingString str = new MappingString(buffer.toString());
+                    MappingString str = new MappingString(buffer.toString(), startIndex, startIndex + buffer.length());
+                    startIndex = context.readIndex;
                     exprList.add(str);
                 }
                 int oldIndex = context.readIndex;
@@ -144,8 +147,9 @@ public class MappingTemplate {
                 try {
                     expr = parseExpression();
                 } catch (ForestTemplateSyntaxError th) {
-                    exprList.add(new MappingString("{"));
+                    exprList.add(new MappingString("{", startIndex, startIndex + 1));
                     context.readIndex = oldIndex;
+                    startIndex = context.readIndex;
                     continue;
                 }
                 match('}');
@@ -160,7 +164,8 @@ public class MappingTemplate {
                 if (ch1 == '{') {
                     nextChar();
                     if (buffer.length() > 0) {
-                        MappingString str = new MappingString(buffer.toString());
+                        MappingString str = new MappingString(buffer.toString(), startIndex, startIndex + buffer.length());
+                        startIndex = context.readIndex;
                         exprList.add(str);
                     }
                     buffer = new StringBuffer();
@@ -186,7 +191,7 @@ public class MappingTemplate {
 
 
         if (buffer.length() > 0) {
-            MappingString str = new MappingString(buffer.toString());
+            MappingString str = new MappingString(buffer.toString(), startIndex, startIndex + buffer.length());
             exprList.add(str);
         }
     }
@@ -225,6 +230,7 @@ public class MappingTemplate {
 
     public MappingExpr parseExpression() {
         MappingExpr expr = null;
+        int startIndex = context.readIndex;
         while (!isEnd()) {
             char ch = watch(1);
             switch (ch) {
@@ -237,12 +243,12 @@ public class MappingTemplate {
                 case ')':
                 case '}':
                     if (expr == null) {
-                        return new MappingIndex(++context.argumentIndex);
+                        return new MappingIndex(++context.argumentIndex, startIndex, context.readIndex - 1);
                     }
                     if (expr instanceof MappingInteger) {
                         final int idx = ((MappingInteger) expr).getNumber();
                         context.argumentIndex = idx;
-                        return new MappingIndex(context.argumentIndex);
+                        return new MappingIndex(context.argumentIndex, startIndex, context.readIndex - 1);
                     }
                     if (expr instanceof MappingIdentity) {
                         return new MappingReference(forestMethod, variableScope, ((MappingIdentity) expr).getName(), expr.startIndex, expr.endIndex);
@@ -264,7 +270,7 @@ public class MappingTemplate {
                     break;
                 case '.':
                     nextChar();
-                    int startIndex = context.readIndex;
+                    startIndex = context.readIndex;
                     if (expr instanceof MappingIdentity) {
                         expr = new MappingReference(forestMethod, variableScope, ((MappingIdentity) expr).getName(), expr.startIndex, expr.endIndex);
                     }
@@ -333,7 +339,7 @@ public class MappingTemplate {
 
     public MappingExpr parseTextToken() {
         char ch = watch(1);
-        int startIndex = context.readIndex;
+        int startIndex = context.readIndex + 1;
         StringBuilder builder = new StringBuilder();
         if (Character.isAlphabetic(ch) || ch == '_') {
             do {
@@ -342,7 +348,7 @@ public class MappingTemplate {
                 ch = watch(1);
             } while (Character.isAlphabetic(ch) || Character.isDigit(ch) || ch == '_');
         }
-        int endIndex = context.readIndex;
+        int endIndex = context.readIndex + 1;
         String text = builder.toString();
         if ("true".equals(text)) {
             return new MappingBoolean(true, startIndex, endIndex);
@@ -358,6 +364,7 @@ public class MappingTemplate {
         char ch = watch(1);
         int index = 0;
         int n = 0;
+        int startIndex = context.readIndex + 1;
         while (Character.isDigit(ch)) {
             int x = ch - '0';
             index = 10 * n + x;
@@ -365,7 +372,8 @@ public class MappingTemplate {
             nextChar();
             ch = watch(1);
         }
-        return new MappingIndex(index);
+        int endIndex = context.readIndex + 1;
+        return new MappingIndex(index, startIndex, endIndex);
     }
 
 
@@ -373,12 +381,14 @@ public class MappingTemplate {
     public MappingString parseString(char quoteChar) {
         StringBuilder builder = new StringBuilder();
         char ch = watch(1);
+        int startIndex = context.readIndex + 1;
         while (ch != quoteChar && !isEnd()) {
             builder.append(ch);
             nextChar();
             ch = watch(1);
         }
-        return new MappingString(builder.toString());
+        int endIndex = context.readIndex + 1;
+        return new MappingString(builder.toString(), startIndex, endIndex);
     }
 
 

@@ -1,5 +1,6 @@
 package com.dtflys.test;
 
+import cn.hutool.cache.impl.LRUCache;
 import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONReader;
@@ -14,6 +15,7 @@ import com.dtflys.forest.callback.OnResponse;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestEncoder;
+import com.dtflys.forest.converter.text.DefaultTextConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestAddress;
 import com.dtflys.forest.http.ForestAsyncMode;
@@ -1104,14 +1106,13 @@ public class TestGenericForestClient extends BaseClientTest {
     public void testRequest_content_type_with_charset() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.post("http://localhost:{}/test", server.getPort())
-                .contentTypeJson()
-                .addHeader("Content-Type", "application/json; charset=UTF-8")
-                .addHeader("name", "Forest.backend = okhttp3")
+                .addHeader("Content-Type", "multipart/form-data")
+                .bodyType(ForestDataType.TEXT)
                 .addBody("{\"id\":\"1972664191\", \"name\":\"XieYu20011008\"}")
                 .executeAsString();
         mockRequest(server)
                 .assertBodyEquals("{\"id\":\"1972664191\", \"name\":\"XieYu20011008\"}")
-                .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
+                .assertHeaderEquals("Content-Type", "multipart/form-data");
     }
 
     @Test

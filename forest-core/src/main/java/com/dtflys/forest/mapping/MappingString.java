@@ -13,9 +13,11 @@ public class MappingString extends MappingExpr {
         return text;
     }
 
-    public MappingString(String text) {
+    public MappingString(String text, int startIndex, int endIndex) {
         super(null, Token.STRING);
         this.text = text;
+        this.startIndex = startIndex;
+        this.endIndex = endIndex;
     }
 
     @Override

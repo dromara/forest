@@ -34,52 +34,31 @@ public class ANSIUtil {
 
 
     public static String colorRed(String text) {
-        if (isUnix) {
-            return "\u001B[31m" + text + "\u001B[0m";
-        }
-        return text;
+        return "\u001B[31m" + text + "\u001B[0m";
     }
 
     public static String colorGreen(String text) {
-        if (isUnix) {
-            return "\u001B[32m" + text + "\u001B[0m";
-        }
-        return text;
+        return "\u001B[32m" + text + "\u001B[0m";
     }
 
     public static String colorYellow(String text) {
-        if (isUnix) {
-            return "\u001B[33m" + text + "\u001B[0m";
-        }
-        return text;
+        return "\u001B[33m" + text + "\u001B[0m";
     }
 
     public static String colorBlue(String text) {
-        if (isUnix) {
-            return "\u001B[34m" + text + "\u001B[0m";
-        }
-        return text;
+        return "\u001B[34m" + text + "\u001B[0m";
     }
 
     public static String colorPurple(String text) {
-        if (isUnix) {
-            return "\u001B[35m" + text + "\u001B[0m";
-        }
-        return text;
+        return "\u001B[35m" + text + "\u001B[0m";
     }
 
     public static String colorCyan(String text) {
-        if (isUnix) {
-            return "\u001B[36m" + text + "\u001B[0m";
-        }
-        return text;
+        return "\u001B[36m" + text + "\u001B[0m";
     }
 
     public static String colorGray(String text) {
-        if (isUnix) {
-            return "\u001B[37m" + text + "\u001B[0m";
-        }
-        return text;
+        return "\u001B[37m" + text + "\u001B[0m";
     }
 
 }

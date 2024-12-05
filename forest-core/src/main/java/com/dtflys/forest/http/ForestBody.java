@@ -436,6 +436,13 @@ public class ForestBody implements List<ForestRequestBody> {
 
     @Override
     public boolean remove(Object o) {
+        if (o instanceof CharSequence) {
+            ForestRequestBody item = getNameValueBody(String.valueOf(o));
+            if (item != null) {
+                return bodyItems.remove(item);
+            }
+            return false;
+        }
         return bodyItems.remove(o);
     }
 
