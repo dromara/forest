@@ -5,9 +5,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.dtflys.forest</groupId>
-  <artifactId>forest-jaxb</artifactId>
+  <artifactId>forest-jsonpath</artifactId>
   <version>${revision}</version>
-  <name>forest-jaxb</name>
+  <name>forest-jsonpath</name>
 
   <parent>
     <groupId>com.dtflys.forest</groupId>
@@ -18,7 +18,7 @@
   <properties>
     <maven.compiler.source>8</maven.compiler.source>
     <maven.compiler.target>8</maven.compiler.target>
-    <glassfish.jaxb.version>2.3.1</glassfish.jaxb.version>
+    
   </properties>
 
 
@@ -31,9 +31,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.glassfish.jaxb</groupId>
-      <artifactId>jaxb-runtime</artifactId>
-      <version>${glassfish.jaxb.version}</version>
+      <groupId>com.jayway.jsonpath</groupId>
+      <artifactId>json-path</artifactId>
+      <version>${jsonpath.version}</version>
     </dependency>
 
     <dependency>
@@ -54,9 +54,7 @@
       <groupId>com.alibaba</groupId>
       <artifactId>fastjson</artifactId>
       <version>${fastjson.version}</version>
-      <scope>provided</scope>
     </dependency>
-
 
   </dependencies>
 

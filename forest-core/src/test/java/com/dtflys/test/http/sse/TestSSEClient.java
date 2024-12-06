@@ -5,12 +5,12 @@ import com.dtflys.forest.http.ForestSSE;
 import com.dtflys.test.http.BaseClientTest;
 import com.dtflys.test.model.Contact;
 import com.dtflys.test.sse.MySSEHandler;
-import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.Rule;
 import org.junit.Test;
+
+import javax.naming.Name;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -41,23 +41,21 @@ public class TestSSEClient extends BaseClientTest {
 
         StringBuffer buffer = new StringBuffer();
 
-        ForestSSE sse = sseClient.testSSE();
-        assertThat(sse).isNotNull();
-
-        sse.setOnOpen(eventSource -> {
-            buffer.append("SSE Open\n");
-        }).setOnClose((req, res) -> {
-            buffer.append("SSE Close");
-        }).addOnData((eventSource, name, value) -> {
-            buffer.append("Receive data: ").append(value).append("\n");
-        }).addOnEvent((eventSource, name, value) -> {
-            buffer.append("Receive event: ").append(value).append("\n");
-            if ("close".equals(value)) {
-                eventSource.close();
-            }
-        }).addConsumer("event", Contact.class, (eventSource, name, value) -> {
-            buffer.append("name: ").append(value.getName()).append("; age: ").append(value.getAge()).append("\n");
-        })
+        sseClient.testSSE()
+            .setOnOpen(eventSource -> {
+                buffer.append("SSE Open\n");
+            }).setOnClose((req, res) -> {
+                buffer.append("SSE Close");
+            }).addOnData((eventSource, name, value) -> {
+                buffer.append("Receive data: ").append(value).append("\n");
+            }).addOnEvent((eventSource, name, value) -> {
+                buffer.append("Receive event: ").append(value).append("\n");
+                if ("close".equals(value)) {
+                    eventSource.close();
+                }
+            }).addConsumer("event", Contact.class, (eventSource, name, value) -> {
+                buffer.append("name: ").append(value.getName()).append("; age: ").append(value.getAge()).append("\n");
+            })
         .listen();
 
         System.out.println(buffer);
@@ -82,7 +80,11 @@ public class TestSSEClient extends BaseClientTest {
                 "data:dont show"
         ));
 
-        MySSEHandler sse = sseClient.testSSE_withCustomClass().listen();
+        MySSEHandler sse = sseClient.testSSE_withCustomClass()
+                .addConsumer("name", (nameSource, name, value) -> {
+                    System.out.println("------: " + value);
+                })
+                .listen();
         System.out.println(sse.getStringBuffer());
         assertThat(sse.getStringBuffer().toString()).isEqualTo(
                 "SSE Open\n" +

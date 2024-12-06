@@ -206,6 +206,10 @@ public class ForestMethod<T> implements VariableScope {
         return getOrCreateTemplate(annotationType, attributeName, text);
 //        return new MappingTemplate(annotationType, attributeName, this, text, this, configuration.getProperties(), forestParameters);
     }
+    
+    public MappingTemplate makeTemplate(final String text) {
+        return makeTemplate(null, null, text);
+    }
 
     public MappingURLTemplate makeURLTemplate(
             final Class<? extends Annotation> annotationType,

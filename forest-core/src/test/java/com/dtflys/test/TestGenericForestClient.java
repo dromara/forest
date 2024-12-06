@@ -1,6 +1,5 @@
 package com.dtflys.test;
 
-import cn.hutool.cache.impl.LRUCache;
 import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONReader;
@@ -11,11 +10,9 @@ import com.dtflys.forest.annotation.Post;
 import com.dtflys.forest.annotation.Var;
 import com.dtflys.forest.auth.BasicAuth;
 import com.dtflys.forest.backend.ContentType;
-import com.dtflys.forest.callback.OnResponse;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestEncoder;
-import com.dtflys.forest.converter.text.DefaultTextConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestAddress;
 import com.dtflys.forest.http.ForestAsyncMode;
@@ -43,23 +40,20 @@ import com.dtflys.test.http.BaseClientTest;
 import com.dtflys.test.http.model.UserParam;
 import com.dtflys.test.model.Contact;
 import com.dtflys.test.model.Result;
+import com.dtflys.test.model.TestUser;
 import com.dtflys.test.sse.MySSEHandler;
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okio.Buffer;
 import okio.Okio;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -97,6 +91,11 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class TestGenericForestClient extends BaseClientTest {
 
     public final static String EXPECTED = "{\"status\":\"1\", \"data\":\"2\"}";
+
+    public final static String EXPECTED_SINGLE_USER = "{\"status\":\"ok\", \"data\": {\"name\": \"Foo\", \"age\": 12}}";
+
+    public final static String EXPECTED_LIST_USER = "{\"status\":\"ok\", \"data\": [{\"name\": \"Foo\", \"age\": 12}, {\"name\": \"Bar\", \"age\": 22}]}";
+
 
     @Rule
     public final MockWebServer server = new MockWebServer();
@@ -335,7 +334,6 @@ public class TestGenericForestClient extends BaseClientTest {
 
     @Test
     public void testRequest_query_replace_add2() throws UnsupportedEncodingException {
-
         server.enqueue(new MockResponse().setBody(EXPECTED));
         ForestRequest<?> request = Forest.get("/")
                 .port(server.getPort())
@@ -2571,6 +2569,78 @@ public class TestGenericForestClient extends BaseClientTest {
         );
 
     }
+    
+    @Test
+    public void testJsonpath_single_data() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(EXPECTED_SINGLE_USER));
+        TestUser user = Forest.get("http://localhost:{}", server.getPort())
+                .executeAsResponse()
+                .getByPath("$.data", TestUser.class);
+        assertThat(user).isNotNull();
+        assertThat(user.getName()).isEqualTo("Foo");
+        assertThat(user.getAge()).isEqualTo(12);
+    }
+
+
+    @Test
+    public void testJsonpath_single_data_as_list() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(EXPECTED_SINGLE_USER));
+        List<TestUser> userList = Forest.get("http://localhost:{}", server.getPort())
+                .executeAsResponse()
+                .getByPath("$..data", new TypeReference<List<TestUser>>() {});
+        assertThat(userList).isNotNull();
+        assertThat(userList.get(0).getName()).isEqualTo("Foo");
+        assertThat(userList.get(0).getAge()).isEqualTo(12);
+    }
+
+
+    @Test
+    public void testJsonpath_list_data() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(EXPECTED_LIST_USER));
+        List<TestUser> userList = Forest.get("http://localhost:{}", server.getPort())
+                .executeAsResponse()
+                .getByPath("$.data", new TypeReference<List<TestUser>>() {});
+        assertThat(userList).isNotNull();
+        assertThat(userList.get(0).getName()).isEqualTo("Foo");
+        assertThat(userList.get(0).getAge()).isEqualTo(12);
+    }
+
+
+    @Test
+    public void testJsonpath_list_data_with_condition() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(EXPECTED_LIST_USER));
+        List<TestUser> userList = Forest.get("http://localhost:{}", server.getPort())
+                .executeAsResponse()
+                .getByPath("$.data[?(@.age>20)]", new TypeReference<List<TestUser>>() {});
+        assertThat(userList).isNotNull();
+        assertThat(userList.get(0).getName()).isEqualTo("Bar");
+        assertThat(userList.get(0).getAge()).isEqualTo(22);
+    }
+
+    @Test
+    public void testJsonpath_list_data_with_condition_and_variable() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(EXPECTED_LIST_USER));
+        Forest.config().setVariableValue("maxAge", 20);
+        List<TestUser> userList = Forest.get("http://localhost:{}", server.getPort())
+                .executeAsResponse()
+                .getByPath("$.data[?(@.age>{maxAge})]", new TypeReference<List<TestUser>>() {});
+        assertThat(userList).isNotNull();
+        assertThat(userList.get(0).getName()).isEqualTo("Bar");
+        assertThat(userList.get(0).getAge()).isEqualTo(22);
+    }
+
+
+    @Test
+    public void testJsonpath_list_user_ages_with_condition_and_variable() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(EXPECTED_LIST_USER));
+        Forest.config().setVariableValue("minAge", 20);
+        List<Integer> ageList = Forest.get("http://localhost:{}", server.getPort())
+                .executeAsResponse()
+                .getByPath("$.data[?(@.age>{minAge})].age", new TypeReference<List<Integer>>() {});
+        assertThat(ageList).isNotNull();
+        assertThat(ageList.get(0)).isEqualTo(22);
+    }
+
 
 
 /*

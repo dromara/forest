@@ -1,6 +1,5 @@
 package com.dtflys.forest.http;
 
-import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.annotation.SSEDataMessage;
 import com.dtflys.forest.annotation.SSEEventMessage;
 import com.dtflys.forest.annotation.SSEIdMessage;
@@ -8,14 +7,12 @@ import com.dtflys.forest.annotation.SSEMessage;
 import com.dtflys.forest.annotation.SSEName;
 import com.dtflys.forest.annotation.SSERetryMessage;
 import com.dtflys.forest.annotation.SSEValue;
-import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.sse.SSEMessageConsumer;
 import com.dtflys.forest.sse.EventSource;
 import com.dtflys.forest.sse.ForestSSEListener;
-import com.dtflys.forest.sse.SSEStringMessageConsumer;
+import com.dtflys.forest.sse.SSEMessageConsumer;
 import com.dtflys.forest.sse.SSEMessageResult;
-import com.dtflys.forest.utils.ForestCache;
+import com.dtflys.forest.sse.SSEStringMessageConsumer;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
