@@ -1239,6 +1239,8 @@ public class ForestMethod<T> implements VariableScope {
                                             name, subItem,
                                             parameter.isUrlEncode(), parameter.getCharset());
                                 }
+                                // 恢复parentScope, 防止栈溢出
+                                template.setVariableScope(parentScope);
                             } else if (parameter.isJsonParam()) {
                                 request.addJSONQuery(parameter.getName(), obj);
                             } else {
