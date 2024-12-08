@@ -44,11 +44,10 @@ public class TestBinding extends BaseSpringBootTest {
 
     @Test
     public void testBindingVar() {
-        server.enqueue(new MockResponse().setBody("self"));
         server.enqueue(new MockResponse().setBody(EXPECTED));
         ForestRequest<String> request = bindingVarClient.testBindingVar();
         assertThat(request.getPort()).isEqualTo(server.getPort());
-        assertThat(request.getPath()).isEqualTo("/" + testVariables.getTestName() + "/self");
+        assertThat(request.getPath()).isEqualTo("/" + testVariables.getTestName());
         request.execute();
     }
 

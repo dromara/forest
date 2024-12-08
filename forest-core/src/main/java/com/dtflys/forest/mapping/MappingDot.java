@@ -92,16 +92,16 @@ public class MappingDot extends MappingExpr {
         try {
             method = getPropMethodFromClass(obj.getClass(), right);
         } catch (Throwable th) {
-            throw new ForestExpressionException(th.getMessage(), null, null, forestMethod, null, startIndex, endIndex);
+            throw new ForestExpressionException(th.getMessage(), null, null, forestMethod, null, startIndex + 1, endIndex, th);
         }
         if (method == null) {
-            throw new ForestRuntimeException(new NoSuchMethodException(getterName));
+            NoSuchMethodException ex = new NoSuchMethodException(getterName);
+            throw new ForestExpressionException(ex.getMessage(), null, null, forestMethod, null, startIndex + 1, endIndex, ex);
         }
         try {
-            Object result = method.invoke(obj);
-            return result;
-        } catch (InvocationTargetException | IllegalAccessException e) {
-            throw new ForestExpressionException(e.getMessage(), null, null, forestMethod, null, startIndex, endIndex);
+            return method.invoke(obj);
+        } catch (Throwable th) {
+            throw new ForestExpressionException(th.getMessage(), null, null, forestMethod, null, startIndex + 1, endIndex, th);
         }
     }
 

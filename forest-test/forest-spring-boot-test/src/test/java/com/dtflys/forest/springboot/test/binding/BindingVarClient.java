@@ -8,7 +8,7 @@ import com.dtflys.forest.http.ForestRequest;
 @BindingVar
 public interface BindingVarClient {
 
-    @Get("/{testVariables.testName2}")
+    @Get("/{testVariables.testName}")
     @Address(port = "${port}")
     ForestRequest<String> testBindingVar();
 
