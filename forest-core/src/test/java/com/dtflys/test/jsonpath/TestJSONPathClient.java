@@ -9,20 +9,20 @@ import java.util.List;
 
 public interface TestJSONPathClient {
 
-    @Get("http://localhost:${port}/test/user")
+    @Get("http://localhost:{port}/test/user")
     @JSONPathResult("$.data")
     TestUser getSingleUser();
 
-    @Get("http://localhost:${port}/test/user")
+    @Get("http://localhost:{port}/test/user")
     @JSONPathResult("$.data")
     List<TestUser> getListOfUsers();
 
-    @Get("http://localhost:${port}/test/user")
+    @Get("http://localhost:{port}/test/user")
     @JSONPathResult("$.data[*].age")
     List<Integer> getListOfUserAges();
 
 
-    @Get("http://localhost:${port}/test/user")
+    @Get("http://localhost:{port}/test/user")
     @JSONPathResult("$.data[?(@.age>{minAge})].age")
     List<Integer> getListOfUserAges(@Var("minAge") int minAge);
 }
