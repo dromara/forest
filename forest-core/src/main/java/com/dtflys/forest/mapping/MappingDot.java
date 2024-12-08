@@ -1,8 +1,8 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
-import com.dtflys.forest.exceptions.ForestNoSuchMethodException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.exceptions.ForestExpressionException;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.StringUtils;
 
@@ -88,17 +88,20 @@ public class MappingDot extends MappingExpr {
             return ((Map) obj).get(right.getName());
         }
         String getterName = StringUtils.toGetterName(right.getName());
-        Method method = getPropMethodFromClass(obj.getClass(), right);
+        Method method = null;
+        try {
+            method = getPropMethodFromClass(obj.getClass(), right);
+        } catch (Throwable th) {
+            throw new ForestExpressionException(th.getMessage(), null, null, forestMethod, null, startIndex, endIndex);
+        }
         if (method == null) {
             throw new ForestRuntimeException(new NoSuchMethodException(getterName));
         }
         try {
             Object result = method.invoke(obj);
             return result;
-        } catch (InvocationTargetException e) {
-            throw new ForestRuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new ForestRuntimeException(e);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            throw new ForestExpressionException(e.getMessage(), null, null, forestMethod, null, startIndex, endIndex);
         }
     }
 

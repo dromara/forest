@@ -1,7 +1,7 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
-import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.exceptions.ForestExpressionException;
 import com.dtflys.forest.reflection.ForestMethod;
 
 import java.lang.reflect.InvocationTargetException;
@@ -58,14 +58,9 @@ public class MappingInvoke extends MappingDot {
                 result = method.invoke(obj, renderArgs);
             }
             return result;
-        } catch (NoSuchMethodException e) {
-            throw new ForestRuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new ForestRuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new ForestRuntimeException(e);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            throw new ForestExpressionException(e.getMessage(), null, null, forestMethod, null, startIndex, endIndex);
         }
-
     }
 
     @Override

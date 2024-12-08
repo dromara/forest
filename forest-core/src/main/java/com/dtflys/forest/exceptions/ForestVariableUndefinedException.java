@@ -1,10 +1,8 @@
 package com.dtflys.forest.exceptions;
 
 import com.dtflys.forest.reflection.ForestMethod;
-import com.dtflys.forest.utils.StringUtils;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 
 /**
  * Forest变量未定义异常
@@ -12,7 +10,7 @@ import java.lang.reflect.Method;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.5.0
  */
-public class ForestVariableUndefinedException extends MappingExpressionException {
+public class ForestVariableUndefinedException extends ForestExpressionException {
 
 
     private final String variableName;

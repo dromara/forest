@@ -10,7 +10,7 @@ import java.lang.annotation.Annotation;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.5.0
  */
-public class ForestIndexReferenceException extends MappingExpressionException {
+public class ForestIndexReferenceException extends ForestExpressionException {
 
 
     private final int index;

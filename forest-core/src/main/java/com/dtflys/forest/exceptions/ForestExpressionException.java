@@ -4,7 +4,7 @@ import com.dtflys.forest.reflection.ForestMethod;
 
 import java.lang.annotation.Annotation;
 
-public class MappingExpressionException extends RuntimeException {
+public class ForestExpressionException extends RuntimeException {
 
     protected final Class<? extends Annotation> annotationType;
 
@@ -19,11 +19,11 @@ public class MappingExpressionException extends RuntimeException {
 
     protected final int endIndex;
 
-    public MappingExpressionException(String message, Class<? extends Annotation> annotationType, String attributeName, ForestMethod method, String source, int startIndex, int endIndex) {
+    public ForestExpressionException(String message, Class<? extends Annotation> annotationType, String attributeName, ForestMethod method, String source, int startIndex, int endIndex) {
         this(message, annotationType, attributeName, method, source, startIndex, endIndex, null);
     }
 
-    public MappingExpressionException(String message, Class<? extends Annotation> annotationType, String attributeName, ForestMethod method, String source, int startIndex, int endIndex, Throwable cause) {
+    public ForestExpressionException(String message, Class<? extends Annotation> annotationType, String attributeName, ForestMethod method, String source, int startIndex, int endIndex, Throwable cause) {
         super(MappingExceptionUtil.errorMessage(message, annotationType, attributeName, method, source, startIndex, endIndex), cause);
         this.annotationType = annotationType;
         this.attributeName = attributeName;
