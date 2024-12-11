@@ -17,7 +17,7 @@ import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.TypeReference;
-import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStream;

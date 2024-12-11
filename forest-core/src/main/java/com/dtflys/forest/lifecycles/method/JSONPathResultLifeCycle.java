@@ -24,9 +24,7 @@ public class JSONPathResultLifeCycle implements MethodAnnotationLifeCycle<JSONPa
             if (response.isError()) {
                 return ResponseResult.error(response.getException());
             }
-            final String pathStr = Optional.ofNullable(getAttributeAsString(request, "path")).orElse("");
-            final MappingTemplate pathTemplate = request.getMethod().makeTemplate(JSONPathResult.class, "path", pathStr);
-            final String path = pathTemplate.render(request.getArguments());
+            final String path = Optional.ofNullable(getAttributeAsString(request, "path")).orElse("");
             final Type type = request.getMethod().getResultType();
             return ResponseResult.success(response.getByPath(path, type));
         } catch (Throwable th) {
