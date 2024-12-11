@@ -48,10 +48,10 @@
 		<juniversalchardet.version>1.0.3</juniversalchardet.version>
 		<jsr305.version>3.0.1</jsr305.version>
 		<fastjson.version>1.2.83</fastjson.version>
-		<fastjson2.version>2.0.46</fastjson2.version>
-		<jackson.version>2.13.3</jackson.version>
-		<jackson-databind.version>2.13.3</jackson-databind.version>
-		<jackson-annotations.version>2.13.3</jackson-annotations.version>
+		<fastjson2.version>2.0.53</fastjson2.version>
+		<jackson.version>2.18.2</jackson.version>
+		<jackson-databind.version>2.18.2</jackson-databind.version>
+		<jackson-annotations.version>2.18.2</jackson-annotations.version>
 		<gson.version>2.8.9</gson.version>
 		<xercesImpl.version>2.12.2</xercesImpl.version>
 		<slf4j.version>2.0.13</slf4j.version>
@@ -68,7 +68,7 @@
 		<mockserver-netty.version>5.15.0</mockserver-netty.version>
 		<mockito.version>4.5.1</mockito.version>
 		<junit.version>4.13.2</junit.version>
-		<moco-core.version>1.2.0</moco-core.version>
+		<moco-core.version>1.5.0</moco-core.version>
 		<spring-boot-starter-test.version>2.5.12</spring-boot-starter-test.version>
 
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
@@ -134,7 +134,7 @@
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-all</artifactId>
-			<version>4.1.45.Final</version>
+			<version>4.1.115.Final</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -196,6 +196,10 @@
 				<exclusion>
 					<groupId>com.fasterxml.jackson.core</groupId>
 					<artifactId>jackson-databind</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.jayway.jsonpath</groupId>
+					<artifactId>json-path</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
