@@ -23,6 +23,8 @@ public class OAuth2MockServer extends MockServerRule {
             "\"expires_in\": \"1\"" +
             "}";
     public final static String DEFINITION_TOKEN_JSON = "{\"token\":\"" + TOKEN + "\"}";
+    
+    private MockServerClient server;
 
 
 
@@ -31,7 +33,10 @@ public class OAuth2MockServer extends MockServerRule {
     }
 
     public void initServer() {
-        MockServerClient server = new MockServerClient("localhost", getPort());
+        if (server != null) {
+            return;
+        }
+        server = new MockServerClient("localhost", getPort());
         server.when(
                 request()
                         .withPath("/auth/oauth/token")
@@ -112,5 +117,13 @@ public class OAuth2MockServer extends MockServerRule {
         );
 
     }
+    
+    public void stopServer() {
+        if (server != null) {
+            server.stop();
+            server = null;
+        }
+    }
+            
 
 }

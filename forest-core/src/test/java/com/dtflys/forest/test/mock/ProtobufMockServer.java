@@ -12,15 +12,20 @@ import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
 public class ProtobufMockServer extends MockServerRule {
-
-
+    
+    private MockServerClient server;
+    
     public ProtobufMockServer(Object target) {
         super(target);
     }
 
     public void initServer() {
+        
+        if (server != null) {
+            return;
+        }
 
-        MockServerClient server = new MockServerClient("localhost", getPort());
+        server = new MockServerClient("localhost", getPort());
 
         ForestGoogleProtobufConverter protobufConverter = new ForestGoogleProtobufConverter();
 

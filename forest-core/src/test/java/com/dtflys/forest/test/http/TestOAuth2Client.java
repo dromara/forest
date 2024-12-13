@@ -3,6 +3,8 @@ package com.dtflys.forest.test.http;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.test.http.client.OAuth2Client;
 import com.dtflys.forest.test.mock.OAuth2MockServer;
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -33,7 +35,7 @@ public class TestOAuth2Client extends BaseClientTest {
     public static void prepareClient() {
         configuration = ForestConfiguration.createConfiguration();
     }
-
+    
     @Override
     public void afterRequests() {
     }
@@ -42,6 +44,8 @@ public class TestOAuth2Client extends BaseClientTest {
     public void prepareMockServer() {
         server.initServer();
     }
+    
+    
 
     @Test
     public void testPassword() {

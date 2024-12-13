@@ -16,13 +16,19 @@ import static org.mockserver.model.HttpResponse.response;
 public class GetWithBodyMockServer extends MockServerRule {
 
     public final static String EXPECTED = "{\"status\": \"ok\"}";
+    
+    private MockServerClient clientAndServer;
 
     public GetWithBodyMockServer(Object target) {
         super(target);
     }
 
     public void initServer() {
-        MockServerClient clientAndServer = new MockServerClient("localhost", getPort());
+        if (clientAndServer != null) {
+            return;
+        }
+
+        clientAndServer = new MockServerClient("localhost", getPort());
         clientAndServer.when(
                 request()
                         .withPath("/hello/user")
