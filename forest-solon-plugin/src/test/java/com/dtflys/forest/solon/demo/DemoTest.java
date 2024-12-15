@@ -20,8 +20,11 @@ public class DemoTest implements LoadBalance {
         assert ret.contains("html");
     }
 
-    @Override
-    public String getServer() {
+    public String getServer(int port) {
         return "https://www.gitee.com";
+    }
+
+    public String getServer() {
+        return getServer(0);
     }
 }

@@ -25,10 +25,9 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.TrustManager;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author noear
@@ -105,7 +104,6 @@ public class ForestBeanBuilder {
         forestConfiguration.setSslKeyStores(sslKeystoreMap);
 
 
-
         forestConfiguration.setProperties(properties);
         forestConfiguration.setForestObjectFactory(forestObjectFactory);
         forestConfiguration.setInterceptorFactory(forestInterceptorFactory);
@@ -165,10 +163,10 @@ public class ForestBeanBuilder {
 
                 ClassWrap classWrap = ClassWrap.get(type);
 
-                for (Map.Entry<String, FieldWrap> kv : classWrap.getFieldAllWraps().entrySet()) {
-                    String name = kv.getKey();
+                //for (FieldWrap fw : classWrap.getAllFieldWraps()) {
+                for (FieldWrap fw : getAllFieldWraps(classWrap)) {
+                    String name = fw.getName();
                     Object value = parameters.get(name);
-                    FieldWrap fw = kv.getValue();
 
                     if (value != null) {
                         try {
@@ -198,6 +196,21 @@ public class ForestBeanBuilder {
                 throw new ForestRuntimeException("[Forest] Convert type '" + type.getName() + "' cannot be initialized!", e);
             }
         }
+    }
+
+    public Collection<FieldWrap> getAllFieldWraps(ClassWrap classWrap) throws IllegalAccessException, IllegalArgumentException,
+            InvocationTargetException {
+
+        //兼容 3.0 前后
+        for (Method m1 : ClassWrap.class.getMethods()) {
+            if ("getAllFieldWraps".equals(m1.getName())) {
+                return (Collection<FieldWrap>) m1.invoke(classWrap);
+            } else if ("getFieldWraps".equals(m1.getName())) {
+                return ((Map<String, FieldWrap>) m1.invoke(classWrap)).values();
+            }
+        }
+
+        return Collections.emptyList();
     }
 
     public void registerSSLKeyStoreBean(Map<String, SSLKeyStore> map, ForestSSLKeyStoreProperties sslKeyStoreProperties) {
