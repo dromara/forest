@@ -9,18 +9,17 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.converter.json.JSONConverterSelector;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import org.apache.commons.collections.MapUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -306,7 +305,10 @@ public class ReflectUtils {
                 if (checkOverrideAttribute) {
                     OverrideAttribute overrideAttribute = method.getAnnotation(OverrideAttribute.class);
                     if (overrideAttribute != null) {
-                        results.put(name, value);
+                        final Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(overrideAttribute);
+                        final String attrNameFromMap = MapUtils.getString(attrs, "name");
+                        final String attrValue = StringUtils.isEmpty(attrNameFromMap) ? name : attrNameFromMap;
+                        results.put(attrValue, value);
                     }
                 } else {
                     results.put(name, value);

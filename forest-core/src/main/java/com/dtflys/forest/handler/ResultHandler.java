@@ -5,8 +5,10 @@ import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestHandlerException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.http.ForestSSE;
 import com.dtflys.forest.lifecycles.file.DownloadLifeCycle;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
+import com.dtflys.forest.sse.ForestSSEListener;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
 
@@ -15,6 +17,8 @@ import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import java.util.concurrent.Future;
 
 /**
@@ -41,7 +45,7 @@ public class ResultHandler {
      */
     public Object getResult(ForestRequest request, ForestResponse response, Type resultType) {
         final Class<?> clazz = ReflectUtils.toClass(resultType);
-        return getResult(request, response, resultType, clazz);
+        return getResult(null, request, response, resultType, clazz);
     }
 
     /**
@@ -55,11 +59,28 @@ public class ResultHandler {
      */
     public Object getResult(ForestRequest request, ForestResponse response, Class resultClass) {
         final Type type = ReflectUtils.toType(resultClass);
-        return getResult(request, response, type, resultClass);
+        return getResult(null, request, response, type, resultClass);
     }
 
 
-    public Object getResult(ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
+    public Object getResult(Optional<?> resultOpt, ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
+        String optStringValue = null;
+        if (resultOpt != null) {
+            if (Optional.class.isAssignableFrom(resultClass)) {
+                return resultOpt;
+            }
+            final Object optValue = resultOpt.orElse(null);
+            if (optValue == null) {
+                return null;
+            }
+            final Class<?> optValueClass = optValue.getClass();
+            if (resultClass.isAssignableFrom(optValueClass)) {
+                return optValue;
+            }
+            if (Charset.class.isAssignableFrom(optValueClass)) {
+                optStringValue = String.valueOf(optValue);
+            }
+        }
         if (request.isDownloadFile()) {
             return null;
         }
@@ -68,19 +89,22 @@ public class ResultHandler {
                 if (void.class.isAssignableFrom(resultClass)) {
                     return null;
                 }
+                // 处理特殊泛型类型 （ForestResponse, ForestRequest, Optional）
                 if (ForestResponse.class.isAssignableFrom(resultClass)
-                        || ForestRequest.class.isAssignableFrom(resultClass)) {
+                        || ForestRequest.class.isAssignableFrom(resultClass)
+                        || Optional.class.isAssignableFrom(resultClass)) {
                     if (resultType instanceof ParameterizedType) {
                         final ParameterizedType parameterizedType = (ParameterizedType) resultType;
                         final Class<?> rowClass = (Class<?>) parameterizedType.getRawType();
                         if (ForestResponse.class.isAssignableFrom(rowClass)
-                                || ForestRequest.class.isAssignableFrom(resultClass)) {
+                                || ForestRequest.class.isAssignableFrom(resultClass)
+                                || Optional.class.isAssignableFrom(rowClass)) {
                             final Type realType = parameterizedType.getActualTypeArguments()[0];
                             Class<?> realClass = ReflectUtils.toClass(parameterizedType.getActualTypeArguments()[0]);
                             if (realClass == null) {
                                 realClass = String.class;
                             }
-                            final Object realResult = getResult(request, response, realType, realClass);
+                            final Object realResult = getResult(resultOpt, request, response, realType, realClass);
                             response.setResult(realResult);
                         }
                     }
@@ -96,9 +120,15 @@ public class ResultHandler {
                             if (realClass == null) {
                                 return ((MethodLifeCycleHandler<?>) request.getLifeCycleHandler()).getResultData();
                             }
-                            return getResult(request, response, realType, realClass);
+                            return getResult(resultOpt, request, response, realType, realClass);
                         }
                     }
+                }
+                if (ForestSSEListener.class.isAssignableFrom(resultClass)) {
+                    if (ForestSSE.class.equals(resultClass)) {
+                        return request.sse();
+                    }
+                    return request.sse(resultClass);
                 }
                 if (resultClass.isArray()) {
                     if (byte[].class.isAssignableFrom(resultClass)) {
@@ -113,14 +143,14 @@ public class ResultHandler {
                 String responseText = null;
                 if (CharSequence.class.isAssignableFrom(resultClass)) {
                     try {
-                        responseText = response.readAsString();
+                        responseText = optStringValue != null ? optStringValue : response.readAsString();
                     } catch (Throwable th) {
                         request.getLifeCycleHandler().handleError(request, response, th);
                     }
                 }
                 else {
                     try {
-                        responseText = response.getContent();
+                        responseText = optStringValue != null ? optStringValue : response.getContent();
                     } catch (Throwable th) {
                         request.getLifeCycleHandler().handleError(request, response, th);
                     }
@@ -135,14 +165,16 @@ public class ResultHandler {
                     if (contentType != null && contentType.canReadAsString()) {
                         return decoder.convertToJavaObject(responseText, resultType);
                     } else {
-                        return decoder.convertToJavaObject(response.getByteArray(), resultType);
+                        final String charset = response.getCharset();
+                        return decoder.convertToJavaObject(
+                                response.getByteArray(), resultType, Charset.forName(Optional.ofNullable(charset).orElse("UTF-8")));
                     }
                 } else if (CharSequence.class.isAssignableFrom(resultClass)) {
                     return responseText;
                 }
 
                 final ForestDataType dataType = request.getDataType();
-                final ForestConverter converter = request.getConfiguration().getConverter(dataType);
+                final ForestConverter converter = decoder != null ? decoder : request.getConfiguration().getConverter(dataType);
                 if (contentType != null && contentType.canReadAsString()) {
                     return converter.convertToJavaObject(responseText, resultType);
                 }
@@ -151,7 +183,10 @@ public class ResultHandler {
                 if (resCharset != null) {
                     charset = Charset.forName(resCharset);
                 }
-                return converter.convertToJavaObject(response.getByteArray(), resultType, charset);
+                if (optStringValue != null) {
+                    return converter.convertToJavaObject(optStringValue.getBytes(StandardCharsets.UTF_8), resultType, charset);
+                }
+                return converter.convertToJavaObject(response.getInputStream(), resultType, charset);
             } catch (Exception e) {
                 throw new ForestHandlerException(e, request, response);
             }

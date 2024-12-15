@@ -38,7 +38,7 @@ import static org.junit.Assert.assertTrue;
 @SpringBootTest(classes = Test0.class)
 @EnableAutoConfiguration
 @ComponentScan(basePackages = "com.dtflys.forest.springboot.test.service")
-public class Test0 {
+public class Test0 extends BaseSpringBootTest {
 
     @Resource
     private BeastshopClient beastshopClient;

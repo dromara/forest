@@ -39,6 +39,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Forest请求Query参数Map
@@ -55,7 +56,7 @@ public class ForestQueryMap implements Map<String, Object> {
 
     public ForestQueryMap(final ForestRequest request) {
         this.request = request;
-        this.queries = new LinkedList<>();
+        this.queries = new CopyOnWriteArrayList<>();
     }
 
     public ForestRequest getRequest() {

@@ -28,10 +28,12 @@ import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.exceptions.ForestConvertException;
 import com.dtflys.forest.http.ForestBody;
 import com.dtflys.forest.utils.ForestDataType;
+import com.dtflys.forest.utils.ReflectUtils;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.google.protobuf.Parser;
 
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
@@ -46,7 +48,7 @@ public class ForestGoogleProtobufConverter implements ForestProtobufConverter {
 
     @Override
     public <T> T convertToJavaObject(byte[] source, Type targetType) {
-        final Class<?> c = (Class<?>) targetType;
+        final Class<?> c = ReflectUtils.toClass(targetType);
         try {
             // 转换器 都会有parser方法
             final Method method = c.getDeclaredMethod("parser");
@@ -67,6 +69,34 @@ public class ForestGoogleProtobufConverter implements ForestProtobufConverter {
         }
         final Message message = (Message) source;
         return message.toByteArray();
+    }
+
+    @Override
+    public <T> T convertToJavaObject(InputStream source, Class<T> targetType, Charset charset) {
+        try {
+            // 转换器 都会有parser方法
+            final Method method = targetType.getDeclaredMethod("parser");
+            //noinspection unchecked
+            final Parser<T> parser = (Parser<T>) method.invoke(null);
+            return parser.parseFrom(source);
+        } catch (ReflectiveOperationException | InvalidProtocolBufferException e) {
+            throw new ForestConvertException(this, e);
+        }
+    }
+
+    @Override
+    public <T> T convertToJavaObject(InputStream source, Type targetType, Charset charset) {
+        final Class<?> c = ReflectUtils.toClass(targetType);
+        try {
+            // 转换器 都会有parser方法
+            final Method method = c.getDeclaredMethod("parser");
+            //noinspection unchecked
+            final Parser<T> parser = (Parser<T>) method.invoke(null);
+            return parser.parseFrom(source);
+        } catch (ReflectiveOperationException | InvalidProtocolBufferException e) {
+            throw new ForestConvertException(this, e);
+        }
+
     }
 
     @Override

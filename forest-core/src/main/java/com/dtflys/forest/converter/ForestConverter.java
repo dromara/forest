@@ -1,9 +1,14 @@
 package com.dtflys.forest.converter;
 
+import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.ForestDataType;
+import org.apache.commons.io.IOUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Forest的数据转换器
@@ -54,6 +59,29 @@ public interface ForestConverter<S> {
      * @param <T> 目标类型泛型
      */
     <T> T convertToJavaObject(byte[] source, Type targetType, Charset charset);
+
+
+    default  <T> T convertToJavaObject(InputStream source, Class<T> targetType) {
+        return convertToJavaObject(source, targetType, StandardCharsets.UTF_8);
+    }
+
+    default  <T> T convertToJavaObject(InputStream source, Type targetType) {
+        return convertToJavaObject(source, targetType, StandardCharsets.UTF_8);
+    }
+
+    default  <T> T convertToJavaObject(InputStream source, Class<T> targetType, Charset charset) {
+        return convertToJavaObject(source, (Type) targetType, charset);
+    }
+
+    default  <T> T convertToJavaObject(InputStream source, Type targetType, Charset charset) {
+        try {
+            return convertToJavaObject(IOUtils.toByteArray(source), targetType, charset);
+        } catch (IOException e) {
+            throw new ForestRuntimeException(e);
+        }
+    }
+
+
 
     /**
      * 获取当前数据转换器转换类型

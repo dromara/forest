@@ -10,9 +10,10 @@ public class MappingIdentity extends MappingExpr {
 
     private String name;
 
-    public MappingIdentity(String name) {
+    public MappingIdentity(String name, int startIndex, int endIndex) {
         super(null, Token.ID);
         this.name = name;
+        setIndexRange(startIndex, endIndex);
     }
 
     public String getName() {

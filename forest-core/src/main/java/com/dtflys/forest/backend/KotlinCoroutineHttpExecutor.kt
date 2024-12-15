@@ -12,7 +12,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.Future
 
 /**
  * Forest异步携程请求执行器

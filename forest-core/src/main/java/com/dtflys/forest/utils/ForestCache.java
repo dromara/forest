@@ -1,95 +1,90 @@
 package com.dtflys.forest.utils;
 
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.RemovalCause;
-import com.github.benmanes.caffeine.cache.RemovalListener;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.jetbrains.annotations.NotNull;
+import cn.hutool.cache.impl.LRUCache;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 public class ForestCache<K, V> {
 
-    private final Cache<K, V> cache;
+    
+    private final LRUCache<K, V> lruCache;
 
     public ForestCache(long maxSize, Duration expireAfterAccess) {
-        this.cache = Caffeine.newBuilder()
-                .maximumSize(maxSize)
-                .expireAfterAccess(expireAfterAccess)
-                .build();
+        this.lruCache = new LRUCache<>((int) maxSize, expireAfterAccess.toMillis());
     }
 
     public ForestCache(long maxSize, long expireAfterAccess, TimeUnit timeUnit) {
-        this.cache = Caffeine.newBuilder()
-                .maximumSize(maxSize)
-                .expireAfterAccess(expireAfterAccess, timeUnit)
-                .build();
+        this.lruCache = new LRUCache<>((int) maxSize, timeUnit.toMillis(expireAfterAccess));
     }
 
     public ForestCache(long maxSize) {
-        this.cache = Caffeine.newBuilder()
-                .maximumSize(maxSize)
-                .build();
+        this.lruCache = new LRUCache<>((int) maxSize);
     }
 
     public int size() {
-        return (int) cache.estimatedSize();
+        return lruCache.size();
     }
 
-    public long evictionCount() {
-        return cache.stats().evictionCount();
-    }
 
 
     public boolean isEmpty() {
-        return cache.estimatedSize() == 0;
+        return lruCache.isEmpty();
     }
 
     public boolean containsKey(K key) {
-        return cache.asMap().containsKey(key);
+        return lruCache.containsKey(key);
     }
 
-    public boolean containsValue(V value) {
-        return cache.asMap().containsValue(value);
-    }
 
     public V get(K key) {
-        return cache.getIfPresent(key);
+        return lruCache.get(key);
+    }
+
+    public V get(K key, Supplier<? extends V> supplier) {
+        return lruCache.get(key,  true, () -> supplier.get());
     }
 
     public void put(K key, V value) {
-        cache.put(key, value);
+        lruCache.put(key, value);
     }
 
 
-    public void putAll(@NotNull Map<? extends K, ? extends V> m) {
-        cache.putAll(m);
+    public void putAll(Map<? extends K, ? extends V> m) {
+        for (Map.Entry<? extends K, ? extends V> entry : m.entrySet()) {
+            lruCache.put(entry.getKey(), entry.getValue());
+        }
     }
 
     public void clear() {
-        cache.cleanUp();
+        lruCache.clear();
     }
 
     public Map<K, V> toMap() {
-        return cache.asMap();
+        Map<K, V> map = new HashMap<>(lruCache.size());
+        for (K key : lruCache.keySet()) {
+            map.put(key, lruCache.get(key));
+        }
+        return map;
     }
 
     public Set<K> keySet() {
-        return cache.asMap().keySet();
+        return lruCache.keySet();
     }
 
     public Collection<V> values() {
-        return cache.asMap().values();
+        Collection<V> values = new ArrayList<>(lruCache.size());
+        for (K key : lruCache.keySet()) {
+            values.add(lruCache.get(key));
+        }
+        return values;
     }
-
-    public Set<Map.Entry<K, V>> entrySet() {
-        return cache.asMap().entrySet();
-    }
+    
 }

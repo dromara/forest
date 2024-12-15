@@ -7,7 +7,6 @@ package com.dtflys.forest.http;
  * @author gongjun
  * @since 1.5.29
  */
-@FunctionalInterface
 public interface Lazy<T> {
 
     /**

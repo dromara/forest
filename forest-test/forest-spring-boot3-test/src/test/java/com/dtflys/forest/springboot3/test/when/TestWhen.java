@@ -1,5 +1,6 @@
 package com.dtflys.forest.springboot3.test.when;
 
+import com.dtflys.forest.springboot3.test.BaseSpringBootTest;
 import jakarta.annotation.Resource;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -10,18 +11,20 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@RunWith(SpringRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("when")
-@SpringBootTest(classes = TestWhen.class)
+@SpringBootTest
+@ContextConfiguration(classes = TestWhen.class)
 @ComponentScan(basePackages = "com.dtflys.forest.springboot3.test.when")
 @EnableAutoConfiguration
-public class TestWhen {
+public class TestWhen extends BaseSpringBootTest {
 
     public final static String EXPECTED = "{\"status\": \"ok\"}";
 

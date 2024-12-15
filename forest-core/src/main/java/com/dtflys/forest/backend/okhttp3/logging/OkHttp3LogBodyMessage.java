@@ -84,49 +84,52 @@ public class OkHttp3LogBodyMessage implements LogBodyMessage {
         }
         final ContentType contentType = new ContentType(mediaType.toString(), StandardCharsets.UTF_8);
         if (contentType.isMultipart()) {
-            final MultipartBody multipartBody = (MultipartBody) requestBody;
-            final String boundary = multipartBody.boundary();
-            Long contentLength = null;
-            try {
-                contentLength = multipartBody.contentLength();
-            } catch (IOException e) {
-            }
             final StringBuilder builder = new StringBuilder();
-            builder.append("[")
-                    .append("boundary=")
-                    .append(boundary);
-            if (contentLength != null) {
-                builder.append("; length=").append(contentLength);
-            }
-            builder.append("] parts:");
-            final List<MultipartBody.Part> parts = multipartBody.parts();
-            for (MultipartBody.Part part : parts) {
-                final RequestBody partBody = part.body();
-                final List<String> disposition = part.headers().values("Content-Disposition");
-                builder.append("\n             -- [")
-                        .append(disposition.get(0));
-                final MediaType partMediaType = partBody.contentType();
-                if (partMediaType == null) {
-                    builder.append("; content-type=\"")
-                            .append(partBody.contentType())
-                            .append("\"");
-                    builder.append("; value=\"")
-                            .append(getLogContentForStringBody(partBody))
-                            .append("\"]");
-                } else {
-                    Long length = null;
-                    try {
-                        length = partBody.contentLength();
-                    } catch (IOException e) {
-                    }
-                    if (length != null) {
-                        builder.append("; length=").append(length);
-                    }
-                    builder.append("; content-type=\"")
-                            .append(partBody.contentType())
-                            .append("\"");
-                    builder.append("]");
+            try {
+                final MultipartBody multipartBody = (MultipartBody) requestBody;
+                final String boundary = multipartBody.boundary();
+                Long contentLength = null;
+                try {
+                    contentLength = multipartBody.contentLength();
+                } catch (IOException e) {
                 }
+                builder.append("[")
+                        .append("boundary=")
+                        .append(boundary);
+                if (contentLength != null) {
+                    builder.append("; length=").append(contentLength);
+                }
+                builder.append("] parts:");
+                final List<MultipartBody.Part> parts = multipartBody.parts();
+                for (final MultipartBody.Part part : parts) {
+                    final RequestBody partBody = part.body();
+                    final List<String> disposition = part.headers().values("Content-Disposition");
+                    builder.append("\n             -- [")
+                            .append(disposition.get(0));
+                    final MediaType partMediaType = partBody.contentType();
+                    if (partMediaType == null) {
+                        builder.append("; content-type=\"")
+                                .append(partBody.contentType())
+                                .append("\"");
+                        builder.append("; value=\"")
+                                .append(getLogContentForStringBody(partBody))
+                                .append("\"]");
+                    } else {
+                        Long length = null;
+                        try {
+                            length = partBody.contentLength();
+                        } catch (IOException e) {
+                        }
+                        if (length != null) {
+                            builder.append("; length=").append(length);
+                        }
+                        builder.append("; content-type=\"")
+                                .append(partBody.contentType())
+                                .append("\"");
+                        builder.append("]");
+                    }
+                }
+            } catch (Throwable th) {
             }
             return builder.toString();
         } else if (contentType.isBinary()) {

@@ -56,6 +56,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
         }
         setupContentTypeAndCharset();
         setupContent();
+        this.contentLength = body.contentLength();
     }
 
     /**

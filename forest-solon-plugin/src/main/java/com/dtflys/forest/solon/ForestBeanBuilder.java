@@ -1,6 +1,5 @@
 package com.dtflys.forest.solon;
 
-import com.dtflys.forest.Forest;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.SolonForestProperties;
 import com.dtflys.forest.converter.ForestConverter;
@@ -18,8 +17,7 @@ import com.dtflys.forest.ssl.SSLSocketFactoryBuilder;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 import org.noear.solon.Utils;
-import org.noear.solon.core.AppContext;
-import org.noear.solon.core.BeanWrap;
+import org.noear.solon.core.util.ClassUtil;
 import org.noear.solon.core.wrap.ClassWrap;
 import org.noear.solon.core.wrap.FieldWrap;
 
@@ -66,23 +64,14 @@ public class ForestBeanBuilder {
         ForestConfiguration forestConfiguration = ForestConfiguration.createConfiguration();
 
         Class<? extends ForestLogHandler> logHandlerClass = forestConfigurationProperties.getLogHandler();
-        ForestLogHandler logHandler = null;
-        if (logHandlerClass != null) {
-            try {
-                logHandler = logHandlerClass.newInstance();
-            } catch (InstantiationException e) {
-                throw new ForestRuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new ForestRuntimeException(e);
-            }
-        }
+        ForestLogHandler logHandler = logHandlerClass != null ?
+                forestConfiguration.getForestObject(logHandlerClass) : forestConfiguration.getLogHandler();
 
         forestConfiguration.setMaxAsyncThreadSize(forestConfigurationProperties.getMaxAsyncThreadSize());
         forestConfiguration.setMaxAsyncQueueSize(forestConfigurationProperties.getMaxAsyncQueueSize());
         forestConfiguration.setMaxConnections(forestConfigurationProperties.getMaxConnections());
         forestConfiguration.setMaxRouteConnections(forestConfigurationProperties.getMaxRouteConnections());
         forestConfiguration.setAsyncMode(forestConfigurationProperties.getAsyncMode());
-        forestConfiguration.setTimeout(forestConfigurationProperties.getTimeout());
         forestConfiguration.setConnectTimeout(forestConfigurationProperties.getConnectTimeoutMillis());
         forestConfiguration.setReadTimeout(forestConfigurationProperties.getReadTimeoutMillis());
         forestConfiguration.setCharset(forestConfigurationProperties.getCharset());
@@ -117,28 +106,27 @@ public class ForestBeanBuilder {
 
 
 
-        ForestConfiguration configuration = forestConfiguration;
-        configuration.setProperties(properties);
-        configuration.setForestObjectFactory(forestObjectFactory);
-        configuration.setInterceptorFactory(forestInterceptorFactory);
+        forestConfiguration.setProperties(properties);
+        forestConfiguration.setForestObjectFactory(forestObjectFactory);
+        forestConfiguration.setInterceptorFactory(forestInterceptorFactory);
 
         Map<String, Class> filters = forestConfigurationProperties.getFilters();
         for (Map.Entry<String, Class> entry : filters.entrySet()) {
             String filterName = entry.getKey();
             Class filterClass = entry.getValue();
-            configuration.registerFilter(filterName, filterClass);
+            forestConfiguration.registerFilter(filterName, filterClass);
         }
 
         ForestConvertProperties convertProperties = forestConfigurationProperties.getConverters();
         if (convertProperties != null) {
-            registerConverter(configuration, ForestDataType.TEXT, convertProperties.getText());
-            registerConverter(configuration, ForestDataType.JSON, convertProperties.getJson());
-            registerConverter(configuration, ForestDataType.XML, convertProperties.getXml());
-            registerConverter(configuration, ForestDataType.BINARY, convertProperties.getBinary());
-            registerConverter(configuration, ForestDataType.PROTOBUF, convertProperties.getProtobuf());
+            registerConverter(forestConfiguration, ForestDataType.TEXT, convertProperties.getText());
+            registerConverter(forestConfiguration, ForestDataType.JSON, convertProperties.getJson());
+            registerConverter(forestConfiguration, ForestDataType.XML, convertProperties.getXml());
+            registerConverter(forestConfiguration, ForestDataType.BINARY, convertProperties.getBinary());
+            registerConverter(forestConfiguration, ForestDataType.PROTOBUF, convertProperties.getProtobuf());
         }
 
-        return configuration;
+        return forestConfiguration;
     }
 
 
@@ -247,9 +235,9 @@ public class ForestBeanBuilder {
                                                     String sslSocketFactoryBuilderClass) {
 
 
-        TrustManager trustManager = Utils.newInstance(trustManagerClass);
-        HostnameVerifier hostnameVerifier = Utils.newInstance(hostnameVerifierClass);
-        SSLSocketFactoryBuilder sslSocketFactoryBuilder = Utils.newInstance(sslSocketFactoryBuilderClass);
+        TrustManager trustManager = ClassUtil.tryInstance(trustManagerClass);
+        HostnameVerifier hostnameVerifier = ClassUtil.tryInstance(hostnameVerifierClass);
+        SSLSocketFactoryBuilder sslSocketFactoryBuilder = ClassUtil.tryInstance(sslSocketFactoryBuilderClass);
 
         SSLKeyStore sslKeyStore = new SSLKeyStore(id, keystoreType, filePath, keystorePass, certPass, trustManager, hostnameVerifier, sslSocketFactoryBuilder);
 

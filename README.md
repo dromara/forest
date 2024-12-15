@@ -8,9 +8,6 @@
 
 
 <p align="center">
-<a href="https://gitee.com/dromara/forest">
-    <img src="https://gitee.com/dromara/forest/badge/star.svg" alt="Gitee Stars">
-</a>
 <a href="https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html">
     <img src="https://img.shields.io/badge/JDK-1.8+-yellow" alt="JDK">
 </a>
@@ -21,7 +18,7 @@
 <a href="http://forest.dtflyx.com/">
     <img src="https://img.shields.io/badge/document-1.x-e96.svg" alt="Documentation">
 </a>
-<a href="https://gitee.com/dromara/forest#%E8%81%94%E7%B3%BB%E4%BD%9C%E8%80%85">
+<a href="https://forest.dtflyx.com/pages/author/">
     <img src="https://img.shields.io/badge/author-%E5%85%AC%E5%AD%90%E9%AA%8F-7af" alt="Author">
 </a>
 </p>
@@ -44,14 +41,13 @@ Forest是一个高层的、极简的声明式HTTP调用API框架<br>
 -------------------------------------
 * [项目主页](http://forest.dtflyx.com/) 
 
-* [中文文档](https://forest.dtflyx.com/pages/1.5.33/intro/) 
-
-* [JavaDoc](https://apidoc.gitee.com/dt_flys/forest/)
+* [中文文档](https://forest.dtflyx.com/pages/1.5.36/install_guide/) 
 
 * [示例工程](forest-examples)
 
 Forest有哪些特性？
 -----
+* 同时支持编程式与声明式的请求发送方式
 * 以Httpclient和OkHttp为后端框架
 * 通过调用本地方法的方式去发送Http请求, 实现了业务逻辑与Http协议之间的解耦
 * 因为针对第三方接口，所以不需要依赖Spring Cloud和任何注册中心
@@ -68,7 +64,7 @@ Forest有哪些特性？
 * XML格式数据序列化和反序列化
 * Protobuf格式数据序列化和反序列化
 * JSON、XML或其他类型转换器可以随意扩展和替换
-* 支持JSON转换框架: Fastjson, Jackson, Gson
+* 支持JSON转换框架: Fastjson2, Fastjson1, Jackson, Gson
 * 支持JAXB形式的XML转换
 * 可以通过OnSuccess和OnError接口参数实现请求结果的回调
 * 配置简单，一般只需要@Request一个注解就能完成绝大多数请求的定义
@@ -86,7 +82,7 @@ Forest有哪些特性？
 <dependency>
     <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-spring-boot-starter</artifactId>
-    <version>1.5.35</version>
+    <version>1.5.36</version>
 </dependency>
 ```
 
@@ -383,6 +379,22 @@ public class MyAuthLifeCycle implements MethodAnnotationLifeCycle<MyAuth, Object
 String send(@DataVariable("username") String username);
 ```
 
+### 编程式请求
+
+Forest 的编程式请求支持链式调用，极为方便、高效、简洁
+
+```java
+// GET 请求访问百度
+String baidu = Forest.get("http://www.baidu.com").execute(String.class);
+
+// POST 请求注册用户信息
+String result = Forest.post("/user/register")
+        .contentType("application/json")
+        .addBody("username", "公子骏")
+        .addBody("password", "12345678")
+        .execute(String.class);
+```
+
 #### 详细文档请看：[官方文档](http://forest.dtflyx.com/)
 
 
@@ -404,39 +416,52 @@ String send(@DataVariable("username") String username);
 他们在用
 -----------------------------------
 已在使用Forest的公司列表（排名不分先后）
-<table>
-<tr>
-<td><img height="60px" src="doc/images/logo/logo_thebeastshop.jpg" alt="野兽派花店"></td>
-<td><img height="60px" src="doc/images/logo/logo_geely.png" alt="吉利集团"></td>
-<td><img height="60px" src="doc/images/logo/logo_woshipm.png" alt="人人都是产品经理"></td>
-<td><img height="60px" src="doc/images/logo/logo_gzsunrun.jpg" alt="广州尚融网络科技"></td>
-<td><img height="60px" src="doc/images/logo/logo_tldt.png" alt="神州通立电梯"></td>
-</tr>
-<tr>
-<td><img height="60px" src="doc/images/logo/logo_weidubim.png" alt="成都万智维度"></td>
-<td><img height="60px" src="doc/images/logo/logo_ictbda.jpg" alt="中科院计算所大数据研究院"></td>
-<td><img height="60px" src="doc/images/logo/logo_yiring.png" alt="长沙壹润"></td>
-<td><img height="60px" src="doc/images/logo/logo_huafangzhilian.png" alt="山东华方智联科技"></td>
-<td><img height="60px" src="doc/images/logo/logo_hzqianqi.png" alt="杭州仟奇"></td>
-</tr>
-<tr>
-<td><img height="60px" src="doc/images/logo/logo_byai.png" alt="浙江百应"></td>
-<td><img height="60px" src="doc/images/logo/logo_datapps.png" alt="北京聚云位智"></td>
-<td><img height="60px" src="doc/images/logo/logo_hibobi.png" alt="杭州嗨宝贝"></td>
-<td><img height="60px" src="doc/images/logo/logo_hyperchain.png" alt="杭州趣链"></td>
-<td><img height="60px" src="doc/images/logo/logo_ue-one.png" alt="重庆源一科技"></td>
-</tr>
-<tr>
-<td><img height="60px" src="doc/images/logo/logo_manyibar.png" alt="满意吧"></td>
-</tr>
+<div>
+    <table>
+        <tr>
+            <td style="width: 500px"><a style="cursor: pointer;" href="https://www.huawei.com/cn/" target="_blank"><div style="height: 50px; padding: 5px; margin: 0; display: flex; justify-content: center; align-items: center; border-radius: 8px;background-color: #ffffff"><img height="40px" src="/doc/images/logo/logo_huawei.png" class="no-zoom" alt="华为"></div></a></td>
+            <td style="width: 500px"><a style="cursor: pointer;" href="https://www.thebeastshop.com/" target="_blank"><div style="height: 50px; padding: 5px; margin: 0; display: flex; justify-content: center; align-items: center; border-radius: 8px;background-color: #ffffff"><img height="40px" src="/doc/images/logo/logo_thebeastshop.jpg" class="no-zoom" alt="野兽派花店"></div></a></td>
+            <td style="width: 500px"><a style="cursor: pointer;" href="https://zgh.com/" target="_blank"><div style="height: 50px; padding: 5px; margin: 0; display: flex; justify-content: center; align-items: center; border-radius: 8px;background-color: #ffffff"><img height="40px" src="/doc/images/logo/logo_geely.png" class="no-zoom" alt="吉利集团"></div></a></td>
+        </tr>
+        <tr>
+            <td style="width: 500px"><a style="cursor: pointer;" href="https://www.ictbda.com/" target="_blank"><div style="height: 50px; padding: 5px; margin: 0; display: flex; justify-content: center; align-items: center; border-radius: 8px;background-color: #ffffff"><img height="40px" src="/doc/images/logo/logo_ictbda.png" class="no-zoom" alt="中科院计算所大数据研究院"></div></a></td>
+            <td style="width: 500px"><a style="cursor: pointer;" href="https://www.woshipm.com/" target="_blank"><div style="height: 58px; padding: 1px; margin: 0; display: flex; justify-content: center; align-items: center; border-radius: 8px;background-color: #4470f5"><img height="56px" src="/doc/images/logo/logo_woshipm.webp" class="no-zoom" alt="人人都是产品经理"></div></a></td>
+            <td style="width: 500px"><a style="cursor: pointer;" href="http://tldt.net/" target="_blank"><div style="height: 50px; padding: 5px; margin: 0; display: flex; justify-content: center; align-items: center; border-radius: 8px;background-color: #1590d6;"><img height="40px" src="/doc/images/logo/logo_tldt.png" class="no-zoom" alt="神州通立电梯"></div></a></td>
+        </tr>
+        <tr>
+            <td style="width: 500px"><a style="cursor: pointer;" href="https://weidubim.com/" target="_blank"><div style="height: 50px; padding: 5px; margin: 0; display: flex; justify-content: center; align-items: center; border-radius: 8px;background-color: #222222;"><img height="40px" src="/doc/images/logo/logo_weidubim.png" class="no-zoom" alt="万智维度"></div></a></td>
+            <td style="width: 500px"><a style="cursor: pointer;" href="https://www.yiring.com/" target="_blank"><div style="height: 60px; margin: 0; display: flex; justify-content: center; align-items: center; border-radius: 8px;background-color: #ffffff"><img height="60px" src="/doc/images/logo/logo_yiring.png" class="no-zoom" alt="壹润"></div></a></td>
+            <td style="width: 500px"><a style="cursor: pointer;" href="http://gzsunrun.cn/" target="_blank"><div style="height: 50px; padding: 5px; margin: 0; display: flex; justify-content: center; align-items: center; border-radius: 8px;background-color: #ffffff"><img height="40px" src="/doc/images/logo/logo_gzsunrun.jpg" class="no-zoom" alt="尚融网络科技"></div></a></td>
+        </tr>
+        <tr>
+            <td style="width: 500px"><a style="cursor: pointer;" href="https://www.huafang-aiot.com/" target="_blank"><div style="height: 50px; padding: 5px; margin: 0; display: flex; justify-content: center; align-items: center; border-radius: 8px;background-color: #ffffff"><img height="40px" src="/doc/images/logo/logo_huafangzhilian.png" class="no-zoom" alt="华方智联"></div></a></td>
+            <td style="width: 500px"><a style="cursor: pointer;" href="https://www.hyperchain.cn/" target="_blank"><div style="height: 50px; padding: 5px; margin: 0; display: flex; justify-content: center; align-items: center; border-radius: 8px;background-color: #ffffff"><img height="40px" src="/doc/images/logo/logo_hyperchain.png" class="no-zoom" alt="趣链科技"></div></a></td>
+            <td style="width: 500px"><a style="cursor: pointer;" href="https://www.byai.com/" target="_blank"><div style="height: 50px; padding: 5px; margin: 0; display: flex; justify-content: center; align-items: center; border-radius: 8px;background-color: #2b58fa;"><img height="40px" src="/doc/images/logo/logo_byai.png" class="no-zoom" alt="百应"></div></a></td>
+        </tr>
+        <tr>
+            <td style="width: 500px"><a style="cursor: pointer;" href="http://www.datapps.cn/" target="_blank"><div style="height: 60px; margin: 0; display: flex; justify-content: center; align-items: center; border-radius: 8px;"><img height="60px" src="/doc/images/logo/logo_datapps.png" class="no-zoom" alt="聚云位智"></div></a></td>
+            <td style="width: 500px"><a style="cursor: pointer;" href="https://m.hibobi.com/" target="_blank"><div style="height: 50px; padding: 5px; margin: 0; display: flex; justify-content: center; align-items: center; border-radius: 8px;background-color: #ffffff"><img height="40px" src="/doc/images/logo/logo_hibobi.png" class="no-zoom" alt="嗨宝贝"></div></a></td>
+            <td style="width: 500px"><a style="cursor: pointer;" href="https://hzqianqi.com/" target="_blank"><div style="height: 50px; padding: 5px; margin: 0; display: flex; justify-content: center; align-items: center; border-radius: 8px;background-color: #ffffff"><img height="40px" src="/doc/images/logo/logo_hzqianqi.png" class="no-zoom" alt="仟奇"></div></a></td>
+        </tr>
+        <tr>
+            <td style="width: 500px"><a style="cursor: pointer;" href="https://www.swifthealth.cn/" target="_blank"><div style="height: 50px; padding: 5px; margin: 0; display: flex; justify-content: center; align-items: center; border-radius: 8px;background-color: #ffffff;"><img height="40px" src="/doc/images/logo/logo_swifthealth.png" class="no-zoom" alt="朝前智能"></div></a></td>
+            <td style="width: 500px"><a style="cursor: pointer;" href="https://www.manyibar.com/" target="_blank"><div style="height: 50px; padding: 5px; margin: 0; display: flex; justify-content: center; align-items: center; border-radius: 8px;background-color: #ffffff"><img height="40px" src="/doc/images/logo/logo_manyibar.png" class="no-zoom" alt="满意吧"></div></a></td>
+            <td style="width: 500px"><a style="cursor: pointer;" href="http://www.ue-one.com/" target="_blank"><div style="height: 60px; margin: 0; display: flex; justify-content: center; align-items: center; border-radius: 8px;"><img height="60px" src="/doc/images/logo/logo_ue-one.png" class="no-zoom" alt="源一科技"></div></a></td>
+        </tr>
+        <tr>
+            <td style="width: 500px"><a style="cursor: pointer;" href="https://www.xwsoft.com.cn/" target="_blank"><div style="height: 50px; padding: 5px; margin: 0; display: flex; justify-content: center; align-items: center; border-radius: 8px;background-color: #333333;"><img height="40px" src="/doc/images/logo/logo_xwsoft.png" class="no-zoom" alt="欣网视讯"></div></a></td>
+            <td style="width: 500px"><a style="cursor: pointer;" href="http://www.ynjzh.com/" target="_blank"><div style="height: 50px; padding: 5px; margin: 0; display: flex; justify-content: center; align-items: center; border-radius: 8px;background-color: #ffffff"><img height="40px" src="/doc/images/logo/logo_ynjzh.png" class="no-zoom" alt="嘉之会科技"></div></a></td>
+            <td style="width: 500px"><a style="cursor: pointer;" href="http://www.xingsnb.cn/" target="_blank"><div style="height: 50px; padding: 5px; margin: 0; display: flex; justify-content: center; align-items: center; border-radius: 8px;background-color: #ffffff"><img height="40px" src="/doc/images/logo/logo_xingsnb.jpg" class="no-zoom" alt="星晟工程"></div></a></td>
+        </tr>
+    </table>
+</div>
 
-</table>
 
 参与贡献
 -----------------------------------
 
 1. 进群讨论，可以在群里抛出您遇到的问题，或许已经有人解决了您的问题。
-2. 提issue，如果在gitee的issue中已经有您想解决的问题，可以直接将该issue分配给您自己。如若没有，可以自己在gitee上创建一个issue。
+2. 提issue，如果在issue中已经有您想解决的问题，可以直接将该issue分配给您自己。如若没有，可以自己创建一个issue。
 3. Fork 本项目的仓库
 4. 新建分支，如果是加新特性，分支名格式为`feat_${issue的ID号}`，如果是修改bug，则命名为`fix_${issue的ID号}`。
 5. 本地自测，提交前请通过所有的已经单元测试，以及为您要解决的问题新增单元测试。

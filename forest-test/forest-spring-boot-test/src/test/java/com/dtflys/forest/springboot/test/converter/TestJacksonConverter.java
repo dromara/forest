@@ -3,6 +3,7 @@ package com.dtflys.forest.springboot.test.converter;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestJacksonConverter;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
+import com.dtflys.forest.springboot.test.BaseSpringBootTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -22,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("jackson")
 @SpringBootTest(classes = TestJacksonConverter.class)
 @EnableAutoConfiguration
-public class TestJacksonConverter {
+public class TestJacksonConverter extends BaseSpringBootTest {
 
     @Resource
     private ForestConfiguration forestConfiguration;

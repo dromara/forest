@@ -2,6 +2,7 @@ package com.dtflys.forest.springboot.test.binding;
 
 import com.dtflys.forest.annotation.BindingVar;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.springboot.test.BaseSpringBootTest;
 import com.dtflys.forest.springboot.test.address.TestAddress;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -20,15 +21,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @ActiveProfiles("address")
-@SpringBootTest(classes = TestAddress.class)
-@ComponentScan(basePackages = "com.dtflys.forest.springboot.test.binding")
+@SpringBootTest(classes = TestBinding.class)
 @EnableAutoConfiguration
-public class TestBinding {
+@ComponentScan(basePackages = {"com.dtflys.forest.springboot.test.binding"})
+public class TestBinding extends BaseSpringBootTest {
 
     public final static String EXPECTED = "{\"status\": \"ok\"}";
 
     @Rule
     public MockWebServer server = new MockWebServer();
+
+    @Resource
+    private TestVariables testVariables;
 
     @Resource
     private BindingVarClient bindingVarClient;
@@ -43,6 +47,8 @@ public class TestBinding {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         ForestRequest<String> request = bindingVarClient.testBindingVar();
         assertThat(request.getPort()).isEqualTo(server.getPort());
+        assertThat(request.getPath()).isEqualTo("/" + testVariables.getTestName());
+        request.execute();
     }
 
 }

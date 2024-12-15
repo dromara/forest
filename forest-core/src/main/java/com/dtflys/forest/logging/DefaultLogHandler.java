@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class DefaultLogHandler implements ForestLogHandler {
 
-    private ForestLogger logger = new ForestLogger();
+    private ForestLogger logger = ForestLogger.getLogger(DefaultLogHandler.class);
 
     /**
      * 获取请求头日志内容
@@ -200,11 +200,11 @@ public class DefaultLogHandler implements ForestLogHandler {
      */
     protected String responseLoggingContent(ResponseLogMessage responseLogMessage) {
         final ForestResponse response = responseLogMessage.getResponse();
-        if (response != null && response.getException() != null) {
-            return "Response: [Network Error]: " + response.getException().getMessage();
-        }
         final int status = responseLogMessage.getStatus();
-        if (status >= 0) {
+        if (response != null && response.getException() != null) {
+            return "Response: " + (status > 0 ? ", status = " + status + ", " : " ") + "[Network Error]: " + response.getException().getMessage();
+        }
+        if (status > 0) {
             return "Response: Status = " + responseLogMessage.getStatus() + ", Time = " + responseLogMessage.getTime() + "ms";
         } else {
             return "Response: [Network Error]: Unknown Network Error!";

@@ -1,7 +1,5 @@
 package com.dtflys.forest.utils;
 
-import okio.ByteString;
-
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -117,6 +115,6 @@ public final class StringUtils {
      */
     public static String generateBoundary() {
         final UUID uuid = UUID.randomUUID();
-        return ByteString.encodeUtf8(uuid.toString()).utf8();
+        return fromBytes(uuid.toString().getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
     }
 }

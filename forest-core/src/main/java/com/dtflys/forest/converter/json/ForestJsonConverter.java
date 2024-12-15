@@ -36,20 +36,16 @@ import com.dtflys.forest.http.body.ByteArrayRequestBody;
 import com.dtflys.forest.http.body.NameValueRequestBody;
 import com.dtflys.forest.http.body.ObjectRequestBody;
 import com.dtflys.forest.http.body.StringRequestBody;
-import org.apache.commons.collections4.IterableUtils;
 
 import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 /**
@@ -79,12 +75,12 @@ public interface ForestJsonConverter extends ForestConverter<String>, ForestEnco
      * @param request 请求对象
      * @return 转换后的Map对象
      */
-    default Map<String, Object> convertObjectToMap(Object obj, ForestRequest request) {
+    default Map<String, Object> convertObjectToMap(final Object obj, final ForestRequest request) {
         return convertObjectToMap(obj, request, ConvertOptions.defaultOptions());
     }
 
 
-    default Map<String, Object> convertObjectToMap(Object obj) {
+    default Map<String, Object> convertObjectToMap(final Object obj) {
         return convertObjectToMap(obj, null, ConvertOptions.defaultOptions());
     }
 
@@ -104,7 +100,7 @@ public interface ForestJsonConverter extends ForestConverter<String>, ForestEnco
     @Override
     default byte[] encodeRequestBody(final ForestBody body, final Charset charset, final ConvertOptions options) {
         final Charset cs = charset != null ? charset : StandardCharsets.UTF_8;
-        List<ForestRequestBody> bodyList = new LinkedList<>(body);
+        final List<ForestRequestBody> bodyList = new LinkedList<>(body);
         final ForestRequest request = body.getRequest();
         if (!bodyList.isEmpty()) {
             Object toJsonObj = bodyList;
@@ -116,13 +112,13 @@ public interface ForestJsonConverter extends ForestConverter<String>, ForestEnco
             )) {
                 return bodyList.get(0).getByteArray();
             }
-            for (ForestRequestBody bodyItem : bodyList) {
+            for (final ForestRequestBody bodyItem : bodyList) {
                 if (bodyItem instanceof NameValueRequestBody) {
                     if (jsonMap == null) {
                         jsonMap = new LinkedHashMap<>(bodyList.size());
                     }
-                    NameValueRequestBody nameValueItem = (NameValueRequestBody) bodyItem;
-                    String name = nameValueItem.getName();
+                    final NameValueRequestBody nameValueItem = (NameValueRequestBody) bodyItem;
+                    final String name = nameValueItem.getName();
                     if (options != null && options.shouldExclude(name)) {
                         continue;
                     }
@@ -138,8 +134,8 @@ public interface ForestJsonConverter extends ForestConverter<String>, ForestEnco
                     }
                     jsonMap.put(name, value);
                 } else if (bodyItem instanceof StringRequestBody) {
-                    String content = bodyItem.toString();
-                    Map<String, Object> subMap = this.convertObjectToMap(content, request);
+                    final String content = bodyItem.toString();
+                    final Map<String, Object> subMap = this.convertObjectToMap(content, request);
                     if (subMap != null) {
                         if (jsonMap == null) {
                             jsonMap = new LinkedHashMap<>(bodyList.size());
@@ -150,11 +146,10 @@ public interface ForestJsonConverter extends ForestConverter<String>, ForestEnco
                         jsonArray.add(content);
                     }
                 } else if (bodyItem instanceof ObjectRequestBody) {
-                    Object obj = ((ObjectRequestBody) bodyItem).getObject();
+                    final Object obj = ((ObjectRequestBody) bodyItem).getObject();
                     if (obj == null) {
                         continue;
                     }
-
                     final Class<?> cls = obj.getClass();
                     if (obj instanceof Collection) {
                         jsonArray = jsonArray != null ? jsonArray : new LinkedList<>();
@@ -167,7 +162,7 @@ public interface ForestJsonConverter extends ForestConverter<String>, ForestEnco
                             jsonArray.add(item);
                         }
                     } else {
-                        Map<String, Object> subMap = this.convertObjectToMap(obj, request, options);
+                        final Map<String, Object> subMap = this.convertObjectToMap(obj, request, options);
                         if (subMap == null) {
                             continue;
                         }
@@ -191,12 +186,12 @@ public interface ForestJsonConverter extends ForestConverter<String>, ForestEnco
                 text = this.encodeToString(((ObjectRequestBody) toJsonObj).getObject());
                 return text.getBytes(cs);
             } else if (toJsonObj instanceof NameValueRequestBody) {
-                Map<String, Object> subMap = new HashMap<>(1);
+                final Map<String, Object> subMap = new HashMap<>(1);
                 subMap.put(((NameValueRequestBody) toJsonObj).getName(), ((NameValueRequestBody) toJsonObj).getValue());
                 text = this.encodeToString(subMap);
                 return text.getBytes(cs);
             } else if (toJsonObj instanceof ByteArrayRequestBody) {
-                byte[] bytes = ((ByteArrayRequestBody) toJsonObj).getByteArray();
+                final byte[] bytes = ((ByteArrayRequestBody) toJsonObj).getByteArray();
                 return bytes;
             } else {
                 text = this.encodeToString(toJsonObj);

@@ -39,7 +39,7 @@ import java.net.URL;
  * Forest URL
  *
  * @author gongjun[dt_flys@hotmail.com]
- * @since v1.5.2
+ * @since 1.5.2
  */
 public class ForestURL {
 

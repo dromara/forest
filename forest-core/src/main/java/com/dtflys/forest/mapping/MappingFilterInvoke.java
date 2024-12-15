@@ -13,8 +13,8 @@ import java.util.List;
  */
 public class MappingFilterInvoke extends MappingInvoke {
 
-    public MappingFilterInvoke(ForestMethod<?> forestMethod, VariableScope variableScope, MappingIdentity name, List<MappingExpr> argList) {
-        super(forestMethod, Token.FILTER_INVOKE, variableScope, null, name, argList);
+    public MappingFilterInvoke(ForestMethod<?> forestMethod, VariableScope variableScope, MappingIdentity name, List<MappingExpr> argList, int startIndex, int endIndex) {
+        super(forestMethod, Token.FILTER_INVOKE, variableScope, null, name, argList, startIndex, endIndex);
     }
 
     @Override

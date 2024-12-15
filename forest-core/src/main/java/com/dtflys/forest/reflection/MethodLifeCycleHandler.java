@@ -2,6 +2,7 @@ package com.dtflys.forest.reflection;
 
 import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
+import com.dtflys.forest.callback.OnResponse;
 import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.converter.ForestEncoder;
@@ -15,12 +16,16 @@ import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestFuture;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.interceptor.ResponseResult;
+import com.dtflys.forest.interceptor.ResponseResultStatus;
+import com.dtflys.forest.interceptor.ResponseSuccess;
 import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.utils.ForestProgress;
 import com.dtflys.forest.utils.ReflectUtils;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Future;
 
 /**
@@ -43,7 +48,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
     private volatile T resultData;
 
 
-    public MethodLifeCycleHandler(Type resultType, Type onSuccessClassGenericType) {
+    public MethodLifeCycleHandler(final Type resultType, final Type onSuccessClassGenericType) {
         this.onSuccessClassGenericType = onSuccessClassGenericType;
         this.resultType = ReflectUtils.toType(resultType);
         this.resultRawClass = ReflectUtils.toClass(resultType);
@@ -51,24 +56,31 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
 
 
     @Override
-    public Object handleSync(ForestRequest request, ForestResponse response) {
+    public Object handleSync(final ForestRequest request, final ForestResponse response) {
         return handleSyncWithException(request, response, null);
     }
 
     @Override
-    public Object handleSyncWithException(ForestRequest request, ForestResponse response, Throwable ex) {
+    public Object handleSyncWithException(final ForestRequest request, final ForestResponse response, final Throwable ex) {
         this.response = response;
         try {
             Object resultData = null;
-            if (response.isSuccess()) {
-                resultData = handleResultType(request, response, resultType, resultRawClass);
-                handleSuccess(resultData, request, response);
+            final ResponseResult responseResult = handleResponse(request, response);
+            final ResponseSuccess responseSuccess = responseResult instanceof ResponseSuccess ? (ResponseSuccess) responseResult : null;
+            ResponseResultStatus status = responseResult.getStatus();
+            if (ResponseResultStatus.PROCEED == status) {
+                status = response.isSuccess() ? ResponseResultStatus.SUCCESS : ResponseResultStatus.ERROR;
+            }
+            if (ResponseResultStatus.SUCCESS == status) {
+                final Optional<?> resultOpt = responseSuccess != null ? responseSuccess.getResult() : null;
+                resultData = handleResultType(resultOpt, request, response, resultType, resultRawClass);
+                handleSuccess(resultData, resultOpt, request, response);
                 if ((!ForestResponse.class.isAssignableFrom(resultRawClass)
                         && !Future.class.isAssignableFrom(resultRawClass))
                         || request.isDownloadFile()) {
                     resultData = response.getResult();
                 }
-            } else {
+            } else if (ResponseResultStatus.ERROR == status) {
                 if (ex != null) {
                     resultData = handleError(request, response, ex);
                 } else {
@@ -86,6 +98,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
             }
             return resultData;
         } catch (Throwable th) {
+            th.printStackTrace();
             Object resultData = response.getResult();
             handleResult(resultData);
             if (ForestResponse.class.isAssignableFrom(resultRawClass)) {
@@ -104,15 +117,14 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
     }
 
     @Override
-    public Object handleResultType(ForestRequest request, ForestResponse response) {
+    public Object handleResultType(final ForestRequest request, final ForestResponse response) {
         return handleResultType(request, response, resultType, resultRawClass);
     }
 
-
     @Override
-    public synchronized Object handleResultType(ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
+    public Object handleResultType(Optional<?> resultOpt, ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
         this.response = response;
-        Object resultData = RESULT_HANDLER.getResult(request, response, resultType, resultClass);
+        final Object resultData = RESULT_HANDLER.getResult(resultOpt, request, response, resultType, resultClass);
         if (!(resultData instanceof ForestResponse)) {
             response.setResult(resultData);
         }
@@ -120,42 +132,70 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
         return resultData;
     }
 
-    private void handleSaveCookie(ForestRequest request, ForestResponse response) {
-        List<ForestCookie> cookieList = response.getCookies();
+
+    @Override
+    public synchronized Object handleResultType(final ForestRequest request, final ForestResponse response, final Type resultType, final Class resultClass) {
+        this.response = response;
+        final Object resultData = RESULT_HANDLER.getResult(null, request, response, resultType, resultClass);
+        if (!(resultData instanceof ForestResponse)) {
+            response.setResult(resultData);
+        }
+        this.resultData = (T) resultData;
+        return resultData;
+    }
+
+    private void handleSaveCookie(final ForestRequest request, final ForestResponse response) {
+        final List<ForestCookie> cookieList = response.getCookies();
         if (cookieList != null && cookieList.size() > 0) {
-            ForestCookies cookies = new ForestCookies(response.getCookies());
+            final ForestCookies cookies = new ForestCookies(response.getCookies());
             handleSaveCookie(request, cookies);
         }
     }
 
-
     @Override
-    public void handleSuccess(final Object resultData, ForestRequest request, ForestResponse response) {
+    public ResponseResult handleResponse(ForestRequest request, ForestResponse response) {
         this.response = response;
         handleSaveCookie(request, response);
+        ResponseResult result = request.getInterceptorChain().onResponse(request, response);
+        if (result != null
+                && (ResponseResultStatus.ERROR.equals(result.getStatus())
+                || ResponseResultStatus.SUCCESS.equals(result.getStatus()))) {
+            return result;
+        }
+        final OnResponse onResponse = request.getOnResponse();
+        if (onResponse != null) {
+            result = onResponse.onResponse(request, response);
+        }
+        return result;
+    }
+
+
+    @Override
+    public void handleSuccess(final Object resultData, final Optional<?> resultOpt, final ForestRequest request, final ForestResponse response) {
         request.getInterceptorChain().onSuccess(resultData, request, response);
-        OnSuccess onSuccess = request.getOnSuccess();
+        final OnSuccess onSuccess = request.getOnSuccess();
         if (onSuccess != null) {
-            Object result = RESULT_HANDLER.getResult(request, response, onSuccessClassGenericType, ReflectUtils.toClass(onSuccessClassGenericType));
+            final Object result = RESULT_HANDLER.getResult(
+                    resultOpt, request, response, onSuccessClassGenericType, ReflectUtils.toClass(onSuccessClassGenericType));
             onSuccess.onSuccess(result, request, response);
         }
     }
 
     @Override
-    public void handleInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
+    public void handleInvokeMethod(final ForestRequest request, final ForestMethod method, final Object[] args) {
         request.getInterceptorChain().onInvokeMethod(request, method, args);
     }
 
     @Override
-    public Object handleError(ForestRequest request, ForestResponse response) {
+    public Object handleError(final ForestRequest request, final ForestResponse response) {
         handleSaveCookie(request, response);
-        ForestNetworkException networkException = new ForestNetworkException(
+        final ForestNetworkException networkException = new ForestNetworkException(
                 "", response.getStatusCode(), response);
         return handleError(request, response, networkException);
     }
 
     @Override
-    public Object handleError(ForestRequest request, ForestResponse response, Throwable ex) {
+    public Object handleError(final ForestRequest request, final ForestResponse response, final Throwable ex) {
         this.response = response;
         handleSaveCookie(request, response);
         ForestRuntimeException e = null;
@@ -178,12 +218,12 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
     }
 
     @Override
-    public byte[] handleBodyEncode(ForestRequest request, ForestEncoder encoder, byte[] encodedData) {
+    public byte[] handleBodyEncode(final ForestRequest request, final ForestEncoder encoder, final byte[] encodedData) {
         return request.getInterceptorChain().onBodyEncode(request, encoder, encodedData);
     }
 
     @Override
-    public void handleCanceled(ForestRequest request, ForestResponse response) {
+    public void handleCanceled(final ForestRequest request, final ForestResponse response) {
         this.response = response;
         request.getInterceptorChain().onCanceled(request, response);
         if (request.getOnCanceled() != null) {
@@ -192,40 +232,40 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
     }
 
     @Override
-    public void handleProgress(ForestRequest request, ForestProgress progress) {
+    public void handleProgress(final ForestRequest request, final ForestProgress progress) {
         request.getInterceptorChain().onProgress(progress);
-        OnProgress onProgress = request.getOnProgress();
+        final OnProgress onProgress = request.getOnProgress();
         if (onProgress != null) {
             onProgress.onProgress(progress);
         }
     }
 
     @Override
-    public void handleLoadCookie(ForestRequest request, ForestCookies cookies) {
+    public void handleLoadCookie(final ForestRequest request, final ForestCookies cookies) {
         request.getInterceptorChain().onLoadCookie(request, cookies);
-        OnLoadCookie onLoadCookie = request.getOnLoadCookie();
+        final OnLoadCookie onLoadCookie = request.getOnLoadCookie();
         if (onLoadCookie != null) {
             onLoadCookie.onLoadCookie(request, cookies);
         }
     }
 
     @Override
-    public void handleSaveCookie(ForestRequest request, ForestCookies cookies) {
+    public void handleSaveCookie(final ForestRequest request, final ForestCookies cookies) {
         request.getInterceptorChain().onSaveCookie(request, cookies);
-        OnSaveCookie onSaveCookie = request.getOnSaveCookie();
+        final OnSaveCookie onSaveCookie = request.getOnSaveCookie();
         if (onSaveCookie != null) {
             onSaveCookie.onSaveCookie(request, cookies);
         }
     }
 
     @Override
-    public Object handleResult(Object resultData) {
+    public Object handleResult(final Object resultData) {
         this.resultData = (T) resultData;
         return resultData;
     }
 
     @Override
-    public Object handleFuture(ForestRequest request, Future resultData) {
+    public Object handleFuture(final ForestRequest request, final Future resultData) {
         if (resultData == null) {
             return null;
         }
@@ -249,16 +289,16 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
         return resultData;
     }
 
-    public void setResultType(Type resultType) {
+    public void setResultType(final Type resultType) {
         this.resultType = ReflectUtils.toType(resultType);
         this.resultRawClass = ReflectUtils.toClass(resultType);
     }
 
-    public void setResultRawClass(Class resultRawClass) {
+    public void setResultRawClass(final Class resultRawClass) {
         this.resultRawClass = resultRawClass;
     }
 
-    public void setOnSuccessClassGenericType(Type onSuccessClassGenericType) {
+    public void setOnSuccessClassGenericType(final Type onSuccessClassGenericType) {
         this.onSuccessClassGenericType = onSuccessClassGenericType;
     }
 

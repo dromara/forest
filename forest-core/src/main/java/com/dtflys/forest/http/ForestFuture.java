@@ -3,6 +3,7 @@ package com.dtflys.forest.http;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -17,11 +18,11 @@ import java.util.concurrent.TimeoutException;
 public class ForestFuture<T> extends ResultGetter implements Future<T> {
     private final ForestRequest<T> request;
 
-    private final Future<ForestResponse<T>> future;
+    private final CompletableFuture<ForestResponse<T>> future;
 
     private ForestResponse<T> response;
 
-    public ForestFuture(ForestRequest<T> request, Future<ForestResponse<T>> future) {
+    public ForestFuture(ForestRequest<T> request, CompletableFuture<ForestResponse<T>> future) {
         super(request);
         this.request = request;
         this.future = future;
@@ -85,7 +86,6 @@ public class ForestFuture<T> extends ResultGetter implements Future<T> {
     public T get(long timeout, @NotNull TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         ForestResponse<T> res = await(timeout, unit);
         return res.getResult();
-
     }
 
     @Override

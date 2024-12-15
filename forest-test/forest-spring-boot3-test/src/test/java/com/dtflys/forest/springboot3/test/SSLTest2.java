@@ -15,17 +15,19 @@ import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 
-@RunWith(SpringRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("ssl2")
-@SpringBootTest(classes = SSLTest2.class)
+@SpringBootTest
+@ContextConfiguration(classes = SSLTest2.class)
 @EnableAutoConfiguration
-public class SSLTest2 {
+public class SSLTest2 extends BaseSpringBootTest {
 
     @Resource
     private ForestConfiguration sslConfig;

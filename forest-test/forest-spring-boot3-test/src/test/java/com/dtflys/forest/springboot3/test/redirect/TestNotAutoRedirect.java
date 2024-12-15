@@ -2,6 +2,7 @@ package com.dtflys.forest.springboot3.test.redirect;
 
 import com.dtflys.forest.annotation.BindingVar;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.springboot3.test.BaseSpringBootTest;
 import jakarta.annotation.Resource;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -11,7 +12,8 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,11 +22,12 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2021-09-19 1:23
  */
-@RunWith(SpringRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("notredirect")
-@SpringBootTest(classes = TestNotAutoRedirect.class)
+@SpringBootTest
+@ContextConfiguration(classes = TestNotAutoRedirect.class)
 @EnableAutoConfiguration
-public class TestNotAutoRedirect {
+public class TestNotAutoRedirect extends BaseSpringBootTest {
 
     public final static String EXPECTED = "{\"status\": \"ok\"}";
 

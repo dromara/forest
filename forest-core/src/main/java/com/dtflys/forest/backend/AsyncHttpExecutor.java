@@ -130,7 +130,7 @@ public class AsyncHttpExecutor<T> implements HttpExecutor {
     public void execute(LifeCycleHandler lifeCycleHandler) {
         final ThreadPoolExecutor pool = AsyncThreadPools.getOrCreate(configuration);
         final AsyncTask<T> task = new AsyncTask<>(syncExecutor, lifeCycleHandler);
-        final Future<ForestResponse<T>> future = CompletableFuture.supplyAsync(task, pool);
+        final CompletableFuture<ForestResponse<T>> future = CompletableFuture.supplyAsync(task, pool);
         final ForestFuture<T> forestFuture = new ForestFuture<>(getRequest(), future);
         responseHandler.handleFuture(getRequest(), forestFuture);
     }

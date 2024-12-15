@@ -4,6 +4,7 @@ import com.dtflys.forest.annotation.BindingVar;
 import com.dtflys.forest.backend.AsyncHttpExecutor;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestAsyncAbortException;
+import com.dtflys.forest.springboot3.test.BaseSpringBootTest;
 import com.dtflys.forest.springboot3.test.address.TestAddress;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -14,19 +15,21 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import jakarta.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@RunWith(SpringRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("async")
-@SpringBootTest(classes = TestAddress.class)
+@SpringBootTest
+@ContextConfiguration(classes = TestAddress.class)
 @ComponentScan(basePackages = "com.dtflys.forest.springboot3.test.async")
 @EnableAutoConfiguration
-public class TestAsync {
+public class TestAsync extends BaseSpringBootTest {
 
     public final static String EXPECTED = "{\"status\": \"ok\"}";
 

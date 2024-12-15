@@ -6,10 +6,12 @@ import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.interceptor.ResponseResult;
 import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.utils.ForestProgress;
 
 import java.lang.reflect.Type;
+import java.util.Optional;
 import java.util.concurrent.Future;
 
 /**
@@ -33,12 +35,22 @@ public class NoneLifeCycleHandler implements LifeCycleHandler {
     }
 
     @Override
+    public Object handleResultType(Optional<?> resultOpt, ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
+        return null;
+    }
+
+    @Override
     public Object handleResultType(ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
         return null;
     }
 
     @Override
-    public void handleSuccess(Object resultData, ForestRequest request, ForestResponse response) {
+    public ResponseResult handleResponse(ForestRequest request, ForestResponse response) {
+        return null;
+    }
+
+    @Override
+    public void handleSuccess(Object resultData, final Optional<?> resultOpt, ForestRequest request, ForestResponse response) {
     }
 
     @Override

@@ -24,7 +24,6 @@
 
 package com.dtflys.forest.http;
 
-import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.auth.BasicAuth;
 import com.dtflys.forest.auth.ForestAuthenticator;
 import com.dtflys.forest.backend.ContentType;
@@ -35,6 +34,7 @@ import com.dtflys.forest.callback.OnError;
 import com.dtflys.forest.callback.OnLoadCookie;
 import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.callback.OnRedirection;
+import com.dtflys.forest.callback.OnResponse;
 import com.dtflys.forest.callback.OnRetry;
 import com.dtflys.forest.callback.OnSaveCookie;
 import com.dtflys.forest.callback.OnSuccess;
@@ -82,14 +82,13 @@ import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.TimeUtils;
 import com.dtflys.forest.utils.TypeReference;
-import com.dtflys.forest.utils.URLUtils;
+import com.dtflys.forest.utils.Validations;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import java.io.File;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
@@ -110,6 +109,8 @@ import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.dtflys.forest.mapping.MappingParameter.TARGET_BODY;
@@ -238,7 +239,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @since 1.5.28
      */
-    private ForestAuthenticator authenticator = new BasicAuth();
+    private ForestAuthenticator authenticator;
 
     /**
      * 是否打开自动重定向
@@ -312,7 +313,12 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * 参数表
      * <p>接口方法调用时传入的参数表
      */
-    private final Object[] arguments;
+    private Object[] arguments;
+
+    /**
+     * 回调函数：接收到请求响应时调用
+     */
+    private OnResponse onResponse;
 
     /**
      * 回调函数：请求成功时调用
@@ -465,6 +471,11 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      */
     private ForestProxy proxy;
 
+    /**
+     * 是否为SSE请求
+     */
+    boolean isSSE = false;
+
 
     public ForestRequest(ForestConfiguration configuration, ForestMethod method, ForestBody body, Object[] arguments) {
         this.configuration = configuration;
@@ -494,6 +505,151 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     }
 
     /**
+     * 链式条件函数: 如果条件为真，则执行 Lambda 函数，否则不执行
+     *
+     * @param condition 判断条件，布尔值
+     * @param consumer Lambda 函数
+     * @return {@link ForestRequest}对象实例
+     * @since 1.6.0
+     */
+    public ForestRequest<T> cond(boolean condition, Consumer<ForestRequest<?>> consumer) {
+        if (condition) {
+            consumer.accept(this);
+        }
+        return this;
+    }
+
+    /**
+     * 链式条件函数: 如果对象为空，则执行 Lambda 函数，否则不执行
+     *
+     * @param value 被判断的对象
+     * @param consumer Lambda 函数
+     * @return {@link ForestRequest}对象实例
+     * @since 1.6.0
+     */
+    public ForestRequest<T> condNull(Object value, Consumer<ForestRequest<?>> consumer) {
+        return cond(value == null, consumer);
+    }
+
+    /**
+     * 链式条件函数: 如果字符串为空，则执行 Lambda 函数，否则不执行
+     *
+     * @param value 被判断的字符串
+     * @param consumer Lambda 函数
+     * @return {@link ForestRequest}对象实例
+     * @since 1.6.0
+     */
+    public ForestRequest<T> condEmpty(CharSequence value, Consumer<ForestRequest<?>> consumer) {
+        return cond(StringUtils.isEmpty(value), consumer);
+    }
+
+    /**
+     * 链式条件函数: 如果对象不为空，则执行 Lambda 函数，否则不执行
+     *
+     * @param value 被判断的对象
+     * @param consumer Lambda 函数
+     * @return {@link ForestRequest}对象实例
+     * @since 1.6.0
+     */
+    public ForestRequest<T> condNotNull(Object value, Consumer<ForestRequest<?>> consumer) {
+        return cond(value != null, consumer);
+    }
+
+    /**
+     * 链式条件函数: 如果字符串不为空，则执行 Lambda 函数，否则不执行
+     *
+     * @param value 被判断的字符串
+     * @param consumer Lambda 函数
+     * @return {@link ForestRequest}对象实例
+     * @since 1.6.0
+     */
+    public ForestRequest<T> condNotEmpty(CharSequence value, Consumer<ForestRequest<?>> consumer) {
+        return cond(StringUtils.isNotEmpty(value), consumer);
+    }
+
+    /**
+     * 链式条件函数: 如果条件为真，则执行 Lambda 函数，否则可能执行 {@code elseIfThen}、{@code elseThen} 等其他链式提交方法，也可能什么都不执行
+     * <p>并返回一个 Forest 请求提交包装对象</p>
+     *
+     * @param condition 判断条件，布尔值
+     * @param consumer Lambda 函数
+     * @return {@link ForestRequestConditionWrapper} Forest 请求提交包装对象
+     * @since 1.6.0
+     */
+    public ForestRequestConditionWrapper<T> ifThen(boolean condition, Consumer<ForestRequest<?>> consumer) {
+        if (condition) {
+            consumer.accept(this);
+        }
+        return new ForestRequestConditionWrapper<>(this, condition);
+    }
+
+    /**
+     * 链式条件函数: 如果条件 Lambda 执行结果为真，则执行 Lambda 函数，否则可能执行 {@code elseIfThen}、{@code elseThen} 等其他链式提交方法，也可能什么都不执行
+     * <p>并返回一个 Forest 请求提交包装对象</p>
+     *
+     * @param conditionFunc 条件 Lambda 函数
+     * @param consumer Lambda 函数
+     * @return {@link ForestRequestConditionWrapper} Forest 请求提交包装对象
+     * @since 1.6.0
+     */
+    public ForestRequestConditionWrapper<T> ifThen(Function<ForestRequest<?>, Boolean> conditionFunc, Consumer<ForestRequest<?>> consumer) {
+        Validations.assertParamNotNull(conditionFunc, "conditionFunc");
+        return ifThen(conditionFunc.apply(this), consumer);
+    }
+
+    /**
+     * 链式条件函数: 如果对象为空，则执行 Lambda 函数，否则可能执行 {@code elseIfThen}、{@code elseThen} 等其他链式提交方法，也可能什么都不执行
+     * <p>并返回一个 Forest 请求提交包装对象</p>
+     *
+     * @param value 被判断对象
+     * @param consumer Lambda 函数
+     * @return {@link ForestRequestConditionWrapper} Forest 请求提交包装对象
+     * @since 1.6.0
+     */
+    public ForestRequestConditionWrapper<T> ifNullThen(Object value, Consumer<ForestRequest<?>> consumer) {
+        return ifThen(value == null, consumer);
+    }
+
+    /**
+     * 链式条件函数: 如果对象不为空，则执行 Lambda 函数，否则可能执行 {@code elseIfThen}、{@code elseThen} 等其他链式提交方法，也可能什么都不执行
+     * <p>并返回一个 Forest 请求提交包装对象</p>
+     *
+     * @param value 被判断对象
+     * @param consumer Lambda 函数
+     * @return {@link ForestRequestConditionWrapper} Forest 请求提交包装对象
+     * @since 1.6.0
+     */
+    public ForestRequestConditionWrapper<T> ifNotNullThen(Object value, Consumer<ForestRequest<?>> consumer) {
+        return ifThen(value != null, consumer);
+    }
+
+    /**
+     * 链式条件函数: 如果字符串为空，则执行 Lambda 函数，否则可能执行 {@code elseIfThen}、{@code elseThen} 等其他链式提交方法，也可能什么都不执行
+     * <p>并返回一个 Forest 请求提交包装对象</p>
+     *
+     * @param value 被判断字符串
+     * @param consumer Lambda 函数
+     * @return {@link ForestRequestConditionWrapper} Forest 请求提交包装对象
+     * @since 1.6.0
+     */
+    public ForestRequestConditionWrapper<T> ifEmptyThen(CharSequence value, Consumer<ForestRequest<?>> consumer) {
+        return ifThen(StringUtils.isEmpty(value), consumer);
+    }
+
+    /**
+     * 链式条件函数: 如果字符串不为空，则执行 Lambda 函数，否则可能执行 {@code elseIfThen}、{@code elseThen} 等其他链式提交方法，也可能什么都不执行
+     * <p>并返回一个 Forest 请求提交包装对象</p>
+     *
+     * @param value 被判断字符串
+     * @param consumer Lambda 函数
+     * @return {@link ForestRequestConditionWrapper} Forest 请求提交包装对象
+     * @since 1.6.0
+     */
+    public ForestRequestConditionWrapper<T> ifNotEmptyThen(CharSequence value, Consumer<ForestRequest<?>> consumer) {
+        return ifThen(StringUtils.isNotEmpty(value), consumer);
+    }
+
+    /**
      * 获取该请求的配置对象
      *
      * @return 配置对象
@@ -510,7 +666,6 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     public ForestProtocol getProtocol() {
         return protocol;
     }
-
 
     /**
      * 设置请求协议
@@ -658,6 +813,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         if (StringUtils.isBlank(url)) {
             throw new ForestRuntimeException("[Forest] Request url cannot be empty!");
         }
+        arguments(args);
         final String srcUrl = StringUtils.trimBegin(url);
         MappingURLTemplate template = method.makeURLTemplate(null, null, srcUrl);
         return setUrl(template, args);
@@ -672,7 +828,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return {@link ForestRequest}对象实例
      */
     public ForestRequest<T> setUrl(String url) {
-        return setUrl(url, EMPTY_RENDER_ARGS);
+        return setUrl(url, arguments == null ? EMPTY_RENDER_ARGS : arguments);
     }
 
 
@@ -862,7 +1018,6 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         return getPort();
     }
 
-
     /**
      * 设置请求的主机地址(主机名/ip地址 + 端口号)
      *
@@ -886,7 +1041,6 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         return this;
     }
 
-
     /**
      * 设置请求的主机地址(主机名/ip地址 + 端口号)
      *
@@ -897,7 +1051,6 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     public ForestRequest<T> setAddress(String host, int port) {
         return setAddress(new ForestAddress(host, port));
     }
-
 
     /**
      * 设置请求的主机地址(主机名/ip地址 + 端口号)
@@ -1388,6 +1541,8 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     public String queryString() {
         return getQueryString();
     }
+
+
 
     /**
      * 添加请求中的Query参数
@@ -1916,7 +2071,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
             synchronized (this) {
                 if (filename == null) {
                     String[] strs = getUrl().split("/");
-                    filename = strs[strs.length - 1];
+                    filename = strs[strs.length - 1].replaceAll(":", "_");
                 }
             }
         }
@@ -2747,6 +2902,15 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     }
 
     /**
+     * 是否为SSE请求
+     * @return {@code true}: 是SSE请求，{@code false}: 不是
+     * @since 1.6.0
+     */
+    public boolean isSSE() {
+        return isSSE;
+    }
+
+    /**
      * 获取请求失败后的重试次数
      *
      * @return 重试次数
@@ -3177,6 +3341,11 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         return nameValueList;
     }
 
+    private ForestRequest<T> arguments(Object... args) {
+        this.arguments = args;
+        return this;
+    }
+
     /**
      * 根据参数下标获取该请求对应方法的参数值
      *
@@ -3301,7 +3470,6 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     }
 
 
-
     /**
      * 添加请求头到该请求中
      *
@@ -3335,6 +3503,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         this.headers.setHeader(name, value);
         return this;
     }
+
 
     /**
      * 添加请求头到该请求中
@@ -3588,6 +3757,42 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         return addFile(name, bytes, filename, null);
     }
 
+    /**
+     * 获取OnResponse回调函数，该回调函数在接收到请求响应时调用
+     *
+     * @return {@link OnResponse}接口实例
+     * @since 1.6.0
+     */
+    public OnResponse getOnResponse() {
+        return onResponse;
+    }
+
+    /**
+     * 设置OnResponse回调函数，该回调函数在接收到请求响应时调用
+     *
+     * @param onResponse {@link OnResponse}接口实例
+     * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#onResponse} 方法
+     * @since 1.6.0
+     */
+    public ForestRequest<T> setOnResponse(OnResponse onResponse) {
+        this.onResponse = onResponse;
+        return this;
+    }
+
+    /**
+     * 设置OnResponse回调函数，该回调函数在接收到请求响应时调用
+     * <p>同 {@link ForestRequest#setOnResponse(OnResponse)}
+     *
+     * @param onResponse {@link OnResponse}接口实例
+     * @return {@link ForestRequest}类实例
+     * @see ForestRequest#setOnResponse(OnResponse)
+     * @since 1.6.0
+     */
+    public ForestRequest<T> onResponse(OnResponse onResponse) {
+        return setOnResponse(onResponse);
+    }
+
 
     /**
      * 获取OnSuccess回调函数，该回调函数在请求成功时被调用
@@ -3603,6 +3808,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param onSuccess {@link OnSuccess}接口实例
      * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#onSuccess} 方法
      */
     public ForestRequest<T> setOnSuccess(OnSuccess onSuccess) {
         this.onSuccess = onSuccess;
@@ -3621,7 +3827,6 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         return setOnSuccess(onSuccess);
     }
 
-
     /**
      * 获取OnError回调函数，该回调函数在请求失败时被调用
      *
@@ -3636,6 +3841,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param onError {@link OnError}接口实例
      * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#onError(OnError)} 方法
      */
     public ForestRequest<T> setOnError(OnError onError) {
         this.onError = onError;
@@ -3669,6 +3875,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param onCanceled {@link OnCanceled}接口实例
      * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#onCanceled(OnCanceled)} 方法
      * @since 1.5.27
      */
     public ForestRequest<T> setOnCanceled(OnCanceled onCanceled) {
@@ -3707,6 +3914,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param successWhen {@link SuccessWhen}接口实例
      * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#successWhen(SuccessWhen)} 方法
      */
     public ForestRequest<T> setSuccessWhen(SuccessWhen successWhen) {
         this.successWhen = successWhen;
@@ -3722,6 +3930,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param conditionClass  {@link SuccessWhen} 实现类的 {@link Class} 对象
      * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#successWhen(Class)} 方法
      */
     public ForestRequest<T> setSuccessWhen(Class<? extends SuccessWhen> conditionClass) {
         if (conditionClass != null && !conditionClass.isInterface()) {
@@ -3777,6 +3986,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param onRetry {@link OnRetry}接口实例
      * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#onRetry(OnRetry)} 方法
      */
     public ForestRequest<T> setOnRetry(OnRetry onRetry) {
         this.onRetry = onRetry;
@@ -3810,6 +4020,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param retryWhen {@link RetryWhen}接口实例
      * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#retryWhen(RetryWhen)} 方法
      */
     public ForestRequest<T> setRetryWhen(RetryWhen retryWhen) {
         this.retryWhen = retryWhen;
@@ -3836,6 +4047,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param conditionClass  {@link RetryWhen} 实现类的 {@link Class} 对象
      * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#retryWhen(Class)} 方法
      */
     public ForestRequest<T> setRetryWhen(Class<? extends RetryWhen> conditionClass) {
         if (conditionClass != null && !conditionClass.isInterface()) {
@@ -3920,11 +4132,27 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param progressStep 进度监听的步长，{@code long}类型数值
      * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#progressStep(long)} 方法
      */
     public ForestRequest<T> setProgressStep(long progressStep) {
         this.progressStep = progressStep;
         return this;
     }
+
+
+    /**
+     * 设置获取上传/下载进度监听的步长
+     * <p>
+     * 每上传/下载一定的比特数，执行一次监听回调函数
+     *
+     * @param progressStep 进度监听的步长，{@code long}类型数值
+     * @return {@link ForestRequest}类实例
+     * @since 1.6.0
+     */
+    public ForestRequest<T> progressStep(long progressStep) {
+        return setProgressStep(progressStep);
+    }
+
 
     /**
      * 获取重定向回调函数: 在请求重定向时触发
@@ -3940,6 +4168,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param onRedirection 重定向回调函数， {@link OnRedirection}接口实例
      * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#onRedirection(OnRedirection)} 方法
      */
     public ForestRequest<T> setOnRedirection(OnRedirection onRedirection) {
         this.onRedirection = onRedirection;
@@ -3977,6 +4206,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param onProgress 进度回调函数，{@link OnProgress}接口实例
      * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#onProgress(OnProgress)} 方法
      */
     public ForestRequest<T> setOnProgress(OnProgress onProgress) {
         this.onProgress = onProgress;
@@ -3996,6 +4226,28 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         return setOnProgress(onProgress);
     }
 
+    /**
+     * 创建 SSE 监听接口
+     *
+     * @return {@link ForestSSE}实例
+     * @since 1.6.0
+     */
+    public ForestSSE sse() {
+        return ForestSSE.fromRequest(this);
+    }
+
+    /**
+     * 创建自定义类型的 SSE 监听接口
+     *
+     * @param sseClass SSE 自定义实现类
+     * @return 自定义类型 SSE 监听接口实例
+     * @param <SSE> 自定义 SSE 监听类
+     * @since 1.6.0
+     */
+    public <SSE extends ForestSSE> SSE sse(Class<? extends SSE> sseClass) {
+        return ForestSSE.fromClass(this, sseClass);
+    }
+
 
     /**
      * 获取回调函数: 加载Cookie时调用
@@ -4011,6 +4263,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param onLoadCookie {@link OnLoadCookie}接口实例
      * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#onLoadCookie(OnLoadCookie)} 方法
      */
     public ForestRequest<T> setOnLoadCookie(OnLoadCookie onLoadCookie) {
         this.onLoadCookie = onLoadCookie;
@@ -4044,6 +4297,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @param onSaveCookie {@link OnSaveCookie}接口实例
      * @return {@link ForestRequest}类实例
+     * @deprecated 请使用 {@link ForestRequest#onSaveCookie(OnSaveCookie)} 方法
      */
     public ForestRequest<T> setOnSaveCookie(OnSaveCookie onSaveCookie) {
         this.onSaveCookie = onSaveCookie;
@@ -4077,6 +4331,22 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
             throw new ForestVariableUndefinedException(name);
         }
         return method.getVariableValue(name, method);
+    }
+
+    /**
+     * 获取请求所绑定到的变量值
+     *
+     * @param name 变量名
+     * @param clazz 返回类型
+     * @return 变量名
+     * @param <R> 返回类型
+     */
+    public <R> R getVariableValue(String name, Class<R> clazz) {
+        final Object result = getVariableValue(name);
+        if (result == null) {
+            return null;
+        }
+        return clazz.cast(result);
     }
 
     /**
@@ -4149,9 +4419,11 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         InterceptorAttributes oldAttributes = interceptorAttributes.get(interceptorClass);
         if (oldAttributes != null) {
             for (Map.Entry<String, Object> entry : attributes.getAttributeTemplates().entrySet()) {
-                oldAttributes.addAttribute(entry.getKey(), entry.getValue());
+                oldAttributes.getAttributeTemplates().put(entry.getKey(), entry.getValue());
             }
-
+            if (!attributes.getAttributeTemplates().isEmpty()) {
+                oldAttributes.render(arguments);
+            }
             for (Map.Entry<String, Object> entry : attributes.getAttributes().entrySet()) {
                 oldAttributes.addAttribute(entry.getKey(), entry.getValue());
             }
@@ -4335,7 +4607,27 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @return 附件值
      */
     public Object getAttachment(String name) {
+        Validations.assertParamNotNull(name, "name");
         return attachments.get(name);
+    }
+
+
+        /**
+     * 根据名称获取该请求中的附件
+     * <p>Attachment 是和请求绑定的附件属性值，这些值不能通过网络请求传递到远端服务器。</p>
+     * <p>不同请求的附件相互独立，即使名称相同，也互不影响。</p>
+     *
+     * @param name 附件名
+     * @return 附件值
+     */
+    public <R> R getAttachment(String name, Class<R> clazz) {
+        Validations.assertParamNotNull(name, "name");
+        Validations.assertParamNotNull(clazz, "clazz");
+        final Object result = attachments.get(name);
+        if (result == null) {
+            return null;
+        }
+        return clazz.cast(result);
     }
 
     /**
@@ -4672,6 +4964,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         newRequest.retryer = this.retryer;
         newRequest.maxRetryCount = this.maxRetryCount;
         newRequest.maxRetryInterval = this.maxRetryInterval;
+        newRequest.onResponse = this.onResponse;
         newRequest.onSuccess = this.onSuccess;
         newRequest.successWhen = this.successWhen;
         newRequest.onError = this.onError;
@@ -4708,8 +5001,15 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         if (interceptorChain.beforeExecute(this)) {
             // 认证信息增强
             if (this.authenticator != null) {
-                this.authenticator.enhanceAuthorization(this);
+                for (ForestAuthenticator auth = this.authenticator; auth != null; auth = auth.next()) {
+                    auth.enhanceAuthorization(this);
+                }
             }
+            final String userInfo = getUserInfo();
+            if (StringUtils.isNotEmpty(userInfo) && getHeader("Authorization") == null) {
+                new BasicAuth(userInfo).enhanceAuthorization(this);
+            }
+
             this.url.mergeAddress().checkAndComplete();
             ForestCookies cookies = new ForestCookies();
             lifeCycleHandler.handleLoadCookie(this, cookies);
@@ -4877,7 +5177,6 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     public ForestResponse executeAsResponse() {
         return execute(ForestResponse.class);
     }
-
 
     /**
      * 执行请求发送过程

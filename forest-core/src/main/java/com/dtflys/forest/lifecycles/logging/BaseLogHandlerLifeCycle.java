@@ -29,14 +29,7 @@ public class BaseLogHandlerLifeCycle implements BaseAnnotationLifeCycle<LogHandl
             interfaceProxyHandler.setBaseLogConfiguration(logConfiguration);
         }
         Class<? extends ForestLogHandler> logHandlerClass = annotation.value();
-        ForestLogHandler logHandler = null;
-        try {
-            logHandler = logHandlerClass.newInstance();
-        } catch (InstantiationException e) {
-            throw new ForestRuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new ForestRuntimeException(e);
-        }
+        ForestLogHandler logHandler = configuration.getForestObject(logHandlerClass);
         if (logHandler != null) {
             logConfiguration.setLogHandler(logHandler);
         } else {

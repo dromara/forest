@@ -79,6 +79,15 @@ public class ForestScannerRegister implements BeanFactoryAware, ImportBeanDefini
         return basePackages;
     }
 
+
+    /**
+     * 清空扫描的包名
+     */
+    public static void cleanBackPackages() {
+        basePackages.clear();
+    }
+
+
     /**
      * 获取Forest全局配置ID
      *

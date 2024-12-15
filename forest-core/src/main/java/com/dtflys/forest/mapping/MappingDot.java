@@ -2,6 +2,7 @@ package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.exceptions.ForestExpressionException;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.StringUtils;
 
@@ -18,15 +19,16 @@ public class MappingDot extends MappingExpr {
     protected final MappingExpr left;
     protected final MappingIdentity right;
 
-    public MappingDot(ForestMethod forestMethod, VariableScope variableScope, MappingExpr left, MappingIdentity right) {
-        this(forestMethod, Token.DOT, variableScope, left, right);
+    public MappingDot(ForestMethod forestMethod, VariableScope variableScope, MappingExpr left, MappingIdentity right, int startIndex, int endIndex) {
+        this(forestMethod, Token.DOT, variableScope, left, right, startIndex, endIndex);
     }
 
-    protected MappingDot(ForestMethod forestMethod, Token token, VariableScope variableScope, MappingExpr left, MappingIdentity right) {
+    protected MappingDot(ForestMethod forestMethod, Token token, VariableScope variableScope, MappingExpr left, MappingIdentity right, int startIndex, int endIndex) {
         super(forestMethod, token);
         this.variableScope = variableScope;
         this.left = left;
         this.right = right;
+        setIndexRange(startIndex, endIndex);
     }
 
     public Method getPropMethodFromClass(Class clazz, MappingIdentity right) {
@@ -86,17 +88,20 @@ public class MappingDot extends MappingExpr {
             return ((Map) obj).get(right.getName());
         }
         String getterName = StringUtils.toGetterName(right.getName());
-        Method method = getPropMethodFromClass(obj.getClass(), right);
+        Method method = null;
+        try {
+            method = getPropMethodFromClass(obj.getClass(), right);
+        } catch (Throwable th) {
+            throw new ForestExpressionException(th.getMessage(), null, null, forestMethod, null, startIndex + 1, endIndex, th);
+        }
         if (method == null) {
-            throw new ForestRuntimeException(new NoSuchMethodException(getterName));
+            NoSuchMethodException ex = new NoSuchMethodException(getterName);
+            throw new ForestExpressionException(ex.getMessage(), null, null, forestMethod, null, startIndex + 1, endIndex, ex);
         }
         try {
-            Object result = method.invoke(obj);
-            return result;
-        } catch (InvocationTargetException e) {
-            throw new ForestRuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new ForestRuntimeException(e);
+            return method.invoke(obj);
+        } catch (Throwable th) {
+            throw new ForestExpressionException(th.getMessage(), null, null, forestMethod, null, startIndex + 1, endIndex, th);
         }
     }
 

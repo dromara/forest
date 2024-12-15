@@ -1,7 +1,7 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
-import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.exceptions.ForestExpressionException;
 import com.dtflys.forest.reflection.ForestMethod;
 
 import java.lang.reflect.InvocationTargetException;
@@ -16,12 +16,12 @@ public class MappingInvoke extends MappingDot {
 
     private List<MappingExpr> argList;
 
-    public MappingInvoke(ForestMethod<?> forestMethod, VariableScope variableScope, MappingExpr left, MappingIdentity name, List<MappingExpr> argList) {
-        this(forestMethod, Token.INVOKE, variableScope, left, name, argList);
+    public MappingInvoke(ForestMethod<?> forestMethod, VariableScope variableScope, MappingExpr left, MappingIdentity name, List<MappingExpr> argList, int startIndex, int endIndex) {
+        this(forestMethod, Token.INVOKE, variableScope, left, name, argList, startIndex, endIndex);
     }
 
-    protected MappingInvoke(ForestMethod<?> forestMethod, Token token, VariableScope variableScope, MappingExpr left, MappingIdentity name, List<MappingExpr> argList) {
-        super(forestMethod, token, variableScope, left, name);
+    protected MappingInvoke(ForestMethod<?> forestMethod, Token token, VariableScope variableScope, MappingExpr left, MappingIdentity name, List<MappingExpr> argList, int startIndex, int endIndex) {
+        super(forestMethod, token, variableScope, left, name, startIndex, endIndex);
         this.argList = argList;
     }
 
@@ -58,14 +58,9 @@ public class MappingInvoke extends MappingDot {
                 result = method.invoke(obj, renderArgs);
             }
             return result;
-        } catch (NoSuchMethodException e) {
-            throw new ForestRuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new ForestRuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new ForestRuntimeException(e);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            throw new ForestExpressionException(e.getMessage(), null, null, forestMethod, null, startIndex, endIndex);
         }
-
     }
 
     @Override

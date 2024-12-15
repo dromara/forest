@@ -40,6 +40,7 @@ import java.lang.reflect.Type;
 import java.net.SocketTimeoutException;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Forest请求响应类
@@ -135,7 +136,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
     /**
      * 响应内容反序列化成对象后的结果
      */
-    protected volatile T result;
+    protected volatile Optional<T> result;
 
 
     public ForestResponse(ForestRequest request, Date requestTime, Date responseTime) {
@@ -338,13 +339,13 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
         this.content = content;
     }
 
-
     /**
-     * 获取反序列化成对象类型的请求响应内容
+     * 获取反序列化成对象类型的请求响应内容的 Optional 包装对象
      *
-     * @return 反序列化成对象类型的请求响应内容
+     * @return 反序列化成对象类型的请求响应内容的 Optional 包装对象
+     * @since 1.6.0
      */
-    public T getResult() {
+    public Optional<T> getResultOpt() {
         if (result == null && isReceivedResponseData()) {
             Type type = request.getLifeCycleHandler().getResultType();
             if (type == null) {
@@ -352,23 +353,41 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
             }
             if (type == null) {
                 try {
-                    result = (T) get(String.class);
+                    result = Optional.ofNullable((T) get(String.class));
                 } catch (Throwable th) {
                 }
             } else {
                 final Class<?> clazz = ReflectUtils.toClass(type);
-                if (ForestResponse.class.isAssignableFrom(clazz)) {
+                if (Optional.class.isAssignableFrom(clazz) || ForestResponse.class.isAssignableFrom(clazz)) {
                     Type argType = ReflectUtils.getGenericArgument(clazz);
                     if (argType == null) {
                         argType = String.class;
                     }
-                    result = get(argType);
+                    result = Optional.ofNullable(get(argType));
                 } else {
-                    result = get(type);
+                    result = Optional.ofNullable(get(type));
                 }
             }
         }
-        return result;
+        return result == null ? Optional.empty() : result;
+    }
+
+    /**
+     * 获取反序列化成对象类型的请求响应内容
+     *
+     * @return 反序列化成对象类型的请求响应内容
+     */
+    public T getResult() {
+        final Optional<T> opt = getResultOpt();
+        Type type = request.getLifeCycleHandler().getResultType();
+        if (type == null) {
+            type = request.getMethod().getReturnType();
+        }
+        final Class<?> clazz = ReflectUtils.toClass(type);
+        if (Optional.class.isAssignableFrom(clazz)) {
+            return (T) opt;
+        }
+        return opt.orElse(null);
     }
 
     /**
@@ -377,7 +396,11 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      * @param result 反序列化成对象类型的请求响应内容
      */
     public void setResult(T result) {
-        this.result = result;
+        if (result instanceof Optional) {
+            this.result = (Optional<T>) result;
+        } else {
+            this.result = Optional.ofNullable(result);
+        }
     }
 
     /**
@@ -727,6 +750,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
     public String getCharset() {
         return charset;
     }
+
 
     /**
      * 把字节数组转换成字符串（自动根据字符串编码转换）

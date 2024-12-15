@@ -24,28 +24,28 @@ public class URLEncoder {
     /**
      * URI用户信息部分中不会被编码的字符集
      */
-    private static final char[] USER_INFO_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '*', ':', '=', '%'};
+    private static final char[] USER_INFO_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '*', ':', '='};
 
     /**
      * URI路径中不会被编码的字符集
      */
-    private static final char[] PATH_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '[', ']', '*', '/', ':', '?', '=', '$', '@', '&', '%', '~'};
+    private static final char[] PATH_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '[', ']', '*', '/', ':', '?', '=', '$', '@', '&', '~'};
 
     /**
      * 查询参数值中不会被编码的字符集
      */
-    private static final char[] QUERY_VALUE_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '[', ']', ',', '*', '/', ':', '?', '=', '%', '~'};
+    private static final char[] QUERY_VALUE_EXCLUDED_CHARACTERS = {'-', '.', '_', '+', '!', '(', ')', '[', ']', ',', '*', '/', ':', '?', '=', '~'};
 
     /**
      * (带不转义大括号的) 查询参数值中不会被编码的字符集
      */
-    private static final char[] QUERY_VALUE_EXCLUDED_CHARACTERS_WITH_BRACE = {'-', '.', '_', '+', '!', '{', '}', '(', ')', '[', ']', ',', '*', '/', ':', '?', '=', '%', '~'};
+    private static final char[] QUERY_VALUE_EXCLUDED_CHARACTERS_WITH_BRACE = {'-', '.', '_', '+', '!', '{', '}', '(', ')', '[', ']', ',', '*', '/', ':', '?', '=', '~'};
 
 
     /**
      * 查询参数值中不会被编码的字符集
      */
-    private static final char[] X_WWW_FORM_URLENCODED_VALUE_EXCLUDED_CHARACTERS = {'-', '.', '_', '!', '{', '}', '[', ']', ',', '"', '*', '/', ':', '?', '#', '=', '%'};
+    private static final char[] X_WWW_FORM_URLENCODED_VALUE_EXCLUDED_CHARACTERS = {'-', '.', '_', '!', '{', '}', '[', ']', ',', '"', '*', '/', ':', '?', '#', '='};
 
     /**
      * 强制全编码中不会被编码的字符集
@@ -223,6 +223,29 @@ public class URLEncoder {
         }
     }
 
+    private boolean isHexCharacter(final char ch) {
+        if (Character.isDigit(ch)) {
+            return true;
+        }
+        switch (ch) {
+            case 'a':
+            case 'b':
+            case 'c':
+            case 'd':
+            case 'e':
+            case 'f':
+            case 'A':
+            case 'B':
+            case 'C':
+            case 'D':
+            case 'E':
+            case 'F':
+                return true;
+            default:
+                return false;
+        }
+    }
+
     private boolean isURLEncoded(final char[] charArray, final int index) {
         if (charArray[index] != '%') {
             return false;
@@ -231,7 +254,7 @@ public class URLEncoder {
         if (index + 2 < len) {
             final char ch1 = charArray[index + 1];
             final char ch2 = charArray[index + 2];
-            return Character.isDigit(ch1) && Character.isDigit(ch2);
+            return isHexCharacter(ch1) && isHexCharacter(ch2);
         }
         return false;
     }

@@ -34,6 +34,23 @@ public class NameUtils {
     }
 
     /**
+     * 将首字母小写
+     *
+     * @param name 名称
+     * @return 首字母小写化的名称
+     */
+    public static String lowerFirst(final String name) {
+        if (StringUtils.isEmpty(name)) {
+            return name;
+        }
+        final char first = name.charAt(0);
+        if (Character.isUpperCase(first)) {
+            return Character.toLowerCase(first) + name.substring(1);
+        }
+        return name;
+    }
+
+    /**
      * 按驼峰命名法的规则将字符串分割
      *
      * @param name 源字符串
@@ -81,7 +98,17 @@ public class NameUtils {
         StringBuilder builder = new StringBuilder();
         for (int i = 1; i < strs.length; i++) {
             String str = strs[i];
-            builder.append(str);
+            if (i > 1) {
+                final char[] chars = str.toCharArray();
+                builder.append(String.valueOf(chars[0]).toUpperCase());
+                if (chars.length > 1) {
+                    for (int j = 1; j < chars.length; j++) {
+                        builder.append(chars[j]);
+                    }
+                }
+            } else {
+                builder.append(str);
+            }
         }
         return builder.toString();
     }

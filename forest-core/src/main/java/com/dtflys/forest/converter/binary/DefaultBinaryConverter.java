@@ -38,14 +38,12 @@ public class DefaultBinaryConverter implements ForestConverter<Object>, ForestEn
     }
 
 
-    private <T> T convertToJavaObject(Object source, Class<T> targetType, Charset charset) {
-        if (source instanceof byte[]) {
-            source = new ByteArrayInputStream((byte[]) source);
-        }
-        if (source instanceof InputStream) {
-            final InputStream in = (InputStream) source;
+    private <T> T convertToJavaObject(final Object source, final Class<T> targetType, final Charset charset) {
+        final Object src = source instanceof byte[] ? new ByteArrayInputStream((byte[]) source) : source;
+        if (src instanceof InputStream) {
+            final InputStream in = (InputStream) src;
             if (InputStream.class.isAssignableFrom(targetType)) {
-                return (T) source;
+                return (T) src;
             }
             if (byte[].class.isAssignableFrom(targetType)) {
                 return (T) inputStreamToByteArray(in);
@@ -63,15 +61,15 @@ public class DefaultBinaryConverter implements ForestConverter<Object>, ForestEn
                     encode = charset.name();
                 }
                 str = IOUtils.toString(tmp, encode);
-            } catch (IOException e) {
+            } catch (Throwable e) {
                 throw new ForestRuntimeException(e);
             }
             if (String.class.isAssignableFrom(targetType)) {
                 return (T) str;
             }
             return autoConverter.convertToJavaObject(str, targetType);
-        } else if (source instanceof File) {
-            final File file = (File) source;
+        } else if (src instanceof File) {
+            final File file = (File) src;
             if (File.class.isAssignableFrom(targetType)) {
                 return (T) file;
             }
@@ -91,22 +89,22 @@ public class DefaultBinaryConverter implements ForestConverter<Object>, ForestEn
                 throw new ForestConvertException(this, e);
             }
         }
-        return convertToJavaObjectEx(source, targetType);
+        return convertToJavaObjectEx(src, targetType);
 
     }
 
     @Override
-    public <T> T convertToJavaObject(Object source, Class<T> targetType) {
+    public <T> T convertToJavaObject(final Object source, final Class<T> targetType) {
         return convertToJavaObject(source, targetType, StandardCharsets.UTF_8);
     }
 
 
-    protected <T> T convertToJavaObjectEx(Object source, Class<T> targetType) {
+    protected <T> T convertToJavaObjectEx(final Object source, final Class<T> targetType) {
         return convertToJavaObject(source, targetType, StandardCharsets.UTF_8);
     }
 
 
-    private byte[] inputStreamToByteArray(InputStream in) {
+    private byte[] inputStreamToByteArray(final InputStream in) {
         try {
             return IOUtils.toByteArray(in);
         } catch (IOException e) {
@@ -115,19 +113,19 @@ public class DefaultBinaryConverter implements ForestConverter<Object>, ForestEn
     }
 
     @Override
-    public <T> T convertToJavaObject(Object source, Type targetType) {
-        Class clazz = ReflectUtils.toClass(targetType);
+    public <T> T convertToJavaObject(final Object source, final Type targetType) {
+        final Class clazz = ReflectUtils.toClass(targetType);
         return (T) convertToJavaObject(source, clazz);
     }
 
     @Override
-    public <T> T convertToJavaObject(byte[] source, Class<T> targetType, Charset charset) {
+    public <T> T convertToJavaObject(final byte[] source, final Class<T> targetType, final Charset charset) {
         return convertToJavaObject((Object) source, targetType, StandardCharsets.UTF_8);
     }
 
     @Override
-    public <T> T convertToJavaObject(byte[] source, Type targetType, Charset charset) {
-        Class clazz = ReflectUtils.toClass(targetType);
+    public <T> T convertToJavaObject(final byte[] source, final Type targetType, final Charset charset) {
+        final Class clazz = ReflectUtils.toClass(targetType);
         return (T) convertToJavaObject((Object) source, clazz, StandardCharsets.UTF_8);
     }
 
@@ -137,17 +135,17 @@ public class DefaultBinaryConverter implements ForestConverter<Object>, ForestEn
     }
 
     @Override
-    public byte[] encodeRequestBody(ForestBody reqBody, Charset charset, ConvertOptions options) {
-        List<byte[]> byteList = new LinkedList<>();
+    public byte[] encodeRequestBody(final ForestBody reqBody, final Charset charset, final ConvertOptions options) {
+        final List<byte[]> byteList = new LinkedList<>();
         int size = 0;
-        for (ForestRequestBody body : reqBody) {
-            byte[] byteArray = body.getByteArray();
+        for (final ForestRequestBody body : reqBody) {
+            final byte[] byteArray = body.getByteArray();
             byteList.add(byteArray);
             size += byteArray.length;
         }
-        byte[] bytes = new byte[size];
+        final byte[] bytes = new byte[size];
         int pos = 0;
-        for (byte[] bytesItem : byteList) {
+        for (final byte[] bytesItem : byteList) {
             for (int i = 0; i < bytesItem.length; i++) {
                 bytes[pos + i] = bytesItem[i];
             }
@@ -157,24 +155,24 @@ public class DefaultBinaryConverter implements ForestConverter<Object>, ForestEn
     }
 
     @Override
-    public byte[] encodeRequestBody(ForestRequest request, Charset charset) {
-        ForestBody reqBody = request.body();
-        List<ForestMultipart> multiparts = request.getMultiparts();
-        List<byte[]> byteList = new LinkedList<>();
+    public byte[] encodeRequestBody(final ForestRequest request, final Charset charset) {
+        final ForestBody reqBody = request.body();
+        final List<ForestMultipart> multiparts = request.getMultiparts();
+        final List<byte[]> byteList = new LinkedList<>();
         int size = 0;
-        for (ForestMultipart multipart : multiparts) {
-            byte[] byteArray = multipart.getBytes();
+        for (final ForestMultipart multipart : multiparts) {
+            final byte[] byteArray = multipart.getBytes();
             byteList.add(byteArray);
             size += byteArray.length;
         }
-        for (ForestRequestBody body : reqBody) {
-            byte[] byteArray = body.getByteArray();
+        for (final ForestRequestBody body : reqBody) {
+            final byte[] byteArray = body.getByteArray();
             byteList.add(byteArray);
             size += byteArray.length;
         }
-        byte[] bytes = new byte[size];
+        final byte[] bytes = new byte[size];
         int pos = 0;
-        for (byte[] bytesItem : byteList) {
+        for (final byte[] bytesItem : byteList) {
             for (int i = 0; i < bytesItem.length; i++) {
                 bytes[pos + i] = bytesItem[i];
             }

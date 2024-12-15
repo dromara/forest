@@ -8,12 +8,23 @@ import com.dtflys.forest.http.ForestRequest;
  * @author gongjun
  * @since 1.5.28
  */
-public interface ForestAuthenticator {
+public abstract class ForestAuthenticator {
+
+    private ForestAuthenticator next;
 
     /**
      * 增强请求的认证信息
      *
      * @param request Forest 请求对象
      */
-    void enhanceAuthorization(ForestRequest request);
+    public abstract void enhanceAuthorization(ForestRequest request);
+
+    public final ForestAuthenticator next(ForestAuthenticator next) {
+        this.next = next;
+        return this;
+    }
+
+    public ForestAuthenticator next() {
+        return next;
+    }
 }

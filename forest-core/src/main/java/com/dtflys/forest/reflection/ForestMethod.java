@@ -24,6 +24,7 @@ import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.http.ForestAddress;
 import com.dtflys.forest.http.ForestQueryMap;
 import com.dtflys.forest.http.ForestQueryParameter;
+import com.dtflys.forest.http.ForestSSE;
 import com.dtflys.forest.http.SimpleQueryParameter;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
@@ -51,6 +52,7 @@ import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.multipart.ForestMultipartFactory;
 import com.dtflys.forest.proxy.InterfaceProxyHandler;
 import com.dtflys.forest.retryer.ForestRetryer;
+import com.dtflys.forest.sse.ForestSSEListener;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.HeaderUtils;
@@ -203,6 +205,10 @@ public class ForestMethod<T> implements VariableScope {
             final String text) {
         return getOrCreateTemplate(annotationType, attributeName, text);
 //        return new MappingTemplate(annotationType, attributeName, this, text, this, configuration.getProperties(), forestParameters);
+    }
+    
+    public MappingTemplate makeTemplate(final String text) {
+        return makeTemplate(null, null, text);
     }
 
     public MappingURLTemplate makeURLTemplate(
@@ -726,7 +732,7 @@ public class ForestMethod<T> implements VariableScope {
             this.encoder = configuration.getForestObjectFactory().getObject(encoderClass);
         }
 
-        if (decoderClass != null && !encoderClass.isInterface()
+        if (decoderClass != null && !decoderClass.isInterface()
                 && ForestConverter.class.isAssignableFrom(decoderClass)) {
             this.decoder = configuration.getForestObjectFactory().getObject(decoderClass);
         }
@@ -877,24 +883,23 @@ public class ForestMethod<T> implements VariableScope {
      * @param args 调用本对象对应方法时传入的参数数组
      * @return Forest请求对象，{@link ForestRequest}类实例
      */
-    private ForestRequest<?> makeRequest(Object[] args) {
+    private ForestRequest<?> makeRequest(final Object[] args) {
         initMethod();
-        MetaRequest baseMetaRequest = interfaceProxyHandler.getBaseMetaRequest();
+        final MetaRequest baseMetaRequest = interfaceProxyHandler.getBaseMetaRequest();
         ForestURL baseURL = null;
-        ForestRequestType type = type(args);
+        final ForestRequestType type = type(args);
 
         // createExecutor and initialize http instance
-        ForestRequest<T> request = new ForestRequest<>(configuration, this, args);
+        final ForestRequest<T> request = new ForestRequest<>(configuration, this, args);
 
-        ForestQueryMap queries = new ForestQueryMap(request);
+        final ForestQueryMap queries = new ForestQueryMap(request);
         if (baseUrlTemplate != null) {
             baseURL = baseUrlTemplate.render(args, queries);
         }
         if (urlTemplate == null) {
             throw new ForestRuntimeException("request URL is empty");
         }
-        ForestURL renderedURL = urlTemplate.render(args, queries);
-
+        final ForestURL renderedURL = urlTemplate.render(args, queries);
 
         String baseContentEncoding = null;
         if (baseEncodeTemplate != null) {
@@ -914,7 +919,7 @@ public class ForestMethod<T> implements VariableScope {
             baseUserAgent = baseUserAgentTemplate.render(args);
         }
         String charset = null;
-        String renderedCharset = charsetTemplate.render(args);
+        final String renderedCharset = charsetTemplate.render(args);
         if (StringUtils.isNotBlank(renderedCharset)) {
             charset = renderedCharset;
         } else if (baseCharsetTemplate != null) {
@@ -927,7 +932,7 @@ public class ForestMethod<T> implements VariableScope {
         }
 
         String sslProtocol = null;
-        String renderedSslProtocol = sslProtocolTemplate.render(args);
+        final String renderedSslProtocol = sslProtocolTemplate.render(args);
         if (StringUtils.isNotBlank(renderedSslProtocol) && !"null".equals(renderedSslProtocol)) {
             sslProtocol = renderedSslProtocol;
         } else if (baseSslProtocolTemplate != null) {
@@ -944,20 +949,20 @@ public class ForestMethod<T> implements VariableScope {
         if (userAgentTemplate != null) {
             renderedUserAgent = userAgentTemplate.render(args).trim();
         }
-        List<RequestNameValue> nameValueList = new ArrayList<>();
-        String[] headerArray = baseMetaRequest.getHeaders();
+        final List<RequestNameValue> nameValueList = new ArrayList<>();
+        final String[] headerArray = baseMetaRequest.getHeaders();
         MappingTemplate[] baseHeaders = null;
         if (headerArray != null && headerArray.length > 0) {
             baseHeaders = new MappingTemplate[headerArray.length];
             for (int j = 0; j < baseHeaders.length; j++) {
-                MappingTemplate header = new MappingTemplate(
+                final MappingTemplate header = new MappingTemplate(
                         BaseRequest.class, "headers",
                         this, headerArray[j], this, configuration.getProperties(), forestParameters);
                 baseHeaders[j] = header;
             }
         }
 
-        AddressSource addressSource = configuration.getBaseAddressSource();
+        final AddressSource addressSource = configuration.getBaseAddressSource();
         ForestAddress address = configuration.getBaseAddress();
 
         if (baseURL != null) {
@@ -1018,10 +1023,74 @@ public class ForestMethod<T> implements VariableScope {
             request.setUserAgent(renderedUserAgent);
         }
 
+
+        for (final MappingTemplate headerTemplate : headerTemplateArray) {
+            final String header = headerTemplate.render(args);
+            final String[] headNameValue = header.split(":", 2);
+            if (headNameValue.length > 0) {
+                final String name = headNameValue[0].trim();
+                final RequestNameValue nameValue = new RequestNameValue(name, TARGET_HEADER);
+                if (headNameValue.length == 2) {
+                    nameValue.setValue(headNameValue[1].trim());
+                }
+                request.addHeader(nameValue);
+            }
+        }
+
+        if (timeout != null) {
+            request.setTimeout(timeout);
+        } else if (baseTimeout != null) {
+            request.setTimeout(baseTimeout);
+        } else if (configuration.getTimeout() != null) {
+            request.setTimeout(configuration.getTimeout());
+        }
+
+        if (connectTimeout != null) {
+            request.setConnectTimeout(connectTimeout);
+        } else if (baseConnectTimeout != null) {
+            request.setConnectTimeout(baseConnectTimeout);
+        } else if (configuration.getConnectTimeout() != null) {
+            request.setConnectTimeout(configuration.getConnectTimeout());
+        }
+
+        if (readTimeout != null) {
+            request.setReadTimeout(readTimeout);
+        } else if (baseReadTimeout != null) {
+            request.setReadTimeout(baseReadTimeout);
+        } else if (configuration.getReadTimeout() != null) {
+            request.setReadTimeout(configuration.getReadTimeout());
+        }
+
+        if (retryCount != null) {
+            request.setMaxRetryCount(retryCount);
+        } else if (baseRetryCount != null) {
+            request.setMaxRetryCount(baseRetryCount);
+        } else if (configuration.getMaxRetryCount() != null) {
+            request.setMaxRetryCount(configuration.getMaxRetryCount());
+        }
+
+        if (maxRetryInterval >= 0) {
+            request.setMaxRetryInterval(maxRetryInterval);
+        } else if (baseMaxRetryInterval != null) {
+            request.setMaxRetryInterval(baseMaxRetryInterval);
+        } else if (configuration.getMaxRetryInterval() >= 0) {
+            request.setMaxRetryInterval(configuration.getMaxRetryInterval());
+        }
+
+        final Class globalRetryerClass = configuration.getRetryer();
+
+        if (retryerClass != null && ForestRetryer.class.isAssignableFrom(retryerClass)) {
+            request.setRetryer(retryerClass);
+        } else if (baseRetryerClass != null && ForestRetryer.class.isAssignableFrom(baseRetryerClass)) {
+            request.setRetryer(baseRetryerClass);
+        } else if (globalRetryerClass != null && ForestRetryer.class.isAssignableFrom(globalRetryerClass)) {
+            request.setRetryer(globalRetryerClass);
+        }
+
         for (int i = 0; i < namedParameters.size(); i++) {
-            MappingParameter parameter = namedParameters.get(i);
+            final MappingParameter parameter = namedParameters.get(i);
             if (parameter.isObjectProperties()) {
-                int target = parameter.isUnknownTarget() ? type.getDefaultParamTarget() : parameter.getTarget();
+                final int target = parameter.isUnknownTarget() ? type.getDefaultParamTarget() : parameter.getTarget();
                 Object obj = args[parameter.getIndex()];
                 if (obj == null && StringUtils.isNotEmpty(parameter.getDefaultValue())) {
                     obj = parameter.getConvertedDefaultValue(configuration.getJsonConverter());
@@ -1070,7 +1139,7 @@ public class ForestMethod<T> implements VariableScope {
                                 .setDefaultValue(parameter.getDefaultValue()));
                     }
                 } else if (obj instanceof Map) {
-                    Map map = (Map) obj;
+                    final Map map = (Map) obj;
                     if (MappingParameter.isQuery(target)) {
                         request.addQuery(map, parameter.isUrlEncode(), parameter.getCharset());
                     } else if (MappingParameter.isBody(target)) {
@@ -1103,21 +1172,21 @@ public class ForestMethod<T> implements VariableScope {
                             }
                         }
                     } else if (MappingParameter.isBody(target)) {
-                        ForestRequestBody body = RequestBodyBuilder
+                        final ForestRequestBody body = RequestBodyBuilder
                                 .type(obj.getClass())
                                 .build(obj, parameter.getDefaultValue());
                         request.addBody(body);
                     }
                 } else if (MappingParameter.isBody(target)) {
-                    ForestRequestBody body = RequestBodyBuilder
+                    final ForestRequestBody body = RequestBodyBuilder
                             .type(obj.getClass())
                             .build(obj, parameter.getDefaultValue());
                     request.addBody(body);
                 } else {
                     try {
-                        List<RequestNameValue> list = getNameValueListFromObjectWithJSON(parameter, configuration, obj, type);
+                        final List<RequestNameValue> list = getNameValueListFromObjectWithJSON(parameter, configuration, obj, type);
                         if (list != null) {
-                            for (RequestNameValue nameValue : list) {
+                            for (final RequestNameValue nameValue : list) {
                                 if (nameValue.isInHeader()) {
                                     request.addHeader(nameValue);
                                 } else {
@@ -1130,8 +1199,8 @@ public class ForestMethod<T> implements VariableScope {
                     }
                 }
             } else if (parameter.getIndex() != null) {
-                int target = parameter.isUnknownTarget() ? type.getDefaultParamTarget() : parameter.getTarget();
-                RequestNameValue nameValue = new RequestNameValue(parameter.getName(), target, parameter.getPartContentType())
+                final int target = parameter.isUnknownTarget() ? type.getDefaultParamTarget() : parameter.getTarget();
+                final RequestNameValue nameValue = new RequestNameValue(parameter.getName(), target, parameter.getPartContentType())
                         .setDefaultValue(parameter.getDefaultValue());
                 Object obj = args[parameter.getIndex()];
                 if (obj == null && StringUtils.isNotEmpty(nameValue.getDefaultValue())) {
@@ -1170,6 +1239,8 @@ public class ForestMethod<T> implements VariableScope {
                                             name, subItem,
                                             parameter.isUrlEncode(), parameter.getCharset());
                                 }
+                                // 恢复parentScope, 防止栈溢出
+                                template.setVariableScope(parentScope);
                             } else if (parameter.isJsonParam()) {
                                 request.addJSONQuery(parameter.getName(), obj);
                             } else {
@@ -1219,12 +1290,12 @@ public class ForestMethod<T> implements VariableScope {
             }
         }
 
-        List<ForestMultipart> multiparts = new ArrayList<>(multipartFactories.size());
-        String contentType = request.getContentType();
+        final List<ForestMultipart> multiparts = new ArrayList<>(multipartFactories.size());
+        final String contentType = request.getContentType();
 
         if (!multipartFactories.isEmpty()) {
             if (StringUtils.isBlank(contentType)) {
-                String boundary = StringUtils.generateBoundary();
+                final String boundary = StringUtils.generateBoundary();
                 request.setContentType(ContentType.MULTIPART_FORM_DATA + "; boundary=" + boundary);
             } else if (ContentType.MULTIPART_FORM_DATA.equalsIgnoreCase(contentType)
                     && request.getBoundary() == null) {
@@ -1232,19 +1303,18 @@ public class ForestMethod<T> implements VariableScope {
             }
         }
 
-        for (int i = 0; i < multipartFactories.size(); i++) {
-            ForestMultipartFactory factory = multipartFactories.get(i);
-            MappingTemplate nameTemplate = factory.getNameTemplate();
-            MappingTemplate fileNameTemplate = factory.getFileNameTemplate();
-            int index = factory.getIndex();
-            Object data = args[index];
+        for (final ForestMultipartFactory factory : multipartFactories) {
+            final MappingTemplate nameTemplate = factory.getNameTemplate();
+            final MappingTemplate fileNameTemplate = factory.getFileNameTemplate();
+            final int index = factory.getIndex();
+            final Object data = args[index];
             factory.addMultipart(nameTemplate, fileNameTemplate, data, multiparts, args);
         }
         request.setMultiparts(multiparts);
         // setup ssl keystore
         if (sslKeyStoreId != null) {
             SSLKeyStore sslKeyStore = null;
-            String keyStoreId = sslKeyStoreId.render(args);
+            final String keyStoreId = sslKeyStoreId.render(args);
             if (StringUtils.isNotEmpty(keyStoreId)) {
                 sslKeyStore = configuration.getKeyStore(keyStoreId);
                 request.setKeyStore(sslKeyStore);
@@ -1269,19 +1339,17 @@ public class ForestMethod<T> implements VariableScope {
             request.addHeaders(configuration.getDefaultHeaders());
         }
 
-        List<RequestNameValue> dataNameValueList = new ArrayList<>();
+        final List<RequestNameValue> dataNameValueList = new ArrayList<>();
         renderedContentType = request.getContentType();
         if (renderedContentType == null || renderedContentType.equalsIgnoreCase(ContentType.APPLICATION_X_WWW_FORM_URLENCODED)) {
-            for (int i = 0; i < dataTemplateArray.length; i++) {
-                MappingTemplate dataTemplate = dataTemplateArray[i];
-                String data = dataTemplate.render(args);
-                String[] paramArray = data.split("&");
-                for (int j = 0; j < paramArray.length; j++) {
-                    String dataParam = paramArray[j];
-                    String[] dataNameValue = dataParam.split("=", 2);
+            for (final MappingTemplate dataTemplate : dataTemplateArray) {
+                final String data = dataTemplate.render(args);
+                final String[] paramArray = data.split("&");
+                for (final String dataParam : paramArray) {
+                    final String[] dataNameValue = dataParam.split("=", 2);
                     if (dataNameValue.length > 0) {
-                        String name = dataNameValue[0].trim();
-                        RequestNameValue nameValue = new RequestNameValue(name, type.getDefaultParamTarget());
+                        final String name = dataNameValue[0].trim();
+                        final RequestNameValue nameValue = new RequestNameValue(name, type.getDefaultParamTarget());
                         if (dataNameValue.length == 2) {
                             nameValue.setValue(dataNameValue[1].trim());
                         }
@@ -1291,77 +1359,13 @@ public class ForestMethod<T> implements VariableScope {
                 }
             }
         } else {
-            for (int i = 0; i < dataTemplateArray.length; i++) {
-                MappingTemplate dataTemplate = dataTemplateArray[i];
-                String data = dataTemplate.render(args);
+            for (final MappingTemplate dataTemplate : dataTemplateArray) {
+                final String data = dataTemplate.render(args);
                 request.addBody(data);
             }
         }
         request.addNameValue(nameValueList);
 
-        for (int i = 0; i < headerTemplateArray.length; i++) {
-            MappingTemplate headerTemplate = headerTemplateArray[i];
-            String header = headerTemplate.render(args);
-            String[] headNameValue = header.split(":", 2);
-            if (headNameValue.length > 0) {
-                String name = headNameValue[0].trim();
-                RequestNameValue nameValue = new RequestNameValue(name, TARGET_HEADER);
-                if (headNameValue.length == 2) {
-                    nameValue.setValue(headNameValue[1].trim());
-                }
-                request.addHeader(nameValue);
-            }
-        }
-
-        if (timeout != null) {
-            request.setTimeout(timeout);
-        } else if (baseTimeout != null) {
-            request.setTimeout(baseTimeout);
-        } else if (configuration.getTimeout() != null) {
-            request.setTimeout(configuration.getTimeout());
-        }
-
-        if (connectTimeout != null) {
-            request.setConnectTimeout(connectTimeout);
-        } else if (baseConnectTimeout != null) {
-            request.setConnectTimeout(baseConnectTimeout);
-        } else if (configuration.getConnectTimeout() != null) {
-            request.setConnectTimeout(configuration.getConnectTimeout());
-        }
-
-        if (readTimeout != null) {
-            request.setReadTimeout(readTimeout);
-        } else if (baseReadTimeout != null) {
-            request.setReadTimeout(baseReadTimeout);
-        } else if (configuration.getReadTimeout() != null) {
-            request.setReadTimeout(configuration.getReadTimeout());
-        }
-
-        if (retryCount != null) {
-            request.setMaxRetryCount(retryCount);
-        } else if (baseRetryCount != null) {
-            request.setMaxRetryCount(baseRetryCount);
-        } else if (configuration.getMaxRetryCount() != null) {
-            request.setMaxRetryCount(configuration.getMaxRetryCount());
-        }
-
-        if (maxRetryInterval >= 0) {
-            request.setMaxRetryInterval(maxRetryInterval);
-        } else if (baseMaxRetryInterval != null) {
-            request.setMaxRetryInterval(baseMaxRetryInterval);
-        } else if (configuration.getMaxRetryInterval() >= 0) {
-            request.setMaxRetryInterval(configuration.getMaxRetryInterval());
-        }
-
-        Class globalRetryerClass = configuration.getRetryer();
-
-        if (retryerClass != null && ForestRetryer.class.isAssignableFrom(retryerClass)) {
-            request.setRetryer(retryerClass);
-        } else if (baseRetryerClass != null && ForestRetryer.class.isAssignableFrom(baseRetryerClass)) {
-            request.setRetryer(baseRetryerClass);
-        } else if (globalRetryerClass != null && ForestRetryer.class.isAssignableFrom(globalRetryerClass)) {
-            request.setRetryer(globalRetryerClass);
-        }
 
         if (onSuccessParameter != null) {
             OnSuccess<?> onSuccessCallback = (OnSuccess<?>) args[onSuccessParameter.getIndex()];
@@ -1395,32 +1399,34 @@ public class ForestMethod<T> implements VariableScope {
             request.setDataType(ForestDataType.TEXT);
         } else {
             dataType = dataType.toUpperCase();
-            ForestDataType forestDataType = ForestDataType.findByName(dataType);
+            final ForestDataType forestDataType = ForestDataType.findByName(dataType);
             request.setDataType(forestDataType);
         }
 
         if (interceptorAttributesList != null && interceptorAttributesList.size() > 0) {
-            for (InterceptorAttributes attributes : interceptorAttributesList) {
-                InterceptorAttributes newAttrs = attributes.clone();
+            for (final InterceptorAttributes attributes : interceptorAttributesList) {
+                final InterceptorAttributes newAttrs = attributes.clone();
                 request.addInterceptorAttributes(newAttrs.getInterceptorClass(), newAttrs);
-                request.getInterceptorAttributes(newAttrs.getInterceptorClass()).render(args);
+            }
+            for (final InterceptorAttributes attributes : request.getInterceptorAttributes().values()) {
+                request.getInterceptorAttributes(attributes.getInterceptorClass()).render(args);
             }
         }
 
         if (globalInterceptorList != null && globalInterceptorList.size() > 0) {
-            for (Interceptor item : globalInterceptorList) {
+            for (final Interceptor item : globalInterceptorList) {
                 request.addInterceptor(item);
             }
         }
 
         if (baseInterceptorList != null && baseInterceptorList.size() > 0) {
-            for (Interceptor item : baseInterceptorList) {
+            for (final Interceptor item : baseInterceptorList) {
                 request.addInterceptor(item);
             }
         }
 
         if (interceptorList != null && interceptorList.size() > 0) {
-            for (Interceptor item : interceptorList) {
+            for (final Interceptor item : interceptorList) {
                 request.addInterceptor(item);
             }
         }
@@ -1428,17 +1434,19 @@ public class ForestMethod<T> implements VariableScope {
     }
 
 
-    private List<RequestNameValue> getNameValueListFromObjectWithJSON(MappingParameter parameter, ForestConfiguration configuration, Object obj, ForestRequestType type) {
+    private List<RequestNameValue> getNameValueListFromObjectWithJSON(final MappingParameter parameter, final ForestConfiguration configuration, final Object obj, final ForestRequestType type) {
         if (obj == null) {
             return null;
         }
-        Map<String, Object> propMap = ReflectUtils.convertObjectToMap(obj, configuration);
-        List<RequestNameValue> nameValueList = new ArrayList<>();
-        for (Map.Entry<String, Object> entry : propMap.entrySet()) {
-            String name = entry.getKey();
-            Object value = entry.getValue();
+        final Map<String, Object> propMap = ReflectUtils.convertObjectToMap(obj, configuration);
+        final List<RequestNameValue> nameValueList = new ArrayList<>();
+        for (final Map.Entry<String, Object> entry : propMap.entrySet()) {
+            final String name = entry.getKey();
+            final Object value = entry.getValue();
             if (value != null) {
-                RequestNameValue nameValue = new RequestNameValue(name, value,
+                final RequestNameValue nameValue = new RequestNameValue(
+                        name,
+                        value,
                         parameter.isUnknownTarget() ? type.getDefaultParamTarget() : parameter.getTarget(),
                         parameter.getPartContentType());
                 nameValueList.add(nameValue);
@@ -1453,17 +1461,18 @@ public class ForestMethod<T> implements VariableScope {
      * @param args 调用本对象对应方法时传入的参数数组
      * @return 调用本对象对应方法结束后返回的值，任意类型的对象实例
      */
-    public Object invoke(Object[] args) {
-        Type rType = this.getReturnType();
-        ForestRequest<?> request = makeRequest(args);
+    public Object invoke(final Object[] args) {
+        final ForestRequest<?> request = makeRequest(args);
         MethodLifeCycleHandler<T> lifeCycleHandler = null;
         request.setBackend(configuration.getBackend());
+        Type rType = this.getReturnType();
         // 如果返回类型为ForestRequest，直接返回请求对象
-        if (ForestRequest.class.isAssignableFrom(returnClass)) {
-            Type retType = getReturnType();
+        if (ForestRequest.class.isAssignableFrom(returnClass)
+                || ForestSSEListener.class.isAssignableFrom(returnClass)) {
+            final Type retType = getReturnType();
             if (retType instanceof ParameterizedType) {
-                ParameterizedType parameterizedType = (ParameterizedType) retType;
-                Type[] genTypes = parameterizedType.getActualTypeArguments();
+                final ParameterizedType parameterizedType = (ParameterizedType) retType;
+                final Type[] genTypes = parameterizedType.getActualTypeArguments();
                 if (genTypes.length > 0) {
                     Type targetType = genTypes[0];
                     rType = targetType;
@@ -1471,8 +1480,8 @@ public class ForestMethod<T> implements VariableScope {
                     rType = String.class;
                 }
                 if (rType instanceof WildcardType) {
-                    WildcardType wildcardType = (WildcardType) rType;
-                    Type[] bounds = wildcardType.getUpperBounds();
+                    final WildcardType wildcardType = (WildcardType) rType;
+                    final Type[] bounds = wildcardType.getUpperBounds();
                     if (bounds.length > 0) {
                         rType = bounds[0];
                     } else {
@@ -1494,8 +1503,17 @@ public class ForestMethod<T> implements VariableScope {
             }
             request.setLifeCycleHandler(lifeCycleHandler);
             lifeCycleHandler.handleInvokeMethod(request, this, args);
+
+            if (ForestSSEListener.class.isAssignableFrom(returnClass)) {
+                if (ForestSSE.class.equals(returnClass)) {
+                    return request.sse();
+                }
+                return request.sse(returnClass);
+            }
+
             return request;
         }
+
         lifeCycleHandler = new MethodLifeCycleHandler<>(
                 rType, onSuccessClassGenericType);
         request.setLifeCycleHandler(lifeCycleHandler);
@@ -1511,8 +1529,7 @@ public class ForestMethod<T> implements VariableScope {
      * @param index   泛型参数下标
      * @return 泛型参数中的类型，{@link Type}接口实例
      */
-    private static Type getGenericClassOrType(Type genType, final int index) {
-
+    private static Type getGenericClassOrType(final Type genType, final int index) {
         if (!(genType instanceof ParameterizedType)) {
             return Object.class;
         }
@@ -1575,14 +1592,14 @@ public class ForestMethod<T> implements VariableScope {
      * @return 请求结果类型，{@link Type}接口实例
      */
     public Type getResultType() {
-        Type type = getReturnType();
+        final Type type = getReturnType();
         if (type == null) {
             return Void.class;
         }
-        Class clazz = ReflectUtils.toClass(type);
+        final Class clazz = ReflectUtils.toClass(type);
         if (ForestResponse.class.isAssignableFrom(clazz)) {
             if (type instanceof ParameterizedType) {
-                Type[] types = ((ParameterizedType) type).getActualTypeArguments();
+                final Type[] types = ((ParameterizedType) type).getActualTypeArguments();
                 if (types.length > 0) {
                     return types[0];
                 }

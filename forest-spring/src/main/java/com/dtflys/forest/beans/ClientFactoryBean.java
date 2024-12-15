@@ -13,7 +13,7 @@ import org.springframework.context.ApplicationContextAware;
  */
 public class ClientFactoryBean<T> implements FactoryBean<T>, ApplicationContextAware {
 
-    private static ApplicationContext applicationContext;
+    private ApplicationContext applicationContext;
 
     private ForestConfiguration forestConfiguration;
 
