@@ -34,7 +34,7 @@
 	</scm>
 
 	<properties>
-		<revision>1.6.0</revision>
+		<revision>1.6.0-ALPHA</revision>
 		<maven.compiler.source>8</maven.compiler.source>
 		<maven.compiler.target>8</maven.compiler.target>
 
@@ -75,7 +75,7 @@
 		<maven-source-plugin.version>3.2.0</maven-source-plugin.version>
 		<maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
 		<cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>
-		<nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
+		<nexus-staging-maven-plugin.version>1.7.0</nexus-staging-maven-plugin.version>
 		<spring-boot-maven-plugin.version>2.0.1.RELEASE</spring-boot-maven-plugin.version>
 		<maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
 		<maven-gpg-plugin.version>1.5</maven-gpg-plugin.version>
@@ -499,13 +499,15 @@
 							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
 							<autoReleaseAfterClose>false</autoReleaseAfterClose>
 						</configuration>
+<!--
 						<dependencies>
 							<dependency>
 								<groupId>com.thoughtworks.xstream</groupId>
 								<artifactId>xstream</artifactId>
-								<version>1.4.15</version> <!-- apparently this needs to be exactly this version -->
+								<version>1.4.21</version> &lt;!&ndash; apparently this needs to be exactly this version &ndash;&gt;
 							</dependency>
 						</dependencies>
+-->
 					</plugin>
 
 				</plugins>
