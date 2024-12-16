@@ -345,7 +345,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      * @return 反序列化成对象类型的请求响应内容的 Optional 包装对象
      * @since 1.6.0
      */
-    public Optional<T> getOpt() {
+    public Optional<T> opt() {
         return getResultOpt();
     }
 

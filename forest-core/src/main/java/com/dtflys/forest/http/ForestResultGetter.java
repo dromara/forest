@@ -16,11 +16,11 @@ public interface ForestResultGetter {
 
     <T> T get(TypeReference<T> typeReference);
 
-    <T> Optional<T> getOpt(Class<T> clazz);
+    <T> Optional<T> opt(Class<T> clazz);
 
-    <T> Optional<T> getOpt(Type type);
+    <T> Optional<T> opt(Type type);
 
-    <T> Optional<T> getOpt(TypeReference<T> typeReference);
+    <T> Optional<T> opt(TypeReference<T> typeReference);
 
     <T> T getByPath(String path, Class<T> clazz);
 

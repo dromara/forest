@@ -5179,7 +5179,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @since 1.6.0
      */
     public <R> Optional<R> executeAsOpt(Class<R> clazz) {
-        return executeAsResponse().getOpt(clazz);
+        return executeAsResponse().opt(clazz);
     }
 
     /**
@@ -5191,7 +5191,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @since 1.6.0
      */
     public <R> Optional<R> executeAsOpt(Type type) {
-        return executeAsResponse().getOpt(type);
+        return executeAsResponse().opt(type);
     }
 
     /**
@@ -5203,7 +5203,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      * @since 1.6.0
      */
     public <R> Optional<R> executeAsOpt(TypeReference<R> typeReference) {
-        return executeAsResponse().getOpt(typeReference);
+        return executeAsResponse().opt(typeReference);
     }
 
 

@@ -60,17 +60,17 @@ public abstract class ResultGetter implements ForestResultGetter {
     }
 
     @Override
-    public <T> Optional<T> getOpt(Class<T> clazz) {
+    public <T> Optional<T> opt(Class<T> clazz) {
         return Optional.ofNullable(get(clazz));
     }
 
     @Override
-    public <T> Optional<T> getOpt(Type type) {
+    public <T> Optional<T> opt(Type type) {
         return Optional.ofNullable(get(type));
     }
 
     @Override
-    public <T> Optional<T> getOpt(TypeReference<T> typeReference) {
+    public <T> Optional<T> opt(TypeReference<T> typeReference) {
         return Optional.ofNullable(get(typeReference));
     }
 
