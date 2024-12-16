@@ -10,6 +10,7 @@ import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.forest.ssl.SSLUtils;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,6 +57,11 @@ public class ForestConfigurationProperties {
      * Parallel mode of async requests
      */
     private ForestAsyncMode asyncMode = ForestAsyncMode.PLATFORM;
+
+    /**
+     * Timeout in milliseconds
+     */
+    private int timeout = 3000;
 
     /**
      * Connect timeout in milliseconds
@@ -158,6 +164,16 @@ public class ForestConfigurationProperties {
     private String backend = "okhttp3";
 
     /**
+     * Max size of backend client cache
+     */
+    private Integer backendClientCacheMaxSize = 128;
+
+    /**
+     * Expire time of backend client cache
+     */
+    private Duration backendClientCacheExpireTime;
+
+    /**
      * global variables
      */
     private Map<String, Object> variables = new HashMap<>();
@@ -176,6 +192,7 @@ public class ForestConfigurationProperties {
      * Retry When callback function: used to determine whether to trigger a retry request
      */
     private Class<? extends RetryWhen> retryWhen;
+
 
     /**
      * SSL Key Stores
@@ -250,6 +267,14 @@ public class ForestConfigurationProperties {
 
     public void setAsyncMode(ForestAsyncMode asyncMode) {
         this.asyncMode = asyncMode;
+    }
+
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
     }
 
     public Integer getConnectTimeout() {
@@ -413,6 +438,22 @@ public class ForestConfigurationProperties {
 
     public void setBackend(String backend) {
         this.backend = backend;
+    }
+
+    public Integer getBackendClientCacheMaxSize() {
+        return backendClientCacheMaxSize;
+    }
+
+    public void setBackendClientCacheMaxSize(Integer backendClientCacheMaxSize) {
+        this.backendClientCacheMaxSize = backendClientCacheMaxSize;
+    }
+
+    public Duration getBackendClientCacheExpireTime() {
+        return backendClientCacheExpireTime;
+    }
+
+    public void setBackendClientCacheExpireTime(Duration backendClientCacheExpireTime) {
+        this.backendClientCacheExpireTime = backendClientCacheExpireTime;
     }
 
     public Map<String, Object> getVariables() {

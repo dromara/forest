@@ -72,6 +72,7 @@ public class ForestBeanBuilder {
         forestConfiguration.setMaxRouteConnections(forestConfigurationProperties.getMaxRouteConnections());
         forestConfiguration.setAsyncMode(forestConfigurationProperties.getAsyncMode());
         forestConfiguration.setConnectTimeout(forestConfigurationProperties.getConnectTimeoutMillis());
+        forestConfiguration.setTimeout(forestConfigurationProperties.getTimeout());
         forestConfiguration.setReadTimeout(forestConfigurationProperties.getReadTimeoutMillis());
         forestConfiguration.setCharset(forestConfigurationProperties.getCharset());
         forestConfiguration.setRetryer(forestConfigurationProperties.getRetryer());
