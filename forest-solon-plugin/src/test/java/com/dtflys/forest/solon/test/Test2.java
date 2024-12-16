@@ -9,6 +9,7 @@ import com.dtflys.forest.solon.test.interceptor.GlobalInterceptor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.noear.solon.annotation.Import;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.test.SolonJUnit4ClassRunner;
 import org.noear.solon.test.SolonTest;
@@ -18,7 +19,8 @@ import static org.junit.Assert.assertEquals;
 
 
 @RunWith(SolonJUnit4ClassRunner.class)
-@SolonTest(env = "test2")
+@Import(scanPackages = {"com.dtflys.forest.solon.test.client2", "com.dtflys.forest.solon.test.interceptor"})
+@SolonTest(env = "test2", scanning = false)
 public class Test2 {
 
     @Inject

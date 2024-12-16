@@ -18,6 +18,7 @@ import com.dtflys.forest.solon.test.service.impl.TestServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.noear.solon.annotation.Import;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.core.AppContext;
 import org.noear.solon.test.SolonJUnit4ClassRunner;
@@ -30,7 +31,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SolonJUnit4ClassRunner.class)
-@SolonTest(env = "test0")
+@Import(scanPackages = {"com.dtflys.forest.solon.test.client0", "com.dtflys.forest.solon.test.service"})
+@SolonTest(env = "test0", scanning = false)
 public class Test0 {
 
     @Inject
