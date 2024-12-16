@@ -1,0 +1,34 @@
+package com.dtflys.forest.http;
+
+import com.dtflys.forest.utils.TypeReference;
+
+import java.io.InputStream;
+import java.lang.reflect.Type;
+import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+
+public interface ForestResultGetter {
+    
+    <T> T get(Class<T> clazz);
+
+    <T> T get(Type type);
+
+    <T> T get(TypeReference<T> typeReference);
+
+    <T> Optional<T> getOpt(Class<T> clazz);
+
+    <T> Optional<T> getOpt(Type type);
+
+    <T> Optional<T> getOpt(TypeReference<T> typeReference);
+
+    <T> T getByPath(String path, Class<T> clazz);
+
+    <T> T getByPath(String path, TypeReference<T> typeReference);
+
+    <T> T getByPath(String path, Type type);
+
+    ResultGetter accept(BiConsumer<InputStream, ForestResponse> consumer);
+
+    <R> R accept(BiFunction<InputStream, ForestResponse, R> function);
+}

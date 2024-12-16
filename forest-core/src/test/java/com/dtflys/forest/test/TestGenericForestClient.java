@@ -1,6 +1,7 @@
 package com.dtflys.forest.test;
 
 import cn.hutool.core.codec.Base64;
+import cn.hutool.core.map.MapUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONReader;
 import com.alibaba.fastjson.annotation.JSONField;
@@ -45,6 +46,7 @@ import com.dtflys.forest.utils.URLUtils;
 import com.google.common.collect.Lists;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Option;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okio.Buffer;
@@ -53,6 +55,8 @@ import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.Rule;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -74,6 +78,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -95,6 +100,7 @@ public class TestGenericForestClient extends BaseClientTest {
     public final static String EXPECTED_SINGLE_USER = "{\"status\":\"ok\", \"data\": {\"name\": \"Foo\", \"age\": 12}}";
 
     public final static String EXPECTED_LIST_USER = "{\"status\":\"ok\", \"data\": [{\"name\": \"Foo\", \"age\": 12}, {\"name\": \"Bar\", \"age\": 22}]}";
+    private static final Logger log = LoggerFactory.getLogger(TestGenericForestClient.class);
 
 
     @Rule
@@ -890,6 +896,57 @@ public class TestGenericForestClient extends BaseClientTest {
         assertThat(result).isNotNull();
         assertThat(result).isEqualTo(Lists.newArrayList(1, 2, 3));
     }
+
+    @Test
+    public void testRequest_get_return_opt() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Optional<Integer> result = Forest.get("http://localhost:{}", server.getPort())
+                .onResponse((req, res) -> ResponseResult.success(5))
+                .executeAsOpt();
+        assertThat(result).isNotNull();
+        assertThat(result).isEqualTo(Optional.of(5));
+    }
+
+    @Test
+    public void testRequest_get_return_opt_null() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Optional<Integer> result = Forest.get("http://localhost:{}", server.getPort())
+                .onResponse((req, res) -> ResponseResult.success(null))
+                .executeAsOpt();
+        assertThat(result).isNotNull();
+        assertThat(result.orElse(-1)).isEqualTo(-1);
+    }
+
+    @Test
+    public void testRequest_get_return_opt2() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Optional<String> result = Forest.get("http://localhost:{}", server.getPort())
+                .onResponse((req, res) -> ResponseResult.success("xxx"))
+                .executeAsOpt(String.class);
+        assertThat(result).isNotNull();
+        assertThat(result).isEqualTo(Optional.of("xxx"));
+    }
+
+    @Test
+    public void testRequest_get_return_opt3() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Optional<Map<String, String>> result = Forest.get("http://localhost:{}", server.getPort())
+                .executeAsOpt(new TypeReference<Map<String, String>>() {});
+        assertThat(result).isNotNull();
+        assertThat(result.get().get("status")).isEqualTo("1");
+        assertThat(result.get().get("data")).isEqualTo("2");
+    }
+
+    @Test
+    public void testRequest_get_return_opt4() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Optional<List<Integer>> result = Forest.get("http://localhost:{}", server.getPort())
+                .onResponse((req, res) -> ResponseResult.success(Lists.newArrayList(1, 2, 3)))
+                .executeAsOpt(new TypeReference<List<Integer>>() {});
+        assertThat(result).isNotNull();
+        assertThat(result.get()).isEqualTo(Lists.newArrayList(1, 2, 3));
+    }
+
 
     @Test
     public void testRequest_get_return_stream_onResponse() {
@@ -1955,6 +2012,89 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertQueryEquals("a=1");
         assertThat(result).isEqualTo(EXPECTED);
     }
+
+    @Test
+    public void testRequest_async_completable_future() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        CompletableFuture<String> future = Forest.get("/")
+                .port(server.getPort())
+                .async()
+                .addQuery("a", "1")
+                .addQuery("a", "2")
+                .addQuery("a", "3")
+                .execute(new TypeReference<CompletableFuture<String>>() {});
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertQueryEquals("a=1&a=2&a=3");
+        AtomicBoolean accepted = new AtomicBoolean(false);
+        AtomicBoolean asyncAccepted = new AtomicBoolean(false);
+        future.thenAccept(result -> {
+            accepted.set(true);
+            log.info("result: {}", result);
+            assertThat(result).isEqualTo(EXPECTED);
+        }).thenAcceptAsync(Result -> {
+            asyncAccepted.set(true);
+        }).join();
+        assertThat(accepted.get()).isTrue();
+        assertThat(asyncAccepted.get()).isTrue();
+    }
+
+
+    @Test
+    public void testRequest_async_completable_future2() {
+        AtomicBoolean accepted = new AtomicBoolean(false);
+        AtomicBoolean asyncAccepted = new AtomicBoolean(false);
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.get("/")
+                .port(server.getPort())
+                .async()
+                .addQuery("a", "1")
+                .addQuery("a", "2")
+                .addQuery("a", "3")
+                .executeAsCompletableFuture(String.class)
+                .thenAccept(result -> {
+                    accepted.set(true);
+                    log.info("result: {}", result);
+                    assertThat(result).isEqualTo(EXPECTED);
+                }).thenAccept(res -> {
+                    asyncAccepted.set(true);
+                }).join();
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertQueryEquals("a=1&a=2&a=3");
+        assertThat(accepted.get()).isTrue();
+        assertThat(asyncAccepted.get()).isTrue();
+    }
+
+
+    @Test
+    public void testRequest_async_completable_future3() {
+        AtomicBoolean accepted = new AtomicBoolean(false);
+        AtomicBoolean asyncAccepted = new AtomicBoolean(false);
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.get("/")
+                .port(server.getPort())
+                .async()
+                .addQuery("a", "1")
+                .addQuery("a", "2")
+                .addQuery("a", "3")
+                .executeAsCompletableFuture(new TypeReference<ForestResponse<String>>() {})
+                .thenAccept(res -> {
+                    String result = res.getResult();
+                    accepted.set(true);
+                    log.info("result: {}", result);
+                    assertThat(result).isEqualTo(EXPECTED);
+                }).thenAccept(res -> {
+                    asyncAccepted.set(true);
+                }).join();
+        mockRequest(server)
+                .assertPathEquals("/")
+                .assertQueryEquals("a=1&a=2&a=3");
+        assertThat(accepted.get()).isTrue();
+        assertThat(asyncAccepted.get()).isTrue();
+    }
+
+
 
     @Test
     public void testRequest_async_await() {

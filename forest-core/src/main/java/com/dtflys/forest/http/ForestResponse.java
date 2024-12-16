@@ -136,7 +136,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
     /**
      * 响应内容反序列化成对象后的结果
      */
-    protected volatile Optional<T> result;
+    volatile Optional<T> result;
 
 
     public ForestResponse(ForestRequest request, Date requestTime, Date responseTime) {
@@ -341,6 +341,16 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
 
     /**
      * 获取反序列化成对象类型的请求响应内容的 Optional 包装对象
+     * 
+     * @return 反序列化成对象类型的请求响应内容的 Optional 包装对象
+     * @since 1.6.0
+     */
+    public Optional<T> getOpt() {
+        return getResultOpt();
+    }
+
+    /**
+     * 获取反序列化成对象类型的请求响应内容的 Optional 包装对象
      *
      * @return 反序列化成对象类型的请求响应内容的 Optional 包装对象
      * @since 1.6.0
@@ -371,7 +381,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
         }
         return result == null ? Optional.empty() : result;
     }
-
+    
     /**
      * 获取反序列化成对象类型的请求响应内容
      *

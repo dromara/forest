@@ -48,6 +48,12 @@ public class ResultHandler {
         return getResult(null, request, response, resultType, clazz);
     }
 
+    public Object getResult(Optional<?> resultOpt, ForestRequest request, ForestResponse response, Type resultType) {
+        final Class<?> clazz = ReflectUtils.toClass(resultType);
+        return getResult(resultOpt, request, response, resultType, clazz);
+    }
+
+
     /**
      * 进行转换并获取结果
      *
@@ -61,6 +67,12 @@ public class ResultHandler {
         final Type type = ReflectUtils.toType(resultClass);
         return getResult(null, request, response, type, resultClass);
     }
+
+    public Object getResult(Optional<?> resultOpt, ForestRequest request, ForestResponse response, Class resultClass) {
+        final Type type = ReflectUtils.toType(resultClass);
+        return getResult(resultOpt, request, response, type, resultClass);
+    }
+
 
 
     public Object getResult(Optional<?> resultOpt, ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
@@ -76,6 +88,21 @@ public class ResultHandler {
             final Class<?> optValueClass = optValue.getClass();
             if (resultClass.isAssignableFrom(optValueClass)) {
                 return optValue;
+            }
+            if (ForestResponse.class.isAssignableFrom(resultClass)) {
+                final ParameterizedType parameterizedType = ReflectUtils.toParameterizedType(resultType);
+                if (parameterizedType == null) {
+                    return resultOpt;
+                }
+                final Type[] argTypes = parameterizedType.getActualTypeArguments();
+                if (argTypes.length == 0) {
+                    return resultOpt;
+                }
+                final Type argType = argTypes[0];
+                final Class argClass = ReflectUtils.toClass(argType);
+                if (optValueClass.isAssignableFrom(argClass)) {
+                    return resultOpt;
+                }
             }
             if (Charset.class.isAssignableFrom(optValueClass)) {
                 optStringValue = String.valueOf(optValue);

@@ -105,7 +105,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Stack;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -5158,6 +5160,54 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     }
 
     /**
+     * 执行请求发送过程，并获取 Optional 可空类型结果
+     * 
+     * @return 请求执行响应后返回的 Optional 可空类型结果, 其为 {@link Optional} 对象实例
+     * @param <T> 返回结果类型泛型
+     * @since 1.6.0
+     */
+    public <T> Optional<T> executeAsOpt() {
+        return execute(new TypeReference<Optional<T>>() {});
+    }
+
+    /**
+     * 执行请求发送过程，并获取 Optional 可空类型结果
+     * 
+     * @param clazz Optional中所包含的返回结果类型
+     * @return 请求执行响应后返回的 Optional 可空类型结果, 其为 {@link Optional} 对象实例
+     * @param <R> 返回结果类型泛型
+     * @since 1.6.0
+     */
+    public <R> Optional<R> executeAsOpt(Class<R> clazz) {
+        return executeAsResponse().getOpt(clazz);
+    }
+
+    /**
+     * 执行请求发送过程，并获取 Optional 可空类型结果
+     * 
+     * @param type Optional中所包含的返回结果类型
+     * @return 请求执行响应后返回的 Optional 可空类型结果, 其为 {@link Optional} 对象实例
+     * @param <R> 返回结果类型泛型
+     * @since 1.6.0
+     */
+    public <R> Optional<R> executeAsOpt(Type type) {
+        return executeAsResponse().getOpt(type);
+    }
+
+    /**
+     * 执行请求发送过程，并获取 Optional 可空类型结果
+     * 
+     * @param typeReference Optional中所包含的返回结果类型引用
+     * @return 请求执行响应后返回的 Optional 可空类型结果, 其为 {@link Optional} 对象实例
+     * @param <R> 返回结果类型泛型
+     * @since 1.6.0
+     */
+    public <R> Optional<R> executeAsOpt(TypeReference<R> typeReference) {
+        return executeAsResponse().getOpt(typeReference);
+    }
+
+
+    /**
      * 执行请求发送过程，并获取 Future 类型结果
      *
      * @return 请求执行响应后返回的结果, 其为 {@link Future} 对象实例
@@ -5167,11 +5217,49 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         return execute(new TypeReference<ForestFuture<T>>() {});
     }
 
+    /**
+     * 执行请求发送过程，并获取 CompletableFuture 类型结果
+     * 
+     * @param clazz 返回结果类型
+     * @return 请求执行响应后返回的 CompletableFuture 类型结果, 其为 {@link CompletableFuture} 对象实例
+     * @param <R> 返回结果类型泛型
+     * @since 1.6.0
+     */
+    public <R> CompletableFuture<R> executeAsCompletableFuture(Class<R> clazz) {
+        return execute(new TypeReference<ForestFuture<R>>() {})
+                .toCompletableFuture(clazz);
+    }
+
+    /**
+     * 执行请求发送过程，并获取 CompletableFuture 类型结果
+     * 
+     * @param type 返回结果类型
+     * @return 请求执行响应后返回的 CompletableFuture 类型结果, 其为 {@link CompletableFuture} 对象实例
+     * @param <R> 返回结果类型泛型
+     * @since 1.6.0
+     */
+    public <R> CompletableFuture<R> executeAsCompletableFuture(Type type) {
+        return execute(new TypeReference<ForestFuture<R>>() {})
+                .toCompletableFuture(type);
+    }
+
+    /**
+     * 执行请求发送过程，并获取 CompletableFuture 类型结果
+     * 
+     * @param typeReference 返回结果类型引用
+     * @return 请求执行响应后返回的 CompletableFuture 类型结果, 其为 {@link CompletableFuture} 对象实例
+     * @param <R> 返回结果类型泛型
+     * @since 1.6.0
+     */
+    public <R> CompletableFuture<R> executeAsCompletableFuture(TypeReference<R> typeReference) {
+        return executeAsCompletableFuture(typeReference.getType());
+    }
+    
 
     /**
      * 执行请求发送过程，并获取响应类型结果
      *
-     * @return 请求执行响应后返回的结果, 其为 {@link ForestResponse} 对象实例
+     * @return 请求执行响应后返回的 Forest 响应类型结果, 其为 {@link ForestResponse} 对象实例
      * @since 1.5.27
      */
     public ForestResponse executeAsResponse() {

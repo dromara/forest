@@ -48,10 +48,12 @@ public class TestAsync {
         ForestConfiguration config = ForestConfiguration.createConfiguration();
         config.setMaxAsyncThreadSize(1);
         config.setMaxAsyncQueueSize(0);
+        config.setVariableValue("port", getPort());
         Throwable throwable = null;
+        AsyncClient client = config.client(AsyncClient.class);
         for (int i = 0; i < 3; i++) {
             try {
-                asyncClient.postFuture();
+                client.postFuture();
             } catch (Throwable th) {
                 throwable = th;
             }

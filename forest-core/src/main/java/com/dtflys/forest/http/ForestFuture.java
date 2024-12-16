@@ -1,8 +1,11 @@
 package com.dtflys.forest.http;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.utils.TypeReference;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Type;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -43,8 +46,6 @@ public class ForestFuture<T> extends ResultGetter implements Future<T> {
     public boolean isDone() {
         return future.isDone();
     }
-
-
 
     public ForestResponse<T> await() {
         if (response == null) {
@@ -87,10 +88,26 @@ public class ForestFuture<T> extends ResultGetter implements Future<T> {
         ForestResponse<T> res = await(timeout, unit);
         return res.getResult();
     }
+    
 
     @Override
     public ForestResponse<T> getResponse() {
         return await();
+    }
+    
+    public CompletableFuture<T> toCompletableFuture() {
+        return CompletableFuture.supplyAsync(() -> await().getResult());
+    }
+
+    public <R> CompletableFuture<R> toCompletableFuture(Class<R> clazz) {
+        if (ForestResponse.class.isAssignableFrom(clazz)) {
+            return (CompletableFuture<R>) future;
+        }
+        return CompletableFuture.supplyAsync(() -> await().get(clazz));
+    }
+
+    public <R> CompletableFuture<R> toCompletableFuture(Type type) {
+        return CompletableFuture.supplyAsync(() -> await().get(type));
     }
 
 }

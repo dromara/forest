@@ -12,10 +12,11 @@ import com.jayway.jsonpath.ReadContext;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
-public abstract class ResultGetter {
+public abstract class ResultGetter implements ForestResultGetter {
 
     protected final static ResultHandler HANDLER = new ResultHandler();
 
@@ -28,38 +29,63 @@ public abstract class ResultGetter {
     protected abstract ForestResponse getResponse();
 
 
+    @Override
     public <T> T get(Class<T> clazz) {
-        final Object result = HANDLER.getResult(request, getResponse(), clazz);
+        final Optional retOpt = getResponse().result;
+        final Object result = HANDLER.getResult(retOpt, request, getResponse(), clazz);
         if (result == null) {
             return null;
         }
         return (T) result;
     }
 
+    @Override
     public <T> T get(Type type) {
-        final Object result = HANDLER.getResult(request, getResponse(), type);
+        final Optional retOpt = getResponse().result;
+        final Object result = HANDLER.getResult(retOpt, request, getResponse(), type);
         if (result == null) {
             return null;
         }
         return (T) result;
     }
 
+    @Override
     public <T> T get(TypeReference<T> typeReference) {
-        final Object result = HANDLER.getResult(request, getResponse(), typeReference.getType());
+        final Optional retOpt = getResponse().result;
+        final Object result = HANDLER.getResult(retOpt, request, getResponse(), typeReference.getType());
         if (result == null) {
             return null;
         }
         return (T) result;
     }
-    
+
+    @Override
+    public <T> Optional<T> getOpt(Class<T> clazz) {
+        return Optional.ofNullable(get(clazz));
+    }
+
+    @Override
+    public <T> Optional<T> getOpt(Type type) {
+        return Optional.ofNullable(get(type));
+    }
+
+    @Override
+    public <T> Optional<T> getOpt(TypeReference<T> typeReference) {
+        return Optional.ofNullable(get(typeReference));
+    }
+
+    @Override
     public <T> T getByPath(String path, Class<T> clazz) {
         return getByPath(path, (Type) clazz);
     }
     
+    @Override
     public <T> T getByPath(String path, TypeReference<T> typeReference) {
         return getByPath(path, typeReference.getType());
     }
     
+    
+    @Override
     public <T> T getByPath(String path, Type type) {
         try {
             final MappingTemplate pathTemplate = request.getMethod().makeTemplate(path);
@@ -86,6 +112,7 @@ public abstract class ResultGetter {
      * @return {@link ForestResponse}实例
      * @since 1.6.0
      */
+    @Override
     public ResultGetter accept(BiConsumer<InputStream, ForestResponse> consumer) {
         final ForestResponse response = getResponse();
         try (final InputStream in = response.getInputStream()) {
@@ -104,6 +131,7 @@ public abstract class ResultGetter {
      * @param function 处理响应体数据流的 Lambda 函数
      * @since 1.6.0
      */
+    @Override
     public <R> R accept(BiFunction<InputStream, ForestResponse, R> function) {
         final ForestResponse response = getResponse();
         try (final InputStream in = response.getInputStream()) {

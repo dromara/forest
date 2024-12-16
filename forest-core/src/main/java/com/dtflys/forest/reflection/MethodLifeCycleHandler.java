@@ -26,6 +26,8 @@ import com.dtflys.forest.utils.ReflectUtils;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
@@ -268,6 +270,27 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
     public Object handleFuture(final ForestRequest request, final Future resultData) {
         if (resultData == null) {
             return null;
+        }
+        if  (CompletableFuture.class.isAssignableFrom(resultRawClass)) {
+            if (resultData instanceof CompletableFuture) {
+                this.resultData = (T) resultData;
+            } else if (resultData instanceof ForestFuture) {
+                Type[] argTypes = ReflectUtils.toParameterizedType(resultType).getActualTypeArguments();
+                if (argTypes.length == 0) {
+                    this.resultData = (T) ((ForestFuture<?>) resultData).toCompletableFuture();
+                }
+                this.resultData = (T) ((ForestFuture<?>) resultData).toCompletableFuture(argTypes[0]);
+            } else if (resultData instanceof Future) {
+                this.resultData = (T) CompletableFuture.supplyAsync(() -> {
+                    try {
+                        return resultData.get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        throw new ForestRuntimeException(e);
+                    }
+                });
+            }
+
+            return this.resultData;
         }
         if (Future.class.isAssignableFrom(resultRawClass)) {
             this.resultData = (T) resultData;
