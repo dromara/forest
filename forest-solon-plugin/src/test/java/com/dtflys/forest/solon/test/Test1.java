@@ -12,6 +12,7 @@ import com.dtflys.forest.solon.test.logging.TestLogHandler;
 import com.dtflys.forest.utils.ForestDataType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.noear.solon.annotation.Import;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.core.AppContext;
 import org.noear.solon.test.SolonJUnit4ClassRunner;
@@ -22,7 +23,8 @@ import static org.junit.Assert.*;
 
 
 @RunWith(SolonJUnit4ClassRunner.class)
-@SolonTest(env = "test1")
+@Import(BaiduClient.class)
+@SolonTest(env = "test1", scanning = false)
 public class Test1 {
 
     @Inject
