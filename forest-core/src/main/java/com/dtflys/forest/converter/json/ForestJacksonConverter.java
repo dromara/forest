@@ -81,7 +81,17 @@ public class ForestJacksonConverter implements ForestJsonConverter {
     private final ThreadLocal<ConvertOptions> optionsThreadLocal = new InheritableThreadLocal<>();
 
     public ForestJacksonConverter(final ObjectMapper mapper) {
-        this.mapper = mapper.copy();
+        if (mapper != null) {
+            this.mapper = mapper.copy();
+        } else {
+            this.mapper = new ObjectMapper();
+            SimpleModule module = new SimpleModule();
+            module.addSerializer(Lazy.class, new LazySerializer());
+            this.mapper.registerModule(module);
+            this.mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            this.mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            this.mapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
+        }
     }
 
     public ForestJacksonConverter() {

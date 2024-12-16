@@ -5,6 +5,8 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.security.PrivateKey;
+import java.util.PrimitiveIterator;
 
 /**
  * Forest日志控制对象
@@ -28,20 +30,25 @@ public interface ForestLogger {
         }
 
         if (supportSlf4j) {
-            Class<?> slfLoggerClass = ForestSlf4jLogger.class;
-            try {
-                Constructor<?> constructor = slfLoggerClass.getConstructor(Class.class);
-                return (ForestLogger) constructor.newInstance(clazz);
-            } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
-                     IllegalAccessException e) {
-                throw new ForestRuntimeException(e);
-            }
+            return createLogger("com.dtflys.forest.logging.ForestSlf4jLogger", clazz);
         }
 
         if (supportAndroid) {
-            return new ForestAndroidLogger(clazz);
+            return createLogger("com.dtflys.forest.logging.ForestAndroidLogger", clazz);
         }
         return new ForestJDKLogger(clazz);
+    }
+
+
+    static ForestLogger createLogger(String className, Class<?> clazz) {
+        try {
+            Class<?> slfLoggerClass = Class.forName(className);
+            Constructor<?> constructor = slfLoggerClass.getConstructor(Class.class);
+            return (ForestLogger) constructor.newInstance(clazz);
+        } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException |
+                 IllegalAccessException e) {
+            throw new ForestRuntimeException(e);
+        }
     }
 
 
