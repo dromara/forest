@@ -4086,7 +4086,12 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     public boolean isDownloadFile() {
         return isDownloadFile;
     }
-    
+
+    /**
+     * 该请求是否以流的方式接受数据
+     * 
+     * @return {@code true}: 流的方式，{@code false}: 非流的方式
+     */
     public boolean isReceiveStream() {
         if (isDownloadFile()) {
             return true;

@@ -991,8 +991,7 @@ public class TestGenericForestClient extends BaseClientTest {
     public void testRequest_get_return_response() {
         server.enqueue(new MockResponse().setBody("{\"a\": 1, \"b\": 2, \"c\": 3}"));
         ForestResponse<Map<String, Object>> response = Forest.get("http://localhost:{}", server.getPort())
-                .execute(new TypeReference<ForestResponse<Map<String, Object>>>() {
-                });
+                .execute(new TypeReference<ForestResponse<Map<String, Object>>>() {});
         assertThat(response).isNotNull();
         Map<String, Object> result = response.getResult();
         assertThat(result).isNotNull();

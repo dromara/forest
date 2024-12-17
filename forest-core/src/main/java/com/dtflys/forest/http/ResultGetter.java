@@ -119,6 +119,8 @@ public abstract class ResultGetter implements ForestResultGetter {
             consumer.accept(in, response);
         } catch (Exception e) {
             throw new ForestRuntimeException(e);
+        } finally {
+            response.close();
         }
         return this;
     }
@@ -142,6 +144,8 @@ public abstract class ResultGetter implements ForestResultGetter {
             return (R) ret;
         } catch (Exception e) {
             throw new ForestRuntimeException(e);
+        } finally {
+            response.close();
         }
     }
 
