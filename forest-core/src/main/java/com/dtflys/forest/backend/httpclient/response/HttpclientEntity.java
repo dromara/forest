@@ -61,6 +61,9 @@ public class HttpclientEntity implements HttpEntity {
     public InputStream getContent() throws IOException, UnsupportedOperationException {
         if (isStreaming()) {
             final InputStream in = entity.getContent();
+            if (request.isSSE()) {
+                return in;
+            }
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
             if (contentLength < 0) {
                 contentLength = getContentLength();

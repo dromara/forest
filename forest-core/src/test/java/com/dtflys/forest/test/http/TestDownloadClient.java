@@ -1,10 +1,13 @@
 package com.dtflys.forest.test.http;
 
 import com.dtflys.forest.Forest;
+import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.interceptor.ResponseResult;
 import com.dtflys.forest.test.http.client.DownloadClient;
 import com.dtflys.forest.utils.ForestProgress;
+import com.dtflys.forest.utils.TypeReference;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okio.Buffer;
@@ -29,6 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.in;
 
 /**
  * @author gongjun[dt_flys@hotmail.com]
@@ -319,10 +323,62 @@ public class TestDownloadClient extends BaseClientTest {
         buffer.readAll(Okio.sink(bytesOut));
         byte[] out = bytesOut.toByteArray();
         AtomicBoolean acceptDone = new AtomicBoolean(false);
+        AtomicBoolean responseBytesRead = new AtomicBoolean(false);
 
         Forest.get("http://localhost:{}/download/test-img.jpg", server.getPort())
-                .executeAsResponse()
-                .accept((in, res) -> {
+                .onResponse((req, res) -> {
+                    if (res.isError()) {
+                        return ResponseResult.error();
+                    }
+                    res.openStream((in, _res) -> {
+                        responseBytesRead.set(res.isBytesRead());
+                        System.out.println("Accept stream");
+                        try {
+                            byte[] fileBytes = IOUtils.toByteArray(in);
+                            assertThat(fileBytes)
+                                    .hasSize(out.length)
+                                    .isEqualTo(out);
+                            acceptDone.set(true);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                    return ResponseResult.proceed();
+                })
+                .execute(new TypeReference<ForestResponse<InputStream>>() {});
+        assertThat(acceptDone.get()).isTrue();
+        assertThat(responseBytesRead.get()).isFalse();
+    }
+
+
+    @Test
+    public void testDownloadWithInputStreamResponse() throws IOException {
+        Buffer buffer = getImageBuffer();
+        server.enqueue(new MockResponse().setBody(buffer));
+
+        ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
+        buffer.readAll(Okio.sink(bytesOut));
+
+        ForestResponse<InputStream> res = Forest.get("http://localhost:{}/download/test-img.jpg", server.getPort())
+                .execute(new TypeReference<ForestResponse<InputStream>>() {});
+        assertThat(res.isBytesRead()).isFalse();
+    }
+
+
+    @Test
+    public void testDownloadWithExecuteAsStream() throws IOException {
+        Buffer buffer = getImageBuffer();
+        server.enqueue(new MockResponse().setBody(buffer));
+
+        ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
+        buffer.readAll(Okio.sink(bytesOut));
+        byte[] out = bytesOut.toByteArray();
+        AtomicBoolean acceptDone = new AtomicBoolean(false);
+        AtomicBoolean responseBytesRead = new AtomicBoolean(false);
+
+        Forest.get("http://localhost:{}/download/test-img.jpg", server.getPort())
+                .executeAsStream((in, req, res) -> {
+                    responseBytesRead.set(res.isBytesRead());
                     System.out.println("Accept stream");
                     try {
                         byte[] fileBytes = IOUtils.toByteArray(in);
@@ -335,7 +391,38 @@ public class TestDownloadClient extends BaseClientTest {
                     }
                 });
         assertThat(acceptDone.get()).isTrue();
+        assertThat(responseBytesRead.get()).isFalse();
     }
+
+
+    @Test
+    public void testDownloadWithExecuteAsStream2() throws IOException {
+        Buffer buffer = getImageBuffer();
+        server.enqueue(new MockResponse().setBody(buffer));
+
+        ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
+        buffer.readAll(Okio.sink(bytesOut));
+        byte[] out = bytesOut.toByteArray();
+        AtomicBoolean acceptDone = new AtomicBoolean(false);
+        AtomicBoolean responseBytesRead = new AtomicBoolean(false);
+
+        byte[] bytes = Forest.get("http://localhost:{}/download/test-img.jpg", server.getPort())
+                .executeAsStream((in, req, res) -> {
+                    responseBytesRead.set(res.isBytesRead());
+                    System.out.println("Accept stream");
+                    try {
+                        byte[] fileBytes = IOUtils.toByteArray(in);
+                        acceptDone.set(true);
+                        return fileBytes;
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+        assertThat(bytes).isEqualTo(out);
+        assertThat(acceptDone.get()).isTrue();
+        assertThat(responseBytesRead.get()).isFalse();
+    }
+
 
 
     @Test
@@ -350,7 +437,7 @@ public class TestDownloadClient extends BaseClientTest {
 
         byte[] fileBytes = Forest.get("http://localhost:{}/download/test-img.jpg", server.getPort())
                 .executeAsResponse()
-                .accept((in, res) -> {
+                .openStream((in, res) -> {
                     try {
                         return IOUtils.toByteArray(in);
                     } catch (IOException e) {

@@ -73,6 +73,8 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      */
     protected volatile boolean closed = false;
 
+    protected volatile boolean bytesRead = false;
+
     /**
      * 是否为Gzip压缩
      */
@@ -793,6 +795,10 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
 
     public boolean isClosed() {
         return closed;
+    }
+    
+    public boolean isBytesRead() {
+        return bytesRead;
     }
 
     public abstract void close();

@@ -28,7 +28,7 @@ public interface ForestResultGetter {
 
     <T> T getByPath(String path, Type type);
 
-    ResultGetter accept(BiConsumer<InputStream, ForestResponse> consumer);
+    ResultGetter openStream(BiConsumer<InputStream, ForestResponse> consumer);
 
-    <R> R accept(BiFunction<InputStream, ForestResponse, R> function);
+    <R> R openStream(BiFunction<InputStream, ForestResponse, R> function);
 }

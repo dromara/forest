@@ -65,9 +65,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
      * @date 2021/12/8 23:51
      **/
     private void setupContent() {
-        if (request.isDownloadFile()
-                || InputStream.class.isAssignableFrom(request.getMethod().getReturnClass())
-                || InputStream.class.isAssignableFrom(ReflectUtils.toClass(request.getLifeCycleHandler().getResultType()))
+        if (request.isReceiveStream()
                 || (contentType != null && contentType.canReadAsBinaryStream())) {
             final StringBuilder builder = new StringBuilder();
             builder.append("[stream content-type: ")
@@ -198,6 +196,7 @@ public class OkHttp3ForestResponse extends ForestResponse {
                 return null;
             } else {
                 try {
+                    bytesRead = true;
                     bytes = body.bytes();
                 } finally {
                     close();

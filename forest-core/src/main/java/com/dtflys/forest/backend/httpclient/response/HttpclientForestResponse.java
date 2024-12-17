@@ -88,9 +88,7 @@ public class HttpclientForestResponse extends ForestResponse {
     private void setupContent() {
         if (content == null) {
             final Class<?> resultClass = ReflectUtils.toClass(request.getLifeCycleHandler().getResultType());
-            if (request.isDownloadFile()
-                    || InputStream.class.isAssignableFrom(request.getMethod().getReturnClass())
-                    || (resultClass != null && InputStream.class.isAssignableFrom(resultClass))
+            if (request.isReceiveStream()
                     || (contentType != null && contentType.canReadAsBinaryStream())) {
                 final StringBuilder builder = new StringBuilder();
                 builder.append("[stream content-type: ")
@@ -173,6 +171,7 @@ public class HttpclientForestResponse extends ForestResponse {
                 return null;
             } else {
                 try {
+                    bytesRead = true;
                     bytes = EntityUtils.toByteArray(entity);
                 } finally {
                     close();

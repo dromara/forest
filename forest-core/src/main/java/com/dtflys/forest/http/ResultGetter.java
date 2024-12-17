@@ -113,7 +113,7 @@ public abstract class ResultGetter implements ForestResultGetter {
      * @since 1.6.0
      */
     @Override
-    public ResultGetter accept(BiConsumer<InputStream, ForestResponse> consumer) {
+    public ResultGetter openStream(BiConsumer<InputStream, ForestResponse> consumer) {
         final ForestResponse response = getResponse();
         try (final InputStream in = response.getInputStream()) {
             consumer.accept(in, response);
@@ -132,7 +132,7 @@ public abstract class ResultGetter implements ForestResultGetter {
      * @since 1.6.0
      */
     @Override
-    public <R> R accept(BiFunction<InputStream, ForestResponse, R> function) {
+    public <R> R openStream(BiFunction<InputStream, ForestResponse, R> function) {
         final ForestResponse response = getResponse();
         try (final InputStream in = response.getInputStream()) {
             final Object ret = function.apply(in, response);

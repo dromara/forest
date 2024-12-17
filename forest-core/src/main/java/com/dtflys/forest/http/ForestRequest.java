@@ -24,6 +24,7 @@
 
 package com.dtflys.forest.http;
 
+import cn.hutool.core.lang.func.Consumer3;
 import com.dtflys.forest.auth.BasicAuth;
 import com.dtflys.forest.auth.ForestAuthenticator;
 import com.dtflys.forest.backend.ContentType;
@@ -37,6 +38,7 @@ import com.dtflys.forest.callback.OnRedirection;
 import com.dtflys.forest.callback.OnResponse;
 import com.dtflys.forest.callback.OnRetry;
 import com.dtflys.forest.callback.OnSaveCookie;
+import com.dtflys.forest.callback.OnStream;
 import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.callback.RetryWhen;
 import com.dtflys.forest.callback.SuccessWhen;
@@ -78,6 +80,7 @@ import com.dtflys.forest.ssl.SSLSocketFactoryBuilder;
 import com.dtflys.forest.ssl.SSLUtils;
 import com.dtflys.forest.ssl.TrustAllHostnameVerifier;
 import com.dtflys.forest.utils.ForestDataType;
+import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.TimeUtils;
@@ -91,6 +94,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.nio.charset.Charset;
@@ -111,6 +115,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -4081,6 +4086,29 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     public boolean isDownloadFile() {
         return isDownloadFile;
     }
+    
+    public boolean isReceiveStream() {
+        if (isDownloadFile()) {
+            return true;
+        }
+        if (InputStream.class.isAssignableFrom(getMethod().getReturnClass())) {
+            return true;
+        }
+        Type resultType = getLifeCycleHandler().getResultType();
+        if (InputStream.class.isAssignableFrom(ReflectUtils.toClass(resultType))) {
+            return true;
+        }
+        if (ForestResponse.class.isAssignableFrom(ReflectUtils.toClass(resultType))) {
+            ParameterizedType parameterizedType = ReflectUtils.toParameterizedType(resultType);
+            if (parameterizedType != null) {
+                Type argType = parameterizedType.getActualTypeArguments()[0];
+                if (InputStream.class.isAssignableFrom(ReflectUtils.toClass(argType))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     /**
      * 设置该请求是否下载文件
@@ -5264,6 +5292,36 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      */
     public ForestResponse executeAsResponse() {
         return execute(ForestResponse.class);
+    }
+
+    /**
+     * 执行请求发送过程，获取输入流类型结果，并流作为回调函数的参数进行调用，无返回值
+     * <p>该接口会安全处理响应体数据流，在回调函数被回调时，流已被自动打开，调用结束后也会自动关闭流</p>
+     * 
+     * @param consumer 回调函数
+     * @since 1.6.0
+     */
+    public void executeAsStream(Consumer3<InputStream, ForestRequest, ForestResponse> consumer) {
+        final ForestResponse<InputStream> response = execute(new TypeReference<ForestResponse<InputStream>>() {});
+        response.openStream((in, _res) -> {
+            consumer.accept(in, this, response);
+        });
+    }
+
+    /**
+     * 执行请求发送过程，获取输入流类型结果，并流作为回调函数的参数进行调用，最终返回回调函数中的返回值
+     * <p>该接口会安全处理响应体数据流，在回调函数被回调时，流已被自动打开，调用结束后也会自动关闭流</p>
+     * 
+     * @param onStream 回调函数
+     * @return 回调函数中的返回值
+     * @param <R> 回调函数中的返回值类型
+     * @since 1.6.0
+     */
+    public <R> R executeAsStream(OnStream<R> onStream) {
+        final ForestResponse<InputStream> response = execute(new TypeReference<ForestResponse<InputStream>>() {});
+        return response.openStream((in, _res) -> {
+            return onStream.onStream(in, this, response);
+        });
     }
 
     /**
