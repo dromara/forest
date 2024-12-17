@@ -129,6 +129,7 @@ public class ResultHandler {
                         if (ForestResponse.class.isAssignableFrom(rowClass)
                                 || ForestRequest.class.isAssignableFrom(resultClass)
                                 || Optional.class.isAssignableFrom(rowClass)) {
+                            
                             final Type realType = parameterizedType.getActualTypeArguments()[0];
                             Class<?> realClass = ReflectUtils.toClass(parameterizedType.getActualTypeArguments()[0]);
                             if (realClass == null) {

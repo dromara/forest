@@ -1,5 +1,6 @@
 package com.dtflys.forest.utils;
 
+import cn.hutool.core.map.MapUtil;
 import com.dtflys.forest.annotation.AliasFor;
 import com.dtflys.forest.annotation.BaseLifeCycle;
 import com.dtflys.forest.annotation.MethodLifeCycle;
@@ -9,7 +10,6 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.converter.json.JSONConverterSelector;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
-import org.apache.commons.collections.MapUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
@@ -317,7 +317,7 @@ public class ReflectUtils {
                     OverrideAttribute overrideAttribute = method.getAnnotation(OverrideAttribute.class);
                     if (overrideAttribute != null) {
                         final Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(overrideAttribute);
-                        final String attrNameFromMap = MapUtils.getString(attrs, "name");
+                        final String attrNameFromMap = MapUtil.getStr(attrs, "name");
                         final String attrValue = StringUtils.isEmpty(attrNameFromMap) ? name : attrNameFromMap;
                         results.put(attrValue, value);
                     }

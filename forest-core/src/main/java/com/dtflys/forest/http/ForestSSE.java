@@ -1,5 +1,6 @@
 package com.dtflys.forest.http;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.dtflys.forest.annotation.SSEDataMessage;
 import com.dtflys.forest.annotation.SSEEventMessage;
 import com.dtflys.forest.annotation.SSEIdMessage;
@@ -8,6 +9,7 @@ import com.dtflys.forest.annotation.SSEName;
 import com.dtflys.forest.annotation.SSERetryMessage;
 import com.dtflys.forest.annotation.SSEValue;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.reflection.MethodLifeCycleHandler;
 import com.dtflys.forest.sse.EventSource;
 import com.dtflys.forest.sse.ForestSSEListener;
 import com.dtflys.forest.sse.SSEMessageConsumer;
@@ -17,7 +19,6 @@ import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.TypeReference;
-import org.apache.commons.collections.CollectionUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -32,6 +33,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -44,7 +46,7 @@ import java.util.function.Function;
  */
 public class ForestSSE implements ForestSSEListener<ForestSSE> {
 
-    private ForestRequest request;
+    private ForestRequest<InputStream> request;
 
     private Consumer<EventSource> onOpenConsumer;
 
@@ -71,6 +73,7 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
         if (this.request == null) {
             this.request = request;
             this.request.isSSE = true;
+            this.request.setLifeCycleHandler(new MethodLifeCycleHandler<InputStream>(InputStream.class, InputStream.class) {});
             final Class<?> clazz = this.getClass();
             final Method[] methods = ReflectUtils.getMethods(clazz);
             for (final Method method : methods) {
@@ -326,7 +329,7 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
     @Override
     public void onMessage(EventSource eventSource, String name, String value) {
         final List<SSEStringMessageConsumer> consumers = consumerMap.get(name);
-        if (CollectionUtils.isEmpty(consumers)) {
+        if (CollectionUtil.isEmpty(consumers)) {
             return;
         }
         for (final SSEStringMessageConsumer consumer : consumers) {
@@ -368,7 +371,19 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
     @Override
     public <R extends ForestSSE> R listen() {
         final boolean isAsync = this.request.isAsync();
-        final ForestResponse response = isAsync ? this.request.executeAsFuture().await() : this.request.executeAsResponse();
+        ForestResponse<InputStream> response;
+        if (isAsync) {
+            try {
+                response = this.request.executeAsCompletableFuture(new TypeReference<ForestResponse<InputStream>>() {}).get();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new ForestRuntimeException(e);
+            }
+        } else {
+            response =  this.request.execute(new TypeReference<ForestResponse<InputStream>>() {});
+        }
+        if (response == null) {
+            return (R) this;
+        }
         if (response.isError()) {
             return (R) this;
         }

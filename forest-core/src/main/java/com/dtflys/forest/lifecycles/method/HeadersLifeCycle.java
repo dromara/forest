@@ -5,11 +5,6 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MetaRequest;
-import com.dtflys.forest.utils.ReflectUtils;
-import org.apache.commons.lang3.ArrayUtils;
-
-import java.io.Serializable;
-import java.lang.annotation.Annotation;
 
 
 public class HeadersLifeCycle implements MethodAnnotationLifeCycle<Headers, Object> {

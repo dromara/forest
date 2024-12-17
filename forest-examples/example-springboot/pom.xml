@@ -11,7 +11,7 @@
     <properties>
         <java.version>1.8</java.version>
         <maven.deploy.skip>true</maven.deploy.skip>
-        <forest.version>1.5.36</forest.version>
+        <forest.version>1.6.0-ALPHA2</forest.version>
     </properties>
 
     <parent>
@@ -31,7 +31,7 @@
         <dependency>
             <groupId>com.dtflys.forest</groupId>
             <artifactId>forest-spring-boot-starter</artifactId>
-            <version>1.5.31</version>
+            <version>${forest.version}</version>
         </dependency>
 
         <dependency>

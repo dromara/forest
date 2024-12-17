@@ -7,7 +7,6 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.GzipUtils;
 import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.*;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.util.EntityUtils;
