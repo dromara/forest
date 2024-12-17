@@ -11,7 +11,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-@BaseRequest(baseURL = "localhost:8080")
+@BaseRequest(baseURL = "localhost:#{server.port}")
 public interface UploadClient {
 
     @Request(

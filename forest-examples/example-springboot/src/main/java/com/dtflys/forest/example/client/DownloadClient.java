@@ -13,7 +13,7 @@ import java.io.InputStream;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2020-08-04 22:33
  */
-@BaseRequest(baseURL = "localhost:8080")
+@BaseRequest(baseURL = "localhost:#{server.port}")
 public interface DownloadClient {
 
     @Request(url = "/images/test-img.jpg")

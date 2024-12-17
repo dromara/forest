@@ -6,7 +6,7 @@ import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.example.interceptors.ApiClientInterceptor;
 
 
-@BaseRequest(baseURL = "localhost:8080")
+@BaseRequest(baseURL = "localhost:#{server.port}")
 public interface TestInterceptorClient {
 
     @Request(

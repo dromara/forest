@@ -65,6 +65,9 @@ public class HttpclientEntity implements HttpEntity {
             if (contentLength < 0) {
                 contentLength = getContentLength();
             }
+            if (contentLength < 0) {
+                return in;
+            }
             final ForestProgress progress = new ForestProgress(request, contentLength);
             try {
                 final byte[] tmp = new byte[4096];
