@@ -87,7 +87,6 @@
 
 	<modules>
 		<module>forest-core</module>
-		<module>forest-jsonpath</module>
 		<module>forest-jaxb</module>
 		<module>forest-jakarta-xml</module>
 		<module>forest-spring</module>
@@ -95,7 +94,7 @@
 		<module>forest-spring-boot3-starter</module>
 		<module>forest-mock</module>
 		<module>forest-solon-plugin</module>
-<!--        <module>forest-test</module>-->
+        <module>forest-test</module>
 	</modules>
 
 	<dependencies>

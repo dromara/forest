@@ -40,7 +40,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * Forest SSE
+ * Forest SSE 控制器
  *
  * @since 1.6.0
  */
@@ -69,6 +69,12 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
 
     protected ForestSSE() {}
 
+    /**
+     * 初始化 SSE 控制器
+     * 
+     * @param request Forest 请求对象
+     * @since 1.6.0
+     */
     void init(final ForestRequest request) {
         if (this.request == null) {
             this.request = request;
@@ -76,26 +82,37 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
             this.request.setLifeCycleHandler(new MethodLifeCycleHandler<InputStream>(InputStream.class, InputStream.class) {});
             final Class<?> clazz = this.getClass();
             final Method[] methods = ReflectUtils.getMethods(clazz);
+            
+            // 批量注册 SSE 控制器类中的消息处理方法
             for (final Method method : methods) {
                 final Annotation[] annArray = method.getAnnotations();
                 for (final Annotation ann : annArray) {
                     if (ann instanceof SSEMessage) {
-                        processMessageMethod(request, method, ann, null);
+                        registerMessageMethod(request, method, ann, null);
                     } else if (ann instanceof SSEDataMessage) {
-                        processMessageMethod(request, method, ann, "data");
+                        registerMessageMethod(request, method, ann, "data");
                     } else if (ann instanceof SSEEventMessage) {
-                        processMessageMethod(request, method, ann, "event");
+                        registerMessageMethod(request, method, ann, "event");
                     } else if (ann instanceof SSEIdMessage) {
-                        processMessageMethod(request, method, ann, "id");
+                        registerMessageMethod(request, method, ann, "id");
                     } else if (ann instanceof SSERetryMessage) {
-                        processMessageMethod(request, method, ann, "retry");
+                        registerMessageMethod(request, method, ann, "retry");
                     }
                 }
             }
         }
     }
 
-    private void processMessageMethod(ForestRequest request, Method method, Annotation ann, String defaultName) {
+    /**
+     * 注册 SSE 消息处理方法
+     * 
+     * @param request Forest 请求对象
+     * @param method Java 方法对象
+     * @param ann 注解对象
+     * @param defaultName SSE 消息默认名称
+     * @since 1.6.0
+     */
+    private void registerMessageMethod(ForestRequest request, Method method, Annotation ann, String defaultName) {
         Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(ann);
         String valueRegex = String.valueOf(attrs.getOrDefault("valueRegex", ""));
         String valuePrefix = String.valueOf(attrs.getOrDefault("valuePrefix", ""));
@@ -109,6 +126,17 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
         }
     }
 
+    /**
+     * 调用 SSE 消息处理方法
+     * 
+     * @param method Java 方法对象
+     * @param eventSource SSE 消息源
+     * @param name 消息的名称
+     * @param value 消息的值
+     * @param request Forest 请求对象
+     * @param response Forest 响应对象
+     * @since 1.6.0
+     */
     private void callSSEMessageMethod(
             final Method method,
             final EventSource eventSource,
@@ -162,12 +190,29 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
         }
     }
 
+    /**
+     * 添加字符串类型 SSE 消费者
+     * 
+     * @param name 消息名称
+     * @param consumer 字符串类型 SSE 消息消费者
+     * @return SSE 控制器自身对象
+     * @since 1.6.0
+     */
     public ForestSSE addConsumer(String name, SSEStringMessageConsumer consumer) {
         consumerMap.computeIfAbsent(name, k -> new CopyOnWriteArrayList<>()).add(consumer);
         return this;
     }
 
-
+    /**
+     * 添加通用类型 SSE 消费者
+     * 
+     * @param name 消息名称
+     * @param valueType 值的类型: {@link Class}对象
+     * @param consumer 通用类型 SSE 消息消费者
+     * @return SSE 控制器自身对象
+     * @param <T> 值的类型
+     * @since 1.6.0
+     */
     public <T> ForestSSE addConsumer(String name, Class<T> valueType, SSEMessageConsumer<T> consumer) {
         consumerMap.computeIfAbsent(name, k -> new CopyOnWriteArrayList<>()).add((eventSource, n, v) -> {
             if (valueType.isAssignableFrom(CharSequence.class)) {
@@ -180,7 +225,16 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
         return this;
     }
 
-
+    /**
+     * 添加通用类型 SSE 消费者
+     * 
+     * @param name 消息名称
+     * @param valueType 值的类型: {@link TypeReference}对象
+     * @param consumer 通用类型 SSE 消息消费者
+     * @return SSE 控制器自身对象
+     * @param <T> 值的类型
+     * @since 1.6.0
+     */
     public <T> ForestSSE addConsumer(String name, TypeReference<T> valueType, SSEMessageConsumer<T> consumer) {
         consumerMap.computeIfAbsent(name, k -> new CopyOnWriteArrayList<>()).add((eventSource, n, v) -> {
             T encodedValue = (T) request.getConfiguration().getConverter(ForestDataType.AUTO).convertToJavaObject(v, valueType);
@@ -190,6 +244,15 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
     }
 
 
+    /**
+     * 添加带模式匹配的字符串类型 SSE 消费者
+     * 
+     * @param name 消息名称
+     * @param matcher 模式匹配函数
+     * @param consumer 字符串类型 SSE 消息消费者
+     * @return SSE 控制器自身对象
+     * @since 1.6.0
+     */
     public ForestSSE addConsumer(String name, Function<EventSource, Boolean> matcher, SSEStringMessageConsumer consumer) {
         consumerMap.computeIfAbsent(name, k -> new CopyOnWriteArrayList<>()).add(new SSEStringMessageConsumer() {
             @Override
@@ -205,18 +268,56 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
         return this;
     }
 
+    /**
+     * 添加匹配前缀的字符串类型 SSE 消费者
+     * 
+     * @param name 消息名称
+     * @param valuePrefix 值的前缀
+     * @param consumer 字符串类型 SSE 消息消费者
+     * @return SSE 控制器自身对象
+     * @since 1.6.0
+     */
     public ForestSSE addConsumerMatchesPrefix(String name, String valuePrefix, SSEStringMessageConsumer consumer) {
         return addConsumer(name, eventSource -> eventSource.getValue().startsWith(valuePrefix), consumer);
     }
 
+    /**
+     * 添加匹配后缀的字符串类型 SSE 消费者
+     * 
+     * @param name 消息名称
+     * @param valuePostfix 值的后缀
+     * @param consumer 字符串类型 SSE 消息消费者
+     * @return SSE 控制器自身对象
+     * @since 1.6.0
+     */
     public ForestSSE addConsumerMatchesPostfix(String name, String valuePostfix, SSEStringMessageConsumer consumer) {
         return addConsumer(name, eventSource -> eventSource.getValue().endsWith(valuePostfix), consumer);
     }
 
+    /**
+     * 添加带正则匹配的字符串类型 SSE 消费者
+     * 
+     * @param name 消息名称
+     * @param valueRegex 正则表达式
+     * @param consumer 字符串类型 SSE 消息消费者
+     * @return SSE 控制器自身对象
+     * @since 1.6.0
+     */
     public ForestSSE addConsumerMatches(String name, String valueRegex, SSEStringMessageConsumer consumer) {
         return addConsumer(name, eventSource -> eventSource.getValue().matches(valueRegex), consumer);
     }
 
+    /**
+     * 添加带正则匹配、前缀匹配、以及后缀匹配的字符串类型 SSE 消费者
+     * 
+     * @param name 消息名称
+     * @param valueRegex 正则表达式
+     * @param valuePrefix 值的前缀
+     * @param valuePostfix 值的后缀
+     * @param consumer 字符串类型 SSE 消息消费者
+     * @return SSE 控制器自身对象
+     * @since 1.6.0
+     */
     public ForestSSE addConsumerMatches(String name, String valueRegex, String valuePrefix, String valuePostfix, SSEStringMessageConsumer consumer) {
         return addConsumer(name, eventSource -> {
             final String value = eventSource.getValue();
@@ -239,93 +340,255 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
         }, consumer);
     }
 
-
+    /**
+     * 设置监听打开的回调函数: 该回调函数会在 SSE 开始监听时执行
+     * 
+     * @param onOpenConsumer 回调函数
+     * @return SSE 控制器自身对象
+     * @since 1.6.0
+     */
     public ForestSSE setOnOpen(Consumer<EventSource> onOpenConsumer) {
         this.onOpenConsumer = onOpenConsumer;
         return this;
     }
 
+    /**
+     * 设置监听关闭的回调函数: 该回调函数会在 SSE 结束监听时执行
+     * 
+     * @param onCloseConsumer 回调函数
+     * @return SSE 控制器自身对象
+     * @since 1.6.0
+     */
     public ForestSSE setOnClose(BiConsumer<ForestRequest, ForestResponse> onCloseConsumer) {
         this.onCloseConsumer = onCloseConsumer;
         return this;
     }
 
+    /**
+     * 添加监听 data 事件的回调函数: 该回调函数会在 SSE 监听到 name 为 data 的消息时执行
+     * 
+     * @param consumer 回调函数
+     * @return SSE 控制器自身对象
+     * @since 1.6.0
+     */
     public ForestSSE addOnData(SSEStringMessageConsumer consumer) {
         return addConsumer("data", consumer);
     }
 
+    /**
+     * 添加监听 data 事件的回调函数: 该回调函数会在 SSE 监听到 name 为 data 的消息时执行，并且将值转换为给的类型的对象
+     * 
+     * @param valueClass 值的类型: {@link Class}对象
+     * @param consumer 回调函数
+     * @return SSE 控制器自身对象
+     * @param <T> 值的类型
+     * @since 1.6.0
+     */
     public <T> ForestSSE addOnData(Class<T> valueClass, SSEMessageConsumer<T> consumer) {
         return addConsumer("data", valueClass, consumer);
     }
 
+    /**
+     * 添加匹配值前缀的监听 data 事件的回调函数: 该回调函数会在 SSE 监听到 name 为 data 的消息，并且值能匹配给定前缀时才会执行
+     * 
+     * @param valuePrefix 值的前缀
+     * @param consumer 回调函数
+     * @return SSE 控制器自身对象
+     * @since 1.6.0
+     */
     public ForestSSE addOnDataMatchesPrefix(String valuePrefix, SSEStringMessageConsumer consumer) {
         return addConsumerMatchesPrefix("data", valuePrefix, consumer);
     }
 
-    public ForestSSE addOnDataMatchesPostfix(String valuePrefix, SSEStringMessageConsumer consumer) {
-        return addConsumerMatchesPostfix("data", valuePrefix, consumer);
+    /**
+     * 添加匹配值后缀的监听 data 事件的回调函数: 该回调函数会在 SSE 监听到 name 为 data 的消息，并且值能匹配给定的后缀时才会执行
+     * 
+     * @param valuePostfix 值的后缀
+     * @param consumer 回调函数
+     * @return SSE 控制器自身对象
+     * @since 1.6.0
+     */
+    public ForestSSE addOnDataMatchesPostfix(String valuePostfix, SSEStringMessageConsumer consumer) {
+        return addConsumerMatchesPostfix("data", valuePostfix, consumer);
     }
 
+    /**
+     * 添加监听 event 事件的回调函数: 该回调函数会在 SSE 监听到 name 为 event 的消息时执行
+     * 
+     * @param consumer 回调函数
+     * @return SSE 控制器自身对象
+     * @since 1.6.0
+     */
     public ForestSSE addOnEvent(SSEStringMessageConsumer consumer) {
         return addConsumer("event", consumer);
     }
 
+    /**
+     * 添加监听 event 事件的回调函数: 该回调函数会在 SSE 监听到 name 为 event 的消息时执行，并且将值转换为给的类型的对象
+     * 
+     * @param valueClass 值的类型: {@link Class}对象
+     * @param consumer 回调函数
+     * @return SSE 控制器自身对象
+     * @param <T> 值的类型
+     * @since 1.6.0
+     */
     public <T> ForestSSE addOnEvent(Class<T> valueClass, SSEMessageConsumer<T> consumer) {
         return addConsumer("event", valueClass, consumer);
     }
 
+    /**
+     * 添加匹配值前缀的监听 event 事件的回调函数: 该回调函数会在 SSE 监听到 name 为 event 的消息，并且值能匹配给定前缀时才会执行
+     *
+     * @param valuePrefix 值的前缀
+     * @param consumer 回调函数
+     * @return SSE 控制器自身对象
+     * @since 1.6.0
+     */
     public ForestSSE addOnEventMatchesPrefix(String valuePrefix, SSEStringMessageConsumer consumer) {
         return addConsumerMatchesPrefix("event", valuePrefix, consumer);
     }
 
-    public ForestSSE addOnEventMatchesPostfix(String valuePrefix, SSEStringMessageConsumer consumer) {
-        return addConsumerMatchesPostfix("event", valuePrefix, consumer);
+    /**
+     * 添加匹配值后缀的监听 event 事件的回调函数: 该回调函数会在 SSE 监听到 name 为 event 的消息，并且值能匹配给定的后缀时才会执行
+     * 
+     * @param valuePostfix 值的后缀
+     * @param consumer 回调函数
+     * @return SSE 控制器自身对象
+     * @since 1.6.0
+     */
+    public ForestSSE addOnEventMatchesPostfix(String valuePostfix, SSEStringMessageConsumer consumer) {
+        return addConsumerMatchesPostfix("event", valuePostfix, consumer);
     }
 
+    /**
+     * 添加监听 id 事件的回调函数: 该回调函数会在 SSE 监听到 name 为 id 的消息时执行
+     * 
+     * @param consumer 回调函数
+     * @return SSE 控制器自身对象
+     * @since 1.6.0
+     */
     public ForestSSE addOnId(SSEStringMessageConsumer consumer) {
         return addConsumer("id", consumer);
     }
 
+    /**
+     * 添加监听 id 事件的回调函数: 该回调函数会在 SSE 监听到 name 为 id 的消息时执行，并且将值转换为给的类型的对象
+     *
+     * @param valueClass 值的类型: {@link Class}对象
+     * @param consumer 回调函数
+     * @return SSE 控制器自身对象
+     * @param <T> 值的类型
+     * @since 1.6.0
+     */
     public <T> ForestSSE addOnId(Class<T> valueClass, SSEMessageConsumer<T> consumer) {
         return addConsumer("id", valueClass, consumer);
     }
 
+    /**
+     * 添加匹配值前缀的监听 id 事件的回调函数: 该回调函数会在 SSE 监听到 name 为 id 的消息，并且值能匹配给定前缀时才会执行
+     * 
+     * @param valuePrefix 值的前缀
+     * @param consumer 回调函数
+     * @return SSE 控制器自身对象
+     * @since 1.6.0
+     */
     public ForestSSE addOnIdMatchesPrefix(String valuePrefix, SSEStringMessageConsumer consumer) {
         return addConsumerMatchesPrefix("id", valuePrefix, consumer);
     }
 
-    public ForestSSE addOnIdMatchesPostfix(String valuePrefix, SSEStringMessageConsumer consumer) {
-        return addConsumerMatchesPostfix("id", valuePrefix, consumer);
+    /**
+     * 添加匹配值后缀的监听 id 事件的回调函数: 该回调函数会在 SSE 监听到 name 为 id 的消息，并且值能匹配给定的后缀时才会执行
+     * 
+     * @param valuePostfix 值的后缀
+     * @param consumer 回调函数
+     * @return SSE 控制器自身对象
+     * @since 1.6.0
+     */
+    public ForestSSE addOnIdMatchesPostfix(String valuePostfix, SSEStringMessageConsumer consumer) {
+        return addConsumerMatchesPostfix("id", valuePostfix, consumer);
     }
 
+    /**
+     * 添加监听 retry 事件的回调函数: 该回调函数会在 SSE 监听到 name 为 retry 的消息时执行
+     * 
+     * @param consumer 回调函数
+     * @return SSE 控制器自身对象
+     * @since 1.6.0
+     */
     public ForestSSE addOnRetry(SSEStringMessageConsumer consumer) {
         return addConsumer("retry", consumer);
     }
 
+    /**
+     * 添加监听 retry 事件的回调函数: 该回调函数会在 SSE 监听到 name 为 retry 的消息时执行，并且将值转换为给的类型的对象
+     * 
+     * @param valueClass 值的类型: {@link Class}对象
+     * @param consumer 回调函数
+     * @return SSE 控制器自身对象
+     * @param <T> 值的类型
+     * @since 1.6.0
+     */
     public <T> ForestSSE addOnRetry(Class<T> valueClass, SSEMessageConsumer<T> consumer) {
         return addConsumer("retry", valueClass, consumer);
     }
 
+    /**
+     * 添加匹配值后缀的监听 retry 事件的回调函数: 该回调函数会在 SSE 监听到 name 为 retry 的消息，并且值能匹配给定的后缀时才会执行
+     *
+     * @param valuePrefix 值的前缀
+     * @param consumer 回调函数
+     * @return SSE 控制器自身对象
+     * @since 1.6.0
+     */
     public ForestSSE addOnRetryMatchesPrefix(String valuePrefix, SSEStringMessageConsumer consumer) {
         return addConsumerMatchesPrefix("retry", valuePrefix, consumer);
     }
 
-    public ForestSSE addOnRetryMatchesPostfix(String valuePrefix, SSEStringMessageConsumer consumer) {
-        return addConsumerMatchesPostfix("retry", valuePrefix, consumer);
+    /**
+     * 添加匹配值后缀的监听 retry 事件的回调函数: 该回调函数会在 SSE 监听到 name 为 retry 的消息，并且值能匹配给定的后缀时才会执行
+     * 
+     * @param valuePostfix 值的后缀
+     * @param consumer 回调函数
+     * @return SSE 控制器自身对象
+     * @since 1.6.0
+     */
+    public ForestSSE addOnRetryMatchesPostfix(String valuePostfix, SSEStringMessageConsumer consumer) {
+        return addConsumerMatchesPostfix("retry", valuePostfix, consumer);
     }
 
+    /**
+     * 监听打开回调函数：在开始 SSE 数据流监听的时候调用
+     * 
+     * @param eventSource 消息源
+     * @since 1.6.0
+     */
     protected void onOpen(EventSource eventSource) {
         if (onOpenConsumer != null) {
             onOpenConsumer.accept(eventSource);
         }
     }
 
+    /**
+     * 监听关闭回调函数：在结束 SSE 数据流监听的时候调用
+     * 
+     * @param request Forest 请求对象
+     * @param response Forest 响应对象
+     * @since 1.6.0
+     */
     protected void onClose(ForestRequest request, ForestResponse response) {
         if (onCloseConsumer != null) {
             onCloseConsumer.accept(request, response);
         }
     }
 
+    /**
+     * 消息回调函数：在接收到 SSE 消息后调用
+     * 
+     * @param eventSource 消息源
+     * @param name 名称
+     * @param value 值
+     * @since 1.6.0
+     */
     @Override
     public void onMessage(EventSource eventSource, String name, String value) {
         final List<SSEStringMessageConsumer> consumers = consumerMap.get(name);
@@ -343,11 +606,24 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
         }
     }
 
+    /**
+     * 获取 Forest 请求对象
+     * 
+     * @return Forest 请求对象
+     * @since 1.6.0
+     */
     @Override
     public ForestRequest getRequest() {
         return this.request;
     }
 
+    /**
+     * 解析字符串行
+     * 
+     * @param line 字符串行
+     * @return 解析后的字符串
+     * @since 1.6.0
+     */
     private String parseLine(String line) {
         final String[] group = line.split("\\:", 2);
         if (group.length == 1) {
@@ -357,6 +633,13 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
     }
 
 
+    /**
+     * 解析事件源
+     * 
+     * @param response Forest 响应对象
+     * @param line 字符串行
+     * @return {@link EventSource}事件源对象
+     */
     private EventSource parseEventSource(ForestResponse response, String line) {
         final String[] group = line.split("\\:", 2);
         if (group.length == 1) {
@@ -368,6 +651,13 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
     }
 
 
+    /**
+     * 开始对 SSE 数据流进行监听
+     * 
+     * @return SSE 控制器自身对象
+     * @param <R> 自身类型
+     * @since 1.6.0
+     */
     @Override
     public <R extends ForestSSE> R listen() {
         final boolean isAsync = this.request.isAsync();
@@ -418,11 +708,26 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
         return (R) this;
     }
 
+    /**
+     * 开始对 SSE 数据流进行异步监听
+     * 
+     * @return SSE 控制器自身对象
+     * @param <R> 自身类型
+     * @since 1.6.0
+     */
     @Override
     public <R extends ForestSSE> CompletableFuture<R> asyncListen() {
         return CompletableFuture.supplyAsync(this::listen);
     }
 
+    /**
+     * 开始对 SSE 数据流在线程池中进行异步监听
+     * 
+     * @param pool 线程池
+     * @return SSE 控制器自身对象
+     * @param <R> 自身类型
+     * @since 1.6.0
+     */
     @Override
     public <R extends ForestSSE> CompletableFuture<R> asyncListen(ExecutorService pool) {
         return CompletableFuture.supplyAsync(this::listen, pool);

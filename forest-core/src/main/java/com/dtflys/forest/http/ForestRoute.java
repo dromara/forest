@@ -1,13 +1,5 @@
 package com.dtflys.forest.http;
 
-import com.dtflys.forest.backend.HttpBackend;
-import com.dtflys.forest.utils.ForestCache;
-import com.dtflys.forest.utils.TimeUtils;
-
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
