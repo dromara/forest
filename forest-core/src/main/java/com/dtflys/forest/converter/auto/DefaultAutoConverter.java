@@ -119,7 +119,10 @@ public class DefaultAutoConverter implements ForestConverter<Object> {
         final Class clazz = ReflectUtils.toClass(targetType);
         if (src instanceof CharSequence) {
             final String str = src.toString();
-            if (String.class.isAssignableFrom(clazz)) {
+            if (CharSequence.class.isAssignableFrom(clazz)) {
+                return (T) str;
+            }
+            if (Object.class.equals(clazz)) {
                 return (T) str;
             }
             final String trimmedStr = str.trim();

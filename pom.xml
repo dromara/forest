@@ -34,7 +34,7 @@
 	</scm>
 
 	<properties>
-		<revision>1.6.0-ALPHA</revision>
+		<revision>1.6.0-ALPHA2</revision>
 		<maven.compiler.source>8</maven.compiler.source>
 		<maven.compiler.target>8</maven.compiler.target>
 
@@ -80,7 +80,7 @@
 		<nexus-staging-maven-plugin.version>1.7.0</nexus-staging-maven-plugin.version>
 		<spring-boot-maven-plugin.version>2.0.1.RELEASE</spring-boot-maven-plugin.version>
 		<maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
-		<maven-gpg-plugin.version>1.5</maven-gpg-plugin.version>
+		<maven-gpg-plugin.version>3.0.1</maven-gpg-plugin.version>
 		<protobuf.version>3.25.5</protobuf.version>
 		<assertj.version>3.13.2</assertj.version>
 	</properties>
@@ -95,7 +95,7 @@
 		<module>forest-spring-boot3-starter</module>
 		<module>forest-mock</module>
 		<module>forest-solon-plugin</module>
-        <module>forest-test</module>
+<!--        <module>forest-test</module>-->
 	</modules>
 
 	<dependencies>
@@ -498,15 +498,6 @@
 							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
 							<autoReleaseAfterClose>false</autoReleaseAfterClose>
 						</configuration>
-<!--
-						<dependencies>
-							<dependency>
-								<groupId>com.thoughtworks.xstream</groupId>
-								<artifactId>xstream</artifactId>
-								<version>1.4.21</version> &lt;!&ndash; apparently this needs to be exactly this version &ndash;&gt;
-							</dependency>
-						</dependencies>
--->
 					</plugin>
 
 				</plugins>

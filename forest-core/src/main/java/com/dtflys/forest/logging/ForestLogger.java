@@ -2,6 +2,7 @@ package com.dtflys.forest.logging;
 
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.utils.ReflectUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -14,28 +15,25 @@ import java.util.PrimitiveIterator;
  * @since 2020-09-16 10:16
  */
 public interface ForestLogger {
-
+    
     static ForestLogger getLogger(Class<?> clazz) {
         boolean supportSlf4j = false;
-        boolean supportAndroid = false;
+        boolean supportAndroid = ReflectUtils.isAndroid();
+
+        if (supportAndroid) {
+            return createLogger("com.dtflys.forest.logging.ForestAndroidLogger", clazz);
+        }
+
         try {
             Class.forName("org.slf4j.Logger");
             supportSlf4j = true;
-        } catch (ClassNotFoundException e1) {
-            try {
-                Class.forName("android.util.Log");
-                supportAndroid = true;
-            } catch (ClassNotFoundException e2) {
-            }
+        } catch (ClassNotFoundException e2) {
         }
 
         if (supportSlf4j) {
             return createLogger("com.dtflys.forest.logging.ForestSlf4jLogger", clazz);
         }
 
-        if (supportAndroid) {
-            return createLogger("com.dtflys.forest.logging.ForestAndroidLogger", clazz);
-        }
         return new ForestJDKLogger(clazz);
     }
 

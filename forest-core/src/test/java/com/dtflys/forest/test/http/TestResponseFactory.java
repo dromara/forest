@@ -34,13 +34,10 @@ public class TestResponseFactory {
         when(httpResponse.getStatusLine()).thenReturn(statusLine);
         LifeCycleHandler lifeCycleHandler = new NoneLifeCycleHandler();
         ForestResponse response = responseFactory.createResponse(request, httpResponse, lifeCycleHandler, null, requestTime);
-        assertThat(response)
-                .isNotNull()
-                .extracting(
-                        ForestResponse::getStatusCode,
-                        ForestResponse::getContent,
-                        ForestResponse::getResult)
-                .contains(200, "", null);
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getContent()).isEqualTo("");
+        assertThat(response.getResult()).isEqualTo("");
     }
 
 }

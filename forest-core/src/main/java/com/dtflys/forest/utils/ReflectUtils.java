@@ -48,19 +48,30 @@ public class ReflectUtils {
     /**
      * 被排除调注解方法名集合
      */
-    private static Set<String> excludedAnntotationMethodNames = new HashSet<>();
+    private static Set<String> excludedAnnotationMethodNames = new HashSet<>();
     static {
-        excludedAnntotationMethodNames.add("equals");
-        excludedAnntotationMethodNames.add("getClass");
-        excludedAnntotationMethodNames.add("annotationType");
-        excludedAnntotationMethodNames.add("notify");
-        excludedAnntotationMethodNames.add("notifyAll");
-        excludedAnntotationMethodNames.add("wait");
-        excludedAnntotationMethodNames.add("hashCode");
-        excludedAnntotationMethodNames.add("toString");
-        excludedAnntotationMethodNames.add("newProxyInstance");
-        excludedAnntotationMethodNames.add("newProxyClass");
-        excludedAnntotationMethodNames.add("getInvocationHandler");
+        excludedAnnotationMethodNames.add("equals");
+        excludedAnnotationMethodNames.add("getClass");
+        excludedAnnotationMethodNames.add("annotationType");
+        excludedAnnotationMethodNames.add("notify");
+        excludedAnnotationMethodNames.add("notifyAll");
+        excludedAnnotationMethodNames.add("wait");
+        excludedAnnotationMethodNames.add("hashCode");
+        excludedAnnotationMethodNames.add("toString");
+        excludedAnnotationMethodNames.add("newProxyInstance");
+        excludedAnnotationMethodNames.add("newProxyClass");
+        excludedAnnotationMethodNames.add("getInvocationHandler");
+    }
+    
+    
+    public static boolean isAndroid() {
+        try {
+            Class.forName("android.os.Build");
+            return true;
+        } catch (ClassNotFoundException e) {
+            String osName = System.getProperty("os.name", "").toLowerCase();
+            return osName.startsWith("android");
+        }
     }
 
 
@@ -292,7 +303,7 @@ public class ReflectUtils {
         final Object[] args = new Object[0];
         for (final Method method : methods) {
             final String name = method.getName();
-            if (excludedAnntotationMethodNames.contains(name)) {
+            if (excludedAnnotationMethodNames.contains(name)) {
                 continue;
             }
             if (method.getParameters().length > 0) {

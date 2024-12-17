@@ -1,5 +1,6 @@
 package com.dtflys.forest.logging;
 
+import cn.hutool.core.text.StrFormatter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 
 import java.lang.reflect.InvocationTargetException;
@@ -30,7 +31,8 @@ public class ForestAndroidLogger implements ForestLogger {
     @Override
     public void info(String content, Object... args) {
         try {
-            infoMethod.invoke(androidLogClass, args);
+            final String str = StrFormatter.format(content, args);
+            infoMethod.invoke(androidLogClass, clazz.getSimpleName(), str);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new ForestRuntimeException(e);
         }
@@ -39,7 +41,8 @@ public class ForestAndroidLogger implements ForestLogger {
     @Override
     public void error(String content, Object... args) {
         try {
-            errorMethod.invoke(androidLogClass, args);
+            final String str = StrFormatter.format(content, args);
+            errorMethod.invoke(androidLogClass, clazz.getSimpleName(), str);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new ForestRuntimeException(e);
         }

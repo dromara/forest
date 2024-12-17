@@ -8,6 +8,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.annotation.Body;
 import com.dtflys.forest.annotation.Post;
+import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.annotation.Var;
 import com.dtflys.forest.auth.BasicAuth;
 import com.dtflys.forest.backend.ContentType;
@@ -372,7 +373,7 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_json_path() {
         server.enqueue(new MockResponse().setBody("{\"status\":\"1\", \"data\":[{\"name\": \"foo\", \"age\": \"18\", \"phone\": \"12345678\"}]}"));
-        ForestResponse response = Forest.get("http://localhost:{}/", server.getPort()).executeAsResponse();
+        ForestResponse response = Forest.get("http://localhost:{}", server.getPort()).executeAsResponse();
         String result = response.get(String.class);
         final Object document = Configuration.defaultConfiguration().jsonProvider().parse(result);
         Object data = JsonPath.read(document, "$.data");
@@ -1978,6 +1979,26 @@ public class TestGenericForestClient extends BaseClientTest {
                 .isNotNull()
                 .isEqualTo(ForestAsyncMode.PLATFORM);
     }
+    
+    @Test
+    public void testRequest_async_onSuccess() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        AtomicReference<String> result = new AtomicReference<>("");
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        Forest.get("http://localhost:{}", server.getPort())
+                .async()
+                .onSuccess((data, req, res) -> {
+                    result.set(data.toString());
+                    countDownLatch.countDown();
+                })
+                .execute();
+        try {
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        assertThat(result.get()).isEqualTo(EXPECTED);
+    }
 
     @Test
     public void testRequest_async_future() throws ExecutionException, InterruptedException {
@@ -1988,8 +2009,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .addQuery("a", "1")
                 .addQuery("a", "2")
                 .addQuery("a", "3")
-                .execute(new TypeReference<Future<String>>() {
-                });
+                .execute(new TypeReference<Future<String>>() {});
         mockRequest(server)
                 .assertPathEquals("/")
                 .assertQueryEquals("a=1&a=2&a=3");

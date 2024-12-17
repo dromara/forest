@@ -92,16 +92,19 @@ public class ResultHandler {
             if (ForestResponse.class.isAssignableFrom(resultClass)) {
                 final ParameterizedType parameterizedType = ReflectUtils.toParameterizedType(resultType);
                 if (parameterizedType == null) {
-                    return resultOpt;
+                    response.setResult(optValue);
+                    return response;
                 }
                 final Type[] argTypes = parameterizedType.getActualTypeArguments();
                 if (argTypes.length == 0) {
-                    return resultOpt;
+                    response.setResult(optValue);
+                    return response;
                 }
                 final Type argType = argTypes[0];
                 final Class argClass = ReflectUtils.toClass(argType);
                 if (optValueClass.isAssignableFrom(argClass)) {
-                    return resultOpt;
+                    response.setResult(optValue);
+                    return response;
                 }
             }
             if (Charset.class.isAssignableFrom(optValueClass)) {

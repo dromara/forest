@@ -58,6 +58,7 @@ import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorFactory;
 import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.ForestLogHandler;
+import com.dtflys.forest.logging.ForestLogger;
 import com.dtflys.forest.pool.FixedRequestPool;
 import com.dtflys.forest.pool.ForestRequestPool;
 import com.dtflys.forest.proxy.ProxyFactory;
@@ -76,8 +77,6 @@ import com.dtflys.forest.utils.ForestCache;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.TimeUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -104,7 +103,7 @@ import java.util.stream.Collectors;
  */
 public class ForestConfiguration implements Serializable {
 
-    private static Logger log = LoggerFactory.getLogger(ForestConfiguration.class);
+    private static ForestLogger log = ForestLogger.getLogger(ForestConfiguration.class);
 
     private final static Map<String, ForestConfiguration> CONFIGURATION_CACHE = new ConcurrentHashMap<>();
 
