@@ -4099,17 +4099,27 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         if (InputStream.class.isAssignableFrom(getMethod().getReturnClass())) {
             return true;
         }
-        Type resultType = getLifeCycleHandler().getResultType();
-        if (InputStream.class.isAssignableFrom(ReflectUtils.toClass(resultType))) {
+        final Type resultType = getLifeCycleHandler().getResultType();
+        final Class<?> resultClass = ReflectUtils.toClass(resultType);
+        if (InputStream.class.isAssignableFrom(resultClass)) {
             return true;
         }
-        if (ForestResponse.class.isAssignableFrom(ReflectUtils.toClass(resultType))) {
+        final boolean isResultResponse = ForestResponse.class.isAssignableFrom(resultClass);
+        final boolean isResultOptional = Optional.class.isAssignableFrom(resultClass);
+        
+        if (isResultResponse || isResultOptional) {
             ParameterizedType parameterizedType = ReflectUtils.toParameterizedType(resultType);
             if (parameterizedType != null) {
-                Type argType = parameterizedType.getActualTypeArguments()[0];
-                if (InputStream.class.isAssignableFrom(ReflectUtils.toClass(argType))) {
+                final Type argType = parameterizedType.getActualTypeArguments()[0];
+                final Class<?> argClass = ReflectUtils.toClass(argType);
+                if (InputStream.class.isAssignableFrom(argClass)) {
                     return true;
                 }
+                if (Object.class.equals(argClass) && isResultResponse) {
+                    return true;
+                }
+            } else if (isResultResponse) {
+                return true;
             }
         }
         return false;

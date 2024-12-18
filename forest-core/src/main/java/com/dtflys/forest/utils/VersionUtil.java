@@ -19,6 +19,7 @@ public abstract class VersionUtil {
      * @since 1.5.31
      */
     public static String getForestVersion() {
-        return Optional.ofNullable(VersionUtil.class.getPackage()).map(Package::getImplementationVersion).orElse("dev");
+        return (ReflectUtils.isAndroid() ? "android-" : "")
+                + Optional.ofNullable(VersionUtil.class.getPackage()).map(Package::getImplementationVersion).orElse("dev");
     }
 }

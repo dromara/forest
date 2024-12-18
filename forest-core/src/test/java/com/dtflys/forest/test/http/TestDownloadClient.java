@@ -358,10 +358,27 @@ public class TestDownloadClient extends BaseClientTest {
 
         ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
         buffer.readAll(Okio.sink(bytesOut));
+        byte[] out = bytesOut.toByteArray();
+        AtomicBoolean acceptDone = new AtomicBoolean(false);
+        AtomicBoolean responseBytesRead = new AtomicBoolean(false);
 
-        ForestResponse<InputStream> res = Forest.get("http://localhost:{}/download/test-img.jpg", server.getPort())
-                .execute(new TypeReference<ForestResponse<InputStream>>() {});
-        assertThat(res.isBytesRead()).isFalse();
+        Forest.get("http://localhost:{}/download/test-img.jpg", server.getPort())
+                .execute(new TypeReference<ForestResponse<InputStream>>() {})
+                .openStream((in, res) -> {
+                    responseBytesRead.set(res.isBytesRead());
+                    System.out.println("Accept stream");
+                    try {
+                        byte[] fileBytes = IOUtils.toByteArray(in);
+                        assertThat(fileBytes)
+                                .hasSize(out.length)
+                                .isEqualTo(out);
+                        acceptDone.set(true);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+        assertThat(acceptDone.get()).isTrue();
+        assertThat(responseBytesRead.get()).isFalse();
     }
 
 
