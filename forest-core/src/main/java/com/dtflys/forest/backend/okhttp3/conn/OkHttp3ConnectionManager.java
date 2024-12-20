@@ -141,7 +141,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
             final OkHttpClient.Builder builder = new OkHttpClient.Builder()
                     .connectionPool(connectionManager.pool)
                     .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
-                    .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
+                    .readTimeout(request.isSSE() ? Integer.MAX_VALUE : readTimeout, TimeUnit.MILLISECONDS)
                     .writeTimeout(writeTimeout, TimeUnit.MILLISECONDS)
                     .protocols(connectionManager.getProtocols(request))
                     .followRedirects(false)

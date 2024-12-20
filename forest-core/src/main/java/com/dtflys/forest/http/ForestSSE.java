@@ -122,25 +122,13 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
         String annName = defaultName != null ? defaultName : String.valueOf(attrs.getOrDefault("name", ""));
         final SSEMessageMethod sseMessageMethod = new SSEMessageMethod(this, method);
         if (StringUtils.isEmpty(valueRegex) && StringUtils.isEmpty(valuePrefix) && StringUtils.isEmpty(valuePostfix)) {
-            addConsumer(annName, (eventSource, name, value) -> callSSEMessageMethod(sseMessageMethod, eventSource));
+            addConsumer(annName, (eventSource, name, value) -> sseMessageMethod.invoke(eventSource));
         } else {
             addConsumerMatches(annName, valueRegex, valuePrefix, valuePostfix,
-                    (eventSource, name, value) -> callSSEMessageMethod(sseMessageMethod, eventSource));
+                    (eventSource, name, value) -> sseMessageMethod.invoke(eventSource));
         }
     }
 
-    /**
-     * 调用 SSE 消息处理方法
-     * 
-     * @param sseMessageMethod SSE 消息方法对象
-     * @param eventSource SSE 消息源
-     * @since 1.6.0
-     */
-    private void callSSEMessageMethod(
-            final SSEMessageMethod sseMessageMethod,
-            final EventSource eventSource) {
-        sseMessageMethod.invoke(eventSource);
-    }
 
     private void setParameterValue(Method method, String value, ForestRequest request, Object[] args, int i, Class<?> paramType) {
         if (CharSequence.class.isAssignableFrom(paramType)) {
@@ -647,7 +635,7 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
         }
         try {
             final String charset = Optional.ofNullable(response.getCharset()).orElse("UTF-8");
-            final InputStream in = new BufferedInputStream(response.getInputStream());
+            final InputStream in = response.getInputStream();
             final InputStreamReader isr = new InputStreamReader(in, charset);
             try (final BufferedReader reader = new BufferedReader(isr)) {
                 String line = null;

@@ -117,7 +117,7 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
             // 设置请求连接超时时间
             configBuilder.setConnectTimeout(connectTimeout);
             // 设置请求数据传输超时时间
-            configBuilder.setSocketTimeout(readTimeout);
+            configBuilder.setSocketTimeout(request.isSSE() ? Integer.MAX_VALUE : readTimeout);
 
             configBuilder.setConnectionRequestTimeout(connectTimeout);
             // 设置从连接池获取连接实例的超时

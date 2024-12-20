@@ -2844,9 +2844,13 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
                 .append(":")
                 .append(getPort())
                 .append("-t=")
-                .append(connectTimeout)
-                .append("-")
-                .append(readTimeout);
+                .append(connectTimeout);
+        
+        if (isSSE()) {
+            builder.append("-sse");
+        } else {
+            builder.append("-").append(readTimeout);
+        }
 
         if (isSSL()) {
             if (sslSocketFactoryBuilder != null) {
