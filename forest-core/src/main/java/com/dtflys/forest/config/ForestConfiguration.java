@@ -79,6 +79,8 @@ import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.TimeUtils;
 
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -608,8 +610,22 @@ public class ForestConfiguration implements Serializable {
      * @return Forest对象实例
      */
     public <T> T getForestObject(Class<T> clazz) {
-        return getForestObjectFactory().getObject(clazz);
+        return getForestObject(clazz, true);
     }
+
+
+    public <T> T getForestObject(Class<T> clazz, boolean singleton) {
+        if (singleton) {
+            return getForestObjectFactory().getObject(clazz);
+        }
+        try {
+            final Constructor<T> constructor = clazz.getConstructor();
+            return constructor.newInstance();
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            throw new ForestRuntimeException(e);
+        }
+    }
+
 
 
     /**

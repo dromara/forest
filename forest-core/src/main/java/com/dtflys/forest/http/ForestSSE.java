@@ -5,9 +5,7 @@ import com.dtflys.forest.annotation.SSEDataMessage;
 import com.dtflys.forest.annotation.SSEEventMessage;
 import com.dtflys.forest.annotation.SSEIdMessage;
 import com.dtflys.forest.annotation.SSEMessage;
-import com.dtflys.forest.annotation.SSEName;
 import com.dtflys.forest.annotation.SSERetryMessage;
-import com.dtflys.forest.annotation.SSEValue;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
 import com.dtflys.forest.sse.EventSource;
@@ -21,14 +19,12 @@ import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.TypeReference;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +61,7 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
     }
 
     public static <T extends ForestSSE> T fromClass(ForestRequest request, Class<T> clazz) {
-        T sse = request.getConfiguration().getForestObject(clazz);
+        T sse = request.getConfiguration().getForestObject(clazz, false);
         sse.init(request);
         return sse;
     }
@@ -115,11 +111,11 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
      * @since 1.6.0
      */
     private void registerMessageMethod(Method method, Annotation ann, String defaultName) {
-        Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(ann);
-        String valueRegex = String.valueOf(attrs.getOrDefault("valueRegex", ""));
-        String valuePrefix = String.valueOf(attrs.getOrDefault("valuePrefix", ""));
-        String valuePostfix = String.valueOf(attrs.getOrDefault("valuePostfix", ""));
-        String annName = defaultName != null ? defaultName : String.valueOf(attrs.getOrDefault("name", ""));
+        final Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(ann);
+        final String valueRegex = String.valueOf(attrs.getOrDefault("valueRegex", ""));
+        final String valuePrefix = String.valueOf(attrs.getOrDefault("valuePrefix", ""));
+        final String valuePostfix = String.valueOf(attrs.getOrDefault("valuePostfix", ""));
+        final String annName = defaultName != null ? defaultName : String.valueOf(attrs.getOrDefault("name", ""));
         final SSEMessageMethod sseMessageMethod = new SSEMessageMethod(this, method);
         if (StringUtils.isEmpty(valueRegex) && StringUtils.isEmpty(valuePrefix) && StringUtils.isEmpty(valuePostfix)) {
             addConsumer(annName, (eventSource, name, value) -> sseMessageMethod.invoke(eventSource));
@@ -567,21 +563,6 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
         return this.request;
     }
 
-    /**
-     * 解析字符串行
-     * 
-     * @param line 字符串行
-     * @return 解析后的字符串
-     * @since 1.6.0
-     */
-    private String parseLine(String line) {
-        final String[] group = line.split("\\:", 2);
-        if (group.length == 1) {
-            return group[0];
-        }
-        return StringUtils.trimBegin(group[1]);
-    }
-
 
     /**
      * 解析事件源
@@ -635,23 +616,27 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
         }
         try {
             final String charset = Optional.ofNullable(response.getCharset()).orElse("UTF-8");
-            final InputStream in = response.getInputStream();
-            final InputStreamReader isr = new InputStreamReader(in, charset);
-            try (final BufferedReader reader = new BufferedReader(isr)) {
-                String line = null;
-                while ((line = reader.readLine()) != null) {
-                    if (StringUtils.isEmpty(line)) {
-                        continue;
+            response.openStream((in, res) -> {
+                try {
+                    final InputStreamReader isr = new InputStreamReader(in, charset);
+                    final BufferedReader reader = new BufferedReader(isr);
+                    String line = null;
+                    while ((line = reader.readLine()) != null) {
+                        if (StringUtils.isEmpty(line)) {
+                            continue;
+                        }
+                        final EventSource eventSource = parseEventSource(response, line);
+                        onMessage(eventSource, eventSource.getName(), eventSource.getValue());
+                        if (SSEMessageResult.CLOSE.equals(eventSource.getMessageResult())) {
+                            break;
+                        }
                     }
-                    final EventSource eventSource = parseEventSource(response, line);
-                    onMessage(eventSource, eventSource.getName(), eventSource.getValue());
-                    if (SSEMessageResult.CLOSE.equals(eventSource.getMessageResult())) {
-                        break;
-                    }
+                } catch (IOException e) {
+                    throw new ForestRuntimeException(e);
+                } finally {
+                    onClose(request, response);
                 }
-            } finally {
-                onClose(request, response);
-            }
+            });
         } catch (Exception e) {
             throw new ForestRuntimeException(e);
         }

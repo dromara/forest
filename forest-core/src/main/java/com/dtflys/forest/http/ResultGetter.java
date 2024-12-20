@@ -118,6 +118,9 @@ public abstract class ResultGetter implements ForestResultGetter {
         try (final InputStream in = response.getInputStream()) {
             consumer.accept(in, response);
         } catch (Exception e) {
+            if (e instanceof ForestRuntimeException) {
+                throw (ForestRuntimeException) e;
+            }
             throw new ForestRuntimeException(e);
         } finally {
             response.close();

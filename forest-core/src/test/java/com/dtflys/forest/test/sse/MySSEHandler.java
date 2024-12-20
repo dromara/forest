@@ -40,7 +40,6 @@ public class  MySSEHandler extends ForestSSE {
                 .append("\n");
     }
 
-
     @SSEEventMessage(valuePrefix = "close")
     public void onEventClose(EventSource eventSource, @SSEValue String value) {
         buffer.append("receive close --- " + value).append("\n");

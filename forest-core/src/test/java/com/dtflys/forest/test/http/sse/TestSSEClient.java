@@ -1,6 +1,7 @@
 package com.dtflys.forest.test.http.sse;
 
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.http.ForestSSE;
 import com.dtflys.forest.test.model.Contact;
 import com.dtflys.forest.test.model.TestUser;
 import com.dtflys.forest.test.sse.MySSEHandler;
@@ -78,11 +79,8 @@ public class TestSSEClient extends BaseClientTest {
                 "data:dont show"
         ));
 
-        MySSEHandler sse = sseClient.testSSE_withCustomClass()
-                .addConsumer("name", (nameSource, name, value) -> {
-                    System.out.println("------: " + value);
-                })
-                .listen();
+        MySSEHandler sse = sseClient.testSSE_withCustomClass().listen();
+        
         System.out.println(sse.getStringBuffer());
         assertThat(sse.getStringBuffer().toString()).isEqualTo(
                 "SSE Open\n" +
