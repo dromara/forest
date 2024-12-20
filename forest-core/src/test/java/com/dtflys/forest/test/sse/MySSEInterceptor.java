@@ -10,11 +10,12 @@ import com.dtflys.forest.interceptor.SSEInterceptor;
 import com.dtflys.forest.sse.EventSource;
 import com.dtflys.forest.test.model.Contact;
 
+import java.io.InputStream;
+
 public class MySSEInterceptor implements SSEInterceptor {
 
-
     @Override
-    public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
+    public void onSuccess(InputStream data, ForestRequest request, ForestResponse response) {
         StringBuilder builder = (StringBuilder) request.getOrAddAttachment("text", StringBuilder::new);
         builder.append("MySSEInterceptor onSuccess\n");
    }

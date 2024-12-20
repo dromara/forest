@@ -4,12 +4,14 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.sse.EventSource;
 
+import java.io.InputStream;
+
 /**
  * Forest SSE 拦截器
  * 
  * @since 1.6.1
  */
-public interface SSEInterceptor extends Interceptor {
+public interface SSEInterceptor extends Interceptor<InputStream> {
 
     /**
      * 监听打开回调函数：在开始 SSE 数据流监听的时候调用

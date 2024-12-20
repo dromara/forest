@@ -4662,7 +4662,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     }
 
 
-        /**
+    /**
      * 根据名称获取该请求中的附件
      * <p>Attachment 是和请求绑定的附件属性值，这些值不能通过网络请求传递到远端服务器。</p>
      * <p>不同请求的附件相互独立，即使名称相同，也互不影响。</p>
@@ -4679,8 +4679,17 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         }
         return clazz.cast(result);
     }
-    
-    
+
+    /**
+     * 根据名称获取或添加该请求中的附件
+     * <p>当该请求中附件名所对应的附件值不存在时，会调用回调函数添加一个附件值</p>
+     * 
+     * @param name 附件名
+     * @param supplier 附件值回调函数
+     * @return 附件值
+     * @param <R> 附件值类型
+     * @since 1.6.1
+     */
     public <R> R getOrAddAttachment(String name, Supplier<R> supplier) {
         Object obj = getAttachment(name);
         if  (obj == null) {
