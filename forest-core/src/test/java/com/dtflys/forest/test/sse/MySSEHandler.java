@@ -9,9 +9,11 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.sse.EventSource;
 import com.dtflys.forest.http.ForestSSE;
 import com.dtflys.forest.test.model.Contact;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
-public class MySSEHandler extends ForestSSE {
+public class  MySSEHandler extends ForestSSE {
 
     private final StringBuffer buffer = new StringBuffer();
 
@@ -26,8 +28,8 @@ public class MySSEHandler extends ForestSSE {
     }
 
     @SSEMessage("data")
-    public void onHello(@SSEName String name, @SSEValue String value) {
-        buffer.append(name + " ---- " + value).append("\n");
+    public void onData(EventSource eventSource, @SSEName String name, @SSEValue String value) {
+        buffer.append("Receive ").append(name).append(": ").append(value).append("\n");
     }
 
     @SSEEventMessage(valueRegex = "\\{.*name.*\\}")

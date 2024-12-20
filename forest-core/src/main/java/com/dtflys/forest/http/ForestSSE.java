@@ -13,6 +13,7 @@ import com.dtflys.forest.reflection.MethodLifeCycleHandler;
 import com.dtflys.forest.sse.EventSource;
 import com.dtflys.forest.sse.ForestSSEListener;
 import com.dtflys.forest.sse.SSEMessageConsumer;
+import com.dtflys.forest.sse.SSEMessageMethod;
 import com.dtflys.forest.sse.SSEMessageResult;
 import com.dtflys.forest.sse.SSEStringMessageConsumer;
 import com.dtflys.forest.utils.ForestDataType;
@@ -20,12 +21,14 @@ import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.TypeReference;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
@@ -88,15 +91,15 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
                 final Annotation[] annArray = method.getAnnotations();
                 for (final Annotation ann : annArray) {
                     if (ann instanceof SSEMessage) {
-                        registerMessageMethod(request, method, ann, null);
+                        registerMessageMethod(method, ann, null);
                     } else if (ann instanceof SSEDataMessage) {
-                        registerMessageMethod(request, method, ann, "data");
+                        registerMessageMethod(method, ann, "data");
                     } else if (ann instanceof SSEEventMessage) {
-                        registerMessageMethod(request, method, ann, "event");
+                        registerMessageMethod(method, ann, "event");
                     } else if (ann instanceof SSEIdMessage) {
-                        registerMessageMethod(request, method, ann, "id");
+                        registerMessageMethod(method, ann, "id");
                     } else if (ann instanceof SSERetryMessage) {
-                        registerMessageMethod(request, method, ann, "retry");
+                        registerMessageMethod(method, ann, "retry");
                     }
                 }
             }
@@ -106,78 +109,37 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
     /**
      * 注册 SSE 消息处理方法
      * 
-     * @param request Forest 请求对象
      * @param method Java 方法对象
      * @param ann 注解对象
      * @param defaultName SSE 消息默认名称
      * @since 1.6.0
      */
-    private void registerMessageMethod(ForestRequest request, Method method, Annotation ann, String defaultName) {
+    private void registerMessageMethod(Method method, Annotation ann, String defaultName) {
         Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(ann);
         String valueRegex = String.valueOf(attrs.getOrDefault("valueRegex", ""));
         String valuePrefix = String.valueOf(attrs.getOrDefault("valuePrefix", ""));
         String valuePostfix = String.valueOf(attrs.getOrDefault("valuePostfix", ""));
         String annName = defaultName != null ? defaultName : String.valueOf(attrs.getOrDefault("name", ""));
+        final SSEMessageMethod sseMessageMethod = new SSEMessageMethod(this, method);
         if (StringUtils.isEmpty(valueRegex) && StringUtils.isEmpty(valuePrefix) && StringUtils.isEmpty(valuePostfix)) {
-            addConsumer(annName, (eventSource, name, value) -> callSSEMessageMethod(method, eventSource, name, value, request, eventSource.getResponse()));
+            addConsumer(annName, (eventSource, name, value) -> callSSEMessageMethod(sseMessageMethod, eventSource));
         } else {
             addConsumerMatches(annName, valueRegex, valuePrefix, valuePostfix,
-                    (eventSource, name, value) -> callSSEMessageMethod(method, eventSource, name, value, request, eventSource.getResponse()));
+                    (eventSource, name, value) -> callSSEMessageMethod(sseMessageMethod, eventSource));
         }
     }
 
     /**
      * 调用 SSE 消息处理方法
      * 
-     * @param method Java 方法对象
+     * @param sseMessageMethod SSE 消息方法对象
      * @param eventSource SSE 消息源
-     * @param name 消息的名称
-     * @param value 消息的值
-     * @param request Forest 请求对象
-     * @param response Forest 响应对象
      * @since 1.6.0
      */
     private void callSSEMessageMethod(
-            final Method method,
-            final EventSource eventSource,
-            final String name,
-            final String value,
-            ForestRequest request,
-            ForestResponse response) {
-        final Class<?>[] paramTypes = method.getParameterTypes();
-        final Object[] args = new Object[paramTypes.length];
-        for (int i = 0; i < paramTypes.length; i++) {
-            Class<?> paramType = paramTypes[i];
-            if (EventSource.class.isAssignableFrom(paramType)) {
-                args[i] = eventSource;
-            } else if (ForestRequest.class.isAssignableFrom(paramType)) {
-                args[i] = request;
-            } else if (ForestResponse.class.isAssignableFrom(paramType)) {
-                args[i] = response;
-            } else {
-                final Annotation[] paramAnnArray = paramType.getAnnotations();
-                if (paramAnnArray.length > 0) {
-                    for (final Annotation ann : paramAnnArray) {
-                        if (ann instanceof SSEName) {
-                            args[i] = name;
-                        } else if (ann instanceof SSEValue) {
-                            setParameterValue(method, value, request, args, i, paramType);
-                        }
-                    }
-                } else {
-                    setParameterValue(method, value, request, args, i, paramType);
-                }
-            }
-        }
-        final boolean accessible = method.isAccessible();
-        method.setAccessible(true);
-        try {
-            method.invoke(this, args);
-        } catch (InvocationTargetException | IllegalAccessException e) {
-            throw new ForestRuntimeException(e);
-        } finally {
-            method.setAccessible(accessible);
-        }
+            final SSEMessageMethod sseMessageMethod,
+            final EventSource eventSource) {
+        sseMessageMethod.invoke(eventSource);
     }
 
     private void setParameterValue(Method method, String value, ForestRequest request, Object[] args, int i, Class<?> paramType) {
@@ -685,7 +647,7 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
         }
         try {
             final String charset = Optional.ofNullable(response.getCharset()).orElse("UTF-8");
-            final InputStream in = response.getInputStream();
+            final InputStream in = new BufferedInputStream(response.getInputStream());
             final InputStreamReader isr = new InputStreamReader(in, charset);
             try (final BufferedReader reader = new BufferedReader(isr)) {
                 String line = null;

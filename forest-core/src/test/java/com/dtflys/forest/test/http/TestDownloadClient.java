@@ -6,8 +6,11 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.interceptor.ResponseResult;
 import com.dtflys.forest.test.http.client.DownloadClient;
+import com.dtflys.forest.test.http.model.UserParam;
 import com.dtflys.forest.utils.ForestProgress;
 import com.dtflys.forest.utils.TypeReference;
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okio.Buffer;
@@ -23,7 +26,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -397,6 +402,7 @@ public class TestDownloadClient extends BaseClientTest {
                 .executeAsStream((in, req, res) -> {
                     responseBytesRead.set(res.isBytesRead());
                     System.out.println("Accept stream");
+                    List<UserParam> userParam = new Gson().fromJson(new JsonReader(new InputStreamReader(in)), UserParam.class);
                     try {
                         byte[] fileBytes = IOUtils.toByteArray(in);
                         assertThat(fileBytes)

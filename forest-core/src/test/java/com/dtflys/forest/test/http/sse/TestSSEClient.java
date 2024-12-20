@@ -2,6 +2,7 @@ package com.dtflys.forest.test.http.sse;
 
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.test.model.Contact;
+import com.dtflys.forest.test.model.TestUser;
 import com.dtflys.forest.test.sse.MySSEHandler;
 import com.dtflys.forest.test.http.BaseClientTest;
 import okhttp3.mockwebserver.MockResponse;
@@ -30,7 +31,7 @@ public class TestSSEClient extends BaseClientTest {
     public void testSSE() {
         server.enqueue(new MockResponse().setResponseCode(200).setBody(
                 "data:start\n" +
-                "data:hello\n" +
+                "data:{\"event\": \"message\", \"conversation_id\": \"aee49897-5214308b6b2d\", \"message_id\": \"9e292a7d\", \"created_at\": 1734689225 \"answer\": \"I\", \"from_variable_selector\": null}\n" +
                 "event:{\"name\":\"Peter\",\"age\": \"18\",\"phone\":\"12345678\"}\n" +
                 "event:close\n" +
                 "data:dont show"
@@ -44,14 +45,14 @@ public class TestSSEClient extends BaseClientTest {
             }).setOnClose((req, res) -> {
                 buffer.append("SSE Close");
             }).addOnData((eventSource, name, value) -> {
-                buffer.append("Receive data: ").append(value).append("\n");
+                buffer.append("Receive " + name + ": " + value + "\n");
             }).addOnEvent((eventSource, name, value) -> {
-                buffer.append("Receive event: ").append(value).append("\n");
+                buffer.append("Receive " + name + ": " + value + "\n");
                 if ("close".equals(value)) {
                     eventSource.close();
                 }
-            }).addConsumer("event", Contact.class, (eventSource, name, value) -> {
-                buffer.append("name: ").append(value.getName()).append("; age: ").append(value.getAge()).append("\n");
+            }).addOnEvent(Contact.class, (eventSource, name, value) -> {
+                buffer.append("name: " + value.getName() + "; age: " + value.getAge() + "\n");
             })
         .listen();
 
@@ -59,7 +60,7 @@ public class TestSSEClient extends BaseClientTest {
         assertThat(buffer.toString()).isEqualTo(
                 "SSE Open\n" +
                 "Receive data: start\n" +
-                "Receive data: hello\n" +
+                "Receive data: {\"event\": \"message\", \"conversation_id\": \"aee49897-5214308b6b2d\", \"message_id\": \"9e292a7d\", \"created_at\": 1734689225 \"answer\": \"I\", \"from_variable_selector\": null}\n" +
                 "Receive event: {\"name\":\"Peter\",\"age\": \"18\",\"phone\":\"12345678\"}\n" +
                 "name: Peter; age: 18\n" +
                 "Receive event: close\n" +
@@ -71,7 +72,7 @@ public class TestSSEClient extends BaseClientTest {
     public void testSSE_withCustomClass() {
         server.enqueue(new MockResponse().setResponseCode(200).setBody(
                 "data:start\n" +
-                "data:hello\n" +
+                "data:{\"event\": \"message\", \"conversation_id\": \"aee49897-5214308b6b2d\", \"message_id\": \"9e292a7d\", \"created_at\": 1734689225 \"answer\": \"I\", \"from_variable_selector\": null}\n" +
                 "event:{\"name\":\"Peter\",\"age\": \"18\",\"phone\":\"12345678\"}\n" +
                 "event:close\n" +
                 "data:dont show"
@@ -85,8 +86,8 @@ public class TestSSEClient extends BaseClientTest {
         System.out.println(sse.getStringBuffer());
         assertThat(sse.getStringBuffer().toString()).isEqualTo(
                 "SSE Open\n" +
-                "start ---- start\n" +
-                "hello ---- hello\n" +
+                "Receive data: start\n" +
+                "Receive data: {\"event\": \"message\", \"conversation_id\": \"aee49897-5214308b6b2d\", \"message_id\": \"9e292a7d\", \"created_at\": 1734689225 \"answer\": \"I\", \"from_variable_selector\": null}\n" +
                 "name: Peter; age: 18; phone: 12345678\n" +
                 "receive close --- close\n" +
                 "SSE Close"
