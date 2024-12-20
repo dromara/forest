@@ -118,6 +118,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.dtflys.forest.mapping.MappingParameter.TARGET_BODY;
@@ -4677,6 +4678,16 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
             return null;
         }
         return clazz.cast(result);
+    }
+    
+    
+    public <R> R getOrAddAttachment(String name, Supplier<R> supplier) {
+        Object obj = getAttachment(name);
+        if  (obj == null) {
+            obj = supplier.get();
+            addAttachment(name, obj);
+        }
+        return (R) obj;
     }
 
     /**

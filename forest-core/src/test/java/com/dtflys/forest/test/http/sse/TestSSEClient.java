@@ -92,4 +92,30 @@ public class TestSSEClient extends BaseClientTest {
         );
     }
 
+    @Test
+    public void testSSE_withInterceptor() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(
+                "data:start\n" +
+                "data:{\"event\": \"message\", \"conversation_id\": \"aee49897-5214308b6b2d\", \"message_id\": \"9e292a7d\", \"created_at\": 1734689225 \"answer\": \"I\", \"from_variable_selector\": null}\n" +
+                "event:{\"name\":\"Peter\",\"age\": \"18\",\"phone\":\"12345678\"}\n" +
+                "event:close\n" +
+                "data:dont show"
+        ));
+
+        ForestSSE sse = sseClient.testSSE_withInterceptor().listen();
+
+        System.out.println(sse.getRequest().getAttachment("text"));
+        assertThat(sse.getRequest().getAttachment("text").toString()).isEqualTo(
+                "MySSEInterceptor onSuccess\n" +
+                "MySSEInterceptor afterExecute\n" +
+                "MySSEInterceptor onSSEOpen\n" +
+                "Receive data: start\n" +
+                "Receive data: {\"event\": \"message\", \"conversation_id\": \"aee49897-5214308b6b2d\", \"message_id\": \"9e292a7d\", \"created_at\": 1734689225 \"answer\": \"I\", \"from_variable_selector\": null}\n" +
+                "name: Peter; age: 18; phone: 12345678\n" +
+                "receive close --- close\n" +
+                "MySSEInterceptor onSSEClose"
+        );
+    }
+
+
 }

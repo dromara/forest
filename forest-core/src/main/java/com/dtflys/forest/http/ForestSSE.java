@@ -7,6 +7,8 @@ import com.dtflys.forest.annotation.SSEIdMessage;
 import com.dtflys.forest.annotation.SSEMessage;
 import com.dtflys.forest.annotation.SSERetryMessage;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.interceptor.Interceptor;
+import com.dtflys.forest.interceptor.SSEInterceptor;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
 import com.dtflys.forest.sse.EventSource;
 import com.dtflys.forest.sse.ForestSSEListener;
@@ -81,22 +83,38 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
             this.request.setLifeCycleHandler(new MethodLifeCycleHandler<InputStream>(InputStream.class, InputStream.class) {});
             final Class<?> clazz = this.getClass();
             final Method[] methods = ReflectUtils.getMethods(clazz);
-            
-            // 批量注册 SSE 控制器类中的消息处理方法
-            for (final Method method : methods) {
-                final Annotation[] annArray = method.getAnnotations();
-                for (final Annotation ann : annArray) {
-                    if (ann instanceof SSEMessage) {
-                        registerMessageMethod(method, ann, null);
-                    } else if (ann instanceof SSEDataMessage) {
-                        registerMessageMethod(method, ann, "data");
-                    } else if (ann instanceof SSEEventMessage) {
-                        registerMessageMethod(method, ann, "event");
-                    } else if (ann instanceof SSEIdMessage) {
-                        registerMessageMethod(method, ann, "id");
-                    } else if (ann instanceof SSERetryMessage) {
-                        registerMessageMethod(method, ann, "retry");
-                    }
+            final List<Interceptor> interceptors = request.getInterceptorChain().getInterceptors();
+            for (final Interceptor interceptor : interceptors) {
+                if (interceptor instanceof SSEInterceptor) {
+                    final Class<?> interceptorClass = interceptor.getClass();
+                    final Method[] interceptorMethods = ReflectUtils.getMethods(interceptorClass);
+                    registerMethodArray(interceptor, interceptorMethods);
+                }
+            }
+            registerMethodArray(this, methods);
+        }
+    }
+
+    /**
+     * 批量注册 SSE 控制器类中的消息处理方法
+     * 
+     * @param instance 方法所属实例
+     * @param methods Java 方法数组
+     */
+    private void registerMethodArray(Object instance, final Method[] methods) {
+        for (final Method method : methods) {
+            final Annotation[] annArray = method.getAnnotations();
+            for (final Annotation ann : annArray) {
+                if (ann instanceof SSEMessage) {
+                    registerMessageMethod(instance, method, ann, null);
+                } else if (ann instanceof SSEDataMessage) {
+                    registerMessageMethod(instance, method, ann, "data");
+                } else if (ann instanceof SSEEventMessage) {
+                    registerMessageMethod(instance, method, ann, "event");
+                } else if (ann instanceof SSEIdMessage) {
+                    registerMessageMethod(instance, method, ann, "id");
+                } else if (ann instanceof SSERetryMessage) {
+                    registerMessageMethod(instance, method, ann, "retry");
                 }
             }
         }
@@ -105,18 +123,19 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
     /**
      * 注册 SSE 消息处理方法
      * 
+     * @param instance 方法所属实例
      * @param method Java 方法对象
      * @param ann 注解对象
      * @param defaultName SSE 消息默认名称
      * @since 1.6.0
      */
-    private void registerMessageMethod(Method method, Annotation ann, String defaultName) {
+    private void registerMessageMethod(Object instance, Method method, Annotation ann, String defaultName) {
         final Map<String, Object> attrs = ReflectUtils.getAttributesFromAnnotation(ann);
         final String valueRegex = String.valueOf(attrs.getOrDefault("valueRegex", ""));
         final String valuePrefix = String.valueOf(attrs.getOrDefault("valuePrefix", ""));
         final String valuePostfix = String.valueOf(attrs.getOrDefault("valuePostfix", ""));
         final String annName = defaultName != null ? defaultName : String.valueOf(attrs.getOrDefault("name", ""));
-        final SSEMessageMethod sseMessageMethod = new SSEMessageMethod(this, method);
+        final SSEMessageMethod sseMessageMethod = new SSEMessageMethod(instance, method);
         if (StringUtils.isEmpty(valueRegex) && StringUtils.isEmpty(valuePrefix) && StringUtils.isEmpty(valuePostfix)) {
             addConsumer(annName, (eventSource, name, value) -> sseMessageMethod.invoke(eventSource));
         } else {
@@ -501,6 +520,19 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
     public ForestSSE addOnRetryMatchesPostfix(String valuePostfix, SSEStringMessageConsumer consumer) {
         return addConsumerMatchesPostfix("retry", valuePostfix, consumer);
     }
+    
+    private void doOnOpen(final EventSource eventSource) {
+        final List<Interceptor> interceptors = eventSource.getRequest().getInterceptorChain().getInterceptors();
+        for (Interceptor interceptor : interceptors) {
+            if (interceptor instanceof SSEInterceptor) {
+                ((SSEInterceptor) interceptor).onSSEOpen(eventSource);
+            }
+        }
+        onOpen(eventSource);
+        if (onOpenConsumer != null) {
+            onOpenConsumer.accept(eventSource);
+        }
+    }
 
     /**
      * 监听打开回调函数：在开始 SSE 数据流监听的时候调用
@@ -509,9 +541,19 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
      * @since 1.6.0
      */
     protected void onOpen(EventSource eventSource) {
-        if (onOpenConsumer != null) {
-            onOpenConsumer.accept(eventSource);
+    }
+    
+    private void doOnClose(final ForestRequest request, final ForestResponse response) {
+        final List<Interceptor> interceptors = request.getInterceptorChain().getInterceptors();
+        for (Interceptor interceptor : interceptors) {
+            if (interceptor instanceof SSEInterceptor) {
+                ((SSEInterceptor) interceptor).onSSEClose(request, response);
+            }
         }
+        if (onCloseConsumer != null) {
+            onCloseConsumer.accept(request, response);
+        }
+        onClose(request, response);
     }
 
     /**
@@ -522,9 +564,6 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
      * @since 1.6.0
      */
     protected void onClose(ForestRequest request, ForestResponse response) {
-        if (onCloseConsumer != null) {
-            onCloseConsumer.accept(request, response);
-        }
     }
 
     /**
@@ -600,7 +639,7 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
                 throw new ForestRuntimeException(e);
             }
         } else {
-            response =  this.request.execute(new TypeReference<ForestResponse<InputStream>>() {});
+            response = this.request.execute(new TypeReference<ForestResponse<InputStream>>() {});
         }
         if (response == null) {
             return (R) this;
@@ -609,7 +648,7 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
             return (R) this;
         }
         final EventSource openEventSource = new EventSource("open", request, response);
-        this.onOpen(openEventSource);
+        this.doOnOpen(openEventSource);
         if (SSEMessageResult.CLOSE.equals(openEventSource.getMessageResult())) {
             onClose(request, response);
             return (R) this;
@@ -634,7 +673,7 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
                 } catch (IOException e) {
                     throw new ForestRuntimeException(e);
                 } finally {
-                    onClose(request, response);
+                    doOnClose(request, response);
                 }
             });
         } catch (Exception e) {

@@ -4,7 +4,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 
 /**
- * Forest SSE Event Source
+ * Forest SSE 事件来源
  *
  * @since 1.6.0
  */

@@ -138,4 +138,8 @@ public class InterceptorChain implements Interceptor {
             item.afterExecute(request, response);
         }
     }
+
+    public LinkedList<Interceptor> getInterceptors() {
+        return interceptors;
+    }
 }

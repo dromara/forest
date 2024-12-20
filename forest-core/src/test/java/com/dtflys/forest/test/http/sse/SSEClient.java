@@ -8,7 +8,6 @@ import com.dtflys.forest.test.sse.MySSEHandler;
 import com.dtflys.forest.test.sse.MySSEInterceptor;
 
 @Address(host = "localhost", port = "{port}")
-@BaseRequest(interceptor = MySSEInterceptor.class)
 public interface SSEClient {
 
     @Get("/sse")
@@ -16,5 +15,8 @@ public interface SSEClient {
 
     @Get("/sse")
     MySSEHandler testSSE_withCustomClass();
+
+    @Get(url = "/sse", interceptor = MySSEInterceptor.class)
+    ForestSSE testSSE_withInterceptor();
 
 }

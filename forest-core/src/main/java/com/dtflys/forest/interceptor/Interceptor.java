@@ -17,6 +17,8 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.ForestProgress;
 
+import java.util.function.Supplier;
+
 /**
  * Forest拦截器接口
  * <p>拦截器在请求的初始化、发送请求前、发送成功、发送失败等生命周期中都会被调用
@@ -238,15 +240,15 @@ public interface Interceptor<T> extends
      * @param request Forest请求对象
      * @param name 属性名称
      * @param clazz 属性值的类型对象
-     * @param <T> 属性值类型的泛型
+     * @param <R> 属性值类型的泛型
      * @return Attribute 属性值
      */
-    default <T> T getAttribute(ForestRequest request, String name, Class<T> clazz) {
+    default <R> R getAttribute(ForestRequest request, String name, Class<R> clazz) {
         Object obj = request.getInterceptorAttribute(this.getClass(), name);
         if (obj == null) {
             return null;
         }
-        return (T) obj;
+        return clazz.cast(obj);
     }
 
     /**
@@ -307,6 +309,26 @@ public interface Interceptor<T> extends
             return null;
         }
         return (Double) attr;
+    }
+
+    /**
+     * 获取或添加请求在本拦截器中的 Attribute 属性
+     * <p>当 Attribute 属性中不存在属性名称所对应的值，则添加属性值</p>
+     * 
+     * @param request Forest请求对象
+     * @param name  属性名称
+     * @param supplier 属性值回调函数
+     * @return 属性值
+     * @param <R> 属性值类型
+     * @since 1.6.1
+     */
+    default <R> R getOrAddAttribute(ForestRequest request, String name, Supplier<R> supplier) {
+        Object obj = getAttribute(request, name);
+        if (obj == null && supplier != null) {
+            obj = supplier.get();
+            addAttribute(request, name, obj);
+        }
+        return (R) obj;
     }
 
 }

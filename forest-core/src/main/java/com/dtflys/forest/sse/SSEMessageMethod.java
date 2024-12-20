@@ -15,17 +15,32 @@ import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.function.Function;
 
+/**
+ * SSE 消息方法
+ * <p>用于包装注册好的 SSE 消息处理方法</p>
+ * 
+ * @since 1.6.1
+ */
 public class SSEMessageMethod {
 
-    private final ForestSSE sse;
+    /**
+     * 方法所属实例
+     */
+    private final Object instance;
 
+    /**
+     * Java 方法
+     */
     private final Method method;
-   
+
+    /**
+     * 方法参数值获取函数表
+     */
     private Function<EventSource, ?>[] argumentFunctions;
     
 
-    public SSEMessageMethod(ForestSSE sse, Method method) {
-        this.sse = sse;
+    public SSEMessageMethod(Object instance, Method method) {
+        this.instance = instance;
         this.method = method;
         init();
     }
@@ -77,7 +92,7 @@ public class SSEMessageMethod {
         final boolean accessible = method.isAccessible();
         method.setAccessible(true);
         try {
-            method.invoke(sse, args);
+            method.invoke(instance, args);
         } catch (InvocationTargetException | IllegalAccessException e) {
             throw new ForestRuntimeException(e);
         } finally {
