@@ -15,6 +15,7 @@ import com.dtflys.forest.sse.ForestSSEListener;
 import com.dtflys.forest.sse.SSEMessageConsumer;
 import com.dtflys.forest.sse.SSEMessageMethod;
 import com.dtflys.forest.sse.SSEMessageResult;
+import com.dtflys.forest.sse.SSEState;
 import com.dtflys.forest.sse.SSEStringMessageConsumer;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
@@ -46,6 +47,8 @@ import java.util.function.Function;
  * @since 1.6.0
  */
 public class ForestSSE implements ForestSSEListener<ForestSSE> {
+    
+    private volatile SSEState state = SSEState.INITIALIZED;
 
     private ForestRequest<InputStream> request;
 
@@ -54,6 +57,8 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
     private BiConsumer<ForestRequest, ForestResponse> onCloseConsumer;
 
     private Map<String, List<SSEStringMessageConsumer>> consumerMap = new ConcurrentHashMap<>();
+    
+    private volatile CompletableFuture<? extends ForestSSE> completableFuture;
 
 
     public static ForestSSE fromRequest(ForestRequest request) {
@@ -135,7 +140,7 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
         final String valuePrefix = String.valueOf(attrs.getOrDefault("valuePrefix", ""));
         final String valuePostfix = String.valueOf(attrs.getOrDefault("valuePostfix", ""));
         final String annName = defaultName != null ? defaultName : String.valueOf(attrs.getOrDefault("name", ""));
-        final SSEMessageMethod sseMessageMethod = new SSEMessageMethod(instance, method);
+        final SSEMessageMethod sseMessageMethod = new SSEMessageMethod(this, instance, method);
         if (StringUtils.isEmpty(valueRegex) && StringUtils.isEmpty(valuePrefix) && StringUtils.isEmpty(valuePostfix)) {
             addConsumer(annName, (eventSource, name, value) -> sseMessageMethod.invoke(eventSource));
         } else {
@@ -544,16 +549,21 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
     }
     
     private void doOnClose(final ForestRequest request, final ForestResponse response) {
-        final List<Interceptor> interceptors = request.getInterceptorChain().getInterceptors();
-        for (Interceptor interceptor : interceptors) {
-            if (interceptor instanceof SSEInterceptor) {
-                ((SSEInterceptor) interceptor).onSSEClose(request, response);
+        try {
+            final List<Interceptor> interceptors = request.getInterceptorChain().getInterceptors();
+            for (Interceptor interceptor : interceptors) {
+                if (interceptor instanceof SSEInterceptor) {
+                    ((SSEInterceptor) interceptor).onSSEClose(request, response);
+                }
             }
+            if (onCloseConsumer != null) {
+                onCloseConsumer.accept(request, response);
+            }
+            onClose(request, response);
+        } finally {
+            response.close();
+            state = SSEState.CLOSED;
         }
-        if (onCloseConsumer != null) {
-            onCloseConsumer.accept(request, response);
-        }
-        onClose(request, response);
     }
 
     /**
@@ -585,7 +595,7 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
                 continue;
             }
             consumer.onMessage(eventSource, name, value);
-            if (SSEMessageResult.CLOSE.equals(eventSource.getMessageResult())) {
+            if (state != SSEState.LISTENING || SSEMessageResult.CLOSE.equals(eventSource.getMessageResult())) {
                 return;
             }
         }
@@ -613,12 +623,14 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
     private EventSource parseEventSource(ForestResponse response, String line) {
         final String[] group = line.split("\\:", 2);
         if (group.length == 1) {
-            return new EventSource("", request, response, line, line);
+            return new EventSource(this, "", request, response, line, line);
         }
         final String name = group[0].trim();
         final String data = StringUtils.trimBegin(group[1]);
-        return new EventSource(name, request, response, line, data);
+        return new EventSource(this, name, request, response, line, data);
     }
+    
+    
 
 
     /**
@@ -631,6 +643,7 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
     @Override
     public <R extends ForestSSE> R listen() {
         final boolean isAsync = this.request.isAsync();
+        state = SSEState.REQUESTING;
         ForestResponse<InputStream> response;
         if (isAsync) {
             try {
@@ -647,10 +660,11 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
         if (response.isError()) {
             return (R) this;
         }
-        final EventSource openEventSource = new EventSource("open", request, response);
+        state = SSEState.LISTENING;
+        final EventSource openEventSource = new EventSource(this, "open", request, response);
         this.doOnOpen(openEventSource);
-        if (SSEMessageResult.CLOSE.equals(openEventSource.getMessageResult())) {
-            onClose(request, response);
+        if (SSEState.LISTENING != state || SSEMessageResult.CLOSE.equals(openEventSource.getMessageResult())) {
+            doOnClose(request, response);
             return (R) this;
         }
         try {
@@ -666,7 +680,7 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
                         }
                         final EventSource eventSource = parseEventSource(response, line);
                         onMessage(eventSource, eventSource.getName(), eventSource.getValue());
-                        if (SSEMessageResult.CLOSE.equals(eventSource.getMessageResult())) {
+                        if (SSEState.LISTENING != state) {
                             break;
                         }
                     }
@@ -690,8 +704,9 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
      * @since 1.6.0
      */
     @Override
-    public <R extends ForestSSE> CompletableFuture<R> asyncListen() {
-        return CompletableFuture.supplyAsync(this::listen);
+    public <R extends ForestSSE> R asyncListen() {
+         completableFuture = CompletableFuture.supplyAsync(this::listen);
+        return (R) this;
     }
 
     /**
@@ -703,7 +718,22 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
      * @since 1.6.0
      */
     @Override
-    public <R extends ForestSSE> CompletableFuture<R> asyncListen(ExecutorService pool) {
-        return CompletableFuture.supplyAsync(this::listen, pool);
+    public <R extends ForestSSE> R asyncListen(ExecutorService pool) {
+        completableFuture = CompletableFuture.supplyAsync(this::listen, pool);
+        return (R) this;
+    }
+
+    @Override
+    public <R extends ForestSSE> R await() {
+        if (completableFuture != null) {
+            completableFuture.join();
+        }
+        return (R) this;
+    }
+
+    @Override
+    public <R extends ForestSSE> R close() {
+        state = SSEState.CLOSING;
+        return (R) this;
     }
 }

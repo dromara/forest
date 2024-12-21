@@ -2,6 +2,7 @@ package com.dtflys.forest.sse;
 
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.http.ForestSSE;
 
 /**
  * Forest SSE 事件来源
@@ -9,6 +10,8 @@ import com.dtflys.forest.http.ForestResponse;
  * @since 1.6.0
  */
 public class EventSource {
+    
+    private final ForestSSE sse;
 
     private final String name;
 
@@ -22,18 +25,18 @@ public class EventSource {
 
     private volatile SSEMessageResult messageResult = SSEMessageResult.PROCEED;
 
-    public EventSource(String name, ForestRequest request, ForestResponse response) {
-        this(name, request, response, null, null);
+    public EventSource(ForestSSE sse, String name, ForestRequest request, ForestResponse response) {
+        this(sse, name, request, response, null, null);
     }
 
-    public EventSource(String name, ForestRequest request, ForestResponse response, String rawData, String value) {
+    public EventSource(ForestSSE sse, String name, ForestRequest request, ForestResponse response, String rawData, String value) {
+        this.sse = sse;
         this.name = name;
         this.request = request;
         this.response = response;
         this.rawData = rawData;
         this.value = value;
     }
-
 
     public ForestRequest getRequest() {
         return request;
@@ -59,7 +62,12 @@ public class EventSource {
         return messageResult;
     }
 
+    public ForestSSE sse() {
+        return sse;
+    }
+
     public void close() {
-        messageResult = SSEMessageResult.CLOSE;
+        sse.close();
+        this.messageResult = SSEMessageResult.CLOSE;
     }
 }

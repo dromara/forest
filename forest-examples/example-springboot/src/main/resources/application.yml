@@ -19,9 +19,9 @@ spring:
     multipart:
       max-file-size: 2GB
       max-request-size: 2GB
-  resources:
-    static-locations:=classpath:/META-INF/resources/,classpath:/resources/,
-    classpath:/static/,classpath:/public/,file:static/
+#  resources:
+#    static-locations:=classpath:/META-INF/resources/,classpath:/resources/,
+#    classpath:/static/,classpath:/public/,file:static/
   thymeleaf:
     cache: false
     encoding: utf-8

@@ -22,6 +22,8 @@ import java.util.function.Function;
  * @since 1.6.1
  */
 public class SSEMessageMethod {
+    
+    private final ForestSSE sse;
 
     /**
      * 方法所属实例
@@ -39,7 +41,8 @@ public class SSEMessageMethod {
     private Function<EventSource, ?>[] argumentFunctions;
     
 
-    public SSEMessageMethod(Object instance, Method method) {
+    public SSEMessageMethod(ForestSSE sse, Object instance, Method method) {
+        this.sse = sse;
         this.instance = instance;
         this.method = method;
         init();
@@ -62,6 +65,8 @@ public class SSEMessageMethod {
                 argumentFunctions[i] = eventSource -> eventSource.getRequest();
             } else if (ForestResponse.class.isAssignableFrom(paramType)) {
                 argumentFunctions[i] = eventSource -> eventSource.getResponse();
+            } else if (ForestSSE.class.isAssignableFrom(paramType)) {
+                argumentFunctions[i] = eventSource -> sse;
             } else {
                 final Annotation[] paramAnnArray = parameter.getAnnotations();
                 if (paramAnnArray.length > 0) {

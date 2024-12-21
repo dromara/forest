@@ -1,14 +1,12 @@
 package com.dtflys.forest.test;
 
 import cn.hutool.core.codec.Base64;
-import cn.hutool.core.map.MapUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONReader;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.annotation.Body;
 import com.dtflys.forest.annotation.Post;
-import com.dtflys.forest.annotation.Request;
 import com.dtflys.forest.annotation.Var;
 import com.dtflys.forest.auth.BasicAuth;
 import com.dtflys.forest.backend.ContentType;
@@ -2649,7 +2647,7 @@ public class TestGenericForestClient extends BaseClientTest {
         ));
         StringBuffer buffer = new StringBuffer();
 
-        CompletableFuture<ForestSSE> future = Forest.get("http://localhost:{}/sse", server.getPort())
+        ForestSSE sse = Forest.get("http://localhost:{}/sse", server.getPort())
                 .sse()
                 .setOnOpen(eventSource -> {
                     buffer.append("SSE Open\n");
@@ -2666,7 +2664,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 })
                 .asyncListen();
 
-        future.join();
+        sse.await();
         System.out.println(buffer);
         assertThat(buffer.toString()).isEqualTo(
                 "SSE Open\n" +
@@ -2694,8 +2692,8 @@ public class TestGenericForestClient extends BaseClientTest {
         System.out.println(sse.getStringBuffer());
         assertThat(sse.getStringBuffer().toString()).isEqualTo(
                 "SSE Open\n" +
-                "start ---- start\n" +
-                "hello ---- hello\n" +
+                "Receive data: start\n" +
+                "Receive data: hello\n" +
                 "receive close --- close\n" +
                 "SSE Close"
         );
@@ -2710,19 +2708,18 @@ public class TestGenericForestClient extends BaseClientTest {
                 "data:dont show"
         ));
 
-        CompletableFuture<MySSEHandler> future = Forest.get("http://localhost:{}/sse", server.getPort())
+        MySSEHandler sse = Forest.get("http://localhost:{}/sse", server.getPort())
                 .sse(MySSEHandler.class)
                 .asyncListen();
 
-        future.thenAccept(sse -> {
-            System.out.println(sse.getStringBuffer());
-        });
+        sse.await();
 
-        MySSEHandler sse = future.join();
+        System.out.println(sse.getStringBuffer());
+        
         assertThat(sse.getStringBuffer().toString()).isEqualTo(
             "SSE Open\n" +
-            "start ---- start\n" +
-            "hello ---- hello\n" +
+            "Receive data: start\n" +
+            "Receive data: hello\n" +
             "receive close --- close\n" +
             "SSE Close"
         );

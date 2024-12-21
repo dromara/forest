@@ -20,12 +20,8 @@
         </encoder>
     </appender>
 
-    <!-- 日志输出级别 -->
-    <logger name="com.dtflys.forest" level="DEBUG">
-        <appender-ref ref="STDOUT" />
-    </logger>
 
-    <root level="ERROR">
+    <root level="INFO">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>

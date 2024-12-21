@@ -1,9 +1,9 @@
-package com.dtflys.forest.example.client;
+package com.dtflys.forest.forestspringboot3example.client;
 
 import com.dtflys.forest.annotation.BaseRequest;
 import com.dtflys.forest.annotation.Get;
 import com.dtflys.forest.backend.httpclient.HttpClient;
-import com.dtflys.forest.example.sse.MySSEHandler;
+import com.dtflys.forest.forestspringboot3example.sse.MySSEHandler;
 import com.dtflys.forest.http.ForestSSE;
 
 @HttpClient

@@ -11,13 +11,13 @@
     <properties>
         <java.version>1.8</java.version>
         <maven.deploy.skip>true</maven.deploy.skip>
-        <forest.version>1.6.0-ALPHA2</forest.version>
+        <forest.version>1.6.2</forest.version>
     </properties>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.8.RELEASE</version>
+        <version>2.5.15</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -33,6 +33,12 @@
             <artifactId>forest-spring-boot-starter</artifactId>
             <version>${forest.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+
 
         <dependency>
             <groupId>com.dtflys.forest</groupId>

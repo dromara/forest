@@ -16,6 +16,7 @@
     <properties>
         <java.version>17</java.version>
         <maven.deploy.skip>true</maven.deploy.skip>
+        <forest.version>1.6.2</forest.version>
     </properties>
 
     <dependencies>
@@ -23,18 +24,23 @@
         <dependency>
             <groupId>com.dtflys.forest</groupId>
             <artifactId>forest-spring-boot3-starter</artifactId>
-            <version>1.5.30</version>
+            <version>${forest.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.dtflys.forest</groupId>
             <artifactId>forest-jakarta-xml</artifactId>
-            <version>1.5.30</version>
+            <version>${forest.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
 
         <dependency>
