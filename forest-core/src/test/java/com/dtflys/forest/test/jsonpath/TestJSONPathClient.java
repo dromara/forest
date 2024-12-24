@@ -14,9 +14,17 @@ public interface TestJSONPathClient {
     TestUser getSingleUser();
 
     @Get("http://localhost:{port}/test/user")
+    @JSONPathResult("$.data.name")
+    String getNameOfSingleUser();
+
+    @Get("http://localhost:{port}/test/user")
+    @JSONPathResult("$.data.age")
+    int getAgeOfSingleUser();
+
+    @Get("http://localhost:{port}/test/user")
     @JSONPathResult("$.data")
     List<TestUser> getListOfUsers();
-
+   
     @Get("http://localhost:{port}/test/user")
     @JSONPathResult("$.data[*].age")
     List<Integer> getListOfUserAges();

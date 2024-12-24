@@ -1,8 +1,11 @@
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.ResultHandler;
 import com.dtflys.forest.mapping.MappingTemplate;
+import com.dtflys.forest.utils.ForestDataType;
+import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.TypeReference;
 import com.jayway.jsonpath.Configuration;
@@ -95,9 +98,11 @@ public abstract class ResultGetter implements ForestResultGetter {
             final Object document = Configuration.defaultConfiguration().jsonProvider().parse(getResponse().getInputStream(), charset);
             final ReadContext ctx = JsonPath.parse(document);
             final Object obj = ctx.read(pathStr);
-            final String content = JsonPath.parse(obj).jsonString();
-            return request.getConfiguration()
-                    .getJsonConverter()
+            final Class objClass = obj.getClass();
+            final String content = ReflectUtils.isPrimaryType(objClass)
+                    ? String.valueOf(obj) : JsonPath.parse(obj).jsonString();
+            return (T) request.getConfiguration()
+                    .getConverter(ForestDataType.AUTO)
                     .convertToJavaObject(new ByteArrayInputStream(content.getBytes(charset)), type);
         } catch (Throwable th) {
             throw new ForestRuntimeException(th);

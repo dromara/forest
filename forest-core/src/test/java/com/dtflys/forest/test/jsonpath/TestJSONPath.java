@@ -11,9 +11,11 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
 public class TestJSONPath {
 
-    public final static String SINGLE_EXPECTED = "{\"status\":\"ok\", \"data\": {\"name\": \"Foo\", \"age\": 12}}";
+    public final static String SINGLE_EXPECTED = "{\"status\":\"ok\", \"data\": {\"name\": \"中文\", \"age\": 12}}";
 
     public final static String LIST_EXPECTED = "{\"status\":\"ok\", \"data\": [{\"name\": \"Foo\", \"age\": 12}, {\"name\": \"Bar\", \"age\": 22}]}";
 
@@ -40,6 +42,21 @@ public class TestJSONPath {
         TestUser user = testJSONPathClient.getSingleUser();
         System.out.println(JSONObject.toJSONString(user));
     }
+
+    @Test
+    public void testGetNameOfSingleUser() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(SINGLE_EXPECTED));
+        String name = testJSONPathClient.getNameOfSingleUser();
+        assertThat(name).isEqualTo("中文");
+    }
+
+    @Test
+    public void testGetAgeOfSingleUser() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(SINGLE_EXPECTED));
+        int age = testJSONPathClient.getAgeOfSingleUser();
+        assertThat(age).isEqualTo(12);
+    }
+
 
     @Test
     public void testGetListOfUser() {

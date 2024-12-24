@@ -229,6 +229,36 @@ public class ReflectUtils {
         return false;
     }
 
+    
+    public static boolean  isAssignableFrom(final Class<?> type1, final Class<?> type2) {
+        if (type1.isAssignableFrom(type2)) {
+            return true;
+        }
+        if (isPrimaryType(type1) && isPrimaryType(type2)) {
+            if (int.class.isAssignableFrom(type1) && Integer.class.isAssignableFrom(type2)) {
+                return true;
+            }
+            if (long.class.isAssignableFrom(type1) && Long.class.isAssignableFrom(type2)) {
+                return true;
+            }
+            if (short.class.isAssignableFrom(type1) && Short.class.isAssignableFrom(type2)) {
+                return true;
+            }
+            if (float.class.isAssignableFrom(type1) && Float.class.isAssignableFrom(type2)) {
+                return true;
+            }
+            if (double.class.isAssignableFrom(type1) && Double.class.isAssignableFrom(type2)) {
+                return true;
+            }
+            if (char.class.isAssignableFrom(type1) && Character.class.isAssignableFrom(type2)) {
+                return true;
+            }
+            if (boolean.class.isAssignableFrom(type1) && Boolean.class.isAssignableFrom(type2)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * 是否为基本数组类型

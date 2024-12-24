@@ -402,7 +402,6 @@ public class TestDownloadClient extends BaseClientTest {
                 .executeAsStream((in, req, res) -> {
                     responseBytesRead.set(res.isBytesRead());
                     System.out.println("Accept stream");
-                    List<UserParam> userParam = new Gson().fromJson(new JsonReader(new InputStreamReader(in)), UserParam.class);
                     try {
                         byte[] fileBytes = IOUtils.toByteArray(in);
                         assertThat(fileBytes)

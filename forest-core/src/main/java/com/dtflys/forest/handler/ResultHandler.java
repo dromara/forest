@@ -86,7 +86,7 @@ public class ResultHandler {
                 return null;
             }
             final Class<?> optValueClass = optValue.getClass();
-            if (resultClass.isAssignableFrom(optValueClass)) {
+            if (ReflectUtils.isAssignableFrom(resultClass, optValueClass)) {
                 return optValue;
             }
             if (ForestResponse.class.isAssignableFrom(resultClass)) {
@@ -107,7 +107,7 @@ public class ResultHandler {
                     return response;
                 }
             }
-            if (Charset.class.isAssignableFrom(optValueClass)) {
+            if (ReflectUtils.isPrimaryType(optValueClass)) {
                 optStringValue = String.valueOf(optValue);
             }
         }

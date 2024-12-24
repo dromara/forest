@@ -16,6 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import reactor.core.publisher.Flux;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
@@ -53,6 +54,27 @@ public class TestSSEController {
     public String testStreamWithMyHandler() {
         sseClient.streamWithMyHandler().listen();
         return "ok";
+    }
+
+
+    @GetMapping(value = "/sse-emitter-test")
+    public SseEmitter testSSEEmitterTest() {
+        SseEmitter sseEmitter = new SseEmitter(-1L);
+        sseClient.stream()
+                .addOnData((eventSource, name, value) -> {
+                    log.info("Received event [{}: {}]", name, value);
+                    try {
+                        sseEmitter.send("Received event [" + name + ": " + value + "]");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                })
+                .setOnClose((eventSource, res) -> {
+                    log.info("SSE Closed");
+                    eventSource.sse().close();
+                })
+                .asyncListen();
+        return sseEmitter;
     }
 
 
