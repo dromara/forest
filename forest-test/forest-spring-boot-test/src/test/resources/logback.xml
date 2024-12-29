@@ -22,8 +22,11 @@
 
 
     <!-- 日志输出级别 -->
+    <logger name="com.dtflys.forest" level="INFO">
+        <appender-ref ref="STDOUT" />
+    </logger>
 
-    <root level="DEBUG">
+    <root level="ERROR">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>

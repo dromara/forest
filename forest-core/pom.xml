@@ -23,7 +23,7 @@
         <jgitflow-plugin.version>1.0-m4.3</jgitflow-plugin.version>
         <versions-plugin.version>2.1</versions-plugin.version>
         <kotlin.version>1.9.23</kotlin.version>
-        <kotlinx.version>1.7.3</kotlinx.version>
+        <kotlinx.version>1.10.1</kotlinx.version>
 
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
     </properties>
@@ -73,20 +73,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>jsr305</artifactId>
-            <version>${jsr305.version}</version>
-        </dependency>
-
-<!--
-        <dependency>
-            <groupId>com.github.ben-manes.caffeine</groupId>
-            <artifactId>caffeine</artifactId>
-            <version>${caffeine.version}</version>
-        </dependency>
--->
-
-        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>${common-io.version}</version>
@@ -96,6 +82,13 @@
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-cache</artifactId>
             <version>${hutool.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <version>${spotbugs-annotations.version}</version>
+            <scope>provided</scope>
         </dependency>
 
 
@@ -148,6 +141,7 @@
             <version>${gson.version}</version>
             <scope>provided</scope>
         </dependency>
+        
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java-util</artifactId>
@@ -207,13 +201,13 @@
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
-            <version>1.12.3</version>
+            <version>${byte-buddy.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy-agent</artifactId>
-            <version>1.12.3</version>
+            <version>${byte-buddy.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -240,13 +234,6 @@
 
     </dependencies>
 
-
-    <!--<distributionManagement>-->
-        <!--<repository>-->
-            <!--<id>gongjun-mvn-repo</id>-->
-            <!--<url>file:D:\Projects\maven-repo\repository</url>-->
-        <!--</repository>-->
-    <!--</distributionManagement>-->
 
 
     <build>

@@ -33,7 +33,6 @@
             <version>${protobuf.version}</version>
         </dependency>
 
-
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>solon-test-junit4</artifactId>

@@ -19,6 +19,8 @@
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
 
+
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -57,8 +59,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-        
+       
         <dependency>
             <groupId>com.dtflys.forest</groupId>
             <artifactId>forest-spring</artifactId>
