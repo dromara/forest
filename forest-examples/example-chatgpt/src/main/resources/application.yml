@@ -3,7 +3,7 @@ forest:
   connect-timeout: 60000
   read-timeout: 60000
   variables:
-    apiKey: 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
+    apiKey: [YOUR API KEY]
     model: gpt-4o-mini
     maxTokens: 50
     temperature: 0.5
