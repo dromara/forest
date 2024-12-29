@@ -28,13 +28,13 @@ public class MySSEInterceptor implements SSEInterceptor {
 
     @Override
     public void onSSEOpen(EventSource eventSource) {
-        StringBuilder builder = (StringBuilder) eventSource.getRequest().getOrAddAttachment("text", StringBuilder::new);
+        StringBuilder builder = (StringBuilder) eventSource.request().getOrAddAttachment("text", StringBuilder::new);
         builder.append("MySSEInterceptor onSSEOpen\n");
     }
 
     @Override
-    public void onSSEClose(ForestRequest request, ForestResponse response) {
-        StringBuilder builder = (StringBuilder) request.getOrAddAttachment("text", StringBuilder::new);
+    public void onSSEClose(EventSource eventSource) {
+        StringBuilder builder = (StringBuilder) eventSource.request().getOrAddAttachment("text", StringBuilder::new);
         builder.append("MySSEInterceptor onSSEClose");
     }
     

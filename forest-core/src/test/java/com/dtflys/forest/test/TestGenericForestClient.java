@@ -2614,7 +2614,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .setOnOpen(eventSource -> {
                     buffer.append("SSE Open\n");
                 })
-                .setOnClose((req, res) -> {
+                .setOnClose(eventSource -> {
                     buffer.append("SSE Close");
                 })
                 .addOnData((eventSource, name, value) -> {
@@ -2648,11 +2648,12 @@ public class TestGenericForestClient extends BaseClientTest {
         StringBuffer buffer = new StringBuffer();
 
         ForestSSE sse = Forest.get("http://localhost:{}/sse", server.getPort())
+                .contentType("text/event-stream")
                 .sse()
                 .setOnOpen(eventSource -> {
                     buffer.append("SSE Open\n");
                 })
-                .setOnClose((req, res) -> {
+                .setOnClose(eventSource -> {
                     buffer.append("SSE Close");
                 })
                 .addOnData((eventSource, name, value) -> {

@@ -3,6 +3,8 @@ package com.dtflys.forest.sse;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestSSE;
+import com.dtflys.forest.utils.ForestDataType;
+import com.dtflys.forest.utils.TypeReference;
 
 /**
  * Forest SSE 事件来源
@@ -38,27 +40,38 @@ public class EventSource {
         this.value = value;
     }
 
-    public ForestRequest getRequest() {
+    public ForestRequest request() {
         return request;
     }
 
-    public ForestResponse getResponse() {
+    public ForestResponse response() {
         return response;
     }
 
-    public String getRawData() {
+    public String rawData() {
         return rawData;
     }
 
-    public String getName() {
+    public String name() {
         return name;
     }
 
-    public String getValue() {
+    public String value() {
         return value;
     }
+    
+    public <T> T value(Class<T> type) {
+        T encodedValue = (T) request.getConfiguration().getConverter(ForestDataType.AUTO).convertToJavaObject(value, type);
+        return encodedValue;
+    }
 
-    public SSEMessageResult getMessageResult() {
+    public <T> T value(TypeReference<T> typeReference) {
+        T encodedValue = (T) request.getConfiguration().getConverter(ForestDataType.AUTO).convertToJavaObject(value, typeReference);
+        return encodedValue;
+    }
+
+
+    public SSEMessageResult messageResult() {
         return messageResult;
     }
 
@@ -66,8 +79,9 @@ public class EventSource {
         return sse;
     }
 
-    public void close() {
+    public EventSource close() {
         sse.close();
         this.messageResult = SSEMessageResult.CLOSE;
+        return this;
     }
 }

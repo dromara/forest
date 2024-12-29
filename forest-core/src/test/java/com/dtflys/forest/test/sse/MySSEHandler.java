@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class  MySSEHandler extends ForestSSE {
+public class MySSEHandler extends ForestSSE {
 
     private final StringBuffer buffer = new StringBuffer();
 
@@ -23,7 +23,7 @@ public class  MySSEHandler extends ForestSSE {
     }
 
     @Override
-    protected void onClose(ForestRequest request, ForestResponse response) {
+    protected void onClose(EventSource eventSource) {
         buffer.append("SSE Close");
     }
 

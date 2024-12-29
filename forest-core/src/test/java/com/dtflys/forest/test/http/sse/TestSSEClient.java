@@ -43,7 +43,7 @@ public class TestSSEClient extends BaseClientTest {
         sseClient.testSSE()
             .setOnOpen(eventSource -> {
                 buffer.append("SSE Open\n");
-            }).setOnClose((req, res) -> {
+            }).setOnClose(eventSource -> {
                 buffer.append("SSE Close");
             }).addOnData((eventSource, name, value) -> {
                 buffer.append("Receive " + name + ": " + value + "\n");

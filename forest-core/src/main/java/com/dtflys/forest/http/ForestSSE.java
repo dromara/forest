@@ -28,7 +28,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,7 +36,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -54,7 +52,7 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
 
     private Consumer<EventSource> onOpenConsumer;
 
-    private BiConsumer<ForestRequest, ForestResponse> onCloseConsumer;
+    private Consumer<EventSource> onCloseConsumer;
 
     private Map<String, List<SSEStringMessageConsumer>> consumerMap = new ConcurrentHashMap<>();
     
@@ -150,15 +148,6 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
     }
 
 
-    private void setParameterValue(Method method, String value, ForestRequest request, Object[] args, int i, Class<?> paramType) {
-        if (CharSequence.class.isAssignableFrom(paramType)) {
-            args[i] = value;
-        } else {
-            final Type type = method.getParameters()[i].getParameterizedType();
-            final Object encodedValue = request.getConfiguration().getConverter(ForestDataType.AUTO).convertToJavaObject(value, type);
-            args[i] = encodedValue;
-        }
-    }
 
     /**
      * 添加字符串类型 SSE 消费者
@@ -188,7 +177,7 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
             if (valueType.isAssignableFrom(CharSequence.class)) {
                 consumer.onMessage(eventSource, n, (T) String.valueOf(v));
             } else {
-                T encodedValue = (T) request.getConfiguration().getConverter(ForestDataType.AUTO).convertToJavaObject(v, valueType);
+                T encodedValue = eventSource.value(valueType);
                 consumer.onMessage(eventSource, n, encodedValue);
             }
         });
@@ -248,7 +237,7 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
      * @since 1.6.0
      */
     public ForestSSE addConsumerMatchesPrefix(String name, String valuePrefix, SSEStringMessageConsumer consumer) {
-        return addConsumer(name, eventSource -> eventSource.getValue().startsWith(valuePrefix), consumer);
+        return addConsumer(name, eventSource -> eventSource.value().startsWith(valuePrefix), consumer);
     }
 
     /**
@@ -261,7 +250,7 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
      * @since 1.6.0
      */
     public ForestSSE addConsumerMatchesPostfix(String name, String valuePostfix, SSEStringMessageConsumer consumer) {
-        return addConsumer(name, eventSource -> eventSource.getValue().endsWith(valuePostfix), consumer);
+        return addConsumer(name, eventSource -> eventSource.value().endsWith(valuePostfix), consumer);
     }
 
     /**
@@ -274,7 +263,7 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
      * @since 1.6.0
      */
     public ForestSSE addConsumerMatches(String name, String valueRegex, SSEStringMessageConsumer consumer) {
-        return addConsumer(name, eventSource -> eventSource.getValue().matches(valueRegex), consumer);
+        return addConsumer(name, eventSource -> eventSource.value().matches(valueRegex), consumer);
     }
 
     /**
@@ -290,7 +279,7 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
      */
     public ForestSSE addConsumerMatches(String name, String valueRegex, String valuePrefix, String valuePostfix, SSEStringMessageConsumer consumer) {
         return addConsumer(name, eventSource -> {
-            final String value = eventSource.getValue();
+            final String value = eventSource.value();
             if (StringUtils.isNotEmpty(valueRegex)) {
                 if (!value.matches(valueRegex)) {
                     return false;
@@ -329,7 +318,7 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
      * @return SSE 控制器自身对象
      * @since 1.6.0
      */
-    public ForestSSE setOnClose(BiConsumer<ForestRequest, ForestResponse> onCloseConsumer) {
+    public ForestSSE setOnClose(Consumer<EventSource> onCloseConsumer) {
         this.onCloseConsumer = onCloseConsumer;
         return this;
     }
@@ -527,7 +516,7 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
     }
     
     private void doOnOpen(final EventSource eventSource) {
-        final List<Interceptor> interceptors = eventSource.getRequest().getInterceptorChain().getInterceptors();
+        final List<Interceptor> interceptors = eventSource.request().getInterceptorChain().getInterceptors();
         for (Interceptor interceptor : interceptors) {
             if (interceptor instanceof SSEInterceptor) {
                 ((SSEInterceptor) interceptor).onSSEOpen(eventSource);
@@ -548,18 +537,20 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
     protected void onOpen(EventSource eventSource) {
     }
     
-    private void doOnClose(final ForestRequest request, final ForestResponse response) {
+    private void doOnClose(final EventSource eventSource) {
+        final ForestRequest request = eventSource.request();
+        final ForestResponse response = eventSource.response();
         try {
             final List<Interceptor> interceptors = request.getInterceptorChain().getInterceptors();
             for (Interceptor interceptor : interceptors) {
                 if (interceptor instanceof SSEInterceptor) {
-                    ((SSEInterceptor) interceptor).onSSEClose(request, response);
+                    ((SSEInterceptor) interceptor).onSSEClose(eventSource);
                 }
             }
             if (onCloseConsumer != null) {
-                onCloseConsumer.accept(request, response);
+                onCloseConsumer.accept(eventSource);
             }
-            onClose(request, response);
+            onClose(eventSource);
         } finally {
             response.close();
             state = SSEState.CLOSED;
@@ -569,11 +560,10 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
     /**
      * 监听关闭回调函数：在结束 SSE 数据流监听的时候调用
      * 
-     * @param request Forest 请求对象
-     * @param response Forest 响应对象
+     * @param eventSource 消息源
      * @since 1.6.0
      */
-    protected void onClose(ForestRequest request, ForestResponse response) {
+    protected void onClose(EventSource eventSource) {
     }
 
     /**
@@ -595,7 +585,7 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
                 continue;
             }
             consumer.onMessage(eventSource, name, value);
-            if (state != SSEState.LISTENING || SSEMessageResult.CLOSE.equals(eventSource.getMessageResult())) {
+            if (state != SSEState.LISTENING || SSEMessageResult.CLOSE.equals(eventSource.messageResult())) {
                 return;
             }
         }
@@ -663,8 +653,9 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
         state = SSEState.LISTENING;
         final EventSource openEventSource = new EventSource(this, "open", request, response);
         this.doOnOpen(openEventSource);
-        if (SSEState.LISTENING != state || SSEMessageResult.CLOSE.equals(openEventSource.getMessageResult())) {
-            doOnClose(request, response);
+        if (SSEState.LISTENING != state || SSEMessageResult.CLOSE.equals(openEventSource.messageResult())) {
+            final EventSource closeEventSource = new EventSource(this, "close", request, response);
+            doOnClose(closeEventSource);
             return (R) this;
         }
         try {
@@ -679,7 +670,7 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
                             continue;
                         }
                         final EventSource eventSource = parseEventSource(response, line);
-                        onMessage(eventSource, eventSource.getName(), eventSource.getValue());
+                        onMessage(eventSource, eventSource.name(), eventSource.value());
                         if (SSEState.LISTENING != state) {
                             break;
                         }
@@ -687,7 +678,8 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
                 } catch (IOException e) {
                     throw new ForestRuntimeException(e);
                 } finally {
-                    doOnClose(request, response);
+                    final EventSource closeEventSource = new EventSource(this, "close", request, response);
+                    doOnClose(closeEventSource);
                 }
             });
         } catch (Exception e) {

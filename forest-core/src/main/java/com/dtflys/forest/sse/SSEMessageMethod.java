@@ -62,9 +62,9 @@ public class SSEMessageMethod {
             if (EventSource.class.isAssignableFrom(paramType)) {
                 argumentFunctions[i] = eventSource -> eventSource;
             } else if (ForestRequest.class.isAssignableFrom(paramType)) {
-                argumentFunctions[i] = eventSource -> eventSource.getRequest();
+                argumentFunctions[i] = eventSource -> eventSource.request();
             } else if (ForestResponse.class.isAssignableFrom(paramType)) {
-                argumentFunctions[i] = eventSource -> eventSource.getResponse();
+                argumentFunctions[i] = eventSource -> eventSource.response();
             } else if (ForestSSE.class.isAssignableFrom(paramType)) {
                 argumentFunctions[i] = eventSource -> sse;
             } else {
@@ -72,7 +72,7 @@ public class SSEMessageMethod {
                 if (paramAnnArray.length > 0) {
                     for (final Annotation ann : paramAnnArray) {
                         if (ann instanceof SSEName) {
-                            argumentFunctions[i] = eventSource -> eventSource.getName();
+                            argumentFunctions[i] = eventSource -> eventSource.name();
                         } else if (ann instanceof SSEValue) {
                             setParameterValueFunction(method, i, paramType);
                         }
@@ -107,11 +107,11 @@ public class SSEMessageMethod {
 
     private void setParameterValueFunction(Method method, int i, Class<?> paramType) {
         if (CharSequence.class.isAssignableFrom(paramType)) {
-            argumentFunctions[i] = eventSource -> eventSource.getValue();
+            argumentFunctions[i] = eventSource -> eventSource.value();
         } else {
             final Type type = method.getParameters()[i].getParameterizedType();
             argumentFunctions[i] = eventSource -> eventSource
-                    .getRequest().getConfiguration().getConverter(ForestDataType.AUTO).convertToJavaObject(eventSource.getValue(), type);
+                    .request().getConfiguration().getConverter(ForestDataType.AUTO).convertToJavaObject(eventSource.value(), type);
         }
     }
 

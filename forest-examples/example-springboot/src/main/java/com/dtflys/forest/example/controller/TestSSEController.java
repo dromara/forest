@@ -61,6 +61,14 @@ public class TestSSEController {
     public SseEmitter testSSEEmitterTest() {
         SseEmitter sseEmitter = new SseEmitter(-1L);
         sseClient.stream()
+                .setOnOpen(eventSource -> {
+                    log.info("SSE Open");
+                    try {
+                        sseEmitter.send("SSE Start ...");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                })
                 .addOnData((eventSource, name, value) -> {
                     log.info("Received event [{}: {}]", name, value);
                     try {
