@@ -27,6 +27,11 @@ public class MySSEHandler extends ForestSSE {
         buffer.append("SSE Close");
     }
 
+    @Override
+    public void onMessage(EventSource eventSource, String name, String value) {
+        
+    }
+
     @SSEMessage("data")
     public void onData(EventSource eventSource, @SSEName String name, @SSEValue String value) {
         buffer.append("Receive ").append(name).append(": ").append(value).append("\n");

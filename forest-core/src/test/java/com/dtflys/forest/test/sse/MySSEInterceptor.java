@@ -2,6 +2,7 @@ package com.dtflys.forest.test.sse;
 
 import com.dtflys.forest.annotation.SSEDataMessage;
 import com.dtflys.forest.annotation.SSEEventMessage;
+import com.dtflys.forest.annotation.SSEMessage;
 import com.dtflys.forest.annotation.SSEName;
 import com.dtflys.forest.annotation.SSEValue;
 import com.dtflys.forest.http.ForestRequest;
@@ -18,6 +19,7 @@ public class MySSEInterceptor implements SSEInterceptor {
     public void onSuccess(InputStream data, ForestRequest request, ForestResponse response) {
         StringBuilder builder = (StringBuilder) request.getOrAddAttachment("text", StringBuilder::new);
         builder.append("MySSEInterceptor onSuccess\n");
+        System.out.println("");
    }
 
     @Override
@@ -36,6 +38,11 @@ public class MySSEInterceptor implements SSEInterceptor {
     public void onSSEClose(EventSource eventSource) {
         StringBuilder builder = (StringBuilder) eventSource.request().getOrAddAttachment("text", StringBuilder::new);
         builder.append("MySSEInterceptor onSSEClose");
+    }
+    
+    @SSEMessage("data")
+    public void onMessage(EventSource eventSource) {
+        System.out.println("MySSEInterceptor onMessage");
     }
     
     @SSEDataMessage
