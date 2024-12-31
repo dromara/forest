@@ -4964,6 +4964,12 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         if (ex == null) {
             ex = new ForestRetryException(this, maxRetryCount, getCurrentRetryCount());
         }
+
+        // 判断是否达到最大重试次数
+        if (ex.isMaxRetryCountReached()) {
+            return null;
+        }
+
         if (response == null || !retryEnabled) {
             throw ex.getCause();
         }
