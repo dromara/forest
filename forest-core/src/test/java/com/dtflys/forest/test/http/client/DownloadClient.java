@@ -1,7 +1,9 @@
 package com.dtflys.forest.test.http.client;
 
 import com.dtflys.forest.annotation.Get;
+import com.dtflys.forest.annotation.LogEnabled;
 import com.dtflys.forest.annotation.Var;
+import com.dtflys.forest.backend.httpclient.HttpClient;
 import com.dtflys.forest.backend.okhttp3.OkHttp3;
 import com.dtflys.forest.callback.OnProgress;
 import com.dtflys.forest.extensions.DownloadFile;
@@ -39,11 +41,9 @@ public interface DownloadClient {
     @Get("http://localhost:${port}/download/test-img.jpg")
     ForestResponse downloadAsInputResponse();
 
-
-
     @Get(url = "http://localhost:${port}/download/test-img-void.jpg", progressStep = 100)
     @DownloadFile(dir = "{dir}")
     void downloadFileReturnNothing(@Var("dir") String dir, OnProgress onProgress);
-
+    
 
 }
