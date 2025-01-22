@@ -1147,11 +1147,12 @@ public class TestGenericForestClient extends BaseClientTest {
     public void testRequest_post_invalid_json() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         String result = Forest.post("http://localhost:{}", server.getPort())
-                .addHeader("Content-Type", "application/json; charset=UTF-8")
+                .addHeader("Content-Type", "application/json;charset=UTF-8")
                 .addBody("xxxxxxxyyyyyyy")
                 .execute(String.class);
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
+                .assertHeaderEquals("Content-Type", "application/json;charset=UTF-8")
                 .assertBodyEquals("xxxxxxxyyyyyyy");
     }
 
@@ -1271,21 +1272,21 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.post("http://localhost:{}/test", server.getPort())
                 .contentTypeJson()
-                .addHeader("Content-Type", req -> "application/json; charset=UTF-8")
+                .addHeader("Content-Type", req -> "application/json;charset=UTF-8")
                 .addHeader("name", req -> "Forest.backend = " + req.getBackend().getName())
                 .addBody("{\"id\":\"1972664191\", \"name\":\"XieYu20011008\"}")
                 .execute();
         mockRequest(server)
                 .assertHeaderEquals("name", "Forest.backend = " + Forest.config().getBackend().getName())
                 .assertBodyEquals("{\"id\":\"1972664191\", \"name\":\"XieYu20011008\"}")
-                .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
+                .assertHeaderEquals("Content-Type", "application/json;charset=UTF-8");
     }
 
     @Test
     public void testRequest_lazy_header2() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.post("http://localhost:{}/test", server.getPort())
-                .addHeader("Content-Type", "application/json; charset=UTF-8")
+                .addHeader("Content-Type", "application/json;charset=GBK")
                 .addHeader("Authorization", req -> Base64.encode("Token=" + req.body().encodeToString()))
                 .addBody("id", "1972664191")
                 .addBody("name", "XieYu20011008")
@@ -1294,7 +1295,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertHeaderEquals("Authorization",
                         Base64.encode("Token={\"id\":\"1972664191\",\"name\":\"XieYu20011008\"}"))
                 .assertBodyEquals("{\"id\":\"1972664191\",\"name\":\"XieYu20011008\"}")
-                .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
+                .assertHeaderEquals("Content-Type", "application/json;charset=GBK");
     }
 
     @Test

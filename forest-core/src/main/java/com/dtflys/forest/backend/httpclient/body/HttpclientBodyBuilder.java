@@ -42,10 +42,10 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
         StringEntity entity = new StringEntity(text, charset);
         if (charset == null && mergeCharset) {
             if (!contentType.contains("charset=")) {
-                contentType = contentType + "; charset=" + charset;
+                contentType = contentType + ";charset=" + charset;
             } else {
                 String[] strs = contentType.split("charset=");
-                contentType = strs[0] + " charset=" + charset;
+                contentType = strs[0] + "charset=" + charset;
             }
             entity.setContentEncoding(charset);
         }
@@ -161,10 +161,10 @@ public class HttpclientBodyBuilder<T extends HttpEntityEnclosingRequestBase> ext
         }
         if (charset == null && mergeCharset) {
             if (!contentType.contains("charset=")) {
-                contentType = contentType + "; charset=" + charset;
+                contentType = contentType + ";charset=" + charset;
             } else {
                 String[] strs = contentType.split("charset=");
-                contentType = strs[0] + " charset=" + charset;
+                contentType = strs[0] + "charset=" + charset;
             }
         }
         ContentType ctype = ContentType.create(contentType, charset);

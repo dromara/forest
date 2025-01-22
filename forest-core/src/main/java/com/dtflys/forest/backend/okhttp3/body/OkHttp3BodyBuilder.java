@@ -42,7 +42,7 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
             final Charset mtcs = mediaType.charset();
             if (mtcs == null) {
                 if (charset != null && mergeCharset) {
-                    mediaType = MediaType.parse(contentType + "; charset=" + charset);
+                    mediaType = MediaType.parse(contentType + ";charset=" + charset);
                 }
             }
         }
@@ -166,7 +166,7 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
         final Charset mtcs = mediaType.charset();
         if (mtcs == null) {
             if (charset != null && mergeCharset) {
-                mediaType = MediaType.parse(ctype + "; charset=" + charset);
+                mediaType = MediaType.parse(ctype + ";charset=" + charset);
             }
         }
         final RequestBody body = RequestBody.create(mediaType, bytes);

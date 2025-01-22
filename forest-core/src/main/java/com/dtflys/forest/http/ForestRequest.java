@@ -2453,7 +2453,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
             contentType = ContentType.APPLICATION_X_WWW_FORM_URLENCODED;
         }
 
-        String[] typeGroup = contentType.split(";[ ]*charset=");
+        String[] typeGroup = contentType.split(";[ \t]*charset=");
         String mineType = typeGroup[0];
         boolean hasDefinedCharset = typeGroup.length > 1;
 

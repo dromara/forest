@@ -252,7 +252,7 @@ public class ContentType {
         }
         if (!parameters.isEmpty()) {
             for (Map.Entry<String, String> entry : parameters.entrySet()) {
-                builder.append("; ")
+                builder.append(";")
                         .append(entry.getKey())
                         .append("=")
                         .append(entry.getValue());
