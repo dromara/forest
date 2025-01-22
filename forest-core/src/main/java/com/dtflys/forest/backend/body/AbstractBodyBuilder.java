@@ -1,5 +1,6 @@
 package com.dtflys.forest.backend.body;
 
+import cn.hutool.core.lang.Opt;
 import com.dtflys.forest.backend.BodyBuilder;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.converter.ForestEncoder;
@@ -34,8 +35,10 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
     public void buildBody(T httpRequest, ForestRequest request, LifeCycleHandler lifeCycleHandler) {
         final ContentType mineContentType = request.mineContentType();
         final String charsetName = mineContentType.getCharsetName();
-        final Charset charset = StringUtils.isEmpty(charsetName) ? mineContentType.getCharset() : Charset.forName(charsetName);
-        boolean mergeCharset = mineContentType.isHasDefinedCharset();
+        final Charset charset = StringUtils.isBlank(charsetName)
+                ? Charset.forName(Opt.ofBlankAble(request.charset()).orElse("UTF-8"))
+                : Charset.forName(charsetName);
+        final boolean mergeCharset = mineContentType.isHasDefinedCharset();
         final String ctypeWithoutParams = mineContentType.toStringWithoutParameters();
         final ForestEncoder encoder = request.getEncoder();
         

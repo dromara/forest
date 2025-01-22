@@ -1495,7 +1495,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
             if (idx > 0) {
                 StringBuilder builder = new StringBuilder(group[0]);
                 for (int i = 1; i < group.length; i++) {
-                    builder.append("; ");
+                    builder.append(";");
                     if (i == idx) {
                         builder.append(boundaryName)
                                 .append("=")
@@ -1507,7 +1507,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
                 this.setContentType(builder.toString());
             }
         } else {
-            this.setContentType(contentType + "; boundary=" + boundary);
+            this.setContentType(contentType + ";boundary=" + boundary);
         }
         return this;
     }
