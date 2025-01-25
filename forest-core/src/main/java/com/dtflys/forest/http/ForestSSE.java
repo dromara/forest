@@ -565,17 +565,9 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
      */
     protected void onClose(EventSource eventSource) {
     }
-
-    /**
-     * 消息回调函数：在接收到 SSE 消息后调用
-     * 
-     * @param eventSource 消息源
-     * @param name 名称
-     * @param value 值
-     * @since 1.6.0
-     */
-    @Override
-    public void onMessage(EventSource eventSource, String name, String value) {
+    
+    
+    private void doOnMessage(EventSource eventSource, String name, String value) {
         final List<SSEStringMessageConsumer> consumers = consumerMap.get(name);
         if (CollectionUtil.isEmpty(consumers)) {
             return;
@@ -588,7 +580,23 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
             if (state != SSEState.LISTENING || SSEMessageResult.CLOSE.equals(eventSource.messageResult())) {
                 return;
             }
+            onMessage(eventSource, name, value);
+            if (state != SSEState.LISTENING || SSEMessageResult.CLOSE.equals(eventSource.messageResult())) {
+                return;
+            }
         }
+    }
+
+    /**
+     * 消息回调函数：在接收到 SSE 消息后调用
+     * 
+     * @param eventSource 消息源
+     * @param name 名称
+     * @param value 值
+     * @since 1.6.0
+     */
+    @Override
+    public void onMessage(EventSource eventSource, String name, String value) {
     }
 
     /**
@@ -670,7 +678,7 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
                             continue;
                         }
                         final EventSource eventSource = parseEventSource(response, line);
-                        onMessage(eventSource, eventSource.name(), eventSource.value());
+                        doOnMessage(eventSource, eventSource.name(), eventSource.value());
                         if (SSEState.LISTENING != state) {
                             break;
                         }

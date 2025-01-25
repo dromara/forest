@@ -1319,14 +1319,14 @@ public class TestGenericForestClient extends BaseClientTest {
     public void testRequest_lazy_body() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.post("http://localhost:{}/test", server.getPort())
-                .addHeader("Content-Type", "application/json; charset=UTF-8")
+                .addHeader("Content-Type", "application/json;charset=UTF-8")
                 .addHeader("_id", "20011008")
                 .addBody("id", "1972664191")
                 .addBody("name", req -> "XieYu" + req.headerValue("_id"))
                 .execute();
         mockRequest(server)
                 .assertBodyEquals("{\"id\":\"1972664191\",\"name\":\"XieYu20011008\"}")
-                .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
+                .assertHeaderEquals("Content-Type", "application/json;charset=UTF-8");
     }
 
 
@@ -1334,7 +1334,7 @@ public class TestGenericForestClient extends BaseClientTest {
     public void testRequest_lazy_body2() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.post("http://localhost:{}/test", server.getPort())
-                .addHeader("Content-Type", "application/json; charset=UTF-8")
+                .addHeader("Content-Type", "application/json;charset=UTF-8")
                 .addHeader("_id", "20011008")
                 .addBody("id", "1972664191")
                 .addBody("name", req -> "XieYu" + req.headerValue("_id"))
@@ -1346,14 +1346,14 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertBodyEquals("{\"id\":\"1972664191\",\"name\":\"XieYu20011008\",\"token\":\"" +
                         Base64.encode("{\"id\":\"1972664191\",\"name\":\"XieYu20011008\"}") +
                         "\"}")
-                .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
+                .assertHeaderEquals("Content-Type", "application/json;charset=UTF-8");
     }
 
     @Test
     public void testRequest_lazy_body3() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.post("http://localhost:{}/test", server.getPort())
-                .addHeader("Content-Type", "application/json; charset=UTF-8")
+                .addHeader("Content-Type", "application/json;charset=UTF-8")
                 .addHeader("_id", "20011008")
                 .addBody("id", "1972664191")
                 .addBody("name", req -> "XieYu" + req.headerValue("_id"))
@@ -1363,14 +1363,14 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertBodyEquals("{\"id\":\"1972664191\",\"name\":\"XieYu20011008\",\"token\":\"" +
                         Base64.encode("{\"id\":\"1972664191\",\"name\":\"XieYu20011008\"}") +
                         "\"}")
-                .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
+                .assertHeaderEquals("Content-Type", "application/json;charset=UTF-8");
     }
 
     @Test
     public void testRequest_lazy_body4() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.post("http://localhost:{}/test", server.getPort())
-                .addHeader("Content-Type", "application/json; charset=UTF-8")
+                .addHeader("Content-Type", "application/json;charset=UTF-8")
                 .addHeader("_id", "20011008")
                 .addBody("id", "1972664191")
                 .addBody("name", req -> "XieYu" + req.headerValue("_id"))
@@ -1380,7 +1380,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertBodyEquals("{\"id\":\"1972664191\",\"name\":\"XieYu20011008\",\"token\":\"" +
                         Base64.encode("id=1972664191&name=XieYu20011008") +
                         "\"}")
-                .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
+                .assertHeaderEquals("Content-Type", "application/json;charset=UTF-8");
     }
 
 
@@ -1393,7 +1393,7 @@ public class TestGenericForestClient extends BaseClientTest {
         data.put("name", "XieYu20011008");
 
         Forest.post("http://localhost:{}/test", server.getPort())
-                .addHeader("Content-Type", "application/json; charset=UTF-8")
+                .addHeader("Content-Type", "application/json;charset=UTF-8")
                 .addHeader("_id", "20011008")
                 .addBody(data)
                 .addBody("token", req -> Base64.encode(req.body().encode()))
@@ -1403,7 +1403,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertBodyEquals("{\"id\":\"1972664191\",\"name\":\"XieYu20011008\",\"token\":\"" +
                         Base64.encode("{\"id\":\"1972664191\",\"name\":\"XieYu20011008\"}") +
                         "\"}")
-                .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
+                .assertHeaderEquals("Content-Type", "application/json;charset=UTF-8");
     }
 
 
@@ -1417,7 +1417,7 @@ public class TestGenericForestClient extends BaseClientTest {
         data.put("token", (Lazy<Object>) (req -> Base64.encode(req.body().encode())));
 
         Forest.post("http://localhost:{}/test", server.getPort())
-                .addHeader("Content-Type", "application/json; charset=UTF-8")
+                .addHeader("Content-Type", "application/json;charset=UTF-8")
                 .addHeader("_id", "20011008")
                 .addBody(data)
                 .execute();
@@ -1426,7 +1426,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertBodyEquals("{\"id\":\"1972664191\",\"name\":\"XieYu20011008\",\"token\":\"" +
                         Base64.encode("{\"id\":\"1972664191\",\"name\":\"XieYu20011008\"}") +
                         "\"}")
-                .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
+                .assertHeaderEquals("Content-Type", "application/json;charset=UTF-8");
     }
 
     public static class LazyData {
@@ -1475,7 +1475,7 @@ public class TestGenericForestClient extends BaseClientTest {
         data.setToken(req -> Base64.encode(req.body().encode()));
 
         Forest.post("http://localhost:{}/test", server.getPort())
-                .addHeader("Content-Type", "application/json; charset=UTF-8")
+                .addHeader("Content-Type", "application/json;charset=UTF-8")
                 .addHeader("_id", "20011008")
                 .addBody(data)
                 .execute();
@@ -1484,7 +1484,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertBodyEquals("{\"id\":\"1972664191\",\"name\":\"XieYu20011008\",\"token\":\"" +
                         Base64.encode("{\"id\":\"1972664191\",\"name\":\"XieYu20011008\"}") +
                         "\"}")
-                .assertHeaderEquals("Content-Type", "application/json; charset=UTF-8");
+                .assertHeaderEquals("Content-Type", "application/json;charset=UTF-8");
     }
 
 

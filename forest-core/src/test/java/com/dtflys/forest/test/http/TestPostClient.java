@@ -425,7 +425,7 @@ public class TestPostClient extends BaseClientTest {
         mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
-                .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
+                .assertHeaderEquals("Content-Type", "application/json;charset=utf-8")
                 .assertBodyEquals("{\"username\":\"foo\",\"password\":\"123456&&++===\",\"cn_name\":\"中文名\"}");
     }
 
@@ -439,7 +439,7 @@ public class TestPostClient extends BaseClientTest {
         mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
-                .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
+                .assertHeaderEquals("Content-Type", "application/json;charset=utf-8")
                 .assertBodyEquals("{\"username\":\"foo\",\"password\":\"123456&&++===\",\"cn_name\":\"中文名\"}");
     }
 
@@ -452,7 +452,7 @@ public class TestPostClient extends BaseClientTest {
         mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
-                .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
+                .assertHeaderEquals("Content-Type", "application/json;charset=utf-8")
                 .assertBodyEquals("{\"username\":\"foo\",\"password\":\"123456&&++===\",\"cn_name\":\"中文名\"}");
     }
 
@@ -465,7 +465,7 @@ public class TestPostClient extends BaseClientTest {
         mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
-                .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
+                .assertHeaderEquals("Content-Type", "application/json;charset=utf-8")
                 .assertBodyEquals("{\"username\":\"foo\",\"password\":\"123456&&++===\",\"cn_name\":\"中文名\"}");
     }
 
@@ -481,7 +481,7 @@ public class TestPostClient extends BaseClientTest {
 //        mockRequest(server)
 //                .assertMethodEquals("POST")
 //                .assertPathEquals("/json")
-//                .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
+//                .assertHeaderEquals("Content-Type", "application/json;charset=utf-8")
 //                .assertBodyEquals("{\"username\":\"foo\",\"password\":\"123456&&++===\",\"cn_name\":\"中文名\"}");
     }
 
@@ -498,7 +498,7 @@ public class TestPostClient extends BaseClientTest {
         mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
-                .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
+                .assertHeaderEquals("Content-Type", "application/json;charset=utf-8")
                 .assertBodyEquals("{\"username\":\"foo\",\"password\":\"123456&&++===\",\"cn_name\":\"中文名\"}");
     }
 
@@ -515,7 +515,7 @@ public class TestPostClient extends BaseClientTest {
         mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
-                .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
+                .assertHeaderEquals("Content-Type", "application/json;charset=utf-8")
                 .assertBodyEquals("{\"username\":\"foo\",\"password\":\"123456&&++===\",\"cn_name\":\"中文名\"}");
     }
 
@@ -532,7 +532,7 @@ public class TestPostClient extends BaseClientTest {
         mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
-                .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
+                .assertHeaderEquals("Content-Type", "application/json;charset=utf-8")
                 .assertBodyEquals("{\"username\":\"foo\",\"password\":\"123456&&++===\",\"cn_name\":\"null\"}");
     }
 
@@ -550,7 +550,7 @@ public class TestPostClient extends BaseClientTest {
         mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
-                .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
+                .assertHeaderEquals("Content-Type", "application/json;charset=utf-8")
                 .assertBodyEquals("{\"username\":\"foo\",\"password\":\"123456&&++===\"}");
     }
 
@@ -567,7 +567,7 @@ public class TestPostClient extends BaseClientTest {
         mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
-                .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
+                .assertHeaderEquals("Content-Type", "application/json;charset=utf-8")
                 .assertBodyEquals("{\"username\":\"foo\",\"password\":\"123456&&++===\"}");
     }
 
@@ -582,7 +582,7 @@ public class TestPostClient extends BaseClientTest {
         mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
-                .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
+                .assertHeaderEquals("Content-Type", "application/json;charset=utf-8")
                 .assertBodyEquals("{\"username\":\"foo\",\"password\":\"123456&&++===\",\"cn_name\":\"中文名\"}");
     }
 
@@ -596,7 +596,7 @@ public class TestPostClient extends BaseClientTest {
         mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
-                .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
+                .assertHeaderEquals("Content-Type", "application/json;charset=utf-8")
                 .assertBodyEquals("{\"username\":\"foo\",\"password\":\"123456&&++===\",\"cn_name\":\"中文名\"}");
     }
 
@@ -610,7 +610,7 @@ public class TestPostClient extends BaseClientTest {
         mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
-                .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
+                .assertHeaderEquals("Content-Type", "application/json;charset=utf-8")
                 .assertBodyEquals("{\"username\":\"foo\",\"password\":\"123456&&++===\",\"cn_name\":\"中文名\"}");
     }
 
@@ -745,7 +745,7 @@ public class TestPostClient extends BaseClientTest {
         Mockito.verify(logger, Mockito.never()).info("[Forest] Request (" + configuration.getBackend().getName() + "): \n" +
                 "\tPOST http://localhost:" + server.getPort() + "/json HTTP\n" +
                 "\tHeaders: \n" +
-                "\t\tContent-Type: application/json; charset=utf-8\n" +
+                "\t\tContent-Type: application/json;charset=utf-8\n" +
                 "\tBody: [{\"userList\":[{\"username\":\"foo\"}]}]");
         Mockito.verify(logger).info("[Forest] Response Content:\n\t" + EXPECTED);
     }
@@ -913,7 +913,7 @@ public class TestPostClient extends BaseClientTest {
         mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
-                .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
+                .assertHeaderEquals("Content-Type", "application/json;charset=utf-8")
                 .assertBodyEquals("[{\"userList\":[{\"username\":\"foo\"}]}]");
     }
 
@@ -932,7 +932,7 @@ public class TestPostClient extends BaseClientTest {
         mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
-                .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
+                .assertHeaderEquals("Content-Type", "application/json;charset=utf-8")
                 .assertBodyEquals("[{\"userList\":[{\"username\":\"foo\"}]}]");
     }
 
@@ -949,7 +949,7 @@ public class TestPostClient extends BaseClientTest {
         mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
-                .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
+                .assertHeaderEquals("Content-Type", "application/json;charset=utf-8")
                 .assertBodyEquals("{\"userList\":[{\"username\":\"foo\"}]}");
     }
 
@@ -966,7 +966,7 @@ public class TestPostClient extends BaseClientTest {
         mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
-                .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
+                .assertHeaderEquals("Content-Type", "application/json;charset=utf-8")
                 .assertBodyEquals("{\"userList\":[{\"username\":\"foo\"}]}");
     }
 
@@ -979,7 +979,7 @@ public class TestPostClient extends BaseClientTest {
         mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
-                .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
+                .assertHeaderEquals("Content-Type", "application/json;charset=utf-8")
                 .assertBodyEquals("{\"userList\":[{\"username\":\"foo\"}]}");
     }
 
@@ -996,7 +996,7 @@ public class TestPostClient extends BaseClientTest {
         mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
-                .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
+                .assertHeaderEquals("Content-Type", "application/json;charset=utf-8")
                 .assertBodyEquals("{\"name\":\"test\",\"data\":[\"A\",\"B\",\"C\"]}");
     }
 
@@ -1010,7 +1010,7 @@ public class TestPostClient extends BaseClientTest {
         mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
-                .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
+                .assertHeaderEquals("Content-Type", "application/json;charset=utf-8")
                 .assertBodyEquals("{\"name\":\"test\",\"data\":[\"A\",\"B\",\"C\"]}");
     }
 
@@ -1023,7 +1023,7 @@ public class TestPostClient extends BaseClientTest {
         mockRequest(server)
                 .assertMethodEquals("POST")
                 .assertPathEquals("/json")
-                .assertHeaderEquals("Content-Type", "application/json; charset=utf-8")
+                .assertHeaderEquals("Content-Type", "application/json;charset=utf-8")
                 .assertBodyEquals("{\"name\":\"test\",\"data\":[\"A\",\"B\",\"C\"]}");
     }
 
