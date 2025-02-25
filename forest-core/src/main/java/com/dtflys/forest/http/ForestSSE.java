@@ -622,12 +622,23 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
     }
     
     private void doOnMessage(EventSource eventSource, String name, String value) {
+        final List<Interceptor> interceptors = eventSource.request().getInterceptorChain().getInterceptors();
+        for (Interceptor interceptor : interceptors) {
+            if (interceptor instanceof SSEInterceptor) {
+                SSEInterceptor sseInterceptor = (SSEInterceptor) interceptor;
+                sseInterceptor.onMessage(eventSource);
+                sseInterceptor.onMessage(eventSource, name, value);
+            }
+        }
+
+        onMessage(eventSource);
+        onMessage(eventSource, name, value);
+
         if (onMessageConsumer != null) {
             onMessageConsumer.onMessage(eventSource);
             if (state != SSEState.LISTENING || SSEMessageResult.CLOSE.equals(eventSource.messageResult())) {
                 return;
             }
-            onMessage(eventSource, name, value);
         }
     }
     
@@ -635,13 +646,22 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
     /**
      * 消息回调函数：在接收到 SSE 消息后调用
      * 
-     * @param eventSource 消息源
+     * @param event 消息源
      * @param name 名称
      * @param value 值
      * @since 1.6.0
      */
     @Override
-    public void onMessage(EventSource eventSource, String name, String value) {
+    public void onMessage(EventSource event, String name, String value) {
+    }
+
+    /**
+     * 消息回调函数：在接收到 SSE 消息后调用
+     * 
+     * @param event 消息源
+     * @since 1.6.4
+     */
+    public void onMessage(EventSource event) {
     }
 
     /**
@@ -740,7 +760,7 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
         while ((line = reader.readLine()) != null) {
             if (StringUtils.isBlank(line)) {
                 if (lastEventSource != null) {
-                    doOnMessage(lastEventSource, lastEventSource.name(), line);
+                    doOnMessage(lastEventSource, lastEventSource.name(), lastEventSource.value());
                     lastEventSource = null;
                     eventList = new SSEEventList(this, request, response);
                 }

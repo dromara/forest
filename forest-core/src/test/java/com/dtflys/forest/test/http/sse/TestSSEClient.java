@@ -2,10 +2,12 @@ package com.dtflys.forest.test.http.sse;
 
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestSSE;
+import com.dtflys.forest.sse.SSELinesMode;
 import com.dtflys.forest.test.model.Contact;
 import com.dtflys.forest.test.model.TestUser;
 import com.dtflys.forest.test.sse.MySSEHandler;
 import com.dtflys.forest.test.http.BaseClientTest;
+import com.dtflys.forest.test.sse.MySSEHandler2;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.Rule;
@@ -93,6 +95,41 @@ public class TestSSEClient extends BaseClientTest {
     }
 
     @Test
+    public void testSSE_withCustomClass2() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(
+                "\n\n" +
+                "id:1\n" +
+                "event:user\n" +
+                "data:{\"name\": \"Peter\", \"age\": 10}\n" +
+                "\n" +
+                "id:2\n" +
+                "event:user\n" +
+                "data:{\"name\": \"Marry\", \"age\": 9}\n" +
+                "\n" +
+                "id:3\n" +
+                "event:user\n" +
+                "data:{\"name\": \"Steven\", \"age\": 12}\n" +
+                "\n"
+        ));
+
+        MySSEHandler2 sse = sseClient.testSSE_withCustomClass2().listen();
+
+        System.out.println(sse.getStringBuffer());
+        assertThat(sse.getStringBuffer().toString()).isEqualTo(
+                "id => 1\n" +
+                "event => user\n" +
+                "data => {\"name\": \"Peter\", \"age\": 10}\n" +
+                "id => 2\n" +
+                "event => user\n" +
+                "data => {\"name\": \"Marry\", \"age\": 9}\n" +
+                "id => 3\n" +
+                "event => user\n" +
+                "data => {\"name\": \"Steven\", \"age\": 12}\n"
+        );
+    }
+
+
+    @Test
     public void testSSE_withInterceptor() {
         server.enqueue(new MockResponse().setResponseCode(200).setBody(
                 "data:start\n" +
@@ -102,7 +139,7 @@ public class TestSSEClient extends BaseClientTest {
                 "data:dont show"
         ));
 
-        ForestSSE sse = sseClient.testSSE_withInterceptor().listen();
+        ForestSSE sse = sseClient.testSSE_withInterceptor().listen(SSELinesMode.SINGLE_LINE);
 
         System.out.println(sse.getRequest().getAttachment("text"));
         assertThat(sse.getRequest().getAttachment("text").toString()).isEqualTo(
@@ -114,6 +151,41 @@ public class TestSSEClient extends BaseClientTest {
                 "name: Peter; age: 18; phone: 12345678\n" +
                 "receive close --- close\n" +
                 "MySSEInterceptor onSSEClose"
+        );
+    }
+
+
+    @Test
+    public void testSSE_withInterceptor2() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(
+                "\n\n" +
+                "id:1\n" +
+                "event:user\n" +
+                "data:{\"name\": \"Peter\", \"age\": 10}\n" +
+                "\n" +
+                "id:2\n" +
+                "event:user\n" +
+                "data:{\"name\": \"Marry\", \"age\": 9}\n" +
+                "\n" +
+                "id:3\n" +
+                "event:user\n" +
+                "data:{\"name\": \"Steven\", \"age\": 12}\n" +
+                "\n"
+        ));
+
+        ForestSSE sse = sseClient.testSSE_withInterceptor2().listen();
+
+        System.out.println(sse.getRequest().getAttachment("text"));
+        assertThat(sse.getRequest().getAttachment("text").toString()).isEqualTo(
+                "id => 1\n" +
+                "event => user\n" +
+                "data => {\"name\": \"Peter\", \"age\": 10}\n" +
+                "id => 2\n" +
+                "event => user\n" +
+                "data => {\"name\": \"Marry\", \"age\": 9}\n" +
+                "id => 3\n" +
+                "event => user\n" +
+                "data => {\"name\": \"Steven\", \"age\": 12}\n"
         );
     }
 
