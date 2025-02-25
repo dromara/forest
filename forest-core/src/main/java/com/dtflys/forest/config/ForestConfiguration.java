@@ -1999,19 +1999,42 @@ public class ForestConfiguration implements Serializable {
      * @param url 请求 URL
      * @return {@link ForestRequest} 对象
      */
+    public ForestRequest<?> get(String url) {
+        return get(url, null);
+    }
+
+
+    /**
+     * 创建 GET 请求的 {@link ForestRequest} 对象
+     *
+     * @param url 请求 URL
+     * @param args 字符串模板渲染参数数组
+     * @return {@link ForestRequest} 对象
+     */
     public ForestRequest<?> get(String url, Object ...args) {
         return request()
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.GET)
                 .setUrl(url, args);
-
     }
 
     /**
      * 创建 POST 请求的 {@link ForestRequest} 对象
      *
      * @param url 请求 URL
+     * @return {@link ForestRequest} 对象
+     */
+    public ForestRequest<?> post(String url) {
+        return post(url, null);
+    }
+
+
+    /**
+     * 创建 POST 请求的 {@link ForestRequest} 对象
+     *
+     * @param url 请求 URL
+     * @param args 字符串模板渲染参数数组
      * @return {@link ForestRequest} 对象
      */
     public ForestRequest<?> post(String url, Object ...args) {
@@ -2028,13 +2051,23 @@ public class ForestConfiguration implements Serializable {
      * @param url 请求 URL
      * @return {@link ForestRequest} 对象
      */
+    public ForestRequest<?> put(String url) {
+        return put(url, null);
+    }
+
+    /**
+     * 创建 PUT 请求的 {@link ForestRequest} 对象
+     *
+     * @param url 请求 URL
+     * @param args 字符串模板渲染参数数组
+     * @return {@link ForestRequest} 对象
+     */
     public ForestRequest<?> put(String url, Object ...args) {
         return request()
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.PUT)
                 .setUrl(url, args);
-
     }
 
     /**
@@ -2043,13 +2076,23 @@ public class ForestConfiguration implements Serializable {
      * @param url 请求 URL
      * @return {@link ForestRequest} 对象
      */
+    public ForestRequest<?> delete(String url) {
+        return delete(url, null);
+    }
+
+    /**
+     * 创建 DELETE 请求的 {@link ForestRequest} 对象
+     *
+     * @param url 请求 URL
+     * @param args 字符串模板渲染参数数组
+     * @return {@link ForestRequest} 对象
+     */
     public ForestRequest<?> delete(String url, Object ...args) {
         return request()
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.DELETE)
                 .setUrl(url, args);
-
     }
 
     /**
@@ -2058,19 +2101,40 @@ public class ForestConfiguration implements Serializable {
      * @param url 请求 URL
      * @return {@link ForestRequest} 对象
      */
+    public ForestRequest<?> head(String url) {
+        return head(url, null);
+    }
+
+    /**
+     * 创建 HEAD 请求的 {@link ForestRequest} 对象
+     *
+     * @param url 请求 URL
+     * @param args 字符串模板渲染参数数组
+     * @return {@link ForestRequest} 对象
+     */
     public ForestRequest<?> head(String url, Object ...args) {
         return request()
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.HEAD)
                 .setUrl(url, args);
-
     }
 
     /**
      * 创建 PATCH 请求的 {@link ForestRequest} 对象
      *
      * @param url 请求 URL
+     * @return {@link ForestRequest} 对象
+     */
+    public ForestRequest<?> patch(String url) {
+        return patch(url, null);
+    }
+
+    /**
+     * 创建 PATCH 请求的 {@link ForestRequest} 对象
+     *
+     * @param url 请求 URL
+     * @param args 字符串模板渲染参数数组
      * @return {@link ForestRequest} 对象
      */
     public ForestRequest<?> patch(String url, Object ...args) {
@@ -2087,19 +2151,40 @@ public class ForestConfiguration implements Serializable {
      * @param url 请求 URL
      * @return {@link ForestRequest} 对象
      */
+    public ForestRequest<?> options(String url) {
+        return options(url, null);
+    }
+
+    /**
+     * 创建 OPTIONS 请求的 {@link ForestRequest} 对象
+     *
+     * @param url 请求 URL
+     * @param args 字符串模板渲染参数数组
+     * @return {@link ForestRequest} 对象
+     */
     public ForestRequest<?> options(String url, Object ...args) {
         return request()
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.OPTIONS)
                 .setUrl(url, args);
-
     }
 
     /**
      * 创建 TRACE 请求的 {@link ForestRequest} 对象
      *
      * @param url 请求 URL
+     * @return {@link ForestRequest} 对象
+     */
+    public ForestRequest<?> trace(String url) {
+        return trace(url, null);
+    }
+
+    /**
+     * 创建 TRACE 请求的 {@link ForestRequest} 对象
+     *
+     * @param url 请求 URL
+     * @param args 字符串模板渲染参数数组
      * @return {@link ForestRequest} 对象
      */
     public ForestRequest<?> trace(String url, Object ...args) {
