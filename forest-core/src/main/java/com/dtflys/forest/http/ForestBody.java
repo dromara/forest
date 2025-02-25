@@ -16,6 +16,8 @@ import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.Validations;
 
+import java.io.File;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -181,6 +183,127 @@ public class ForestBody implements List<ForestRequestBody> {
     public List<ObjectRequestBody> getObjectItems() {
         return getItems(ObjectRequestBody.class);
     }
+
+    /**
+     * 根据类型获取Body中的对象实例
+     * 
+     * @param objectClass 对象类型
+     * @return 对象实例
+     * @param <T> 对象类型泛型
+     * @since 1.6.4
+     */
+    public <T> T get(Class<T> objectClass) {
+        return getOpt(objectClass).orElse(null);
+    }
+
+    /**
+     * 根据类型获取Body中的对象的可空Optional实例
+     * 
+     * @param objectClass 对象类型
+     * @return 对象的可空Optional实例
+     * @param <T> 对象类型泛型
+     * @since 1.6.4
+     */
+    public <T> Optional<T> getOpt(Class<T> objectClass) {
+        for (final ForestRequestBody item : bodyItems) {
+            if (CharSequence.class.isAssignableFrom(objectClass)) {
+                if (item instanceof StringRequestBody) {
+                    return Optional.ofNullable(objectClass.cast(((StringRequestBody) item).getContent()));
+                }
+            }
+            if (byte[].class.isAssignableFrom(objectClass)) {
+                if (item instanceof ByteArrayRequestBody) {
+                    return Optional.ofNullable(objectClass.cast(item.getByteArray()));
+                }
+            }
+            if (InputStream.class.isAssignableFrom(objectClass)) {
+                if (item instanceof InputStreamRequestBody) {
+                    return Optional.ofNullable(objectClass.cast(((InputStreamRequestBody) item).getInputStream()));
+                }
+            }
+            if (File.class.isAssignableFrom(objectClass)) {
+                if (item instanceof FileRequestBody) {
+                    return Optional.ofNullable(objectClass.cast(((FileRequestBody) item).getFile()));
+                }
+            }
+            if (ForestRequestBody.class.isAssignableFrom(objectClass)) {
+                if (objectClass.isAssignableFrom(ForestRequestBody.class)) {
+                    return Optional.ofNullable(objectClass.cast(item));
+                }
+            }
+            if (item instanceof ObjectRequestBody) {
+                if (objectClass.isAssignableFrom(((ObjectRequestBody) item).getObjectClass())) {
+                    return Optional.ofNullable(((ObjectRequestBody) item).getObject(objectClass));
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * 根据类型获取Body中的对象实例列表
+     * 
+     * @param objectClass 对象类型
+     * @return 对象实例列表
+     * @param <T> 对象类型泛型
+     * @since 1.6.4
+     */
+    public <T> List<T> getList(Class<T> objectClass) {
+        final List<T> list = new LinkedList<>();
+        for (final ForestRequestBody item : bodyItems) {
+            if (CharSequence.class.isAssignableFrom(objectClass)) {
+                if (item instanceof StringRequestBody) {
+                    final T obj = objectClass.cast(((StringRequestBody) item).getContent());
+                    if (obj != null) {
+                        list.add(obj);
+                    }
+                }
+            }
+            if (byte[].class.isAssignableFrom(objectClass)) {
+                if (item instanceof ByteArrayRequestBody) {
+                    final T obj = objectClass.cast(item.getByteArray());
+                    if (obj != null) {
+                        list.add(obj);
+                    }
+                }
+            }
+            if (InputStream.class.isAssignableFrom(objectClass)) {
+                if (item instanceof InputStreamRequestBody) {
+                    final T obj = objectClass.cast(((InputStreamRequestBody) item).getInputStream());
+                    if (obj != null) {
+                        list.add(obj);
+                    }
+                }
+            }
+            if (File.class.isAssignableFrom(objectClass)) {
+                if (item instanceof FileRequestBody) {
+                    final T obj = objectClass.cast(((FileRequestBody) item).getFile());
+                    if (obj != null) {
+                        list.add(obj);
+                    }
+                }
+            }
+            if (ForestRequestBody.class.isAssignableFrom(objectClass)) {
+                if (objectClass.isAssignableFrom(ForestRequestBody.class)) {
+                    final T obj = objectClass.cast(item);
+                    if (obj != null) {
+                        list.add(obj);
+                    }
+                }
+            }
+
+            if (item instanceof ObjectRequestBody) {
+                if (objectClass.isAssignableFrom(((ObjectRequestBody) item).getObjectClass())) {
+                    final T obj = ((ObjectRequestBody) item).getObject(objectClass);
+                    if (obj != null) {
+                        list.add(obj);
+                    }
+                }
+            }
+        }
+        return list;
+    }
+
 
     public List<ByteArrayRequestBody> getByteArrayItems() {
         return getItems(ByteArrayRequestBody.class);

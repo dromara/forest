@@ -45,7 +45,6 @@ import com.dtflys.forest.utils.URLUtils;
 import com.google.common.collect.Lists;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.Option;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okio.Buffer;
@@ -1229,10 +1228,10 @@ public class TestGenericForestClient extends BaseClientTest {
         data.put("c", (Lazy<Object>) (req -> "3"));
         data.put("token", (Lazy<Object>) (req -> Base64.encode(req.getQueryString())));
 
-        Forest.get("/")
+        ForestRequest request = Forest.get("/")
                 .port(server.getPort())
-                .addQuery(data)
-                .execute();
+                .addQuery(data);
+        request.execute();
 
         mockRequest(server)
                 .assertPathEquals("/")
@@ -1249,6 +1248,11 @@ public class TestGenericForestClient extends BaseClientTest {
                 .port(server.getPort())
                 .bodyType(ForestDataType.JSON)
                 .addBody(param);
+        
+        UserParam fromBody = request.body().get(UserParam.class);
+        assertThat(fromBody).isNotNull();
+        assertThat(fromBody.getUsername()).isEqualTo(param.getUsername());
+        
         System.out.println(request.body()
                 .encodeToString(
                         ConvertOptions.defaultOptions()
@@ -2636,6 +2640,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 "SSE Close"
         );
     }
+    
 
     @Test
     public void testAsyncSSE() {
@@ -2725,9 +2730,91 @@ public class TestGenericForestClient extends BaseClientTest {
             "receive close --- close\n" +
             "SSE Close"
         );
-
     }
-    
+
+    @Test
+    public void testSSE_withOnMessage() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(
+                "{\"name\": \"a\"}\n" +
+                "{\"name\": \"b\"}\n" +
+                "{\"name\": \"c\"}\n"
+        ));
+        
+        final StringBuffer buffer = new StringBuffer();
+
+        Forest.get("http://localhost:{}/sse", server.getPort())
+                .sse()
+                .setOnMessage(event -> {
+                    buffer.append("--------------\n");
+                    buffer.append("id => ").append(event.id()).append("\n");
+                    buffer.append("event => ").append(event.event()).append("\n");
+                    buffer.append("data => ").append(event.data()).append("\n");
+                })
+                .listen();
+        
+        System.out.println(buffer);
+        
+        assertThat(buffer.toString()).isEqualTo(
+                "--------------\n" +
+                "id => 1\n" +
+                "event => json\n" +
+                "data => {\"name\": \"a\"}\n" +
+                "--------------\n" +
+                "id => 2\n" +
+                "event => json\n" +
+                "data => {\"name\": \"b\"}\n" +
+                "--------------\n" +
+                "id => 3\n" +
+                "event => json\n" +
+                "data => {\"name\": \"c\"}\n");
+    }
+
+    @Test
+    public void testSSE_withPureJSON() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(
+                "id:1\n" +
+                        "event:json\n" +
+                        "data:{\"name\": \"a\"}\n" +
+                        "\n" +
+                        "id:2\n" +
+                        "event:json\n" +
+                        "data:{\"name\": \"b\"}\n" +
+                        "\n" +
+                        "id:3\n" +
+                        "event:json\n" +
+                        "data:{\"name\": \"c\"}\n"
+        ));
+
+        final StringBuffer buffer = new StringBuffer();
+
+        Forest.get("http://localhost:{}/sse", server.getPort())
+                .sse()
+                .setOnMessage(event -> {
+                    buffer.append("--------------\n");
+                    buffer.append("id => ").append(event.id()).append("\n");
+                    buffer.append("event => ").append(event.event()).append("\n");
+                    buffer.append("data => ").append(event.data()).append("\n");
+                })
+                .listen();
+
+        System.out.println(buffer);
+
+        assertThat(buffer.toString()).isEqualTo(
+                "--------------\n" +
+                        "id => 1\n" +
+                        "event => json\n" +
+                        "data => {\"name\": \"a\"}\n" +
+                        "--------------\n" +
+                        "id => 2\n" +
+                        "event => json\n" +
+                        "data => {\"name\": \"b\"}\n" +
+                        "--------------\n" +
+                        "id => 3\n" +
+                        "event => json\n" +
+                        "data => {\"name\": \"c\"}\n");
+    }
+
+
     @Test
     public void testJsonpath_single_data() {
         server.enqueue(new MockResponse().setResponseCode(200).setBody(EXPECTED_SINGLE_USER));
