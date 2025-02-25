@@ -1396,12 +1396,18 @@ public class TestGenericForestClient extends BaseClientTest {
         data.put("id", "1972664191");
         data.put("name", "XieYu20011008");
 
-        Forest.post("http://localhost:{}/test", server.getPort())
+        ForestRequest request = Forest.post("http://localhost:{}/test", server.getPort())
                 .addHeader("Content-Type", "application/json;charset=UTF-8")
                 .addHeader("_id", "20011008")
                 .addBody(data)
-                .addBody("token", req -> Base64.encode(req.body().encode()))
-                .execute();
+                .addBody("token", req -> Base64.encode(req.body().encode()));
+        
+        Map fromBody = request.body().get(Map.class);
+        assertThat(fromBody).isNotNull();
+        assertThat(fromBody.get("id")).isEqualTo("1972664191");
+        assertThat(fromBody.get("name")).isEqualTo("XieYu20011008");
+
+        request.execute();
 
         mockRequest(server)
                 .assertBodyEquals("{\"id\":\"1972664191\",\"name\":\"XieYu20011008\",\"token\":\"" +
@@ -1497,10 +1503,15 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         String body = "xxxxxxxyyyyyyy";
         byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
-        String result = Forest.post("http://localhost:{}", server.getPort())
+        ForestRequest request = Forest.post("http://localhost:{}", server.getPort())
                 .contentTypeJson()
-                .addBody(bytes)
-                .execute(String.class);
+                .addBody(bytes);
+
+        byte[] fromBody = request.body().get(byte[].class);
+        assertThat(fromBody).isNotNull();
+        assertThat(fromBody).isEqualTo(bytes);
+        
+        String result = request.executeAsString();
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
         mockRequest(server)
                 .assertBodyEquals("xxxxxxxyyyyyyy");

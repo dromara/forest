@@ -37,6 +37,10 @@ public class ObjectRequestBody extends ForestRequestBody implements SupportFormU
     public Object getObject() {
         return object;
     }
+    
+    public <T> T getObject(Class<T> clazz) {
+        return clazz.cast(object);
+    }
 
 
     public void setObject(Object object) {
@@ -75,6 +79,15 @@ public class ObjectRequestBody extends ForestRequestBody implements SupportFormU
         }
         return toString().getBytes();
     }
+    
+    public Class getObjectClass() {
+        if (object == null) {
+            return null;
+        }
+        return object.getClass();
+    }
+    
+    
 
     @Override
     public ForestDataType getDefaultBodyType() {
