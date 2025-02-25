@@ -822,8 +822,13 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
         }
     }
 
-
-
+    /**
+     * 开始对 SSE 数据流进行监听
+     *
+     * @return SSE 控制器自身对象
+     * @param <R> 自身类型
+     * @since 1.6.0
+     */
     @Override
     public <R extends ForestSSE> R listen() {
         return listen(SSELinesMode.AUTO);
@@ -834,7 +839,7 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
      * 
      * @return SSE 控制器自身对象
      * @param <R> 自身类型
-     * @since 1.6.0
+     * @since 1.6.4
      */
     public <R extends ForestSSE> R listen(SSELinesMode mode) {
         final boolean isAsync = this.request.isAsync();
@@ -886,21 +891,48 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
      */
     @Override
     public <R extends ForestSSE> R asyncListen() {
-         completableFuture = CompletableFuture.supplyAsync(this::listen);
+        return asyncListen(SSELinesMode.AUTO);
+    }
+
+    /**
+     * 开始对 SSE 事件流进行异步监听
+     *
+     * @param linesMode 行模式
+     * @return ForestSSEListener 或其子类对象
+     * @param <R> 自身类型
+     * @since 1.6.4
+     */
+    @Override
+    public <R extends ForestSSE> R asyncListen(SSELinesMode linesMode) {
+        completableFuture = CompletableFuture.supplyAsync(() -> listen(linesMode));
         return (R) this;
     }
 
     /**
-     * 开始对 SSE 数据流在线程池中进行异步监听
-     * 
+     * 开始对 SSE 事件流在线程池中进行异步监听
+     *
      * @param pool 线程池
-     * @return SSE 控制器自身对象
+     * @return ForestSSEListener 或其子类对象
      * @param <R> 自身类型
      * @since 1.6.0
      */
     @Override
     public <R extends ForestSSE> R asyncListen(ExecutorService pool) {
-        completableFuture = CompletableFuture.supplyAsync(this::listen, pool);
+        return asyncListen(SSELinesMode.AUTO, pool);
+    }
+
+    /**
+     * 开始对 SSE 数据流在线程池中进行异步监听
+     *
+     * @param linesMode 行模式
+     * @param pool 线程池
+     * @return SSE 控制器自身对象
+     * @param <R> 自身类型
+     * @since 1.6.4
+     */
+    @Override
+    public <R extends ForestSSE> R asyncListen(SSELinesMode linesMode, ExecutorService pool) {
+        completableFuture = CompletableFuture.supplyAsync(() -> listen(linesMode), pool);
         return (R) this;
     }
 
