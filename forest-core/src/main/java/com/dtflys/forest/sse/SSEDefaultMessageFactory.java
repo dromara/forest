@@ -4,6 +4,11 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestSSE;
 import com.dtflys.forest.utils.StringUtils;
 
+/**
+ * 默认 SSE 消息工厂
+ * 
+ * @since 1.6.4
+ */
 public class SSEDefaultMessageFactory implements SSEMessageFactory {
     
     @Override
