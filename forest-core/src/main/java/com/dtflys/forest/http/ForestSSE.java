@@ -12,9 +12,14 @@ import com.dtflys.forest.interceptor.SSEInterceptor;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
 import com.dtflys.forest.sse.EventSource;
 import com.dtflys.forest.sse.ForestSSEListener;
+import com.dtflys.forest.sse.SSEDefaultMessageFactory;
+import com.dtflys.forest.sse.SSELinesMode;
+import com.dtflys.forest.sse.SSEEventList;
 import com.dtflys.forest.sse.SSEMessageConsumer;
+import com.dtflys.forest.sse.SSEMessageFactory;
 import com.dtflys.forest.sse.SSEMessageMethod;
 import com.dtflys.forest.sse.SSEMessageResult;
+import com.dtflys.forest.sse.SSEOnMessage;
 import com.dtflys.forest.sse.SSEState;
 import com.dtflys.forest.sse.SSEStringMessageConsumer;
 import com.dtflys.forest.utils.ForestDataType;
@@ -56,6 +61,10 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
 
     private Map<String, List<SSEStringMessageConsumer>> consumerMap = new ConcurrentHashMap<>();
     
+    private SSEOnMessage onMessageConsumer;
+    
+    private SSEMessageFactory messageFactory;
+    
     private volatile CompletableFuture<? extends ForestSSE> completableFuture;
 
 
@@ -96,6 +105,30 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
             }
             registerMethodArray(this, methods);
         }
+    }
+
+    /**
+     * 设置 SSE 消息工厂对象
+     * 
+     * @param messageFactory SSE 消息工厂对象实例
+     * @return SSE 控制器自身对象
+     * @since 1.6.4
+     */
+    public ForestSSE messageFactory(SSEMessageFactory messageFactory) {
+        this.messageFactory = messageFactory;
+        return this;
+    }
+
+    /**
+     * 设置 SSE 消息工厂对象类型
+     * 
+     * @param clazz SSE 消息工厂对象类型
+     * @return SSE 控制器自身对象
+     * @since 1.6.4
+     */
+    public ForestSSE messageFactory(Class<? extends SSEMessageFactory> clazz) {
+        this.messageFactory = request.getConfiguration().getForestObject(clazz, true);
+        return this;
     }
 
     /**
@@ -320,6 +353,11 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
      */
     public ForestSSE setOnClose(Consumer<EventSource> onCloseConsumer) {
         this.onCloseConsumer = onCloseConsumer;
+        return this;
+    }
+
+    public ForestSSE setOnMessage(SSEOnMessage onMessageConsumer) {
+        this.onMessageConsumer = onMessageConsumer;
         return this;
     }
 
@@ -567,7 +605,7 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
     }
     
     
-    private void doOnMessage(EventSource eventSource, String name, String value) {
+    private void doOnReceiveEventSource(SSEEventList event, EventSource eventSource, String name, String value) {
         final List<SSEStringMessageConsumer> consumers = consumerMap.get(name);
         if (CollectionUtil.isEmpty(consumers)) {
             return;
@@ -580,12 +618,19 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
             if (state != SSEState.LISTENING || SSEMessageResult.CLOSE.equals(eventSource.messageResult())) {
                 return;
             }
-            onMessage(eventSource, name, value);
+        }
+    }
+    
+    private void doOnMessage(EventSource eventSource, String name, String value) {
+        if (onMessageConsumer != null) {
+            onMessageConsumer.onMessage(eventSource);
             if (state != SSEState.LISTENING || SSEMessageResult.CLOSE.equals(eventSource.messageResult())) {
                 return;
             }
+            onMessage(eventSource, name, value);
         }
     }
+    
 
     /**
      * 消息回调函数：在接收到 SSE 消息后调用
@@ -618,18 +663,151 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
      * @param line 字符串行
      * @return {@link EventSource}事件源对象
      */
-    private EventSource parseEventSource(ForestResponse response, String line) {
-        final String[] group = line.split("\\:", 2);
-        if (group.length == 1) {
-            return new EventSource(this, "", request, response, line, line);
-        }
-        final String name = group[0].trim();
-        final String data = StringUtils.trimBegin(group[1]);
-        return new EventSource(this, name, request, response, line, data);
+    private EventSource parseEventSource(SSEEventList eventList, ForestResponse response, String line) {
+        return messageFactory.createEventSource(eventList, this, response, line);
     }
     
+    private void decodeLines(final SSELinesMode mode, final ForestResponse<InputStream> response, final InputStream in, final String charset) {
+        switch (mode) {
+            case SINGLE_LINE:
+                decodeLinesWithSingleLineMode(response, in ,charset);
+                break;
+            case MULTI_LINES:
+                decodeLinesWithMultiLinesMode(response, in ,charset);
+                break;
+            case AUTO:
+                decodeLinesWithAutoMode(response, in ,charset);
+                break;
+        }
+    }
     
+    protected void decodeLinesWithAutoMode(final ForestResponse<InputStream> response, final InputStream in, final String charset) {
+        String line = null;
+        EventSource lastEventSource = null;
 
+        try {
+            final InputStreamReader isr = new InputStreamReader(in, charset);
+            final BufferedReader reader = new BufferedReader(isr);
+
+            line = reader.readLine();
+            // 忽略开头的空白行
+            if (StringUtils.isBlank(line)) {
+                do {
+                    line = reader.readLine();
+                } while (StringUtils.isBlank(line));
+            }
+
+            final char firstChar = line.charAt(0);
+            // 检测第一行的第一个字符
+            if (firstChar == '[' || firstChar == '{' || firstChar == '<' || firstChar == '"' || firstChar == '\'' ) {
+                if (StringUtils.isNotBlank(line)) {
+                    final EventSource eventSource = parseEventSource(null, response, line);
+                    doOnMessage(eventSource, eventSource.name(), line);
+                    doOnReceiveEventSource(null, eventSource, eventSource.name(), eventSource.value());
+                    if (SSEState.LISTENING != state) {
+                        return;
+                    }
+                }
+                readSingleLine(response, reader);
+            } else {
+                SSEEventList eventList = new SSEEventList(this, request, response);
+                if (StringUtils.isNotBlank(line)) {
+                    final EventSource eventSource = parseEventSource(eventList, response, line);
+                    doOnReceiveEventSource(eventList, eventSource, eventSource.name(), eventSource.value());
+                    lastEventSource = eventSource;
+                    if (SSEState.LISTENING != state) {
+                        return;
+                    }
+                }
+                lastEventSource = readMultiLines(eventList, response, reader);
+            }
+        } catch (IOException e) {
+            throw new ForestRuntimeException(e);
+        } finally {
+            if (lastEventSource != null) {
+                doOnMessage(lastEventSource, lastEventSource.name(), lastEventSource.rawData());
+            }
+            final EventSource closeEventSource = new EventSource(null, this, "close", request, response);
+            doOnClose(closeEventSource);
+        }
+    }
+    
+    protected EventSource readMultiLines(SSEEventList eventList, final ForestResponse<InputStream> response, final BufferedReader reader) throws IOException {
+        String line = null;
+        EventSource lastEventSource = null;
+        eventList = eventList == null ? new SSEEventList(this, request, response) : eventList;
+        
+        while ((line = reader.readLine()) != null) {
+            if (StringUtils.isBlank(line)) {
+                if (lastEventSource != null) {
+                    doOnMessage(lastEventSource, lastEventSource.name(), line);
+                    lastEventSource = null;
+                    eventList = new SSEEventList(this, request, response);
+                }
+                continue;
+            }
+            final EventSource eventSource = parseEventSource(eventList, response, line);
+            doOnReceiveEventSource(eventList, eventSource, eventSource.name(), eventSource.value());
+            lastEventSource = eventSource;
+            if (SSEState.LISTENING != state) {
+                break;
+            }
+        }
+        return lastEventSource;
+    }
+
+    protected void decodeLinesWithMultiLinesMode(final ForestResponse<InputStream> response, final InputStream in, final String charset) {
+        EventSource lastEventSource = null;
+
+        try {
+            final InputStreamReader isr = new InputStreamReader(in, charset);
+            final BufferedReader reader = new BufferedReader(isr);
+            lastEventSource = readMultiLines(null, response, reader);
+        } catch (IOException e) {
+            throw new ForestRuntimeException(e);
+        } finally {
+            if (lastEventSource != null) {
+                doOnMessage(lastEventSource, lastEventSource.name(), lastEventSource.rawData());
+            }
+            final EventSource closeEventSource = new EventSource(null, this, "close", request, response);
+            doOnClose(closeEventSource);
+        }
+    }
+    
+    protected void readSingleLine(final ForestResponse<InputStream> response, final BufferedReader reader) throws IOException {
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            if (StringUtils.isBlank(line)) {
+                continue;
+            }
+            final EventSource eventSource = parseEventSource(null, response, line);
+            doOnMessage(eventSource, eventSource.name(), line);
+            doOnReceiveEventSource(null, eventSource, eventSource.name(), eventSource.value());
+            if (SSEState.LISTENING != state) {
+                break;
+            }
+        }
+    }
+
+    protected void decodeLinesWithSingleLineMode(final ForestResponse<InputStream> response, final InputStream in, final String charset) {
+        try {
+            final InputStreamReader isr = new InputStreamReader(in, charset);
+            final BufferedReader reader = new BufferedReader(isr);
+            readSingleLine(response, reader);
+        } catch (IOException e) {
+            throw new ForestRuntimeException(e);
+        } finally {
+            final EventSource closeEventSource = new EventSource(null, this, "close", request, response);
+            doOnClose(closeEventSource);
+        }
+    }
+
+
+
+    @Override
+    public <R extends ForestSSE> R listen() {
+        return listen(SSELinesMode.AUTO);
+    }
 
     /**
      * 开始对 SSE 数据流进行监听
@@ -638,11 +816,13 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
      * @param <R> 自身类型
      * @since 1.6.0
      */
-    @Override
-    public <R extends ForestSSE> R listen() {
+    public <R extends ForestSSE> R listen(SSELinesMode mode) {
         final boolean isAsync = this.request.isAsync();
         state = SSEState.REQUESTING;
         ForestResponse<InputStream> response;
+        if (messageFactory == null) {
+            messageFactory = new SSEDefaultMessageFactory();
+        }
         if (isAsync) {
             try {
                 response = this.request.executeAsCompletableFuture(new TypeReference<ForestResponse<InputStream>>() {}).get();
@@ -659,36 +839,17 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
             return (R) this;
         }
         state = SSEState.LISTENING;
-        final EventSource openEventSource = new EventSource(this, "open", request, response);
+        final EventSource openEventSource = new EventSource(null, this, "open", request, response);
         this.doOnOpen(openEventSource);
         if (SSEState.LISTENING != state || SSEMessageResult.CLOSE.equals(openEventSource.messageResult())) {
-            final EventSource closeEventSource = new EventSource(this, "close", request, response);
+            final EventSource closeEventSource = new EventSource(null, this, "close", request, response);
             doOnClose(closeEventSource);
             return (R) this;
         }
         try {
             final String charset = Optional.ofNullable(response.getCharset()).orElse("UTF-8");
             response.openStream((in, res) -> {
-                try {
-                    final InputStreamReader isr = new InputStreamReader(in, charset);
-                    final BufferedReader reader = new BufferedReader(isr);
-                    String line = null;
-                    while ((line = reader.readLine()) != null) {
-                        if (StringUtils.isEmpty(line)) {
-                            continue;
-                        }
-                        final EventSource eventSource = parseEventSource(response, line);
-                        doOnMessage(eventSource, eventSource.name(), eventSource.value());
-                        if (SSEState.LISTENING != state) {
-                            break;
-                        }
-                    }
-                } catch (IOException e) {
-                    throw new ForestRuntimeException(e);
-                } finally {
-                    final EventSource closeEventSource = new EventSource(this, "close", request, response);
-                    doOnClose(closeEventSource);
-                }
+                decodeLines(mode, response, in, charset);
             });
         } catch (Exception e) {
             throw new ForestRuntimeException(e);

@@ -31,6 +31,7 @@ import com.dtflys.forest.interceptor.ResponseResult;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.retryer.NoneRetryer;
+import com.dtflys.forest.sse.SSELinesMode;
 import com.dtflys.forest.test.http.BaseClientTest;
 import com.dtflys.forest.test.http.model.UserParam;
 import com.dtflys.forest.test.model.Contact;
@@ -472,7 +473,6 @@ public class TestGenericForestClient extends BaseClientTest {
             } catch (InterruptedException e) {
             }
             assertThat(errorCount.get()).isGreaterThan(0);
-//            System.out.println("第一阶段: 全部已完成");
 
             for (int i = 0; i < total; i++) {
                 server.enqueue(new MockResponse().setHeader("Status", "Ok"));
@@ -2743,9 +2743,63 @@ public class TestGenericForestClient extends BaseClientTest {
         );
     }
 
+
     @Test
-    public void testSSE_withOnMessage() {
+    public void testSSE_withOnMultilinesMessage() {
         server.enqueue(new MockResponse().setResponseCode(200).setBody(
+                "\n\n\n" +
+                "id:1\n" +
+                "event:json\n" +
+                "data:{\"name\": \"a\", \"age\": 10}\n" +
+                "\n\n" +
+                "id:2\n" +
+                "event:json\n" +
+                "data:{\"name\": \"b\", \"age\": 12}\n" +
+                "\n" +
+                "id:3\n" +
+                "event:json\n" +
+                "data:{\"name\": \"c\", \"age\": 9}\n"
+        ));
+
+        final StringBuffer buffer = new StringBuffer();
+
+        Forest.get("http://localhost:{}/sse", server.getPort())
+                .sse()
+                .setOnMessage(event -> {
+                    buffer.append("--------------\n");
+                    buffer.append("id => ").append(event.id(int.class) * 100).append("\n");
+                    buffer.append("event => ").append(event.event()).append("\n");
+                    TestUser user = event.data(TestUser.class);
+                    buffer.append("name => ").append(user.getName()).append("\n");
+                    buffer.append("age => ").append(user.getAge()).append("\n");
+                })
+                .listen(SSELinesMode.MULTI_LINES);
+
+        System.out.println(buffer);
+
+        assertThat(buffer.toString()).isEqualTo(
+                "--------------\n" +
+                "id => 100\n" +
+                "event => json\n" +
+                "name => a\n" +
+                "age => 10\n" +
+                "--------------\n" +
+                "id => 200\n" +
+                "event => json\n" +
+                "name => b\n" +
+                "age => 12\n" +
+                "--------------\n" +
+                "id => 300\n" +
+                "event => json\n" +
+                "name => c\n" +
+                "age => 9\n");
+    }
+
+
+    @Test
+    public void testSSE_withOnSingleLineJSONMessage() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(
+                "\n\n" +
                 "{\"name\": \"a\"}\n" +
                 "{\"name\": \"b\"}\n" +
                 "{\"name\": \"c\"}\n"
@@ -2757,43 +2811,36 @@ public class TestGenericForestClient extends BaseClientTest {
                 .sse()
                 .setOnMessage(event -> {
                     buffer.append("--------------\n");
-                    buffer.append("id => ").append(event.id()).append("\n");
-                    buffer.append("event => ").append(event.event()).append("\n");
-                    buffer.append("data => ").append(event.data()).append("\n");
+                    Map map = event.value(Map.class);
+                    buffer.append("map => ").append(map.toString()).append("\n");
                 })
-                .listen();
+                .listen(SSELinesMode.SINGLE_LINE);
         
         System.out.println(buffer);
         
         assertThat(buffer.toString()).isEqualTo(
                 "--------------\n" +
-                "id => 1\n" +
-                "event => json\n" +
-                "data => {\"name\": \"a\"}\n" +
+                "map => {name=a}\n" +
                 "--------------\n" +
-                "id => 2\n" +
-                "event => json\n" +
-                "data => {\"name\": \"b\"}\n" +
+                "map => {name=b}\n" +
                 "--------------\n" +
-                "id => 3\n" +
-                "event => json\n" +
-                "data => {\"name\": \"c\"}\n");
+                "map => {name=c}\n");
     }
 
     @Test
-    public void testSSE_withPureJSON() {
+    public void testSSE_withAutoLines() {
         server.enqueue(new MockResponse().setResponseCode(200).setBody(
                 "id:1\n" +
-                        "event:json\n" +
-                        "data:{\"name\": \"a\"}\n" +
-                        "\n" +
-                        "id:2\n" +
-                        "event:json\n" +
-                        "data:{\"name\": \"b\"}\n" +
-                        "\n" +
-                        "id:3\n" +
-                        "event:json\n" +
-                        "data:{\"name\": \"c\"}\n"
+                "event:json\n" +
+                "data:{\"name\": \"a\", \"age\": 10}\n" +
+                "\n" +
+                "id:2\n" +
+                "event:json\n" +
+                "data:{\"name\": \"b\", \"age\": 12}\n" +
+                "\n" +
+                "id:3\n" +
+                "event:json\n" +
+                "data:{\"name\": \"c\", \"age\": 9}\n"
         ));
 
         final StringBuffer buffer = new StringBuffer();
@@ -2804,7 +2851,9 @@ public class TestGenericForestClient extends BaseClientTest {
                     buffer.append("--------------\n");
                     buffer.append("id => ").append(event.id()).append("\n");
                     buffer.append("event => ").append(event.event()).append("\n");
-                    buffer.append("data => ").append(event.data()).append("\n");
+                    TestUser user = event.value(TestUser.class);
+                    buffer.append("name => ").append(user.getName()).append("\n");
+                    buffer.append("age => ").append(user.getAge()).append("\n");
                 })
                 .listen();
 
@@ -2812,18 +2861,53 @@ public class TestGenericForestClient extends BaseClientTest {
 
         assertThat(buffer.toString()).isEqualTo(
                 "--------------\n" +
-                        "id => 1\n" +
-                        "event => json\n" +
-                        "data => {\"name\": \"a\"}\n" +
-                        "--------------\n" +
-                        "id => 2\n" +
-                        "event => json\n" +
-                        "data => {\"name\": \"b\"}\n" +
-                        "--------------\n" +
-                        "id => 3\n" +
-                        "event => json\n" +
-                        "data => {\"name\": \"c\"}\n");
+                "id => 1\n" +
+                "event => json\n" +
+                "name => a\n" +
+                "age => 10\n" +
+                "--------------\n" +
+                "id => 2\n" +
+                "event => json\n" +
+                "name => b\n" +
+                "age => 12\n" +
+                "--------------\n" +
+                "id => 3\n" +
+                "event => json\n" +
+                "name => c\n" +
+                "age => 9\n");
     }
+
+    @Test
+    public void testSSE_withAutoLineJSONMessage() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(
+                "\n\n" +
+                        "{\"name\": \"a\"}\n" +
+                        "{\"name\": \"b\"}\n" +
+                        "{\"name\": \"c\"}\n"
+        ));
+
+        final StringBuffer buffer = new StringBuffer();
+
+        Forest.get("http://localhost:{}/sse", server.getPort())
+                .sse()
+                .setOnMessage(event -> {
+                    buffer.append("--------------\n");
+                    Map map = event.value(Map.class);
+                    buffer.append("map => ").append(map.toString()).append("\n");
+                })
+                .listen();
+
+        System.out.println(buffer);
+
+        assertThat(buffer.toString()).isEqualTo(
+                "--------------\n" +
+                        "map => {name=a}\n" +
+                        "--------------\n" +
+                        "map => {name=b}\n" +
+                        "--------------\n" +
+                        "map => {name=c}\n");
+    }
+
 
 
     @Test

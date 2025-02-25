@@ -821,6 +821,9 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
         if (StringUtils.isBlank(url)) {
             throw new ForestRuntimeException("[Forest] Request url cannot be empty!");
         }
+        if (args == null) {
+            args = EMPTY_RENDER_ARGS;
+        }
         arguments(args);
         final String srcUrl = StringUtils.trimBegin(url);
         MappingURLTemplate template = method.makeURLTemplate(null, null, srcUrl);
