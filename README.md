@@ -39,7 +39,7 @@ Forest是一个高层的、极简的声明式HTTP调用API框架<br>
 
 文档和示例：
 -------------------------------------
-* [项目主页](https://forest.dtflyx.com/pages/author) 
+* [项目主页](https://forest.dtflyx.com/) 
 
 * [中文文档](https://forest.dtflyx.com/pages/1.6.x/install_guide/) 
 
