@@ -1,7 +1,7 @@
 
 
 <p align="center">
-<a href="https://forest.dromara.org/">
+<a href="https://forest.dtflyx.com/">
     <img width="300" src="site/media/logo3.png" alt="logo">
 </a>
 </p>
@@ -15,10 +15,10 @@
 <a href="https://opensource.org/licenses/mit-license.php">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
 </a>
-<a href="https://forest.dromara.org/">
+<a href="https://forest.dtflyx.com/">
     <img src="https://img.shields.io/badge/document-1.x-e96.svg" alt="Documentation">
 </a>
-<a href="https://forest.dromara.org/pages/author/">
+<a href="https://forest.dtflyx.com/pages/author/">
     <img src="https://img.shields.io/badge/author-%E5%85%AC%E5%AD%90%E9%AA%8F-7af" alt="Author">
 </a>
 </p>
@@ -39,9 +39,9 @@ Forest是一个高层的、极简的声明式HTTP调用API框架<br>
 
 文档和示例：
 -------------------------------------
-* [项目主页](https://forest.dromara.org/) 
+* [项目主页](https://forest.dtflyx.com/pages/author) 
 
-* [中文文档](https://forest.dromara.org/pages/1.5.36/install_guide/) 
+* [中文文档](https://forest.dtflyx.com/pages/1.6.x/install_guide/) 
 
 * [示例工程](forest-examples)
 
@@ -396,7 +396,7 @@ String result = Forest.post("/user/register")
         .execute(String.class);
 ```
 
-#### 详细文档请看：[官方文档](https://forest.dromara.org/)
+#### 详细文档请看：[官方文档](https://forest.dtflyx.com/)
 
 
 ## 获得奖项
