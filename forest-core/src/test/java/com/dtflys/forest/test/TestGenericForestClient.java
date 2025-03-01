@@ -86,6 +86,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.LockSupport;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static junit.framework.Assert.assertFalse;
@@ -2979,6 +2982,54 @@ public class TestGenericForestClient extends BaseClientTest {
                 .getByPath("$.data[?(@.age>{minAge})].age", new TypeReference<List<Integer>>() {});
         assertThat(ageList).isNotNull();
         assertThat(ageList.get(0)).isEqualTo(22);
+    }
+    
+    public static class T4 {
+        public void printA(Thread thread) {
+            try {
+                Thread.sleep(3000L);
+                System.out.println("A");
+                LockSupport.unpark(thread);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public void printB(Thread thread) {
+            try {
+                Thread.sleep(10L);
+                LockSupport.park();
+                System.out.println("B");
+                LockSupport.unpark(thread);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public void printC() {
+            try {
+                Thread.sleep(5L);
+                LockSupport.park();
+                System.out.println("C");
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+    
+
+    public static void main(String[] args) {
+        T4 t4 = new T4();
+        Thread tC = new Thread(() -> {t4.printC();});
+        Thread tB = new Thread(() -> {t4.printB(tC);});
+        Thread tA = new Thread(() -> {t4.printA(tB);});
+        
+        tA.start();
+        tB.start();
+        tC.start();
+
+        ReentrantLock lock = new ReentrantLock();
+        lock.unlock();
     }
 
 

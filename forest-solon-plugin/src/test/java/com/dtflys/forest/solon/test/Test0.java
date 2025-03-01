@@ -61,10 +61,13 @@ public class Test0 {
         assertEquals(Integer.valueOf(1200), config0.getMaxConnections());
         assertEquals(Integer.valueOf(1100), config0.getMaxRouteConnections());
         assertEquals(Integer.valueOf(1000), config0.getTimeout());
+        assertEquals("config0", config0.getId());
         assertEquals("UTF-8", config0.getCharset());
         assertEquals(Integer.valueOf(5), config0.getMaxRetryCount());
         assertEquals("httpclient", config0.getBackend().getName());
         assertEquals("SSLv3", config0.getSslProtocol());
+        Forest.config("config0").setSslProtocol("TLS");
+        assertEquals("TLS", config0.getSslProtocol());
         assertTrue(config0.getLogHandler() instanceof DefaultLogHandler);
         assertEquals("https://www.thebeastshop.com/autopage", config0.getVariableValue("baseUrl"));
         assertEquals("xxx", config0.getVariableValue("myName"));

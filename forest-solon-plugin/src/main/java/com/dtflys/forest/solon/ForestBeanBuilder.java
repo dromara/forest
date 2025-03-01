@@ -1,5 +1,6 @@
 package com.dtflys.forest.solon;
 
+import com.dtflys.forest.Forest;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.SolonForestProperties;
 import com.dtflys.forest.converter.ForestConverter;
@@ -59,13 +60,13 @@ public class ForestBeanBuilder {
             id = "forestConfiguration";
             forestConfigurationProperties.setBeanId(id);
         }
-
-        ForestConfiguration forestConfiguration = ForestConfiguration.createConfiguration();
+        
+        ForestConfiguration forestConfiguration = Forest.config(id);
 
         Class<? extends ForestLogHandler> logHandlerClass = forestConfigurationProperties.getLogHandler();
         ForestLogHandler logHandler = logHandlerClass != null ?
                 forestConfiguration.getForestObject(logHandlerClass) : forestConfiguration.getLogHandler();
-
+        
         forestConfiguration.setMaxAsyncThreadSize(forestConfigurationProperties.getMaxAsyncThreadSize());
         forestConfiguration.setMaxAsyncQueueSize(forestConfigurationProperties.getMaxAsyncQueueSize());
         forestConfiguration.setMaxConnections(forestConfigurationProperties.getMaxConnections());
