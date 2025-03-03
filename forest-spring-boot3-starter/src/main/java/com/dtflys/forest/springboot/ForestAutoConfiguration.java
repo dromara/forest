@@ -6,6 +6,7 @@ import com.dtflys.forest.reflection.SpringForestObjectFactory;
 import com.dtflys.forest.spring.ForestBeanProcessor;
 import com.dtflys.forest.springboot.annotation.ForestScannerRegister;
 import com.dtflys.forest.springboot.properties.ForestConfigurationProperties;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -13,27 +14,32 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Role;
 
 
 @Configuration
 @EnableConfigurationProperties({ForestConfigurationProperties.class})
 @Import({ForestScannerRegister.class})
+@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 public class ForestAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public SpringForestProperties forestProperties() {
         return new SpringForestProperties();
     }
 
     @Bean
     @ConditionalOnMissingBean
+    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public SpringForestObjectFactory forestObjectFactory() {
         return new SpringForestObjectFactory();
     }
 
     @Bean
     @ConditionalOnMissingBean
+    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public SpringInterceptorFactory forestInterceptorFactory() {
         return new SpringInterceptorFactory();
     }
@@ -42,6 +48,7 @@ public class ForestAutoConfiguration {
     @Bean
     @DependsOn("forestBeanProcessor")
     @ConditionalOnMissingBean
+    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public ForestBeanRegister forestBeanRegister(ConfigurableApplicationContext applicationContext,
                                                  SpringForestProperties properties,
                                                  SpringForestObjectFactory forestObjectFactory,
@@ -60,6 +67,7 @@ public class ForestAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public ForestBeanProcessor forestBeanProcessor() {
         return new ForestBeanProcessor();
     }

@@ -37,7 +37,6 @@ import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcessor {
 
@@ -124,6 +123,7 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
                 .addPropertyValue("variables", forestConfigurationProperties.getVariables())
                 .setLazyInit(false)
                 .setFactoryMethod("configuration")
+                .setRole(BeanDefinition.ROLE_INFRASTRUCTURE)
                 .addConstructorArgValue(id);
 
 
@@ -165,6 +165,7 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
 
     public ConverterBeanListener registerConverterBeanListener(ForestConfiguration forestConfiguration) {
         BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(ConverterBeanListener.class);
+        beanDefinitionBuilder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
         BeanDefinition beanDefinition = beanDefinitionBuilder.getRawBeanDefinition();
         beanDefinition.getPropertyValues().addPropertyValue("forestConfiguration", forestConfiguration);
         BeanDefinitionRegistry beanFactory = (BeanDefinitionRegistry) applicationContext.getBeanFactory();
