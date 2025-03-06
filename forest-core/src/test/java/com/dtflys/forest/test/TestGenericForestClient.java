@@ -1,6 +1,7 @@
 package com.dtflys.forest.test;
 
 import cn.hutool.core.codec.Base64;
+import cn.hutool.core.collection.ListUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONReader;
 import com.alibaba.fastjson.annotation.JSONField;
@@ -81,7 +82,9 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -3019,17 +3022,11 @@ public class TestGenericForestClient extends BaseClientTest {
     
 
     public static void main(String[] args) {
-        T4 t4 = new T4();
-        Thread tC = new Thread(() -> {t4.printC();});
-        Thread tB = new Thread(() -> {t4.printB(tC);});
-        Thread tA = new Thread(() -> {t4.printA(tB);});
+        List<Integer> list1 = ListUtil.toList(1, 2, 3, 4, 5);
+        List<Integer> list2 = ListUtil.toList(2, 4, 5, 8, 10);
         
-        tA.start();
-        tB.start();
-        tC.start();
-
-        ReentrantLock lock = new ReentrantLock();
-        lock.unlock();
+        list1.retainAll(list2);
+        System.out.println(list1);
     }
 
 

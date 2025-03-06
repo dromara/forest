@@ -7,6 +7,7 @@ import com.dtflys.forest.annotation.Body;
 import com.dtflys.forest.annotation.BodyType;
 import com.dtflys.forest.annotation.Post;
 import com.dtflys.forest.backend.ContentType;
+import com.dtflys.forest.backend.httpclient.HttpClient;
 import com.dtflys.forest.converter.json.FastjsonEncoder;
 import com.dtflys.forest.converter.json.GsonEncoder;
 import com.dtflys.forest.converter.json.JacksonEncoder;
@@ -63,6 +64,7 @@ public interface EncoderClient {
         }
     }
 
+    @HttpClient
     @BodyType("json")
     @Post(url = "/", contentType = ContentType.APPLICATION_X_WWW_FORM_URLENCODED)
     ForestRequest testEncoder(@Body("name") String name, @Body("value") Object value);
@@ -73,7 +75,7 @@ public interface EncoderClient {
 
     @BodyType("multipart")
     @Post(url = "/", contentType = ContentType.MULTIPART_FORM_DATA)
-    ForestRequest testMutlipart(@Body Entry entry);
+    ForestRequest testMultipart(@Body Entry entry);
 
     @BodyType(type = "json", encoder = MyEncoder.class)
     @Post(url = "/", contentType = ContentType.APPLICATION_X_WWW_FORM_URLENCODED)

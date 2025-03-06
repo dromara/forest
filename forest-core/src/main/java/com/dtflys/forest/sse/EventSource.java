@@ -43,7 +43,7 @@ public class EventSource {
         this.value = value;
         this.eventList.addEventSource(this);
     }
-
+    
     /**
      * 获取当前消息对应的请求对象
      * 

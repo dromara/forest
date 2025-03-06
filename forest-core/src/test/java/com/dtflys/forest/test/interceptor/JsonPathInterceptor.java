@@ -16,7 +16,7 @@ public class JsonPathInterceptor implements Interceptor<Object> {
     @Override
     public ResponseResult onResponse(ForestRequest request, ForestResponse response) {
         if (response.isError()) {
-            return error();
+            return error(response.getException());
         }
         final String jsonStr = response.readAsString();
         final Object document = Configuration.defaultConfiguration().jsonProvider().parse(jsonStr);

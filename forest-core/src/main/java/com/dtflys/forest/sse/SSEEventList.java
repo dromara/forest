@@ -6,10 +6,11 @@ import com.dtflys.forest.http.ForestSSE;
 import com.dtflys.forest.utils.TypeReference;
 
 import java.util.ArrayList;
-import java.util.EventListener;
 import java.util.List;
 
 public class SSEEventList {
+    
+    public final static int MAX_EVENTS_CAPACITY = 32;
 
     private final ForestSSE sse;
 
@@ -17,7 +18,7 @@ public class SSEEventList {
 
     private final ForestResponse response;
 
-    private final List<EventSource> eventSources = new ArrayList<>();
+    private final List<EventSource> eventSources = new ArrayList<>(MAX_EVENTS_CAPACITY);
 
     public ForestSSE sse() {
         return sse;
@@ -48,6 +49,10 @@ public class SSEEventList {
             }
         }
         return null;
+    }
+    
+    public int size() {
+        return eventSources.size();
     }
     
     public boolean isEmpty() {
