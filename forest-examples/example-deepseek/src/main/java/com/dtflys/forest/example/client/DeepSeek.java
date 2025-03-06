@@ -4,9 +4,10 @@ package com.dtflys.forest.example.client;
 import com.dtflys.forest.annotation.BaseRequest;
 import com.dtflys.forest.annotation.Post;
 import com.dtflys.forest.annotation.Var;
+import com.dtflys.forest.example.interceptor.DeepSeekInterceptor;
 import com.dtflys.forest.http.ForestSSE;
 
-@BaseRequest(baseURL = "{baseUrl}")
+@BaseRequest(baseURL = "{baseUrl}", interceptor = DeepSeekInterceptor.class)
 public interface DeepSeek {
     
     @Post(
