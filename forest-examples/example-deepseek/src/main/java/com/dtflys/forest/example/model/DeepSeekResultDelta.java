@@ -6,7 +6,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class DeepSeekResultDelta implements Serializable {
+public class DeepSeekResultDelta {
     
     private String content;
 
