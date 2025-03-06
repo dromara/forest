@@ -18,6 +18,11 @@ public class DeepSeekExampleApplication implements CommandLineRunner {
     @Resource
     private DeepSeek deepSeek;
 
+    /**
+     * 不带思维链的聊天
+     * 
+     * @param message 发送给DeepSeek的消息
+     */
     private void completions(String message) {
         deepSeek.completions(message)
                 .setOnMessage(event -> {
