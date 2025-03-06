@@ -31,7 +31,7 @@ public class DeepSeekResult {
         List<JSONObject> choices = getChoices();
         if (CollectionUtil.isNotEmpty(choices)) {
             JSONObject chooseJson = choices.get(0);
-            DeepSeekResultChoose choose = chooseJson.toJavaObject(DeepSeekResultChoose.class);
+            DeepSeekResultChoice choose = chooseJson.toJavaObject(DeepSeekResultChoice.class);
             String reasoningContent = choose.getDelta().getReasoningContent();
             if (StringUtils.isNotEmpty(reasoningContent)) {
                 return new DeepSeekContent(true, reasoningContent);

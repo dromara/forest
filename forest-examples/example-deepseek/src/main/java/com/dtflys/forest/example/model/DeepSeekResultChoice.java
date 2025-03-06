@@ -3,7 +3,7 @@ package com.dtflys.forest.example.model;
 import lombok.Data;
 
 @Data
-public class DeepSeekResultChoose {
+public class DeepSeekResultChoice {
     
     private Integer index;
     
