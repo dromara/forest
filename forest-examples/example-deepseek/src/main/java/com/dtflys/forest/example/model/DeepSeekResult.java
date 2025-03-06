@@ -31,12 +31,12 @@ public class DeepSeekResult {
         List<JSONObject> choices = getChoices();
         if (CollectionUtil.isNotEmpty(choices)) {
             JSONObject chooseJson = choices.get(0);
-            DeepSeekResultChoice choose = chooseJson.toJavaObject(DeepSeekResultChoice.class);
-            String reasoningContent = choose.getDelta().getReasoningContent();
+            DeepSeekResultChoice choice = chooseJson.toJavaObject(DeepSeekResultChoice.class);
+            String reasoningContent = choice.getDelta().getReasoningContent();
             if (StringUtils.isNotEmpty(reasoningContent)) {
                 return new DeepSeekContent(true, reasoningContent);
             }
-            return new DeepSeekContent(false, choose.getDelta().getContent());
+            return new DeepSeekContent(false, choice.getDelta().getContent());
         }
         return new DeepSeekContent();
     }
