@@ -77,7 +77,7 @@ public class ResultHandler {
 
     public Object getResult(Optional<?> resultOpt, ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
         String optStringValue = null;
-        if (resultOpt != null) {
+        if (resultOpt != null && resultOpt.isPresent()) {
             if (Optional.class.isAssignableFrom(resultClass)) {
                 return resultOpt;
             }

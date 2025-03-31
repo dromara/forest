@@ -358,7 +358,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      * @since 1.6.0
      */
     public Optional<T> getResultOpt() {
-        if (result == null && isReceivedResponseData()) {
+        if ((result == null || !result.isPresent()) && isReceivedResponseData()) {
             Type type = request.getLifeCycleHandler().getResultType();
             if (type == null) {
                 type = request.getMethod().getReturnType();
@@ -381,7 +381,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
                 }
             }
         }
-        return result == null ? Optional.empty() : result;
+        return result == null || !result.isPresent() ? Optional.empty() : result;
     }
     
     /**
