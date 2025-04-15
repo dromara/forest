@@ -4,10 +4,9 @@ import com.dtflys.forest.extensions.BasicAuth;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.reflection.ForestMethod;
-import com.dtflys.forest.utils.Base64Utils;
 import com.dtflys.forest.utils.StringUtils;
 
-public class BasicAuthLifeCycle implements MethodAnnotationLifeCycle<BasicAuth, Object> {
+public class BearerAuthLifeCycle implements MethodAnnotationLifeCycle<BasicAuth, Object> {
 
     @Override
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
@@ -16,10 +15,9 @@ public class BasicAuthLifeCycle implements MethodAnnotationLifeCycle<BasicAuth, 
 
     @Override
     public boolean beforeExecute(ForestRequest request) {
-        final String username = getAttributeAsString(request, "username");
-        final String password = getAttributeAsString(request, "password");
-        if (StringUtils.isNotEmpty(username) || StringUtils.isNotEmpty(password)) {
-            request.authenticator(new com.dtflys.forest.auth.BasicAuth(username, password));
+        final String token = getAttributeAsString(request, "token");
+        if (StringUtils.isNotEmpty(token)) {
+            request.authenticator(new com.dtflys.forest.auth.BearerAuth(token));
         }
         return true;
     }
