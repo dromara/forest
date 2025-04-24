@@ -183,7 +183,7 @@ public class EventSource {
      * @param <T> 消息值类型泛型
      */
     public <T> T value(TypeReference<T> typeReference) {
-        T encodedValue = (T) request.getConfiguration().getConverter(ForestDataType.AUTO).convertToJavaObject(value, typeReference);
+        T encodedValue = (T) request.getConfiguration().getConverter(ForestDataType.AUTO).convertToJavaObject(value, typeReference.getType());
         return encodedValue;
     }
 
