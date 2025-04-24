@@ -1,6 +1,7 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.reflection.ForestMethod;
 
 /**
@@ -24,7 +25,7 @@ public abstract class MappingExpr {
         this.token = token;
     }
 
-    public Object render(Object[] args) {
+    public Object render(ForestRequest request, Object[] args) {
         return null;
     }
 

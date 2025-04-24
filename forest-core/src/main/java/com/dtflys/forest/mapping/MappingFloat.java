@@ -1,6 +1,6 @@
 package com.dtflys.forest.mapping;
 
-import com.dtflys.forest.reflection.ForestMethod;
+import com.dtflys.forest.http.ForestRequest;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -16,7 +16,7 @@ public class MappingFloat extends MappingExpr {
     }
 
     @Override
-    public Object render(Object[] args) {
+    public Object render(ForestRequest request, Object[] args) {
         return number;
     }
 

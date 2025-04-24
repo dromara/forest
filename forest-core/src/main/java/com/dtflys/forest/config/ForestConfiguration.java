@@ -62,11 +62,13 @@ import com.dtflys.forest.logging.ForestLogger;
 import com.dtflys.forest.pool.FixedRequestPool;
 import com.dtflys.forest.pool.ForestRequestPool;
 import com.dtflys.forest.proxy.ProxyFactory;
-import com.dtflys.forest.reflection.BasicVariableValue;
+import com.dtflys.forest.reflection.BasicVariable;
 import com.dtflys.forest.reflection.DefaultObjectFactory;
+import com.dtflys.forest.reflection.ForestArgumentsVariable;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.ForestObjectFactory;
-import com.dtflys.forest.reflection.ForestVariableValue;
+import com.dtflys.forest.reflection.ForestMethodVariable;
+import com.dtflys.forest.reflection.ForestVariable;
 import com.dtflys.forest.result.AfterExecuteResultTypeHandler;
 import com.dtflys.forest.result.ForestRequestResultHandler;
 import com.dtflys.forest.result.ResultTypeHandler;
@@ -103,7 +105,7 @@ import java.util.stream.Collectors;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-03-24
  */
-public class ForestConfiguration implements Serializable {
+public class ForestConfiguration implements VariableScope, Serializable {
 
     private static ForestLogger log = ForestLogger.getLogger(ForestConfiguration.class);
 
@@ -337,7 +339,7 @@ public class ForestConfiguration implements Serializable {
     /**
      * 全局变量表
      */
-    private Map<String, ForestVariableValue> variables = new ConcurrentHashMap<>(64);
+    private Map<String, ForestVariable> variables = new ConcurrentHashMap<>(64);
 
     /**
      * SSL的Key Store集合
@@ -1593,7 +1595,7 @@ public class ForestConfiguration implements Serializable {
      * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setVariableValue(String name, Object value) {
-        this.variables.put(name, new BasicVariableValue(value));
+        this.variables.put(name, new BasicVariable(value));
         return this;
     }
 
@@ -1601,10 +1603,23 @@ public class ForestConfiguration implements Serializable {
      * 设置全局变量
      *
      * @param name  变量名
-     * @param value {@link ForestVariableValue}类型变量值
+     * @param value {@link ForestArgumentsVariable}类型变量值
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setVariableValue(String name, ForestVariableValue value) {
+    public ForestConfiguration setVariableValue(String name, ForestArgumentsVariable value) {
+        this.variables.put(name, value);
+        return this;
+    }
+
+
+    /**
+     * 设置全局变量
+     *
+     * @param name  变量名
+     * @param value {@link ForestMethodVariable}类型变量值
+     * @return 当前ForestConfiguration实例
+     */
+    public ForestConfiguration setVariableValue(String name, ForestMethodVariable value) {
         this.variables.put(name, value);
         return this;
     }
@@ -1616,17 +1631,62 @@ public class ForestConfiguration implements Serializable {
      * @return 变量值
      */
     public Object getVariableValue(String name) {
-        return getVariableValue(name, null);
+        return getVariableValueFromMethodOrRequest(name, null, null);
     }
 
-    public Object getVariableValue(String name, ForestMethod method) {
-        ForestVariableValue variableValue = this.variables.get(name);
-        if (variableValue != null) {
-            Object value = variableValue.getValue(method);
-            return value;
+    @Override
+    public <R> R getVariableValue(String name, Class<R> clazz) {
+        return getVariableValue(name, null, clazz);
+    }
+
+
+    public Object getVariableValue(String name, ForestRequest request) {
+        ForestVariable variable = this.variables.get(name);
+        if (variable != null) {
+            return variable.getValue(request);
+        }
+        return getVariableValueFromMethodOrRequest(name, null, request);
+    }
+
+    @Override
+    public <R> R getVariableValue(String name, ForestRequest request, Class<R> clazz) {
+        Object value = getVariableValueFromMethodOrRequest(name, null, request);
+        if (value == null) {
+            return null;
+        }
+        return clazz.cast(value);
+    }
+
+
+    private Object getVariableValueFromMethodOrRequest(String name, ForestMethod method, ForestRequest request) {
+        ForestVariable variable = this.variables.get(name);
+        if (variable != null) {
+            if (variable instanceof BasicVariable) {
+                return ((BasicVariable) variable).getValue();
+            }
+            if (variable instanceof ForestMethodVariable) {
+                return ((ForestMethodVariable) variable).getValue(method);
+            }
+            return variable.getValue(request);
         }
         return null;
     }
+
+
+    public Object getVariableValue(String name, ForestMethod method) {
+        return getVariableValueFromMethodOrRequest(name, method, null);
+    }
+
+    @Override
+    public ForestVariable getVariable(String name) {
+        return variables.get(name);
+    }
+
+    @Override
+    public ForestConfiguration getConfiguration() {
+        return this;
+    }
+
 
 
     /**
@@ -1816,7 +1876,7 @@ public class ForestConfiguration implements Serializable {
      *
      * @return 全局变量表
      */
-    public Map<String, ForestVariableValue> getVariables() {
+    public Map<String, ForestVariable> getVariables() {
         return variables;
     }
 

@@ -2,7 +2,7 @@ package com.dtflys.forest.solon;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.reflection.ForestMethod;
-import com.dtflys.forest.reflection.ForestVariableValue;
+import com.dtflys.forest.reflection.ForestMethodVariable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
  * @author noear
  * @since 1.11
  */
-public class SolonForestVariableValue implements ForestVariableValue {
+public class SolonForestVariableValue implements ForestMethodVariable {
 
     private final static Object[] DEFAULT_ARGUMENTS = new Object[0];
 

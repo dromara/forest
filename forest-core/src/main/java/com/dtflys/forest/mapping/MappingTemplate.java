@@ -7,6 +7,7 @@ import com.dtflys.forest.exceptions.ForestIndexReferenceException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.exceptions.ForestTemplateSyntaxError;
 import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
@@ -466,7 +467,7 @@ public class MappingTemplate {
         return null;
     }
 
-    protected String renderExpression(ForestJsonConverter jsonConverter, MappingExpr expr, Object[] args) {
+    protected String renderExpression(ForestRequest request, ForestJsonConverter jsonConverter, MappingExpr expr, Object[] args) {
         Object val = null;
         MappingParameter param = null;
         if (expr instanceof MappingString) {
@@ -486,7 +487,7 @@ public class MappingTemplate {
                 return String.valueOf(val);
             }
         } else {
-            val = expr.render(args);
+            val = expr.render(request, args);
             if (val != null) {
                 val = getParameterValue(jsonConverter, val);
                 if (param != null && param.isUrlEncode()) {
@@ -499,14 +500,14 @@ public class MappingTemplate {
     }
 
 
-    public String render(Object[] args) {
+    public String render(ForestRequest request, Object[] args) {
         try {
             ForestJsonConverter jsonConverter = variableScope.getConfiguration().getJsonConverter();
             int len = exprList.size();
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i < len; i++) {
                 MappingExpr expr = exprList.get(i);
-                String val = renderExpression(jsonConverter, expr, args);
+                String val = renderExpression(request, jsonConverter, expr, args);
                 if (val != null) {
                     builder.append(val);
                 }

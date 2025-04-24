@@ -32,7 +32,7 @@ public class BackendLifeCycle implements MethodAnnotationLifeCycle<Backend, Obje
     public void onInvokeMethod(ForestRequest request, ForestMethod method, Object[] args) {
         final Object backendName = request.getMethod().getExtensionParameterValue(PARAM_KEY_BACKEND_NAME);
         if (backendName != null && backendName instanceof MappingTemplate) {
-            request.setBackend(((MappingTemplate) backendName).render(args));
+            request.setBackend(((MappingTemplate) backendName).render(request, args));
         }
     }
 

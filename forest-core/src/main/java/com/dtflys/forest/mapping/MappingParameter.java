@@ -2,9 +2,13 @@ package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
+import com.dtflys.forest.exceptions.ForestIndexReferenceException;
 import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.filter.FilterChain;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
+import com.dtflys.forest.reflection.ForestArgumentsVariable;
+import com.dtflys.forest.reflection.ForestVariable;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.util.Iterator;
@@ -15,7 +19,7 @@ import java.util.Iterator;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.0.0
  */
-public class MappingParameter {
+public class MappingParameter implements ForestArgumentsVariable {
 
     public final static int TARGET_UNKNOWN = 0;
     public final static int TARGET_QUERY = 1;
@@ -232,5 +236,22 @@ public class MappingParameter {
 
     public void addFilter(Filter filter) {
         filterChain.addFilter(filter);
+    }
+
+    @Override
+    public Object getValue(ForestRequest request, Object[] args) {
+        if (index != null && index >= 0) {
+            if (args != null) {
+                if (index < args.length) {
+                    return args[index];
+                }
+                throw new ForestIndexReferenceException(index, args.length);
+            }
+            if (request != null) {
+                return request.argument(index);
+            }
+        }
+        request.getVariableValue(name);
+        return getConvertedDefaultValue(request.getConfiguration().getJsonConverter());
     }
 }

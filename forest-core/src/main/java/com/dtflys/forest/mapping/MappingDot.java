@@ -3,6 +3,7 @@ package com.dtflys.forest.mapping;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.exceptions.ForestExpressionException;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.StringUtils;
 
@@ -79,8 +80,8 @@ public class MappingDot extends MappingExpr {
     }
 
     @Override
-    public Object render(Object[] args) {
-        Object obj = left.render(args);
+    public Object render(ForestRequest request, Object[] args) {
+        Object obj = left.render(request, args);
         if (obj == null) {
             throw new ForestRuntimeException(new NullPointerException());
         }

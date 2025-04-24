@@ -82,16 +82,12 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.LockSupport;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static junit.framework.Assert.assertFalse;
@@ -3020,14 +3016,6 @@ public class TestGenericForestClient extends BaseClientTest {
         }
     }
     
-
-    public static void main(String[] args) {
-        List<Integer> list1 = ListUtil.toList(1, 2, 3, 4, 5);
-        List<Integer> list2 = ListUtil.toList(2, 4, 5, 8, 10);
-        
-        list1.retainAll(list2);
-        System.out.println(list1);
-    }
 
 
 

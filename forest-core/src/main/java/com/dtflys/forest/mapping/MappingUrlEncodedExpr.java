@@ -1,6 +1,7 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.reflection.ForestMethod;
 
 public class MappingUrlEncodedExpr extends MappingExpr {
@@ -28,8 +29,8 @@ public class MappingUrlEncodedExpr extends MappingExpr {
     }
 
     @Override
-    public Object render(Object[] args) {
-        Object ret = expr.render(args);
+    public Object render(ForestRequest request, Object[] args) {
+        Object ret = expr.render(request, args);
         if (ret == null) {
             return null;
         }

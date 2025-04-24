@@ -2,14 +2,13 @@ package com.dtflys.forest.test.http.gzip;
 
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.reflection.BasicVariableValue;
+import com.dtflys.forest.reflection.BasicVariable;
 import com.dtflys.forest.test.mock.Get2MockServer;
 import com.dtflys.forest.test.http.BaseClientTest;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockserver.client.MockServerClient;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -36,7 +35,7 @@ public class GzipClientTest extends BaseClientTest {
     public static void prepareClient() {
         configuration = ForestConfiguration.createConfiguration();
         configuration.setLogResponseContent(true);
-        configuration.getVariables().put("baseUrl", new BasicVariableValue("http://localhost"));
+        configuration.getVariables().put("baseUrl", new BasicVariable("http://localhost"));
     }
 
     @Override
