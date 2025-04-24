@@ -1585,7 +1585,18 @@ public class ForestConfiguration implements VariableScope, Serializable {
     }
 
 
-
+    /**
+     * 设置全局变量
+     *
+     * @param name  变量名
+     * @param value 变量值
+     * @return 当前ForestConfiguration实例
+     */
+    @Deprecated
+    public ForestConfiguration setVariableValue(String name, Object value) {
+        this.variables.put(name, new BasicVariable(value));
+        return this;
+    }
 
     /**
      * 设置全局变量
@@ -1594,7 +1605,7 @@ public class ForestConfiguration implements VariableScope, Serializable {
      * @param value 变量值
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setVariableValue(String name, Object value) {
+    public ForestConfiguration setVariable(String name, Object value) {
         this.variables.put(name, new BasicVariable(value));
         return this;
     }
@@ -1606,7 +1617,7 @@ public class ForestConfiguration implements VariableScope, Serializable {
      * @param value {@link ForestArgumentsVariable}类型变量值
      * @return 当前ForestConfiguration实例
      */
-    public ForestConfiguration setVariableValue(String name, ForestArgumentsVariable value) {
+    public ForestConfiguration setVariable(String name, ForestVariable value) {
         this.variables.put(name, value);
         return this;
     }
@@ -1616,9 +1627,25 @@ public class ForestConfiguration implements VariableScope, Serializable {
      * 设置全局变量
      *
      * @param name  变量名
-     * @param value {@link ForestMethodVariable}类型变量值
+     * @param value {@link ForestArgumentsVariable}类型变量值
      * @return 当前ForestConfiguration实例
      */
+    public ForestConfiguration setVariable(String name, ForestArgumentsVariable value) {
+        this.variables.put(name, value);
+        return this;
+    }
+
+
+
+    /**
+     * 设置全局变量
+     *
+     * @param name  变量名
+     * @param value {@link ForestMethodVariable}类型变量值
+     * @return 当前ForestConfiguration实例
+     * @deprecated 请求使用 setVariable(String name, ForestVariable variable)
+     */
+    @Deprecated
     public ForestConfiguration setVariableValue(String name, ForestMethodVariable value) {
         this.variables.put(name, value);
         return this;

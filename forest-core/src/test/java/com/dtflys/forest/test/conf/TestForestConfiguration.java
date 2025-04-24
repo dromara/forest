@@ -105,8 +105,8 @@ public class TestForestConfiguration {
     @Test
     public void testVars() {
         ForestConfiguration configuration = ForestConfiguration.createConfiguration();
-        configuration.setVariableValue("name", "Peter");
-        configuration.setVariableValue("baseUrl", "http://abc.com");
+        configuration.setVariable("name", "Peter");
+        configuration.setVariable("baseUrl", "http://abc.com");
         assertEquals("Peter", configuration.getVariableValue("name"));
         assertEquals("http://abc.com", configuration.getVariableValue("baseUrl"));
 
@@ -118,7 +118,7 @@ public class TestForestConfiguration {
         assertThat(configuration.getVariableValue("abc")).isEqualTo(123);
         AtomicInteger value = new AtomicInteger(0);
         configuration.setVariableValue("foo", method -> value.getAndIncrement());
-        configuration.setVariableValue("foo2", (req, args) -> value.getAndIncrement());
+        configuration.setVariable("foo2", req -> value.getAndIncrement());
         assertThat(configuration.getVariableValue("foo")).isEqualTo(0);
         assertThat(configuration.getVariableValue("foo")).isEqualTo(1);
         assertThat(configuration.getVariableValue("foo2")).isEqualTo(2);

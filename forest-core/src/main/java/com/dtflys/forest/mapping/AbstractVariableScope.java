@@ -3,6 +3,8 @@ package com.dtflys.forest.mapping;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.reflection.BasicVariable;
+import com.dtflys.forest.reflection.ForestArgumentsVariable;
+import com.dtflys.forest.reflection.ForestMethodVariable;
 import com.dtflys.forest.reflection.ForestVariable;
 
 import java.util.Map;
@@ -17,7 +19,7 @@ public abstract class AbstractVariableScope<SELF extends VariableScope> implemen
     public AbstractVariableScope(VariableScope parent) {
         this.parent = parent;
     }
-
+    
 
     @Override
     public boolean isVariableDefined(String name) {
@@ -26,7 +28,6 @@ public abstract class AbstractVariableScope<SELF extends VariableScope> implemen
             return parent.isVariableDefined(name);
         }
         return true;
-
     }
 
     @Override
@@ -68,6 +69,16 @@ public abstract class AbstractVariableScope<SELF extends VariableScope> implemen
             return parent.getVariable(name);
         }
         return variable;
+    }
+
+    public SELF setVariable(String name, ForestVariable variable) {
+        variables.put(name, variable);
+        return (SELF) this;
+    }
+
+    public SELF setVariable(String name, ForestArgumentsVariable variable) {
+        variables.put(name, variable);
+        return (SELF) this;
     }
     
     public SELF setVariable(String name, Object value) {

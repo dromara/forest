@@ -5,11 +5,11 @@ import com.dtflys.forest.http.ForestRequest;
 @FunctionalInterface
 public interface ForestVariable {
     
-    Object getValue(ForestRequest request);
+    Object getValue(ForestRequest req);
     
     
-    default  <R> R getValue(ForestRequest request, Class<R> clazz) {
-        Object value = getValue(request);
+    default  <R> R getValue(ForestRequest req, Class<R> clazz) {
+        Object value = getValue(req);
         if (value == null) {
             return null;
         }
