@@ -16,8 +16,8 @@ public class BasicAuthLifeCycle implements MethodAnnotationLifeCycle<BasicAuth, 
 
     @Override
     public boolean beforeExecute(ForestRequest request) {
-        final String username = (String) getAttribute(request, "username");
-        final String password = (String) getAttribute(request, "password");
+        final String username = getAttributeAsString(request, "username");
+        final String password = getAttributeAsString(request, "password");
         if (StringUtils.isNotEmpty(username) || StringUtils.isNotEmpty(password)) {
             request.authenticator(new com.dtflys.forest.auth.BasicAuth(username, password));
         }

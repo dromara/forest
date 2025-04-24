@@ -1,6 +1,7 @@
 package com.dtflys.forest.test;
 
 import cn.hutool.core.codec.Base64;
+import cn.hutool.core.collection.ListUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONReader;
 import com.alibaba.fastjson.annotation.JSONField;
@@ -86,9 +87,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.LockSupport;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static junit.framework.Assert.assertFalse;
@@ -3017,20 +3016,6 @@ public class TestGenericForestClient extends BaseClientTest {
         }
     }
     
-
-    public static void main(String[] args) {
-        T4 t4 = new T4();
-        Thread tC = new Thread(() -> {t4.printC();});
-        Thread tB = new Thread(() -> {t4.printB(tC);});
-        Thread tA = new Thread(() -> {t4.printA(tB);});
-        
-        tA.start();
-        tB.start();
-        tC.start();
-
-        ReentrantLock lock = new ReentrantLock();
-        lock.unlock();
-    }
 
 
 

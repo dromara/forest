@@ -57,7 +57,7 @@ public class HttpclientLogBodyMessage implements LogBodyMessage {
         InputStream in = null;
         try {
             in = entity.getContent();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
             return getLogContentFormBufferedReader(reader);
         } catch (IOException e) {
             e.printStackTrace();

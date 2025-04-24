@@ -1,8 +1,7 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.exceptions.ForestIndexReferenceException;
-import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.reflection.ForestMethod;
+import com.dtflys.forest.http.ForestRequest;
 
 /**
  * Created by Administrator on 2016/5/17.
@@ -19,7 +18,7 @@ public class MappingIndex extends MappingExpr {
     }
 
     @Override
-    public Object render(Object[] args) {
+    public Object render(ForestRequest request, Object[] args) {
         try {
             if (index < 0) {
                 int argIndex = args.length + index;

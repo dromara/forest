@@ -1,6 +1,8 @@
 package com.dtflys.forest.mapping;
 
 
+import com.dtflys.forest.http.ForestRequest;
+
 /**
  * Created by Administrator on 2016/5/17.
  */
@@ -14,7 +16,7 @@ public class MappingInteger extends MappingExpr {
     }
 
     @Override
-    public Object render(Object[] args) {
+    public Object render(ForestRequest request, Object[] args) {
         return number;
     }
 

@@ -92,7 +92,7 @@ public abstract class ResultGetter implements ForestResultGetter {
     public <T> T getByPath(String path, Type type) {
         try {
             final MappingTemplate pathTemplate = request.getMethod().makeTemplate(path);
-            final String pathStr = pathTemplate.render(request.getArguments());
+            final String pathStr = pathTemplate.render(request, request.getArguments());
             final String resCharset = getResponse().getCharset();
             final String charset = StringUtils.isBlank(resCharset) ? "UTF-8" : resCharset;
             final Object document = Configuration.defaultConfiguration().jsonProvider().parse(getResponse().getInputStream(), charset);

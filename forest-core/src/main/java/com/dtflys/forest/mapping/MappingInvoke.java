@@ -2,6 +2,7 @@ package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.exceptions.ForestExpressionException;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.reflection.ForestMethod;
 
 import java.lang.reflect.InvocationTargetException;
@@ -40,8 +41,8 @@ public class MappingInvoke extends MappingDot {
     }
 
     @Override
-    public Object render(Object[] args) {
-        Object obj = left.render(args);
+    public Object render(ForestRequest request, Object[] args) {
+        Object obj = left.render(request, args);
         String methodName = right.getName();
         try {
             Method method = obj.getClass().getDeclaredMethod(methodName);
@@ -53,7 +54,7 @@ public class MappingInvoke extends MappingDot {
                 Object[] renderArgs = new Object[argList.size()];
                 for (int i = 0, len = argList.size(); i < len; i++) {
                     MappingExpr expr = argList.get(i);
-                    renderArgs[i] = expr.render(args);
+                    renderArgs[i] = expr.render(request, args);
                 }
                 result = method.invoke(obj, renderArgs);
             }

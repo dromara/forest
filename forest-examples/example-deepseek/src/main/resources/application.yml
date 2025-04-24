@@ -1,0 +1,12 @@
+
+forest:
+  connect-timeout: 10000
+  read-timeout: 3600000
+  variables:
+    baseUrl: https://api.deepseek.com
+    apiKey: YOUR_API_KEY
+    model: deepseek-reasoner
+
+
+
+

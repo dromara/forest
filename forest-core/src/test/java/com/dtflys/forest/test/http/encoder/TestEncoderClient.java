@@ -100,7 +100,7 @@ public class TestEncoderClient extends BaseClientTest {
     public void testMultipart() {
         EncoderClient.Entry entry = new EncoderClient.Entry("AAA", "BBB");
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        ForestRequest request = encoderClient.testMutlipart(entry);
+        ForestRequest request = encoderClient.testMultipart(entry);
         assertThat(request).isNotNull();
         assertThat(request.bodyType()).isNotNull().isEqualTo(ForestDataType.MULTIPART);
         request.execute();

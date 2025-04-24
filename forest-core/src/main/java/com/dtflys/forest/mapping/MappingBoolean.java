@@ -1,5 +1,6 @@
 package com.dtflys.forest.mapping;
 
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.reflection.ForestMethod;
 
 /**
@@ -21,7 +22,7 @@ public class MappingBoolean extends MappingExpr {
     }
 
     @Override
-    public Object render(Object[] args) {
+    public Object render(ForestRequest request, Object[] args) {
         return value;
     }
 

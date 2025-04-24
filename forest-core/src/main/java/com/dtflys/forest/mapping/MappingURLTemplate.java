@@ -8,6 +8,7 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
 import com.dtflys.forest.exceptions.ForestExpressionException;
 import com.dtflys.forest.http.ForestQueryMap;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.SimpleQueryParameter;
 import com.dtflys.forest.http.ForestURL;
 import com.dtflys.forest.http.ForestURLBuilder;
@@ -24,11 +25,11 @@ public class MappingURLTemplate extends MappingTemplate {
     }
 
     @Override
-    public String render(Object[] args) {
-        return super.render(args);
+    public String render(ForestRequest request, Object[] args) {
+        return super.render(request, args);
     }
 
-    public ForestURL render(Object[] args, ForestQueryMap queries) {
+    public ForestURL render(ForestRequest request, Object[] args, ForestQueryMap queries) {
         String scheme = null;
         StringBuilder userInfo = null;
         String host = null;
@@ -47,7 +48,7 @@ public class MappingURLTemplate extends MappingTemplate {
             SimpleQueryParameter lastQuery  = null;
             for (int i = 0; i < len; i++) {
                 MappingExpr expr = exprList.get(i);
-                String exprVal = String.valueOf(renderExpression(jsonConverter, expr, args));
+                String exprVal = String.valueOf(renderExpression(request, jsonConverter, expr, args));
                 builder.append(exprVal);
                 if (renderedQuery) {
                     // 已渲染到查询参数
@@ -127,7 +128,7 @@ public class MappingURLTemplate extends MappingTemplate {
                                 pathCharIndex++;
                                 ch = baseUrlChars[pathCharIndex];
                                 if (ch != '/') {
-                                    throw new ForestRuntimeException("URI '" + super.render(args) + "' is invalid.");
+                                    throw new ForestRuntimeException("URI '" + super.render(request, args) + "' is invalid.");
                                 }
                                 pathCharIndex++;
                                 if (pathCharIndex + 1 < baseLen && baseUrlChars[pathCharIndex + 1] == '/') {

@@ -1,7 +1,6 @@
 package com.dtflys.forest.backend.okhttp3.logging;
 
 import com.dtflys.forest.backend.ContentType;
-import com.dtflys.forest.backend.httpclient.body.HttpclientMultipartFileBody;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.logging.LogBodyMessage;
 import okhttp3.MediaType;
@@ -51,7 +50,7 @@ public class OkHttp3LogBodyMessage implements LogBodyMessage {
             }
         }
         final InputStream inputStream = new ByteArrayInputStream(out.toByteArray());
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
         final StringBuilder builder = new StringBuilder();
         String line;
         try {

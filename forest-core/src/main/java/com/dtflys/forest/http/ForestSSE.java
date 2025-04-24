@@ -757,6 +757,11 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
         EventSource lastEventSource = null;
         eventList = eventList == null ? new SSEEventList(this, request, response) : eventList;
         
+        if (eventList.size() > SSEEventList.MAX_EVENTS_CAPACITY) {
+            readSingleLine(response, reader);
+            return lastEventSource;
+        }
+        
         while ((line = reader.readLine()) != null) {
             if (StringUtils.isBlank(line)) {
                 if (lastEventSource != null) {

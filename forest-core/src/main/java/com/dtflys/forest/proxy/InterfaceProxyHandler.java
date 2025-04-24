@@ -6,11 +6,13 @@ import com.dtflys.forest.annotation.MethodLifeCycle;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.interceptor.InterceptorFactory;
 import com.dtflys.forest.lifecycles.BaseAnnotationLifeCycle;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.reflection.ForestMethod;
+import com.dtflys.forest.reflection.ForestVariable;
 import com.dtflys.forest.reflection.MetaRequest;
 import com.dtflys.forest.utils.MethodHandlesUtil;
 
@@ -254,21 +256,32 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
 
     @Override
     public Object getVariableValue(String name) {
-        return getVariableValue(name, null);
+        return configuration.getVariableValue(name);
     }
 
     @Override
-    public Object getVariableValue(String name, ForestMethod method) {
-        return configuration.getVariableValue(name, method);
+    public <R> R getVariableValue(String name, Class<R> clazz) {
+        return configuration.getVariableValue(name, clazz);
     }
+
+    @Override
+    public Object getVariableValue(String name, ForestRequest request) {
+        return configuration.getVariableValue(name, request);
+    }
+
+    @Override
+    public <R> R getVariableValue(String name, ForestRequest request, Class<R> clazz) {
+        return configuration.getVariableValue(name, clazz);
+    }
+
 
     public List<Annotation> getBaseAnnotations() {
         return baseAnnotations;
     }
 
     @Override
-    public MappingVariable getVariable(String name) {
-        return null;
+    public ForestVariable getVariable(String name) {
+        return configuration.getVariable(name);
     }
 
     @Override

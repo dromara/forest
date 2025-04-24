@@ -5,7 +5,7 @@ import com.dtflys.forest.utils.Base64Utils;
 import com.dtflys.forest.utils.StringUtils;
 
 /**
- * Forest BasicAuth 认证器
+ * Forest Basic 认证器
  * <p>为请求提供 BasicAuth 认证信息</p>
  *
  * @author gongjun
@@ -34,10 +34,6 @@ public class BasicAuth extends ForestAuthenticator {
         return new BasicAuth(userInfo);
     }
 
-
-    public String setUserInfo() {
-        return userInfo;
-    }
 
     public BasicAuth setUserInfo(final String userInfo) {
         this.userInfo = userInfo;

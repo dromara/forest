@@ -28,7 +28,7 @@ public interface OnResponse {
         return new ResponseSuccess(data);
     }
 
-    default ResponseError error(Exception exception) {
+    default ResponseError error(Throwable exception) {
         return new ResponseError(exception);
     }
 

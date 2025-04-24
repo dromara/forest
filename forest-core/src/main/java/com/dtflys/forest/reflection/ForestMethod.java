@@ -125,7 +125,7 @@ public class ForestMethod<T> implements VariableScope {
     private MappingParameter[] forestParameters;
     private final List<MappingParameter> namedParameters = new ArrayList<>();
     private final List<ForestMultipartFactory> multipartFactories = new ArrayList<>();
-    private final Map<String, MappingVariable> variables = new ConcurrentHashMap<>();
+    private final Map<String, ForestVariable> variables = new ConcurrentHashMap<>();
     private final Map<String, MappingTemplate> templateCache = new ConcurrentHashMap<>();
     private MappingParameter onSuccessParameter = null;
     private MappingParameter onErrorParameter = null;
@@ -188,9 +188,40 @@ public class ForestMethod<T> implements VariableScope {
         return getVariableValue(name, this);
     }
 
-    @Override
+    @Deprecated
     public Object getVariableValue(String name, ForestMethod method) {
-        return configuration.getVariableValue(name, method);
+        ForestVariable variable = getVariable(name);
+        if (variable == null) {
+            return null;
+        }
+        if (variable instanceof ForestMethodVariable) {
+            return ((ForestMethodVariable) variable).getValue(method);
+        }
+        return variable.getValue(null);
+    }
+
+
+    @Override
+    public <R> R getVariableValue(String name, Class<R> clazz) {
+        return getVariableValue(name, null, clazz);
+    }
+
+    @Override
+    public Object getVariableValue(String name, ForestRequest request) {
+        ForestVariable variable = getVariable(name);
+        if (variable == null) {
+            return null;
+        }
+        return variable.getValue(request);
+    }
+
+    @Override
+    public <R> R getVariableValue(String name, ForestRequest request, Class<R> clazz) {
+        ForestVariable variable = getVariable(name);
+        if (variable == null) {
+            return null;
+        }
+        return variable.getValue(request, clazz);
     }
 
     public MappingTemplate makeTemplate(MappingParameter parameter) {
@@ -265,8 +296,12 @@ public class ForestMethod<T> implements VariableScope {
 
 
     @Override
-    public MappingVariable getVariable(String name) {
-        return variables.get(name);
+    public ForestVariable getVariable(String name) {
+        ForestVariable variable = variables.get(name);
+        if (variable == null && configuration != null) {
+            return configuration.getVariable(name);
+        }
+        return variable;
     }
 
     public MappingParameter[] getParameters() {
@@ -824,7 +859,7 @@ public class ForestMethod<T> implements VariableScope {
      * @param name     变量名
      * @param variable 变量对象，{@link MappingVariable}类实例
      */
-    public void addVariable(String name, MappingVariable variable) {
+    public void addVariable(String name, ForestVariable variable) {
         variables.put(name, variable);
     }
 
@@ -857,11 +892,12 @@ public class ForestMethod<T> implements VariableScope {
     /**
      * 获得最终的请求类型
      *
+     * @param request 请求对象
      * @param args 调用本对象对应方法时传入的参数数组
      * @return 请求类型，{@link ForestRequestType}枚举实例
      */
-    private ForestRequestType type(Object[] args) {
-        String renderedType = typeTemplate.render(args);
+    private ForestRequestType type(ForestRequest request, Object[] args) {
+        String renderedType = typeTemplate.render(request, args);
         if (StringUtils.isBlank(renderedType)) {
             String typeFromName = methodNameItems[0];
             ForestRequestType type = ForestRequestType.findType(typeFromName);
@@ -887,67 +923,68 @@ public class ForestMethod<T> implements VariableScope {
         initMethod();
         final MetaRequest baseMetaRequest = interfaceProxyHandler.getBaseMetaRequest();
         ForestURL baseURL = null;
-        final ForestRequestType type = type(args);
+        
 
         // createExecutor and initialize http instance
         final ForestRequest<T> request = new ForestRequest<>(configuration, this, args);
+        final ForestRequestType type = type(request, args);
 
         final ForestQueryMap queries = new ForestQueryMap(request);
         if (baseUrlTemplate != null) {
-            baseURL = baseUrlTemplate.render(args, queries);
+            baseURL = baseUrlTemplate.render(request, args, queries);
         }
         if (urlTemplate == null) {
             throw new ForestRuntimeException("request URL is empty");
         }
-        final ForestURL renderedURL = urlTemplate.render(args, queries);
+        final ForestURL renderedURL = urlTemplate.render(request, args, queries);
 
         String baseContentEncoding = null;
         if (baseEncodeTemplate != null) {
-            baseContentEncoding = baseEncodeTemplate.render(args);
+            baseContentEncoding = baseEncodeTemplate.render(request, args);
         }
         String contentEncoding = null;
         if (encodeTemplate != null) {
-            contentEncoding = encodeTemplate.render(args);
+            contentEncoding = encodeTemplate.render(request, args);
         }
 
         String baseContentType = null;
         if (baseContentTypeTemplate != null) {
-            baseContentType = baseContentTypeTemplate.render(args);
+            baseContentType = baseContentTypeTemplate.render(request, args);
         }
         String baseUserAgent = null;
         if (baseUserAgentTemplate != null) {
-            baseUserAgent = baseUserAgentTemplate.render(args);
+            baseUserAgent = baseUserAgentTemplate.render(request, args);
         }
         String charset = null;
-        final String renderedCharset = charsetTemplate.render(args);
+        final String renderedCharset = charsetTemplate.render(request, args);
         if (StringUtils.isNotBlank(renderedCharset)) {
             charset = renderedCharset;
         } else if (baseCharsetTemplate != null) {
-            charset = baseCharsetTemplate.render(args);
+            charset = baseCharsetTemplate.render(request, args);
         }
 
         String responseEncoding = null;
         if (responseEncodingTemplate != null) {
-            responseEncoding = responseEncodingTemplate.render(args);
+            responseEncoding = responseEncodingTemplate.render(request, args);
         }
 
         String sslProtocol = null;
-        final String renderedSslProtocol = sslProtocolTemplate.render(args);
+        final String renderedSslProtocol = sslProtocolTemplate.render(request, args);
         if (StringUtils.isNotBlank(renderedSslProtocol) && !"null".equals(renderedSslProtocol)) {
             sslProtocol = renderedSslProtocol;
         } else if (baseSslProtocolTemplate != null) {
-            sslProtocol = baseSslProtocolTemplate.render(args);
+            sslProtocol = baseSslProtocolTemplate.render(request, args);
         } else {
             sslProtocol = configuration.getSslProtocol();
         }
 
         String renderedContentType = null;
         if (contentTypeTemplate != null) {
-            renderedContentType = contentTypeTemplate.render(args).trim();
+            renderedContentType = contentTypeTemplate.render(request, args).trim();
         }
         String renderedUserAgent = null;
         if (userAgentTemplate != null) {
-            renderedUserAgent = userAgentTemplate.render(args).trim();
+            renderedUserAgent = userAgentTemplate.render(request, args).trim();
         }
         final List<RequestNameValue> nameValueList = new ArrayList<>();
         final String[] headerArray = baseMetaRequest.getHeaders();
@@ -986,7 +1023,7 @@ public class ForestMethod<T> implements VariableScope {
 
         String bodyTypeName = "text";
         if (bodyTypeTemplate != null) {
-            bodyTypeName = bodyTypeTemplate.render(args);
+            bodyTypeName = bodyTypeTemplate.render(request, args);
         }
         ForestDataType bodyType = ForestDataType.findByName(bodyTypeName);
 
@@ -1025,7 +1062,7 @@ public class ForestMethod<T> implements VariableScope {
 
 
         for (final MappingTemplate headerTemplate : headerTemplateArray) {
-            final String header = headerTemplate.render(args);
+            final String header = headerTemplate.render(request, args);
             final String[] headNameValue = header.split(":", 2);
             if (headNameValue.length > 0) {
                 final String name = headNameValue[0].trim();
@@ -1231,10 +1268,10 @@ public class ForestMethod<T> implements VariableScope {
                                 VariableScope parentScope = template.getVariableScope();
                                 for (Object subItem : (Iterable) obj) {
                                     SubVariableScope scope = new SubVariableScope(parentScope);
-                                    scope.addVariableValue("_it", subItem);
-                                    scope.addVariableValue("_index", index++);
+                                    scope.setVariable("_it", subItem);
+                                    scope.setVariable("_index", index++);
                                     template.setVariableScope(scope);
-                                    String name = template.render(args);
+                                    String name = template.render(request, args);
                                     request.addQuery(
                                             name, subItem,
                                             parameter.isUrlEncode(), parameter.getCharset());
@@ -1256,9 +1293,9 @@ public class ForestMethod<T> implements VariableScope {
                                 for (Object subItem : (Iterable) obj) {
                                     SubVariableScope scope = new SubVariableScope(parentScope);
                                     template.setVariableScope(scope);
-                                    scope.addVariableValue("_it", subItem);
-                                    scope.addVariableValue("_index", index++);
-                                    String name = template.render(args);
+                                    scope.setVariable("_it", subItem);
+                                    scope.setVariable("_index", index++);
+                                    String name = template.render(request, args);
                                     nameValueList.add(
                                             new RequestNameValue(name, subItem, target, parameter.getPartContentType())
                                                     .setDefaultValue(parameter.getDefaultValue()));
@@ -1308,13 +1345,13 @@ public class ForestMethod<T> implements VariableScope {
             final MappingTemplate fileNameTemplate = factory.getFileNameTemplate();
             final int index = factory.getIndex();
             final Object data = args[index];
-            factory.addMultipart(nameTemplate, fileNameTemplate, data, multiparts, args);
+            factory.addMultipart(request, nameTemplate, fileNameTemplate, data, multiparts, args);
         }
         request.setMultiparts(multiparts);
         // setup ssl keystore
         if (sslKeyStoreId != null) {
             SSLKeyStore sslKeyStore = null;
-            final String keyStoreId = sslKeyStoreId.render(args);
+            final String keyStoreId = sslKeyStoreId.render(request, args);
             if (StringUtils.isNotEmpty(keyStoreId)) {
                 sslKeyStore = configuration.getKeyStore(keyStoreId);
                 request.setKeyStore(sslKeyStore);
@@ -1343,7 +1380,7 @@ public class ForestMethod<T> implements VariableScope {
         renderedContentType = request.getContentType();
         if (renderedContentType == null || renderedContentType.equalsIgnoreCase(ContentType.APPLICATION_X_WWW_FORM_URLENCODED)) {
             for (final MappingTemplate dataTemplate : dataTemplateArray) {
-                final String data = dataTemplate.render(args);
+                final String data = dataTemplate.render(request, args);
                 final String[] paramArray = data.split("&");
                 for (final String dataParam : paramArray) {
                     final String[] dataNameValue = dataParam.split("=", 2);
@@ -1360,7 +1397,7 @@ public class ForestMethod<T> implements VariableScope {
             }
         } else {
             for (final MappingTemplate dataTemplate : dataTemplateArray) {
-                final String data = dataTemplate.render(args);
+                final String data = dataTemplate.render(request, args);
                 request.addBody(data);
             }
         }
@@ -1394,7 +1431,7 @@ public class ForestMethod<T> implements VariableScope {
             request.setOnLoadCookie(onLoadCookieCallback);
         }
 
-        String dataType = dataTypeTemplate.render(args);
+        String dataType = dataTypeTemplate.render(request, args);
         if (StringUtils.isEmpty(dataType)) {
             request.setDataType(ForestDataType.TEXT);
         } else {
@@ -1409,7 +1446,7 @@ public class ForestMethod<T> implements VariableScope {
                 request.addInterceptorAttributes(newAttrs.getInterceptorClass(), newAttrs);
             }
             for (final InterceptorAttributes attributes : request.getInterceptorAttributes().values()) {
-                request.getInterceptorAttributes(attributes.getInterceptorClass()).render(args);
+                request.getInterceptorAttributes(attributes.getInterceptorClass()).render(request, args);
             }
         }
 

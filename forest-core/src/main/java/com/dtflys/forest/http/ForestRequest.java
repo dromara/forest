@@ -65,6 +65,7 @@ import com.dtflys.forest.interceptor.InterceptorChain;
 import com.dtflys.forest.lifecycles.file.DownloadLifeCycle;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.RequestLogMessage;
+import com.dtflys.forest.mapping.AbstractVariableScope;
 import com.dtflys.forest.mapping.MappingURLTemplate;
 import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.multipart.ByteArrayMultipart;
@@ -72,7 +73,9 @@ import com.dtflys.forest.multipart.FileMultipart;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.multipart.InputStreamMultipart;
 import com.dtflys.forest.pool.ForestRequestPool;
+import com.dtflys.forest.reflection.ForestArgumentsVariable;
 import com.dtflys.forest.reflection.ForestMethod;
+import com.dtflys.forest.reflection.ForestVariable;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
 import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
@@ -131,7 +134,7 @@ import static com.dtflys.forest.mapping.MappingParameter.TARGET_QUERY;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-03-24
  */
-public class ForestRequest<T> implements HasURL, HasHeaders {
+public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> implements HasURL, HasHeaders {
 
     private final static Object[] EMPTY_RENDER_ARGS = new Object[0];
 
@@ -486,6 +489,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
 
 
     public ForestRequest(ForestConfiguration configuration, ForestMethod method, ForestBody body, Object[] arguments) {
+        super(method != null ? method : configuration);
         this.configuration = configuration;
         this.method = method;
         this.arguments = arguments;
@@ -494,6 +498,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
 
 
     public ForestRequest(ForestConfiguration configuration, ForestMethod method, Object[] arguments) {
+        super(method != null ? method : configuration);
         this.configuration = configuration;
         this.method = method;
         this.arguments = arguments;
@@ -662,6 +667,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
      *
      * @return 配置对象
      */
+    @Override
     public ForestConfiguration getConfiguration() {
         return configuration;
     }
@@ -798,7 +804,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
             this.query.clearQueriesFromUrl();
         }
 
-        final ForestURL newUrl = urlTemplate.render(args, this.query);
+        final ForestURL newUrl = urlTemplate.render(this, args, this.query);
         if (this.url == null) {
             this.url = newUrl;
         } else {
@@ -4160,7 +4166,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
             downloadFileMap.put("dir", dir);
             downloadFileMap.put("filename", filename != null ? filename : "");
             InterceptorAttributes attributes = new InterceptorAttributes(DownloadLifeCycle.class, downloadFileMap);
-            attributes.render(new Object[0]);
+            attributes.render(this, new Object[0]);
             this.addInterceptorAttributes(DownloadLifeCycle.class, attributes);
         }
         return this;
@@ -4368,52 +4374,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
     public ForestRequest<T> onSaveCookie(OnSaveCookie onSaveCookie) {
         return setOnSaveCookie(onSaveCookie);
     }
-
-    /**
-     * 获取请求所绑定到的变量值
-     *
-     * @param name 变量名
-     * @return 变量值
-     */
-    public Object getVariableValue(String name) {
-        MappingVariable variable = method.getVariable(name);
-        if (variable != null) {
-            return getArgument(variable.getIndex());
-        }
-        if (!method.isVariableDefined(name)) {
-            throw new ForestVariableUndefinedException(name);
-        }
-        return method.getVariableValue(name, method);
-    }
-
-    /**
-     * 获取请求所绑定到的变量值
-     *
-     * @param name 变量名
-     * @param clazz 返回类型
-     * @return 变量名
-     * @param <R> 返回类型
-     */
-    public <R> R getVariableValue(String name, Class<R> clazz) {
-        final Object result = getVariableValue(name);
-        if (result == null) {
-            return null;
-        }
-        return clazz.cast(result);
-    }
-
-    /**
-     * 获取请求所绑定到的变量值
-     * <p>同 {@link ForestRequest#getVariableValue(String)}
-     *
-     * @param name 变量名
-     * @return 变量值
-     * @see ForestRequest#getVariableValue(String)
-     */
-    public Object variableValue(String name) {
-        return getVariableValue(name);
-    }
-
+    
 
     /**
      * 添加拦截器到该请求中
@@ -4475,7 +4436,7 @@ public class ForestRequest<T> implements HasURL, HasHeaders {
                 oldAttributes.getAttributeTemplates().put(entry.getKey(), entry.getValue());
             }
             if (!attributes.getAttributeTemplates().isEmpty()) {
-                oldAttributes.render(arguments);
+                oldAttributes.render(this, arguments);
             }
             for (Map.Entry<String, Object> entry : attributes.getAttributes().entrySet()) {
                 oldAttributes.addAttribute(entry.getKey(), entry.getValue());
