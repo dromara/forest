@@ -1,10 +1,10 @@
 package com.dtflys.forest.springboot.test.binding;
 
-import com.dtflys.forest.annotation.BindingVar;
+import com.dtflys.forest.annotation.Var;
 import org.springframework.stereotype.Component;
 
-@BindingVar
 @Component
+@Var("testVariables")
 public class TestVariables {
 
     public String getTestName() {

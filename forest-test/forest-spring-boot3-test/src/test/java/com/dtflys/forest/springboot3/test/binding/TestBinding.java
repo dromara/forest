@@ -1,6 +1,7 @@
 package com.dtflys.forest.springboot3.test.binding;
 
 import com.dtflys.forest.annotation.BindingVar;
+import com.dtflys.forest.annotation.Var;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.springboot3.test.BaseSpringBootTest;
 import com.dtflys.forest.springboot3.test.address.TestAddress;
@@ -10,6 +11,8 @@ import okhttp3.mockwebserver.MockWebServer;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
@@ -29,6 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TestBinding extends BaseSpringBootTest {
 
     public final static String EXPECTED = "{\"status\": \"ok\"}";
+    private static final Logger log = LoggerFactory.getLogger(TestBinding.class);
 
     @Rule
     public MockWebServer server = new MockWebServer();
@@ -36,8 +40,9 @@ public class TestBinding extends BaseSpringBootTest {
     @Resource
     private BindingVarClient bindingVarClient;
 
-    @BindingVar("port")
-    public int getPort() {
+    @Var("port")
+    public int getPort(ForestRequest<?> request) {
+        log.info("getPort, url: {}", request.getUrl());
         return server.getPort();
     }
 

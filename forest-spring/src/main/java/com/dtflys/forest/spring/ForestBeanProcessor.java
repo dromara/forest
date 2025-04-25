@@ -2,6 +2,7 @@ package com.dtflys.forest.spring;
 
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.annotation.BindingVar;
+import com.dtflys.forest.annotation.Var;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.utils.NameUtils;
 import com.dtflys.forest.utils.StringUtils;
@@ -49,26 +50,43 @@ public class ForestBeanProcessor implements InstantiationAwareBeanPostProcessor 
                 configuration = Forest.config();
             }
             final String varName = bindingBeanVariableName(classAnnotation.value(), beanName);
-            configuration.setVariableValue(varName, bean);
+            configuration.setVariable(varName, bean);
         }
+
+        final Var classVarAnnotation = AnnotationUtils.findAnnotation(beanClass, Var.class);
+        // 类级别 Var 绑定
+        if (classVarAnnotation != null) {
+            ForestConfiguration configuration = Forest.config();
+            final String varName = bindingBeanVariableName(classVarAnnotation.value(), beanName);
+            configuration.setVariable(varName, bean);
+        }
+
 
         // 方法级别绑定
         final Method[] methods = beanClass.getDeclaredMethods();
         for (final Method method : methods) {
+            String confId = null;
+            String name = null;
             final BindingVar annotation = method.getAnnotation(BindingVar.class);
-            if (annotation == null) {
+            final Var varAnnotation = AnnotationUtils.findAnnotation(method, Var.class);
+            if (annotation == null && varAnnotation != null) {
                 continue;
             }
-            final String confId = annotation.configuration();
+            if (annotation != null) {
+                confId = annotation.configuration();
+                name = annotation.value();
+            } else if (varAnnotation != null) {
+                name = varAnnotation.value();
+            }
             ForestConfiguration configuration = null;
             if (StringUtils.isNotBlank(confId)) {
                 configuration = Forest.config(confId);
             } else {
                 configuration = Forest.config();
             }
-            final String varName = bindingMethodVariableName(annotation.value(), method);
+            final String varName = bindingMethodVariableName(name, method);
             SpringMethodVariableValue variableValue = new SpringMethodVariableValue(bean, method);
-            configuration.setVariableValue(varName, variableValue);
+            configuration.setVariable(varName, variableValue);
         }
     }
 

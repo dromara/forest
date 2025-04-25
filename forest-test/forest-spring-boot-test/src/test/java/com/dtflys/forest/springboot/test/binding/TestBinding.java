@@ -37,7 +37,7 @@ public class TestBinding extends BaseSpringBootTest {
     @Resource
     private BindingVarClient bindingVarClient;
 
-    @BindingVar("port")
+    @BindingVar
     public int getPort() {
         return server.getPort();
     }
@@ -46,8 +46,8 @@ public class TestBinding extends BaseSpringBootTest {
     public void testBindingVar() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         ForestRequest<String> request = bindingVarClient.testBindingVar();
-        assertThat(request.getPort()).isEqualTo(server.getPort());
-        assertThat(request.getPath()).isEqualTo("/" + testVariables.getTestName());
+        assertThat(request.port()).isEqualTo(server.getPort());
+        assertThat(request.path()).isEqualTo("/" + testVariables.getTestName());
         request.execute();
     }
 
