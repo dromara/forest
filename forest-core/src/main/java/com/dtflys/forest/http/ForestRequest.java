@@ -50,7 +50,6 @@ import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestAsyncAbortException;
 import com.dtflys.forest.exceptions.ForestRetryException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.body.ByteArrayRequestBody;
 import com.dtflys.forest.http.body.FileRequestBody;
@@ -67,15 +66,12 @@ import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.RequestLogMessage;
 import com.dtflys.forest.mapping.AbstractVariableScope;
 import com.dtflys.forest.mapping.MappingURLTemplate;
-import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.multipart.ByteArrayMultipart;
 import com.dtflys.forest.multipart.FileMultipart;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.multipart.InputStreamMultipart;
 import com.dtflys.forest.pool.ForestRequestPool;
-import com.dtflys.forest.reflection.ForestArgumentsVariable;
 import com.dtflys.forest.reflection.ForestMethod;
-import com.dtflys.forest.reflection.ForestVariable;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
 import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
@@ -4957,6 +4953,16 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      */
     public ForestRequestPool pool() {
         return this.configuration.getPool();
+    }
+
+    @Override
+    public Object getVariableValue(String name) {
+        return getVariableValue(name, this);
+    }
+
+    @Override
+    public <R> R getVariableValue(String name, Class<R> clazz) {
+        return getVariableValue(name, this, clazz);
     }
 
     /**

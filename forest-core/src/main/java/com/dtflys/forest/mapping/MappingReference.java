@@ -38,17 +38,20 @@ public class MappingReference extends MappingExpr {
 
     @Override
     public Object render(ForestRequest request, Object[] args) {
-        ForestVariable variable = variableScope.getVariable(name);
+        ForestVariable variable = null;
+        if (variableScope != null) {
+            variable = variableScope.getVariable(name);
+        }
+        if (variable == null && request != null) {
+            variable = request.getVariable(name);
+        }
         if (variable != null) {
             if (variable instanceof ForestArgumentsVariable) {
                 return ((ForestArgumentsVariable) variable).getValue(request, args);
             }
             return variable.getValue(request);
         }
-        if (!variableScope.isVariableDefined(name)) {
-            throw new ForestVariableUndefinedException(name, startIndex, endIndex);
-        }
-        return variableScope.getVariableValue(name, request);
+        throw new ForestVariableUndefinedException(name, startIndex, endIndex);
     }
 
     @Override

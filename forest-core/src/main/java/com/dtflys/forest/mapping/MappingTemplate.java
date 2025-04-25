@@ -502,7 +502,7 @@ public class MappingTemplate {
 
     public String render(ForestRequest request, Object[] args) {
         try {
-            ForestJsonConverter jsonConverter = variableScope.getConfiguration().getJsonConverter();
+            ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
             int len = exprList.size();
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i < len; i++) {

@@ -241,7 +241,7 @@ public class MappingParameter implements ForestArgumentsVariable {
     @Override
     public Object getValue(ForestRequest request, Object[] args) {
         if (index != null && index >= 0) {
-            if (args != null) {
+            if (args != null && args.length > 0) {
                 if (index < args.length) {
                     return args[index];
                 }
@@ -251,7 +251,16 @@ public class MappingParameter implements ForestArgumentsVariable {
                 return request.argument(index);
             }
         }
-        request.getVariableValue(name);
+        ForestVariable variable = null;
+        if (request != null) {
+            variable = request.getVariable(name);
+        }
+        if (variable != null) {
+            if (variable instanceof ForestArgumentsVariable) {
+                return ((ForestArgumentsVariable) variable).getValue(request, args);
+            }
+            return variable.getValue(request);
+        }
         return getConvertedDefaultValue(request.getConfiguration().getJsonConverter());
     }
 }

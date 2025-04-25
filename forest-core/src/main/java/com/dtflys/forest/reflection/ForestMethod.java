@@ -271,7 +271,7 @@ public class ForestMethod<T> implements VariableScope {
                                     attributeName,
                                     this,
                                     text,
-                                    this,
+                                    null,
                                     configuration.getProperties(),
                                     forestParameters);
                     if (templateCache.size() < 128) {
