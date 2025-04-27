@@ -17,7 +17,7 @@ import java.util.Map;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.5.0-BETA9
  */
-public abstract class AbstractBodyLifeCycle<A extends Annotation> implements ParameterAnnotationLifeCycle<A, Object> {
+public abstract class AbstractBodyLifeCycle<A extends Annotation> implements ParameterAnnotationLifeCycle<A, Void> {
 
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, A annotation) {

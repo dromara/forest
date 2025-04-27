@@ -12,7 +12,7 @@ import com.dtflys.forest.reflection.ForestMethod;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.5.1
  */
-public class RedirectionLifeCycle implements MethodAnnotationLifeCycle<Redirection, Object> {
+public class RedirectionLifeCycle implements MethodAnnotationLifeCycle<Redirection, Void> {
 
     private final static String PARAM_KEY_AUTO_REDIRECTS = "__auto_redirects";
 

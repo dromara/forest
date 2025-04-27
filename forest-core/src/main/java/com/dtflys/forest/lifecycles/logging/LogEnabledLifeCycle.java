@@ -7,7 +7,7 @@ import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MetaRequest;
 
-public class LogEnabledLifeCycle implements MethodAnnotationLifeCycle<LogEnabled, Object> {
+public class LogEnabledLifeCycle implements MethodAnnotationLifeCycle<LogEnabled, Void> {
 
     @Override
     public void onMethodInitialized(ForestMethod method, LogEnabled annotation) {

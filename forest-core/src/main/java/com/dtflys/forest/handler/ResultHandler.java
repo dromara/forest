@@ -116,7 +116,7 @@ public class ResultHandler {
         }
         if (isReceivedResponseData(response)) {
             try {
-                if (void.class.isAssignableFrom(resultClass)) {
+                if (void.class.isAssignableFrom(resultClass) || Void.class.isAssignableFrom(resultClass)) {
                     return null;
                 }
                 // 处理特殊泛型类型 （ForestResponse, ForestRequest, Optional）

@@ -9,7 +9,7 @@ import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MetaRequest;
 
-public class LogHandlerLifeCycle implements MethodAnnotationLifeCycle<LogHandler, Object> {
+public class LogHandlerLifeCycle implements MethodAnnotationLifeCycle<LogHandler, Void> {
 
 
     @Override

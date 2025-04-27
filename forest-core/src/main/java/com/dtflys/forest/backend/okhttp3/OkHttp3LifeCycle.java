@@ -4,7 +4,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.reflection.ForestMethod;
 
-public class OkHttp3LifeCycle implements MethodAnnotationLifeCycle<OkHttp3, Object> {
+public class OkHttp3LifeCycle implements MethodAnnotationLifeCycle<OkHttp3, Void> {
 
     private final static String PARAM_KEY_OKHTTP3_PROVIDER = "__okhttp3_provider";
 

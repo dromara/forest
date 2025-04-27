@@ -11,7 +11,7 @@ import com.dtflys.forest.reflection.ForestMethod;
 import java.lang.reflect.Type;
 import java.util.Optional;
 
-public class JSONPathResultLifeCycle implements MethodAnnotationLifeCycle<JSONPathResult, Object> {
+public class JSONPathResultLifeCycle implements MethodAnnotationLifeCycle<JSONPathResult, Void> {
     
     @Override
     public void onMethodInitialized(ForestMethod method, JSONPathResult annotation) {

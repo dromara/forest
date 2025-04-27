@@ -16,7 +16,7 @@ import java.util.Map;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2020-08-21 1:37
  */
-public class VariableLifeCycle implements ParameterAnnotationLifeCycle<Annotation, Object> {
+public class VariableLifeCycle implements ParameterAnnotationLifeCycle<Annotation, Void> {
 
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, Annotation annotation) {

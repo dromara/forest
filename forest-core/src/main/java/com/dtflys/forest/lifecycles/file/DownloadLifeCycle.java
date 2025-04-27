@@ -6,6 +6,7 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.extensions.DownloadFile;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.interceptor.ResponseResult;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.LogConfiguration;
@@ -28,7 +29,7 @@ import java.lang.reflect.Type;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2020-08-04 02:29
  */
-public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile, Object> {
+public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile, Void> {
 
     public final static String ATTACHMENT_NAME_FILE = "__file";
 
@@ -77,7 +78,7 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
     }
 
     @Override
-    public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
+    public void onSuccess(Void data, ForestRequest request, ForestResponse response) {
         final String dirPath = getAttributeAsString(request, "dir");
         String filename = getAttributeAsString(request, "filename");
         final Type resultType = getAttribute(request, "__resultType", Type.class);
@@ -99,17 +100,14 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
             }
         }
         InputStream in = null;
-        if (data != null && data instanceof byte[]) {
-            in = new ByteArrayInputStream((byte[]) data);
-        } else {
-            try {
-                in = response.getInputStream();
-            } catch (Exception e) {
-                throw new ForestRuntimeException(e);
-            }
+        try {
+            in = response.getInputStream();
+        } catch (Exception e) {
+            throw new ForestRuntimeException(e);
         }
         final String path = dir.getAbsolutePath() + File.separator + filename;
         final File file = new File(path);
+        Object resultData = null;
         try {
             FileUtils.copyInputStreamToFile(in, file);
             FileUtils.waitFor(file, 10);
@@ -122,8 +120,8 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
                         .getConfiguration()
                         .getConverterMap()
                         .get(ForestDataType.AUTO);
-                data = converter.convertToJavaObject(file, resultType);
-                response.setResult(data);
+                resultData = converter.convertToJavaObject(file, resultType);
+                response.setResult(resultData);
             }
         } catch (IOException e) {
             throw new ForestRuntimeException(e);
@@ -134,5 +132,8 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
                 throw new ForestRuntimeException(e);
             }
         }
+
     }
+
+
 }

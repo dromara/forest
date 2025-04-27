@@ -1,5 +1,7 @@
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.reflection.ForestVariable;
+
 /**
  * Forest 延迟求值 Lambda 接口
  *
@@ -7,7 +9,7 @@ package com.dtflys.forest.http;
  * @author gongjun
  * @since 1.5.29
  */
-public interface Lazy<T> {
+public interface Lazy<T> extends ForestVariable {
 
     /**
      * 调用 Lambda 进行求值

@@ -14,7 +14,7 @@ import com.dtflys.forest.utils.StringUtils;
  *
  * @author gongjun [dt_flys@hotmail.com]
  */
-public class AddressLifeCycle implements MethodAnnotationLifeCycle<Address, Object> {
+public class AddressLifeCycle implements MethodAnnotationLifeCycle<Address, Void> {
 
 
     @Override

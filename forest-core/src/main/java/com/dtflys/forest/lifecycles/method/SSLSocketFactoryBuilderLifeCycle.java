@@ -13,7 +13,7 @@ import javax.net.ssl.HostnameVerifier;
  *
  * @author gongjun [dt_flys@hotmail.com]
  */
-public class SSLSocketFactoryBuilderLifeCycle implements MethodAnnotationLifeCycle<SSLSocketFactoryBuilder, Object> {
+public class SSLSocketFactoryBuilderLifeCycle implements MethodAnnotationLifeCycle<SSLSocketFactoryBuilder, Void> {
 
     private final static String PARAM_KEY_SSL_SOCKET_FACTORY_BUILDER = "__ssl_socket_factory_builder";
 

@@ -12,7 +12,7 @@ import com.dtflys.forest.reflection.ForestMethod;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.5.1
  */
-public class DecompressGzipLifeCycle implements MethodAnnotationLifeCycle<DecompressGzip, Object> {
+public class DecompressGzipLifeCycle implements MethodAnnotationLifeCycle<DecompressGzip, Void> {
 
     private final static String PARAM_KEY_DECOMPRESS_GZIP = "__decompress_gzip";
 

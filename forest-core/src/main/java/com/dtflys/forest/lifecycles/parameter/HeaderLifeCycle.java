@@ -15,7 +15,7 @@ import java.util.Map;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2020-08-21 1:31
  */
-public class HeaderLifeCycle implements ParameterAnnotationLifeCycle<Header, Object> {
+public class HeaderLifeCycle implements ParameterAnnotationLifeCycle<Header, Void> {
 
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, Header annotation) {

@@ -7,7 +7,7 @@ import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MetaRequest;
 
 
-public class HeadersLifeCycle implements MethodAnnotationLifeCycle<Headers, Object> {
+public class HeadersLifeCycle implements MethodAnnotationLifeCycle<Headers, Void> {
 
     @Override
     public void onMethodInitialized(ForestMethod method, Headers annotation) {

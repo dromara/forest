@@ -14,7 +14,7 @@ import java.util.Map;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.5.1
  */
-public class URLEncodeLifeCycle implements ParameterAnnotationLifeCycle<URLEncode, Object> {
+public class URLEncodeLifeCycle implements ParameterAnnotationLifeCycle<URLEncode, Void> {
 
     @Override
     public void onParameterInitialized(ForestMethod method, MappingParameter parameter, URLEncode annotation) {

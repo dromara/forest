@@ -13,7 +13,7 @@ import javax.net.ssl.HostnameVerifier;
  *
  * @author gongjun [dt_flys@hotmail.com]
  */
-public class SSLHostnameVerifierLifeCycle implements MethodAnnotationLifeCycle<SSLHostnameVerifier, Object> {
+public class SSLHostnameVerifierLifeCycle implements MethodAnnotationLifeCycle<SSLHostnameVerifier, Void> {
 
     private final static String PARAM_KEY_HOSTNAME_VERIFIER = "__hostname_verifier";
 

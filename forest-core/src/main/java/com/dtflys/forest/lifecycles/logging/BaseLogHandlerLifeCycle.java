@@ -13,7 +13,7 @@ import com.dtflys.forest.proxy.InterfaceProxyHandler;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.MetaRequest;
 
-public class BaseLogHandlerLifeCycle implements BaseAnnotationLifeCycle<LogHandler, Object> {
+public class BaseLogHandlerLifeCycle implements BaseAnnotationLifeCycle<LogHandler, Void> {
 
 
     @Override

@@ -9,7 +9,7 @@ import com.dtflys.forest.utils.ReflectUtils;
 import java.lang.annotation.Annotation;
 
 
-public class RequestLifeCycle implements MethodAnnotationLifeCycle<Annotation, Object> {
+public class RequestLifeCycle implements MethodAnnotationLifeCycle<Annotation, Void> {
 
     protected MetaRequest createMetaRequest(Annotation annotation) {
         final MetaRequest metaRequest = new MetaRequest(annotation);
