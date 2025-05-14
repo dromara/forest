@@ -11,7 +11,7 @@ import com.dtflys.forest.reflection.MetaRequest;
 
 import java.util.Optional;
 
-public class BaseLogEnabledLifeCycle implements BaseAnnotationLifeCycle<LogEnabled, Void> {
+public class BaseLogEnabledLifeCycle implements BaseAnnotationLifeCycle<LogEnabled> {
 
     @Override
     public void onProxyHandlerInitialized(InterfaceProxyHandler interfaceProxyHandler, LogEnabled annotation) {

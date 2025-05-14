@@ -50,8 +50,6 @@ import java.util.Optional;
  */
 public abstract class ForestResponse<T> extends ResultGetter implements HasURL, HasHeaders {
 
-    protected final static int MAX_BYTES_CAPACITY = 1024 * 1024 * 2;
-
     /**
      * 请求对象
      */

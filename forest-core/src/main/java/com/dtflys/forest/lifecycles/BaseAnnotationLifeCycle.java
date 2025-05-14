@@ -3,6 +3,7 @@ package com.dtflys.forest.lifecycles;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.interceptor.ForestInterceptor;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.proxy.InterfaceProxyHandler;
 
@@ -12,7 +13,7 @@ import java.lang.annotation.Annotation;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2020-08-23 23:04
  */
-public interface BaseAnnotationLifeCycle <A extends Annotation, I> extends Interceptor<I> {
+public interface BaseAnnotationLifeCycle <A extends Annotation> extends ForestInterceptor {
 
     /**
      * 在被注解修饰的接口初始化时被调用
@@ -26,7 +27,4 @@ public interface BaseAnnotationLifeCycle <A extends Annotation, I> extends Inter
     default void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
     }
 
-    @Override
-    default void onSuccess(I data, ForestRequest request, ForestResponse response) {
-    }
 }

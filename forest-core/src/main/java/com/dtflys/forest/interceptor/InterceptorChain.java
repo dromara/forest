@@ -76,10 +76,14 @@ public class InterceptorChain implements Interceptor {
     @Override
     public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
         for (Interceptor item : interceptors) {
-            if (response != null) {
-                data = response.getResult();
+            if (item instanceof ForestInterceptor) {
+                item.onSuccess(null, request, response);
+            } else {
+                if (response != null) {
+                    data = response.getResult();
+                }
+                item.onSuccess(data, request, response);
             }
-            item.onSuccess(data, request, response);
         }
     }
 
