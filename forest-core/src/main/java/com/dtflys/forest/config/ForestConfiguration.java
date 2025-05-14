@@ -967,7 +967,7 @@ public class ForestConfiguration implements VariableScope, Serializable {
      * @since 1.5.6
      */
     public ForestConfiguration setConnectTimeout(int connectTimeout, TimeUnit timeUnit) {
-        this.connectTimeout = TimeUtils.toMillis("global connect timeout", connectTimeout, timeUnit);
+        this.connectTimeout = TimeUtils.toMillis(connectTimeout, timeUnit);
         return this;
     }
 
@@ -1015,7 +1015,7 @@ public class ForestConfiguration implements VariableScope, Serializable {
      * @since 1.5.6
      */
     public ForestConfiguration setReadTimeout(int readTimeout, TimeUnit timeUnit) {
-        this.readTimeout = TimeUtils.toMillis("global read timeout", readTimeout, timeUnit);
+        this.readTimeout = TimeUtils.toMillis(readTimeout, timeUnit);
         return this;
     }
 

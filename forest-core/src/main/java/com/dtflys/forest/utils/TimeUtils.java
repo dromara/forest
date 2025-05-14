@@ -33,21 +33,16 @@ public class TimeUtils {
     /**
      * 将特定时间单位字段转换为毫秒数
      *
-     * @param name 字段名
      * @param duration 时长, 整数对象
      * @param timeUnit 时间单位
      * @return 毫秒数
      */
-    public static Integer toMillis(final String name, final Integer duration, final TimeUnit timeUnit) {
+    public static Integer toMillis(final Integer duration, final TimeUnit timeUnit) {
         if (isNone(duration)) {
             return null;
         }
         if (timeUnit != null) {
-            final long millis = timeUnit.toMillis(duration);
-            if (millis > Integer.MAX_VALUE) {
-                throw new ForestRuntimeException(name + " (" + millis + " ms) is too large");
-            }
-            return (int) millis;
+            return (int) timeUnit.toMillis(duration);
         }
         return duration;
     }

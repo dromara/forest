@@ -10,6 +10,7 @@ import com.dtflys.forest.annotation.Body;
 import com.dtflys.forest.annotation.Post;
 import com.dtflys.forest.annotation.Var;
 import com.dtflys.forest.auth.BasicAuth;
+import com.dtflys.forest.auth.BearerAuth;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ConvertOptions;
@@ -415,6 +416,33 @@ public class TestGenericForestClient extends BaseClientTest {
         mockRequest(server)
                 .assertHeaderEquals("Authorization", "Basic Zm9vOmJhcg==");
     }
+
+    @Test
+    public void testAuth_BasicAuth3() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        BasicAuth basicAuth = new BasicAuth("xx", "yy");
+        basicAuth.setUserInfo("foo:bar");
+
+        Forest.get("/")
+                .port(server.getPort())
+                .authenticator(basicAuth)
+                .execute();
+        mockRequest(server)
+                .assertHeaderEquals("Authorization", "Basic Zm9vOmJhcg==");
+    }
+
+
+    @Test
+    public void testAuth_BearerAuth() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.get("/")
+                .port(server.getPort())
+                .authenticator(new BearerAuth("test-token-xxxx"))
+                .execute();
+        mockRequest(server)
+                .assertHeaderEquals("Authorization", "Bearer test-token-xxxx");
+    }
+
 
 
     @Test

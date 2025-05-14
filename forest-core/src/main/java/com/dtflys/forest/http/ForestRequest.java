@@ -2607,7 +2607,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @since 1.5.6
      */
     public ForestRequest<T> connectTimeout(int connectTimeout, TimeUnit timeUnit) {
-        this.connectTimeout = TimeUtils.toMillis("connect timeout", connectTimeout, timeUnit);
+        this.connectTimeout = TimeUtils.toMillis(connectTimeout, timeUnit);
         return this;
     }
 
@@ -2680,7 +2680,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @since 1.5.6
      */
     public ForestRequest<T> readTimeout(int readTimeout, TimeUnit timeUnit) {
-        this.readTimeout = TimeUtils.toMillis("read timeout", readTimeout, timeUnit);
+        this.readTimeout = TimeUtils.toMillis(readTimeout, timeUnit);
         return this;
     }
 
