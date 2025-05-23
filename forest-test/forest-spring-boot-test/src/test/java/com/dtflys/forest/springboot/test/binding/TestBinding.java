@@ -1,6 +1,7 @@
 package com.dtflys.forest.springboot.test.binding;
 
 import com.dtflys.forest.annotation.BindingVar;
+import com.dtflys.forest.annotation.Var;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.springboot.test.BaseSpringBootTest;
 import com.dtflys.forest.springboot.test.address.TestAddress;
@@ -37,7 +38,7 @@ public class TestBinding extends BaseSpringBootTest {
     @Resource
     private BindingVarClient bindingVarClient;
 
-    @BindingVar
+    @Var("port")
     public int getPort() {
         return server.getPort();
     }

@@ -39,6 +39,7 @@ public interface ForestLogHandler {
      */
     void logResponseStatus(ResponseLogMessage responseLogMessage);
 
+
     /**
      * 打印响应内容日志
      * @param responseLogMessage 响应日志消息

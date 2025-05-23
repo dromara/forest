@@ -69,13 +69,13 @@ public class ForestBeanProcessor implements InstantiationAwareBeanPostProcessor 
             String name = null;
             final BindingVar annotation = method.getAnnotation(BindingVar.class);
             final Var varAnnotation = AnnotationUtils.findAnnotation(method, Var.class);
-            if (annotation == null && varAnnotation != null) {
+            if (annotation == null && varAnnotation == null) {
                 continue;
             }
             if (annotation != null) {
                 confId = annotation.configuration();
                 name = annotation.value();
-            } else if (varAnnotation != null) {
+            } else {
                 name = varAnnotation.value();
             }
             ForestConfiguration configuration = null;

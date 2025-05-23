@@ -6,6 +6,7 @@ import com.dtflys.forest.annotation.Get
 import com.dtflys.forest.annotation.JSONBody
 import com.dtflys.forest.annotation.Post
 import com.dtflys.forest.annotation.Query
+import com.dtflys.forest.annotation.Var
 import com.dtflys.forest.callback.OnSuccess
 import com.dtflys.forest.config.ForestConfiguration
 import com.dtflys.forest.mock.MockServerRequest
@@ -35,7 +36,7 @@ class TestKotlinClient(backend: String?, jsonConverter: String) : BaseClientTest
     var client : Client?
 
     init {
-        configuration?.setVariableValue("port", server.port)
+        configuration?.setVariable("port", {req -> server.port})
         client = configuration?.client(Client::class.java)
     }
 
@@ -46,8 +47,8 @@ class TestKotlinClient(backend: String?, jsonConverter: String) : BaseClientTest
         @Get("/")
         fun getText() : String
 
-        @Get("https://baidu.com")
-        fun getBaidu() : String
+        @Get("http://{hostname}:{port}")
+        fun getWithVariable(@Var("hostname") hostname: String) : String
 
         @Get("/")
         fun getWithQuery(@Query("name") name: String) : String
@@ -71,8 +72,9 @@ class TestKotlinClient(backend: String?, jsonConverter: String) : BaseClientTest
     }
 
     @Test
-    fun testGetBaidu() {
-        val result = client?.getBaidu()
+    fun testKotlinGetWithVariable() {
+        server.enqueue(MockResponse().setBody(EXPECTED))
+        val result = client?.getWithVariable(server.hostName)
         assertThat(result).isNotNull
     }
 

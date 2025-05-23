@@ -129,7 +129,7 @@ public class OkHttp3Executor implements HttpExecutor {
         final ResponseLogMessage logMessage = new ResponseLogMessage(response, response.getStatusCode());
         final ForestLogHandler logHandler = logConfiguration.getLogHandler();
         if (logHandler != null) {
-            if (logConfiguration.isLogResponseStatus()) {
+            if (logConfiguration.isLogResponseStatus() || logConfiguration.isLogResponseHeaders()) {
                 logHandler.logResponseStatus(logMessage);
             }
             if (logConfiguration.isLogResponseContent()) {

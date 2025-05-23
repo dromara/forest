@@ -32,6 +32,6 @@ public class MySSEInterceptor implements SSEInterceptor {
     @SSEDataMessage
     public void onData(ForestRequest request, @SSEName String name, @SSEValue String value) {
         StringBuilder builder = (StringBuilder) request.getOrAddAttachment("text", StringBuilder::new);
-        builder.append("Receive name=" + name + "; value=" + value + "\n");
+        builder.append("Receive name=" + name + "; value=" + value + "; comp=" + testComp.getValue() + "\n");
     }
 }

@@ -12,6 +12,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestCache {
 
+    private void refreshCache(ForestCache<Integer, Integer> cache) {
+        for (Integer i : cache.keySet()) {
+            cache.get(i);
+        }
+    }
+
     @Test
     public void testCacheMaxSize() throws InterruptedException {
         ForestCache<Integer, Integer> cache = new ForestCache<>(10);
@@ -31,13 +37,12 @@ public class TestCache {
         for (int i = 0; i < 30; i++) {
             cache.put(i, i);
         }
-        TimeUnit.SECONDS.sleep(1);
+        TimeUnit.MILLISECONDS.sleep(200);
+        refreshCache(cache);
         System.out.println("size: " + cache.size());
         assertThat(cache.size()).isEqualTo(10);
-        for (int i = 0; i < 30; i++) {
-            cache.get(i);
-        }
         TimeUnit.SECONDS.sleep(2);
+        refreshCache(cache);
         System.out.println("size: " + cache.size());
         assertThat(cache.size()).isEqualTo(0);
     }
@@ -51,13 +56,12 @@ public class TestCache {
             map.put(i, i);
         }
         cache.putAll(map);
-        TimeUnit.SECONDS.sleep(1);
+        TimeUnit.MILLISECONDS.sleep(200);
+        refreshCache(cache);
         System.out.println("size: " + cache.size());
         assertThat(cache.size()).isEqualTo(10);
-        for (int i = 0; i < 30; i++) {
-            cache.get(i);
-        }
         TimeUnit.SECONDS.sleep(2);
+        refreshCache(cache);
         System.out.println("size: " + cache.size());
         assertThat(cache.size()).isEqualTo(0);
     }

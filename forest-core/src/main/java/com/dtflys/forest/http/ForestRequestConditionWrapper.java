@@ -24,17 +24,6 @@ public class ForestRequestConditionWrapper<T> {
         return request;
     }
 
-/*
-    public ForestRequestConditionWrapper<T> ifThen(boolean condition, Consumer<ForestRequest<?>> consumer) {
-        return request.ifThen(condition, consumer);
-    }
-
-
-    public ForestRequestConditionWrapper<T> ifThen(Function<ForestRequest<?>, Boolean> conditionFunc, Consumer<ForestRequest<?>> consumer) {
-        return request.ifThen(conditionFunc, consumer);
-    }
-*/
-
 
     public ForestRequestConditionWrapper<T> elseIfThen(boolean condition, Consumer<ForestRequest<?>> consumer) {
         if (!endIf && !this.condition && condition) {
@@ -44,7 +33,6 @@ public class ForestRequestConditionWrapper<T> {
         this.condition = condition;
         return this;
     }
-
 
     public ForestRequestConditionWrapper<T> elseIfThen(Function<ForestRequest<?>, Boolean> conditionFunc, Consumer<ForestRequest<?>> consumer) {
         Validations.assertParamNotNull(conditionFunc, "conditionFunc");

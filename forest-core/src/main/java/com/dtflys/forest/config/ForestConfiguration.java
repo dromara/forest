@@ -228,6 +228,11 @@ public class ForestConfiguration implements VariableScope, Serializable {
     private boolean logResponseStatus = true;
 
     /**
+     * 是否允许打印响应头日志
+     */
+    private boolean logResponseHeaders = false;
+
+    /**
      * 是否允许打印响应内容日志
      */
     private boolean logResponseContent = false;
@@ -359,7 +364,7 @@ public class ForestConfiguration implements VariableScope, Serializable {
     /**
      * Forest请求池
      */
-    private ForestRequestPool pool;
+    private volatile ForestRequestPool pool;
 
 
     /**
@@ -367,7 +372,7 @@ public class ForestConfiguration implements VariableScope, Serializable {
      *
      * @since 1.5.29
      */
-    ThreadPoolExecutor asyncPool;
+    volatile ThreadPoolExecutor asyncPool;
 
 
     /**
@@ -1286,6 +1291,26 @@ public class ForestConfiguration implements VariableScope, Serializable {
      */
     public ForestConfiguration setLogResponseStatus(boolean logResponseStatus) {
         this.logResponseStatus = logResponseStatus;
+        return this;
+    }
+
+    /**
+     * 是否允许打印响应头日志
+     *
+     * @return 允许为 {@code true}, 否则为 {@code false}
+     */
+    public boolean isLogResponseHeaders() {
+        return logResponseHeaders;
+    }
+
+    /**
+     * 设置是否允许打印响应头日志
+     *
+     * @param logResponseHeaders 允许为 {@code true}, 否则为 {@code false}
+     * @return 当前ForestConfiguration实例
+     */
+    public ForestConfiguration setLogResponseHeaders(boolean logResponseHeaders) {
+        this.logResponseHeaders = logResponseHeaders;
         return this;
     }
 
