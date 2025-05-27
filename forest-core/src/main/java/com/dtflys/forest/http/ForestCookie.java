@@ -443,7 +443,7 @@ public class ForestCookie implements Cloneable, Serializable {
                 continue;
             }
             if ("Max-Age".equalsIgnoreCase(name)) {
-                final long maxAgeValue = Long.parseLong(value);
+                final long maxAgeValue = parseMaxAge(value);
                 maxAge = maxAgeValue < 0 ? null : Duration.ofMillis(maxAgeValue);
                 persistent = true;
                 continue;
@@ -492,6 +492,10 @@ public class ForestCookie implements Cloneable, Serializable {
         if (!URLUtils.matchDomain(urlHost, domain)) {
             return null;
         }
+        
+        if (path == null) {
+            path = "/";
+        }
 
         final ForestCookie cookie = new ForestCookie(
                 cookieName,
@@ -526,7 +530,7 @@ public class ForestCookie implements Cloneable, Serializable {
     }
 
 
-    private long parseMaxAge(String s) {
+    private static long parseMaxAge(String s) {
         try {
             long num = Long.parseLong(s);
             return num <= 0L ? -1 : num;
@@ -537,7 +541,6 @@ public class ForestCookie implements Cloneable, Serializable {
             throw e;
         }
     }
-
 
 
     public long getExpiresTime() {
