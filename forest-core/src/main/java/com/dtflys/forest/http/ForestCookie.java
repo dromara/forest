@@ -24,15 +24,21 @@
 
 package com.dtflys.forest.http;
 
-import com.dtflys.forest.backend.okhttp3.OkHttp3Cookie;
+import com.dtflys.forest.utils.StringUtils;
 import okhttp3.Cookie;
 import okhttp3.HttpUrl;
+import okhttp3.internal.http.HttpDate;
+import okhttp3.internal.publicsuffix.PublicSuffixDatabase;
 
+import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.Date;
 
-import static okhttp3.internal.Util.verifyAsIpAddress;
+import static okhttp3.internal.Util.*;
+import static okhttp3.internal.Util.delimiterOffset;
+import static okhttp3.internal.Util.indexOfControlOrNonAscii;
+import static okhttp3.internal.Util.trimSubstring;
 
 /**
  * Forest Cookie
@@ -71,6 +77,11 @@ public class ForestCookie implements Cloneable, Serializable {
      * 路径
      */
     private String path;
+
+    /**
+     * 版本
+     */
+    private int version = 0;
 
     /**
      * 是否仅限HTTPS
@@ -117,6 +128,15 @@ public class ForestCookie implements Cloneable, Serializable {
         this.persistent = persistent;
     }
 
+    public static ForestCookie nameValue(String name, String value) {
+        return new ForestCookie(name, value);
+    }
+
+    public static ForestCookie name(String name) {
+        return new ForestCookie(name, "");
+    }
+
+
     public String getName() {
         return name;
     }
@@ -148,10 +168,25 @@ public class ForestCookie implements Cloneable, Serializable {
         return maxAge;
     }
 
+    public int getMaxAgeAsMillis() {
+        if (maxAge == null) {
+            return -1;
+        }
+        return (int) maxAge.toMillis();
+    }
+
+
     public ForestCookie setMaxAge(Duration maxAge) {
         this.maxAge = maxAge;
         return this;
     }
+
+
+    public ForestCookie setMaxAge(int maxAge) {
+        this.maxAge = Duration.ofMillis(maxAge);
+        return this;
+    }
+
 
     /**
      * 获取Cookie所在的域名
@@ -196,6 +231,27 @@ public class ForestCookie implements Cloneable, Serializable {
             throw new IllegalArgumentException("[Forest] cookie path must start with '/'");
         }
         this.path = path;
+        return this;
+    }
+
+    /**
+     * 获取Cookie版本
+     *
+     * @return 版本
+     * @since 1.7.0
+     */
+    public int getVersion() {
+        return version;
+    }
+
+    /**
+     * 设置Cookie版本
+     *
+     * @param version 版本
+     * @return {@link ForestCookies}类实例
+     */
+    public ForestCookie setVersion(int version) {
+        this.version = version;
         return this;
     }
 
@@ -385,12 +441,114 @@ public class ForestCookie implements Cloneable, Serializable {
         );
     }
 
+
+
+    private ForestCookie parse(long currentTimeMillis, HttpUrl url, String setCookieString) {
+        int pos = 0;
+        final String source = StringUtils.isBlank(setCookieString) ? "" : setCookieString.trim();
+        final String[] nameValuePairs = source.split(";");
+
+        String cookieName = null;
+        String cookieValue = null;
+        Duration maxAge = null;
+        int version = 0;
+        boolean secure = false;
+        boolean httpOnly = false;
+        boolean hostOnly = false;
+
+        for (int i = 0; i < nameValuePairs.length; i++) {
+            final String pair = nameValuePairs[i].trim();
+            final String[] nameValue = pair.split("=", 2);
+            final String name = nameValue[0].trim();
+            final String value = nameValue.length > 1 ? nameValue[1].trim() : "";
+            if (i == 0) {
+                cookieName = name;
+                cookieValue = value;
+                continue;
+            }
+            if ("Max-Age".equalsIgnoreCase(name)) {
+                long maxAgeValue = Long.parseLong(value);
+                maxAge = maxAgeValue < 0 ? null : Duration.ofMillis(maxAgeValue);
+                continue;
+            }
+            if ("Expires".equalsIgnoreCase(name)) {
+                continue;
+            }
+            if ("Domain".equalsIgnoreCase(name)) {
+                continue;
+            }
+            if ("Path".equalsIgnoreCase(name)) {
+                continue;
+            }
+            if ("Secure".equalsIgnoreCase(name)) {
+                secure = true;
+                continue;
+            }
+            if ("Version".equalsIgnoreCase(name)) {
+                version = Integer.parseInt(value);
+                continue;
+            }
+            if ("HttpOnly".equalsIgnoreCase(name)) {
+                httpOnly = true;
+                continue;
+            }
+            if ("HostOnly".equalsIgnoreCase(name)) {
+                hostOnly = true;
+                continue;
+            }
+        }
+
+        return new ForestCookie(
+                cookieName,
+                cookieValue,
+                new Date(),
+                maxAge,
+                domain,
+                path,
+                secure,
+                httpOnly,
+                hostOnly,
+                persistent);
+    }
+
+
+    private long parseMaxAge(String s) {
+        try {
+            long num = Long.parseLong(s);
+            return num <= 0L ? -1 : num;
+        } catch (NumberFormatException e) {
+            if (s.matches("-?\\d+")) {
+                return s.startsWith("-") ? -1 : Long.MAX_VALUE;
+            }
+            throw e;
+        }
+    }
+
+
+
     public long getExpiresTime() {
         final long maxAgeMillis = maxAge.toMillis();
         if (maxAgeMillis == Long.MAX_VALUE) {
             return Long.MAX_VALUE;
         }
         return createTime.getTime() + maxAge.toMillis();
+    }
+
+    /**
+     * 转换成 Java Cookie 对象
+     *
+     * @return Java Cookie 对象
+     * @since 1.7.0
+     */
+    public javax.servlet.http.Cookie toJavaCookie() {
+        javax.servlet.http.Cookie cookie = new javax.servlet.http.Cookie(name, value);
+        cookie.setMaxAge(getMaxAgeAsMillis());
+        cookie.setDomain(domain);
+        cookie.setPath(path);
+        cookie.setSecure(secure);
+        cookie.setHttpOnly(httpOnly);
+        cookie.setVersion(version);
+        return cookie;
     }
 
     /**

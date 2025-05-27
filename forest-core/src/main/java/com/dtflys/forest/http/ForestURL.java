@@ -108,6 +108,14 @@ public class ForestURL {
         needRegenerateUrl = true;
     }
 
+    public static ForestURL fromUrl(String url) {
+        try {
+            return new ForestURL(new URL(url));
+        } catch (MalformedURLException e) {
+            throw new ForestRuntimeException(e);
+        }
+    }
+
     public ForestURL(URL url) {
         if (url == null) {
             throw new ForestRuntimeException("[Forest] Request url cannot be null!");
