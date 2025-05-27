@@ -134,7 +134,7 @@ public class CookieTest {
                 persistent
         );
         assertThat(cookie.matchDomain("forest.dtflyx.com")).isTrue();
-        assertThat(cookie.matchDomain("dtflyx.com")).isTrue();
+        assertThat(cookie.matchDomain("dtflyx.com")).isFalse();
 
         cookie = new ForestCookie(
                 "foo",

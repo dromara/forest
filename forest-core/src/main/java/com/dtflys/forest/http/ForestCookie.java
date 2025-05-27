@@ -24,21 +24,16 @@
 
 package com.dtflys.forest.http;
 
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import com.dtflys.forest.utils.StringUtils;
-import okhttp3.Cookie;
-import okhttp3.HttpUrl;
-import okhttp3.internal.http.HttpDate;
-import okhttp3.internal.publicsuffix.PublicSuffixDatabase;
+import com.dtflys.forest.utils.URLUtils;
 
-import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.Date;
 
-import static okhttp3.internal.Util.*;
-import static okhttp3.internal.Util.delimiterOffset;
-import static okhttp3.internal.Util.indexOfControlOrNonAscii;
-import static okhttp3.internal.Util.trimSubstring;
 
 /**
  * Forest Cookie
@@ -337,10 +332,10 @@ public class ForestCookie implements Cloneable, Serializable {
         }
         if (!hostOnly && leftDomain.endsWith(rightDomain)
                 && leftDomain.charAt(leftDomain.length() - rightDomain.length() - 1) == '.'
-                && !verifyAsIpAddress(leftDomain)) {
+                && !URLUtils.isValidIPAddress(leftDomain)) {
             return true;
         }
-        return false;
+        return URLUtils.matchDomain(leftDomain, rightDomain);
     }
 
     /**
@@ -350,7 +345,8 @@ public class ForestCookie implements Cloneable, Serializable {
      * @return  {@code true}: 匹配, {@code false}: 不匹配
      */
     public boolean matchDomain(String domain) {
-        return matchDomain(this.hostOnly, this.domain, domain);
+        return URLUtils.matchDomain(domain, this.domain);
+        // return matchDomain(this.hostOnly, this.domain, domain);
     }
 
 
@@ -416,45 +412,25 @@ public class ForestCookie implements Cloneable, Serializable {
     }
 
     public static ForestCookie parse(final String url, final String setCookie) {
-        final HttpUrl httpUrl = HttpUrl.parse(url);
-        final long currentTime = System.currentTimeMillis();
-        final Cookie okCookie = Cookie.parse(httpUrl, setCookie);
-        if (okCookie == null) {
-            return null;
-        }
-        final long expiresAt = okCookie.expiresAt();
-        final long maxAge = expiresAt > currentTime ? expiresAt - currentTime : 0L;
-        final Date createTime = new Date(currentTime);
-        final Duration maxAgeDuration = Duration.ofMillis(maxAge);
-
-        return new ForestCookie(
-                okCookie.name(),
-                okCookie.value(),
-                createTime,
-                maxAgeDuration,
-                okCookie.domain(),
-                okCookie.path(),
-                okCookie.secure(),
-                okCookie.httpOnly(),
-                okCookie.hostOnly(),
-                okCookie.persistent()
-        );
+        return parse(ForestURL.fromUrl(url), setCookie);
     }
 
 
 
-    private ForestCookie parse(long currentTimeMillis, HttpUrl url, String setCookieString) {
-        int pos = 0;
+    private static ForestCookie parse(ForestURL url, String setCookieString) {
         final String source = StringUtils.isBlank(setCookieString) ? "" : setCookieString.trim();
         final String[] nameValuePairs = source.split(";");
 
         String cookieName = null;
         String cookieValue = null;
+        String domain = null;
+        String path = null;
         Duration maxAge = null;
         int version = 0;
         boolean secure = false;
         boolean httpOnly = false;
-        boolean hostOnly = false;
+        boolean hostOnly = true;
+        boolean persistent = false;
 
         for (int i = 0; i < nameValuePairs.length; i++) {
             final String pair = nameValuePairs[i].trim();
@@ -467,17 +443,30 @@ public class ForestCookie implements Cloneable, Serializable {
                 continue;
             }
             if ("Max-Age".equalsIgnoreCase(name)) {
-                long maxAgeValue = Long.parseLong(value);
+                final long maxAgeValue = Long.parseLong(value);
                 maxAge = maxAgeValue < 0 ? null : Duration.ofMillis(maxAgeValue);
+                persistent = true;
                 continue;
             }
             if ("Expires".equalsIgnoreCase(name)) {
+                final DateTime dateTime = DateUtil.parse(value,
+                        DatePattern.HTTP_DATETIME_PATTERN,
+                        DatePattern.JDK_DATETIME_PATTERN,
+                        DatePattern.NORM_DATETIME_PATTERN,
+                        DatePattern.NORM_DATETIME_MS_PATTERN,
+                        DatePattern.PURE_DATETIME_MS_PATTERN);
+                final long maxAgeValue = dateTime.toJdkDate().getTime() - System.currentTimeMillis();
+                maxAge = maxAgeValue < 0 ? null : Duration.ofMillis(maxAgeValue);
+                persistent = true;
                 continue;
             }
             if ("Domain".equalsIgnoreCase(name)) {
+                domain = parseDomain(value);
+                hostOnly = false;
                 continue;
             }
             if ("Path".equalsIgnoreCase(name)) {
+                path = value;
                 continue;
             }
             if ("Secure".equalsIgnoreCase(name)) {
@@ -494,11 +483,17 @@ public class ForestCookie implements Cloneable, Serializable {
             }
             if ("HostOnly".equalsIgnoreCase(name)) {
                 hostOnly = true;
-                continue;
             }
         }
+        String urlHost = url.getHost();
+        if (domain == null) {
+            domain = urlHost;
+        }
+        if (!URLUtils.matchDomain(urlHost, domain)) {
+            return null;
+        }
 
-        return new ForestCookie(
+        final ForestCookie cookie = new ForestCookie(
                 cookieName,
                 cookieValue,
                 new Date(),
@@ -509,6 +504,25 @@ public class ForestCookie implements Cloneable, Serializable {
                 httpOnly,
                 hostOnly,
                 persistent);
+        cookie.setVersion(version);
+        return cookie;
+    }
+
+    private static String parseDomain(String s) {
+        if (s.endsWith(".")) {
+            throw new IllegalArgumentException();
+        } else {
+            if (s.startsWith(".")) {
+                s = s.substring(1);
+            }
+
+            String canonicalDomain = URLUtils.getValidHost(s);
+            if (canonicalDomain == null) {
+                throw new IllegalArgumentException();
+            } else {
+                return canonicalDomain;
+            }
+        }
     }
 
 
