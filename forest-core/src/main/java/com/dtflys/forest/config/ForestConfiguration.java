@@ -53,6 +53,8 @@ import com.dtflys.forest.http.ForestAddress;
 import com.dtflys.forest.http.ForestAsyncMode;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestType;
+import com.dtflys.forest.http.cookie.ForestCookieStorage;
+import com.dtflys.forest.http.cookie.MemoryCookieStorage;
 import com.dtflys.forest.interceptor.DefaultInterceptorFactory;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorFactory;
@@ -179,7 +181,6 @@ public class ForestConfiguration implements VariableScope, Serializable {
      * 全局的请求读取超时时间，单位为毫秒
      */
     private Integer readTimeout;
-
 
     /**
      * 全局的请求失败重试策略类
@@ -362,6 +363,21 @@ public class ForestConfiguration implements VariableScope, Serializable {
     private List<AfterExecuteResultTypeHandler<?>> afterExecuteResultTypeHandlers = new LinkedList<>();
 
     /**
+     * 是否允许 Cookie 自动存取
+     */
+    private boolean autoCookieSaveAndLoadEnabled = false;
+
+    /**
+     * Cookie 的最大自动存储大小
+     */
+    private int cookiesStorageMaxSize = 2048;
+
+    /**
+     * 全局 Cookie 存储器
+     */
+    private volatile ForestCookieStorage cookieStorage;
+
+    /**
      * Forest请求池
      */
     private volatile ForestRequestPool pool;
@@ -492,7 +508,6 @@ public class ForestConfiguration implements VariableScope, Serializable {
     public ForestConfiguration setBackend(HttpBackend backend) {
         if (backend != null) {
             backend.init(this);
-            log.info("[Forest] Http Backend: " + backend.getName());
         }
         this.backend = backend;
         return this;
@@ -1769,6 +1784,65 @@ public class ForestConfiguration implements VariableScope, Serializable {
     public ForestConfiguration setSslKeyStores(Map<String, SSLKeyStore> sslKeyStores) {
         this.sslKeyStores = sslKeyStores;
         return this;
+    }
+
+    /**
+     * 是否允许 Cookie 自动存取
+     * 
+     * @return {@code true}: 允许自动存取, {@code false}: 不允许
+     * @since 1.7.0
+     */
+    public boolean isAutoCookieSaveAndLoadEnabled() {
+        return autoCookieSaveAndLoadEnabled;
+    }
+
+    /**
+     * 设置是否允许 Cookie 自动存取
+     * 
+     * @param autoCookieSaveAndLoadEnabled {@code true}: 允许自动存取, {@code false}: 不允许
+     * @return 当前ForestConfiguration实例
+     * @since 1.7.0
+     */
+    public ForestConfiguration setAutoCookieSaveAndLoadEnabled(boolean autoCookieSaveAndLoadEnabled) {
+        this.autoCookieSaveAndLoadEnabled = autoCookieSaveAndLoadEnabled;
+        return this;
+    }
+
+    /**
+     * 获取 Cookie 的最大自动存储大小
+     * 
+     * @return Cookie 的最大自动存储大小
+     * @since 1.7.0
+     */
+    public int getCookiesStorageMaxSize() {
+        return cookiesStorageMaxSize;
+    }
+
+    /**
+     * 设置 Cookie 的最大自动存储大小
+     * 
+     * @param cookiesStorageMaxSize Cookie 的最大自动存储大小
+     * @since 1.7.0
+     */
+    public void setCookiesStorageMaxSize(int cookiesStorageMaxSize) {
+        this.cookiesStorageMaxSize = cookiesStorageMaxSize;
+    }
+
+    /**
+     * 获取全局 Cookie 存储器
+     * 
+     * @return Cookie 存储器对象
+     * @since 1.7.0
+     */
+    public ForestCookieStorage getCookieStorage() {
+        if (cookieStorage == null) {
+            synchronized (this) {
+                if (cookieStorage == null) {
+                    cookieStorage = new MemoryCookieStorage(cookiesStorageMaxSize);
+                }
+            }
+        }
+        return cookieStorage;
     }
 
     /**

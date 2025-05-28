@@ -25,6 +25,7 @@
 package com.dtflys.forest.http;
 
 import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.util.HashUtil;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
@@ -512,6 +513,9 @@ public class ForestCookie implements Cloneable, Serializable {
      * @return {@code true}: 已过期, {@code false}: 未过期
      */
     public boolean isExpired(long currentTimeMillis) {
+        if (maxAge == null) {
+            return false;
+        }
         long expiredTime = getExpiresTime();
         return expiredTime <= currentTimeMillis;
     }
@@ -732,6 +736,22 @@ public class ForestCookie implements Cloneable, Serializable {
         }
 
         return result.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return HashUtil.javaDefaultHash(domain + ";" + path + ";" + name);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ForestCookie)) {
+            return false;
+        }
+        final ForestCookie other = (ForestCookie) obj;
+        return other.domain.equals(domain) &&
+                other.path.equals(path) &&
+                other.name.equals(name);
     }
 
     /**

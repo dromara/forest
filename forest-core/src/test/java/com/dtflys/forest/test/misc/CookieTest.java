@@ -6,9 +6,13 @@ import com.alibaba.fastjson2.util.DateUtils;
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.backend.httpclient.HttpclientCookie;
 import com.dtflys.forest.backend.okhttp3.OkHttp3Cookie;
+import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestCookie;
 import com.dtflys.forest.http.ForestCookies;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.http.cookie.ForestCookieStorage;
+import com.dtflys.forest.http.cookie.MemoryCookieStorage;
 import okhttp3.Cookie;
 import okhttp3.HttpUrl;
 import okhttp3.mockwebserver.MockResponse;
@@ -17,6 +21,7 @@ import org.apache.http.impl.cookie.BasicClientCookie2;
 import org.junit.Rule;
 import org.junit.Test;
 
+import javax.mail.Store;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -508,6 +513,48 @@ public class CookieTest {
         assertThat(cookieA.isSecure()).isTrue();
         assertThat(cookieA.isHttpOnly()).isTrue();
         assertThat(cookieA.getVersion()).isEqualTo(3);
+    }
+    
+    
+    @Test
+    public void testCookieStorage() {
+        ForestCookieStorage storage = new MemoryCookieStorage(128);
+
+        server.enqueue(new MockResponse()
+                .setBody(EXPECTED)
+                .addHeader("Set-Cookie", "FOO=123-abc; Max-Age=2592000; Path=/abc; Secure; Version=1; Domain=" + server.getHostName())
+                .addHeader("Set-Cookie", "BAR=789-xyz; Max-Age=2592000; Secure; HttpOnly; Version=2; Domain=" + server.getHostName())
+                .setResponseCode(200));
+        
+        ForestResponse response = Forest.get("/")
+                .logResponseHeaders(true)
+                .host(server.getHostName())
+                .port(server.getPort())
+                .executeAsResponse();
+        
+        assertThat(response).isNotNull();
+        List<ForestCookie> cookies = response.getCookies();
+
+        storage.save(new ForestCookies(cookies));
+        
+        ForestRequest request = Forest.get("/abc")
+                .scheme("https")
+                .host(server.getHostName())
+                .port(server.getPort());
+        
+        ForestCookies cookieList = storage.load(request.url());
+        assertThat(cookieList).isNotNull();
+        assertThat(cookieList.size()).isEqualTo(2);
+        
+        List<ForestCookie> cookies1 = cookieList.getCookies(server.getHostName(), "/abc", "FOO");
+        assertThat(cookies1).isNotNull();
+        assertThat(cookies1.size()).isEqualTo(1);
+        assertThat(cookies1.get(0)).isEqualTo(response.getCookie("FOO"));
+
+        List<ForestCookie> cookies2 = cookieList.getCookies(server.getHostName(), "/", "BAR");
+        assertThat(cookies2).isNotNull();
+        assertThat(cookies2.size()).isEqualTo(1);
+        assertThat(cookies2.get(0)).isEqualTo(response.getCookie("BAR"));
 
     }
 

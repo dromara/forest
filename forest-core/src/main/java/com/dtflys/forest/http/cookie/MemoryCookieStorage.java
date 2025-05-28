@@ -3,58 +3,134 @@ package com.dtflys.forest.http.cookie;
 import cn.hutool.core.collection.ConcurrentHashSet;
 import com.dtflys.forest.http.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MemoryCookieStorage implements ForestCookieStorage {
+    
+    private final Map<String, ConcurrentHashSet<ForestCookie>> cookieMap = new ConcurrentHashMap<>();
+    
+    private AtomicInteger size = new AtomicInteger(0);
+    
+    private final int threshold;
 
-    private ConcurrentHashSet<ForestCookie> cookieSet;
-
-    private int maxSize;
+    private final int maxSize;
 
     public MemoryCookieStorage(int maxSize) {
         this.maxSize = maxSize;
-        this.cookieSet = new ConcurrentHashSet<>(maxSize);
+        this.threshold = Math.min(Math.max(maxSize / 2, 8), this.maxSize);
     }
 
     private void refresh() {
-        Set<ForestCookie> toRemove = new HashSet<>();
-        for (ForestCookie cookie : cookieSet) {
-            if (cookie.isExpired(System.currentTimeMillis())) {
-                toRemove.add(cookie);
+        for (ConcurrentHashSet<ForestCookie> cookieSet : cookieMap.values()) {
+            final Set<ForestCookie> toRemove = new HashSet<>();
+            for (ForestCookie cookie : cookieSet) {
+                if (cookie.isExpired(System.currentTimeMillis())) {
+                    toRemove.add(cookie);
+                }
+            }
+            if (!toRemove.isEmpty()) {
+                cookieSet.removeAll(toRemove);
+                synchronized (this) {
+                    size.set(size.get() - cookieSet.size());
+                }
             }
         }
-        cookieSet.removeAll(toRemove);
     }
 
     @Override
-    public ForestCookies load(ForestRequest request) {
-        int len = cookieSet.size();
-        if (len >= maxSize) {
+    public ForestCookies load(final ForestURL url) {
+        final int len = cookieMap.size();
+        if (len >= threshold) {
             refresh();
         }
-        ForestCookies cookies = new ForestCookies();
-        for (ForestCookie cookie : cookieSet) {
-            if (cookie.isExpired(System.currentTimeMillis())) {
-                cookieSet.remove(cookie);
-                continue;
+        final ForestCookies cookies = new ForestCookies();
+        if (size.get() >= maxSize) {
+            return cookies;
+        }
+        
+        final List<ConcurrentHashSet<ForestCookie>> cookieSets = getCookieSetsByURL(url);
+        
+        for (final ConcurrentHashSet<ForestCookie> cookieSet : cookieSets) {
+            final Set<ForestCookie> toRemove = new HashSet<>();
+            for (final ForestCookie cookie : cookieSet) {
+                if (cookie.isExpired(System.currentTimeMillis())) {
+                    toRemove.add(cookie);
+                    continue;
+                }
+                if (cookie.matchURL(url)) {
+                    cookies.addCookie(cookie);
+                }
             }
-            if (cookie.matchURL(request.url())) {
-                cookies.addCookie(cookie);
+            if (!toRemove.isEmpty()) {
+                cookieSet.removeAll(toRemove);
+                synchronized (this) {
+                    size.set(size.get() - cookieSet.size());
+                }
             }
         }
         return cookies;
     }
 
+    
+    private List<ConcurrentHashSet<ForestCookie>> getCookieSetsByURL(ForestURL url) {
+        List<ConcurrentHashSet<ForestCookie>> result = new ArrayList<>();
+        final String domain = url.getHost();
+        final String[] fragments = domain.split("\\.");
+        if (fragments.length == 1 && "localhost".equals(domain)) {
+            final ConcurrentHashSet<ForestCookie> cookieSet = getCookieSetByDomainFragments(fragments, 0);
+            if (cookieSet != null) {
+                result.add(cookieSet);
+            }
+        } else {
+            for (int i = 0; fragments.length - i > 1; i++) {
+                final ConcurrentHashSet<ForestCookie> cookieSet = getCookieSetByDomainFragments(fragments, i);
+                if (cookieSet != null) {
+                    result.add(cookieSet);
+                }
+            }
+        }
+        return result;
+    }
+
+    private ConcurrentHashSet<ForestCookie> getCookieSetByDomainFragments(final String[] fragments, final int start) {
+        if (fragments == null) {
+            return null;
+        }
+        final int len = fragments.length;
+        final StringBuilder builder = new StringBuilder();
+        for (int i = start; i < len; i++) {
+            builder.append(fragments[i]);
+            if (i < len - 1) {
+                builder.append(".");
+            }
+        }
+        return cookieMap.get(builder.toString());
+    }
 
 
     @Override
-    public void save(ForestRequest request, ForestResponse response, ForestCookies cookies) {
-        for (ForestCookie cookie : cookies) {
-            cookieSet.add(cookie);
-            if (cookieSet.size() >= maxSize) {
+    public void save(ForestCookies cookies) {
+        for (final ForestCookie cookie : cookies) {
+            if (size.get() >= threshold) {
                 refresh();
             }
+            if (size.get() >= maxSize) {
+                return;
+            }
+            final String domain = cookie.getDomain();
+            ConcurrentHashSet<ForestCookie> cookieSet = cookieMap.computeIfAbsent(
+                    domain, k -> new ConcurrentHashSet<>());
+            cookieSet.add(cookie);
+            if (cookie.isExpired(System.currentTimeMillis())) {
+                cookieSet.remove(cookie);
+            }
+            size.incrementAndGet();
         }
     }
 }
