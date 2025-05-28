@@ -7,6 +7,7 @@ import com.dtflys.forest.utils.StringUtils;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 默认日志处理器
@@ -45,6 +46,7 @@ public class DefaultLogHandler implements ForestLogHandler {
                 builder.append("\n");
             }
         }
+
         return builder.toString();
     }
 
@@ -240,16 +242,11 @@ public class DefaultLogHandler implements ForestLogHandler {
     protected String responseHeadersLoggingContent(ResponseLogMessage responseLogMessage, final ForestResponse response) {
         final StringBuilder builder = new StringBuilder();
         final ForestHeaderMap headerMap = response.getHeaders();
-        for (final String name : headerMap.names()) {
-            final List<ForestHeader> headers = headerMap.getHeaders(name);
-            if (CollectionUtil.isNotEmpty(headers)) {
-                for (final ForestHeader header : headers) {
-                    builder.append("\n\t\t");
-                    builder.append(header.getName());
-                    builder.append(": ");
-                    builder.append(header.getValue());
-                }
-            }
+        for (final ForestHeader header : headerMap.allHeaders()) {
+            builder.append("\n\t\t");
+            builder.append(header.getName());
+            builder.append(": ");
+            builder.append(header.getValue());
         }
         return builder.toString();
     }

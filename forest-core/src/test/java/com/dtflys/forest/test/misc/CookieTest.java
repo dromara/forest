@@ -3,13 +3,18 @@ package com.dtflys.forest.test.misc;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson2.util.DateUtils;
+import com.dtflys.forest.Forest;
 import com.dtflys.forest.backend.httpclient.HttpclientCookie;
 import com.dtflys.forest.backend.okhttp3.OkHttp3Cookie;
 import com.dtflys.forest.http.ForestCookie;
 import com.dtflys.forest.http.ForestCookies;
+import com.dtflys.forest.http.ForestResponse;
 import okhttp3.Cookie;
 import okhttp3.HttpUrl;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 import org.apache.http.impl.cookie.BasicClientCookie2;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.text.DateFormat;
@@ -17,11 +22,19 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
+import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class CookieTest {
+
+    public final static String EXPECTED = "{\"status\":\"1\", \"data\":\"2\"}";
+
+    @Rule
+    public final MockWebServer server = new MockWebServer();
+
 
     @Test
     public void testCookie() throws InterruptedException {
@@ -356,12 +369,133 @@ public class CookieTest {
     }
 
     @Test
-    public void testCookieParse() {
+    public void testRequestCookies1() {
+        server.enqueue(new MockResponse()
+                .setBody(EXPECTED)
+                .setResponseCode(200));
+
+        Forest.get("/")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .addHeader("Cookie", "FOO=123-abc; BAR=789-xyz")
+                .execute();
+
+        mockRequest(server)
+                .assertHeaderEquals("Cookie", "FOO=123-abc; BAR=789-xyz");
     }
 
+
     @Test
-    public void testCookies() {
-        ForestCookies cookies = new ForestCookies();
+    public void testRequestCookies2() {
+        server.enqueue(new MockResponse()
+                .setBody(EXPECTED)
+                .setResponseCode(200));
+
+        Forest.get("/")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .addCookie(Forest.cookie("FOO", "123-abc"))
+                .addCookie(Forest.cookie("BAR", "789-xyz"))
+                .execute();
+
+        mockRequest(server)
+                .assertHeaderEquals("Cookie", "FOO=123-abc; BAR=789-xyz");
+    }
+
+
+    @Test
+    public void testRequestCookies3() {
+        server.enqueue(new MockResponse()
+                .setBody(EXPECTED)
+                .setResponseCode(200));
+
+        ForestCookie cookie1 = ForestCookie.parse(
+                "XXX=YYY; Max-Age=2592000; Path=/; Version=1; Domain=" + server.getHostName());
+
+        ForestCookie cookie2 = ForestCookie.parse(
+                "OK=NO; Max-Age=2592000; Path=/abc; Version=1; Domain=" + server.getHostName());
+
+        ForestCookie cookie3 = ForestCookie.parse(
+                "A=1; Max-Age=2592000; Path=/; Version=1; Domain=www.dtflyx.com");
+
+        ForestCookie cookie4 = ForestCookie.parse(
+                "B=2; Max-Age=2592000; Path=/; Version=1; Secure; Domain=" + server.getHostName());
+
+        Forest.get("/")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .addCookie(Forest.cookie("FOO", "123-abc"))
+                .addCookie(Forest.cookie("BAR", "789-xyz"))
+                .addCookie(cookie1)
+                .addCookie(cookie2)
+                .addCookie(cookie3)
+                .addCookie(cookie4)
+                .execute();
+
+        mockRequest(server)
+                .assertHeaderEquals("Cookie", "FOO=123-abc; BAR=789-xyz; XXX=YYY");
+    }
+
+
+
+    @Test
+    public void testResponseCookies() {
+        server.enqueue(new MockResponse()
+                .setBody(EXPECTED)
+                .addHeader("Set-Cookie", "FOO=123-abc; Max-Age=2592000; Path=/abc; Secure; Version=1; Domain=" + server.getHostName())
+                .addHeader("Set-Cookie", "BAR=789-xyz; Max-Age=2592000; Secure; HttpOnly; Version=2; Domain=" + server.getHostName())
+                .addHeader("Set-Cookie", "A=1; Max-Age=2592000; Comment=XXXX; Secure; HttpOnly; Version=3")
+                .setResponseCode(200));
+
+        ForestResponse<?> response = Forest.get("/abc/xxx")
+                .logResponseHeaders(true)
+                .host(server.getHostName())
+                .port(server.getPort())
+                .executeAsResponse();
+
+        assertThat(response).isNotNull();
+        List<ForestCookie> cookies = response.getCookies();
+        assertThat(cookies).isNotNull();
+        assertThat(cookies.size()).isEqualTo(3);
+
+        ForestCookie cookieFoo = response.getCookie("FOO");
+        assertThat(cookieFoo).isNotNull().isEqualTo(cookies.stream()
+                .filter(cookie -> cookie.getName().equals("FOO")).findFirst().orElse(null));
+
+        assertThat(cookieFoo.getValue()).isEqualTo("123-abc");
+        assertThat(cookieFoo.getMaxAge().getSeconds()).isEqualTo(2592000);
+        assertThat(cookieFoo.getDomain()).isEqualTo(server.getHostName());
+        assertThat(cookieFoo.getPath()).isEqualTo("/abc");
+        assertThat(cookieFoo.isPersistent()).isTrue();
+        assertThat(cookieFoo.isSecure()).isTrue();
+        assertThat(cookieFoo.isHostOnly()).isFalse();
+        assertThat(cookieFoo.getVersion()).isEqualTo(1);
+
+        ForestCookie cookieBar = response.getCookie("BAR");
+        assertThat(cookieBar).isNotNull().isEqualTo(cookies.stream()
+                .filter(cookie -> cookie.getName().equals("BAR")).findFirst().orElse(null));
+        assertThat(cookieBar.getValue()).isEqualTo("789-xyz");
+        assertThat(cookieBar.getMaxAge().getSeconds()).isEqualTo(2592000);
+        assertThat(cookieBar.getDomain()).isEqualTo(server.getHostName());
+        assertThat(cookieBar.getPath()).isEqualTo("/");
+        assertThat(cookieBar.isPersistent()).isTrue();
+        assertThat(cookieBar.isSecure()).isTrue();
+        assertThat(cookieBar.isHttpOnly()).isTrue();
+        assertThat(cookieBar.getVersion()).isEqualTo(2);
+
+        ForestCookie cookieA = response.getCookie("A");
+        assertThat(cookieA).isNotNull().isEqualTo(cookies.stream()
+                .filter(cookie -> cookie.getName().equals("A")).findFirst().orElse(null));
+        assertThat(cookieA.getValue()).isEqualTo("1");
+        assertThat(cookieA.getMaxAge().getSeconds()).isEqualTo(2592000);
+        assertThat(cookieA.getDomain()).isEqualTo(server.getHostName());
+        assertThat(cookieA.getPath()).isEqualTo("/");
+        assertThat(cookieA.getComment()).isEqualTo("XXXX");
+        assertThat(cookieA.isPersistent()).isTrue();
+        assertThat(cookieA.isSecure()).isTrue();
+        assertThat(cookieA.isHttpOnly()).isTrue();
+        assertThat(cookieA.getVersion()).isEqualTo(3);
+
     }
 
 }

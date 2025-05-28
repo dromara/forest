@@ -132,7 +132,7 @@ public class ForestCookieHeader extends SimpleHeader {
         if (strict && !cookie.matchURL(url)) {
             return false;
         }
-        if (strict && cookie.isExpired(new Date())) {
+        if (strict && cookie.isPersistent() && cookie.isExpired(new Date())) {
             return false;
         }
         final String name = cookie.getName();

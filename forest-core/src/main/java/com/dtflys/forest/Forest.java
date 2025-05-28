@@ -1,6 +1,7 @@
 package com.dtflys.forest;
 
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.http.ForestCookie;
 import com.dtflys.forest.http.ForestFuture;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
@@ -319,5 +320,18 @@ public abstract class Forest {
             callback.accept(future.getResponse());
         }
     }
+
+    /**
+     * 通过Cookie名和Cookie值创建一个Cookie
+     *
+     * @param name Cookie名
+     * @param value Cookie值
+     * @return Forest Cookie
+     * @since 1.7.0
+     */
+    public static ForestCookie cookie(String name, String value) {
+        return ForestCookie.nameValue(name, value);
+    }
+
 
 }

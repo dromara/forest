@@ -25,8 +25,6 @@
 package com.dtflys.forest.http;
 
 import cn.hutool.core.date.DatePattern;
-import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
@@ -35,9 +33,6 @@ import javax.servlet.http.Cookie;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
 
@@ -49,6 +44,10 @@ import java.util.Locale;
  * @since 1.5.0-RC1
  */
 public class ForestCookie implements Cloneable, Serializable {
+
+    private final static SimpleDateFormat EXPIRES_DATE_FORMAT =
+            new SimpleDateFormat(DatePattern.HTTP_DATETIME_PATTERN, Locale.ENGLISH);
+
 
     /**
      * Cookie名称
@@ -69,6 +68,11 @@ public class ForestCookie implements Cloneable, Serializable {
      * 最大时长
      */
     private Duration maxAge;
+
+    /**
+     * 注释
+     */
+    private String comment;
 
     /**
      * 域名
@@ -117,19 +121,82 @@ public class ForestCookie implements Cloneable, Serializable {
         this(name, value, new Date(), null, null, "/", false, false, false, false);
     }
 
-    public ForestCookie(String name, String value, Date createTime, Duration maxAge, String domain, String path, boolean secure, boolean httpOnly, boolean hostOnly, boolean persistent) {
+    public ForestCookie(String name,
+                        String value,
+                        Date createTime,
+                        Duration maxAge,
+                        String domain,
+                        String path,
+                        boolean secure,
+                        boolean httpOnly,
+                        boolean hostOnly,
+                        boolean persistent) {
+        this(name, value, createTime, maxAge, null, domain, path, 0, secure, httpOnly, hostOnly, persistent);
+    }
+
+
+    public ForestCookie(String name,
+                        String value,
+                        Date createTime,
+                        Duration maxAge,
+                        String comment,
+                        String domain,
+                        String path,
+                        int version,
+                        boolean secure,
+                        boolean httpOnly,
+                        boolean hostOnly,
+                        boolean persistent) {
+        if (StringUtils.isEmpty(name)) {
+            throw new IllegalArgumentException("Cookie name cannot be empty");
+        }
+
+        if (!isValidCookieName(name) ||
+                "Max-Age".equalsIgnoreCase(name) ||
+                "Expires".equalsIgnoreCase(name) ||
+                "Domain".equalsIgnoreCase(name) ||
+                "Path".equalsIgnoreCase(name) ||
+                "Secure".equalsIgnoreCase(name) ||
+                "HttpOnly".equalsIgnoreCase(name) ||
+                "HostOnly".equalsIgnoreCase(name) ||
+                "Version".equalsIgnoreCase(name) ||
+                name.startsWith("$")) {
+            throw new IllegalArgumentException("Cookie name is invalid");
+        }
+
         this.name = name;
         this.value = value;
         this.createTime = createTime;
         this.maxAge = maxAge;
+        this.comment = comment;
         this.domain = domain;
         this.path = path;
+        this.version = version;
         this.secure = secure;
         this.httpOnly = httpOnly;
         this.hostOnly = hostOnly;
         this.persistent = persistent;
     }
 
+    private static boolean isValidCookieName(String value) {
+        int len = value.length();
+        for (int i = 0; i < len; i++) {
+            char c = value.charAt(i);
+            if (c < 0x20 || c >= 0x7f) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 通过Cookie名和Cookie值创建一个Cookie
+     *
+     * @param name Cookie名
+     * @param value Cookie值
+     * @return Forest Cookie 对象
+     * @since 1.7.0
+     */
     public static ForestCookie nameValue(String name, String value) {
         return new ForestCookie(name, value);
     }
@@ -189,6 +256,26 @@ public class ForestCookie implements Cloneable, Serializable {
         return this;
     }
 
+    /**
+     * 获取Cookie的注释
+     *
+     * @return 注释
+     */
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * 设置Cookie的注释
+     *
+     * @param comment 注释
+     * @return {@link ForestCookies}类实例
+     * @since 1.7.0
+     */
+    public ForestCookie setComment(String comment) {
+        this.comment = comment;
+        return this;
+    }
 
     /**
      * 获取Cookie所在的域名
@@ -378,8 +465,8 @@ public class ForestCookie implements Cloneable, Serializable {
      */
     public boolean matchURL(ForestURL url) {
         if (!matchSchema(url.getScheme())) return false;
-        if (!matchDomain(url.getHost())) return false;
-        if (!matchPath(url.getPath())) return false;
+        if (domain != null && !matchDomain(url.getHost())) return false;
+        if (path != null && !matchPath(url.getPath())) return false;
         return true;
     }
 
@@ -418,6 +505,11 @@ public class ForestCookie implements Cloneable, Serializable {
         return expiredTime <= date.getTime();
     }
 
+    public static ForestCookie parse(final String setCookie) {
+        return parse((ForestURL) null, System.currentTimeMillis(), setCookie);
+    }
+
+
     public static ForestCookie parse(final String url, final String setCookie) {
         return parse(ForestURL.fromUrl(url), System.currentTimeMillis(), setCookie);
     }
@@ -432,6 +524,7 @@ public class ForestCookie implements Cloneable, Serializable {
 
         String cookieName = null;
         String cookieValue = null;
+        String comment = null;
         String domain = null;
         String path = null;
         long expiresAt = -1;
@@ -456,8 +549,7 @@ public class ForestCookie implements Cloneable, Serializable {
                 persistent = true;
             } else if ("Expires".equalsIgnoreCase(name)) {
                 try {
-                    SimpleDateFormat formatter = new SimpleDateFormat(DatePattern.HTTP_DATETIME_PATTERN, Locale.ENGLISH);
-                    Date date = formatter.parse(value);
+                    final Date date = EXPIRES_DATE_FORMAT.parse(value);
                     expiresAt = date.getTime();
                     persistent = true;
                 } catch (Throwable th) {
@@ -472,18 +564,23 @@ public class ForestCookie implements Cloneable, Serializable {
                 secure = true;
             } else if ("Version".equalsIgnoreCase(name)) {
                 version = Integer.parseInt(value);
+            } else if ("Comment".equalsIgnoreCase(name)) {
+                comment = value;
             } else if ("HttpOnly".equalsIgnoreCase(name)) {
                 httpOnly = true;
             } else if ("HostOnly".equalsIgnoreCase(name)) {
                 hostOnly = true;
             }
         }
-        String urlHost = url.getHost();
-        if (domain == null) {
-            domain = urlHost;
-        }
-        if (!URLUtils.matchDomain(urlHost, domain)) {
-            return null;
+
+        if (url != null) {
+            String urlHost = url.getHost();
+            if (domain == null) {
+                domain = urlHost;
+            }
+            if (!URLUtils.matchDomain(urlHost, domain)) {
+                return null;
+            }
         }
         
         if (path == null) {
@@ -497,19 +594,19 @@ public class ForestCookie implements Cloneable, Serializable {
             }
         }
 
-        final ForestCookie cookie = new ForestCookie(
+        return new ForestCookie(
                 cookieName,
                 cookieValue,
-                new Date(),
+                new Date(currentTimeMillis),
                 maxAge,
+                comment,
                 domain,
                 path,
+                version,
                 secure,
                 httpOnly,
                 hostOnly,
                 persistent);
-        cookie.setVersion(version);
-        return cookie;
     }
 
     private static String parseDomain(String s) {
@@ -616,6 +713,10 @@ public class ForestCookie implements Cloneable, Serializable {
 
         if (httpOnly) {
             result.append("; HttpOnly");
+        }
+
+        if (version != 0) {
+            result.append("; Version=").append(version);
         }
 
         return result.toString();
