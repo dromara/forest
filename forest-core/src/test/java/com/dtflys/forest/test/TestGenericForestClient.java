@@ -1,7 +1,6 @@
 package com.dtflys.forest.test;
 
 import cn.hutool.core.codec.Base64;
-import cn.hutool.core.collection.ListUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONReader;
 import com.alibaba.fastjson.annotation.JSONField;

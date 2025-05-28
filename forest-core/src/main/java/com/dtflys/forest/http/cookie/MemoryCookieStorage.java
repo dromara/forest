@@ -9,11 +9,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MemoryCookieStorage implements ForestCookieStorage {
     
-    private final Map<String, ConcurrentHashSet<ForestCookie>> cookieMap = new ConcurrentHashMap<>();
+    private final Map<String, ConcurrentLinkedDeque<ForestCookie>> cookieMap = new ConcurrentHashMap<>();
     
     private AtomicInteger size = new AtomicInteger(0);
     
@@ -27,7 +28,7 @@ public class MemoryCookieStorage implements ForestCookieStorage {
     }
 
     private void refresh() {
-        for (ConcurrentHashSet<ForestCookie> cookieSet : cookieMap.values()) {
+        for (ConcurrentLinkedDeque<ForestCookie> cookieSet : cookieMap.values()) {
             final Set<ForestCookie> toRemove = new HashSet<>();
             for (ForestCookie cookie : cookieSet) {
                 if (cookie.isExpired(System.currentTimeMillis())) {
@@ -54,9 +55,9 @@ public class MemoryCookieStorage implements ForestCookieStorage {
             return cookies;
         }
         
-        final List<ConcurrentHashSet<ForestCookie>> cookieSets = getCookieSetsByURL(url);
+        final List<ConcurrentLinkedDeque<ForestCookie>> cookieSets = getCookieSetsByURL(url);
         
-        for (final ConcurrentHashSet<ForestCookie> cookieSet : cookieSets) {
+        for (final ConcurrentLinkedDeque<ForestCookie> cookieSet : cookieSets) {
             final Set<ForestCookie> toRemove = new HashSet<>();
             for (final ForestCookie cookie : cookieSet) {
                 if (cookie.isExpired(System.currentTimeMillis())) {
@@ -78,18 +79,18 @@ public class MemoryCookieStorage implements ForestCookieStorage {
     }
 
     
-    private List<ConcurrentHashSet<ForestCookie>> getCookieSetsByURL(ForestURL url) {
-        List<ConcurrentHashSet<ForestCookie>> result = new ArrayList<>();
+    private List<ConcurrentLinkedDeque<ForestCookie>> getCookieSetsByURL(ForestURL url) {
+        List<ConcurrentLinkedDeque<ForestCookie>> result = new ArrayList<>();
         final String domain = url.getHost();
         final String[] fragments = domain.split("\\.");
         if (fragments.length == 1 && "localhost".equals(domain)) {
-            final ConcurrentHashSet<ForestCookie> cookieSet = getCookieSetByDomainFragments(fragments, 0);
+            final ConcurrentLinkedDeque<ForestCookie> cookieSet = getCookieSetByDomainFragments(fragments, 0);
             if (cookieSet != null) {
                 result.add(cookieSet);
             }
         } else {
             for (int i = 0; fragments.length - i > 1; i++) {
-                final ConcurrentHashSet<ForestCookie> cookieSet = getCookieSetByDomainFragments(fragments, i);
+                final ConcurrentLinkedDeque<ForestCookie> cookieSet = getCookieSetByDomainFragments(fragments, i);
                 if (cookieSet != null) {
                     result.add(cookieSet);
                 }
@@ -98,7 +99,7 @@ public class MemoryCookieStorage implements ForestCookieStorage {
         return result;
     }
 
-    private ConcurrentHashSet<ForestCookie> getCookieSetByDomainFragments(final String[] fragments, final int start) {
+    private ConcurrentLinkedDeque<ForestCookie> getCookieSetByDomainFragments(final String[] fragments, final int start) {
         if (fragments == null) {
             return null;
         }
@@ -116,6 +117,7 @@ public class MemoryCookieStorage implements ForestCookieStorage {
 
     @Override
     public void save(ForestCookies cookies) {
+        final long currentTime = System.currentTimeMillis();
         for (final ForestCookie cookie : cookies) {
             if (size.get() >= threshold) {
                 refresh();
@@ -124,13 +126,24 @@ public class MemoryCookieStorage implements ForestCookieStorage {
                 return;
             }
             final String domain = cookie.getDomain();
-            ConcurrentHashSet<ForestCookie> cookieSet = cookieMap.computeIfAbsent(
-                    domain, k -> new ConcurrentHashSet<>());
-            cookieSet.add(cookie);
-            if (cookie.isExpired(System.currentTimeMillis())) {
-                cookieSet.remove(cookie);
+            final ConcurrentLinkedDeque<ForestCookie> cookieSet = cookieMap.computeIfAbsent(
+                    domain, k -> new ConcurrentLinkedDeque<>());
+
+            for (ForestCookie savedCookie : cookieSet) {
+                if (savedCookie.equals(cookie)) {
+                    cookieSet.remove(savedCookie);
+                    break;
+                } else if (savedCookie.isExpired(currentTime)) {
+                    cookieSet.remove(savedCookie);
+                }
             }
-            size.incrementAndGet();
+            if (!cookie.isExpired(currentTime)) {
+                cookieSet.add(cookie);
+                size.incrementAndGet();
+            }
         }
     }
+    
+    
+    
 }

@@ -13,6 +13,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.cookie.ForestCookieStorage;
 import com.dtflys.forest.http.cookie.MemoryCookieStorage;
+import com.dtflys.forest.test.http.BaseClientTest;
 import okhttp3.Cookie;
 import okhttp3.HttpUrl;
 import okhttp3.mockwebserver.MockResponse;
@@ -33,12 +34,16 @@ import java.util.Locale;
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-public class CookieTest {
+public class CookieTest extends BaseClientTest {
 
     public final static String EXPECTED = "{\"status\":\"1\", \"data\":\"2\"}";
 
     @Rule
     public final MockWebServer server = new MockWebServer();
+
+    public CookieTest(String backendName, String jsonConverterName) {
+        super(backendName, jsonConverterName, ForestConfiguration.createConfiguration());
+    }
 
 
     @Test
@@ -567,6 +572,8 @@ public class CookieTest {
                 .setBody(EXPECTED)
                 .addHeader("Set-Cookie", "FOO=123-abc; Max-Age=2592000; Path=/abc; Version=1; Domain=" + server.getHostName())
                 .addHeader("Set-Cookie", "BAR=789-xyz; Max-Age=2592000; HttpOnly; Version=2; Domain=" + server.getHostName())
+                .addHeader("Set-Cookie", "XXX=111; Max-Age=2592000; Path=/aaa; HttpOnly; Version=2; Domain=" + server.getHostName())
+                .addHeader("Set-Cookie", "YYY=222; Max-Age=2592000; Path=/abc/yyy; HttpOnly; Version=2; Domain=" + server.getHostName())
                 .setResponseCode(200));
 
         ForestResponse response = configuration.get("/")
@@ -579,22 +586,21 @@ public class CookieTest {
                 .assertHeaderEquals("Cookie", null);
 
         assertThat(response).isNotNull();
-        assertThat(response.getCookies().size()).isEqualTo(2);
+        assertThat(response.getCookies().size()).isEqualTo(4);
         assertThat(response.getCookie("FOO").getValue()).isEqualTo("123-abc");
         assertThat(response.getCookie("BAR").getValue()).isEqualTo("789-xyz");
-        
 
         server.enqueue(new MockResponse()
                 .setBody(EXPECTED)
                 .setResponseCode(200));
 
-        configuration.get("/abc")
+        configuration.get("/abc/yyy")
                 .host(server.getHostName())
                 .port(server.getPort())
                 .execute();
         
         mockRequest(server)
-                .assertHeaderEquals("Cookie", "FOO=123-abc; BAR=789-xyz");
+                .assertHeaderEquals("Cookie", "FOO=123-abc; BAR=789-xyz; YYY=222");
     }
 
 
