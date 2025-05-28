@@ -1,5 +1,8 @@
 package com.dtflys.forest.test.misc;
 
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
+import com.alibaba.fastjson2.util.DateUtils;
 import com.dtflys.forest.backend.httpclient.HttpclientCookie;
 import com.dtflys.forest.backend.okhttp3.OkHttp3Cookie;
 import com.dtflys.forest.http.ForestCookie;
@@ -9,8 +12,12 @@ import okhttp3.HttpUrl;
 import org.apache.http.impl.cookie.BasicClientCookie2;
 import org.junit.Test;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Date;
+import java.util.Locale;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -50,7 +57,7 @@ public class CookieTest {
         assertThat(cookie.isPersistent()).isEqualTo(false);
         assertThat(cookie.getExpiresTime()).isEqualTo(expiresTime);
         assertThat(cookie.isExpired(new Date())).isFalse();
-        assertThat(cookie.toString()).isEqualTo("foo=bar; path=/; secure");
+        assertThat(cookie.toString()).isEqualTo("foo=bar; Path=/; Secure");
         Thread.sleep(1000L);
         assertThat(cookie.isExpired(new Date())).isTrue();
 
@@ -72,7 +79,7 @@ public class CookieTest {
                 persistent
         );
         assertThat(cookie.toString())
-                .isEqualTo("foo=bar; max-age=0; domain=localhost; path=/; httponly");
+                .isEqualTo("foo=bar; Max-Age=0; Domain=localhost; Path=/; HttpOnly");
 
         maxAge = Duration.ofMillis(1000L);
         secure = false;
@@ -92,7 +99,7 @@ public class CookieTest {
                 persistent
         );
         assertThat(cookie.toString())
-                .isEqualTo("foo=bar; max-age=1; domain=localhost; path=/");
+                .isEqualTo("foo=bar; Max-Age=1; Domain=localhost; Path=/");
     }
 
     @Test
@@ -202,9 +209,12 @@ public class CookieTest {
 
 
     @Test
-    public void testParseCookie() {
+    public void testParseCookie() throws ParseException {
         Duration maxAge = Duration.ofSeconds(1L);
         String url = "http://forest.dtflyx.com/docs";
+
+        // test parse Set-Cookie just include name-value and max-age
+
         String setCookie = "foo=bar; max-age=" + maxAge.getSeconds();
         ForestCookie cookie = ForestCookie.parse(url, setCookie);
         assertThat(cookie).isNotNull();
@@ -220,6 +230,8 @@ public class CookieTest {
         assertThat(cookie.isHostOnly()).isTrue();
         assertThat(cookie.isHttpOnly()).isFalse();
 
+        // test parse Set-Cookie just include max-age and domain
+
         setCookie = "foo=bar; max-age=" + maxAge.getSeconds() + "; domain=dtflyx.com; secure";
         cookie = ForestCookie.parse(url, setCookie);
         assertThat(cookie).isNotNull();
@@ -230,6 +242,67 @@ public class CookieTest {
         assertThat(cookie.getExpiresTime()).isEqualTo(expiresTime);
         assertThat(cookie.getDomain()).isEqualTo("dtflyx.com");
         assertThat(cookie.getPath()).isEqualTo("/");
+        assertThat(cookie.isPersistent()).isTrue();
+        assertThat(cookie.isSecure()).isTrue();
+        assertThat(cookie.isHostOnly()).isFalse();
+        assertThat(cookie.isHttpOnly()).isFalse();
+
+        // test parse Set-Cookie including both Max-Age and Expires
+
+        setCookie = "FOO=bar-123-abc; Max-Age=2592000; Expires=Thu, 26 Jun 2025 11:10:51 GMT; Domain=dtflyx.com; Path=/; Secure;HttpOnly;Domain=forest.dtflyx.com";
+        cookie = ForestCookie.parse(url, setCookie);
+        assertThat(cookie).isNotNull();
+        assertThat(cookie.getName()).isEqualTo("FOO");
+        assertThat(cookie.getValue()).isEqualTo("bar-123-abc");
+        assertThat(cookie.getMaxAge().getSeconds()).isEqualTo(2592000);
+        expiresTime = cookie.getCreateTime().getTime() + Duration.ofSeconds(2592000).toMillis();
+        assertThat(cookie.getExpiresTime()).isEqualTo(expiresTime);
+        assertThat(cookie.getDomain()).isEqualTo("forest.dtflyx.com");
+        assertThat(cookie.getPath()).isEqualTo("/");
+        assertThat(cookie.isPersistent()).isTrue();
+        assertThat(cookie.isSecure()).isTrue();
+        assertThat(cookie.isHostOnly()).isFalse();
+        assertThat(cookie.isHttpOnly()).isTrue();
+
+        // test parse Set-Cookie including Expires
+
+        final long currentTime = System.currentTimeMillis();
+        final long expireAt = currentTime + 2593000;
+        final Date expires = new Date(expireAt);
+        DateFormat expiresFormat = new SimpleDateFormat(DatePattern.HTTP_DATETIME_PATTERN, Locale.ENGLISH);
+        final String expiresStr = expiresFormat.format(expires);
+        final Date dateAfterDecode = expiresFormat.parse(expiresStr);
+        final long expireAtAfterDecode = dateAfterDecode.getTime();
+        final long maxAgeAfterDecode = expireAtAfterDecode - currentTime;
+
+        setCookie = "FOO=bar-123-abc; Expires=" + expiresStr + "; Domain=dtflyx.com; Path=/; Secure;HttpOnly;Domain=forest.dtflyx.com";
+        cookie = ForestCookie.parse(url, currentTime, setCookie);
+        assertThat(cookie).isNotNull();
+        assertThat(cookie.getName()).isEqualTo("FOO");
+        assertThat(cookie.getValue()).isEqualTo("bar-123-abc");
+        assertThat(cookie.getMaxAge().getSeconds()).isEqualTo(maxAgeAfterDecode);
+        expiresTime = cookie.getCreateTime().getTime() + Duration.ofSeconds(maxAgeAfterDecode).toMillis();
+        assertThat(cookie.getExpiresTime()).isEqualTo(expiresTime);
+        assertThat(cookie.getDomain()).isEqualTo("forest.dtflyx.com");
+        assertThat(cookie.getPath()).isEqualTo("/");
+        assertThat(cookie.isPersistent()).isTrue();
+        assertThat(cookie.isSecure()).isTrue();
+        assertThat(cookie.isHostOnly()).isFalse();
+        assertThat(cookie.isHttpOnly()).isTrue();
+
+        // test parse Set-Cookie including Version
+
+        setCookie = "FOO=bar-123-abc; Max-Age=2592000; Secure; Version=2; Domain=forest.dtflyx.com";
+        cookie = ForestCookie.parse(url, setCookie);
+        assertThat(cookie).isNotNull();
+        assertThat(cookie.getName()).isEqualTo("FOO");
+        assertThat(cookie.getValue()).isEqualTo("bar-123-abc");
+        assertThat(cookie.getMaxAge().getSeconds()).isEqualTo(2592000);
+        expiresTime = cookie.getCreateTime().getTime() + Duration.ofSeconds(2592000).toMillis();
+        assertThat(cookie.getExpiresTime()).isEqualTo(expiresTime);
+        assertThat(cookie.getDomain()).isEqualTo("forest.dtflyx.com");
+        assertThat(cookie.getPath()).isEqualTo("/");
+        assertThat(cookie.getVersion()).isEqualTo(2);
         assertThat(cookie.isPersistent()).isTrue();
         assertThat(cookie.isSecure()).isTrue();
         assertThat(cookie.isHostOnly()).isFalse();
@@ -280,6 +353,10 @@ public class CookieTest {
         assertThat(cookie.getPath()).isEqualTo("/");
         assertThat(cookie.isPersistent()).isFalse();
         assertThat(cookie.isSecure()).isFalse();
+    }
+
+    @Test
+    public void testCookieParse() {
     }
 
     @Test
