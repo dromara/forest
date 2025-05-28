@@ -23,6 +23,7 @@ import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.utils.ForestProgress;
 import com.dtflys.forest.utils.ReflectUtils;
 
+import javax.security.auth.login.Configuration;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
@@ -244,11 +245,13 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
 
     @Override
     public void handleLoadCookie(final ForestRequest request, final ForestCookies cookies) {
+        request.getConfiguration().getCookieStorage().load(request.url(), cookies);
         request.getInterceptorChain().onLoadCookie(request, cookies);
         final OnLoadCookie onLoadCookie = request.getOnLoadCookie();
         if (onLoadCookie != null) {
             onLoadCookie.onLoadCookie(request, cookies);
         }
+         
     }
 
     @Override
@@ -258,6 +261,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
         if (onSaveCookie != null) {
             onSaveCookie.onSaveCookie(request, cookies);
         }
+        request.getConfiguration().getCookieStorage().save(cookies);
     }
 
     @Override

@@ -555,7 +555,47 @@ public class CookieTest {
         assertThat(cookies2).isNotNull();
         assertThat(cookies2.size()).isEqualTo(1);
         assertThat(cookies2.get(0)).isEqualTo(response.getCookie("BAR"));
-
     }
+
+
+    @Test
+    public void testCookieAutoSaveAndLoad() {
+        ForestConfiguration configuration = ForestConfiguration.createConfiguration()
+                .setAutoCookieSaveAndLoadEnabled(true);
+
+        server.enqueue(new MockResponse()
+                .setBody(EXPECTED)
+                .addHeader("Set-Cookie", "FOO=123-abc; Max-Age=2592000; Path=/abc; Version=1; Domain=" + server.getHostName())
+                .addHeader("Set-Cookie", "BAR=789-xyz; Max-Age=2592000; HttpOnly; Version=2; Domain=" + server.getHostName())
+                .setResponseCode(200));
+
+        ForestResponse response = configuration.get("/")
+                .logResponseHeaders(true)
+                .host(server.getHostName())
+                .port(server.getPort())
+                .executeAsResponse();
+
+        mockRequest(server)
+                .assertHeaderEquals("Cookie", null);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getCookies().size()).isEqualTo(2);
+        assertThat(response.getCookie("FOO").getValue()).isEqualTo("123-abc");
+        assertThat(response.getCookie("BAR").getValue()).isEqualTo("789-xyz");
+        
+
+        server.enqueue(new MockResponse()
+                .setBody(EXPECTED)
+                .setResponseCode(200));
+
+        configuration.get("/abc")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .execute();
+        
+        mockRequest(server)
+                .assertHeaderEquals("Cookie", "FOO=123-abc; BAR=789-xyz");
+    }
+
 
 }
