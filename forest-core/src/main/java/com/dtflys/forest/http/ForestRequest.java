@@ -3561,6 +3561,50 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
     }
 
     /**
+     * 添加多个 Cookie 到请求中 (默认严格匹配)
+     *
+     * @param cookies {@link ForestCookie}对象数组
+     * @return {@link ForestRequest}类实例
+     * @since 1.7.0
+     */
+    public ForestRequest<T> addCookie(ForestCookie ...cookies) {
+        if (cookies != null) {
+            for (final ForestCookie cookie : cookies) {
+                this.headers.addCookie(cookie);
+            }
+        }
+        return this;
+    }
+
+
+    /**
+     * 通过 Cookie 名和 Cookie 值添加 Cookie 到请求中 (默认严格匹配)
+     *
+     * @param name Cookie名
+     * @param value Cookie值
+     * @return {@link ForestRequest}类实例
+     * @since 1.7.0
+     */
+    public ForestRequest<T> addCookie(String name, String value) {
+        this.headers.addCookie(ForestCookie.nameValue(name, value));
+        return this;
+    }
+
+
+    /**
+     * 通过 Cookie 内容字符串加 Cookie 到请求中 (默认严格匹配)
+     *
+     * @param cookieContent Cookie 内容字符串
+     * @return {@link ForestRequest}类实例
+     * @since 1.7.0
+     */
+    public ForestRequest<T> addCookie(String cookieContent) {
+        this.headers.addHeader("Cookie", cookieContent);
+        return this;
+    }
+
+
+    /**
      * 添加 Cookie 到请求中
      *
      * @param cookie {@link ForestCookie}对象实例

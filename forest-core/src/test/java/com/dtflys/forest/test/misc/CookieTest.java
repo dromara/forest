@@ -424,16 +424,29 @@ public class CookieTest {
         Forest.get("/")
                 .host(server.getHostName())
                 .port(server.getPort())
-                .addCookie(Forest.cookie("FOO", "123-abc"))
-                .addCookie(Forest.cookie("BAR", "789-xyz"))
-                .addCookie(cookie1)
-                .addCookie(cookie2)
-                .addCookie(cookie3)
-                .addCookie(cookie4)
+                .addCookie("FOO", "123-abc")
+                .addCookie("BAR", "789-xyz")
+                .addCookie(cookie1, cookie2, cookie3, cookie4)
                 .execute();
 
         mockRequest(server)
                 .assertHeaderEquals("Cookie", "FOO=123-abc; BAR=789-xyz; XXX=YYY");
+    }
+
+    @Test
+    public void testRequestCookies4() {
+        server.enqueue(new MockResponse()
+                .setBody(EXPECTED)
+                .setResponseCode(200));
+
+        Forest.get("/")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .addCookie("FOO=123-abc; BAR=789-xyz")
+                .execute();
+
+        mockRequest(server)
+                .assertHeaderEquals("Cookie", "FOO=123-abc; BAR=789-xyz");
     }
 
 
