@@ -505,6 +505,18 @@ public class ForestCookie implements Cloneable, Serializable {
         return expiredTime <= date.getTime();
     }
 
+    /**
+     * 判断Cookie是否过期
+     *
+     * @param currentTimeMillis 当前时间戳
+     * @return {@code true}: 已过期, {@code false}: 未过期
+     */
+    public boolean isExpired(long currentTimeMillis) {
+        long expiredTime = getExpiresTime();
+        return expiredTime <= currentTimeMillis;
+    }
+
+
     public static ForestCookie parse(final String setCookie) {
         return parse((ForestURL) null, System.currentTimeMillis(), setCookie);
     }
