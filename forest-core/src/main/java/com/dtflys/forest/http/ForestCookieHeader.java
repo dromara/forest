@@ -2,7 +2,9 @@ package com.dtflys.forest.http;
 
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.utils.StringUtils;
+import com.dtflys.forest.utils.URLEncoder;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -132,7 +134,7 @@ public class ForestCookieHeader extends SimpleHeader {
         if (strict && !cookie.matchURL(url)) {
             return false;
         }
-        if (strict && cookie.isExpired(new Date())) {
+        if (strict && cookie.isPersistent() && cookie.isExpired(new Date())) {
             return false;
         }
         final String name = cookie.getName();
@@ -186,7 +188,7 @@ public class ForestCookieHeader extends SimpleHeader {
             final ForestCookie cookie = list.get(i);
             builder.append(cookie.getName())
                     .append("=")
-                    .append(cookie.getValue());
+                    .append(URLEncoder.ALL.encode(cookie.getValue(), StandardCharsets.UTF_8));
             if (i < len - 1) {
                 builder.append("; ");
             }

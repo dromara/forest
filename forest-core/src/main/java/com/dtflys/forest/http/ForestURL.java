@@ -25,6 +25,7 @@
 package com.dtflys.forest.http;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.mapping.MappingURLTemplate;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
 import org.slf4j.Logger;
@@ -106,6 +107,15 @@ public class ForestURL {
 
     private void needRegenerateUrl() {
         needRegenerateUrl = true;
+    }
+
+
+    public static ForestURL fromUrl(String url) {
+        try {
+            return new ForestURL(new URL(url));
+        } catch (MalformedURLException e) {
+            throw new ForestRuntimeException(e);
+        }
     }
 
     public ForestURL(URL url) {
