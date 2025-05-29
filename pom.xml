@@ -235,6 +235,12 @@
 			<artifactId>moco-core</artifactId>
 			<version>${moco-core.version}</version>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>json-path</artifactId>
+					<groupId>com.jayway.jsonpath</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>

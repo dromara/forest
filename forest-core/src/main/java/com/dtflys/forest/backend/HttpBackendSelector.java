@@ -83,14 +83,14 @@ public class HttpBackendSelector {
                             return backend;
                         }
                     }
-                    backend = findOkHttp3BackendInstance();
-                    if (backend != null) {
-                        BACKEND_MAP.put(OKHTTP3_BACKEND_NAME, backend);
-                        return backend;
-                    }
                     backend = findHttpclientBackendInstance();
                     if (backend != null) {
                         BACKEND_MAP.put(HTTPCLIENT_BACKEND_NAME, backend);
+                        return backend;
+                    }
+                    backend = findOkHttp3BackendInstance();
+                    if (backend != null) {
+                        BACKEND_MAP.put(OKHTTP3_BACKEND_NAME, backend);
                         return backend;
                     }
                     throw new ForestRuntimeException("Http Backed is undefined.");
@@ -114,7 +114,7 @@ public class HttpBackendSelector {
         try {
             Class.forName(OKHTTP3_CLIENT_CLASS_NAME);
             return OKHTTP3_BACKEND_CREATOR.create();
-        } catch (ClassNotFoundException e) {
+        } catch (Throwable ignored) {
         }
         return null;
     }
@@ -132,12 +132,8 @@ public class HttpBackendSelector {
             try {
                 final Class klass = Class.forName(className);
                 return (HttpBackend) klass.newInstance();
-            } catch (ClassNotFoundException e) {
-                throw new ForestRuntimeException(e);
-            } catch (InstantiationException e) {
-                throw new ForestRuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new ForestRuntimeException(e);
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ignored) {
+                return null;
             }
         }
     }
