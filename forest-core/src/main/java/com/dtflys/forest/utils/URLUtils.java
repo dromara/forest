@@ -1,7 +1,6 @@
 package com.dtflys.forest.utils;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
-import okhttp3.internal.Util;
 
 import java.io.UnsupportedEncodingException;
 import java.net.IDN;

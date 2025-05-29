@@ -32,6 +32,7 @@ import com.dtflys.forest.utils.URLUtils;
 
 import javax.servlet.http.Cookie;
 import java.io.Serializable;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Date;
@@ -48,6 +49,17 @@ public class ForestCookie implements Cloneable, Serializable {
 
     private final static SimpleDateFormat EXPIRES_DATE_FORMAT =
             new SimpleDateFormat(DatePattern.HTTP_DATETIME_PATTERN, Locale.ENGLISH);
+
+    private final static SimpleDateFormat EXPIRES_DATE_FORMAT2 =
+            new SimpleDateFormat("EEE, dd-MMM-yyyy HH:mm:ss z", Locale.ENGLISH);
+
+    private final static SimpleDateFormat EXPIRES_DATE_FORMAT3 =
+            new SimpleDateFormat("EEE, dd/MMM/yyyy HH:mm:ss z", Locale.ENGLISH);
+
+    private final static SimpleDateFormat EXPIRES_DATE_FORMAT4 =
+            new SimpleDateFormat("EEE, dd\\MMM\\yyyy HH:mm:ss z", Locale.ENGLISH);
+
+
 
 
     /**
@@ -427,7 +439,7 @@ public class ForestCookie implements Cloneable, Serializable {
         }
         if (!hostOnly && leftDomain.endsWith(rightDomain)
                 && leftDomain.charAt(leftDomain.length() - rightDomain.length() - 1) == '.'
-                && !URLUtils.isValidIPAddress(leftDomain)) {
+                && URLUtils.isValidIPAddress(leftDomain)) {
             return true;
         }
         return URLUtils.matchDomain(leftDomain, rightDomain);
@@ -502,6 +514,9 @@ public class ForestCookie implements Cloneable, Serializable {
      * @return {@code true}: 已过期, {@code false}: 未过期
      */
     public boolean isExpired(Date date) {
+        if (maxAge == null) {
+            return false;
+        }
         long expiredTime = getExpiresTime();
         return expiredTime <= date.getTime();
     }
@@ -535,6 +550,10 @@ public class ForestCookie implements Cloneable, Serializable {
     }
 
     public static ForestCookie parse(ForestURL url, long currentTimeMillis, String setCookieString) {
+        if (StringUtils.isBlank(setCookieString)) {
+            return null;
+        }
+
         final String source = StringUtils.isBlank(setCookieString) ? "" : setCookieString.trim();
         final String[] nameValuePairs = source.split(";");
 
@@ -551,6 +570,7 @@ public class ForestCookie implements Cloneable, Serializable {
         boolean hostOnly = true;
         boolean persistent = false;
 
+        // 循环遍历 Set-Cookie 字符串中的所有键值对
         for (int i = 0; i < nameValuePairs.length; i++) {
             final String pair = nameValuePairs[i].trim();
             final String[] nameValue = pair.split("=", 2);
@@ -559,15 +579,20 @@ public class ForestCookie implements Cloneable, Serializable {
             if (i == 0) {
                 cookieName = name;
                 cookieValue = value;
+                if (StringUtils.isEmpty(value) && !pair.contains("=")) {
+                    return null;
+                }
             } else if ("Max-Age".equalsIgnoreCase(name)) {
                 final long maxAgeValue = parseMaxAge(value);
                 maxAge = maxAgeValue < 0 ? null : Duration.ofSeconds(maxAgeValue);
                 persistent = true;
             } else if ("Expires".equalsIgnoreCase(name)) {
                 try {
-                    final Date date = EXPIRES_DATE_FORMAT.parse(value);
-                    expiresAt = date.getTime();
-                    persistent = true;
+                    final Date date = parseExpires(value);
+                    if (date != null) {
+                        expiresAt = date.getTime();
+                        persistent = true;
+                    }
                 } catch (Throwable th) {
                     throw new ForestRuntimeException(th);
                 }
@@ -603,10 +628,12 @@ public class ForestCookie implements Cloneable, Serializable {
             path = "/";
         }
 
+        // 如果同时有 Max-Age 和 Expires，则 Max-Age 的优先级更高
+        // 若只有 Expires，则把 Expires 转换成当前时刻距离过期时间的毫秒数，并存到 maxAge 中
         if (maxAge == null && expiresAt != -1) {
             final long maxAgeValue = expiresAt - currentTimeMillis;
             if (maxAgeValue >= 0) {
-                maxAge = Duration.ofSeconds(maxAgeValue);
+                maxAge = Duration.ofMillis(maxAgeValue);
             }
         }
 
@@ -642,6 +669,29 @@ public class ForestCookie implements Cloneable, Serializable {
         }
     }
 
+    private static Date parseExpires(String s) {
+        if (s.length() > 4 && s.charAt(3) == ',') {
+            try {
+                return EXPIRES_DATE_FORMAT.parse(s);
+            } catch (ParseException e) {
+                try {
+                    return EXPIRES_DATE_FORMAT2.parse(s);
+                } catch (ParseException ex) {
+                    try {
+                        return EXPIRES_DATE_FORMAT3.parse(s);
+                    } catch (ParseException exc) {
+                        try {
+                            return EXPIRES_DATE_FORMAT4.parse(s);
+                        } catch (ParseException parseException) {
+                            return null;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
 
     private static long parseMaxAge(String s) {
         try {
@@ -655,9 +705,28 @@ public class ForestCookie implements Cloneable, Serializable {
         }
     }
 
-
+    /**
+     * 获取过期时间
+     *
+     * @return 毫秒数，过期时间
+     */
     public long getExpiresTime() {
+        if (maxAge == null) {
+            return -1L;
+        }
         return createTime.getTime() + maxAge.toMillis();
+    }
+
+    /**
+     * 获取过期时间
+     *
+     * @return 日期对象，过期时间
+     */
+    public Date getExpires() {
+        if (maxAge == null) {
+            return null;
+        }
+        return new Date(getExpiresTime());
     }
 
     /**

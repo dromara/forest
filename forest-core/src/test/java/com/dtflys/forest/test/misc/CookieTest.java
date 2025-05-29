@@ -303,9 +303,10 @@ public class CookieTest extends BaseClientTest {
         assertThat(cookie).isNotNull();
         assertThat(cookie.getName()).isEqualTo("FOO");
         assertThat(cookie.getValue()).isEqualTo("bar-123-abc");
-        assertThat(cookie.getMaxAge().getSeconds()).isEqualTo(maxAgeAfterDecode);
-        expiresTime = cookie.getCreateTime().getTime() + Duration.ofSeconds(maxAgeAfterDecode).toMillis();
+        assertThat(cookie.getMaxAge().toMillis()).isEqualTo(maxAgeAfterDecode);
+        expiresTime = cookie.getCreateTime().getTime() + maxAgeAfterDecode;
         assertThat(cookie.getExpiresTime()).isEqualTo(expiresTime);
+        assertThat(cookie.getExpires().getTime()).isEqualTo(expiresTime);
         assertThat(cookie.getDomain()).isEqualTo("forest.dtflyx.com");
         assertThat(cookie.getPath()).isEqualTo("/");
         assertThat(cookie.isPersistent()).isTrue();

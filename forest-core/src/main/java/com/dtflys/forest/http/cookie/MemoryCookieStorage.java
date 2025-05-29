@@ -1,15 +1,12 @@
 package com.dtflys.forest.http.cookie;
 
-import cn.hutool.core.collection.ConcurrentHashSet;
 import com.dtflys.forest.http.*;
+import com.dtflys.forest.utils.URLUtils;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MemoryCookieStorage implements ForestCookieStorage {
@@ -22,9 +19,19 @@ public class MemoryCookieStorage implements ForestCookieStorage {
 
     private final int maxSize;
 
+    private final Timer timer = new Timer();
+
+
     public MemoryCookieStorage(int maxSize) {
         this.maxSize = maxSize;
         this.threshold = Math.min(Math.max(maxSize / 2, 8), this.maxSize);
+
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                refresh();
+            }
+        }, TimeUnit.SECONDS.toSeconds(5));
     }
 
     private void refresh() {
@@ -83,12 +90,12 @@ public class MemoryCookieStorage implements ForestCookieStorage {
         List<ConcurrentLinkedDeque<ForestCookie>> result = new ArrayList<>();
         final String domain = url.getHost();
         final String[] fragments = domain.split("\\.");
-        if (fragments.length == 1 && "localhost".equals(domain)) {
+        if (fragments.length == 1 && Character.isLetter(domain.charAt(0))) {
             final ConcurrentLinkedDeque<ForestCookie> cookieSet = getCookieSetByDomainFragments(fragments, 0);
             if (cookieSet != null) {
                 result.add(cookieSet);
             }
-        } else {
+        } else if (!URLUtils.isValidIPAddress(domain)) {
             for (int i = 0; fragments.length - i > 1; i++) {
                 final ConcurrentLinkedDeque<ForestCookie> cookieSet = getCookieSetByDomainFragments(fragments, i);
                 if (cookieSet != null) {
