@@ -1,44 +1,27 @@
 package com.dtflys.forest.backend.okhttp3.conn;
 
 import com.dtflys.forest.backend.ForestConnectionManager;
-import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.backend.SocksAuthenticator;
-import com.dtflys.forest.backend.httpclient.HttpClientProvider;
 import com.dtflys.forest.backend.okhttp3.OkHttp3Backend;
 import com.dtflys.forest.backend.okhttp3.OkHttpClientProvider;
 import com.dtflys.forest.backend.okhttp3.response.OkHttpResponseBody;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.LifeCycleHandler;
-import com.dtflys.forest.http.ForestHeaderMap;
-import com.dtflys.forest.http.ForestProtocol;
-import com.dtflys.forest.http.ForestProxy;
-import com.dtflys.forest.http.ForestProxyType;
-import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.*;
 import com.dtflys.forest.ssl.ForestX509TrustManager;
 import com.dtflys.forest.ssl.SSLKeyStore;
 import com.dtflys.forest.ssl.TrustAllManager;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.TimeUtils;
-import okhttp3.Authenticator;
-import okhttp3.ConnectionPool;
-import okhttp3.Credentials;
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Protocol;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.*;
 
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**

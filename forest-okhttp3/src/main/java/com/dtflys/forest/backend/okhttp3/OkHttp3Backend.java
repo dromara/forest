@@ -4,7 +4,7 @@ import com.dtflys.forest.backend.AbstractHttpBackend;
 import com.dtflys.forest.backend.ForestConnectionManager;
 import com.dtflys.forest.backend.HttpExecutor;
 import com.dtflys.forest.backend.okhttp3.conn.OkHttp3ConnectionManager;
-import com.dtflys.forest.backend.okhttp3.executor.*;
+import com.dtflys.forest.backend.okhttp3.executor.OkHttp3Executor;
 import com.dtflys.forest.backend.okhttp3.response.OkHttp3ResponseHandler;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;

@@ -1,5 +1,6 @@
 package com.dtflys.forest.backend.okhttp3.response;
 
+import com.dtflys.forest.backend.okhttp3.response.OkHttp3ForestResponse;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;

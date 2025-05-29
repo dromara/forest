@@ -4,7 +4,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.dtflys.forest</groupId>
     <artifactId>forest-core</artifactId>
     <version>${revision}</version>
 
@@ -22,8 +21,6 @@
         <gmaven-plugin.version>1.5</gmaven-plugin.version>
         <jgitflow-plugin.version>1.0-m4.3</jgitflow-plugin.version>
         <versions-plugin.version>2.1</versions-plugin.version>
-        <kotlin.version>1.9.23</kotlin.version>
-        <kotlinx.version>1.10.1</kotlinx.version>
 
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
     </properties>
@@ -66,11 +63,6 @@
             <version>${httpclient.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>${okhttp.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>commons-io</groupId>

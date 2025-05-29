@@ -2,6 +2,7 @@ package com.dtflys.forest.backend.okhttp3.body;
 
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.body.AbstractBodyBuilder;
+import com.dtflys.forest.backend.okhttp3.body.OkHttpMultipartBody;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.LifeCycleHandler;
@@ -11,19 +12,17 @@ import com.dtflys.forest.http.body.NameValueRequestBody;
 import com.dtflys.forest.http.body.ObjectRequestBody;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.multipart.ForestMultipart;
-import com.dtflys.forest.utils.ReflectUtils;
-import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
-import okhttp3.*;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 
-import java.io.File;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -134,7 +133,7 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
             final String mimeType = URLConnection.guessContentTypeFromName(multipart.getOriginalFileName());
             if (mimeType == null) {
                 // guess this is a video uploading
-                fileMediaType = MediaType.parse(com.dtflys.forest.backend.ContentType.MULTIPART_FORM_DATA);
+                fileMediaType = MediaType.parse(ContentType.MULTIPART_FORM_DATA);
             } else {
                 fileMediaType = MediaType.parse(mimeType);
             }

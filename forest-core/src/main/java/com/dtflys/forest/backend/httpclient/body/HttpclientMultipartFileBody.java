@@ -3,7 +3,6 @@ package com.dtflys.forest.backend.httpclient.body;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.utils.ForestProgress;
-import okio.BufferedSink;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.util.Args;
@@ -29,8 +28,6 @@ public class HttpclientMultipartFileBody extends FileBody {
     private long contentLength = -1;
 
     private long writtenBytes;
-
-    private BufferedSink bufferedSink;
 
     private final long progressStep;
 

@@ -5,7 +5,6 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.GzipUtils;
-import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
 import okhttp3.Headers;
 import okhttp3.MediaType;
@@ -13,7 +12,6 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Date;
