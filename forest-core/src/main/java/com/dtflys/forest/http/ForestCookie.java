@@ -25,6 +25,7 @@
 package com.dtflys.forest.http;
 
 import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.net.URLDecoder;
 import cn.hutool.core.util.HashUtil;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.utils.StringUtils;
@@ -32,6 +33,7 @@ import com.dtflys.forest.utils.URLUtils;
 
 import javax.servlet.http.Cookie;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -577,11 +579,11 @@ public class ForestCookie implements Cloneable, Serializable {
             final String name = nameValue[0].trim();
             final String value = nameValue.length > 1 ? nameValue[1].trim() : "";
             if (i == 0) {
-                cookieName = name;
-                cookieValue = value;
                 if (StringUtils.isEmpty(value) && !pair.contains("=")) {
                     return null;
                 }
+                cookieName = name;
+                cookieValue = URLDecoder.decode(value, StandardCharsets.UTF_8);
             } else if ("Max-Age".equalsIgnoreCase(name)) {
                 final long maxAgeValue = parseMaxAge(value);
                 maxAge = maxAgeValue < 0 ? null : Duration.ofSeconds(maxAgeValue);
