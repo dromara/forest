@@ -4,20 +4,20 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 
 public interface ResponseResult {
 
-    ResponseSuccess SUCCESS = new ResponseSuccess(true);
+    ResponseSuccess RESPONSE_RESULT_SUCCESS = new ResponseSuccess(true);
 
-    ResponseError ERROR = new ResponseError(null);
+    ResponseError RESPONSE_RESULT_ERROR = new ResponseError(null);
 
-    ResponseProceed PROCEED = new ResponseProceed();
+    ResponseProceed RESPONSE_RESULT_PROCEED = new ResponseProceed();
 
     ResponseResultStatus getStatus();
 
     static ResponseResult proceed() {
-        return PROCEED;
+        return RESPONSE_RESULT_PROCEED;
     }
 
     static ResponseResult success() {
-        return SUCCESS;
+        return RESPONSE_RESULT_SUCCESS;
     }
 
     static ResponseResult success(Object data) {
@@ -25,7 +25,7 @@ public interface ResponseResult {
     }
 
     static ResponseResult error() {
-        return ERROR;
+        return RESPONSE_RESULT_ERROR;
     }
 
     static ResponseResult error(Throwable e) {
