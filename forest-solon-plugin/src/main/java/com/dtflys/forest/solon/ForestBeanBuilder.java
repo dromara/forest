@@ -69,6 +69,7 @@ public class ForestBeanBuilder {
         
         forestConfiguration.setMaxAsyncThreadSize(forestConfigurationProperties.getMaxAsyncThreadSize());
         forestConfiguration.setMaxAsyncQueueSize(forestConfigurationProperties.getMaxAsyncQueueSize());
+        forestConfiguration.setAsyncRejectPolicyClass(forestConfigurationProperties.getAsyncRejectPolicyClass());
         forestConfiguration.setMaxConnections(forestConfigurationProperties.getMaxConnections());
         forestConfiguration.setMaxRouteConnections(forestConfigurationProperties.getMaxRouteConnections());
         forestConfiguration.setAsyncMode(forestConfigurationProperties.getAsyncMode());
