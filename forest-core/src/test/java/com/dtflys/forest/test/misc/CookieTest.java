@@ -528,8 +528,8 @@ public class CookieTest extends BaseClientTest {
 
         server.enqueue(new MockResponse()
                 .setBody(EXPECTED)
-                .addHeader("Set-Cookie", "FOO=123-abc; Max-Age=2592000; Path=/abc; Secure; Version=1; Domain=" + server.getHostName())
-                .addHeader("Set-Cookie", "BAR=789-xyz; Max-Age=2592000; Secure; HttpOnly; Version=2; Domain=" + server.getHostName())
+                .addHeader("Set-Cookie", "FOO=123-abc.111; Max-Age=2592000; Path=/abc; Secure; Version=1; Domain=" + server.getHostName())
+                .addHeader("Set-Cookie", "BAR=789-xyz.222; Max-Age=2592000; Secure; HttpOnly; Version=2; Domain=" + server.getHostName())
                 .setResponseCode(200));
         
         ForestResponse response = Forest.get("/")
@@ -556,11 +556,13 @@ public class CookieTest extends BaseClientTest {
         assertThat(cookies1).isNotNull();
         assertThat(cookies1.size()).isEqualTo(1);
         assertThat(cookies1.get(0)).isEqualTo(response.getCookie("FOO"));
+        assertThat(cookies1.get(0).getValue()).isEqualTo("123-abc.111");
 
         List<ForestCookie> cookies2 = cookieList.getCookies(server.getHostName(), "/", "BAR");
         assertThat(cookies2).isNotNull();
         assertThat(cookies2.size()).isEqualTo(1);
         assertThat(cookies2.get(0)).isEqualTo(response.getCookie("BAR"));
+        assertThat(cookies2.get(0).getValue()).isEqualTo("789-xyz.222");
     }
 
 
@@ -571,8 +573,8 @@ public class CookieTest extends BaseClientTest {
 
         server.enqueue(new MockResponse()
                 .setBody(EXPECTED)
-                .addHeader("Set-Cookie", "FOO=123-abc; Max-Age=2592000; Path=/abc; Version=1; Domain=" + server.getHostName())
-                .addHeader("Set-Cookie", "BAR=789-xyz; Max-Age=2592000; HttpOnly; Version=2; Domain=" + server.getHostName())
+                .addHeader("Set-Cookie", "FOO=123-abc.111; Max-Age=2592000; Path=/abc; Version=1; Domain=" + server.getHostName())
+                .addHeader("Set-Cookie", "BAR=789-xyz.222; Max-Age=2592000; HttpOnly; Version=2; Domain=" + server.getHostName())
                 .addHeader("Set-Cookie", "XXX=111; Max-Age=2592000; Path=/aaa; HttpOnly; Version=2; Domain=" + server.getHostName())
                 .addHeader("Set-Cookie", "YYY=222; Max-Age=2592000; Path=/abc/yyy; HttpOnly; Version=2; Domain=" + server.getHostName())
                 .setResponseCode(200));
@@ -588,8 +590,8 @@ public class CookieTest extends BaseClientTest {
 
         assertThat(response).isNotNull();
         assertThat(response.getCookies().size()).isEqualTo(4);
-        assertThat(response.getCookie("FOO").getValue()).isEqualTo("123-abc");
-        assertThat(response.getCookie("BAR").getValue()).isEqualTo("789-xyz");
+        assertThat(response.getCookie("FOO").getValue()).isEqualTo("123-abc.111");
+        assertThat(response.getCookie("BAR").getValue()).isEqualTo("789-xyz.222");
 
         server.enqueue(new MockResponse()
                 .setBody(EXPECTED)
@@ -601,7 +603,7 @@ public class CookieTest extends BaseClientTest {
                 .execute();
         
         mockRequest(server)
-                .assertHeaderEquals("Cookie", "FOO=123-abc; BAR=789-xyz; YYY=222");
+                .assertHeaderEquals("Cookie", "FOO=123-abc.111; BAR=789-xyz.222; YYY=222");
     }
 
 

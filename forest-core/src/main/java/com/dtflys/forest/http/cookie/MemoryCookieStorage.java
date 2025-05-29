@@ -19,13 +19,12 @@ public class MemoryCookieStorage implements ForestCookieStorage {
 
     private final int maxSize;
 
-    private final Timer timer = new Timer();
-
 
     public MemoryCookieStorage(int maxSize) {
         this.maxSize = maxSize;
         this.threshold = Math.min(Math.max(maxSize / 2, 8), this.maxSize);
 
+        final Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -35,20 +34,24 @@ public class MemoryCookieStorage implements ForestCookieStorage {
     }
 
     private void refresh() {
-        for (ConcurrentLinkedDeque<ForestCookie> cookieSet : cookieMap.values()) {
+        for (final ConcurrentLinkedDeque<ForestCookie> cookieSet : cookieMap.values()) {
             final Set<ForestCookie> toRemove = new HashSet<>();
-            for (ForestCookie cookie : cookieSet) {
-                if (cookie.isExpired(System.currentTimeMillis())) {
+            final long currentTime = System.currentTimeMillis();
+            for (final ForestCookie cookie : cookieSet) {
+                if (cookie.isExpired(currentTime)) {
                     toRemove.add(cookie);
                 }
             }
             if (!toRemove.isEmpty()) {
                 cookieSet.removeAll(toRemove);
-                synchronized (this) {
-                    size.set(size.get() - cookieSet.size());
-                }
+                size.addAndGet(-1 * cookieSet.size());
             }
         }
+        int total = 0;
+        for (final ConcurrentLinkedDeque<ForestCookie> cookieSet : cookieMap.values()) {
+            total += cookieSet.size();
+        }
+        size.set(total);
     }
 
     @Override
@@ -77,9 +80,7 @@ public class MemoryCookieStorage implements ForestCookieStorage {
             }
             if (!toRemove.isEmpty()) {
                 cookieSet.removeAll(toRemove);
-                synchronized (this) {
-                    size.set(size.get() - cookieSet.size());
-                }
+                size.addAndGet(-1 * cookieSet.size());
             }
         }
         return cookies;
@@ -139,9 +140,11 @@ public class MemoryCookieStorage implements ForestCookieStorage {
             for (ForestCookie savedCookie : cookieSet) {
                 if (savedCookie.equals(cookie)) {
                     cookieSet.remove(savedCookie);
+                    size.decrementAndGet();
                     break;
                 } else if (savedCookie.isExpired(currentTime)) {
                     cookieSet.remove(savedCookie);
+                    size.decrementAndGet();
                 }
             }
             if (!cookie.isExpired(currentTime)) {
