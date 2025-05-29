@@ -112,7 +112,7 @@ public interface Interceptor<T> extends
      */
     @Override
     default ResponseResult onResponse(ForestRequest request, ForestResponse response) {
-        return ResponseResult.PROCEED;
+        return ResponseResult.RESPONSE_RESULT_PROCEED;
     }
 
     /**

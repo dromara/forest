@@ -17,11 +17,11 @@ import com.dtflys.forest.interceptor.ResponseProceed;
 public interface OnResponse {
 
     default ResponseSuccess success() {
-        return ResponseResult.SUCCESS;
+        return ResponseResult.RESPONSE_RESULT_SUCCESS;
     }
 
     default ResponseError error() {
-        return ResponseResult.ERROR;
+        return ResponseResult.RESPONSE_RESULT_ERROR;
     }
 
     default ResponseSuccess success(Object data) {
@@ -37,7 +37,7 @@ public interface OnResponse {
     }
 
     default ResponseProceed proceed() {
-        return ResponseResult.PROCEED;
+        return ResponseResult.RESPONSE_RESULT_PROCEED;
     }
 
     /**
