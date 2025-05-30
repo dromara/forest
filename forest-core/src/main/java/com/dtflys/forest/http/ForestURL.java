@@ -24,7 +24,10 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.Forest;
+import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingURLTemplate;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
@@ -45,6 +48,17 @@ import java.net.URL;
 public class ForestURL {
 
     private final static Logger log = LoggerFactory.getLogger(ForestURL.class);
+
+    /**
+     * 变量作用域
+     * @since 1.7.0
+     */
+    private volatile VariableScope scope = Forest.config();
+
+    /**
+     * URL字符串模板
+     */
+    private MappingURLTemplate template;
 
     /**
      * 原始URL
@@ -103,7 +117,7 @@ public class ForestURL {
     /**
      * 是否需要重新生成 URL
      */
-    private boolean needRegenerateUrl = false;
+    private volatile boolean needRegenerateUrl = false;
 
     private void needRegenerateUrl() {
         needRegenerateUrl = true;

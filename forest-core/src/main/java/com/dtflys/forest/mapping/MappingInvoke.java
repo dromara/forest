@@ -3,6 +3,7 @@ package com.dtflys.forest.mapping;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.exceptions.ForestExpressionException;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.RequestVariableScope;
 import com.dtflys.forest.reflection.ForestMethod;
 
 import java.lang.reflect.InvocationTargetException;
@@ -17,12 +18,12 @@ public class MappingInvoke extends MappingDot {
 
     private List<MappingExpr> argList;
 
-    public MappingInvoke(ForestMethod<?> forestMethod, VariableScope variableScope, MappingExpr left, MappingIdentity name, List<MappingExpr> argList, int startIndex, int endIndex) {
-        this(forestMethod, Token.INVOKE, variableScope, left, name, argList, startIndex, endIndex);
+    public MappingInvoke(ForestMethod<?> forestMethod, MappingExpr left, MappingIdentity name, List<MappingExpr> argList, int startIndex, int endIndex) {
+        this(forestMethod, Token.INVOKE, left, name, argList, startIndex, endIndex);
     }
 
-    protected MappingInvoke(ForestMethod<?> forestMethod, Token token, VariableScope variableScope, MappingExpr left, MappingIdentity name, List<MappingExpr> argList, int startIndex, int endIndex) {
-        super(forestMethod, token, variableScope, left, name, startIndex, endIndex);
+    protected MappingInvoke(ForestMethod<?> forestMethod, Token token, MappingExpr left, MappingIdentity name, List<MappingExpr> argList, int startIndex, int endIndex) {
+        super(forestMethod, token, left, name, startIndex, endIndex);
         this.argList = argList;
     }
 
@@ -30,19 +31,10 @@ public class MappingInvoke extends MappingDot {
         return argList;
     }
 
-    @Override
-    public void setVariableScope(VariableScope variableScope) {
-        super.setVariableScope(variableScope);
-        if (argList != null) {
-            for (MappingExpr arg : argList) {
-                arg.setVariableScope(variableScope);
-            }
-        }
-    }
 
     @Override
-    public Object render(ForestRequest request, Object[] args) {
-        Object obj = left.render(request, args);
+    public Object render(RequestVariableScope scope, Object[] args) {
+        Object obj = left.render(scope, args);
         String methodName = right.getName();
         try {
             Method method = obj.getClass().getDeclaredMethod(methodName);
@@ -54,7 +46,7 @@ public class MappingInvoke extends MappingDot {
                 Object[] renderArgs = new Object[argList.size()];
                 for (int i = 0, len = argList.size(); i < len; i++) {
                     MappingExpr expr = argList.get(i);
-                    renderArgs[i] = expr.render(request, args);
+                    renderArgs[i] = expr.render(scope, args);
                 }
                 result = method.invoke(obj, renderArgs);
             }

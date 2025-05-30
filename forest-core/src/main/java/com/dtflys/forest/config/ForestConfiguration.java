@@ -1754,8 +1754,6 @@ public class ForestConfiguration implements VariableScope, Serializable {
         return this;
     }
 
-
-
     /**
      * 判断变量是否已定义
      *

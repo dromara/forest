@@ -1,6 +1,8 @@
 package com.dtflys.forest.mapping;
 
+import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.RequestVariableScope;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -21,7 +23,7 @@ public class MappingIdentity extends MappingExpr {
     }
 
     @Override
-    public Object render(ForestRequest request, Object[] args) {
+    public Object render(RequestVariableScope scope, Object[] args) {
         return name;
     }
 

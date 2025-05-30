@@ -4,6 +4,7 @@ import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.exceptions.ForestExpressionException;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.RequestVariableScope;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.StringUtils;
 
@@ -20,13 +21,12 @@ public class MappingDot extends MappingExpr {
     protected final MappingExpr left;
     protected final MappingIdentity right;
 
-    public MappingDot(ForestMethod forestMethod, VariableScope variableScope, MappingExpr left, MappingIdentity right, int startIndex, int endIndex) {
-        this(forestMethod, Token.DOT, variableScope, left, right, startIndex, endIndex);
+    public MappingDot(ForestMethod forestMethod, MappingExpr left, MappingIdentity right, int startIndex, int endIndex) {
+        this(forestMethod, Token.DOT, left, right, startIndex, endIndex);
     }
 
-    protected MappingDot(ForestMethod forestMethod, Token token, VariableScope variableScope, MappingExpr left, MappingIdentity right, int startIndex, int endIndex) {
+    protected MappingDot(ForestMethod forestMethod, Token token, MappingExpr left, MappingIdentity right, int startIndex, int endIndex) {
         super(forestMethod, token);
-        this.variableScope = variableScope;
         this.left = left;
         this.right = right;
         setIndexRange(startIndex, endIndex);
@@ -56,16 +56,6 @@ public class MappingDot extends MappingExpr {
         return method;
     }
 
-    @Override
-    public void setVariableScope(VariableScope variableScope) {
-        super.setVariableScope(variableScope);
-        if (left != null) {
-            left.setVariableScope(variableScope);
-        }
-        if (right != null) {
-            right.setVariableScope(variableScope);
-        }
-    }
 
     @Override
     public boolean isIterateVariable() {
@@ -80,8 +70,8 @@ public class MappingDot extends MappingExpr {
     }
 
     @Override
-    public Object render(ForestRequest request, Object[] args) {
-        Object obj = left.render(request, args);
+    public Object render(RequestVariableScope scope, Object[] args) {
+        Object obj = left.render(scope, args);
         if (obj == null) {
             throw new ForestRuntimeException(new NullPointerException());
         }

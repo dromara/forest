@@ -2,6 +2,7 @@ package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.RequestVariableScope;
 import com.dtflys.forest.reflection.ForestMethod;
 
 public class MappingUrlEncodedExpr extends MappingExpr {
@@ -13,11 +14,6 @@ public class MappingUrlEncodedExpr extends MappingExpr {
         this.expr = expr;
     }
 
-    @Override
-    public void setVariableScope(VariableScope variableScope) {
-        super.setVariableScope(variableScope);
-        expr.setVariableScope(variableScope);
-    }
 
     @Override
     public boolean isIterateVariable() {
@@ -29,8 +25,8 @@ public class MappingUrlEncodedExpr extends MappingExpr {
     }
 
     @Override
-    public Object render(ForestRequest request, Object[] args) {
-        Object ret = expr.render(request, args);
+    public Object render(RequestVariableScope scope, Object[] args) {
+        Object ret = expr.render(scope, args);
         if (ret == null) {
             return null;
         }

@@ -1,10 +1,12 @@
 package com.dtflys.forest.reflection;
 
+import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.http.ForestRequest;
 
 @FunctionalInterface
 public interface ForestVariable {
-    
+
+
     Object getValue(ForestRequest req);
     
     
@@ -18,5 +20,20 @@ public interface ForestVariable {
         }
         return (R) value;
     }
-    
+
+    default  Object getValueFromScope(VariableScope scope) {
+        if (scope != null && scope instanceof ForestRequest) {
+            return getValue((ForestRequest) scope);
+        }
+        return null;
+    }
+
+    default  <R> R getValueFromScope(VariableScope scope, Class<R> clazz) {
+        if (scope != null && scope instanceof ForestRequest) {
+            return getValue((ForestRequest) scope, clazz);
+        }
+        return null;
+    }
+
+
 }

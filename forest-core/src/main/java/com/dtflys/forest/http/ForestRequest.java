@@ -73,6 +73,7 @@ import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.multipart.InputStreamMultipart;
 import com.dtflys.forest.pool.ForestRequestPool;
 import com.dtflys.forest.reflection.ForestMethod;
+import com.dtflys.forest.reflection.ForestVariable;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
 import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
@@ -132,7 +133,7 @@ import static com.dtflys.forest.mapping.MappingParameter.TARGET_QUERY;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-03-24
  */
-public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> implements HasURL, HasHeaders {
+public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> implements RequestVariableScope, HasURL, HasHeaders {
 
     private final static Object[] EMPTY_RENDER_ARGS = new Object[0];
 
@@ -5506,4 +5507,8 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
         return execute(typeReference.getType());
     }
 
+    @Override
+    public ForestRequest asRequest() {
+        return this;
+    }
 }

@@ -3,6 +3,7 @@ package com.dtflys.forest.mapping;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.RequestVariableScope;
 import com.dtflys.forest.reflection.ForestArgumentsVariable;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.ForestVariable;
@@ -25,9 +26,8 @@ public class MappingReference extends MappingExpr {
     }
 
 
-    public MappingReference(ForestMethod<?> forestMethod, VariableScope variableScope, String name, int startIndex, int endIndex) {
+    public MappingReference(ForestMethod<?> forestMethod, String name, int startIndex, int endIndex) {
         super(forestMethod, Token.REF);
-        this.variableScope = variableScope;
         this.name = name;
         setIndexRange(startIndex, endIndex);
     }
@@ -37,19 +37,16 @@ public class MappingReference extends MappingExpr {
     }
 
     @Override
-    public Object render(ForestRequest request, Object[] args) {
+    public Object render(RequestVariableScope scope, Object[] args) {
         ForestVariable variable = null;
-        if (variableScope != null) {
-            variable = variableScope.getVariable(name);
-        }
-        if (variable == null && request != null) {
-            variable = request.getVariable(name);
+        if (scope != null) {
+            variable = scope.getVariable(name);
         }
         if (variable != null) {
             if (variable instanceof ForestArgumentsVariable) {
-                return ((ForestArgumentsVariable) variable).getValue(request, args);
+                return ((ForestArgumentsVariable) variable).getValue(scope.asRequest(), args);
             }
-            return variable.getValue(request);
+            return variable.getValue(scope.asRequest());
         }
         throw new ForestVariableUndefinedException(name, startIndex, endIndex);
     }

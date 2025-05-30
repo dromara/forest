@@ -2,6 +2,7 @@ package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.RequestVariableScope;
 import com.dtflys.forest.reflection.ForestMethod;
 
 /**
@@ -14,8 +15,6 @@ public abstract class MappingExpr {
 
     final Token token;
 
-    protected VariableScope variableScope;
-
     int startIndex = -1;
 
     int endIndex = -1;
@@ -25,13 +24,14 @@ public abstract class MappingExpr {
         this.token = token;
     }
 
-    public Object render(ForestRequest request, Object[] args) {
+    public Object render(RequestVariableScope scope, Object[] args) {
         return null;
     }
 
-    public void setVariableScope(VariableScope variableScope) {
-        this.variableScope = variableScope;
+    public Object render(RequestVariableScope scope) {
+        return render(scope, new Object[0]);
     }
+
 
     public abstract boolean isIterateVariable();
 
