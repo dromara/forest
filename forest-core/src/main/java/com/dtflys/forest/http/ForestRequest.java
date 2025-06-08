@@ -115,8 +115,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -132,7 +130,7 @@ import static com.dtflys.forest.mapping.MappingParameter.TARGET_QUERY;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-03-24
  */
-public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> implements HasURL, HasHeaders {
+public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> implements RequestVariableScope, HasURL, HasHeaders {
 
     private final static Object[] EMPTY_RENDER_ARGS = new Object[0];
 
@@ -801,7 +799,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
         if (!this.query.isEmpty()) {
             this.query.clearQueriesFromUrl();
         }
-
+        
         final ForestURL newUrl = urlTemplate.render(this, args, this.query);
         if (this.url == null) {
             this.url = newUrl;
@@ -5506,4 +5504,8 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
         return execute(typeReference.getType());
     }
 
+    @Override
+    public ForestRequest asRequest() {
+        return this;
+    }
 }

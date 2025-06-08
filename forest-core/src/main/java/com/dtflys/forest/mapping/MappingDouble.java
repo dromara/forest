@@ -1,6 +1,8 @@
 package com.dtflys.forest.mapping;
 
+import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.RequestVariableScope;
 import com.dtflys.forest.reflection.ForestMethod;
 
 /**
@@ -17,7 +19,7 @@ public class MappingDouble extends MappingExpr {
     }
 
     @Override
-    public Object render(ForestRequest request, Object[] args) {
+    public Object render(VariableScope scope, Object[] args) {
         return number;
     }
 

@@ -178,6 +178,7 @@ public class ForestMethod<T> implements VariableScope {
     }
 
 
+
     @Override
     public boolean isVariableDefined(String name) {
         return configuration.isVariableDefined(name);
@@ -224,6 +225,10 @@ public class ForestMethod<T> implements VariableScope {
         return variable.getValue(request, clazz);
     }
 
+    public MappingParameter[] getForestParameters() {
+        return forestParameters;
+    }
+
     public MappingTemplate makeTemplate(MappingParameter parameter) {
         return getOrCreateTemplate(null, null, parameter.getName());
 //        return new MappingTemplate(null, null, this, parameter.getName(), this, configuration.getProperties(), forestParameters);
@@ -251,7 +256,6 @@ public class ForestMethod<T> implements VariableScope {
                 attributeName,
                 this,
                 text,
-                this,
                 configuration.getProperties(),
                 forestParameters);
     }
@@ -271,7 +275,6 @@ public class ForestMethod<T> implements VariableScope {
                                     attributeName,
                                     this,
                                     text,
-                                    null,
                                     configuration.getProperties(),
                                     forestParameters);
                     if (templateCache.size() < 128) {
@@ -994,7 +997,7 @@ public class ForestMethod<T> implements VariableScope {
             for (int j = 0; j < baseHeaders.length; j++) {
                 final MappingTemplate header = new MappingTemplate(
                         BaseRequest.class, "headers",
-                        this, headerArray[j], this, configuration.getProperties(), forestParameters);
+                        this, headerArray[j], configuration.getProperties(), forestParameters);
                 baseHeaders[j] = header;
             }
         }
@@ -1265,19 +1268,18 @@ public class ForestMethod<T> implements VariableScope {
                             if (!parameter.isJsonParam() && obj instanceof Iterable) {
                                 int index = 0;
                                 MappingTemplate template = makeTemplate(parameter);
-                                VariableScope parentScope = template.getVariableScope();
+                                VariableScope parentScope = request;
                                 for (Object subItem : (Iterable) obj) {
                                     SubVariableScope scope = new SubVariableScope(parentScope);
                                     scope.setVariable("_it", subItem);
                                     scope.setVariable("_index", index++);
-                                    template.setVariableScope(scope);
-                                    String name = template.render(request, args);
+                                    String name = template.render(scope, args);
                                     request.addQuery(
                                             name, subItem,
                                             parameter.isUrlEncode(), parameter.getCharset());
                                 }
                                 // 恢复parentScope, 防止栈溢出
-                                template.setVariableScope(parentScope);
+//                                template.setVariableScope(parentScope);
                             } else if (parameter.isJsonParam()) {
                                 request.addJSONQuery(parameter.getName(), obj);
                             } else {
@@ -1289,13 +1291,12 @@ public class ForestMethod<T> implements VariableScope {
                             MappingTemplate template = makeTemplate(parameter);
                             if (obj instanceof Iterable && template.hasIterateVariable()) {
                                 int index = 0;
-                                VariableScope parentScope = template.getVariableScope();
+                                VariableScope parentScope = request;
                                 for (Object subItem : (Iterable) obj) {
                                     SubVariableScope scope = new SubVariableScope(parentScope);
-                                    template.setVariableScope(scope);
                                     scope.setVariable("_it", subItem);
                                     scope.setVariable("_index", index++);
-                                    String name = template.render(request, args);
+                                    String name = template.render(scope, args);
                                     nameValueList.add(
                                             new RequestNameValue(name, subItem, target, parameter.getPartContentType())
                                                     .setDefaultValue(parameter.getDefaultValue()));

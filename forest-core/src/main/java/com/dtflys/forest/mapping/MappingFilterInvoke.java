@@ -4,6 +4,7 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.RequestVariableScope;
 import com.dtflys.forest.reflection.ForestMethod;
 
 import java.util.List;
@@ -14,19 +15,19 @@ import java.util.List;
  */
 public class MappingFilterInvoke extends MappingInvoke {
 
-    public MappingFilterInvoke(ForestMethod<?> forestMethod, VariableScope variableScope, MappingIdentity name, List<MappingExpr> argList, int startIndex, int endIndex) {
-        super(forestMethod, Token.FILTER_INVOKE, variableScope, null, name, argList, startIndex, endIndex);
+    public MappingFilterInvoke(ForestMethod<?> forestMethod, MappingIdentity name, List<MappingExpr> argList, int startIndex, int endIndex) {
+        super(forestMethod, Token.FILTER_INVOKE, null, name, argList, startIndex, endIndex);
     }
 
     @Override
-    public Object render(ForestRequest request, Object[] args) {
-        ForestConfiguration configuration = request.getConfiguration();
+    public Object render(VariableScope scope, Object[] args) {
+        ForestConfiguration configuration = scope.getConfiguration();
         Filter filter = configuration.newFilterInstance(right.getName());
         List<MappingExpr> exprList = getArgList();
         Object[] invokeArgs = new Object[exprList.size()];
         for (int i = 0; i < exprList.size(); i++) {
             MappingExpr expr = exprList.get(i);
-            Object renderedArg = expr.render(request, args);
+            Object renderedArg = expr.render(scope, args);
             invokeArgs[i] = renderedArg;
         }
         if (invokeArgs.length > 0) {

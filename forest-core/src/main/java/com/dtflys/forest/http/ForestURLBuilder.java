@@ -11,28 +11,28 @@ public class ForestURLBuilder {
     /**
      * HTTP协议
      */
-    private String scheme;
+    protected String scheme;
 
     /**
      * 主机地址
      */
-    private String host;
+    protected String host;
 
     /**
      * 主机端口
      */
-    private Integer port;
+    protected Integer port;
 
     /**
      * URL根路径
      */
-    private String basePath;
+    protected String basePath;
 
     /**
      * URL路径
      * <p>该路径为整个URL去除前面协议 + Host + Port 后部分
      */
-    private String path;
+    protected String path;
 
     /**
      * 用户信息
@@ -41,18 +41,18 @@ public class ForestURLBuilder {
      * <p>URL http://xxx:yyy@localhost:8080 中 xxx:yyy 的部分为用户信息
      * <p>其中，xxx为用户名，yyy为用户密码
      */
-    private String userInfo;
+    protected String userInfo;
 
     /**
      * reference
      * <p>URL井号(#)后面的字符串
      */
-    private String ref;
+    protected String ref;
 
     /**
      * 是否为SSL
      */
-    private boolean ssl;
+    protected boolean ssl;
 
     public String getScheme() {
         return scheme;

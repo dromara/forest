@@ -24,6 +24,9 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.Forest;
+import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.mapping.MappingURLTemplate;
 import com.dtflys.forest.utils.StringUtils;
@@ -31,6 +34,7 @@ import com.dtflys.forest.utils.URLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.annotation.ElementType;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -47,10 +51,23 @@ public class ForestURL {
     private final static Logger log = LoggerFactory.getLogger(ForestURL.class);
 
     /**
-     * 原始URL
+     * 变量作用域
+     * @since 1.7.0
+     */
+    private volatile VariableScope scope = Forest.config();
+    
+    volatile ForestRequest request;
+
+    /**
+     * URL字符串模板
+     */
+    private MappingURLTemplate template;
+
+    /**
+     * 解析后的URL
      * <p>即为整个完整的没被拆分的URL字符串
      */
-    private String originalUrl;
+    private String parsedUrl;
 
     private ForestAddress address;
 
@@ -103,12 +120,70 @@ public class ForestURL {
     /**
      * 是否需要重新生成 URL
      */
-    private boolean needRegenerateUrl = false;
+    private volatile boolean needUrlRegenerate = false;
+    
+    
+    private volatile boolean variablesChanged = false;
 
-    private void needRegenerateUrl() {
-        needRegenerateUrl = true;
+    private void needUrlRegenerate() {
+        needUrlRegenerate = true;
     }
 
+    public static ForestURL create(final String url) {
+        return create(Forest.config(), url);
+    }
+
+
+    public static ForestURL create(ForestRequest request, final MappingURLTemplate template) {
+        final ForestURL forestURL = create(template);
+        forestURL.request = request;
+        return forestURL;
+    }
+
+
+    public static ForestURL create(final MappingURLTemplate template) {
+        final ForestURL forestURL = new ForestURL();
+        forestURL.template = template;
+        forestURL.needUrlRegenerate = true;
+        forestURL.variablesChanged = true;
+        return forestURL;
+    }
+
+
+    public static ForestURL create(final ForestConfiguration configuration, final String url) {
+        final MappingURLTemplate urlTemplate = MappingURLTemplate.get(configuration, url);
+        final ForestURL forestURL = new ForestURL();
+        forestURL.parsedUrl = url;
+        forestURL.template = urlTemplate;
+        forestURL.needUrlRegenerate = true;
+        forestURL.variablesChanged = true;
+        return forestURL;
+    }
+
+    public static ForestURL parse(final ForestRequest request, final String url) {
+        final ForestConfiguration configuration = request.getConfiguration();
+        final MappingURLTemplate urlTemplate = MappingURLTemplate.get(configuration, url);
+        final ForestURL forestURL = new ForestURL();
+        forestURL.parsedUrl = url;
+        forestURL.template = urlTemplate;
+        urlTemplate.render(forestURL, request, request.arguments(), request.getQuery());
+        return forestURL;
+    }
+
+    public static ForestURL parse(final String url) {
+        return parse(Forest.config(), url);
+    }
+
+
+    public static ForestURL parse(final ForestConfiguration configuration, final String url) {
+        final MappingURLTemplate urlTemplate = MappingURLTemplate.get(configuration, url);
+        final ForestURL forestURL = new ForestURL();
+        forestURL.parsedUrl = url;
+        forestURL.template = urlTemplate;
+        final ForestQueryMap queryMap = new ForestQueryMap(null);
+        urlTemplate.render(forestURL, configuration, new Object[0], queryMap);
+        return forestURL;
+    }
 
     public static ForestURL fromUrl(String url) {
         try {
@@ -116,6 +191,20 @@ public class ForestURL {
         } catch (MalformedURLException e) {
             throw new ForestRuntimeException(e);
         }
+    }
+
+    public static ForestURL unparsedURL(final String url) {
+        ForestURL forestURL = new ForestURL();
+        forestURL.template = MappingURLTemplate.get(url);
+        return forestURL;
+    }
+
+    public static ForestURL emptyURL() {
+        return new ForestURL();
+    }
+
+
+    private ForestURL() {
     }
 
     public ForestURL(URL url) {
@@ -142,7 +231,7 @@ public class ForestURL {
         this.port = port;
         this.path = path;
         this.ref = ref;
-        needRegenerateUrl();
+        needUrlRegenerate();
     }
 
     /**
@@ -151,11 +240,11 @@ public class ForestURL {
      * @return 原始URL字符串
      */
     public String getOriginalUrl() {
-        if (originalUrl == null || needRegenerateUrl) {
-            originalUrl = toURLString();
-            needRegenerateUrl = false;
+        if (parsedUrl == null || needUrlRegenerate) {
+            parsedUrl = toURLString();
+            needUrlRegenerate = false;
         }
-        return originalUrl;
+        return parsedUrl;
     }
 
     /**
@@ -201,11 +290,12 @@ public class ForestURL {
         }
         this.scheme = scheme.trim();
         refreshSSL();
-        needRegenerateUrl();
+        needUrlRegenerate();
         return this;
     }
 
     public String getHost() {
+        checkAndReparseUrl();
         if (StringUtils.isEmpty(host) && address != null) {
             return address.getHost();
         }
@@ -220,7 +310,7 @@ public class ForestURL {
         if (this.host.endsWith("/")) {
             this.host = this.host.substring(0, this.host.lastIndexOf("/"));
         }
-        needRegenerateUrl();
+        needUrlRegenerate();
         return this;
     }
 
@@ -238,9 +328,9 @@ public class ForestURL {
         return normalizePort(port, ssl);
     }
 
-    public ForestURL setPort(int port) {
+    public ForestURL setPort(Integer port) {
         this.port = port;
-        needRegenerateUrl();
+        needUrlRegenerate();
         return this;
     }
 
@@ -315,7 +405,7 @@ public class ForestURL {
                 this.basePath = "/" + this.basePath;
             }
         }
-        needRegenerateUrl();
+        needUrlRegenerate();
         return this;
     }
 
@@ -344,7 +434,7 @@ public class ForestURL {
             return this;
         }
         this.path = path.trim();
-        needRegenerateUrl();
+        needUrlRegenerate();
         return this;
     }
 
@@ -357,7 +447,7 @@ public class ForestURL {
 
     public ForestURL setUserInfo(String userInfo) {
         this.userInfo = userInfo;
-        needRegenerateUrl();
+        needUrlRegenerate();
         return this;
     }
 
@@ -572,7 +662,7 @@ public class ForestURL {
                 this.path = basePath + this.path;
             }
         }
-        needRegenerateUrl();
+        needUrlRegenerate();
         return this;
     }
 
@@ -595,7 +685,7 @@ public class ForestURL {
             if (StringUtils.isEmpty(basePath)) {
                 setBasePath(address.getBasePath(), false);
             }
-            needRegenerateUrl();
+            needUrlRegenerate();
         }
         return this;
     }
@@ -614,6 +704,18 @@ public class ForestURL {
             }
         }
         return this;
+    }
+    
+    private void checkAndReparseUrl() {
+        if (variablesChanged && template != null) {
+            final ForestQueryMap queryMap = new ForestQueryMap(null);
+            if (request != null) {
+                template.render(this, request, request.arguments(), request.getQuery());
+            } else {
+                template.render(this, Forest.config(), new Object[0], queryMap);
+            }
+            needUrlRegenerate();
+        }
     }
 
 }

@@ -824,13 +824,17 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_template_in_url() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        Forest.config().setVariableValue("testVar", "foo");
+        Forest.config()
+                .setVariable("hello", "world")
+                .setVariable("bar", "ok")
+                .setVariable("foo", "foo/{bar}")
+                .setVariable("testVar", "var/{foo}/{hello}");
         Forest.get("/test/{testVar}")
                 .host("127.0.0.1")
                 .port(server.getPort())
                 .execute();
         mockRequest(server)
-                .assertPathEquals("/test/foo");
+                .assertPathEquals("/test/var/foo/ok/world");
     }
 
     @Test
@@ -2989,7 +2993,7 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testJsonpath_list_data_with_condition_and_variable() {
         server.enqueue(new MockResponse().setResponseCode(200).setBody(EXPECTED_LIST_USER));
-        Forest.config().setVariableValue("maxAge", 20);
+        Forest.config().setVariable("maxAge", 20);
         List<TestUser> userList = Forest.get("http://localhost:{}", server.getPort())
                 .executeAsResponse()
                 .getByPath("$.data[?(@.age>{maxAge})]", new TypeReference<List<TestUser>>() {});
@@ -3002,7 +3006,7 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testJsonpath_list_user_ages_with_condition_and_variable() {
         server.enqueue(new MockResponse().setResponseCode(200).setBody(EXPECTED_LIST_USER));
-        Forest.config().setVariableValue("minAge", 20);
+        Forest.config().setVariable("minAge", 20);
         List<Integer> ageList = Forest.get("http://localhost:{}", server.getPort())
                 .executeAsResponse()
                 .getByPath("$.data[?(@.age>{minAge})].age", new TypeReference<List<Integer>>() {});

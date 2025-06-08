@@ -1,5 +1,6 @@
 package com.dtflys.forest.springboot.properties;
 
+import com.dtflys.forest.backend.AsyncAbortPolicy;
 import com.dtflys.forest.callback.AddressSource;
 import com.dtflys.forest.callback.RetryWhen;
 import com.dtflys.forest.callback.SuccessWhen;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.RejectedExecutionHandler;
 
 @Component
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
@@ -55,6 +57,11 @@ public class ForestConfigurationProperties {
      * Capacity of async requests queue
      */
     private int maxAsyncQueueSize = 100;
+
+    /**
+     * Class of async reject policy
+     */
+    private Class<? extends RejectedExecutionHandler> asyncRejectPolicyClass = AsyncAbortPolicy.class;
 
     /**
      * Parallel mode of async requests
@@ -261,6 +268,14 @@ public class ForestConfigurationProperties {
 
     public void setMaxAsyncQueueSize(int maxAsyncQueueSize) {
         this.maxAsyncQueueSize = maxAsyncQueueSize;
+    }
+
+    public Class<? extends RejectedExecutionHandler> getAsyncRejectPolicyClass() {
+        return asyncRejectPolicyClass;
+    }
+
+    public void setAsyncRejectPolicyClass(Class<? extends RejectedExecutionHandler> asyncRejectPolicyClass) {
+        this.asyncRejectPolicyClass = asyncRejectPolicyClass;
     }
 
     public ForestAsyncMode getAsyncMode() {

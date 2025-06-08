@@ -61,6 +61,7 @@ import com.dtflys.forest.interceptor.InterceptorFactory;
 import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.ForestLogger;
+import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.pool.FixedRequestPool;
 import com.dtflys.forest.pool.ForestRequestPool;
 import com.dtflys.forest.proxy.ProxyFactory;
@@ -71,6 +72,7 @@ import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.ForestObjectFactory;
 import com.dtflys.forest.reflection.ForestMethodVariable;
 import com.dtflys.forest.reflection.ForestVariable;
+import com.dtflys.forest.reflection.TemplateVariable;
 import com.dtflys.forest.result.AfterExecuteResultTypeHandler;
 import com.dtflys.forest.result.ForestRequestResultHandler;
 import com.dtflys.forest.result.ResultTypeHandler;
@@ -1634,8 +1636,7 @@ public class ForestConfiguration implements VariableScope, Serializable {
      */
     @Deprecated
     public ForestConfiguration setVariableValue(String name, Object value) {
-        this.variables.put(name, new BasicVariable(value));
-        return this;
+        return setVariable(name, value);
     }
 
     /**
@@ -1646,7 +1647,15 @@ public class ForestConfiguration implements VariableScope, Serializable {
      * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setVariable(String name, Object value) {
-        this.variables.put(name, new BasicVariable(value));
+        if (value instanceof ForestVariable) {
+            this.variables.put(name, (ForestVariable) value);
+        } else if (value instanceof CharSequence) {
+            final MappingTemplate mappingTemplate = MappingTemplate.create(this, String.valueOf(value));
+            final TemplateVariable templateVariable = new TemplateVariable(mappingTemplate);
+            variables.put(name, templateVariable);
+        } else {
+            this.variables.put(name, new BasicVariable(value));
+        }
         return this;
     }
 
@@ -1753,8 +1762,6 @@ public class ForestConfiguration implements VariableScope, Serializable {
     public ForestConfiguration getConfiguration() {
         return this;
     }
-
-
 
     /**
      * 判断变量是否已定义
