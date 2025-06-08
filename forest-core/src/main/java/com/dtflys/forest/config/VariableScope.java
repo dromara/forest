@@ -32,4 +32,5 @@ public interface VariableScope {
     ForestVariable getVariable(String name);
 
     ForestConfiguration getConfiguration();
+
 }

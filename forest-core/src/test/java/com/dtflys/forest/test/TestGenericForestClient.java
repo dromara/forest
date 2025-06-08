@@ -1,7 +1,6 @@
 package com.dtflys.forest.test;
 
 import cn.hutool.core.codec.Base64;
-import cn.hutool.core.collection.ListUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONReader;
 import com.alibaba.fastjson.annotation.JSONField;
@@ -10,6 +9,7 @@ import com.dtflys.forest.annotation.Body;
 import com.dtflys.forest.annotation.Post;
 import com.dtflys.forest.annotation.Var;
 import com.dtflys.forest.auth.BasicAuth;
+import com.dtflys.forest.auth.BearerAuth;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ConvertOptions;
@@ -416,6 +416,33 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertHeaderEquals("Authorization", "Basic Zm9vOmJhcg==");
     }
 
+    @Test
+    public void testAuth_BasicAuth3() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        BasicAuth basicAuth = new BasicAuth("xx", "yy");
+        basicAuth.setUserInfo("foo:bar");
+
+        Forest.get("/")
+                .port(server.getPort())
+                .authenticator(basicAuth)
+                .execute();
+        mockRequest(server)
+                .assertHeaderEquals("Authorization", "Basic Zm9vOmJhcg==");
+    }
+
+
+    @Test
+    public void testAuth_BearerAuth() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.get("/")
+                .port(server.getPort())
+                .authenticator(new BearerAuth("test-token-xxxx"))
+                .execute();
+        mockRequest(server)
+                .assertHeaderEquals("Authorization", "Bearer test-token-xxxx");
+    }
+
+
 
     @Test
     public void testAsyncPool() {
@@ -797,13 +824,17 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_template_in_url() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        Forest.config().setVariableValue("testVar", "foo");
+        Forest.config()
+                .setVariable("hello", "world")
+                .setVariable("bar", "ok")
+                .setVariable("foo", "foo/{bar}")
+                .setVariable("testVar", "var/{foo}/{hello}");
         Forest.get("/test/{testVar}")
                 .host("127.0.0.1")
                 .port(server.getPort())
                 .execute();
         mockRequest(server)
-                .assertPathEquals("/test/foo");
+                .assertPathEquals("/test/var/foo/ok/world");
     }
 
     @Test
@@ -2962,7 +2993,7 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testJsonpath_list_data_with_condition_and_variable() {
         server.enqueue(new MockResponse().setResponseCode(200).setBody(EXPECTED_LIST_USER));
-        Forest.config().setVariableValue("maxAge", 20);
+        Forest.config().setVariable("maxAge", 20);
         List<TestUser> userList = Forest.get("http://localhost:{}", server.getPort())
                 .executeAsResponse()
                 .getByPath("$.data[?(@.age>{maxAge})]", new TypeReference<List<TestUser>>() {});
@@ -2975,7 +3006,7 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testJsonpath_list_user_ages_with_condition_and_variable() {
         server.enqueue(new MockResponse().setResponseCode(200).setBody(EXPECTED_LIST_USER));
-        Forest.config().setVariableValue("minAge", 20);
+        Forest.config().setVariable("minAge", 20);
         List<Integer> ageList = Forest.get("http://localhost:{}", server.getPort())
                 .executeAsResponse()
                 .getByPath("$.data[?(@.age>{minAge})].age", new TypeReference<List<Integer>>() {});

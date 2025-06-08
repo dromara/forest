@@ -41,8 +41,8 @@ public class TestResponseClient extends BaseClientTest {
     @Test
     public void testHeaders() {
         server.enqueue(new MockResponse()
-                .addHeader("Set-Cookie", "A=1; path=/; domain=localhost; expires= Wednesday, 19-OCT-2105 23:12:40 GMT; secure")
-                .addHeader("Set-Cookie", "B=2; path=/; domain=localhost; expires= Wednesday, 19-OCT-2105 23:12:40 GMT; secure")
+                .addHeader("Set-Cookie", "A=1; path=/; domain=localhost; expires= Wed, 19 OCT 2055 23:12:40 GMT; secure")
+                .addHeader("Set-Cookie", "B=2; path=/; domain=localhost; expires= Wednesday, 19-OCT-2055 23:12:40 GMT; secure")
                 .setBody(EXPECTED));
         ForestResponse<String> response = responseClient.getResponseHeaders();
         assertThat(response.isSuccess()).isTrue();

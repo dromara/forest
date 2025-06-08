@@ -3,12 +3,22 @@ package com.dtflys.forest.utils;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 
 import java.io.UnsupportedEncodingException;
+import java.net.IDN;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Locale;
+import java.util.regex.Pattern;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2017-05-17 16:35
  */
 public final class URLUtils {
+
+    private static final Pattern IP_ADDRESS_PATTERN = Pattern.compile(
+            "([0-9a-fA-F]*:[0-9a-fA-F:.]*)|([\\d.]+)");
+
 
     private URLUtils() {
     }
@@ -32,15 +42,14 @@ public final class URLUtils {
      */
     public static boolean hasProtocol(String url) {
         int len = url.length();
-        char[] chars = url.toCharArray();
         for (int i = 0; i < len; i++) {
-            char ch = chars[i];
+            char ch = url.charAt(i);
             if (ch == ':') {
                 String protocol = url.substring(0, i);
                 if (i + 1 >= len) {
                     return false;
                 }
-                char nc = chars[i + 1];
+                char nc = url.charAt(i + 1);
                 if (nc == '/') {
                     return isValidProtocol(protocol);
                 }
@@ -79,6 +88,16 @@ public final class URLUtils {
     }
 
     /**
+     * 判断字符串是否为合法的IP地址
+     * 
+     * @param ipAddress 需要被判断的IP地址字符串
+     * @return {@code true}: 是合法的IP地址, {@code false}: 不是合法的IP地址
+     */
+    public static boolean isValidIPAddress(String ipAddress) {
+        return IP_ADDRESS_PATTERN.matcher(ipAddress).matches();
+    }
+
+    /**
      * 判断字符串是否为合法的URL
      *
      * @param url 被判断的URL字符串
@@ -87,6 +106,36 @@ public final class URLUtils {
     public static boolean isValidUrl(String url) {
         return hasProtocol(url);
     }
+
+
+    /**
+     * 判断域名是否匹配
+     * <p>域名相等或是父子域名关系则匹配，否则不匹配
+     * 
+     * @param mainDomain 主域名
+     * @param subDomain 子域名
+     * @return {@code true}: 匹配, {@code false}: 不匹配
+     */
+    public static boolean matchDomain(String mainDomain, String subDomain) {
+        if (mainDomain == null || subDomain == null) {
+            return false;
+        }
+        
+        if (mainDomain.equals(subDomain)) {
+            // 'a.com' 匹配 'a.com'
+            return true;
+        }
+
+        if (mainDomain.endsWith(subDomain)
+                && mainDomain.charAt(mainDomain.length() - subDomain.length() - 1) == '.'
+                && !isValidIPAddress(mainDomain)) {
+            // 'a.com' 匹配 'www.a.com'
+            return true;
+        }
+
+        return false;
+    }
+    
 
     public static void checkBaseURL(String baseUrl) {
         if (!hasProtocol(baseUrl)) {
@@ -296,5 +345,90 @@ public final class URLUtils {
         }
         return false;
     }
+
+    public static String getValidHost(String host) {
+        if (!host.contains(":")) {
+            try {
+                String result = IDN.toASCII(host).toLowerCase(Locale.US);
+                if (result.isEmpty()) {
+                    return null;
+                } else {
+                    return checkHostnameAsciiCodesIsValid(result) ? result : null;
+                }
+            } catch (IllegalArgumentException var3) {
+                return null;
+            }
+        } else {
+            InetAddress inetAddress = host.startsWith("[") && host.endsWith("]") ?
+                    parseIPv6(host, 1, host.length() - 1) :
+                    parseIPv6(host, 0, host.length());
+            if (inetAddress == null) {
+                return null;
+            } else {
+                byte[] address = inetAddress.getAddress();
+                if (address.length == 16) {
+                    return inetAddress.getHostAddress();
+                } else if (address.length == 4) {
+                    return inetAddress.getHostAddress();
+                } else {
+                    throw new AssertionError("Invalid IPv6 address: '" + host + "'");
+                }
+            }
+        }
+    }
+
+    private static boolean checkHostnameAsciiCodesIsValid(String hostnameAscii) {
+         for(int i = 0; i < hostnameAscii.length(); ++i) {
+            final char c = hostnameAscii.charAt(i);
+            if (c <= 31 || c >= 127) {
+                return false;
+            }
+            switch (c) {
+                case ' ':
+                case '[':
+                case ']':
+                case '@':
+                case '%':
+                case '#':
+                case '/':
+                case '?':
+                case ':':
+                case '\\':
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    private static Inet6Address parseIPv6(String ipv6Address, int start, int end) {
+        return parseIPv6(ipv6Address.substring(start, end));
+    }
+
+
+
+    /**
+     * 将IPv6地址字符串转换为Inet6Address对象
+     * 
+     * @param ipv6Address IPv6地址字符串（支持完整或压缩格式）
+     * @return Inet6Address对象
+     * @throws IllegalArgumentException 输入为空或解析失败
+     * @since 1.7.0
+     */
+    private static Inet6Address parseIPv6(String ipv6Address) {
+        InetAddress inetAddress = null;
+        try {
+            inetAddress = InetAddress.getByName(ipv6Address);
+        } catch (UnknownHostException e) {
+            throw new ForestRuntimeException(e);
+        }
+
+        // 类型验证
+        if (!(inetAddress instanceof Inet6Address)) {
+            throw new IllegalArgumentException("输入的地址不是有效的IPv6格式");
+        }
+
+        return (Inet6Address) inetAddress;
+    }
+
 
 }

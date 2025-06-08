@@ -1,8 +1,10 @@
 package com.dtflys.forest.test.mock;
 
 import org.mockserver.client.MockServerClient;
+import org.mockserver.configuration.Configuration;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.junit.MockServerRule;
+import org.mockserver.netty.MockServer;
 
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
@@ -36,7 +38,9 @@ public class OAuth2MockServer extends MockServerRule {
         if (server != null) {
             return;
         }
-        server = new MockServerClient("localhost", getPort());
+        Configuration configuration = new Configuration();
+        configuration.maxSocketTimeoutInMillis(100000L);
+        server = new MockServerClient(configuration, "localhost", getPort());
         server.when(
                 request()
                         .withPath("/auth/oauth/token")

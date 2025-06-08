@@ -129,7 +129,7 @@ public class OkHttp3Executor implements HttpExecutor {
         final ResponseLogMessage logMessage = new ResponseLogMessage(response, response.getStatusCode());
         final ForestLogHandler logHandler = logConfiguration.getLogHandler();
         if (logHandler != null) {
-            if (logConfiguration.isLogResponseStatus()) {
+            if (logConfiguration.isLogResponseStatus() || logConfiguration.isLogResponseHeaders()) {
                 logHandler.logResponseStatus(logMessage);
             }
             if (logConfiguration.isLogResponseContent()) {
@@ -164,7 +164,10 @@ public class OkHttp3Executor implements HttpExecutor {
                 } else if (ForestHeader.CONTENT_ENCODING.equalsIgnoreCase(name)) {
                     contentEncodingHeaderName = name;
                 } else {
-                    builder.addHeader(name, MappingTemplate.getParameterValue(jsonConverter, nameValue.getValue()));
+                    String headerValue = MappingTemplate.getParameterValue(jsonConverter, nameValue.getValue());
+                    if (headerValue != null) {
+                        builder.addHeader(name, headerValue);
+                    }
                 }
             }
         }

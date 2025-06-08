@@ -62,6 +62,7 @@ import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorAttributes;
 import com.dtflys.forest.interceptor.InterceptorChain;
 import com.dtflys.forest.lifecycles.file.DownloadLifeCycle;
+import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.RequestLogMessage;
 import com.dtflys.forest.mapping.AbstractVariableScope;
@@ -114,7 +115,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -130,7 +130,7 @@ import static com.dtflys.forest.mapping.MappingParameter.TARGET_QUERY;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-03-24
  */
-public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> implements HasURL, HasHeaders {
+public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> implements RequestVariableScope, HasURL, HasHeaders {
 
     private final static Object[] EMPTY_RENDER_ARGS = new Object[0];
 
@@ -449,7 +449,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
     /**
      * 请求日志配置信息
      */
-    private LogConfiguration logConfiguration;
+    private volatile LogConfiguration logConfiguration;
 
 
     /**
@@ -799,7 +799,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
         if (!this.query.isEmpty()) {
             this.query.clearQueriesFromUrl();
         }
-
+        
         final ForestURL newUrl = urlTemplate.render(this, args, this.query);
         if (this.url == null) {
             this.url = newUrl;
@@ -2607,7 +2607,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @since 1.5.6
      */
     public ForestRequest<T> connectTimeout(int connectTimeout, TimeUnit timeUnit) {
-        this.connectTimeout = TimeUtils.toMillis("connect timeout", connectTimeout, timeUnit);
+        this.connectTimeout = TimeUtils.toMillis(connectTimeout, timeUnit);
         return this;
     }
 
@@ -2680,7 +2680,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @since 1.5.6
      */
     public ForestRequest<T> readTimeout(int readTimeout, TimeUnit timeUnit) {
-        this.readTimeout = TimeUtils.toMillis("read timeout", readTimeout, timeUnit);
+        this.readTimeout = TimeUtils.toMillis(readTimeout, timeUnit);
         return this;
     }
 
@@ -3557,6 +3557,50 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
         this.headers.addCookie(cookie);
         return this;
     }
+
+    /**
+     * 添加多个 Cookie 到请求中 (默认严格匹配)
+     *
+     * @param cookies {@link ForestCookie}对象数组
+     * @return {@link ForestRequest}类实例
+     * @since 1.7.0
+     */
+    public ForestRequest<T> addCookie(ForestCookie ...cookies) {
+        if (cookies != null) {
+            for (final ForestCookie cookie : cookies) {
+                this.headers.addCookie(cookie);
+            }
+        }
+        return this;
+    }
+
+
+    /**
+     * 通过 Cookie 名和 Cookie 值添加 Cookie 到请求中 (默认严格匹配)
+     *
+     * @param name Cookie名
+     * @param value Cookie值
+     * @return {@link ForestRequest}类实例
+     * @since 1.7.0
+     */
+    public ForestRequest<T> addCookie(String name, String value) {
+        this.headers.addCookie(ForestCookie.nameValue(name, value));
+        return this;
+    }
+
+
+    /**
+     * 通过 Cookie 内容字符串加 Cookie 到请求中 (默认严格匹配)
+     *
+     * @param cookieContent Cookie 内容字符串
+     * @return {@link ForestRequest}类实例
+     * @since 1.7.0
+     */
+    public ForestRequest<T> addCookie(String cookieContent) {
+        this.headers.addHeader("Cookie", cookieContent);
+        return this;
+    }
+
 
     /**
      * 添加 Cookie 到请求中
@@ -4724,11 +4768,111 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
     }
 
     /**
+     * 是否允许打印请求/响应日志
+     *
+     * @return 允许为 {@code true}, 否则为 {@code false}
+     * @since 1.7.0
+     */
+    public boolean isLogEnabled() {
+        return getLogConfiguration().isLogEnabled();
+    }
+
+    public ForestRequest<T> logEnabled(boolean logEnabled) {
+        getLogConfiguration().setLogEnabled(logEnabled);
+        return this;
+    }
+
+    /**
+     * 是否允许打印请求日志
+     *
+     * @return 允许为 {@code true}, 否则为 {@code false}
+     * @since 1.7.0
+     */
+    public boolean isLogRequest() {
+        return getLogConfiguration().isLogRequest();
+    }
+
+    public ForestRequest<T> logRequest(boolean logRequest) {
+        getLogConfiguration().setLogRequest(logRequest);
+        return this;
+    }
+
+    /**
+     * 是否允许打印响应日志
+     *
+     * @return 允许为 {@code true}, 否则为 {@code false}
+     * @since 1.7.0
+     */
+    public boolean isLogResponseStatus() {
+        return getLogConfiguration().isLogResponseStatus();
+    }
+
+    public ForestRequest<T> logResponseStatus(boolean logResponseStatus) {
+        getLogConfiguration().setLogResponseStatus(logResponseStatus);
+        return this;
+    }
+
+    /**
+     * 是否允许打印响应头日志
+     *
+     * @return 允许为 {@code true}, 否则为 {@code false}
+     * @since 1.7.0
+     */
+    public boolean isLogResponseHeaders() {
+        return getLogConfiguration().isLogResponseHeaders();
+    }
+
+    public ForestRequest<T> logResponseHeaders(boolean logResponseHeaders) {
+        getLogConfiguration().setLogResponseHeaders(logResponseHeaders);
+        return this;
+    }
+
+    /**
+     * 是否允许打印响应日志
+     *
+     * @return 允许为 {@code true}, 否则为 {@code false}
+     * @since 1.7.0
+     */
+    public boolean isLogResponseContent() {
+        return getLogConfiguration().isLogResponseContent();
+    }
+
+    public ForestRequest<T> logResponseContent(boolean logResponseContent) {
+        getLogConfiguration().setLogResponseContent(logResponseContent);
+        return this;
+    }
+
+    /**
+     * 获取日志处理器
+     *
+     * @return 日志处理器接口实例
+     * @since 1.7.0
+     */
+    public ForestLogHandler logHandler() {
+        return getLogConfiguration().getLogHandler();
+    }
+
+    /**
+     * 设置日志处理器
+     *
+     * @param logHandler 日志处理器接口实例
+     * @return {@link ForestRequest}类实例
+     * @since 1.7.0
+     */
+    public ForestRequest<T> logHandler(ForestLogHandler logHandler) {
+        getLogConfiguration().setLogHandler(logHandler);
+        return this;
+    }
+
+    /**
      * 获取请求日志配置信息
      *
      * @return 请求日志配置信息，{@link LogConfiguration}类实例
      */
     public LogConfiguration getLogConfiguration() {
+        if (logConfiguration == null) {
+            logConfiguration = new LogConfiguration(configuration);
+        }
         return logConfiguration;
     }
 
@@ -5360,4 +5504,8 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
         return execute(typeReference.getType());
     }
 
+    @Override
+    public ForestRequest asRequest() {
+        return this;
+    }
 }

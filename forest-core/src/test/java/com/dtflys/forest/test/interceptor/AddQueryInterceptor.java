@@ -3,19 +3,16 @@ package com.dtflys.forest.test.interceptor;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.interceptor.ForestInterceptor;
 import com.dtflys.forest.interceptor.Interceptor;
 
-public class AddQueryInterceptor implements Interceptor {
+public class AddQueryInterceptor implements ForestInterceptor {
 
     @Override
     public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
 
     }
 
-    @Override
-    public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
-
-    }
 
     @Override
     public boolean beforeExecute(ForestRequest request) {

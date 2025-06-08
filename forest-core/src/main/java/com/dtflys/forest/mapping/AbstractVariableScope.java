@@ -4,8 +4,8 @@ import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.reflection.BasicVariable;
 import com.dtflys.forest.reflection.ForestArgumentsVariable;
-import com.dtflys.forest.reflection.ForestMethodVariable;
 import com.dtflys.forest.reflection.ForestVariable;
+import com.dtflys.forest.reflection.TemplateVariable;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -84,8 +84,13 @@ public abstract class AbstractVariableScope<SELF extends VariableScope> implemen
     public SELF setVariable(String name, Object value) {
         if (value instanceof ForestVariable) {
             variables.put(name, (ForestVariable) value);
+        } else if (value instanceof CharSequence) {
+            final MappingTemplate mappingTemplate = MappingTemplate.create(this, String.valueOf(value)); 
+            final TemplateVariable templateVariable = new TemplateVariable(mappingTemplate);
+            variables.put(name, templateVariable);
+        } else {
+            variables.put(name, new BasicVariable(value));
         }
-        variables.put(name, new BasicVariable(value));
         return (SELF) this;
     }
     

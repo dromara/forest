@@ -35,13 +35,13 @@ import java.util.*;
  */
 public class ForestHeaderMap implements Map<String, String>, Cloneable {
 
-    private final List<ForestHeader> headers;
+    protected final List<ForestHeader> headers;
 
-    private ForestCookieHeader cookieHeader = null;
+    protected ForestCookieHeader cookieHeader = null;
 
-    private final List<ForestCookie> requestCookies = new LinkedList<>();
+    protected final List<ForestCookie> requestCookies = new LinkedList<>();
 
-    private final HasURL hasURL;
+    protected final HasURL hasURL;
 
     public ForestHeaderMap(List<ForestHeader> headers, HasURL hasURL) {
         this.headers = headers;
@@ -129,7 +129,6 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
         } else if ("Cookie".equalsIgnoreCase(key)) {
             final ForestCookie cookie = ForestCookie.parse(hasURL.url().toURLString(), value);
             if (cookie != null) {
-                final ForestSetCookieHeader cookieHeader = ForestSetCookieHeader.fromCookie(hasURL, cookie);
                 addHeader(cookieHeader);
             }
         } else if ("Set-Cookie".equalsIgnoreCase(key)) {
@@ -191,6 +190,10 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
             set.add(header.getName());
         }
         return set;
+    }
+
+    public List<ForestHeader> allHeaders() {
+        return Collections.unmodifiableList(headers);
     }
 
     @Override
@@ -408,6 +411,9 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
      * @since 1.5.25
      */
     public void addCookie(ForestCookie cookie, boolean strict) {
+        if (cookie == null) {
+            return;
+        }
         if (cookieHeader == null) {
             final ForestCookieHeader cookieHeaderTmp = new ForestCookieHeader(hasURL);
             if (cookieHeaderTmp.addCookie(cookie, strict)) {

@@ -1,5 +1,7 @@
 package com.dtflys.forest.mapping;
 
+import com.dtflys.forest.Forest;
+import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.ForestProperties;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
@@ -7,29 +9,83 @@ import com.dtflys.forest.exceptions.ForestIndexReferenceException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
 import com.dtflys.forest.exceptions.ForestExpressionException;
-import com.dtflys.forest.http.ForestQueryMap;
-import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.http.SimpleQueryParameter;
-import com.dtflys.forest.http.ForestURL;
-import com.dtflys.forest.http.ForestURLBuilder;
+import com.dtflys.forest.http.*;
 import com.dtflys.forest.reflection.ForestMethod;
+import com.dtflys.forest.utils.ForestCache;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.lang.annotation.Annotation;
 
 public class MappingURLTemplate extends MappingTemplate {
 
+    private final static ForestCache<String, MappingURLTemplate> URL_TEMPLATE_CACHE = new ForestCache<>(256);
 
-    public MappingURLTemplate(Class<? extends Annotation> annotationType, String attributeName, ForestMethod<?> forestMethod, String template, VariableScope variableScope, ForestProperties properties, MappingParameter[] parameters) {
-        super(annotationType, attributeName, forestMethod, template, variableScope, properties, parameters);
+    private final static int MAX_CACHE_SIZE = 128;
+
+    public static MappingURLTemplate get(final String text) {
+        return get(Forest.config(), text);
+    }
+
+    public static MappingURLTemplate get(
+            final ForestConfiguration configuration,
+            final String text) {
+        return get(null, configuration, null, text);
+    }
+
+    public static MappingURLTemplate get(
+            final Class<? extends Annotation> annotationType,
+            final ForestConfiguration configuration,
+            final String attributeName,
+            final String text) {
+        return get(annotationType, null, configuration, attributeName, text);
+    }
+
+    public static MappingURLTemplate get(
+            final Class<? extends Annotation> annotationType,
+            final ForestMethod method,
+            final ForestConfiguration configuration,
+            final String attributeName,
+            final String text) {
+        if (StringUtils.isEmpty(text)) {
+            throw new IllegalArgumentException("url text cannot be empty");
+        }
+        if (text.length() <= MAX_CACHE_SIZE) {
+            return URL_TEMPLATE_CACHE.get(text, () ->
+                    create(annotationType, method, configuration, attributeName, text));
+        }
+        return create(annotationType, method, configuration, attributeName, text);
+    }
+
+    public static MappingURLTemplate create(
+            final Class<? extends Annotation> annotationType,
+            final ForestMethod method,
+            final ForestConfiguration configuration,
+            final String attributeName,
+            final String text) {
+        return new MappingURLTemplate(
+                annotationType,
+                attributeName,
+                method,
+                text,
+                configuration.getProperties(),
+                method == null ? null : method.getForestParameters());
+    }
+
+
+    public MappingURLTemplate(Class<? extends Annotation> annotationType, String attributeName, ForestMethod<?> forestMethod, String template, ForestProperties properties, MappingParameter[] parameters) {
+        super(annotationType, attributeName, forestMethod, template, properties, parameters);
     }
 
     @Override
-    public String render(ForestRequest request, Object[] args) {
-        return super.render(request, args);
+    public String render(VariableScope scope, Object[] args) {
+        return super.render(scope, args);
     }
 
-    public ForestURL render(ForestRequest request, Object[] args, ForestQueryMap queries) {
+    public ForestURL render(VariableScope scope, Object[] args, ForestQueryMap queries) {
+        return render(ForestURL.emptyURL(), scope, args, queries);
+    }
+
+    public ForestURL render(ForestURL url, VariableScope scope, Object[] args, ForestQueryMap queries) {
         String scheme = null;
         StringBuilder userInfo = null;
         String host = null;
@@ -42,13 +98,13 @@ public class MappingURLTemplate extends MappingTemplate {
         boolean nextIsPort = false;
         boolean renderedPath = false;
         try {
-            ForestJsonConverter jsonConverter = variableScope.getConfiguration().getJsonConverter();
+            ForestJsonConverter jsonConverter = scope.getConfiguration().getJsonConverter();
             int len = exprList.size();
             StringBuilder builder = new StringBuilder();
             SimpleQueryParameter lastQuery  = null;
             for (int i = 0; i < len; i++) {
                 MappingExpr expr = exprList.get(i);
-                String exprVal = String.valueOf(renderExpression(request, jsonConverter, expr, args));
+                String exprVal = String.valueOf(renderExpression(scope, jsonConverter, expr, args));
                 builder.append(exprVal);
                 if (renderedQuery) {
                     // 已渲染到查询参数
@@ -128,7 +184,7 @@ public class MappingURLTemplate extends MappingTemplate {
                                 pathCharIndex++;
                                 ch = baseUrlChars[pathCharIndex];
                                 if (ch != '/') {
-                                    throw new ForestRuntimeException("URI '" + super.render(request, args) + "' is invalid.");
+                                    throw new ForestRuntimeException("URI '" + super.render(scope, args) + "' is invalid.");
                                 }
                                 pathCharIndex++;
                                 if (pathCharIndex + 1 < baseLen && baseUrlChars[pathCharIndex + 1] == '/') {
@@ -283,14 +339,22 @@ public class MappingURLTemplate extends MappingTemplate {
                     ref = group[1];
                 }
             }
-            return new ForestURLBuilder()
-                    .setScheme(scheme)
+//            new ForestURLBuilder()
+//                    .setScheme(scheme)
+//                    .setUserInfo(userInfo != null ? userInfo.toString() : null)
+//                    .setHost(host)
+//                    .setPort(port != null ? port : (host != null ? -1 : null))
+//                    .setPath(path != null ? path.toString() : null)
+//                    .setRef(ref)
+//                    .build();
+
+            return url.setScheme(scheme)
                     .setUserInfo(userInfo != null ? userInfo.toString() : null)
                     .setHost(host)
                     .setPort(port != null ? port : (host != null ? -1 : null))
                     .setPath(path != null ? path.toString() : null)
-                    .setRef(ref)
-                    .build();
+                    .setRef(ref);
+
         } catch (ForestVariableUndefinedException ex) {
             throw new ForestVariableUndefinedException(annotationType, attributeName, forestMethod, ex.getVariableName(), template, ex.getStartIndex(), ex.getEndIndex());
         } catch (ForestIndexReferenceException ex) {
@@ -300,7 +364,4 @@ public class MappingURLTemplate extends MappingTemplate {
         }
     }
 
-    public ForestURL getURL() {
-        return null;
-    }
 }

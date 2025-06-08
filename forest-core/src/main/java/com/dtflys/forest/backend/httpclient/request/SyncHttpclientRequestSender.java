@@ -43,14 +43,14 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
 
     public void logResponse(ForestResponse response) {
         final LogConfiguration logConfiguration = request.getLogConfiguration();
-        if (!logConfiguration.isLogEnabled() || response.isLogged()) {
+        if (!request.isLogEnabled() || response.isLogged()) {
             return;
         }
         response.setLogged(true);
         final ResponseLogMessage logMessage = new ResponseLogMessage(response, response.getStatusCode());
         final ForestLogHandler logHandler = logConfiguration.getLogHandler();
         if (logHandler != null) {
-            if (logConfiguration.isLogResponseStatus()) {
+            if (logConfiguration.isLogResponseStatus() || logConfiguration.isLogResponseHeaders()) {
                 logHandler.logResponseStatus(logMessage);
             }
             if (logConfiguration.isLogResponseContent()) {

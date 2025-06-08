@@ -1,13 +1,13 @@
 package com.dtflys.forest.logging;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.dtflys.forest.backend.HttpBackend;
-import com.dtflys.forest.http.ForestAsyncMode;
-import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.http.*;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 默认日志处理器
@@ -16,7 +16,15 @@ import java.util.List;
  */
 public class DefaultLogHandler implements ForestLogHandler {
 
-    private ForestLogger logger = ForestLogger.getLogger(DefaultLogHandler.class);
+    private ForestLogger logger;
+
+    public DefaultLogHandler() {
+        this(ForestLogger.getLogger(DefaultLogHandler.class));
+    }
+
+    public DefaultLogHandler(ForestLogger logger) {
+        this.logger = logger;
+    }
 
     /**
      * 获取请求头日志内容
@@ -38,6 +46,7 @@ public class DefaultLogHandler implements ForestLogHandler {
                 builder.append("\n");
             }
         }
+
         return builder.toString();
     }
 
@@ -200,15 +209,46 @@ public class DefaultLogHandler implements ForestLogHandler {
      */
     protected String responseLoggingContent(ResponseLogMessage responseLogMessage) {
         final ForestResponse response = responseLogMessage.getResponse();
+        final ForestRequest request = response.getRequest();
+        StringBuilder builder = new StringBuilder();
+        builder.append("Response: ");
+        if (request.isLogResponseStatus() && request.isLogResponseHeaders()) {
+            builder.append("\n\tResponse Status:");
+            builder.append("\n\t\t");
+        }
+        if (request.isLogResponseStatus()) {
+            builder.append(responseStatusLoggingContent(responseLogMessage, response));
+        }
+        if (request.isLogResponseHeaders()) {
+            builder.append("\n\tResponse Headers:");
+            builder.append(responseHeadersLoggingContent(responseLogMessage, response));
+        }
+        return builder.toString();
+    }
+
+
+    protected String responseStatusLoggingContent(ResponseLogMessage responseLogMessage, final ForestResponse response) {
         final int status = responseLogMessage.getStatus();
         if (response != null && response.getException() != null) {
-            return "Response: " + (status > 0 ? ", status = " + status + ", " : " ") + "[Network Error]: " + response.getException().getMessage();
+            return (status > 0 ? ", status = " + status + ", " : " ") + "[Network Error]: " + response.getException().getMessage();
         }
         if (status > 0) {
-            return "Response: Status = " + responseLogMessage.getStatus() + ", Time = " + responseLogMessage.getTime() + "ms";
+            return "Status = " + responseLogMessage.getStatus() + ", Time = " + responseLogMessage.getTime() + "ms";
         } else {
-            return "Response: [Network Error]: Unknown Network Error!";
+            return "[Network Error]: Unknown Network Error!";
         }
+    }
+
+    protected String responseHeadersLoggingContent(ResponseLogMessage responseLogMessage, final ForestResponse response) {
+        final StringBuilder builder = new StringBuilder();
+        final ForestHeaderMap headerMap = response.getHeaders();
+        for (final ForestHeader header : headerMap.allHeaders()) {
+            builder.append("\n\t\t");
+            builder.append(header.getName());
+            builder.append(": ");
+            builder.append(header.getValue());
+        }
+        return builder.toString();
     }
 
 
@@ -239,6 +279,11 @@ public class DefaultLogHandler implements ForestLogHandler {
     @Override
     public void logRequest(RequestLogMessage requestLogMessage) {
         final String content = requestLoggingContent(requestLogMessage);
+        logContent(content);
+    }
+
+    public void logResponse(ResponseLogMessage responseLogMessage) {
+        final String content = responseLoggingContent(responseLogMessage);
         logContent(content);
     }
 

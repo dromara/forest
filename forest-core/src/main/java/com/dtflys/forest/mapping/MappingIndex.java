@@ -1,7 +1,9 @@
 package com.dtflys.forest.mapping;
 
+import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.exceptions.ForestIndexReferenceException;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.RequestVariableScope;
 
 /**
  * Created by Administrator on 2016/5/17.
@@ -18,7 +20,7 @@ public class MappingIndex extends MappingExpr {
     }
 
     @Override
-    public Object render(ForestRequest request, Object[] args) {
+    public Object render(VariableScope scope, Object[] args) {
         try {
             if (index < 0) {
                 int argIndex = args.length + index;
