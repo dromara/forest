@@ -1743,6 +1743,9 @@ public class ForestConfiguration implements VariableScope, Serializable {
             if (variable instanceof ForestMethodVariable) {
                 return ((ForestMethodVariable) variable).getValue(method);
             }
+            if (variable instanceof TemplateVariable) {
+                return ((TemplateVariable) variable).getValue(method == null ? this : method);
+            }
             return variable.getValue(request);
         }
         return null;

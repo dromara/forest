@@ -284,6 +284,12 @@ public class MappingTemplate {
                     nextChar();
                     expr = parseIndex();
                     break;
+                case '?':
+                    nextChar();
+                    ch = watch(1);
+                    if (ch == '.') {
+                        
+                    }
                 case '.':
                     nextChar();
                     startIndex = context.readIndex;

@@ -8,6 +8,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.ForestLogger;
+import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.retryer.BackOffRetryer;
 import com.dtflys.forest.springboot.test.client0.BeastshopClient;
 import com.dtflys.forest.springboot.test.client0.DisturbInterface;
@@ -79,6 +80,9 @@ public class Test0 extends BaseSpringBootTest {
         assertEquals(BackOffRetryer.class, config0.getRetryer());
         assertEquals(Integer.valueOf(5), config0.getMaxRetryCount());
         assertEquals(Long.valueOf(2000), Long.valueOf(config0.getMaxRetryInterval()));
+        assertEquals(config0.getVariableValue("myName"), config0.getVariableValue("userName"));
+        assertEquals(MappingTemplate.create(config0, "{user.name}").render(config0, null), config0.getVariableValue("foo"));
+        assertEquals(MappingTemplate.create(config0, "{user.password}").render(config0, null), config0.getVariableValue("bar"));
     }
 
     @Test
