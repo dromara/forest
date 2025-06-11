@@ -1,6 +1,7 @@
 package com.dtflys.forest.test;
 
 import cn.hutool.core.codec.Base64;
+import cn.hutool.core.map.MapUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONReader;
 import com.alibaba.fastjson.annotation.JSONField;
@@ -850,19 +851,10 @@ public class TestGenericForestClient extends BaseClientTest {
         Forest.config()
                 .setVariable("testVar", null)
                 .setVariable("testVar2", "ok");
-        Forest.get("/test/{testVar?.a}/{testVar?.a ?? 'foo'}/{testVar?.a?.b?.c.d.e ?? 'bar'}/{testVar2 ?? 'xx'}/{testVar2?}")
+        Forest.get("/test/{testVar?.a}/{testVar?.a ?? 'foo'}/{testVar?.a?.b.c.d.e ?? 'bar'}/{testVar2 ?? 'xx'}/{testVar2?}")
                 .host(server.getHostName())
                 .port(server.getPort())
                 .execute();
-
-        ForestRequest req = Forest.get("/");
-        for (ForestRequestBody item : req.body()) {
-            if (item instanceof NameValueRequestBody) {
-                if (((NameValueRequestBody) item).getName().equals("yourName")) {
-                    req.body().remove(item);
-                }
-            }
-        }
 
         mockRequest(server)
                 .assertPathEquals("/test/null/foo/bar/ok/ok");
@@ -871,9 +863,9 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_template_in_url4() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        Forest.config().setVariable("testVar", null);
+        Forest.config().setVariable("testVar", MapUtil.of("a", null));
         assertThatThrownBy(() -> {
-            Forest.get("/test/{testVar?.a.b}")
+            Forest.get("/test/{testVar?.foo.value}")
                     .host(server.getHostName())
                     .port(server.getPort())
                     .execute();

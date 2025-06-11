@@ -87,7 +87,7 @@ public class MappingDot extends MappingExpr {
             return method.invoke(obj);
         } catch (Throwable th) {
             if (th instanceof NullPointerException) {
-                throw new ForestExpressionNullException(this, th);
+                throw new ForestExpressionNullException(right, th);
             }
             throw new ForestExpressionException(th.getMessage(), null, null, forestMethod, null, startIndex + 1, endIndex, th);
         }
@@ -97,7 +97,7 @@ public class MappingDot extends MappingExpr {
     public Object render(VariableScope scope, Object[] args) {
         Object obj = left.render(scope, args);
         if (obj == null) {
-            throw new ForestExpressionNullException(this, new NullPointerException());
+            throw new ForestExpressionNullException(right, new NullPointerException());
         }
         if (obj == MappingEmpty.EMPTY) {
             return obj;
