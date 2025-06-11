@@ -30,10 +30,6 @@ public class MappingTemplate {
     protected List<MappingExpr> exprList;
     protected MappingCompileContext context = new MappingCompileContext();
 
-    private boolean isEnd(int index) {
-        return index >= template.length() - 1;
-    }
-
     private boolean isEnd() {
         return context.readIndex >= template.length() - 1;
     }
@@ -258,6 +254,9 @@ public class MappingTemplate {
                 case ')':
                 case '}':
                     if (expr == null) {
+                        if (startIndex > 1 && watch(0) != '{') {
+                            return null;
+                        }
                         return new MappingIndex(++context.argumentIndex, startIndex, context.readIndex + 1);
                     }
                     if (expr instanceof MappingInteger) {
@@ -296,12 +295,6 @@ public class MappingTemplate {
                         expr = parseOptionExpr(expr, startIndex);
                     }
                     break;
-                case '?':
-                    nextChar();
-                    ch = watch(1);
-                    if (ch == '.') {
-                        
-                    }
                 case '.':
                     nextChar();
                     startIndex = context.readIndex;
@@ -370,9 +363,12 @@ public class MappingTemplate {
                         leftExpr.startIndex, leftExpr.endIndex) :
                 leftExpr;
         if (newExpr == null) {
-            throw new ForestTemplateSyntaxError("There is no valid token before '??'");
+            throw new ForestExpressionException("Unexpected token '??'", annotationType, attributeName, forestMethod, template, context.readIndex - 1, context.readIndex + 1);
         }
         final MappingExpr rightExpr = parseExpression();
+        if (rightExpr == null) {
+            throw new ForestExpressionException("Unexpected token '??'", annotationType, attributeName, forestMethod, template, context.readIndex - 1, context.readIndex + 1);
+        }
         return new MappingElvisExpr(forestMethod, newExpr, rightExpr, startIndex, rightExpr.endIndex);
     }
 

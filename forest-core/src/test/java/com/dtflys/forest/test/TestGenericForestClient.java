@@ -15,6 +15,7 @@ import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestEncoder;
+import com.dtflys.forest.exceptions.ForestExpressionException;
 import com.dtflys.forest.exceptions.ForestExpressionNullException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.*;
@@ -865,12 +866,27 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.config().setVariable("testVar", MapUtil.of("a", null));
         assertThatThrownBy(() -> {
-            Forest.get("/test/{testVar?.foo.value}")
+            Forest.get("/test/{testVar.foo.value}")
                     .host(server.getHostName())
                     .port(server.getPort())
                     .execute();
         }).isInstanceOf(ForestExpressionNullException.class);
     }
+
+    @Test
+    public void testRequest_template_in_url5() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config().setVariable("testVar", MapUtil.of("a", null));
+        assertThatThrownBy(() -> {
+            Forest.get("/test/{testVar.foo ??}")
+                    .host(server.getHostName())
+                    .port(server.getPort())
+                    .execute();
+        })
+                .isInstanceOf(ForestExpressionException.class)
+                .hasMessageContaining("Unexpected token '??'");
+    }
+
 
 
     @Test
