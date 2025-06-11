@@ -53,6 +53,8 @@ public class MappingInvoke extends MappingDot {
             return result;
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             throw new ForestExpressionException(e.getMessage(), null, null, forestMethod, null, startIndex, endIndex);
+        } catch (Throwable e) {
+            throw new ForestExpressionException(e.getMessage(), null, null, forestMethod, null, startIndex, endIndex, e);
         }
     }
 

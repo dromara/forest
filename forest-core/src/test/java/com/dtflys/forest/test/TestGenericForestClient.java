@@ -14,18 +14,10 @@ import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestEncoder;
+import com.dtflys.forest.exceptions.ForestExpressionNullException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.http.ForestAddress;
-import com.dtflys.forest.http.ForestAsyncMode;
-import com.dtflys.forest.http.ForestFuture;
-import com.dtflys.forest.http.ForestHeader;
-import com.dtflys.forest.http.ForestProxy;
-import com.dtflys.forest.http.ForestProxyType;
-import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.http.ForestSSE;
-import com.dtflys.forest.http.ForestURL;
-import com.dtflys.forest.http.Lazy;
+import com.dtflys.forest.http.*;
+import com.dtflys.forest.http.body.NameValueRequestBody;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorChain;
 import com.dtflys.forest.interceptor.ResponseResult;
@@ -55,6 +47,7 @@ import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.function.ThrowingRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,6 +86,7 @@ import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 public class TestGenericForestClient extends BaseClientTest {
 
@@ -830,12 +824,62 @@ public class TestGenericForestClient extends BaseClientTest {
                 .setVariable("foo", "foo/{bar}")
                 .setVariable("testVar", "var/{foo}/{hello}");
         Forest.get("/test/{testVar}")
-                .host("127.0.0.1")
+                .host(server.getHostName())
                 .port(server.getPort())
                 .execute();
         mockRequest(server)
                 .assertPathEquals("/test/var/foo/ok/world");
     }
+
+
+    @Test
+    public void testRequest_template_in_url2() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config().setVariable("testVar", null);
+        Forest.get("/test/{testVar ?? 'foo'}/{testVar?}/{testVar ?? ''}")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/test/foo/null/");
+    }
+
+    @Test
+    public void testRequest_template_in_url3() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config()
+                .setVariable("testVar", null)
+                .setVariable("testVar2", "ok");
+        Forest.get("/test/{testVar?.a}/{testVar?.a ?? 'foo'}/{testVar?.a?.b?.c.d.e ?? 'bar'}/{testVar2 ?? 'xx'}/{testVar2?}")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .execute();
+
+        ForestRequest req = Forest.get("/");
+        for (ForestRequestBody item : req.body()) {
+            if (item instanceof NameValueRequestBody) {
+                if (((NameValueRequestBody) item).getName().equals("yourName")) {
+                    req.body().remove(item);
+                }
+            }
+        }
+
+        mockRequest(server)
+                .assertPathEquals("/test/null/foo/bar/ok/ok");
+    }
+
+    @Test
+    public void testRequest_template_in_url4() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config().setVariable("testVar", null);
+        assertThatThrownBy(() -> {
+            Forest.get("/test/{testVar?.a.b}")
+                    .host(server.getHostName())
+                    .port(server.getPort())
+                    .execute();
+        }).isInstanceOf(ForestExpressionNullException.class);
+    }
+
 
     @Test
     public void testRequest_get_return_string() {

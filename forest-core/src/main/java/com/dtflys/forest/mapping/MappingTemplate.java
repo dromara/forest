@@ -4,10 +4,7 @@ package com.dtflys.forest.mapping;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.ForestProperties;
 import com.dtflys.forest.config.VariableScope;
-import com.dtflys.forest.exceptions.ForestIndexReferenceException;
-import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.exceptions.ForestTemplateSyntaxError;
-import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
+import com.dtflys.forest.exceptions.*;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.RequestVariableScope;
 import com.dtflys.forest.reflection.ForestMethod;
@@ -17,7 +14,6 @@ import com.dtflys.forest.utils.URLUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
-import java.lang.reflect.Parameter;
 import java.util.*;
 
 /**
@@ -33,10 +29,6 @@ public class MappingTemplate {
     protected   String template;
     protected List<MappingExpr> exprList;
     protected MappingCompileContext context = new MappingCompileContext();
-
-    private boolean isEnd(int index) {
-        return index >= template.length() - 1;
-    }
 
     private boolean isEnd() {
         return context.readIndex >= template.length() - 1;
@@ -127,84 +119,87 @@ public class MappingTemplate {
     public void compile() {
         context.readIndex = -1;
         exprList = new ArrayList<>();
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         int startIndex = context.readIndex;
 
         while (!isEnd()) {
             char ch = nextChar();
-            if (ch == '$') {
-                char ch1 = watch(1);
-                if (ch1 == '{') {
-                    nextChar();
-                    if (buffer.length() > 0) {
-                        MappingString str = new MappingString(buffer.toString(), startIndex, startIndex + buffer.length());
-                        startIndex = context.readIndex;
-                        exprList.add(str);
-                    }
+            switch (ch) {
+                case '$': {
+                    char ch1 = watch(1);
+                    if (ch1 == '{') {
+                        nextChar();
+                        if (buffer.length() > 0) {
+                            MappingString str = new MappingString(buffer.toString(), startIndex, startIndex + buffer.length());
+                            startIndex = context.readIndex;
+                            exprList.add(str);
+                        }
 
-                    buffer = new StringBuffer();
-                    MappingExpr expr = parseExpression();
-                    match('}');
-                    if (expr != null) {
-                        exprList.add(expr);
+                        buffer = new StringBuilder();
+                        MappingExpr expr = parseExpression();
+                        match('}');
+                        if (expr != null) {
+                            exprList.add(expr);
+                        }
+                        continue;
                     }
-                    continue;
+                    break;
                 }
-            }
-            else if (ch == '{') {
-                if (buffer.length() > 0) {
-                    MappingString str = new MappingString(buffer.toString(), startIndex, startIndex + buffer.length());
-                    startIndex = context.readIndex;
-                    exprList.add(str);
-                }
-                int oldIndex = context.readIndex;
-                buffer = new StringBuffer();
-                MappingExpr expr = null;
-                try {
-                    expr = parseExpression();
-                } catch (ForestTemplateSyntaxError th) {
-                    exprList.add(new MappingString("{", startIndex, startIndex + 1));
-                    context.readIndex = oldIndex;
-                    startIndex = context.readIndex;
-                    continue;
-                }
-                match('}');
-                if (expr != null) {
-                    expr = new MappingUrlEncodedExpr(forestMethod, expr);
-                    exprList.add(expr);
-                }
-                continue;
-            }
-            if (ch == '#') {
-                char ch1 = watch(1);
-                if (ch1 == '{') {
-                    nextChar();
+                case '{': {
                     if (buffer.length() > 0) {
                         MappingString str = new MappingString(buffer.toString(), startIndex, startIndex + buffer.length());
                         startIndex = context.readIndex;
                         exprList.add(str);
                     }
-                    buffer = new StringBuffer();
-                    MappingExpr expr = parseProperty();
+                    int oldIndex = context.readIndex;
+                    buffer = new StringBuilder();
+                    MappingExpr expr = null;
+                    try {
+                        expr = parseExpression();
+                    } catch (ForestTemplateSyntaxError th) {
+                        exprList.add(new MappingString("{", startIndex, startIndex + 1));
+                        context.readIndex = oldIndex;
+                        startIndex = context.readIndex;
+                        continue;
+                    }
                     match('}');
                     if (expr != null) {
+                        expr = new MappingUrlEncodedExpr(forestMethod, expr);
                         exprList.add(expr);
                     }
                     continue;
                 }
-            }
-            else if (ch == '\\') {
-                char nc = watch(1);
-                if (nc == '$' || nc == '{') {
-                    ch = nextChar();
-                    buffer.append(ch);
-                } else {
-                    buffer.append(ch);
+                case '#': {
+                    char ch1 = watch(1);
+                    if (ch1 == '{') {
+                        nextChar();
+                        if (buffer.length() > 0) {
+                            MappingString str = new MappingString(buffer.toString(), startIndex, startIndex + buffer.length());
+                            startIndex = context.readIndex;
+                            exprList.add(str);
+                        }
+                        buffer = new StringBuilder();
+                        MappingExpr expr = parseProperty();
+                        match('}');
+                        if (expr != null) {
+                            exprList.add(expr);
+                        }
+                        continue;
+                    }
+                    break;
+                }
+                case '\\': {
+                    char nc = watch(1);
+                    if (nc == '$' || nc == '{') {
+                        ch = nextChar();
+                        buffer.append(ch);
+                    } else {
+                        buffer.append(ch);
+                    }
                 }
             }
             buffer.append(ch);
         }
-
 
         if (buffer.length() > 0) {
             MappingString str = new MappingString(buffer.toString(), startIndex, startIndex + buffer.length());
@@ -284,14 +279,23 @@ public class MappingTemplate {
                     nextChar();
                     expr = parseIndex();
                     break;
+                case '?':
+                    nextChar();
+                    ch = watch(1);
+                    if (ch == '.') {
+                        nextChar();
+                        expr = parseOptionalDot(expr, startIndex);
+                    } else if (ch == '?') {
+                        nextChar();
+                        expr = parseElvisExpr(expr, startIndex);
+                    } else {
+                        expr = parseOptionExpr(expr, startIndex);
+                    }
+                    break;
                 case '.':
                     nextChar();
                     startIndex = context.readIndex;
-                    if (expr instanceof MappingIdentity) {
-                        expr = new MappingReference(forestMethod, ((MappingIdentity) expr).getName(), expr.startIndex, expr.endIndex);
-                    }
-                    MappingIdentity id = parseIdentity();
-                    expr = new MappingDot(forestMethod, expr, id, startIndex, id.endIndex);
+                    expr = parseDot(expr, startIndex);
                     break;
                 case '(':
                     nextChar();
@@ -299,11 +303,11 @@ public class MappingTemplate {
                     if (expr == null) {
                         syntaxErrorWatch1(ch);
                     }
-                    if (expr.token == Token.DOT && ((MappingDot) expr).right != null) {
+                    if ((expr.token == Token.DOT || expr.token == Token.OPTIONAL_DOT) &&
+                            ((MappingDot) expr).right != null) {
                         methodName = ((MappingDot) expr).right;
                         expr = ((MappingDot) expr).left;
-                    }
-                    else if (expr.token == Token.ID) {
+                    } else if (expr.token == Token.ID) {
                         methodName = (MappingIdentity) expr;
                         expr = null;
                     }
@@ -321,7 +325,60 @@ public class MappingTemplate {
         return expr;
     }
 
+    public MappingDot parseDot(final MappingExpr leftExpr, final int startIndex) {
+        final MappingExpr newExpr = leftExpr instanceof MappingIdentity ?
+                new MappingReference(forestMethod, ((MappingIdentity) leftExpr).getName(), leftExpr.startIndex, leftExpr.endIndex) :
+                leftExpr;
+        if (newExpr == null) {
+            throw new ForestTemplateSyntaxError("There is no valid token before '.'");
+        }
+        final MappingIdentity id = parseIdentity();
+        return new MappingDot(forestMethod, newExpr, id, startIndex, id.endIndex);
+    }
 
+    public MappingOptionalDot parseOptionalDot(final MappingExpr leftExpr, final int startIndex) {
+        final MappingExpr newExpr = leftExpr instanceof MappingIdentity ?
+                new MappingReference(
+                        forestMethod,
+                        ((MappingIdentity) leftExpr).getName(),
+                        true,
+                        leftExpr.startIndex, leftExpr.endIndex) :
+                leftExpr;
+        if (newExpr == null) {
+            throw new ForestTemplateSyntaxError("There is no valid token before '?.'");
+        }
+        final MappingIdentity id = parseIdentity();
+        return new MappingOptionalDot(forestMethod, newExpr, id, startIndex, id.endIndex);
+    }
+
+    public MappingElvisExpr parseElvisExpr(final MappingExpr leftExpr, final int startIndex) {
+        final MappingExpr newExpr = leftExpr instanceof MappingIdentity ?
+                new MappingReference(
+                        forestMethod,
+                        ((MappingIdentity) leftExpr).getName(),
+                        true,
+                        leftExpr.startIndex, leftExpr.endIndex) :
+                leftExpr;
+        if (newExpr == null) {
+            throw new ForestTemplateSyntaxError("There is no valid token before '??'");
+        }
+        final MappingExpr rightExpr = parseExpression();
+        return new MappingElvisExpr(forestMethod, newExpr, rightExpr, startIndex, rightExpr.endIndex);
+    }
+
+    public MappingExpr parseOptionExpr(final MappingExpr leftExpr, final int startIndex) {
+        final MappingExpr newExpr = leftExpr instanceof MappingIdentity ?
+                new MappingReference(
+                        forestMethod,
+                        ((MappingIdentity) leftExpr).getName(),
+                        true,
+                        leftExpr.startIndex, leftExpr.endIndex) :
+                leftExpr;
+        if (newExpr == null) {
+            throw new ForestTemplateSyntaxError("There is no valid token before '?'");
+        }
+        return newExpr;
+    }
 
 
     public MappingIdentity parseIdentity() {
@@ -531,6 +588,8 @@ public class MappingTemplate {
             throw new ForestVariableUndefinedException(annotationType, attributeName, forestMethod, ex.getVariableName(), template, ex.getStartIndex(), ex.getEndIndex());
         } catch (ForestIndexReferenceException ex) {
             throw new ForestIndexReferenceException(annotationType, attributeName, forestMethod, ex.getIndex(), ex.getArgumentsLength(), template, ex.getStartIndex(), ex.getEndIndex());
+        } catch (ForestExpressionNullException ex) {
+            throw new ForestExpressionNullException(annotationType, attributeName, template, ex.getExpr(), ex.getCause());
         } catch (ForestRuntimeException ex) {
             throw ex;
         }

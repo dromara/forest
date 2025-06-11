@@ -17,7 +17,8 @@ import java.util.Set;
  */
 public class MappingReference extends MappingExpr {
 
-    private String name;
+    final boolean optional;
+    private final String name;
 
     private final static Set<String> ITERATE_VARS = new HashSet<>();
     static {
@@ -25,10 +26,14 @@ public class MappingReference extends MappingExpr {
         ITERATE_VARS.add("_key");
     }
 
-
     public MappingReference(ForestMethod<?> forestMethod, String name, int startIndex, int endIndex) {
+        this(forestMethod, name, false, startIndex, endIndex);
+    }
+
+    public MappingReference(ForestMethod<?> forestMethod, String name, boolean optional, int startIndex, int endIndex) {
         super(forestMethod, Token.REF);
         this.name = name;
+        this.optional = optional;
         setIndexRange(startIndex, endIndex);
     }
 
@@ -50,6 +55,9 @@ public class MappingReference extends MappingExpr {
             }
             return variable.getValueFromScope(scope);
         }
+        if (optional) {
+            return null;
+        }
         throw new ForestVariableUndefinedException(name, startIndex, endIndex);
     }
 
@@ -63,6 +71,7 @@ public class MappingReference extends MappingExpr {
         }
         return false;
     }
+
 
     @Override
     public String toString() {

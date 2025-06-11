@@ -1659,6 +1659,7 @@ public class ForestConfiguration implements VariableScope, Serializable {
         return this;
     }
 
+
     /**
      * 设置全局变量
      *
@@ -1680,7 +1681,11 @@ public class ForestConfiguration implements VariableScope, Serializable {
      * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setVariable(String name, ForestArgumentsVariable value) {
-        this.variables.put(name, value);
+        if (value == null) {
+            this.variables.remove(name);
+        } else {
+            this.variables.put(name, value);
+        }
         return this;
     }
 

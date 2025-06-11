@@ -1,8 +1,7 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
-import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.exceptions.ForestExpressionException;
+import com.dtflys.forest.exceptions.*;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.RequestVariableScope;
 import com.dtflys.forest.reflection.ForestMethod;
@@ -69,12 +68,7 @@ public class MappingDot extends MappingExpr {
         return ret;
     }
 
-    @Override
-    public Object render(VariableScope scope, Object[] args) {
-        Object obj = left.render(scope, args);
-        if (obj == null) {
-            throw new ForestRuntimeException(new NullPointerException());
-        }
+    protected Object renderRight(Object obj, VariableScope scope, Object[] args) {
         if (obj instanceof Map) {
             return ((Map) obj).get(right.getName());
         }
@@ -92,8 +86,23 @@ public class MappingDot extends MappingExpr {
         try {
             return method.invoke(obj);
         } catch (Throwable th) {
+            if (th instanceof NullPointerException) {
+                throw new ForestExpressionNullException(this, th);
+            }
             throw new ForestExpressionException(th.getMessage(), null, null, forestMethod, null, startIndex + 1, endIndex, th);
         }
+    }
+
+    @Override
+    public Object render(VariableScope scope, Object[] args) {
+        Object obj = left.render(scope, args);
+        if (obj == null) {
+            throw new ForestExpressionNullException(this, new NullPointerException());
+        }
+        if (obj == MappingEmpty.EMPTY) {
+            return obj;
+        }
+        return renderRight(obj, scope, args);
     }
 
 

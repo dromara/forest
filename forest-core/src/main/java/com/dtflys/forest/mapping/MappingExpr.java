@@ -38,5 +38,19 @@ public abstract class MappingExpr {
         this.endIndex = endIndex;
     }
 
+    public ForestMethod<?> getForestMethod() {
+        return forestMethod;
+    }
 
+    public Token getToken() {
+        return token;
+    }
+
+    public int getStartIndex() {
+        return startIndex;
+    }
+
+    public int getEndIndex() {
+        return endIndex;
+    }
 }

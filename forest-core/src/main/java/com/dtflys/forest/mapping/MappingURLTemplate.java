@@ -5,10 +5,7 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.ForestProperties;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
-import com.dtflys.forest.exceptions.ForestIndexReferenceException;
-import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
-import com.dtflys.forest.exceptions.ForestExpressionException;
+import com.dtflys.forest.exceptions.*;
 import com.dtflys.forest.http.*;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.ForestCache;
@@ -359,6 +356,8 @@ public class MappingURLTemplate extends MappingTemplate {
             throw new ForestVariableUndefinedException(annotationType, attributeName, forestMethod, ex.getVariableName(), template, ex.getStartIndex(), ex.getEndIndex());
         } catch (ForestIndexReferenceException ex) {
             throw new ForestIndexReferenceException(annotationType, attributeName, forestMethod, ex.getIndex(), ex.getArgumentsLength(), template, ex.getStartIndex(), ex.getEndIndex());
+        } catch (ForestExpressionNullException ex) {
+            throw new ForestExpressionNullException(annotationType, attributeName, template, ex.getExpr(), ex.getCause());
         } catch (ForestExpressionException ex) {
             throw new ForestExpressionException(ex.getMessage(), annotationType, attributeName, forestMethod, template, ex.getStartIndex(), ex.getEndIndex());
         }
