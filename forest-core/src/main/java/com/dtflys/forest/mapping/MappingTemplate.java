@@ -30,6 +30,10 @@ public class MappingTemplate {
     protected List<MappingExpr> exprList;
     protected MappingCompileContext context = new MappingCompileContext();
 
+    private boolean isEnd(int index) {
+        return index >= template.length() - 1;
+    }
+
     private boolean isEnd() {
         return context.readIndex >= template.length() - 1;
     }
@@ -292,6 +296,12 @@ public class MappingTemplate {
                         expr = parseOptionExpr(expr, startIndex);
                     }
                     break;
+                case '?':
+                    nextChar();
+                    ch = watch(1);
+                    if (ch == '.') {
+                        
+                    }
                 case '.':
                     nextChar();
                     startIndex = context.readIndex;

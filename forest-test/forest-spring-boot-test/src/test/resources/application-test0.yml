@@ -19,6 +19,9 @@ forest:
     myName: xxx
     myCount: 12
     idServiceUrl: http://www.thebeastshop.com
+    userName: "{myName}"
+    foo: "{user.name}"
+    bar: "{user.password}"
     user:
       name: foo
       password: bar
