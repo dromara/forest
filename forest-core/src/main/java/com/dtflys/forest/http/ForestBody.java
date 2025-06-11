@@ -583,6 +583,22 @@ public class ForestBody implements List<ForestRequestBody> {
         return rets.stream().allMatch(ret -> ret);
     }
 
+    public <T extends ForestRequestBody> boolean removeNameValueBody(String name) {
+        final List<Boolean> rets = new LinkedList<>();
+        for (ForestRequestBody item : bodyItems) {
+            if (item instanceof NameValueRequestBody) {
+                if (((NameValueRequestBody) item).getName().equals(name)) {
+                    rets.add(bodyItems.remove(item));
+                }
+            }
+        }
+        if (rets.isEmpty()) {
+            return false;
+        }
+        return rets.stream().allMatch(ret -> ret);
+    }
+
+
     @Override
     public boolean containsAll(Collection<?> c) {
         return bodyItems.containsAll(c);
