@@ -7,8 +7,8 @@ public class MappingUrlEncodedExpr extends MappingExpr {
 
     private final MappingExpr expr;
 
-    protected MappingUrlEncodedExpr(ForestMethod<?> forestMethod, MappingExpr expr) {
-        super(forestMethod, expr.token);
+    protected MappingUrlEncodedExpr(MappingTemplate source, MappingExpr expr) {
+        super(source, expr.token);
         this.expr = expr;
     }
 

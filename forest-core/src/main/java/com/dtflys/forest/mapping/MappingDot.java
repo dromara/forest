@@ -2,12 +2,9 @@ package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.exceptions.*;
-import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.http.RequestVariableScope;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.StringUtils;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -20,12 +17,12 @@ public class MappingDot extends MappingExpr {
     protected final MappingExpr left;
     protected final MappingIdentity right;
 
-    public MappingDot(ForestMethod forestMethod, MappingExpr left, MappingIdentity right, int startIndex, int endIndex) {
-        this(forestMethod, Token.DOT, left, right, startIndex, endIndex);
+    public MappingDot(MappingTemplate source, MappingExpr left, MappingIdentity right, int startIndex, int endIndex) {
+        this(source, Token.DOT, left, right, startIndex, endIndex);
     }
 
-    protected MappingDot(ForestMethod forestMethod, Token token, MappingExpr left, MappingIdentity right, int startIndex, int endIndex) {
-        super(forestMethod, token);
+    protected MappingDot(MappingTemplate source, Token token, MappingExpr left, MappingIdentity right, int startIndex, int endIndex) {
+        super(source, token);
         this.left = left;
         this.right = right;
         setIndexRange(startIndex, endIndex);
@@ -77,27 +74,30 @@ public class MappingDot extends MappingExpr {
         try {
             method = getPropMethodFromClass(obj.getClass(), right);
         } catch (Throwable th) {
-            throw new ForestExpressionException(th.getMessage(), null, null, forestMethod, null, startIndex + 1, endIndex, th);
+            throwExpressionException(th.getMessage(), th);
         }
         if (method == null) {
             NoSuchMethodException ex = new NoSuchMethodException(getterName);
-            throw new ForestExpressionException(ex.getMessage(), null, null, forestMethod, null, startIndex + 1, endIndex, ex);
+            throwExpressionException(ex.getMessage(), ex);
         }
         try {
             return method.invoke(obj);
         } catch (Throwable th) {
             if (th instanceof NullPointerException) {
-                throw new ForestExpressionNullException(right, th);
+                throwExpressionNulException(null, right, th);
+            } else {
+                throwExpressionException(th.getMessage(), th);
             }
-            throw new ForestExpressionException(th.getMessage(), null, null, forestMethod, null, startIndex + 1, endIndex, th);
         }
+        return null;
     }
 
     @Override
     public Object render(VariableScope scope, Object[] args) {
         Object obj = left.render(scope, args);
         if (obj == null) {
-            throw new ForestExpressionNullException(right, new NullPointerException());
+            throwExpressionNulException(left.toTemplateString(), right, new NullPointerException());
+            return null;
         }
         if (obj == MappingEmpty.EMPTY) {
             return obj;
@@ -106,9 +106,9 @@ public class MappingDot extends MappingExpr {
     }
 
 
-
     @Override
     public String toString() {
         return "[Dot: " + left.toString() + "." + right + "]";
     }
+
 }

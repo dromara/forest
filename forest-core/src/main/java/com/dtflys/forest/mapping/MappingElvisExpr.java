@@ -1,7 +1,6 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
-import com.dtflys.forest.reflection.ForestMethod;
 
 public class MappingElvisExpr extends MappingExpr {
 
@@ -9,8 +8,8 @@ public class MappingElvisExpr extends MappingExpr {
 
     private final MappingExpr right;
 
-    protected MappingElvisExpr(ForestMethod forestMethod, MappingExpr left, MappingExpr right, int startIndex, int endIndex) {
-        super(forestMethod, Token.ELVIS);
+    protected MappingElvisExpr(MappingTemplate source, MappingExpr left, MappingExpr right, int startIndex, int endIndex) {
+        super(source, Token.ELVIS);
         this.left = left;
         this.right = right;
         setIndexRange(startIndex, endIndex);

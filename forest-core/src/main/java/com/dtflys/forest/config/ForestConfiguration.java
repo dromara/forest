@@ -61,6 +61,7 @@ import com.dtflys.forest.interceptor.InterceptorFactory;
 import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.ForestLogger;
+import com.dtflys.forest.mapping.MappingEmpty;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.pool.FixedRequestPool;
 import com.dtflys.forest.pool.ForestRequestPool;
@@ -1668,7 +1669,11 @@ public class ForestConfiguration implements VariableScope, Serializable {
      * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setVariable(String name, ForestVariable value) {
-        this.variables.put(name, value);
+        if (value == null) {
+            this.variables.put(name, new BasicVariable(null));
+        } else {
+            this.variables.put(name, value);
+        }
         return this;
     }
 
@@ -1682,14 +1687,17 @@ public class ForestConfiguration implements VariableScope, Serializable {
      */
     public ForestConfiguration setVariable(String name, ForestArgumentsVariable value) {
         if (value == null) {
-            this.variables.remove(name);
+            this.variables.put(name, new BasicVariable(null));
         } else {
             this.variables.put(name, value);
         }
         return this;
     }
 
-
+    public ForestConfiguration removeVariable(String name) {
+        this.variables.remove(name);
+        return this;
+    }
 
     /**
      * 设置全局变量

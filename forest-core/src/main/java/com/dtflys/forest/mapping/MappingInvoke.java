@@ -1,9 +1,6 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
-import com.dtflys.forest.exceptions.ForestExpressionException;
-import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.http.RequestVariableScope;
 import com.dtflys.forest.reflection.ForestMethod;
 
 import java.lang.reflect.InvocationTargetException;
@@ -18,12 +15,12 @@ public class MappingInvoke extends MappingDot {
 
     private List<MappingExpr> argList;
 
-    public MappingInvoke(ForestMethod<?> forestMethod, MappingExpr left, MappingIdentity name, List<MappingExpr> argList, int startIndex, int endIndex) {
-        this(forestMethod, Token.INVOKE, left, name, argList, startIndex, endIndex);
+    public MappingInvoke(MappingTemplate source, MappingExpr left, MappingIdentity name, List<MappingExpr> argList, int startIndex, int endIndex) {
+        this(source, Token.INVOKE, left, name, argList, startIndex, endIndex);
     }
 
-    protected MappingInvoke(ForestMethod<?> forestMethod, Token token, MappingExpr left, MappingIdentity name, List<MappingExpr> argList, int startIndex, int endIndex) {
-        super(forestMethod, token, left, name, startIndex, endIndex);
+    protected MappingInvoke(MappingTemplate source, Token token, MappingExpr left, MappingIdentity name, List<MappingExpr> argList, int startIndex, int endIndex) {
+        super(source, token, left, name, startIndex, endIndex);
         this.argList = argList;
     }
 
@@ -52,10 +49,11 @@ public class MappingInvoke extends MappingDot {
             }
             return result;
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            throw new ForestExpressionException(e.getMessage(), null, null, forestMethod, null, startIndex, endIndex);
+            throwExpressionException(e.getMessage(), null);
         } catch (Throwable e) {
-            throw new ForestExpressionException(e.getMessage(), null, null, forestMethod, null, startIndex, endIndex, e);
+            throwExpressionException(e.getMessage(), e);
         }
+        return null;
     }
 
     @Override

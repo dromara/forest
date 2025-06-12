@@ -15,11 +15,10 @@ import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestEncoder;
-import com.dtflys.forest.exceptions.ForestExpressionException;
+import com.dtflys.forest.mapping.ForestExpressionException;
 import com.dtflys.forest.exceptions.ForestExpressionNullException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.*;
-import com.dtflys.forest.http.body.NameValueRequestBody;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorChain;
 import com.dtflys.forest.interceptor.ResponseResult;
@@ -49,7 +48,6 @@ import org.apache.commons.io.IOUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.function.ThrowingRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -861,8 +859,26 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertPathEquals("/test/null/foo/bar/ok/ok");
     }
 
+
     @Test
     public void testRequest_template_in_url4() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config()
+                .removeVariable("testVar")
+                .setVariable("foo", MapUtil.empty())
+                .setVariable("testVar2", "ok");
+        Forest.get("/test/{testVar ?? `it_is_{foo.a.b}`}")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .execute();
+
+        mockRequest(server)
+                .assertPathEquals("/test/it_is_ok");
+    }
+
+
+    @Test
+    public void testRequest_template_in_url_error1() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.config().setVariable("testVar", MapUtil.of("a", null));
         assertThatThrownBy(() -> {
@@ -874,7 +890,7 @@ public class TestGenericForestClient extends BaseClientTest {
     }
 
     @Test
-    public void testRequest_template_in_url5() {
+    public void testRequest_template_in_url_error2() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.config().setVariable("testVar", MapUtil.of("a", null));
         assertThatThrownBy(() -> {

@@ -13,8 +13,8 @@ public class MappingDouble extends MappingExpr {
 
     private final double number;
 
-    public MappingDouble(double number) {
-        super(null, Token.DOUBLE);
+    public MappingDouble(MappingTemplate source, double number) {
+        super(source, Token.DOUBLE);
         this.number = number;
     }
 

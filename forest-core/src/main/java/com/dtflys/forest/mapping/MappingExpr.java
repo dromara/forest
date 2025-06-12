@@ -1,6 +1,9 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
+import com.dtflys.forest.exceptions.ForestExpressionNullException;
+import com.dtflys.forest.exceptions.ForestIndexReferenceException;
+import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
 import com.dtflys.forest.reflection.ForestMethod;
 
 /**
@@ -9,7 +12,7 @@ import com.dtflys.forest.reflection.ForestMethod;
  */
 public abstract class MappingExpr {
 
-    protected final ForestMethod<?> forestMethod;
+    protected final MappingTemplate source;
 
     final Token token;
 
@@ -17,8 +20,8 @@ public abstract class MappingExpr {
 
     int endIndex = -1;
 
-    protected MappingExpr(ForestMethod<?> forestMethod, Token token) {
-        this.forestMethod = forestMethod;
+    protected MappingExpr(MappingTemplate source, Token token) {
+        this.source = source;
         this.token = token;
     }
 
@@ -39,7 +42,7 @@ public abstract class MappingExpr {
     }
 
     public ForestMethod<?> getForestMethod() {
-        return forestMethod;
+        return source.forestMethod;
     }
 
     public Token getToken() {
@@ -53,4 +56,32 @@ public abstract class MappingExpr {
     public int getEndIndex() {
         return endIndex;
     }
+
+    public String toTemplateString() {
+        if (startIndex != -1 && endIndex != -1) {
+            return source.template.substring(startIndex, endIndex);
+        }
+        return source.template;
+    }
+
+    protected void throwExpressionException(String message, Throwable th) throws ForestExpressionNullException {
+        throw new ForestExpressionException(
+                message, source.annotationType, source.attributeName, getForestMethod(), source.template, startIndex, endIndex, th);
+    }
+
+    protected void throwVariableUndefinedException(String name) throws ForestVariableUndefinedException {
+        throw new ForestVariableUndefinedException(
+                source.annotationType, source.attributeName, source.forestMethod, name, source.template, startIndex, endIndex);
+    }
+
+    protected void throwExpressionNulException(String nullVariableName, MappingExpr expr, Throwable cause) throws ForestExpressionNullException {
+        throw new ForestExpressionNullException(
+                source.annotationType, source.attributeName, source.template, nullVariableName, expr, cause);
+    }
+
+    protected void throwIndexReferenceException(int index, int length) throws ForestExpressionNullException {
+        throw new ForestIndexReferenceException(
+                source.annotationType, source.attributeName, source.forestMethod, index, length, source.template, startIndex, endIndex);
+    }
+
 }

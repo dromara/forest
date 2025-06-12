@@ -26,12 +26,12 @@ public class MappingReference extends MappingExpr {
         ITERATE_VARS.add("_key");
     }
 
-    public MappingReference(ForestMethod<?> forestMethod, String name, int startIndex, int endIndex) {
-        this(forestMethod, name, false, startIndex, endIndex);
+    public MappingReference(MappingTemplate source, String name, int startIndex, int endIndex) {
+        this(source, name, false, startIndex, endIndex);
     }
 
-    public MappingReference(ForestMethod<?> forestMethod, String name, boolean optional, int startIndex, int endIndex) {
-        super(forestMethod, Token.REF);
+    public MappingReference(MappingTemplate source, String name, boolean optional, int startIndex, int endIndex) {
+        super(source, Token.REF);
         this.name = name;
         this.optional = optional;
         setIndexRange(startIndex, endIndex);
@@ -58,7 +58,8 @@ public class MappingReference extends MappingExpr {
         if (optional) {
             return null;
         }
-        throw new ForestVariableUndefinedException(name, startIndex, endIndex);
+        throwVariableUndefinedException(name);
+        return null;
     }
 
     @Override
@@ -77,4 +78,5 @@ public class MappingReference extends MappingExpr {
     public String toString() {
         return "[Refer: " + name + "]";
     }
+
 }

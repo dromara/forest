@@ -1,8 +1,6 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
-import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.http.RequestVariableScope;
 
 /**
  * Created by Administrator on 2016/5/4.

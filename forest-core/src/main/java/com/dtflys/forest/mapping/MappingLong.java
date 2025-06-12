@@ -12,8 +12,8 @@ public class MappingLong extends MappingExpr {
 
     private final long number;
 
-    public MappingLong(long number) {
-        super(null, Token.LONG);
+    public MappingLong(MappingTemplate source, long number) {
+        super(source, Token.LONG);
         this.number = number;
     }
 

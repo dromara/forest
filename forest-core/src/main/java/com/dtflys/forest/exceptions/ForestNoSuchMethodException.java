@@ -1,5 +1,6 @@
 package com.dtflys.forest.exceptions;
 
+import com.dtflys.forest.mapping.ForestExpressionException;
 import com.dtflys.forest.reflection.ForestMethod;
 
 import java.lang.annotation.Annotation;

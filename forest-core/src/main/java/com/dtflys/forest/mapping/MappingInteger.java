@@ -12,8 +12,8 @@ public class MappingInteger extends MappingExpr {
 
     private final int number;
 
-    public MappingInteger(int number) {
-        super(null, Token.INT);
+    public MappingInteger(MappingTemplate source, int number) {
+        super(source, Token.INT);
         this.number = number;
     }
 

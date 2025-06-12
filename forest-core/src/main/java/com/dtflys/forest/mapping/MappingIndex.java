@@ -12,8 +12,8 @@ public class MappingIndex extends MappingExpr {
 
     private final Integer index;
 
-    public MappingIndex(Integer index, int startIndex, int endIndex) {
-        super(null, Token.INDEX);
+    public MappingIndex(MappingTemplate source, Integer index, int startIndex, int endIndex) {
+        super(source, Token.INDEX);
         this.index = index;
         this.startIndex = startIndex;
         this.endIndex = endIndex;
@@ -28,7 +28,8 @@ public class MappingIndex extends MappingExpr {
             }
             return args[index];
         } catch (Throwable t) {
-            throw new ForestIndexReferenceException(index, args.length, startIndex, endIndex);
+            throwIndexReferenceException(index, args.length);
+            return null;
         }
     }
 

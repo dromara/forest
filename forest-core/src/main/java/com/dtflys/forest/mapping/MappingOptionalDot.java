@@ -1,12 +1,11 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
-import com.dtflys.forest.reflection.ForestMethod;
 
 public class MappingOptionalDot extends MappingDot {
 
-    protected MappingOptionalDot(ForestMethod forestMethod, MappingExpr left, MappingIdentity right, int startIndex, int endIndex) {
-        super(forestMethod, Token.OPTIONAL_DOT, left, right, startIndex, endIndex);
+    protected MappingOptionalDot(MappingTemplate source, MappingExpr left, MappingIdentity right, int startIndex, int endIndex) {
+        super(source, Token.OPTIONAL_DOT, left, right, startIndex, endIndex);
     }
 
     @Override

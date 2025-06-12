@@ -4,6 +4,7 @@ import com.dtflys.forest.Forest;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.reflection.BasicVariable;
 import junit.framework.Assert;
 import com.dtflys.forest.mapping.MappingReference;
@@ -32,6 +33,7 @@ public class TestMappingReference {
 
         ForestMethod forestMethod = Mockito.spy(new ForestMethod(null,
                 configuration, Forest.request().getMethod().getMethod()));
+        MappingTemplate template = MappingTemplate.create(forestMethod, "xxx");
         MappingVariable nameVar = new MappingVariable("name", String.class);
         nameVar.setIndex(0);
         MappingVariable ageVar = new MappingVariable("age", String.class);
@@ -41,13 +43,13 @@ public class TestMappingReference {
         when(forestMethod.getVariable("motherName")).thenReturn(new BasicVariable("Linda"));
         
         when(forestMethod.isVariableDefined("motherName")).thenReturn(true);
-        MappingReference nameRef = new MappingReference(forestMethod, "name", -1, -1);
-        MappingReference ageRef = new MappingReference(forestMethod, "age", -1, -1);
-        MappingReference motherNameRef = new MappingReference(forestMethod, "motherName", -1, -1);
+        MappingReference nameRef = new MappingReference(template, "name", -1, -1);
+        MappingReference ageRef = new MappingReference(template, "age", -1, -1);
+        MappingReference motherNameRef = new MappingReference(template, "motherName", -1, -1);
 
-        MappingReference aRef = new MappingReference(forestMethod, "A", -1, -1);
-        MappingReference bRef = new MappingReference(forestMethod, "B", -1, -1);
-        MappingReference cRef = new MappingReference(forestMethod, "C", -1, -1);
+        MappingReference aRef = new MappingReference(template, "A", -1, -1);
+        MappingReference bRef = new MappingReference(template, "B", -1, -1);
+        MappingReference cRef = new MappingReference(template, "C", -1, -1);
 
         ForestRequest request = new ForestRequest(configuration, forestMethod);
         assertThat(nameRef.render(request, new Object[] {"Peter", 15})).isEqualTo("Peter");
