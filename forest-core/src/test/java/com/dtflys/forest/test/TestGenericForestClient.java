@@ -865,9 +865,9 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.config()
                 .removeVariable("testVar")
-                .setVariable("foo", MapUtil.empty())
+                .setVariable("map", MapUtil.empty())
                 .setVariable("testVar2", "ok");
-        Forest.get("/test/{testVar ?? `it_is_{foo.a.b}`}")
+        Forest.get("/test/{testVar ?? `it_is_{map.foo.bar.aaa.bbb}`}")
                 .host(server.getHostName())
                 .port(server.getPort())
                 .execute();
@@ -903,6 +903,22 @@ public class TestGenericForestClient extends BaseClientTest {
                 .hasMessageContaining("Unexpected token '??'");
     }
 
+    @Test
+    public void testRequest_template_in_url_error3() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config()
+                .removeVariable("testVar")
+                .setVariable("map", MapUtil.empty());
+
+        assertThatThrownBy(() -> {
+            Forest.get("/test/{testVar ?? `it_is_{map.foo.bar.aaa.bbb}`}")
+                    .host(server.getHostName())
+                    .port(server.getPort())
+                    .execute();
+        })
+                .isInstanceOf(ForestExpressionNullException.class)
+                .hasMessageContaining("Null pointer error: map.foo is null");
+    }
 
 
     @Test

@@ -15,9 +15,9 @@ public class ForestExpressionException extends RuntimeException {
 
     protected String source;
 
-    int startIndex;
+    protected int startIndex;
 
-    int endIndex;
+    protected int endIndex;
 
     public ForestExpressionException(String message, Class<? extends Annotation> annotationType, String attributeName, ForestMethod method, String source, int startIndex, int endIndex) {
         this(message, annotationType, attributeName, method, source, startIndex, endIndex, null);
