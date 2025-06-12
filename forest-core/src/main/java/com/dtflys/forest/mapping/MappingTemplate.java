@@ -145,7 +145,7 @@ public class MappingTemplate {
     
     public void compile() {
         context.readIndex = -1 + startReadIndex;
-        exprList = new ArrayList<>();
+        exprList = new ArrayList<>(8);
         StringBuilder buffer = new StringBuilder();
         int startIndex = context.readIndex;
 

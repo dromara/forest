@@ -2,7 +2,7 @@ package com.dtflys.forest.mapping;
 
 public class MappingEmpty {
 
-    public final static MappingEmpty EMPTY = new MappingEmpty();
+    public final static MappingEmpty OPTIONAL = new MappingEmpty();
 
     private MappingEmpty() {}
 

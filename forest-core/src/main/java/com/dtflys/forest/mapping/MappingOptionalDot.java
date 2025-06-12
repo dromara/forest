@@ -11,8 +11,8 @@ public class MappingOptionalDot extends MappingDot {
     @Override
     public Object render(VariableScope scope, Object[] args) {
         Object obj = left.render(scope, args);
-        if (obj == null || obj == MappingEmpty.EMPTY) {
-            return MappingEmpty.EMPTY;
+        if (obj == null || obj == MappingEmpty.OPTIONAL) {
+            return MappingEmpty.OPTIONAL;
         }
         return renderRight(obj, scope, args);
     }

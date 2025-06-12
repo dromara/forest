@@ -2,7 +2,6 @@ package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.exceptions.*;
-import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.StringUtils;
 
 import java.lang.reflect.Method;
@@ -43,7 +42,13 @@ public class MappingDot extends MappingExpr {
         }
         if (method == null) {
             if (!Object.class.equals(clazz)) {
-                return getPropMethodFromClass(clazz.getSuperclass(), right);
+                try {
+                    return getPropMethodFromClass(clazz.getSuperclass(), right);
+                } catch (Throwable ex) {
+                    if (th != null) {
+                        throw new ForestRuntimeException(th);
+                    }
+                }
             }
             if (th != null) {
                 throw new ForestRuntimeException(th);
@@ -74,11 +79,13 @@ public class MappingDot extends MappingExpr {
         try {
             method = getPropMethodFromClass(obj.getClass(), right);
         } catch (Throwable th) {
-            throwExpressionException(th.getMessage(), th);
         }
         if (method == null) {
+            final String className = obj.getClass().getName();
             NoSuchMethodException ex = new NoSuchMethodException(getterName);
-            throwExpressionException(ex.getMessage(), ex);
+            throwExpressionException(
+                    "No such property method: " + className + "." + right.getName() + "() or " + className + "." + getterName + "()",
+                    right, ex);
         }
         try {
             return method.invoke(obj);
@@ -86,7 +93,7 @@ public class MappingDot extends MappingExpr {
             if (th instanceof NullPointerException) {
                 throwExpressionNulException(null, right, th);
             } else {
-                throwExpressionException(th.getMessage(), th);
+                throwExpressionException(th.getMessage(), right, th);
             }
         }
         return null;
@@ -99,7 +106,7 @@ public class MappingDot extends MappingExpr {
             throwExpressionNulException(left.toTemplateString(), right, new NullPointerException());
             return null;
         }
-        if (obj == MappingEmpty.EMPTY) {
+        if (obj == MappingEmpty.OPTIONAL) {
             return obj;
         }
         return renderRight(obj, scope, args);

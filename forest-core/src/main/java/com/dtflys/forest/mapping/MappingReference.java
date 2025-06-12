@@ -1,11 +1,8 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
-import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
-import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.RequestVariableScope;
 import com.dtflys.forest.reflection.ForestArgumentsVariable;
-import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.ForestVariable;
 import com.dtflys.forest.utils.StringUtils;
 
@@ -56,7 +53,7 @@ public class MappingReference extends MappingExpr {
             return variable.getValueFromScope(scope);
         }
         if (optional) {
-            return null;
+            return MappingEmpty.OPTIONAL;
         }
         throwVariableUndefinedException(name);
         return null;

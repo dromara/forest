@@ -871,6 +871,20 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertPathEquals("/test/it_is_ok");
     }
 
+    @Test
+    public void testRequest_template_in_url5() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config().removeVariable("testVar");
+        Forest.get("/test/{testVar?}")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .execute();
+
+        mockRequest(server)
+                .assertPathEquals("/test/null");
+    }
+
+
 
     @Test
     public void testRequest_json_template() {
@@ -922,17 +936,17 @@ public class TestGenericForestClient extends BaseClientTest {
     public void testRequest_template_in_url_error3() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.config()
-                .removeVariable("testVar")
+                .setVariable("testVar", null)
                 .setVariable("map", MapUtil.empty());
 
         assertThatThrownBy(() -> {
-            Forest.get("/test/{testVar ?? `it_is_{map.foo.bar.aaa.bbb}`}")
+            Forest.get("/test/{testVar ?? `it_is_{map?.foo.bar.aaa.bbb}`}")
                     .host(server.getHostName())
                     .port(server.getPort())
                     .execute();
         })
                 .isInstanceOf(ForestExpressionNullException.class)
-                .hasMessageContaining("Null pointer error: map.foo is null");
+                .hasMessageContaining("Null pointer error: map?.foo is null");
     }
 
 

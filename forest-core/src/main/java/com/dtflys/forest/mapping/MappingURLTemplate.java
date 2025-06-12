@@ -223,9 +223,8 @@ public class MappingURLTemplate extends MappingTemplate {
                         if (nextIsPort) {
                             userInfo.append(':');
                         }
-                        userInfo.append(subBuilder.toString());
+                        userInfo.append(subBuilder);
                         subBuilder = new StringBuilder();
-                        continue;
                     } else if (ch == '/' || pathCharIndex + 1 == baseLen) {
                         if (ch != '/') {
                             subBuilder.append(ch);
@@ -239,7 +238,6 @@ public class MappingURLTemplate extends MappingTemplate {
                                 pathCharIndex--;
                                 renderedPath = true;
                             }
-                            continue;
                         } else if (scheme != null && host == null) {
                             // 解析地址部分
                             host = subBuilder.toString();
@@ -248,7 +246,6 @@ public class MappingURLTemplate extends MappingTemplate {
                                 pathCharIndex--;
                                 renderedPath = true;
                             }
-                            continue;
                         } else {
                             if (ch == '/') {
                                 subBuilder.append(ch);

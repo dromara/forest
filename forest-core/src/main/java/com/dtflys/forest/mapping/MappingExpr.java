@@ -63,11 +63,18 @@ public abstract class MappingExpr {
         }
         return source.template;
     }
+    
 
     protected void throwExpressionException(String message, Throwable th) throws ForestExpressionNullException {
         throw new ForestExpressionException(
                 message, source.annotationType, source.attributeName, getForestMethod(), source.template, startIndex, endIndex, th);
     }
+
+    protected void throwExpressionException(String message, MappingExpr expr, Throwable th) throws ForestExpressionNullException {
+        throw new ForestExpressionException(
+                message, source.annotationType, source.attributeName, getForestMethod(), source.template, expr.startIndex, expr.endIndex, th);
+    }
+
 
     protected void throwVariableUndefinedException(String name) throws ForestVariableUndefinedException {
         throw new ForestVariableUndefinedException(
