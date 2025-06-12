@@ -70,7 +70,7 @@ public class MappingURLTemplate extends MappingTemplate {
 
 
     public MappingURLTemplate(Class<? extends Annotation> annotationType, String attributeName, ForestMethod<?> forestMethod, String template, ForestProperties properties, MappingParameter[] parameters) {
-        super(annotationType, attributeName, forestMethod, template, properties, parameters);
+        super(annotationType, attributeName, forestMethod, template, parameters);
     }
 
     @Override

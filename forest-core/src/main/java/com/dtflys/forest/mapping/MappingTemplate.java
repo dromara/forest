@@ -21,11 +21,10 @@ import java.util.*;
  * @since 2016-05-04
  */
 public class MappingTemplate {
-    protected final Class<? extends Annotation> annotationType;
-    protected final String attributeName;
-    protected final ForestMethod<?> forestMethod;
-    protected final MappingParameter[] parameters;
-    protected final ForestProperties properties;
+    protected Class<? extends Annotation> annotationType;
+    protected String attributeName;
+    protected ForestMethod<?> forestMethod;
+    protected MappingParameter[] parameters;
     protected String template;
     protected List<MappingExpr> exprList;
     protected MappingCompileContext context = new MappingCompileContext();
@@ -53,10 +52,6 @@ public class MappingTemplate {
     }
 
 
-    public ForestProperties getProperties() {
-        return properties;
-    }
-
 
     private void match(char except) {
         if (isEnd()) {
@@ -81,12 +76,15 @@ public class MappingTemplate {
         return template.charAt(context.readIndex + i);
     }
 
+    public static MappingTemplate create(final String template) {
+        return create(null, template);
+    }
+
     public static MappingTemplate create(final VariableScope scope, final String template) {
         return create(scope, template, 0, template == null ? 0 : template.length());
     }
     
     public static MappingTemplate create(final VariableScope scope, final String template, final int startReadIndex, final int endReadIndex) {
-        final ForestConfiguration configuration = scope.getConfiguration();
         if (scope instanceof RequestVariableScope) {
             final ForestRequest request = ((RequestVariableScope) scope).asRequest();
             return new MappingTemplate(
@@ -94,7 +92,6 @@ public class MappingTemplate {
                     null,
                     request.getMethod(),
                     template,
-                    configuration.getProperties(),
                     request.getMethod().getParameters(),
                     startReadIndex,
                     endReadIndex
@@ -105,7 +102,6 @@ public class MappingTemplate {
                     null,
                     null,
                     template,
-                    configuration.getProperties(),
                     null,
                     startReadIndex,
                     endReadIndex
@@ -113,17 +109,16 @@ public class MappingTemplate {
         }
     }
 
-    public MappingTemplate(Class<? extends Annotation> annotationType, String attributeName, ForestMethod<?> forestMethod, String template, ForestProperties properties, MappingParameter[] parameters) {
-        this(annotationType, attributeName, forestMethod, template, properties, parameters, 0, template == null ? 0 : template.length());
+    public MappingTemplate(Class<? extends Annotation> annotationType, String attributeName, ForestMethod<?> forestMethod, String template, MappingParameter[] parameters) {
+        this(annotationType, attributeName, forestMethod, template, parameters, 0, template == null ? 0 : template.length());
     }
 
 
-    public MappingTemplate(Class<? extends Annotation> annotationType, String attributeName, ForestMethod<?> forestMethod, String template, ForestProperties properties, MappingParameter[] parameters, int startReadIndex, int endReadIndex) {
+    public MappingTemplate(Class<? extends Annotation> annotationType, String attributeName, ForestMethod<?> forestMethod, String template, MappingParameter[] parameters, int startReadIndex, int endReadIndex) {
         this.annotationType = annotationType;
         this.attributeName = attributeName;
         this.forestMethod = forestMethod;
         this.template = template;
-        this.properties = properties;
         this.parameters = parameters;
         this.startReadIndex = startReadIndex;
         this.endReadIndex = endReadIndex;
@@ -131,6 +126,21 @@ public class MappingTemplate {
             this.template = "";
         }
         compile();
+    }
+
+    public void bindScope(VariableScope scope) {
+        if (scope instanceof RequestVariableScope) {
+            ForestRequest request = ((RequestVariableScope) scope).asRequest();
+            if (request != null) {
+                this.forestMethod = request.getMethod();
+                this.parameters = request.getMethod().getParameters();
+            }
+        }
+    }
+
+    public void bindAnnotationAttribute(Class<? extends Annotation> annotationType, String attributeName) {
+        this.annotationType = annotationType;
+        this.attributeName = attributeName;
     }
     
     public void compile() {
@@ -601,7 +611,7 @@ public class MappingTemplate {
 
 
     public String render(VariableScope scope, Object[] args) {
-        ForestJsonConverter jsonConverter = scope.getConfiguration().getJsonConverter();
+        final ForestJsonConverter jsonConverter = scope.getConfiguration().getJsonConverter();
         int len = exprList.size();
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < len; i++) {
@@ -684,7 +694,7 @@ public class MappingTemplate {
 
     @Override
     public MappingTemplate clone() {
-        MappingTemplate template = new MappingTemplate(annotationType, attributeName, forestMethod, this.template, this.properties, this.parameters);
+        MappingTemplate template = new MappingTemplate(annotationType, attributeName, forestMethod, this.template, this.parameters);
         template.exprList = this.exprList;
         return template;
     }
@@ -701,7 +711,7 @@ public class MappingTemplate {
 
     public MappingTemplate valueOf(String value) {
         return new MappingTemplate(
-                annotationType, attributeName, forestMethod, value, properties, forestMethod.getParameters());
+                annotationType, attributeName, forestMethod, value, forestMethod.getParameters());
     }
 
 

@@ -275,7 +275,6 @@ public class ForestMethod<T> implements VariableScope {
                                     attributeName,
                                     this,
                                     text,
-                                    configuration.getProperties(),
                                     forestParameters);
                     if (templateCache.size() < 128) {
                         templateCache.put(key, newTemplate);
@@ -997,7 +996,7 @@ public class ForestMethod<T> implements VariableScope {
             for (int j = 0; j < baseHeaders.length; j++) {
                 final MappingTemplate header = new MappingTemplate(
                         BaseRequest.class, "headers",
-                        this, headerArray[j], configuration.getProperties(), forestParameters);
+                        this, headerArray[j], forestParameters);
                 baseHeaders[j] = header;
             }
         }

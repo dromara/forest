@@ -1,12 +1,15 @@
 package com.dtflys.forest.http.body;
 
 import com.dtflys.forest.config.ForestConfiguration;
+import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.mapping.MappingParameter;
+import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
+import com.dtflys.forest.utils.TemplateUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -25,6 +28,16 @@ public class StringRequestBody extends ForestRequestBody implements SupportFormU
     public StringRequestBody(String content) {
         this.content = content;
     }
+
+    public StringRequestBody(String content, ForestRequest request) {
+        this(content, request, request.arguments());
+    }
+
+
+    public StringRequestBody(String content, VariableScope scope, Object[] arguments) {
+        this.content = TemplateUtils.readString(content, scope, arguments);
+    }
+
 
     public String getContent() {
         return content;

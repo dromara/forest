@@ -66,6 +66,7 @@ import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.RequestLogMessage;
 import com.dtflys.forest.mapping.AbstractVariableScope;
+import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingURLTemplate;
 import com.dtflys.forest.multipart.ByteArrayMultipart;
 import com.dtflys.forest.multipart.FileMultipart;
@@ -3085,7 +3086,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> addBody(String stringBody) {
-        return addBody(new StringRequestBody(stringBody));
+        return addBody(new StringRequestBody(stringBody, this));
     }
 
     /**

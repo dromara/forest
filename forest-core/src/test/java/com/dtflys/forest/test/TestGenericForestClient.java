@@ -32,11 +32,7 @@ import com.dtflys.forest.test.model.Contact;
 import com.dtflys.forest.test.model.Result;
 import com.dtflys.forest.test.model.TestUser;
 import com.dtflys.forest.test.sse.MySSEHandler;
-import com.dtflys.forest.utils.ForestDataType;
-import com.dtflys.forest.utils.ForestProgress;
-import com.dtflys.forest.utils.GzipUtils;
-import com.dtflys.forest.utils.TypeReference;
-import com.dtflys.forest.utils.URLUtils;
+import com.dtflys.forest.utils.*;
 import com.google.common.collect.Lists;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
@@ -865,9 +861,8 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.config()
                 .removeVariable("testVar")
-                .setVariable("map", MapUtil.empty())
                 .setVariable("testVar2", "ok");
-        Forest.get("/test/{testVar ?? `it_is_{map.foo.bar.aaa.bbb}`}")
+        Forest.get("/test/{testVar ?? `it_is_{testVar2}`}")
                 .host(server.getHostName())
                 .port(server.getPort())
                 .execute();
@@ -875,6 +870,26 @@ public class TestGenericForestClient extends BaseClientTest {
         mockRequest(server)
                 .assertPathEquals("/test/it_is_ok");
     }
+
+
+    @Test
+    public void testRequest_json_template() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config()
+                .setVariable("testVar", "{\"a\": \"foo\", \"b\": \"bar\"}")
+                .setVariable("testVar2", "{testVar}");
+        Forest.post("/test")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .contentTypeJson()
+                .addBody("{testVar2}")
+                .execute();
+
+        mockRequest(server)
+                .assertPathEquals("/test")
+                .assertBodyEquals("{\"a\": \"foo\", \"b\": \"bar\"}");
+    }
+
 
 
     @Test
