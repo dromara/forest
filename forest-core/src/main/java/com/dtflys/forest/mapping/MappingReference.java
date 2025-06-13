@@ -1,6 +1,7 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
+import com.dtflys.forest.exceptions.ForestReferenceException;
 import com.dtflys.forest.http.RequestVariableScope;
 import com.dtflys.forest.reflection.ForestArgumentsVariable;
 import com.dtflys.forest.reflection.ForestVariable;
@@ -45,12 +46,17 @@ public class MappingReference extends MappingExpr {
             variable = scope.getVariable(name);
         }
         if (variable != null) {
-            if (variable instanceof ForestArgumentsVariable) {
-                if (scope instanceof RequestVariableScope) {
-                    return ((ForestArgumentsVariable) variable).getValueFromScope(scope, args);
+            try {
+                if (variable instanceof ForestArgumentsVariable) {
+                    if (scope instanceof RequestVariableScope) {
+                        return checkDeepReference(((ForestArgumentsVariable) variable).getValueFromScope(scope, args),
+                                this, scope, args);
+                    }
                 }
+                return checkDeepReference(variable.getValueFromScope(scope), this, scope, args);
+            } catch (Throwable th) {
+                throwReferenceException(this, th);
             }
-            return variable.getValueFromScope(scope);
         }
         if (optional) {
             return MappingEmpty.OPTIONAL;

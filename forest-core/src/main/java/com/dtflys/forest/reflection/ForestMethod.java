@@ -252,6 +252,7 @@ public class ForestMethod<T> implements VariableScope {
             final String attributeName,
             final String text) {
         return new MappingURLTemplate(
+                MappingTemplate.METHOD_URL,
                 annotationType,
                 attributeName,
                 this,
@@ -271,6 +272,7 @@ public class ForestMethod<T> implements VariableScope {
                 if (template == null) {
                     final MappingTemplate newTemplate =
                             new MappingTemplate(
+                                    MappingTemplate.METHOD_TEMPLATE,
                                     annotationType,
                                     attributeName,
                                     this,
@@ -995,6 +997,7 @@ public class ForestMethod<T> implements VariableScope {
             baseHeaders = new MappingTemplate[headerArray.length];
             for (int j = 0; j < baseHeaders.length; j++) {
                 final MappingTemplate header = new MappingTemplate(
+                        MappingTemplate.METHOD_TEMPLATE,
                         BaseRequest.class, "headers",
                         this, headerArray[j], forestParameters);
                 baseHeaders[j] = header;

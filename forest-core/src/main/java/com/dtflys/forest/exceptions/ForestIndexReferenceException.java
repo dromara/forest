@@ -1,6 +1,7 @@
 package com.dtflys.forest.exceptions;
 
 import com.dtflys.forest.mapping.ForestExpressionException;
+import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.reflection.ForestMethod;
 
 import java.lang.annotation.Annotation;
@@ -23,8 +24,13 @@ public class ForestIndexReferenceException extends ForestExpressionException {
         this(null, null, null, index, argumentsLength, null, -1, -1);
     }
 
-    public ForestIndexReferenceException(Class<? extends Annotation> annotationType, String attributeName, ForestMethod method, int index, int argumentsLength, String source, int startIndex, int endIndex) {
-        super("Index " + index + " out of bounds for arguments length " + argumentsLength, annotationType, attributeName, method, source, startIndex, endIndex);
+    public ForestIndexReferenceException(Class<? extends Annotation> annotationType, String attributeName, ForestMethod method, int index, int argumentsLength, MappingTemplate source, int startIndex, int endIndex) {
+        this(annotationType, attributeName, method, index, argumentsLength, source, startIndex, endIndex, null);
+    }
+
+
+    public ForestIndexReferenceException(Class<? extends Annotation> annotationType, String attributeName, ForestMethod method, int index, int argumentsLength, MappingTemplate source, int startIndex, int endIndex, Throwable cause) {
+        super("Index " + index + " out of bounds for arguments length " + argumentsLength, annotationType, attributeName, method, source, startIndex, endIndex, cause);
         this.index = index;
         this.argumentsLength = argumentsLength;
     }

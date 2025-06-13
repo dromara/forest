@@ -13,29 +13,37 @@ public class ForestExpressionException extends RuntimeException {
 
     protected ForestMethod method;
 
-    protected String source;
+    protected MappingTemplate template;
 
     protected int startIndex;
 
     protected int endIndex;
 
-    public ForestExpressionException(String message, Class<? extends Annotation> annotationType, String attributeName, ForestMethod method, String source, int startIndex, int endIndex) {
-        this(message, annotationType, attributeName, method, source, startIndex, endIndex, null);
+    protected Throwable expressionCause;
+
+    public ForestExpressionException(String message, Class<? extends Annotation> annotationType, String attributeName, ForestMethod method, MappingTemplate template, int startIndex, int endIndex) {
+        this(message, annotationType, attributeName, method, template, startIndex, endIndex, null);
     }
 
-    public ForestExpressionException(String message, Class<? extends Annotation> annotationType, String attributeName, String source, MappingExpr expr, Throwable cause) {
-        this(message, annotationType, attributeName, expr.getForestMethod(), source, expr.getStartIndex(), expr.getEndIndex(), cause);
+    public ForestExpressionException(String message, Class<? extends Annotation> annotationType, String attributeName, MappingTemplate template, MappingExpr expr, Throwable cause) {
+        this(message, annotationType, attributeName, expr.getForestMethod(), template, expr.getStartIndex(), expr.getEndIndex(), cause instanceof ForestExpressionException ? null : cause);
+        if (cause instanceof ForestExpressionException) {
+            this.expressionCause = cause;
+        }
     }
 
 
-    public ForestExpressionException(String message, Class<? extends Annotation> annotationType, String attributeName, ForestMethod method, String source, int startIndex, int endIndex, Throwable cause) {
-        super(MappingExceptionUtil.errorMessage(message, annotationType, attributeName, method, source, startIndex, endIndex), cause);
+    public ForestExpressionException(String message, Class<? extends Annotation> annotationType, String attributeName, ForestMethod method, MappingTemplate template, int startIndex, int endIndex, Throwable cause) {
+        super(MappingExceptionUtil.errorMessage(message, annotationType, attributeName, method, template, startIndex, endIndex, cause), cause instanceof ForestExpressionException ? null : cause);
         this.annotationType = annotationType;
         this.attributeName = attributeName;
         this.method = method;
-        this.source = source;
+        this.template = template;
         this.startIndex = startIndex;
         this.endIndex = endIndex;
+        if (cause instanceof ForestExpressionException) {
+            this.expressionCause = cause;
+        }
     }
 
     public Class<? extends Annotation> getAnnotationType() {
@@ -50,8 +58,12 @@ public class ForestExpressionException extends RuntimeException {
         return method;
     }
 
+    public MappingTemplate getTemplate() {
+        return template;
+    }
+
     public String getSource() {
-        return source;
+        return template.getSource();
     }
 
     public int getStartIndex() {
@@ -60,5 +72,12 @@ public class ForestExpressionException extends RuntimeException {
 
     public int getEndIndex() {
         return endIndex;
+    }
+
+    public Throwable getExpressionCause() {
+        if (expressionCause != null) {
+            return expressionCause;
+        }
+        return getCause();
     }
 }

@@ -1,6 +1,7 @@
 package com.dtflys.forest.exceptions;
 
 import com.dtflys.forest.mapping.ForestExpressionException;
+import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.reflection.ForestMethod;
 
 import java.lang.annotation.Annotation;
@@ -19,11 +20,11 @@ public class ForestVariableUndefinedException extends ForestExpressionException 
         this(null, null, null, variableName, null, -1, -1);
     }
 
-    public ForestVariableUndefinedException(String variableName, String source) {
+    public ForestVariableUndefinedException(String variableName, MappingTemplate source) {
         this(null, null, null, variableName, source, -1, -1);
     }
 
-    public ForestVariableUndefinedException(Class<? extends Annotation> annotationType, String attributeName, ForestMethod method, String variableName, String source, int startIndex, int endIndex) {
+    public ForestVariableUndefinedException(Class<? extends Annotation> annotationType, String attributeName, ForestMethod method, String variableName, MappingTemplate source, int startIndex, int endIndex) {
         super("Cannot resolve variable '" + variableName + "'", annotationType, attributeName, method, source, startIndex, endIndex);
         this.variableName = variableName;
     }

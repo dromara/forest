@@ -21,7 +21,7 @@ import com.dtflys.forest.exceptions.ForestUnsupportException;
 import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.utils.ANSIUtil;
+import com.dtflys.forest.mapping.MappingTemplate;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
@@ -148,7 +148,7 @@ public class TestExceptions {
         assertThat(exception.getVariableName()).isEqualTo("foo");
         assertThat(exception.getSource()).isNull();
 
-        exception = new ForestVariableUndefinedException("bar", "foo=${bar}");
+        exception = new ForestVariableUndefinedException("bar", MappingTemplate.create("foo=${bar}"));
         exception.printStackTrace();
         assertThat(exception.getMessage().replaceAll("\\[\\d(\\d)?m", ""))
                 .isEqualTo("Cannot resolve variable 'bar'\n" +

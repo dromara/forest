@@ -70,7 +70,8 @@ public class MappingDot extends MappingExpr {
         return ret;
     }
 
-    protected Object renderRight(Object obj, VariableScope scope, Object[] args) {
+
+    protected Object renderRight(Object obj) {
         if (obj instanceof Map) {
             return ((Map) obj).get(right.getName());
         }
@@ -109,7 +110,7 @@ public class MappingDot extends MappingExpr {
         if (obj == MappingEmpty.OPTIONAL) {
             return obj;
         }
-        return renderRight(obj, scope, args);
+        return checkDeepReference(renderRight(obj), right, scope, args);
     }
 
 

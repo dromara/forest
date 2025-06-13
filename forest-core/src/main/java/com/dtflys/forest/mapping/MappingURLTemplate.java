@@ -60,6 +60,7 @@ public class MappingURLTemplate extends MappingTemplate {
             final String attributeName,
             final String text) {
         return new MappingURLTemplate(
+                URL,
                 annotationType,
                 attributeName,
                 method,
@@ -69,8 +70,8 @@ public class MappingURLTemplate extends MappingTemplate {
     }
 
 
-    public MappingURLTemplate(Class<? extends Annotation> annotationType, String attributeName, ForestMethod<?> forestMethod, String template, ForestProperties properties, MappingParameter[] parameters) {
-        super(annotationType, attributeName, forestMethod, template, parameters);
+    public MappingURLTemplate(int type, Class<? extends Annotation> annotationType, String attributeName, ForestMethod<?> forestMethod, String template, ForestProperties properties, MappingParameter[] parameters) {
+        super(type, annotationType, attributeName, forestMethod, template, parameters);
     }
 
     @Override
