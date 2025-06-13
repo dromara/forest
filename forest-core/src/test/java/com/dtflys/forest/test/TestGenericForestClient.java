@@ -966,7 +966,7 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.config()
                 .setVariable("testVar3", "aaa{foo}")
-                .setVariable("testVar2", "ok: {testVar3}")
+                .setVariable("testVar2", "ok: {temp ?? `haha {testVar3}`}")
                 .setVariable("testVar1", MapUtil.of("ref", "{testVar2}"));
         Forest.get("/test/{testVar1.ref}")
                 .host(server.getHostName())

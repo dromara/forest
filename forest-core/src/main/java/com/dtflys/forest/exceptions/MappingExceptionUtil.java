@@ -118,9 +118,9 @@ public abstract class MappingExceptionUtil {
                 }
                 builder.append(attrBuilder);
             } else {
-                builder.append(ANSIUtil.colorPurple("template:")).append(' ');
+                builder.append(ANSIUtil.colorPurple("source:")).append(' ');
                 builder.append(ANSIUtil.colorGreen(source));
-                int spaceCount = "template: ".length();
+                int spaceCount = "source: ".length();
                 builder.append("\n");
                 if (startIndex != -1 && endIndex != -1) {
                     builder.append(errorLine(message, spaceCount, startIndex, endIndex));

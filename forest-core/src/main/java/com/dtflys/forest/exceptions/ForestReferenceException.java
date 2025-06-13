@@ -15,11 +15,11 @@ import java.lang.annotation.Annotation;
 public class ForestReferenceException extends ForestExpressionException {
 
     public ForestReferenceException(Class<? extends Annotation> annotationType, String attributeName, ForestMethod method, MappingTemplate source, MappingExpr expr, int startIndex, int endIndex, Throwable cause) {
-        super("An error occurred in reference: " + expr.toTemplateString(), annotationType, attributeName, method, source, startIndex, endIndex, cause);
+        super("Reference error: " + expr.toTemplateString(), annotationType, attributeName, method, source, startIndex, endIndex, cause);
     }
 
     public ForestReferenceException(Class<? extends Annotation> annotationType, String attributeName, ForestMethod method, MappingTemplate source, String refTemplate, MappingExpr expr, int startIndex, int endIndex, Throwable cause) {
-        super("An error occurred in reference: " + expr.toTemplateString() + wrapReferenceTemplate(refTemplate), annotationType, attributeName, method, source, startIndex, endIndex, cause);
+        super("Reference error: " + expr.toTemplateString() + wrapReferenceTemplate(refTemplate), annotationType, attributeName, method, source, startIndex, endIndex, cause);
     }
 
     private static String wrapReferenceTemplate(String refTemplate) {

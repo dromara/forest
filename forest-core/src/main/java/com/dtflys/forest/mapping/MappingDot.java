@@ -110,7 +110,7 @@ public class MappingDot extends MappingExpr {
         if (obj == MappingEmpty.OPTIONAL) {
             return obj;
         }
-        return checkDeepReference(renderRight(obj), right, scope, args);
+        return checkDeepReference(renderRight(obj), this, scope, args);
     }
 
 

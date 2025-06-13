@@ -14,6 +14,6 @@ public class MappingOptionalDot extends MappingDot {
         if (obj == null || obj == MappingEmpty.OPTIONAL) {
             return MappingEmpty.OPTIONAL;
         }
-        return checkDeepReference(renderRight(obj), right, scope, args);
+        return checkDeepReference(renderRight(obj), this, scope, args);
     }
 }
