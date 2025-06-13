@@ -952,26 +952,52 @@ public class TestGenericForestClient extends BaseClientTest {
     public void testRequest_template_in_url_error4() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.config()
+                .removeVariable("foo")
                 .setVariable("testVar3", "aaa{foo}")
                 .setVariable("testVar2", "ok: {testVar3}")
                 .setVariable("testVar1", "{testVar2}");
-        Forest.get("/test/{testVar1}")
-                .host(server.getHostName())
-                .port(server.getPort())
-                .execute();
+
+        assertThatThrownBy(() -> {
+            Forest.get("/test/{testVar1}")
+                    .host(server.getHostName())
+                    .port(server.getPort())
+                    .execute();
+        }).hasMessageContainingAll(
+                "\"aaa{foo}\"",
+                "\"ok: {testVar3}\"",
+                "\"{testVar2}\"",
+                "/test/{testVar1}",
+                "^^^ Cannot resolve variable 'foo'",
+                "^^^^^^^^ Reference error: testVar3 -> \"aaa{foo}\"",
+                "^^^^^^^^ Reference error: testVar2 -> \"ok: {testVar3}\"",
+                "^^^^^^^^ Reference error: testVar1 -> \"{testVar2}\""
+        );
     }
 
     @Test
     public void testRequest_template_in_url_error5() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.config()
+                .removeVariable("foo")
                 .setVariable("testVar3", "aaa{foo}")
                 .setVariable("testVar2", "ok: {temp ?? `haha {testVar3}`}")
                 .setVariable("testVar1", MapUtil.of("ref", "{testVar2}"));
-        Forest.get("/test/{testVar1.ref}")
-                .host(server.getHostName())
-                .port(server.getPort())
-                .execute();
+
+        assertThatThrownBy(() -> {
+            Forest.get("/test/{testVar1.ref}")
+                    .host(server.getHostName())
+                    .port(server.getPort())
+                    .execute();
+        }).hasMessageContainingAll(
+                "testVar3 -> \"aaa{foo}\"",
+                "ok: {temp ?? `haha {testVar3}`}",
+                "{testVar2}",
+                "/test/{testVar1.ref}",
+                "^^^ Cannot resolve variable 'foo'",
+                "^^^^^^^^ Reference error: testVar3 -> \"aaa{foo}\"",
+                "^^^^^^^^ Reference error: testVar2 -> \"ok: {temp ?? `haha {testVar3}`}\"",
+                "^^^^^^^^^^^^ Reference error: testVar1.ref -> \"{testVar2}\""
+        );
     }
 
 

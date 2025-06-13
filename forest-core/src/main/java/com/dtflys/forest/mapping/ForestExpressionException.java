@@ -19,7 +19,6 @@ public class ForestExpressionException extends RuntimeException {
 
     protected int endIndex;
 
-    protected Throwable expressionCause;
 
     public ForestExpressionException(String message, Class<? extends Annotation> annotationType, String attributeName, ForestMethod method, MappingTemplate template, int startIndex, int endIndex) {
         this(message, annotationType, attributeName, method, template, startIndex, endIndex, null);
@@ -27,9 +26,6 @@ public class ForestExpressionException extends RuntimeException {
 
     public ForestExpressionException(String message, Class<? extends Annotation> annotationType, String attributeName, MappingTemplate template, MappingExpr expr, Throwable cause) {
         this(message, annotationType, attributeName, expr.getForestMethod(), template, expr.getStartIndex(), expr.getEndIndex(), cause instanceof ForestExpressionException ? null : cause);
-        if (cause instanceof ForestExpressionException) {
-            this.expressionCause = cause;
-        }
     }
 
 
@@ -41,9 +37,6 @@ public class ForestExpressionException extends RuntimeException {
         this.template = template;
         this.startIndex = startIndex;
         this.endIndex = endIndex;
-        if (cause instanceof ForestExpressionException) {
-            this.expressionCause = cause;
-        }
     }
 
     public Class<? extends Annotation> getAnnotationType() {
@@ -74,10 +67,4 @@ public class ForestExpressionException extends RuntimeException {
         return endIndex;
     }
 
-    public Throwable getExpressionCause() {
-        if (expressionCause != null) {
-            return expressionCause;
-        }
-        return getCause();
-    }
 }
