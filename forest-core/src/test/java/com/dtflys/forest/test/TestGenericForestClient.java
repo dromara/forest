@@ -993,13 +993,13 @@ public class TestGenericForestClient extends BaseClientTest {
                 "^^^ Cannot resolve variable 'foo'",
 
                 "ok: {temp ?? `haha {testVar3}`}",
-                "                    ^^^^^^^^ Reference error: testVar3 -> \"aaa{foo}\"",
+                "^^^^^^^^ Reference error: testVar3 -> \"aaa{foo}\"",
 
                 "{testVar2}",
-                " ^^^^^^^^ Reference error: testVar2 -> \"ok: {temp ?? `haha {testVar3}`}\"",
+                "^^^^^^^^ Reference error: testVar2 -> \"ok: {temp ?? `haha {testVar3}`}\"",
 
                 "/test/{testVar1.ref}",
-                "       ^^^^^^^^^^^^ Reference error: testVar1.ref -> \"{testVar2}\""
+                "^^^^^^^^^^^^ Reference error: testVar1.ref -> \"{testVar2}\""
         );
     }
 
