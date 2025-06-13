@@ -72,8 +72,11 @@ public abstract class MappingExpr {
         if (deepReference) {
             if (obj instanceof CharSequence) {
                 final String str = obj.toString();
+                if (str.length() == 2 && str.charAt(0) == '{' && str.charAt(1) == '}') {
+                    return str;
+                }
                 try {
-                    return TemplateUtils.readString(str, scope, args);
+                    return TemplateUtils.readString(str, scope, args, false);
                 } catch (Throwable th) {
                     throwReferenceException(expr, str, th);
                 }
@@ -81,7 +84,7 @@ public abstract class MappingExpr {
             if (obj instanceof MappingTemplate) {
                 final MappingTemplate template = (MappingTemplate) obj;
                 try {
-                    return template.render(scope, args);
+                    return template.render(scope, args, false);
                 } catch (Throwable th) {
                     throwReferenceException(expr, template.getSource(), th);
                 }

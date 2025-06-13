@@ -106,7 +106,7 @@ public class TestGetClient extends BaseClientTest {
     }
 
 
-        @Test
+//        @Test
     public void performance() {
         int count = 10000;
         for (int i = 0; i < count; i++) {

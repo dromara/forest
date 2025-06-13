@@ -35,7 +35,7 @@ public class StringRequestBody extends ForestRequestBody implements SupportFormU
 
 
     public StringRequestBody(String content, VariableScope scope, Object[] arguments) {
-        this.content = TemplateUtils.readString(content, scope, arguments);
+        this.content = TemplateUtils.readString(content, scope, arguments, false);
     }
 
 

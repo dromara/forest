@@ -16,9 +16,6 @@ public class ForestVariableUndefinedException extends ForestExpressionException 
 
     private final String variableName;
 
-    public ForestVariableUndefinedException(String variableName) {
-        this(null, null, null, variableName, null, -1, -1);
-    }
 
     public ForestVariableUndefinedException(String variableName, MappingTemplate source) {
         this(null, null, null, variableName, source, -1, -1);

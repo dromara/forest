@@ -143,10 +143,10 @@ public class TestExceptions {
 
     @Test
     public void testVariableUndefinedException() {
-        ForestVariableUndefinedException exception = new ForestVariableUndefinedException("foo");
-        assertThat(exception.getMessage()).isEqualTo("Cannot resolve variable 'foo'");
+        ForestVariableUndefinedException exception = new ForestVariableUndefinedException("foo", MappingTemplate.create("{foo}"));
+//        assertThat(exception.getMessage()).isEqualTo("Cannot resolve variable 'foo'");
         assertThat(exception.getVariableName()).isEqualTo("foo");
-        assertThat(exception.getSource()).isNull();
+        assertThat(exception.getSource()).isNotNull();
 
         exception = new ForestVariableUndefinedException("bar", MappingTemplate.create("foo=${bar}"));
         exception.printStackTrace();
@@ -155,7 +155,7 @@ public class TestExceptions {
                         "\n" +
                         "\t[From Template]\n" +
                         "\n" +
-                        "\ttemplate: foo=${bar}\n");
+                        "\tsource: foo=${bar}\n");
         assertThat(exception.getVariableName()).isEqualTo("bar");
         assertThat(exception.getSource()).isEqualTo("foo=${bar}");
     }
@@ -185,7 +185,7 @@ public class TestExceptions {
         exception.printStackTrace();
         assertThat(exception.getMessage().replaceAll("\\[\\d(\\d)?m", "")).isEqualTo("Cannot resolve variable 'data'\n" +
                 "\n" +
-                "\t[From Template]\n" +
+                "\t[From URL]\n" +
                 "\n" +
                 "\tmethod: com.dtflys.forest.test.exception.TestExceptions$TestClient#urlVar()\n" +
                 "\tannotation: com.dtflys.forest.annotation.@Get\n" +

@@ -39,6 +39,14 @@ public class MappingTemplate {
     protected final int startReadIndex;
     protected final int endReadIndex;
 
+    public static class CompileContext {
+        boolean allowEmptyBraces = true;
+
+        public CompileContext(boolean allowEmptyBraces) {
+            this.allowEmptyBraces = allowEmptyBraces;
+        }
+    }
+
     private boolean isEnd() {
         return context.readIndex >= endReadIndex - 1;
     }
@@ -111,28 +119,50 @@ public class MappingTemplate {
         return template;
     }
 
-
     public static MappingTemplate create(final String source) {
-        return create(TEMPLATE, source);
+        return create(TEMPLATE, source, true);
+    }
+
+
+    public static MappingTemplate create(final String source, final boolean allowEmptyBrace) {
+        return create(TEMPLATE, source, allowEmptyBrace);
     }
 
     public static MappingTemplate create(final int type, final String source) {
-        return create(type, null, source);
+        return create(type, null, source, true);
+    }
+
+    public static MappingTemplate create(final int type, final String source, final boolean allowEmptyBrace) {
+        return create(type, null, source, allowEmptyBrace);
     }
 
     public static MappingTemplate create(final VariableScope scope, final String source) {
-        return create(TEMPLATE, scope, source);
+        return create(TEMPLATE, scope, source, true);
+    }
+
+    public static MappingTemplate create(final VariableScope scope, final String source, final boolean allowEmptyBrace) {
+        return create(TEMPLATE, scope, source, allowEmptyBrace);
     }
 
     public static MappingTemplate create(final int type, final VariableScope scope, final String source) {
-        return create(type, scope, source, 0, source == null ? 0 : source.length());
+        return create(type, scope, source, true, 0, source == null ? 0 : source.length());
+    }
+
+
+    public static MappingTemplate create(final int type, final VariableScope scope, final String source, final boolean allowEmptyBrace) {
+        return create(type, scope, source, allowEmptyBrace, 0, source == null ? 0 : source.length());
     }
 
     public static MappingTemplate create(final VariableScope scope, final String source, final int startReadIndex, final int endReadIndex) {
-        return create(TEMPLATE, scope, source, startReadIndex, endReadIndex);
+        return create(TEMPLATE, scope, source, true, startReadIndex, endReadIndex);
+    }
+
+
+    public static MappingTemplate create(final VariableScope scope, final String source, final boolean allowEmptyBrace, final int startReadIndex, final int endReadIndex) {
+        return create(TEMPLATE, scope, source, allowEmptyBrace, startReadIndex, endReadIndex);
     }
     
-    public static MappingTemplate create(final int type, final VariableScope scope, final String source, final int startReadIndex, final int endReadIndex) {
+    public static MappingTemplate create(final int type, final VariableScope scope, final String source, final boolean allowEmptyBrace, final int startReadIndex, final int endReadIndex) {
         if (scope instanceof RequestVariableScope) {
             final ForestRequest request = ((RequestVariableScope) scope).asRequest();
             return new MappingTemplate(
@@ -142,6 +172,7 @@ public class MappingTemplate {
                     request.getMethod(),
                     source,
                     request.getMethod().getParameters(),
+                    allowEmptyBrace,
                     startReadIndex,
                     endReadIndex
             );
@@ -153,6 +184,7 @@ public class MappingTemplate {
                     null,
                     source,
                     null,
+                    allowEmptyBrace,
                     startReadIndex,
                     endReadIndex
             );
@@ -160,11 +192,18 @@ public class MappingTemplate {
     }
 
     public MappingTemplate(int type, Class<? extends Annotation> annotationType, String attributeName, ForestMethod<?> forestMethod, String source, MappingParameter[] parameters) {
-        this(type, annotationType, attributeName, forestMethod, source, parameters, 0, source == null ? 0 : source.length());
+        this(type, annotationType, attributeName, forestMethod, source, parameters, true, 0, source == null ? 0 : source.length());
     }
 
+    public MappingTemplate(int type, Class<? extends Annotation> annotationType, String attributeName, ForestMethod<?> forestMethod, String source, boolean allowEmptyBrace, MappingParameter[] parameters) {
+        this(type, annotationType, attributeName, forestMethod, source, parameters, allowEmptyBrace, 0, source == null ? 0 : source.length());
+    }
 
     public MappingTemplate(int type, Class<? extends Annotation> annotationType, String attributeName, ForestMethod<?> forestMethod, String source, MappingParameter[] parameters, int startReadIndex, int endReadIndex) {
+        this(type, annotationType, attributeName, forestMethod, source, parameters, true, startReadIndex, endReadIndex);
+    }
+
+    public MappingTemplate(int type, Class<? extends Annotation> annotationType, String attributeName, ForestMethod<?> forestMethod, String source, MappingParameter[] parameters, boolean allowEmptyBrace, int startReadIndex, int endReadIndex) {
         this.type = type;
         this.annotationType = annotationType;
         this.attributeName = attributeName;
@@ -176,7 +215,7 @@ public class MappingTemplate {
         if (this.source == null) {
             this.source = "";
         }
-        compile();
+        compile(new CompileContext(allowEmptyBrace));
     }
 
     public int getType() {
@@ -198,7 +237,7 @@ public class MappingTemplate {
         this.attributeName = attributeName;
     }
     
-    public void compile() {
+    public void compile(final CompileContext compileContext) {
         context.readIndex = -1 + startReadIndex;
         exprList = new ArrayList<>(8);
         StringBuilder buffer = new StringBuilder();
@@ -218,7 +257,7 @@ public class MappingTemplate {
                         }
 
                         buffer = new StringBuilder();
-                        MappingExpr expr = parseExpression();
+                        MappingExpr expr = parseExpression(compileContext);
                         match('}');
                         if (expr != null) {
                             exprList.add(expr);
@@ -237,7 +276,7 @@ public class MappingTemplate {
                     buffer = new StringBuilder();
                     MappingExpr expr = null;
                     try {
-                        expr = parseExpression();
+                        expr = parseExpression(compileContext);
                     } catch (ForestTemplateSyntaxError th) {
                         exprList.add(new MappingString("{", startIndex, startIndex + 1));
                         context.readIndex = oldIndex;
@@ -321,7 +360,7 @@ public class MappingTemplate {
         return prop;
     }
 
-    public MappingExpr parseExpression() {
+    public MappingExpr parseExpression(final CompileContext compileContext) {
         MappingExpr expr = null;
         int startIndex = context.readIndex + 1;
         while (!isEnd()) {
@@ -339,7 +378,11 @@ public class MappingTemplate {
                         if (startIndex > 1 && watch(0) != '{') {
                             return null;
                         }
-                        return new MappingIndex(this, ++context.argumentIndex, startIndex, context.readIndex + 1);
+                        if (compileContext.allowEmptyBraces) {
+                            return new MappingIndex(this, ++context.argumentIndex, startIndex, context.readIndex + 1);
+                        } else {
+                            return new MappingString("{}", startIndex, context.readIndex + 1);
+                        }
                     }
                     if (expr instanceof MappingInteger) {
                         final int idx = ((MappingInteger) expr).getNumber();
@@ -377,7 +420,7 @@ public class MappingTemplate {
                         expr = parseOptionalDot(expr, startIndex);
                     } else if (ch == '?') {
                         nextChar();
-                        expr = parseElvisExpr(expr, startIndex);
+                        expr = parseElvisExpr(compileContext, expr, startIndex);
                     } else {
                         expr = parseOptionExpr(expr, startIndex);
                     }
@@ -403,7 +446,7 @@ public class MappingTemplate {
                     if (methodName == null || StringUtils.isEmpty(methodName.getName())) {
                         syntaxErrorWatch1(ch);
                     }
-                    expr = parseInvokeParams(expr, methodName);
+                    expr = parseInvokeParams(compileContext, expr, methodName);
                     match(')');
                     break;
                 default:
@@ -440,7 +483,7 @@ public class MappingTemplate {
         return new MappingOptionalDot(this, newExpr, id, startIndex, id.endIndex);
     }
 
-    public MappingElvisExpr parseElvisExpr(final MappingExpr leftExpr, final int startIndex) {
+    public MappingElvisExpr parseElvisExpr(final CompileContext compileContext, final MappingExpr leftExpr, final int startIndex) {
         final MappingExpr newExpr = leftExpr instanceof MappingIdentity ?
                 new MappingReference(
                         this,
@@ -451,7 +494,7 @@ public class MappingTemplate {
         if (newExpr == null) {
             throw new ForestExpressionException("Unexpected token '??'", annotationType, attributeName, forestMethod, this, context.readIndex - 1, context.readIndex + 1);
         }
-        final MappingExpr rightExpr = parseExpression();
+        final MappingExpr rightExpr = parseExpression(compileContext);
         if (rightExpr == null) {
             throw new ForestExpressionException("Unexpected token '??'", annotationType, attributeName, forestMethod, this, context.readIndex - 1, context.readIndex + 1);
         }
@@ -559,12 +602,12 @@ public class MappingTemplate {
     }
 
 
-    public MappingInvoke parseInvokeParams(MappingExpr left, MappingIdentity name) {
-        return parseMethodParams_inner(left, name, new ArrayList<>());
+    public MappingInvoke parseInvokeParams(final CompileContext compileContext, MappingExpr left, MappingIdentity name) {
+        return parseMethodParams_inner(compileContext, left, name, new ArrayList<>());
     }
 
 
-    public MappingInvoke parseMethodParams_inner(MappingExpr left, MappingIdentity name, List<MappingExpr> argExprList) {
+    public MappingInvoke parseMethodParams_inner(final CompileContext compileContext, MappingExpr left, MappingIdentity name, List<MappingExpr> argExprList) {
         skipSpaces();
         char ch = watch(1);
         switch (ch) {
@@ -575,11 +618,11 @@ public class MappingTemplate {
                 return new MappingInvoke(this, left, name, argExprList, left.startIndex, context.readIndex);
             case ',':
                 nextChar();
-                MappingExpr expr = parseExpression();
+                MappingExpr expr = parseExpression(compileContext);
                 argExprList.add(expr);
-                return parseMethodParams_inner(left, name, argExprList);
+                return parseMethodParams_inner(compileContext, left, name, argExprList);
             default:
-                MappingExpr expr2 = parseExpression();
+                MappingExpr expr2 = parseExpression(compileContext);
                 if (expr2 == null) {
                     if (argExprList.isEmpty()) {
                         throwSyntaxError("Expecting some argument expression between '(' and ')'");
@@ -587,7 +630,7 @@ public class MappingTemplate {
                     }
                 } else {
                     argExprList.add(expr2);
-                    return parseMethodParams_inner(left, name, argExprList);
+                    return parseMethodParams_inner(compileContext, left, name, argExprList);
                 }
         }
         throwSyntaxError("Expecting token ')'");
@@ -640,12 +683,18 @@ public class MappingTemplate {
         return null;
     }
 
-    protected String renderExpression(VariableScope scope, ForestJsonConverter jsonConverter, MappingExpr expr, Object[] args) {
+    protected String renderExpression(VariableScope scope, ForestJsonConverter jsonConverter, MappingExpr expr, Object[] args, boolean allowEmptyBraces) {
         Object val = null;
         MappingParameter param = null;
         if (expr instanceof MappingString) {
             return ((MappingString) expr).getText();
         } else if (expr instanceof MappingIndex) {
+            if (!allowEmptyBraces) {
+                final String indexExprText = expr.toTemplateString();
+                if (indexExprText.length() == 2) {
+                    return indexExprText;
+                }
+            }
             Integer index = ((MappingIndex) expr).getIndex();
             if (parameters != null && index < parameters.length) {
                 param = parameters[index];
@@ -673,14 +722,17 @@ public class MappingTemplate {
         return null;
     }
 
-
     public String render(VariableScope scope, Object[] args) {
+        return render(scope, args, true);
+    }
+
+    public String render(VariableScope scope, Object[] args, boolean allowEmptyBrace) {
         final ForestJsonConverter jsonConverter = scope.getConfiguration().getJsonConverter();
         int len = exprList.size();
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < len; i++) {
             MappingExpr expr = exprList.get(i);
-            String val = renderExpression(scope, jsonConverter, expr, args);
+            String val = renderExpression(scope, jsonConverter, expr, args, allowEmptyBrace);
             if (val != null) {
                 builder.append(val);
             }
@@ -759,7 +811,7 @@ public class MappingTemplate {
     @Override
     public MappingTemplate clone() {
         MappingTemplate template = new MappingTemplate(
-                type, annotationType, attributeName, forestMethod, this.source, this.parameters);
+                type, annotationType, attributeName, forestMethod, this.source, this.parameters );
         template.exprList = this.exprList;
         return template;
     }

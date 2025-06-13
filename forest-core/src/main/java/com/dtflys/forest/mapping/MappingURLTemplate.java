@@ -84,6 +84,10 @@ public class MappingURLTemplate extends MappingTemplate {
     }
 
     public ForestURL render(ForestURL url, VariableScope scope, Object[] args, ForestQueryMap queries) {
+        return render(url, scope, args, queries, true);
+    }
+
+    public ForestURL render(ForestURL url, VariableScope scope, Object[] args, ForestQueryMap queries, boolean allowEmptyBrace) {
         String scheme = null;
         StringBuilder userInfo = null;
         String host = null;
@@ -101,7 +105,7 @@ public class MappingURLTemplate extends MappingTemplate {
         SimpleQueryParameter lastQuery  = null;
         for (int i = 0; i < len; i++) {
             MappingExpr expr = exprList.get(i);
-            String exprVal = String.valueOf(renderExpression(scope, jsonConverter, expr, args));
+            String exprVal = String.valueOf(renderExpression(scope, jsonConverter, expr, args, allowEmptyBrace));
             builder.append(exprVal);
             if (renderedQuery) {
                 // 已渲染到查询参数
