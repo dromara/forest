@@ -240,15 +240,17 @@ public class MappingTemplate {
     
     public void compile(final CompileContext compileContext) {
         context.readIndex = -1 + startReadIndex;
-        exprList = new ArrayList<>(8);
-        StringBuilder buffer = new StringBuilder();
+        exprList = new LinkedList<>();
+        final StringBuilder buffer = new StringBuilder();
         int startIndex = context.readIndex;
-
+        boolean skip;
+        
         while (!isEnd()) {
-            char ch = nextChar();
+            skip = false;
+            final char ch = nextChar();
             switch (ch) {
                 case '$': {
-                    char ch1 = watch(1);
+                    final char ch1 = watch(1);
                     if (ch1 == '{') {
                         nextChar();
                         if (buffer.length() > 0) {
@@ -257,8 +259,8 @@ public class MappingTemplate {
                             exprList.add(str);
                         }
 
-                        buffer = new StringBuilder();
-                        MappingExpr expr = parseExpression(compileContext);
+                        buffer.setLength(0);
+                        final MappingExpr expr = parseExpression(compileContext);
                         match('}');
                         if (expr != null) {
                             exprList.add(expr);
@@ -269,12 +271,12 @@ public class MappingTemplate {
                 }
                 case '{': {
                     if (buffer.length() > 0) {
-                        MappingString str = new MappingString(buffer.toString(), startIndex, startIndex + buffer.length());
+                        final MappingString str = new MappingString(buffer.toString(), startIndex, startIndex + buffer.length());
                         startIndex = context.readIndex;
                         exprList.add(str);
                     }
-                    int oldIndex = context.readIndex;
-                    buffer = new StringBuilder();
+                    final int oldIndex = context.readIndex;
+                    buffer.setLength(0);
                     MappingExpr expr = null;
                     try {
                         expr = parseExpression(compileContext);
@@ -300,7 +302,7 @@ public class MappingTemplate {
                             startIndex = context.readIndex;
                             exprList.add(str);
                         }
-                        buffer = new StringBuilder();
+                        buffer.setLength(0);
                         MappingExpr expr = parseProperty();
                         match('}');
                         if (expr != null) {
@@ -312,15 +314,22 @@ public class MappingTemplate {
                 }
                 case '\\': {
                     char nc = watch(1);
-                    if (nc == '$' || nc == '{') {
-                        ch = nextChar();
-                        buffer.append(ch);
-                    } else {
-                        buffer.append(ch);
+                    switch (nc) {
+                        case '$':
+                        case '{':
+                        case '}':
+                            buffer.append(nc);
+                            nextChar();
+                            skip = true;
+                            break;
+                        default:
+                            buffer.append(ch);
                     }
                 }
             }
-            buffer.append(ch);
+            if (!skip) {
+                buffer.append(ch);
+            }
         }
 
         if (buffer.length() > 0) {
@@ -536,7 +545,7 @@ public class MappingTemplate {
 
     public MappingProperty parsePropertyName() {
         char ch = watch(1);
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         if (Character.isAlphabetic(ch) || ch == '_' || ch == '-') {
             do {
                 builder.append(ch);
@@ -559,7 +568,7 @@ public class MappingTemplate {
     public MappingExpr parseTextToken() {
         char ch = watch(1);
         int startIndex = context.readIndex + 1;
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         if (Character.isAlphabetic(ch) || ch == '_') {
             do {
                 builder.append(ch);
@@ -597,7 +606,7 @@ public class MappingTemplate {
 
 
     public MappingExpr parseString(char quoteChar, boolean isTemplateString) {
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         char ch = watch(1);
         int startIndex = context.readIndex + 1;
         while (ch != quoteChar && !isEnd()) {
@@ -653,7 +662,7 @@ public class MappingTemplate {
     public MappingExpr parseLiteral() {
         char ch = watch(1);
         if (Character.isDigit(ch)) {
-            StringBuilder builder = new StringBuilder();
+            final StringBuilder builder = new StringBuilder();
             do {
                 builder.append(ch);
                 nextChar();
@@ -740,7 +749,7 @@ public class MappingTemplate {
     public String render(VariableScope scope, Object[] args, boolean allowEmptyBrace) {
         final ForestJsonConverter jsonConverter = scope.getConfiguration().getJsonConverter();
         int len = exprList.size();
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         for (int i = 0; i < len; i++) {
             MappingExpr expr = exprList.get(i);
             String val = renderExpression(scope, jsonConverter, expr, args, allowEmptyBrace);
@@ -769,7 +778,7 @@ public class MappingTemplate {
         if (collection.isEmpty()) {
             return null;
         }
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         for (Iterator iterator = collection.iterator(); iterator.hasNext(); ) {
             Object item = iterator.next();
             builder.append(item);
@@ -782,7 +791,7 @@ public class MappingTemplate {
 
 
     private static String getFormArrayValueString(Object array) {
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         int len = Array.getLength(array);
         if (len == 0) {
             return null;
@@ -833,7 +842,7 @@ public class MappingTemplate {
 
     @Override
     public String toString() {
-        StringBuilder buff = new StringBuilder();
+        final StringBuilder buff = new StringBuilder();
         for (MappingExpr expr : exprList) {
             buff.append(expr.toString());
         }
