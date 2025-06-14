@@ -28,6 +28,9 @@ public class MappingUrlEncodedExpr extends MappingExpr {
         if (ret == null) {
             return null;
         }
+        if (ret instanceof MappingValue) {
+            return ret;
+        }
         String str = String.valueOf(ret);
         return str;
     }

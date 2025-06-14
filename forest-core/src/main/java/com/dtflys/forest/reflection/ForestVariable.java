@@ -3,6 +3,8 @@ package com.dtflys.forest.reflection;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.RequestVariableScope;
+import com.dtflys.forest.mapping.MappingTemplate;
+import com.dtflys.forest.mapping.MappingValue;
 
 @FunctionalInterface
 public interface ForestVariable {
@@ -22,7 +24,13 @@ public interface ForestVariable {
         return (R) value;
     }
 
-    default  Object getValueFromScope(VariableScope scope) {
+    default  Object getValueFromScope(VariableScope scope, boolean deepReference) {
+        if (!deepReference && this instanceof TemplateVariable) {
+            final MappingTemplate template = ((TemplateVariable) this).getTemplate();
+            if (template != null) {
+                return MappingValue.rendered(template.getSource());
+            }
+        }
         if (scope instanceof RequestVariableScope) {
             return getValue(((RequestVariableScope) scope).asRequest());
         }

@@ -76,7 +76,7 @@ public abstract class MappingExpr {
                     return str;
                 }
                 try {
-                    return TemplateUtils.readString(str, scope, args, false);
+                    return MappingValue.rendered(TemplateUtils.readString(str, scope, args, false));
                 } catch (Throwable th) {
                     throwReferenceException(expr, str, th);
                 }
@@ -84,7 +84,7 @@ public abstract class MappingExpr {
             if (obj instanceof MappingTemplate) {
                 final MappingTemplate template = (MappingTemplate) obj;
                 try {
-                    return template.render(scope, args, false);
+                    return MappingValue.rendered(template.render(scope, args, false));
                 } catch (Throwable th) {
                     throwReferenceException(expr, template.getSource(), th);
                 }

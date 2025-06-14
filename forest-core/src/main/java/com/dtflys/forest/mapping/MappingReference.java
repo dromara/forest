@@ -1,7 +1,6 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
-import com.dtflys.forest.exceptions.ForestReferenceException;
 import com.dtflys.forest.http.RequestVariableScope;
 import com.dtflys.forest.reflection.ForestArgumentsVariable;
 import com.dtflys.forest.reflection.ForestVariable;
@@ -22,6 +21,11 @@ public class MappingReference extends MappingExpr {
     static {
         ITERATE_VARS.add("_index");
         ITERATE_VARS.add("_key");
+    }
+    
+    public MappingReference(MappingTemplate source, MappingIdentity identity) {
+        this(source, identity.getName(), identity.getStartIndex(), identity.getEndIndex());
+        this.deepReference = identity.deepReference;
     }
 
     public MappingReference(MappingTemplate source, String name, int startIndex, int endIndex) {
@@ -53,13 +57,13 @@ public class MappingReference extends MappingExpr {
                                 this, scope, args);
                     }
                 }
-                return checkDeepReference(variable.getValueFromScope(scope), this, scope, args);
+                return variable.getValueFromScope(scope, deepReference);
             } catch (Throwable th) {
                 throwReferenceException(this, th);
             }
         }
         if (optional) {
-            return MappingEmpty.OPTIONAL;
+            return MappingValue.EMPTY;
         }
         throwVariableUndefinedException(name);
         return null;

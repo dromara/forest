@@ -107,7 +107,7 @@ public class MappingDot extends MappingExpr {
             throwExpressionNulException(left.toTemplateString(), right, new NullPointerException());
             return null;
         }
-        if (obj == MappingEmpty.OPTIONAL) {
+        if (obj == MappingValue.EMPTY) {
             return obj;
         }
         return checkDeepReference(renderRight(obj), this, scope, args);

@@ -12,6 +12,7 @@ import com.dtflys.forest.utils.URLUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
+import java.lang.reflect.Parameter;
 import java.util.*;
 
 /**
@@ -390,7 +391,7 @@ public class MappingTemplate {
                         return new MappingIndex(this, context.argumentIndex, startIndex, context.readIndex + 1);
                     }
                     if (expr instanceof MappingIdentity) {
-                        return new MappingReference(this, ((MappingIdentity) expr).getName(), expr.startIndex, expr.endIndex);
+                        return new MappingReference(this, (MappingIdentity) expr);
                     }
                     return expr;
                 case '\'':
@@ -421,8 +422,18 @@ public class MappingTemplate {
                     } else if (ch == '?') {
                         nextChar();
                         expr = parseElvisExpr(compileContext, expr, startIndex);
-                    } else {
+                    } else if (expr != null) {
                         expr = parseOptionExpr(expr, startIndex);
+                    } else {
+                        syntaxErrorWatch1(ch);
+                    }
+                    break;
+                case '!':
+                    nextChar();
+                    if (expr != null) {
+                        expr.deepReference = false;
+                    } else {
+                        syntaxErrorWatch1(ch);
                     }
                     break;
                 case '.':
@@ -514,7 +525,7 @@ public class MappingTemplate {
         }
         return newExpr;
     }
-
+    
 
     public MappingIdentity parseIdentity() {
         MappingExpr expr = parseTextToken();

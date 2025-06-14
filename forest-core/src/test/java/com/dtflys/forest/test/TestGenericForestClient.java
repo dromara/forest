@@ -884,6 +884,38 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertPathEquals("/test/null");
     }
 
+    @Test
+    public void testRequest_template_in_url6() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config()
+                .removeVariable("foo")
+                .setVariable("testVar3", "aaa{foo}")
+                .setVariable("testVar2", "ok: {testVar3}")
+                .setVariable("testVar1", "{testVar2}");
+        Forest.get("/test/{testVar1!}")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .execute();
+        mockRequest(server)
+                .assertPathEquals(URLEncoder.PATH.encode("/test/{testVar2}", "UTF-8"));
+    }
+
+
+    @Test
+    public void testRequest_template_in_url7() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config()
+                .removeVariable("foo")
+                .setVariable("testVar3", "aaa{foo}")
+                .setVariable("testVar2", "ok: {testVar3!}")
+                .setVariable("testVar1", "{testVar2}");
+        Forest.get("/test/{testVar1}")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .execute();
+        mockRequest(server)
+                .assertPathEquals(URLEncoder.PATH.encode("/test/ok: aaa{foo}", "UTF-8"));
+    }
 
 
     @Test

@@ -61,7 +61,6 @@ import com.dtflys.forest.interceptor.InterceptorFactory;
 import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.ForestLogger;
-import com.dtflys.forest.mapping.MappingEmpty;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.pool.FixedRequestPool;
 import com.dtflys.forest.pool.ForestRequestPool;

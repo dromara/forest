@@ -11,8 +11,8 @@ public class MappingOptionalDot extends MappingDot {
     @Override
     public Object render(VariableScope scope, Object[] args) {
         Object obj = left.render(scope, args);
-        if (obj == null || obj == MappingEmpty.OPTIONAL) {
-            return MappingEmpty.OPTIONAL;
+        if (obj == null || obj == MappingValue.EMPTY) {
+            return MappingValue.EMPTY;
         }
         return checkDeepReference(renderRight(obj), this, scope, args);
     }

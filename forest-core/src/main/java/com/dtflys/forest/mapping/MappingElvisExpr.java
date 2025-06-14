@@ -23,7 +23,7 @@ public class MappingElvisExpr extends MappingExpr {
     @Override
     public Object render(VariableScope scope, Object[] args) {
         Object obj = left.render(scope, args);
-        if (obj == null || obj instanceof MappingEmpty) {
+        if (obj == null || obj instanceof MappingValue) {
             return right.render(scope, args);
         }
         return obj;
