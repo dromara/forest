@@ -37,7 +37,7 @@ public class TestResponseFactory {
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(200);
         assertThat(response.getContent()).isEqualTo("");
-        assertThat(response.getResult()).isEqualTo("");
+        assertThat(response.get(String.class)).isNull();
     }
 
 }

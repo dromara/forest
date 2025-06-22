@@ -25,7 +25,7 @@ public class HttpBackendSelector {
 
     private final static String HTTPCLIENT_BACKEND_NAME = "httpclient";
     private final static String OKHTTP3_BACKEND_NAME = "okhttp3";
-
+    
     public final static String HTTPCLIENT_CLIENT_CLASS_NAME = "org.apache.http.client.HttpClient";
     public final static String OKHTTP3_CLIENT_CLASS_NAME = "okhttp3.OkHttpClient";
     private final static String HTTPCLIENT_BACKEND_CLASS_NAME = "com.dtflys.forest.backend.httpclient.HttpclientBackend";
@@ -55,7 +55,7 @@ public class HttpBackendSelector {
      */
     public HttpBackend select(ForestConfiguration configuration) {
         final String backendName = configuration.getBackendName();
-        return select(backendName);
+        return select(backendName, configuration);
     }
 
     /**
@@ -64,7 +64,7 @@ public class HttpBackendSelector {
      * @param backendName Forest后端框架名称，如：httpclient, okhttp3
      * @return Forest后端框架
      */
-    public HttpBackend select(String backendName) {
+    public HttpBackend select(String backendName, ForestConfiguration configuration) {
         HttpBackend backend = StringUtils.isNotEmpty(backendName) ? BACKEND_MAP.get(backendName) : null;
         if (backend == null) {
             synchronized (this) {
@@ -79,18 +79,21 @@ public class HttpBackendSelector {
                         }
                         backend = backendCreator.create();
                         if (backend != null) {
+                            backend.init(configuration);
                             BACKEND_MAP.put(backendName, backend);
                             return backend;
                         }
                     }
-                    backend = findOkHttp3BackendInstance();
-                    if (backend != null) {
-                        BACKEND_MAP.put(OKHTTP3_BACKEND_NAME, backend);
-                        return backend;
-                    }
+                    // 先找 Httpclient
                     backend = findHttpclientBackendInstance();
                     if (backend != null) {
                         BACKEND_MAP.put(HTTPCLIENT_BACKEND_NAME, backend);
+                        return backend;
+                    }
+                    // 再找 Okhttp3
+                    backend = findOkHttp3BackendInstance();
+                    if (backend != null) {
+                        BACKEND_MAP.put(OKHTTP3_BACKEND_NAME, backend);
                         return backend;
                     }
                     throw new ForestRuntimeException("Http Backed is undefined.");

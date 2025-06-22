@@ -1,11 +1,8 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
-import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
-import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.RequestVariableScope;
 import com.dtflys.forest.reflection.ForestArgumentsVariable;
-import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.ForestVariable;
 import com.dtflys.forest.utils.StringUtils;
 
@@ -17,18 +14,28 @@ import java.util.Set;
  */
 public class MappingReference extends MappingExpr {
 
-    private String name;
+    final boolean optional;
+    private final String name;
 
     private final static Set<String> ITERATE_VARS = new HashSet<>();
     static {
         ITERATE_VARS.add("_index");
         ITERATE_VARS.add("_key");
     }
+    
+    public MappingReference(MappingTemplate source, MappingIdentity identity) {
+        this(source, identity.getName(), identity.getStartIndex(), identity.getEndIndex());
+        this.deepReference = identity.deepReference;
+    }
 
+    public MappingReference(MappingTemplate source, String name, int startIndex, int endIndex) {
+        this(source, name, false, startIndex, endIndex);
+    }
 
-    public MappingReference(ForestMethod<?> forestMethod, String name, int startIndex, int endIndex) {
-        super(forestMethod, Token.REF);
+    public MappingReference(MappingTemplate source, String name, boolean optional, int startIndex, int endIndex) {
+        super(source, Token.REF);
         this.name = name;
+        this.optional = optional;
         setIndexRange(startIndex, endIndex);
     }
 
@@ -43,14 +50,23 @@ public class MappingReference extends MappingExpr {
             variable = scope.getVariable(name);
         }
         if (variable != null) {
-            if (variable instanceof ForestArgumentsVariable) {
-                if (scope instanceof RequestVariableScope) {
-                    return ((ForestArgumentsVariable) variable).getValueFromScope(scope, args);
+            try {
+                if (variable instanceof ForestArgumentsVariable) {
+                    if (scope instanceof RequestVariableScope) {
+                        return checkDeepReference(((ForestArgumentsVariable) variable).getValueFromScope(scope, args),
+                                this, scope, args);
+                    }
                 }
+                return variable.getValueFromScope(scope, deepReference);
+            } catch (Throwable th) {
+                throwReferenceException(this, th);
             }
-            return variable.getValueFromScope(scope);
         }
-        throw new ForestVariableUndefinedException(name, startIndex, endIndex);
+        if (optional) {
+            return MappingValue.EMPTY;
+        }
+        throwVariableUndefinedException(name);
+        return null;
     }
 
     @Override
@@ -64,8 +80,10 @@ public class MappingReference extends MappingExpr {
         return false;
     }
 
+
     @Override
     public String toString() {
         return "[Refer: " + name + "]";
     }
+
 }

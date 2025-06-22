@@ -8,6 +8,7 @@ import com.dtflys.forest.converter.text.DefaultTextConverter;
 import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestBody;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
@@ -54,7 +55,7 @@ public abstract class AbstractBodyBuilder<T> implements BodyBuilder<T> {
                 !reqBody.isEmpty() ||
                 !request.getMultiparts().isEmpty();
 
-        if (needRequestBody) {
+        if (needRequestBody && !reqBody.isEmpty()) {
             ForestDataType bodyType = request.bodyType();
             if (bodyType == null || bodyType == ForestDataType.AUTO) {
                 if (request.getContentType() == null) {

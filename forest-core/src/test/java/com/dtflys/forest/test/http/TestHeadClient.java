@@ -49,7 +49,7 @@ public class TestHeadClient extends BaseClientTest {
 
 
     @Test
-    public void testHeadHelloUser() throws InterruptedException {
+    public void testHeadHelloUser() {
         server.enqueue(new MockResponse().setBody("ok"));
         headClient.headHelloUser();
         mockRequest(server)
@@ -63,7 +63,7 @@ public class TestHeadClient extends BaseClientTest {
     }
 
     @Test
-    public void testHeadHelloUser2() throws InterruptedException {
+    public void testHeadHelloUser2() {
         server.enqueue(new MockResponse().setBody("ok"));
         headClient.headHelloUser("text/plain", "11111111");
         mockRequest(server)
@@ -77,7 +77,7 @@ public class TestHeadClient extends BaseClientTest {
     }
 
     @Test
-    public void testHeadHelloUser_lazy() throws InterruptedException {
+    public void testHeadHelloUser_lazy() {
         server.enqueue(new MockResponse().setBody("ok"));
         headClient.headHelloUser_Lazy("text/plain", req -> "11111111");
         mockRequest(server)
@@ -92,7 +92,7 @@ public class TestHeadClient extends BaseClientTest {
 
 
     @Test
-    public void testHeadHelloUser2WithDefaultHeaders() throws InterruptedException {
+    public void testHeadHelloUser2WithDefaultHeaders() {
         server.enqueue(new MockResponse().setBody("ok"));
         headClient.headHelloUserWithDefaultHeaders(null, null);
         mockRequest(server)
@@ -106,12 +106,11 @@ public class TestHeadClient extends BaseClientTest {
     }
 
     @Test
-    public void testSimpleHead() throws InterruptedException {
+    public void testSimpleHead() {
         server.enqueue(new MockResponse().setBody("ok"));
         accessTokenLocal.set("11111111");
         assertThat(headClient.simpleHead(accessTokenLocal.get(), "testquery:dsds", "testquery2: dsds"))
-            .isNotNull()
-            .isEqualTo("");
+            .isNull();
         mockRequest(server)
                 .assertMethodEquals("HEAD")
                 .assertPathEquals("/hello/user")
@@ -123,7 +122,7 @@ public class TestHeadClient extends BaseClientTest {
     }
 
     @Test
-    public void testSimpleHead2() throws InterruptedException {
+    public void testSimpleHead2() {
         server.enqueue(new MockResponse().setBody("ok"));
         headClient.simpleHead2();
         mockRequest(server)
@@ -137,7 +136,7 @@ public class TestHeadClient extends BaseClientTest {
     }
 
     @Test
-    public void testSimpleHead3() throws InterruptedException {
+    public void testSimpleHead3() {
         server.enqueue(new MockResponse().setBody("ok"));
         headClient.simpleHead3();
         mockRequest(server)
@@ -152,7 +151,7 @@ public class TestHeadClient extends BaseClientTest {
 
 
     @Test
-    public void testHeadHelloUser3() throws InterruptedException {
+    public void testHeadHelloUser3() {
         server.enqueue(new MockResponse().setBody("ok"));
         accessTokenLocal.set("11111111");
         Map<String, Object> headers = new HashMap<>();
@@ -172,7 +171,7 @@ public class TestHeadClient extends BaseClientTest {
     }
 
     @Test
-    public void testHeadHelloUser4() throws InterruptedException {
+    public void testHeadHelloUser4() {
         server.enqueue(new MockResponse().setBody("ok"));
         TestHeaders headers = new TestHeaders();
         headers.setAccept("text/plain");
@@ -192,7 +191,7 @@ public class TestHeadClient extends BaseClientTest {
 
 
    @Test
-    public void testResponseHead() throws InterruptedException {
+    public void testResponseHead() {
         server.enqueue(new MockResponse()
                 .setHeader("server", "mock server")
                 .setHeader("Content-Length", "0"));

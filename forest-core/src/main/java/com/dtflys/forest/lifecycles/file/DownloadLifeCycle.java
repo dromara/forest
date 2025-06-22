@@ -49,7 +49,8 @@ public class DownloadLifeCycle implements MethodAnnotationLifeCycle<DownloadFile
 
     @Override
     public boolean beforeExecute(ForestRequest request) {
-        if (request.getMethod().getMethod().getDeclaringClass() == ForestGenericClient.class) {
+        final ForestMethod<?> forestMethod = request.getMethod();
+        if (forestMethod == null) {
             final Type resultType = getResultType(request.getLifeCycleHandler().getResultType());
             addAttribute(request, "__resultType", resultType);
             request.setDownloadFile(true);

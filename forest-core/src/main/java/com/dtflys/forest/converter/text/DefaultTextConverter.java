@@ -1,5 +1,6 @@
 package com.dtflys.forest.converter.text;
 
+import cn.hutool.core.util.StrUtil;
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.converter.ForestEncoder;
@@ -56,6 +57,10 @@ public class DefaultTextConverter implements ForestConverter<String>, ForestEnco
         if (charset == null) {
             charset = StandardCharsets.UTF_8;
         }
+        if (body.size() == 1) {
+            final String strBody = body.get(0).toString();
+            return strBody.getBytes(charset);
+        }
         final StringBuilder builder = new StringBuilder();
         ForestRequestBody lastBodyItem = null;
         for (ForestRequestBody bodyItem : body) {
@@ -66,7 +71,6 @@ public class DefaultTextConverter implements ForestConverter<String>, ForestEnco
             lastBodyItem = bodyItem;
         }
         final String strBody = builder.toString();
-        final byte[] bytes = strBody.getBytes(charset);
-        return bytes;
+        return strBody.getBytes(charset);
     }
 }

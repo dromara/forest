@@ -1,5 +1,8 @@
 package com.dtflys.forest.exceptions;
 
+import com.dtflys.forest.ForestGenericClient;
+import com.dtflys.forest.mapping.ForestExpressionException;
+import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.ANSIUtil;
 import com.dtflys.forest.utils.StringUtils;
@@ -9,12 +12,61 @@ import java.lang.reflect.Method;
 
 public abstract class MappingExceptionUtil {
 
-    public static String errorMessage(String message, Class<? extends Annotation> annotationType, String attributeName, ForestMethod forestMethod, String source, int startIndex, int endIndex) {
+    private static String sourceType(MappingTemplate template) {
+        switch (template.getType()) {
+            case MappingTemplate.TEMPLATE:
+            case MappingTemplate.METHOD_TEMPLATE:
+                return "Template";
+            case MappingTemplate.URL:
+            case MappingTemplate.METHOD_URL:
+                return "URL";
+            case MappingTemplate.GLOBAL_VARIABLE:
+                return "Global Variable";
+            case MappingTemplate.METHOD_VARIABLE:
+                return "Method Variable";
+            case MappingTemplate.REQUEST_VARIABLE:
+                return "Request Variable";
+            default:
+                return "Template";
+        }
+    }
+
+    private static String attributeType(MappingTemplate template) {
+        switch (template.getType()) {
+            case MappingTemplate.GLOBAL_VARIABLE:
+            case MappingTemplate.METHOD_VARIABLE:
+            case MappingTemplate.REQUEST_VARIABLE:
+                return "variable";
+            default:
+                return "attribute";
+        }
+    }
+
+    private static boolean isVariable(MappingTemplate template) {
+        switch (template.getType()) {
+            case MappingTemplate.GLOBAL_VARIABLE:
+            case MappingTemplate.METHOD_VARIABLE:
+            case MappingTemplate.REQUEST_VARIABLE:
+                return true;
+            default:
+                return false;
+        }
+
+    }
+
+    public static String errorMessage(String message, Class<? extends Annotation> annotationType, String attributeName, ForestMethod forestMethod, MappingTemplate template, int startIndex, int endIndex, Throwable cause) {
         StringBuilder builder = new StringBuilder();
         builder.append(message);
+
+        if (cause != null) {
+            builder.append(". Caused by: ").append(cause.getMessage());
+        }
+
+        final String source = template.getSource();
+
         if (StringUtils.isNotBlank(source)) {
-            builder.append("\n\n\t").append(ANSIUtil.colorPurple("[From Template]")).append("\n\n\t");
-            if (forestMethod != null) {
+            builder.append("\n\n\t").append(ANSIUtil.colorPurple("[From " + sourceType(template) + "]")).append("\n\n\t");
+            if (forestMethod != null && ForestGenericClient.class != forestMethod.getMethod().getDeclaringClass()) {
                 Method method = forestMethod.getMethod();
                 String typeName = method.getDeclaringClass().getTypeName();
                 String methodName = method.getName();
@@ -53,11 +105,11 @@ public abstract class MappingExceptionUtil {
             }
             if (attributeName != null) {
                 StringBuilder attrBuilder = new StringBuilder();
-                attrBuilder.append(ANSIUtil.colorPurple("attribute:"))
+                attrBuilder.append(ANSIUtil.colorPurple(attributeType(template) + ":"))
                         .append(' ')
                         .append(ANSIUtil.COLOR_BLUE)
                         .append(attributeName)
-                        .append(" = ")
+                        .append(isVariable(template) ? " -> " : " = ")
                         .append(ANSIUtil.COLOR_END);
                 int spaceCount = ("attribute: " + attributeName + " = \"").length();
                 attrBuilder.append(ANSIUtil.colorGreen("\"" + source + "\"")).append("\n");
@@ -66,15 +118,18 @@ public abstract class MappingExceptionUtil {
                 }
                 builder.append(attrBuilder);
             } else {
-                builder.append(ANSIUtil.colorPurple("template:")).append(' ');
+                builder.append(ANSIUtil.colorPurple("source:")).append(' ');
                 builder.append(ANSIUtil.colorGreen(source));
-                int spaceCount = "template: ".length();
+                int spaceCount = "source: ".length();
                 builder.append("\n");
                 if (startIndex != -1 && endIndex != -1) {
                     builder.append(errorLine(message, spaceCount, startIndex, endIndex));
                 }
             }
+
         }
+
+
         return builder.toString();
     }
 

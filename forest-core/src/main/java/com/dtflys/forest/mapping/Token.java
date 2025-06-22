@@ -64,14 +64,24 @@ public enum  Token {
     DOT(10, "DOT"),
 
     /**
+     * 空安全点操作标记
+     */
+    OPTIONAL_DOT(11, "OPTIONAL_DOT"),
+
+    /**
+     * Elvis操作标记
+     */
+    ELVIS(12, "ELVIS"),
+
+    /**
      * 变量引用标记
      */
-    REF(11, "REF"),
+    REF(13, "REF"),
 
     /**
      * property配置属性
      */
-    PROP(12, "PROP")
+    PROP(14, "PROP")
 
     ;
 

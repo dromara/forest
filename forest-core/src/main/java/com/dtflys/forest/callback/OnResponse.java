@@ -48,6 +48,6 @@ public interface OnResponse {
      * @return 请求响应结果: {@link ResponseSuccess} 或 {@link ResponseSuccess} 实例
      * @since 1.6.0
      */
-    ResponseResult onResponse(ForestRequest req, ForestResponse res);
+    ResponseResult onResponse(ForestRequest req, ForestResponse<?> res);
 
 }

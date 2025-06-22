@@ -75,6 +75,7 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
         ForestResponseFactory forestResponseFactory = new HttpclientForestResponseFactory();
         try {
             logRequest(request.getCurrentRetryCount(), (HttpRequestBase) httpRequest, client);
+            request.pool().awaitRequest(request);
             httpResponse = client.execute(httpRequest, httpClientContext);
         } catch (Throwable e) {
             response = forestResponseFactory.createResponse(request, httpResponse, lifeCycleHandler, e, startDate);
@@ -137,6 +138,10 @@ public class SyncHttpclientRequestSender extends AbstractHttpclientRequestSender
             }
             else {
                 throw new ForestRuntimeException(ex);
+            }
+        } finally {
+            if (response.isAutoClosable() && !request.isReceiveStream()) {
+                response.close();
             }
         }
     }

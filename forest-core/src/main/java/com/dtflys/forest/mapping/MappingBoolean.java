@@ -13,8 +13,8 @@ public class MappingBoolean extends MappingExpr {
 
     private boolean value;
 
-    protected MappingBoolean(boolean value, int startIndex, int endIndex) {
-        super(null, Token.BOOLEAN);
+    protected MappingBoolean(MappingTemplate source, boolean value, int startIndex, int endIndex) {
+        super(source, Token.BOOLEAN);
         this.value = value;
         setIndexRange(startIndex, endIndex);
     }

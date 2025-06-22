@@ -14,8 +14,10 @@ import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
+import com.google.protobuf.ByteString;
 import okhttp3.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
@@ -24,12 +26,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
  * @since 2018-02-27 18:18
  */
 public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
+
+    private final static Map<String, MediaType> MEDIA_TYPE_CACHE = new ConcurrentHashMap<>();
 
     @Override
     protected void setStringBody(Request.Builder builder, ForestRequest request, String text, String charset, String contentType, boolean mergeCharset) {
@@ -161,13 +166,13 @@ public class OkHttp3BodyBuilder extends AbstractBodyBuilder<Request.Builder> {
             final String contentType,
             final byte[] bytes,
             boolean mergeCharset) {
-        final String ctype = StringUtils.isBlank(contentType) ? ContentType.APPLICATION_OCTET_STREAM : contentType;
-        MediaType mediaType = MediaType.parse(ctype);
+        final String ctype = StringUtils.isEmpty(contentType) ? ContentType.APPLICATION_OCTET_STREAM : contentType;
+        MediaType mediaType = MEDIA_TYPE_CACHE.computeIfAbsent(ctype, key -> MediaType.parse(ctype));
         final Charset mtcs = mediaType.charset();
-        if (mtcs == null) {
-            if (charset != null && mergeCharset) {
-                mediaType = MediaType.parse(ctype + ";charset=" + charset);
-            }
+        if (mtcs == null && charset != null && mergeCharset) {
+            final String newCType = ctype + ";charset=" + charset;
+            mediaType = MEDIA_TYPE_CACHE.computeIfAbsent(newCType,
+                    key -> MediaType.parse(newCType));
         }
         final RequestBody body = RequestBody.create(mediaType, bytes);
         builder.method(request.getType().getName(), body);

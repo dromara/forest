@@ -12,8 +12,8 @@ public class MappingIdentity extends MappingExpr {
 
     private String name;
 
-    public MappingIdentity(String name, int startIndex, int endIndex) {
-        super(null, Token.ID);
+    public MappingIdentity(MappingTemplate source, String name, int startIndex, int endIndex) {
+        super(source, Token.ID);
         this.name = name;
         setIndexRange(startIndex, endIndex);
     }

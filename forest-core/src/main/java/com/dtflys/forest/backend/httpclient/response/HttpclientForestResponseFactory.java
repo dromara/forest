@@ -4,9 +4,15 @@ import com.dtflys.forest.handler.LifeCycleHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestResponseFactory;
+import com.dtflys.forest.http.Res;
+import com.dtflys.forest.http.UnclosedResponse;
+import com.dtflys.forest.utils.ReflectUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 
+import java.io.InputStream;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Date;
 
 /**
@@ -29,10 +35,13 @@ public class HttpclientForestResponseFactory implements ForestResponseFactory<Ht
                 entity = new HttpclientEntity(request, entity, lifeCycleHandler);
             }
         }
-        final HttpclientForestResponse response = new HttpclientForestResponse(request, httpResponse, entity, requestTime, new Date());
+        final HttpclientForestResponse response = isUnclosedResponse(request, lifeCycleHandler) ?
+                new HttpclientUnclosedResponse(request, httpResponse, entity, requestTime, new Date()) :
+                new HttpclientForestResponse(request, httpResponse, entity, requestTime, new Date());
         this.resultResponse = response;
         response.setException(exception);
         return response;
     }
+    
 
 }

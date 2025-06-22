@@ -3,6 +3,7 @@ package com.dtflys.forest.backend.okhttp3.response;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.GzipUtils;
 import com.dtflys.forest.utils.ReflectUtils;
@@ -15,6 +16,7 @@ import okhttp3.ResponseBody;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.SocketTimeoutException;
 import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.List;
@@ -29,33 +31,45 @@ public class OkHttp3ForestResponse extends ForestResponse {
     private final Response okResponse;
 
     private final ResponseBody body;
-
+    
+    
     /**
      * 内容字节数组
      */
-    private byte[] bytes;
+    private volatile byte[] bytes;
 
     public OkHttp3ForestResponse(ForestRequest request, Response okResponse, Date requestTime, Date responseTime) {
-        super(request, requestTime, responseTime);
+        this(request, okResponse, requestTime, responseTime, true);
+    }
+
+    protected OkHttp3ForestResponse(ForestRequest request, Response okResponse, Date requestTime, Date responseTime, boolean autoClosable) {
+        super(request, requestTime, responseTime, autoClosable);
         this.okResponse = okResponse;
         if (okResponse == null) {
             this.body = null;
             this.statusCode = null;
             return;
         }
-
-        this.body = okResponse.body();
+        final ForestRequestType type = request.type();
+        if (ForestRequestType.HEAD != type) {
+            this.body = okResponse.body();
+        } else {
+            this.body = null;
+        }
+        
         this.statusCode = okResponse.code();
         this.reasonPhrase = okResponse.message();
         setupHeaders();
         setupContentEncoding();
+        setupContentTypeAndCharset();
         // 判断是否将Response数据按GZIP来解压
         setupGzip();
+        if (autoClosable && !request.isReceiveStream()) {
+            readContentAsString();
+        }
         if (body == null) {
             return;
         }
-        setupContentTypeAndCharset();
-        setupContent();
         this.contentLength = body.contentLength();
     }
 
@@ -85,6 +99,14 @@ public class OkHttp3ForestResponse extends ForestResponse {
         } else {
             this.content = readContentAsString();
         }
+    }
+
+    @Override
+    public String getContent() {
+        if (content == null) {
+            setupContent();
+        }
+        return content;
     }
 
     /**
@@ -130,19 +152,21 @@ public class OkHttp3ForestResponse extends ForestResponse {
      * @author designer[19901753334@163.com]
      * @date 2021/12/8 23:51
      **/
-    private void setupContentTypeAndCharset() {
-        MediaType mediaType = body.contentType();
-        if (mediaType != null) {
-            String type = mediaType.type();
-            String subType = mediaType.subtype();
-            this.contentType = new ContentType(type, subType);
-            Charset charset = mediaType.charset();
-            if (charset != null) {
-                this.charset = charset.name();
-                return;
+    protected void setupContentTypeAndCharset() {
+        if (body != null) {
+            MediaType mediaType = body.contentType();
+            if (mediaType != null) {
+                String type = mediaType.type();
+                String subType = mediaType.subtype();
+                this.contentType = new ContentType(type, subType);
+                Charset charset = mediaType.charset();
+                if (charset != null) {
+                    this.charset = charset.name();
+                    return;
+                }
             }
+            setupResponseCharset();
         }
-        setupResponseCharset();
     }
 
 
@@ -178,10 +202,15 @@ public class OkHttp3ForestResponse extends ForestResponse {
 
     @Override
     public InputStream getInputStream() throws Exception {
-        if (bytes != null) {
-            return new ByteArrayInputStream(getByteArray());
+        if (openedStream != null) {
+            return openedStream;
         }
-        return body.byteStream();
+        if (bytes != null) {
+            openedStream = new ByteArrayInputStream(getByteArray());
+        } else {
+            openedStream = body.byteStream();
+        }
+        return openedStream;
     }
 
     @Override
@@ -217,8 +246,17 @@ public class OkHttp3ForestResponse extends ForestResponse {
             } catch (Throwable th) {
                 throw new ForestRuntimeException(th);
             } finally {
+                openedStream = null;
                 closed = true;
             }
         }
+        if (openedStream != null) {
+            try {
+                openedStream.close();
+            } catch (IOException ignored) {
+            }
+        }
     }
+    
+
 }

@@ -36,11 +36,13 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.SocketTimeoutException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 /**
  * Forest请求响应类
@@ -48,8 +50,8 @@ import java.util.Optional;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.1.0
  */
-public abstract class ForestResponse<T> extends ResultGetter implements HasURL, HasHeaders {
-
+public abstract class ForestResponse<T> extends ResultGetter implements Res<T> {
+    
     /**
      * 请求对象
      */
@@ -65,6 +67,16 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      * 响应接受时间
      */
     protected Date responseTime;
+
+    /**
+     * 响应是否可自动关闭
+     */
+    protected final boolean autoClosable;
+
+    /**
+     * 已开启的响应流
+     */
+    protected volatile InputStream openedStream;
 
     /**
      * 响应体是否已关闭
@@ -139,11 +151,12 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
     volatile Optional<T> result;
 
 
-    public ForestResponse(ForestRequest request, Date requestTime, Date responseTime) {
+    public ForestResponse(ForestRequest request, Date requestTime, Date responseTime, boolean autoClosable) {
         super(request);
         this.request = request;
         this.requestTime = requestTime;
         this.responseTime = responseTime;
+        this.autoClosable = autoClosable;
     }
 
     @Override
@@ -170,6 +183,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return 请求对象, {@link ForestRequest}类实例
      */
+    @Override
     public ForestRequest getRequest() {
         return request;
     }
@@ -179,6 +193,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return 请求开始时间, {@link Date}对象实例
      */
+    @Override
     public Date getRequestTime() {
         return requestTime;
     }
@@ -188,6 +203,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return 响应接受时间, {@link Date}对象实例
      */
+    @Override
     public Date getResponseTime() {
         return responseTime;
     }
@@ -197,6 +213,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return 从请求开始到接受到响应的整个耗费的时间, 单位：毫秒
      */
+    @Override
     public long getTimeAsMillisecond() {
         return responseTime.getTime() - requestTime.getTime();
     }
@@ -207,6 +224,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      * @return {@code true}: 请求已被取消; {@code false}: 未被取消
      * @since 1.5.27
      */
+    @Override
     public boolean isCanceled() {
         return request.isCanceled();
     }
@@ -216,6 +234,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return {@code true}: 已打印过， {@code false}: 没打印过
      */
+    @Override
     public boolean isLogged() {
         return logged;
     }
@@ -225,6 +244,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @param logged {@code true}: 已打印过， {@code false}: 没打印过
      */
+    @Override
     public void setLogged(boolean logged) {
         this.logged = logged;
     }
@@ -234,8 +254,14 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return {@code true}: 是重定向, {@code false}: 不是重定向
      */
+    @Override
     public boolean isRedirection() {
         return getStatusCode() > HttpStatus.MULTIPLE_CHOICES && getStatusCode() <= HttpStatus.TEMPORARY_REDIRECT;
+    }
+
+    @Override
+    public boolean isAutoClosable() {
+        return autoClosable;
     }
 
     /**
@@ -243,6 +269,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return 重定向地址
      */
+    @Override
     public String getRedirectionLocation() {
         return getHeaderValue(ForestHeader.LOCATION);
     }
@@ -252,6 +279,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return Forest请求对象
      */
+    @Override
     public ForestRequest<T> redirectionRequest() {
         if (isRedirection() && request != null) {
             try {
@@ -277,6 +305,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return 文件名
      */
+    @Override
     public String getFilename() {
         final ForestHeader header = getHeader("Content-Disposition");
         if (header != null) {
@@ -310,6 +339,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return 响应内容文本字符串
      */
+    @Override
     public String getContent() {
         if (content != null) {
             return content;
@@ -323,6 +353,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return 请求响应内容字符串
      */
+    @Override
     public String readAsString() {
         try {
             final byte[] bytes = getByteArray();
@@ -335,6 +366,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
         }
     }
 
+    @Override
     public synchronized void setContent(String content) {
         this.content = content;
     }
@@ -345,6 +377,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      * @return 反序列化成对象类型的请求响应内容的 Optional 包装对象
      * @since 1.6.0
      */
+    @Override
     public Optional<T> opt() {
         return getResultOpt();
     }
@@ -355,6 +388,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      * @return 反序列化成对象类型的请求响应内容的 Optional 包装对象
      * @since 1.6.0
      */
+    @Override
     public Optional<T> getResultOpt() {
         if (result == null && isReceivedResponseData()) {
             Type type = request.getLifeCycleHandler().getResultType();
@@ -374,9 +408,17 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
                         argType = String.class;
                     }
                     result = Optional.ofNullable(get(argType));
+                } else if (Res.class.isAssignableFrom(clazz)) {
+                    final ParameterizedType parameterizedType = ReflectUtils.toParameterizedType(type);
+                    final Type[] typeArray = parameterizedType.getActualTypeArguments();
+                    if (typeArray.length > 0) {
+                        final Type argType = typeArray[0];
+                        result = Optional.ofNullable((T) get(argType));
+                    }
                 } else {
                     result = Optional.ofNullable(get(type));
                 }
+
             }
         }
         return result == null ? Optional.empty() : result;
@@ -387,6 +429,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return 反序列化成对象类型的请求响应内容
      */
+    @Override
     public T getResult() {
         final Optional<T> opt = getResultOpt();
         Type type = request.getLifeCycleHandler().getResultType();
@@ -405,6 +448,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @param result 反序列化成对象类型的请求响应内容
      */
+    @Override
     public void setResult(T result) {
         if (result instanceof Optional) {
             this.result = (Optional<T>) result;
@@ -418,6 +462,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return 异常对象, {@link Throwable}类及其子类实例
      */
+    @Override
     public Throwable getException() {
         return exception;
     }
@@ -427,6 +472,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return {@code true}: 没有异常, {@code false}: 有异常
      */
+    @Override
     public boolean noException() {
         return exception == null;
     }
@@ -436,6 +482,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return {@code true}: 已超时, {@code false}: 未超时
      */
+    @Override
     public boolean isTimeout() {
         if (noException()) {
             return false;
@@ -448,6 +495,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @param exception 异常对象, {@link Throwable}类及其子类实例
      */
+    @Override
     public void setException(Throwable exception) {
         this.exception = exception;
     }
@@ -457,6 +505,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return 请求响应的状态码
      */
+    @Override
     public int getStatusCode() {
         if (statusCode == null) {
             return -1;
@@ -471,6 +520,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      * @return 请求响应的状态码
      * @see ForestResponse#getStatusCode()
      */
+    @Override
     public int statusCode() {
         if (statusCode == null) {
             return -1;
@@ -484,6 +534,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @param statusCode 请求响应的状态码
      */
+    @Override
     public void setStatusCode(Integer statusCode) {
         this.statusCode = statusCode;
     }
@@ -493,6 +544,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return 请求响应的原因短语
      */
+    @Override
     public String getReasonPhrase() {
         return reasonPhrase;
     }
@@ -502,6 +554,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return 请求响应内容的数据类型, {@link ContentType}类实例
      */
+    @Override
     public ContentType getContentType() {
         return contentType;
     }
@@ -511,6 +564,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @param contentType 请求响应内容的数据类型, {@link ContentType}类实例
      */
+    @Override
     public void setContentType(ContentType contentType) {
         this.contentType = contentType;
     }
@@ -520,6 +574,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return 请求响应内容的数据编码名称
      */
+    @Override
     public String getContentEncoding() {
         return contentEncoding;
     }
@@ -529,6 +584,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return 请求响应内容的数据长度
      */
+    @Override
     public long getContentLength() {
         return contentLength;
     }
@@ -550,6 +606,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return {@code true}: 请求成功， {@code false}: 请求失败
      */
+    @Override
     public boolean isSuccess() {
         if (success == null) {
             if (request != null) {
@@ -574,6 +631,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return {@code true}: 在 100 ~ 199 范围内, {@code false}: 不在
      */
+    @Override
     public boolean status_1xx() {
         return getStatusCode() >= HttpStatus.CONTINUE
                 && getStatusCode() < HttpStatus.OK;
@@ -584,6 +642,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return {@code true}: 在 200 ~ 299 范围内, {@code false}: 不在
      */
+    @Override
     public boolean status_2xx() {
         return getStatusCode() >= HttpStatus.OK
                 && getStatusCode() < HttpStatus.MULTIPLE_CHOICES;
@@ -594,6 +653,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return {@code true}: 在 300 ~ 399 范围内, {@code false}: 不在
      */
+    @Override
     public boolean status_3xx() {
         return getStatusCode() >= HttpStatus.MULTIPLE_CHOICES
                 && getStatusCode() < HttpStatus.BAD_REQUEST;
@@ -604,6 +664,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return {@code true}: 在 400 ~ 499 范围内, {@code false}: 不在
      */
+    @Override
     public boolean status_4xx() {
         return getStatusCode() >= HttpStatus.BAD_REQUEST
                 && getStatusCode() < HttpStatus.INTERNAL_SERVER_ERROR;
@@ -614,6 +675,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return {@code true}: 在 500 ~ 599 范围内, {@code false}: 不在
      */
+    @Override
     public boolean status_5xx() {
         return getStatusCode() >= HttpStatus.INTERNAL_SERVER_ERROR
                 && getStatusCode() < 600;
@@ -624,6 +686,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return {@code true}: 在 100 ~ 399 范围内, {@code false}: 不在
      */
+    @Override
     public boolean statusOk() {
         return status_1xx() || status_2xx() || status_3xx();
     }
@@ -634,6 +697,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      * @param statusCode 被比较的响应码
      * @return {@code true}: 相同, {@code false}: 不同
      */
+    @Override
     public boolean statusIs(int statusCode) {
         return getStatusCode() == statusCode;
     }
@@ -644,6 +708,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      * @param statusCode 被比较的响应码
      * @return {@code true}: 不同, {@code false}: 相同
      */
+    @Override
     public boolean statusIsNot(int statusCode) {
         return getStatusCode() != statusCode;
     }
@@ -653,32 +718,10 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return {@code true}: 失败
      */
+    @Override
     public boolean isError() {
         return !isSuccess();
     }
-
-    /**
-     * 是否已接受到响应数据
-     *
-     * @return {@code true}: 已接收到， {@code false}: 未接收到
-     */
-    public abstract boolean isReceivedResponseData();
-
-    /**
-     * 以字节数组的形式获取请求响应内容
-     *
-     * @return 字节数组形式的响应内容
-     * @throws Exception 读取字节数组过程中可能的异常
-     */
-    public abstract byte[] getByteArray() throws Exception;
-
-    /**
-     * 以输入流的形式获取请求响应内容
-     *
-     * @return 输入流形式的响应内容, {@link InputStream}实例
-     * @throws Exception 可能抛出的异常类型
-     */
-    public abstract InputStream getInputStream() throws Exception;
 
     /**
      * 根据响应头名称获取单个请求响应头
@@ -686,6 +729,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      * @param name 响应头名称
      * @return 请求响应头, {@link ForestHeader}类实例
      */
+    @Override
     public ForestHeader getHeader(String name) {
         return headers.getHeader(name);
     }
@@ -697,6 +741,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      * @return 请求响应头列表
      * @see ForestHeader
      */
+    @Override
     public List<ForestHeader> getHeaders(String name) {
         return headers.getHeaders(name);
     }
@@ -706,6 +751,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return {@link ForestCookie}对象列表
      */
+    @Override
     public List<ForestCookie> getCookies() {
         return headers.getSetCookies();
     }
@@ -717,6 +763,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      * @return {@link ForestCookie}对象实例
      * @since 1.5.23
      */
+    @Override
     public ForestCookie getCookie(String name) {
         return headers.getSetCookie(name);
     }
@@ -727,6 +774,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      * @param name 响应头名称
      * @return 请求响应头值
      */
+    @Override
     public String getHeaderValue(String name) {
         return headers.getValue(name);
     }
@@ -737,6 +785,7 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      * @param name 响应头名称
      * @return 请求响应头值列表
      */
+    @Override
     public List<String> getHeaderValues(String name) {
         return headers.getValues(name);
     }
@@ -757,10 +806,10 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
      *
      * @return 编码字符集
      */
+    @Override
     public String getCharset() {
         return charset;
     }
-
 
     /**
      * 把字节数组转换成字符串（自动根据字符串编码转换）
@@ -791,14 +840,14 @@ public abstract class ForestResponse<T> extends ResultGetter implements HasURL, 
         return IOUtils.toString(bytes, charset);
     }
 
+    @Override
     public boolean isClosed() {
         return closed;
     }
     
+    @Override
     public boolean isBytesRead() {
         return bytesRead;
     }
-
-    public abstract void close();
 
 }

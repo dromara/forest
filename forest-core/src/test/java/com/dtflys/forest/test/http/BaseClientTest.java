@@ -36,7 +36,7 @@ public abstract class BaseClientTest {
     protected ForestJsonConverter jsonConverter;
 
     public BaseClientTest(String backendName, String jsonConverterName, ForestConfiguration configuration) {
-        this.backend = configuration.getBackendSelector().select(backendName);
+        this.backend = configuration.getBackendSelector().select(backendName, configuration);
         this.jsonConverter = selectJsonConverter(jsonConverterName);
         configuration.setCacheEnabled(false);
         configuration.setBackend(this.backend);
