@@ -149,8 +149,9 @@ public class OkHttp3ForestResponse extends ForestResponse {
 
 
     /**
+     * 从响应体读取并设置 Content-Type 和 Charset
+     * 
      * @author designer[19901753334@163.com]
-     * @date 2021/12/8 23:51
      **/
     protected void setupContentTypeAndCharset() {
         if (body != null) {
