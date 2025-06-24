@@ -6,6 +6,7 @@ import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.http.UnclosedResponse;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.ForestProgress;
 
@@ -77,6 +78,8 @@ public class InterceptorChain implements Interceptor {
     public void onSuccess(Object data, ForestRequest request, ForestResponse response) {
         for (Interceptor item : interceptors) {
             if (item instanceof ForestInterceptor) {
+                item.onSuccess(null, request, response);
+            } else if (response instanceof UnclosedResponse) {
                 item.onSuccess(null, request, response);
             } else {
                 if (response != null) {

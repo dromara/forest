@@ -1,6 +1,8 @@
 package com.dtflys.forest.test;
 
 import cn.hutool.core.codec.Base64;
+import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.map.MapUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONReader;
 import com.alibaba.fastjson.annotation.JSONField;
@@ -14,18 +16,10 @@ import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestEncoder;
+import com.dtflys.forest.mapping.ForestExpressionException;
+import com.dtflys.forest.exceptions.ForestExpressionNullException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.http.ForestAddress;
-import com.dtflys.forest.http.ForestAsyncMode;
-import com.dtflys.forest.http.ForestFuture;
-import com.dtflys.forest.http.ForestHeader;
-import com.dtflys.forest.http.ForestProxy;
-import com.dtflys.forest.http.ForestProxyType;
-import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.http.ForestResponse;
-import com.dtflys.forest.http.ForestSSE;
-import com.dtflys.forest.http.ForestURL;
-import com.dtflys.forest.http.Lazy;
+import com.dtflys.forest.http.*;
 import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorChain;
 import com.dtflys.forest.interceptor.ResponseResult;
@@ -39,11 +33,7 @@ import com.dtflys.forest.test.model.Contact;
 import com.dtflys.forest.test.model.Result;
 import com.dtflys.forest.test.model.TestUser;
 import com.dtflys.forest.test.sse.MySSEHandler;
-import com.dtflys.forest.utils.ForestDataType;
-import com.dtflys.forest.utils.ForestProgress;
-import com.dtflys.forest.utils.GzipUtils;
-import com.dtflys.forest.utils.TypeReference;
-import com.dtflys.forest.utils.URLUtils;
+import com.dtflys.forest.utils.*;
 import com.google.common.collect.Lists;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
@@ -79,20 +69,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.LockSupport;
+import java.util.stream.Stream;
 
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 public class TestGenericForestClient extends BaseClientTest {
 
@@ -830,12 +826,239 @@ public class TestGenericForestClient extends BaseClientTest {
                 .setVariable("foo", "foo/{bar}")
                 .setVariable("testVar", "var/{foo}/{hello}");
         Forest.get("/test/{testVar}")
-                .host("127.0.0.1")
+                .host(server.getHostName())
                 .port(server.getPort())
                 .execute();
         mockRequest(server)
                 .assertPathEquals("/test/var/foo/ok/world");
     }
+
+
+    @Test
+    public void testRequest_template_in_url2() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config().setVariable("testVar", null);
+        Forest.get("/test/{testVar ?? 'foo'}/{testVar?}/{testVar ?? ''}")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/test/foo/null/");
+    }
+
+    @Test
+    public void testRequest_template_in_url3() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config()
+                .setVariable("testVar", null)
+                .setVariable("testVar2", "ok");
+        Forest.get("/test/{testVar?.a}/{testVar?.a ?? 'foo'}/{testVar?.a?.b.c.d.e ?? 'bar'}/{testVar2 ?? 'xx'}/{testVar2?}")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .execute();
+
+        mockRequest(server)
+                .assertPathEquals("/test/null/foo/bar/ok/ok");
+    }
+
+
+    @Test
+    public void testRequest_template_in_url4() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config()
+                .removeVariable("testVar")
+                .setVariable("testVar2", "ok");
+        Forest.get("/test/{testVar ?? `it_is_{testVar2}`}")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .execute();
+
+        mockRequest(server)
+                .assertPathEquals("/test/it_is_ok");
+    }
+
+    @Test
+    public void testRequest_template_in_url5() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config().removeVariable("testVar");
+        Forest.get("/test/{testVar?}")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .execute();
+
+        mockRequest(server)
+                .assertPathEquals("/test/null");
+    }
+
+    @Test
+    public void testRequest_template_in_url6() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config()
+                .removeVariable("foo")
+                .setVariable("testVar3", "aaa\\{foo}")
+                .setVariable("testVar2", "ok: {testVar3}")
+                .setVariable("testVar1", "{testVar2}");
+        Forest.get("/test/{testVar1}")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .execute();
+        mockRequest(server)
+                .assertPathEquals(URLEncoder.PATH.encode("/test/ok: aaa{foo}", "UTF-8"));
+    }
+
+
+    @Test
+    public void testRequest_template_in_url7() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config()
+                .removeVariable("foo")
+                .setVariable("testVar3", "aaa{foo}")
+                .setVariable("testVar2", "ok: {testVar3}")
+                .setVariable("testVar1", "{testVar2}");
+        Forest.get("/test/{testVar1!}")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .execute();
+        mockRequest(server)
+                .assertPathEquals(URLEncoder.PATH.encode("/test/{testVar2}", "UTF-8"));
+    }
+
+
+
+    @Test
+    public void testRequest_template_in_url8() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config()
+                .removeVariable("foo")
+                .setVariable("testVar3", "aaa{foo}")
+                .setVariable("testVar2", "ok: {testVar3?!}")
+                .setVariable("testVar1", "{testVar2}");
+        Forest.get("/test/{testVar1}")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .execute();
+        mockRequest(server)
+                .assertPathEquals(URLEncoder.PATH.encode("/test/ok: aaa{foo}", "UTF-8"));
+    }
+
+
+    @Test
+    public void testRequest_json_template() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config()
+                .setVariable("testVar", "{\"a\": \"foo\", \"b\": \"bar\"}")
+                .setVariable("testVar2", "{testVar}");
+        Forest.post("/test")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .contentTypeJson()
+                .addBody("{testVar2}")
+                .execute();
+
+        mockRequest(server)
+                .assertPathEquals("/test")
+                .assertBodyEquals("{\"a\": \"foo\", \"b\": \"bar\"}");
+    }
+
+
+    @Test
+    public void testRequest_template_in_url_error1() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config().setVariable("testVar", MapUtil.of("a", null));
+        assertThatThrownBy(() -> {
+            Forest.get("/test/{testVar.foo.value}")
+                    .host(server.getHostName())
+                    .port(server.getPort())
+                    .execute();
+        }).isInstanceOf(ForestExpressionNullException.class);
+    }
+
+    @Test
+    public void testRequest_template_in_url_error2() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config().setVariable("testVar", MapUtil.of("a", null));
+        assertThatThrownBy(() -> {
+            Forest.get("/test/{testVar.foo ??}")
+                    .host(server.getHostName())
+                    .port(server.getPort())
+                    .execute();
+        })
+                .isInstanceOf(ForestExpressionException.class)
+                .hasMessageContaining("Unexpected token '??'");
+    }
+
+    @Test
+    public void testRequest_template_in_url_error3() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config()
+                .setVariable("testVar", null)
+                .setVariable("map", MapUtil.empty());
+
+        assertThatThrownBy(() -> {
+            Forest.get("/test/{testVar ?? `it_is_{map?.foo.bar.aaa.bbb}`}")
+                    .host(server.getHostName())
+                    .port(server.getPort())
+                    .execute();
+        })
+                .isInstanceOf(ForestExpressionNullException.class)
+                .hasMessageContaining("Null pointer error: map?.foo is null");
+    }
+
+    @Test
+    public void testRequest_template_in_url_error4() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config()
+                .removeVariable("foo")
+                .setVariable("testVar3", "aaa{foo}")
+                .setVariable("testVar2", "ok: {testVar3}")
+                .setVariable("testVar1", "{testVar2}");
+
+        assertThatThrownBy(() -> {
+            Forest.get("/test/{testVar1}")
+                    .host(server.getHostName())
+                    .port(server.getPort())
+                    .execute();
+        }).hasMessageContainingAll(
+                "\"aaa{foo}\"",
+                "\"ok: {testVar3}\"",
+                "\"{testVar2}\"",
+                "/test/{testVar1}",
+                "^^^ Cannot resolve variable 'foo'",
+                "^^^^^^^^ Reference error: testVar3 -> \"aaa{foo}\"",
+                "^^^^^^^^ Reference error: testVar2 -> \"ok: {testVar3}\"",
+                "^^^^^^^^ Reference error: testVar1 -> \"{testVar2}\""
+        );
+    }
+
+    @Test
+    public void testRequest_template_in_url_error5() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config()
+                .removeVariable("foo")
+                .setVariable("testVar3", "aaa{foo}")
+                .setVariable("testVar2", "ok: {temp ?? `haha {testVar3}`}")
+                .setVariable("testVar1", MapUtil.of("ref", "{testVar2}"));
+
+        assertThatThrownBy(() -> {
+            Forest.get("/test/{testVar1.ref}")
+                    .host(server.getHostName())
+                    .port(server.getPort())
+                    .execute();
+        }).hasMessageContainingAll(
+                "testVar3 -> \"aaa{foo}\"",
+                "^^^ Cannot resolve variable 'foo'",
+
+                "ok: {temp ?? `haha {testVar3}`}",
+                "^^^^^^^^ Reference error: testVar3 -> \"aaa{foo}\"",
+
+                "{testVar2}",
+                "^^^^^^^^ Reference error: testVar2 -> \"ok: {temp ?? `haha {testVar3}`}\"",
+
+                "/test/{testVar1.ref}",
+                "^^^^^^^^^^^^ Reference error: testVar1.ref -> \"{testVar2}\""
+        );
+    }
+
 
     @Test
     public void testRequest_get_return_string() {
@@ -1000,11 +1223,86 @@ public class TestGenericForestClient extends BaseClientTest {
                         return ResponseResult.error(e);
                     }
                 })
-                .setOnSuccess(((data, req, res) -> {}))
+                .onSuccess(((data, req, res) -> {}))
                 .executeAsList();
         assertThat(result).isNotNull();
         assertThat(result).isEqualTo(Lists.newArrayList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
     }
+
+    @Test
+    public void testRequest_auto_closed_response_openStream() {
+        server.enqueue(new MockResponse().setBody("[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"));
+        BlockingQueue<Integer> queue = new LinkedBlockingQueue<>();
+        Forest.get("http://localhost:{}", server.getPort())
+                .executeAsResponse()
+                .openStream((in, res) -> {
+                    JSONReader jsonReader = new JSONReader(new InputStreamReader(in));
+                    queue.add(0);
+                    jsonReader.startArray();
+                    while (jsonReader.hasNext()) {
+                        queue.add(jsonReader.readInteger());
+                    }
+                    jsonReader.endArray();
+                });
+        assertThat(queue).isNotNull();
+        assertThat(queue.toArray()).isEqualTo(new Integer[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
+    }
+
+
+    @Test
+    public void testRequest_unclosed_response_openStream() {
+        server.enqueue(new MockResponse().setBody("[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"));
+        BlockingQueue<Integer> queue = new LinkedBlockingQueue<>();
+        Forest.get("http://localhost:{}", server.getPort())
+                .executeAsUnclosedResponse()
+                .openStream((in, res) -> {
+                    JSONReader jsonReader = new JSONReader(new InputStreamReader(in));
+                    queue.add(0);
+                    jsonReader.startArray();
+                    while (jsonReader.hasNext()) {
+                        queue.add(jsonReader.readInteger());
+                    }
+                    jsonReader.endArray();
+                });
+        assertThat(queue).isNotNull();
+        assertThat(queue.toArray()).isEqualTo(new Integer[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
+    }
+
+
+    @Test
+    public void testRequest_auto_closed_response() {
+        server.enqueue(new MockResponse().setBody("[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"));
+        ForestResponse response = Forest.get("http://localhost:{}", server.getPort())
+                .executeAsResponse();
+        assertThat(response).isNotNull();
+        assertThat(response.isClosed()).isTrue();
+    }
+
+    @Test
+    public void testRequest_unclosed_response() {
+        server.enqueue(new MockResponse().setBody("[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"));
+        UnclosedResponse response = Forest.get("http://localhost:{}", server.getPort())
+                .executeAsUnclosedResponse();
+        assertThat(response).isNotNull();
+        assertThat(response.isClosed()).isFalse();
+        response.close();
+        assertThat(response.isClosed()).isTrue();
+    }
+
+    @Test
+    public void testRequest_unclosed_response_get() {
+        server.enqueue(new MockResponse().setBody("[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"));
+        UnclosedResponse response = Forest.get("http://localhost:{}", server.getPort())
+                .executeAsUnclosedResponse();
+        assertThat(response).isNotNull();
+        assertThat(response.isClosed()).isFalse();
+        List<Integer> nums = response.get(new TypeReference<List<Integer>>() {});
+        assertThat(response.isClosed()).isTrue();
+        assertThat(nums).isNotNull();
+        assertThat(nums).isEqualTo(Lists.newArrayList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+    }
+
+
 
     @Test
     public void testRequest_get_return_map_list() {
@@ -2406,7 +2704,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .addInterceptor(TestInterceptor.class)
                 .getInterceptorChain();
         assertThat(interceptorChain).isNotNull();
-        assertThat(interceptorChain.getInterceptorSize()).isEqualTo(2);
+        assertThat(interceptorChain.getInterceptorSize()).isEqualTo(1);
         assertFalse(interceptorChain.beforeExecute(null));
         assertTrue(inter3Before.get());
     }
@@ -3012,6 +3310,23 @@ public class TestGenericForestClient extends BaseClientTest {
                 .getByPath("$.data[?(@.age>{minAge})].age", new TypeReference<List<Integer>>() {});
         assertThat(ageList).isNotNull();
         assertThat(ageList.get(0)).isEqualTo(22);
+    }
+
+
+    @Test
+    public void testLoadBalance() {
+        int count = 100;
+        for (int i = 0; i < count; i++) {
+            server.enqueue(new MockResponse().setResponseCode(200).setBody(EXPECTED_LIST_USER));
+        }
+
+        Forest.config("test_lb").setVariable("host", Arrays.asList("localhost", "127.0.0.1"));
+
+        for (int i = 0; i < count; i++) {
+            Forest.config("test_lb").get("http://{host}:{}/abc", server.getPort())
+                    .execute();
+        }
+
     }
     
     public static class T4 {

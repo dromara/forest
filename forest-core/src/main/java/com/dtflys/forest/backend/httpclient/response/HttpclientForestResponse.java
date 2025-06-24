@@ -3,17 +3,23 @@ package com.dtflys.forest.backend.httpclient.response;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.ForestRequestType;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.utils.GzipUtils;
 import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
 import org.apache.http.*;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.conn.ConnectTimeoutException;
+import org.apache.http.conn.ConnectionPoolTimeoutException;
 import org.apache.http.util.EntityUtils;
 
+import javax.mail.UIDFolder;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.PhantomReference;
+import java.net.SocketTimeoutException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -26,13 +32,17 @@ public class HttpclientForestResponse extends ForestResponse {
 
     private final HttpResponse httpResponse;
 
-    private final HttpEntity entity;
+    private volatile HttpEntity entity;
 
-    private byte[] bytes;
-
+    private volatile byte[] bytes;
+    
 
     public HttpclientForestResponse(ForestRequest request, HttpResponse httpResponse, HttpEntity entity, Date requestTime, Date responseTime) {
-        super(request, requestTime, responseTime);
+        this(request, httpResponse, entity, requestTime, responseTime, true);
+    }
+    
+    protected HttpclientForestResponse(ForestRequest request, HttpResponse httpResponse, HttpEntity entity, Date requestTime, Date responseTime, boolean autoClosable) {
+        super(request, requestTime, responseTime, autoClosable);
         this.httpResponse = httpResponse;
         this.entity = entity;
         if (httpResponse != null) {
@@ -45,21 +55,37 @@ public class HttpclientForestResponse extends ForestResponse {
                 if (type != null) {
                     this.contentType = new ContentType(type.getValue(), StandardCharsets.UTF_8);
                 }
+                //是否将Response数据按GZIP来解压
+                setupGzip();
                 //响应消息的编码格式: gzip...
                 setupContentEncoding();
                 //响应文本的字符串编码
                 setupResponseCharset();
-                //是否将Response数据按GZIP来解压
-                setupGzip();
-                setupContent();
-                this.contentLength = entity.getContentLength();
-            } else {
-                this.bytes = new byte[0];
-                this.content = "";
+                if (autoClosable && !request.isReceiveStream()) {
+                    readContentAsString();
+                }
             }
         } else {
             this.statusCode = -1;
         }
+    }
+
+    @Override
+    public String getContent() {
+        if (content == null) {
+            synchronized (this) {
+                if (content == null) {
+                    if (entity != null) {
+                        setupContent();
+                        this.contentLength = entity.getContentLength();
+                    } else {
+                        this.content = "";
+                    }
+                }
+            }
+        }
+        return content;
+
     }
 
     private void setupContentEncoding() {
@@ -87,7 +113,6 @@ public class HttpclientForestResponse extends ForestResponse {
 
     private void setupContent() {
         if (content == null) {
-            final Class<?> resultClass = ReflectUtils.toClass(request.getLifeCycleHandler().getResultType());
             if (request.isReceiveStream()
                     || (contentType != null && contentType.canReadAsBinaryStream())) {
                 final StringBuilder builder = new StringBuilder();
@@ -158,10 +183,15 @@ public class HttpclientForestResponse extends ForestResponse {
 
     @Override
     public InputStream getInputStream() throws Exception {
-        if (bytes != null) {
-            return new ByteArrayInputStream(getByteArray());
+        if (openedStream != null) {
+            return openedStream;
         }
-        return entity.getContent();
+        if (bytes != null) {
+            openedStream = new ByteArrayInputStream(getByteArray());
+        } else {
+            openedStream = entity.getContent();
+        }
+        return openedStream;
     }
 
     @Override
@@ -186,6 +216,13 @@ public class HttpclientForestResponse extends ForestResponse {
         if (closed) {
             return;
         }
+        if (entity != null) {
+            try {
+                EntityUtils.consume(entity);
+                entity = null;
+            } catch (IOException ignored) {
+            }
+        }
         try {
             if (httpResponse instanceof CloseableHttpResponse) {
                 ((CloseableHttpResponse) httpResponse).close();
@@ -195,5 +232,21 @@ public class HttpclientForestResponse extends ForestResponse {
         } finally {
             closed = true;
         }
+        if (openedStream != null) {
+            try {
+                openedStream.close();
+            } catch (IOException ignored) {
+            }
+        }
+    }
+
+    @Override
+    public boolean isTimeout() {
+        if (noException()) {
+            return false;
+        }
+        return exception instanceof SocketTimeoutException ||
+                exception instanceof ConnectionPoolTimeoutException ||
+                exception instanceof ConnectTimeoutException;
     }
 }

@@ -11,8 +11,8 @@ public class MappingProperty extends MappingExpr {
     private final String propertyName;
     private ForestProperties properties;
 
-    protected MappingProperty(ForestMethod<?> forestMethod, String propertyName) {
-        super(forestMethod, Token.PROP);
+    protected MappingProperty(MappingTemplate source, String propertyName) {
+        super(source, Token.PROP);
         this.propertyName = propertyName;
     }
 

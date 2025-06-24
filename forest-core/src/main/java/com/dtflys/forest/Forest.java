@@ -1,5 +1,6 @@
 package com.dtflys.forest;
 
+import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestCookie;
 import com.dtflys.forest.http.ForestFuture;
@@ -38,6 +39,16 @@ public abstract class Forest {
      */
     public final static String VERSION = VersionUtil.getForestVersion();
 
+    /**
+     * 根据后端名称获取Forest后端对象
+     * 
+     * @param backendName 后端名称
+     * @return Forest后端对象
+     * @since v1.7.1
+     */
+    public static HttpBackend backend(String backendName) {
+        return Forest.config().backend(backendName);
+    }
 
     /**
      * 获取或创建全局默认配置，即 {@link ForestConfiguration} 对象

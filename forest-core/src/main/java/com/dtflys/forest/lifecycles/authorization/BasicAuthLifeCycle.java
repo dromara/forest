@@ -7,6 +7,9 @@ import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.Base64Utils;
 import com.dtflys.forest.utils.StringUtils;
 
+/**
+ * BasicAuth 注解的生命周期类
+ */
 public class BasicAuthLifeCycle implements MethodAnnotationLifeCycle<BasicAuth, Void> {
 
     @Override

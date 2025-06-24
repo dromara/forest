@@ -125,7 +125,7 @@ public class OAuth2MockServer extends MockServerRule {
     public void stopServer() {
         if (server != null) {
             server.stop();
-            server = null;
+//            server = null;
         }
     }
             

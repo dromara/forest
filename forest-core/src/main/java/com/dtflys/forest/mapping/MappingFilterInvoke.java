@@ -15,8 +15,8 @@ import java.util.List;
  */
 public class MappingFilterInvoke extends MappingInvoke {
 
-    public MappingFilterInvoke(ForestMethod<?> forestMethod, MappingIdentity name, List<MappingExpr> argList, int startIndex, int endIndex) {
-        super(forestMethod, Token.FILTER_INVOKE, null, name, argList, startIndex, endIndex);
+    public MappingFilterInvoke(MappingTemplate source, MappingIdentity name, List<MappingExpr> argList, int startIndex, int endIndex) {
+        super(source, Token.FILTER_INVOKE, null, name, argList, startIndex, endIndex);
     }
 
     @Override

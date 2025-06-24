@@ -50,11 +50,11 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
     /**
      * connection pool
      */
-    private ConnectionPool pool;
+    private volatile ConnectionPool pool;
 
-    private DefaultOkHttpClientProvider defaultOkHttpClientProvider;
+    private volatile DefaultOkHttpClientProvider defaultOkHttpClientProvider;
 
-    private boolean inited = false;
+    private volatile boolean inited = false;
 
     /**
      * 协议版本: http 1.0
@@ -125,7 +125,7 @@ public class OkHttp3ConnectionManager implements ForestConnectionManager {
                         final ForestConfiguration configuration = request.getConfiguration();
                         connectionManager = (OkHttp3ConnectionManager) configuration
                                 .getBackendSelector()
-                                .select(OkHttp3Backend.NAME)
+                                .select(OkHttp3Backend.NAME, configuration)
                                 .getConnectionManager();
                         if (!connectionManager.isInitialized()) {
                             connectionManager.init(configuration);

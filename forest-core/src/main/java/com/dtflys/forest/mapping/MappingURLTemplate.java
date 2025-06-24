@@ -5,16 +5,17 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.config.ForestProperties;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.converter.json.ForestJsonConverter;
-import com.dtflys.forest.exceptions.ForestIndexReferenceException;
-import com.dtflys.forest.exceptions.ForestRuntimeException;
-import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
-import com.dtflys.forest.exceptions.ForestExpressionException;
+import com.dtflys.forest.exceptions.*;
 import com.dtflys.forest.http.*;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.ForestCache;
 import com.dtflys.forest.utils.StringUtils;
+import org.apache.commons.lang3.RandomUtils;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
+import java.util.Collection;
+import java.util.Map;
 
 public class MappingURLTemplate extends MappingTemplate {
 
@@ -63,6 +64,7 @@ public class MappingURLTemplate extends MappingTemplate {
             final String attributeName,
             final String text) {
         return new MappingURLTemplate(
+                URL,
                 annotationType,
                 attributeName,
                 method,
@@ -72,8 +74,8 @@ public class MappingURLTemplate extends MappingTemplate {
     }
 
 
-    public MappingURLTemplate(Class<? extends Annotation> annotationType, String attributeName, ForestMethod<?> forestMethod, String template, ForestProperties properties, MappingParameter[] parameters) {
-        super(annotationType, attributeName, forestMethod, template, properties, parameters);
+    public MappingURLTemplate(int type, Class<? extends Annotation> annotationType, String attributeName, ForestMethod<?> forestMethod, String template, ForestProperties properties, MappingParameter[] parameters) {
+        super(type, annotationType, attributeName, forestMethod, template, parameters);
     }
 
     @Override
@@ -86,6 +88,10 @@ public class MappingURLTemplate extends MappingTemplate {
     }
 
     public ForestURL render(ForestURL url, VariableScope scope, Object[] args, ForestQueryMap queries) {
+        return render(url, scope, args, queries, true);
+    }
+
+    public ForestURL render(ForestURL url, VariableScope scope, Object[] args, ForestQueryMap queries, boolean allowEmptyBrace) {
         String scheme = null;
         StringBuilder userInfo = null;
         String host = null;
@@ -97,271 +103,270 @@ public class MappingURLTemplate extends MappingTemplate {
         boolean renderedQuery = false;
         boolean nextIsPort = false;
         boolean renderedPath = false;
-        try {
-            ForestJsonConverter jsonConverter = scope.getConfiguration().getJsonConverter();
-            int len = exprList.size();
-            StringBuilder builder = new StringBuilder();
-            SimpleQueryParameter lastQuery  = null;
-            for (int i = 0; i < len; i++) {
-                MappingExpr expr = exprList.get(i);
-                String exprVal = String.valueOf(renderExpression(scope, jsonConverter, expr, args));
-                builder.append(exprVal);
-                if (renderedQuery) {
-                    // 已渲染到查询参数
-                    if (lastQuery != null && (
-                            expr instanceof MappingUrlEncodedExpr)) {
-                        // 在查询参数的位置进行变量引用
-                        Object lastQueryValue = lastQuery.getValue();
-                        String queryVal = lastQueryValue == null ? exprVal : lastQueryValue + exprVal;
-                        lastQuery.setValue(queryVal);
-                    } else {
-                        // 非变量引用
-                        String[] subQueries = exprVal.split("&");
-                        int subQueryLen = subQueries.length;
-                        int k = 1;
-                        if (exprVal.charAt(0) != '&') {
-                            // 非连接符 & 开头
-                            String lastQueryPartVal = subQueries[0];
-                            if (lastQuery != null) {
-                                // 可能要接着上一个查询参数
-                                Object lastQueryValue = lastQuery.getValue();
-                                String queryVal = lastQueryValue == null ? lastQueryPartVal : lastQueryValue + lastQueryPartVal;
-                                lastQuery.setValue(queryVal);
-                            } else {
-                                // 可能是第一个查询参数
-                                String[] keyValue = lastQueryPartVal.split("=", 2);
-                                if (keyValue.length == 1) {
-                                    lastQuery = new SimpleQueryParameter(queries, lastQueryPartVal);
-                                } else {
-                                    lastQuery = new SimpleQueryParameter(queries, keyValue[0], keyValue[1]);
-                                }
-                                queries.addQuery(lastQuery);
-                            }
-                        }
-                        // 解析查询参数
-                        for ( ; k < subQueryLen; k++) {
-                            String queryItem = subQueries[k];
-                            String[] keyValue = queryItem.split("=", 2);
+        ForestJsonConverter jsonConverter = scope.getConfiguration().getJsonConverter();
+        int len = exprList.size();
+        StringBuilder builder = new StringBuilder();
+        SimpleQueryParameter lastQuery  = null;
+        for (int i = 0; i < len; i++) {
+            MappingExpr expr = exprList.get(i);
+            String exprVal = String.valueOf(renderExpression(scope, jsonConverter, expr, args, allowEmptyBrace, !renderedQuery));
+            builder.append(exprVal);
+            if (renderedQuery) {
+                // 已渲染到查询参数
+                if (lastQuery != null && (
+                        expr instanceof MappingUrlEncodedExpr)) {
+                    // 在查询参数的位置进行变量引用
+                    Object lastQueryValue = lastQuery.getValue();
+                    String queryVal = lastQueryValue == null ? exprVal : lastQueryValue + exprVal;
+                    lastQuery.setValue(queryVal);
+                } else {
+                    // 非变量引用
+                    String[] subQueries = exprVal.split("&");
+                    int subQueryLen = subQueries.length;
+                    int k = 1;
+                    if (exprVal.charAt(0) != '&') {
+                        // 非连接符 & 开头
+                        String lastQueryPartVal = subQueries[0];
+                        if (lastQuery != null) {
+                            // 可能要接着上一个查询参数
+                            Object lastQueryValue = lastQuery.getValue();
+                            String queryVal = lastQueryValue == null ? lastQueryPartVal : lastQueryValue + lastQueryPartVal;
+                            lastQuery.setValue(queryVal);
+                        } else {
+                            // 可能是第一个查询参数
+                            String[] keyValue = lastQueryPartVal.split("=", 2);
                             if (keyValue.length == 1) {
-                                lastQuery = new SimpleQueryParameter(queries, queryItem);
+                                lastQuery = new SimpleQueryParameter(queries, lastQueryPartVal);
                             } else {
-                                lastQuery = new SimpleQueryParameter(queries, keyValue[0]);
-                                String queryVal = keyValue[1];
-                                if (StringUtils.isNotBlank(queryVal)) {
-                                    lastQuery.setValue(queryVal);
-                                }
+                                lastQuery = new SimpleQueryParameter(queries, keyValue[0], keyValue[1]);
                             }
                             queries.addQuery(lastQuery);
                         }
                     }
-                } else {
-                    // 查询参数前面部分
-                    int refIndex = exprVal.indexOf('#');
-                    int queryIndex = exprVal.indexOf('?');
-                    renderedQuery = ref == null && queryIndex >= 0 && (queryIndex < refIndex || refIndex < 0);
-
-                    String baseUrl = exprVal;
-                    if (renderedQuery) {
-                        baseUrl = exprVal.substring(0, queryIndex);
-                    } else if (host != null && !nextIsPort && port == null && path == null) {
-                        baseUrl = host + baseUrl;
-                        host = null;
-                        urlBuilder = new StringBuilder(scheme).append("//");
+                    // 解析查询参数
+                    for ( ; k < subQueryLen; k++) {
+                        String queryItem = subQueries[k];
+                        String[] keyValue = queryItem.split("=", 2);
+                        if (keyValue.length == 1) {
+                            lastQuery = new SimpleQueryParameter(queries, queryItem);
+                        } else {
+                            lastQuery = new SimpleQueryParameter(queries, keyValue[0]);
+                            String queryVal = keyValue[1];
+                            if (StringUtils.isNotBlank(queryVal)) {
+                                lastQuery.setValue(queryVal);
+                            }
+                        }
+                        queries.addQuery(lastQuery);
                     }
-                    urlBuilder.append(baseUrl);
-                    char[] baseUrlChars = baseUrl.toCharArray();
-                    int baseLen = baseUrlChars.length;
-                    char ch;
-                    StringBuilder subBuilder = new StringBuilder();
-                    for (int pathCharIndex = 0 ; pathCharIndex < baseLen; pathCharIndex++) {
-                        ch = baseUrlChars[pathCharIndex];
-                        if (!renderedPath && ch == ':') {
-                            if (scheme == null && pathCharIndex + 1 < baseLen
-                                    && baseUrlChars[pathCharIndex + 1] == '/') {
-                                // 解析协议部分
-                                scheme = subBuilder.toString();
-                                subBuilder = new StringBuilder();
-                                pathCharIndex++;
-                                ch = baseUrlChars[pathCharIndex];
-                                if (ch != '/') {
-                                    throw new ForestRuntimeException("URI '" + super.render(scope, args) + "' is invalid.");
-                                }
-                                pathCharIndex++;
-                                if (pathCharIndex + 1 < baseLen && baseUrlChars[pathCharIndex + 1] == '/') {
-                                    do {
-                                        pathCharIndex++;
-                                    } while (pathCharIndex + 1 < baseLen && baseUrlChars[pathCharIndex + 1] == '/');
-                                }
-                                continue;
-                            }
-                            if (scheme != null && host == null) {
-                                // 解析地址部分
-                                boolean hasNext = pathCharIndex + 1 < baseLen;
-                                if (!hasNext || (hasNext && Character.isDigit(baseUrlChars[pathCharIndex + 1]))) {
-                                    host = subBuilder.toString();
-                                    subBuilder = new StringBuilder();
-                                    nextIsPort = true;
-                                } else if (hasNext && !Character.isDigit(baseUrlChars[pathCharIndex + 1])) {
-                                    if (userInfo == null) {
-                                        userInfo = new StringBuilder(subBuilder.toString() + ':');
-                                    } else {
-                                        userInfo.append(subBuilder).append(':');
-                                    }
-                                    subBuilder = new StringBuilder();
-                                }
-                            } else if (host != null && port == null) {
-                                nextIsPort = true;
-                            } else {
-                                subBuilder.append(ch);
-                            }
-                        } else if (!renderedPath && ch == '@') {
-                            // 解析用户名密码
-                            if (userInfo == null) {
-                                if (host != null) {
-                                    userInfo = new StringBuilder(host);
-                                    host = null;
-                                } else {
-                                    userInfo = new StringBuilder();
-                                }
-                            }
-                            if (nextIsPort) {
-                                userInfo.append(':');
-                            }
-                            userInfo.append(subBuilder.toString());
+                }
+            } else {
+                // 查询参数前面部分
+                int refIndex = exprVal.indexOf('#');
+                int queryIndex = exprVal.indexOf('?');
+                renderedQuery = ref == null && queryIndex >= 0 && (queryIndex < refIndex || refIndex < 0);
+
+                String baseUrl = exprVal;
+                if (renderedQuery) {
+                    baseUrl = exprVal.substring(0, queryIndex);
+                } else if (host != null && !nextIsPort && port == null && path == null) {
+                    baseUrl = host + baseUrl;
+                    host = null;
+                    urlBuilder = new StringBuilder(scheme).append("//");
+                }
+                urlBuilder.append(baseUrl);
+                char[] baseUrlChars = baseUrl.toCharArray();
+                int baseLen = baseUrlChars.length;
+                char ch;
+                StringBuilder subBuilder = new StringBuilder();
+                for (int pathCharIndex = 0 ; pathCharIndex < baseLen; pathCharIndex++) {
+                    ch = baseUrlChars[pathCharIndex];
+                    if (!renderedPath && ch == ':') {
+                        if (scheme == null && pathCharIndex + 1 < baseLen
+                                && baseUrlChars[pathCharIndex + 1] == '/') {
+                            // 解析协议部分
+                            scheme = subBuilder.toString();
                             subBuilder = new StringBuilder();
-                            continue;
-                        } else if (ch == '/' || pathCharIndex + 1 == baseLen) {
+                            pathCharIndex++;
+                            ch = baseUrlChars[pathCharIndex];
                             if (ch != '/') {
-                                subBuilder.append(ch);
+                                throw new ForestRuntimeException("URI '" + super.render(scope, args) + "' is invalid.");
                             }
-                            if (!renderedPath && nextIsPort && port == null) {
-                                // 解析端口号
-                                port = Integer.parseInt(subBuilder.toString());
-                                subBuilder = new StringBuilder();
-                                nextIsPort = false;
-                                if (ch == '/') {
-                                    pathCharIndex--;
-                                    renderedPath = true;
-                                }
-                                continue;
-                            } else if (scheme != null && host == null) {
-                                // 解析地址部分
+                            pathCharIndex++;
+                            if (pathCharIndex + 1 < baseLen && baseUrlChars[pathCharIndex + 1] == '/') {
+                                do {
+                                    pathCharIndex++;
+                                } while (pathCharIndex + 1 < baseLen && baseUrlChars[pathCharIndex + 1] == '/');
+                            }
+                            continue;
+                        }
+                        if (scheme != null && host == null) {
+                            // 解析地址部分
+                            boolean hasNext = pathCharIndex + 1 < baseLen;
+                            if (!hasNext || (hasNext && Character.isDigit(baseUrlChars[pathCharIndex + 1]))) {
                                 host = subBuilder.toString();
                                 subBuilder = new StringBuilder();
-                                if (ch == '/') {
-                                    pathCharIndex--;
-                                    renderedPath = true;
+                                nextIsPort = true;
+                            } else if (hasNext && !Character.isDigit(baseUrlChars[pathCharIndex + 1])) {
+                                if (userInfo == null) {
+                                    userInfo = new StringBuilder(subBuilder.toString() + ':');
+                                } else {
+                                    userInfo.append(subBuilder).append(':');
                                 }
-                                continue;
-                            } else {
-                                if (ch == '/') {
-                                    subBuilder.append(ch);
-                                    renderedPath = true;
-                                }
-                                if (renderedPath) {
-                                    if (path == null) {
-                                        path = new StringBuilder(subBuilder.toString());
-                                    } else {
-                                        path.append(subBuilder.toString());
-                                    }
-                                    subBuilder = new StringBuilder();
-                                }
+                                subBuilder = new StringBuilder();
                             }
+                        } else if (host != null && port == null) {
+                            nextIsPort = true;
                         } else {
                             subBuilder.append(ch);
                         }
-                    }
-                    if (refIndex > queryIndex) {
-                        String[] group = exprVal.split("#", 2);
-                        exprVal = group[0];
-                        ref = group[1];
-                    }
-                    if (renderedQuery) {
-                        if (queryIndex + 1 < exprVal.length()) {
-                            String queryStr = exprVal.substring(queryIndex + 1);
-                            String[] queryItems = queryStr.split("&");
-                            if (queryItems.length > 0) {
-                                for (String queryItem : queryItems) {
-                                    String[] keyValue = queryItem.split("=", 2);
-                                    lastQuery = new SimpleQueryParameter(queries, keyValue[0]);
-                                    queries.addQuery(lastQuery);
-                                    if (keyValue.length > 1 && StringUtils.isNotBlank(keyValue[1])) {
-                                        lastQuery.setValue(keyValue[1]);
-                                    }
-                                }
+                    } else if (!renderedPath && ch == '@') {
+                        // 解析用户名密码
+                        if (userInfo == null) {
+                            if (host != null) {
+                                userInfo = new StringBuilder(host);
+                                host = null;
+                            } else {
+                                userInfo = new StringBuilder();
                             }
                         }
-                    }
-                }
-            }
-            if (host == null && StringUtils.isEmpty(path) && StringUtils.isNotEmpty(urlBuilder)) {
-                if (scheme == null) {
-                    String urlStr = urlBuilder.toString();
-                    if (!urlStr.startsWith("/")) {
-                        String[] urlStrGroup = urlStr.split(":");
-                        if (urlStrGroup.length > 1) {
-                            String urlGroup0 = urlStrGroup[0];
-                            String urlGroup1 = urlStrGroup[1];
-                            try {
-                                port = Integer.valueOf(urlGroup1);
-                                host = urlGroup0;
-                            } catch (Throwable th) {
-                                if (path == null) {
-                                    path = new StringBuilder();
-                                }
-                                path.append(builder);
+                        if (nextIsPort) {
+                            userInfo.append(':');
+                        }
+                        userInfo.append(subBuilder);
+                        subBuilder = new StringBuilder();
+                    } else if (ch == '/' || pathCharIndex + 1 == baseLen) {
+                        if (ch != '/') {
+                            subBuilder.append(ch);
+                        }
+                        if (!renderedPath && nextIsPort && port == null) {
+                            // 解析端口号
+                            port = Integer.parseInt(subBuilder.toString());
+                            subBuilder = new StringBuilder();
+                            nextIsPort = false;
+                            if (ch == '/') {
+                                pathCharIndex--;
+                                renderedPath = true;
+                            }
+                        } else if (scheme != null && host == null) {
+                            // 解析地址部分
+                            host = subBuilder.toString();
+                            subBuilder = new StringBuilder();
+                            if (ch == '/') {
+                                pathCharIndex--;
+                                renderedPath = true;
                             }
                         } else {
-                            String urlGroup0 = urlStrGroup[0];
-                            if (urlGroup0.equals("localhost") ||
-                                    urlGroup0.matches("^(((\\d)|([1-9]\\d)|(1\\d{2})|(2[0-4]\\d)|(25[0-5]))\\.){3}((\\d)|([1-9]\\d)|(1\\d{2})|(2[0-4]\\d)|(25[0-5]))$")) {
-                                host = urlGroup0;
-                            } else {
+                            if (ch == '/') {
+                                subBuilder.append(ch);
+                                renderedPath = true;
+                            }
+                            if (renderedPath) {
                                 if (path == null) {
-                                    path = new StringBuilder();
+                                    path = new StringBuilder(subBuilder.toString());
+                                } else {
+                                    path.append(subBuilder.toString());
                                 }
-                                path.append(builder);
+                                subBuilder = new StringBuilder();
+                            }
+                        }
+                    } else {
+                        subBuilder.append(ch);
+                    }
+                }
+                if (refIndex > queryIndex) {
+                    String[] group = exprVal.split("#", 2);
+                    exprVal = group[0];
+                    ref = group[1];
+                }
+                if (renderedQuery) {
+                    if (queryIndex + 1 < exprVal.length()) {
+                        String queryStr = exprVal.substring(queryIndex + 1);
+                        String[] queryItems = queryStr.split("&");
+                        if (queryItems.length > 0) {
+                            for (String queryItem : queryItems) {
+                                String[] keyValue = queryItem.split("=", 2);
+                                lastQuery = new SimpleQueryParameter(queries, keyValue[0]);
+                                queries.addQuery(lastQuery);
+                                if (keyValue.length > 1 && StringUtils.isNotBlank(keyValue[1])) {
+                                    lastQuery.setValue(keyValue[1]);
+                                }
                             }
                         }
                     }
-                } else {
-                    if (path == null) {
-                        path = new StringBuilder();
-                    }
-                    path.append(builder);
                 }
             }
-            if (StringUtils.isNotEmpty(path)) {
-                String[] group = path.toString().split("#", 2);
-                if (group.length > 1) {
-                    path = new StringBuilder();
-                    path.append(group[0]);
-                    ref = group[1];
-                }
-            }
-//            new ForestURLBuilder()
-//                    .setScheme(scheme)
-//                    .setUserInfo(userInfo != null ? userInfo.toString() : null)
-//                    .setHost(host)
-//                    .setPort(port != null ? port : (host != null ? -1 : null))
-//                    .setPath(path != null ? path.toString() : null)
-//                    .setRef(ref)
-//                    .build();
-
-            return url.setScheme(scheme)
-                    .setUserInfo(userInfo != null ? userInfo.toString() : null)
-                    .setHost(host)
-                    .setPort(port != null ? port : (host != null ? -1 : null))
-                    .setPath(path != null ? path.toString() : null)
-                    .setRef(ref);
-
-        } catch (ForestVariableUndefinedException ex) {
-            throw new ForestVariableUndefinedException(annotationType, attributeName, forestMethod, ex.getVariableName(), template, ex.getStartIndex(), ex.getEndIndex());
-        } catch (ForestIndexReferenceException ex) {
-            throw new ForestIndexReferenceException(annotationType, attributeName, forestMethod, ex.getIndex(), ex.getArgumentsLength(), template, ex.getStartIndex(), ex.getEndIndex());
-        } catch (ForestExpressionException ex) {
-            throw new ForestExpressionException(ex.getMessage(), annotationType, attributeName, forestMethod, template, ex.getStartIndex(), ex.getEndIndex());
         }
+        if (host == null && StringUtils.isEmpty(path) && StringUtils.isNotEmpty(urlBuilder)) {
+            if (scheme == null) {
+                String urlStr = urlBuilder.toString();
+                if (!urlStr.startsWith("/")) {
+                    String[] urlStrGroup = urlStr.split(":");
+                    if (urlStrGroup.length > 1) {
+                        String urlGroup0 = urlStrGroup[0];
+                        String urlGroup1 = urlStrGroup[1];
+                        try {
+                            port = Integer.valueOf(urlGroup1);
+                            host = urlGroup0;
+                        } catch (Throwable th) {
+                            if (path == null) {
+                                path = new StringBuilder();
+                            }
+                            path.append(builder);
+                        }
+                    } else {
+                        String urlGroup0 = urlStrGroup[0];
+                        if (urlGroup0.equals("localhost") ||
+                                urlGroup0.matches("^(((\\d)|([1-9]\\d)|(1\\d{2})|(2[0-4]\\d)|(25[0-5]))\\.){3}((\\d)|([1-9]\\d)|(1\\d{2})|(2[0-4]\\d)|(25[0-5]))$")) {
+                            host = urlGroup0;
+                        } else {
+                            if (path == null) {
+                                path = new StringBuilder();
+                            }
+                            path.append(builder);
+                        }
+                    }
+                }
+            } else {
+                if (path == null) {
+                    path = new StringBuilder();
+                }
+                path.append(builder);
+            }
+        }
+        if (StringUtils.isNotEmpty(path)) {
+            String[] group = path.toString().split("#", 2);
+            if (group.length > 1) {
+                path = new StringBuilder();
+                path.append(group[0]);
+                ref = group[1];
+            }
+        }
+
+        return url.setScheme(scheme)
+                .setUserInfo(userInfo != null ? userInfo.toString() : null)
+                .setHost(host)
+                .setPort(port != null ? port : (host != null ? -1 : null))
+                .setPath(path != null ? path.toString() : null)
+                .setRef(ref);
+
     }
 
+    @Override
+    protected Object postValueRender(Object value, boolean enable) {
+        if (value == null || !enable) {
+            return value;
+        }
+        if (value instanceof Collection) {
+            Collection collection = (Collection) value;
+            int len = collection.size();
+            int index = RandomUtils.nextInt(0, len);
+            return collection.toArray()[index];
+        }
+        if (value.getClass().isArray()) {
+            int len = Array.getLength(value);
+            int index = RandomUtils.nextInt(0, len);
+            return Array.get(value, index);
+        }
+        return super.postValueRender(value, enable);
+    }
 }

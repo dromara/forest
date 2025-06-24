@@ -1,8 +1,6 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
-import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.http.RequestVariableScope;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -12,8 +10,8 @@ public class MappingFloat extends MappingExpr {
 
     private final float number;
 
-    public MappingFloat(float number) {
-        super(null, Token.FLOAT);
+    public MappingFloat(MappingTemplate source, float number) {
+        super(source, Token.FLOAT);
         this.number = number;
     }
 

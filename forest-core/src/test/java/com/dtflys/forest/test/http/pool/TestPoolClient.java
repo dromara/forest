@@ -60,15 +60,17 @@ public class TestPoolClient extends BaseClientTest {
         AtomicBoolean hasOut = new AtomicBoolean(false);
         AtomicReference<ForestAbortException> exceptionRef = new AtomicReference<>(null);
         for (int i = 0; i < count; i++) {
+            int finalI = i;
             executorService.execute(() -> {
                 ForestResponse<String> response = poolClient.send();
+                System.out.println("i: " + finalI);
                 if (pool.getRunningPoolSize() > pool.getMaxPoolSize()) {
                     hasOut.set(true);
                 } else {
                     System.out.println("pool running size: " + pool.getRunningPoolSize() + ", max size: " + pool.getMaxPoolSize() + ", queue size: " + pool.getQueueSize());
                 }
                 if (response.getException() != null && response.getException() instanceof ForestAbortException) {
-                    response.getException().printStackTrace();
+//                    response.getException().printStackTrace();
                     exceptionRef.set((ForestAbortException) response.getException());
                 }
                 latch.countDown();

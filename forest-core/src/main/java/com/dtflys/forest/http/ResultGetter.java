@@ -4,6 +4,7 @@ import com.dtflys.forest.converter.ForestConverter;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.handler.ResultHandler;
 import com.dtflys.forest.mapping.MappingTemplate;
+import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.ReflectUtils;
 import com.dtflys.forest.utils.StringUtils;
@@ -91,7 +92,10 @@ public abstract class ResultGetter implements ForestResultGetter {
     @Override
     public <T> T getByPath(String path, Type type) {
         try {
-            final MappingTemplate pathTemplate = request.getMethod().makeTemplate(path);
+            final ForestMethod<?> forestMethod = request.getMethod();
+            final MappingTemplate pathTemplate = forestMethod != null ?
+                    request.getMethod().makeTemplate(path) :
+                    MappingTemplate.create(path);
             final String pathStr = pathTemplate.render(request, request.getArguments());
             final String resCharset = getResponse().getCharset();
             final String charset = StringUtils.isBlank(resCharset) ? "UTF-8" : resCharset;

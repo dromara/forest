@@ -3,6 +3,8 @@ package com.dtflys.forest.test.http;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.test.http.client.OAuth2Client;
 import com.dtflys.forest.test.mock.OAuth2MockServer;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -19,7 +21,11 @@ import static org.junit.Assert.assertNotNull;
 public class TestOAuth2Client extends BaseClientTest {
 
     @Rule
-    public OAuth2MockServer server = new OAuth2MockServer(this);
+    public MockWebServer server = new MockWebServer();
+
+    
+//    @Rule
+//    public OAuth2MockServer server2 = new OAuth2MockServer(this);
 
     private static ForestConfiguration configuration;
 
@@ -40,15 +46,17 @@ public class TestOAuth2Client extends BaseClientTest {
     public void afterRequests() {
     }
 
+/*
     @Before
-    public void prepareMockServer() {
+    public void setup() {
         server.initServer();
     }
-    
-    
+*/
 
     @Test
     public void testPassword() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(OAuth2MockServer.TOKEN_JSON));
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(OAuth2MockServer.EXPECTED));
         String result = oAuth2Client.testPassword();
         assertNotNull(result);
         assertEquals(OAuth2MockServer.EXPECTED, result);
@@ -56,6 +64,8 @@ public class TestOAuth2Client extends BaseClientTest {
 
     @Test
     public void testPasswordTokenAtURL() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(OAuth2MockServer.TOKEN_JSON));
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(OAuth2MockServer.EXPECTED));
         String result = oAuth2Client.testPasswordTokenAtURL("root", "123456");
         assertNotNull(result);
         assertEquals(OAuth2MockServer.EXPECTED, result);
@@ -63,6 +73,8 @@ public class TestOAuth2Client extends BaseClientTest {
 
     @Test
     public void testClientCredentials() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(OAuth2MockServer.TOKEN_JSON));
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(OAuth2MockServer.EXPECTED));
         String result = oAuth2Client.testClientCredentials();
         assertNotNull(result);
         assertEquals(OAuth2MockServer.EXPECTED, result);
@@ -70,6 +82,8 @@ public class TestOAuth2Client extends BaseClientTest {
 
     @Test
     public void testClientCredentialsTokenAtURL() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(OAuth2MockServer.TOKEN_JSON));
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(OAuth2MockServer.EXPECTED));
         String result = oAuth2Client.testClientCredentialsTokenAtURL();
         assertNotNull(result);
         assertEquals(OAuth2MockServer.EXPECTED, result);
@@ -79,6 +93,8 @@ public class TestOAuth2Client extends BaseClientTest {
 
     @Test
     public void testDefinitionOAuth2() {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(OAuth2MockServer.DEFINITION_TOKEN_JSON));
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(OAuth2MockServer.EXPECTED));
         String result = oAuth2Client.testDefinitionOAuth2();
         assertNotNull(result);
         assertEquals(OAuth2MockServer.EXPECTED, result);

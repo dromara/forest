@@ -66,6 +66,7 @@ import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.RequestLogMessage;
 import com.dtflys.forest.mapping.AbstractVariableScope;
+import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingURLTemplate;
 import com.dtflys.forest.multipart.ByteArrayMultipart;
 import com.dtflys.forest.multipart.FileMultipart;
@@ -484,6 +485,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
     boolean isSSE = false;
 
 
+
     public ForestRequest(ForestConfiguration configuration, ForestMethod method, ForestBody body, Object[] arguments) {
         super(method != null ? method : configuration);
         this.configuration = configuration;
@@ -828,7 +830,9 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
         }
         arguments(args);
         final String srcUrl = StringUtils.trimBegin(url);
-        MappingURLTemplate template = method.makeURLTemplate(null, null, srcUrl);
+        MappingURLTemplate template = method != null ?
+                method.makeURLTemplate(null, null, srcUrl) :
+                MappingURLTemplate.get(srcUrl);
         return setUrl(template, args);
     }
 
@@ -1320,7 +1324,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @return {@link ForestRequest}对象实例
      */
     public ForestRequest<T> setBackend(String backendName) {
-        HttpBackend backend = configuration.getBackendSelector().select(backendName);
+        HttpBackend backend = configuration.getBackendSelector().select(backendName, configuration);
         if (backend != null) {
             backend.init(configuration);
             this.backend = backend;
@@ -3085,7 +3089,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> addBody(String stringBody) {
-        return addBody(new StringRequestBody(stringBody));
+        return addBody(new StringRequestBody(stringBody, this));
     }
 
     /**
@@ -4147,10 +4151,11 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @return {@code true}: 流的方式，{@code false}: 非流的方式
      */
     public boolean isReceiveStream() {
-        if (isDownloadFile()) {
+        if (isSSE || isDownloadFile) {
             return true;
         }
-        if (InputStream.class.isAssignableFrom(getMethod().getReturnClass())) {
+
+        if (method != null && InputStream.class.isAssignableFrom(method.getReturnClass())) {
             return true;
         }
         final Type resultType = getLifeCycleHandler().getResultType();
@@ -4173,7 +4178,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
                     return true;
                 }
             } else if (isResultResponse) {
-                return true;
+                return false;
             }
         }
         return false;
@@ -5167,6 +5172,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
         newRequest.attachments = this.attachments;
         newRequest.logConfiguration = this.logConfiguration;
         newRequest.requestLogMessage = this.requestLogMessage;
+        newRequest.variables.putAll(this.variables);
         return newRequest;
     }
 
@@ -5438,7 +5444,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
     
 
     /**
-     * 执行请求发送过程，并获取响应类型结果
+     * 执行请求发送过程，并获取响应类型结果 (响应对象会自动关闭，无需手动操作)
      *
      * @return 请求执行响应后返回的 Forest 响应类型结果, 其为 {@link ForestResponse} 对象实例
      * @since 1.5.27
@@ -5448,6 +5454,17 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
     }
 
     /**
+     * 执行请求发送过程，并获取未关闭的响应类型结果 (需要自行手动关闭响应对象)
+     * 
+     * @return 请求执行响应后返回的 Forest 未关闭的响应类型结果, 其为 {@link UnclosedResponse} 对象实例，该类型响应对象需要手动关闭
+     * @since 1.7.1
+     */
+    public UnclosedResponse<T> executeAsUnclosedResponse() {
+        return execute(UnclosedResponse.class);
+    }
+
+
+    /**
      * 执行请求发送过程，获取输入流类型结果，并流作为回调函数的参数进行调用，无返回值
      * <p>该接口会安全处理响应体数据流，在回调函数被回调时，流已被自动打开，调用结束后也会自动关闭流</p>
      * 
@@ -5455,9 +5472,8 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @since 1.6.0
      */
     public void executeAsStream(Consumer3<InputStream, ForestRequest, ForestResponse> consumer) {
-        final ForestResponse<InputStream> response = execute(new TypeReference<ForestResponse<InputStream>>() {});
-        response.openStream((in, _res) -> {
-            consumer.accept(in, this, response);
+        executeAsUnclosedResponse().openStream((in, res) -> {
+            consumer.accept(in, this, res);
         });
     }
 
@@ -5471,9 +5487,9 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @since 1.6.0
      */
     public <R> R executeAsStream(OnStream<R> onStream) {
-        final ForestResponse<InputStream> response = execute(new TypeReference<ForestResponse<InputStream>>() {});
+        final UnclosedResponse<T> response = executeAsUnclosedResponse();
         return response.openStream((in, _res) -> {
-            return onStream.onStream(in, this, response);
+            return onStream.onStream(in, this, (ForestResponse) response);
         });
     }
 

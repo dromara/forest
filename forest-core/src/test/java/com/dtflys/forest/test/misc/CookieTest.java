@@ -569,6 +569,7 @@ public class CookieTest extends BaseClientTest {
     @Test
     public void testCookieAutoSaveAndLoad() {
         ForestConfiguration configuration = ForestConfiguration.createConfiguration()
+                .setCookiesStorageMaxSize(16)
                 .setAutoCookieSaveAndLoadEnabled(true);
 
         server.enqueue(new MockResponse()

@@ -3,12 +3,17 @@ package com.dtflys.forest.test.http;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HttpResponse;
+import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
+import com.dtflys.forest.Forest;
 import com.dtflys.forest.backend.ContentType;
+import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestURL;
+import com.dtflys.forest.test.http.backend.BackendClient;
 import com.dtflys.forest.test.http.client.GetClient;
 import com.dtflys.forest.test.http.client.UrlEncodedClient;
 import com.dtflys.forest.test.http.model.JsonTestUser;
@@ -16,18 +21,23 @@ import com.dtflys.forest.test.model.Contact;
 import com.dtflys.forest.test.model.TokenResult;
 import com.dtflys.forest.utils.TypeReference;
 import com.google.common.collect.Lists;
+import okhttp3.*;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okio.Buffer;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -37,6 +47,7 @@ import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static org.assertj.core.api.Assertions.*;
@@ -49,6 +60,7 @@ import static org.junit.Assert.assertNotNull;
 public class TestGetClient extends BaseClientTest {
 
     public final static String EXPECTED = "{\"status\":\"ok\"}";
+    private static final Logger log = LoggerFactory.getLogger(TestGetClient.class);
 
     @Rule
     public final MockWebServer server = new MockWebServer();
@@ -106,7 +118,7 @@ public class TestGetClient extends BaseClientTest {
     }
 
 
-    //    @Test
+//    @Test
     public void performance() {
         int count = 10000;
         for (int i = 0; i < count; i++) {
@@ -114,12 +126,75 @@ public class TestGetClient extends BaseClientTest {
         }
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
+        HttpBackend httpBackend = Forest.backend("httpclient");
         for (int i = 0; i < count; i++) {
-            getClient.testPath("abc");
+            log.info("i = " + i);
+            Forest.post("http://{}:{}/abc", server.getHostName(), server.getPort())
+                    .logEnabled(false)
+                    .backend(httpBackend)
+                    .addHeader("Accept", "text/plain")
+                    .addBody("username=foo")
+                    .executeAsStream((in, req, resp) -> {
+                    });
         }
         stopWatch.stop();
         System.out.println("总耗时: " + stopWatch.getTotalTimeMillis() + "ms");
     }
+
+
+//    @Test
+    public void performance_okhttp() {
+        int count = 10000;
+        ConnectionPool pool = new ConnectionPool(10000, 100000, TimeUnit.SECONDS);
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectionPool(pool)
+                .build();
+
+        MediaType mediaType = MediaType.parse(ContentType.APPLICATION_X_WWW_FORM_URLENCODED);
+        for (int i = 0; i < count; i++) {
+            server.enqueue(new MockResponse().setBody(EXPECTED));
+        }
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        for (int i = 0; i < count; i++) {
+            log.info("i = " + i);
+            Request.Builder builder = new Request.Builder();
+            Request request = builder.url("http://localhost:" + server.getPort() + "/abc")
+                    .header("Accept", "text/plain")
+                    .method("POST", RequestBody.create(mediaType, "username=foo".getBytes(StandardCharsets.UTF_8)))
+                    .build();
+            Call call = client.newCall(request);
+            try {
+                Response response = call.execute();
+                response.body().close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        stopWatch.stop();
+        System.out.println("总耗时: " + stopWatch.getTotalTimeMillis() + "ms");
+    }
+
+
+//    @Test
+    public void performance_hutool() {
+        int count = 10000;
+        for (int i = 0; i < count; i++) {
+            server.enqueue(new MockResponse().setBody(EXPECTED));
+        }
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        for (int i = 0; i < count; i++) {
+            log.info("i = " + i);
+            HttpUtil.createPost("http://localhost:" + server.getPort() + "/abc")
+                            .header("Accept", "text/plain")
+                            .body("username=foo")
+                            .execute();
+        }
+        stopWatch.stop();
+        System.out.println("总耗时: " + stopWatch.getTotalTimeMillis() + "ms");
+    }
+
 
     //    @Test
     public void performance_concurrent() throws InterruptedException {

@@ -116,7 +116,6 @@ public class HttpclientExecutor extends AbstractHttpExecutor {
             }
         }
         try {
-            request.pool().awaitRequest(request);
             requestSender.sendRequest(
                     request,
                     this,

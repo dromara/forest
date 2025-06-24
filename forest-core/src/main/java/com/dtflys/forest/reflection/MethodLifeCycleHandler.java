@@ -17,6 +17,7 @@ import com.dtflys.forest.http.ForestCookies;
 import com.dtflys.forest.http.ForestFuture;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.http.UnclosedResponse;
 import com.dtflys.forest.interceptor.ResponseResult;
 import com.dtflys.forest.interceptor.ResponseResultStatus;
 import com.dtflys.forest.interceptor.ResponseSuccess;
@@ -25,6 +26,7 @@ import com.dtflys.forest.utils.ForestProgress;
 import com.dtflys.forest.utils.ReflectUtils;
 
 import javax.security.auth.login.Configuration;
+import java.io.UncheckedIOException;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
@@ -79,7 +81,9 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
                 final Optional<?> resultOpt = responseSuccess != null ? responseSuccess.getResult() : null;
                 resultData = handleResultType(resultOpt, request, response, resultType, resultRawClass);
                 handleSuccess(resultData, resultOpt, request, response);
-                if ((!ForestResponse.class.isAssignableFrom(resultRawClass)
+                if (UnclosedResponse.class.isAssignableFrom(resultRawClass)) {
+                    resultData = response;
+                } else if ((!ForestResponse.class.isAssignableFrom(resultRawClass)
                         && !Future.class.isAssignableFrom(resultRawClass))
                         || request.isDownloadFile()) {
                     resultData = response.getResult();
@@ -179,9 +183,16 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
         request.getInterceptorChain().onSuccess(resultData, request, response);
         final OnSuccess onSuccess = request.getOnSuccess();
         if (onSuccess != null) {
-            final Object result = RESULT_HANDLER.getResult(
-                    resultOpt, request, response, onSuccessClassGenericType, ReflectUtils.toClass(onSuccessClassGenericType));
-            onSuccess.onSuccess(result, request, response);
+            final Class<?> onSuccessClass = ReflectUtils.toClass(onSuccessClassGenericType);
+            if (Object.class == onSuccessClass) {
+                final Object result = resultOpt != null ? resultOpt.orElse(null) : RESULT_HANDLER.getResult(
+                        resultOpt, request, response, String.class, String.class);
+                onSuccess.onSuccess(result, request, response);
+            } else {
+                final Object result = RESULT_HANDLER.getResult(
+                        resultOpt, request, response, onSuccessClassGenericType, onSuccessClass);
+                onSuccess.onSuccess(result, request, response);
+            }
         }
     }
 

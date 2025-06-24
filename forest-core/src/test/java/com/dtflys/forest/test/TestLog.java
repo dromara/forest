@@ -96,8 +96,8 @@ public class TestLog {
                 .logHandler(logHandler)
                 .executeAsResponse();
 
-        verify(logger).info(eq("[Forest] Request (okhttp3): \n" +
-                "\tGET http://" + server.getHostName() + ":" + server.getPort() + "/test HTTP\n" +
+        verify(logger).info(eq("[Forest] Request (httpclient): \n" +
+                "\tGET http://localhost:" + server.getPort() + "/test HTTP\n" +
                 "\tHeaders: \n" +
                 "\t\tUser-Agent: forest/dev"));
         verify(logger).info(eq("[Forest] Response: Status = 200, Time = " + response.getTimeAsMillisecond() + "ms"));
@@ -127,9 +127,9 @@ public class TestLog {
                 "\tResponse Status:\n" +
                 "\t\tStatus = 200, Time = " + response.getTimeAsMillisecond() + "ms\n" +
                 "\tResponse Headers:\n" +
-                "\t\tcontent-length: 26\n" +
-                "\t\tcontent-type: application/json\n" +
-                "\t\tserver: MockWebServer"));
+                "\t\tContent-Type: application/json\n" +
+                "\t\tServer: MockWebServer\n" +
+                "\t\tContent-Length: 26"));
     }
 
 

@@ -21,6 +21,7 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.config.ConnectionConfig;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
@@ -30,6 +31,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicHeader;
 
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -63,10 +65,15 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
                                 .register("https", new ForestSSLConnectionFactory())
                                 .register("http", new ForestConnectionFactory())
                                 .build();
+                ConnectionConfig connectionConfig = ConnectionConfig.custom()
+                        .setBufferSize(1024)
+                        .setCharset(StandardCharsets.UTF_8)
+                        .build();
                 tsConnectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
                 tsConnectionManager.setMaxTotal(maxConnections);
                 tsConnectionManager.setDefaultMaxPerRoute(Integer.MAX_VALUE);
                 tsConnectionManager.setValidateAfterInactivity(60);
+                tsConnectionManager.setDefaultConnectionConfig(connectionConfig);
                 defaultHttpClientProvider = new DefaultHttpClientProvider();
                 inited = true;
             } catch (Throwable th) {
@@ -88,7 +95,7 @@ public class HttpclientConnectionManager implements ForestConnectionManager {
                         ForestConfiguration configuration = request.getConfiguration();
                         connectionManager = (HttpclientConnectionManager) configuration
                                 .getBackendSelector()
-                                .select(HttpclientBackend.NAME)
+                                .select(HttpclientBackend.NAME, configuration)
                                 .getConnectionManager();
                         if (!connectionManager.isInitialized()) {
                             connectionManager.init(configuration);

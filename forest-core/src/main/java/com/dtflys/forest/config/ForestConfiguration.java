@@ -49,10 +49,7 @@ import com.dtflys.forest.filter.EncodeUserInfoFilter;
 import com.dtflys.forest.filter.Filter;
 import com.dtflys.forest.filter.JSONFilter;
 import com.dtflys.forest.filter.XmlFilter;
-import com.dtflys.forest.http.ForestAddress;
-import com.dtflys.forest.http.ForestAsyncMode;
-import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.http.ForestRequestType;
+import com.dtflys.forest.http.*;
 import com.dtflys.forest.http.cookie.ForestCookieStorage;
 import com.dtflys.forest.http.cookie.MemoryCookieStorage;
 import com.dtflys.forest.interceptor.DefaultInterceptorFactory;
@@ -65,14 +62,7 @@ import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.pool.FixedRequestPool;
 import com.dtflys.forest.pool.ForestRequestPool;
 import com.dtflys.forest.proxy.ProxyFactory;
-import com.dtflys.forest.reflection.BasicVariable;
-import com.dtflys.forest.reflection.DefaultObjectFactory;
-import com.dtflys.forest.reflection.ForestArgumentsVariable;
-import com.dtflys.forest.reflection.ForestMethod;
-import com.dtflys.forest.reflection.ForestObjectFactory;
-import com.dtflys.forest.reflection.ForestMethodVariable;
-import com.dtflys.forest.reflection.ForestVariable;
-import com.dtflys.forest.reflection.TemplateVariable;
+import com.dtflys.forest.reflection.*;
 import com.dtflys.forest.result.AfterExecuteResultTypeHandler;
 import com.dtflys.forest.result.ForestRequestResultHandler;
 import com.dtflys.forest.result.ResultTypeHandler;
@@ -269,7 +259,7 @@ public class ForestConfiguration implements VariableScope, Serializable {
     /**
      * 后端客户端对象缓存
      */
-    private ForestCache<String, Object> backendClientCache;
+    private volatile ForestCache<String, Object> backendClientCache;
 
 
     /**
@@ -499,6 +489,17 @@ public class ForestConfiguration implements VariableScope, Serializable {
      */
     public HttpBackendSelector getBackendSelector() {
         return httpBackendSelector;
+    }
+
+    /**
+     * 根据后端名称获取Forest后端对象
+     * 
+     * @param backendName 后端名称 
+     * @return Forest后端对象
+     * @since v1.7.1
+     */
+    public HttpBackend backend(String backendName) {
+        return getBackendSelector().select(backendName, this);
     }
 
     /**
@@ -1650,7 +1651,8 @@ public class ForestConfiguration implements VariableScope, Serializable {
         if (value instanceof ForestVariable) {
             this.variables.put(name, (ForestVariable) value);
         } else if (value instanceof CharSequence) {
-            final MappingTemplate mappingTemplate = MappingTemplate.create(this, String.valueOf(value));
+            final MappingTemplate mappingTemplate = MappingTemplate.createVariableTemplate(
+                    name, this, String.valueOf(value));
             final TemplateVariable templateVariable = new TemplateVariable(mappingTemplate);
             variables.put(name, templateVariable);
         } else {
@@ -1658,6 +1660,7 @@ public class ForestConfiguration implements VariableScope, Serializable {
         }
         return this;
     }
+
 
     /**
      * 设置全局变量
@@ -1667,7 +1670,11 @@ public class ForestConfiguration implements VariableScope, Serializable {
      * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setVariable(String name, ForestVariable value) {
-        this.variables.put(name, value);
+        if (value == null) {
+            this.variables.put(name, new BasicVariable(null));
+        } else {
+            this.variables.put(name, value);
+        }
         return this;
     }
 
@@ -1680,11 +1687,18 @@ public class ForestConfiguration implements VariableScope, Serializable {
      * @return 当前ForestConfiguration实例
      */
     public ForestConfiguration setVariable(String name, ForestArgumentsVariable value) {
-        this.variables.put(name, value);
+        if (value == null) {
+            this.variables.put(name, new BasicVariable(null));
+        } else {
+            this.variables.put(name, value);
+        }
         return this;
     }
 
-
+    public ForestConfiguration removeVariable(String name) {
+        this.variables.remove(name);
+        return this;
+    }
 
     /**
      * 设置全局变量
@@ -1742,6 +1756,9 @@ public class ForestConfiguration implements VariableScope, Serializable {
             }
             if (variable instanceof ForestMethodVariable) {
                 return ((ForestMethodVariable) variable).getValue(method);
+            }
+            if (variable instanceof TemplateVariable) {
+                return ((TemplateVariable) variable).getValue(method == null ? this : method);
             }
             return variable.getValue(request);
         }
@@ -1829,10 +1846,12 @@ public class ForestConfiguration implements VariableScope, Serializable {
      * 设置 Cookie 的最大自动存储大小
      * 
      * @param cookiesStorageMaxSize Cookie 的最大自动存储大小
+     * @return 当前ForestConfiguration实例
      * @since 1.7.0
      */
-    public void setCookiesStorageMaxSize(int cookiesStorageMaxSize) {
+    public ForestConfiguration setCookiesStorageMaxSize(int cookiesStorageMaxSize) {
         this.cookiesStorageMaxSize = cookiesStorageMaxSize;
+        return this;
     }
 
     /**
@@ -2174,14 +2193,46 @@ public class ForestConfiguration implements VariableScope, Serializable {
         return returnOnInvokeMethodTypeHandlers;
     }
 
+    private <R> ForestRequest<R> createRequest(Class<R> clazz) {
+        final ForestRequest<R> request = new ForestRequest<>(this);
+        request.setBackend(getBackend());
+        if (timeout != null && timeout >= 0) {
+            request.setTimeout(timeout);
+        }
+        if (connectTimeout != null && connectTimeout >= 0) {
+            request.setConnectTimeout(connectTimeout);
+        }
+        if (readTimeout != null && readTimeout >= 0) {
+            request.setReadTimeout(readTimeout);
+        }
+        if (maxRetryCount != null) {
+            request.setMaxRetryCount(maxRetryCount);
+        }
+        if (interceptors != null) {
+            for (Class<? extends Interceptor> interceptor : interceptors) {
+                request.addInterceptor(interceptor);
+            }
+        }
+        request.setDataType(ForestDataType.AUTO);
+        request.setAsyncMode(asyncMode);
+        request.setRetryer(getRetryer());
+        MethodLifeCycleHandler<?> lifeCycleHandler = new MethodLifeCycleHandler<>(
+                 clazz, Object.class);
+        request.setLifeCycleHandler(lifeCycleHandler);
+        return request;
+    }
+
+    private ForestRequest<?> createRequest() {
+        return createRequest(Void.class);
+    }
+
     /**
      * 创建通用 {@link ForestRequest} 对象
      *
      * @return {@link ForestRequest} 对象
      */
     public ForestRequest<?> request() {
-        ForestGenericClient client = client(ForestGenericClient.class);
-        return client.request();
+        return createRequest().setUrl("/");
     }
 
     /**
@@ -2192,8 +2243,7 @@ public class ForestConfiguration implements VariableScope, Serializable {
      * @return {@link ForestRequest} 对象
      */
     public <R> ForestRequest<R> request(Class<R> clazz) {
-        ForestGenericClient client = client(ForestGenericClient.class);
-        return client.request(clazz);
+        return createRequest(clazz).setUrl("/");
     }
 
     /**
@@ -2215,7 +2265,7 @@ public class ForestConfiguration implements VariableScope, Serializable {
      * @return {@link ForestRequest} 对象
      */
     public ForestRequest<?> get(String url, Object ...args) {
-        return request()
+        return createRequest()
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.GET)
@@ -2241,7 +2291,7 @@ public class ForestConfiguration implements VariableScope, Serializable {
      * @return {@link ForestRequest} 对象
      */
     public ForestRequest<?> post(String url, Object ...args) {
-        return request()
+        return createRequest()
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.POST)
@@ -2266,7 +2316,7 @@ public class ForestConfiguration implements VariableScope, Serializable {
      * @return {@link ForestRequest} 对象
      */
     public ForestRequest<?> put(String url, Object ...args) {
-        return request()
+        return createRequest()
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.PUT)
@@ -2291,7 +2341,7 @@ public class ForestConfiguration implements VariableScope, Serializable {
      * @return {@link ForestRequest} 对象
      */
     public ForestRequest<?> delete(String url, Object ...args) {
-        return request()
+        return createRequest()
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.DELETE)
@@ -2316,7 +2366,7 @@ public class ForestConfiguration implements VariableScope, Serializable {
      * @return {@link ForestRequest} 对象
      */
     public ForestRequest<?> head(String url, Object ...args) {
-        return request()
+        return createRequest()
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.HEAD)
@@ -2341,7 +2391,7 @@ public class ForestConfiguration implements VariableScope, Serializable {
      * @return {@link ForestRequest} 对象
      */
     public ForestRequest<?> patch(String url, Object ...args) {
-        return request()
+        return createRequest()
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.PATCH)
@@ -2366,7 +2416,7 @@ public class ForestConfiguration implements VariableScope, Serializable {
      * @return {@link ForestRequest} 对象
      */
     public ForestRequest<?> options(String url, Object ...args) {
-        return request()
+        return createRequest()
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.OPTIONS)
@@ -2391,7 +2441,7 @@ public class ForestConfiguration implements VariableScope, Serializable {
      * @return {@link ForestRequest} 对象
      */
     public ForestRequest<?> trace(String url, Object ...args) {
-        return request()
+        return createRequest()
                 .setType(null)
                 .clearTypeChangeHistory()
                 .setType(ForestRequestType.TRACE)

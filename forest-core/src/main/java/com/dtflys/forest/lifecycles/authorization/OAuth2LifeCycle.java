@@ -8,6 +8,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.reflection.ForestMethod;
+import com.dtflys.forest.utils.ForestCache;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
 
@@ -30,7 +31,7 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Void> 
     /**
      * Token 缓存
      */
-    private final Map<String, TokenCache> cache = new LinkedHashMap<>();
+    private final ForestCache<String, TokenCache> cache = new ForestCache<>(1024);
     private OAuth2Client oAuth2Client;
 
     @Override

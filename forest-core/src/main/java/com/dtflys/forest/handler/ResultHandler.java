@@ -6,6 +6,8 @@ import com.dtflys.forest.exceptions.ForestHandlerException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestSSE;
+import com.dtflys.forest.http.Res;
+import com.dtflys.forest.http.UnclosedResponse;
 import com.dtflys.forest.lifecycles.file.DownloadLifeCycle;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
 import com.dtflys.forest.sse.ForestSSEListener;
@@ -27,7 +29,7 @@ import java.util.concurrent.Future;
  */
 public class ResultHandler {
 
-    protected boolean isReceivedResponseData(ForestResponse response) {
+    protected boolean isReceivedResponseData(Res response) {
         if (response == null) {
             return false;
         }
@@ -43,12 +45,12 @@ public class ResultHandler {
      * @return 转换后的对象
      * @since 1.5.27
      */
-    public Object getResult(ForestRequest request, ForestResponse response, Type resultType) {
+    public Object getResult(ForestRequest request, Res response, Type resultType) {
         final Class<?> clazz = ReflectUtils.toClass(resultType);
         return getResult(null, request, response, resultType, clazz);
     }
 
-    public Object getResult(Optional<?> resultOpt, ForestRequest request, ForestResponse response, Type resultType) {
+    public Object getResult(Optional<?> resultOpt, ForestRequest request, Res response, Type resultType) {
         final Class<?> clazz = ReflectUtils.toClass(resultType);
         return getResult(resultOpt, request, response, resultType, clazz);
     }
@@ -63,19 +65,19 @@ public class ResultHandler {
      * @return 转换后的对象
      * @since 1.5.27
      */
-    public Object getResult(ForestRequest request, ForestResponse response, Class resultClass) {
+    public Object getResult(ForestRequest request, Res response, Class resultClass) {
         final Type type = ReflectUtils.toType(resultClass);
         return getResult(null, request, response, type, resultClass);
     }
 
-    public Object getResult(Optional<?> resultOpt, ForestRequest request, ForestResponse response, Class resultClass) {
+    public Object getResult(Optional<?> resultOpt, ForestRequest request, Res response, Class resultClass) {
         final Type type = ReflectUtils.toType(resultClass);
         return getResult(resultOpt, request, response, type, resultClass);
     }
 
 
 
-    public Object getResult(Optional<?> resultOpt, ForestRequest request, ForestResponse response, Type resultType, Class resultClass) {
+    public Object getResult(Optional<?> resultOpt, ForestRequest request, Res response, Type resultType, Class resultClass) {
         String optStringValue = null;
         if (resultOpt != null) {
             if (Optional.class.isAssignableFrom(resultClass)) {
@@ -89,7 +91,7 @@ public class ResultHandler {
             if (ReflectUtils.isAssignableFrom(resultClass, optValueClass)) {
                 return optValue;
             }
-            if (ForestResponse.class.isAssignableFrom(resultClass)) {
+            if (Res.class.isAssignableFrom(resultClass)) {
                 final ParameterizedType parameterizedType = ReflectUtils.toParameterizedType(resultType);
                 if (parameterizedType == null) {
                     response.setResult(optValue);
@@ -119,14 +121,14 @@ public class ResultHandler {
                 if (void.class.isAssignableFrom(resultClass) || Void.class.isAssignableFrom(resultClass)) {
                     return null;
                 }
-                // 处理特殊泛型类型 （ForestResponse, ForestRequest, Optional）
-                if (ForestResponse.class.isAssignableFrom(resultClass)
+                // 处理特殊泛型类型 （Res, ForestRequest, Optional）
+                if (Res.class.isAssignableFrom(resultClass)
                         || ForestRequest.class.isAssignableFrom(resultClass)
                         || Optional.class.isAssignableFrom(resultClass)) {
                     if (resultType instanceof ParameterizedType) {
                         final ParameterizedType parameterizedType = (ParameterizedType) resultType;
                         final Class<?> rowClass = (Class<?>) parameterizedType.getRawType();
-                        if (ForestResponse.class.isAssignableFrom(rowClass)
+                        if (Res.class.isAssignableFrom(rowClass)
                                 || ForestRequest.class.isAssignableFrom(resultClass)
                                 || Optional.class.isAssignableFrom(rowClass)) {
                             
@@ -135,8 +137,11 @@ public class ResultHandler {
                             if (realClass == null) {
                                 realClass = String.class;
                             }
-                            final Object realResult = getResult(resultOpt, request, response, realType, realClass);
-                            response.setResult(realResult);
+                            if (!(UnclosedResponse.class.isAssignableFrom(rowClass))) {
+                                final Object realResult = getResult(resultOpt, request, response, realType, realClass);
+                                response.setResult(realResult);
+                            }
+                            
                         }
                     }
                     return response;
@@ -176,14 +181,14 @@ public class ResultHandler {
                     try {
                         responseText = optStringValue != null ? optStringValue : response.readAsString();
                     } catch (Throwable th) {
-                        request.getLifeCycleHandler().handleError(request, response, th);
+                        request.getLifeCycleHandler().handleError(request, (ForestResponse) response, th);
                     }
                 }
                 else {
                     try {
                         responseText = optStringValue != null ? optStringValue : response.getContent();
                     } catch (Throwable th) {
-                        request.getLifeCycleHandler().handleError(request, response, th);
+                        request.getLifeCycleHandler().handleError(request, (ForestResponse) response, th);
                     }
                 }
                 response.setContent(responseText);
@@ -219,10 +224,10 @@ public class ResultHandler {
                 }
                 return converter.convertToJavaObject(response.getInputStream(), resultType, charset);
             } catch (Exception e) {
-                throw new ForestHandlerException(e, request, response);
+                throw new ForestHandlerException(e, request, (ForestResponse) response);
             }
         }
-        else if (ForestResponse.class.isAssignableFrom(resultClass)) {
+        else if (Res.class.isAssignableFrom(resultClass)) {
             return response;
         }
         return null;

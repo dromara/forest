@@ -136,6 +136,9 @@ public class DefaultBinaryConverter implements ForestConverter<Object>, ForestEn
 
     @Override
     public byte[] encodeRequestBody(final ForestBody reqBody, final Charset charset, final ConvertOptions options) {
+        if (reqBody.size() == 1) {
+            return reqBody.get(0).getByteArray();
+        }
         final List<byte[]> byteList = new LinkedList<>();
         int size = 0;
         for (final ForestRequestBody body : reqBody) {
