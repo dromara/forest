@@ -15,6 +15,7 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestURL;
 import com.dtflys.forest.test.http.backend.BackendClient;
 import com.dtflys.forest.test.http.client.GetClient;
+import com.dtflys.forest.test.http.client.PostClient;
 import com.dtflys.forest.test.http.client.UrlEncodedClient;
 import com.dtflys.forest.test.http.model.JsonTestUser;
 import com.dtflys.forest.test.model.Contact;
@@ -87,6 +88,24 @@ public class TestGetClient extends BaseClientTest {
         configuration.setVariableValue("port", server.getPort());
         getClient = configuration.createInstance(GetClient.class);
         urlEncodedClient = configuration.createInstance(UrlEncodedClient.class);
+    }
+
+    @Test
+    public void testHash() {
+        PostClient postClient = Forest.client(PostClient.class);
+        int hashCode1 = getClient.hashCode();
+        int hashCode2 = postClient.hashCode();
+        int hashCode3 = getClient.hashCode();
+        assertThat(hashCode1).isNotEqualTo(hashCode2);
+        assertThat(hashCode1).isEqualTo(hashCode3);
+    }
+
+    @Test
+    public void testClass() {
+        Class<?> clientClass = getClient.getClass();
+        assertThat(clientClass).isNotNull();
+        assertThat(getClient).isInstanceOf(GetClient.class);
+        assertThat(GetClient.class.isAssignableFrom(clientClass)).isTrue();
     }
 
 
