@@ -1,7 +1,6 @@
 package com.dtflys.forest.test;
 
 import cn.hutool.core.codec.Base64;
-import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.map.MapUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONReader;
@@ -71,8 +70,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -82,7 +79,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.LockSupport;
-import java.util.stream.Stream;
 
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static junit.framework.Assert.assertFalse;
@@ -1497,6 +1493,17 @@ public class TestGenericForestClient extends BaseClientTest {
         mockRequest(server)
                 .assertBodyEquals("{\"id\":\"1972664191\", \"name\":\"XieYu20011008\"}")
                 .assertHeaderEquals("Content-Type", "multipart/form-data");
+    }
+
+    @Test
+    public void testRequest_nested_json_string() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        String json = "{\"msgParam\":\"{\\\"title\\\":\\\"123\\\",\\\"text\\\":\\\"1123\\\"}\",\"msgKey\":\"xxxxxxxx\"}";
+        Forest.post("http://localhost:{}/test", server.getPort())
+                .addBody(json)
+                .executeAsString();
+        mockRequest(server)
+                .assertBodyEquals(json);
     }
 
     @Test
