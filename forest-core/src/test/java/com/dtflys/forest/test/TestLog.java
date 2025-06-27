@@ -97,7 +97,7 @@ public class TestLog {
                 .executeAsResponse();
 
         verify(logger).info(eq("[Forest] Request (httpclient): \n" +
-                "\tGET http://localhost:" + server.getPort() + "/test HTTP\n" +
+                "\tGET http://" + server.getHostName() + ":" + server.getPort() + "/test HTTP\n" +
                 "\tHeaders: \n" +
                 "\t\tUser-Agent: forest/dev"));
         verify(logger).info(eq("[Forest] Response: Status = 200, Time = " + response.getTimeAsMillisecond() + "ms"));
