@@ -53,7 +53,7 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
             "{Forest Proxy Object of " + handler.interfaceClass.getName() + "}"
         );
         registerNonParamsInvocation("getClass", (handler, proxy) -> proxy.getClass());
-        registerNonParamsInvocation("hashCode", (handler, proxy) -> proxy.hashCode());
+        registerNonParamsInvocation("hashCode", (handler, proxy) -> handler.hashCode());
         registerNonParamsInvocation("notify", (handler, proxy) -> {
             proxy.notify();
             return null;
