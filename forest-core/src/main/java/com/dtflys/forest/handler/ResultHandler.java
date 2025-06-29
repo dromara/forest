@@ -104,7 +104,7 @@ public class ResultHandler {
                 }
                 final Type argType = argTypes[0];
                 final Class argClass = ReflectUtils.toClass(argType);
-                if (optValueClass.isAssignableFrom(argClass)) {
+                if (argClass.isAssignableFrom(optValueClass)) {
                     response.setResult(optValue);
                     return response;
                 }
