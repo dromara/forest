@@ -11,7 +11,7 @@
     <properties>
         <java.version>1.8</java.version>
         <maven.deploy.skip>true</maven.deploy.skip>
-        <forest.version>1.7.1</forest.version>
+        <forest.version>1.7.2</forest.version>
         <fastjson2.version>2.0.53</fastjson2.version>
     </properties>
 
