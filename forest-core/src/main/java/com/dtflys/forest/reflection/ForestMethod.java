@@ -145,7 +145,10 @@ public class ForestMethod<T> implements VariableScope {
 
     private boolean logEnabled = true;
     private boolean logRequest = true;
+    private boolean logRequestHeaders = true;
+    private boolean logRequestBody = true;
     private boolean logResponseStatus = true;
+    private boolean logResponseHeaders = true;
     private boolean logResponseContent = false;
     private ForestLogHandler logHandler = null;
     private LogConfiguration logConfiguration = null;
@@ -712,7 +715,10 @@ public class ForestMethod<T> implements VariableScope {
             logEnabled = metaRequest.isLogEnabled();
         }
         logRequest = configuration.isLogRequest();
+        logRequestHeaders = configuration.isLogRequestHeaders();
+        logRequestBody = configuration.isLogRequestBody();
         logResponseStatus = configuration.isLogResponseStatus();
+        logResponseHeaders = configuration.isLogResponseHeaders();
         logResponseContent = configuration.isLogResponseContent();
 
         LogConfiguration metaLogConfiguration = metaRequest.getLogConfiguration();
@@ -722,7 +728,10 @@ public class ForestMethod<T> implements VariableScope {
         if (metaLogConfiguration != null) {
             logEnabled = metaLogConfiguration.isLogEnabled();
             logRequest = metaLogConfiguration.isLogRequest();
+            logRequestHeaders = metaLogConfiguration.isLogRequestHeaders();
+            logRequestBody = metaLogConfiguration.isLogRequestBody();
             logResponseStatus = metaLogConfiguration.isLogResponseStatus();
+            logResponseHeaders = metaLogConfiguration.isLogResponseHeaders();
             logResponseContent = metaLogConfiguration.isLogResponseContent();
             logHandler = metaLogConfiguration.getLogHandler();
             if (logHandler == null && baseLogConfiguration != null) {
@@ -739,7 +748,10 @@ public class ForestMethod<T> implements VariableScope {
         logConfiguration = new LogConfiguration();
         logConfiguration.setLogEnabled(logEnabled);
         logConfiguration.setLogRequest(logRequest);
+        logConfiguration.setLogRequestHeaders(logRequestHeaders);
+        logConfiguration.setLogRequestBody(logRequestBody);
         logConfiguration.setLogResponseStatus(logResponseStatus);
+        logConfiguration.setLogResponseHeaders(logResponseHeaders);
         logConfiguration.setLogResponseContent(logResponseContent);
         logConfiguration.setLogHandler(logHandler);
 

@@ -323,8 +323,6 @@ public class MappingTemplate {
                             nextChar();
                             skip = true;
                             break;
-                        default:
-                            buffer.append(ch);
                     }
                 }
             }

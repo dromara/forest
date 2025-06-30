@@ -34,10 +34,31 @@ public @interface LogEnabled {
     boolean logRequest() default true;
 
     /**
+     * 是否打印请求头日志
+     * @return {@code true}: 打印, {@code false}: 不打印
+     * @since 1.7.3
+     */
+    boolean logRequestHeaders() default true;
+
+    /**
+     * 是否打印请求体日志
+     * @return {@code true}: 打印, {@code false}: 不打印
+     * @since 1.7.3
+     */
+    boolean logRequestBody() default true;
+
+    /**
      * 是否打印响应状态日志
      * @return {@code true}: 打印, {@code false}: 不打印
      */
     boolean logResponseStatus() default true;
+
+    /**
+     * 是否打印响应头日志
+     * @return {@code true}: 打印, {@code false}: 不打印
+     * @since 1.7.3
+     */
+    boolean logResponseHeaders() default false;
 
     /**
      * 是否打印响应内容日志

@@ -72,7 +72,8 @@ public class OkHttp3Executor implements HttpExecutor {
 
     private Call call;
 
-    protected RequestLogMessage buildRequestMessage(int retryCount, Request okRequest) {
+    protected RequestLogMessage buildRequestMessage(
+            LogConfiguration logConfiguration, int retryCount, Request okRequest) {
         final RequestLogMessage message = new RequestLogMessage();
         final HttpUrl url = okRequest.url();
         final String scheme = url.scheme().toUpperCase();
@@ -82,8 +83,12 @@ public class OkHttp3Executor implements HttpExecutor {
         message.setType(method);
         message.setScheme(scheme);
         message.setRetryCount(retryCount);
-        setLogHeaders(message, okRequest);
-        setLogBody(message, okRequest);
+        if (logConfiguration.isLogRequestHeaders()) {
+            setLogHeaders(message, okRequest);
+        }
+        if (logConfiguration.isLogRequestBody()) {
+            setLogBody(message, okRequest);
+        }
         return message;
     }
 
@@ -108,7 +113,7 @@ public class OkHttp3Executor implements HttpExecutor {
         if (!logConfiguration.isLogEnabled() || !logConfiguration.isLogRequest()) {
             return;
         }
-        final RequestLogMessage logMessage = buildRequestMessage(retryCount, okRequest);
+        final RequestLogMessage logMessage = buildRequestMessage(logConfiguration, retryCount, okRequest);
         logMessage.setRequest(request);
         logMessage.setRetryCount(retryCount);
         final Proxy proxy = okHttpClient.proxy();
