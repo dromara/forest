@@ -7,14 +7,18 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.dtflys.forest.Forest;
+import com.dtflys.forest.annotation.LogEnabled;
+import com.dtflys.forest.annotation.Post;
 import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestURL;
+import com.dtflys.forest.http.UnclosedResponse;
 import com.dtflys.forest.test.http.backend.BackendClient;
 import com.dtflys.forest.test.http.client.GetClient;
+import com.dtflys.forest.test.http.client.PostClient;
 import com.dtflys.forest.test.http.client.UrlEncodedClient;
 import com.dtflys.forest.test.http.model.JsonTestUser;
 import com.dtflys.forest.test.model.Contact;
@@ -89,6 +93,24 @@ public class TestGetClient extends BaseClientTest {
         urlEncodedClient = configuration.createInstance(UrlEncodedClient.class);
     }
 
+    @Test
+    public void testHash() {
+        PostClient postClient = Forest.client(PostClient.class);
+        int hashCode1 = getClient.hashCode();
+        int hashCode2 = postClient.hashCode();
+        int hashCode3 = getClient.hashCode();
+        assertThat(hashCode1).isNotEqualTo(hashCode2);
+        assertThat(hashCode1).isEqualTo(hashCode3);
+    }
+
+    @Test
+    public void testClass() {
+        Class<?> clientClass = getClient.getClass();
+        assertThat(clientClass).isNotNull();
+        assertThat(getClient).isInstanceOf(GetClient.class);
+        assertThat(GetClient.class.isAssignableFrom(clientClass)).isTrue();
+    }
+
 
     @Test
     public void testGet() {
@@ -117,6 +139,35 @@ public class TestGetClient extends BaseClientTest {
 */
     }
 
+    public interface PerformanceClient {
+
+        @Post(
+                url = "http://{}:{}/abc",
+                headers = "Accept: text/plain",
+                data = "username=foo"
+        )
+        @LogEnabled(false)
+        UnclosedResponse test(String hostname, int port);
+    }
+
+
+//    @Test
+    public void performance_interface() {
+        int count = 10000;
+        for (int i = 0; i < count; i++) {
+            server.enqueue(new MockResponse().setBody(EXPECTED));
+        }
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        PerformanceClient client = Forest.client(PerformanceClient.class);
+        for (int i = 0; i < count; i++) {
+            log.info("i = " + i);
+            client.test("localhost", server.getPort()).close();
+        }
+        stopWatch.stop();
+        System.out.println("总耗时: " + stopWatch.getTotalTimeMillis() + "ms");
+    }
+
 
 //    @Test
     public void performance() {
@@ -126,16 +177,14 @@ public class TestGetClient extends BaseClientTest {
         }
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        HttpBackend httpBackend = Forest.backend("httpclient");
         for (int i = 0; i < count; i++) {
             log.info("i = " + i);
             Forest.post("http://{}:{}/abc", server.getHostName(), server.getPort())
                     .logEnabled(false)
-                    .backend(httpBackend)
                     .addHeader("Accept", "text/plain")
                     .addBody("username=foo")
-                    .executeAsStream((in, req, resp) -> {
-                    });
+                    .executeAsUnclosedResponse()
+                    .close();
         }
         stopWatch.stop();
         System.out.println("总耗时: " + stopWatch.getTotalTimeMillis() + "ms");

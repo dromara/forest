@@ -144,9 +144,24 @@ public class ForestConfigurationProperties {
     private boolean logRequest = true;
 
     /**
+     * Enable print log of request headers
+     */
+    private boolean logRequestHeaders = true;
+
+    /**
+     * Enable print log of request body
+     */
+    private boolean logRequestBody = true;
+
+    /**
      * Enable print log of response status
      */
     private boolean logResponseStatus = true;
+
+    /**
+     * Enable print log of response headers
+     */
+    private boolean logResponseHeaders = true;
 
     /**
      * Enable print log of response content
@@ -418,12 +433,36 @@ public class ForestConfigurationProperties {
         this.logRequest = logRequest;
     }
 
+    public boolean isLogRequestHeaders() {
+        return logRequestHeaders;
+    }
+
+    public void setLogRequestHeaders(boolean logRequestHeaders) {
+        this.logRequestHeaders = logRequestHeaders;
+    }
+
+    public boolean isLogRequestBody() {
+        return logRequestBody;
+    }
+
+    public void setLogRequestBody(boolean logRequestBody) {
+        this.logRequestBody = logRequestBody;
+    }
+
     public boolean isLogResponseStatus() {
         return logResponseStatus;
     }
 
     public void setLogResponseStatus(boolean logResponseStatus) {
         this.logResponseStatus = logResponseStatus;
+    }
+
+    public boolean isLogResponseHeaders() {
+        return logResponseHeaders;
+    }
+
+    public void setLogResponseHeaders(boolean logResponseHeaders) {
+        this.logResponseHeaders = logResponseHeaders;
     }
 
     public boolean isLogResponseContent() {

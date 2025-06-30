@@ -83,7 +83,10 @@ public class ForestBeanBuilder {
         forestConfiguration.setAutoRedirection(forestConfigurationProperties.isAutoRedirection());
         forestConfiguration.setLogEnabled(forestConfigurationProperties.isLogEnabled());
         forestConfiguration.setLogRequest(forestConfigurationProperties.isLogRequest());
+        forestConfiguration.setLogRequestHeaders(forestConfigurationProperties.isLogRequestHeaders());
+        forestConfiguration.setLogRequestBody(forestConfigurationProperties.isLogRequestBody());
         forestConfiguration.setLogResponseStatus(forestConfigurationProperties.isLogResponseStatus());
+        forestConfiguration.setLogResponseHeaders(forestConfigurationProperties.isLogResponseHeaders());
         forestConfiguration.setLogResponseContent(forestConfigurationProperties.isLogResponseContent());
         forestConfiguration.setLogHandler(logHandler);
         forestConfiguration.setBackendName(forestConfigurationProperties.getBackend());

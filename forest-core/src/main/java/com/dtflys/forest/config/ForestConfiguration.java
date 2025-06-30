@@ -24,7 +24,6 @@
 
 package com.dtflys.forest.config;
 
-import com.dtflys.forest.ForestGenericClient;
 import com.dtflys.forest.backend.HttpBackend;
 import com.dtflys.forest.backend.HttpBackendSelector;
 import com.dtflys.forest.callback.AddressSource;
@@ -214,6 +213,15 @@ public class ForestConfiguration implements VariableScope, Serializable {
      */
     private boolean logRequest = true;
 
+    /**
+     * 是否允许打印请求头日志
+     */
+    private boolean logRequestHeaders = true;
+
+    /**
+     * 是否允许打印请求体日志
+     */
+    private boolean logRequestBody = true;
 
     /**
      * 是否允许打印响应状态日志
@@ -1290,6 +1298,46 @@ public class ForestConfiguration implements VariableScope, Serializable {
     public ForestConfiguration setLogRequest(boolean logRequest) {
         this.logRequest = logRequest;
         return this;
+    }
+
+    /**
+     * 是否允许打印请求头日志
+     *
+     * @return 允许为 {@code true} , 否则为 {@code false}
+     * @since 1.7.3
+     */
+    public boolean isLogRequestHeaders() {
+        return logRequestHeaders;
+    }
+
+    /**
+     * 设置是否允许打印请求头日志
+     *
+     * @param logRequestHeaders 允许为 {@code true} , 否则为 {@code false}
+     * @since 1.7.3
+     */
+    public void setLogRequestHeaders(boolean logRequestHeaders) {
+        this.logRequestHeaders = logRequestHeaders;
+    }
+
+    /**
+     * 是否允许打印请求体日志
+     *
+     * @return 允许为 {@code true} , 否则为 {@code false}
+     * @since 1.7.3
+     */
+    public boolean isLogRequestBody() {
+        return logRequestBody;
+    }
+
+    /**
+     * 设置是否允许打印请求体日志
+     *
+     * @param logRequestBody 允许为 {@code true} , 否则为 {@code false}
+     * @since 1.7.3
+     */
+    public void setLogRequestBody(boolean logRequestBody) {
+        this.logRequestBody = logRequestBody;
     }
 
     /**

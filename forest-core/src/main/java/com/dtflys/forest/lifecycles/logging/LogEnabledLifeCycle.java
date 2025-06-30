@@ -15,7 +15,6 @@ public class LogEnabledLifeCycle implements MethodAnnotationLifeCycle<LogEnabled
         if (metaRequest == null) {
             return;
         }
-        ForestConfiguration configuration = method.getConfiguration();
         LogConfiguration logConfiguration = metaRequest.getLogConfiguration();
         if (logConfiguration == null) {
             logConfiguration = new LogConfiguration();
@@ -23,11 +22,17 @@ public class LogEnabledLifeCycle implements MethodAnnotationLifeCycle<LogEnabled
         }
         boolean logEnabled = annotation.value();
         boolean logRequest = annotation.logRequest();
+        boolean logRequestHeaders = annotation.logRequestHeaders();
+        boolean logRequestBody = annotation.logRequestBody();
         boolean logResponseStatus = annotation.logResponseStatus();
+        boolean logResponseHeaders = annotation.logResponseHeaders();
         boolean logResponseContent = annotation.logResponseContent();
         logConfiguration.setLogEnabled(logEnabled);
         logConfiguration.setLogRequest(logRequest);
+        logConfiguration.setLogRequestHeaders(logRequestHeaders);
+        logConfiguration.setLogRequestBody(logRequestBody);
         logConfiguration.setLogResponseStatus(logResponseStatus);
+        logConfiguration.setLogResponseHeaders(logResponseHeaders);
         logConfiguration.setLogResponseContent(logResponseContent);
         metaRequest.setLogConfiguration(logConfiguration);
     }

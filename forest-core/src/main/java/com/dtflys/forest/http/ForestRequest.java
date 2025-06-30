@@ -4803,6 +4803,36 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
     }
 
     /**
+     * 是否允许打印请求头日志
+     *
+     * @return 允许为 {@code true}, 否则为 {@code false}
+     * @since 1.7.3
+     */
+    public boolean isLogRequestHeaders() {
+        return getLogConfiguration().isLogRequestHeaders();
+    }
+
+    public ForestRequest<T> logRequestHeaders(boolean logRequestHeaders) {
+        getLogConfiguration().setLogRequestHeaders(logRequestHeaders);
+        return this;
+    }
+
+    /**
+     * 是否允许打印请求体内容日志
+     *
+     * @return 允许为 {@code true}, 否则为 {@code false}
+     * @since 1.7.3
+     */
+    public boolean isLogRequestBody() {
+        return getLogConfiguration().isLogRequestBody();
+    }
+
+    public ForestRequest<T> logRequestBody(boolean logRequestBody) {
+        getLogConfiguration().setLogRequestBody(logRequestBody);
+        return this;
+    }
+
+    /**
      * 是否允许打印响应日志
      *
      * @return 允许为 {@code true}, 否则为 {@code false}
