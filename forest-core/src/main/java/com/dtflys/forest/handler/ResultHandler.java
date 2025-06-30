@@ -214,15 +214,17 @@ public class ResultHandler {
                 if (contentType != null && contentType.canReadAsString()) {
                     return converter.convertToJavaObject(responseText, resultType);
                 }
-                Charset charset = null;
-                String resCharset  = response.getCharset();
+                Charset charset = null; 
+                String resCharset = response.getCharset();
                 if (resCharset != null) {
                     charset = Charset.forName(resCharset);
                 }
                 if (optStringValue != null) {
                     return converter.convertToJavaObject(optStringValue.getBytes(StandardCharsets.UTF_8), resultType, charset);
                 }
-                return converter.convertToJavaObject(response.getInputStream(), resultType, charset);
+                try (InputStream inputStream = response.getInputStream()) {
+                    return converter.convertToJavaObject(inputStream, resultType, charset);
+                }
             } catch (Exception e) {
                 throw new ForestHandlerException(e, request, (ForestResponse) response);
             }

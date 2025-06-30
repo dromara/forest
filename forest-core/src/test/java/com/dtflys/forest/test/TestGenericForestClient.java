@@ -1072,6 +1072,21 @@ public class TestGenericForestClient extends BaseClientTest {
         assertThat(result).isNotNull().isEqualTo(EXPECTED);
     }
 
+    @Test
+    public void testResponse_repeated_get() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        ForestResponse response = Forest.get("http://localhost:{}", server.getPort()).executeAsResponse();
+        assertThat(response).isNotNull();
+        assertThat(response.get(String.class)).isNotNull().isEqualTo(EXPECTED);
+        assertThat(response.get(String.class)).isNotNull().isEqualTo(EXPECTED);
+        assertThat(response.get(String.class)).isNotNull().isEqualTo(EXPECTED);
+        Result<Integer> result1 = response.get(new TypeReference<Result<Integer>>() {});
+        assertThat(result1).isNotNull();
+        assertThat(result1.getStatus()).isEqualTo(1);
+        assertThat(result1.getData()).isNotNull().isEqualTo(2);
+        Result<Integer> result2 = response.get(new TypeReference<Result<Integer>>() {});
+        assertThat(result2).isNotNull();
+    }
 
 
 /*

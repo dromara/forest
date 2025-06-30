@@ -204,6 +204,13 @@ public class OkHttp3ForestResponse extends ForestResponse {
     @Override
     public InputStream getInputStream() throws Exception {
         if (openedStream != null) {
+            if (openedStream.available() > 0) {
+                return openedStream;
+            } else {
+                openedStream = null;
+            }
+        }
+        if (openedStream != null) {
             return openedStream;
         }
         if (bytes != null) {
