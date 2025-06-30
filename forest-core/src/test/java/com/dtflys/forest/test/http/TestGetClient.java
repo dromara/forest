@@ -151,7 +151,7 @@ public class TestGetClient extends BaseClientTest {
     }
 
 
-//    @Test
+    @Test
     public void performance_interface() {
         int count = 10000;
         for (int i = 0; i < count; i++) {
@@ -169,7 +169,7 @@ public class TestGetClient extends BaseClientTest {
     }
 
 
-//    @Test
+    @Test
     public void performance() {
         int count = 10000;
         for (int i = 0; i < count; i++) {
@@ -177,10 +177,12 @@ public class TestGetClient extends BaseClientTest {
         }
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
+        HttpBackend httpBackend = Forest.backend("httpclient");
         for (int i = 0; i < count; i++) {
             log.info("i = " + i);
             Forest.post("http://{}:{}/abc", server.getHostName(), server.getPort())
                     .logEnabled(false)
+                    .backend(httpBackend)
                     .addHeader("Accept", "text/plain")
                     .addBody("username=foo")
                     .executeAsUnclosedResponse()
