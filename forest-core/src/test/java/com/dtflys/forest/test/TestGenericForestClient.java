@@ -1312,6 +1312,7 @@ public class TestGenericForestClient extends BaseClientTest {
         assertThat(result.get(1).get("b")).isEqualTo(2);
         assertThat(result.get(2).get("c")).isEqualTo(3);
     }
+    
 
     @Test
     public void testRequest_get_return_response() {
@@ -1326,6 +1327,29 @@ public class TestGenericForestClient extends BaseClientTest {
         assertThat(result.get("c")).isEqualTo(3);
         assertThat(response.isClosed()).isTrue();
         assertThat(response.getResult()).isNotNull();
+    }
+    
+    
+    @Test
+    public void testRequest_return_response_with_generic_type() {
+        server.enqueue(new MockResponse().setBody("{\"name\": \"foo\", \"age\": 10}"));
+        ForestResponse<TestUser> response = Forest.get("http://localhost:{}", server.getPort())
+                .onResponse((req, res) -> {
+                    TestUser user = res.get(TestUser.class);
+                    TestUser2 user2 = new TestUser2();
+                    user2.setName(user.getName());
+                    user2.setAge(user.getAge());
+                    user2.setEmail("foo@bar.com");
+                    return ResponseResult.success(user2);
+                })
+                .execute(new TypeReference<ForestResponse<TestUser>>() {});
+        assertThat(response).isNotNull();
+        TestUser user = response.getResult();
+        assertThat(user).isNotNull().isInstanceOf(TestUser2.class);
+        TestUser2 user2 = (TestUser2) user;
+        assertThat(user2.getName()).isEqualTo("foo");
+        assertThat(user2.getAge()).isEqualTo(10);
+        assertThat(user2.getEmail()).isEqualTo("foo@bar.com");
     }
 
     @Test
