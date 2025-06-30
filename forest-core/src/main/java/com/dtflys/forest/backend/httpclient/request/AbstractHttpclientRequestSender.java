@@ -62,7 +62,8 @@ public abstract class AbstractHttpclientRequestSender implements HttpclientReque
     }
 
 
-    private <T extends  HttpRequestBase> RequestLogMessage getRequestLogMessage(int retryCount, T httpReq, HttpClient client) {
+    private <T extends  HttpRequestBase> RequestLogMessage getRequestLogMessage(
+            LogConfiguration logConfiguration, int retryCount, T httpReq, HttpClient client) {
         final RequestLogMessage logMessage = new RequestLogMessage();
         final URI uri = httpReq.getURI();
         logMessage.setUri(uri.toASCIIString());
@@ -78,12 +79,14 @@ public abstract class AbstractHttpclientRequestSender implements HttpclientReque
             proxyLogMessage.setType(proxy.getType().name());
             proxyLogMessage.setHost(proxy.getHost());
             proxyLogMessage.setPort(proxy.getPort() + "");
-            ForestHeaderMap headers = proxy.getHeaders();
-            if (headers != null && !headers.isEmpty()) {
-                proxyLogMessage.setHeaders(
-                        proxy.getHeaders().entrySet().stream()
-                                .map(entry -> entry.getKey() + ": " + entry.getValue())
-                                .toArray(String[]::new));
+            if (logConfiguration.isLogRequestHeaders()) {
+                final ForestHeaderMap headers = proxy.getHeaders();
+                if (headers != null && !headers.isEmpty()) {
+                    proxyLogMessage.setHeaders(
+                            proxy.getHeaders().entrySet().stream()
+                                    .map(entry -> entry.getKey() + ": " + entry.getValue())
+                                    .toArray(String[]::new));
+                }
             }
             logMessage.setProxy(proxyLogMessage);
         }
@@ -97,7 +100,7 @@ public abstract class AbstractHttpclientRequestSender implements HttpclientReque
         if (!logConfiguration.isLogEnabled() || !logConfiguration.isLogRequest()) {
             return;
         }
-        RequestLogMessage logMessage = getRequestLogMessage(retryCount, httpReq, client);
+        RequestLogMessage logMessage = getRequestLogMessage(logConfiguration, retryCount, httpReq, client);
         logMessage.setRequest(request);
         request.setRequestLogMessage(logMessage);
 

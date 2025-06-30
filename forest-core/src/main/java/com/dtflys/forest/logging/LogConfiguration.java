@@ -21,6 +21,16 @@ public class LogConfiguration {
     private volatile boolean logRequest;
 
     /**
+     * 是否允许打印请求头日志
+     */
+    private volatile boolean logRequestHeaders;
+
+    /**
+     * 是否允许打印请求体内容日志
+     */
+    private volatile boolean logRequestBody;
+
+    /**
      * 是否允许打印响应状态日志
      */
     private volatile boolean logResponseStatus;
@@ -47,6 +57,8 @@ public class LogConfiguration {
         if (configuration != null) {
             logEnabled = configuration.isLogEnabled();
             logRequest = configuration.isLogRequest();
+            logRequestHeaders = configuration.isLogRequestHeaders();
+            logRequestBody = configuration.isLogRequestBody();
             logResponseStatus = configuration.isLogResponseStatus();
             logResponseHeaders = configuration.isLogResponseHeaders();
             logResponseContent = configuration.isLogResponseContent();
@@ -77,6 +89,30 @@ public class LogConfiguration {
 
     public void setLogRequest(boolean logRequest) {
         this.logRequest = logRequest;
+    }
+
+    /**
+     * 是否允许打印请求头日志
+     * @return 允许为 {@code true}, 否则为 {@code false}
+     */
+    public boolean isLogRequestHeaders() {
+        return logRequestHeaders;
+    }
+
+    public void setLogRequestHeaders(boolean logRequestHeaders) {
+        this.logRequestHeaders = logRequestHeaders;
+    }
+
+    /**
+     * 是否允许打印请求体内容日志
+     * @return 允许为 {@code true}, 否则为 {@code false}
+     */
+    public boolean isLogRequestBody() {
+        return logRequestBody;
+    }
+
+    public void setLogRequestBody(boolean logRequestBody) {
+        this.logRequestBody = logRequestBody;
     }
 
     /**

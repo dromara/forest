@@ -179,6 +179,7 @@ public class DefaultLogHandler implements ForestLogHandler {
      * @return 请求日志字符串
      */
     protected String requestLoggingContent(RequestLogMessage requestLogMessage) {
+        final ForestRequest request = requestLogMessage.getRequest();
         final StringBuilder builder = new StringBuilder();
         builder.append("Request ");
         builder.append(asyncModeContent(requestLogMessage));
@@ -189,15 +190,19 @@ public class DefaultLogHandler implements ForestLogHandler {
         builder.append(proxyContent(requestLogMessage));
         builder.append(requestTypeChangeHistory(requestLogMessage));
         builder.append(requestLogMessage.getRequestLine());
-        final String headers = requestLoggingHeaders(requestLogMessage);
-        if (StringUtils.isNotEmpty(headers)) {
-            builder.append("\n\tHeaders: \n");
-            builder.append(headers);
+        if (request.isLogRequestHeaders()) {
+            final String headers = requestLoggingHeaders(requestLogMessage);
+            if (StringUtils.isNotEmpty(headers)) {
+                builder.append("\n\tHeaders: \n");
+                builder.append(headers);
+            }
         }
-        final String body = requestLoggingBody(requestLogMessage);
-        if (StringUtils.isNotEmpty(body)) {
-            builder.append("\n\tBody: ");
-            builder.append(body);
+        if (request.isLogRequestBody()) {
+            final String body = requestLoggingBody(requestLogMessage);
+            if (StringUtils.isNotEmpty(body)) {
+                builder.append("\n\tBody: ");
+                builder.append(body);
+            }
         }
         return builder.toString();
     }
