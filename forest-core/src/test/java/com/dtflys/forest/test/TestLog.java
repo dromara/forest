@@ -70,6 +70,20 @@ public class TestLog {
     }
 
     @Test
+    public void testLogRequestHeaders() {
+        ForestRequest request = configuration.request();
+        assertThat(request.isLogRequestHeaders()).isEqualTo(configuration.isLogRequestHeaders());
+
+        request.setLogConfiguration(null);
+        assertThat(request.isLogRequestHeaders()).isEqualTo(configuration.isLogRequestHeaders());
+
+        request.setLogConfiguration(null);
+        request.logRequestHeaders(!configuration.isLogRequestHeaders());
+        assertThat(request.isLogRequestHeaders()).isEqualTo(!configuration.isLogRequestHeaders());
+    }
+
+
+    @Test
     public void testLogResponseStatus() {
         ForestRequest request = configuration.request();
         assertThat(request.isLogResponseStatus()).isEqualTo(configuration.isLogResponseStatus());
@@ -81,6 +95,141 @@ public class TestLog {
         request.logResponseStatus(!configuration.isLogRequest());
         assertThat(request.isLogResponseStatus()).isEqualTo(!configuration.isLogResponseStatus());
     }
+
+    @Test
+    public void testLogResponseHeaders() {
+        ForestRequest request = configuration.request();
+        assertThat(request.isLogResponseHeaders()).isEqualTo(configuration.isLogResponseHeaders());
+
+        request.setLogConfiguration(null);
+        assertThat(request.isLogResponseHeaders()).isEqualTo(configuration.isLogResponseHeaders());
+
+        request.setLogConfiguration(null);
+        request.logResponseHeaders(!configuration.isLogResponseHeaders());
+        assertThat(request.isLogResponseHeaders()).isEqualTo(!configuration.isLogResponseHeaders());
+    }
+
+    @Test
+    public void testLogRequestHeaders_content() {
+        ForestLogger logger = Mockito.spy(new ForestSlf4jLogger(TestLog.class));
+        DefaultLogHandler logHandler = new DefaultLogHandler(logger);
+
+        server.enqueue(new MockResponse()
+                .setBody(EXPECTED)
+                .setResponseCode(200));
+        ForestResponse response = configuration.post("/test")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .addBody(EXPECTED)
+                .logHandler(logHandler)
+                .executeAsResponse();
+
+        verify(logger).info(eq("[Forest] Request (httpclient): \n" +
+                "\tPOST http://" + server.getHostName() + ":" + server.getPort() + "/test HTTP\n" +
+                "\tHeaders: \n" +
+                "\t\tUser-Agent: forest/dev\n" +
+                "\t\tAccept: application/json\n" +
+                "\t\tContent-Type: application/json\n" +
+                "\tBody: " + EXPECTED));
+        verify(logger).info(eq("[Forest] Response: Status = 200, Time = " + response.getTimeAsMillisecond() + "ms"));
+
+        server.enqueue(new MockResponse()
+                .setBody(EXPECTED)
+                .setResponseCode(200));
+
+        configuration.post("/test")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .addBody(EXPECTED)
+                .logHandler(logHandler)
+                .logRequestHeaders(false)
+                .executeAsResponse();
+
+        verify(logger).info(eq("[Forest] Request (httpclient): \n" +
+                "\tPOST http://" + server.getHostName() + ":" + server.getPort() + "/test HTTP\n" +
+                "\tBody: " + EXPECTED));
+        verify(logger).info(eq("[Forest] Response: Status = 200, Time = " + response.getTimeAsMillisecond() + "ms"));
+    }
+
+    @Test
+    public void testLogRequestBody_content() {
+        ForestLogger logger = Mockito.spy(new ForestSlf4jLogger(TestLog.class));
+        DefaultLogHandler logHandler = new DefaultLogHandler(logger);
+
+        server.enqueue(new MockResponse()
+                .setBody(EXPECTED)
+                .setResponseCode(200));
+        ForestResponse response = configuration.post("/test")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .addBody(EXPECTED)
+                .logHandler(logHandler)
+                .executeAsResponse();
+
+        verify(logger).info(eq("[Forest] Request (httpclient): \n" +
+                "\tPOST http://" + server.getHostName() + ":" + server.getPort() + "/test HTTP\n" +
+                "\tHeaders: \n" +
+                "\t\tUser-Agent: forest/dev\n" +
+                "\t\tAccept: application/json\n" +
+                "\t\tContent-Type: application/json\n" +
+                "\tBody: " + EXPECTED));
+        verify(logger).info(eq("[Forest] Response: Status = 200, Time = " + response.getTimeAsMillisecond() + "ms"));
+
+        server.enqueue(new MockResponse()
+                .setBody(EXPECTED)
+                .setResponseCode(200));
+
+        configuration.post("/test")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .addBody(EXPECTED)
+                .logHandler(logHandler)
+                .logRequestBody(false)
+                .executeAsResponse();
+
+        verify(logger).info(eq("[Forest] Request (httpclient): \n" +
+                "\tPOST http://" + server.getHostName() + ":" + server.getPort() + "/test HTTP\n" +
+                "\tHeaders: \n" +
+                "\t\tUser-Agent: forest/dev\n" +
+                "\t\tAccept: application/json\n" +
+                "\t\tContent-Type: application/json"));
+        verify(logger).info(eq("[Forest] Response: Status = 200, Time = " + response.getTimeAsMillisecond() + "ms"));
+    }
+
+    @Test
+    public void testLogRequestLineOnly() {
+        ForestLogger logger = Mockito.spy(new ForestSlf4jLogger(TestLog.class));
+        DefaultLogHandler logHandler = new DefaultLogHandler(logger);
+
+        server.enqueue(new MockResponse()
+                .setBody(EXPECTED)
+                .setResponseCode(200));
+
+        ForestResponse response = configuration.post("/test")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json")
+                .addBody(EXPECTED)
+                .logHandler(logHandler)
+                .logRequestHeaders(false)
+                .logRequestBody(false)
+                .executeAsResponse();
+
+        verify(logger).info(eq("[Forest] Request (httpclient): \n" +
+                "\tPOST http://" + server.getHostName() + ":" + server.getPort() + "/test HTTP"));
+        verify(logger).info(eq("[Forest] Response: Status = 200, Time = " + response.getTimeAsMillisecond() + "ms"));
+    }
+
+
 
     @Test
     public void testLogRequestContent() {
@@ -101,7 +250,6 @@ public class TestLog {
                 "\tHeaders: \n" +
                 "\t\tUser-Agent: forest/dev"));
         verify(logger).info(eq("[Forest] Response: Status = 200, Time = " + response.getTimeAsMillisecond() + "ms"));
-
     }
 
 
