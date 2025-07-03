@@ -395,6 +395,11 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
     private OnSaveCookie onSaveCookie;
 
     /**
+     * 是否允许该请求的 Cookie 自动存取
+     */
+    private Boolean autoCookieSaveAndLoadEnabled;
+
+    /**
      * 是否下载文件
      */
     private boolean isDownloadFile = false;
@@ -4419,7 +4424,41 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
     public ForestRequest<T> onSaveCookie(OnSaveCookie onSaveCookie) {
         return setOnSaveCookie(onSaveCookie);
     }
-    
+
+    /**
+     * 是否允许该请求的 Cookie 自动存取
+     *
+     * @return {@code true}: 允许自动存取, {@code false}: 不允许
+     * @since 1.7.4
+     */
+    public boolean isAutoCookieSaveAndLoadEnabled() {
+        return autoCookieSaveAndLoadEnabled != null ? autoCookieSaveAndLoadEnabled : configuration.isAutoCookieSaveAndLoadEnabled();
+    }
+
+    /**
+     * 设置是否允许该请求的 Cookie 自动存取
+     *
+     * @param autoCookieSaveAndLoadEnabled {@code true}: 允许自动存取, {@code false}: 不允许
+     * @return {@link ForestRequest}类实例
+     * @since 1.7.4
+     */
+    public ForestRequest<T> setAutoCookieSaveAndLoadEnabled(Boolean autoCookieSaveAndLoadEnabled) {
+        this.autoCookieSaveAndLoadEnabled = autoCookieSaveAndLoadEnabled;
+        return this;
+    }
+
+    /**
+     * 设置是否允许该请求的 Cookie 自动存取
+     * <p>同 {@link ForestRequest#setAutoCookieSaveAndLoadEnabled(Boolean)} )}
+     *
+     * @param autoCookieSaveAndLoadEnabled {@code true}: 允许自动存取, {@code false}: 不允许
+     * @return {@link ForestRequest}类实例
+     * @since 1.7.4
+     */
+    public ForestRequest<T> autoCookieSaveAndLoadEnabled(Boolean autoCookieSaveAndLoadEnabled) {
+        return setAutoCookieSaveAndLoadEnabled(autoCookieSaveAndLoadEnabled);
+    }
+
 
     /**
      * 添加拦截器到该请求中

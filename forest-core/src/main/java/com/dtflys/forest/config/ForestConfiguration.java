@@ -1920,6 +1920,30 @@ public class ForestConfiguration implements VariableScope, Serializable {
     }
 
     /**
+     * 设置全局 Cookie 存储器
+     *
+     * @param cookieStorage Cookie 存储器对象
+     * @return 当前ForestConfiguration实例
+     * @since 1.7.4
+     */
+    public ForestConfiguration setCookieStorage(ForestCookieStorage cookieStorage) {
+        this.cookieStorage = cookieStorage;
+        return this;
+    }
+
+    /**
+     * 设置全局 Cookie 存储器类
+     *
+     * @param cookieStorageClass Cookie 存储器类
+     * @return 当前ForestConfiguration实例
+     * @since 1.7.4
+     */
+    public ForestConfiguration setCookieStorage(Class<? extends ForestCookieStorage> cookieStorageClass) {
+        this.cookieStorage = getForestObject(cookieStorageClass, true);
+        return this;
+    }
+
+    /**
      * 获取全局请求池
      *
      * @return Forest请求池

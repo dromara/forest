@@ -258,7 +258,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
     @Override
     public void handleLoadCookie(final ForestRequest request, final ForestCookies cookies) {
         final ForestConfiguration configuration = request.getConfiguration();
-        if (configuration.isAutoCookieSaveAndLoadEnabled()) {
+        if (request.isAutoCookieSaveAndLoadEnabled()) {
             configuration.getCookieStorage().load(request.url(), cookies);
         }
         request.getInterceptorChain().onLoadCookie(request, cookies);
@@ -277,7 +277,7 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
             onSaveCookie.onSaveCookie(request, cookies);
         }
         final ForestConfiguration configuration = request.getConfiguration();
-        if (configuration.isAutoCookieSaveAndLoadEnabled()) {
+        if (request.isAutoCookieSaveAndLoadEnabled()) {
             configuration.getCookieStorage().save(cookies);
         }
     }

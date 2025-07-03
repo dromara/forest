@@ -303,4 +303,20 @@ public class TestLog {
     }
 
 
+    @Test
+    public void testLogResponseContent2() {
+        server.enqueue(new MockResponse()
+                .setBody(EXPECTED)
+                .setResponseCode(200));
+
+        Forest.get("/test")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .logRequest(true)
+                .logResponseStatus(true)
+                .logResponseHeaders(true)
+                .logResponseContent(true)
+                .execute();
+    }
+
 }

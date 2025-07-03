@@ -588,7 +588,7 @@ public class CookieTest extends BaseClientTest {
 
 
     @Test
-    public void testCookieAutoSaveAndLoad() {
+    public void testCookieAutoSaveAndLoad_global() {
         ForestConfiguration configuration = ForestConfiguration.createConfiguration()
                 .setCookiesStorageMaxSize(16)
                 .setAutoCookieSaveAndLoadEnabled(true);
@@ -628,5 +628,47 @@ public class CookieTest extends BaseClientTest {
                 .assertHeaderEquals("Cookie", "FOO=123-abc.111; BAR=789-xyz.222; YYY=222");
     }
 
+    @Test
+    public void testCookieAutoSaveAndLoad_request() {
+        ForestConfiguration configuration = ForestConfiguration.createConfiguration()
+                .setCookiesStorageMaxSize(16)
+                .setAutoCookieSaveAndLoadEnabled(false);
+
+        server.enqueue(new MockResponse()
+                .setBody(EXPECTED)
+                .addHeader("Set-Cookie", "FOO=123-abc.111; Max-Age=2592000; Path=/abc; Version=1; Domain=" + server.getHostName())
+                .addHeader("Set-Cookie", "BAR=789-xyz.222; Max-Age=2592000; HttpOnly; Version=2; Domain=" + server.getHostName())
+                .addHeader("Set-Cookie", "XXX=111; Max-Age=2592000; Path=/aaa; HttpOnly; Version=2; Domain=" + server.getHostName())
+                .addHeader("Set-Cookie", "YYY=222; Max-Age=2592000; Path=/abc/yyy; HttpOnly; Version=2; Domain=" + server.getHostName())
+                .setResponseCode(200));
+
+        ForestResponse response = configuration.get("/")
+                .logResponseHeaders(true)
+                .autoCookieSaveAndLoadEnabled(true)
+                .host(server.getHostName())
+                .port(server.getPort())
+                .executeAsResponse();
+
+        mockRequest(server)
+                .assertHeaderEquals("Cookie", null);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getCookies().size()).isEqualTo(4);
+        assertThat(response.getCookie("FOO").getValue()).isEqualTo("123-abc.111");
+        assertThat(response.getCookie("BAR").getValue()).isEqualTo("789-xyz.222");
+
+        server.enqueue(new MockResponse()
+                .setBody(EXPECTED)
+                .setResponseCode(200));
+
+        configuration.get("/abc/yyy")
+                .autoCookieSaveAndLoadEnabled(true)
+                .host(server.getHostName())
+                .port(server.getPort())
+                .execute();
+
+        mockRequest(server)
+                .assertHeaderEquals("Cookie", "FOO=123-abc.111; BAR=789-xyz.222; YYY=222");
+    }
 
 }
