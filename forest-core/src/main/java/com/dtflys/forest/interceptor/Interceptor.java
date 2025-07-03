@@ -255,6 +255,25 @@ public interface Interceptor<T> extends
     }
 
     /**
+     * 按布尔类型获取请求在本拦截器中的 Attribute 属性
+     *
+     * @param request Forest请求对象
+     * @param name 属性名称
+     * @return 布尔类型属性值
+     */
+    default Boolean getAttributeAsBoolean(ForestRequest request, String name) {
+        Object attr = getAttribute(request, name);
+        if (attr == null) {
+            return null;
+        }
+        if (attr instanceof Boolean) {
+            return (Boolean) attr;
+        }
+        return Boolean.valueOf(String.valueOf(attr));
+    }
+
+
+    /**
      * 按字符串类型获取请求在本拦截器中的 Attribute 属性
      *
      * @param request Forest请求对象

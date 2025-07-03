@@ -14,7 +14,7 @@ public class AutoCookieSaveAndLoadLifeCycle implements MethodAnnotationLifeCycle
 
     @Override
     public boolean beforeExecute(ForestRequest request) {
-        boolean value = getAttribute(request, "value", boolean.class);
+        Boolean value = getAttributeAsBoolean(request, "value");
         request.autoCookieSaveAndLoadEnabled(value);
         return true;
     }

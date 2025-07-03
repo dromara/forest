@@ -153,7 +153,12 @@ public class MemoryCookieStorage implements ForestCookieStorage {
             }
         }
     }
-    
-    
-    
+
+    @Override
+    public void clear() {
+        size.set(0);
+        cookieMap.clear();
+    }
+
+
 }

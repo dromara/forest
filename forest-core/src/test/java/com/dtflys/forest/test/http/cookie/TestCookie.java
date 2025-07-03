@@ -1,8 +1,6 @@
-package com.dtflys.forest.test.misc;
+package com.dtflys.forest.test.http.cookie;
 
 import cn.hutool.core.date.DatePattern;
-import cn.hutool.core.date.DateUtil;
-import com.alibaba.fastjson2.util.DateUtils;
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.backend.httpclient.HttpclientCookie;
 import com.dtflys.forest.backend.okhttp3.OkHttp3Cookie;
@@ -22,7 +20,6 @@ import org.apache.http.impl.cookie.BasicClientCookie2;
 import org.junit.Rule;
 import org.junit.Test;
 
-import javax.mail.Store;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -34,14 +31,14 @@ import java.util.Locale;
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-public class CookieTest extends BaseClientTest {
+public class TestCookie extends BaseClientTest {
 
     public final static String EXPECTED = "{\"status\":\"1\", \"data\":\"2\"}";
 
     @Rule
     public final MockWebServer server = new MockWebServer();
 
-    public CookieTest(String backendName, String jsonConverterName) {
+    public TestCookie(String backendName, String jsonConverterName) {
         super(backendName, jsonConverterName, ForestConfiguration.createConfiguration());
     }
 

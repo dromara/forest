@@ -42,4 +42,11 @@ public interface ForestCookieStorage {
      */
     void save(ForestCookies cookies);
 
+    /**
+     * 清空 Cookie
+     *
+     * @since 1.7.4
+     */
+    void clear();
+
 }
