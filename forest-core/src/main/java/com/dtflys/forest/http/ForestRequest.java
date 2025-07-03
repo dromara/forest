@@ -3585,6 +3585,33 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
 
 
     /**
+     * 添加 Cookie 到请求中 (默认严格匹配)
+     *
+     * @param nameValue 请求头键值对，{@link RequestNameValue}类实例
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.23
+     */
+    public ForestRequest<T> addCookie(RequestNameValue nameValue) {
+        this.addCookie(nameValue.getName(), nameValue.getValue());
+        return this;
+    }
+
+    /**
+     * 添加 Cookie 到请求中 (默认严格匹配)
+     *
+     * @param nameValues 请求头键值对列表
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.23
+     */
+    public ForestRequest<T> addCookie(List<RequestNameValue> nameValues) {
+        for (RequestNameValue nameValue : nameValues) {
+            this.addCookie(nameValue);
+        }
+        return this;
+    }
+
+
+    /**
      * 通过 Cookie 名和 Cookie 值添加 Cookie 到请求中 (默认严格匹配)
      *
      * @param name Cookie名
@@ -3596,6 +3623,37 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
         this.headers.addCookie(ForestCookie.nameValue(name, value));
         return this;
     }
+
+    public ForestRequest<T> addCookie(String name, Object value) {
+        if (value == null) {
+            return this;
+        }
+        if (value instanceof ForestCookie) {
+            this.headers.addCookie((ForestCookie) value);
+        }
+        this.headers.addCookie(ForestCookie.nameValue(name, String.valueOf(value)));
+        return this;
+    }
+
+
+
+    public ForestRequest<T> addCookie(Map cookies) {
+        if (cookies != null && !cookies.isEmpty()) {
+            for (final Object key : cookies.keySet()) {
+                final Object value = cookies.get(key);
+                if (value instanceof ForestCookie) {
+                    this.addCookie((ForestCookie) value);
+                } else {
+                    final String cookieName = String.valueOf(key);
+                    final String cookieContent = String.valueOf(value);
+                    this.addCookie(cookieName, cookieContent);
+                }
+
+            }
+        }
+        return this;
+    }
+
 
 
     /**

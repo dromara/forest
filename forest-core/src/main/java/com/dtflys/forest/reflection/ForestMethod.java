@@ -1171,6 +1171,8 @@ public class ForestMethod<T> implements VariableScope {
                     if (obj != null) {
                         if (MappingParameter.isHeader(target)) {
                             request.addHeader(new RequestNameValue(null, obj, target));
+                        } else if (MappingParameter.isCookie(target)) {
+                            request.addCookie(new RequestNameValue(null, obj, target));
                         } else if (MappingParameter.isQuery(target)) {
                             request.addQuery(obj.toString(), (Object) null,
                                     parameter.isUrlEncode(), parameter.getCharset());
@@ -1200,6 +1202,8 @@ public class ForestMethod<T> implements VariableScope {
                         request.addBody(map, parameter.getPartContentType());
                     } else if (MappingParameter.isHeader(target)) {
                         request.addHeader(map);
+                    } else if (MappingParameter.isCookie(target)) {
+                        request.addCookie(map);
                     }
                 } else if (obj instanceof Iterable
                         || (obj != null
@@ -1278,6 +1282,8 @@ public class ForestMethod<T> implements VariableScope {
                         nameValue.setValue(obj);
                         if (MappingParameter.isHeader(target)) {
                             request.addHeader(nameValue);
+                        } else if (MappingParameter.isCookie(target)) {
+                            request.addCookie(nameValue);
                         } else if (MappingParameter.isQuery(target)) {
                             if (!parameter.isJsonParam() && obj instanceof Iterable) {
                                 int index = 0;

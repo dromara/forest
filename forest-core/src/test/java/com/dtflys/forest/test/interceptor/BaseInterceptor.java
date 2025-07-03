@@ -40,6 +40,7 @@ public class BaseInterceptor implements Interceptor {
     public void onError(ForestRuntimeException ex, ForestRequest request, ForestResponse response) {
     }
 
+
     @Override
     public void afterExecute(ForestRequest request, ForestResponse response) {
         log.info("invoke Base afterExecute");

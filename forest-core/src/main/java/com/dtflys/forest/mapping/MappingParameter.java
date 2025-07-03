@@ -25,6 +25,7 @@ public class MappingParameter implements ForestArgumentsVariable {
     public final static int TARGET_QUERY = 1;
     public final static int TARGET_BODY = 2;
     public final static int TARGET_HEADER = 3;
+    public final static int TARGET_COOKIE = 4;
 
     /**
      * 参数类型
@@ -134,12 +135,20 @@ public class MappingParameter implements ForestArgumentsVariable {
         return target == TARGET_HEADER;
     }
 
+    public boolean isCookie() {
+        return target == TARGET_COOKIE;
+    }
+
     public static boolean isUnknownTarget(int target) {
         return target == TARGET_UNKNOWN;
     }
 
     public static boolean isHeader(int target) {
         return target == TARGET_HEADER;
+    }
+
+    public static boolean isCookie(int target) {
+        return target == TARGET_COOKIE;
     }
 
     public static boolean isBody(int target) {

@@ -96,6 +96,10 @@ public class RequestNameValue {
         return target == TARGET_HEADER;
     }
 
+    public boolean isInCookie() {
+        return target == TARGET_COOKIE;
+    }
+
     public int getTarget() {
         return target;
     }
