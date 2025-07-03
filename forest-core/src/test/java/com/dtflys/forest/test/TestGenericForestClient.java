@@ -939,6 +939,161 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertPathEquals(URLEncoder.PATH.encode("/test/ok: aaa{foo}", "UTF-8"));
     }
 
+    @Test
+    public void testRequest_property_in_url() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        System.setProperty("test.a.b.test-var2", "aaa{foo}");
+        System.setProperty("test.a.b.test-var1", "x{foo}#{test.a.b.test-var2}x");
+        Forest.config().setVariable("foo", "bar");
+
+        Forest.get("/test/#{test.a.b.test-var1}")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/test/xbaraaabarx");
+
+        System.clearProperty("test.a.b.test-var1");
+        System.clearProperty("test.a.b.test-var2");
+        Forest.config().removeVariable("foo");
+    }
+
+    @Test
+    public void testRequest_property_internal_in_url() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        System.setProperty("test.a.b.test-var2", "aaa{foo}");
+        System.setProperty("test.a.b.test-var1", "x{foo}{#test.a.b.test-var2}x");
+        Forest.config().setVariable("foo", "bar");
+
+        Forest.get("/test/{#test.a.b.test-var1}")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/test/xbaraaabarx");
+
+        System.clearProperty("test.a.b.test-var1");
+        System.clearProperty("test.a.b.test-var2");
+        Forest.config().removeVariable("foo");
+    }
+
+
+    @Test
+    public void testRequest_property_in_url2() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        System.setProperty("test.a.b.test-var2", "aaa{foo}");
+        System.setProperty("test.a.b.test-var1", "x{foo}#{test.a.b.test-var2!}x");
+        Forest.config().setVariable("foo", "bar");
+
+        Forest.get("/test/#{test.a.b.test-var1}")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .execute();
+        mockRequest(server)
+                .assertPathEquals(URLEncoder.PATH.encode("/test/xbaraaa{foo}x", "UTF-8"));
+
+        System.clearProperty("test.a.b.test-var1");
+        System.clearProperty("test.a.b.test-var2");
+        Forest.config().removeVariable("foo");
+    }
+
+
+    @Test
+    public void testRequest_property_internal_in_url2() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        System.setProperty("test.a.b.test-var2", "aaa{foo}");
+        System.setProperty("test.a.b.test-var1", "x{foo}{#test.a.b.test-var2!}x");
+        Forest.config().setVariable("foo", "bar");
+
+        Forest.get("/test/{#test.a.b.test-var1}")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .execute();
+        mockRequest(server)
+                .assertPathEquals(URLEncoder.PATH.encode("/test/xbaraaa{foo}x", "UTF-8"));
+
+        System.clearProperty("test.a.b.test-var1");
+        System.clearProperty("test.a.b.test-var2");
+        Forest.config().removeVariable("foo");
+    }
+
+
+    @Test
+    public void testRequest_property_in_url3() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        System.clearProperty("test.a.b.test-var1");
+
+        Forest.get("/test/#{test.a.b.test-var1 ?? 'xxx'}")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/test/xxx");
+
+        System.clearProperty("test.a.b.test-var1");
+        Forest.config().removeVariable("foo");
+    }
+
+    @Test
+    public void testRequest_property_internal_in_url3() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        System.clearProperty("test.a.b.test-var1");
+
+        Forest.get("/test/{#test.a.b.test-var1 ?? 'xxx'}")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/test/xxx");
+
+        System.clearProperty("test.a.b.test-var1");
+        Forest.config().removeVariable("foo");
+    }
+
+
+    @Test
+    public void testRequest_property_in_url4() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        System.setProperty("test.a.b.test-var2", "aaa");
+        System.clearProperty("test.a.b.test-var1");
+
+        Forest.get("/test/#{test.a.b.test-var1 ?? #test.a.b.test-var2}")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/test/aaa");
+
+        System.clearProperty("test.a.b.test-var1");
+        Forest.config().removeVariable("foo");
+    }
+
+
+    @Test
+    public void testRequest_property_internal_in_url4() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        System.setProperty("test.a.b.test-var2", "aaa");
+        System.clearProperty("test.a.b.test-var1");
+
+        Forest.get("/test/{#test.a.b.test-var1 ?? #test.a.b.test-var2}")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .execute();
+        mockRequest(server)
+                .assertPathEquals("/test/aaa");
+
+        System.clearProperty("test.a.b.test-var1");
+        Forest.config().removeVariable("foo");
+    }
+
 
     @Test
     public void testRequest_json_template() {
