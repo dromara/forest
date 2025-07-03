@@ -304,7 +304,7 @@ public class MappingTemplate {
                             exprList.add(str);
                         }
                         buffer.setLength(0);
-                        MappingExpr expr = parseProperty();
+                        MappingExpr expr = parseProperty(compileContext);
                         match('}');
                         if (expr != null) {
                             exprList.add(expr);
@@ -358,15 +358,49 @@ public class MappingTemplate {
                 "', column " + (context.readIndex + n + 1) + " at \"" + source + "\"");
     }
 
-    public MappingProperty parseProperty() {
-        MappingProperty prop = null;
+    public MappingProperty parsePropertyId() {
         char ch = watch(1);
-        if (Character.isAlphabetic(ch) || ch == '_' || ch == '-') {
-            prop = parsePropertyName();
-        } else {
-            syntaxErrorWatch1(ch);
+        int startIndex = context.readIndex + 1;
+        final StringBuilder builder = new StringBuilder();
+        if (Character.isAlphabetic(ch) || ch == '_') {
+            do {
+                builder.append(ch);
+                nextChar();
+                ch = watch(1);
+            } while (Character.isAlphabetic(ch) ||
+                    Character.isDigit(ch) ||
+                    ch == '_' ||
+                    ch == '-' ||
+                    ch == '.' ||
+                    ch == '[' ||
+                    ch == ']');
         }
-        return prop;
+        final int endIndex = context.readIndex + 1;
+        final String text = builder.toString();
+        return new MappingProperty(this, text, startIndex, endIndex);
+    }
+
+    public MappingExpr parseProperty(CompileContext compileContext) {
+        MappingExpr expr = parsePropertyId();
+
+        skipSpaces();
+
+        char ch = watch(1);
+        switch (ch) {
+            case '!':
+                expr.deepReference = false;
+                nextChar();
+                break;
+            case '?':
+                nextChar();
+                ch = watch(1);
+                if (ch == '?') {
+                    nextChar();
+                    expr = parseElvisExpr(compileContext, expr, expr.startIndex);
+                }
+                break;
+        }
+        return expr;
     }
 
     public MappingExpr parseExpression(final CompileContext compileContext) {
@@ -420,6 +454,10 @@ public class MappingTemplate {
                 case '$':
                     nextChar();
                     expr = parseIndex();
+                    break;
+                case '#':
+                    nextChar();
+                    expr = parsePropertyId();
                     break;
                 case '?':
                     nextChar();
@@ -539,27 +577,6 @@ public class MappingTemplate {
         MappingExpr expr = parseTextToken();
         matchToken(expr, Token.ID);
         return (MappingIdentity) expr;
-    }
-
-
-    public MappingProperty parsePropertyName() {
-        char ch = watch(1);
-        final StringBuilder builder = new StringBuilder();
-        if (Character.isAlphabetic(ch) || ch == '_' || ch == '-') {
-            do {
-                builder.append(ch);
-                nextChar();
-                ch = watch(1);
-            } while (Character.isAlphabetic(ch) ||
-                    Character.isDigit(ch) ||
-                    ch == '_' ||
-                    ch == '-' ||
-                    ch == '[' ||
-                    ch == ']' ||
-                    ch == '.');
-        }
-        String text = builder.toString();
-        return new MappingProperty(this, text);
     }
 
 
