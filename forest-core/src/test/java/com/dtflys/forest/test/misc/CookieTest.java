@@ -45,6 +45,27 @@ public class CookieTest extends BaseClientTest {
         super(backendName, jsonConverterName, ForestConfiguration.createConfiguration());
     }
 
+    @Test
+    public void toStringAndParse() {
+        ForestCookie cookie1 = Forest.cookie("Foo", "Bar")
+                .setDomain("forest.dtflyx.com")
+                .setPath("/")
+                .setMaxAge(10000)
+                .setSecure(true);
+        String cookieString = cookie1.toString();
+        ForestCookie cookie1back = ForestCookie.parse(cookieString);
+
+        assertThat(cookie1back).isNotNull();
+        assertThat(cookie1back.toString()).isEqualTo(cookieString);
+        assertThat(cookie1back.getName()).isEqualTo("Foo");
+        assertThat(cookie1back.getValue()).isEqualTo("Bar");
+        assertThat(cookie1back.getDomain()).isEqualTo("forest.dtflyx.com");
+        assertThat(cookie1back.getPath()).isEqualTo("/");
+        assertThat(cookie1back.isPersistent()).isEqualTo(true);
+        assertThat(cookie1back.getMaxAge()).isNotNull().isEqualTo(Duration.ofMillis(10000));
+        assertThat(cookie1back.isSecure()).isTrue();
+    }
+
 
     @Test
     public void testCookie() throws InterruptedException {

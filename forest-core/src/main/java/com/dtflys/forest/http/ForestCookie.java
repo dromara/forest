@@ -268,6 +268,7 @@ public class ForestCookie implements Cloneable, Serializable {
 
     public ForestCookie setMaxAge(int maxAge) {
         this.maxAge = Duration.ofMillis(maxAge);
+        this.persistent = maxAge > 0;
         return this;
     }
 
