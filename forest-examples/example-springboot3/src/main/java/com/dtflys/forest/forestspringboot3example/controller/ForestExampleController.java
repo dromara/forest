@@ -1,5 +1,6 @@
 package com.dtflys.forest.forestspringboot3example.controller;
 
+import com.dtflys.forest.callback.OnSuccess;
 import com.dtflys.forest.forestspringboot3example.client.Amap;
 import com.dtflys.forest.forestspringboot3example.client.Cn12306;
 import com.dtflys.forest.forestspringboot3example.client.Gitee;
@@ -8,6 +9,7 @@ import com.dtflys.forest.forestspringboot3example.model.GiteeBranch;
 import com.dtflys.forest.forestspringboot3example.model.GiteeReadme;
 import com.dtflys.forest.forestspringboot3example.model.Location;
 import com.dtflys.forest.forestspringboot3example.model.Result;
+import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -76,10 +78,10 @@ public class ForestExampleController {
     public String aysncGitee2() throws ExecutionException, InterruptedException {
         AtomicReference<String> ref = new AtomicReference<>("");
         CountDownLatch latch = new CountDownLatch(1);
-        gitee.asyncIndex2((result, request, response) -> {
+        gitee.asyncIndex2((result, req, res) -> {
             ref.set(result);
             latch.countDown();
-        }, (ex, request, response) -> {
+        }, (ex, req, res) -> {
             ref.set(ex.getMessage());
             latch.countDown();
         });

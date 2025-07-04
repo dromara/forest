@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.0-M1</version>
+        <version>3.1.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.dtflys.forest</groupId>
@@ -16,7 +16,7 @@
     <properties>
         <java.version>17</java.version>
         <maven.deploy.skip>true</maven.deploy.skip>
-        <forest.version>1.6.2</forest.version>
+        <forest.version>1.7.3</forest.version>
     </properties>
 
     <dependencies>

@@ -6,6 +6,7 @@ import com.dtflys.forest.annotation.SSEValue;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.http.ForestSSE;
+import com.dtflys.forest.sse.EventSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,8 +19,9 @@ public class MySSEHandler extends ForestSSE {
         log.info("MySSEHandler onData: name = {}, value = {}", name, value);
     }
 
+
     @Override
-    public void onClose(ForestRequest request, ForestResponse response) {
+    protected void onClose(EventSource eventSource) {
         log.info("SSE Closed");
     }
 }
