@@ -13,7 +13,7 @@ public class MappingIdentity extends MappingExpr {
     private String name;
 
     public MappingIdentity(MappingTemplate source, String name, int startIndex, int endIndex) {
-        super(source, Token.ID);
+        super(source, Token.ID, false);
         this.name = name;
         setIndexRange(startIndex, endIndex);
     }

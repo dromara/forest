@@ -11,7 +11,7 @@ public class MappingFloat extends MappingExpr {
     private final float number;
 
     public MappingFloat(MappingTemplate source, float number) {
-        super(source, Token.FLOAT);
+        super(source, Token.FLOAT, true);
         this.number = number;
     }
 

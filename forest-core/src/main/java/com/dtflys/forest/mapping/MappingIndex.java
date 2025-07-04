@@ -13,7 +13,7 @@ public class MappingIndex extends MappingExpr {
     private final Integer index;
 
     public MappingIndex(MappingTemplate source, Integer index, int startIndex, int endIndex) {
-        super(source, Token.INDEX);
+        super(source, Token.INDEX, false);
         this.index = index;
         this.startIndex = startIndex;
         this.endIndex = endIndex;

@@ -24,9 +24,12 @@ public abstract class MappingExpr {
 
     int endIndex = -1;
 
-    protected MappingExpr(MappingTemplate template, Token token) {
+    final boolean isConstant;
+
+    protected MappingExpr(MappingTemplate template, Token token, final boolean isConstant) {
         this.template = template;
         this.token = token;
+        this.isConstant = isConstant;
     }
 
     public Object render(VariableScope scope, Object[] args) {

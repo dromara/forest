@@ -13,7 +13,7 @@ public class MappingProperty extends MappingExpr {
     private ForestProperties properties;
 
     protected MappingProperty(MappingTemplate source, String propertyName, int startIndex, int endIndex) {
-        super(source, Token.PROP);
+        super(source, Token.PROP, false);
         this.propertyName = propertyName;
         this.startIndex = startIndex;
         this.endIndex = endIndex;

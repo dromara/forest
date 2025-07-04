@@ -14,7 +14,7 @@ public class MappingString extends MappingExpr {
     }
 
     public MappingString(String text, int startIndex, int endIndex) {
-        super(null, Token.STRING);
+        super(null, Token.STRING, true);
         this.text = text;
         this.startIndex = startIndex;
         this.endIndex = endIndex;

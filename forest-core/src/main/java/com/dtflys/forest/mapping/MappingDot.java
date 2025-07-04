@@ -21,7 +21,7 @@ public class MappingDot extends MappingExpr {
     }
 
     protected MappingDot(MappingTemplate source, Token token, MappingExpr left, MappingIdentity right, int startIndex, int endIndex) {
-        super(source, token);
+        super(source, token, false);
         this.left = left;
         this.right = right;
         setIndexRange(startIndex, endIndex);

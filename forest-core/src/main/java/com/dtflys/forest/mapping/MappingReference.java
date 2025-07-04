@@ -33,7 +33,7 @@ public class MappingReference extends MappingExpr {
     }
 
     public MappingReference(MappingTemplate source, String name, boolean optional, int startIndex, int endIndex) {
-        super(source, Token.REF);
+        super(source, Token.REF, false);
         this.name = name;
         this.optional = optional;
         setIndexRange(startIndex, endIndex);

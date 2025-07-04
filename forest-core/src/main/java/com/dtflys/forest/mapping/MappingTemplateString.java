@@ -12,7 +12,7 @@ public class MappingTemplateString extends MappingExpr {
 
 
     protected MappingTemplateString(MappingTemplate source, MappingTemplate template, int startIndex, int endIndex) {
-        super(source, Token.STRING);
+        super(source, Token.STRING, template.isConstant());
         this.template = template;
         this.startIndex = startIndex;
         this.endIndex = endIndex;

@@ -39,6 +39,7 @@ public class MappingTemplate {
     protected MappingCompileContext context = new MappingCompileContext();
     protected final int startReadIndex;
     protected final int endReadIndex;
+    protected final boolean isConstant;
 
     public static class CompileContext {
         boolean allowEmptyBraces = true;
@@ -218,6 +219,7 @@ public class MappingTemplate {
             this.source = "";
         }
         compile(new CompileContext(allowEmptyBrace));
+        isConstant = checkConstants();
     }
 
     public int getType() {
@@ -689,6 +691,7 @@ public class MappingTemplate {
                 if (Character.isDigit(ch2)) {
                     builder.append('.');
                     nextChar();
+                    ch = watch(1);
                     do {
                         builder.append(ch);
                         nextChar();
@@ -878,20 +881,20 @@ public class MappingTemplate {
                 type, annotationType, attributeName, forestMethod, value, forestMethod.getParameters());
     }
 
-    public boolean isConstant() {
-        if (exprList == null || exprList.size() == 0) {
+    private boolean checkConstants() {
+        if (exprList == null || exprList.isEmpty()) {
             return true;
         }
         for (final MappingExpr expr : exprList) {
-            if (!(expr instanceof MappingString ||
-                    expr instanceof MappingInteger ||
-                    expr instanceof MappingBoolean ||
-                    expr instanceof MappingFloat ||
-                    expr instanceof MappingDouble)) {
+            if (!expr.isConstant) {
                 return false;
             }
         }
         return true;
+    }
+
+    public boolean isConstant() {
+        return isConstant;
     }
 
 }

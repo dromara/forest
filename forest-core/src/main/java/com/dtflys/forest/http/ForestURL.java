@@ -50,12 +50,7 @@ public class ForestURL {
 
     private final static Logger log = LoggerFactory.getLogger(ForestURL.class);
 
-    /**
-     * 变量作用域
-     * @since 1.7.0
-     */
-    private volatile VariableScope scope = Forest.config();
-    
+
     volatile ForestRequest request;
 
     /**

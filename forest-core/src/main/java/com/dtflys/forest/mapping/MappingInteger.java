@@ -13,7 +13,7 @@ public class MappingInteger extends MappingExpr {
     private final int number;
 
     public MappingInteger(MappingTemplate source, int number) {
-        super(source, Token.INT);
+        super(source, Token.INT, true);
         this.number = number;
     }
 

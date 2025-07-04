@@ -1,8 +1,6 @@
 package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
-import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.http.RequestVariableScope;
 
 /**
  * @author gongjun[jun.gong@thebeastshop.com]
@@ -13,7 +11,7 @@ public class MappingLong extends MappingExpr {
     private final long number;
 
     public MappingLong(MappingTemplate source, long number) {
-        super(source, Token.LONG);
+        super(source, Token.LONG, true);
         this.number = number;
     }
 

@@ -9,7 +9,7 @@ public class MappingElvisExpr extends MappingExpr {
     private final MappingExpr right;
 
     protected MappingElvisExpr(MappingTemplate source, MappingExpr left, MappingExpr right, int startIndex, int endIndex) {
-        super(source, Token.ELVIS);
+        super(source, Token.ELVIS, right.isConstant);
         this.left = left;
         this.right = right;
         setIndexRange(startIndex, endIndex);

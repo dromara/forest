@@ -14,7 +14,7 @@ public class MappingUrlEncodedExpr extends MappingExpr {
     private final MappingExpr expr;
 
     protected MappingUrlEncodedExpr(MappingTemplate source, MappingExpr expr) {
-        super(source, expr.token);
+        super(source, expr.token, expr.isConstant);
         this.expr = expr;
     }
 

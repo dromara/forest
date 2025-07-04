@@ -14,7 +14,7 @@ public class MappingDouble extends MappingExpr {
     private final double number;
 
     public MappingDouble(MappingTemplate source, double number) {
-        super(source, Token.DOUBLE);
+        super(source, Token.DOUBLE, true);
         this.number = number;
     }
 
