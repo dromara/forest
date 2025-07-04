@@ -878,5 +878,20 @@ public class MappingTemplate {
                 type, annotationType, attributeName, forestMethod, value, forestMethod.getParameters());
     }
 
+    public boolean isConstant() {
+        if (exprList == null || exprList.size() == 0) {
+            return true;
+        }
+        for (final MappingExpr expr : exprList) {
+            if (!(expr instanceof MappingString ||
+                    expr instanceof MappingInteger ||
+                    expr instanceof MappingBoolean ||
+                    expr instanceof MappingFloat ||
+                    expr instanceof MappingDouble)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
 }
