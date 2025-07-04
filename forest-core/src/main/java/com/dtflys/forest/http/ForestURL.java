@@ -53,44 +53,40 @@ public class ForestURL {
 
     volatile ForestRequest request;
 
-    /**
-     * URL字符串模板
-     */
-    private MappingURLTemplate template;
 
     /**
      * 解析后的URL
      * <p>即为整个完整的没被拆分的URL字符串
      */
-    private String parsedUrl;
+    protected String parsedUrl;
 
-    private ForestAddress address;
+    protected ForestAddress address;
 
     /**
      * HTTP协议
      */
-    private String scheme;
+    protected String scheme;
 
     /**
      * 主机地址
      */
-    private String host;
+    protected String host;
 
     /**
      * 主机端口
      */
-    private Integer port;
+    protected Integer port;
 
     /**
      * URL根路径
      */
-    private String basePath;
+    protected String basePath;
 
     /**
      * URL路径
      * <p>该路径为整个URL去除前面协议 + Host + Port 后部分
      */
-    private String path;
+    protected String path;
 
     /**
      * 用户信息
@@ -99,28 +95,28 @@ public class ForestURL {
      * <p>URL http://xxx:yyy@localhost:8080 中 xxx:yyy 的部分为用户信息
      * <p>其中，xxx为用户名，yyy为用户密码
      */
-    private String userInfo;
+    protected String userInfo;
 
     /**
      * reference
      * <p>URL井号(#)后面的字符串
      */
-    private String ref;
+    protected String ref;
 
     /**
      * 是否为SSL
      */
-    private boolean ssl;
+    protected boolean ssl;
 
     /**
      * 是否需要重新生成 URL
      */
-    private volatile boolean needUrlRegenerate = false;
-    
-    
-    private volatile boolean variablesChanged = false;
+    protected volatile boolean needUrlRegenerate = false;
 
-    private void needUrlRegenerate() {
+
+    protected volatile boolean variablesChanged = false;
+
+    protected void needUrlRegenerate() {
         needUrlRegenerate = true;
     }
 
@@ -138,7 +134,6 @@ public class ForestURL {
 
     public static ForestURL create(final MappingURLTemplate template) {
         final ForestURL forestURL = new ForestURL();
-        forestURL.template = template;
         forestURL.needUrlRegenerate = true;
         forestURL.variablesChanged = true;
         return forestURL;
@@ -149,7 +144,6 @@ public class ForestURL {
         final MappingURLTemplate urlTemplate = MappingURLTemplate.get(configuration, url);
         final ForestURL forestURL = new ForestURL();
         forestURL.parsedUrl = url;
-        forestURL.template = urlTemplate;
         forestURL.needUrlRegenerate = true;
         forestURL.variablesChanged = true;
         return forestURL;
@@ -160,7 +154,6 @@ public class ForestURL {
         final MappingURLTemplate urlTemplate = MappingURLTemplate.get(configuration, url);
         final ForestURL forestURL = new ForestURL();
         forestURL.parsedUrl = url;
-        forestURL.template = urlTemplate;
         urlTemplate.render(forestURL, request, request.arguments(), request.getQuery());
         return forestURL;
     }
@@ -174,7 +167,6 @@ public class ForestURL {
         final MappingURLTemplate urlTemplate = MappingURLTemplate.get(configuration, url);
         final ForestURL forestURL = new ForestURL();
         forestURL.parsedUrl = url;
-        forestURL.template = urlTemplate;
         final ForestQueryMap queryMap = new ForestQueryMap(null);
         urlTemplate.render(forestURL, configuration, new Object[0], queryMap);
         return forestURL;
@@ -190,7 +182,6 @@ public class ForestURL {
 
     public static ForestURL unparsedURL(final String url) {
         ForestURL forestURL = new ForestURL();
-        forestURL.template = MappingURLTemplate.get(url);
         return forestURL;
     }
 
@@ -199,7 +190,7 @@ public class ForestURL {
     }
 
 
-    private ForestURL() {
+    protected ForestURL() {
     }
 
     public ForestURL(URL url) {
@@ -702,13 +693,8 @@ public class ForestURL {
     }
     
     private void checkAndReparseUrl() {
-        if (variablesChanged && template != null) {
+        if (variablesChanged) {
             final ForestQueryMap queryMap = new ForestQueryMap(null);
-            if (request != null) {
-                template.render(this, request, request.arguments(), request.getQuery());
-            } else {
-                template.render(this, Forest.config(), new Object[0], queryMap);
-            }
             needUrlRegenerate();
         }
     }
