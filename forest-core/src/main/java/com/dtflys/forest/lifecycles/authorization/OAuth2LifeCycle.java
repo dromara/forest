@@ -173,7 +173,7 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Void> 
     @NotNull
     private TokenCache requestToken(ForestRequest request) {
         final String clientId = getAttributeAsString(request, "clientId");
-        OAuth2.ClientAuthentication clientAuthentication = (OAuth2.ClientAuthentication) getAttribute(request, "clientAuthentication");
+        OAuth2.ClientAuthentication clientAuthentication = getAttribute(request, "clientAuthentication", OAuth2.ClientAuthentication.class);
         Map<String, Object> body = createRequestBody(clientId, request, clientAuthentication, true);
         Map<String, Object> headers = createRequestHeaders(clientId, request, clientAuthentication);
 
@@ -189,7 +189,7 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Void> 
      */
     private TokenCache requestRefreshToken(ForestRequest request, TokenCache tokenCache) {
         final String clientId = getAttributeAsString(request, "clientId");
-        OAuth2.ClientAuthentication clientAuthentication = (OAuth2.ClientAuthentication) getAttribute(request, "clientAuthentication");
+        OAuth2.ClientAuthentication clientAuthentication = getAttribute(request, "clientAuthentication", OAuth2.ClientAuthentication.class);
         Map<String, Object> body = createRequestBody(clientId, request, clientAuthentication, false);
         Map<String, Object> headers = createRequestHeaders(clientId, request, clientAuthentication);
 
@@ -265,7 +265,7 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Void> 
         }
         body.put("scope", getAttributeAsString(request, "scope"));
 
-        final OAuth2.GrantType grantType = (OAuth2.GrantType) getAttribute(request, "grantType");
+        final OAuth2.GrantType grantType = getAttribute(request, "grantType", OAuth2.GrantType.class);
         final String grantTypeValue = grantType.getValue(getAttributeAsString(request, "grantTypeValue"));
         body.put("grant_type", grantTypeValue);
 
