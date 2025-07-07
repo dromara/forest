@@ -806,8 +806,9 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
         if (!this.query.isEmpty()) {
             this.query.clearQueriesFromUrl();
         }
-        
-        final ForestURL newUrl = urlTemplate.render(this, args, this.query);
+        final ForestURL newUrl = urlTemplate.isConstant() ?
+                urlTemplate.render(this, args, this.query) :
+                ForestURL.create(this, urlTemplate);
         if (this.url == null) {
             this.url = newUrl;
         } else {

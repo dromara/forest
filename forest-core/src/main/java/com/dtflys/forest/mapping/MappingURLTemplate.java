@@ -84,7 +84,7 @@ public class MappingURLTemplate extends MappingTemplate {
     }
 
     public ForestURL render(VariableScope scope, Object[] args, ForestQueryMap queries) {
-        return render(ForestURL.emptyURL(), scope, args, queries);
+        return render(isConstant ? ForestURL.emptyURL() : new ForestDynamicURL(this), scope, args, queries);
     }
 
     public ForestURL render(ForestURL url, VariableScope scope, Object[] args, ForestQueryMap queries) {

@@ -15,7 +15,7 @@ public class ForestDynamicURL extends ForestURL {
     }
 
     private void checkAndRefreshURL() {
-        if (renderedURL == null) {
+        if (renderedURL == null && request != null) {
             renderedURL = new ForestURL();
             template.render(renderedURL, request, request.arguments(), request.getQuery());
         }
@@ -23,6 +23,7 @@ public class ForestDynamicURL extends ForestURL {
 
     @Override
     public String getHost() {
+        final String host = super.getHost();
         if (host != null) {
             return host;
         }
@@ -33,7 +34,9 @@ public class ForestDynamicURL extends ForestURL {
     @Override
     public int getPort() {
         if (!URLUtils.isNonePort(port)) {
-            return port;
+            return normalizePort(port, ssl);
+        } else if (address != null) {
+            return normalizePort(address.getPort(), ssl);
         }
         checkAndRefreshURL();
         return renderedURL.getPort();
@@ -41,10 +44,34 @@ public class ForestDynamicURL extends ForestURL {
 
     @Override
     public String getScheme() {
+        final String scheme = super.getScheme();
         if (scheme != null) {
             return scheme;
         }
         checkAndRefreshURL();
         return renderedURL.getScheme();
+    }
+
+    @Override
+    public String getPath() {
+        if (path != null) {
+            return path;
+        }
+        checkAndRefreshURL();
+        return renderedURL.getPath();
+    }
+
+    @Override
+    protected String getBasePath() {
+        if (basePath != null) {
+            return basePath;
+        }
+        checkAndRefreshURL();
+        return renderedURL.getBasePath();
+    }
+
+    @Override
+    public String toURLString() {
+        return super.toURLString();
     }
 }

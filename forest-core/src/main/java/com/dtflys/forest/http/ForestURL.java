@@ -133,29 +133,44 @@ public class ForestURL {
 
 
     public static ForestURL create(final MappingURLTemplate template) {
-        final ForestURL forestURL = new ForestURL();
-        forestURL.needUrlRegenerate = true;
-        forestURL.variablesChanged = true;
-        return forestURL;
+        return newURL(null, template);
     }
 
 
     public static ForestURL create(final ForestConfiguration configuration, final String url) {
         final MappingURLTemplate urlTemplate = MappingURLTemplate.get(configuration, url);
-        final ForestURL forestURL = new ForestURL();
-        forestURL.parsedUrl = url;
-        forestURL.needUrlRegenerate = true;
-        forestURL.variablesChanged = true;
+        final ForestURL forestURL = newURL(url, urlTemplate);
         return forestURL;
     }
 
     public static ForestURL parse(final ForestRequest request, final String url) {
         final ForestConfiguration configuration = request.getConfiguration();
         final MappingURLTemplate urlTemplate = MappingURLTemplate.get(configuration, url);
-        final ForestURL forestURL = new ForestURL();
-        forestURL.parsedUrl = url;
-        urlTemplate.render(forestURL, request, request.arguments(), request.getQuery());
+        final ForestURL forestURL = newURL(request, url, urlTemplate, true);
         return forestURL;
+    }
+
+    private static ForestURL newURL(final String url, final MappingURLTemplate urlTemplate) {
+        return newURL(null, url, urlTemplate, false);
+    }
+
+    private static ForestURL newURL(final ForestRequest request, final String url, final MappingURLTemplate urlTemplate, final boolean renderURL) {
+        if (urlTemplate.isConstant()) {
+            final ForestURL forestURL;
+            try {
+                forestURL = StringUtils.isNotEmpty(url) ? new ForestURL(new URL(url)) : new ForestURL();
+            } catch (MalformedURLException e) {
+                throw new ForestRuntimeException(e);
+            }
+//            forestURL.parsedUrl = url;
+            forestURL.needUrlRegenerate = true;
+            forestURL.variablesChanged = true;
+            if (request != null) {
+                urlTemplate.render(forestURL, request, request.arguments(), request.getQuery());
+            }
+            return forestURL;
+        }
+        return new ForestDynamicURL(urlTemplate);
     }
 
     public static ForestURL parse(final String url) {
@@ -280,12 +295,16 @@ public class ForestURL {
         return this;
     }
 
-    public String getHost() {
-        checkAndReparseUrl();
+    protected String getHost(String host) {
         if (StringUtils.isEmpty(host) && address != null) {
             return address.getHost();
         }
         return host;
+    }
+
+    public String getHost() {
+        checkAndReparseUrl();
+        return getHost(host);
     }
 
     public ForestURL setHost(String host) {
@@ -300,7 +319,7 @@ public class ForestURL {
         return this;
     }
 
-    private static int normalizePort(Integer port, boolean ssl) {
+    protected static int normalizePort(Integer port, boolean ssl) {
         if (URLUtils.isNonePort(port)) {
             return ssl ? 443 : 80;
         }
@@ -351,6 +370,10 @@ public class ForestURL {
      */
     public ForestURL setBasePath(String basePath) {
         return setBasePath(basePath, true);
+    }
+
+    protected String getBasePath() {
+        return basePath;
     }
 
     /**
@@ -439,6 +462,10 @@ public class ForestURL {
 
     public String getAuthority() {
         final StringBuilder builder = new StringBuilder();
+        final String userInfo = getUserInfo();
+        final String host = getHost();
+        final int port = getPort();
+        final boolean ssl = isSSL();
         if (StringUtils.isNotEmpty(userInfo)) {
             builder.append(URLUtils.userInfoEncode(userInfo, "UTF-8")).append("@");
         }
@@ -472,6 +499,7 @@ public class ForestURL {
 
     public String toURLString() {
         final StringBuilder builder = new StringBuilder();
+        final String scheme = getScheme();
         if (StringUtils.isNotEmpty(scheme)) {
             builder.append(scheme).append("://");
         }
@@ -479,6 +507,8 @@ public class ForestURL {
         if (StringUtils.isNotEmpty(authority)) {
             builder.append(authority);
         }
+        final String basePath = getBasePath();
+        final String host = getHost();
         if (StringUtils.isNotEmpty(basePath)) {
             String encodedBasePath = URLUtils.pathEncode(basePath, "UTF-8");
             if (host != null && encodedBasePath.charAt(0) != '/') {
@@ -486,6 +516,7 @@ public class ForestURL {
             }
             builder.append(encodedBasePath);
         }
+        final String path = getPath();
         if (StringUtils.isNotEmpty(path)) {
             String encodedPath = URLUtils.pathEncode(path, "UTF-8");
             final int len =  builder.length() - 1;

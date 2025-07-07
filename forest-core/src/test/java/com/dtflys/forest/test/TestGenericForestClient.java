@@ -1094,6 +1094,21 @@ public class TestGenericForestClient extends BaseClientTest {
         Forest.config().removeVariable("foo");
     }
 
+    @Test
+    public void testRequest_template_in_dynamic_url() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        Forest.get("http://{host}:{port}/test/{testVar}")
+                .setVariable("host", server.getHostName())
+                .setVariable("port", server.getPort())
+                .setVariable("testVar", "var/foo/ok/world")
+                .execute();
+
+        mockRequest(server)
+                .assertPathEquals("/test/var/foo/ok/world");
+    }
+
+
 
     @Test
     public void testRequest_json_template() {
