@@ -32,11 +32,9 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Void> 
      * Token 缓存
      */
     private final ForestCache<String, TokenCache> cache = new ForestCache<>(1024);
-    private OAuth2Client oAuth2Client;
 
     @Override
     public void onMethodInitialized(ForestMethod method, OAuth2 annotation) {
-        oAuth2Client = method.getConfiguration().createInstance(OAuth2Client.class);
     }
 
     @Override
