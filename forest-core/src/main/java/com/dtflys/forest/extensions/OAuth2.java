@@ -5,6 +5,7 @@ import com.dtflys.forest.annotation.NotNull;
 import com.dtflys.forest.annotation.RequestAttributes;
 import com.dtflys.forest.handler.AutoOAuth2DefinitionHandler;
 import com.dtflys.forest.handler.OAuth2DefinitionHandler;
+import com.dtflys.forest.interceptor.ForestInterceptor;
 import com.dtflys.forest.lifecycles.authorization.OAuth2LifeCycle;
 import com.dtflys.forest.utils.StringUtils;
 
@@ -172,6 +173,13 @@ public @interface OAuth2 {
      * @return OAuth2Token
      */
     Class<? extends OAuth2DefinitionHandler> OAuth2TokenHandler() default AutoOAuth2DefinitionHandler.class;
+
+    /**
+     * 获取 Token 时的请求拦截器，可以在发起获取 Token 请求时用来处理一些事情，例如：修改请求头、Query、Body等
+     *
+     * @return ForestInterceptor
+     */
+    Class<? extends ForestInterceptor> forestInterceptor() default ForestInterceptor.class;
 
     /**
      * 验证类型

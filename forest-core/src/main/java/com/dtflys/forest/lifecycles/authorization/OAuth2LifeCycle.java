@@ -1,5 +1,6 @@
 package com.dtflys.forest.lifecycles.authorization;
 
+import com.dtflys.forest.Forest;
 import com.dtflys.forest.annotation.NotNull;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
@@ -7,6 +8,7 @@ import com.dtflys.forest.extensions.OAuth2;
 import com.dtflys.forest.handler.OAuth2DefinitionHandler;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
+import com.dtflys.forest.interceptor.ForestInterceptor;
 import com.dtflys.forest.lifecycles.MethodAnnotationLifeCycle;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.utils.ForestCache;
@@ -215,7 +217,18 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Void> 
 
         final Map<String, Object> queryItems = kv2map((String[]) getAttribute(request, "query"));
         final Class<? extends OAuth2DefinitionHandler> handlerClass = getAttribute(request, "OAuth2TokenHandler", Class.class);
-        final ForestResponse<String> response = oAuth2Client.token(getAttributeAsString(request, "tokenUri"), headers, queryItems, body);
+
+        ForestRequest<?> forestRequest = Forest.post(getAttributeAsString(request, "tokenUri"));
+        final Class<? extends ForestInterceptor> forestInterceptor = getAttribute(request, "forestInterceptor", Class.class);
+        // 注解参数默认是 ForestInterceptor.class 对象值，所以直接使用这个对象是无效的，因此传入的对象只有不为 ForestInterceptor.class 时才表明是一个有效的配置参数
+        if (ForestInterceptor.class != forestInterceptor) {
+            forestRequest.addInterceptor(forestInterceptor);
+        }
+        forestRequest.addHeader(headers);
+        forestRequest.addQuery(queryItems);
+        forestRequest.addBody(body);
+
+        ForestResponse<String> response = forestRequest.executeAsResponse();
         OAuth2Token token;
         try {
             final OAuth2DefinitionHandler handler = handlerClass.newInstance();
