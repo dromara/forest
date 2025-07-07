@@ -179,7 +179,7 @@ public @interface OAuth2 {
      *
      * @return ForestInterceptor
      */
-    Class<? extends ForestInterceptor> forestInterceptor() default ForestInterceptor.class;
+    Class<? extends ForestInterceptor> tokenInterceptor() default ForestInterceptor.class;
 
     /**
      * 验证类型

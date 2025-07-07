@@ -217,10 +217,10 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Void> 
         final Class<? extends OAuth2DefinitionHandler> handlerClass = getAttribute(request, "OAuth2TokenHandler", Class.class);
 
         ForestRequest<?> forestRequest = Forest.post(getAttributeAsString(request, "tokenUri"));
-        final Class<? extends ForestInterceptor> forestInterceptor = getAttribute(request, "forestInterceptor", Class.class);
+        final Class<? extends ForestInterceptor> tokenInterceptor = getAttribute(request, "tokenInterceptor", Class.class);
         // 注解参数默认是 ForestInterceptor.class 对象值，所以直接使用这个对象是无效的，因此传入的对象只有不为 ForestInterceptor.class 时才表明是一个有效的配置参数
-        if (ForestInterceptor.class != forestInterceptor) {
-            forestRequest.addInterceptor(forestInterceptor);
+        if (ForestInterceptor.class != tokenInterceptor) {
+            forestRequest.addInterceptor(tokenInterceptor);
         }
         forestRequest.addHeader(headers);
         forestRequest.addQuery(queryItems);
