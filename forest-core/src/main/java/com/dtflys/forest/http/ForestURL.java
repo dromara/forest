@@ -126,9 +126,7 @@ public class ForestURL {
 
 
     public static ForestURL create(ForestRequest request, final MappingURLTemplate template) {
-        final ForestURL forestURL = create(template);
-        forestURL.request = request;
-        return forestURL;
+        return newURL(request, null, template, false);
     }
 
 
@@ -474,7 +472,7 @@ public class ForestURL {
         }
         if (URLUtils.isNotNonePort(port) &&
                 ((port != 80 && port != 443 && port > -1) ||
-                (port == 80 && !ssl) ||
+                (port == 80 && ssl) ||
                 (port == 443 && !ssl))) {
             builder.append(':').append(port);
         }

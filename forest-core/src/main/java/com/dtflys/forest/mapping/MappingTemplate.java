@@ -40,6 +40,7 @@ public class MappingTemplate {
     protected final int startReadIndex;
     protected final int endReadIndex;
     protected final boolean isConstant;
+    protected volatile MappingListener listener;
 
     public static class CompileContext {
         boolean allowEmptyBraces = true;
@@ -784,7 +785,11 @@ public class MappingTemplate {
                 builder.append(val);
             }
         }
-        return builder.toString();
+        final String value = builder.toString();
+        if (listener != null) {
+            listener.onChanged(this, value);
+        }
+        return value;
     }
 
     public static String getParameterValue(ForestJsonConverter jsonConverter, Object obj) {
@@ -895,6 +900,12 @@ public class MappingTemplate {
 
     public boolean isConstant() {
         return isConstant;
+    }
+
+    public void clearRenderedValue() {
+        if (listener != null) {
+            listener.clear();
+        }
     }
 
 }

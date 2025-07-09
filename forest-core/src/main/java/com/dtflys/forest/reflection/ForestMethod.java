@@ -947,12 +947,12 @@ public class ForestMethod<T> implements VariableScope {
 
         final ForestQueryMap queries = new ForestQueryMap(request);
         if (baseUrlTemplate != null) {
-            baseURL = baseUrlTemplate.render(request, args, queries);
+            baseURL = ForestURL.create(request, baseUrlTemplate);
         }
         if (urlTemplate == null) {
             throw new ForestRuntimeException("request URL is empty");
         }
-        final ForestURL renderedURL = urlTemplate.render(request, args, queries);
+        final ForestURL renderedURL = ForestURL.create(request, urlTemplate);
 
         String baseContentEncoding = null;
         if (baseEncodeTemplate != null) {

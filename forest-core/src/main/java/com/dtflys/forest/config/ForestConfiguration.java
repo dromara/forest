@@ -57,6 +57,7 @@ import com.dtflys.forest.interceptor.InterceptorFactory;
 import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.ForestLogger;
+import com.dtflys.forest.mapping.AbstractVariableScope;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.pool.FixedRequestPool;
 import com.dtflys.forest.pool.ForestRequestPool;
@@ -98,7 +99,7 @@ import java.util.stream.Collectors;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-03-24
  */
-public class ForestConfiguration implements VariableScope, Serializable {
+public class ForestConfiguration extends AbstractVariableScope<ForestConfiguration> implements VariableScope, Serializable {
 
     private static ForestLogger log = ForestLogger.getLogger(ForestConfiguration.class);
 
@@ -342,10 +343,6 @@ public class ForestConfiguration implements VariableScope, Serializable {
      */
     private Map<String, Class> filterRegisterMap = new HashMap<>();
 
-    /**
-     * 全局变量表
-     */
-    private Map<String, ForestVariable> variables = new ConcurrentHashMap<>(64);
 
     /**
      * SSL的Key Store集合
@@ -398,6 +395,7 @@ public class ForestConfiguration implements VariableScope, Serializable {
 
 
     private ForestConfiguration() {
+        super(null);
     }
 
 

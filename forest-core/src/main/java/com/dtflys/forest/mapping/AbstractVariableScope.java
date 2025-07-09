@@ -85,7 +85,7 @@ public abstract class AbstractVariableScope<SELF extends VariableScope> implemen
         if (value instanceof ForestVariable) {
             variables.put(name, (ForestVariable) value);
         } else if (value instanceof CharSequence) {
-            final MappingTemplate mappingTemplate = MappingTemplate.create(this, String.valueOf(value)); 
+            final MappingTemplate mappingTemplate = MappingTemplate.create(this, String.valueOf(value));
             final TemplateVariable templateVariable = new TemplateVariable(mappingTemplate);
             variables.put(name, templateVariable);
         } else {

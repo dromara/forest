@@ -1101,7 +1101,9 @@ public class TestGenericForestClient extends BaseClientTest {
         Forest.get("http://{host}:{port}/test/{testVar}")
                 .setVariable("host", server.getHostName())
                 .setVariable("port", server.getPort())
-                .setVariable("testVar", "var/foo/ok/world")
+                .setVariable("testVar", "{testVar2}")
+                .setVariable("testVar2", "var/foo/ok/{testVar3}")
+                .setVariable("testVar3", req -> "world")
                 .execute();
 
         mockRequest(server)

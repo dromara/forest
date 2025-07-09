@@ -1,12 +1,15 @@
 package com.dtflys.forest.http;
 
 
+import com.dtflys.forest.mapping.MappingListener;
+import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingURLTemplate;
+import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
 
-public class ForestDynamicURL extends ForestURL {
+public class ForestDynamicURL extends ForestURL implements MappingListener {
 
-    private volatile MappingURLTemplate template;
+    private final MappingURLTemplate template;
 
     private volatile ForestURL renderedURL;
 
@@ -18,7 +21,19 @@ public class ForestDynamicURL extends ForestURL {
         if (renderedURL == null && request != null) {
             renderedURL = new ForestURL();
             template.render(renderedURL, request, request.arguments(), request.getQuery());
+
         }
+    }
+
+    @Override
+    public String getUserInfo() {
+        if (StringUtils.isNotEmpty(userInfo)) {
+            return userInfo;
+        } else if (address != null) {
+            return address.getUserInfo();
+        }
+        checkAndRefreshURL();
+        return renderedURL.getUserInfo();
     }
 
     @Override
@@ -70,8 +85,25 @@ public class ForestDynamicURL extends ForestURL {
         return renderedURL.getBasePath();
     }
 
+//    @Override
+//    public String toURLString() {
+//        if (renderedURL == null && template != null) {
+//            if (request != null) {
+//                checkAndRefreshURL();
+//            } else {
+//                return template.toString();
+//            }
+//        }
+//        return super.toURLString();
+//    }
+
     @Override
-    public String toURLString() {
-        return super.toURLString();
+    public void clear() {
+        this.renderedURL = null;
+    }
+
+    @Override
+    public void onChanged(MappingTemplate template, Object newValue) {
+
     }
 }

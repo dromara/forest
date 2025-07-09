@@ -726,6 +726,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      */
     public ForestRequest<T> url(ForestURL url) {
         this.url = url;
+        url.request = this;
         return this;
     }
 

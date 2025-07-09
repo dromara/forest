@@ -342,13 +342,16 @@ public class MappingURLTemplate extends MappingTemplate {
             }
         }
 
-        return url.setScheme(scheme)
+        url.setScheme(scheme)
                 .setUserInfo(userInfo != null ? userInfo.toString() : null)
                 .setHost(host)
                 .setPort(port != null ? port : (host != null ? -1 : null))
                 .setPath(path != null ? path.toString() : null)
                 .setRef(ref);
-
+        if (listener != null) {
+            listener.onChanged(this, url);
+        }
+        return url;
     }
 
     @Override
