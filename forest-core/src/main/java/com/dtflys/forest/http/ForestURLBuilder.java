@@ -1,5 +1,7 @@
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.reflection.ForestVariable;
+
 /**
  * Forest URL 构造器
  *
@@ -132,6 +134,12 @@ public class ForestURLBuilder {
      * @return {@link ForestURL}对象实例
      */
     public ForestURL build() {
-        return new ForestURL(scheme, userInfo, host, port, path, ref);
+        return new ForestURL(
+                scheme,
+                userInfo,
+                ForestVariable.create(host),
+                port,
+                ForestVariable.create(path),
+                ref);
     }
 }

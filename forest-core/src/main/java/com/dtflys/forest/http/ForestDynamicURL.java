@@ -4,6 +4,7 @@ package com.dtflys.forest.http;
 import com.dtflys.forest.mapping.MappingListener;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingURLTemplate;
+import com.dtflys.forest.reflection.ForestVariable;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
 
@@ -32,6 +33,12 @@ public class ForestDynamicURL extends ForestURL implements MappingListener {
         } else if (address != null) {
             return address.getUserInfo();
         }
+        if (baseURL != null) {
+            final String baseUserInfo = baseURL.getUserInfo();
+            if (StringUtils.isNotEmpty(baseUserInfo)) {
+                return baseUserInfo;
+            }
+        }
         checkAndRefreshURL();
         return renderedURL.getUserInfo();
     }
@@ -42,6 +49,12 @@ public class ForestDynamicURL extends ForestURL implements MappingListener {
         if (host != null) {
             return host;
         }
+        if (baseURL != null) {
+            final String baseHost = baseURL.getHost();
+            if (StringUtils.isNotEmpty(baseHost)) {
+                return baseHost;
+            }
+        }
         checkAndRefreshURL();
         return renderedURL.getHost();
     }
@@ -51,7 +64,16 @@ public class ForestDynamicURL extends ForestURL implements MappingListener {
         if (!URLUtils.isNonePort(port)) {
             return normalizePort(port, ssl);
         } else if (address != null) {
-            return normalizePort(address.getPort(), ssl);
+            int addressPort = address.getPort();
+            if (!URLUtils.isNonePort(addressPort)) {
+                return normalizePort(addressPort, ssl);
+            }
+        }
+        if (baseURL != null) {
+            final int basePort = baseURL.getPort();
+            if (!URLUtils.isNonePort(basePort)) {
+                return basePort;
+            }
         }
         checkAndRefreshURL();
         return renderedURL.getPort();
@@ -70,7 +92,7 @@ public class ForestDynamicURL extends ForestURL implements MappingListener {
     @Override
     public String getPath() {
         if (path != null) {
-            return path;
+            return ForestVariable.getStringValue(path, request);
         }
         checkAndRefreshURL();
         return renderedURL.getPath();

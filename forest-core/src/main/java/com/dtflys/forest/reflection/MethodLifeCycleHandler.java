@@ -1,10 +1,6 @@
 package com.dtflys.forest.reflection;
 
-import com.dtflys.forest.callback.OnLoadCookie;
-import com.dtflys.forest.callback.OnProgress;
-import com.dtflys.forest.callback.OnResponse;
-import com.dtflys.forest.callback.OnSaveCookie;
-import com.dtflys.forest.callback.OnSuccess;
+import com.dtflys.forest.callback.*;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ForestEncoder;
 import com.dtflys.forest.exceptions.ForestNetworkException;
@@ -222,8 +218,9 @@ public class MethodLifeCycleHandler<T> implements LifeCycleHandler {
         }
         request.getInterceptorChain().onError(e, request, response);
         Object resultData = null;
-        if (request.getOnError() != null) {
-            request.getOnError().onError(e, request, response);
+        final OnError onError = request.getOnError();
+        if (onError != null) {
+            onError.onError(e, request, response);
             resultData = response.getResult();
             return resultData;
         }

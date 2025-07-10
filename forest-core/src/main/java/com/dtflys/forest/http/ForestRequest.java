@@ -74,6 +74,7 @@ import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.multipart.InputStreamMultipart;
 import com.dtflys.forest.pool.ForestRequestPool;
 import com.dtflys.forest.reflection.ForestMethod;
+import com.dtflys.forest.reflection.ForestVariable;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
 import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.ssl.SSLKeyStore;
@@ -726,7 +727,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      */
     public ForestRequest<T> url(ForestURL url) {
         this.url = url;
-        url.request = this;
+        url.setRequest(this);
         return this;
     }
 
@@ -750,6 +751,28 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      */
     public String getUrl() {
         return url.getOriginalUrl();
+    }
+
+    public ForestRequest<T> baseUrl(ForestURL baseUrl) {
+        url.setBaseURL(baseUrl);
+        return this;
+    }
+
+    public ForestRequest<T> baseUrl(String baseUrl) {
+        url.setBaseURL(baseUrl);
+        return this;
+    }
+
+    public ForestURL baseUrl() {
+        return url.getBaseURL();
+    }
+
+    public String getBaseUrl() {
+        final ForestURL baseUrl = baseUrl();
+        if (baseUrl == null) {
+            return null;
+        }
+        return baseUrl.getOriginalUrl();
     }
 
     /**
@@ -815,6 +838,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
         } else {
             this.url = newUrl.mergeURLWith(this.url);
         }
+        this.url.request = this;
         return this;
     }
 
@@ -967,6 +991,19 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
 
     /**
      * 设置URL主机地址
+     *
+     * @param host 主机地址变量
+     * @return {@link ForestRequest}对象实例
+     * @since 1.7.4
+     */
+    public ForestRequest<T> setHost(ForestVariable host) {
+        this.url.setHost(host);
+        return this;
+    }
+
+
+    /**
+     * 设置URL主机地址
      * <p>同 {@link ForestRequest#setHost(String)} 方法
      *
      * @param host 主机地址
@@ -974,6 +1011,20 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @see ForestRequest#setHost(String)
      */
     public ForestRequest<T> host(String host) {
+        return setHost(host);
+    }
+
+
+    /**
+     * 设置URL主机地址
+     * <p>同 {@link ForestRequest#setHost(ForestVariable)} 方法
+     *
+     * @param host 主机地址变量
+     * @return {@link ForestRequest}对象实例
+     * @see ForestRequest#setHost(String)
+     * @since 1.7.4
+     */
+    public ForestRequest<T> host(ForestVariable host) {
         return setHost(host);
     }
 
@@ -1179,6 +1230,20 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
 
     /**
      * 设置URL路径
+     * <p>该路径为整个URL去除前面协议 + Host + Port + BasePath 后部分
+     *
+     * @param path URL路径变量
+     * @return {@link ForestRequest}对象实例
+     * @since 1.7.4
+     */
+    public ForestRequest<T> setPath(ForestVariable path) {
+        this.url.setPath(path);
+        return this;
+    }
+
+
+    /**
+     * 设置URL路径
      * <p>同 {@link ForestRequest#setPath(String)} 方法
      *
      * @param path URL路径
@@ -1186,6 +1251,19 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @see ForestRequest#setPath(String)
      */
     public ForestRequest<T> path(String path) {
+        return setPath(path);
+    }
+
+    /**
+     * 设置URL路径
+     * <p>同 {@link ForestRequest#setPath(String)} 方法
+     *
+     * @param path URL路径变量
+     * @return {@link ForestRequest}对象实例
+     * @see ForestRequest#setPath(ForestVariable)
+     * @since 1.7.4
+     */
+    public ForestRequest<T> path(ForestVariable path) {
         return setPath(path);
     }
 

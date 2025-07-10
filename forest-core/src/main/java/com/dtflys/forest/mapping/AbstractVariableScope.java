@@ -86,12 +86,31 @@ public abstract class AbstractVariableScope<SELF extends VariableScope> implemen
             variables.put(name, (ForestVariable) value);
         } else if (value instanceof CharSequence) {
             final MappingTemplate mappingTemplate = MappingTemplate.create(this, String.valueOf(value));
-            final TemplateVariable templateVariable = new TemplateVariable(mappingTemplate);
+            if (mappingTemplate.isConstant) {
+                variables.put(name, new BasicVariable(mappingTemplate.getPureTextConstant()));
+            } else {
+                final TemplateVariable templateVariable = new TemplateVariable(mappingTemplate);
+                variables.put(name, templateVariable);
+            }
+        } else if (value instanceof MappingTemplate) {
+            final TemplateVariable templateVariable = new TemplateVariable((MappingTemplate) value);
             variables.put(name, templateVariable);
         } else {
             variables.put(name, new BasicVariable(value));
         }
         return (SELF) this;
+    }
+
+    public SELF setVar(String name, ForestVariable variable) {
+        return setVariable(name, variable);
+    }
+
+    public SELF setVar(String name, ForestArgumentsVariable variable) {
+        return setVariable(name, variable);
+    }
+
+    public SELF setVar(String name, Object value) {
+        return setVariable(name, value);
     }
     
 }

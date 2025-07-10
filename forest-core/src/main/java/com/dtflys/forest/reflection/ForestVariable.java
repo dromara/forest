@@ -9,6 +9,44 @@ import com.dtflys.forest.mapping.MappingValue;
 @FunctionalInterface
 public interface ForestVariable {
 
+    static ForestVariable create(Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof ForestVariable) {
+            return (ForestVariable) value;
+        } else if (value instanceof CharSequence) {
+            final MappingTemplate mappingTemplate = MappingTemplate.create(String.valueOf(value));
+            if (mappingTemplate.isConstant()) {
+                return new BasicVariable(mappingTemplate.getPureTextConstant());
+            } else {
+                return new TemplateVariable(mappingTemplate);
+            }
+        } else if (value instanceof MappingTemplate) {
+            return new TemplateVariable((MappingTemplate) value);
+        } else {
+            return new BasicVariable(value);
+        }
+    }
+
+    static <R> R getValue(ForestVariable variable, ForestRequest req, Class<R> clazz) {
+        if (variable == null) {
+            return null;
+        }
+        return variable.getValue(req, clazz);
+    }
+
+    static Object getValue(ForestVariable variable, ForestRequest req) {
+        if (variable == null) {
+            return null;
+        }
+        return variable.getValue(req);
+    }
+
+    static String getStringValue(ForestVariable variable, ForestRequest req) {
+        return getValue(variable, req, String.class);
+    }
+
 
     Object getValue(ForestRequest req);
     

@@ -866,7 +866,16 @@ public class ForestSSE implements ForestSSEListener<ForestSSE> {
             return (R) this;
         }
         if (response.isError()) {
-            return (R) this;
+            final Throwable th = response.getException();
+            if (th != null) {
+                final ForestRuntimeException ex = th instanceof ForestRuntimeException ?
+                        (ForestRuntimeException) th : new ForestRuntimeException(th);
+                if (request.getOnError() != null) {
+                    request.getOnError().onError(ex, request, response);
+                    return (R) this;
+                }
+                throw ex;
+            }
         }
         state = SSEState.LISTENING;
         final EventSource openEventSource = new EventSource(null, this, "open", request, response);

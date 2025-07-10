@@ -15,7 +15,6 @@ import com.dtflys.forest.backend.ContentType;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.converter.ConvertOptions;
 import com.dtflys.forest.converter.ForestEncoder;
-import com.dtflys.forest.interceptor.ForestInterceptor;
 import com.dtflys.forest.mapping.ForestExpressionException;
 import com.dtflys.forest.exceptions.ForestExpressionNullException;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
@@ -82,6 +81,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.LockSupport;
 
+import static com.dtflys.forest.Forest.constant;
+import static com.dtflys.forest.Forest.template;
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
@@ -1098,16 +1099,90 @@ public class TestGenericForestClient extends BaseClientTest {
     public void testRequest_template_in_dynamic_url() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
 
-        Forest.get("http://{host}:{port}/test/{testVar}")
-                .setVariable("host", server.getHostName())
-                .setVariable("port", server.getPort())
-                .setVariable("testVar", "{testVar2}")
-                .setVariable("testVar2", "var/foo/ok/{testVar3}")
-                .setVariable("testVar3", req -> "world")
+        Forest.config()
+                .setVar("host", "xxxxx")
+                .setVar("port", 80);
+
+        Forest.get("http://{host}:{port}/test/{a}")
+                .setVar("host", server.getHostName())
+                .setVar("port", server.getPort())
+                .setVar("a", "{b}")
+                .setVar("b", "var/foo/ok/{c}")
+                .setVar("c", req -> "world")
                 .execute();
 
         mockRequest(server)
                 .assertPathEquals("/test/var/foo/ok/world");
+
+        Forest.config()
+                .removeVariable("host")
+                .removeVariable("port");
+    }
+
+
+    @Test
+    public void testRequest_template_in_dynamic_base_url() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        Forest.get("/test/{a}")
+                .baseUrl("{baseUrl}")
+                .setVar("host", server.getHostName())
+                .setVar("port", server.getPort())
+                .setVar("a", "{b}")
+                .setVar("b", "var/foo/ok/{c}")
+                .setVar("c", req -> "world")
+                .setVar("baseUrl", "http://{host}:{port}/base")
+                .execute();
+
+        mockRequest(server)
+                .assertPathEquals("/base/test/var/foo/ok/world");
+    }
+
+    @Test
+    public void testRequest_template_in_host() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        Forest.get("/")
+                .host("{testHost}")
+                .port(server.getPort())
+                .path("/test/host")
+                .setVar("testHost", server.getHostName())
+                .execute();
+
+        mockRequest(server)
+                .assertPathEquals("/test/host");
+    }
+
+    @Test
+    public void testRequest_template_in_path() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        Forest.get("/")
+                .host("{testHost}")
+                .port(server.getPort())
+                .path("/{testPath}")
+                .setVar("testHost", server.getHostName())
+                .setVar("testPath", "test/host")
+                .execute();
+
+        mockRequest(server)
+                .assertPathEquals("/test/host");
+    }
+
+    @Test
+    public void testRequest_constant_in_path() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        Forest.get("/")
+                .host("{testHost}")
+                .port(server.getPort())
+                .path(constant("/{testPath}"))
+                .setVar("testHost", server.getHostName())
+                .setVar("testPath", "test/host")
+                .execute();
+
+        mockRequest(server)
+                .assertPathEquals("/test/host");
     }
 
 

@@ -902,6 +902,18 @@ public class MappingTemplate {
         return isConstant;
     }
 
+    public String getPureTextConstant() {
+        if (exprList == null || exprList.isEmpty()) {
+            return "";
+        }
+        final StringBuilder builder = new StringBuilder();
+        for (final MappingExpr expr : exprList) {
+            final String val = String.valueOf(expr.render(null));
+            builder.append(val);
+        }
+        return builder.toString();
+    }
+
     public void clearRenderedValue() {
         if (listener != null) {
             listener.clear();
