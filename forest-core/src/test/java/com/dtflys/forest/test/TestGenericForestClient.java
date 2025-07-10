@@ -1170,7 +1170,7 @@ public class TestGenericForestClient extends BaseClientTest {
     }
 
     @Test
-    public void testRequest_constant_in_port() {
+    public void testRequest_string_in_port() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
 
         Forest.get("/")
