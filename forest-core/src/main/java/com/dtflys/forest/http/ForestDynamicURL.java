@@ -61,8 +61,9 @@ public class ForestDynamicURL extends ForestURL implements MappingListener {
 
     @Override
     public int getPort() {
-        if (!URLUtils.isNonePort(port)) {
-            return normalizePort(port, ssl);
+        final Integer portInt = ForestVariable.getIntegerValue(port, request);
+        if (!URLUtils.isNonePort(portInt)) {
+            return normalizePort(portInt, ssl);
         } else if (address != null) {
             int addressPort = address.getPort();
             if (!URLUtils.isNonePort(addressPort)) {

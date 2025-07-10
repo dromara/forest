@@ -4,11 +4,11 @@ import com.dtflys.forest.Forest;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.mapping.MappingTemplate;
 
-public class BasicVariable implements ForestVariable {
+public class ConstantVariable implements ForestVariable {
 
     private final Object value;
 
-    public BasicVariable(Object value) {
+    public ConstantVariable(Object value) {
         this.value = value;
     }
 
@@ -24,5 +24,10 @@ public class BasicVariable implements ForestVariable {
     
     public Object getValue() {
         return value;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
     }
 }

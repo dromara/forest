@@ -1,5 +1,6 @@
 package com.dtflys.forest.reflection;
 
+import com.dtflys.forest.Forest;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.RequestVariableScope;
@@ -18,14 +19,14 @@ public interface ForestVariable {
         } else if (value instanceof CharSequence) {
             final MappingTemplate mappingTemplate = MappingTemplate.create(String.valueOf(value));
             if (mappingTemplate.isConstant()) {
-                return new BasicVariable(mappingTemplate.getPureTextConstant());
+                return new ConstantVariable(mappingTemplate.getPureTextConstant());
             } else {
                 return new TemplateVariable(mappingTemplate);
             }
         } else if (value instanceof MappingTemplate) {
             return new TemplateVariable((MappingTemplate) value);
         } else {
-            return new BasicVariable(value);
+            return new ConstantVariable(value);
         }
     }
 
@@ -47,6 +48,11 @@ public interface ForestVariable {
         return getValue(variable, req, String.class);
     }
 
+    static Integer getIntegerValue(ForestVariable variable, ForestRequest req) {
+        return getValue(variable, req, Integer.class);
+    }
+
+
 
     Object getValue(ForestRequest req);
     
@@ -57,7 +63,19 @@ public interface ForestVariable {
             return null;
         }
         if (clazz != null) {
-            return clazz.cast(value);
+            if (clazz.isAssignableFrom(value.getClass())) {
+                return clazz.cast(value);
+            }
+            if (int.class.isAssignableFrom(clazz) || Integer.class.isAssignableFrom(clazz)) {
+                return clazz.cast(Integer.parseInt(String.valueOf(value)));
+            }
+            if (long.class.isAssignableFrom(clazz) || Long.class.isAssignableFrom(clazz)) {
+                return clazz.cast(Long.parseLong(String.valueOf(value)));
+            }
+            if (req != null) {
+                return req.getConfiguration().getJsonConverter().convertToJavaObject(String.valueOf(value), clazz);
+            }
+            return Forest.config().getConfiguration().getJsonConverter().convertToJavaObject(String.valueOf(value), clazz);
         }
         return (R) value;
     }

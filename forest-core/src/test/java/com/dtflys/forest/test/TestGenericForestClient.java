@@ -1154,6 +1154,39 @@ public class TestGenericForestClient extends BaseClientTest {
     }
 
     @Test
+    public void testRequest_template_in_port() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        Forest.get("/")
+                .host("{testHost}")
+                .port("{testPort}")
+                .path("/test/port")
+                .setVar("testHost", server.getHostName())
+                .setVar("testPort", server.getPort())
+                .execute();
+
+        mockRequest(server)
+                .assertPathEquals("/test/port");
+    }
+
+    @Test
+    public void testRequest_constant_in_port() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        Forest.get("/")
+                .host("{testHost}")
+                .port(String.valueOf(server.getPort()))
+                .path("/test/port")
+                .setVar("testHost", server.getHostName())
+                .execute();
+
+        mockRequest(server)
+                .assertPathEquals("/test/port");
+    }
+
+
+
+    @Test
     public void testRequest_template_in_path() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
 

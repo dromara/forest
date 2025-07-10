@@ -1074,6 +1074,33 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
     }
 
     /**
+     * 设置URL主机端口
+     * <p>同 {@link ForestRequest#setPort(int)} 方法
+     *
+     * @param port 主机端口字符串
+     * @return {@link ForestRequest}对象实例
+     * @since 1.7.4
+     */
+    public ForestRequest<T> setPort(String port) {
+        this.url.setPort(port);
+        return this;
+    }
+
+    /**
+     * 设置URL主机端口
+     * <p>同 {@link ForestRequest#setPort(String)} 方法
+     *
+     * @param port 主机端口字符串
+     * @return {@link ForestRequest}对象实例
+     * @see ForestRequest#setPort(String)
+     * @since 1.7.4
+     */
+    public ForestRequest<T> port(String port) {
+        return setPort(port);
+    }
+
+
+    /**
      * 获取URL主机端口
      *
      * @return 主机端口

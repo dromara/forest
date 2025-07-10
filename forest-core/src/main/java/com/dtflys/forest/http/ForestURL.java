@@ -26,17 +26,15 @@ package com.dtflys.forest.http;
 
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.config.ForestConfiguration;
-import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.mapping.MappingURLTemplate;
-import com.dtflys.forest.reflection.BasicVariable;
+import com.dtflys.forest.reflection.ConstantVariable;
 import com.dtflys.forest.reflection.ForestVariable;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.annotation.ElementType;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -79,7 +77,7 @@ public class ForestURL {
     /**
      * 主机端口
      */
-    protected Integer port;
+    protected ForestVariable port;
 
     /**
      * URL根路径
@@ -219,18 +217,18 @@ public class ForestURL {
         }
         setScheme(url.getProtocol());
         host = ForestVariable.create(url.getHost());
-        port = url.getPort();
+        port = ForestVariable.create(url.getPort());
         path = ForestVariable.create(url.getPath());
         userInfo = url.getUserInfo();
         setRef(url.getRef());
     }
 
-    public ForestURL(String scheme, String userInfo, ForestVariable host, Integer port, ForestVariable path) {
+    public ForestURL(String scheme, String userInfo, ForestVariable host, ForestVariable port, ForestVariable path) {
         this(scheme, userInfo, host, port, path, null);
     }
 
 
-    public ForestURL(String scheme, String userInfo, ForestVariable host, Integer port, ForestVariable path, String ref) {
+    public ForestURL(String scheme, String userInfo, ForestVariable host, ForestVariable port, ForestVariable path, String ref) {
         setScheme(scheme);
         this.userInfo = userInfo;
         this.host = host;
@@ -350,8 +348,8 @@ public class ForestURL {
         if (hostVar == null) {
             return this;
         }
-        if (hostVar instanceof BasicVariable) {
-            final String hostStr = String.valueOf(((BasicVariable) hostVar).getValue());
+        if (hostVar instanceof ConstantVariable) {
+            final String hostStr = String.valueOf(((ConstantVariable) hostVar).getValue());
             if (StringUtils.isBlank(hostStr)) {
                 return this;
             }
@@ -376,8 +374,9 @@ public class ForestURL {
     }
 
     public int getPort() {
-        if (!URLUtils.isNonePort(port)) {
-            return normalizePort(port, ssl);
+        final Integer portInt = ForestVariable.getIntegerValue(port, request);
+        if (!URLUtils.isNonePort(portInt)) {
+            return normalizePort(portInt, ssl);
         } else if (address != null) {
             int addressPort = address.getPort();
             if (!URLUtils.isNonePort(addressPort)) {
@@ -390,14 +389,21 @@ public class ForestURL {
                 return basePort;
             }
         }
-        return normalizePort(port, ssl);
+        return normalizePort(portInt, ssl);
     }
 
     public ForestURL setPort(Integer port) {
-        this.port = port;
+        this.port = new ConstantVariable(port);
         needUrlRegenerate();
         return this;
     }
+
+    public ForestURL setPort(String port) {
+        this.port = ForestVariable.create(port);
+        needUrlRegenerate();
+        return this;
+    }
+
 
     /**
      * 获取URL根路径
@@ -464,8 +470,9 @@ public class ForestURL {
                     if (forced || StringUtils.isEmpty(hostStr)) {
                         this.host = ForestVariable.create(url.getHost());
                     }
-                    if (forced || (URLUtils.isNonePort(port) && StringUtils.isEmpty(originHost))) {
-                        this.port = url.getPort();
+                    final Integer portInt = url.getPort();
+                    if (forced || (URLUtils.isNonePort(portInt) && StringUtils.isEmpty(originHost))) {
+                        this.port = ForestVariable.create(url.getPort());
                     }
                     this.basePath = url.getPath();
                 } catch (MalformedURLException e) {
@@ -713,7 +720,7 @@ public class ForestURL {
         String newSchema = this.scheme == null ? url.scheme : this.scheme;
         String newUserInfo = this.userInfo == null ? url.userInfo : this.userInfo;
         ForestVariable newHost = this.host == null ? url.host : this.host;
-        Integer newPort = this.port == null ? url.port : this.port;
+        ForestVariable newPort = this.port == null ? url.port : this.port;
         ForestVariable newPath = this.path == null ? url.path : this.path;
         String newRef = this.ref == null ? url.ref : this.ref;
         return new ForestURL(newSchema, newUserInfo, newHost, newPort, newPath, newRef);
@@ -770,8 +777,9 @@ public class ForestURL {
             if (baseURL.host != null) {
                 baseHost = ForestVariable.getStringValue(baseURL.host, request);
             }
-            if (URLUtils.isNotNonePort(baseURL.port)) {
-                basePort = baseURL.port;
+            final Integer basePortInt = ForestVariable.getIntegerValue(baseURL.port, request);
+            if (URLUtils.isNotNonePort(basePortInt)) {
+                basePort = basePortInt;
             }
             if (baseURL.path != null) {
                 basePath = ForestVariable.getStringValue(baseURL.path, request);
@@ -790,9 +798,9 @@ public class ForestURL {
             this.host = ForestVariable.create(baseHost);
             needBasePath = true;
         }
-
-        if (portChange && URLUtils.isNonePort(this.port)) {
-            this.port = basePort;
+        final Integer portInt = ForestVariable.getIntegerValue(this.port, request);
+        if (portChange && URLUtils.isNonePort(portInt)) {
+            this.port = ForestVariable.create(basePort);
         }
         final String pathStr = ForestVariable.getStringValue(this.path, request);
         String newPathStr = pathStr;
@@ -829,8 +837,9 @@ public class ForestURL {
             if (StringUtils.isEmpty(hostStr)) {
                 host = ForestVariable.create(address.getHost());
             }
-            if (URLUtils.isNonePort(port) && StringUtils.isEmpty(originHost)) {
-                port = address.getPort();
+            final Integer portInt = ForestVariable.getIntegerValue(port, request);
+            if (URLUtils.isNonePort(portInt) && StringUtils.isEmpty(originHost)) {
+                port = ForestVariable.create(address.getPort());
             }
             if (StringUtils.isEmpty(userInfo)) {
                 userInfo = address.getUserInfo();
@@ -851,7 +860,8 @@ public class ForestURL {
         final String hostStr = ForestVariable.getStringValue(host, request);
         if (StringUtils.isEmpty(hostStr)) {
             setHost("localhost");
-            if (URLUtils.isNonePort(port)) {
+            final Integer portInt = ForestVariable.getIntegerValue(port, request);
+            if (URLUtils.isNonePort(portInt)) {
                 log.warn("[Forest] Invalid url '" + oldUrl + "'. But an valid url must start width 'http://' or 'https://'. Convert this url to '" + toURLString() + "' automatically!");
             } else {
                 log.warn("[Forest] Invalid url '" + oldUrl + "'. Host is empty. Convert this url to '" + toURLString() + "' automatically!");

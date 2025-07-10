@@ -33,4 +33,16 @@ public class TemplateVariable implements ForestVariable {
     public MappingTemplate getTemplate() {
         return template;
     }
+
+    @Override
+    public String toString() {
+        if (template == null) {
+            return "null";
+        }
+        final String source = template.getSource();
+        if (source == null) {
+            return String.valueOf(template);
+        }
+        return source;
+    }
 }

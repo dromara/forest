@@ -2,7 +2,7 @@ package com.dtflys.forest.mapping;
 
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.reflection.BasicVariable;
+import com.dtflys.forest.reflection.ConstantVariable;
 import com.dtflys.forest.reflection.ForestArgumentsVariable;
 import com.dtflys.forest.reflection.ForestVariable;
 import com.dtflys.forest.reflection.TemplateVariable;
@@ -87,7 +87,7 @@ public abstract class AbstractVariableScope<SELF extends VariableScope> implemen
         } else if (value instanceof CharSequence) {
             final MappingTemplate mappingTemplate = MappingTemplate.create(this, String.valueOf(value));
             if (mappingTemplate.isConstant) {
-                variables.put(name, new BasicVariable(mappingTemplate.getPureTextConstant()));
+                variables.put(name, new ConstantVariable(mappingTemplate.getPureTextConstant()));
             } else {
                 final TemplateVariable templateVariable = new TemplateVariable(mappingTemplate);
                 variables.put(name, templateVariable);
@@ -96,7 +96,7 @@ public abstract class AbstractVariableScope<SELF extends VariableScope> implemen
             final TemplateVariable templateVariable = new TemplateVariable((MappingTemplate) value);
             variables.put(name, templateVariable);
         } else {
-            variables.put(name, new BasicVariable(value));
+            variables.put(name, new ConstantVariable(value));
         }
         return (SELF) this;
     }

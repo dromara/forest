@@ -7,7 +7,7 @@ import com.dtflys.forest.http.ForestFuture;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.mapping.MappingTemplate;
-import com.dtflys.forest.reflection.BasicVariable;
+import com.dtflys.forest.reflection.ConstantVariable;
 import com.dtflys.forest.utils.VersionUtil;
 
 import java.util.Arrays;
@@ -354,11 +354,11 @@ public abstract class Forest {
      * 创建一个基础常量类型的 Forest 变量
      *
      * @param value 常量值
-     * @return {@link BasicVariable}实例
+     * @return {@link ConstantVariable}实例
      * @since 1.7.4
      */
-    public static BasicVariable constant(Object value) {
-        return new BasicVariable(value);
+    public static ConstantVariable constant(Object value) {
+        return new ConstantVariable(value);
     }
 
 }

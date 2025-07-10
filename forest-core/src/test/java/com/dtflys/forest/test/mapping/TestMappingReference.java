@@ -1,13 +1,11 @@
 package com.dtflys.forest.test.mapping;
 
-import com.dtflys.forest.Forest;
 import com.dtflys.forest.ForestGenericClient;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestVariableUndefinedException;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.mapping.MappingTemplate;
-import com.dtflys.forest.reflection.BasicVariable;
-import junit.framework.Assert;
+import com.dtflys.forest.reflection.ConstantVariable;
 import com.dtflys.forest.mapping.MappingReference;
 import com.dtflys.forest.mapping.MappingVariable;
 import com.dtflys.forest.reflection.ForestMethod;
@@ -44,7 +42,7 @@ public class TestMappingReference {
         ageVar.setIndex(1);
         when(forestMethod.getVariable("name")).thenReturn(nameVar);
         when(forestMethod.getVariable("age")).thenReturn(ageVar);
-        when(forestMethod.getVariable("motherName")).thenReturn(new BasicVariable("Linda"));
+        when(forestMethod.getVariable("motherName")).thenReturn(new ConstantVariable("Linda"));
         
         when(forestMethod.isVariableDefined("motherName")).thenReturn(true);
         MappingReference nameRef = new MappingReference(template, "name", -1, -1);
@@ -61,12 +59,12 @@ public class TestMappingReference {
         assertThat(bRef.render(request)).isEqualTo(222);
         assertThatExceptionOfType(ForestVariableUndefinedException.class).isThrownBy(() -> cRef.render(request));
 
-        when(forestMethod.getVariable("name")).thenReturn(new BasicVariable("Marry"));
+        when(forestMethod.getVariable("name")).thenReturn(new ConstantVariable("Marry"));
         Mockito.verify(forestMethod).getVariable(eq("name"));
         Mockito.verify(forestMethod, Mockito.never()).getVariableValue(eq("name"));
         
         assertThat(ageRef.render(request, new Object[] {"Peter", 15})).isEqualTo(15);
-        when(forestMethod.getVariable("age")).thenReturn(new BasicVariable(12));
+        when(forestMethod.getVariable("age")).thenReturn(new ConstantVariable(12));
         
         assertThat(motherNameRef.render(request, new Object[] {"Peter", 15})).isEqualTo("Linda");
     }
