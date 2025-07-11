@@ -85,6 +85,12 @@ public class ForestDynamicURL extends ForestURL implements MappingListener {
                 return basePort;
             }
         }
+        if (baseAddress != null) {
+            final int basePort = baseAddress.getPort();
+            if (!URLUtils.isNonePort(basePort)) {
+                return normalizePort(basePort, ssl);
+            }
+        }
 
         return renderedPort;
     }
@@ -112,6 +118,12 @@ public class ForestDynamicURL extends ForestURL implements MappingListener {
                 return normalizeScheme(baseScheme);
             }
         }
+        if (baseAddress != null) {
+            final String baseAddressScheme = baseAddress.getScheme();
+            if (StringUtils.isNotEmpty(baseAddressScheme)) {
+                return normalizeScheme(baseAddressScheme);
+            }
+        }
         return normalizeScheme(renderedScheme);
     }
 
@@ -126,11 +138,27 @@ public class ForestDynamicURL extends ForestURL implements MappingListener {
 
     @Override
     protected String getBasePath() {
-        if (basePath != null) {
+        if (StringUtils.isNotEmpty(basePath)) {
             return basePath;
         }
         checkAndRefreshURL();
-        return renderedURL.getBasePath();
+        final String renderedBasePath = renderedURL.getBasePath();
+        if (StringUtils.isNotEmpty(renderedBasePath)) {
+            return renderedBasePath;
+        }
+        if (address != null) {
+            final String addressBasePath = address.getBasePath();
+            if (StringUtils.isNotEmpty(addressBasePath)) {
+                return addressBasePath;
+            }
+        }
+        if (baseAddress != null) {
+            final String baseAddressBasePath = baseAddress.getBasePath();
+            if (StringUtils.isNotEmpty(baseAddressBasePath)) {
+                return baseAddressBasePath;
+            }
+        }
+        return renderedBasePath;
     }
 
 //    @Override

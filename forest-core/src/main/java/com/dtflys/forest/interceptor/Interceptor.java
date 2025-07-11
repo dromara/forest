@@ -353,4 +353,14 @@ public interface Interceptor<T> extends
         return (R) obj;
     }
 
+    default boolean isGlobalInterceptor(ForestRequest request) {
+        Boolean ret = getAttributeAsBoolean(request, "__global__");
+        return ret != null && ret;
+    }
+
+    default boolean isBaseInterceptor(ForestRequest request) {
+        Boolean ret = getAttributeAsBoolean(request, "__base__");
+        return ret != null && ret;
+    }
+
 }

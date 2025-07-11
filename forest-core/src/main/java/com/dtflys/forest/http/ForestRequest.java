@@ -24,6 +24,7 @@
 
 package com.dtflys.forest.http;
 
+import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.lang.func.Consumer3;
 import com.dtflys.forest.auth.BasicAuth;
 import com.dtflys.forest.auth.ForestAuthenticator;
@@ -101,17 +102,7 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Stack;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
@@ -1226,6 +1217,11 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      */
     public ForestRequest<T> address(ForestAddress address, boolean forced) {
         this.url.setAddress(address, forced);
+        return this;
+    }
+
+    public ForestRequest<T> baseAddress(ForestAddress address) {
+        this.url.setBaseAddress(address);
         return this;
     }
 

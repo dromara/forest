@@ -54,12 +54,13 @@ public class ForestURL {
 
     volatile ForestURL baseURL;
 
-
     /**
      * 解析后的URL
      * <p>即为整个完整的没被拆分的URL字符串
      */
     protected String parsedUrl;
+
+    protected volatile ForestAddress baseAddress;
 
     protected volatile ForestAddress address;
 
@@ -265,25 +266,16 @@ public class ForestURL {
      * @return {@link ForestURL}对象
      */
     public ForestURL setBaseAddress(ForestAddress baseAddress) {
-        if (baseAddress != null) {
-            final String baseScheme = baseAddress.getScheme();
-            final String baseHost = baseAddress.getHost();
-            final String bastPath = baseAddress.getBasePath();
-
-            final int basePort = baseAddress.getPort();
-            setBasePath(bastPath);
-            setScheme(baseScheme);
-            setHost(baseHost);
-            if (basePort != -1) {
-                setPort(basePort);
-            }
-        }
+        this.baseAddress = baseAddress;
         return this;
     }
 
     public String getScheme() {
         final String schemeStr = ForestVariable.getStringValue(scheme, request);
-        if (StringUtils.isEmpty(schemeStr) && address != null) {
+        if (StringUtils.isNotEmpty(schemeStr)) {
+            return normalizeScheme(schemeStr);
+        }
+        if (address != null) {
             final String addressScheme = address.getScheme();
             if (StringUtils.isNotEmpty(addressScheme)) {
                 return normalizeScheme(addressScheme);
@@ -292,9 +284,13 @@ public class ForestURL {
         if (baseURL != null) {
             final String baseScheme = baseURL.getScheme();
             if (StringUtils.isNotEmpty(baseScheme)) {
-                refreshSSL(baseScheme);
-                needUrlRegenerate();
                 return normalizeScheme(baseScheme);
+            }
+        }
+        if (baseAddress != null) {
+            final String baseAddressScheme = baseAddress.getScheme();
+            if (StringUtils.isNotEmpty(baseAddressScheme)) {
+                return normalizeScheme(baseAddressScheme);
             }
         }
         return normalizeScheme(schemeStr);
@@ -338,12 +334,26 @@ public class ForestURL {
     }
 
     public String getHost() {
-        checkAndReparseUrl();
         final String hostStr = getHost(ForestVariable.getStringValue(host, request));
-        if (StringUtils.isEmpty(hostStr) && baseURL != null) {
+        if (StringUtils.isNotEmpty(hostStr)) {
+            return hostStr;
+        }
+        if (address != null) {
+            final String addressHost = address.getHost();
+            if (StringUtils.isNotEmpty(addressHost)) {
+                return addressHost;
+            }
+        }
+        if (baseURL != null) {
             final String baseHost = baseURL.getHost();
             if (StringUtils.isNotEmpty(baseHost)) {
                 return baseHost;
+            }
+        }
+        if (baseAddress != null) {
+            final String baseAddressHost = baseAddress.getHost();
+            if (StringUtils.isNotEmpty(baseAddressHost)) {
+                return baseAddressHost;
             }
         }
         return hostStr;
@@ -396,7 +406,9 @@ public class ForestURL {
         final Integer portInt = ForestVariable.getIntegerValue(port, request);
         if (!URLUtils.isNonePort(portInt)) {
             return normalizePort(portInt, ssl);
-        } else if (address != null) {
+        }
+
+        if (address != null) {
             int addressPort = address.getPort();
             if (!URLUtils.isNonePort(addressPort)) {
                 return normalizePort(addressPort, ssl);
@@ -406,6 +418,13 @@ public class ForestURL {
             final int basePort = baseURL.getPort();
             if (!URLUtils.isNonePort(basePort)) {
                 return basePort;
+            }
+        }
+
+        if (baseAddress != null) {
+            final int baseAddressPort = baseAddress.getPort();
+            if (!URLUtils.isNonePort(baseAddressPort)) {
+                return normalizePort(baseAddressPort, ssl);
             }
         }
         return normalizePort(portInt, ssl);
@@ -463,6 +482,21 @@ public class ForestURL {
     }
 
     protected String getBasePath() {
+        if (StringUtils.isNotEmpty(basePath)) {
+            return basePath;
+        }
+        if (address != null) {
+            final String addressBasePath = address.getBasePath();
+            if (StringUtils.isNotEmpty(addressBasePath)) {
+                return addressBasePath;
+            }
+        }
+        if (baseAddress != null) {
+            final String baseAddressBasePath = baseAddress.getBasePath();
+            if (StringUtils.isNotEmpty(baseAddressBasePath)) {
+                return baseAddressBasePath;
+            }
+        }
         return basePath;
     }
 
@@ -547,11 +581,12 @@ public class ForestURL {
             final String baseRet = baseURL.getPath();
             builder.append(baseRet);
         }
-        if (StringUtils.isNotEmpty(basePath)) {
-            if (host != null && basePath.charAt(0) != '/') {
+        final String basePathStr = getBasePath();
+        if (StringUtils.isNotEmpty(basePathStr)) {
+            if (host != null && basePathStr.charAt(0) != '/') {
                 builder.append('/');
             }
-            builder.append(basePath);
+            builder.append(basePathStr);
         }
         final String path = getPath();
         if (StringUtils.isNotEmpty(path)) {
@@ -740,11 +775,22 @@ public class ForestURL {
      * @return {@link ForestURL}对象实例
      */
     public ForestURL setAddress(ForestAddress address, boolean forced) {
-        if (forced) {
-            setBaseAddress(address);
-        } else {
-            this.address = address;
+        if (forced && address != null) {
+            if (StringUtils.isNotEmpty(address.getScheme())) {
+                this.scheme = ForestVariable.create(address.getScheme());
+            }
+            if (StringUtils.isNotEmpty(address.getHost())) {
+                this.host = ForestVariable.create(address.getHost());
+            }
+            if (URLUtils.isNonePort(address.getPort())) {
+                this.port = ForestVariable.create(address.getPort());
+            }
+            if (StringUtils.isNotEmpty(address.getBasePath())) {
+                this.basePath = address.getBasePath();
+            }
+            needUrlRegenerate();
         }
+        this.address = address;
         return this;
     }
 
@@ -896,11 +942,11 @@ public class ForestURL {
 
     public ForestURL checkAndComplete() {
         String oldUrl = getOriginalUrl();
-        final String schemeStr = ForestVariable.getStringValue(scheme, request);
+        final String schemeStr = getScheme();
         if (StringUtils.isEmpty(schemeStr)) {
             setScheme(ssl ? "https" : "http");
         }
-        final String hostStr = ForestVariable.getStringValue(host, request);
+        final String hostStr = getHost();
         if (StringUtils.isEmpty(hostStr)) {
             setHost("localhost");
             final Integer portInt = ForestVariable.getIntegerValue(port, request);

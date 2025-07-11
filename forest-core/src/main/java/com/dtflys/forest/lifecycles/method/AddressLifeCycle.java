@@ -44,10 +44,18 @@ public class AddressLifeCycle implements MethodAnnotationLifeCycle<Address, Void
             final Object addressSourceObj = request.getConfiguration().getForestObject(addressSourceClass);
             final AddressSource addressSource = (AddressSource) addressSourceObj;
             final ForestAddress address = addressSource.getAddress(request);
-            request.address(address, false);
+            if (isBaseInterceptor(request)) {
+                request.baseAddress(address);
+            } else {
+                request.address(address, false);
+            }
         } else {
             final ForestAddress address = new ForestAddress(scheme, host, port, basePath);
-            request.address(address, false);
+            if (isBaseInterceptor(request)) {
+                request.baseAddress(address);
+            } else {
+                request.address(address, false);
+            }
         }
 
     }
