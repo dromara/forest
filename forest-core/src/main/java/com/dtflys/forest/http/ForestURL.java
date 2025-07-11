@@ -29,7 +29,6 @@ import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.mapping.MappingURLTemplate;
 import com.dtflys.forest.reflection.BasicVariable;
-import com.dtflys.forest.reflection.ConstantVariable;
 import com.dtflys.forest.reflection.ForestVariable;
 import com.dtflys.forest.utils.StringUtils;
 import com.dtflys.forest.utils.URLUtils;
@@ -284,26 +283,37 @@ public class ForestURL {
 
     public String getScheme() {
         final String schemeStr = ForestVariable.getStringValue(scheme, request);
-        refreshSSL();
-        needUrlRegenerate();
         if (StringUtils.isEmpty(schemeStr) && address != null) {
-            return address.getScheme();
-        }
-        if (StringUtils.isEmpty(schemeStr)) {
-            return ssl ? "https" : "http";
+            final String addressScheme = address.getScheme();
+            if (StringUtils.isNotEmpty(addressScheme)) {
+                return normalizeScheme(addressScheme);
+            }
         }
         if (baseURL != null) {
             final String baseScheme = baseURL.getScheme();
             if (StringUtils.isNotEmpty(baseScheme)) {
-                return baseScheme;
+                refreshSSL(baseScheme);
+                needUrlRegenerate();
+                return normalizeScheme(baseScheme);
             }
         }
-        return schemeStr;
+        return normalizeScheme(schemeStr);
     }
 
     private void refreshSSL() {
         final String schemeStr = ForestVariable.getStringValue(scheme, request);
         this.ssl = "https".equals(schemeStr);
+    }
+
+    private void refreshSSL(final String schemeStr) {
+        this.ssl = "https".equals(schemeStr);
+    }
+
+    protected String normalizeScheme(final String scheme) {
+        final String schemeStr = StringUtils.isEmpty(scheme) ? (ssl ? "https" : "http") : scheme;
+        refreshSSL(schemeStr);
+        needUrlRegenerate();
+        return schemeStr;
     }
 
     public ForestURL setScheme(String scheme) {
@@ -329,14 +339,14 @@ public class ForestURL {
 
     public String getHost() {
         checkAndReparseUrl();
-        final String ret = getHost(ForestVariable.getStringValue(host, request));
-        if (StringUtils.isEmpty(ret) && baseURL != null) {
+        final String hostStr = getHost(ForestVariable.getStringValue(host, request));
+        if (StringUtils.isEmpty(hostStr) && baseURL != null) {
             final String baseHost = baseURL.getHost();
             if (StringUtils.isNotEmpty(baseHost)) {
                 return baseHost;
             }
         }
-        return ret;
+        return hostStr;
     }
 
     public ForestURL setHost(String host) {
@@ -515,11 +525,53 @@ public class ForestURL {
         if (baseURL != null) {
             final String baseRet = baseURL.getPath();
             if (StringUtils.isNotEmpty(baseRet)) {
-                return baseRet;
+                if (pathStr.startsWith("/") && baseRet.endsWith("/")) {
+                    return baseRet + pathStr.substring(1);
+                }
+                return baseRet + pathStr;
             }
         }
         return pathStr;
     }
+
+    /**
+     * 获取完整URL路径
+     * <p>Full Path = baseURL path + basePath + path
+     *
+     * @return 完整URL路径
+     * @since 1.7.4
+     */
+    public String getFullPath() {
+        final StringBuilder builder = new StringBuilder();
+        if (baseURL != null) {
+            final String baseRet = baseURL.getPath();
+            builder.append(baseRet);
+        }
+        if (StringUtils.isNotEmpty(basePath)) {
+            if (host != null && basePath.charAt(0) != '/') {
+                builder.append('/');
+            }
+            builder.append(basePath);
+        }
+        final String path = getPath();
+        if (StringUtils.isNotEmpty(path)) {
+            final int len =  builder.length() - 1;
+            if (len >= 0) {
+                if ((host != null || basePath != null) && path.charAt(0) != '/' && builder.charAt(len) != '/') {
+                    builder.append('/');
+                    builder.append(path);
+                } else if (path.length() > 1 && path.charAt(0) == '/' && builder.charAt(len) == '/') {
+                    builder.append(path.substring(1));
+                } else {
+                    builder.append(path);
+                }
+            } else {
+                builder.append(path);
+            }
+        }
+        return builder.toString();
+    }
+
 
     /**
      * 设置URL路径
@@ -606,10 +658,7 @@ public class ForestURL {
 
     public boolean isSSL() {
         final String scheme = getScheme();
-        if (StringUtils.isEmpty(scheme)) {
-            return "https".equals(address.getScheme());
-        }
-        return ssl;
+        return "https".equals(scheme);
     }
 
     public String toURLString() {
@@ -622,40 +671,17 @@ public class ForestURL {
         if (StringUtils.isNotEmpty(authority)) {
             builder.append(authority);
         }
-        final String basePath = getBasePath();
         final String host = getHost();
-        if (baseURL != null) {
-            final String pathOfBaseURL = baseURL.getPath();
-            if (StringUtils.isNotEmpty(pathOfBaseURL)) {
-                final String encodedPathOfBaseURL = URLUtils.pathEncode(pathOfBaseURL, "UTF-8");
-                if (host != null && encodedPathOfBaseURL.charAt(0) != '/') {
-                    builder.append('/');
-                }
-                builder.append(encodedPathOfBaseURL);
-            }
-        }
 
-        if (StringUtils.isNotEmpty(basePath)) {
-            String encodedBasePath = URLUtils.pathEncode(basePath, "UTF-8");
-            if (host != null && encodedBasePath.charAt(0) != '/') {
+        final String fullPath = getFullPath();
+        if (StringUtils.isNotEmpty(fullPath)) {
+            final String encodedFullPath = URLUtils.pathEncode(fullPath, "UTF-8");
+            if (host != null && encodedFullPath.charAt(0) != '/') {
                 builder.append('/');
             }
-            builder.append(encodedBasePath);
+            builder.append(encodedFullPath);
         }
-        final String path = getPath();
-        if (StringUtils.isNotEmpty(path)) {
-            String encodedPath = URLUtils.pathEncode(path, "UTF-8");
-            final int len =  builder.length() - 1;
-            if ((host != null || basePath != null) && encodedPath.charAt(0) != '/' && builder.charAt(len) != '/') {
-                builder.append('/');
-                builder.append(encodedPath);
-            } else if (encodedPath.length() > 1 && encodedPath.charAt(0) == '/' && builder.charAt(len) == '/') {
-                builder.append(encodedPath.substring(1));
-            } else {
-                builder.append(encodedPath);
-            }
 
-        }
         return builder.toString();
     }
 
@@ -842,29 +868,29 @@ public class ForestURL {
     }
 
     public ForestURL mergeAddress() {
-        if (address != null) {
-            final String hostStr = ForestVariable.getStringValue(host, request);
-            String originHost = hostStr;
-            final String schemeStr = ForestVariable.getStringValue(scheme, request);
-            if (StringUtils.isEmpty(schemeStr)) {
-                scheme = ForestVariable.create(address.getScheme());
-                refreshSSL();
-            }
-            if (StringUtils.isEmpty(hostStr)) {
-                host = ForestVariable.create(address.getHost());
-            }
-            final Integer portInt = ForestVariable.getIntegerValue(port, request);
-            if (URLUtils.isNonePort(portInt) && StringUtils.isEmpty(originHost)) {
-                port = ForestVariable.create(address.getPort());
-            }
-            if (StringUtils.isEmpty(userInfo)) {
-                userInfo = address.getUserInfo();
-            }
-            if (StringUtils.isEmpty(basePath)) {
-                setBasePath(address.getBasePath(), false);
-            }
-            needUrlRegenerate();
-        }
+//        if (address != null) {
+//            final String hostStr = ForestVariable.getStringValue(host, request);
+//            String originHost = hostStr;
+//            final String schemeStr = ForestVariable.getStringValue(scheme, request);
+//            if (StringUtils.isEmpty(schemeStr)) {
+//                scheme = ForestVariable.create(address.getScheme());
+//                refreshSSL();
+//            }
+//            if (StringUtils.isEmpty(hostStr)) {
+//                host = ForestVariable.create(address.getHost());
+//            }
+//            final Integer portInt = ForestVariable.getIntegerValue(port, request);
+//            if (URLUtils.isNonePort(portInt) && StringUtils.isEmpty(originHost)) {
+//                port = ForestVariable.create(address.getPort());
+//            }
+//            if (StringUtils.isEmpty(userInfo)) {
+//                userInfo = address.getUserInfo();
+//            }
+//            if (StringUtils.isEmpty(basePath)) {
+//                setBasePath(address.getBasePath(), false);
+//            }
+//            needUrlRegenerate();
+//        }
         return this;
     }
 
@@ -887,9 +913,8 @@ public class ForestURL {
         return this;
     }
     
-    private void checkAndReparseUrl() {
+    protected void checkAndReparseUrl() {
         if (variablesChanged) {
-            final ForestQueryMap queryMap = new ForestQueryMap(null);
             needUrlRegenerate();
         }
     }

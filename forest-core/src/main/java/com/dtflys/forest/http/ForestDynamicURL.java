@@ -22,7 +22,6 @@ public class ForestDynamicURL extends ForestURL implements MappingListener {
         if (renderedURL == null && request != null) {
             renderedURL = new ForestURL();
             template.render(renderedURL, request, request.arguments(), request.getQuery());
-
         }
     }
 
@@ -45,9 +44,14 @@ public class ForestDynamicURL extends ForestURL implements MappingListener {
 
     @Override
     public String getHost() {
-        final String host = super.getHost();
-        if (host != null) {
-            return host;
+        final String hostStr = getHost(ForestVariable.getStringValue(host, request));
+        if (StringUtils.isNotEmpty(hostStr)) {
+            return hostStr;
+        }
+        checkAndRefreshURL();
+        final String renderedHost = ForestVariable.getStringValue(renderedURL.host, request);
+        if (StringUtils.isNotEmpty(renderedHost)) {
+            return renderedHost;
         }
         if (baseURL != null) {
             final String baseHost = baseURL.getHost();
@@ -55,8 +59,7 @@ public class ForestDynamicURL extends ForestURL implements MappingListener {
                 return baseHost;
             }
         }
-        checkAndRefreshURL();
-        return renderedURL.getHost();
+        return renderedHost;
     }
 
     @Override
@@ -64,7 +67,13 @@ public class ForestDynamicURL extends ForestURL implements MappingListener {
         final Integer portInt = ForestVariable.getIntegerValue(port, request);
         if (!URLUtils.isNonePort(portInt)) {
             return normalizePort(portInt, ssl);
-        } else if (address != null) {
+        }
+        checkAndRefreshURL();
+        final Integer renderedPort = ForestVariable.getIntegerValue(renderedURL.port, request);
+        if (!URLUtils.isNonePort(renderedPort)) {
+            return renderedPort;
+        }
+        if (address != null) {
             int addressPort = address.getPort();
             if (!URLUtils.isNonePort(addressPort)) {
                 return normalizePort(addressPort, ssl);
@@ -76,18 +85,34 @@ public class ForestDynamicURL extends ForestURL implements MappingListener {
                 return basePort;
             }
         }
-        checkAndRefreshURL();
-        return renderedURL.getPort();
+
+        return renderedPort;
     }
 
     @Override
     public String getScheme() {
-        final String scheme = super.getScheme();
-        if (scheme != null) {
-            return scheme;
+        final String schemeStr = ForestVariable.getStringValue(scheme, request);
+        if (StringUtils.isNotEmpty(schemeStr)) {
+            return normalizeScheme(schemeStr);
         }
         checkAndRefreshURL();
-        return renderedURL.getScheme();
+        final String renderedScheme = ForestVariable.getStringValue(renderedURL.scheme, request);
+        if (StringUtils.isNotEmpty(renderedScheme)) {
+            return normalizeScheme(renderedScheme);
+        }
+        if (address != null) {
+            final String addressScheme = address.getScheme();
+            if (StringUtils.isNotEmpty(addressScheme)) {
+                return normalizeScheme(addressScheme);
+            }
+        }
+        if (baseURL != null) {
+            final String baseScheme = baseURL.getScheme();
+            if (StringUtils.isNotEmpty(baseScheme)) {
+                return normalizeScheme(baseScheme);
+            }
+        }
+        return normalizeScheme(renderedScheme);
     }
 
     @Override

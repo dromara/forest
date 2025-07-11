@@ -1139,6 +1139,26 @@ public class TestGenericForestClient extends BaseClientTest {
     }
 
     @Test
+    public void testRequest_template_in_dynamic_base_url2() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        ForestRequest request = Forest.get("http://{host}:{port}/test/base/url")
+                .baseUrl("https://baidu.com:80")
+                .setVar("host", server.getHostName())
+                .setVar("port", server.getPort());
+
+        assertThat(request.scheme()).isEqualTo("http");
+        assertThat(request.host()).isEqualTo(server.getHostName());
+        assertThat(request.port()).isEqualTo(server.getPort());
+
+        request.execute();
+
+        mockRequest(server)
+                .assertPathEquals("/test/base/url");
+    }
+
+
+    @Test
     public void testRequest_template_in_scheme() {
         ForestRequest request = Forest.get("/")
                 .scheme("{testScheme}")
