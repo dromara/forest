@@ -66,7 +66,6 @@ import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.RequestLogMessage;
 import com.dtflys.forest.mapping.AbstractVariableScope;
-import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingURLTemplate;
 import com.dtflys.forest.multipart.ByteArrayMultipart;
 import com.dtflys.forest.multipart.FileMultipart;
@@ -867,6 +866,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
         return setUrl(template, args);
     }
 
+
     /**
      * 设置请求的url地址
      * <p>每次设置请求的url地址时，都会解析传入的url参数字符串
@@ -953,6 +953,30 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @see ForestRequest#setScheme(String)
      */
     public ForestRequest<T> scheme(String scheme) {
+        return setScheme(scheme);
+    }
+
+    /**
+     * 设置URL地址的HTTP协议头
+     *
+     * @param scheme HTTP协议头变量
+     * @return {@link ForestRequest}对象实例
+     * @since 1.7.4
+     */
+    public ForestRequest<T> setScheme(ForestVariable scheme) {
+        this.url.setScheme(scheme);
+        return this;
+    }
+
+    /**
+     * 设置URL地址的HTTP协议头
+     *
+     * @param scheme HTTP协议头变量
+     * @return {@link ForestRequest}对象实例
+     * @see ForestRequest#setScheme(ForestVariable)
+     * @since 1.7.4
+     */
+    public ForestRequest<T> scheme(ForestVariable scheme) {
         return setScheme(scheme);
     }
 
@@ -1099,6 +1123,30 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
         return setPort(port);
     }
 
+    /**
+     * 设置URL主机端口
+     *
+     * @param port 主机端口变量
+     * @return {@link ForestRequest}对象实例
+     * @since 1.7.4
+     */
+    public ForestRequest<T> setPort(ForestVariable port) {
+        this.url.setPort(port);
+        return this;
+    }
+
+    /**
+     * 设置URL主机端口
+     * <p>同 {@link ForestRequest#setPort(ForestVariable)} 方法
+     *
+     * @param port 主机端口变量
+     * @return {@link ForestRequest}对象实例
+     * @see ForestRequest#setPort(ForestVariable)
+     * @since 1.7.4
+     */
+    public ForestRequest<T> port(ForestVariable port) {
+        return setPort(port);
+    }
 
     /**
      * 获取URL主机端口

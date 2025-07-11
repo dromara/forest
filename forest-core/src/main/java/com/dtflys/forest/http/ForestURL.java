@@ -28,6 +28,7 @@ import com.dtflys.forest.Forest;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
 import com.dtflys.forest.mapping.MappingURLTemplate;
+import com.dtflys.forest.reflection.BasicVariable;
 import com.dtflys.forest.reflection.ConstantVariable;
 import com.dtflys.forest.reflection.ForestVariable;
 import com.dtflys.forest.utils.StringUtils;
@@ -61,23 +62,23 @@ public class ForestURL {
      */
     protected String parsedUrl;
 
-    protected ForestAddress address;
+    protected volatile ForestAddress address;
 
 
     /**
      * HTTP协议
      */
-    protected String scheme;
+    protected volatile ForestVariable scheme;
 
     /**
      * 主机地址
      */
-    protected ForestVariable host;
+    protected volatile ForestVariable host;
 
     /**
      * 主机端口
      */
-    protected ForestVariable port;
+    protected volatile ForestVariable port;
 
     /**
      * URL根路径
@@ -88,7 +89,7 @@ public class ForestURL {
      * URL路径
      * <p>该路径为整个URL去除前面协议 + Host + Port 后部分
      */
-    protected ForestVariable path;
+    protected volatile ForestVariable path;
 
     /**
      * 用户信息
@@ -223,12 +224,12 @@ public class ForestURL {
         setRef(url.getRef());
     }
 
-    public ForestURL(String scheme, String userInfo, ForestVariable host, ForestVariable port, ForestVariable path) {
+    public ForestURL(ForestVariable scheme, String userInfo, ForestVariable host, ForestVariable port, ForestVariable path) {
         this(scheme, userInfo, host, port, path, null);
     }
 
 
-    public ForestURL(String scheme, String userInfo, ForestVariable host, ForestVariable port, ForestVariable path, String ref) {
+    public ForestURL(ForestVariable scheme, String userInfo, ForestVariable host, ForestVariable port, ForestVariable path, String ref) {
         setScheme(scheme);
         this.userInfo = userInfo;
         this.host = host;
@@ -282,10 +283,13 @@ public class ForestURL {
     }
 
     public String getScheme() {
-        if (StringUtils.isEmpty(scheme) && address != null) {
+        final String schemeStr = ForestVariable.getStringValue(scheme, request);
+        refreshSSL();
+        needUrlRegenerate();
+        if (StringUtils.isEmpty(schemeStr) && address != null) {
             return address.getScheme();
         }
-        if (StringUtils.isEmpty(scheme)) {
+        if (StringUtils.isEmpty(schemeStr)) {
             return ssl ? "https" : "http";
         }
         if (baseURL != null) {
@@ -294,22 +298,27 @@ public class ForestURL {
                 return baseScheme;
             }
         }
-        return scheme;
+        return schemeStr;
     }
 
     private void refreshSSL() {
-        this.ssl = "https".equals(this.scheme);
+        final String schemeStr = ForestVariable.getStringValue(scheme, request);
+        this.ssl = "https".equals(schemeStr);
     }
 
     public ForestURL setScheme(String scheme) {
         if (StringUtils.isBlank(scheme)) {
             return this;
         }
-        this.scheme = scheme.trim();
-        refreshSSL();
-        needUrlRegenerate();
+        this.scheme = ForestVariable.create(scheme.trim());
         return this;
     }
+
+    public ForestURL setScheme(ForestVariable scheme) {
+        this.scheme = scheme;
+        return this;
+    }
+
 
     protected String getHost(String host) {
         if (StringUtils.isEmpty(host) && address != null) {
@@ -348,8 +357,8 @@ public class ForestURL {
         if (hostVar == null) {
             return this;
         }
-        if (hostVar instanceof ConstantVariable) {
-            final String hostStr = String.valueOf(((ConstantVariable) hostVar).getValue());
+        if (hostVar instanceof BasicVariable) {
+            final String hostStr = String.valueOf(((BasicVariable) hostVar).getValue());
             if (StringUtils.isBlank(hostStr)) {
                 return this;
             }
@@ -393,7 +402,7 @@ public class ForestURL {
     }
 
     public ForestURL setPort(Integer port) {
-        this.port = new ConstantVariable(port);
+        this.port = ForestVariable.create(port);
         needUrlRegenerate();
         return this;
     }
@@ -404,6 +413,11 @@ public class ForestURL {
         return this;
     }
 
+    public ForestURL setPort(ForestVariable port) {
+        this.port = port;
+        needUrlRegenerate();
+        return this;
+    }
 
     /**
      * 获取URL根路径
@@ -460,8 +474,9 @@ public class ForestURL {
                 try {
                     final String hostStr = ForestVariable.getStringValue(this.host, request);
                     final String originHost = hostStr;
+                    final String schemeStr = ForestVariable.getStringValue(this.scheme, request);
                     final URL url = new URL(this.basePath);
-                    if (forced || StringUtils.isEmpty(this.scheme)) {
+                    if (forced || StringUtils.isEmpty(schemeStr)) {
                         setScheme(url.getProtocol());
                     }
                     if (forced || StringUtils.isEmpty(this.userInfo)) {
@@ -717,7 +732,7 @@ public class ForestURL {
         if (url == null) {
             return this;
         }
-        String newSchema = this.scheme == null ? url.scheme : this.scheme;
+        ForestVariable newSchema = this.scheme == null ? url.scheme : this.scheme;
         String newUserInfo = this.userInfo == null ? url.userInfo : this.userInfo;
         ForestVariable newHost = this.host == null ? url.host : this.host;
         ForestVariable newPort = this.port == null ? url.port : this.port;
@@ -769,7 +784,7 @@ public class ForestURL {
         boolean portChange = false;
         if (baseURL != null) {
             if (baseURL.scheme != null) {
-                baseSchema = baseURL.scheme;
+                baseSchema = ForestVariable.getStringValue(baseURL.scheme, request);
             }
             if (baseURL.userInfo != null) {
                 baseUserInfo = baseURL.userInfo;
@@ -830,8 +845,9 @@ public class ForestURL {
         if (address != null) {
             final String hostStr = ForestVariable.getStringValue(host, request);
             String originHost = hostStr;
-            if (StringUtils.isEmpty(scheme)) {
-                scheme = address.getScheme();
+            final String schemeStr = ForestVariable.getStringValue(scheme, request);
+            if (StringUtils.isEmpty(schemeStr)) {
+                scheme = ForestVariable.create(address.getScheme());
                 refreshSSL();
             }
             if (StringUtils.isEmpty(hostStr)) {
@@ -854,7 +870,8 @@ public class ForestURL {
 
     public ForestURL checkAndComplete() {
         String oldUrl = getOriginalUrl();
-        if (StringUtils.isEmpty(scheme)) {
+        final String schemeStr = ForestVariable.getStringValue(scheme, request);
+        if (StringUtils.isEmpty(schemeStr)) {
             setScheme(ssl ? "https" : "http");
         }
         final String hostStr = ForestVariable.getStringValue(host, request);

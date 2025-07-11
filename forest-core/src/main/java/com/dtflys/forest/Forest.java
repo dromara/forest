@@ -7,6 +7,7 @@ import com.dtflys.forest.http.ForestFuture;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.mapping.MappingTemplate;
+import com.dtflys.forest.reflection.BasicVariable;
 import com.dtflys.forest.reflection.ConstantVariable;
 import com.dtflys.forest.utils.VersionUtil;
 

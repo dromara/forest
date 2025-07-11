@@ -775,6 +775,9 @@ public class MappingTemplate {
     }
 
     public String render(VariableScope scope, Object[] args, boolean allowEmptyBrace) {
+        if (isConstant) {
+            return getPureTextConstant();
+        }
         final ForestJsonConverter jsonConverter = scope.getConfiguration().getJsonConverter();
         int len = exprList.size();
         final StringBuilder builder = new StringBuilder();
@@ -905,6 +908,9 @@ public class MappingTemplate {
     public String getPureTextConstant() {
         if (exprList == null || exprList.isEmpty()) {
             return "";
+        }
+        if (exprList.size() == 1) {
+            return String.valueOf(exprList.get(0).render(null));
         }
         final StringBuilder builder = new StringBuilder();
         for (final MappingExpr expr : exprList) {

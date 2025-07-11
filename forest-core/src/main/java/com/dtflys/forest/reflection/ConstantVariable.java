@@ -1,33 +1,15 @@
 package com.dtflys.forest.reflection;
 
-import com.dtflys.forest.Forest;
 import com.dtflys.forest.http.ForestRequest;
-import com.dtflys.forest.mapping.MappingTemplate;
 
-public class ConstantVariable implements ForestVariable {
-
-    private final Object value;
+public class ConstantVariable extends BasicVariable {
 
     public ConstantVariable(Object value) {
-        this.value = value;
+        super(value);
     }
 
     @Override
     public Object getValue(ForestRequest request) {
-        if (value instanceof MappingTemplate) {
-            return ((MappingTemplate) value).render(
-                    request == null ? Forest.config() : request,
-                    request == null ? null : request.arguments());
-        }
         return value;
-    }
-    
-    public Object getValue() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return String.valueOf(value);
     }
 }

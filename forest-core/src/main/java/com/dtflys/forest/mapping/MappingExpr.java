@@ -14,6 +14,8 @@ import com.dtflys.forest.utils.TemplateUtils;
  */
 public abstract class MappingExpr {
 
+    private final static Object[] EMPTY_ARRAY = new Object[0];
+
     protected final MappingTemplate template;
 
     boolean deepReference = true;
@@ -37,7 +39,7 @@ public abstract class MappingExpr {
     }
 
     public Object render(VariableScope scope) {
-        return render(scope, new Object[0]);
+        return render(scope, EMPTY_ARRAY);
     }
 
 

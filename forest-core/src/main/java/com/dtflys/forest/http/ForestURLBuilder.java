@@ -135,7 +135,7 @@ public class ForestURLBuilder {
      */
     public ForestURL build() {
         return new ForestURL(
-                scheme,
+                ForestVariable.create(scheme),
                 userInfo,
                 ForestVariable.create(host),
                 ForestVariable.create(port),

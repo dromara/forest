@@ -6,6 +6,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.RequestVariableScope;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingValue;
+import com.dtflys.forest.mapping.MappingVariable;
 
 @FunctionalInterface
 public interface ForestVariable {
@@ -26,7 +27,7 @@ public interface ForestVariable {
         } else if (value instanceof MappingTemplate) {
             return new TemplateVariable((MappingTemplate) value);
         } else {
-            return new ConstantVariable(value);
+            return new BasicVariable(value);
         }
     }
 
@@ -61,6 +62,22 @@ public interface ForestVariable {
         Object value = getValue(req);
         if (value == null) {
             return null;
+        }
+        if (!(this instanceof ConstantVariable)) {
+            if (value instanceof ForestVariable) {
+                return getValue((ForestVariable) value, req, clazz);
+            }
+            if (value instanceof CharSequence) {
+                value = MappingTemplate.create(req, String.valueOf(value));
+            }
+            if (value instanceof MappingTemplate) {
+                final MappingTemplate template = (MappingTemplate) value;
+                if (template.isConstant() || req == null) {
+                    value = template.getPureTextConstant();
+                } else {
+                    value = template.render(req, req.arguments());
+                }
+            }
         }
         if (clazz != null) {
             if (clazz.isAssignableFrom(value.getClass())) {

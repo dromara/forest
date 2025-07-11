@@ -7,7 +7,7 @@ import com.dtflys.forest.mapping.MappingTemplate;
 
 public class TemplateVariable implements ForestVariable {
 
-    private MappingTemplate template;
+    private volatile MappingTemplate template;
 
     public TemplateVariable(MappingTemplate template) {
         this.template = template;

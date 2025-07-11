@@ -1702,7 +1702,7 @@ public class ForestConfiguration extends AbstractVariableScope<ForestConfigurati
             final TemplateVariable templateVariable = new TemplateVariable(mappingTemplate);
             variables.put(name, templateVariable);
         } else {
-            this.variables.put(name, new ConstantVariable(value));
+            this.variables.put(name, new BasicVariable(value));
         }
         return this;
     }
@@ -1717,7 +1717,7 @@ public class ForestConfiguration extends AbstractVariableScope<ForestConfigurati
      */
     public ForestConfiguration setVariable(String name, ForestVariable value) {
         if (value == null) {
-            this.variables.put(name, new ConstantVariable(null));
+            this.variables.put(name, new BasicVariable(null));
         } else {
             this.variables.put(name, value);
         }
@@ -1734,7 +1734,7 @@ public class ForestConfiguration extends AbstractVariableScope<ForestConfigurati
      */
     public ForestConfiguration setVariable(String name, ForestArgumentsVariable value) {
         if (value == null) {
-            this.variables.put(name, new ConstantVariable(null));
+            this.variables.put(name, new BasicVariable(null));
         } else {
             this.variables.put(name, value);
         }
@@ -1797,8 +1797,8 @@ public class ForestConfiguration extends AbstractVariableScope<ForestConfigurati
     private Object getVariableValueFromMethodOrRequest(String name, ForestMethod method, ForestRequest request) {
         ForestVariable variable = this.variables.get(name);
         if (variable != null) {
-            if (variable instanceof ConstantVariable) {
-                return ((ConstantVariable) variable).getValue();
+            if (variable instanceof BasicVariable) {
+                return ((BasicVariable) variable).getValue();
             }
             if (variable instanceof ForestMethodVariable) {
                 return ((ForestMethodVariable) variable).getValue(method);

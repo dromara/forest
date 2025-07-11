@@ -17,6 +17,8 @@ import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Map;
 
+import static com.dtflys.forest.Forest.constant;
+
 public class MappingURLTemplate extends MappingTemplate {
 
     private final static ForestCache<String, MappingURLTemplate> URL_TEMPLATE_CACHE = new ForestCache<>(256);
@@ -346,7 +348,7 @@ public class MappingURLTemplate extends MappingTemplate {
                 .setUserInfo(userInfo != null ? userInfo.toString() : null)
                 .setHost(host)
                 .setPort(port != null ? port : (host != null ? -1 : null))
-                .setPath(path != null ? path.toString() : null)
+                .setPath(path != null ? constant(path.toString()) : null)
                 .setRef(ref);
         if (listener != null) {
             listener.onChanged(this, url);
