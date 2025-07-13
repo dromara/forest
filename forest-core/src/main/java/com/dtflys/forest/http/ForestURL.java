@@ -404,26 +404,26 @@ public class ForestURL {
 
     public int getPort() {
         final Integer portInt = ForestVariable.getIntegerValue(port, request);
-        if (!URLUtils.isNonePort(portInt)) {
+        if (URLUtils.isNotNonePort(portInt)) {
             return normalizePort(portInt, ssl);
         }
 
         if (address != null) {
             int addressPort = address.getPort();
-            if (!URLUtils.isNonePort(addressPort)) {
+            if (URLUtils.isNotNonePort(addressPort)) {
                 return normalizePort(addressPort, ssl);
             }
         }
         if (baseURL != null) {
             final int basePort = baseURL.getPort();
-            if (!URLUtils.isNonePort(basePort)) {
+            if (URLUtils.isNotNonePort(basePort)) {
                 return basePort;
             }
         }
 
         if (baseAddress != null) {
             final int baseAddressPort = baseAddress.getPort();
-            if (!URLUtils.isNonePort(baseAddressPort)) {
+            if (URLUtils.isNotNonePort(baseAddressPort)) {
                 return normalizePort(baseAddressPort, ssl);
             }
         }
@@ -782,7 +782,7 @@ public class ForestURL {
             if (StringUtils.isNotEmpty(address.getHost())) {
                 this.host = ForestVariable.create(address.getHost());
             }
-            if (URLUtils.isNonePort(address.getPort())) {
+            if (URLUtils.isNotNonePort(address.getPort())) {
                 this.port = ForestVariable.create(address.getPort());
             }
             if (StringUtils.isNotEmpty(address.getBasePath())) {

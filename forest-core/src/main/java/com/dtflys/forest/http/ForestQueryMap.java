@@ -56,7 +56,7 @@ public class ForestQueryMap implements Map<String, Object> {
 
     public ForestQueryMap(final ForestRequest request) {
         this.request = request;
-        this.queries = new CopyOnWriteArrayList<>();
+        this.queries = new LinkedList<>();
     }
 
     public ForestRequest getRequest() {
