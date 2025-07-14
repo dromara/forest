@@ -10,5 +10,5 @@
 
 文档已搬家：
 
-[文档新地址](http://forest.dtflyx.com/)
+[文档新地址](http://forest.kim/)
 
