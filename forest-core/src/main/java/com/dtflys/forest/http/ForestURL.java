@@ -772,6 +772,9 @@ public class ForestURL {
             builder.append(authority);
         }
         final String host = getHost();
+        if (StringUtils.isEmpty(host)) {
+            builder.setLength(0);
+        }
 
         final String fullPath = getFullPath();
         if (StringUtils.isNotEmpty(fullPath)) {
