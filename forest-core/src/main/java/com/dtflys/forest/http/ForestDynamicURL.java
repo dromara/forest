@@ -13,10 +13,18 @@ public class ForestDynamicURL extends ForestURL implements MappingListener {
     private final MappingURLTemplate template;
 
     private volatile ForestURL renderedURL;
+    
+    
 
     public ForestDynamicURL(MappingURLTemplate template) {
         this.template = template;
     }
+
+    private ForestDynamicURL(MappingURLTemplate template, ForestURL lastURL) {
+        this.template = template;
+        this.mergedURL = lastURL;
+    }
+
 
     private void checkAndRefreshURL() {
         if (renderedURL == null && request != null) {
@@ -77,78 +85,35 @@ public class ForestDynamicURL extends ForestURL implements MappingListener {
                 return baseAddressHost;
             }
         }
+        if (mergedURL != null) {
+            final String mergedHost = mergedURL.getHost();
+            if (StringUtils.isNotEmpty(mergedHost)) {
+                return mergedHost;
+            }
+        }
         return renderedHost;
     }
 
     @Override
-    public int getPort() {
+    protected Integer getPortWithoutBaseURL() {
         final Integer portInt = ForestVariable.getIntegerValue(port, request);
         if (URLUtils.isNotNonePort(portInt)) {
-            return normalizePort(portInt, ssl);
+            return portInt;
         }
         checkAndRefreshURL();
         final Integer renderedPort = ForestVariable.getIntegerValue(renderedURL.port, request);
         if (URLUtils.isNotNonePort(renderedPort)) {
-            return normalizePort(renderedPort, ssl);
+            return renderedPort;
         }
-        final String schemeStr = ForestVariable.getStringValue(scheme, request);
-        if (StringUtils.isNotEmpty(schemeStr)) {
-            return normalizePort(portInt, ssl);
-        }
-
-        if (address != null) {
-            int addressPort = address.getPort();
-            if (URLUtils.isNotNonePort(addressPort)) {
-                return normalizePort(addressPort, ssl);
-            }
-        }
-        if (baseURL != null) {
-            final int basePort = baseURL.getPort();
-            if (URLUtils.isNotNonePort(basePort)) {
-                return basePort;
-            }
-        }
-        if (baseAddress != null) {
-            final int basePort = baseAddress.getPort();
-            if (URLUtils.isNotNonePort(basePort)) {
-                return normalizePort(basePort, ssl);
-            }
-        }
-
-        return normalizePort(portInt, ssl);
+        return null;
     }
 
-    @Override
-    public String getScheme() {
-        final String schemeStr = getSchemeWithoutBaseURL();
-        if (StringUtils.isNotEmpty(schemeStr)) {
-            return schemeStr;
-        }
-        if (address != null) {
-            final String addressScheme = address.getScheme();
-            if (StringUtils.isNotEmpty(addressScheme)) {
-                return normalizeScheme(addressScheme);
-            }
-        }
-        if (baseURL != null) {
-            final String baseScheme = baseURL.getScheme();
-            if (StringUtils.isNotEmpty(baseScheme)) {
-                return normalizeScheme(baseScheme);
-            }
-        }
-        if (baseAddress != null) {
-            final String baseAddressScheme = baseAddress.getScheme();
-            if (StringUtils.isNotEmpty(baseAddressScheme)) {
-                return normalizeScheme(baseAddressScheme);
-            }
-        }
-        return normalizeScheme(schemeStr);
-    }
 
     @Override
     public String getPath() {
-        if (path != null) {
-            return ForestVariable.getStringValue(path, request);
+        final String pathStr = ForestVariable.getStringValue(path, request);
+        if (StringUtils.isNotEmpty(pathStr)) {
+            return pathStr;
         }
         checkAndRefreshURL();
         return renderedURL.getPath();
@@ -215,12 +180,38 @@ public class ForestDynamicURL extends ForestURL implements MappingListener {
     }
 
     @Override
+    public ForestURL mergeURLWith(ForestURL url) {
+        final ForestDynamicURL newURL = new ForestDynamicURL(template, url);
+        newURL.query = this.query;
+        return newURL;
+    }
+
+    @Override
     public void clear() {
         this.renderedURL = null;
     }
 
     @Override
     public void onChanged(MappingTemplate template, Object newValue) {
+
+    }
+
+    @Override
+    public ForestDynamicURL clone(ForestRequest newRequest) {
+        ForestDynamicURL clone = new ForestDynamicURL(template);
+        clone.request = newRequest;
+        clone.mergedURL = mergedURL == null ? null : this.mergedURL;
+        clone.baseURL = baseURL == null ? null : baseURL.clone(newRequest);
+        clone.address = address;
+        clone.baseAddress = baseAddress;
+        clone.query = query == null ? null : query.clone(newRequest);
+        clone.scheme = scheme;
+        clone.host = host;
+        clone.port = port;
+        clone.userInfo = userInfo;
+        clone.basePath = basePath;
+        clone.clear();
+        return clone;
 
     }
 }

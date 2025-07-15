@@ -116,6 +116,10 @@ public class ForestQueryMap implements Map<String, Object> {
         return null;
     }
 
+    List<SimpleQueryParameter> getAllQueries() {
+        return queries;
+    }
+
     public List<SimpleQueryParameter> getQueries(String name) {
         final List<SimpleQueryParameter> list = new LinkedList<>();
         if (StringUtils.isEmpty(name)) {

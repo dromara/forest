@@ -52,6 +52,8 @@ public class ForestURL {
 
     protected volatile ForestRequest request;
 
+    protected ForestURL mergedURL;
+
     volatile ForestURL baseURL;
 
     /**
@@ -240,6 +242,20 @@ public class ForestURL {
         this.ref = ref;
         needUrlRegenerate();
     }
+    
+    private ForestURL(ForestURL mergedURL, ForestVariable scheme, String userInfo, ForestVariable host, ForestVariable port, ForestVariable path, ForestVariable ref) {
+        this(scheme, userInfo, host, port, path, ref);
+        if (mergedURL != null) {
+            this.mergedURL = mergedURL;
+            this.baseURL = mergedURL.baseURL;
+            this.baseAddress = mergedURL.baseAddress;
+            this.address = mergedURL.address;
+            mergedURL.baseURL = null;
+            mergedURL.baseAddress = null;
+            mergedURL.address = null;
+        }
+    }
+
 
     void setRequest(final ForestRequest request) {
         this.request = request;
@@ -277,7 +293,7 @@ public class ForestURL {
     }
 
     public String getScheme() {
-        final String schemeStr = ForestVariable.getStringValue(scheme, request);
+        final String schemeStr = getSchemeWithoutBaseURL();
         if (StringUtils.isNotEmpty(schemeStr)) {
             return normalizeScheme(schemeStr);
         }
@@ -297,6 +313,13 @@ public class ForestURL {
             final String baseAddressScheme = baseAddress.getScheme();
             if (StringUtils.isNotEmpty(baseAddressScheme)) {
                 return normalizeScheme(baseAddressScheme);
+            }
+        }
+        if (mergedURL != null) {
+            mergedURL.ssl = ssl;
+            final String mergedScheme = mergedURL.getSchemeWithoutBaseURL();
+            if (StringUtils.isNotEmpty(mergedScheme)) {
+                return normalizeScheme(mergedScheme);
             }
         }
         return normalizeScheme(schemeStr);
@@ -362,6 +385,9 @@ public class ForestURL {
                 return baseAddressHost;
             }
         }
+        if (mergedURL != null) {
+            return mergedURL.getHost();
+        }
         return hostStr;
     }
 
@@ -407,9 +433,13 @@ public class ForestURL {
         }
         return port;
     }
+    
+    protected Integer getPortWithoutBaseURL() {
+        return ForestVariable.getIntegerValue(port, request);
+    }
 
     public int getPort() {
-        final Integer portInt = ForestVariable.getIntegerValue(port, request);
+        final Integer portInt = getPortWithoutBaseURL();
         if (URLUtils.isNotNonePort(portInt)) {
             return normalizePort(portInt, ssl);
         }
@@ -435,6 +465,12 @@ public class ForestURL {
             final int baseAddressPort = baseAddress.getPort();
             if (URLUtils.isNotNonePort(baseAddressPort)) {
                 return normalizePort(baseAddressPort, ssl);
+            }
+        }
+        if (mergedURL != null) {
+            final Integer mergedPort = mergedURL.getPortWithoutBaseURL();
+            if (URLUtils.isNotNonePort(mergedPort)) {
+                return normalizePort(mergedPort, ssl);
             }
         }
         return normalizePort(portInt, ssl);
@@ -490,6 +526,7 @@ public class ForestURL {
     public ForestURL setBasePath(String basePath) {
         return setBasePath(basePath, true);
     }
+    
 
     protected String getBasePath() {
         if (StringUtils.isNotEmpty(basePath)) {
@@ -505,6 +542,12 @@ public class ForestURL {
             final String baseAddressBasePath = baseAddress.getBasePath();
             if (StringUtils.isNotEmpty(baseAddressBasePath)) {
                 return baseAddressBasePath;
+            }
+        }
+        if (mergedURL != null) {
+            final String mergedABasePath = mergedURL.getBasePath();
+            if (StringUtils.isNotEmpty(mergedABasePath)) {
+                return mergedABasePath;
             }
         }
         return basePath;
@@ -566,15 +609,6 @@ public class ForestURL {
         if (StringUtils.isNotEmpty(pathStr) && pathStr.charAt(0) != '/') {
             return '/' + pathStr;
         }
-//        if (baseURL != null) {
-//            final String baseRet = baseURL.getPath();
-//            if (StringUtils.isNotEmpty(baseRet)) {
-//                if (pathStr.startsWith("/") && baseRet.endsWith("/")) {
-//                    return baseRet + pathStr.substring(1);
-//                }
-//                return baseRet + pathStr;
-//            }
-//        }
         return pathStr;
     }
 
@@ -836,13 +870,18 @@ public class ForestURL {
         if (url == null) {
             return this;
         }
-        ForestVariable newSchema = this.scheme == null ? url.scheme : this.scheme;
-        String newUserInfo = this.userInfo == null ? url.userInfo : this.userInfo;
-        ForestVariable newHost = this.host == null ? url.host : this.host;
-        ForestVariable newPort = this.port == null ? url.port : this.port;
-        ForestVariable newPath = this.path == null ? url.path : this.path;
-        ForestVariable newRef = this.ref == null ? url.ref : this.ref;
-        return new ForestURL(newSchema, newUserInfo, newHost, newPort, newPath, newRef);
+       
+//        ForestVariable newSchema = this.scheme == null ? url.scheme : this.scheme;
+//        String newUserInfo = this.userInfo == null ? url.userInfo : this.userInfo;
+//        ForestVariable newHost = this.host == null ? url.host : this.host;
+//        ForestVariable newPort = this.port == null ? url.port : this.port;
+//        ForestVariable newPath = this.path == null ? url.path : this.path;
+//        ForestVariable newRef = this.ref == null ? url.ref : this.ref;
+//        return new ForestURL(newSchema, newUserInfo, newHost, newPort, newPath, newRef);
+        url.mergedURL = null;
+        final ForestURL newURL = new ForestURL(url, this.scheme, this.userInfo, this.host, this.port, this.path, this.ref);
+        newURL.query = this.query;
+        return newURL;
     }
 
 
@@ -997,4 +1036,19 @@ public class ForestURL {
         }
     }
 
+    public ForestURL clone(ForestRequest newRequest) {
+        ForestURL clone = new ForestURL();
+        clone.request = newRequest;
+        clone.mergedURL = mergedURL == null ? null : this.mergedURL;
+        clone.baseURL = baseURL == null ? null : baseURL.clone(newRequest);
+        clone.address = address;
+        clone.baseAddress = baseAddress;
+        clone.query = query == null ? null : query.clone(newRequest);
+        clone.scheme = scheme;
+        clone.host = host;
+        clone.port = port;
+        clone.userInfo = userInfo;
+        clone.basePath = basePath;
+        return clone;
+    }
 }

@@ -817,12 +817,15 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @return {@link ForestRequest}对象实例
      */
     public ForestRequest<T> setUrl(MappingURLTemplate urlTemplate, Object... args) {
-        if (!this.query.isEmpty()) {
-            this.query.clearQueriesFromUrl();
-        }
-        final ForestURL newUrl = urlTemplate.isConstant() ?
-                urlTemplate.render(this, args, this.query) :
-                ForestURL.create(this, urlTemplate);
+//        if (!this.query.isEmpty()) {
+//            this.query.clearQueriesFromUrl();
+//        }
+        final ForestURL newUrl = ForestURL.create(this, urlTemplate);
+        //        if (!urlTemplate.isConstant()) {
+//            urlTemplate.render(newUrl, this, args, newUrl.query);
+//        }
+        
+        
         if (this.url == null) {
             this.url = newUrl;
         } else {
@@ -5415,8 +5418,9 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
         newRequest.lifeCycleHandler = this.lifeCycleHandler;
         newRequest.protocol = this.protocol;
         newRequest.sslProtocol = this.sslProtocol;
-        newRequest.url = this.url;
         newRequest.query = this.query.clone(newRequest);
+        newRequest.url = this.url.clone(newRequest);
+        newRequest.query.request = newRequest;
         newRequest.headers = this.headers.clone(newRequest);
         newRequest.timeout = this.timeout;
         newRequest.filename = this.filename;

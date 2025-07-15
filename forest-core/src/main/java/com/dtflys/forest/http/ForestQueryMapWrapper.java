@@ -21,7 +21,7 @@ public class ForestQueryMapWrapper extends ForestQueryMap {
         if (request != null) {
             final ForestURL url = request.url();
             if (url != null) {
-                for (final SimpleQueryParameter query : queries) {
+                for (final SimpleQueryParameter query : url.getQuery().queries) {
                     if (query.getName().equalsIgnoreCase(name)) {
                         return query;
                     }
