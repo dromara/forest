@@ -413,6 +413,10 @@ public class ForestURL {
         if (URLUtils.isNotNonePort(portInt)) {
             return normalizePort(portInt, ssl);
         }
+        final String schemeStr = ForestVariable.getStringValue(scheme, request);
+        if (StringUtils.isNotEmpty(schemeStr)) {
+            return normalizePort(portInt, ssl);
+        }
 
         if (address != null) {
             int addressPort = address.getPort();
@@ -562,16 +566,20 @@ public class ForestURL {
         if (StringUtils.isNotEmpty(pathStr) && pathStr.charAt(0) != '/') {
             return '/' + pathStr;
         }
-        if (baseURL != null) {
-            final String baseRet = baseURL.getPath();
-            if (StringUtils.isNotEmpty(baseRet)) {
-                if (pathStr.startsWith("/") && baseRet.endsWith("/")) {
-                    return baseRet + pathStr.substring(1);
-                }
-                return baseRet + pathStr;
-            }
-        }
+//        if (baseURL != null) {
+//            final String baseRet = baseURL.getPath();
+//            if (StringUtils.isNotEmpty(baseRet)) {
+//                if (pathStr.startsWith("/") && baseRet.endsWith("/")) {
+//                    return baseRet + pathStr.substring(1);
+//                }
+//                return baseRet + pathStr;
+//            }
+//        }
         return pathStr;
+    }
+
+    protected String getSchemeWithoutBaseURL() {
+        return ForestVariable.getStringValue(scheme, request);
     }
 
     /**
@@ -583,7 +591,8 @@ public class ForestURL {
      */
     public String getFullPath() {
         final StringBuilder builder = new StringBuilder();
-        if (baseURL != null) {
+        final String schemaStr = getSchemeWithoutBaseURL();
+        if (StringUtils.isEmpty(schemaStr) && baseURL != null) {
             final String baseRet = baseURL.getPath();
             if (StringUtils.isNotEmpty(baseRet)) {
                 builder.append(baseRet);

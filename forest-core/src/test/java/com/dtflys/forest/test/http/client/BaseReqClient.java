@@ -48,6 +48,7 @@ public interface BaseReqClient {
 
     @Get
     String testBaseTimeoutWithInterceptor(@Var("encoding") String encoding);
+
     @Request(
             url = "/hello/user?username=foo"
     )

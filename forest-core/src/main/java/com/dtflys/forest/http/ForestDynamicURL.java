@@ -89,8 +89,13 @@ public class ForestDynamicURL extends ForestURL implements MappingListener {
         checkAndRefreshURL();
         final Integer renderedPort = ForestVariable.getIntegerValue(renderedURL.port, request);
         if (URLUtils.isNotNonePort(renderedPort)) {
-            return renderedPort;
+            return normalizePort(renderedPort, ssl);
         }
+        final String schemeStr = ForestVariable.getStringValue(scheme, request);
+        if (StringUtils.isNotEmpty(schemeStr)) {
+            return normalizePort(portInt, ssl);
+        }
+
         if (address != null) {
             int addressPort = address.getPort();
             if (URLUtils.isNotNonePort(addressPort)) {
@@ -115,14 +120,9 @@ public class ForestDynamicURL extends ForestURL implements MappingListener {
 
     @Override
     public String getScheme() {
-        final String schemeStr = ForestVariable.getStringValue(scheme, request);
+        final String schemeStr = getSchemeWithoutBaseURL();
         if (StringUtils.isNotEmpty(schemeStr)) {
-            return normalizeScheme(schemeStr);
-        }
-        checkAndRefreshURL();
-        final String renderedScheme = ForestVariable.getStringValue(renderedURL.scheme, request);
-        if (StringUtils.isNotEmpty(renderedScheme)) {
-            return normalizeScheme(renderedScheme);
+            return schemeStr;
         }
         if (address != null) {
             final String addressScheme = address.getScheme();
@@ -142,7 +142,7 @@ public class ForestDynamicURL extends ForestURL implements MappingListener {
                 return normalizeScheme(baseAddressScheme);
             }
         }
-        return normalizeScheme(renderedScheme);
+        return normalizeScheme(schemeStr);
     }
 
     @Override
@@ -177,6 +177,20 @@ public class ForestDynamicURL extends ForestURL implements MappingListener {
             }
         }
         return renderedBasePath;
+    }
+
+    @Override
+    protected String getSchemeWithoutBaseURL() {
+        final String schemeStr = ForestVariable.getStringValue(scheme, request);
+        if (StringUtils.isNotEmpty(schemeStr)) {
+            return normalizeScheme(schemeStr);
+        }
+        checkAndRefreshURL();
+        final String renderedScheme = ForestVariable.getStringValue(renderedURL.scheme, request);
+        if (StringUtils.isNotEmpty(renderedScheme)) {
+            return normalizeScheme(renderedScheme);
+        }
+        return null;
     }
 
 
