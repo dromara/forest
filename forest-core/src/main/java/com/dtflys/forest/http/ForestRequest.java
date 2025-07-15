@@ -193,7 +193,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
     /**
      * URL中的Query参数表
      */
-    private ForestQueryMap query = new ForestQueryMap(this);
+    private ForestQueryMap query = new ForestQueryMapWrapper(this);
 
     /**
      * 请求类型
@@ -1703,6 +1703,9 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @return Query参数字符串
      */
     public String getQueryString() {
+        if (query.request == null) {
+            query.request = this;
+        }
         return query.toQueryString();
     }
 

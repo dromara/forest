@@ -21,8 +21,14 @@ public class ForestDynamicURL extends ForestURL implements MappingListener {
     private void checkAndRefreshURL() {
         if (renderedURL == null && request != null) {
             renderedURL = new ForestURL();
-            template.render(renderedURL, request, request.arguments(), request.getQuery());
+            template.render(renderedURL, request, request.arguments(), query);
         }
+    }
+
+    @Override
+    public ForestQueryMap getQuery() {
+        checkAndRefreshURL();
+        return query;
     }
 
     @Override
@@ -53,10 +59,22 @@ public class ForestDynamicURL extends ForestURL implements MappingListener {
         if (StringUtils.isNotEmpty(renderedHost)) {
             return renderedHost;
         }
+        if (address != null) {
+            final String addressHost = address.getHost();
+            if (StringUtils.isNotEmpty(addressHost)) {
+                return addressHost;
+            }
+        }
         if (baseURL != null) {
             final String baseHost = baseURL.getHost();
             if (StringUtils.isNotEmpty(baseHost)) {
                 return baseHost;
+            }
+        }
+        if (baseAddress != null) {
+            final String baseAddressHost = baseAddress.getHost();
+            if (StringUtils.isNotEmpty(baseAddressHost)) {
+                return baseAddressHost;
             }
         }
         return renderedHost;
@@ -92,7 +110,7 @@ public class ForestDynamicURL extends ForestURL implements MappingListener {
             }
         }
 
-        return renderedPort;
+        return normalizePort(portInt, ssl);
     }
 
     @Override
@@ -161,17 +179,26 @@ public class ForestDynamicURL extends ForestURL implements MappingListener {
         return renderedBasePath;
     }
 
-//    @Override
-//    public String toURLString() {
-//        if (renderedURL == null && template != null) {
-//            if (request != null) {
-//                checkAndRefreshURL();
-//            } else {
-//                return template.toString();
-//            }
-//        }
-//        return super.toURLString();
-//    }
+
+    @Override
+    public String getRef() {
+        String refStr = ForestVariable.getStringValue(ref, request);
+        if (StringUtils.isNotEmpty(refStr)) {
+            return refStr;
+        }
+        checkAndRefreshURL();
+        final String renderedRef = renderedURL.getRef();
+        if (StringUtils.isNotEmpty(renderedRef)) {
+            return renderedRef;
+        }
+        if (baseURL != null) {
+            final String baseRef = baseURL.getRef();
+            if (StringUtils.isNotEmpty(baseRef)) {
+                return baseRef;
+            }
+        }
+        return refStr;
+    }
 
     @Override
     public void clear() {

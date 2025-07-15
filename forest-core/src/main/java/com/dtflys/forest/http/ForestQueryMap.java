@@ -50,9 +50,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class ForestQueryMap implements Map<String, Object> {
 
-    final ForestRequest request;
+    volatile ForestRequest request;
 
-    private final List<SimpleQueryParameter> queries;
+    protected final List<SimpleQueryParameter> queries;
 
     public ForestQueryMap(final ForestRequest request) {
         this.request = request;
@@ -453,9 +453,13 @@ public class ForestQueryMap implements Map<String, Object> {
         return set;
     }
 
+    protected Iterator<SimpleQueryParameter> allQueryIterator() {
+        return queries.iterator();
+    }
+
     public String toQueryString() {
         final StringBuilder builder = new StringBuilder();
-        final Iterator<SimpleQueryParameter> iterator = queries.iterator();
+        final Iterator<SimpleQueryParameter> iterator = allQueryIterator();
         final ForestJsonConverter jsonConverter = request.getConfiguration().getJsonConverter();
         final HttpBackend backend = request.getBackend();
         final boolean allowEncodeBraceInQueryValue =

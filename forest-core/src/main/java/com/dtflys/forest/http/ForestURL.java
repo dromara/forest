@@ -104,7 +104,9 @@ public class ForestURL {
      * reference
      * <p>URL井号(#)后面的字符串
      */
-    protected String ref;
+    protected ForestVariable ref;
+
+    protected ForestQueryMap query = new ForestQueryMap(null);
 
     /**
      * 是否为SSL
@@ -170,7 +172,7 @@ public class ForestURL {
             forestURL.needUrlRegenerate = true;
             forestURL.variablesChanged = true;
             if (request != null) {
-                urlTemplate.render(forestURL, request, request.arguments(), request.getQuery());
+                urlTemplate.render(forestURL, request, request.arguments(), forestURL.query);
             }
             return forestURL;
         }
@@ -186,8 +188,8 @@ public class ForestURL {
         final MappingURLTemplate urlTemplate = MappingURLTemplate.get(configuration, url);
         final ForestURL forestURL = new ForestURL();
         forestURL.parsedUrl = url;
-        final ForestQueryMap queryMap = new ForestQueryMap(null);
-        urlTemplate.render(forestURL, configuration, new Object[0], queryMap);
+//        final ForestQueryMap queryMap = new ForestQueryMap(null);
+        urlTemplate.render(forestURL, configuration, new Object[0], forestURL.query);
         return forestURL;
     }
 
@@ -229,7 +231,7 @@ public class ForestURL {
     }
 
 
-    public ForestURL(ForestVariable scheme, String userInfo, ForestVariable host, ForestVariable port, ForestVariable path, String ref) {
+    public ForestURL(ForestVariable scheme, String userInfo, ForestVariable host, ForestVariable port, ForestVariable path, ForestVariable ref) {
         setScheme(scheme);
         this.userInfo = userInfo;
         this.host = host;
@@ -257,6 +259,10 @@ public class ForestURL {
             needUrlRegenerate = false;
         }
         return parsedUrl;
+    }
+
+    public ForestQueryMap getQuery() {
+        return query;
     }
 
     /**
@@ -579,7 +585,9 @@ public class ForestURL {
         final StringBuilder builder = new StringBuilder();
         if (baseURL != null) {
             final String baseRet = baseURL.getPath();
-            builder.append(baseRet);
+            if (StringUtils.isNotEmpty(baseRet)) {
+                builder.append(baseRet);
+            }
         }
         final String basePathStr = getBasePath();
         if (StringUtils.isNotEmpty(basePathStr)) {
@@ -683,11 +691,25 @@ public class ForestURL {
     }
 
     public String getRef() {
-        return ref;
+        String refStr = ForestVariable.getStringValue(ref, request);
+        if (StringUtils.isNotEmpty(refStr)) {
+            return refStr;
+        }
+        if (baseURL != null) {
+            final String baseRef = baseURL.getRef();
+            if (StringUtils.isNotEmpty(baseRef)) {
+                return baseRef;
+            }
+        }
+        return refStr;
     }
 
     public ForestURL setRef(String ref) {
-        this.ref = ref;
+        if (ref == null) {
+            this.ref = null;
+        } else {
+            this.ref = ForestVariable.create(ref);
+        }
         return this;
     }
 
@@ -733,6 +755,7 @@ public class ForestURL {
 
     @Override
     public String toString() {
+        final String ref = getRef();
         if (StringUtils.isNotEmpty(ref)) {
             return getOriginalUrl() + "#" + ref;
         }
@@ -809,7 +832,7 @@ public class ForestURL {
         ForestVariable newHost = this.host == null ? url.host : this.host;
         ForestVariable newPort = this.port == null ? url.port : this.port;
         ForestVariable newPath = this.path == null ? url.path : this.path;
-        String newRef = this.ref == null ? url.ref : this.ref;
+        ForestVariable newRef = this.ref == null ? url.ref : this.ref;
         return new ForestURL(newSchema, newUserInfo, newHost, newPort, newPath, newRef);
     }
 

@@ -140,6 +140,6 @@ public class ForestURLBuilder {
                 ForestVariable.create(host),
                 ForestVariable.create(port),
                 ForestVariable.create(path),
-                ref);
+                ForestVariable.create(ref));
     }
 }

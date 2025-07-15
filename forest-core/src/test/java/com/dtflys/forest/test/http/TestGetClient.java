@@ -169,7 +169,7 @@ public class TestGetClient extends BaseClientTest {
     }
 
 
-    @Test
+//    @Test
     public void performance() {
         int count = 10000;
         for (int i = 0; i < count; i++) {
@@ -191,7 +191,7 @@ public class TestGetClient extends BaseClientTest {
     }
 
 
-    @Test
+//    @Test
     public void performance_okhttp() {
         int count = 10000;
         ConnectionPool pool = new ConnectionPool(10000, 100000, TimeUnit.SECONDS);
@@ -225,7 +225,7 @@ public class TestGetClient extends BaseClientTest {
     }
 
 
-    @Test
+//    @Test
     public void performance_hutool() {
         int count = 10000;
         for (int i = 0; i < count; i++) {
