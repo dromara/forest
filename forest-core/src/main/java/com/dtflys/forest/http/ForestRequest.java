@@ -5809,4 +5809,9 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
     public ForestRequest asRequest() {
         return this;
     }
+
+    @Override
+    protected void onVariableChanged() {
+        this.url.clear();
+    }
 }

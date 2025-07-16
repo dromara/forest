@@ -29,6 +29,7 @@ public class ForestDynamicURL extends ForestURL implements MappingListener {
     private void checkAndRefreshURL() {
         if (renderedURL == null && request != null) {
             renderedURL = new ForestURL();
+            query.clear();
             template.render(renderedURL, request, request.arguments(), query);
         }
     }
@@ -188,6 +189,7 @@ public class ForestDynamicURL extends ForestURL implements MappingListener {
 
     @Override
     public void clear() {
+        super.clear();
         this.renderedURL = null;
     }
 

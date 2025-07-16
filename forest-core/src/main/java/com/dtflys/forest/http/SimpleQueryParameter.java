@@ -24,6 +24,8 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.reflection.ForestVariable;
+
 /**
  * Forest请求URL的Query参数项
  *
@@ -39,7 +41,7 @@ public class SimpleQueryParameter extends AbstractQueryParameter<SimpleQueryPara
     /**
      * 参数值
      */
-    private Object value;
+    private ForestVariable value;
 
 
     public SimpleQueryParameter(ForestQueryMap queries, String name, Object value) {
@@ -53,7 +55,7 @@ public class SimpleQueryParameter extends AbstractQueryParameter<SimpleQueryPara
     public SimpleQueryParameter(ForestQueryMap queries, String name, Object value, boolean fromUrl, Boolean urlencoded, String charset) {
         super(queries, fromUrl);
         this.name = name;
-        this.value = value;
+        this.value = ForestVariable.create(value);
         if (urlencoded != null) {
             this.urlencoded = urlencoded;
         } else if (fromUrl) {
@@ -73,25 +75,25 @@ public class SimpleQueryParameter extends AbstractQueryParameter<SimpleQueryPara
         return name;
     }
 
-
-    public Object getOriginalValue() {
-        return value;
-    }
-
     @Override
     public Object getValue() {
         if (value == null) {
             return null;
         }
-        if (value instanceof Lazy) {
-            return ((Lazy<?>) value).eval(queries.request);
+        return ForestVariable.getValue(value, queries.request);
+    }
+
+
+    public Object getOriginalValue() {
+        if (value == null) {
+            return null;
         }
-        return value;
+        return value.getOriginalValue();
     }
 
     @Override
     public SimpleQueryParameter setValue(Object value) {
-        this.value = value;
+        this.value = ForestVariable.create(value);
         return this;
     }
 

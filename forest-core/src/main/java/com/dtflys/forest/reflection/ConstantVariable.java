@@ -8,6 +8,7 @@ public class ConstantVariable extends BasicVariable {
         super(value);
     }
 
+
     @Override
     public Object getValue(ForestRequest request) {
         return value;

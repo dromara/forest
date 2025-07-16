@@ -13,6 +13,11 @@ public class BasicVariable implements ForestVariable {
     }
 
     @Override
+    public Object getOriginalValue() {
+        return value;
+    }
+
+    @Override
     public Object getValue(ForestRequest request) {
         if (value instanceof MappingTemplate) {
             return ((MappingTemplate) value).render(

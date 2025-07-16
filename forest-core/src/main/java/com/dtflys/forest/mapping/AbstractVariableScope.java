@@ -73,11 +73,13 @@ public abstract class AbstractVariableScope<SELF extends VariableScope> implemen
 
     public SELF setVariable(String name, ForestVariable variable) {
         variables.put(name, variable);
+        onVariableChanged();
         return (SELF) this;
     }
 
     public SELF setVariable(String name, ForestArgumentsVariable variable) {
         variables.put(name, variable);
+        onVariableChanged();
         return (SELF) this;
     }
     
@@ -98,6 +100,7 @@ public abstract class AbstractVariableScope<SELF extends VariableScope> implemen
         } else {
             variables.put(name, new BasicVariable(value));
         }
+        onVariableChanged();
         return (SELF) this;
     }
 
@@ -111,6 +114,9 @@ public abstract class AbstractVariableScope<SELF extends VariableScope> implemen
 
     public SELF setVar(String name, Object value) {
         return setVariable(name, value);
+    }
+
+    protected void onVariableChanged() {
     }
     
 }

@@ -27,6 +27,8 @@ package com.dtflys.forest.http;
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.config.ForestConfiguration;
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.mapping.MappingListener;
+import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingURLTemplate;
 import com.dtflys.forest.reflection.BasicVariable;
 import com.dtflys.forest.reflection.ForestVariable;
@@ -46,7 +48,7 @@ import java.net.URL;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 1.5.2
  */
-public class ForestURL {
+public class ForestURL implements MappingListener {
 
     private final static Logger log = LoggerFactory.getLogger(ForestURL.class);
 
@@ -1037,6 +1039,20 @@ public class ForestURL {
         if (variablesChanged) {
             needUrlRegenerate();
         }
+    }
+
+    @Override
+    public void clear() {
+        if (baseURL != null) {
+            baseURL.clear();
+        }
+        if (mergedURL != null) {
+            mergedURL.clear();
+        }
+    }
+
+    @Override
+    public void onChanged(MappingTemplate template, Object newValue) {
     }
 
     public ForestURL clone(ForestRequest newRequest) {

@@ -3,6 +3,7 @@ package com.dtflys.forest.reflection;
 import com.dtflys.forest.Forest;
 import com.dtflys.forest.config.VariableScope;
 import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.http.Lazy;
 import com.dtflys.forest.http.RequestVariableScope;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingValue;
@@ -42,6 +43,9 @@ public interface ForestVariable {
         if (variable == null) {
             return null;
         }
+        if (variable instanceof Lazy) {
+            return ((Lazy<?>) variable).eval(req);
+        }
         return variable.getValue(req);
     }
 
@@ -53,7 +57,9 @@ public interface ForestVariable {
         return getValue(variable, req, Integer.class);
     }
 
-
+    default Object getOriginalValue() {
+        return this;
+    }
 
     Object getValue(ForestRequest req);
     
