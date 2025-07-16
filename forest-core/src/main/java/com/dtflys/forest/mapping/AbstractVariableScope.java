@@ -104,17 +104,30 @@ public abstract class AbstractVariableScope<SELF extends VariableScope> implemen
         return (SELF) this;
     }
 
-    public SELF setVar(String name, ForestVariable variable) {
+    public SELF var(String name, ForestVariable variable) {
         return setVariable(name, variable);
     }
 
-    public SELF setVar(String name, ForestArgumentsVariable variable) {
+    public SELF var(String name, ForestArgumentsVariable variable) {
         return setVariable(name, variable);
     }
 
-    public SELF setVar(String name, Object value) {
+    public SELF var(String name, Object value) {
         return setVariable(name, value);
     }
+
+    public Object var(String name) {
+        return getVariableValue(name);
+    }
+
+    public <R> R varAs(String name, ForestRequest request, Class<R> clazz) {
+        return getVariableValue(name, request, clazz);
+    }
+
+    public <R> R varAs(String name, Class<R> clazz) {
+        return getVariableValue(name, clazz);
+    }
+
 
     protected void onVariableChanged() {
     }

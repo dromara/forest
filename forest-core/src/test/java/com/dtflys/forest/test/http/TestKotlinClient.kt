@@ -1,5 +1,6 @@
 package com.dtflys.forest.test.http
 
+import com.dtflys.forest.Forest
 import com.dtflys.forest.annotation.Address
 import com.dtflys.forest.annotation.Body
 import com.dtflys.forest.annotation.Get
@@ -10,6 +11,7 @@ import com.dtflys.forest.annotation.Var
 import com.dtflys.forest.callback.OnSuccess
 import com.dtflys.forest.config.ForestConfiguration
 import com.dtflys.forest.mock.MockServerRequest
+import com.dtflys.forest.test.http.TestBodyAnnotation.mockRequest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.assertj.core.api.Assertions.assertThat
@@ -122,6 +124,20 @@ class TestKotlinClient(backend: String?, jsonConverter: String) : BaseClientTest
             called = true
         }
         assertThat(called).isTrue
+    }
+
+    @Test
+    fun testKotlinRequest() {
+        server.enqueue(MockResponse().setBody(EXPECTED))
+
+        Forest.get("/{path}")
+            .host(server.hostName)
+            .port(server.port)
+            .`var`("path", "test")
+            .execute()
+
+        mockRequest(server)
+            .assertPathEquals("/test")
     }
 
 

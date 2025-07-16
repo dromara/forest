@@ -1,7 +1,6 @@
 package com.dtflys.forest.test;
 
 import cn.hutool.core.codec.Base64;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONReader;
@@ -28,7 +27,6 @@ import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.retryer.NoneRetryer;
 import com.dtflys.forest.sse.SSELinesMode;
 import com.dtflys.forest.test.http.BaseClientTest;
-import com.dtflys.forest.test.http.model.JsonTestDate;
 import com.dtflys.forest.test.http.model.UserParam;
 import com.dtflys.forest.test.model.Contact;
 import com.dtflys.forest.test.model.Result;
@@ -76,7 +74,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.LockSupport;
 
 import static com.dtflys.forest.Forest.constant;
-import static com.dtflys.forest.Forest.template;
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
@@ -843,8 +840,8 @@ public class TestGenericForestClient extends BaseClientTest {
     public void testRequest_template_in_url3() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.config()
-                .setVariable("testVar", null)
-                .setVariable("testVar2", "ok");
+                .var("testVar", null)
+                .var("testVar2", "ok");
         Forest.get("/test/{testVar?.a}/{testVar?.a ?? 'foo'}/{testVar?.a?.b.c.d.e ?? 'bar'}/{testVar2 ?? 'xx'}/{testVar2?}")
                 .host(server.getHostName())
                 .port(server.getPort())
@@ -860,7 +857,7 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.config()
                 .removeVariable("testVar")
-                .setVariable("testVar2", "ok");
+                .var("testVar2", "ok");
         Forest.get("/test/{testVar ?? `it_is_{testVar2}`}")
                 .host(server.getHostName())
                 .port(server.getPort())
@@ -888,9 +885,9 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.config()
                 .removeVariable("foo")
-                .setVariable("testVar3", "aaa\\{foo}")
-                .setVariable("testVar2", "ok: {testVar3}")
-                .setVariable("testVar1", "{testVar2}");
+                .var("testVar3", "aaa\\{foo}")
+                .var("testVar2", "ok: {testVar3}")
+                .var("testVar1", "{testVar2}");
         Forest.get("/test/{testVar1}")
                 .host(server.getHostName())
                 .port(server.getPort())
@@ -905,9 +902,9 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.config()
                 .removeVariable("foo")
-                .setVariable("testVar3", "aaa{foo}")
-                .setVariable("testVar2", "ok: {testVar3}")
-                .setVariable("testVar1", "{testVar2}");
+                .var("testVar3", "aaa{foo}")
+                .var("testVar2", "ok: {testVar3}")
+                .var("testVar1", "{testVar2}");
         Forest.get("/test/{testVar1!}")
                 .host(server.getHostName())
                 .port(server.getPort())
@@ -923,9 +920,9 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.config()
                 .removeVariable("foo")
-                .setVariable("testVar3", "aaa{foo}")
-                .setVariable("testVar2", "ok: {testVar3?!}")
-                .setVariable("testVar1", "{testVar2}");
+                .var("testVar3", "aaa{foo}")
+                .var("testVar2", "ok: {testVar3?!}")
+                .var("testVar1", "{testVar2}");
         Forest.get("/test/{testVar1}")
                 .host(server.getHostName())
                 .port(server.getPort())
@@ -940,7 +937,7 @@ public class TestGenericForestClient extends BaseClientTest {
 
         System.setProperty("test.a.b.test-var2", "aaa{foo}");
         System.setProperty("test.a.b.test-var1", "x{foo}#{test.a.b.test-var2}x");
-        Forest.config().setVariable("foo", "bar");
+        Forest.config().var("foo", "bar");
 
         Forest.get("/test/#{test.a.b.test-var1}")
                 .host(server.getHostName())
@@ -960,7 +957,7 @@ public class TestGenericForestClient extends BaseClientTest {
 
         System.setProperty("test.a.b.test-var2", "aaa{foo}");
         System.setProperty("test.a.b.test-var1", "x{foo}{#test.a.b.test-var2}x");
-        Forest.config().setVariable("foo", "bar");
+        Forest.config().var("foo", "bar");
 
         Forest.get("/test/{#test.a.b.test-var1}")
                 .host(server.getHostName())
@@ -981,7 +978,7 @@ public class TestGenericForestClient extends BaseClientTest {
 
         System.setProperty("test.a.b.test-var2", "aaa{foo}");
         System.setProperty("test.a.b.test-var1", "x{foo}#{test.a.b.test-var2!}x");
-        Forest.config().setVariable("foo", "bar");
+        Forest.config().var("foo", "bar");
 
         Forest.get("/test/#{test.a.b.test-var1}")
                 .host(server.getHostName())
@@ -1002,7 +999,7 @@ public class TestGenericForestClient extends BaseClientTest {
 
         System.setProperty("test.a.b.test-var2", "aaa{foo}");
         System.setProperty("test.a.b.test-var1", "x{foo}{#test.a.b.test-var2!}x");
-        Forest.config().setVariable("foo", "bar");
+        Forest.config().var("foo", "bar");
 
         Forest.get("/test/{#test.a.b.test-var1}")
                 .host(server.getHostName())
@@ -1094,15 +1091,15 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
 
         Forest.config()
-                .setVar("host", "xxxxx")
-                .setVar("port", 80);
+                .var("host", "xxxxx")
+                .var("port", 80);
 
         Forest.get("http://{host}:{port}/test/{a}")
-                .setVar("host", server.getHostName())
-                .setVar("port", server.getPort())
-                .setVar("a", "{b}")
-                .setVar("b", "var/foo/ok/{c}")
-                .setVar("c", req -> "world")
+                .var("host", server.getHostName())
+                .var("port", server.getPort())
+                .var("a", "{b}")
+                .var("b", "var/foo/ok/{c}")
+                .var("c", req -> "world")
                 .execute();
 
         mockRequest(server)
@@ -1119,19 +1116,19 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
 
         Forest.config()
-                .setVar("host", "xxxxx")
-                .setVar("port", 80);
+                .var("host", "xxxxx")
+                .var("port", 80);
 
         ForestRequest request = Forest.get("http://{host}:{port}/test/{a}")
-                .setVar("host", server.getHostName())
-                .setVar("port", server.getPort())
-                .setVar("a", "{b}")
-                .setVar("b", "var/foo/ok/{c}")
-                .setVar("c", req -> "world");
+                .var("host", server.getHostName())
+                .var("port", server.getPort())
+                .var("a", "{b}")
+                .var("b", "var/foo/ok/{c}")
+                .var("c", req -> "world");
 
         assertThat(request.url().getFullPath()).isEqualTo("/test/var/foo/ok/world");
 
-        request.setVar("a", "foo/bar");
+        request.var("a", "foo/bar");
         request.execute();
 
         mockRequest(server)
@@ -1150,12 +1147,12 @@ public class TestGenericForestClient extends BaseClientTest {
 
         Forest.get("/test/{a}")
                 .baseUrl("{baseUrl}")
-                .setVar("host", server.getHostName())
-                .setVar("port", server.getPort())
-                .setVar("a", "{b}")
-                .setVar("b", "var/foo/ok/{c}")
-                .setVar("c", req -> "world")
-                .setVar("baseUrl", "http://{host}:{port}/base")
+                .var("host", server.getHostName())
+                .var("port", server.getPort())
+                .var("a", "{b}")
+                .var("b", "var/foo/ok/{c}")
+                .var("c", req -> "world")
+                .var("baseUrl", "http://{host}:{port}/base")
                 .execute();
 
         mockRequest(server)
@@ -1168,15 +1165,15 @@ public class TestGenericForestClient extends BaseClientTest {
 
         ForestRequest request = Forest.get("/test/{a}")
                 .baseUrl("{baseUrl}")
-                .setVar("host", server.getHostName())
-                .setVar("port", server.getPort())
-                .setVar("a", "{b}")
-                .setVar("b", "var/foo/ok/{c}")
-                .setVar("c", req -> "world")
-                .setVar("baseUrl", "http://{host}:{port}/base");
+                .var("host", server.getHostName())
+                .var("port", server.getPort())
+                .var("a", "{b}")
+                .var("b", "var/foo/ok/{c}")
+                .var("c", req -> "world")
+                .var("baseUrl", "http://{host}:{port}/base");
 
         assertThat(request.url().getFullPath()).isEqualTo("/base/test/var/foo/ok/world");
-        request.setVar("baseUrl", "http://{host}:{port}/base2");
+        request.var("baseUrl", "http://{host}:{port}/base2");
 
         request.execute();
 
@@ -1191,8 +1188,8 @@ public class TestGenericForestClient extends BaseClientTest {
 
         ForestRequest request = Forest.get("http://{host}:{port}/test/base/url")
                 .baseUrl("https://baidu.com:80")
-                .setVar("host", server.getHostName())
-                .setVar("port", server.getPort());
+                .var("host", server.getHostName())
+                .var("port", server.getPort());
 
         assertThat(request.scheme()).isEqualTo("http");
         assertThat(request.host()).isEqualTo(server.getHostName());
@@ -1209,15 +1206,15 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
 
         Forest.config()
-                .setVar("host", "xxxxx")
-                .setVar("port", 80);
+                .var("host", "xxxxx")
+                .var("port", 80);
 
         Forest.get("http://{host}:{port}/test?a={a}&b={b}")
-                .setVar("host", server.getHostName())
-                .setVar("port", server.getPort())
-                .setVar("a", "foo")
-                .setVar("b", "ok_{c}")
-                .setVar("c", req -> "world")
+                .var("host", server.getHostName())
+                .var("port", server.getPort())
+                .var("a", "foo")
+                .var("b", "ok_{c}")
+                .var("c", req -> "world")
                 .execute();
 
         mockRequest(server)
@@ -1236,21 +1233,23 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
 
         Forest.config()
-                .setVar("host", "xxxxx")
-                .setVar("port", 80);
+                .var("host", "xxxxx")
+                .var("port", 80);
 
         ForestRequest request = Forest.get("http://{host}:{port}/test?a={a}&b={b}")
-                .setVar("host", server.getHostName())
-                .setVar("port", server.getPort())
-                .setVar("a", "foo")
-                .setVar("b", "ok_{c}")
-                .setVar("c", req -> "world");
+                .var("host", server.getHostName())
+                .var("port", server.getPort())
+                .var("a", "foo")
+                .var("b", "ok_{c}")
+                .var("c", req -> "world");
 
-        assertThat(request.getQuery("a")).isNotNull().isEqualTo("foo");
-        assertThat(request.getQuery("b")).isNotNull().isEqualTo("ok_world");
+        assertThat(request.var("host")).isNotNull().isEqualTo(server.getHostName());
+        assertThat(request.var("port")).isNotNull().isEqualTo(server.getPort());
+        assertThat(request.query("a")).isNotNull().isEqualTo("foo");
+        assertThat(request.query("b")).isNotNull().isEqualTo("ok_world");
 
-        request.setVar("a", "bar");
-        assertThat(request.getQuery("a")).isNotNull().isEqualTo("bar");
+        request.var("a", "bar");
+        assertThat(request.query("a")).isNotNull().isEqualTo("bar");
 
         request.execute();
 
@@ -1269,17 +1268,17 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
 
         Forest.config()
-                .setVar("host", "xxxxx")
-                .setVar("port", 80);
+                .var("host", "xxxxx")
+                .var("port", 80);
 
         Forest.get("http://{host}:{port}/test")
-                .addQuery("a", "{a}")
-                .addQuery("b", "{b}")
-                .setVar("host", server.getHostName())
-                .setVar("port", server.getPort())
-                .setVar("a", "foo")
-                .setVar("b", "ok_{c}")
-                .setVar("c", req -> "world")
+                .query("a", "{a}")
+                .query("b", "{b}")
+                .var("host", server.getHostName())
+                .var("port", server.getPort())
+                .var("a", "foo")
+                .var("b", "ok_{c}")
+                .var("c", req -> "world")
                 .execute();
 
         mockRequest(server)
@@ -1297,22 +1296,22 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
 
         Forest.config()
-                .setVar("host", "xxxxx")
-                .setVar("port", 80);
+                .var("host", "xxxxx")
+                .var("port", 80);
 
         ForestRequest request = Forest.get("http://{host}:{port}/test")
-                .addQuery("a", "{a}")
-                .addQuery("b", "{b}")
-                .setVar("host", server.getHostName())
-                .setVar("port", server.getPort())
-                .setVar("a", "foo")
-                .setVar("b", "ok_{c}")
-                .setVar("c", req -> "world");
+                .query("a", "{a}")
+                .query("b", "{b}")
+                .var("host", server.getHostName())
+                .var("port", server.getPort())
+                .var("a", "foo")
+                .var("b", "ok_{c}")
+                .var("c", req -> "world");
 
         assertThat(request.getQuery("a")).isNotNull().isEqualTo("foo");
         assertThat(request.getQuery("b")).isNotNull().isEqualTo("ok_world");
 
-        request.setVar("a", "bar");
+        request.var("a", "bar");
         assertThat(request.getQuery("a")).isNotNull().isEqualTo("bar");
 
         request.execute();
@@ -1334,7 +1333,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .host(server.getHostName())
                 .port(server.getPort())
                 .path("/test/scheme")
-                .setVar("testScheme", "https");
+                .var("testScheme", "https");
 
         assertThat(request.getScheme()).isEqualTo("https");
         assertThat(request.url().isSSL()).isTrue();
@@ -1348,7 +1347,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .host(server.getHostName())
                 .port(server.getPort())
                 .path("/test/scheme")
-                .setVar("testScheme", "https");
+                .var("testScheme", "https");
 
         assertThat(request.getScheme()).isEqualTo("https");
         assertThat(request.url().isSSL()).isTrue();
@@ -1365,7 +1364,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .host("{testHost}")
                 .port(server.getPort())
                 .path("/test/host")
-                .setVar("testHost", server.getHostName())
+                .var("testHost", server.getHostName())
                 .execute();
 
         mockRequest(server)
@@ -1380,8 +1379,8 @@ public class TestGenericForestClient extends BaseClientTest {
                 .host("{testHost}")
                 .port("{testPort}")
                 .path("/test/port")
-                .setVar("testHost", server.getHostName())
-                .setVar("testPort", server.getPort())
+                .var("testHost", server.getHostName())
+                .var("testPort", server.getPort())
                 .execute();
 
         mockRequest(server)
@@ -1397,7 +1396,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .host("{testHost}")
                 .port(req -> server.getPort())
                 .path("/test/port")
-                .setVar("testHost", server.getHostName())
+                .var("testHost", server.getHostName())
                 .execute();
 
         mockRequest(server)
@@ -1412,7 +1411,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .host("{testHost}")
                 .port(constant(server.getPort()))
                 .path("/test/port")
-                .setVar("testHost", server.getHostName())
+                .var("testHost", server.getHostName())
                 .execute();
 
         mockRequest(server)
@@ -1429,7 +1428,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .host("{testHost}")
                 .port(String.valueOf(server.getPort()))
                 .path("/test/port")
-                .setVar("testHost", server.getHostName())
+                .var("testHost", server.getHostName())
                 .execute();
 
         mockRequest(server)
@@ -1445,8 +1444,8 @@ public class TestGenericForestClient extends BaseClientTest {
                 .host("{testHost}")
                 .port(server.getPort())
                 .path("/{testPath}")
-                .setVar("testHost", server.getHostName())
-                .setVar("testPath", "test/host")
+                .var("testHost", server.getHostName())
+                .var("testPath", "test/host")
                 .execute();
 
         mockRequest(server)
@@ -1461,8 +1460,8 @@ public class TestGenericForestClient extends BaseClientTest {
                 .host("{testHost}")
                 .port(server.getPort())
                 .path(constant("/{testPath}"))
-                .setVar("testHost", server.getHostName())
-                .setVar("testPath", "test/host")
+                .var("testHost", server.getHostName())
+                .var("testPath", "test/host")
                 .execute();
 
         mockRequest(server)
@@ -1475,8 +1474,9 @@ public class TestGenericForestClient extends BaseClientTest {
     public void testRequest_json_template() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.config()
-                .setVariable("testVar", "{\"a\": \"foo\", \"b\": \"bar\"}")
-                .setVariable("testVar2", "{testVar}");
+                .var("testVar", "{\"a\": \"foo\", \"b\": \"bar\"}")
+                .var("testVar2", "{testVar}");
+
         Forest.post("/test")
                 .host(server.getHostName())
                 .port(server.getPort())
@@ -1505,7 +1505,7 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_template_in_url_error2() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
-        Forest.config().setVariable("testVar", MapUtil.of("a", null));
+        Forest.config().var("testVar", MapUtil.of("a", null));
         assertThatThrownBy(() -> {
             Forest.get("/test/{testVar.foo ??}")
                     .host(server.getHostName())
@@ -1520,8 +1520,8 @@ public class TestGenericForestClient extends BaseClientTest {
     public void testRequest_template_in_url_error3() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.config()
-                .setVariable("testVar", null)
-                .setVariable("map", MapUtil.empty());
+                .var("testVar", null)
+                .var("map", MapUtil.empty());
 
         assertThatThrownBy(() -> {
             Forest.get("/test/{testVar ?? `it_is_{map?.foo.bar.aaa.bbb}`}")
@@ -1538,9 +1538,9 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.config()
                 .removeVariable("foo")
-                .setVariable("testVar3", "aaa{foo}")
-                .setVariable("testVar2", "ok: {testVar3}")
-                .setVariable("testVar1", "{testVar2}");
+                .var("testVar3", "aaa{foo}")
+                .var("testVar2", "ok: {testVar3}")
+                .var("testVar1", "{testVar2}");
 
         assertThatThrownBy(() -> {
             Forest.get("/test/{testVar1}")
@@ -2101,9 +2101,9 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.get("/")
                 .port(server.getPort())
-                .addQuery("a", "1")
-                .addQuery("b", "2")
-                .addQuery("c", req -> "3")
+                .query("a", "1")
+                .query("b", "2")
+                .query("c", req -> "3")
                 .execute();
         mockRequest(server)
                 .assertPathEquals("/")
@@ -2116,10 +2116,10 @@ public class TestGenericForestClient extends BaseClientTest {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.get("/")
                 .port(server.getPort())
-                .addQuery("a", 1)
-                .addQuery("b", 2)
-                .addQuery("c", req -> 3)
-                .addQuery("token", req -> Base64.encode(req.getQueryString()))
+                .query("a", 1)
+                .query("b", 2)
+                .query("c", req -> 3)
+                .query("token", req -> Base64.encode(req.getQueryString()))
                 .execute();
         mockRequest(server)
                 .assertPathEquals("/")
@@ -2207,9 +2207,9 @@ public class TestGenericForestClient extends BaseClientTest {
                 .addHeader("Content-Type", "{contentType}")
                 .addHeader("name", "{name}")
                 .addBody("{\"id\":\"1972664191\", \"name\":\"XieYu20011008\"}")
-                .setVar("name", "Forest.backend = {backend}")
-                .setVar("backend", req -> Forest.config().getBackend().getName())
-                .setVar("contentType", "application/json;charset=UTF-8")
+                .var("name", "Forest.backend = {backend}")
+                .var("backend", req -> Forest.config().getBackend().getName())
+                .var("contentType", "application/json;charset=UTF-8")
                 .execute();
         mockRequest(server)
                 .assertHeaderEquals("name", "Forest.backend = " + Forest.config().getBackend().getName())
@@ -2226,15 +2226,15 @@ public class TestGenericForestClient extends BaseClientTest {
                 .addHeader("name", "{nameOfHeader}")
                 .addBody("id", "1972664191")
                 .addBody("name", "XieYu20011008")
-                .setVar("nameOfHeader", "Forest.backend = {backend}")
-                .setVar("backend", req -> Forest.config().getBackend().getName())
-                .setVar("contentType", "application/json;charset=UTF-8");
+                .var("nameOfHeader", "Forest.backend = {backend}")
+                .var("backend", req -> Forest.config().getBackend().getName())
+                .var("contentType", "application/json;charset=UTF-8");
 
         assertThat(request.getHeaderValue("Content-Type")).isNotNull().isEqualTo("application/json;charset=UTF-8");
         assertThat(request.getHeaderValue("name")).isNotNull().isEqualTo("Forest.backend = " + Forest.config().getBackend().getName());
 
-        request.setVar("contentType", ContentType.APPLICATION_X_WWW_FORM_URLENCODED);
-        request.setVar("nameOfHeader", "foo");
+        request.var("contentType", ContentType.APPLICATION_X_WWW_FORM_URLENCODED);
+        request.var("nameOfHeader", "foo");
 
         request.execute();
 

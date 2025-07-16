@@ -1701,6 +1701,17 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
     }
 
     /**
+     * 根据名称获取请求的Query参数值
+     *
+     * @param name Query参数名称
+     * @return Query参数值
+     * @since 1.8.0
+     */
+    public Object query(String name) {
+        return query.get(name);
+    }
+
+    /**
      * 动态获取请求的URL Query参数字符串
      *
      * @return Query参数字符串
@@ -1722,6 +1733,17 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
     }
 
 
+    /**
+     * 添加请求中的Query参数
+     *
+     * @param name Query参数名
+     * @param value Query参数值
+     * @return {@link ForestRequest}对象实例
+     * @since 1.8.0
+     */
+    public ForestRequest<T> query(String name, Object value) {
+        return addQuery(name, value);
+    }
 
     /**
      * 添加请求中的Query参数
@@ -1740,7 +1762,20 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      *
      * @param name Query参数名
      * @param lazyValue 延迟求值的Query参数值
-     * @return
+     * @return {@link ForestRequest}对象实例
+     * @since 1.8.0
+     */
+    public ForestRequest<T> query(String name, Lazy lazyValue) {
+        return addQuery(name, lazyValue);
+    }
+
+
+    /**
+     * 添加请求中延迟求值的Query参数
+     *
+     * @param name Query参数名
+     * @param lazyValue 延迟求值的Query参数值
+     * @return {@link ForestRequest}对象实例
      */
     public ForestRequest<T> addQuery(String name, Lazy lazyValue) {
         this.query.addQuery(name, lazyValue);
@@ -1759,6 +1794,18 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
     public ForestRequest<T> addQuery(String name, Object value, boolean isUrlEncode, String charset) {
         this.query.addQuery(name, value, isUrlEncode, charset);
         return this;
+    }
+
+    /**
+     * 添加请求中的集合类Query参数 (重复 Query 参数名)
+     *
+     * @param name Query参数名
+     * @param collection 集合对象
+     * @return {@link ForestRequest}对象实例
+     * @since 1.8.0
+     */
+    public ForestRequest<T> query(String name, Collection collection) {
+        return addQuery(name, collection);
     }
 
 
@@ -1818,6 +1865,21 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
         this.query.addQuery(name, array, isUrlEncode, charset);
         return this;
     }
+
+    /**
+     * 添加 Map 类 Query 参数
+     * <p>将 Map 的 key 作为 Query 参数名
+     * <p>Map 的 value 作为 Query 参数值
+     * <p>批量插入到请求的 Query 参数中
+     *
+     * @param queryMap {@link Map}对象
+     * @return {@link ForestRequest}对象实例
+     * @since 1.8.0
+     */
+    public ForestRequest<T> query(Map queryMap) {
+        return addQuery(queryMap);
+    }
+
 
 
     /**
