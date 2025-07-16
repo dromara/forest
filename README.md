@@ -2,7 +2,7 @@
 
 <p align="center">
 <a href="https://forest.dtflyx.com/">
-    <img width="300" src="site/media/logo3.png" alt="logo">
+    <img width="300" src="site/media/forest_main_logo.svg" alt="logo">
 </a>
 </p>
 
