@@ -1191,7 +1191,7 @@ public class ForestMethod<T> implements VariableScope {
                         request.addQuery(ForestQueryParameter.createSimpleQueryParameter(request.getQuery(), obj)
                                 .setDefaultValue(parameter.getDefaultValue()));
                     } else if (MappingParameter.isBody(target)) {
-                        request.addBody(new StringRequestBody(obj.toString())
+                        request.addBody(new StringRequestBody(ForestVariable.create(obj.toString()))
                                 .setDefaultValue(parameter.getDefaultValue()));
                     }
                 } else if (obj instanceof Map) {

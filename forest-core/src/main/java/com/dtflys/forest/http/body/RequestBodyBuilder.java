@@ -1,6 +1,7 @@
 package com.dtflys.forest.http.body;
 
 import com.dtflys.forest.http.ForestRequestBody;
+import com.dtflys.forest.reflection.ForestVariable;
 
 import java.io.File;
 import java.io.InputStream;
@@ -59,7 +60,7 @@ public abstract class RequestBodyBuilder<T, B extends ForestRequestBody, D exten
             if (data == null) {
                 return null;
             }
-            final StringRequestBody body = new StringRequestBody(data);
+            final StringRequestBody body = new StringRequestBody(ForestVariable.create(data));
             body.setDefaultValue(defaultValue);
             return body;
         }

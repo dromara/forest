@@ -1467,8 +1467,7 @@ public class TestGenericForestClient extends BaseClientTest {
         mockRequest(server)
                 .assertPathEquals(URLEncoder.PATH.encode("/{testPath}", "UTF-8"));
     }
-
-
+    
 
     @Test
     public void testRequest_json_template() {
@@ -1487,6 +1486,54 @@ public class TestGenericForestClient extends BaseClientTest {
         mockRequest(server)
                 .assertPathEquals("/test")
                 .assertBodyEquals("{\"a\": \"foo\", \"b\": \"bar\"}");
+    }
+
+
+    @Test
+    public void testRequest_template_in_string_body() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config()
+                .var("testVar", "{\"a\": \"{a}\", \"b\": \"{b}\"}")
+                .var("testVar2", "{testVar}");
+
+        Forest.post("/test")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .contentTypeJson()
+                .addBody("{testVar2}")
+                .var("a", "foo")
+                .var("b", "bar")
+                .execute();
+
+        mockRequest(server)
+                .assertPathEquals("/test")
+                .assertBodyEquals("{\"a\": \"foo\", \"b\": \"bar\"}");
+    }
+
+    @Test
+    public void testRequest_template_in_string_body_changed() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.config()
+                .var("testVar", "{\"a\": \"{a}\", \"b\": \"{b}\"}")
+                .var("testVar2", "{testVar}");
+
+        ForestRequest request = Forest.post("/test")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .contentTypeJson()
+                .addBody("{testVar2}")
+                .var("a", "foo")
+                .var("b", "bar");
+        
+        assertThat(request.body().encodeToString()).isEqualTo("{\"a\": \"foo\", \"b\": \"bar\"}");
+        request.var("a", "111");
+        request.var("b", req -> "222");
+        
+        request.execute();
+
+        mockRequest(server)
+                .assertPathEquals("/test")
+                .assertBodyEquals("{\"a\": \"111\", \"b\": \"222\"}");
     }
 
 

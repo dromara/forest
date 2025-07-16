@@ -6,6 +6,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingTemplate;
+import com.dtflys.forest.reflection.ForestVariable;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 import com.dtflys.forest.utils.StringUtils;
@@ -23,38 +24,40 @@ import java.util.List;
  */
 public class StringRequestBody extends ForestRequestBody implements SupportFormUrlEncoded {
 
-    private String content;
+    private ForestVariable content;
 
-    public StringRequestBody(String content) {
+    public StringRequestBody(ForestVariable content) {
         this.content = content;
     }
 
-    public StringRequestBody(String content, ForestRequest request) {
-        this(content, request, request.arguments());
-    }
-
-
-    public StringRequestBody(String content, VariableScope scope, Object[] arguments) {
-        this.content = TemplateUtils.readString(content, scope, arguments, false);
-    }
 
 
     public String getContent() {
-        return content;
+        if (content == null) {
+            return null;
+        }
+        return ForestVariable.getStringValue(content, body.getRequest());
     }
 
     public void setContent(String content) {
-        this.content = content;
+        this.content = ForestVariable.create(content);
     }
 
     @Override
     public String toString() {
-        return content;
+        if (content == null) {
+            return "null";
+        }
+        return String.valueOf(content.getOriginalValue());
     }
 
     @Override
     public byte[] getByteArray() {
-        return content.getBytes();
+        final String contentStr = getContent();
+        if (contentStr == null) {
+            return new byte[0];
+        }
+        return contentStr.getBytes();
     }
 
     @Override
@@ -65,8 +68,9 @@ public class StringRequestBody extends ForestRequestBody implements SupportFormU
     @Override
     public List<RequestNameValue> getNameValueList(ForestRequest request) {
         final List<RequestNameValue> nameValueList = new LinkedList<>();
-        if (StringUtils.isNotBlank(content)) {
-            final String[] items = content.split("&");
+        final String contentStr = getContent();
+        if (StringUtils.isNotBlank(contentStr)) {
+            final String[] items = contentStr.split("&");
             for (String item : items) {
                 final String[] pair = item.split("=", 2);
                 if (pair.length == 1) {

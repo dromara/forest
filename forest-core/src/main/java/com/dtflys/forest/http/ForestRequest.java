@@ -3313,7 +3313,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> addBody(String stringBody) {
-        return addBody(new StringRequestBody(stringBody, this));
+        return addBody(new StringRequestBody(ForestVariable.create(stringBody)));
     }
 
     /**
