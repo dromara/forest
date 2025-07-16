@@ -724,7 +724,7 @@ public class ForestURL implements MappingListener {
             builder.append(URLUtils.userInfoEncode(userInfo, "UTF-8")).append("@");
         }
         if (StringUtils.isNotEmpty(host)) {
-            builder.append(URLUtils.userInfoEncode(host, "UTF-8"));
+            builder.append(host);
         }
         if (URLUtils.isNotNonePort(port) &&
                 ((port != 80 && port != 443 && port > -1) ||
