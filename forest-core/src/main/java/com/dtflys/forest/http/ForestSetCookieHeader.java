@@ -10,8 +10,6 @@ public class ForestSetCookieHeader extends SimpleHeader {
 
     private ForestCookie cookie;
 
-    private HasURL hasURL;
-
     public static ForestSetCookieHeader fromCookie(HasURL hasURL, ForestCookie cookie) {
         return new ForestSetCookieHeader("Cookie", hasURL, cookie);
     }
@@ -21,9 +19,8 @@ public class ForestSetCookieHeader extends SimpleHeader {
     }
 
     public ForestSetCookieHeader(String headerName, HasURL hasURL, ForestCookie cookie) {
-        super(headerName, null);
+        super(hasURL, headerName, null);
         this.cookie = cookie;
-        this.hasURL = hasURL;
     }
 
     @Override

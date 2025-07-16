@@ -24,6 +24,8 @@
 
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.reflection.ForestVariable;
+
 import java.util.*;
 
 /**
@@ -138,7 +140,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
                 addHeader(cookieHeader);
             }
         } else {
-            final ForestHeader newHeader = new SimpleHeader(key, value);
+            final ForestHeader newHeader = new SimpleHeader(hasURL, key, ForestVariable.create(value));
             addHeader(newHeader);
         }
         return value;
@@ -385,7 +387,7 @@ public class ForestHeaderMap implements Map<String, String>, Cloneable {
                 addHeader(cookieHeader);
             }
         } else {
-            addHeader(new SimpleHeader(name, value));
+            addHeader(new SimpleHeader(hasURL, name, ForestVariable.create(value)));
         }
     }
 

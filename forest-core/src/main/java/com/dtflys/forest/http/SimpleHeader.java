@@ -1,18 +1,24 @@
 package com.dtflys.forest.http;
 
+import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.reflection.ForestVariable;
+
 public class SimpleHeader implements ForestHeader<SimpleHeader, String> {
+
+    protected final HasURL hasURL;
 
     /**
      * 请求头名称
      */
-    private final String name;
+    protected final String name;
 
     /**
      * 请求头的值
      */
-    private String value;
+    private ForestVariable value;
 
-    public SimpleHeader(String name, String value) {
+    public SimpleHeader(HasURL hasURL, String name, ForestVariable value) {
+        this.hasURL = hasURL;
         this.name = name;
         this.value = value;
     }
@@ -25,17 +31,23 @@ public class SimpleHeader implements ForestHeader<SimpleHeader, String> {
 
     @Override
     public String getValue() {
-        return value;
+        if (!(hasURL instanceof ForestRequest)) {
+            throw new ForestRuntimeException(
+                    "the request of header[name=" + name + "] dose not exist");
+        }
+        final ForestRequest request = (ForestRequest) hasURL;
+        final Object result = ForestVariable.getValue(value, request);
+        return result == null ? null : result.toString();
     }
 
     @Override
     public SimpleHeader setValue(String value) {
-        this.value = value;
+        this.value = ForestVariable.create(value);
         return this;
     }
 
     @Override
     public SimpleHeader clone(ForestHeaderMap headerMap) {
-        return new SimpleHeader(name, value);
+        return new SimpleHeader(headerMap.hasURL, name, value);
     }
 }

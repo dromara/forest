@@ -22,11 +22,9 @@ public class ForestCookieHeader extends SimpleHeader {
 
     private final Map<String, Map<String, ForestCookie>> cookies = new LinkedHashMap<>();
 
-    private final HasURL hasURL;
 
     public ForestCookieHeader(HasURL hasURL) {
-        super("Cookie", null);
-        this.hasURL = hasURL;
+        super(hasURL, "Cookie", null);
     }
 
     /**

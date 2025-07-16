@@ -2206,6 +2206,53 @@ public class TestGenericForestClient extends BaseClientTest {
     }
 
     @Test
+    public void testRequest_template_in_header() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        Forest.post("http://localhost:{}/test", server.getPort())
+                .contentTypeJson()
+                .addHeader("Content-Type", "{contentType}")
+                .addHeader("name", "{name}")
+                .addBody("{\"id\":\"1972664191\", \"name\":\"XieYu20011008\"}")
+                .setVar("name", "Forest.backend = {backend}")
+                .setVar("backend", req -> Forest.config().getBackend().getName())
+                .setVar("contentType", "application/json;charset=UTF-8")
+                .execute();
+        mockRequest(server)
+                .assertHeaderEquals("name", "Forest.backend = " + Forest.config().getBackend().getName())
+                .assertBodyEquals("{\"id\":\"1972664191\", \"name\":\"XieYu20011008\"}")
+                .assertHeaderEquals("Content-Type", "application/json;charset=UTF-8");
+    }
+
+    @Test
+    public void testRequest_template_in_header_changed() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+        ForestRequest request = Forest.post("http://localhost:{}/test", server.getPort())
+                .contentTypeJson()
+                .addHeader("Content-Type", "{contentType}")
+                .addHeader("name", "{nameOfHeader}")
+                .addBody("id", "1972664191")
+                .addBody("name", "XieYu20011008")
+                .setVar("nameOfHeader", "Forest.backend = {backend}")
+                .setVar("backend", req -> Forest.config().getBackend().getName())
+                .setVar("contentType", "application/json;charset=UTF-8");
+
+        assertThat(request.getHeaderValue("Content-Type")).isNotNull().isEqualTo("application/json;charset=UTF-8");
+        assertThat(request.getHeaderValue("name")).isNotNull().isEqualTo("Forest.backend = " + Forest.config().getBackend().getName());
+
+        request.setVar("contentType", ContentType.APPLICATION_X_WWW_FORM_URLENCODED);
+        request.setVar("nameOfHeader", "foo");
+
+        request.execute();
+
+        mockRequest(server)
+                .assertHeaderEquals("name", "foo")
+                .assertBodyEquals("id=1972664191&name=XieYu20011008")
+                .assertHeaderEquals("Content-Type", "application/x-www-form-urlencoded");
+    }
+
+
+
+    @Test
     public void testRequest_lazy_header() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.post("http://localhost:{}/test", server.getPort())
