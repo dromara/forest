@@ -2,7 +2,7 @@
 
 <p align="center">
 <a href="https://forest.kim/">
-    <img width="300" src="site/media/forest_main_logo.svg" alt="logo">
+    <img width="500" src="site/media/forest_main_logo.svg" alt="logo">
 </a>
 </p>
 
