@@ -1,14 +1,14 @@
 package com.dtflys.forest.extensions;
 
 import com.dtflys.forest.annotation.MethodLifeCycle;
+import com.dtflys.forest.annotation.NotNull;
 import com.dtflys.forest.annotation.RequestAttributes;
 import com.dtflys.forest.handler.AutoOAuth2DefinitionHandler;
 import com.dtflys.forest.handler.OAuth2DefinitionHandler;
-import com.dtflys.forest.http.ForestRequest;
+import com.dtflys.forest.interceptor.ForestInterceptor;
 import com.dtflys.forest.lifecycles.authorization.OAuth2LifeCycle;
 import com.dtflys.forest.utils.StringUtils;
 
-import javax.annotation.Nonnull;
 import java.lang.annotation.*;
 
 /**
@@ -28,7 +28,7 @@ public @interface OAuth2 {
      *
      * @return 请求Token的URL地址
      */
-    @Nonnull
+    @NotNull
     String tokenUri();
 
     /**
@@ -48,7 +48,7 @@ public @interface OAuth2 {
      *
      * @return 客户端ID
      */
-    @Nonnull
+    @NotNull
     String clientId();
 
     /**
@@ -56,7 +56,7 @@ public @interface OAuth2 {
      *
      * @return 客户端秘钥
      */
-    @Nonnull
+    @NotNull
     String clientSecret();
 
     /**
@@ -64,7 +64,6 @@ public @interface OAuth2 {
      *
      * @return grantType 类型
      */
-    @Nonnull
     GrantType grantType() default GrantType.CLIENT_CREDENTIALS;
 
     /**
@@ -139,7 +138,6 @@ public @interface OAuth2 {
      *
      * @return Token 信息位置
      */
-    @Nonnull
     TokenAt tokenAt() default TokenAt.HEADER;
 
     /**
@@ -161,11 +159,27 @@ public @interface OAuth2 {
     String tokenPrefix() default "";
 
     /**
+     * 客户端身份认证模式：clientId/clientSecret 参数的传输模式。
+     * <p>BASIC_HEADER：把 clientId/clientSecret 以 Base64 编码，然后通过 Header <code>Authorization: Basic xxx</code> 传输</p>
+     * <p>BODY：把 clientId/clientSecret 放在 Body 中传输</p>
+     *
+     * @return clientId/clientSecret 认证传输模式
+     */
+    ClientAuthentication clientAuthentication() default ClientAuthentication.BODY;
+
+    /**
      * 处理认证响应实体
      *
      * @return OAuth2Token
      */
     Class<? extends OAuth2DefinitionHandler> OAuth2TokenHandler() default AutoOAuth2DefinitionHandler.class;
+
+    /**
+     * 获取 Token 时的请求拦截器，可以在发起获取 Token 请求时用来处理一些事情，例如：修改请求头、Query、Body等
+     *
+     * @return ForestInterceptor
+     */
+    Class<? extends ForestInterceptor> tokenInterceptor() default ForestInterceptor.class;
 
     /**
      * 验证类型
@@ -276,6 +290,20 @@ public @interface OAuth2 {
             }
             return prefix + " " + token;
         }
+    }
+
+    /**
+     * 客户端认证模式：clientId/clientSecret 参数的传输模式。
+     */
+    enum ClientAuthentication {
+        /**
+         * 把 clientId/clientSecret 以 Base64 编码，然后通过 Header <code>Authorization: Basic xxx</code> 传输
+         */
+        BASIC_HEADER,
+        /**
+         * 把 clientId/clientSecret 放在 Body 中传输
+         */
+        BODY
     }
 
 }
