@@ -579,13 +579,7 @@ public class ForestCookie implements Cloneable, Serializable {
             final String[] nameValue = pair.split("=", 2);
             final String name = nameValue[0].trim();
             final String value = nameValue.length > 1 ? nameValue[1].trim() : "";
-            if (i == 0) {
-                if (StringUtils.isEmpty(value) && !pair.contains("=")) {
-                    return null;
-                }
-                cookieName = name;
-                cookieValue = URLDecoder.decode(value, StandardCharsets.UTF_8);
-            } else if ("Max-Age".equalsIgnoreCase(name)) {
+            if ("Max-Age".equalsIgnoreCase(name)) {
                 final long maxAgeValue = parseMaxAge(value);
                 maxAge = maxAgeValue < 0 ? null : Duration.ofSeconds(maxAgeValue);
                 persistent = true;
@@ -614,7 +608,17 @@ public class ForestCookie implements Cloneable, Serializable {
                 httpOnly = true;
             } else if ("HostOnly".equalsIgnoreCase(name)) {
                 hostOnly = true;
+            } else if (i == 0) {
+                if (StringUtils.isEmpty(value) && !pair.contains("=")) {
+                    return null;
+                }
+                cookieName = name;
+                cookieValue = URLDecoder.decode(value, StandardCharsets.UTF_8);
             }
+        }
+
+        if (StringUtils.isEmpty(cookieName)) {
+            return null;
         }
 
         if (url != null) {
