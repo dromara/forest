@@ -5884,8 +5884,19 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
         return this;
     }
 
+    /**
+     * 重置请求中的所有变量
+     *
+     * @return {@link ForestRequest}对象实例
+     * @since 1.8.0
+     */
+    public ForestRequest<T> resetVariables() {
+        this.url.clear();
+        return this;
+    }
+
     @Override
     protected void onVariableChanged() {
-        this.url.clear();
+        resetVariables();
     }
 }
