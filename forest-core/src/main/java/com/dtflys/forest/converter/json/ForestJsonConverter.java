@@ -122,10 +122,10 @@ public interface ForestJsonConverter extends ForestConverter<String>, ForestEnco
                     if (options != null && options.shouldExclude(name)) {
                         continue;
                     }
-                    Object value = nameValueItem.getOriginalValue();
-                    if (Lazy.isEvaluatingLazyValue(value, request)) {
+                    if (!nameValueItem.canGetValue()) {
                         continue;
                     }
+                    Object value = nameValueItem.getOriginalValue();
                     if (options != null) {
                         value = options.getValue(value, request);
                         if (options.shouldIgnore(value)) {

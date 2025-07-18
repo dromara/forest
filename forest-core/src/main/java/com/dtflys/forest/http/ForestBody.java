@@ -142,7 +142,11 @@ public class ForestBody implements List<ForestRequestBody> {
                 final NameValueRequestBody nameValueRequestBody = (NameValueRequestBody) body;
                 final String name = nameValueRequestBody.getName();
                 if (!map.containsKey(name)) {
-                    map.put(name, nameValueRequestBody.getValue());
+                    if (!nameValueRequestBody.canGetValue()) {
+                        map.put(name, nameValueRequestBody.getOriginalValue());
+                    } else {
+                        map.put(name, nameValueRequestBody.getValue());
+                    }
                 }
             } else if (body instanceof ObjectRequestBody) {
                 final ObjectRequestBody objectRequestBody = (ObjectRequestBody) body;

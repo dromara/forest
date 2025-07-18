@@ -23,6 +23,8 @@ import com.dtflys.forest.interceptor.Interceptor;
 import com.dtflys.forest.interceptor.InterceptorChain;
 import com.dtflys.forest.interceptor.ResponseResult;
 import com.dtflys.forest.logging.LogConfiguration;
+import com.dtflys.forest.mapping.MappingTemplate;
+import com.dtflys.forest.reflection.ForestVariable;
 import com.dtflys.forest.retryer.ForestRetryer;
 import com.dtflys.forest.retryer.NoneRetryer;
 import com.dtflys.forest.sse.SSELinesMode;
@@ -74,6 +76,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.LockSupport;
 
 import static com.dtflys.forest.Forest.constant;
+import static com.dtflys.forest.Forest.template;
 import static com.dtflys.forest.mock.MockServerRequest.mockRequest;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
@@ -1343,7 +1346,7 @@ public class TestGenericForestClient extends BaseClientTest {
     @Test
     public void testRequest_lambda_in_scheme() {
         ForestRequest request = Forest.get("/")
-                .scheme(req -> "{testScheme}")
+                .scheme(req -> template("{testScheme}"))
                 .host(server.getHostName())
                 .port(server.getPort())
                 .path("/test/scheme")
@@ -1353,7 +1356,6 @@ public class TestGenericForestClient extends BaseClientTest {
         assertThat(request.url().isSSL()).isTrue();
         assertThat(request.urlString()).isEqualTo("https://" + server.getHostName() + ":" + server.getPort() + "/test/scheme");
     }
-
 
 
     @Test
@@ -1372,6 +1374,26 @@ public class TestGenericForestClient extends BaseClientTest {
     }
 
     @Test
+    public void testRequest_template_in_host_changed() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        ForestRequest request = Forest.get("/")
+                .host("{testHost}")
+                .port(server.getPort())
+                .path("/test/host")
+                .var("testHost", "xxx.com");
+
+        assertThat(request.host()).isEqualTo("xxx.com");
+        request.var("testHost", server.getHostName());
+
+        request.execute();
+
+        mockRequest(server)
+                .assertPathEquals("/test/host");
+    }
+
+
+    @Test
     public void testRequest_template_in_port() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
 
@@ -1382,6 +1404,28 @@ public class TestGenericForestClient extends BaseClientTest {
                 .var("testHost", server.getHostName())
                 .var("testPort", server.getPort())
                 .execute();
+
+        mockRequest(server)
+                .assertPathEquals("/test/port");
+    }
+
+
+    @Test
+    public void testRequest_template_in_port_changed() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        ForestRequest request = Forest.get("/")
+                .host("{testHost}")
+                .port("{testPort}")
+                .path("/test/port")
+                .var("testHost", server.getHostName())
+                .var("testPort", 111);
+
+        assertThat(request.port()).isEqualTo(111);
+        request.var("testPort", "222");
+        assertThat(request.port()).isEqualTo(222);
+        request.var("testPort", server.getPort());
+        request.execute();
 
         mockRequest(server)
                 .assertPathEquals("/test/port");
@@ -1443,13 +1487,13 @@ public class TestGenericForestClient extends BaseClientTest {
         Forest.get("/")
                 .host("{testHost}")
                 .port(server.getPort())
-                .path("/{testPath}")
+                .path("{testPath}")
                 .var("testHost", server.getHostName())
-                .var("testPath", "test/host")
+                .var("testPath", "test/path")
                 .execute();
 
         mockRequest(server)
-                .assertPathEquals("/test/host");
+                .assertPathEquals("/test/path");
     }
 
     @Test
@@ -1535,6 +1579,26 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertPathEquals("/test")
                 .assertBodyEquals("{\"a\": \"111\", \"b\": \"222\"}");
     }
+
+    @Test
+    public void testRequest_template_in_nameValue_body() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        Forest.post("/test")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .contentTypeJson()
+                .addBody("a", "{a}")
+                .addBody("b", "{b}")
+                .var("a", "foo")
+                .var("b", "bar")
+                .execute();
+
+        mockRequest(server)
+                .assertPathEquals("/test")
+                .assertBodyEquals("{\"a\":\"foo\",\"b\":\"bar\"}");
+    }
+
 
 
     @Test

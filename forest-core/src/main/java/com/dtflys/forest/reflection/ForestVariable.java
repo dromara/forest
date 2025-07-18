@@ -39,6 +39,16 @@ public interface ForestVariable {
         return variable.getValue(req, clazz);
     }
 
+    static boolean canGetValue(ForestVariable variable, ForestRequest req) {
+        if (variable == null || req == null) {
+            return false;
+        }
+        if (variable instanceof Lazy) {
+            return !Lazy.isEvaluatingLazyValue(variable, req);
+        }
+        return true;
+    }
+
     static Object getValue(ForestVariable variable, ForestRequest req) {
         if (variable == null) {
             return null;
@@ -73,9 +83,9 @@ public interface ForestVariable {
             if (value instanceof ForestVariable) {
                 return getValue((ForestVariable) value, req, clazz);
             }
-            if (value instanceof CharSequence) {
-                value = MappingTemplate.create(req, String.valueOf(value));
-            }
+//            if (value instanceof CharSequence) {
+//                value = MappingTemplate.create(req, String.valueOf(value));
+//            }
             if (value instanceof MappingTemplate) {
                 final MappingTemplate template = (MappingTemplate) value;
                 if (template.isConstant() || req == null) {

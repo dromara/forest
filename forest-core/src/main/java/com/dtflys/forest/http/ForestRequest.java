@@ -67,6 +67,7 @@ import com.dtflys.forest.logging.ForestLogHandler;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.RequestLogMessage;
 import com.dtflys.forest.mapping.AbstractVariableScope;
+import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingURLTemplate;
 import com.dtflys.forest.multipart.ByteArrayMultipart;
 import com.dtflys.forest.multipart.FileMultipart;
@@ -3317,6 +3318,17 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
     }
 
     /**
+     * 添加字符串模板Body数据
+     *
+     * @param templateBody 请求体字符串模板内容
+     * @return
+     */
+    public ForestRequest<T> addBody(MappingTemplate templateBody) {
+        return addBody(new StringRequestBody(ForestVariable.create(templateBody)));
+    }
+
+
+    /**
      * 添加字节数组Body数据
      *
      * @param byteArrayBody 请求体字节数组内容
@@ -3364,7 +3376,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> addBody(String name, Object value) {
-        return addBody(new NameValueRequestBody(name, value));
+        return addBody(new NameValueRequestBody(name, ForestVariable.create(value)));
     }
 
     /**
@@ -3416,7 +3428,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> addBody(String name, String contentType, Object value) {
-        return addBody(new NameValueRequestBody(name, contentType, value));
+        return addBody(new NameValueRequestBody(name, contentType, ForestVariable.create(value)));
     }
 
     /**
@@ -3427,7 +3439,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      */
     @Deprecated
     public ForestRequest<T> addBody(RequestNameValue nameValue) {
-        return addBody(new NameValueRequestBody(nameValue.getName(), nameValue.getValue()));
+        return addBody(new NameValueRequestBody(nameValue.getName(), ForestVariable.create(nameValue.getValue())));
     }
 
     /**

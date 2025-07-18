@@ -5,6 +5,7 @@ import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestRequestBody;
 import com.dtflys.forest.http.Lazy;
 import com.dtflys.forest.mapping.MappingParameter;
+import com.dtflys.forest.reflection.ForestVariable;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.RequestNameValue;
 
@@ -28,19 +29,19 @@ public class NameValueRequestBody extends ForestRequestBody implements SupportFo
     /**
      * 键值对值
      */
-    private Object value;
+    private ForestVariable value;
 
     /**
      * 请求体项Content-Type
      */
     private String contentType;
 
-    public NameValueRequestBody(String name, Object value) {
+    public NameValueRequestBody(String name, ForestVariable value) {
         this.name = name;
         this.value = value;
     }
 
-    public NameValueRequestBody(String name, String contentType, Object value) {
+    public NameValueRequestBody(String name, String contentType, ForestVariable value) {
         this.name = name;
         this.contentType = contentType;
         this.value = value;
@@ -59,12 +60,22 @@ public class NameValueRequestBody extends ForestRequestBody implements SupportFo
         return value;
     }
 
+    public boolean canGetValue() {
+        if (body == null) {
+            return false;
+        }
+        return ForestVariable.canGetValue(value, body.getRequest());
+    }
+
     public Object getValue() {
         if (value == null) {
             return getDefaultValue();
         }
-        if (body != null && value instanceof Lazy) {
-            final ForestRequest request = body.getRequest();
+        if (body == null) {
+            return value;
+        }
+        final ForestRequest request = body.getRequest();
+        if (value instanceof Lazy) {
             if (Lazy.isEvaluatingLazyValue(value, request)) {
                 return null;
             }
@@ -74,11 +85,11 @@ public class NameValueRequestBody extends ForestRequestBody implements SupportFo
             }
             return evaluatedValue;
         }
-        return value;
+        return ForestVariable.getValue(value, request);
     }
 
     public void setValue(Object value) {
-        this.value = value;
+        this.value = ForestVariable.create(value);
     }
 
     public String getContentType() {
@@ -121,7 +132,9 @@ public class NameValueRequestBody extends ForestRequestBody implements SupportFo
     @Override
     public List<RequestNameValue> getNameValueList(ForestRequest request) {
         final List<RequestNameValue> nameValueList = new ArrayList<>(1);
-        nameValueList.add(new RequestNameValue(name, value, MappingParameter.TARGET_BODY));
+        if (ForestVariable.canGetValue(value, request)) {
+            nameValueList.add(new RequestNameValue(name, ForestVariable.getValue(value, request), MappingParameter.TARGET_BODY));
+        }
         return nameValueList;
     }
 

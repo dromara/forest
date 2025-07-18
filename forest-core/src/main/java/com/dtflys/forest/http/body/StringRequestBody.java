@@ -31,7 +31,6 @@ public class StringRequestBody extends ForestRequestBody implements SupportFormU
     }
 
 
-
     public String getContent() {
         if (content == null) {
             return null;

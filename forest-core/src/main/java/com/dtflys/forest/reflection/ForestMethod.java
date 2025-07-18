@@ -1418,8 +1418,7 @@ public class ForestMethod<T> implements VariableScope {
             }
         } else {
             for (final MappingTemplate dataTemplate : dataTemplateArray) {
-                final String data = dataTemplate.render(request, args);
-                request.addBody(data);
+                request.addBody(dataTemplate);
             }
         }
         request.addNameValue(nameValueList);

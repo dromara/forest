@@ -2,6 +2,7 @@ package com.dtflys.forest.converter;
 
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.Lazy;
+import com.dtflys.forest.reflection.ForestVariable;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -92,19 +93,22 @@ public class ConvertOptions {
 
     public Object getValue(Object value, ForestRequest request) {
         if (value != null) {
-            if (request != null && value instanceof Lazy) {
-                Object result = null;
-                if (evaluateLazyValue) {
-                    result = ((Lazy<?>) value).eval(request);
-                } else {
-                    return value;
+            if (request != null) {
+                if (value instanceof Lazy) {
+                    Object result = null;
+                    if (evaluateLazyValue) {
+                        result = ((Lazy<?>) value).eval(request);
+                    } else {
+                        return value;
+                    }
+                    if (result != null) {
+                        return result;
+                    }
+                } else if (value instanceof ForestVariable) {
+                    return ForestVariable.getValue((ForestVariable) value, request);
                 }
-                if (result != null) {
-                    return result;
-                }
-            } else {
-                return value;
             }
+            return value;
         }
         return NullValuePolicy.WRITE_NULL_STRING.equals(nullValuePolicy) ? "null" :
                 NullValuePolicy.WRITE_EMPTY_STRING.equals(nullValuePolicy) ? "" : null;

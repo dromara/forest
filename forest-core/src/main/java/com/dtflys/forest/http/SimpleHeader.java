@@ -1,7 +1,10 @@
 package com.dtflys.forest.http;
 
 import com.dtflys.forest.exceptions.ForestRuntimeException;
+import com.dtflys.forest.mapping.MappingTemplate;
+import com.dtflys.forest.reflection.ConstantVariable;
 import com.dtflys.forest.reflection.ForestVariable;
+import com.dtflys.forest.reflection.TemplateVariable;
 
 public class SimpleHeader implements ForestHeader<SimpleHeader, String> {
 
@@ -31,13 +34,29 @@ public class SimpleHeader implements ForestHeader<SimpleHeader, String> {
 
     @Override
     public String getValue() {
-        if (!(hasURL instanceof ForestRequest)) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof ConstantVariable) {
+            final Object val =  ((ConstantVariable) value).getValue();
+            if (val == null) {
+                return null;
+            }
+            return String.valueOf(val);
+        }
+        if (value instanceof TemplateVariable) {
+            MappingTemplate template = ((TemplateVariable) value).getTemplate();
+            if (template.isConstant()) {
+                return template.getPureTextConstant();
+            }
+        }
+        if (!(hasURL instanceof ForestRequest || hasURL instanceof ForestResponse)) {
             throw new ForestRuntimeException(
                     "the request of header[name=" + name + "] dose not exist");
         }
-        final ForestRequest request = (ForestRequest) hasURL;
-        final Object result = ForestVariable.getValue(value, request);
-        return result == null ? null : result.toString();
+        final ForestRequest request = hasURL instanceof ForestRequest ?
+                (ForestRequest) hasURL : null;
+        return ForestVariable.getStringValue(value, request);
     }
 
     @Override
