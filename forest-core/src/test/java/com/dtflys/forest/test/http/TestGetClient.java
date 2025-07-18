@@ -169,25 +169,38 @@ public class TestGetClient extends BaseClientTest {
     }
 
 
-//    @Test
+    @Test
     public void performance() {
+        Forest.config()
+                .var("host", server.getHostName())
+                .var("port", server.getPort())
+                .var("username", "foo")
+                .var("accept", "text/plain");
+
         int count = 10000;
         for (int i = 0; i < count; i++) {
             server.enqueue(new MockResponse().setBody(EXPECTED));
         }
+
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         for (int i = 0; i < count; i++) {
             log.info("i = " + i);
-            Forest.post("http://{}:{}/abc", server.getHostName(), server.getPort())
+            Forest.post("http://{host}:{port}/abc")
                     .logEnabled(false)
-                    .addHeader("Accept", "text/plain")
-                    .addBody("username=foo")
+                    .addHeader("Accept", "{accept}")
+                    .addBody("username={username}")
                     .executeAsUnclosedResponse()
                     .close();
         }
         stopWatch.stop();
         System.out.println("总耗时: " + stopWatch.getTotalTimeMillis() + "ms");
+
+        Forest.config()
+                .removeVariable("host")
+                .removeVariable("port")
+                .removeVariable("username")
+                .removeVariable("accept");
     }
 
 
@@ -225,7 +238,7 @@ public class TestGetClient extends BaseClientTest {
     }
 
 
-//    @Test
+    @Test
     public void performance_hutool() {
         int count = 10000;
         for (int i = 0; i < count; i++) {
