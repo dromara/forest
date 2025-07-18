@@ -1599,6 +1599,29 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertBodyEquals("{\"a\":\"foo\",\"b\":\"bar\"}");
     }
 
+    @Test
+    public void testRequest_template_in_nameValue_body_changed() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        ForestRequest request = Forest.post("/test")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .contentTypeJson()
+                .addBody("a", "{a}")
+                .addBody("b", "{b}")
+                .var("a", "foo")
+                .var("b", "bar");
+
+        assertThat(request.body().encodeToString()).isEqualTo("{\"a\":\"foo\",\"b\":\"bar\"}");
+        request.var("a", "111");
+        request.var("b", req -> "222");
+
+        request.execute();
+
+        mockRequest(server)
+                .assertPathEquals("/test")
+                .assertBodyEquals("{\"a\":\"111\",\"b\":\"222\"}");
+    }
 
 
     @Test
