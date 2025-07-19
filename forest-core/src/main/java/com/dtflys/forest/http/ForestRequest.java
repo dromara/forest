@@ -255,17 +255,18 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
     /**
      * 请求超时时间
      */
-    private int timeout = 3000;
+    private ForestVariable timeout;
 
     /**
      * 请求连接超时时间
      */
-    private Integer connectTimeout = -1;
+    private ForestVariable connectTimeout;
 
+    
     /**
      * 请求读取超时时间
      */
-    private Integer readTimeout = -1;
+    private ForestVariable readTimeout;
 
     /**
      * 是否开启解压GZIP响应内容
@@ -2767,7 +2768,8 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      */
     @Deprecated
     public int getTimeout() {
-        return timeout;
+        final Integer timeoutInt = ForestVariable.getIntegerValue(timeout, this);
+        return timeoutInt != null ? timeoutInt : -1;
     }
 
     /**
@@ -2778,7 +2780,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      */
     @Deprecated
     public ForestRequest<T> setTimeout(int timeout) {
-        this.timeout = timeout;
+        this.timeout = ForestVariable.create(timeout);
         return this;
     }
 
@@ -2788,7 +2790,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @return 连接超时时间
      */
     public Integer getConnectTimeout() {
-        return connectTimeout;
+        return ForestVariable.getIntegerValue(connectTimeout, this);
     }
 
     /**
@@ -2798,7 +2800,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @return {@link ForestRequest}对象实例
      */
     public ForestRequest<T> setConnectTimeout(int connectTimeout) {
-        this.connectTimeout = connectTimeout;
+        this.connectTimeout = ForestVariable.create(connectTimeout);
         return this;
     }
 
@@ -2824,7 +2826,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @since 1.5.6
      */
     public ForestRequest<T> connectTimeout(int connectTimeout) {
-        this.connectTimeout = connectTimeout;
+        this.connectTimeout = ForestVariable.create(connectTimeout);
         return this;
     }
 
@@ -2837,7 +2839,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @since 1.5.6
      */
     public ForestRequest<T> connectTimeout(int connectTimeout, TimeUnit timeUnit) {
-        this.connectTimeout = TimeUtils.toMillis(connectTimeout, timeUnit);
+        this.connectTimeout = ForestVariable.create(TimeUtils.toMillis(connectTimeout, timeUnit));
         return this;
     }
 
@@ -2849,7 +2851,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @since 1.5.6
      */
     public ForestRequest<T> connectTimeout(Duration connectTimeout) {
-        this.connectTimeout = TimeUtils.toMillis("connect timeout", connectTimeout);
+        this.connectTimeout = ForestVariable.create(TimeUtils.toMillis("connect timeout", connectTimeout));
         return this;
     }
 
@@ -2861,7 +2863,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @since 1.5.6
      */
     public Integer getReadTimeout() {
-        return readTimeout;
+        return ForestVariable.getIntegerValue(readTimeout, this);
     }
 
     /**
@@ -2872,7 +2874,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @since 1.5.6
      */
     public ForestRequest<T> setReadTimeout(int readTimeout) {
-        this.readTimeout = readTimeout;
+        this.readTimeout = ForestVariable.create(readTimeout);
         return this;
     }
 
@@ -2910,7 +2912,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @since 1.5.6
      */
     public ForestRequest<T> readTimeout(int readTimeout, TimeUnit timeUnit) {
-        this.readTimeout = TimeUtils.toMillis(readTimeout, timeUnit);
+        this.readTimeout = ForestVariable.create(TimeUtils.toMillis(readTimeout, timeUnit));
         return this;
     }
 
@@ -2922,7 +2924,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @since 1.5.6
      */
     public ForestRequest<T> readTimeout(Duration readTimeout) {
-        this.readTimeout = TimeUtils.toMillis("read timeout", readTimeout);
+        this.readTimeout = ForestVariable.create(TimeUtils.toMillis("read timeout", readTimeout));
         return this;
     }
 
