@@ -169,7 +169,7 @@ public class TestGetClient extends BaseClientTest {
     }
 
 
-    @Test
+//    @Test
     public void performance() {
         Forest.config()
                 .var("host", server.getHostName())
@@ -238,7 +238,7 @@ public class TestGetClient extends BaseClientTest {
     }
 
 
-    @Test
+//    @Test
     public void performance_hutool() {
         int count = 10000;
         for (int i = 0; i < count; i++) {

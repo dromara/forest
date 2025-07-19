@@ -1625,6 +1625,59 @@ public class TestGenericForestClient extends BaseClientTest {
 
 
     @Test
+    public void testRequest_template_in_charset() {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        Forest.post("/test")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .contentTypeJson()
+                .charset("{charset}")
+                .addBody("a", "{a}")
+                .addBody("b", "{b}")
+                .var("a", "中文")
+                .var("b", "你好")
+                .var("charset", "GBK")
+                .execute();
+
+        try {
+            mockRequest(server)
+                    .assertPathEquals("/test")
+                    .assertBodyEquals(new String("{\"a\":\"中文\",\"b\":\"你好\"}".getBytes("GBK")));
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void testRequest_template_in_charset_changed() throws UnsupportedEncodingException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        ForestRequest request = Forest.post("/test")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .contentTypeJson()
+                .charset("{charset}")
+                .addBody("a", "{a}")
+                .addBody("b", "{b}")
+                .var("a", "中文")
+                .var("b", "你好")
+                .var("charset", "UTF-8");
+
+        assertThat(request.var("charset")).isEqualTo("UTF-8");
+        assertThat(request.charset()).isEqualTo("UTF-8");
+        assertThat(request.body().encodeToString()).isEqualTo(new String("{\"a\":\"中文\",\"b\":\"你好\"}".getBytes("UTF-8")));
+        request.var("charset", "GBK");
+        request.execute();
+
+        mockRequest(server)
+                .assertPathEquals("/test")
+                .assertBodyEquals(new String("{\"a\":\"中文\",\"b\":\"你好\"}".getBytes("GBK")));
+    }
+
+
+
+    @Test
     public void testRequest_template_in_url_error1() {
         server.enqueue(new MockResponse().setBody(EXPECTED));
         Forest.config().setVariable("testVar", MapUtil.of("a", null));

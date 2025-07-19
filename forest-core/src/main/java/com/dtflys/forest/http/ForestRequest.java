@@ -214,7 +214,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
     /**
      * 请求参数编码字符集
      */
-    private String charset;
+    private ForestVariable charset;
 
     /**
      * 请求响应返回数据的字符编码
@@ -2344,7 +2344,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @return 请求参数编码字符集
      */
     public String getCharset() {
-        return this.charset;
+        return ForestVariable.getStringValue(this.charset, this);
     }
 
     /**
@@ -2354,13 +2354,14 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      * @return {@link ForestRequest}类实例
      */
     public ForestRequest<T> setCharset(String charset) {
-        this.charset = charset;
+        this.charset = ForestVariable.create(charset);
         return this;
     }
 
     public Charset mineCharset() {
-        if (StringUtils.isNotEmpty(this.charset)) {
-            return Charset.forName(this.charset);
+        final String charsetStr = ForestVariable.getStringValue(this.charset, this);
+        if (StringUtils.isNotEmpty(charsetStr)) {
+            return Charset.forName(charsetStr);
         }
         if (StringUtils.isNotEmpty(this.configuration.getCharset())) {
             return Charset.forName(this.configuration.getCharset());
