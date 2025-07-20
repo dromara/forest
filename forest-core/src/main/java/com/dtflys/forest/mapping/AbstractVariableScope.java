@@ -10,7 +10,7 @@ import com.dtflys.forest.reflection.TemplateVariable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class AbstractVariableScope<SELF extends VariableScope> implements VariableScope {
+public abstract class AbstractVariableScope<SELF extends AbstractVariableScope<SELF>> implements VariableScope<SELF> {
 
     protected final VariableScope parent;
 
@@ -31,8 +31,8 @@ public abstract class AbstractVariableScope<SELF extends VariableScope> implemen
     }
 
     @Override
-    public Object getVariableValue(String name) {
-        return getVariableValue(name, (ForestRequest) null);
+    public <R> R getVariableValue(String name) {
+        return (R) getVariableValue(name, (ForestRequest) null);
     }
 
     @Override
@@ -120,13 +120,6 @@ public abstract class AbstractVariableScope<SELF extends VariableScope> implemen
         return getVariableValue(name);
     }
 
-    public <R> R varAs(String name, ForestRequest request, Class<R> clazz) {
-        return getVariableValue(name, request, clazz);
-    }
-
-    public <R> R varAs(String name, Class<R> clazz) {
-        return getVariableValue(name, clazz);
-    }
 
 
     protected void onVariableChanged() {

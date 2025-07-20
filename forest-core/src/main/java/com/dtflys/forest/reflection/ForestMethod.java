@@ -43,6 +43,7 @@ import com.dtflys.forest.lifecycles.method.RequestLifeCycle;
 import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.LogConfiguration;
 import com.dtflys.forest.logging.ForestLogHandler;
+import com.dtflys.forest.mapping.AbstractVariableScope;
 import com.dtflys.forest.mapping.MappingParameter;
 import com.dtflys.forest.mapping.MappingTemplate;
 import com.dtflys.forest.mapping.MappingURLTemplate;
@@ -74,7 +75,7 @@ import static com.dtflys.forest.mapping.MappingParameter.*;
  * @author gongjun
  * @since 2016-05-03
  */
-public class ForestMethod<T> implements VariableScope {
+public class ForestMethod<T> extends AbstractVariableScope<ForestMethod<T>> implements VariableScope<ForestMethod<T>> {
     // 默认根地址
     private static final ForestAddress DEFAULT_ADDRESS = new ForestAddress("http", "localhost", -1);
     private final InterfaceProxyHandler interfaceProxyHandler;
@@ -125,7 +126,7 @@ public class ForestMethod<T> implements VariableScope {
     private MappingParameter[] forestParameters;
     private final List<MappingParameter> namedParameters = new ArrayList<>();
     private final List<ForestMultipartFactory> multipartFactories = new ArrayList<>();
-    private final Map<String, ForestVariable> variables = new ConcurrentHashMap<>();
+//    private final Map<String, ForestVariable> variables = new ConcurrentHashMap<>();
     private final Map<String, MappingTemplate> templateCache = new ConcurrentHashMap<>();
     private MappingParameter onSuccessParameter = null;
     private MappingParameter onErrorParameter = null;
@@ -155,6 +156,7 @@ public class ForestMethod<T> implements VariableScope {
     private Map<String, Object> extensionParameters = new ConcurrentHashMap<>();
 
     public ForestMethod(InterfaceProxyHandler interfaceProxyHandler, ForestConfiguration configuration, Method method) {
+        super(configuration);
         this.interfaceProxyHandler = interfaceProxyHandler;
         this.configuration = configuration;
         this.method = method;
@@ -187,10 +189,12 @@ public class ForestMethod<T> implements VariableScope {
         return configuration.isVariableDefined(name);
     }
 
+/*
     @Override
     public Object getVariableValue(String name) {
         return getVariableValue(name, this);
     }
+*/
 
     @Deprecated
     public Object getVariableValue(String name, ForestMethod method) {
@@ -205,11 +209,14 @@ public class ForestMethod<T> implements VariableScope {
     }
 
 
+/*
     @Override
     public <R> R getVariableValue(String name, Class<R> clazz) {
         return getVariableValue(name, null, clazz);
     }
+*/
 
+/*
     @Override
     public Object getVariableValue(String name, ForestRequest request) {
         ForestVariable variable = getVariable(name);
@@ -218,7 +225,9 @@ public class ForestMethod<T> implements VariableScope {
         }
         return variable.getValue(request);
     }
+*/
 
+/*
     @Override
     public <R> R getVariableValue(String name, ForestRequest request, Class<R> clazz) {
         ForestVariable variable = getVariable(name);
@@ -227,6 +236,7 @@ public class ForestMethod<T> implements VariableScope {
         }
         return variable.getValue(request, clazz);
     }
+*/
 
     public MappingParameter[] getForestParameters() {
         return forestParameters;
@@ -302,6 +312,7 @@ public class ForestMethod<T> implements VariableScope {
     }
 
 
+/*
     @Override
     public ForestVariable getVariable(String name) {
         ForestVariable variable = variables.get(name);
@@ -310,6 +321,7 @@ public class ForestMethod<T> implements VariableScope {
         }
         return variable;
     }
+*/
 
     public MappingParameter[] getParameters() {
         return forestParameters;

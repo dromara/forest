@@ -99,7 +99,7 @@ import java.util.stream.Collectors;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-03-24
  */
-public class ForestConfiguration extends AbstractVariableScope<ForestConfiguration> implements VariableScope, Serializable {
+public class ForestConfiguration extends AbstractVariableScope<ForestConfiguration> implements VariableScope<ForestConfiguration>, Serializable {
 
     private static ForestLogger log = ForestLogger.getLogger(ForestConfiguration.class);
 

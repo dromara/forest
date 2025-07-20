@@ -123,7 +123,7 @@ import static com.dtflys.forest.mapping.MappingParameter.TARGET_QUERY;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-03-24
  */
-public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> implements RequestVariableScope, HasURL, HasHeaders {
+public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> implements RequestVariableScope<ForestRequest<T>>, HasURL, HasHeaders {
 
     private final static Object[] EMPTY_RENDER_ARGS = new Object[0];
 
@@ -2769,7 +2769,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
     @Deprecated
     public int getTimeout() {
         final Integer timeoutInt = ForestVariable.getIntegerValue(timeout, this);
-        return timeoutInt != null ? timeoutInt : -1;
+        return timeoutInt != null ? timeoutInt : configuration.getTimeout();
     }
 
     /**
@@ -2815,6 +2815,20 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
     public Integer connectTimeout() {
         return getConnectTimeout();
     }
+
+    /**
+     * 设置连接超时时间，时间单位为毫秒
+     *
+     * @param connectTimeout 连接超时时间字符串变量
+     * @see ForestRequest#setConnectTimeout(int)
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.6
+     */
+    public ForestRequest<T> connectTimeout(String connectTimeout) {
+        this.connectTimeout = ForestVariable.create(connectTimeout);
+        return this;
+    }
+
 
     /**
      * 设置连接超时时间，时间单位为毫秒
@@ -2866,6 +2880,7 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
         return ForestVariable.getIntegerValue(readTimeout, this);
     }
 
+
     /**
      * 设置读取超时时间，时间单位为毫秒
      *
@@ -2889,6 +2904,19 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
     public Integer readTimeout() {
         return getReadTimeout();
     }
+
+    /**
+     * 设置读取超时时间，时间单位为毫秒
+     *
+     * @param readTimeout 读取超时时间字符串变量
+     * @return {@link ForestRequest}类实例
+     * @since 1.5.6
+     */
+    public ForestRequest<T> readTimeout(String readTimeout) {
+        this.readTimeout = ForestVariable.create(readTimeout);
+        return this;
+    }
+
 
     /**
      * 设置读取超时时间，时间单位为毫秒
@@ -5466,8 +5494,8 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
     }
 
     @Override
-    public Object getVariableValue(String name) {
-        return getVariableValue(name, this);
+    public <R> R getVariableValue(String name) {
+        return (R) getVariableValue(name, this);
     }
 
     @Override
@@ -5902,4 +5930,5 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
     protected void onVariableChanged() {
         resetVariables();
     }
+
 }

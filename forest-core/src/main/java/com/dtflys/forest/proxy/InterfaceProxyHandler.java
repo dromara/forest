@@ -32,7 +32,7 @@ import java.util.Map;
  * @author gongjun[dt_flys@hotmail.com]
  * @since 2016-05-04
  */
-public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScope {
+public class InterfaceProxyHandler<T> implements InvocationHandler {
 
     private interface NonParamsInvocation {
         Object invoke(InterfaceProxyHandler<?> handler, Object proxy) throws Throwable;
@@ -249,42 +249,47 @@ public class InterfaceProxyHandler<T> implements InvocationHandler, VariableScop
         return baseMetaRequest;
     }
 
+/*
     @Override
     public boolean isVariableDefined(String name) {
         return configuration.isVariableDefined(name);
     }
+*/
 
+/*
     @Override
     public Object getVariableValue(String name) {
         return configuration.getVariableValue(name);
     }
+*/
 
+/*
     @Override
     public <R> R getVariableValue(String name, Class<R> clazz) {
         return configuration.getVariableValue(name, clazz);
     }
+*/
 
+/*
     @Override
     public Object getVariableValue(String name, ForestRequest request) {
         return configuration.getVariableValue(name, request);
     }
+*/
 
+/*
     @Override
     public <R> R getVariableValue(String name, ForestRequest request, Class<R> clazz) {
         return configuration.getVariableValue(name, clazz);
     }
+*/
 
 
-    public List<Annotation> getBaseAnnotations() {
-        return baseAnnotations;
-    }
+//    @Override
+//    public ForestVariable getVariable(String name) {
+//        return configuration.getVariable(name);
+//    }
 
-    @Override
-    public ForestVariable getVariable(String name) {
-        return configuration.getVariable(name);
-    }
-
-    @Override
     public ForestConfiguration getConfiguration() {
         return configuration;
     }

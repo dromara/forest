@@ -13,6 +13,6 @@ public class MyHTTPProxySource2 implements HTTPProxySource {
 
     @Override
     public ForestProxy getProxy(ForestRequest request) {
-        return new ForestProxy("localhost", request.variableValue("port", Integer.class));
+        return new ForestProxy("localhost", (Integer) request.varAs("port", Integer.class));
     }
 }

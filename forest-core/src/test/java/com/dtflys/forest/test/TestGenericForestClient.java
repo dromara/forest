@@ -1176,6 +1176,7 @@ public class TestGenericForestClient extends BaseClientTest {
                 .var("baseUrl", "http://{host}:{port}/base");
 
         assertThat(request.url().getFullPath()).isEqualTo("/base/test/var/foo/ok/world");
+        assertThat(request.varAsString("host")).isEqualTo(server.getHostName());
         request.var("baseUrl", "http://{host}:{port}/base2");
 
         request.execute();
@@ -1675,6 +1676,26 @@ public class TestGenericForestClient extends BaseClientTest {
                 .assertBodyEquals(new String("{\"a\":\"中文\",\"b\":\"你好\"}".getBytes("GBK")));
     }
 
+    @Test
+    public void testRequest_template_in_timeout_changed() throws UnsupportedEncodingException {
+        server.enqueue(new MockResponse().setBody(EXPECTED));
+
+        ForestRequest request = Forest.get("/test")
+                .host(server.getHostName())
+                .port(server.getPort())
+                .connectTimeout("{connTimeout}")
+                .readTimeout("{readTimeout}")
+                .var("connTimeout", 12345)
+                .var("readTimeout", "45678");
+
+        assertThat(request.connectTimeout()).isEqualTo(12345);
+        assertThat(request.readTimeout()).isEqualTo(45678);
+
+        request.var("connTimeout", "1000")
+                .var("readTimeout", "1000");
+        
+        
+    }
 
 
     @Test

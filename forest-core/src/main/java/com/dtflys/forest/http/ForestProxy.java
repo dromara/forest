@@ -90,7 +90,7 @@ public class ForestProxy implements HasURL, HasHeaders {
         }
     }
 
-    public ForestProxy(String ip, int port) {
+    public ForestProxy(String ip, Integer port) {
         this(ForestProxyType.HTTP, ip, port);
     }
 
