@@ -440,27 +440,11 @@ public class MappingTemplate {
                     }
                     return expr;
                 case '\'':
-                    nextChar();
-                    expr = parseString(ch, false);
-                    match('\'');
-                    break;
                 case '\"':
-                    nextChar();
-                    expr = parseString(ch, false);
-                    match('\"');
-                    break;
                 case '`':
-                    nextChar();
-                    expr = parseString(ch, true);
-                    match('`');
-                    break;
                 case '$':
-                    nextChar();
-                    expr = parseIndex();
-                    break;
                 case '#':
-                    nextChar();
-                    expr = parsePropertyId();
+                    expr = parseFactor();
                     break;
                 case '?':
                     nextChar();
@@ -513,6 +497,37 @@ public class MappingTemplate {
                     expr = parseLiteral();
                     break;
             }
+        }
+        return expr;
+    }
+    
+    private MappingExpr parseFactor() {
+        MappingExpr expr = null;
+        char ch = watch(1);
+        switch (ch) {
+            case '\'':
+                nextChar();
+                expr = parseString(ch, false);
+                match('\'');
+                break;
+            case '\"':
+                nextChar();
+                expr = parseString(ch, false);
+                match('\"');
+                break;
+            case '`':
+                nextChar();
+                expr = parseString(ch, true);
+                match('`');
+                break;
+            case '$':
+                nextChar();
+                expr = parseIndex();
+                break;
+            case '#':
+                nextChar();
+                expr = parsePropertyId();
+                break;
         }
         return expr;
     }
