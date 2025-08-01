@@ -1,0 +1,10 @@
+
+forest:
+  enabled: true
+  max-connections: 300
+  max-route-connections: 300
+  connect-timeout: 3000
+  max-retry-count: 0
+  variables:
+    myAccept: application/json
+    foo: Bar

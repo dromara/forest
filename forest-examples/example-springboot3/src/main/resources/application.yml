@@ -11,6 +11,5 @@ forest:
     giteeUrl: https://gitee.com
     idServiceUrl: https://www.12306.cn
 
-
 myfile:
   uploadPath: D:\TestUpload\target
