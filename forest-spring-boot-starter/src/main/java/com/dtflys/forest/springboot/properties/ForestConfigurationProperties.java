@@ -161,7 +161,7 @@ public class ForestConfigurationProperties {
     /**
      * Enable print log of response headers
      */
-    private boolean logResponseHeaders = true;
+    private boolean logResponseHeaders = false;
 
     /**
      * Enable print log of response content

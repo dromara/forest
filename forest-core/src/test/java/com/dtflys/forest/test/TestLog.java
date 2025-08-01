@@ -7,6 +7,7 @@ import com.dtflys.forest.http.ForestResponse;
 import com.dtflys.forest.logging.DefaultLogHandler;
 import com.dtflys.forest.logging.ForestLogger;
 import com.dtflys.forest.logging.ForestSlf4jLogger;
+import com.dtflys.forest.test.http.BaseClientTest;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.Before;
@@ -18,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
-public class TestLog {
+public class TestLog extends BaseClientTest {
 
     public final static String EXPECTED = "{\"status\":\"1\", \"data\":\"2\"}";
 
@@ -26,6 +27,10 @@ public class TestLog {
     public final MockWebServer server = new MockWebServer();
 
     private ForestConfiguration configuration;
+
+    public TestLog(String backend, String jsonConverter) {
+        super(backend, jsonConverter, Forest.config());
+    }
 
     @Before
     public void setUp() {

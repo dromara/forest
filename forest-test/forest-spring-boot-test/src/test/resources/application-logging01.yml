@@ -1,0 +1,13 @@
+
+forest:
+  max-connections: 5000
+  max-route-connections: 5500
+  timeout: 50
+  connect-timeout: 4000
+  charset: GBK
+  log-enabled: true
+  log-request: true
+  log-response-headers: true
+
+
+
