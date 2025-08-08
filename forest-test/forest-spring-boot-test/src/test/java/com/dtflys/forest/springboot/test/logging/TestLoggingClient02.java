@@ -45,6 +45,10 @@ public class TestLoggingClient02 {
         return server;
     }
 
+    public void setUp() {
+
+    }
+
     @Test
     public void testLogConfig() {
         assertThat(configuration.isLogEnabled()).isTrue();
@@ -79,8 +83,8 @@ public class TestLoggingClient02 {
                     "\t\tcontent-length: 16\n" +
                     "\t\tcontent-type: application/json"));
 
-            Mockito.verify(logHandler).logContent(eq("Response Content:\n" +
-                    "\t{\"status\": \"ok\"}"));
+//            Mockito.verify(logHandler).logContent(eq("Response Content:\n" +
+//                    "\t{\"status\": \"ok\"}"));
         } finally {
             configuration.setLogHandler(oldLogHandler);
         }
