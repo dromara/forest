@@ -1,0 +1,7 @@
+blank_issues_enabled: true
+
+# 引导用户浏览相关文档
+contact_links:
+  -   name: Forest 官网
+      url: https://forest.kim/
+      about: 查阅官网以获得基本功能使用、介绍和常见问题解答
