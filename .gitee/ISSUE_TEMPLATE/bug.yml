@@ -7,7 +7,7 @@ body:
       attributes:
         label: 依赖环境：
         description: Forest 以及相关依赖框架的版本
-        placeholder: |
+        value: |
           Java: version
           Forest: version
           Backend: (okhttp或httpclient)/version
@@ -25,7 +25,7 @@ body:
       attributes:
         label: 如何复现：
         description: 请详细告诉我们如何复现您遇到的问题，并附上可复现的代码示例
-        placeholder: |
+        value: |
           1. ...
           2. ...
           3. ...
