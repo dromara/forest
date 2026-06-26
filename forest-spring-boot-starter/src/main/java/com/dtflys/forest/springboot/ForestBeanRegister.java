@@ -18,11 +18,11 @@ import com.dtflys.forest.springboot.properties.ForestConverterItemProperties;
 import com.dtflys.forest.springboot.properties.ForestSSLKeyStoreProperties;
 import com.dtflys.forest.utils.ForestDataType;
 import com.dtflys.forest.utils.StringUtils;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.cglib.core.ReflectUtils;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcessor {
+public class ForestBeanRegister implements ResourceLoaderAware, BeanDefinitionRegistryPostProcessor {
 
     private final ConfigurableApplicationContext applicationContext;
 
@@ -69,6 +69,16 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
     @Override
     public void setResourceLoader(ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
+    }
+
+    @Override
+    public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
+        registerForestConfiguration();
+        registerScanner();
+    }
+
+    @Override
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
     }
 
 
@@ -296,13 +306,4 @@ public class ForestBeanRegister implements ResourceLoaderAware, BeanPostProcesso
         return scanner;
     }
 
-    @Override
-    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-        return bean;
-    }
-
-    @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        return bean;
-    }
 }
