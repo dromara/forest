@@ -12,7 +12,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Role;
 
@@ -46,29 +45,25 @@ public class ForestAutoConfiguration {
 
 
     @Bean
-    @DependsOn("forestBeanProcessor")
     @ConditionalOnMissingBean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    public ForestBeanRegister forestBeanRegister(ConfigurableApplicationContext applicationContext,
-                                                 SpringForestProperties properties,
-                                                 SpringForestObjectFactory forestObjectFactory,
-                                                 SpringInterceptorFactory forestInterceptorFactory,
-                                                 ForestConfigurationProperties forestConfigurationProperties) {
-        ForestBeanRegister register = new ForestBeanRegister(
+    public static ForestBeanRegister forestBeanRegister(ConfigurableApplicationContext applicationContext,
+                                                        SpringForestProperties properties,
+                                                        SpringForestObjectFactory forestObjectFactory,
+                                                        SpringInterceptorFactory forestInterceptorFactory,
+                                                        ForestConfigurationProperties forestConfigurationProperties) {
+        return new ForestBeanRegister(
                 applicationContext,
                 forestConfigurationProperties,
                 properties,
                 forestObjectFactory,
                 forestInterceptorFactory);
-        register.registerForestConfiguration();
-        register.registerScanner();
-        return register;
     }
 
     @Bean
     @ConditionalOnMissingBean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    public ForestBeanProcessor forestBeanProcessor() {
+    public static ForestBeanProcessor forestBeanProcessor() {
         return new ForestBeanProcessor();
     }
 
