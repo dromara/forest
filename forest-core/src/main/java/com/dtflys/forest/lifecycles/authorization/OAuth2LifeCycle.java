@@ -71,7 +71,7 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Void> 
         if (StringUtils.isNotBlank(cacheId)) {
             return cacheId;
         }
-        // tokenUri/clientId/grantType/scope/username 任何一个变动都可能是不同的帐号权限
+        // tokenUri/clientId/grantType/scope/username 任何一个变动都可能是不同的账号权限
         final String tokenUri = getAttributeAsString(request, "tokenUri");
         final String clientId = getAttributeAsString(request, "clientId");
         final Object grantType = getAttribute(request, "grantType");
@@ -265,7 +265,7 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Void> 
      * @param clientId                 客户端ID
      * @param request                  请求对象
      * @param clientAuthentication     客户端认证模式：clientId/clientSecret 参数的传输模式
-     * @param fillAccount              是否填充帐号信息。该帐号信息在注解中设置
+     * @param fillAccount              是否填充账号信息。该账号信息在注解中设置
      * @return 返回请求参数
      */
     private Map<String, Object> createRequestBody(String clientId, ForestRequest request, OAuth2.ClientAuthentication clientAuthentication, boolean fillAccount) {
