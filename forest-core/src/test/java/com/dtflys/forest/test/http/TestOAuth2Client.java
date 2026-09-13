@@ -6,6 +6,7 @@ import com.dtflys.forest.test.http.client.OAuth2Client;
 import com.dtflys.forest.test.mock.OAuth2MockServer;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,12 +53,29 @@ public class TestOAuth2Client extends ForestClientTest {
 */
 
     @Test
-    public void testPassword() {
+    public void testPassword() throws Exception {
         server.enqueue(new MockResponse().setResponseCode(200).setBody(OAuth2MockServer.TOKEN_JSON));
         server.enqueue(new MockResponse().setResponseCode(200).setBody(OAuth2MockServer.EXPECTED));
         String result = oAuth2Client.testPassword();
         assertNotNull(result);
         assertEquals(OAuth2MockServer.EXPECTED, result);
+        // 默认 HEADER：Authorization 头带 Bearer 前缀
+        server.takeRequest();
+        RecordedRequest resource = server.takeRequest();
+        assertEquals("Bearer " + OAuth2MockServer.TOKEN, resource.getHeader("Authorization"));
+    }
+
+    @Test
+    public void testPasswordTokenAtHeaderNoPrefix() throws Exception {
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(OAuth2MockServer.TOKEN_JSON));
+        server.enqueue(new MockResponse().setResponseCode(200).setBody(OAuth2MockServer.EXPECTED));
+        String result = oAuth2Client.testPasswordTokenAtHeaderNoPrefix();
+        assertNotNull(result);
+        assertEquals(OAuth2MockServer.EXPECTED, result);
+        // HEADER_NO_PREFIX：Authorization 头不带 Bearer 前缀
+        server.takeRequest();
+        RecordedRequest resource = server.takeRequest();
+        assertEquals(OAuth2MockServer.TOKEN, resource.getHeader("Authorization"));
     }
 
     @Test

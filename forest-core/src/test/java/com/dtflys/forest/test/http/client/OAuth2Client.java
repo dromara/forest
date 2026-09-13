@@ -43,6 +43,22 @@ public interface OAuth2Client {
     String testPasswordTokenAtURL(String username, String password);
 
     /**
+     * 测试使用密码登录，Token 放在 Header 中且不带前缀
+     */
+    @OAuth2(
+            tokenUri = "http://localhost:${port}/auth/oauth/token",
+            clientId = "password",
+            clientSecret = "123456",
+            grantType = OAuth2.GrantType.PASSWORD,
+            scope = "any",
+            username = "root",
+            password = "123456",
+            tokenAt = OAuth2.TokenAt.HEADER_NO_PREFIX
+    )
+    @GetRequest(url = "http://localhost:${port}/auth/test/password_no_prefix")
+    String testPasswordTokenAtHeaderNoPrefix();
+
+    /**
      * 测试使用 CLIENT_CREDENTIALS 模式调用接口
      */
     @OAuth2(
