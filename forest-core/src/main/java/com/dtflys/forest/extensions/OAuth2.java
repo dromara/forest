@@ -232,6 +232,11 @@ public @interface OAuth2 {
          */
         HEADER("Authorization", "Bearer"),
         /**
+         * 请求头，不带前缀。Token 原样放入 Header（如 <code>Authorization: &lt;token&gt;</code>），
+         * 用于服务端不接受 "Bearer " 前缀的场景；仍可通过 @OAuth2.tokenPrefix 显式覆盖前缀
+         */
+        HEADER_NO_PREFIX("Authorization", ""),
+        /**
          * 请求内容
          */
         URL("access_token", "");

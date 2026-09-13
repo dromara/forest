@@ -52,7 +52,7 @@ public class OAuth2LifeCycle implements MethodAnnotationLifeCycle<OAuth2, Void> 
         final String defaultPrefix = getAttributeAsString(request, "tokenPrefix");
         final String tokenValue = tokenAt.getTokenValue(defaultPrefix, tokenCache.getAccessToken());
 
-        if (tokenAt == OAuth2.TokenAt.HEADER) {
+        if (tokenAt == OAuth2.TokenAt.HEADER || tokenAt == OAuth2.TokenAt.HEADER_NO_PREFIX) {
             request.addHeader(tokenVariable, tokenValue);
         } else {
             request.addQuery(tokenVariable, tokenValue);
