@@ -73,6 +73,7 @@ import com.dtflys.forest.multipart.FileMultipart;
 import com.dtflys.forest.multipart.ForestMultipart;
 import com.dtflys.forest.multipart.InputStreamMultipart;
 import com.dtflys.forest.pool.ForestRequestPool;
+import com.dtflys.forest.reflection.ConstantVariable;
 import com.dtflys.forest.reflection.ForestMethod;
 import com.dtflys.forest.reflection.ForestVariable;
 import com.dtflys.forest.reflection.MethodLifeCycleHandler;
@@ -3345,6 +3346,16 @@ public class ForestRequest<T> extends AbstractVariableScope<ForestRequest<T>> im
      */
     public ForestRequest<T> addBody(String stringBody) {
         return addBody(new StringRequestBody(ForestVariable.create(stringBody)));
+    }
+
+    /**
+     * 添加原始字符串Body数据，不做任何模板变量解析
+     *
+     * @param rawStringBody 请求体原始字符串内容
+     * @return {@link ForestRequest}类实例
+     */
+    public ForestRequest<T> addRawBody(String rawStringBody) {
+        return addBody(new StringRequestBody(new ConstantVariable(rawStringBody)));
     }
 
     /**
