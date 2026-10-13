@@ -4,6 +4,7 @@ import com.dtflys.forest.Forest;
 import com.dtflys.forest.http.ForestDynamicURL;
 import com.dtflys.forest.http.ForestRequest;
 import com.dtflys.forest.http.ForestURL;
+import com.dtflys.forest.utils.URLUtils;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,6 +65,16 @@ public class TestURL {
         assertThat(url.getPath()).isEqualTo("/xxx");
         assertThat(request.getQuery("a")).isEqualTo("1");
         assertThat(request.getQuery("b")).isEqualTo("2");
+    }
+
+    @Test
+    public void testQueryValueEncodesPlus() {
+        assertThat(URLUtils.queryValueEncode("name+age", "UTF-8")).isEqualTo("name%2Bage");
+
+        ForestRequest request = Forest.get("/test")
+                .addQuery("a", "name+age");
+
+        assertThat(request.getQueryString()).isEqualTo("a=name%2Bage");
     }
 
 }
